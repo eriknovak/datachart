@@ -1,0 +1,53 @@
+[build-system]
+requires = ['setuptools>=42']
+build-backend = 'setuptools.build_meta'
+
+[project]
+version = "0.0.1"
+name = "datachart"
+description = "The customizable data chart creation package"
+authors=[{ name = "Erik Novak", email = "novak.erik@gmail.com" }]
+readme = "README.md"
+license = { file = "LICENSE" }
+dynamic = ["dependencies"]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: BSD 3-Clause License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Multimedia :: Graphics",
+    "Framework :: Matplotlib",
+]
+requires-python = ">=3.9"
+
+[project.urls]
+Source = "https://github.com/eriknovak/datachart"
+Docs = "https://github.com/eriknovak/datachart"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "pytest-xdist",
+    "flake8",
+    "mypy",
+    "pandas-stubs",
+    "pre-commit",
+    "flit",
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+
+
+
