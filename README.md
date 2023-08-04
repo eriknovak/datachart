@@ -10,8 +10,6 @@ Before starting the project make sure these requirements are available:
 - [git][git]. For versioning your code.
 
 
-
-
 ## 🛠️ Setup
 
 ### Create the python environment
@@ -39,6 +37,14 @@ To install the requirements run:
 
 ```bash
 pip install -e .
+```
+
+### Running tests
+
+To run existing tests, simply run:
+
+```bash
+python -m unittest discover test
 ```
 
 
