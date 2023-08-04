@@ -1,2 +1,2 @@
 # import configuration object
-from .config import config
+from .config import config, Config
