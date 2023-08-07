@@ -422,9 +422,8 @@ def draw_hist_chart(
     x_all = [get_chart_data("x", chart) for chart in charts]
     bins = np.histogram(np.hstack(tuple(x_all)), bins=n_bins)[1]
 
-    if not chart_config["as_subplots"]:
+    def set_single_chart():
         # visualize all charts in a common subplot
-
         hist_config = [get_hist_config(chart.get("style", {})) for chart in charts]
         color = [c["color"] for c in hist_config]
 
@@ -448,7 +447,7 @@ def draw_hist_chart(
             # show the chart grid
             axes[0].grid(axis=chart_config["grid"], **get_grid_config(charts[0]))
 
-    else:
+    def set_multiple_charts():
         # visualize each chart in a separate subplot
         for chart, ax in zip(charts, axes):
             # get the chart style attributes
@@ -473,3 +472,6 @@ def draw_hist_chart(
             if chart_config["grid"]:
                 # show the chart grid
                 ax.grid(axis=chart_config["grid"], **get_grid_config(chart))
+
+    # draw the histogram chart
+    set_single_chart() if not chart_config["as_subplots"] else set_multiple_charts()
