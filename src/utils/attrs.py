@@ -56,12 +56,12 @@ def create_config_dict(
 
 
 def get_subplot_config(
-    show_separate: bool, n_charts: int, max_cols: int
+    as_subplots: bool, n_charts: int, max_cols: int
 ) -> dict[str, int]:
     """
     Calculate the configuration for subplots in a figure.
     Args:
-        show_separate (bool): Whether to show subplots separately.
+        as_subplots (bool): Whether to show subplots separately.
         n_charts (int): The number of subplots.
         max_cols (int): The maximum number of columns for the subplots.
     Returns:
@@ -72,7 +72,7 @@ def get_subplot_config(
     nrows = 1
     ncols = 1
 
-    if show_separate:
+    if as_subplots:
         # there are more subplots
         nrows = math.ceil(n_charts / max_cols)
         ncols = max_cols if n_charts >= max_cols else n_charts % max_cols
@@ -135,6 +135,65 @@ def get_line_config(chart_style: dict) -> dict:
         ("linestyle", "plot.line.style"),
         ("marker", "plot.line.marker"),
         ("drawstyle", "plot.line.drawstyle"),
+        ("zorder", "plot.line.zorder"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+# -------------------------------------
+# Bar Configuration
+# -------------------------------------
+
+
+def get_bar_config(chart_style: dict, horizontal_flag: bool = False) -> dict:
+    """Get the bar configuration
+
+    Args:
+        chart_style (dict): The chart style dictionary.
+        horizontal_flag (bool): Whether the bar is horizontal or not.
+
+    Returns:
+        dict: The bar configuration dict.
+
+    """
+    config_attrs = [
+        ("color", "plot.bar.color"),
+        ("alpha", "plot.bar.alpha"),
+        ("height" if horizontal_flag else "width", "plot.bar.width"),
+        ("hatch", "plot.bar.hatch"),
+        ("linewidth", "plot.bar.edge.width"),
+        ("edgecolor", "plot.bar.edge.color"),
+        ("ecolor", "plot.bar.error.color"),
+        ("zorder", "plot.bar.zorder"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+# -------------------------------------
+# Hist Configuration
+# -------------------------------------
+
+
+def get_hist_config(chart_style: dict) -> dict:
+    """Get the hist configuration
+
+    Args:
+        chart_style (dict): The chart style dictionary.
+
+    Returns:
+        dict: The hist configuration dict.
+
+    """
+    config_attrs = [
+        ("color", "plot.hist.color"),
+        ("alpha", "plot.hist.alpha"),
+        ("zorder", "plot.hist.zorder"),
+        ("histtype", "plot.hist.type"),
+        ("align", "plot.hist.align"),
+        ("linewidth", "plot.hist.edge.width"),
+        ("edgecolor", "plot.hist.edge.color"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -160,6 +219,7 @@ def get_area_config(chart_style: dict) -> dict:
         ("alpha", "plot.area.alpha"),
         ("color", "plot.area.color"),
         ("linewidth", "plot.area.linewidth"),
+        ("zorder", "plot.area.zorder"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -185,6 +245,7 @@ def get_grid_config(chart_style: dict) -> dict:
         ("color", "plot.grid.color"),
         ("linewidth", "plot.grid.line.width"),
         ("linestyle", "plot.grid.line.style"),
+        ("zorder", "plot.grid.zorder"),
     ]
     return create_config_dict(chart_style, config_attrs)
 
@@ -211,6 +272,7 @@ def configure_axes_spines(ax, config: Config):
         ax.spines[axis].set(
             linewidth=config["axes.spines.width"],
             visible=config[f"axes.spines.{axis}.visible"],
+            zorder=config["axes.spines.zorder"],
         )
 
 

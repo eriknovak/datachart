@@ -129,3 +129,24 @@ class LineChartAttrs(ChartCommonAttrs):
     show_confidence_interval: Union[bool, None]
     show_separate: Union[bool, None]
     show_grid: Union[bool, None]
+
+
+# ================================================
+# Line Chart Definitions
+# ================================================
+
+
+class BarDataPointAttrs(DataPointAttrs):
+    label: Union[str, None]
+
+
+class BarDataAttrs(TypedDict):
+    data: List[BarDataPointAttrs]
+    x: Union[str, None]
+    y: Union[str, None]
+    subtitle: Union[str, None]
+
+
+class BarChartAttrs(ChartCommonAttrs):
+    charts: Union[BarDataAttrs, List[BarDataAttrs]]
+    show_separate: Union[bool, None]

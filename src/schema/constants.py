@@ -3,18 +3,55 @@
 # ================================================
 
 
+class Figsize:
+    """Figsize constants"""
+
+    DEFAULT = (6.4, 4.8)
+    A4 = (8.2, 11.6)
+    A4_1_COLUMN = (8.2, 2.4)
+    A4_2_COLUMN = (8.2, 4.8)
+    A4_3_COLUMN = (8.2, 7.2)
+
+
+class FontStyle:
+    """Font Style constants"""
+
+    DEFAULT = "normal"
+    NORMAL = "normal"
+    ITALIC = "italic"
+    OBLIQUE = "oblique"
+
+
+class FontWeight:
+    """Font Weight constants"""
+
+    DEFAULT = "normal"
+    ULTRA_LIGHT = "ultralight"
+    LIGHT = "light"
+    NORMAL = "normal"
+    BOLD = "bold"
+    HEAVY = "heavy"
+    ULTRA_HEAVY = "ultrabold"
+
+
 class LineMarker:
-    POINT = "."
+    """Line Marker constants"""
+
     PIXEL = ","
-    CROSS = "x"
-    PLUS = "+"
+    POINT = "."
     CIRCLE = "o"
-    TRIANGLE = "v"
+    TRIANGLE = "^"
     SQUARE = "s"
     PENTAGON = "p"
+    HEXAGON = "h"
+    STAR = "*"
+    CROSS = "x"
+    PLUS = "+"
 
 
 class LineStyle:
+    """Line Style constants"""
+
     SOLID = "-"
     DASHED = "--"
     DASHDOT = "-."
@@ -22,25 +59,32 @@ class LineStyle:
 
 
 class LineDrawStyle:
+    """Line Draw Style constants"""
+
     DEFAULT = "default"
-    STEPS = "steps"
+    STEPS = "steps-pre"
     STEPS_PRE = "steps-pre"
     STEPS_MID = "steps-mid"
     STEPS_POST = "steps-post"
 
 
-class Figsize:
-    A4_FULL = (8, 11)
-    A4_WIDTH = (8, 1)
+class BarHatch:
+    """Bar Hatch constants"""
+
+    DEFAULT = None
+    DIAGONAL = "/"
+    VERTICAL = "|"
+    HORIZONTAL = "-"
+    CROSSED = "+"
+    CROSSED_DIAGONAL = "x"
+    DOTS = "."
+    CIRCLES = "o"
+    STARS = "*"
 
 
-class FontStyle:
-    NORMAL = "normal"
-    BOLD = "bold"
-    ITALIC = "italic"
-    BOLD_ITALIC = "bold italic"
+class HistType:
+    """Hist Type constants"""
 
-
-class FontWeight:
-    NORMAL = "normal"
-    BOLD = "bold"
+    BAR = "bar"
+    STEP = "step"
+    STEPFILLED = "stepfilled"
