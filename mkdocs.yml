@@ -1,0 +1,74 @@
+# Project information
+site_name: datachart
+site_author: Erik Novak
+site_description: >-
+  The homepage for the customizable data chart creation package.
+
+# Repository
+repo_name: eriknovak/datacharts
+repo_url: https://github.com/eriknovak/datacharts
+
+# Copyright
+copyright: ""
+
+# Configuration
+theme:
+  name: material
+  features:
+    - content.code.copy
+    - content.code.annotate
+    - content.tooltips
+    - navigation.indexes
+    - navigation.tabs
+    - navigation.top
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+  palette:
+    # Palette toggle for light
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    # Palette toggle for dark
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  logo: ""
+
+edit_uri: ""
+
+# Plugins
+plugins:
+  - search
+
+# Markdown Extensions
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:materialx.emoji.twemoji
+
+# Page tree
+nav:
+  - Home: index.md

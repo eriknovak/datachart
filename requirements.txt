@@ -1,3 +1,5 @@
 numpy
 pandas
 matplotlib
+# documentation
+mkdocs-material==8.5.11
