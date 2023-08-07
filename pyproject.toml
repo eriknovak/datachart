@@ -29,14 +29,8 @@ Docs = "https://github.com/eriknovak/datachart"
 
 [project.optional-dependencies]
 dev = [
-    "pytest",
-    "pytest-cov",
-    "pytest-xdist",
+    "black",
     "flake8",
-    "mypy",
-    "pandas-stubs",
-    "pre-commit",
-    "flit",
 ]
 
 [tool.setuptools]
