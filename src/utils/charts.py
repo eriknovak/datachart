@@ -111,6 +111,7 @@ def chart_wrapper(func):
 
         # bar chart draw configuration
         orientation = attrs.get("orientation", None)
+        log = attrs.get("log", None)
 
         # hist chart draw configuration
         n_bins = attrs.get("n_bins", None)
@@ -178,6 +179,7 @@ def chart_wrapper(func):
                 "area": show_area,
                 # bar chart configuration
                 "orientation": orientation,
+                "log": log,
                 # hist chart configuration
                 "n_bins": n_bins,
             },
@@ -228,13 +230,13 @@ def draw_line_chart(
     # assert the configuration
     assert_chart_config(
         chart_config=chart_config,
-        supported_chart_config=["as_subplots", "grid", "yerr", "area"],
+        supported_chart_config=["as_subplots", "grid", "yerr", "area", "log"],
     )
 
     # get the color cycle
     color_cycle = custom_color_cycle(chart_config["as_subplots"], n_charts=len(charts))
 
-    for idx, (chart, ax) in enumerate(zip(charts, axes)):
+    for chart, ax in zip(charts, axes):
         # get the chart style attributes
         style = chart.get("style", {})
 
@@ -278,6 +280,9 @@ def draw_line_chart(
         # draw the line chart
         ax.plot(x, y, **line_config)
 
+        if chart_config["log"]:
+            ax.set_yscale("log")
+
         if chart_config["grid"]:
             # show the chart grid
             ax.grid(axis=chart_config["grid"], **get_grid_config(style))
@@ -308,7 +313,7 @@ def draw_bar_chart(
     # assert the configuration
     assert_chart_config(
         chart_config=chart_config,
-        supported_chart_config=["as_subplots", "grid", "yerr", "orientation"],
+        supported_chart_config=["as_subplots", "grid", "yerr", "orientation", "log"],
     )
 
     # preliminary variables
@@ -351,6 +356,7 @@ def draw_bar_chart(
             x + offset,
             y,
             label=labels,
+            log=chart_config["log"],
             **error_values,
             **bar_config,
         )
@@ -435,7 +441,7 @@ def draw_hist_chart(
     # assert the configuration
     assert_chart_config(
         chart_config=chart_config,
-        supported_chart_config=["as_subplots", "grid", "n_bins", "orientation"],
+        supported_chart_config=["as_subplots", "grid", "n_bins", "orientation", "log"],
     )
 
     # get the chart settings
@@ -469,6 +475,7 @@ def draw_hist_chart(
         axes[0].hist(
             x_all,
             bins=bins,
+            log=chart_config["log"],
             orientation=orientation,
             stacked=True,
             **hist_config,
@@ -496,6 +503,7 @@ def draw_hist_chart(
                 x,
                 bins=bins,
                 density=density,
+                log=chart_config["log"],
                 cumulative=cumulative,
                 orientation=orientation,
                 stacked=not chart_config["as_subplots"],
