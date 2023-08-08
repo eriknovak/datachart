@@ -8,9 +8,9 @@ class Figsize:
 
     DEFAULT = (6.4, 4.8)
     A4 = (8.2, 11.6)
-    A4_1_COLUMN = (8.2, 2.4)
-    A4_2_COLUMN = (8.2, 4.8)
-    A4_3_COLUMN = (8.2, 7.2)
+    A4_1_ROWS = (8.2, 2.4)
+    A4_2_ROWS = (8.2, 4.8)
+    A4_3_ROWS = (8.2, 7.2)
 
 
 class FontStyle:

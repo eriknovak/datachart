@@ -1,6 +1,5 @@
 import json
 import warnings
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
@@ -8,23 +7,31 @@ import matplotlib.ticker as mticker
 from utils.colors import create_color_cycle
 from utils.stats import get_min_max_values
 from utils.attrs import (
-    configure_axes_spines,
-    configure_axis_ticks,
     get_subplot_config,
     get_attr_value,
-    get_area_config,
-    get_grid_config,
-    get_text_config,
-    get_line_config,
-    get_bar_config,
-    get_hist_config,
+    get_area_style,
+    get_grid_style,
+    get_line_style,
+    get_bar_style,
+    get_hist_style,
+    configure_axes_spines,
+    configure_axis_ticks,
+    configure_labels,
 )
-
-from typing import List
 
 from schema.constants import Figsize
 
+from typing import List
+
 from config import config
+
+# ================================================
+# Defaults
+# ================================================
+
+DEFAULT_ORIENTATION = "vertical"
+DEFAULT_NUM_BINS = 20
+
 
 # ================================================
 # Helper Functions
@@ -54,24 +61,75 @@ def get_chart_data(attr: str, chart: dict) -> np.array:
     return None
 
 
-def assert_chart_config(chart_config: dict, supported_chart_config: List[str]) -> None:
+def assert_chart_settings(settings: dict, supported_settings: List[str]) -> None:
     """Assert that the chart config is supported."""
-    for key, val in chart_config.items():
-        if key not in supported_chart_config and val:
+    for key, val in settings.items():
+        if key not in supported_settings and val:
             warnings.warn(
-                f"Warning: chart_config['{key}'] is present but is not supported. Ignoring flag..."
+                f"Warning: settings['{key}'] is present but is not supported. Ignoring flag..."
             )
 
 
-def custom_color_cycle(as_subplots: bool, n_charts: int):
-    # get the color cycle
-    color_name = (
-        config["color.general.singular"]
-        if as_subplots
-        else config["color.general.multiple"]
-    )
-    max_colors = 1 if as_subplots else n_charts
-    return create_color_cycle(color_name, max_colors)
+def custom_color_cycle(has_multi_subplots: bool, n_charts: int):
+    """Create a custom color cycle."""
+    color_type = "singular" if has_multi_subplots else "multiple"
+    color_attr = config[f"color.general.{color_type}"]
+    max_colors = 1 if has_multi_subplots else n_charts
+    return create_color_cycle(color_attr, max_colors)
+
+
+settings_attr_mapping = [
+    # common attributes
+    {"name": "title", "default": None},
+    {"name": "xlabel", "default": None},
+    {"name": "ylabel", "default": None},
+    {"name": "sharex", "default": False},
+    {"name": "sharey", "default": False},
+    {"name": "as_subplots", "default": False},
+    {"name": "figsize", "default": Figsize.DEFAULT},
+    {"name": "max_cols", "default": 4},
+    # visibility attributes
+    {"name": "show_grid", "default": None},
+    {"name": "show_yerr", "default": None},
+    {"name": "show_area", "default": None},
+    {"name": "show_density", "default": None},
+    {"name": "show_cumulative", "default": None},
+    # chart specific attributes
+    {"name": "orientation", "default": None},
+    {"name": "log_scale", "default": None},
+    {"name": "num_bins", "default": None},
+]
+
+
+def get_settings(attrs: dict) -> dict:
+    return {
+        attr["name"]: attrs.get(attr["name"], attr["default"])
+        for attr in settings_attr_mapping
+    }
+
+
+settings_chart_mapping = [
+    "show_grid",
+    "show_yerr",
+    "show_area",
+    "show_density",
+    "show_cumulative",
+    "orientation",
+    "log_scale",
+    "num_bins",
+]
+
+
+def get_chart_settings(settings: dict) -> dict:
+    return {key: val for key, val in settings.items() if key in settings_chart_mapping}
+
+
+def has_multiple_subplots(axes: dict) -> bool:
+    return not all([ax == axes[0] for ax in axes])
+
+
+def get_chart_hash(chart: dict) -> str:
+    return hash(json.dumps(chart, sort_keys=True))
 
 
 # ================================================
@@ -80,64 +138,41 @@ def custom_color_cycle(as_subplots: bool, n_charts: int):
 
 
 def chart_wrapper(func):
-    def wrapper(attrs):
+    def wrapper_func(attrs):
         # check how many data point are there
         if not isinstance(attrs["charts"], dict) and not isinstance(
             attrs["charts"], list
         ):
             raise ValueError("Parameter `attrs['charts']` is not correctly structured")
 
-        # retrieve attributes
-        charts = attrs.get("charts")
-
-        title = attrs.get("title", None)
-        xlabel = attrs.get("xlabel", None)
-        ylabel = attrs.get("ylabel", None)
-        figsize = attrs.get("figsize", Figsize.DEFAULT)
-
-        sharex = attrs.get("sharex", False)
-        sharey = attrs.get("sharey", False)
-        max_cols = attrs.get("max_cols", 4)
-        show_grid = attrs.get("show_grid", None)
-        as_subplots = attrs.get("as_subplots", False)
-
-        # common draw configuration
-        show_xaxis_labels = attrs.get("show_xaxis_labels", True)
-        show_yaxis_labels = attrs.get("show_yaxis_labels", True)
-        show_yerr = attrs.get("show_yerr", None)
-
-        # line chart draw configuration
-        show_area = attrs.get("show_area", None)
-
-        # bar chart draw configuration
-        orientation = attrs.get("orientation", None)
-        log = attrs.get("log", None)
-
-        # hist chart draw configuration
-        n_bins = attrs.get("n_bins", None)
+        # get chart settings
+        settings = get_settings(attrs)
 
         # format the data into a 1D array
+        charts = attrs.get("charts")
         charts = charts if isinstance(charts, list) else [charts]
         charts = np.array(charts)
 
         # get the number of rows and columns of the chart
         subplot_config = get_subplot_config(
-            as_subplots, n_charts=charts.shape[0], max_cols=max_cols
+            settings["as_subplots"],
+            n_charts=charts.shape[0],
+            max_cols=settings["max_cols"],
         )
-
+        # define the canvas
         figure, axes = plt.subplots(
-            **subplot_config,
-            figsize=figsize,
-            sharex=sharex,
-            sharey=sharey,
-            squeeze=False,
+            figsize=settings["figsize"],
+            sharex=settings["sharex"],
+            sharey=settings["sharey"],
             constrained_layout=True,
+            squeeze=False,
+            **subplot_config,
         )
 
         # prepare the axes based on the draw type
         axes = (
             [axes[0, 0] for _ in range(charts.shape[0])]
-            if not as_subplots
+            if not settings["as_subplots"]
             else axes.flatten()
         )
 
@@ -146,67 +181,34 @@ def chart_wrapper(func):
             ax.axis("off")
 
         for chart, ax in zip(charts, axes):
-            # configure the axes and their ticks
-            configure_axes_spines(ax, config)
-            configure_axis_ticks(
-                ax, config, "xaxis"
-            ) if show_xaxis_labels else ax.xaxis.set_visible(False)
-            configure_axis_ticks(
-                ax, config, "yaxis"
-            ) if show_yaxis_labels else ax.yaxis.set_visible(False)
+            # configure the local chart spines and ticks
+            configure_axes_spines(ax)
+            configure_axis_ticks(ax, "xaxis")
+            configure_axis_ticks(ax, "yaxis")
+            # configure the local chart labels
+            configure_labels(
+                chart,
+                [
+                    ("subtitle", ax.set_title),
+                    ("xlabel", ax.set_xlabel),
+                    ("ylabel", ax.set_ylabel),
+                ],
+            )
 
-            # graph configuration using actions
-            config_actions = [
-                ("subtitle", ax.set_title),
-                ("xlabel", ax.set_xlabel),
-                ("ylabel", ax.set_ylabel),
-            ]
-
-            for attr, action in config_actions:
-                if attr in chart:
-                    action(chart[attr], **get_text_config(config, attr))
-
-        # draw the charts
-        func(
-            axes,
-            charts,
-            chart_config={
-                # common chart configuration
-                "as_subplots": as_subplots,
-                "grid": show_grid,
-                "yerr": show_yerr,
-                # line chart configuration
-                "area": show_area,
-                # bar chart configuration
-                "orientation": orientation,
-                "log": log,
-                # hist chart configuration
-                "n_bins": n_bins,
-            },
+        func(axes, charts, settings=get_chart_settings(settings))
+        # configure the global figure labels
+        configure_labels(
+            settings,
+            [
+                ("title", figure.suptitle),
+                ("xlabel", figure.supxlabel),
+                ("ylabel", figure.supylabel),
+            ],
         )
-
-        # add the title of the figure
-        if title:
-            figure.suptitle(title, **get_text_config(config, "title"))
-
-        if xlabel:
-            figure.text(
-                0.5, -0.03, xlabel, ha="center", **get_text_config(config, "xlabel")
-            )
-
-        if ylabel:
-            figure.text(
-                -0.03,
-                0.5,
-                ylabel,
-                va="center",
-                rotation="vertical",
-                **get_text_config(config, "ylabel"),
-            )
 
         plt.show()
 
-    return wrapper
+    return wrapper_func
 
 
 # ================================================
@@ -214,78 +216,77 @@ def chart_wrapper(func):
 # ================================================
 
 
-def draw_line_chart(
-    axes: List[plt.Axes],
-    charts: List[dict],
-    chart_config: dict,
-) -> None:
+def draw_line_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> None:
     """Draw a line chart
 
     Args:
         axes: The axes.
         charts: The charts data.
-        chart_config: The draw config.
+        settings: The settings.
     """
 
     # assert the configuration
-    assert_chart_config(
-        chart_config=chart_config,
-        supported_chart_config=["as_subplots", "grid", "yerr", "area", "log"],
+    assert_chart_settings(
+        settings=settings,
+        supported_settings=["show_grid", "show_yerr", "show_area", "log_scale"],
     )
 
+    has_multi_subplots = has_multiple_subplots(axes)
+
     # get the color cycle
-    color_cycle = custom_color_cycle(chart_config["as_subplots"], n_charts=len(charts))
+    color_cycle = custom_color_cycle(has_multi_subplots, charts.shape[0])
 
     for chart, ax in zip(charts, axes):
-        # get the chart style attributes
-        style = chart.get("style", {})
-
         # retrieve the chart data points
         x = get_chart_data("x", chart)
         y = get_chart_data("y", chart)
         yerr = get_chart_data("yerr", chart)
 
+        # get the chart style attributes
+        style = chart.get("style", {})
+
+        # validate the drawing flags
         draw_yerr_flag = (
-            chart_config["yerr"]
+            settings["show_yerr"]
             and isinstance(yerr, np.ndarray)
             and len(yerr) == len(y)
         )
-        draw_area_flag = chart_config["area"]
+        draw_area_flag = settings["show_area"]
 
         if draw_yerr_flag and draw_area_flag:
             warnings.warn(
-                "Warning: Both the `error area` and `area under the curve` will be drawn. "
-                + "Only one of `yerr` and `area` should be True."
+                "Warning: Both the `show_yerr` and `show_area` will be used. "
+                + "Only one of them should be True."
             )
+
         # get style configuration
-        chart_hash = hash(json.dumps(chart, sort_keys=True))
-        line_config = {**color_cycle[chart_hash], **get_line_config(style)}
-        area_config = {**color_cycle[chart_hash], **get_area_config(style)}
+        chart_hash = get_chart_hash(chart)
+        line_style = {**color_cycle[chart_hash], **get_line_style(style)}
+        area_style = {**color_cycle[chart_hash], **get_area_style(style)}
 
         if draw_yerr_flag:
             # draw the confidence interval around the line
             y_min = y - yerr
             y_max = y + yerr
-            ax.fill_between(x, y_min, y_max, **area_config)
+            ax.fill_between(x, y_min, y_max, **area_style)
 
         if draw_area_flag:
-            # draw the area under the line
+            # draw the area under the curve
             step = (
-                line_config["drawstyle"].split("-")[1]
-                if "steps-" in line_config["drawstyle"]
+                line_style["drawstyle"].split("-")[1]
+                if "steps-" in line_style["drawstyle"]
                 else None
             )
-            ax.fill_between(x, y, step=step, **area_config)
+            ax.fill_between(x, y, step=step, **area_style)
 
         # draw the line chart
-        ax.plot(x, y, **line_config)
+        ax.plot(x, y, **line_style)
 
-        if chart_config["log"]:
+        if settings["log_scale"]:
             ax.set_yscale("log")
 
-        if chart_config["grid"]:
-            # show the chart grid
-            ax.grid(axis=chart_config["grid"], **get_grid_config(style))
+        if settings["show_grid"]:
+            ax.grid(axis=settings["show_grid"], **get_grid_style(style))
 
         # set the x-axis limit
         xmin, xmax = get_min_max_values(x)
@@ -297,35 +298,30 @@ def draw_line_chart(
 # ================================================
 
 
-def draw_bar_chart(
-    axes: List[plt.Axes],
-    charts: List[dict],
-    chart_config: dict,
-) -> None:
+def draw_bar_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> None:
     """Draw a bar chart
 
     Args:
         axes: The axes.
         charts: The charts data.
-        draw_config: The draw flags.
+        settings: The settings.
     """
 
     # assert the configuration
-    assert_chart_config(
-        chart_config=chart_config,
-        supported_chart_config=["as_subplots", "grid", "yerr", "orientation", "log"],
+    assert_chart_settings(
+        settings=settings,
+        supported_settings=["show_grid", "show_yerr", "orientation", "log_scale"],
     )
 
-    # preliminary variables
-    x_start = get_chart_data("label", charts[0])
-    x_start = np.arange(len(x_start))
-    x_width = config["plot.bar.width"] / len(charts)  # the width of the bar
-    offset = 0
+    has_multi_subplots = has_multiple_subplots(axes)
+    is_horizontal = settings.get("orientation", DEFAULT_ORIENTATION) == "horizontal"
 
-    is_horizontal = chart_config.get("orientation", "vertical") == "horizontal"
+    color_cycle = custom_color_cycle(has_multi_subplots, charts.shape[0])
 
-    # get the color cycle
-    color_cycle = custom_color_cycle(chart_config["as_subplots"], n_charts=len(charts))
+    # prepare the bar chart position variables
+    x_start = np.arange(max([len(get_chart_data("label", chart)) for chart in charts]))
+    x_width = config["plot.bar.width"] / charts.shape[0]  # the width of the bar
+    x_offset = 0
 
     for idx, (chart, ax) in enumerate(zip(charts, axes)):
         # get the chart style attributes
@@ -333,91 +329,80 @@ def draw_bar_chart(
 
         # retrieve the chart data points
         y = get_chart_data("y", chart)
-        yerr = get_chart_data("yerr", chart)
+        yerr = get_chart_data("yerr", chart) if settings["show_yerr"] else None
         labels = get_chart_data("label", chart)
 
-        # assign the x-axis values
-        x = np.arange(len(labels))
+        x = np.arange(labels.shape[0])
 
-        chart_hash = hash(json.dumps(chart, sort_keys=True))
-        bar_config = {**color_cycle[chart_hash], **get_bar_config(style, is_horizontal)}
-        if not chart_config["as_subplots"]:
-            # update the configuration and offset
-            bar_config["height" if is_horizontal else "width"] = x_width
-            offset = idx * x_width
+        chart_hash = get_chart_hash(chart)
+        bar_style = {**color_cycle[chart_hash], **get_bar_style(style, is_horizontal)}
+
+        if not has_multi_subplots:
+            # update the bar chart style
+            tmp_attr = "height" if is_horizontal else "width"
+            bar_style[tmp_attr] = x_width
+            x_offset = idx * x_width
+
+        tmp_attr = "xerr" if is_horizontal else "yerr"
+        error_range = {tmp_attr: yerr}
 
         # draw the bar chart
         draw_func = ax.barh if is_horizontal else ax.bar
-        error_values = {
-            "xerr" if is_horizontal else "yerr": yerr if chart_config["yerr"] else None
-        }
-
         draw_func(
-            x + offset,
+            x + x_offset,
             y,
             label=labels,
-            log=chart_config["log"],
-            **error_values,
-            **bar_config,
+            log=settings["log_scale"],
+            **error_range,
+            **bar_style,
         )
 
-        if chart_config["grid"]:
-            # show the chart grid
-            ax.grid(axis=chart_config["grid"], **get_grid_config(chart))
+        if settings["show_grid"]:
+            ax.grid(axis=settings["show_grid"], **get_grid_style(chart))
 
         # ---------------------------------------
-        # Assign the tick position
+        # Update the tick position
         # ---------------------------------------
 
-        def rotate_bar_labels(n_labels: int):
+        def get_rotation_degrees(n_labels: int):
             """Rotate the bar labels based on the number of labels."""
-            if chart_config["as_subplots"]:
+            if has_multi_subplots:
                 # rotate based on the number of labels
                 return 90 if n_labels >= 7 else (45 if n_labels >= 4 else 0)
             # do not rotate the labels
             return 0
 
-        def update_group_bar_labels(
-            ticks_loc: List[float], labels: List[str], axis: str
-        ):
+        def position_group_labels(ticks_loc: List[float], labels: List[str], axis: str):
             """Update the group bar labels on the specified axis."""
-            if axis == "x":
+            if axis == "xaxis":
                 ax.set_xticks(ticks_loc, labels)
                 ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
-                ax.set_xticklabels(labels, rotation=rotate_bar_labels(len(labels)))
-            elif axis == "y":
+                ax.set_xticklabels(
+                    labels, rotation=get_rotation_degrees(labels.shape[0])
+                )
+            elif axis == "yaxis":
                 ax.set_yticks(ticks_loc, labels)
                 ax.yaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
 
-        # get the tic positions
-        ticks_loc = (
-            x_start + (len(charts) - 1) / 2 * x_width
-            if not chart_config["as_subplots"]
-            else x
-        )
-        update_group_bar_labels(ticks_loc, labels, axis="y" if is_horizontal else "x")
+        # position the ticks in the middle of the group
+        ticks_loc = x_start + (charts.shape[0] - 1) / 2 * x_width
+        ticks_loc = ticks_loc if not has_multi_subplots else x
+        label_axis = "yaxis" if is_horizontal else "xaxis"
+        position_group_labels(ticks_loc, labels, axis=label_axis)
 
         # ---------------------------------------
         # ! Overwrite the label positions
         # ---------------------------------------
 
         # graph configuration using actions
-        config_actions = [
-            ("subtitle", ax.set_title),
-            ("xlabel", ax.set_xlabel if not is_horizontal else ax.set_ylabel),
-            ("ylabel", ax.set_ylabel if not is_horizontal else ax.set_xlabel),
-        ]
-
-        for attr, action in config_actions:
-            if attr in chart:
-                action(chart[attr], **get_text_config(config, attr))
-
-    # ---------------------------------------
-    # Assign the axis limit
-    # ---------------------------------------
-
-    if not chart_config["as_subplots"]:
-        axes[0].set_xlim(left=0) if is_horizontal else axes[0].set_ylim(bottom=0)
+        configure_labels(
+            chart,
+            [
+                ("subtitle", ax.set_title),
+                ("xlabel", ax.set_xlabel if not is_horizontal else ax.set_ylabel),
+                ("ylabel", ax.set_ylabel if not is_horizontal else ax.set_xlabel),
+            ],
+        )
 
 
 # ================================================
@@ -425,64 +410,68 @@ def draw_bar_chart(
 # ================================================
 
 
-def draw_hist_chart(
-    axes: List[plt.Axes],
-    charts: List[dict],
-    chart_config: dict,
-) -> None:
+def draw_hist_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> None:
     """Draw a bar chart
 
     Args:
         axes: The axes.
         charts: The charts data.
-        draw_config: The draw flags.
+        settings: The draw settings.
     """
 
     # assert the configuration
-    assert_chart_config(
-        chart_config=chart_config,
-        supported_chart_config=["as_subplots", "grid", "n_bins", "orientation", "log"],
+    assert_chart_settings(
+        settings=settings,
+        supported_settings=[
+            "show_grid",
+            "show_density",
+            "show_cumulative",
+            "num_bins",
+            "orientation",
+            "log_scale",
+        ],
     )
 
-    # get the chart settings
-    orientation = chart_config.get("orientation", "vertical")
-    n_bins = chart_config.get("n_bins", 20)
+    has_multi_subplots = has_multiple_subplots(axes)
+    num_bins = settings["num_bins"] if settings["num_bins"] else DEFAULT_NUM_BINS
+    orientation = (
+        settings["orientation"] if settings["orientation"] else DEFAULT_ORIENTATION
+    )
+
+    color_cycle = custom_color_cycle(has_multi_subplots, charts.shape[0])
 
     # normalize the bin size for all charts
-    x_all = [get_chart_data("x", chart) for chart in charts]
-    bins = np.histogram(np.hstack(tuple(x_all)), bins=n_bins)[1]
+    xall = [get_chart_data("x", chart) for chart in charts]
+    bins = np.histogram(np.hstack(tuple(xall)), bins=num_bins)[1]
 
-    # get the color cycle
-    color_cycle = custom_color_cycle(chart_config["as_subplots"], n_charts=len(charts))
-
-    if not chart_config["as_subplots"]:
+    if not has_multi_subplots:
         # visualize all charts in a common subplot
-        hist_config = [
-            {
-                **color_cycle[hash(json.dumps(chart, sort_keys=True))],
-                **get_hist_config(chart.get("style", {})),
-            }
-            for chart in charts
-        ]
-        color = [c["color"] for c in hist_config]
+        tmp_styles = []
+        for chart in charts:
+            chart_hash = get_chart_hash(chart)
+            tmp_styles.append({**color_cycle[chart_hash], **get_hist_style({})})
 
-        hist_config = {
-            **hist_config[0],
-            "color": None if color.count(None) > 0 else color,
+        colors = [c["color"] for c in tmp_styles]
+
+        hist_style = {
+            **tmp_styles[0],
+            "color": colors if colors.count(None) == 0 else None,
         }
 
         # draw the histogram chart
         axes[0].hist(
-            x_all,
+            xall,
             bins=bins,
-            log=chart_config["log"],
-            orientation=orientation,
             stacked=True,
-            **hist_config,
+            log=settings["log_scale"],
+            density=settings["show_density"],
+            cumulative=settings["show_cumulative"],
+            orientation=orientation,
+            **hist_style,
         )
-        if chart_config["grid"]:
+        if settings["show_grid"]:
             # show the chart grid
-            axes[0].grid(axis=chart_config["grid"], **get_grid_config(charts[0]))
+            axes[0].grid(axis=settings["show_grid"], **get_grid_style(charts[0]))
 
     else:
         # visualize each chart in a separate subplot
@@ -492,24 +481,21 @@ def draw_hist_chart(
 
             # retrieve the chart data points
             x = get_chart_data("x", chart)
-            density = get_chart_data("density", chart)
-            cumulative = get_chart_data("cumulative", chart)
 
-            chart_hash = hash(json.dumps(chart, sort_keys=True))
-            hist_config = {**color_cycle[chart_hash], **get_hist_config(style)}
+            chart_hash = get_chart_hash(chart)
+            hist_style = {**color_cycle[chart_hash], **get_hist_style(style)}
 
             # draw the histogram chart
             ax.hist(
                 x,
                 bins=bins,
-                density=density,
-                log=chart_config["log"],
-                cumulative=cumulative,
+                log=settings["log_scale"],
+                density=settings["show_density"],
+                cumulative=settings["show_cumulative"],
                 orientation=orientation,
-                stacked=not chart_config["as_subplots"],
-                **hist_config,
+                **hist_style,
             )
 
-            if chart_config["grid"]:
+            if settings["show_grid"]:
                 # show the chart grid
-                ax.grid(axis=chart_config["grid"], **get_grid_config(chart))
+                ax.grid(axis=settings["show_grid"], **get_grid_style(chart))

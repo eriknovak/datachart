@@ -89,7 +89,7 @@ def get_subplot_config(
 # -------------------------------------
 
 
-def get_text_config(config: Config, text_type: str = "") -> dict:
+def get_text_style(text_type: str = "") -> dict:
     """Get the text configuration
 
     Args:
@@ -122,7 +122,7 @@ def get_text_config(config: Config, text_type: str = "") -> dict:
 # -------------------------------------
 
 
-def get_line_config(chart_style: dict) -> dict:
+def get_line_style(chart_style: dict) -> dict:
     """Get the line configuration
 
     Args:
@@ -150,7 +150,7 @@ def get_line_config(chart_style: dict) -> dict:
 # -------------------------------------
 
 
-def get_bar_config(chart_style: dict, horizontal_flag: bool = False) -> dict:
+def get_bar_style(chart_style: dict, is_horizontal: bool = False) -> dict:
     """Get the bar configuration
 
     Args:
@@ -164,7 +164,7 @@ def get_bar_config(chart_style: dict, horizontal_flag: bool = False) -> dict:
     config_attrs = [
         ("color", "plot.bar.color"),
         ("alpha", "plot.bar.alpha"),
-        ("height" if horizontal_flag else "width", "plot.bar.width"),
+        ("height" if is_horizontal else "width", "plot.bar.width"),
         ("hatch", "plot.bar.hatch"),
         ("linewidth", "plot.bar.edge.width"),
         ("edgecolor", "plot.bar.edge.color"),
@@ -180,7 +180,7 @@ def get_bar_config(chart_style: dict, horizontal_flag: bool = False) -> dict:
 # -------------------------------------
 
 
-def get_hist_config(chart_style: dict) -> dict:
+def get_hist_style(chart_style: dict) -> dict:
     """Get the hist configuration
 
     Args:
@@ -208,7 +208,7 @@ def get_hist_config(chart_style: dict) -> dict:
 # -------------------------------------
 
 
-def get_area_config(chart_style: dict) -> dict:
+def get_area_style(chart_style: dict) -> dict:
     """Get the area configuration
 
     Args:
@@ -234,7 +234,7 @@ def get_area_config(chart_style: dict) -> dict:
 # -------------------------------------
 
 
-def get_grid_config(chart_style: dict) -> dict:
+def get_grid_style(chart_style: dict) -> dict:
     """Get the grid configuration
 
     Args:
@@ -259,13 +259,12 @@ def get_grid_config(chart_style: dict) -> dict:
 # ================================================
 
 
-def configure_axes_spines(ax, config: Config):
+def configure_axes_spines(ax):
     """
     Configure axes spines.
 
     Args:
         ax (Axes): The axes.
-        config (Config): The configuration.
     """
     # Turn on the axes
     ax.axis("on")
@@ -280,12 +279,11 @@ def configure_axes_spines(ax, config: Config):
         )
 
 
-def configure_axis_ticks(ax, config: Config, axis_type: str):
+def configure_axis_ticks(ax, axis_type: str):
     """Configure axis ticks.
 
     Args:
         ax (Axes): The axes.
-        config (Config): The configuration.
         axis_type (str): The axis type. Options: "xaxis", "yaxis".
 
     """
@@ -296,3 +294,15 @@ def configure_axis_ticks(ax, config: Config, axis_type: str):
         length=config["axes.ticks.length"],
         labelsize=config["axes.ticks.label.size"],
     )
+
+
+def configure_labels(settings: dict, actions: list):
+    """Configure chart labels.
+
+    Args:
+        actions (dict): The axes.
+        chart (dict): The chart dictionary.
+    """
+    for label, action in actions:
+        if label in settings:
+            action(settings[label], **get_text_style(label))
