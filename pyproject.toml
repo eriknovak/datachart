@@ -32,6 +32,10 @@ dev = [
     "black",
     "flake8",
 ]
+test = [
+    "coverage",
+]
+all = ["datachart[dev,test]"]
 
 [tool.setuptools]
 package-dir = { "" = "src" }
