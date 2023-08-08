@@ -1,12 +1,18 @@
+from cycler import cycler
+
 from schema.definitions import ConfigAttrs
 from schema.constants import (
     LineStyle,
     FontStyle,
     FontWeight,
     LineDrawStyle,
+    ColorScales,
 )
 
 DEFAULT_THEME: ConfigAttrs = {
+    # general color configuration
+    "color.general.singular": ColorScales.Blue,
+    "color.general.multiple": ColorScales.Spectral,
     # general font configuration
     "font.general.family": "sans-serif",
     "font.general.sans-serif": ["Helvetica", "Arial"],
@@ -79,5 +85,4 @@ DEFAULT_THEME: ConfigAttrs = {
     "plot.hist.align": "mid",
     "plot.hist.edge.width": 0.5,
     "plot.hist.edge.color": "#000000",
-    # TODO: plot heatmap configuration
 }

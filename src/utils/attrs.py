@@ -10,7 +10,7 @@ from config import config, Config
 
 
 def get_attr_value(
-    attr: str, obj: dict, default: Union[Config, bool, int, float, str, None]
+    attr: str, obj: dict, default: Union[Config, dict, bool, int, float, str, None]
 ):
     """Retrieves the value of the specified attribute from the given object.
 
@@ -22,7 +22,7 @@ def get_attr_value(
         The value of the attribute, or the default value if the attribute is not found.
 
     """
-    if isinstance(default, Config):
+    if isinstance(default, Config) or isinstance(default, dict):
         return obj.get(attr, default[attr])
     return obj.get(attr, default)
 
@@ -42,7 +42,11 @@ def create_config_dict(
 
     """
     # Create a dictionary comprehension that maps each key to the attribute value
-    return {key: get_attr_value(attr, styles, config) for key, attr in attrs}
+    return {
+        key: get_attr_value(attr, styles, config)
+        for key, attr in attrs
+        if get_attr_value(attr, styles, config) is not None
+    }
 
 
 # ================================================
