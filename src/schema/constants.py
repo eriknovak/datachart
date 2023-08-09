@@ -68,8 +68,8 @@ class LineDrawStyle:
     STEPS_POST = "steps-post"
 
 
-class BarHatch:
-    """Bar Hatch constants"""
+class Hatch:
+    """Hatch constants"""
 
     DEFAULT = None
     DIAGONAL = "/"
@@ -90,7 +90,7 @@ class HistType:
     STEPFILLED = "stepfilled"
 
 
-class ColorScales:
+class Colors:
     Blue = "blue"
     Green = "green"
     Orange = "orange"

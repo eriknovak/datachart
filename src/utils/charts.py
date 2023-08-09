@@ -14,8 +14,10 @@ from utils.attrs import (
     get_line_style,
     get_bar_style,
     get_hist_style,
+    get_legend_style,
     configure_axes_spines,
     configure_axis_ticks,
+    configure_axis_limits,
     configure_labels,
 )
 
@@ -66,7 +68,7 @@ def assert_chart_settings(settings: dict, supported_settings: List[str]) -> None
     for key, val in settings.items():
         if key not in supported_settings and val:
             warnings.warn(
-                f"Warning: settings['{key}'] is present but is not supported. Ignoring flag..."
+                f"Settings['{key}'] is present but is not supported. Ignoring flag..."
             )
 
 
@@ -85,10 +87,16 @@ settings_attr_mapping = [
     {"name": "ylabel", "default": None},
     {"name": "sharex", "default": False},
     {"name": "sharey", "default": False},
-    {"name": "as_subplots", "default": False},
+    {"name": "subplots", "default": False},
+    {"name": "aspect_ratio", "default": "auto"},
     {"name": "figsize", "default": Figsize.DEFAULT},
     {"name": "max_cols", "default": 4},
+    {"name": "x_min", "default": None},
+    {"name": "x_max", "default": None},
+    {"name": "y_min", "default": None},
+    {"name": "y_max", "default": None},
     # visibility attributes
+    {"name": "show_legend", "default": None},
     {"name": "show_grid", "default": None},
     {"name": "show_yerr", "default": None},
     {"name": "show_area", "default": None},
@@ -109,6 +117,12 @@ def get_settings(attrs: dict) -> dict:
 
 
 settings_chart_mapping = [
+    "aspect_ratio",
+    "x_min",
+    "x_max",
+    "y_min",
+    "y_max",
+    "show_legend",
     "show_grid",
     "show_yerr",
     "show_area",
@@ -155,7 +169,7 @@ def chart_wrapper(func):
 
         # get the number of rows and columns of the chart
         subplot_config = get_subplot_config(
-            settings["as_subplots"],
+            settings["subplots"],
             n_charts=charts.shape[0],
             max_cols=settings["max_cols"],
         )
@@ -172,7 +186,7 @@ def chart_wrapper(func):
         # prepare the axes based on the draw type
         axes = (
             [axes[0, 0] for _ in range(charts.shape[0])]
-            if not settings["as_subplots"]
+            if not settings["subplots"]
             else axes.flatten()
         )
 
@@ -186,14 +200,15 @@ def chart_wrapper(func):
             configure_axis_ticks(ax, "xaxis")
             configure_axis_ticks(ax, "yaxis")
             # configure the local chart labels
-            configure_labels(
-                chart,
-                [
-                    ("subtitle", ax.set_title),
-                    ("xlabel", ax.set_xlabel),
-                    ("ylabel", ax.set_ylabel),
-                ],
-            )
+            if settings["subplots"]:
+                configure_labels(
+                    chart,
+                    [
+                        ("subtitle", ax.set_title),
+                        ("xlabel", ax.set_xlabel),
+                        ("ylabel", ax.set_ylabel),
+                    ],
+                )
 
         func(axes, charts, settings=get_chart_settings(settings))
         # configure the global figure labels
@@ -228,7 +243,18 @@ def draw_line_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
     # assert the configuration
     assert_chart_settings(
         settings=settings,
-        supported_settings=["show_grid", "show_yerr", "show_area", "log_scale"],
+        supported_settings=[
+            "x_min",
+            "x_max",
+            "y_min",
+            "y_max",
+            "aspect_ratio",
+            "show_legend",
+            "show_grid",
+            "show_yerr",
+            "show_area",
+            "log_scale",
+        ],
     )
 
     has_multi_subplots = has_multiple_subplots(axes)
@@ -255,7 +281,7 @@ def draw_line_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
 
         if draw_yerr_flag and draw_area_flag:
             warnings.warn(
-                "Warning: Both the `show_yerr` and `show_area` will be used. "
+                "Both the `show_yerr` and `show_area` will be used. "
                 + "Only one of them should be True."
             )
 
@@ -280,7 +306,8 @@ def draw_line_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
             ax.fill_between(x, y, step=step, **area_style)
 
         # draw the line chart
-        ax.plot(x, y, **line_style)
+        subtitle = chart.get("subtitle", None)
+        ax.plot(x, y, **line_style, label=subtitle)
 
         if settings["log_scale"]:
             ax.set_yscale("log")
@@ -289,8 +316,22 @@ def draw_line_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
             ax.grid(axis=settings["show_grid"], **get_grid_style(style))
 
         # set the x-axis limit
-        xmin, xmax = get_min_max_values(x)
-        ax.set_xlim(xmin, xmax)
+        x_min, x_max = get_min_max_values(x)
+        ax.set_xlim(xmin=x_min, xmax=x_max)
+
+        # override axis limits
+        configure_axis_limits(ax, settings)
+
+        # set the aspect ratio of the chart
+        if settings["aspect_ratio"]:
+            ax.set(adjustable="box", aspect=settings["aspect_ratio"])
+
+    # show the legend in the last subplot
+    if has_multi_subplots and settings["show_legend"]:
+        warnings.warn("The `show_legend` flag will be ignored for multi-subplots.")
+
+    if not has_multi_subplots and settings["show_legend"]:
+        axes[0].legend(title="Legend", **get_legend_style())
 
 
 # ================================================
@@ -310,13 +351,29 @@ def draw_bar_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> 
     # assert the configuration
     assert_chart_settings(
         settings=settings,
-        supported_settings=["show_grid", "show_yerr", "orientation", "log_scale"],
+        supported_settings=[
+            "aspect_ratio",
+            "x_min",
+            "x_max",
+            "y_min",
+            "y_max",
+            "show_legend",
+            "show_grid",
+            "show_yerr",
+            "orientation",
+            "log_scale",
+        ],
     )
 
     has_multi_subplots = has_multiple_subplots(axes)
     is_horizontal = settings.get("orientation", DEFAULT_ORIENTATION) == "horizontal"
 
     color_cycle = custom_color_cycle(has_multi_subplots, charts.shape[0])
+    if not has_multi_subplots and charts.shape[0] > 5:
+        warnings.warn(
+            "The number of charts is greater than 5. "
+            + "Please consider using a different plotting method or create subplots."
+        )
 
     # prepare the bar chart position variables
     x_start = np.arange(max([len(get_chart_data("label", chart)) for chart in charts]))
@@ -347,12 +404,13 @@ def draw_bar_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> 
         error_range = {tmp_attr: yerr}
 
         # draw the bar chart
+        subtitle = chart.get("subtitle", None)
         draw_func = ax.barh if is_horizontal else ax.bar
         draw_func(
             x + x_offset,
-            y,
-            label=labels,
+            y + (1 if settings["log_scale"] else 0),
             log=settings["log_scale"],
+            label=subtitle,
             **error_range,
             **bar_style,
         )
@@ -390,19 +448,30 @@ def draw_bar_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> 
         label_axis = "yaxis" if is_horizontal else "xaxis"
         position_group_labels(ticks_loc, labels, axis=label_axis)
 
-        # ---------------------------------------
-        # ! Overwrite the label positions
-        # ---------------------------------------
+        if has_multi_subplots:
+            # overwrite the label positions
+            configure_labels(
+                chart,
+                [
+                    ("subtitle", ax.set_title),
+                    ("xlabel", ax.set_xlabel if not is_horizontal else ax.set_ylabel),
+                    ("ylabel", ax.set_ylabel if not is_horizontal else ax.set_xlabel),
+                ],
+            )
 
-        # graph configuration using actions
-        configure_labels(
-            chart,
-            [
-                ("subtitle", ax.set_title),
-                ("xlabel", ax.set_xlabel if not is_horizontal else ax.set_ylabel),
-                ("ylabel", ax.set_ylabel if not is_horizontal else ax.set_xlabel),
-            ],
-        )
+        # override axis limits
+        configure_axis_limits(ax, settings)
+
+        # set the aspect ratio of the chart
+        if settings["aspect_ratio"]:
+            ax.set(adjustable="box", aspect=settings["aspect_ratio"])
+
+    # show the legend in the last subplot
+    if has_multi_subplots and settings["show_legend"]:
+        warnings.warn("The `show_legend` flag will be ignored for multi-subplots.")
+
+    if not has_multi_subplots and settings["show_legend"]:
+        axes[0].legend(title="Legend", **get_legend_style())
 
 
 # ================================================
@@ -423,6 +492,12 @@ def draw_hist_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
     assert_chart_settings(
         settings=settings,
         supported_settings=[
+            "aspect_ratio",
+            "x_min",
+            "x_max",
+            "y_min",
+            "y_max",
+            "show_legend",
             "show_grid",
             "show_density",
             "show_cumulative",
@@ -446,10 +521,13 @@ def draw_hist_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
 
     if not has_multi_subplots:
         # visualize all charts in a common subplot
+        labels = []
         tmp_styles = []
+        style = charts[0].get("style", {})
         for chart in charts:
             chart_hash = get_chart_hash(chart)
-            tmp_styles.append({**color_cycle[chart_hash], **get_hist_style({})})
+            tmp_styles.append({**color_cycle[chart_hash], **get_hist_style(style)})
+            labels.append(chart.get("subtitle", None))
 
         colors = [c["color"] for c in tmp_styles]
 
@@ -462,6 +540,7 @@ def draw_hist_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
         axes[0].hist(
             xall,
             bins=bins,
+            label=labels,
             stacked=True,
             log=settings["log_scale"],
             density=settings["show_density"],
@@ -469,9 +548,20 @@ def draw_hist_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
             orientation=orientation,
             **hist_style,
         )
+
+        # override the axis limits
+        configure_axis_limits(axes[0], settings)
+
         if settings["show_grid"]:
             # show the chart grid
             axes[0].grid(axis=settings["show_grid"], **get_grid_style(charts[0]))
+
+        # set the aspect ratio of the chart
+        if settings["aspect_ratio"]:
+            axes[0].set(adjustable="box", aspect=settings["aspect_ratio"])
+
+        if settings["show_legend"]:
+            axes[0].legend(title="Legend", **get_legend_style())
 
     else:
         # visualize each chart in a separate subplot
@@ -484,18 +574,29 @@ def draw_hist_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
 
             chart_hash = get_chart_hash(chart)
             hist_style = {**color_cycle[chart_hash], **get_hist_style(style)}
-
+            label = chart.get("subtitle", None)
             # draw the histogram chart
             ax.hist(
                 x,
                 bins=bins,
+                label=label,
                 log=settings["log_scale"],
                 density=settings["show_density"],
                 cumulative=settings["show_cumulative"],
                 orientation=orientation,
                 **hist_style,
             )
+            # override the axis limits
+            configure_axis_limits(ax, settings)
 
             if settings["show_grid"]:
                 # show the chart grid
                 ax.grid(axis=settings["show_grid"], **get_grid_style(chart))
+
+            # set the aspect ratio of the chart
+            if settings["aspect_ratio"]:
+                ax.set(adjustable="box", aspect=settings["aspect_ratio"])
+
+        # show the legend in the last subplot
+        if settings["show_legend"]:
+            warnings.warn("The `show_legend` flag will be ignored for multi-subplots.")

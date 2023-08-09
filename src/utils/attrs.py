@@ -59,13 +59,11 @@ def create_config_dict(
 # -------------------------------------
 
 
-def get_subplot_config(
-    as_subplots: bool, n_charts: int, max_cols: int
-) -> dict[str, int]:
+def get_subplot_config(subplots: bool, n_charts: int, max_cols: int) -> dict[str, int]:
     """
     Calculate the configuration for subplots in a figure.
     Args:
-        as_subplots (bool): Whether to show subplots separately.
+        subplots (bool): Whether to show subplots separately.
         n_charts (int): The number of subplots.
         max_cols (int): The maximum number of columns for the subplots.
     Returns:
@@ -76,7 +74,7 @@ def get_subplot_config(
     nrows = 1
     ncols = 1
 
-    if as_subplots:
+    if subplots:
         # there are more subplots
         nrows = math.ceil(n_charts / max_cols)
         ncols = max_cols if n_charts >= max_cols else n_charts % max_cols
@@ -85,7 +83,7 @@ def get_subplot_config(
 
 
 # -------------------------------------
-# Text Configuration
+# Text Style
 # -------------------------------------
 
 
@@ -118,7 +116,7 @@ def get_text_style(text_type: str = "") -> dict:
 
 
 # -------------------------------------
-# Line Configuration
+# Line Style
 # -------------------------------------
 
 
@@ -146,7 +144,7 @@ def get_line_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
-# Bar Configuration
+# Bar Style
 # -------------------------------------
 
 
@@ -176,7 +174,7 @@ def get_bar_style(chart_style: dict, is_horizontal: bool = False) -> dict:
 
 
 # -------------------------------------
-# Hist Configuration
+# Hist Style
 # -------------------------------------
 
 
@@ -193,6 +191,8 @@ def get_hist_style(chart_style: dict) -> dict:
     config_attrs = [
         ("color", "plot.hist.color"),
         ("alpha", "plot.hist.alpha"),
+        ("fill", "plot.hist.fill"),
+        ("hatch", "plot.hist.hatch"),
         ("zorder", "plot.hist.zorder"),
         ("histtype", "plot.hist.type"),
         ("align", "plot.hist.align"),
@@ -204,7 +204,7 @@ def get_hist_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
-# Area Configuration
+# Area Style
 # -------------------------------------
 
 
@@ -223,6 +223,7 @@ def get_area_style(chart_style: dict) -> dict:
         ("alpha", "plot.area.alpha"),
         ("color", "plot.area.color"),
         ("linewidth", "plot.area.linewidth"),
+        ("hatch", "plot.area.hatch"),
         ("zorder", "plot.area.zorder"),
     ]
 
@@ -230,7 +231,7 @@ def get_area_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
-# Grid Configuration
+# Grid Style
 # -------------------------------------
 
 
@@ -252,6 +253,29 @@ def get_grid_style(chart_style: dict) -> dict:
         ("zorder", "plot.grid.zorder"),
     ]
     return create_config_dict(chart_style, config_attrs)
+
+
+# -------------------------------------
+# Legend Style
+# -------------------------------------
+
+
+def get_legend_style() -> dict:
+    """Get the legend configuration
+
+    Returns:
+        dict: The grid configuration dict.
+
+    """
+    config_attrs = [
+        ("shadow", "plot.legend.shadow"),
+        ("frameon", "plot.legend.frameon"),
+        ("fontsize", "plot.legend.fontsize"),
+        ("alignment", "plot.legend.alignment"),
+        ("title_fontsize", "plot.legend.title.fontsize"),
+        ("labelcolor", "plot.legend.label.color"),
+    ]
+    return create_config_dict({}, config_attrs)
 
 
 # ================================================
@@ -294,6 +318,26 @@ def configure_axis_ticks(ax, axis_type: str):
         length=config["axes.ticks.length"],
         labelsize=config["axes.ticks.label.size"],
     )
+
+
+def configure_axis_limits(ax, settings: dict):
+    """Configure axis limits.
+
+    Args:
+        ax (Axes): The axes.
+        settings (dict): The settings.
+    """
+    if settings["x_min"] is not None or settings["x_max"] is not None:
+        xmin, xmax = ax.get_xlim()
+        xmin = settings["x_min"] if settings["x_min"] is not None else xmin
+        xmax = settings["x_max"] if settings["x_max"] is not None else xmax
+        ax.set_xlim(xmin=xmin, xmax=xmax)
+
+    if settings["y_min"] is not None or settings["y_max"] is not None:
+        ymin, ymax = ax.get_ylim()
+        ymin = settings["y_min"] if settings["y_min"] is not None else ymin
+        ymax = settings["y_max"] if settings["y_max"] is not None else ymax
+        ax.set_ylim(ymin=ymin, ymax=ymax)
 
 
 def configure_labels(settings: dict, actions: list):

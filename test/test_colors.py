@@ -3,9 +3,9 @@ import unittest
 from config.themes.colors import COLOR_SCALE_MAPPING
 from utils.colors import get_color_scale, get_discrete_colors
 
-from schema.constants import ColorScales
+from schema.constants import Colors
 
-TEST_COLOR_SCALE = ColorScales.Blue
+TEST_COLOR_SCALE = Colors.Blue
 
 COLOR_SCALE_BLUE = COLOR_SCALE_MAPPING[TEST_COLOR_SCALE]
 
