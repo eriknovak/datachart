@@ -1,18 +1,45 @@
-# Datachart Python Package
+<p align="center">
+  <img src="./docs/assets/imgs/logo.png" alt="datachart" height="300">
+</p>
 
-The repository contains the datachart python package source code.
+<p align="center">
+<i>Data visualization package, simple to use, highly customizable</i>
+<p>
+
+
+---
+
+**Documentation:** TODO
+
+**Source code:** https://github.com/eriknovak/datachart
+
+---
+
+# Datachart Python package
+
+The datachart package is a python package for creating data visualizations. It is designed to be simple to use and highly customizable, i.e. it is easy to change the look and feel of the charts.
+
+## Usage Examples
+
+Please find examples of how to use the package in the [notebooks](./notebooks) directory. Specifically:
+
+- [Line Chart](./notebooks/01-line-chart.ipynb)
+- [Bar Chart](./notebooks/02-bar-chart.ipynb)
+- [Hist Chart](./notebooks/03-hist-chart.ipynb)
 
 
 
-## ☑️ Requirements
+## Developer information
+
+### ☑️ Requirements
 Before starting the project make sure these requirements are available:
 - [python][python]. The python programming language (v3.9 or higher).
 - [git][git]. For versioning your code.
 
 
-## 🛠️ Setup
+### 🛠️ Setup
 
-### Create the python environment
+#### Create the python environment
 
 To create a python virtual environment using `venv`, simply run the following
 commands:
@@ -31,7 +58,7 @@ python -m venv venv
 deactivate
 ```
 
-### Install
+#### Install
 
 To install the requirements run:
 
@@ -39,7 +66,7 @@ To install the requirements run:
 pip install -e .
 ```
 
-### Running tests
+#### Running tests
 
 To run existing tests, simply run:
 
