@@ -11,6 +11,8 @@
 
 **Documentation:** TODO
 
+**Chart Examples:** https://github.com/eriknovak/datachart/tree/main/notebooks
+
 **Source code:** https://github.com/eriknovak/datachart
 
 ---
@@ -19,14 +21,17 @@
 
 The datachart package is a python package for creating data visualizations. It is designed to be simple to use and highly customizable, i.e. it is easy to change the look and feel of the charts.
 
+## Installation
+
+TODO: create installation instructions
+
+```bash
+pip install datachart
+```
+
 ## Usage Examples
 
-Please find examples of how to use the package in the [notebooks](./notebooks) directory. Specifically:
-
-- [Line Chart](./notebooks/01-line-chart.ipynb)
-- [Bar Chart](./notebooks/02-bar-chart.ipynb)
-- [Hist Chart](./notebooks/03-hist-chart.ipynb)
-
+Please find examples of how to use the package in the [notebooks](./notebooks) directory.
 
 
 ## Developer information
