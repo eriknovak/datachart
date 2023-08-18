@@ -17,11 +17,9 @@
 
 ---
 
-# Datachart Python package
-
 The datachart package is a python package for creating data visualizations. It is designed to be simple to use and highly customizable, i.e. it is easy to change the look and feel of the charts.
 
-## Installation
+## Install
 
 TODO: create installation instructions
 
@@ -29,14 +27,16 @@ TODO: create installation instructions
 pip install datachart
 ```
 
-## Usage Examples
+## Examples
 
 Please find examples of how to use the package in the [notebooks](./notebooks) directory.
 
 
-## Developer information
+## Development
 
-### ☑️ Requirements
+This section is for developers only. It describes the requirements, the setup process and how to run tests.
+
+### ✅ Requirements
 Before starting the project make sure these requirements are available:
 - [python][python]. The python programming language (v3.9 or higher).
 - [git][git]. For versioning your code.
@@ -68,10 +68,10 @@ deactivate
 To install the requirements run:
 
 ```bash
-pip install -e .
+pip install -e .[all]
 ```
 
-#### Running tests
+### 🧪Tests
 
 To run existing tests, simply run:
 
