@@ -1,4 +1,5 @@
 import math
+import warnings
 from typing import Union, Tuple, Dict, List
 
 from config import config, Config
@@ -303,7 +304,7 @@ def configure_axes_spines(ax):
         )
 
 
-def configure_axis_ticks(ax, axis_type: str):
+def configure_axis_ticks_style(ax, axis_type: str):
     """Configure axis ticks.
 
     Args:
@@ -318,6 +319,38 @@ def configure_axis_ticks(ax, axis_type: str):
         length=config["axes.ticks.length"],
         labelsize=config["axes.ticks.label.size"],
     )
+
+
+def configure_axis_ticks_position(ax, chart: dict):
+    tick_attrs = [
+        ("xticks", "xticklabels", "xaxis"),
+        ("yticks", "yticklabels", "yaxis"),
+    ]
+    for attrs in tick_attrs:
+        ticks = chart.get(attrs[0], None)
+        ticklabels = chart.get(attrs[1], None)
+        func = ax.set_xticks if attrs[2] == "xaxis" else ax.set_yticks
+
+        if ticks is None and ticklabels is not None:
+            warnings.warn(
+                f"The attribute `{attrs[0]}` is not specified but `{attrs[1]}` is. "
+                + f"Please provide the `{attrs[0]}` values."
+            )
+            continue
+        elif ticks is not None:
+            if ticklabels is None:
+                # draw only the ticks
+                func(ticks)
+            elif len(ticks) != len(ticklabels):
+                warnings.warn(
+                    f"The values of `{attrs[0]}` and `{attrs[1]}` are of different lengths. "
+                    + f"Please provide the same number of values. Ignoring `{attrs[1]}` values..."
+                )
+                # draw only the ticks
+                func(ticks)
+            else:
+                # draw both the ticks and the labels
+                func(ticks, labels=ticklabels)
 
 
 def configure_axis_limits(ax, settings: dict):
