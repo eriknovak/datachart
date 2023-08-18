@@ -573,7 +573,7 @@ def draw_hist_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
 
         if settings["show_grid"]:
             # show the chart grid
-            axes[0].grid(axis=settings["show_grid"], **get_grid_style(charts[0]))
+            axes[0].grid(axis=settings["show_grid"], **get_grid_style(style))
 
         # set the aspect ratio of the chart
         if settings["aspect_ratio"]:
@@ -611,7 +611,7 @@ def draw_hist_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
 
             if settings["show_grid"]:
                 # show the chart grid
-                ax.grid(axis=settings["show_grid"], **get_grid_style(chart))
+                ax.grid(axis=settings["show_grid"], **get_grid_style(style))
 
             # set the aspect ratio of the chart
             if settings["aspect_ratio"]:
