@@ -16,7 +16,8 @@ from utils.attrs import (
     get_hist_style,
     get_legend_style,
     configure_axes_spines,
-    configure_axis_ticks,
+    configure_axis_ticks_style,
+    configure_axis_ticks_position,
     configure_axis_limits,
     configure_labels,
 )
@@ -63,21 +64,25 @@ def get_chart_data(attr: str, chart: dict) -> np.array:
     return None
 
 
-def assert_chart_settings(settings: dict, supported_settings: List[str]) -> None:
-    """Assert that the chart config is supported."""
-    for key, val in settings.items():
-        if key not in supported_settings and val:
-            warnings.warn(
-                f"Settings['{key}'] is present but is not supported. Ignoring flag..."
-            )
-
-
 def custom_color_cycle(has_multi_subplots: bool, n_charts: int):
     """Create a custom color cycle."""
     color_type = "singular" if has_multi_subplots else "multiple"
     color_attr = config[f"color.general.{color_type}"]
     max_colors = 1 if has_multi_subplots else n_charts
     return create_color_cycle(color_attr, max_colors)
+
+
+def has_multiple_subplots(axes: dict) -> bool:
+    return not all([ax == axes[0] for ax in axes])
+
+
+def get_chart_hash(chart: dict) -> str:
+    return hash(json.dumps(chart, sort_keys=True))
+
+
+# ------------------------------------------------
+# Settings Mapping
+# ------------------------------------------------
 
 
 settings_attr_mapping = [
@@ -108,14 +113,6 @@ settings_attr_mapping = [
     {"name": "num_bins", "default": None},
 ]
 
-
-def get_settings(attrs: dict) -> dict:
-    return {
-        attr["name"]: attrs.get(attr["name"], attr["default"])
-        for attr in settings_attr_mapping
-    }
-
-
 settings_chart_mapping = [
     "aspect_ratio",
     "x_min",
@@ -134,16 +131,24 @@ settings_chart_mapping = [
 ]
 
 
+def get_settings(attrs: dict) -> dict:
+    return {
+        attr["name"]: attrs.get(attr["name"], attr["default"])
+        for attr in settings_attr_mapping
+    }
+
+
 def get_chart_settings(settings: dict) -> dict:
     return {key: val for key, val in settings.items() if key in settings_chart_mapping}
 
 
-def has_multiple_subplots(axes: dict) -> bool:
-    return not all([ax == axes[0] for ax in axes])
-
-
-def get_chart_hash(chart: dict) -> str:
-    return hash(json.dumps(chart, sort_keys=True))
+def assert_chart_settings(settings: dict, supported_settings: List[str]) -> None:
+    """Assert that the chart config is supported."""
+    for key, val in settings.items():
+        if key not in supported_settings and val:
+            warnings.warn(
+                f"Settings['{key}'] is present but is not supported. Ignoring flag..."
+            )
 
 
 # ================================================
@@ -197,8 +202,8 @@ def chart_wrapper(func):
         for chart, ax in zip(charts, axes):
             # configure the local chart spines and ticks
             configure_axes_spines(ax)
-            configure_axis_ticks(ax, "xaxis")
-            configure_axis_ticks(ax, "yaxis")
+            configure_axis_ticks_style(ax, "xaxis")
+            configure_axis_ticks_style(ax, "yaxis")
             # configure the local chart labels
             if settings["subplots"]:
                 configure_labels(
@@ -321,6 +326,7 @@ def draw_line_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
 
         # override axis limits
         configure_axis_limits(ax, settings)
+        configure_axis_ticks_position(ax, chart)
 
         # set the aspect ratio of the chart
         if settings["aspect_ratio"]:
@@ -416,7 +422,7 @@ def draw_bar_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> 
         )
 
         if settings["show_grid"]:
-            ax.grid(axis=settings["show_grid"], **get_grid_style(chart))
+            ax.grid(axis=settings["show_grid"], **get_grid_style(style))
 
         # ---------------------------------------
         # Update the tick position
@@ -461,6 +467,18 @@ def draw_bar_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> 
 
         # override axis limits
         configure_axis_limits(ax, settings)
+
+        # override axis ticks
+        del_axis_ticks = (
+            ["yticks", "yticklabels"] if is_horizontal else ["xticks", "xticklabels"]
+        )
+        for attr in del_axis_ticks:
+            if chart.get(attr, None) is not None:
+                warnings.warn(f"The `{attr}` flag will be ignored.")
+                del chart[attr]
+
+        # set the tick positions
+        configure_axis_ticks_position(ax, chart)
 
         # set the aspect ratio of the chart
         if settings["aspect_ratio"]:
@@ -551,10 +569,11 @@ def draw_hist_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
 
         # override the axis limits
         configure_axis_limits(axes[0], settings)
+        configure_axis_ticks_position(axes[0], charts[0])
 
         if settings["show_grid"]:
             # show the chart grid
-            axes[0].grid(axis=settings["show_grid"], **get_grid_style(charts[0]))
+            axes[0].grid(axis=settings["show_grid"], **get_grid_style(style))
 
         # set the aspect ratio of the chart
         if settings["aspect_ratio"]:
@@ -588,10 +607,11 @@ def draw_hist_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
             )
             # override the axis limits
             configure_axis_limits(ax, settings)
+            configure_axis_ticks_position(ax, chart)
 
             if settings["show_grid"]:
                 # show the chart grid
-                ax.grid(axis=settings["show_grid"], **get_grid_style(chart))
+                ax.grid(axis=settings["show_grid"], **get_grid_style(style))
 
             # set the aspect ratio of the chart
             if settings["aspect_ratio"]:
