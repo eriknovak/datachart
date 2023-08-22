@@ -13,6 +13,15 @@ class Figsize:
     A4_3_ROWS = (8.2, 7.2)
 
 
+class FigFormat:
+    """FigFormat constants"""
+
+    DEFAULT = "png"
+    SVG = "svg"
+    PDF = "pdf"
+    PNG = "png"
+
+
 class FontStyle:
     """Font Style constants"""
 

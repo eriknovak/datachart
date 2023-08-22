@@ -313,7 +313,7 @@ def chart_wrapper(func: callable) -> callable:
             ],
         )
 
-        plt.show()
+        return figure
 
     return wrapper_func
 
