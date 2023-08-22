@@ -21,10 +21,12 @@ class Config:
     def update_config(self, config: ConfigAttrs) -> None:
         """Updates the global configuration
 
-        Args:
-            config: The new configuration attributes.
-
+        Parameters
+        ----------
+        config: ConfigAttrs
+            The new configuration attributes.
         """
+
         for key, val in config.items():
             if key not in self.config:
                 print(f"Warning: Attribute '{key}' is not valid. Skipping attribute...")
