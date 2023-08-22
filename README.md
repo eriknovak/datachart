@@ -11,27 +11,32 @@
 
 **Documentation:** TODO
 
+**Chart Examples:** https://github.com/eriknovak/datachart/tree/main/notebooks
+
 **Source code:** https://github.com/eriknovak/datachart
 
 ---
 
-# Datachart Python package
-
 The datachart package is a python package for creating data visualizations. It is designed to be simple to use and highly customizable, i.e. it is easy to change the look and feel of the charts.
 
-## Usage Examples
+## Install
 
-Please find examples of how to use the package in the [notebooks](./notebooks) directory. Specifically:
+TODO: create installation instructions
 
-- [Line Chart](./notebooks/01-line-chart.ipynb)
-- [Bar Chart](./notebooks/02-bar-chart.ipynb)
-- [Hist Chart](./notebooks/03-hist-chart.ipynb)
+```bash
+pip install datachart
+```
+
+## Examples
+
+Please find examples of how to use the package in the [notebooks](./notebooks) directory.
 
 
+## Development
 
-## Developer information
+This section is for developers only. It describes the requirements, the setup process and how to run tests.
 
-### ☑️ Requirements
+### ✅ Requirements
 Before starting the project make sure these requirements are available:
 - [python][python]. The python programming language (v3.9 or higher).
 - [git][git]. For versioning your code.
@@ -63,10 +68,10 @@ deactivate
 To install the requirements run:
 
 ```bash
-pip install -e .
+pip install -e .[all]
 ```
 
-#### Running tests
+### 🧪Tests
 
 To run existing tests, simply run:
 
