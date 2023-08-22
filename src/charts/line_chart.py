@@ -1,14 +1,18 @@
 from utils.charts import chart_wrapper, draw_line_chart
+from schema.definitions import LineChartAttrs
 
 # ================================================
 # Main Chart Definition
 # ================================================
 
 
-def line_chart(attrs):
+def line_chart(attrs: LineChartAttrs):
     """Draw a line chart
 
-    Args:
-        attrs (dict): The chart attributes.
+    Parameters
+    ----------
+    attrs : LineChartAttrs
+        The chart attributes.
+
     """
     return chart_wrapper(draw_line_chart)(attrs)

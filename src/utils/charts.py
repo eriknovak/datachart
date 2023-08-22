@@ -22,7 +22,14 @@ from utils.attrs import (
     configure_labels,
 )
 
+from schema.definitions import (
+    LineDataAttrs,
+    BarDataAttrs,
+    HistDataAttrs,
+    UnionChartAttrs,
+)
 from schema.constants import Figsize
+
 
 from typing import List
 
@@ -236,8 +243,8 @@ def assert_chart_settings(settings: dict, supported_settings: List[str]) -> None
 # ================================================
 
 
-def chart_wrapper(func):
-    def wrapper_func(attrs):
+def chart_wrapper(func: callable) -> callable:
+    def wrapper_func(attrs: UnionChartAttrs) -> None:
         # check how many data point are there
         if not isinstance(attrs["charts"], dict) and not isinstance(
             attrs["charts"], list
@@ -316,14 +323,16 @@ def chart_wrapper(func):
 # ================================================
 
 
-def draw_line_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> None:
+def draw_line_chart(
+    axes: List[plt.Axes], charts: List[LineDataAttrs], settings: dict
+) -> None:
     """Draw a line chart
 
     Parameters
     ----------
     axes : List[plt.Axes]
         The axes list.
-    charts : List[dict]
+    charts : List[LineDataAttrs]
         The charts data.
     settings : dict
         The general settings.
@@ -429,14 +438,16 @@ def draw_line_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
 # ================================================
 
 
-def draw_bar_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> None:
+def draw_bar_chart(
+    axes: List[plt.Axes], charts: List[BarDataAttrs], settings: dict
+) -> None:
     """Draw a bar chart
 
     Parameters
     ----------
     axes : List[plt.Axes]
         The axes list.
-    charts : List[dict]
+    charts : List[BarDataAttrs]
         The charts data.
     settings : dict
         The general settings.
@@ -585,14 +596,16 @@ def draw_bar_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> 
 # ================================================
 
 
-def draw_hist_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> None:
+def draw_hist_chart(
+    axes: List[plt.Axes], charts: List[HistDataAttrs], settings: dict
+) -> None:
     """Draw a bar chart
 
     Parameters
     ----------
     axes : List[plt.Axes]
         The axes list.
-    charts : List[dict]
+    charts : List[HistDataAttrs]
         The charts data.
     settings : dict
         The general settings.
