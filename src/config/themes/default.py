@@ -1,5 +1,3 @@
-from cycler import cycler
-
 from schema.definitions import ConfigAttrs
 from schema.constants import (
     LineStyle,
@@ -53,13 +51,13 @@ DEFAULT_THEME: ConfigAttrs = {
     "plot.legend.shadow": False,
     "plot.legend.frameon": True,
     "plot.legend.alignment": "left",
-    "plot.legend.fontsize": 9,
-    "plot.legend.title.fontsize": 10,
+    "plot.legend.font.size": 9,
+    "plot.legend.title.size": 10,
     "plot.legend.label.color": "#000000",
     # plot area style
     "plot.area.alpha": 0.3,
     "plot.area.color": None,
-    "plot.area.linewidth": 0,
+    "plot.area.line.width": 0,
     "plot.area.hatch": None,
     "plot.area.zorder": 3,
     # plot grid style

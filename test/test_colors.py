@@ -6,7 +6,6 @@ from utils.colors import get_color_scale, get_discrete_colors
 from schema.constants import Colors
 
 TEST_COLOR_SCALE = Colors.Blue
-
 COLOR_SCALE_BLUE = COLOR_SCALE_MAPPING[TEST_COLOR_SCALE]
 
 

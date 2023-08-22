@@ -82,6 +82,13 @@ class Hatch:
     STARS = "*"
 
 
+class LegendAlignment:
+    DEFAULT = "left"
+    CENTER = "center"
+    RIGHT = "right"
+    LEFT = "left"
+
+
 class HistType:
     """Hist Type constants"""
 
