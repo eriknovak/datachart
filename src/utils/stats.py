@@ -1,3 +1,4 @@
+import numpy as np
 from typing import Union
 
 
@@ -9,15 +10,20 @@ from typing import Union
 def get_min_max_values(data: list[Union[int, float]]):
     """Gets the min and max values of a list of data points"
 
-    Args:
-        data (list[Union[int, float]]): The data points.
+    Parameters
+    ----------
+    data: List[Union[int, float]]
+        The data points.
 
-    Returns: The min and max values.
+    Returns
+    -------
+    min_val: Union[int, float]
+        The min value.
+    max_val: Union[int, float]
+        The max value.
+
     """
-    assert isinstance(data, list), "The data variable is not a list."
-    assert all(
-        isinstance(d, (int, float)) for d in data
-    ), "data items are not ints or floats."
+    assert isinstance(data, (list, np.ndarray)), "The data variable is not a list."
     min_val = min(data)
     max_val = max(data)
     return min_val, max_val

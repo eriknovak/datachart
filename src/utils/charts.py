@@ -42,16 +42,21 @@ DEFAULT_NUM_BINS = 20
 
 
 def get_chart_data(attr: str, chart: dict) -> np.array:
-    """
-    Generate a numpy array of data from a given chart dictionary.
+    """Generate a numpy array of data from a given chart dictionary.
 
-    Parameters:
-        attr (str): The attribute to extract from the chart data.
-        chart (dict): The chart dictionary containing the data.
+    Parameters
+    ----------
+    attr : str
+        The attribute to extract from the chart data.
+    chart : dict
+        The chart dictionary containing the data.
 
-    Returns:
-        np.array: An array of values extracted from the chart data, or None if no values are found.
+    Returns
+    -------
+    np.array
+        An array of values extracted from the chart data, or None if no values are found.
     """
+
     attr_label = get_attr_value(attr, chart, attr)
 
     if isinstance(chart["data"], dict):
@@ -65,23 +70,63 @@ def get_chart_data(attr: str, chart: dict) -> np.array:
 
 
 def custom_color_cycle(has_multi_subplots: bool, n_charts: int):
-    """Create a custom color cycle."""
+    """Create a custom color cycle.
+
+    Parameters
+    ----------
+    has_multi_subplots : bool
+        True if there are multiple subplots, False otherwise.
+    n_charts : int
+        The number of charts.
+
+    Returns
+    -------
+    list
+        The custom color cycle.
+    """
+
     color_type = "singular" if has_multi_subplots else "multiple"
     color_attr = config[f"color.general.{color_type}"]
     max_colors = 1 if has_multi_subplots else n_charts
     return create_color_cycle(color_attr, max_colors)
 
 
-def has_multiple_subplots(axes: dict) -> bool:
+def has_multiple_subplots(axes: list) -> bool:
+    """Check if there are multiple subplots.
+
+    Parameters
+    ----------
+    axes : list
+        The axes list.
+
+    Returns
+    -------
+    bool
+        True if there are multiple subplots, False otherwise.
+    """
+
     return not all([ax == axes[0] for ax in axes])
 
 
 def get_chart_hash(chart: dict) -> str:
+    """Get a hash of the chart.
+
+    Parameters
+    ----------
+    chart : dict
+        The chart dictionary.
+
+    Returns
+    -------
+    str
+        The hash of the chart.
+    """
+
     return hash(json.dumps(chart, sort_keys=True))
 
 
 # ------------------------------------------------
-# Settings Mapping
+# Settings Mapping and Helpers
 # ------------------------------------------------
 
 
@@ -132,6 +177,19 @@ settings_chart_mapping = [
 
 
 def get_settings(attrs: dict) -> dict:
+    """Get the chart settings.
+
+    Parameters
+    ----------
+    attrs : dict
+        The attributes.
+
+    Returns
+    -------
+    dict
+        The chart settings.
+    """
+
     return {
         attr["name"]: attrs.get(attr["name"], attr["default"])
         for attr in settings_attr_mapping
@@ -139,11 +197,33 @@ def get_settings(attrs: dict) -> dict:
 
 
 def get_chart_settings(settings: dict) -> dict:
+    """Get the chart settings.
+
+    Parameters
+    ----------
+    settings : dict
+        The chart settings.
+
+    Returns
+    -------
+    dict
+        The chart settings without the None values.
+    """
+
     return {key: val for key, val in settings.items() if key in settings_chart_mapping}
 
 
 def assert_chart_settings(settings: dict, supported_settings: List[str]) -> None:
-    """Assert that the chart config is supported."""
+    """Assert that the chart config is supported.
+
+    Parameters
+    ----------
+    settings : dict
+        The chart settings.
+    supported_settings : List[str]
+        The supported settings.
+    """
+
     for key, val in settings.items():
         if key not in supported_settings and val:
             warnings.warn(
@@ -239,10 +319,14 @@ def chart_wrapper(func):
 def draw_line_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> None:
     """Draw a line chart
 
-    Args:
-        axes: The axes.
-        charts: The charts data.
-        settings: The settings.
+    Parameters
+    ----------
+    axes : List[plt.Axes]
+        The axes list.
+    charts : List[dict]
+        The charts data.
+    settings : dict
+        The general settings.
     """
 
     # assert the configuration
@@ -348,10 +432,14 @@ def draw_line_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) ->
 def draw_bar_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> None:
     """Draw a bar chart
 
-    Args:
-        axes: The axes.
-        charts: The charts data.
-        settings: The settings.
+    Parameters
+    ----------
+    axes : List[plt.Axes]
+        The axes list.
+    charts : List[dict]
+        The charts data.
+    settings : dict
+        The general settings.
     """
 
     # assert the configuration
@@ -500,10 +588,14 @@ def draw_bar_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> 
 def draw_hist_chart(axes: List[plt.Axes], charts: List[dict], settings: dict) -> None:
     """Draw a bar chart
 
-    Args:
-        axes: The axes.
-        charts: The charts data.
-        settings: The draw settings.
+    Parameters
+    ----------
+    axes : List[plt.Axes]
+        The axes list.
+    charts : List[dict]
+        The charts data.
+    settings : dict
+        The general settings.
     """
 
     # assert the configuration

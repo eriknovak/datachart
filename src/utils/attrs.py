@@ -1,5 +1,6 @@
 import math
 import warnings
+import matplotlib.pyplot as plt
 from typing import Union, Tuple, Dict, List
 
 from config import config, Config
@@ -15,13 +16,18 @@ def get_attr_value(
 ):
     """Retrieves the value of the specified attribute from the given object.
 
-    Args:
-        attr (str): The name of the attribute.
-        obj (dict): The object.
-        default (Union[Config, bool, int, float, str, None]): The default value to return if the attribute is not found.
-    Returns:
-        The value of the attribute, or the default value if the attribute is not found.
+    Parameters
+    ----------
+    attr : str
+        The name of the attribute.
+    obj : dict
+        The object.
+    default : Union[Config, dict, bool, int, float, str, None]
+        The default value to return if the attribute is not found.
 
+    Returns
+    -------
+    The value of the attribute, or the default value if the attribute is not found.
     """
     if isinstance(default, Config) or isinstance(default, dict):
         return obj.get(attr, default[attr])
@@ -31,17 +37,21 @@ def get_attr_value(
 def create_config_dict(
     styles: Dict[str, str], attrs: List[Tuple[str, str]]
 ) -> Dict[str, str]:
+    """Create a configuration dictionary based on the given styles and attributes.
+
+    Parameters
+    ----------
+    styles : Dict[str, str]
+        A dictionary containing the styles.
+    attrs : List[Tuple[str, str]]
+        A list of tuples representing the attributes.
+
+    Returns
+    -------
+    Dict[str, str]
+        The configuration dictionary.
     """
-    Create a configuration dictionary based on the given styles and attributes.
 
-    Args:
-        styles (dict): A dictionary containing the styles.
-        attrs (list): A list of tuples representing the attributes.
-
-    Returns:
-        dict: The configuration dictionary.
-
-    """
     # Create a dictionary comprehension that maps each key to the attribute value
     return {
         key: get_attr_value(attr, styles, config)
@@ -60,22 +70,33 @@ def create_config_dict(
 # -------------------------------------
 
 
-def get_subplot_config(subplots: bool, n_charts: int, max_cols: int) -> dict[str, int]:
-    """
-    Calculate the configuration for subplots in a figure.
-    Args:
-        subplots (bool): Whether to show subplots separately.
-        n_charts (int): The number of subplots.
-        max_cols (int): The maximum number of columns for the subplots.
-    Returns:
-        dict[str, int]: A dictionary containing the configuration for subplots,
-            including the number of rows (nrows) and the number of columns (ncols).
+def get_subplot_config(
+    subplots: bool, n_charts: int = 1, max_cols: int = 1
+) -> dict[str, int]:
+    """Calculate the configuration for subplots in a figure.
+
+    Parameters
+    ----------
+    subplots : bool
+        Whether to show subplots.
+    n_charts : int, optional (default=1)
+        The number of charts.
+    max_cols : int, optional (default=1)
+        The maximum number of columns.
+
+    Returns
+    -------
+    dict[str, int]
+        The configuration for subplots, including the number of rows (nrows) and
+        the number of columns (ncols).
     """
 
     nrows = 1
     ncols = 1
 
     if subplots:
+        assert n_charts > 0, "The number of charts must be greater than 0."
+        assert max_cols > 0, "The maximum number of columns must be greater than 0."
         # there are more subplots
         nrows = math.ceil(n_charts / max_cols)
         ncols = max_cols if n_charts >= max_cols else n_charts % max_cols
@@ -91,14 +112,17 @@ def get_subplot_config(subplots: bool, n_charts: int, max_cols: int) -> dict[str
 def get_text_style(text_type: str = "") -> dict:
     """Get the text configuration
 
-    Args:
-        config (Config): The configuration.
-        text_type (str): The text type (default: "").
+    Parameters
+    ----------
+    text_type : str, optional (default="")
+        The text type.
 
-    Returns:
-        dict: The text configuration dict.
-
+    Returns
+    -------
+    dict
+        The text configuration dict.
     """
+
     config_attrs = [
         ("fontsize", "font.{type}.size"),
         ("fontweight", "font.{type}.weight"),
@@ -124,13 +148,17 @@ def get_text_style(text_type: str = "") -> dict:
 def get_line_style(chart_style: dict) -> dict:
     """Get the line configuration
 
-    Args:
-        chart_style (dict): The chart style dictionary.
+    Parameters
+    ----------
+    chart_style : dict
+        The chart style dictionary.
 
-    Returns:
-        dict: The line configuration dict.
-
+    Returns
+    -------
+    dict
+        The line configuration dict.
     """
+
     config_attrs = [
         ("color", "plot.line.color"),
         ("alpha", "plot.line.alpha"),
@@ -152,14 +180,19 @@ def get_line_style(chart_style: dict) -> dict:
 def get_bar_style(chart_style: dict, is_horizontal: bool = False) -> dict:
     """Get the bar configuration
 
-    Args:
-        chart_style (dict): The chart style dictionary.
-        horizontal_flag (bool): Whether the bar is horizontal or not.
+    Parameters
+    ----------
+    chart_style : dict
+        The chart style dictionary.
+    is_horizontal : bool
+        Whether the bar is horizontal or not.
 
-    Returns:
-        dict: The bar configuration dict.
-
+    Returns
+    -------
+    dict
+        The bar configuration dict.
     """
+
     config_attrs = [
         ("color", "plot.bar.color"),
         ("alpha", "plot.bar.alpha"),
@@ -182,13 +215,17 @@ def get_bar_style(chart_style: dict, is_horizontal: bool = False) -> dict:
 def get_hist_style(chart_style: dict) -> dict:
     """Get the hist configuration
 
-    Args:
-        chart_style (dict): The chart style dictionary.
+    Parameters
+    ----------
+    chart_style : dict
+        The chart style dictionary.
 
-    Returns:
-        dict: The hist configuration dict.
-
+    Returns
+    -------
+    dict
+        The hist configuration dict.
     """
+
     config_attrs = [
         ("color", "plot.hist.color"),
         ("alpha", "plot.hist.alpha"),
@@ -212,18 +249,21 @@ def get_hist_style(chart_style: dict) -> dict:
 def get_area_style(chart_style: dict) -> dict:
     """Get the area configuration
 
-    Args:
-        chart_style (dict): The chart style dictionary.
+    Parameters
+    ----------
+    chart_style : dict
+        The chart style dictionary.
 
-    Returns:
-        dict: The area configuration dict.
-
+    Returns
+    -------
+    dict
+        The area configuration dict.
     """
 
     config_attrs = [
         ("alpha", "plot.area.alpha"),
         ("color", "plot.area.color"),
-        ("linewidth", "plot.area.linewidth"),
+        ("linewidth", "plot.area.line.width"),
         ("hatch", "plot.area.hatch"),
         ("zorder", "plot.area.zorder"),
     ]
@@ -239,13 +279,17 @@ def get_area_style(chart_style: dict) -> dict:
 def get_grid_style(chart_style: dict) -> dict:
     """Get the grid configuration
 
-    Args:
-        chart_style (dict): The chart style dictionary.
+    Parameters
+    ----------
+    chart_style : dict
+        The chart style dictionary.
 
-    Returns:
-        dict: The grid configuration dict.
-
+    Returns
+    -------
+    dict
+        The grid configuration dict.
     """
+
     config_attrs = [
         ("alpha", "plot.grid.alpha"),
         ("color", "plot.grid.color"),
@@ -264,16 +308,18 @@ def get_grid_style(chart_style: dict) -> dict:
 def get_legend_style() -> dict:
     """Get the legend configuration
 
-    Returns:
-        dict: The grid configuration dict.
-
+    Returns
+    -------
+    dict
+        The legend configuration dict.
     """
+
     config_attrs = [
         ("shadow", "plot.legend.shadow"),
         ("frameon", "plot.legend.frameon"),
-        ("fontsize", "plot.legend.fontsize"),
+        ("fontsize", "plot.legend.font.size"),
         ("alignment", "plot.legend.alignment"),
-        ("title_fontsize", "plot.legend.title.fontsize"),
+        ("title_fontsize", "plot.legend.title.size"),
         ("labelcolor", "plot.legend.label.color"),
     ]
     return create_config_dict({}, config_attrs)
@@ -284,13 +330,15 @@ def get_legend_style() -> dict:
 # ================================================
 
 
-def configure_axes_spines(ax):
-    """
-    Configure axes spines.
+def configure_axes_spines(ax: plt.Axes):
+    """Configure axes spines.
 
-    Args:
-        ax (Axes): The axes.
+    Parameters
+    ----------
+    ax : plt.Axes
+        The axes.
     """
+
     # Turn on the axes
     ax.axis("on")
 
@@ -304,14 +352,17 @@ def configure_axes_spines(ax):
         )
 
 
-def configure_axis_ticks_style(ax, axis_type: str):
+def configure_axis_ticks_style(ax: plt.Axes, axis_type: str):
     """Configure axis ticks.
 
-    Args:
-        ax (Axes): The axes.
-        axis_type (str): The axis type. Options: "xaxis", "yaxis".
-
+    Parameters
+    ----------
+    ax : plt.Axes
+        The axes.
+    axis_type : str
+        The axis type. Options: "xaxis", "yaxis".
     """
+
     # Set tick parameters for major ticks
     getattr(ax, axis_type).set_tick_params(
         which="major",
@@ -321,7 +372,17 @@ def configure_axis_ticks_style(ax, axis_type: str):
     )
 
 
-def configure_axis_ticks_position(ax, chart: dict):
+def configure_axis_ticks_position(ax: plt.Axes, chart: dict):
+    """Configure axis ticks position
+
+    Parameters
+    ----------
+    ax : plt.Axes
+        The axes.
+    chart : dict
+        The chart style.
+    """
+
     tick_attrs = [
         ("xticks", "xticklabels", "xaxis"),
         ("yticks", "yticklabels", "yaxis"),
@@ -353,13 +414,18 @@ def configure_axis_ticks_position(ax, chart: dict):
                 func(ticks, labels=ticklabels)
 
 
-def configure_axis_limits(ax, settings: dict):
+def configure_axis_limits(ax: plt.Axes, settings: dict):
     """Configure axis limits.
 
-    Args:
-        ax (Axes): The axes.
-        settings (dict): The settings.
+    Parameters
+    ----------
+    ax : plt.Axes
+        The axes.
+
+    settings : dict
+        The settings.
     """
+
     if settings["x_min"] is not None or settings["x_max"] is not None:
         xmin, xmax = ax.get_xlim()
         xmin = settings["x_min"] if settings["x_min"] is not None else xmin
@@ -373,13 +439,17 @@ def configure_axis_limits(ax, settings: dict):
         ax.set_ylim(ymin=ymin, ymax=ymax)
 
 
-def configure_labels(settings: dict, actions: list):
+def configure_labels(settings: dict, actions: List[Tuple[str, callable]]):
     """Configure chart labels.
 
-    Args:
-        actions (dict): The axes.
-        chart (dict): The chart dictionary.
+    Parameters
+    ----------
+    settings : dict
+        The chart settings.
+    actions : List[Tuple[str, callable]]
+        The actions.
     """
+
     for label, action in actions:
         if label in settings:
             action(settings[label], **get_text_style(label))
