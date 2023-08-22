@@ -1,19 +1,18 @@
-from utils.charts import chart_wrapper, draw_hist_chart
-from schema.definitions import HistChartAttrs
+from ..utils.charts import chart_wrapper, draw_line_chart
+from ..schema.definitions import LineChartAttrs
 
 # ================================================
 # Main Chart Definition
 # ================================================
 
 
-def hist_chart(attrs: HistChartAttrs):
+def line_chart(attrs: LineChartAttrs):
     """Draw a line chart
 
     Parameters
     ----------
-    attrs : HistChartAttrs
+    attrs : LineChartAttrs
         The chart attributes.
 
     """
-
-    return chart_wrapper(draw_hist_chart)(attrs)
+    return chart_wrapper(draw_line_chart)(attrs)

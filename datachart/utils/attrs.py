@@ -3,7 +3,7 @@ import warnings
 import matplotlib.pyplot as plt
 from typing import Union, Tuple, Dict, List
 
-from config import config, Config
+from ..config import config, Config
 
 
 # ================================================

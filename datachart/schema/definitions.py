@@ -1,6 +1,6 @@
 from typing import TypedDict, Union, Tuple, List, Optional
 
-from schema.constants import (
+from ..schema.constants import (
     Figsize,
     FontStyle,
     FontWeight,

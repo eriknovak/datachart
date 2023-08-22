@@ -7,8 +7,8 @@ from cycler import cycler
 from itertools import cycle
 from collections import defaultdict
 
-from schema.constants import Colors
-from config.themes.colors import COLOR_SCALE_MAPPING
+from ..schema.constants import Colors
+from ..config.themes.colors import COLOR_SCALE_MAPPING
 
 # ===============================================
 # Constants

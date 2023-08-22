@@ -4,9 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 
-from utils.colors import create_color_cycle
-from utils.stats import get_min_max_values
-from utils.attrs import (
+from ..utils.colors import create_color_cycle
+from ..utils.stats import get_min_max_values
+from ..utils.attrs import (
     get_subplot_config,
     get_attr_value,
     get_area_style,
@@ -22,18 +22,16 @@ from utils.attrs import (
     configure_labels,
 )
 
-from schema.definitions import (
+from ..schema.definitions import (
     LineDataAttrs,
     BarDataAttrs,
     HistDataAttrs,
     UnionChartAttrs,
 )
-from schema.constants import Figsize
-
+from ..schema.constants import Figsize
+from ..config import config
 
 from typing import List
-
-from config import config
 
 # ================================================
 # Defaults

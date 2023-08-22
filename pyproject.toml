@@ -37,11 +37,9 @@ test = [
 ]
 all = ["datachart[dev,test]"]
 
-[tool.setuptools]
-package-dir = { "" = "src" }
-
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
+include = ["datachart"]
 
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.txt"] }

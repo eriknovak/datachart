@@ -1,7 +1,7 @@
 import unittest
 
-from config import config
-from config.themes import DEFAULT_THEME
+from datachart.config import config
+from datachart.config.themes import DEFAULT_THEME
 
 
 class TestConfig(unittest.TestCase):

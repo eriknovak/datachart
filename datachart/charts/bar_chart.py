@@ -1,5 +1,5 @@
-from utils.charts import chart_wrapper, draw_bar_chart
-from schema.definitions import BarChartAttrs
+from ..utils.charts import chart_wrapper, draw_bar_chart
+from ..schema.definitions import BarChartAttrs
 
 # ================================================
 # Main Chart Definition

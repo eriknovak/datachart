@@ -1,5 +1,5 @@
-from schema.definitions import ConfigAttrs
-from schema.constants import (
+from ...schema.definitions import ConfigAttrs
+from ...schema.constants import (
     LineStyle,
     FontStyle,
     FontWeight,

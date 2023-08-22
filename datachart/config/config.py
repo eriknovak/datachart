@@ -2,7 +2,7 @@ import copy
 import json
 
 # import the schemas
-from schema.definitions import ConfigAttrs
+from ..schema.definitions import ConfigAttrs
 
 # import the themes
 from .themes import DEFAULT_THEME

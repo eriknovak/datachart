@@ -1,6 +1,6 @@
 import unittest
 
-from utils.stats import get_min_max_values
+from datachart.utils.stats import get_min_max_values
 
 
 class TestStats(unittest.TestCase):
