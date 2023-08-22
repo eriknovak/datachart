@@ -14,6 +14,10 @@ def get_min_max_values(data: list[Union[int, float]]):
 
     Returns: The min and max values.
     """
+    assert isinstance(data, list), "The data variable is not a list."
+    assert all(
+        isinstance(d, (int, float)) for d in data
+    ), "data items are not ints or floats."
     min_val = min(data)
     max_val = max(data)
     return min_val, max_val
