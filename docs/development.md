@@ -97,10 +97,15 @@ Next, to test the package published on testpypi, run:
 ```bash
 # install a virtual environment
 python -m venv env
+
 # activate the environment
 . ./env/bin/activate
+
 # install the datachart package
-pip install --index-url https://test.pypi.org/simple/ datachart
+pip install \
+    --index-url https://test.pypi.org/simple/ \
+    --extra-index-url https://pypi.org/simple/ \
+    datachart
 ```
 This way you can test the package without publishing it.
 
