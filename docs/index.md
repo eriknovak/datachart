@@ -13,7 +13,7 @@ title: Home
 
 ---
 
-**Documentation:** TODO
+**Documentation:** https://eriknovak.github.io/datachart/
 
 **Source code:** https://github.com/eriknovak/datachart
 

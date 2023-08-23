@@ -5,8 +5,8 @@ site_description: >-
   Data visualization package, simple to use, highly customizable
 
 # Repository
-repo_name: eriknovak/datacharts
-repo_url: https://github.com/eriknovak/datacharts
+repo_name: eriknovak/datachart
+repo_url: https://github.com/eriknovak/datachart
 
 # Configuration
 theme:
