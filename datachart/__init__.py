@@ -14,9 +14,7 @@ from `the datachart homepage <https://eriknovak.github.io/datachart>`.
 
 """
 
-from . import charts
 from .charts import line_chart, bar_chart, hist_chart
-
 from . import config
 from . import schema
 from . import utils

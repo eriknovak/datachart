@@ -1,11 +1,10 @@
 import warnings
-
-import numpy as np
-import matplotlib.colors as colors
-
 from cycler import cycler
 from itertools import cycle
 from collections import defaultdict
+
+import numpy as np
+import matplotlib.colors as colors
 
 from ..schema.constants import Colors
 from ..config.themes.colors import COLOR_SCALE_MAPPING

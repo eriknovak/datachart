@@ -1,5 +1,7 @@
 import json
 import warnings
+from typing import List
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
@@ -30,8 +32,6 @@ from ..schema.definitions import (
 )
 from ..schema.constants import Figsize
 from ..config import config
-
-from typing import List
 
 # ================================================
 # Defaults

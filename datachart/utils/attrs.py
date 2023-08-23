@@ -1,7 +1,8 @@
 import math
 import warnings
-import matplotlib.pyplot as plt
 from typing import Union, Tuple, Dict, List
+
+import matplotlib.pyplot as plt
 
 from ..config import config, Config
 
