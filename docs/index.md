@@ -13,9 +13,9 @@ title: Home
 
 ---
 
-**Documentation:** https://eriknovak.github.io/datachart/
+**Documentation:** [https://eriknovak.github.io/datachart](https://eriknovak.github.io/datachart)
 
-**Source code:** https://github.com/eriknovak/datachart
+**Source code:** [https://github.com/eriknovak/datachart](https://github.com/eriknovak/datachart)
 
 ---
 
