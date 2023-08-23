@@ -2,14 +2,11 @@
 site_name: datachart
 site_author: Erik Novak
 site_description: >-
-  The homepage for the customizable data chart creation package.
+  Data visualization package, simple to use, highly customizable
 
 # Repository
 repo_name: eriknovak/datacharts
 repo_url: https://github.com/eriknovak/datacharts
-
-# Copyright
-copyright: ""
 
 # Configuration
 theme:
@@ -42,7 +39,7 @@ theme:
       toggle:
         icon: material/weather-night
         name: Switch to light mode
-  logo: ""
+  logo: assets/imgs/logo.png
 
 edit_uri: ""
 
@@ -72,3 +69,13 @@ markdown_extensions:
 # Page tree
 nav:
   - Home: index.md
+
+  - Documentation:
+    - Overview: documentation/overview.md
+    - Charts:
+      - Line Chart: documentation/charts/line-chart.md
+      - Bar Chart:  documentation/charts/bar-chart.md
+      - Hist Chart: documentation/charts/hist-chart.md
+    - Configuration: documentation/configuration.md
+
+  - Development: development.md
