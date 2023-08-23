@@ -3,7 +3,7 @@ requires = ['setuptools>=42']
 build-backend = 'setuptools.build_meta'
 
 [project]
-version = "0.1.0"
+version = "0.2.0"
 name = "datachart"
 description = "The customizable data chart creation package"
 authors=[{ name = "Erik Novak", email = "novak.erik@gmail.com" }]
@@ -15,7 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "License :: OSI Approved :: BSD 3-Clause License",
+    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Visualization",
     "Topic :: Multimedia :: Graphics",
@@ -31,6 +31,7 @@ Docs = "https://github.com/eriknovak/datachart"
 dev = [
     "black",
     "flake8",
+    "mkdocs-material == 8.5.11",
 ]
 test = [
     "coverage",
@@ -43,7 +44,3 @@ include = ["datachart"]
 
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.txt"] }
-
-
-
-
