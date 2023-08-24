@@ -7,7 +7,19 @@ title: Home
 </p>
 
 <p align="center">
-<i>Data visualization package, simple to use, highly customizable</i>
+  <i>Data visualization package, simple to use, highly customizable</i>
+</p>
+
+<p style="text-align: center">
+  <a href="https://github.com/eriknovak/datachart/actions/workflows/unittests.yaml" target="_blank">
+    <img src="https://github.com/eriknovak/datachart/actions/workflows/unittests.yaml/badge.svg" alt="Test">
+  </a>
+  <a href="https://pypi.org/project/datachart" target="_blank">
+    <img src="https://img.shields.io/pypi/v/datachart?color=%2334D058&amp;label=pypi%20package" alt="Package version">
+  </a>
+  <a href="https://pypi.org/project/datachart" target="_blank">
+    <img src="https://img.shields.io/pypi/pyversions/datachart.svg?color=%2334D058" alt="Supported Python versions">
+  </a>
 </p>
 
 
