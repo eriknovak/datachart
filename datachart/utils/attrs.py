@@ -73,7 +73,7 @@ def create_config_dict(
 
 def get_subplot_config(
     subplots: bool, n_charts: int = 1, max_cols: int = 1
-) -> dict[str, int]:
+) -> Dict[str, int]:
     """Calculate the configuration for subplots in a figure.
 
     Parameters
@@ -87,7 +87,7 @@ def get_subplot_config(
 
     Returns
     -------
-    dict[str, int]
+    Dict[str, int]
         The configuration for subplots, including the number of rows (nrows) and
         the number of columns (ncols).
     """
