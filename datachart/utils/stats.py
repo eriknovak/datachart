@@ -1,4 +1,4 @@
-from typing import Union
+from typing import List, Union
 
 import numpy as np
 
@@ -7,7 +7,7 @@ import numpy as np
 # ================================================
 
 
-def get_min_max_values(data: list[Union[int, float]]):
+def get_min_max_values(data: List[Union[int, float]]):
     """Gets the min and max values of a list of data points"
 
     Parameters
