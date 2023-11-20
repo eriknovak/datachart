@@ -3,7 +3,7 @@ requires = ['setuptools>=42']
 build-backend = 'setuptools.build_meta'
 
 [project]
-version = "0.2.4"
+version = "0.2.5"
 name = "datachart"
 description = "The customizable data chart creation package"
 authors=[{ name = "Erik Novak", email = "novak.erik@gmail.com" }]
