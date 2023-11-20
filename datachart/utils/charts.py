@@ -1,6 +1,6 @@
 import json
 import warnings
-from typing import List
+from typing import List, Union
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,6 +17,8 @@ from ..utils.attrs import (
     get_bar_style,
     get_hist_style,
     get_legend_style,
+    get_vline_style,
+    get_hline_style,
     configure_axes_spines,
     configure_axis_ticks_style,
     configure_axis_ticks_position,
@@ -29,6 +31,8 @@ from ..schema.definitions import (
     BarDataAttrs,
     HistDataAttrs,
     UnionChartAttrs,
+    HLineAttrs,
+    VLineAttrs,
 )
 from ..schema.constants import Figsize
 from ..config import config
@@ -415,6 +419,14 @@ def draw_line_chart(
         x_min, x_max = get_min_max_values(x)
         ax.set_xlim(xmin=x_min, xmax=x_max)
 
+        if "vlines" in chart:
+            # draw vertical lines
+            draw_vlines(ax, chart["vlines"])
+
+        if "hlines" in chart:
+            # draw horizontal lines
+            draw_hlines(ax, chart["hlines"])
+
         # override axis limits
         configure_axis_limits(ax, settings)
         configure_axis_ticks_position(ax, chart)
@@ -562,6 +574,14 @@ def draw_bar_chart(
                 ],
             )
 
+        if "vlines" in chart:
+            # draw vertical lines
+            draw_vlines(ax, chart["vlines"])
+
+        if "hlines" in chart:
+            # draw horizontal lines
+            draw_hlines(ax, chart["hlines"])
+
         # override axis limits
         configure_axis_limits(ax, settings)
 
@@ -670,6 +690,14 @@ def draw_hist_chart(
             **hist_style,
         )
 
+        if "vlines" in chart:
+            # draw vertical lines
+            draw_vlines(axes[0], chart["vlines"])
+
+        if "hlines" in chart:
+            # draw horizontal lines
+            draw_hlines(axes[0], chart["hlines"])
+
         # override the axis limits
         configure_axis_limits(axes[0], settings)
         configure_axis_ticks_position(axes[0], charts[0])
@@ -708,6 +736,15 @@ def draw_hist_chart(
                 orientation=orientation,
                 **hist_style,
             )
+
+            if "vlines" in chart:
+                # draw vertical lines
+                draw_vlines(ax, chart["vlines"])
+
+            if "hlines" in chart:
+                # draw horizontal lines
+                draw_hlines(ax, chart["hlines"])
+
             # override the axis limits
             configure_axis_limits(ax, settings)
             configure_axis_ticks_position(ax, chart)
@@ -723,3 +760,77 @@ def draw_hist_chart(
         # show the legend in the last subplot
         if settings["show_legend"]:
             warnings.warn("The `show_legend` flag will be ignored for multi-subplots.")
+
+
+# ================================================
+# Draw Vertical Lines
+# ================================================
+
+
+def draw_vlines(ax: plt.Axes, vlines: Union[VLineAttrs, List[VLineAttrs]]):
+    """Configure vertical lines.
+
+    Parameters
+    ----------
+    ax : plt.Axes
+        The axes.
+
+    vlines : Union[VLineAttrs, List[VLineAttrs]]
+        The configuration of the vertical lines.
+    """
+
+    vlines = vlines if isinstance(vlines, list) else [vlines]
+
+    for vline in vlines:
+        ymin, ymax = ax.get_ylim()
+
+        x = vline.get("x")
+
+        if x is None:
+            warnings.warn(
+                "The attribute `x` is not specified. Please provide the `x` value."
+            )
+            continue
+
+        ymin = vline.get("ymin", ymin)
+        ymax = vline.get("ymax", ymax)
+        label = vline.get("label", "")
+        style = get_vline_style(vline.get("style", {}))
+        ax.vlines(x=x, ymin=ymin, ymax=ymax, label=label, **style)
+
+
+# ================================================
+# Draw Horizontal Lines
+# ================================================
+
+
+def draw_hlines(ax: plt.Axes, hlines: Union[HLineAttrs, List[HLineAttrs]]):
+    """Configure horizontal lines.
+
+    Parameters
+    ----------
+    ax : plt.Axes
+        The axes.
+
+    hlines : Union[HLineAttrs, List[HLineAttrs]]
+        The configuration of the horizontal lines.
+    """
+
+    hlines = hlines if isinstance(hlines, list) else [hlines]
+
+    for hline in hlines:
+        xmin, xmax = ax.get_xlim()
+
+        y = hline.get("y")
+
+        if y is None:
+            warnings.warn(
+                "The attribute `y` is not specified. Please provide the `y` value."
+            )
+            continue
+
+        xmin = hline.get("xmin", xmin)
+        xmax = hline.get("xmax", xmax)
+        label = hline.get("label", "")
+        style = get_hline_style(hline.get("style", {}))
+        ax.hlines(y=y, xmin=xmin, xmax=xmax, label=label, **style)

@@ -93,4 +93,14 @@ DEFAULT_THEME: ConfigAttrs = {
     "plot.hist.align": "mid",
     "plot.hist.edge.width": 0.5,
     "plot.hist.edge.color": "#000000",
+    # plot vline style
+    "plot.vline.color": None,
+    "plot.vline.style": LineStyle.SOLID,
+    "plot.vline.width": 1,
+    "plot.vline.alpha": 1.0,
+    # plot hline style
+    "plot.hline.color": None,
+    "plot.hline.style": LineStyle.SOLID,
+    "plot.hline.width": 1,
+    "plot.hline.alpha": 1.0,
 }

@@ -302,6 +302,64 @@ def get_grid_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Vertical Line Style
+# -------------------------------------
+
+
+def get_vline_style(vline_style: dict) -> dict:
+    """Get the vline configuration
+
+    Parameters
+    ----------
+    vline_style : dict
+        The vline style dictionary.
+
+    Returns
+    -------
+    dict
+        The vline configuration dict.
+    """
+
+    config_attrs = [
+        ("color", "plot.vline.color"),
+        ("linestyle", "plot.vline.style"),
+        ("linewidth", "plot.vline.width"),
+        ("alpha", "plot.vline.alpha"),
+    ]
+
+    return create_config_dict(vline_style, config_attrs)
+
+
+# -------------------------------------
+# Horizontal Line Style
+# -------------------------------------
+
+
+def get_hline_style(hline_style: dict) -> dict:
+    """Get the vline configuration
+
+    Parameters
+    ----------
+    hline_style : dict
+        The vline style dictionary.
+
+    Returns
+    -------
+    dict
+        The vline configuration dict.
+    """
+
+    config_attrs = [
+        ("colors", "plot.hline.color"),
+        ("linestyle", "plot.hline.style"),
+        ("linewidth", "plot.hline.width"),
+        ("alpha", "plot.hline.alpha"),
+    ]
+
+    return create_config_dict(hline_style, config_attrs)
+
+
+# -------------------------------------
 # Legend Style
 # -------------------------------------
 

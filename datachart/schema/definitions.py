@@ -9,8 +9,6 @@ from ..schema.constants import (
     LineDrawStyle,
     Hatch,
     LegendAlignment,
-    HistType,
-    Colors,
 )
 
 # ================================================
@@ -148,6 +146,26 @@ HistConfigAttrs = TypedDict(
     },
 )
 
+VLineConfigAttrs = TypedDict(
+    "VLineConfigAttrs",
+    {
+        "plot.vline.color": Union[str, None],
+        "plot.vline.style": Union[LineStyle, None],
+        "plot.vline.width": Union[int, float, None],
+        "plot.vline.alpha": Union[float, None],
+    },
+)
+
+HLineConfigAttrs = TypedDict(
+    "HLineConfigAttrs",
+    {
+        "plot.hline.color": Union[str, None],
+        "plot.hline.style": Union[LineStyle, None],
+        "plot.hline.width": Union[int, float, None],
+        "plot.hline.alpha": Union[float, None],
+    },
+)
+
 
 class ConfigAttrs(
     ColorGeneralAttrs,
@@ -159,6 +177,8 @@ class ConfigAttrs(
     LineConfigAttrs,
     BarConfigAttrs,
     HistConfigAttrs,
+    VLineConfigAttrs,
+    HLineConfigAttrs,
 ):
     pass
 
@@ -190,6 +210,27 @@ class ChartCommonAttrs(TypedDict):
 
 
 # ================================================
+# Vertical and Horizontal Line Definitions
+# ================================================
+
+
+class VLineAttrs(TypedDict):
+    x: Union[int, float]
+    ymin: Union[int, float, None]
+    ymax: Union[int, float, None]
+    style: Union[VLineConfigAttrs, None]
+    label: Union[str, None]
+
+
+class HLineAttrs(TypedDict):
+    y: Union[int, float]
+    xmin: Union[int, float, None]
+    xmax: Union[int, float, None]
+    style: Union[HLineConfigAttrs, None]
+    label: Union[str, None]
+
+
+# ================================================
 # Line Chart Definitions
 # ================================================
 
@@ -210,6 +251,9 @@ class LineDataAttrs(TypedDict):
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
+
+    vlines: Union[VLineAttrs, List[VLineAttrs]]
+    hlines: Union[HLineAttrs, List[HLineAttrs]]
 
 
 class LineChartAttrs(ChartCommonAttrs):
@@ -240,6 +284,9 @@ class BarDataAttrs(TypedDict):
     xlabel: Union[str, None]
     ylabel: Union[str, None]
 
+    vlines: Union[VLineAttrs, List[VLineAttrs]]
+    hlines: Union[HLineAttrs, List[HLineAttrs]]
+
 
 class BarChartAttrs(ChartCommonAttrs):
     charts: Union[BarDataAttrs, List[BarDataAttrs]]
@@ -264,6 +311,9 @@ class HistDataAttrs(TypedDict):
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
+
+    vlines: Union[VLineAttrs, List[VLineAttrs]]
+    hlines: Union[HLineAttrs, List[HLineAttrs]]
 
 
 class HistChartAttrs(ChartCommonAttrs):
