@@ -509,6 +509,13 @@ def configure_axis_ticks_position(ax: plt.Axes, chart: dict):
         labels = chart.get(attrs[1], None)
         rotation = chart.get(attrs[2], 0)
 
+        if attrs[3] == "xaxis":
+            ha = "center" if rotation == 0 else "right"
+            va = "top" if rotation == 0 else "center"
+        if attrs[3] == "yaxis":
+            ha = "right"
+            va = "center"
+
         set_ticks = getattr(ax, attrs[3]).set_ticks
 
         if ticks is None and labels is None:
@@ -524,8 +531,8 @@ def configure_axis_ticks_position(ax: plt.Axes, chart: dict):
                 labels=ticks,
                 rotation=rotation,
                 rotation_mode="anchor",
-                ha="center" if rotation == 0 else "right",
-                va="top",
+                ha=ha,
+                va=va,
             )
         elif ticks is not None and labels is not None:
             if len(ticks) != len(labels):
@@ -539,8 +546,8 @@ def configure_axis_ticks_position(ax: plt.Axes, chart: dict):
                     labels=ticks,
                     rotation=rotation,
                     rotation_mode="anchor",
-                    ha="center" if rotation == 0 else "right",
-                    va="top",
+                    ha=ha,
+                    va=va,
                 )
             else:
                 # draw both the ticks and the labels
@@ -549,8 +556,8 @@ def configure_axis_ticks_position(ax: plt.Axes, chart: dict):
                     labels=labels,
                     rotation=rotation,
                     rotation_mode="anchor",
-                    ha="center" if rotation == 0 else "right",
-                    va="top" if rotation == 0 else "center",
+                    ha=ha,
+                    va=va,
                 )
 
 
