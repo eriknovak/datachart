@@ -36,22 +36,22 @@ class TestAttrs(unittest.TestCase):
 
     def test_get_subplot_config(self):
         # no subplot
-        config = get_subplot_config(False)
+        config = get_subplot_config("linechart", False)
         self.assertEqual(config["nrows"], 1)
         self.assertEqual(config["ncols"], 1)
 
         # with subplot and default number of charts
-        config = get_subplot_config(True)
+        config = get_subplot_config("linechart", True)
         self.assertEqual(config["nrows"], 1)
         self.assertEqual(config["ncols"], 1)
 
         # with two subplots
-        config = get_subplot_config(True, 2)
+        config = get_subplot_config("linechart", True, 2)
         self.assertEqual(config["nrows"], 2)
         self.assertEqual(config["ncols"], 1)
 
         # with four subplots in three columns
-        config = get_subplot_config(True, 4, 3)
+        config = get_subplot_config("linechart", True, 4, 3)
         self.assertEqual(config["nrows"], 2)
         self.assertEqual(config["ncols"], 3)
 
