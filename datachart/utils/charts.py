@@ -423,6 +423,10 @@ def draw_line_chart(
         configure_axis_ticks_position(ax, chart)
         configure_axis_limits(ax, settings)
 
+        # override axis limits
+        configure_axis_limits(ax, settings)
+        configure_axis_ticks_position(ax, chart)
+
         if "vlines" in chart:
             # draw vertical lines
             draw_vlines(ax, chart["vlines"])
@@ -573,6 +577,9 @@ def draw_bar_chart(
                     ("ylabel", ax.set_ylabel if not is_horizontal else ax.set_xlabel),
                 ],
             )
+
+        # override axis limits
+        configure_axis_limits(ax, settings)
 
         if "vlines" in chart:
             # draw vertical lines
