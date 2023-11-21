@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
 
-from ..schema.constants import FigFormat
+from ..schema.constants import FIG_FORMAT
 
 
 def save_figure(
     figure: plt.Figure,
     path: str,
     dpi: int = 300,
-    format: FigFormat = None,
+    format: FIG_FORMAT = None,
     transparent=False,
 ) -> None:
     """Save the figure to a file.

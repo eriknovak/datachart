@@ -15,4 +15,4 @@ def bar_chart(attrs: BarChartAttrs):
         The chart attributes.
 
     """
-    return chart_wrapper(draw_bar_chart)(attrs)
+    return chart_wrapper(draw_bar_chart)({**attrs, "type": "barchart"})

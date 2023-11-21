@@ -2,9 +2,9 @@ import unittest
 
 from datachart.config.themes.colors import COLOR_SCALE_MAPPING
 from datachart.utils.colors import get_color_scale, get_discrete_colors
-from datachart.schema.constants import Colors
+from datachart.schema.constants import COLORS
 
-TEST_COLOR_SCALE = Colors.Blue
+TEST_COLOR_SCALE = COLORS.Blue
 COLOR_SCALE_BLUE = COLOR_SCALE_MAPPING[TEST_COLOR_SCALE]
 
 

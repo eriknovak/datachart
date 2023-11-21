@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 
-from ..utils.colors import create_color_cycle
+from ..utils.colors import create_color_cycle, get_colormap
 from ..utils.stats import get_min_max_values
 from ..utils.attrs import (
     get_subplot_config,
@@ -19,6 +19,8 @@ from ..utils.attrs import (
     get_legend_style,
     get_vline_style,
     get_hline_style,
+    get_heatmap_style,
+    get_heatmap_font_style,
     configure_axes_spines,
     configure_axis_ticks_style,
     configure_axis_ticks_position,
@@ -30,19 +32,21 @@ from ..schema.definitions import (
     LineDataAttrs,
     BarDataAttrs,
     HistDataAttrs,
+    HeatmapChartAttrs,
     UnionChartAttrs,
     HLineAttrs,
     VLineAttrs,
 )
-from ..schema.constants import Figsize
+from ..schema.constants import FIG_SIZE, ORIENTATION, VALFMT
 from ..config import config
 
 # ================================================
 # Defaults
 # ================================================
 
-DEFAULT_ORIENTATION = "vertical"
 DEFAULT_NUM_BINS = 20
+DEFAULT_ORIENTATION = ORIENTATION.VERTICAL
+DEFAULT_VALFMT = VALFMT.DEFAULT
 
 
 # ================================================
@@ -141,14 +145,15 @@ def get_chart_hash(chart: dict) -> str:
 
 settings_attr_mapping = [
     # common attributes
+    {"name": "type", "default": None},
     {"name": "title", "default": None},
     {"name": "xlabel", "default": None},
     {"name": "ylabel", "default": None},
     {"name": "sharex", "default": False},
     {"name": "sharey", "default": False},
-    {"name": "subplots", "default": False},
+    {"name": "subplots", "default": None},
     {"name": "aspect_ratio", "default": "auto"},
-    {"name": "figsize", "default": Figsize.DEFAULT},
+    {"name": "figsize", "default": FIG_SIZE.DEFAULT},
     {"name": "max_cols", "default": 4},
     {"name": "xmin", "default": None},
     {"name": "xmax", "default": None},
@@ -161,6 +166,8 @@ settings_attr_mapping = [
     {"name": "show_area", "default": None},
     {"name": "show_density", "default": None},
     {"name": "show_cumulative", "default": None},
+    {"name": "show_colorbars", "default": None},
+    {"name": "show_heatmap_vals", "default": None},
     # chart specific attributes
     {"name": "orientation", "default": None},
     {"name": "log_scale", "default": None},
@@ -179,6 +186,8 @@ settings_chart_mapping = [
     "show_area",
     "show_density",
     "show_cumulative",
+    "show_colorbars",
+    "show_heatmap_vals",
     "orientation",
     "log_scale",
     "num_bins",
@@ -263,6 +272,7 @@ def chart_wrapper(func: callable) -> callable:
 
         # get the number of rows and columns of the chart
         subplot_config = get_subplot_config(
+            settings["type"],
             settings["subplots"],
             n_charts=charts.shape[0],
             max_cols=settings["max_cols"],
@@ -277,10 +287,11 @@ def chart_wrapper(func: callable) -> callable:
             **subplot_config,
         )
 
+        is_single_plot = subplot_config["nrows"] == 1 and subplot_config["ncols"] == 1
         # prepare the axes based on the draw type
         axes = (
             [axes[0, 0] for _ in range(charts.shape[0])]
-            if not settings["subplots"]
+            if is_single_plot
             else axes.flatten()
         )
 
@@ -294,7 +305,7 @@ def chart_wrapper(func: callable) -> callable:
             configure_axis_ticks_style(ax, "xaxis")
             configure_axis_ticks_style(ax, "yaxis")
             # configure the local chart labels
-            if settings["subplots"]:
+            if not is_single_plot:
                 configure_labels(
                     chart,
                     [
@@ -304,7 +315,7 @@ def chart_wrapper(func: callable) -> callable:
                     ],
                 )
 
-        func(axes, charts, settings=get_chart_settings(settings))
+        func(figure, axes, charts, settings=get_chart_settings(settings))
         # configure the global figure labels
         configure_labels(
             settings,
@@ -326,12 +337,17 @@ def chart_wrapper(func: callable) -> callable:
 
 
 def draw_line_chart(
-    axes: List[plt.Axes], charts: List[LineDataAttrs], settings: dict
+    figure: plt.Figure,
+    axes: List[plt.Axes],
+    charts: List[LineDataAttrs],
+    settings: dict,
 ) -> None:
     """Draw a line chart
 
     Parameters
     ----------
+    figure: plt.Figure
+        The figure.
     axes : List[plt.Axes]
         The axes list.
     charts : List[LineDataAttrs]
@@ -423,10 +439,6 @@ def draw_line_chart(
         configure_axis_ticks_position(ax, chart)
         configure_axis_limits(ax, settings)
 
-        # override axis limits
-        configure_axis_limits(ax, settings)
-        configure_axis_ticks_position(ax, chart)
-
         if "vlines" in chart:
             # draw vertical lines
             draw_vlines(ax, chart["vlines"])
@@ -453,12 +465,14 @@ def draw_line_chart(
 
 
 def draw_bar_chart(
-    axes: List[plt.Axes], charts: List[BarDataAttrs], settings: dict
+    figure: plt.Figure, axes: List[plt.Axes], charts: List[BarDataAttrs], settings: dict
 ) -> None:
     """Draw a bar chart
 
     Parameters
     ----------
+    figure: plt.Figure
+        The figure.
     axes : List[plt.Axes]
         The axes list.
     charts : List[BarDataAttrs]
@@ -485,7 +499,9 @@ def draw_bar_chart(
     )
 
     has_multi_subplots = has_multiple_subplots(axes)
-    is_horizontal = settings.get("orientation", DEFAULT_ORIENTATION) == "horizontal"
+    is_horizontal = (
+        settings.get("orientation", DEFAULT_ORIENTATION) == ORIENTATION.HORIZONTAL
+    )
 
     color_cycle = custom_color_cycle(has_multi_subplots, charts.shape[0])
     if not has_multi_subplots and charts.shape[0] > 5:
@@ -578,9 +594,6 @@ def draw_bar_chart(
                 ],
             )
 
-        # override axis limits
-        configure_axis_limits(ax, settings)
-
         if "vlines" in chart:
             # draw vertical lines
             draw_vlines(ax, chart["vlines"])
@@ -611,12 +624,17 @@ def draw_bar_chart(
 
 
 def draw_hist_chart(
-    axes: List[plt.Axes], charts: List[HistDataAttrs], settings: dict
+    figure: plt.Figure,
+    axes: List[plt.Axes],
+    charts: List[HistDataAttrs],
+    settings: dict,
 ) -> None:
     """Draw a bar chart
 
     Parameters
     ----------
+    figure: plt.Figure
+        The figure.
     axes : List[plt.Axes]
         The axes list.
     charts : List[HistDataAttrs]
@@ -686,11 +704,6 @@ def draw_hist_chart(
             **hist_style,
         )
 
-        if orientation == "vertical":
-            # set the x-axis limit
-            xmin, xmax = get_min_max_values([i for l in xall for i in l])
-            axes[0].set_xlim(xmin=xmin, xmax=xmax)
-
         if "vlines" in chart:
             # draw vertical lines
             draw_vlines(axes[0], chart["vlines"])
@@ -737,11 +750,6 @@ def draw_hist_chart(
                 orientation=orientation,
                 **hist_style,
             )
-
-            if orientation == "vertical":
-                # set the x-axis limit
-                xmin, xmax = get_min_max_values(x)
-                ax.set_xlim(xmin=xmin, xmax=xmax)
 
             if "vlines" in chart:
                 # draw vertical lines
@@ -838,3 +846,93 @@ def draw_hlines(ax: plt.Axes, hlines: Union[HLineAttrs, List[HLineAttrs]]):
             continue
 
         ax.hlines(y=y, xmin=xmin, xmax=xmax, label=label, **style)
+
+
+# ================================================
+# Draw Bar Chart
+# ================================================
+
+
+def draw_heatmap(
+    figure: plt.Figure,
+    axes: List[plt.Axes],
+    charts: List[HeatmapChartAttrs],
+    settings: dict,
+) -> None:
+    """Draw a heatmap chart
+
+    Parameters
+    ----------
+    figure: plt.Figure
+        The figure.
+    axes : List[plt.Axes]
+        The axes list.
+    charts : List[HeatmapChartAttrs]
+        The charts data.
+    settings : dict
+        The general settings.
+    """
+
+    # assert the configuration
+    assert_chart_settings(
+        settings=settings,
+        supported_settings=[
+            "aspect_ratio",
+            "show_colorbars",
+            "show_heatmap_vals",
+        ],
+    )
+
+    for chart, ax in zip(charts, axes):
+        # get the chart style attributes
+        style = chart.get("style", {})
+
+        # retrieve the chart data points
+        data = np.array(chart.get("data"))
+        assert len(data.shape) == 2, "The `data` attribute is not a 2-dimensional array"
+
+        data = [[(np.nan if item == None else item) for item in row] for row in data]
+        norm = chart.get("norm", None)
+        vmin = chart.get("vmin", None)
+        vmax = chart.get("vmax", None)
+        valfmt = chart.get("valfmt", DEFAULT_VALFMT)
+        colorbar = chart.get("colorbar", {})
+
+        # get the heatmap style
+        heatmap_style = get_heatmap_style(style)
+        heatmap_style["cmap"] = get_colormap(heatmap_style["cmap"])
+
+        # draw the heatmap
+        im = ax.imshow(data, norm=norm, vmin=vmin, vmax=vmax, **heatmap_style)
+
+        # set the tick positions
+        configure_axis_ticks_position(ax, chart)
+
+        if settings["show_heatmap_vals"]:
+            if isinstance(valfmt, str):
+                valfmt = mticker.StrMethodFormatter(valfmt)
+
+            text_style = get_heatmap_font_style(style)
+            for i in range(len(data)):
+                for j in range(len(data[i])):
+                    ax.text(
+                        j,
+                        i,
+                        valfmt(data[i][j], None),
+                        ha="center",
+                        va="center",
+                        **text_style,
+                    )
+
+        if settings["show_colorbars"]:
+            # draw the colorbar
+            orientation = colorbar.get("orientation", DEFAULT_ORIENTATION)
+            location = "right" if orientation == ORIENTATION.VERTICAL else "top"
+            figure.colorbar(
+                im,
+                ax=ax,
+                orientation=orientation,
+                location=location,
+                fraction=0.1,
+                pad=0.05,
+            )

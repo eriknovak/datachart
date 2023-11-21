@@ -4,7 +4,7 @@ from typing import Union, Tuple, Dict, List
 
 import matplotlib.pyplot as plt
 
-from ..config import config, Config
+from ..config import config, Config, CHART_CONFIGS
 
 
 # ================================================
@@ -72,7 +72,7 @@ def create_config_dict(
 
 
 def get_subplot_config(
-    subplots: bool, n_charts: int = 1, max_cols: int = 1
+    chart_type: str, subplots: bool, n_charts: int = 1, max_cols: int = 1
 ) -> Dict[str, int]:
     """Calculate the configuration for subplots in a figure.
 
@@ -95,7 +95,14 @@ def get_subplot_config(
     nrows = 1
     ncols = 1
 
-    if subplots:
+    chart_config = CHART_CONFIGS[chart_type]
+    if subplots and not chart_config["subplots"]:
+        warnings.warn(
+            f"Chart type '{chart_type}' does not support subplots. Setting subplots to False..."
+        )
+        subplots = False
+
+    if subplots or not chart_config["multiplot"]:
         assert n_charts > 0, "The number of charts must be greater than 0."
         assert max_cols > 0, "The maximum number of columns must be greater than 0."
         # there are more subplots
@@ -336,17 +343,17 @@ def get_vline_style(vline_style: dict) -> dict:
 
 
 def get_hline_style(hline_style: dict) -> dict:
-    """Get the vline configuration
+    """Get the hline configuration
 
     Parameters
     ----------
     hline_style : dict
-        The vline style dictionary.
+        The hline style dictionary.
 
     Returns
     -------
     dict
-        The vline configuration dict.
+        The hline configuration dict.
     """
 
     config_attrs = [
@@ -357,6 +364,57 @@ def get_hline_style(hline_style: dict) -> dict:
     ]
 
     return create_config_dict(hline_style, config_attrs)
+
+
+# -------------------------------------
+# Heatmap Style
+# -------------------------------------
+
+
+def get_heatmap_style(heatmap_style: dict) -> dict:
+    """Get the heatmap configuration
+
+    Parameters
+    ----------
+    heatmap_style : dict
+        The heatmap style dictionary.
+
+    Returns
+    -------
+    dict
+        The heatmap configuration dict.
+    """
+
+    config_attrs = [
+        ("cmap", "plot.heatmap.cmap"),
+        ("alpha", "plot.heatmap.alpha"),
+    ]
+
+    return create_config_dict(heatmap_style, config_attrs)
+
+
+def get_heatmap_font_style(heatmap_style: dict) -> dict:
+    """Get the heatmap configuration
+
+    Parameters
+    ----------
+    heatmap_style : dict
+        The heatmap font style dictionary.
+
+    Returns
+    -------
+    dict
+        The heatmap font configuration dict.
+    """
+
+    config_attrs = [
+        ("size", "plot.heatmap.font.size"),
+        ("color", "plot.heatmap.font.color"),
+        ("style", "plot.heatmap.font.style"),
+        ("weight", "plot.heatmap.font.weight"),
+    ]
+
+    return create_config_dict(heatmap_style, config_attrs)
 
 
 # -------------------------------------
@@ -451,33 +509,49 @@ def configure_axis_ticks_position(ax: plt.Axes, chart: dict):
         labels = chart.get(attrs[1], None)
         rotation = chart.get(attrs[2], 0)
 
-        dticks = getattr(ax, attrs[3]).get_ticklocs()
-        dlabels = getattr(ax, attrs[3]).get_ticklabels()
         set_ticks = getattr(ax, attrs[3]).set_ticks
 
         if ticks is None and labels is None:
-            set_ticks(dticks, labels=dlabels, rotation=rotation)
-        elif ticks is None and labels is not None:
-            if len(dticks) == len(labels):
-                set_ticks(dticks, labels=labels, rotation=rotation)
-            else:
+            continue
+        if ticks is None and labels is not None:
+            warnings.warn(
+                f"Please provide the `{attrs[0]}` values. Ignoring `{attrs[1]}` values..."
+            )
+            continue
+        elif ticks is not None and labels is None:
+            set_ticks(
+                ticks,
+                labels=ticks,
+                rotation=rotation,
+                rotation_mode="anchor",
+                ha="center" if rotation == 0 else "right",
+                va="top",
+            )
+        elif ticks is not None and labels is not None:
+            if len(ticks) != len(labels):
                 warnings.warn(
                     f"The values of `{attrs[0]}` and `{attrs[1]}` are of different lengths. "
                     + f"Please provide the same number of values. Ignoring `{attrs[1]}` values..."
                 )
-                set_ticks(dticks, labels=dlabels, rotation=rotation)
-        elif ticks is not None and labels is None:
-            set_ticks(ticks, labels=ticks, rotation=rotation)
-        elif ticks is not None and len(ticks) != len(labels):
-            warnings.warn(
-                f"The values of `{attrs[0]}` and `{attrs[1]}` are of different lengths. "
-                + f"Please provide the same number of values. Ignoring `{attrs[1]}` values..."
-            )
-            # draw only the ticks
-            set_ticks(ticks, labels=ticks, rotation=rotation)
-        else:
-            # draw both the ticks and the labels
-            set_ticks(ticks, labels=labels, rotation=rotation)
+                # draw only the ticks
+                set_ticks(
+                    ticks,
+                    labels=ticks,
+                    rotation=rotation,
+                    rotation_mode="anchor",
+                    ha="center" if rotation == 0 else "right",
+                    va="top",
+                )
+            else:
+                # draw both the ticks and the labels
+                set_ticks(
+                    ticks,
+                    labels=labels,
+                    rotation=rotation,
+                    rotation_mode="anchor",
+                    ha="center" if rotation == 0 else "right",
+                    va="top" if rotation == 0 else "center",
+                )
 
 
 def configure_axis_limits(ax: plt.Axes, settings: dict):

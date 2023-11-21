@@ -15,4 +15,4 @@ def line_chart(attrs: LineChartAttrs):
         The chart attributes.
 
     """
-    return chart_wrapper(draw_line_chart)(attrs)
+    return chart_wrapper(draw_line_chart)({**attrs, "type": "linechart"})

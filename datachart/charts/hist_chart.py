@@ -16,4 +16,4 @@ def hist_chart(attrs: HistChartAttrs):
 
     """
 
-    return chart_wrapper(draw_hist_chart)(attrs)
+    return chart_wrapper(draw_hist_chart)({**attrs, "type": "histogram"})
