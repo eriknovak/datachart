@@ -216,16 +216,16 @@ class ChartCommonAttrs(TypedDict):
 
 class VLineAttrs(TypedDict):
     x: Union[int, float]
-    ymin: Union[int, float, None]
-    ymax: Union[int, float, None]
+    y_min: Union[int, float, None]
+    y_max: Union[int, float, None]
     style: Union[VLineConfigAttrs, None]
     label: Union[str, None]
 
 
 class HLineAttrs(TypedDict):
     y: Union[int, float]
-    xmin: Union[int, float, None]
-    xmax: Union[int, float, None]
+    x_min: Union[int, float, None]
+    x_max: Union[int, float, None]
     style: Union[HLineConfigAttrs, None]
     label: Union[str, None]
 
