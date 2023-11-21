@@ -114,6 +114,8 @@ LineConfigAttrs = TypedDict(
         "plot.line.alpha": Union[float, None],
         "plot.line.drawstyle": Union[LineDrawStyle, None],
         "plot.line.zorder": Union[int, float, None],
+        "plot.xticks.label.rotate": Union[int, float, None],
+        "plot.yticks.label.rotate": Union[int, float, None],
     },
 )
 
@@ -128,6 +130,8 @@ BarConfigAttrs = TypedDict(
         "plot.bar.edge.width": Union[int, float, None],
         "plot.bar.edge.color": Union[str, None],
         "plot.bar.error.color": Union[str, None],
+        "plot.xticks.label.rotate": Union[int, float, None],
+        "plot.yticks.label.rotate": Union[int, float, None],
     },
 )
 
@@ -143,6 +147,8 @@ HistConfigAttrs = TypedDict(
         "plot.hist.align": Union[str, None],
         "plot.hist.edge.width": Union[int, float, None],
         "plot.hist.edge.color": Union[str, None],
+        "plot.xticks.label.rotate": Union[int, float, None],
+        "plot.yticks.label.rotate": Union[int, float, None],
     },
 )
 
@@ -198,10 +204,10 @@ class ChartCommonAttrs(TypedDict):
     max_cols: Union[int, None]
     aspect_ratio: Union[str, None]
     figsize: Union[Tuple[float, float], None]
-    x_min: Union[int, float, None]
-    x_max: Union[int, float, None]
-    y_min: Union[int, float, None]
-    y_max: Union[int, float, None]
+    xmin: Union[int, float, None]
+    xmax: Union[int, float, None]
+    ymin: Union[int, float, None]
+    ymax: Union[int, float, None]
     # visibility attributes
     show_legend: Union[bool, None]
     show_grid: Union[str, None]
@@ -216,16 +222,16 @@ class ChartCommonAttrs(TypedDict):
 
 class VLineAttrs(TypedDict):
     x: Union[int, float]
-    y_min: Union[int, float, None]
-    y_max: Union[int, float, None]
+    ymin: Union[int, float, None]
+    ymax: Union[int, float, None]
     style: Union[VLineConfigAttrs, None]
     label: Union[str, None]
 
 
 class HLineAttrs(TypedDict):
     y: Union[int, float]
-    x_min: Union[int, float, None]
-    x_max: Union[int, float, None]
+    xmin: Union[int, float, None]
+    xmax: Union[int, float, None]
     style: Union[HLineConfigAttrs, None]
     label: Union[str, None]
 
@@ -251,6 +257,13 @@ class LineDataAttrs(TypedDict):
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
+
+    xticks: Union[int, float, None]
+    xticklabels: Union[List[str], None]
+    xtickrotate: Union[int, None]
+    yticks: Union[int, float, None]
+    yticklabels: Union[List[str], None]
+    ytickrotate: Union[int, None]
 
     vlines: Union[VLineAttrs, List[VLineAttrs]]
     hlines: Union[HLineAttrs, List[HLineAttrs]]
@@ -284,6 +297,13 @@ class BarDataAttrs(TypedDict):
     xlabel: Union[str, None]
     ylabel: Union[str, None]
 
+    xticks: Union[int, float, None]
+    xticklabels: Union[List[str], None]
+    xtickrotate: Union[int, None]
+    yticks: Union[int, float, None]
+    yticklabels: Union[List[str], None]
+    ytickrotate: Union[int, None]
+
     vlines: Union[VLineAttrs, List[VLineAttrs]]
     hlines: Union[HLineAttrs, List[HLineAttrs]]
 
@@ -311,6 +331,13 @@ class HistDataAttrs(TypedDict):
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
+
+    xticks: Union[int, float, None]
+    xticklabels: Union[List[str], None]
+    xtickrotate: Union[int, None]
+    yticks: Union[int, float, None]
+    yticklabels: Union[List[str], None]
+    ytickrotate: Union[int, None]
 
     vlines: Union[VLineAttrs, List[VLineAttrs]]
     hlines: Union[HLineAttrs, List[HLineAttrs]]

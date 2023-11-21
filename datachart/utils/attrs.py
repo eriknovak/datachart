@@ -443,34 +443,41 @@ def configure_axis_ticks_position(ax: plt.Axes, chart: dict):
     """
 
     tick_attrs = [
-        ("xticks", "xticklabels", "xaxis"),
-        ("yticks", "yticklabels", "yaxis"),
+        ("xticks", "xticklabels", "xtickrotate", "xaxis"),
+        ("yticks", "yticklabels", "ytickrotate", "yaxis"),
     ]
     for attrs in tick_attrs:
         ticks = chart.get(attrs[0], None)
-        ticklabels = chart.get(attrs[1], None)
-        func = ax.set_xticks if attrs[2] == "xaxis" else ax.set_yticks
+        labels = chart.get(attrs[1], None)
+        rotation = chart.get(attrs[2], 0)
 
-        if ticks is None and ticklabels is not None:
-            warnings.warn(
-                f"The attribute `{attrs[0]}` is not specified but `{attrs[1]}` is. "
-                + f"Please provide the `{attrs[0]}` values."
-            )
-            continue
-        elif ticks is not None:
-            if ticklabels is None:
-                # draw only the ticks
-                func(ticks)
-            elif len(ticks) != len(ticklabels):
+        dticks = getattr(ax, attrs[3]).get_ticklocs()
+        dlabels = getattr(ax, attrs[3]).get_ticklabels()
+        set_ticks = getattr(ax, attrs[3]).set_ticks
+
+        if ticks is None and labels is None:
+            set_ticks(dticks, labels=dlabels, rotation=rotation)
+        elif ticks is None and labels is not None:
+            if len(dticks) == len(labels):
+                set_ticks(dticks, labels=labels, rotation=rotation)
+            else:
                 warnings.warn(
                     f"The values of `{attrs[0]}` and `{attrs[1]}` are of different lengths. "
                     + f"Please provide the same number of values. Ignoring `{attrs[1]}` values..."
                 )
-                # draw only the ticks
-                func(ticks)
-            else:
-                # draw both the ticks and the labels
-                func(ticks, labels=ticklabels)
+                set_ticks(dticks, labels=dlabels, rotation=rotation)
+        elif ticks is not None and labels is None:
+            set_ticks(ticks, labels=ticks, rotation=rotation)
+        elif ticks is not None and len(ticks) != len(labels):
+            warnings.warn(
+                f"The values of `{attrs[0]}` and `{attrs[1]}` are of different lengths. "
+                + f"Please provide the same number of values. Ignoring `{attrs[1]}` values..."
+            )
+            # draw only the ticks
+            set_ticks(ticks, labels=ticks, rotation=rotation)
+        else:
+            # draw both the ticks and the labels
+            set_ticks(ticks, labels=labels, rotation=rotation)
 
 
 def configure_axis_limits(ax: plt.Axes, settings: dict):
@@ -485,16 +492,16 @@ def configure_axis_limits(ax: plt.Axes, settings: dict):
         The settings.
     """
 
-    if settings["x_min"] is not None or settings["x_max"] is not None:
+    if settings["xmin"] is not None or settings["xmax"] is not None:
         xmin, xmax = ax.get_xlim()
-        xmin = settings["x_min"] if settings["x_min"] is not None else xmin
-        xmax = settings["x_max"] if settings["x_max"] is not None else xmax
+        xmin = settings["xmin"] if settings["xmin"] is not None else xmin
+        xmax = settings["xmax"] if settings["xmax"] is not None else xmax
         ax.set_xlim(xmin=xmin, xmax=xmax)
 
-    if settings["y_min"] is not None or settings["y_max"] is not None:
+    if settings["ymin"] is not None or settings["ymax"] is not None:
         ymin, ymax = ax.get_ylim()
-        ymin = settings["y_min"] if settings["y_min"] is not None else ymin
-        ymax = settings["y_max"] if settings["y_max"] is not None else ymax
+        ymin = settings["ymin"] if settings["ymin"] is not None else ymin
+        ymax = settings["ymax"] if settings["ymax"] is not None else ymax
         ax.set_ylim(ymin=ymin, ymax=ymax)
 
 

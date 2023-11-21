@@ -150,10 +150,10 @@ settings_attr_mapping = [
     {"name": "aspect_ratio", "default": "auto"},
     {"name": "figsize", "default": Figsize.DEFAULT},
     {"name": "max_cols", "default": 4},
-    {"name": "x_min", "default": None},
-    {"name": "x_max", "default": None},
-    {"name": "y_min", "default": None},
-    {"name": "y_max", "default": None},
+    {"name": "xmin", "default": None},
+    {"name": "xmax", "default": None},
+    {"name": "ymin", "default": None},
+    {"name": "ymax", "default": None},
     # visibility attributes
     {"name": "show_legend", "default": None},
     {"name": "show_grid", "default": None},
@@ -169,10 +169,10 @@ settings_attr_mapping = [
 
 settings_chart_mapping = [
     "aspect_ratio",
-    "x_min",
-    "x_max",
-    "y_min",
-    "y_max",
+    "xmin",
+    "xmax",
+    "ymin",
+    "ymax",
     "show_legend",
     "show_grid",
     "show_yerr",
@@ -344,10 +344,10 @@ def draw_line_chart(
     assert_chart_settings(
         settings=settings,
         supported_settings=[
-            "x_min",
-            "x_max",
-            "y_min",
-            "y_max",
+            "xmin",
+            "xmax",
+            "ymin",
+            "ymax",
             "aspect_ratio",
             "show_legend",
             "show_grid",
@@ -392,9 +392,9 @@ def draw_line_chart(
 
         if draw_yerr_flag:
             # draw the confidence interval around the line
-            y_min = y - yerr
-            y_max = y + yerr
-            ax.fill_between(x, y_min, y_max, **area_style)
+            ymin = y - yerr
+            ymax = y + yerr
+            ax.fill_between(x, ymin, ymax, **area_style)
 
         if draw_area_flag:
             # draw the area under the curve
@@ -416,8 +416,12 @@ def draw_line_chart(
             ax.grid(axis=settings["show_grid"], **get_grid_style(style))
 
         # set the x-axis limit
-        x_min, x_max = get_min_max_values(x)
-        ax.set_xlim(xmin=x_min, xmax=x_max)
+        xmin, xmax = get_min_max_values(x)
+        ax.set_xlim(xmin=xmin, xmax=xmax)
+
+        # override axis limits
+        configure_axis_ticks_position(ax, chart)
+        configure_axis_limits(ax, settings)
 
         if "vlines" in chart:
             # draw vertical lines
@@ -426,10 +430,6 @@ def draw_line_chart(
         if "hlines" in chart:
             # draw horizontal lines
             draw_hlines(ax, chart["hlines"])
-
-        # override axis limits
-        configure_axis_limits(ax, settings)
-        configure_axis_ticks_position(ax, chart)
 
         # set the aspect ratio of the chart
         if settings["aspect_ratio"]:
@@ -468,10 +468,10 @@ def draw_bar_chart(
         settings=settings,
         supported_settings=[
             "aspect_ratio",
-            "x_min",
-            "x_max",
-            "y_min",
-            "y_max",
+            "xmin",
+            "xmax",
+            "ymin",
+            "ymax",
             "show_legend",
             "show_grid",
             "show_yerr",
@@ -582,20 +582,9 @@ def draw_bar_chart(
             # draw horizontal lines
             draw_hlines(ax, chart["hlines"])
 
-        # override axis limits
-        configure_axis_limits(ax, settings)
-
-        # override axis ticks
-        del_axis_ticks = (
-            ["yticks", "yticklabels"] if is_horizontal else ["xticks", "xticklabels"]
-        )
-        for attr in del_axis_ticks:
-            if chart.get(attr, None) is not None:
-                warnings.warn(f"The `{attr}` flag will be ignored.")
-                del chart[attr]
-
         # set the tick positions
         configure_axis_ticks_position(ax, chart)
+        configure_axis_limits(ax, settings)
 
         # set the aspect ratio of the chart
         if settings["aspect_ratio"]:
@@ -634,10 +623,10 @@ def draw_hist_chart(
         settings=settings,
         supported_settings=[
             "aspect_ratio",
-            "x_min",
-            "x_max",
-            "y_min",
-            "y_max",
+            "xmin",
+            "xmax",
+            "ymin",
+            "ymax",
             "show_legend",
             "show_grid",
             "show_density",
@@ -690,6 +679,11 @@ def draw_hist_chart(
             **hist_style,
         )
 
+        if orientation == "vertical":
+            # set the x-axis limit
+            xmin, xmax = get_min_max_values([i for l in xall for i in l])
+            axes[0].set_xlim(xmin=xmin, xmax=xmax)
+
         if "vlines" in chart:
             # draw vertical lines
             draw_vlines(axes[0], chart["vlines"])
@@ -699,8 +693,8 @@ def draw_hist_chart(
             draw_hlines(axes[0], chart["hlines"])
 
         # override the axis limits
-        configure_axis_limits(axes[0], settings)
         configure_axis_ticks_position(axes[0], charts[0])
+        configure_axis_limits(axes[0], settings)
 
         if settings["show_grid"]:
             # show the chart grid
@@ -737,6 +731,11 @@ def draw_hist_chart(
                 **hist_style,
             )
 
+            if orientation == "vertical":
+                # set the x-axis limit
+                xmin, xmax = get_min_max_values(x)
+                ax.set_xlim(xmin=xmin, xmax=xmax)
+
             if "vlines" in chart:
                 # draw vertical lines
                 draw_vlines(ax, chart["vlines"])
@@ -746,8 +745,8 @@ def draw_hist_chart(
                 draw_hlines(ax, chart["hlines"])
 
             # override the axis limits
-            configure_axis_limits(ax, settings)
             configure_axis_ticks_position(ax, chart)
+            configure_axis_limits(ax, settings)
 
             if settings["show_grid"]:
                 # show the chart grid
@@ -768,7 +767,7 @@ def draw_hist_chart(
 
 
 def draw_vlines(ax: plt.Axes, vlines: Union[VLineAttrs, List[VLineAttrs]]):
-    """Configure vertical lines.
+    """Draws vertical lines.
 
     Parameters
     ----------
@@ -780,11 +779,13 @@ def draw_vlines(ax: plt.Axes, vlines: Union[VLineAttrs, List[VLineAttrs]]):
     """
 
     vlines = vlines if isinstance(vlines, list) else [vlines]
-
+    ymin, ymax = ax.get_ylim()
     for vline in vlines:
-        ymin, ymax = ax.get_ylim()
-
         x = vline.get("x")
+        ymin = vline.get("ymin", ymin)
+        ymax = vline.get("ymax", ymax)
+        label = vline.get("label", "")
+        style = get_vline_style(vline.get("style", {}))
 
         if x is None:
             warnings.warn(
@@ -792,10 +793,6 @@ def draw_vlines(ax: plt.Axes, vlines: Union[VLineAttrs, List[VLineAttrs]]):
             )
             continue
 
-        ymin = vline.get("ymin", ymin)
-        ymax = vline.get("ymax", ymax)
-        label = vline.get("label", "")
-        style = get_vline_style(vline.get("style", {}))
         ax.vlines(x=x, ymin=ymin, ymax=ymax, label=label, **style)
 
 
@@ -805,7 +802,7 @@ def draw_vlines(ax: plt.Axes, vlines: Union[VLineAttrs, List[VLineAttrs]]):
 
 
 def draw_hlines(ax: plt.Axes, hlines: Union[HLineAttrs, List[HLineAttrs]]):
-    """Configure horizontal lines.
+    """Draws horizontal lines.
 
     Parameters
     ----------
@@ -818,10 +815,14 @@ def draw_hlines(ax: plt.Axes, hlines: Union[HLineAttrs, List[HLineAttrs]]):
 
     hlines = hlines if isinstance(hlines, list) else [hlines]
 
-    for hline in hlines:
-        xmin, xmax = ax.get_xlim()
+    xmin, xmax = ax.get_xlim()
 
+    for hline in hlines:
         y = hline.get("y")
+        xmin = hline.get("xmin", xmin)
+        xmax = hline.get("xmax", xmax)
+        label = hline.get("label", "")
+        style = get_hline_style(hline.get("style", {}))
 
         if y is None:
             warnings.warn(
@@ -829,8 +830,4 @@ def draw_hlines(ax: plt.Axes, hlines: Union[HLineAttrs, List[HLineAttrs]]):
             )
             continue
 
-        xmin = hline.get("xmin", xmin)
-        xmax = hline.get("xmax", xmax)
-        label = hline.get("label", "")
-        style = get_hline_style(hline.get("style", {}))
         ax.hlines(y=y, xmin=xmin, xmax=xmax, label=label, **style)
