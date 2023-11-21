@@ -419,6 +419,10 @@ def draw_line_chart(
         x_min, x_max = get_min_max_values(x)
         ax.set_xlim(xmin=x_min, xmax=x_max)
 
+        # override axis limits
+        configure_axis_limits(ax, settings)
+        configure_axis_ticks_position(ax, chart)
+
         if "vlines" in chart:
             # draw vertical lines
             draw_vlines(ax, chart["vlines"])
@@ -426,10 +430,6 @@ def draw_line_chart(
         if "hlines" in chart:
             # draw horizontal lines
             draw_hlines(ax, chart["hlines"])
-
-        # override axis limits
-        configure_axis_limits(ax, settings)
-        configure_axis_ticks_position(ax, chart)
 
         # set the aspect ratio of the chart
         if settings["aspect_ratio"]:
@@ -574,6 +574,9 @@ def draw_bar_chart(
                 ],
             )
 
+        # override axis limits
+        configure_axis_limits(ax, settings)
+
         if "vlines" in chart:
             # draw vertical lines
             draw_vlines(ax, chart["vlines"])
@@ -581,9 +584,6 @@ def draw_bar_chart(
         if "hlines" in chart:
             # draw horizontal lines
             draw_hlines(ax, chart["hlines"])
-
-        # override axis limits
-        configure_axis_limits(ax, settings)
 
         # override axis ticks
         del_axis_ticks = (
@@ -690,6 +690,10 @@ def draw_hist_chart(
             **hist_style,
         )
 
+        # override the axis limits
+        configure_axis_limits(axes[0], settings)
+        configure_axis_ticks_position(axes[0], charts[0])
+
         if "vlines" in chart:
             # draw vertical lines
             draw_vlines(axes[0], chart["vlines"])
@@ -697,10 +701,6 @@ def draw_hist_chart(
         if "hlines" in chart:
             # draw horizontal lines
             draw_hlines(axes[0], chart["hlines"])
-
-        # override the axis limits
-        configure_axis_limits(axes[0], settings)
-        configure_axis_ticks_position(axes[0], charts[0])
 
         if settings["show_grid"]:
             # show the chart grid
@@ -737,6 +737,10 @@ def draw_hist_chart(
                 **hist_style,
             )
 
+            # override the axis limits
+            configure_axis_limits(ax, settings)
+            configure_axis_ticks_position(ax, chart)
+
             if "vlines" in chart:
                 # draw vertical lines
                 draw_vlines(ax, chart["vlines"])
@@ -744,10 +748,6 @@ def draw_hist_chart(
             if "hlines" in chart:
                 # draw horizontal lines
                 draw_hlines(ax, chart["hlines"])
-
-            # override the axis limits
-            configure_axis_limits(ax, settings)
-            configure_axis_ticks_position(ax, chart)
 
             if settings["show_grid"]:
                 # show the chart grid
