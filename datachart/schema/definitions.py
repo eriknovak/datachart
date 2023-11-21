@@ -1,14 +1,14 @@
 from typing import TypedDict, Union, Tuple, List, Optional
 
+import matplotlib.colors as colors
 from ..schema.constants import (
-    Figsize,
-    FontStyle,
-    FontWeight,
-    LineMarker,
-    LineStyle,
-    LineDrawStyle,
-    Hatch,
-    LegendAlignment,
+    FONT_STYLE,
+    FONT_WEIGHT,
+    HATCH_STYLE,
+    LINE_MARKER,
+    LINE_STYLE,
+    LINE_DRAW_STYLE,
+    LEGEND_ALIGN,
 )
 
 # ================================================
@@ -31,28 +31,28 @@ FontConfigAttrs = TypedDict(
         "font.general.sans-serif": Union[List[str], None],
         "font.general.color": Union[str, None],
         "font.general.size": Union[int, float, str, None],
-        "font.general.style": Union[FontStyle, None],
-        "font.general.weight": Union[FontWeight, None],
+        "font.general.style": Union[FONT_STYLE, None],
+        "font.general.weight": Union[FONT_WEIGHT, None],
         # title font configuration
         "font.title.size": Union[int, float, str, None],
         "font.title.color": Union[str, None],
-        "font.title.style": Union[FontStyle, None],
-        "font.title.weight": Union[FontWeight, None],
+        "font.title.style": Union[FONT_STYLE, None],
+        "font.title.weight": Union[FONT_WEIGHT, None],
         # subtitle font configuration
         "font.subtitle.size": Union[int, float, str, None],
         "font.subtitle.color": Union[str, None],
-        "font.subtitle.style": Union[FontStyle, None],
-        "font.subtitle.weight": Union[FontWeight, None],
+        "font.subtitle.style": Union[FONT_STYLE, None],
+        "font.subtitle.weight": Union[FONT_WEIGHT, None],
         # xlabel font configuration
         "font.xlabel.size": Union[int, float, str, None],
         "font.xlabel.color": Union[str, None],
-        "font.xlabel.style": Union[FontStyle, None],
-        "font.xlabel.weight": Union[FontWeight, None],
+        "font.xlabel.style": Union[FONT_STYLE, None],
+        "font.xlabel.weight": Union[FONT_WEIGHT, None],
         # ylabel font configuration
         "font.ylabel.size": Union[int, float, str, None],
         "font.ylabel.color": Union[str, None],
-        "font.ylabel.style": Union[FontStyle, None],
-        "font.ylabel.weight": Union[FontWeight, None],
+        "font.ylabel.style": Union[FONT_STYLE, None],
+        "font.ylabel.weight": Union[FONT_WEIGHT, None],
     },
 )
 
@@ -75,7 +75,7 @@ LegendConfigAttrs = TypedDict(
     {
         "plot.legend.shadow": Union[bool, None],
         "plot.legend.frameon": Union[bool, None],
-        "plot.legend.alignment": Union[LegendAlignment, None],
+        "plot.legend.alignment": Union[LEGEND_ALIGN, None],
         "plot.legend.font.size": Union[int, float, str, None],
         "plot.legend.title.size": Union[int, float, str, None],
         "plot.legend.label.color": Union[str, None],
@@ -88,7 +88,7 @@ AreaConfigAttrs = TypedDict(
         "plot.area.alpha": Union[float, None],
         "plot.area.color": Union[str, None],
         "plot.area.line.width": Union[int, float, None],
-        "plot.area.hatch": Union[Hatch, None],
+        "plot.area.hatch": Union[HATCH_STYLE, None],
         "plot.area.zorder": Union[int, None],
     },
 )
@@ -99,7 +99,7 @@ GridConfigAttrs = TypedDict(
         "plot.grid.alpha": Union[float, None],
         "plot.grid.color": Union[str, None],
         "plot.grid.linewidth": Union[int, float, None],
-        "plot.grid.linestyle": Union[LineStyle, None],
+        "plot.grid.linestyle": Union[LINE_STYLE, None],
         "plot.grid.zorder": Union[int, None],
     },
 )
@@ -108,11 +108,11 @@ LineConfigAttrs = TypedDict(
     "LineConfigAttrs",
     {
         "plot.line.color": Union[str, None],
-        "plot.line.style": Union[LineStyle, None],
-        "plot.line.marker": Union[LineMarker, None],
+        "plot.line.style": Union[LINE_STYLE, None],
+        "plot.line.marker": Union[LINE_MARKER, None],
         "plot.line.width": Union[int, float, None],
         "plot.line.alpha": Union[float, None],
-        "plot.line.drawstyle": Union[LineDrawStyle, None],
+        "plot.line.drawstyle": Union[LINE_DRAW_STYLE, None],
         "plot.line.zorder": Union[int, float, None],
         "plot.xticks.label.rotate": Union[int, float, None],
         "plot.yticks.label.rotate": Union[int, float, None],
@@ -126,7 +126,7 @@ BarConfigAttrs = TypedDict(
         "plot.bar.alpha": Union[float, None],
         "plot.bar.width": Union[int, float, None],
         "plot.bar.zorder": Union[int, float, None],
-        "plot.bar.hatch": Union[Hatch, None],
+        "plot.bar.hatch": Union[HATCH_STYLE, None],
         "plot.bar.edge.width": Union[int, float, None],
         "plot.bar.edge.color": Union[str, None],
         "plot.bar.error.color": Union[str, None],
@@ -142,7 +142,7 @@ HistConfigAttrs = TypedDict(
         "plot.hist.alpha": Union[float, None],
         "plot.hist.zorder": Union[int, float, None],
         "plot.hist.fill": Union[str, None],
-        "plot.hist.hatch": Union[Hatch, None],
+        "plot.hist.hatch": Union[HATCH_STYLE, None],
         "plot.hist.type": Union[str, None],
         "plot.hist.align": Union[str, None],
         "plot.hist.edge.width": Union[int, float, None],
@@ -156,7 +156,7 @@ VLineConfigAttrs = TypedDict(
     "VLineConfigAttrs",
     {
         "plot.vline.color": Union[str, None],
-        "plot.vline.style": Union[LineStyle, None],
+        "plot.vline.style": Union[LINE_STYLE, None],
         "plot.vline.width": Union[int, float, None],
         "plot.vline.alpha": Union[float, None],
     },
@@ -166,9 +166,21 @@ HLineConfigAttrs = TypedDict(
     "HLineConfigAttrs",
     {
         "plot.hline.color": Union[str, None],
-        "plot.hline.style": Union[LineStyle, None],
+        "plot.hline.style": Union[LINE_STYLE, None],
         "plot.hline.width": Union[int, float, None],
         "plot.hline.alpha": Union[float, None],
+    },
+)
+
+HeatmapConfigAttrs = TypedDict(
+    "HeatmapConfigAttrs",
+    {
+        "plot.heatmap.cmap": Union[str, colors.LinearSegmentedColormap, None],
+        "plot.heatmap.alpha": Union[float, None],
+        "plot.heatmap.font.size": Union[int, float, str, None],
+        "plot.heatmap.font.color": Union[str, None],
+        "plot.heatmap.font.style": Union[FONT_STYLE, None],
+        "plot.heatmap.font.weight": Union[FONT_WEIGHT, None],
     },
 )
 
@@ -185,6 +197,7 @@ class ConfigAttrs(
     HistConfigAttrs,
     VLineConfigAttrs,
     HLineConfigAttrs,
+    HeatmapConfigAttrs,
 ):
     pass
 
@@ -352,7 +365,45 @@ class HistChartAttrs(ChartCommonAttrs):
 
 
 # ================================================
+# Heatmap Chart Definitions
+# ================================================
+
+
+class HeatmapColorbarAttrs(TypedDict):
+    orientation: Union[str, None]
+
+
+class HeatmapDataAttrs(TypedDict):
+    data: List[List[Union[int, float, None]]]
+    style: Union[HeatmapConfigAttrs, None]
+    norm: Union[str, None]
+    vmin: Union[float, None]
+    vmax: Union[float, None]
+
+    subtitle: Union[str, None]
+    xlabel: Union[str, None]
+    ylabel: Union[str, None]
+
+    xticks: Union[int, float, None]
+    xticklabels: Union[List[str], None]
+    xtickrotate: Union[int, None]
+    yticks: Union[int, float, None]
+    yticklabels: Union[List[str], None]
+    ytickrotate: Union[int, None]
+
+    colorbar: Union[HeatmapColorbarAttrs, None]
+
+
+class HeatmapChartAttrs(ChartCommonAttrs):
+    charts: Union[HistDataAttrs, List[HistDataAttrs]]
+    show_colorbars: Union[bool, None]
+    show_heatmap_vals: Union[bool, None]
+
+
+# ================================================
 # Union Chart Definition
 # ================================================
 
-UnionChartAttrs = Union[LineChartAttrs, BarChartAttrs, HistChartAttrs]
+UnionChartAttrs = Union[
+    LineChartAttrs, BarChartAttrs, HistChartAttrs, HeatmapChartAttrs
+]

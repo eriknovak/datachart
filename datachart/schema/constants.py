@@ -3,17 +3,21 @@
 # ================================================
 
 
-class Figsize:
+class FIG_SIZE:
     """Figsize constants"""
 
     DEFAULT = (6.4, 4.8)
     A4 = (8.2, 11.6)
-    A4_1_ROWS = (8.2, 2.4)
-    A4_2_ROWS = (8.2, 4.8)
-    A4_3_ROWS = (8.2, 7.2)
+    A4_NARROW = (8.2, 2.4)
+    A4_REGULAR = (8.2, 4.8)
+    A4_WIDE = (8.2, 7.2)
+
+    SQUARE = (6.4, 6.4)
+    SQUARE_SMALL = (4.8, 4.8)
+    SQUARE_LARGE = (8.2, 8.2)
 
 
-class FigFormat:
+class FIG_FORMAT:
     """FigFormat constants"""
 
     DEFAULT = "png"
@@ -22,7 +26,7 @@ class FigFormat:
     PNG = "png"
 
 
-class FontStyle:
+class FONT_STYLE:
     """Font Style constants"""
 
     DEFAULT = "normal"
@@ -31,7 +35,7 @@ class FontStyle:
     OBLIQUE = "oblique"
 
 
-class FontWeight:
+class FONT_WEIGHT:
     """Font Weight constants"""
 
     DEFAULT = "normal"
@@ -43,7 +47,7 @@ class FontWeight:
     ULTRA_HEAVY = "ultrabold"
 
 
-class LineMarker:
+class LINE_MARKER:
     """Line Marker constants"""
 
     PIXEL = ","
@@ -58,7 +62,7 @@ class LineMarker:
     PLUS = "+"
 
 
-class LineStyle:
+class LINE_STYLE:
     """Line Style constants"""
 
     SOLID = "-"
@@ -67,7 +71,7 @@ class LineStyle:
     DOTTED = ":"
 
 
-class LineDrawStyle:
+class LINE_DRAW_STYLE:
     """Line Draw Style constants"""
 
     DEFAULT = "default"
@@ -77,7 +81,7 @@ class LineDrawStyle:
     STEPS_POST = "steps-post"
 
 
-class Hatch:
+class HATCH_STYLE:
     """Hatch constants"""
 
     DEFAULT = None
@@ -91,14 +95,14 @@ class Hatch:
     STARS = "*"
 
 
-class LegendAlignment:
+class LEGEND_ALIGN:
     DEFAULT = "left"
     CENTER = "center"
     RIGHT = "right"
     LEFT = "left"
 
 
-class HistType:
+class HISTOGRAM_TYPE:
     """Hist Type constants"""
 
     BAR = "bar"
@@ -106,7 +110,7 @@ class HistType:
     STEPFILLED = "stepfilled"
 
 
-class Colors:
+class COLORS:
     Blue = "blue"
     Green = "green"
     Orange = "orange"
@@ -127,3 +131,23 @@ class Colors:
     Spectral = "spectral"
     MixedLight = "mixed_light"
     MixedDark = "mixed_dark"
+
+
+class NORMALIZE:
+    LINEAR = "linear"
+    LOG = "log"
+    SYMLOG = "symlog"
+    ASINH = "asinh"
+    LOGIT = "logit"
+
+
+class ORIENTATION:
+    HORIZONTAL = "horizontal"
+    VERTICAL = "vertical"
+
+
+class VALFMT:
+    DEFAULT = "{x}"
+    INTEGER = "{x:d}"
+    DECIMAL = "{x:.1f}"
+    PERCENT = "{x:.1%}"

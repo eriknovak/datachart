@@ -6,14 +6,14 @@ from collections import defaultdict
 import numpy as np
 import matplotlib.colors as colors
 
-from ..schema.constants import Colors
+from ..schema.constants import COLORS
 from ..config.themes.colors import COLOR_SCALE_MAPPING
 
 # ===============================================
 # Constants
 # ===============================================
 
-DEFAULT_COLOR = Colors.Spectral
+DEFAULT_COLOR = COLORS.Spectral
 DEFAULT_MAX_COLOR = 5
 
 # ===============================================

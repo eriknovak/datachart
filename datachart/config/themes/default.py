@@ -1,43 +1,43 @@
 from ...schema.definitions import ConfigAttrs
 from ...schema.constants import (
-    LineStyle,
-    FontStyle,
-    FontWeight,
-    LineDrawStyle,
-    Colors,
+    LINE_STYLE,
+    FONT_STYLE,
+    FONT_WEIGHT,
+    LINE_DRAW_STYLE,
+    COLORS,
 )
 
 DEFAULT_THEME: ConfigAttrs = {
     # general color style
-    "color.general.singular": Colors.Blue,
-    "color.general.multiple": Colors.Spectral,
+    "color.general.singular": COLORS.Blue,
+    "color.general.multiple": COLORS.Spectral,
     # general font style
     "font.general.family": "sans-serif",
     "font.general.sans-serif": ["Helvetica", "Arial"],
     "font.general.color": "#000000",
     "font.general.size": 11,
-    "font.general.style": FontStyle.NORMAL,
-    "font.general.weight": FontWeight.NORMAL,
+    "font.general.style": FONT_STYLE.NORMAL,
+    "font.general.weight": FONT_WEIGHT.NORMAL,
     # title size style
     "font.title.size": 12,
     "font.title.color": "#000000",
-    "font.title.style": FontStyle.NORMAL,
-    "font.title.weight": FontWeight.NORMAL,
+    "font.title.style": FONT_STYLE.NORMAL,
+    "font.title.weight": FONT_WEIGHT.NORMAL,
     # subtitle size style
     "font.subtitle.size": 11,
     "font.subtitle.color": "#000000",
-    "font.subtitle.style": FontStyle.NORMAL,
-    "font.subtitle.weight": FontWeight.NORMAL,
+    "font.subtitle.style": FONT_STYLE.NORMAL,
+    "font.subtitle.weight": FONT_WEIGHT.NORMAL,
     # xlabel size style
     "font.xlabel.size": 10,
     "font.xlabel.color": "#000000",
-    "font.xlabel.style": FontStyle.NORMAL,
-    "font.xlabel.weight": FontWeight.NORMAL,
+    "font.xlabel.style": FONT_STYLE.NORMAL,
+    "font.xlabel.weight": FONT_WEIGHT.NORMAL,
     # ylabel size style
     "font.ylabel.size": 10,
     "font.ylabel.color": "#000000",
-    "font.ylabel.style": FontStyle.NORMAL,
-    "font.ylabel.weight": FontWeight.NORMAL,
+    "font.ylabel.style": FONT_STYLE.NORMAL,
+    "font.ylabel.weight": FONT_WEIGHT.NORMAL,
     # plot axes style
     "axes.spines.top.visible": True,
     "axes.spines.right.visible": True,
@@ -64,15 +64,15 @@ DEFAULT_THEME: ConfigAttrs = {
     "plot.grid.alpha": 1,
     "plot.grid.color": "#E6E6E6",
     "plot.grid.line.width": 0.5,
-    "plot.grid.line.style": LineStyle.SOLID,
+    "plot.grid.line.style": LINE_STYLE.SOLID,
     "plot.grid.zorder": 0,
     # plot line style
     "plot.line.color": None,
-    "plot.line.style": LineStyle.SOLID,
+    "plot.line.style": LINE_STYLE.SOLID,
     "plot.line.marker": None,
     "plot.line.width": 1,
     "plot.line.alpha": 1.0,
-    "plot.line.drawstyle": LineDrawStyle.DEFAULT,
+    "plot.line.drawstyle": LINE_DRAW_STYLE.DEFAULT,
     "plot.line.zorder": 3,
     # plot bar style
     "plot.bar.color": None,
@@ -95,12 +95,19 @@ DEFAULT_THEME: ConfigAttrs = {
     "plot.hist.edge.color": "#000000",
     # plot vline style
     "plot.vline.color": None,
-    "plot.vline.style": LineStyle.SOLID,
+    "plot.vline.style": LINE_STYLE.SOLID,
     "plot.vline.width": 1,
     "plot.vline.alpha": 1.0,
     # plot hline style
     "plot.hline.color": None,
-    "plot.hline.style": LineStyle.SOLID,
+    "plot.hline.style": LINE_STYLE.SOLID,
     "plot.hline.width": 1,
     "plot.hline.alpha": 1.0,
+    # plot heatmap style
+    "plot.heatmap.cmap": COLORS.Blue,
+    "plot.heatmap.alpha": 1.0,
+    "plot.heatmap.font.size": 9,
+    "plot.heatmap.font.color": "#000000",
+    "plot.heatmap.font.style": FONT_STYLE.NORMAL,
+    "plot.heatmap.font.weight": FONT_WEIGHT.NORMAL,
 }
