@@ -43,6 +43,13 @@ To install the requirements run:
 pip install -e .[all]
 ```
 
+**Githooks.** Githooks enable automatic commit and push hooks. The project is configured to run tests on each commit and to run tests and format the code on each push. See the configuration in `.githooks.ini`. To enable git hooks, run:
+
+```bash
+githooks
+```
+
+
 ## 🧪 Tests
 
 To run existing tests, simply run:

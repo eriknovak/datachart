@@ -33,6 +33,7 @@ Docs = "https://github.com/eriknovak/datachart"
 dev = [
     "black",
     "flake8",
+    "python-githooks",
     "mkdocs-material",
 ]
 test = [
