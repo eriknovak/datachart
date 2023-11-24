@@ -26,7 +26,7 @@ def get_color_scale(name: str = DEFAULT_COLOR) -> list:
 
     Parameters
     ----------
-    name : str, optional (default=Colors.Spectral)
+    name : str, optional (default=COLORS.Spectral)
         The name of the color scale.
 
     Returns
@@ -76,7 +76,7 @@ def get_colormap(name: str = DEFAULT_COLOR) -> colors.LinearSegmentedColormap:
 
     Parameters
     ----------
-    name : str, optional (default=Colors.Spectral)
+    name : str, optional (default=COLORS.Spectral)
         The name of the color map.
 
     Returns
@@ -95,7 +95,7 @@ def get_discrete_colors(
 
     Parameters
     ----------
-    name : str, optional (default=Colors.Spectral)
+    name : str, optional (default=COLORS.Spectral)
         The name of the color scale.
     max_colors : int, optional (default=5)
         The maximum number of colors.
@@ -126,7 +126,7 @@ def create_color_cycle(
 
     Parameters
     ----------
-    name : list, optional (default=Colors.Spectral)
+    name : list, optional (default=COLORS.Spectral)
         The name of the color scale.
     max_colors : int, optional (default=5)
         The maximum number of colors.

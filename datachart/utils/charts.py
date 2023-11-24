@@ -623,7 +623,7 @@ def draw_bar_chart(
 # ================================================
 
 
-def draw_hist_chart(
+def draw_histogram(
     figure: plt.Figure,
     axes: List[plt.Axes],
     charts: List[HistDataAttrs],
