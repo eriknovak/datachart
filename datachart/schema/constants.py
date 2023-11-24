@@ -24,6 +24,7 @@ class FIG_FORMAT:
     SVG = "svg"
     PDF = "pdf"
     PNG = "png"
+    WEBP = "webp"
 
 
 class FONT_STYLE:
