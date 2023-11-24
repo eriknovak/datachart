@@ -1,4 +1,4 @@
-from ..utils.charts import chart_wrapper, draw_hist_chart
+from ..utils.charts import chart_wrapper, draw_histogram
 from ..schema.definitions import HistChartAttrs
 
 # ================================================
@@ -6,7 +6,7 @@ from ..schema.definitions import HistChartAttrs
 # ================================================
 
 
-def hist_chart(attrs: HistChartAttrs):
+def histogram(attrs: HistChartAttrs):
     """Draw a line chart
 
     Parameters
@@ -16,4 +16,4 @@ def hist_chart(attrs: HistChartAttrs):
 
     """
 
-    return chart_wrapper(draw_hist_chart)({**attrs, "type": "histogram"})
+    return chart_wrapper(draw_histogram)({**attrs, "type": "histogram"})
