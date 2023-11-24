@@ -6,8 +6,9 @@ from collections import defaultdict
 import numpy as np
 import matplotlib.colors as colors
 
-from ..schema.constants import COLORS
-from ..config.themes.colors import COLOR_SCALE_MAPPING
+from ..constants import COLORS
+from ..themes.colors import COLOR_SCALE_MAPPING
+
 
 # ===============================================
 # Constants

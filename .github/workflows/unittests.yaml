@@ -25,3 +25,7 @@ jobs:
       - name: Test with unittest
         run: |
           python -m unittest discover test
+
+      - name: Test notebook docs
+        run: |
+          pytest --nbmake **/*ipynb

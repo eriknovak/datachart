@@ -1,5 +1,5 @@
-from ...schema.definitions import ConfigAttrs
-from ...schema.constants import (
+from ..definitions import ConfigAttrs
+from ..constants import (
     LINE_STYLE,
     FONT_STYLE,
     FONT_WEIGHT,

@@ -80,7 +80,7 @@ color_scale_mixed_dark = [
 
 
 # ===============================================
-# Configurations
+# Color Scale Mapping
 # ===============================================
 
 COLOR_SCALE_MAPPING = {
@@ -105,3 +105,9 @@ COLOR_SCALE_MAPPING = {
     "mixed_light": color_scale_mixed_light,
     "mixed_dark": color_scale_mixed_dark,
 }
+
+# ===============================================
+# Color Definitions
+# ===============================================
+
+COLOR_MAPPING = {}

@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from ..schema.constants import FIG_FORMAT
+from ..constants import FIG_FORMAT
 
 
 def save_figure(

@@ -28,7 +28,7 @@ from ..utils.attrs import (
     configure_labels,
 )
 
-from ..schema.definitions import (
+from ..definitions import (
     LineDataAttrs,
     BarDataAttrs,
     HistDataAttrs,
@@ -37,7 +37,7 @@ from ..schema.definitions import (
     HLineAttrs,
     VLineAttrs,
 )
-from ..schema.constants import FIG_SIZE, ORIENTATION, VALFMT
+from ..constants import FIG_SIZE, ORIENTATION, VALFMT
 from ..config import config
 
 # ================================================

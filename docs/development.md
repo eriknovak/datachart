@@ -51,6 +51,12 @@ To run existing tests, simply run:
 python -m unittest discover test
 ```
 
+To test notebooks, run:
+
+```bash
+pytest --nbmake **/*ipynb
+```
+
 ## 📝 Documentation
 
 To start live-reloading the documentation, run:
