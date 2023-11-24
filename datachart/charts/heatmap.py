@@ -1,5 +1,5 @@
 from ..utils.charts import chart_wrapper, draw_heatmap
-from ..schema.definitions import HeatmapChartAttrs
+from ..definitions import HeatmapChartAttrs
 
 # ================================================
 # Main Chart Definition

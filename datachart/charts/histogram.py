@@ -1,5 +1,5 @@
 from ..utils.charts import chart_wrapper, draw_histogram
-from ..schema.definitions import HistChartAttrs
+from ..definitions import HistChartAttrs
 
 # ================================================
 # Main Chart Definition

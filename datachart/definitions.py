@@ -1,7 +1,7 @@
 from typing import TypedDict, Union, Tuple, List, Optional
 
 import matplotlib.colors as colors
-from ..schema.constants import (
+from .constants import (
     FONT_STYLE,
     FONT_WEIGHT,
     HATCH_STYLE,

@@ -127,7 +127,7 @@ class COLORS:
     BrNg = "brng"
     PrGn = "prgn"
     PuOr = "puor"
-    Rdgy = "rdgy"
+    RdGy = "rdgy"
     RdYlGn = "rdylgn"
     Spectral = "spectral"
     MixedLight = "mixed_light"
@@ -152,3 +152,8 @@ class VALFMT:
     INTEGER = "{x:d}"
     DECIMAL = "{x:.1f}"
     PERCENT = "{x:.1%}"
+
+
+class THEME:
+    DEFAULT = "default"
+    GREYSCALE = "greyscale"

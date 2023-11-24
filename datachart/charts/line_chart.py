@@ -1,5 +1,5 @@
 from ..utils.charts import chart_wrapper, draw_line_chart
-from ..schema.definitions import LineChartAttrs
+from ..definitions import LineChartAttrs
 
 # ================================================
 # Main Chart Definition

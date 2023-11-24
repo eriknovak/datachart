@@ -1,11 +1,13 @@
 import copy
 import json
+import warnings
 
 # import the schemas
-from ..schema.definitions import ConfigAttrs
+from datachart.definitions import ConfigAttrs
+from datachart.constants import THEME
 
 # import the themes
-from .themes import DEFAULT_THEME
+from ..themes import DEFAULT_THEME, GREYSCALE_THEME
 
 
 class Config:
@@ -13,6 +15,21 @@ class Config:
 
     def __init__(self):
         self.config = copy.deepcopy(DEFAULT_THEME)
+        self.theme = THEME.DEFAULT
+
+    def set_theme(self, theme: THEME) -> None:
+        """Sets the global theme"""
+        if theme == THEME.DEFAULT:
+            self.config = copy.deepcopy(DEFAULT_THEME)
+            self.theme = THEME.DEFAULT
+        elif theme == THEME.GREYSCALE:
+            self.config = copy.deepcopy(GREYSCALE_THEME)
+            self.theme = THEME.GREYSCALE
+        else:
+            warnings.warn(
+                f"Warning: {theme} is not a valid theme. Must be one of {[THEME.DEFAULT, THEME.GREYSCALE]}. Reverting to last active theme..."
+            )
+            self.set_theme(self.theme)
 
     def reset_config(self) -> None:
         """Resets the global configuration"""
