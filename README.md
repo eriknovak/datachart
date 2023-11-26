@@ -7,15 +7,15 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/eriknovak/datachart/actions/workflows/unittests.yaml" target="_blank">
-    <img src="https://github.com/eriknovak/datachart/actions/workflows/unittests.yaml/badge.svg" alt="Test">
-  </a>
-  <a href="https://pypi.org/project/datachart" target="_blank">
-    <img src="https://img.shields.io/pypi/v/datachart?color=%2334D058&amp;label=pypi%20package" alt="Package version">
-  </a>
-  <a href="https://pypi.org/project/datachart" target="_blank">
-    <img src="https://img.shields.io/pypi/pyversions/datachart.svg?color=%2334D058" alt="Supported Python versions">
-  </a>
+  <a href="https://github.com/eriknovak/datachart/actions/workflows/unittests.yaml" target="_blank"><img 
+    src="https://github.com/eriknovak/datachart/actions/workflows/unittests.yaml/badge.svg" alt="Test" 
+  /></a>
+  <a href="https://pypi.org/project/datachart" target="_blank"><img 
+    src="https://img.shields.io/pypi/v/datachart?color=%2334D058" alt="Package Package Index" 
+  /></a>
+  <a href="https://pypi.org/project/datachart" target="_blank"><img 
+    src="https://img.shields.io/pypi/pyversions/datachart.svg?color=%2334D058" alt="Supported Python Versions" 
+  /></a>
 </p>
 
 
