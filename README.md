@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/eriknovak/datachart/docs/assets/imgs/logo.png" alt="logo" height="250">
+  <img src="https://raw.githubusercontent.com/eriknovak/datachart/main/docs/assets/imgs/logo.png" alt="logo" height="250">
 </p>
 
 <p align="center">
@@ -7,14 +7,14 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/eriknovak/datachart/actions/workflows/unittests.yaml" target="_blank"><img 
-    src="https://github.com/eriknovak/datachart/actions/workflows/unittests.yaml/badge.svg" alt="Test" 
+  <a href="https://github.com/eriknovak/datachart/actions/workflows/unittests.yaml" target="_blank"><img
+    src="https://github.com/eriknovak/datachart/actions/workflows/unittests.yaml/badge.svg" alt="Test"
   /></a>
-  <a href="https://pypi.org/project/datachart" target="_blank"><img 
-    src="https://img.shields.io/pypi/v/datachart?color=%2334D058" alt="Package Package Index" 
+  <a href="https://pypi.org/project/datachart" target="_blank"><img
+    src="https://img.shields.io/pypi/v/datachart?color=%2334D058" alt="Package Package Index"
   /></a>
-  <a href="https://pypi.org/project/datachart" target="_blank"><img 
-    src="https://img.shields.io/pypi/pyversions/datachart.svg?color=%2334D058" alt="Supported Python Versions" 
+  <a href="https://pypi.org/project/datachart" target="_blank"><img
+    src="https://img.shields.io/pypi/pyversions/datachart.svg?color=%2334D058" alt="Supported Python Versions"
   /></a>
 </p>
 
