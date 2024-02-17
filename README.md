@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/eriknovak/datachart/main/docs/assets/imgs/logo.png" alt="logo" height="300">
+  <img src="https://raw.githubusercontent.com/eriknovak/datachart/docs/assets/imgs/logo.png" alt="logo" height="250">
 </p>
 
 <p align="center">

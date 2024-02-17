@@ -109,10 +109,10 @@ Next, to test the package published on testpypi, run:
 
 ```bash
 # install a virtual environment
-python -m venv env
+python -m venv venv
 
 # activate the environment
-. ./env/bin/activate
+. ./venv/bin/activate
 
 # install the datachart package
 pip install \
