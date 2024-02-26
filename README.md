@@ -32,7 +32,7 @@ The datachart package is a python package for creating data visualizations. It i
 ## ✅ Requirements
 Before starting the project make sure these requirements are available:
 
-- [python]. The python programming language (v3.9 or higher).
+- [python]. The python programming language (v3.8 or higher).
 
 ## Install
 

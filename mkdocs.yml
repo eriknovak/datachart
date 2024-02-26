@@ -46,6 +46,7 @@ edit_uri: ""
 # Plugins
 plugins:
   - search
+  - mkdocs-jupyter
 
 # Markdown Extensions
 markdown_extensions:
@@ -63,8 +64,8 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.superfences
   - pymdownx.emoji:
-      emoji_generator: !!python/name:materialx.emoji.to_svg
-      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
 
 # Page tree
 nav:
@@ -73,9 +74,11 @@ nav:
   - Documentation:
     - Overview: documentation/overview.md
     - Charts:
-      - Line Chart: documentation/charts/line-chart.md
-      - Bar Chart:  documentation/charts/bar-chart.md
-      - Hist Chart: documentation/charts/hist-chart.md
+      - Line Chart: documentation/notebooks/01-line-chart.ipynb
+      - Bar Chart:  documentation/notebooks/02-bar-chart.ipynb
+      - Histogram: documentation/notebooks/03-histogram.ipynb
+      - Heatmap: documentation/notebooks/04-heatmap.ipynb
+      - Color Themes: documentation/notebooks/00-color-themes.ipynb
     - Configuration: documentation/configuration.md
 
   - Development: development.md

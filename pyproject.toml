@@ -35,6 +35,7 @@ dev = [
     "flake8",
     "python-githooks",
     "mkdocs-material",
+    "mkdocs-jupyter",
 ]
 test = [
     "coverage",
