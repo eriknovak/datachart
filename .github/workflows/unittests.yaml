@@ -28,4 +28,4 @@ jobs:
 
       - name: Test notebook docs
         run: |
-          pytest --nbmake **/*ipynb
+          pytest --nbmake ./docs/**/notebooks/*ipynb
