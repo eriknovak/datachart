@@ -11,6 +11,11 @@ TEST_COLOR_SCALE = COLORS.Blue
 COLOR_SCALE_BLUE = COLOR_SCALE_MAPPING[TEST_COLOR_SCALE]
 
 
+# =====================================
+# Test Colors
+# =====================================
+
+
 class TestColors(unittest.TestCase):
     def test_color_amount(self):
         self.assertEqual(

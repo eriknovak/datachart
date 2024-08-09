@@ -14,6 +14,9 @@ from datachart.utils.attrs import (
     get_legend_style,
 )
 
+# =====================================
+# Test Attributes
+# =====================================
 
 class TestAttrs(unittest.TestCase):
     def test_get_attr_value(self):
@@ -116,7 +119,7 @@ class TestAttrs(unittest.TestCase):
         self.assertEqual(config["color"], "#FF0000")
         # default line style checkup
         self.assertEqual(config["alpha"], _config["plot.area.alpha"])
-        self.assertEqual(config["linewidth"], _config["plot.area.line.width"])
+        self.assertEqual(config["linewidth"], _config["plot.area.linewidth"])
         self.assertEqual("hatch" not in config, True)
         self.assertEqual(config["zorder"], _config["plot.area.zorder"])
 

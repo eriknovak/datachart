@@ -4,6 +4,10 @@ from datachart.config import config
 from datachart.themes import DEFAULT_THEME
 
 
+# =====================================
+# Test Config
+# =====================================
+
 class TestConfig(unittest.TestCase):
     def test_initial_config(self):
         for key, val in DEFAULT_THEME.items():
