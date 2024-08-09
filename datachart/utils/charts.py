@@ -516,7 +516,10 @@ def plot_line_chart(
 
 
 def plot_bar_chart(
-    figure: plt.Figure, axes: List[plt.Axes], charts: List[BarSingleChartAttrs], settings: dict
+    figure: plt.Figure,
+    axes: List[plt.Axes],
+    charts: List[BarSingleChartAttrs],
+    settings: dict,
 ) -> None:
     """Plot the bar chart.
 

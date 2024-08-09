@@ -8,7 +8,6 @@ Methods:
 
 """
 
-
 import matplotlib.pyplot as plt
 
 from ..constants import FIG_FORMAT
@@ -16,6 +15,7 @@ from ..constants import FIG_FORMAT
 # =====================================
 # Helper functions
 # =====================================
+
 
 def save_figure(
     figure: plt.Figure,

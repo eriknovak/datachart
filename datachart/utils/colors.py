@@ -63,7 +63,9 @@ def get_color_scale(name: str = DEFAULT_COLOR) -> List[str]:
     return COLOR_SCALE_MAPPING[name]
 
 
-def create_colormap(color_list: List[str], name: str = "") -> colors.LinearSegmentedColormap:
+def create_colormap(
+    color_list: List[str], name: str = ""
+) -> colors.LinearSegmentedColormap:
     """Create a color map from a list of colors.
 
     Args:

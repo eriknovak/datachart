@@ -37,7 +37,6 @@ Classes:
 
 """
 
-
 from typing import TypedDict, Union, Tuple, List, Optional
 
 import matplotlib.colors as colors
@@ -59,6 +58,7 @@ from .constants import (
 # Config Definitions
 # ================================================
 
+
 class ColorGeneralStyleAttrs(TypedDict):
     """The typing for the general color style.
 
@@ -67,6 +67,7 @@ class ColorGeneralStyleAttrs(TypedDict):
         color_general_multiple (Union[COLORS, str, None]): The general color for the multiple-typed charts.
 
     """
+
     color_general_singular: Union[COLORS, str, None]
     color_general_multiple: Union[COLORS, str, None]
 
@@ -261,16 +262,16 @@ class BarStyleAttrs(TypedDict):
 
     """
 
-    plot_bar_color: (Union[str, None])
-    plot_bar_alpha: (Union[float, None])
-    plot_bar_width: (Union[int, float, None])
-    plot_bar_zorder: (Union[int, float, None])
-    plot_bar_hatch: (Union[HATCH_STYLE, str, None])
-    plot_bar_edge_width: (Union[int, float, None])
-    plot_bar_edge_color: (Union[str, None])
-    plot_bar_error_color: (Union[str, None])
-    plot_xticks_label_rotate: (Union[int, float, None])
-    plot_yticks_label_rotate: (Union[int, float, None])
+    plot_bar_color: Union[str, None]
+    plot_bar_alpha: Union[float, None]
+    plot_bar_width: Union[int, float, None]
+    plot_bar_zorder: Union[int, float, None]
+    plot_bar_hatch: Union[HATCH_STYLE, str, None]
+    plot_bar_edge_width: Union[int, float, None]
+    plot_bar_edge_color: Union[str, None]
+    plot_bar_error_color: Union[str, None]
+    plot_xticks_label_rotate: Union[int, float, None]
+    plot_yticks_label_rotate: Union[int, float, None]
 
 
 class HistStyleAttrs(TypedDict):
@@ -359,8 +360,22 @@ class HeatmapStyleAttrs(TypedDict):
     plot_heatmap_font_weight: Union[FONT_WEIGHT, str, None]
 
 
-class StyleAttrs(ColorGeneralStyleAttrs, FontStyleAttrs, AxesStyleAttrs, LegendStyleAttrs, AreaStyleAttrs, GridStyleAttrs, LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, VLineStyleAttrs, HLineStyleAttrs, HeatmapStyleAttrs):
+class StyleAttrs(
+    ColorGeneralStyleAttrs,
+    FontStyleAttrs,
+    AxesStyleAttrs,
+    LegendStyleAttrs,
+    AreaStyleAttrs,
+    GridStyleAttrs,
+    LineStyleAttrs,
+    BarStyleAttrs,
+    HistStyleAttrs,
+    VLineStyleAttrs,
+    HLineStyleAttrs,
+    HeatmapStyleAttrs,
+):
     """The style attributes. Combines all style typings."""
+
     pass
 
 
@@ -412,6 +427,7 @@ class ChartCommonAttrs(TypedDict):
     max_cols: Union[int, None]
     sharex: Union[bool, None]
     sharey: Union[bool, None]
+
 
 # ================================================
 # Vertical and Horizontal Line Attributes
@@ -516,8 +532,8 @@ class LineSingleChartAttrs(TypedDict):
     vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
     hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
 
-    x: Union[str, None] = "x" # the name of the x attribute in data
-    y: Union[str, None] = "y" # the name of the y attribute in data
+    x: Union[str, None] = "x"  # the name of the x attribute in data
+    y: Union[str, None] = "y"  # the name of the y attribute in data
     yerr: Union[str, None] = "yerr"  # the name of the yerr attribute in data
 
 
@@ -704,6 +720,7 @@ class HeatmapColorbarAttrs(TypedDict):
         orientation (Union[ORIENTATION, str, None]): The orientation.
 
     """
+
     orientation: Union[ORIENTATION, str, None]
 
 
@@ -761,6 +778,7 @@ class HeatmapChartAttrs(ChartCommonAttrs):
         show_heatmap_values (Union[bool, None]): Whether or not to plot the heatmap values.
 
     """
+
     charts: Union[HeatmapSingleChartAttrs, List[HeatmapSingleChartAttrs]]
     show_colorbars: Union[bool, None]
     show_heatmap_values: Union[bool, None]
@@ -770,7 +788,8 @@ class HeatmapChartAttrs(ChartCommonAttrs):
 # Chart Attributes
 # ================================================
 
+
 class ChartAttrs(LineChartAttrs, BarChartAttrs, HistogramChartAttrs, HeatmapChartAttrs):
     """The union of all chart attributes."""
-    pass
 
+    pass

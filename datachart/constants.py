@@ -23,6 +23,7 @@ Classes:
 
 """
 
+
 class FIG_SIZE:
     """The predefined figure sizes.
 
@@ -338,6 +339,7 @@ class THEME:
         GREYSCALE (str): The greyscale theme. Equals to `"greyscale"`.
 
     """
+
     DEFAULT = "default"
     GREYSCALE = "greyscale"
 

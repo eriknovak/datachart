@@ -19,7 +19,6 @@ Methods:
         Gets the maximum of the values.
 """
 
-
 from typing import List, Tuple, Union
 
 import numpy as np
@@ -115,6 +114,7 @@ def minimum(values: List[Union[int, float]]) -> float:
     """
     assert isinstance(values, (list, np.ndarray)), "The values variable is not a list."
     return min(values)
+
 
 def maximum(values: List[Union[int, float]]) -> float:
     """Gets the maximum of the values.
