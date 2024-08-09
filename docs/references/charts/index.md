@@ -1,7 +1,5 @@
 ---
 title: Charts Module
-hide:
-    - toc
 ---
 
 # Charts Module
@@ -9,3 +7,14 @@ hide:
 ::: datachart.charts
     options:
         heading_level: 2
+
+
+## Chart Functions
+
+::: datachart.charts.LineChart
+
+::: datachart.charts.BarChart
+
+::: datachart.charts.Histogram
+
+::: datachart.charts.Heatmap

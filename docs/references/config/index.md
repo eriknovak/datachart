@@ -1,7 +1,5 @@
 ---
 title: Config Module
-hide:
-    - toc
 ---
 
 # Config Module
@@ -9,3 +7,13 @@ hide:
 ::: datachart.config
     options:
         heading_level: 2
+
+
+## Attributes
+
+::: datachart.config.config
+
+
+## Classes
+
+::: datachart.config.Config

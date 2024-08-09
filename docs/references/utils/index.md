@@ -12,7 +12,3 @@ title: Utils Module
 ## Functions
 
 ::: datachart.utils.figure.save_figure
-    options:
-        show_root_full_path: False
-        show_signature_annotations: True
-
