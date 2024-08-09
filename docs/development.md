@@ -6,7 +6,7 @@ title: Development
 
 This section is for developers only. It describes the requirements, the setup process, how to run tests, and how to deploy.
 
-## ✅ Requirements
+## Requirements
 Before starting the project make sure these requirements are available:
 
 - [python][python]. The python programming language (v3.8 or higher).
@@ -14,7 +14,7 @@ Before starting the project make sure these requirements are available:
 - [git][git]. For versioning your code.
 
 
-## 🛠️ Setup
+## Setup
 
 ### Create the python environment
 
@@ -50,7 +50,7 @@ githooks
 ```
 
 
-## 🧪 Tests
+## Tests
 
 To run existing tests, simply run:
 
@@ -64,7 +64,7 @@ To test notebooks, run:
 pytest --nbmake **/*ipynb
 ```
 
-## 📝 Documentation
+## Documentation
 
 To start live-reloading the documentation, run:
 
