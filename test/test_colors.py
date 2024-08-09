@@ -1,9 +1,9 @@
 import unittest
 
-from datachart.themes.colors import COLOR_SCALE_MAPPING
 from datachart.utils.colors import (
     get_color_scale,
     get_discrete_colors,
+    COLOR_SCALE_MAPPING,
 )
 from datachart.constants import COLORS
 

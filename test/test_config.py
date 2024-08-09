@@ -14,7 +14,7 @@ class TestConfig(unittest.TestCase):
             self.assertEqual(config[key], val)
 
     def test_update_config(self):
-        updated_config = {"font.general.color": "#FFFFFF"}
+        updated_config = {"font_general_color": "#FFFFFF"}
         config.update_config(config=updated_config)
         for key, val in updated_config.items():
             self.assertEqual(config[key], val)

@@ -31,8 +31,8 @@ class TestAttrs(unittest.TestCase):
 
     def test_create_config_dict(self):
         config = create_config_dict(
-            {"plot.line.color": "#FF0000"},
-            [("color", "plot.line.color"), ("alpha", "plot.line.alpha")],
+            {"plot_line_color": "#FF0000"},
+            [("color", "plot_line_color"), ("alpha", "plot_line_alpha")],
         )
         self.assertEqual(config["color"], "#FF0000")
         self.assertEqual(config["alpha"], 1.0)
@@ -61,85 +61,85 @@ class TestAttrs(unittest.TestCase):
     def test_get_text_style(self):
         for key in ["general", "title", "subtitle", "xlabel", "ylabel"]:
             config = get_text_style(key)
-            self.assertEqual(config["fontsize"], _config[f"font.{key}.size"])
-            self.assertEqual(config["fontweight"], _config[f"font.{key}.weight"])
-            self.assertEqual(config["color"], _config[f"font.{key}.color"])
-            self.assertEqual(config["style"], _config[f"font.{key}.style"])
+            self.assertEqual(config["fontsize"], _config[f"font_{key}_size"])
+            self.assertEqual(config["fontweight"], _config[f"font_{key}_weight"])
+            self.assertEqual(config["color"], _config[f"font_{key}_color"])
+            self.assertEqual(config["style"], _config[f"font_{key}_style"])
             self.assertEqual(config["family"], "sans-serif")
 
     def test_get_line_style(self):
-        config = get_line_style({"plot.line.color": "#FF0000"})
+        config = get_line_style({"plot_line_color": "#FF0000"})
         self.assertEqual(config["color"], "#FF0000")
         # default line style checkup
-        self.assertEqual(config["alpha"], _config["plot.line.alpha"])
-        self.assertEqual(config["linewidth"], _config["plot.line.width"])
-        self.assertEqual(config["linestyle"], _config["plot.line.style"])
+        self.assertEqual(config["alpha"], _config["plot_line_alpha"])
+        self.assertEqual(config["linewidth"], _config["plot_line_width"])
+        self.assertEqual(config["linestyle"], _config["plot_line_style"])
         self.assertEqual("marker" not in config, True)
-        self.assertEqual(config["drawstyle"], _config["plot.line.drawstyle"])
-        self.assertEqual(config["zorder"], _config["plot.line.zorder"])
+        self.assertEqual(config["drawstyle"], _config["plot_line_drawstyle"])
+        self.assertEqual(config["zorder"], _config["plot_line_zorder"])
 
     def test_get_bar_style(self):
-        config = get_bar_style({"plot.bar.color": "#FF0000"})
+        config = get_bar_style({"plot_bar_color": "#FF0000"})
         self.assertEqual(config["color"], "#FF0000")
         # default line style checkup
-        self.assertEqual(config["alpha"], _config["plot.bar.alpha"])
-        self.assertEqual(config["width"], _config["plot.bar.width"])
+        self.assertEqual(config["alpha"], _config["plot_bar_alpha"])
+        self.assertEqual(config["width"], _config["plot_bar_width"])
         self.assertEqual("hatch" not in config, True)
-        self.assertEqual(config["linewidth"], _config["plot.bar.edge.width"])
-        self.assertEqual(config["edgecolor"], _config["plot.bar.edge.color"])
-        self.assertEqual(config["ecolor"], _config["plot.bar.error.color"])
-        self.assertEqual(config["zorder"], _config["plot.bar.zorder"])
+        self.assertEqual(config["linewidth"], _config["plot_bar_edge_width"])
+        self.assertEqual(config["edgecolor"], _config["plot_bar_edge_color"])
+        self.assertEqual(config["ecolor"], _config["plot_bar_error_color"])
+        self.assertEqual(config["zorder"], _config["plot_bar_zorder"])
 
-        config = get_bar_style({"plot.bar.color": "#FF0000"}, is_horizontal=True)
+        config = get_bar_style({"plot_bar_color": "#FF0000"}, is_horizontal=True)
         self.assertEqual(config["color"], "#FF0000")
         # default line style checkup
-        self.assertEqual(config["alpha"], _config["plot.bar.alpha"])
-        self.assertEqual(config["height"], _config["plot.bar.width"])
+        self.assertEqual(config["alpha"], _config["plot_bar_alpha"])
+        self.assertEqual(config["height"], _config["plot_bar_width"])
         self.assertEqual("hatch" not in config, True)
-        self.assertEqual(config["linewidth"], _config["plot.bar.edge.width"])
-        self.assertEqual(config["edgecolor"], _config["plot.bar.edge.color"])
-        self.assertEqual(config["ecolor"], _config["plot.bar.error.color"])
-        self.assertEqual(config["zorder"], _config["plot.bar.zorder"])
+        self.assertEqual(config["linewidth"], _config["plot_bar_edge_width"])
+        self.assertEqual(config["edgecolor"], _config["plot_bar_edge_color"])
+        self.assertEqual(config["ecolor"], _config["plot_bar_error_color"])
+        self.assertEqual(config["zorder"], _config["plot_bar_zorder"])
 
     def test_get_hist_style(self):
-        config = get_hist_style({"plot.hist.color": "#FF0000"})
+        config = get_hist_style({"plot_hist_color": "#FF0000"})
         self.assertEqual(config["color"], "#FF0000")
         # default line style checkup
-        self.assertEqual(config["alpha"], _config["plot.hist.alpha"])
+        self.assertEqual(config["alpha"], _config["plot_hist_alpha"])
         self.assertEqual("fill" not in config, True)
         self.assertEqual("hatch" not in config, True)
-        self.assertEqual(config["zorder"], _config["plot.hist.zorder"])
-        self.assertEqual(config["histtype"], _config["plot.hist.type"])
-        self.assertEqual(config["align"], _config["plot.hist.align"])
-        self.assertEqual(config["linewidth"], _config["plot.hist.edge.width"])
-        self.assertEqual(config["edgecolor"], _config["plot.hist.edge.color"])
+        self.assertEqual(config["zorder"], _config["plot_hist_zorder"])
+        self.assertEqual(config["histtype"], _config["plot_hist_type"])
+        self.assertEqual(config["align"], _config["plot_hist_align"])
+        self.assertEqual(config["linewidth"], _config["plot_hist_edge_width"])
+        self.assertEqual(config["edgecolor"], _config["plot_hist_edge_color"])
 
     def test_get_area_style(self):
-        config = get_area_style({"plot.area.color": "#FF0000"})
+        config = get_area_style({"plot_area_color": "#FF0000"})
         self.assertEqual(config["color"], "#FF0000")
         # default line style checkup
-        self.assertEqual(config["alpha"], _config["plot.area.alpha"])
-        self.assertEqual(config["linewidth"], _config["plot.area.linewidth"])
+        self.assertEqual(config["alpha"], _config["plot_area_alpha"])
+        self.assertEqual(config["linewidth"], _config["plot_area_linewidth"])
         self.assertEqual("hatch" not in config, True)
-        self.assertEqual(config["zorder"], _config["plot.area.zorder"])
+        self.assertEqual(config["zorder"], _config["plot_area_zorder"])
 
     def test_get_grid_style(self):
-        config = get_grid_style({"plot.grid.color": "#FF0000"})
+        config = get_grid_style({"plot_grid_color": "#FF0000"})
         self.assertEqual(config["color"], "#FF0000")
         # default line style checkup
-        self.assertEqual(config["alpha"], _config["plot.grid.alpha"])
-        self.assertEqual(config["linewidth"], _config["plot.grid.line.width"])
-        self.assertEqual(config["linestyle"], _config["plot.grid.line.style"])
-        self.assertEqual(config["zorder"], _config["plot.grid.zorder"])
+        self.assertEqual(config["alpha"], _config["plot_grid_alpha"])
+        self.assertEqual(config["linewidth"], _config["plot_grid_linewidth"])
+        self.assertEqual(config["linestyle"], _config["plot_grid_linestyle"])
+        self.assertEqual(config["zorder"], _config["plot_grid_zorder"])
 
     def test_get_legend_style(self):
         config = get_legend_style()
-        self.assertEqual(config["shadow"], _config["plot.legend.shadow"])
-        self.assertEqual(config["frameon"], _config["plot.legend.frameon"])
-        self.assertEqual(config["fontsize"], _config["plot.legend.font.size"])
-        self.assertEqual(config["alignment"], _config["plot.legend.alignment"])
-        self.assertEqual(config["title_fontsize"], _config["plot.legend.title.size"])
-        self.assertEqual(config["labelcolor"], _config["plot.legend.label.color"])
+        self.assertEqual(config["shadow"], _config["plot_legend_shadow"])
+        self.assertEqual(config["frameon"], _config["plot_legend_frameon"])
+        self.assertEqual(config["fontsize"], _config["plot_legend_font_size"])
+        self.assertEqual(config["alignment"], _config["plot_legend_alignment"])
+        self.assertEqual(config["title_fontsize"], _config["plot_legend_title_size"])
+        self.assertEqual(config["labelcolor"], _config["plot_legend_label_color"])
 
 
 if __name__ == "__main__":
