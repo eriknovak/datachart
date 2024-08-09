@@ -1,5 +1,6 @@
 import json
 import warnings
+from itertools import cycle
 from typing import List, Union
 
 import numpy as np
@@ -57,17 +58,13 @@ DEFAULT_VALFMT = VALFMT.DEFAULT
 def get_chart_data(attr: str, chart: dict) -> np.array:
     """Generate a numpy array of data from a given chart dictionary.
 
-    Parameters
-    ----------
-    attr : str
-        The attribute to extract from the chart data.
-    chart : dict
-        The chart dictionary containing the data.
+    Args:
+        attr: The attribute to extract from the chart data.
+        chart: The chart dictionary containing the data.
 
-    Returns
-    -------
-    np.array
-        An array of values extracted from the chart data, or None if no values are found.
+    Returns:
+        An array of values extracted from the chart data, or `None` if no values are found.
+
     """
 
     attr_label = get_attr_value(attr, chart, attr)
@@ -82,20 +79,16 @@ def get_chart_data(attr: str, chart: dict) -> np.array:
     return None
 
 
-def custom_color_cycle(has_multi_subplots: bool, n_charts: int):
+def custom_color_cycle(has_multi_subplots: bool, n_charts: int) -> cycle:
     """Create a custom color cycle.
 
-    Parameters
-    ----------
-    has_multi_subplots : bool
-        True if there are multiple subplots, False otherwise.
-    n_charts : int
-        The number of charts.
+    Args:
+        has_multi_subplots: True if there are multiple subplots, False otherwise.
+        n_charts: The number of charts.
 
-    Returns
-    -------
-    list
+    Returns:
         The custom color cycle.
+
     """
 
     color_type = "singular" if has_multi_subplots else "multiple"
@@ -107,15 +100,12 @@ def custom_color_cycle(has_multi_subplots: bool, n_charts: int):
 def has_multiple_subplots(axes: list) -> bool:
     """Check if there are multiple subplots.
 
-    Parameters
-    ----------
-    axes : list
-        The axes list.
+    Args:
+        axes: The axes list.
 
-    Returns
-    -------
-    bool
-        True if there are multiple subplots, False otherwise.
+    Returns:
+        `True` if there are multiple subplots, `False` otherwise.
+
     """
 
     return not all([ax == axes[0] for ax in axes])
@@ -124,15 +114,12 @@ def has_multiple_subplots(axes: list) -> bool:
 def get_chart_hash(chart: dict) -> str:
     """Get a hash of the chart.
 
-    Parameters
-    ----------
-    chart : dict
-        The chart dictionary.
+    Args:
+        chart: The chart dictionary.
 
-    Returns
-    -------
-    str
+    Returns:
         The hash of the chart.
+
     """
 
     return hash(json.dumps(chart, sort_keys=True))
@@ -149,16 +136,16 @@ settings_attr_mapping = [
     {"name": "title", "default": None},
     {"name": "xlabel", "default": None},
     {"name": "ylabel", "default": None},
-    {"name": "sharex", "default": False},
-    {"name": "sharey", "default": False},
-    {"name": "subplots", "default": None},
-    {"name": "aspect_ratio", "default": "auto"},
     {"name": "figsize", "default": FIG_SIZE.DEFAULT},
-    {"name": "max_cols", "default": 4},
     {"name": "xmin", "default": None},
     {"name": "xmax", "default": None},
     {"name": "ymin", "default": None},
     {"name": "ymax", "default": None},
+    {"name": "aspect_ratio", "default": "auto"},
+    {"name": "subplots", "default": None},
+    {"name": "max_cols", "default": 4},
+    {"name": "sharex", "default": False},
+    {"name": "sharey", "default": False},
     # visibility attributes
     {"name": "show_legend", "default": None},
     {"name": "show_grid", "default": None},
@@ -167,7 +154,7 @@ settings_attr_mapping = [
     {"name": "show_density", "default": None},
     {"name": "show_cumulative", "default": None},
     {"name": "show_colorbars", "default": None},
-    {"name": "show_heatmap_vals", "default": None},
+    {"name": "show_heatmap_values", "default": None},
     # chart specific attributes
     {"name": "orientation", "default": None},
     {"name": "log_scale", "default": None},
@@ -187,7 +174,7 @@ settings_chart_mapping = [
     "show_density",
     "show_cumulative",
     "show_colorbars",
-    "show_heatmap_vals",
+    "show_heatmap_values",
     "orientation",
     "log_scale",
     "num_bins",
@@ -197,15 +184,12 @@ settings_chart_mapping = [
 def get_settings(attrs: dict) -> dict:
     """Get the chart settings.
 
-    Parameters
-    ----------
-    attrs : dict
-        The attributes.
+    Args:
+        attrs: The attributes.
 
-    Returns
-    -------
-    dict
+    Returns:
         The chart settings.
+
     """
 
     return {
@@ -217,15 +201,12 @@ def get_settings(attrs: dict) -> dict:
 def get_chart_settings(settings: dict) -> dict:
     """Get the chart settings.
 
-    Parameters
-    ----------
-    settings : dict
-        The chart settings.
+    Args:
+        settings: The chart settings.
 
-    Returns
-    -------
-    dict
-        The chart settings without the None values.
+    Returns:
+        The chart settings without the `None` values.
+
     """
 
     return {key: val for key, val in settings.items() if key in settings_chart_mapping}
@@ -234,12 +215,10 @@ def get_chart_settings(settings: dict) -> dict:
 def assert_chart_settings(settings: dict, supported_settings: List[str]) -> None:
     """Assert that the chart config is supported.
 
-    Parameters
-    ----------
-    settings : dict
-        The chart settings.
-    supported_settings : List[str]
-        The supported settings.
+    Args:
+        settings: The chart settings.
+        supported_settings: The supported settings.
+
     """
 
     for key, val in settings.items():
@@ -254,7 +233,17 @@ def assert_chart_settings(settings: dict, supported_settings: List[str]) -> None
 # ================================================
 
 
-def chart_wrapper(func: callable) -> callable:
+def chart_plot_wrapper(func: callable) -> callable:
+    """Wraps the chart plot
+
+    Args:
+        func: The plot creation function.
+
+    Returns:
+        The wrapped function.
+
+    """
+
     def wrapper_func(attrs: ChartAttrs) -> None:
         # check how many data point are there
         if not isinstance(attrs["charts"], dict) and not isinstance(
@@ -332,28 +321,90 @@ def chart_wrapper(func: callable) -> callable:
 
 
 # ================================================
-# Draw Line Chart
+# Plot Vertical Lines
 # ================================================
 
 
-def draw_line_chart(
+def plot_vlines(ax: plt.Axes, vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]):
+    """Plots the vertical lines.
+
+    Args:
+        ax: The axes.
+        vlines: The configuration of the vertical lines.
+
+    """
+
+    vlines = vlines if isinstance(vlines, list) else [vlines]
+    ymin, ymax = ax.get_ylim()
+    for vline in vlines:
+        x = vline.get("x")
+        ymin = vline.get("ymin", ymin)
+        ymax = vline.get("ymax", ymax)
+        label = vline.get("label", "")
+        style = get_vline_style(vline.get("style", {}))
+
+        if x is None:
+            warnings.warn(
+                "The attribute `x` is not specified. Please provide the `x` value."
+            )
+            continue
+
+        ax.vlines(x=x, ymin=ymin, ymax=ymax, label=label, **style)
+
+
+# ================================================
+# Plot Horizontal Lines
+# ================================================
+
+
+def plot_hlines(ax: plt.Axes, hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]):
+    """Plots the horizontal lines.
+
+    Args:
+        ax: The axes.
+        hlines: The configuration of the horizontal lines.
+
+    """
+
+    hlines = hlines if isinstance(hlines, list) else [hlines]
+
+    xmin, xmax = ax.get_xlim()
+
+    for hline in hlines:
+        y = hline.get("y")
+        xmin = hline.get("xmin", xmin)
+        xmax = hline.get("xmax", xmax)
+        label = hline.get("label", "")
+        style = get_hline_style(hline.get("style", {}))
+
+        if y is None:
+            warnings.warn(
+                "The attribute `y` is not specified. Please provide the `y` value."
+            )
+            continue
+
+        ax.hlines(y=y, xmin=xmin, xmax=xmax, label=label, **style)
+
+
+# ================================================
+# Plot Line Chart
+# ================================================
+
+
+def plot_line_chart(
     figure: plt.Figure,
     axes: List[plt.Axes],
     charts: List[LineChartAttrs],
     settings: dict,
 ) -> None:
-    """Draw a line chart
+    """Plot the line chart.
 
-    Parameters
-    ----------
-    figure: plt.Figure
-        The figure.
-    axes : List[plt.Axes]
-        The axes list.
-    charts : List[LineDataAttrs]
-        The charts data.
-    settings : dict
-        The general settings.
+    Args:
+        figure: The figure.
+        axes: The axes list.
+        charts: The charts data.
+        settings: The general settings.
+
     """
 
     # assert the configuration
@@ -441,11 +492,11 @@ def draw_line_chart(
 
         if "vlines" in chart:
             # draw vertical lines
-            draw_vlines(ax, chart["vlines"])
+            plot_vlines(ax, chart["vlines"])
 
         if "hlines" in chart:
             # draw horizontal lines
-            draw_hlines(ax, chart["hlines"])
+            plot_hlines(ax, chart["hlines"])
 
         # set the aspect ratio of the chart
         if settings["aspect_ratio"]:
@@ -460,25 +511,21 @@ def draw_line_chart(
 
 
 # ================================================
-# Draw Bar Chart
+# Plot Bar Chart
 # ================================================
 
 
-def draw_bar_chart(
+def plot_bar_chart(
     figure: plt.Figure, axes: List[plt.Axes], charts: List[BarSingleChartAttrs], settings: dict
 ) -> None:
-    """Draw a bar chart
+    """Plot the bar chart.
 
-    Parameters
-    ----------
-    figure: plt.Figure
-        The figure.
-    axes : List[plt.Axes]
-        The axes list.
-    charts : List[BarDataAttrs]
-        The charts data.
-    settings : dict
-        The general settings.
+    Args:
+        figure: The figure.
+        axes: The axes list.
+        charts: The charts data.
+        settings: The general settings.
+
     """
 
     # assert the configuration
@@ -596,11 +643,11 @@ def draw_bar_chart(
 
         if "vlines" in chart:
             # draw vertical lines
-            draw_vlines(ax, chart["vlines"])
+            plot_vlines(ax, chart["vlines"])
 
         if "hlines" in chart:
             # draw horizontal lines
-            draw_hlines(ax, chart["hlines"])
+            plot_hlines(ax, chart["hlines"])
 
         # set the tick positions
         configure_axis_ticks_position(ax, chart)
@@ -619,28 +666,24 @@ def draw_bar_chart(
 
 
 # ================================================
-# Draw Histogram Chart
+# Plot Histogram Chart
 # ================================================
 
 
-def draw_histogram(
+def plot_histogram(
     figure: plt.Figure,
     axes: List[plt.Axes],
     charts: List[HistogramSingleChartAttrs],
     settings: dict,
 ) -> None:
-    """Draw a bar chart
+    """Plot the histogram.
 
-    Parameters
-    ----------
-    figure: plt.Figure
-        The figure.
-    axes : List[plt.Axes]
-        The axes list.
-    charts : List[HistDataAttrs]
-        The charts data.
-    settings : dict
-        The general settings.
+    Args:
+        figure: The figure.
+        axes: The axes list.
+        charts: The charts data.
+        settings: The general settings.
+
     """
 
     # assert the configuration
@@ -706,11 +749,11 @@ def draw_histogram(
 
         if "vlines" in chart:
             # draw vertical lines
-            draw_vlines(axes[0], chart["vlines"])
+            plot_vlines(axes[0], chart["vlines"])
 
         if "hlines" in chart:
             # draw horizontal lines
-            draw_hlines(axes[0], chart["hlines"])
+            plot_hlines(axes[0], chart["hlines"])
 
         # override the axis limits
         configure_axis_ticks_position(axes[0], charts[0])
@@ -753,11 +796,11 @@ def draw_histogram(
 
             if "vlines" in chart:
                 # draw vertical lines
-                draw_vlines(ax, chart["vlines"])
+                plot_vlines(ax, chart["vlines"])
 
             if "hlines" in chart:
                 # draw horizontal lines
-                draw_hlines(ax, chart["hlines"])
+                plot_hlines(ax, chart["hlines"])
 
             # override the axis limits
             configure_axis_ticks_position(ax, chart)
@@ -777,100 +820,24 @@ def draw_histogram(
 
 
 # ================================================
-# Draw Vertical Lines
+# Plot Heatmap
 # ================================================
 
 
-def draw_vlines(ax: plt.Axes, vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]):
-    """Draws vertical lines.
-
-    Parameters
-    ----------
-    ax : plt.Axes
-        The axes.
-
-    vlines : Union[VLineAttrs, List[VLineAttrs]]
-        The configuration of the vertical lines.
-    """
-
-    vlines = vlines if isinstance(vlines, list) else [vlines]
-    ymin, ymax = ax.get_ylim()
-    for vline in vlines:
-        x = vline.get("x")
-        ymin = vline.get("ymin", ymin)
-        ymax = vline.get("ymax", ymax)
-        label = vline.get("label", "")
-        style = get_vline_style(vline.get("style", {}))
-
-        if x is None:
-            warnings.warn(
-                "The attribute `x` is not specified. Please provide the `x` value."
-            )
-            continue
-
-        ax.vlines(x=x, ymin=ymin, ymax=ymax, label=label, **style)
-
-
-# ================================================
-# Draw Horizontal Lines
-# ================================================
-
-
-def draw_hlines(ax: plt.Axes, hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]):
-    """Draws horizontal lines.
-
-    Parameters
-    ----------
-    ax : plt.Axes
-        The axes.
-
-    hlines : Union[HLineAttrs, List[HLineAttrs]]
-        The configuration of the horizontal lines.
-    """
-
-    hlines = hlines if isinstance(hlines, list) else [hlines]
-
-    xmin, xmax = ax.get_xlim()
-
-    for hline in hlines:
-        y = hline.get("y")
-        xmin = hline.get("xmin", xmin)
-        xmax = hline.get("xmax", xmax)
-        label = hline.get("label", "")
-        style = get_hline_style(hline.get("style", {}))
-
-        if y is None:
-            warnings.warn(
-                "The attribute `y` is not specified. Please provide the `y` value."
-            )
-            continue
-
-        ax.hlines(y=y, xmin=xmin, xmax=xmax, label=label, **style)
-
-
-# ================================================
-# Draw Bar Chart
-# ================================================
-
-
-def draw_heatmap(
+def plot_heatmap(
     figure: plt.Figure,
     axes: List[plt.Axes],
     charts: List[HeatmapChartAttrs],
     settings: dict,
 ) -> None:
-    """Draw a heatmap chart
+    """Plot the heatmap.
 
-    Parameters
-    ----------
-    figure: plt.Figure
-        The figure.
-    axes : List[plt.Axes]
-        The axes list.
-    charts : List[HeatmapChartAttrs]
-        The charts data.
-    settings : dict
-        The general settings.
+    Args:
+        figure: The figure.
+        axes: The axes list.
+        charts: The charts data.
+        settings: The general settings.
+
     """
 
     # assert the configuration
@@ -879,7 +846,7 @@ def draw_heatmap(
         supported_settings=[
             "aspect_ratio",
             "show_colorbars",
-            "show_heatmap_vals",
+            "show_heatmap_values",
         ],
     )
 
@@ -908,7 +875,7 @@ def draw_heatmap(
         # set the tick positions
         configure_axis_ticks_position(ax, chart)
 
-        if settings["show_heatmap_vals"]:
+        if settings["show_heatmap_values"]:
             if isinstance(valfmt, str):
                 valfmt = mticker.StrMethodFormatter(valfmt)
 

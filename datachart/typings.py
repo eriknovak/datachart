@@ -4,13 +4,24 @@ The `typings` module contains the typings for all chart components. The module
 is intended to contain the typings for easier input value format checkup.
 
 Classes:
+    ChartAttrs: The union of all chart attributes.
     ChartCommonAttrs: The chart attributes common to all chart types.
     VLinePlotAttrs: The vertical line plot attributes.
     HLinePlotAttrs: The horizontal line plot attributes.
     LineChartAttrs: The line chart attributes.
     LineSingleChartAttrs: The single chart attributes for the line chart.
     LineDataPointAttrs: The data point attributes for the line chart.
+    BarChartAttrs: The bar chart attributes.
+    BarSingleChartAttrs: The single chart attributes for the bar chart.
+    BarDataPointAttrs: The data point attributes for the bar chart.
+    HistogramChartAttrs: The histogram chart attributes.
+    HistogramSingleChartAttrs: The single chart attributes for the histogram chart.
+    HistDataPointAttrs: The data point attributes for the histogram chart.
+    HeatmapChartAttrs: The heatmap chart attributes.
+    HeatmapSingleChartAttrs: The single chart attributes for the heatmap chart.
+    HeatmapColorbarAttrs: The heatmap colorbar attributes.
 
+    StyleAttrs: The style typing.
     ColorGeneralStyleAttrs: The typing for the general color style.
     FontStyleAttrs: The typing for the font style.
     AxesStyleAttrs: The typing for the axes style.
@@ -23,6 +34,7 @@ Classes:
     VLineStyleAttrs: The typing for the vertical line style.
     HLineStyleAttrs: The typing for the horizontal line style.
     HeatmapStyleAttrs: The typing for the heatmap style.
+
 """
 
 
@@ -347,8 +359,13 @@ class HeatmapStyleAttrs(TypedDict):
     plot_heatmap_font_weight: Union[FONT_WEIGHT, str, None]
 
 
+class StyleAttrs(ColorGeneralStyleAttrs, FontStyleAttrs, AxesStyleAttrs, LegendStyleAttrs, AreaStyleAttrs, GridStyleAttrs, LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, VLineStyleAttrs, HLineStyleAttrs, HeatmapStyleAttrs):
+    """The style attributes. Combines all style typings."""
+    pass
+
+
 # ================================================
-# Common Definitions
+# Common Chart Attributes
 # ================================================
 
 
@@ -397,7 +414,7 @@ class ChartCommonAttrs(TypedDict):
     sharey: Union[bool, None]
 
 # ================================================
-# Vertical and Horizontal Line Definitions
+# Vertical and Horizontal Line Attributes
 # ================================================
 
 
@@ -440,7 +457,7 @@ class HLinePlotAttrs(TypedDict):
 
 
 # ================================================
-# Line Chart Definitions
+# Line Chart Attributes
 # ================================================
 
 
@@ -513,17 +530,27 @@ class LineChartAttrs(ChartCommonAttrs):
         show_area (Union[bool, None]): Whether or not to show the area under the lines.
 
     """
+
     charts: Union[LineSingleChartAttrs, List[LineSingleChartAttrs]]
     show_yerr: Union[bool, None]
     show_area: Union[bool, None]
 
 
 # ================================================
-# Bar Chart Definitions
+# Bar Chart Attributes
 # ================================================
 
 
 class BarDataPointAttrs(TypedDict):
+    """The data point attributes for the bar chart.
+
+    Attributes:
+        label (str): The label.
+        y (Union[int, float]): The y-axis value.
+        yerr (Optional[Union[int, float]]): The y-axis error value.
+
+    """
+
     # the default attributes, could be anything
     label: str
     y: Union[int, float]
@@ -531,14 +558,33 @@ class BarDataPointAttrs(TypedDict):
 
 
 class BarSingleChartAttrs(TypedDict):
+    """The single chart attributes for the bar chart.
+
+    Attributes:
+        data (List[BarDataPointAttrs]): The list of data points defining the bar chart.
+        subtitle (Union[str, None]): The subtitle of the bar chart. Also used as the label in the legend.
+        xlabel (Union[str, None]): The xlabel of the bar chart.
+        ylabel (Union[str, None]): The ylabel of the bar chart.
+        style (Union[BarStyleAttrs, None]): The style of the bar chart.
+        xticks (Union[int, float, None]): The xtick positions list.
+        xticklabels (Union[List[str], None]): The xtick labels.
+        xtickrotate (Union[int, None]): The xtick rotation value.
+        yticks (Union[int, float, None]): the ytick position list.
+        yticklabels (Union[List[str], None]): The ytick labels.
+        ytickrotate (Union[int, None]): The ytick rotation value.
+        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
+        label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
+        y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
+        yerr (Union[str, None]): The key name in `data` that contains the y-axis error value. Defaults to `"yerr"`.
+
+    """
+
     data: List[BarDataPointAttrs]
-    label: Union[str, None]  # the name of the label attribute in data
-    y: Union[str, None]  # the name of the y attribute in data
-    yerr: Union[str, None]  # the name of the yerr attribute in data
-    style: Union[BarStyleAttrs, None]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
+    style: Union[BarStyleAttrs, None]
 
     xticks: Union[int, float, None]
     xticklabels: Union[List[str], None]
@@ -550,30 +596,69 @@ class BarSingleChartAttrs(TypedDict):
     vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
     hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
 
+    label: Union[str, None]  # the name of the label attribute in data
+    y: Union[str, None]  # the name of the y attribute in data
+    yerr: Union[str, None]  # the name of the yerr attribute in data
+
 
 class BarChartAttrs(ChartCommonAttrs):
+    """The bar chart attributes.
+
+    Attributes:
+        charts (Union[BarSingleChartAttrs, List[BarSingleChartAttrs]]): The bar chart definitions.
+        show_yerr (Union[bool, None]): Whether or not to show the y-axis errors.
+        orientation (Union[ORIENTATION, str, None]): The orientation of the bar charts.
+
+    """
+
     charts: Union[BarSingleChartAttrs, List[BarSingleChartAttrs]]
     show_yerr: Union[bool, None]
     orientation: Union[ORIENTATION, str, None]
 
 
 # ================================================
-# Hist Chart Definitions
+# Hist Chart Attributes
 # ================================================
 
 
 class HistDataPointAttrs(TypedDict):
+    """The data point attributes for the histogram chart.
+
+    Attributes:
+        x (Union[int, float]): The x-axis value.
+
+    """
+
     # the default attributes, could be anything
     x: Union[int, float]
 
 
 class HistogramSingleChartAttrs(TypedDict):
+    """The single chart attributes for the histogram chart.
+
+    Attributes:
+        data (List[HistDataPointAttrs]): The list of data points defining the histogram chart.
+        subtitle (Union[str, None]): The subtitle of the histogram chart. Also used as the label in the legend.
+        xlabel (Union[str, None]): The xlabel of the histogram chart.
+        ylabel (Union[str, None]): The ylabel of the histogram chart.
+        style (Union[HistStyleAttrs, None]): The style of the histogram chart.
+        xticks (Union[int, float, None]): The xtick positions list.
+        xticklabels (Union[List[str], None]): The xtick labels.
+        xtickrotate (Union[int, None]): The xtick rotation value.
+        yticks (Union[int, float, None]): the ytick position list.
+        yticklabels (Union[List[str], None]): The ytick labels.
+        ytickrotate (Union[int, None]): The ytick rotation value.
+        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
+        x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
+
+    """
+
     data: List[HistDataPointAttrs]
-    x: Union[str, None]  # the name of the x attribute in data
-    style: Union[HistStyleAttrs, None]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
+    style: Union[HistStyleAttrs, None]
 
     xticks: Union[int, float, None]
     xticklabels: Union[List[str], None]
@@ -585,8 +670,21 @@ class HistogramSingleChartAttrs(TypedDict):
     vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
     hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
 
+    x: Union[str, None]  # the name of the x attribute in data
+
 
 class HistogramChartAttrs(ChartCommonAttrs):
+    """The histogram chart attributes.
+
+    Attributes:
+        charts (Union[HistogramSingleChartAttrs, List[HistogramSingleChartAttrs]]): The histogram chart definitions.
+        orientation (Union[ORIENTATION, str, None]): The orientation of the histogram charts.
+        num_bins (Union[int, None]): The number of bins the data points are split in to create the histogram.
+        show_density (Union[bool, None]): Whether or not to plot the density histogram.
+        show_cumulative (Union[bool, None]): Whether or not to plot the cumulative histogram.
+
+    """
+
     charts: Union[HistogramSingleChartAttrs, List[HistogramSingleChartAttrs]]
     orientation: Union[ORIENTATION, str, None]
     num_bins: Union[int, None]
@@ -595,7 +693,7 @@ class HistogramChartAttrs(ChartCommonAttrs):
 
 
 # ================================================
-# Heatmap Chart Definitions
+# Heatmap Chart Attributes
 # ================================================
 
 
@@ -610,15 +708,39 @@ class HeatmapColorbarAttrs(TypedDict):
 
 
 class HeatmapSingleChartAttrs(TypedDict):
-    data: List[List[Union[int, float, None]]]
-    style: Union[HeatmapStyleAttrs, None]
-    norm: Union[str, None]
-    vmin: Union[float, None]
-    vmax: Union[float, None]
+    """The single chart attributes for the heatmap chart.
 
+    Attributes:
+        data (List[List[Union[int, float, None]]]): The list of data points defining the heatmap chart.
+        subtitle (Union[str, None]): The subtitle of the heatmap chart. Also used as the label in the legend.
+        xlabel (Union[str, None]): The xlabel of the heatmap chart.
+        ylabel (Union[str, None]): The ylabel of the heatmap chart.
+        style (Union[HeatmapStyleAttrs, None]): The style of the heatmap chart.
+
+        norm (Union[NORMALIZE, str, None]): The value normalization.
+        vmin (Union[str, None]): The minimum value to normalize the data points.
+        vmax (Union[str, None]): The maximum value to normalize the data points.
+
+        xticks (Union[int, float, None]): The xtick positions list.
+        xticklabels (Union[List[str], None]): The xtick labels.
+        xtickrotate (Union[int, None]): The xtick rotation value.
+        yticks (Union[int, float, None]): the ytick position list.
+        yticklabels (Union[List[str], None]): The ytick labels.
+        ytickrotate (Union[int, None]): The ytick rotation value.
+
+        colorbar (Union[HeatmapColorbarAttrs, None]): The heatmap colorbar attributes.
+
+    """
+
+    data: List[List[Union[int, float, None]]]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
+    style: Union[HeatmapStyleAttrs, None]
+
+    norm: Union[str, None]
+    vmin: Union[float, None]
+    vmax: Union[float, None]
 
     xticks: Union[int, float, None]
     xticklabels: Union[List[str], None]
@@ -631,15 +753,24 @@ class HeatmapSingleChartAttrs(TypedDict):
 
 
 class HeatmapChartAttrs(ChartCommonAttrs):
-    charts: Union[HistogramSingleChartAttrs, List[HistogramSingleChartAttrs]]
+    """The heatmap chart attributes.
+
+    Attributes:
+        charts (Union[HeatmapSingleChartAttrs, List[HeatmapSingleChartAttrs]]): The heatmap chart definitions.
+        show_colorbars (Union[bool, None]): Whether or not to plot the density histogram.
+        show_heatmap_values (Union[bool, None]): Whether or not to plot the heatmap values.
+
+    """
+    charts: Union[HeatmapSingleChartAttrs, List[HeatmapSingleChartAttrs]]
     show_colorbars: Union[bool, None]
-    show_heatmap_vals: Union[bool, None]
+    show_heatmap_values: Union[bool, None]
 
 
 # ================================================
-# Union Chart Definition
+# Chart Attributes
 # ================================================
 
-ChartAttrs = Union[
-    LineChartAttrs, BarChartAttrs, HistogramChartAttrs, HeatmapChartAttrs
-]
+class ChartAttrs(LineChartAttrs, BarChartAttrs, HistogramChartAttrs, HeatmapChartAttrs):
+    """The union of all chart attributes."""
+    pass
+

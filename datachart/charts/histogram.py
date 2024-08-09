@@ -1,4 +1,6 @@
-from ..utils.charts import chart_wrapper, draw_histogram
+import matplotlib.pyplot as plt
+
+from ..utils.charts import chart_plot_wrapper, plot_histogram
 from ..typings import HistogramChartAttrs
 
 # ================================================
@@ -6,14 +8,15 @@ from ..typings import HistogramChartAttrs
 # ================================================
 
 
-def Histogram(attrs: HistogramChartAttrs):
-    """Draw a line chart
+def Histogram(attrs: HistogramChartAttrs) -> plt.Figure:
+    """Creates the histogram.
 
-    Parameters
-    ----------
-    attrs : HistChartAttrs
-        The chart attributes.
+    Args:
+        attrs: The histogram chart attributes.
+
+    Returns:
+        The figure containing the histogram.
 
     """
 
-    return chart_wrapper(draw_histogram)({**attrs, "type": "histogram"})
+    return chart_plot_wrapper(plot_histogram)({**attrs, "type": "histogram"})

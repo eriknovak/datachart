@@ -30,7 +30,7 @@ import numpy as np
 
 
 def count(values: List[Union[int, float]]) -> int:
-    """Counts the number of elements in a list
+    """Counts the number of elements in a list.
 
     Args:
         values: The list of values.
@@ -43,7 +43,7 @@ def count(values: List[Union[int, float]]) -> int:
 
 
 def mean(values: List[Union[int, float]]) -> float:
-    """Calculates the mean of the values
+    """Calculates the mean of the values.
 
     Args:
         values: The list of values.
@@ -56,7 +56,7 @@ def mean(values: List[Union[int, float]]) -> float:
 
 
 def median(values: List[Union[int, float]]) -> float:
-    """Calculates the median of the values
+    """Calculates the median of the values.
 
     Args:
         values: The list of values.
@@ -74,7 +74,7 @@ def median(values: List[Union[int, float]]) -> float:
 
 
 def stdev(values: List[Union[int, float]]) -> float:
-    """Calculates the standard deviation of the values
+    """Calculates the standard deviation of the values.
 
     Args:
         values: The list of values.
@@ -88,7 +88,7 @@ def stdev(values: List[Union[int, float]]) -> float:
 
 
 def quantile(values: List[Union[int, float]], q: float) -> float:
-    """Calculates the quantile of the values
+    """Calculates the quantile of the values.
 
     Args:
         values: The list of values.
@@ -103,8 +103,8 @@ def quantile(values: List[Union[int, float]], q: float) -> float:
     return values[len(values) * q // 100]
 
 
-def minimum(values: List[Union[int, float]]) -> Tuple[float, float]:
-    """Gets the minimum of the values
+def minimum(values: List[Union[int, float]]) -> float:
+    """Gets the minimum of the values.
 
     Args:
         values: The list of values.
@@ -116,8 +116,8 @@ def minimum(values: List[Union[int, float]]) -> Tuple[float, float]:
     assert isinstance(values, (list, np.ndarray)), "The values variable is not a list."
     return min(values)
 
-def maximum(values: List[Union[int, float]]) -> Union[int, float]:
-    """Gets the maximum of the values
+def maximum(values: List[Union[int, float]]) -> float:
+    """Gets the maximum of the values.
 
     Args:
         values: The list of values.
