@@ -29,7 +29,7 @@
 
 The datachart package is a python package for creating data visualizations. It is designed to be simple to use and highly customizable, i.e. it is easy to change the look and feel of the charts.
 
-## ✅ Requirements
+## Requirements
 Before starting the project make sure these requirements are available:
 
 - [python]. The python programming language (v3.8 or higher).
