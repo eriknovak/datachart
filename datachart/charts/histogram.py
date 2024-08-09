@@ -1,12 +1,12 @@
 from ..utils.charts import chart_wrapper, draw_histogram
-from ..definitions import HistChartAttrs
+from ..typings import HistogramChartAttrs
 
 # ================================================
 # Main Chart Definition
 # ================================================
 
 
-def histogram(attrs: HistChartAttrs):
+def Histogram(attrs: HistogramChartAttrs):
     """Draw a line chart
 
     Parameters

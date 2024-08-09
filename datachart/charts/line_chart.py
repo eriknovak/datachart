@@ -1,12 +1,12 @@
 from ..utils.charts import chart_wrapper, draw_line_chart
-from ..definitions import LineChartAttrs
+from ..typings import LineChartAttrs
 
 # ================================================
 # Main Chart Definition
 # ================================================
 
 
-def line_chart(attrs: LineChartAttrs):
+def LineChart(attrs: LineChartAttrs):
     """Draw a line chart
 
     Parameters

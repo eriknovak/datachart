@@ -1,4 +1,4 @@
-from ..definitions import ConfigAttrs
+from ..typings import ConfigAttrs
 from ..constants import (
     LINE_STYLE,
     FONT_STYLE,

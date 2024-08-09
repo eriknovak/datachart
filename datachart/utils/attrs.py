@@ -4,7 +4,8 @@ from typing import Union, Tuple, Dict, List
 
 import matplotlib.pyplot as plt
 
-from ..config import config, Config, CHART_CONFIGS
+from ..config import config, Config
+from ..config.charts import CHART_CONFIGS
 
 
 # ================================================
@@ -271,7 +272,7 @@ def get_area_style(chart_style: dict) -> dict:
     config_attrs = [
         ("alpha", "plot.area.alpha"),
         ("color", "plot.area.color"),
-        ("linewidth", "plot.area.line.width"),
+        ("linewidth", "plot.area.linewidth"),
         ("hatch", "plot.area.hatch"),
         ("zorder", "plot.area.zorder"),
     ]

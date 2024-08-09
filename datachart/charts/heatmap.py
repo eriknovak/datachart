@@ -1,12 +1,12 @@
 from ..utils.charts import chart_wrapper, draw_heatmap
-from ..definitions import HeatmapChartAttrs
+from ..typings import HeatmapChartAttrs
 
 # ================================================
 # Main Chart Definition
 # ================================================
 
 
-def heatmap(attrs: HeatmapChartAttrs):
+def Heatmap(attrs: HeatmapChartAttrs):
     """Draw a heatmap chart
 
     Parameters

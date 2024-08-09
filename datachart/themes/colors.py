@@ -40,8 +40,8 @@ color_scale_pubu = ["#f1eef6", "#bdc9e1", "#74a9cf", "#2b8cbe", "#045a8d"]
 color_scale_rdbn = ["#ca0020", "#f4a582", "#f7f7f7", "#92c5de", "#0571b0"]
 color_scale_rdylbu = ["#d7191c", "#fdae61", "#ffffbf", "#abd9e9", "#2c7bb6"]
 color_scale_brng = ["#a6611a", "#dfc27d", "#f5f5f5", "#80cdc1", "#018571"]
-color_scale_prgn = ["#7b3294", "#c2a5cf", "#f7f7f7", "#a6dba0", "#008837"]
-color_scale_puor = ["#e66101", "#fdb863", "#f7f7f7", "#b2abd2", "#5e3c99"]
+color_scale_pugn = ["#7b3294", "#c2a5cf", "#f7f7f7", "#a6dba0", "#008837"]
+color_scale_orpu = ["#e66101", "#fdb863", "#f7f7f7", "#b2abd2", "#5e3c99"]
 color_scale_rdgy = ["#ca0020", "#f4a582", "#ffffff", "#bababa", "#404040"]
 color_scale_rdylgn = ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"]
 color_scale_spectral = ["#d7191c", "#fdae61", "#ffffbf", "#abdda4", "#2b83ba"]
@@ -97,8 +97,8 @@ COLOR_SCALE_MAPPING = {
     "rdbn": color_scale_rdbn,
     "rdylbu": color_scale_rdylbu,
     "brng": color_scale_brng,
-    "prgn": color_scale_prgn,
-    "puor": color_scale_puor,
+    "pugn": color_scale_pugn,
+    "orpu": color_scale_orpu,
     "rdgy": color_scale_rdgy,
     "rdylgn": color_scale_rdylgn,
     "spectral": color_scale_spectral,

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 
 from ..utils.colors import create_color_cycle, get_colormap
-from ..utils.stats import get_min_max_values
+from ..utils.stats import minimum, maximum
 from ..utils.attrs import (
     get_subplot_config,
     get_attr_value,
@@ -28,14 +28,14 @@ from ..utils.attrs import (
     configure_labels,
 )
 
-from ..definitions import (
-    LineDataAttrs,
-    BarDataAttrs,
-    HistDataAttrs,
+from ..typings import (
+    LineChartAttrs,
+    BarSingleChartAttrs,
+    HistogramSingleChartAttrs,
     HeatmapChartAttrs,
-    UnionChartAttrs,
-    HLineAttrs,
-    VLineAttrs,
+    ChartAttrs,
+    HLinePlotAttrs,
+    VLinePlotAttrs,
 )
 from ..constants import FIG_SIZE, ORIENTATION, VALFMT
 from ..config import config
@@ -255,7 +255,7 @@ def assert_chart_settings(settings: dict, supported_settings: List[str]) -> None
 
 
 def chart_wrapper(func: callable) -> callable:
-    def wrapper_func(attrs: UnionChartAttrs) -> None:
+    def wrapper_func(attrs: ChartAttrs) -> None:
         # check how many data point are there
         if not isinstance(attrs["charts"], dict) and not isinstance(
             attrs["charts"], list
@@ -339,7 +339,7 @@ def chart_wrapper(func: callable) -> callable:
 def draw_line_chart(
     figure: plt.Figure,
     axes: List[plt.Axes],
-    charts: List[LineDataAttrs],
+    charts: List[LineChartAttrs],
     settings: dict,
 ) -> None:
     """Draw a line chart
@@ -432,7 +432,7 @@ def draw_line_chart(
             ax.grid(axis=settings["show_grid"], **get_grid_style(style))
 
         # set the x-axis limit
-        xmin, xmax = get_min_max_values(x)
+        xmin, xmax = minimum(x), maximum(x)
         ax.set_xlim(xmin=xmin, xmax=xmax)
 
         # override axis limits
@@ -465,7 +465,7 @@ def draw_line_chart(
 
 
 def draw_bar_chart(
-    figure: plt.Figure, axes: List[plt.Axes], charts: List[BarDataAttrs], settings: dict
+    figure: plt.Figure, axes: List[plt.Axes], charts: List[BarSingleChartAttrs], settings: dict
 ) -> None:
     """Draw a bar chart
 
@@ -626,7 +626,7 @@ def draw_bar_chart(
 def draw_histogram(
     figure: plt.Figure,
     axes: List[plt.Axes],
-    charts: List[HistDataAttrs],
+    charts: List[HistogramSingleChartAttrs],
     settings: dict,
 ) -> None:
     """Draw a bar chart
@@ -781,7 +781,7 @@ def draw_histogram(
 # ================================================
 
 
-def draw_vlines(ax: plt.Axes, vlines: Union[VLineAttrs, List[VLineAttrs]]):
+def draw_vlines(ax: plt.Axes, vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]):
     """Draws vertical lines.
 
     Parameters
@@ -816,7 +816,7 @@ def draw_vlines(ax: plt.Axes, vlines: Union[VLineAttrs, List[VLineAttrs]]):
 # ================================================
 
 
-def draw_hlines(ax: plt.Axes, hlines: Union[HLineAttrs, List[HLineAttrs]]):
+def draw_hlines(ax: plt.Axes, hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]):
     """Draws horizontal lines.
 
     Parameters

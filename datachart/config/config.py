@@ -3,7 +3,7 @@ import json
 import warnings
 
 # import the schemas
-from datachart.definitions import ConfigAttrs
+from datachart.typings import ConfigAttrs
 from datachart.constants import THEME
 
 # import the themes

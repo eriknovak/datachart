@@ -1,12 +1,12 @@
 from ..utils.charts import chart_wrapper, draw_bar_chart
-from ..definitions import BarChartAttrs
+from ..typings import BarChartAttrs
 
 # ================================================
 # Main Chart Definition
 # ================================================
 
 
-def bar_chart(attrs: BarChartAttrs):
+def BarChart(attrs: BarChartAttrs):
     """Draw a bar chart
 
     Parameters
