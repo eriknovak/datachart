@@ -249,7 +249,7 @@ class COLORS:
         RdPu (str): The diverging red-purple colors. Equals to `"rdbn"`.
         RdYlBu (str): The diverging red-yellow-blue colors. Equals to `"rdylbu"`.
         BrNg (str): The diverging brown-grey colors. Equals to `"brng"`.
-        PrGn (str): The diverging purple-green colors. Equals to `"prgn"`.
+        PuGn (str): The diverging purple-green colors. Equals to `"pugn"`.
         OrPu (str): The diverging orange-purple colors. Equals to `"puor"`.
         RdGy (str): The diverging red-gray colors. Equals to `"rdgy"`.
         RdYlGn (str): The diverging red-yellow-green colors. Equals to `"rdylgn"`.
@@ -271,9 +271,9 @@ class COLORS:
     PuBu = "pubu"
     RdBn = "rdbn"
     RdYlBu = "rdylbu"
-    BrNg = "brng"
-    PrGn = "prgn"
-    PuOr = "puor"
+    BrGn = "brgn"
+    PuGn = "pugn"
+    OrPu = "orpu"
     RdGy = "rdgy"
     RdYlGn = "rdylgn"
     Spectral = "spectral"

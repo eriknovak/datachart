@@ -92,7 +92,7 @@ def custom_color_cycle(has_multi_subplots: bool, n_charts: int) -> cycle:
     """
 
     color_type = "singular" if has_multi_subplots else "multiple"
-    color_attr = config[f"color.general.{color_type}"]
+    color_attr = config[f"color_general_{color_type}"]
     max_colors = 1 if has_multi_subplots else n_charts
     return create_color_cycle(color_attr, max_colors)
 
@@ -559,7 +559,7 @@ def plot_bar_chart(
 
     # prepare the bar chart position variables
     x_start = np.arange(max([len(get_chart_data("label", chart)) for chart in charts]))
-    x_width = config["plot.bar.width"] / charts.shape[0]  # the width of the bar
+    x_width = config["plot_bar_width"] / charts.shape[0]  # the width of the bar
     x_offset = 0
 
     for idx, (chart, ax) in enumerate(zip(charts, axes)):
