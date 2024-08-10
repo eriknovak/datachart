@@ -12,9 +12,6 @@ title: Charts Module
 ## Chart Functions
 
 ::: datachart.charts.LineChart
-
 ::: datachart.charts.BarChart
-
 ::: datachart.charts.Histogram
-
 ::: datachart.charts.Heatmap

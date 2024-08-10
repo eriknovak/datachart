@@ -12,16 +12,9 @@ title: Stats Module
 ## Functions
 
 ::: datachart.utils.stats.count
-
 ::: datachart.utils.stats.mean
-
 ::: datachart.utils.stats.median
-
 ::: datachart.utils.stats.stdev
-
 ::: datachart.utils.stats.quantile
-
 ::: datachart.utils.stats.minimum
-
 ::: datachart.utils.stats.maximum
-

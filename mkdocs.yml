@@ -55,12 +55,15 @@ plugins:
           options:
             heading_level: 3
             members_order: "source"
+            show_source: false
+            show_labels: false
             show_root_heading: true
             show_root_toc_entry: false
             show_symbol_type_toc: true
             show_symbol_type_heading: true
             show_signature_annotations: true
             separate_signature: true
+            annotations_path: source
             docstring_section_style: spacy
 
 markdown_extensions:

@@ -4,7 +4,7 @@ The `config` module contains the configuration objects, enabling the users
 to globally customize the chart and plot styles.
 
 Attributes:
-    config (datachart.config.Config): The configuration instance.
+    config (Config): The configuration instance.
 
 Classes:
     Config: The configuration class.
