@@ -27,6 +27,11 @@ Classes:
 class FIG_SIZE:
     """The predefined figure sizes.
 
+    Examples:
+        >>> from datachart.constants import FIG_SIZE
+        >>> FIG_SIZE.DEFAULT
+        (6.4, 4.8)
+
     Attributes:
         DEFAULT (Tuple[float, float]): The default figure size. Equals to `(6.4, 4.8)`.
         A4 (Tuple[float, float]): The A4 figure size. Equals to `(8.2, 11.6)`.
@@ -53,6 +58,11 @@ class FIG_SIZE:
 class FIG_FORMAT:
     """The supported figure formats.
 
+    Examples:
+        >>> from datachart.constants import FIG_FORMAT
+        >>> FIG_FORMAT.DEFAULT
+        "png"
+
     Attributes:
         DEFAULT (str): The default format. Same as `FIG_FORMAT.PNG`.
         SVG (str): The svg format. Equals to `"svg"`.
@@ -72,6 +82,11 @@ class FIG_FORMAT:
 class FONT_STYLE:
     """The supported font styles.
 
+    Examples:
+        >>> from datachart.constants import FONT_STYLE
+        >>> FONT_STYLE.DEFAULT
+        "normal"
+
     Attributes:
         DEFAULT (str): The default font style. Same as `FONT_STYLE.NORMAL`.
         NORMAL (str): The normal font style. Equals to `"normal"`.
@@ -88,6 +103,11 @@ class FONT_STYLE:
 
 class FONT_WEIGHT:
     """The supported font weights.
+
+    Examples:
+        >>> from datachart.constants import FONT_WEIGHT
+        >>> FONT_WEIGHT.DEFAULT
+        "normal"
 
     Attributes:
         DEFAULT (str): The default font weight. Same as `FONT_WEIGHT.NORMAL`.
@@ -111,6 +131,11 @@ class FONT_WEIGHT:
 
 class LINE_MARKER:
     """The supported line markers.
+
+    Examples:
+        >>> from datachart.constants import LINE_MARKER
+        >>> LINE_MARKER.PIXEL
+        ","
 
     Attributes:
         PIXEL (str): The pixel line marker. Equals to `","`.
@@ -141,6 +166,11 @@ class LINE_MARKER:
 class LINE_STYLE:
     """The supported line styles.
 
+    Examples:
+        >>> from datachart.constants import LINE_STYLE
+        >>> LINE_STYLE.SOLID
+        "-"
+
     Attributes:
         SOLID (str): The solid line style. Equals to `"-"`.
         DASHED (str): The dashed line style. Equals to `"--"`.
@@ -157,6 +187,11 @@ class LINE_STYLE:
 
 class LINE_DRAW_STYLE:
     """The supported line draw styles.
+
+    Examples:
+        >>> from datachart.constants import LINE_DRAW_STYLE
+        >>> LINE_DRAW_STYLE.DEFAULT
+        "default"
 
     Attributes:
         DEFAULT (str): The default line draw style. Equals to `"default"`.
@@ -176,6 +211,11 @@ class LINE_DRAW_STYLE:
 
 class HATCH_STYLE:
     """The supported hatch styles.
+
+    Examples:
+        >>> from datachart.constants import HATCH_STYLE
+        >>> HATCH_STYLE.DEFAULT
+        None
 
     Attributes:
         DEFAULT (str): The default hatch style. Equals to `None`.
@@ -204,6 +244,11 @@ class HATCH_STYLE:
 class LEGEND_ALIGN:
     """The supported legend alignments.
 
+    Examples:
+        >>> from datachart.constants import LEGEND_ALIGN
+        >>> LEGEND_ALIGN.DEFAULT
+        "left"
+
     Attributes:
         DEFAULT (str): The default legend alignment. Same as `LEGEND_ALIGN.LEFT`.
         CENTER (str): The center legend alignment. Equals to `"center"`.
@@ -221,6 +266,11 @@ class LEGEND_ALIGN:
 class HISTOGRAM_TYPE:
     """The supported histogram types.
 
+    Examples:
+        >>> from datachart.constants import HISTOGRAM_TYPE
+        >>> HISTOGRAM_TYPE.BAR
+        "bar"
+
     Attributes:
         BAR (str): The bar histogram style. Equals to `"bar"`.
         STEP (str): The step histogram style. Equals to `"step"`.
@@ -235,6 +285,11 @@ class HISTOGRAM_TYPE:
 
 class COLORS:
     """The predefined colors.
+
+    Examples:
+        >>> from datachart.constants import COLORS
+        >>> COLORS.Blue
+        'blue'
 
     Attributes:
         Blue (str): The single-hue blue color. Equals to `"blue"`.
@@ -285,6 +340,11 @@ class COLORS:
 class NORMALIZE:
     """The supported normalization options.
 
+    Examples:
+        >>> from datachart.constants import NORMALIZE
+        >>> NORMALIZE.LINEAR
+        "linear"
+
     Attributes:
         LINEAR (str): The linear normalization. Equals to `"linear"`.
         LOG (str): The logistic normalization. Equals to `"log"`.
@@ -304,6 +364,11 @@ class NORMALIZE:
 class ORIENTATION:
     """The supported orientations.
 
+    Examples:
+        >>> from datachart.constants import ORIENTATION
+        >>> ORIENTATION.HORIZONTAL
+        "horizontal"
+
     Attributes:
         HORIZONTAL (str): The horizontal orientation. Equals to `"horizontal"`.
         VERTICAL (str): The vertical orientation. Equals to `"vertical"`.
@@ -316,6 +381,11 @@ class ORIENTATION:
 
 class VALFMT:
     """The predefined value formats.
+
+    Examples:
+        >>> from datachart.constants import VALFMT
+        >>> VALFMT.DEFAULT
+        "{x}"
 
     Attributes:
         DEFAULT (str): The default value format. Equals to `"{x}"`.
@@ -334,6 +404,11 @@ class VALFMT:
 class THEME:
     """The predefined themes.
 
+    Examples:
+        >>> from datachart.constants import THEME
+        >>> THEME.DEFAULT
+        "default"
+
     Attributes:
         DEFAULT (str): The default theme. Equals to `"default"`.
         GREYSCALE (str): The greyscale theme. Equals to `"greyscale"`.
@@ -346,6 +421,11 @@ class THEME:
 
 class SHOW_GRID:
     """The supported show grid options.
+
+    Examples:
+        >>> from datachart.constants import SHOW_GRID
+        >>> SHOW_GRID.DEFAULT
+        None
 
     Attributes:
         DEFAULT (str): The default show grid. Same as `SHOW_GRID.NONE`.

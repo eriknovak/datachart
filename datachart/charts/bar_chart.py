@@ -11,6 +11,23 @@ from ..typings import BarChartAttrs
 def BarChart(attrs: BarChartAttrs) -> plt.Figure:
     """Creates the bar chart.
 
+    Examples:
+        >>> from datachart.charts import BarChart
+        >>> figure = BarChart({
+        ...     "charts": {
+        ...         "data": [
+        ...             {"label": "cat1", "y": 5},
+        ...             {"label": "cat2", "y": 10},
+        ...             {"label": "cat3", "y": 15},
+        ...             {"label": "cat4", "y": 20},
+        ...             {"label": "cat5", "y": 25}
+        ...         ],
+        ...     },
+        ...     "title": "Basic Bar Chart",
+        ...     "xlabel": "LABEL",
+        ...     "ylabel": "Y",
+        ... })
+
     Args:
         attrs: The bar chart attributes.
 

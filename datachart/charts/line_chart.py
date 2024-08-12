@@ -11,6 +11,23 @@ from ..typings import LineChartAttrs
 def LineChart(attrs: LineChartAttrs) -> plt.Figure:
     """Creates the line chart.
 
+    Examples:
+        >>> from datachart.charts import LineChart
+        >>> figure = LineChart({
+        ...     "charts": {
+        ...         "data": [
+        ...             {"x": 1, "y": 5},
+        ...             {"x": 2, "y": 10},
+        ...             {"x": 3, "y": 15},
+        ...             {"x": 4, "y": 20},
+        ...             {"x": 5, "y": 25}
+        ...         ],
+        ...     },
+        ...     "title": "Basic Line Chart",
+        ...     "xlabel": "X",
+        ...     "ylabel": "Y",
+        ... })
+
     Args:
         attrs: The line chart attributes.
 

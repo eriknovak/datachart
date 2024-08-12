@@ -26,6 +26,17 @@ def save_figure(
 ) -> None:
     """Save the figure to a file.
 
+    Examples:
+        >>> # 1. create the figure
+        >>> from datachart.charts import LineChart
+        >>> figure = LineChart({...})
+
+        >>> # 2. save the figure
+        >>> from datachart.utils.figure import save_figure
+        >>> from datachart.constants import FIG_FORMAT
+        >>> path = "/path/to/save/chart.png"
+        >>> save_figure(figure, path, dpi=300, format=FIG_FORMAT.PNG, transparent=True)
+
     Args:
         figure: The figure to save.
         path: The path where the figure is saved.

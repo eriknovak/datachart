@@ -31,6 +31,11 @@ import numpy as np
 def count(values: List[Union[int, float]]) -> int:
     """Counts the number of elements in a list.
 
+    Examples:
+        >>> from datachart.utils.stats import count
+        >>> count([1, 2, 3, 4, 5])
+        5
+
     Args:
         values: The list of values.
 
@@ -44,6 +49,11 @@ def count(values: List[Union[int, float]]) -> int:
 def mean(values: List[Union[int, float]]) -> float:
     """Calculates the mean of the values.
 
+    Examples:
+        >>> from datachart.utils.stats import mean
+        >>> mean([1, 2, 3, 4, 5])
+        3.0
+
     Args:
         values: The list of values.
 
@@ -56,6 +66,11 @@ def mean(values: List[Union[int, float]]) -> float:
 
 def median(values: List[Union[int, float]]) -> float:
     """Calculates the median of the values.
+
+    Examples:
+        >>> from datachart.utils.stats import median
+        >>> median([1, 2, 3, 4, 5])
+        3.0
 
     Args:
         values: The list of values.
@@ -75,6 +90,11 @@ def median(values: List[Union[int, float]]) -> float:
 def stdev(values: List[Union[int, float]]) -> float:
     """Calculates the standard deviation of the values.
 
+    Examples:
+        >>> from datachart.utils.stats import stdev
+        >>> stdev([1, 2, 3, 4, 5])
+        1.4142135623730951
+
     Args:
         values: The list of values.
 
@@ -88,6 +108,11 @@ def stdev(values: List[Union[int, float]]) -> float:
 
 def quantile(values: List[Union[int, float]], q: float) -> float:
     """Calculates the quantile of the values.
+
+    Examples:
+        >>> from datachart.utils.stats import quantile
+        >>> quantile([1, 2, 3, 4, 5], 25)
+        2.0
 
     Args:
         values: The list of values.
@@ -105,6 +130,11 @@ def quantile(values: List[Union[int, float]], q: float) -> float:
 def minimum(values: List[Union[int, float]]) -> float:
     """Gets the minimum of the values.
 
+    Examples:
+        >>> from datachart.utils.stats import minimum
+        >>> minimum([1, 2, 3, 4, 5])
+        1
+
     Args:
         values: The list of values.
 
@@ -118,6 +148,11 @@ def minimum(values: List[Union[int, float]]) -> float:
 
 def maximum(values: List[Union[int, float]]) -> float:
     """Gets the maximum of the values.
+
+    Examples:
+        >>> from datachart.utils.stats import maximum
+        >>> maximum([1, 2, 3, 4, 5])
+        5
 
     Args:
         values: The list of values.

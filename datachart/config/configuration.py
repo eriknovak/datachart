@@ -40,6 +40,13 @@ class Config:
     def set_theme(self, theme: THEME) -> None:
         """Sets the global configuration to match the theme.
 
+        Examples:
+            >>> from datachart.constants import THEME
+            >>> from datachart.config import config
+            >>> config.set_theme(THEME.DEFAULT)
+            >>> config.get("theme")
+            'default'
+
         Args:
             theme: The theme to be set.
 
@@ -57,11 +64,25 @@ class Config:
             self.set_theme(self.theme)
 
     def reset_config(self) -> None:
-        """Resets the global configuration."""
+        """Resets the global configuration.
+
+        Examples:
+            >>> from datachart.config import config
+            >>> config.reset_config()
+            >>> config.get("theme")
+            'default'
+
+        """
         self.config = copy.deepcopy(DEFAULT_THEME)
 
     def update_config(self, config: StyleAttrs) -> None:
         """Updates the global configuration.
+
+        Examples:
+            >>> from datachart.config import config
+            >>> config.update_config({"font_general_color": "#FFFFFF"})
+            >>> config.get("font_general_color")
+            '#FFFFFF'
 
         Args:
             config: The configuration attributes to be updated.
@@ -77,6 +98,11 @@ class Config:
     def __getitem__(self, attr: str) -> Any:
         """Gets the associated configuration attribute.
 
+        Examples:
+            >>> from datachart.config import config
+            >>> config["font_general_color"]
+            '#FFFFFF'
+
         Args:
             attr: The attribute to retrieve.
 
@@ -88,6 +114,11 @@ class Config:
 
     def get(self, attr: str, default: Any = None) -> Any:
         """Gets the associated configuration attribute.
+
+        Examples:
+            >>> from datachart.config import config
+            >>> config.get("font_general_color")
+            '#FFFFFF'
 
         Args:
             attr: The attribute to retrieve.

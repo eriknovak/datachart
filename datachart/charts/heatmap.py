@@ -11,6 +11,22 @@ from ..typings import HeatmapChartAttrs
 def Heatmap(attrs: HeatmapChartAttrs) -> plt.Figure:
     """Creates the heatmap.
 
+    Examples:
+        >>> from datachart.charts import Heatmap
+        >>> figure = Heatmap({
+        ...     "charts": {
+        ...         "data": [
+        ...             [1, 2, 3],
+        ...             [4, 5, 6],
+        ...             [7, 8, 9]
+        ...         ],
+        ...     },
+        ...     "title": "Basic Heatmap",
+        ...     "xlabel": "X",
+        ...     "ylabel": "Y",
+        ... })
+
+
     Args:
         attrs: The heatmap chart attributes.
 
