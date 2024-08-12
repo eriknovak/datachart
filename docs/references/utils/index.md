@@ -6,6 +6,7 @@ title: Utils Module
 
 ::: datachart.utils
     options:
+        members: False
         heading_level: 2
 
 
