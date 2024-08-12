@@ -1,6 +1,12 @@
 /* style modifications for jupyter-wrapper */
+
+.jp-Notebook {
+    padding: 0px !important;
+}
+
 .jupyter-wrapper .jp-Collapser,
 .jupyter-wrapper .jp-CodeCell .jp-Cell-inputWrapper .jp-InputPrompt,
+.jupyter-wrapper .jp-Notebook .jp-Cell:not(.jp-mod-active) .jp-OutputPrompt,
 .jupyter-wrapper .jp-OutputArea-prompt:empty {
     display: none !important;
 }
@@ -30,10 +36,4 @@
 
 [data-md-color-scheme=slate] .highlight pre {
     background-color: var(--md-code-bg-color) !important;
-}
-
-/* style modifications for mkdocs-material */
-
-.md-typeset__table {
-    padding: 0;
 }

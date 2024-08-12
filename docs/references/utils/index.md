@@ -12,4 +12,4 @@ title: Utils Module
 
 ## Functions
 
-::: datachart.utils.figure.save_figure
+::: datachart.utils.save_figure

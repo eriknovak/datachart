@@ -96,9 +96,10 @@ nav:
       - Bar Chart: how-to-guides/charts/barchart.ipynb
       - Histogram: how-to-guides/charts/histogram.ipynb
       - Heatmap: how-to-guides/charts/heatmap.ipynb
-    - Utils:
-      - how-to-guides/utils/index.md
-    - Config: how-to-guides/config.md
+    - Utility:
+      - how-to-guides/utility/index.md
+      - Statistics: how-to-guides/utility/stats.ipynb
+    - Config: how-to-guides/config.ipynb
     - Themes: how-to-guides/themes.ipynb
     - Colormaps: how-to-guides/colormaps.ipynb
 
