@@ -136,4 +136,4 @@ class Config:
 
 
 config: Config = Config()
-"""The configuration instance."""
+"""The configuration instance that the users should interact with."""

@@ -13,3 +13,6 @@ Methods:
 
 from .figure import save_figure
 from . import stats
+
+
+__all__ = ["save_figure", "stats"]
