@@ -7,8 +7,8 @@ title: Typings Module
 ::: datachart.typings
     options:
         members: False
-        annotations_path: brief
         heading_level: 2
+        annotations_path: brief
 
 
 ## Chart Typings
