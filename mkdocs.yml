@@ -105,15 +105,12 @@ nav:
 
   - API Reference:
     - references/index.md
-    - charts:
-      - references/charts/index.md
+    - charts: references/charts.md
     - utils:
       - references/utils/index.md
       - stats: references/utils/stats.md
-    - config:
-      - references/config/index.md
-    - themes:
-      - references/themes/index.md
+    - config: references/config.md
+    - themes: references/themes.md
     - constants: references/constants.md
     - typings: references/typings.md
 
