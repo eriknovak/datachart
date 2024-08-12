@@ -8,3 +8,7 @@
 .jupyter-wrapper .highlight {
     font-size: smaller;
 }
+
+.md-typeset__table {
+    padding: 0;
+}
