@@ -42,6 +42,9 @@ theme:
 
 edit_uri: ""
 
+extra_css:
+  - css/extra.css
+
 plugins:
   - autorefs
   - search:
@@ -97,6 +100,7 @@ nav:
       - how-to-guides/utils/index.md
     - Config: how-to-guides/config.md
     - Themes: how-to-guides/themes.ipynb
+    - Colormaps: how-to-guides/colormaps.ipynb
 
 
   - API Reference:
