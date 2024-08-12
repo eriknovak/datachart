@@ -1,6 +1,20 @@
+"""The module containing the commone `figure` utilites.
+
+The `figure` module provides a set of utilities for manipulating the images.
+
+Methods:
+    save_figure(figure, path, dpi, format, transparent):
+        Saves the figure into a file using the provided format parameters.
+
+"""
+
 import matplotlib.pyplot as plt
 
 from ..constants import FIG_FORMAT
+
+# =====================================
+# Helper functions
+# =====================================
 
 
 def save_figure(
@@ -8,22 +22,27 @@ def save_figure(
     path: str,
     dpi: int = 300,
     format: FIG_FORMAT = None,
-    transparent=False,
+    transparent: bool = False,
 ) -> None:
     """Save the figure to a file.
 
-    Parameters
-    ----------
-    figure : plt.Figure
-        The figure to save.
-    path : str
-        The path to save the figure to.
-    dpi : int, optional (default=300)
-        The DPI of the figure.
-    format : FigFormat, optional (default=None)
-        The format of the figure. If None, the format will be determined from the file extension.
-    transparent : bool, optional (default=False)
-        Whether to make the background transparent.
+    Examples:
+        >>> # 1. create the figure
+        >>> from datachart.charts import LineChart
+        >>> figure = LineChart({...})
+
+        >>> # 2. save the figure
+        >>> from datachart.utils.figure import save_figure
+        >>> from datachart.constants import FIG_FORMAT
+        >>> path = "/path/to/save/chart.png"
+        >>> save_figure(figure, path, dpi=300, format=FIG_FORMAT.PNG, transparent=True)
+
+    Args:
+        figure: The figure to save.
+        path: The path where the figure is saved.
+        dpi: The DPI of the figure.
+        format: The format of the figure. If `None`, the format will be determined from the file extension.
+        transparent: Whether to make the background transparent.
     """
 
     # save the figure to a file

@@ -4,7 +4,8 @@ from typing import Union, Tuple, Dict, List
 
 import matplotlib.pyplot as plt
 
-from ..config import config, Config, CHART_CONFIGS
+from ..config import config, Config
+from ..config.charts import CHART_CONFIGS
 
 
 # ================================================
@@ -17,18 +18,14 @@ def get_attr_value(
 ):
     """Retrieves the value of the specified attribute from the given object.
 
-    Parameters
-    ----------
-    attr : str
-        The name of the attribute.
-    obj : dict
-        The object.
-    default : Union[Config, dict, bool, int, float, str, None]
-        The default value to return if the attribute is not found.
+    Args:
+        attr: The name of the attribute.
+        obj: The object.
+        default: The default value to return if the attribute is not found.
 
-    Returns
-    -------
-    The value of the attribute, or the default value if the attribute is not found.
+    Returns:
+        The value of the attribute, or the default value if the attribute is not found.
+
     """
     if isinstance(default, Config) or isinstance(default, dict):
         return obj.get(attr, default[attr])
@@ -40,17 +37,13 @@ def create_config_dict(
 ) -> Dict[str, str]:
     """Create a configuration dictionary based on the given styles and attributes.
 
-    Parameters
-    ----------
-    styles : Dict[str, str]
-        A dictionary containing the styles.
-    attrs : List[Tuple[str, str]]
-        A list of tuples representing the attributes.
+    Args:
+        styles: A dictionary containing the styles.
+        attrs: A list of tuples representing the attributes.
 
-    Returns
-    -------
-    Dict[str, str]
+    Returns:
         The configuration dictionary.
+
     """
 
     # Create a dictionary comprehension that maps each key to the attribute value
@@ -76,18 +69,12 @@ def get_subplot_config(
 ) -> Dict[str, int]:
     """Calculate the configuration for subplots in a figure.
 
-    Parameters
-    ----------
-    subplots : bool
-        Whether to show subplots.
-    n_charts : int, optional (default=1)
-        The number of charts.
-    max_cols : int, optional (default=1)
-        The maximum number of columns.
+    Args:
+        subplots: Whether to show subplots.
+        n_charts: The number of charts.
+        max_cols: The maximum number of columns.
 
-    Returns
-    -------
-    Dict[str, int]
+    Returns:
         The configuration for subplots, including the number of rows (nrows) and
         the number of columns (ncols).
     """
@@ -118,25 +105,22 @@ def get_subplot_config(
 
 
 def get_text_style(text_type: str = "") -> dict:
-    """Get the text configuration
+    """Get the text style.
 
-    Parameters
-    ----------
-    text_type : str, optional (default="")
-        The text type.
+    Args:
+        text_type: The text type.
 
-    Returns
-    -------
-    dict
-        The text configuration dict.
+    Returns:
+        The text style setting.
+
     """
 
     config_attrs = [
-        ("fontsize", "font.{type}.size"),
-        ("fontweight", "font.{type}.weight"),
-        ("color", "font.{type}.color"),
-        ("style", "font.{type}.style"),
-        ("family", "font.{type}.family"),
+        ("fontsize", "font_{type}_size"),
+        ("fontweight", "font_{type}_weight"),
+        ("color", "font_{type}_color"),
+        ("style", "font_{type}_style"),
+        ("family", "font_{type}_family"),
     ]
 
     return {
@@ -154,27 +138,24 @@ def get_text_style(text_type: str = "") -> dict:
 
 
 def get_line_style(chart_style: dict) -> dict:
-    """Get the line configuration
+    """Get the line chart style.
 
-    Parameters
-    ----------
-    chart_style : dict
-        The chart style dictionary.
+    Args:
+        chart_style: The chart style dictionary.
 
-    Returns
-    -------
-    dict
-        The line configuration dict.
+    Returns:
+        The line style setting.
+
     """
 
     config_attrs = [
-        ("color", "plot.line.color"),
-        ("alpha", "plot.line.alpha"),
-        ("linewidth", "plot.line.width"),
-        ("linestyle", "plot.line.style"),
-        ("marker", "plot.line.marker"),
-        ("drawstyle", "plot.line.drawstyle"),
-        ("zorder", "plot.line.zorder"),
+        ("color", "plot_line_color"),
+        ("alpha", "plot_line_alpha"),
+        ("linewidth", "plot_line_width"),
+        ("linestyle", "plot_line_style"),
+        ("marker", "plot_line_marker"),
+        ("drawstyle", "plot_line_drawstyle"),
+        ("zorder", "plot_line_zorder"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -186,30 +167,26 @@ def get_line_style(chart_style: dict) -> dict:
 
 
 def get_bar_style(chart_style: dict, is_horizontal: bool = False) -> dict:
-    """Get the bar configuration
+    """Get the bar chart style.
 
-    Parameters
-    ----------
-    chart_style : dict
-        The chart style dictionary.
-    is_horizontal : bool
-        Whether the bar is horizontal or not.
+    Args:
+        chart_style: The chart style dictionary.
+        is_horizontal: Whether the bar is horizontal or not.
 
-    Returns
-    -------
-    dict
-        The bar configuration dict.
+    Returns:
+        The bar style setting.
+
     """
 
     config_attrs = [
-        ("color", "plot.bar.color"),
-        ("alpha", "plot.bar.alpha"),
-        ("height" if is_horizontal else "width", "plot.bar.width"),
-        ("hatch", "plot.bar.hatch"),
-        ("linewidth", "plot.bar.edge.width"),
-        ("edgecolor", "plot.bar.edge.color"),
-        ("ecolor", "plot.bar.error.color"),
-        ("zorder", "plot.bar.zorder"),
+        ("color", "plot_bar_color"),
+        ("alpha", "plot_bar_alpha"),
+        ("height" if is_horizontal else "width", "plot_bar_width"),
+        ("hatch", "plot_bar_hatch"),
+        ("linewidth", "plot_bar_edge_width"),
+        ("edgecolor", "plot_bar_edge_color"),
+        ("ecolor", "plot_bar_error_color"),
+        ("zorder", "plot_bar_zorder"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -221,29 +198,26 @@ def get_bar_style(chart_style: dict, is_horizontal: bool = False) -> dict:
 
 
 def get_hist_style(chart_style: dict) -> dict:
-    """Get the hist configuration
+    """Get the histogram chart style.
 
-    Parameters
-    ----------
-    chart_style : dict
-        The chart style dictionary.
+    Args:
+        chart_style: The chart style dictionary.
 
-    Returns
-    -------
-    dict
-        The hist configuration dict.
+    Returns:
+        The histogram style setting.
+
     """
 
     config_attrs = [
-        ("color", "plot.hist.color"),
-        ("alpha", "plot.hist.alpha"),
-        ("fill", "plot.hist.fill"),
-        ("hatch", "plot.hist.hatch"),
-        ("zorder", "plot.hist.zorder"),
-        ("histtype", "plot.hist.type"),
-        ("align", "plot.hist.align"),
-        ("linewidth", "plot.hist.edge.width"),
-        ("edgecolor", "plot.hist.edge.color"),
+        ("color", "plot_hist_color"),
+        ("alpha", "plot_hist_alpha"),
+        ("fill", "plot_hist_fill"),
+        ("hatch", "plot_hist_hatch"),
+        ("zorder", "plot_hist_zorder"),
+        ("histtype", "plot_hist_type"),
+        ("align", "plot_hist_align"),
+        ("linewidth", "plot_hist_edge_width"),
+        ("edgecolor", "plot_hist_edge_color"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -255,25 +229,22 @@ def get_hist_style(chart_style: dict) -> dict:
 
 
 def get_area_style(chart_style: dict) -> dict:
-    """Get the area configuration
+    """Get the area chart style.
 
-    Parameters
-    ----------
-    chart_style : dict
-        The chart style dictionary.
+    Args:
+        chart_style: The chart style dictionary.
 
-    Returns
-    -------
-    dict
-        The area configuration dict.
+    Returns:
+        The area style setting.
+
     """
 
     config_attrs = [
-        ("alpha", "plot.area.alpha"),
-        ("color", "plot.area.color"),
-        ("linewidth", "plot.area.line.width"),
-        ("hatch", "plot.area.hatch"),
-        ("zorder", "plot.area.zorder"),
+        ("alpha", "plot_area_alpha"),
+        ("color", "plot_area_color"),
+        ("linewidth", "plot_area_linewidth"),
+        ("hatch", "plot_area_hatch"),
+        ("zorder", "plot_area_zorder"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -285,25 +256,22 @@ def get_area_style(chart_style: dict) -> dict:
 
 
 def get_grid_style(chart_style: dict) -> dict:
-    """Get the grid configuration
+    """Get the grid chart style.
 
-    Parameters
-    ----------
-    chart_style : dict
-        The chart style dictionary.
+    Args:
+        chart_style: The chart style dictionary.
 
-    Returns
-    -------
-    dict
-        The grid configuration dict.
+    Returns:
+        The grid style setting.
+
     """
 
     config_attrs = [
-        ("alpha", "plot.grid.alpha"),
-        ("color", "plot.grid.color"),
-        ("linewidth", "plot.grid.line.width"),
-        ("linestyle", "plot.grid.line.style"),
-        ("zorder", "plot.grid.zorder"),
+        ("alpha", "plot_grid_alpha"),
+        ("color", "plot_grid_color"),
+        ("linewidth", "plot_grid_linewidth"),
+        ("linestyle", "plot_grid_linestyle"),
+        ("zorder", "plot_grid_zorder"),
     ]
     return create_config_dict(chart_style, config_attrs)
 
@@ -314,24 +282,21 @@ def get_grid_style(chart_style: dict) -> dict:
 
 
 def get_vline_style(vline_style: dict) -> dict:
-    """Get the vline configuration
+    """Get the vertical line chart style.
 
-    Parameters
-    ----------
-    vline_style : dict
-        The vline style dictionary.
+    Args:
+        vline_style: The vertical line style dictionary.
 
-    Returns
-    -------
-    dict
-        The vline configuration dict.
+    Returns:
+        The vertical line style setting.
+
     """
 
     config_attrs = [
-        ("color", "plot.vline.color"),
-        ("linestyle", "plot.vline.style"),
-        ("linewidth", "plot.vline.width"),
-        ("alpha", "plot.vline.alpha"),
+        ("color", "plot_vline_color"),
+        ("linestyle", "plot_vline_style"),
+        ("linewidth", "plot_vline_width"),
+        ("alpha", "plot_vline_alpha"),
     ]
 
     return create_config_dict(vline_style, config_attrs)
@@ -343,24 +308,21 @@ def get_vline_style(vline_style: dict) -> dict:
 
 
 def get_hline_style(hline_style: dict) -> dict:
-    """Get the hline configuration
+    """Get the horizontal line chart style.
 
-    Parameters
-    ----------
-    hline_style : dict
-        The hline style dictionary.
+    Args:
+        hline_style: The horizontal line style dictionary.
 
-    Returns
-    -------
-    dict
-        The hline configuration dict.
+    Returns:
+        The horizontal line style setting.
+
     """
 
     config_attrs = [
-        ("colors", "plot.hline.color"),
-        ("linestyle", "plot.hline.style"),
-        ("linewidth", "plot.hline.width"),
-        ("alpha", "plot.hline.alpha"),
+        ("colors", "plot_hline_color"),
+        ("linestyle", "plot_hline_style"),
+        ("linewidth", "plot_hline_width"),
+        ("alpha", "plot_hline_alpha"),
     ]
 
     return create_config_dict(hline_style, config_attrs)
@@ -372,46 +334,40 @@ def get_hline_style(hline_style: dict) -> dict:
 
 
 def get_heatmap_style(heatmap_style: dict) -> dict:
-    """Get the heatmap configuration
+    """Get the heatmap style.
 
-    Parameters
-    ----------
-    heatmap_style : dict
-        The heatmap style dictionary.
+    Args:
+        heatmap_style: The heatmap style dictionary.
 
-    Returns
-    -------
-    dict
-        The heatmap configuration dict.
+    Returns:
+        The heatmap style setting.
+
     """
 
     config_attrs = [
-        ("cmap", "plot.heatmap.cmap"),
-        ("alpha", "plot.heatmap.alpha"),
+        ("cmap", "plot_heatmap_cmap"),
+        ("alpha", "plot_heatmap_alpha"),
     ]
 
     return create_config_dict(heatmap_style, config_attrs)
 
 
 def get_heatmap_font_style(heatmap_style: dict) -> dict:
-    """Get the heatmap configuration
+    """Get the heatmap font style.
 
-    Parameters
-    ----------
-    heatmap_style : dict
-        The heatmap font style dictionary.
+    Args:
+        heatmap_style: The heatmap font style dictionary.
 
-    Returns
-    -------
-    dict
-        The heatmap font configuration dict.
+    Returns:
+        The heatmap font style setting.
+
     """
 
     config_attrs = [
-        ("size", "plot.heatmap.font.size"),
-        ("color", "plot.heatmap.font.color"),
-        ("style", "plot.heatmap.font.style"),
-        ("weight", "plot.heatmap.font.weight"),
+        ("size", "plot_heatmap_font_size"),
+        ("color", "plot_heatmap_font_color"),
+        ("style", "plot_heatmap_font_style"),
+        ("weight", "plot_heatmap_font_weight"),
     ]
 
     return create_config_dict(heatmap_style, config_attrs)
@@ -423,21 +379,20 @@ def get_heatmap_font_style(heatmap_style: dict) -> dict:
 
 
 def get_legend_style() -> dict:
-    """Get the legend configuration
+    """Get the legend style.
 
-    Returns
-    -------
-    dict
-        The legend configuration dict.
+    Returns:
+        The legend style setting.
+
     """
 
     config_attrs = [
-        ("shadow", "plot.legend.shadow"),
-        ("frameon", "plot.legend.frameon"),
-        ("fontsize", "plot.legend.font.size"),
-        ("alignment", "plot.legend.alignment"),
-        ("title_fontsize", "plot.legend.title.size"),
-        ("labelcolor", "plot.legend.label.color"),
+        ("shadow", "plot_legend_shadow"),
+        ("frameon", "plot_legend_frameon"),
+        ("fontsize", "plot_legend_font_size"),
+        ("alignment", "plot_legend_alignment"),
+        ("title_fontsize", "plot_legend_title_size"),
+        ("labelcolor", "plot_legend_label_color"),
     ]
     return create_config_dict({}, config_attrs)
 
@@ -450,10 +405,9 @@ def get_legend_style() -> dict:
 def configure_axes_spines(ax: plt.Axes):
     """Configure axes spines.
 
-    Parameters
-    ----------
-    ax : plt.Axes
-        The axes.
+    Args:
+        ax: The axes.
+
     """
 
     # Turn on the axes
@@ -463,41 +417,37 @@ def configure_axes_spines(ax: plt.Axes):
     for axis in ["top", "bottom", "left", "right"]:
         # Set the linewidth and visibility of the spine
         ax.spines[axis].set(
-            linewidth=config["axes.spines.width"],
-            visible=config[f"axes.spines.{axis}.visible"],
-            zorder=config["axes.spines.zorder"],
+            linewidth=config["axes_spines_width"],
+            visible=config[f"axes_spines_{axis}_visible"],
+            zorder=config["axes_spines_zorder"],
         )
 
 
 def configure_axis_ticks_style(ax: plt.Axes, axis_type: str):
     """Configure axis ticks.
 
-    Parameters
-    ----------
-    ax : plt.Axes
-        The axes.
-    axis_type : str
-        The axis type. Options: "xaxis", "yaxis".
+    Args:
+        ax: The axes.
+        axis_type: The axis type. Options: "xaxis", "yaxis".
+
     """
 
     # Set tick parameters for major ticks
     getattr(ax, axis_type).set_tick_params(
         which="major",
-        width=config["axes.spines.width"],
-        length=config["axes.ticks.length"],
-        labelsize=config["axes.ticks.label.size"],
+        width=config["axes_spines_width"],
+        length=config["axes_ticks_length"],
+        labelsize=config["axes_ticks_label_size"],
     )
 
 
 def configure_axis_ticks_position(ax: plt.Axes, chart: dict):
-    """Configure axis ticks position
+    """Configure axis ticks position.
 
-    Parameters
-    ----------
-    ax : plt.Axes
-        The axes.
-    chart : dict
-        The chart style.
+    Args:
+        ax: The axes.
+        chart: The chart style.
+
     """
 
     tick_attrs = [
@@ -564,13 +514,10 @@ def configure_axis_ticks_position(ax: plt.Axes, chart: dict):
 def configure_axis_limits(ax: plt.Axes, settings: dict):
     """Configure axis limits.
 
-    Parameters
-    ----------
-    ax : plt.Axes
-        The axes.
+    Args:
+        ax: The axes.
+        settings: The settings.
 
-    settings : dict
-        The settings.
     """
 
     if settings["xmin"] is not None or settings["xmax"] is not None:
@@ -589,12 +536,10 @@ def configure_axis_limits(ax: plt.Axes, settings: dict):
 def configure_labels(settings: dict, actions: List[Tuple[str, callable]]):
     """Configure chart labels.
 
-    Parameters
-    ----------
-    settings : dict
-        The chart settings.
-    actions : List[Tuple[str, callable]]
-        The actions.
+    Args:
+        settings: The chart settings.
+        actions: The actions.
+
     """
 
     for label, action in actions:

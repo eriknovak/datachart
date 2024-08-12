@@ -1,14 +1,11 @@
-# Project information
 site_name: datachart
 site_author: Erik Novak
 site_description: >-
   Data visualization package, simple to use, highly customizable
 
-# Repository
 repo_name: eriknovak/datachart
 repo_url: https://github.com/eriknovak/datachart
 
-# Configuration
 theme:
   name: material
   features:
@@ -18,6 +15,7 @@ theme:
     - navigation.indexes
     - navigation.tabs
     - navigation.top
+    - navigation.footer
     - search.highlight
     - search.share
     - search.suggest
@@ -26,29 +24,49 @@ theme:
     # Palette toggle for light
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: blue
-      accent: light blue
+      primary: black
+      accent: blue
       toggle:
         icon: material/weather-sunny
         name: Switch to dark mode
     # Palette toggle for dark
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: blue
-      accent: light blue
+      primary: black
+      accent: blue
       toggle:
         icon: material/weather-night
         name: Switch to light mode
   logo: assets/imgs/logo.png
+  favicon: assets/imgs/favicon.png
 
 edit_uri: ""
 
-# Plugins
-plugins:
-  - search
-  - mkdocs-jupyter
+extra_css:
+  - css/extra.css
 
-# Markdown Extensions
+plugins:
+  - autorefs
+  - search:
+      separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - mkdocs-jupyter
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            heading_level: 3
+            members_order: "source"
+            show_source: false
+            show_labels: false
+            show_root_heading: true
+            show_root_toc_entry: false
+            show_symbol_type_toc: true
+            show_symbol_type_heading: true
+            show_signature_annotations: true
+            separate_signature: true
+            annotations_path: source
+            docstring_section_style: spacy
+
 markdown_extensions:
   - admonition
   - attr_list
@@ -67,18 +85,36 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
       emoji_index: !!python/name:material.extensions.emoji.twemoji
 
-# Page tree
 nav:
   - Home: index.md
 
-  - Documentation:
-    - Overview: documentation/overview.md
+  - How-To Guides:
+    - how-to-guides/index.md
     - Charts:
-      - Line Chart: documentation/notebooks/01-line-chart.ipynb
-      - Bar Chart:  documentation/notebooks/02-bar-chart.ipynb
-      - Histogram: documentation/notebooks/03-histogram.ipynb
-      - Heatmap: documentation/notebooks/04-heatmap.ipynb
-      - Color Themes: documentation/notebooks/00-color-themes.ipynb
-    - Configuration: documentation/configuration.md
+      - how-to-guides/charts/index.md
+      - Line Chart: how-to-guides/charts/linechart.ipynb
+      - Bar Chart: how-to-guides/charts/barchart.ipynb
+      - Histogram: how-to-guides/charts/histogram.ipynb
+      - Heatmap: how-to-guides/charts/heatmap.ipynb
+    - Utility:
+      - how-to-guides/utility/index.md
+      - Statistics: how-to-guides/utility/stats.ipynb
+    - Config: how-to-guides/config.ipynb
+    - Themes: how-to-guides/themes.ipynb
+    - Colormaps: how-to-guides/colormaps.ipynb
 
+
+  - API Reference:
+    - references/index.md
+    - charts: references/charts.md
+    - utils:
+      - references/utils/index.md
+      - stats: references/utils/stats.md
+    - config: references/config.md
+    - themes: references/themes.md
+    - constants: references/constants.md
+    - typings: references/typings.md
+
+
+  - Changelog: changelog.md
   - Development: development.md

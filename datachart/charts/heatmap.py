@@ -1,18 +1,38 @@
-from ..utils.charts import chart_wrapper, draw_heatmap
-from ..definitions import HeatmapChartAttrs
+import matplotlib.pyplot as plt
+
+from ..utils.charts import chart_plot_wrapper, plot_heatmap
+from ..typings import HeatmapChartAttrs
 
 # ================================================
 # Main Chart Definition
 # ================================================
 
 
-def heatmap(attrs: HeatmapChartAttrs):
-    """Draw a heatmap chart
+def Heatmap(attrs: HeatmapChartAttrs) -> plt.Figure:
+    """Creates the heatmap.
 
-    Parameters
-    ----------
-    attrs : HeatmapChartAttrs
-        The chart attributes.
+    Examples:
+        >>> from datachart.charts import Heatmap
+        >>> figure = Heatmap({
+        ...     "charts": {
+        ...         "data": [
+        ...             [1, 2, 3],
+        ...             [4, 5, 6],
+        ...             [7, 8, 9]
+        ...         ],
+        ...     },
+        ...     "title": "Basic Heatmap",
+        ...     "xlabel": "X",
+        ...     "ylabel": "Y",
+        ... })
+
+
+    Args:
+        attrs: The heatmap chart attributes.
+
+    Returns:
+        The figure containing the heatmap.
 
     """
-    return chart_wrapper(draw_heatmap)({**attrs, "type": "heatmap"})
+
+    return chart_plot_wrapper(plot_heatmap)({**attrs, "type": "heatmap"})

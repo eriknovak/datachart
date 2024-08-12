@@ -3,13 +3,14 @@ requires = ['setuptools>=42']
 build-backend = 'setuptools.build_meta'
 
 [project]
-version = "0.5.0"
 name = "datachart"
 description = "The customizable data chart creation package"
-authors=[{ name = "Erik Novak", email = "novak.erik@gmail.com" }]
+authors=[{ name = "Erik Novak" }]
+maintainers = [{ name = "Erik Novak" }]
 readme = "README.md"
 license = { file = "LICENSE" }
-dynamic = ["dependencies"]
+dynamic = ["dependencies", "version"]
+keywords = ["python", "dataviz", "visualization"]
 classifiers = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python :: 3.8",
@@ -36,6 +37,7 @@ dev = [
     "python-githooks",
     "mkdocs-material",
     "mkdocs-jupyter",
+    "mkdocstrings[python]",
 ]
 test = [
     "coverage",
@@ -47,6 +49,6 @@ all = ["datachart[dev,test]"]
 where = ["."]
 include = ["datachart*"]
 
-
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.txt"] }
+version = { attr = "datachart.__version__" }

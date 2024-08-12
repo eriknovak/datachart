@@ -1,14 +1,19 @@
 import unittest
 
-from datachart.themes.colors import COLOR_SCALE_MAPPING
 from datachart.utils.colors import (
     get_color_scale,
     get_discrete_colors,
+    COLOR_SCALE_MAPPING,
 )
 from datachart.constants import COLORS
 
 TEST_COLOR_SCALE = COLORS.Blue
 COLOR_SCALE_BLUE = COLOR_SCALE_MAPPING[TEST_COLOR_SCALE]
+
+
+# =====================================
+# Test Colors
+# =====================================
 
 
 class TestColors(unittest.TestCase):
