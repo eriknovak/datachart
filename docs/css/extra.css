@@ -1,0 +1,10 @@
+
+.jupyter-wrapper .jp-Collapser,
+.jupyter-wrapper .jp-CodeCell .jp-Cell-inputWrapper .jp-InputPrompt,
+.jupyter-wrapper .jp-OutputArea-prompt:empty {
+    display: none !important;
+}
+
+.jupyter-wrapper .highlight {
+    font-size: smaller;
+}
