@@ -46,12 +46,10 @@ pip install datachart
 pip install datachart --upgrade
 ```
 
+## Examples
 
-## Example
-
-!!! note
-    The example section is still pending. Stay tuned.
-
+The examples showcases on how to use the `datachart` package are available
+on the official [How-to Guides](https://eriknovak.github.io/datachart/how-to-guides/).
 
 ## Acknowledgements
 

@@ -1,7 +1,5 @@
 ---
 title: How-to Guides
-hide:
-    - toc
 ---
 
 # How-to Guides
