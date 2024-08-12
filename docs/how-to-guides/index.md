@@ -6,7 +6,7 @@ hide:
 
 # How-to Guides
 
-The how-to guides showcases how to utilize the `datachart` package to create charts, reflecting the data and the message the user wants to send with it,how to leverage the existing utility module to prepare the data, and how to create a custom theme and configure the package to reflect it.
+The how-to guides showcases how to utilize the `datachart` package to create charts, reflecting the data and the message the user wants to send with it, how to leverage the existing utility module to prepare the data, and how to create a custom theme and configure the package to reflect it.
 
 | Section                   | Description                                                                          |
 | :------------------------ | :----------------------------------------------------------------------------------- |
