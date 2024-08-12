@@ -6,6 +6,7 @@ title: Charts Module
 
 ::: datachart.charts
     options:
+        members: False
         heading_level: 2
 
 

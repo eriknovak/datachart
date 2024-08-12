@@ -6,6 +6,7 @@ title: Config Module
 
 ::: datachart.config
     options:
+        members: False
         heading_level: 2
 
 
