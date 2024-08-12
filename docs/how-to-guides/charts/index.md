@@ -1,7 +1,7 @@
 ---
-title: Configuration
+title: Charts
 ---
 
-# Configuration
+# Charts
 
 :construction: Page is under construction. Please come back later.

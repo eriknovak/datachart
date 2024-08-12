@@ -43,8 +43,6 @@ theme:
 edit_uri: ""
 
 plugins:
-  - blog:
-      blog_dir: how-to-guides
   - autorefs
   - search:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
@@ -89,16 +87,17 @@ nav:
 
   - How-To Guides:
     - how-to-guides/index.md
-
-  - Documentation:
-    - Overview: documentation/overview.md
     - Charts:
-      - Line Chart: documentation/notebooks/01-line-chart.ipynb
-      - Bar Chart:  documentation/notebooks/02-bar-chart.ipynb
-      - Histogram: documentation/notebooks/03-histogram.ipynb
-      - Heatmap: documentation/notebooks/04-heatmap.ipynb
-      - Color Themes: documentation/notebooks/00-color-themes.ipynb
-    - Configuration: documentation/configuration.md
+      - how-to-guides/charts/index.md
+      - Line Chart: how-to-guides/charts/linechart.ipynb
+      - Bar Chart: how-to-guides/charts/barchart.ipynb
+      - Histogram: how-to-guides/charts/histogram.ipynb
+      - Heatmap: how-to-guides/charts/heatmap.ipynb
+    - Utils:
+      - how-to-guides/utils/index.md
+    - Config: how-to-guides/config.md
+    - Themes: how-to-guides/themes.ipynb
+
 
   - API Reference:
     - references/index.md
