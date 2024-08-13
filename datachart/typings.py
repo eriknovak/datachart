@@ -3,8 +3,10 @@
 The `typings` module contains the typings for all chart components. The module
 is intended to contain the typings for easier input value format checkup.
 
-Classes:
+Attributes:
     ChartAttrs: The union of all chart attributes.
+
+Classes:
     ChartCommonAttrs: The chart attributes common to all chart types.
     VLinePlotAttrs: The vertical line plot attributes.
     HLinePlotAttrs: The horizontal line plot attributes.
