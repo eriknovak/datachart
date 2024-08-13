@@ -103,7 +103,8 @@ def stdev(values: List[Union[int, float]]) -> float:
     """
 
     assert isinstance(values, (list, np.ndarray)), "The values variable is not a list."
-    return (sum([(x - mean(values)) ** 2 for x in values]) / len(values)) ** 0.5
+    m = mean(values)
+    return (sum([(x - m) ** 2 for x in values]) / len(values)) ** 0.5
 
 
 def quantile(values: List[Union[int, float]], q: float) -> float:
