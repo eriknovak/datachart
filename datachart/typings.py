@@ -789,7 +789,7 @@ class HeatmapChartAttrs(ChartCommonAttrs):
 # ================================================
 
 
-class ChartAttrs(LineChartAttrs, BarChartAttrs, HistogramChartAttrs, HeatmapChartAttrs):
-    """The union of all chart attributes."""
-
-    pass
+ChartAttrs = Union[
+    LineChartAttrs, BarChartAttrs, HistogramChartAttrs, HeatmapChartAttrs
+]
+"""The union of all chart attributes."""
