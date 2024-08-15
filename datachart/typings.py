@@ -54,6 +54,8 @@ from .constants import (
     LEGEND_ALIGN,
     ORIENTATION,
     COLORS,
+    SHOW_GRID,
+    SCALE,
 )
 
 # ================================================
@@ -399,8 +401,9 @@ class ChartCommonAttrs(TypedDict):
         ymin (Union[int, float, None]): Determine the minimum y-axis value.
         ymax (Union[int, float, None]): Determine the maximum y-axis value.
         show_legend (Union[bool, None]): Whether or not to show the legend.
-        show_grid (Union[str, None]):
-        log_scale (Union[bool, None]):
+        show_grid (Union[SHOW_GRID, str, None]): Determine which grid lines to show.
+        scalex (Union[SCALE, str, None]): The scale of the x-axis.
+        scaley (Union[SCALE, str, None]): The scale of the y-axis.
         aspect_ratio (Union[str, None]): The aspect ratio of the charts.
 
         subplots (Union[bool, None]): Whether or not to create a separate subplot for each chart.
@@ -420,9 +423,9 @@ class ChartCommonAttrs(TypedDict):
     ymax: Union[int, float, None]
     # visibility attributes
     show_legend: Union[bool, None]
-    show_grid: Union[str, None]
-    # chart scale attributes
-    log_scale: Union[bool, None]
+    show_grid: Union[SHOW_GRID, str, None]
+    scalex: Union[SCALE, str, None]
+    scaley: Union[SCALE, str, None]
     aspect_ratio: Union[str, None]
     # the subplot attributes
     subplots: Union[bool, None]

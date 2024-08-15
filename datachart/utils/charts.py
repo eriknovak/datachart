@@ -38,7 +38,7 @@ from ..typings import (
     HLinePlotAttrs,
     VLinePlotAttrs,
 )
-from ..constants import FIG_SIZE, ORIENTATION, VALFMT
+from ..constants import FIG_SIZE, ORIENTATION, VALFMT, SCALE
 from ..config import config
 
 # ================================================
@@ -157,7 +157,8 @@ settings_attr_mapping = [
     {"name": "show_heatmap_values", "default": None},
     # chart specific attributes
     {"name": "orientation", "default": None},
-    {"name": "log_scale", "default": None},
+    {"name": "scalex", "default": None},
+    {"name": "scaley", "default": None},
     {"name": "num_bins", "default": None},
 ]
 
@@ -176,7 +177,8 @@ settings_chart_mapping = [
     "show_colorbars",
     "show_heatmap_values",
     "orientation",
-    "log_scale",
+    "scalex",
+    "scaley",
     "num_bins",
 ]
 
@@ -420,7 +422,8 @@ def plot_line_chart(
             "show_grid",
             "show_yerr",
             "show_area",
-            "log_scale",
+            "scalex",
+            "scaley",
         ],
     )
 
@@ -476,8 +479,11 @@ def plot_line_chart(
         subtitle = chart.get("subtitle", None)
         ax.plot(x, y, **line_style, label=subtitle)
 
-        if settings["log_scale"]:
-            ax.set_yscale("log")
+        if settings["scalex"]:
+            ax.set_xscale(settings["scalex"])
+
+        if settings["scaley"]:
+            ax.set_yscale(settings["scaley"])
 
         if settings["show_grid"]:
             ax.grid(axis=settings["show_grid"], **get_grid_style(style))
@@ -544,7 +550,7 @@ def plot_bar_chart(
             "show_grid",
             "show_yerr",
             "orientation",
-            "log_scale",
+            "scaley",
         ],
     )
 
@@ -593,12 +599,15 @@ def plot_bar_chart(
         draw_func = ax.barh if is_horizontal else ax.bar
         draw_func(
             x + x_offset,
-            y + (1 if settings["log_scale"] else 0),
-            log=settings["log_scale"],
+            y + (1 if settings["scaley"] == "log" else 0),
             label=subtitle,
+            align="edge",
             **error_range,
             **bar_style,
         )
+
+        if settings["scaley"]:
+            ax.set_yscale(settings["scaley"])
 
         if settings["show_grid"]:
             ax.grid(axis=settings["show_grid"], **get_grid_style(style))
@@ -704,7 +713,7 @@ def plot_histogram(
             "show_cumulative",
             "num_bins",
             "orientation",
-            "log_scale",
+            "scaley",
         ],
     )
 
@@ -743,12 +752,19 @@ def plot_histogram(
             bins=bins,
             label=labels,
             stacked=True,
-            log=settings["log_scale"],
             density=settings["show_density"],
             cumulative=settings["show_cumulative"],
             orientation=orientation,
             **hist_style,
         )
+
+        if settings["scaley"]:
+            if settings["scaley"] == SCALE.LOGIT:
+                warnings.warn(
+                    "The `logit` scale is not supported for histograms. Setting `scaley` to `linear`."
+                )
+                settings["scaley"] = SCALE.LINEAR
+            axes[0].set_yscale(settings["scaley"])
 
         if "vlines" in chart:
             # draw vertical lines
@@ -790,12 +806,14 @@ def plot_histogram(
                 x,
                 bins=bins,
                 label=label,
-                log=settings["log_scale"],
                 density=settings["show_density"],
                 cumulative=settings["show_cumulative"],
                 orientation=orientation,
                 **hist_style,
             )
+
+            if settings["scaley"]:
+                ax.set_yscale(settings["scaley"])
 
             if "vlines" in chart:
                 # draw vertical lines
