@@ -441,3 +441,27 @@ class SHOW_GRID:
     X = "x"
     Y = "y"
     BOTH = "both"
+
+
+class SCALE:
+    """The supported scale options.
+
+    Examples:
+        >>> from datachart.constants import SCALE
+        >>> SCALE.DEFAULT
+        "linear"
+
+    Attributes:
+        DEFAULT (str): The default scale. Same as `SCALE.LINEAR`.
+        LINEAR (str): The linear scale. Equals to `"linear"`.
+        LOG (str): The log scale. Equals to `"log"`.
+        SYMLOG (str): The symlog scale. Equals to `"symlog"`.
+        LOGIT (str): The logit scale. Equals to `"logit"`.
+        ASINH (str): The asinh scale. Equals to `"asinh"`.
+    """
+
+    DEFAULT = "linear"
+    LINEAR = "linear"
+    LOG = "log"
+    SYMLOG = "symlog"
+    ASINH = "asinh"
