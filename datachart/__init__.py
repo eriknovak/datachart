@@ -15,7 +15,7 @@ Modules:
 
 """
 
-__version__ = "0.6.0"
+__version__ = "0.6.1"
 
 from . import charts
 from . import utils

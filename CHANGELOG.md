@@ -1,3 +1,9 @@
+### datachart-0.6.1 (2024-08-15)
+
+**New Features:**
+
+- Add `scale` support to `LineChart`, `BarChart` and `Histogram`
+
 ### datachart-0.6.0 (2024-08-13)
 
 **Breaking Changes:**
