@@ -1,3 +1,9 @@
+### datachart-0.6.2 (2024-08-16)
+
+**Bug Fixes:**
+
+- Fix `BarChart` bar position bug
+
 ### datachart-0.6.1 (2024-08-15)
 
 **New Features:**
