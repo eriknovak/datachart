@@ -601,7 +601,6 @@ def plot_bar_chart(
             x + x_offset,
             y + (1 if settings["scaley"] == "log" else 0),
             label=subtitle,
-            align="edge",
             **error_range,
             **bar_style,
         )

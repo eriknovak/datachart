@@ -402,8 +402,6 @@ class ChartCommonAttrs(TypedDict):
         ymax (Union[int, float, None]): Determine the maximum y-axis value.
         show_legend (Union[bool, None]): Whether or not to show the legend.
         show_grid (Union[SHOW_GRID, str, None]): Determine which grid lines to show.
-        scalex (Union[SCALE, str, None]): The scale of the x-axis.
-        scaley (Union[SCALE, str, None]): The scale of the y-axis.
         aspect_ratio (Union[str, None]): The aspect ratio of the charts.
 
         subplots (Union[bool, None]): Whether or not to create a separate subplot for each chart.
@@ -424,8 +422,6 @@ class ChartCommonAttrs(TypedDict):
     # visibility attributes
     show_legend: Union[bool, None]
     show_grid: Union[SHOW_GRID, str, None]
-    scalex: Union[SCALE, str, None]
-    scaley: Union[SCALE, str, None]
     aspect_ratio: Union[str, None]
     # the subplot attributes
     subplots: Union[bool, None]
@@ -549,12 +545,16 @@ class LineChartAttrs(ChartCommonAttrs):
         charts (Union[LineSingleChartAttrs, List[LineSingleChartAttrs]]): The line chart definitions.
         show_yerr (Union[bool, None]): Whether or not to show the y-axis errors.
         show_area (Union[bool, None]): Whether or not to show the area under the lines.
+        scalex (Union[SCALE, str, None]): The scale of the x-axis.
+        scaley (Union[SCALE, str, None]): The scale of the y-axis.
 
     """
 
     charts: Union[LineSingleChartAttrs, List[LineSingleChartAttrs]]
     show_yerr: Union[bool, None]
     show_area: Union[bool, None]
+    scalex: Union[SCALE, str, None]
+    scaley: Union[SCALE, str, None]
 
 
 # ================================================
@@ -629,12 +629,14 @@ class BarChartAttrs(ChartCommonAttrs):
         charts (Union[BarSingleChartAttrs, List[BarSingleChartAttrs]]): The bar chart definitions.
         show_yerr (Union[bool, None]): Whether or not to show the y-axis errors.
         orientation (Union[ORIENTATION, str, None]): The orientation of the bar charts.
+        scaley (Union[SCALE, str, None]): The scale of the y-axis.
 
     """
 
     charts: Union[BarSingleChartAttrs, List[BarSingleChartAttrs]]
     show_yerr: Union[bool, None]
     orientation: Union[ORIENTATION, str, None]
+    scaley: Union[SCALE, str, None]
 
 
 # ================================================
@@ -703,6 +705,7 @@ class HistogramChartAttrs(ChartCommonAttrs):
         num_bins (Union[int, None]): The number of bins the data points are split in to create the histogram.
         show_density (Union[bool, None]): Whether or not to plot the density histogram.
         show_cumulative (Union[bool, None]): Whether or not to plot the cumulative histogram.
+        scaley (Union[SCALE, str, None]): The scale of the y-axis.
 
     """
 
@@ -711,6 +714,7 @@ class HistogramChartAttrs(ChartCommonAttrs):
     num_bins: Union[int, None]
     show_density: Union[bool, None]
     show_cumulative: Union[bool, None]
+    scaley: Union[SCALE, str, None]
 
 
 # ================================================
