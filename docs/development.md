@@ -61,7 +61,7 @@ python -m unittest discover test
 To test notebooks, run:
 
 ```bash
-pytest --nbmake **/*ipynb
+pytest --nbmake ./docs/how-to-guides/**/*ipynb
 ```
 
 ## Documentation

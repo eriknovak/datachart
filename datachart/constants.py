@@ -456,7 +456,6 @@ class SCALE:
         LINEAR (str): The linear scale. Equals to `"linear"`.
         LOG (str): The log scale. Equals to `"log"`.
         SYMLOG (str): The symlog scale. Equals to `"symlog"`.
-        LOGIT (str): The logit scale. Equals to `"logit"`.
         ASINH (str): The asinh scale. Equals to `"asinh"`.
     """
 

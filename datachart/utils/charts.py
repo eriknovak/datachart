@@ -758,11 +758,6 @@ def plot_histogram(
         )
 
         if settings["scaley"]:
-            if settings["scaley"] == SCALE.LOGIT:
-                warnings.warn(
-                    "The `logit` scale is not supported for histograms. Setting `scaley` to `linear`."
-                )
-                settings["scaley"] = SCALE.LINEAR
             axes[0].set_yscale(settings["scaley"])
 
         if "vlines" in chart:
