@@ -1,3 +1,10 @@
+### datachart-0.6.3 (2024-10-17)
+
+**Bug Fixes:**
+
+- Fix `scaley` bug in `Histogram`
+
+
 ### datachart-0.6.2 (2024-08-16)
 
 **Bug Fixes:**
