@@ -4,11 +4,10 @@ import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import chart_plot_wrapper, plot_heatmap
 from ..typings import (
-    HeatmapSingleChartAttrs,
     HeatmapStyleAttrs,
     HeatmapColorbarAttrs,
 )
-from ..constants import FIG_SIZE, ORIENTATION
+from ..constants import FIG_SIZE
 
 # ================================================
 # Main Chart Definition

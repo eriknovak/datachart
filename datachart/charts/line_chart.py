@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import chart_plot_wrapper, plot_line_chart
 from ..typings import (
     LineDataPointAttrs,
-    LineSingleChartAttrs,
     LineStyleAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
@@ -191,14 +190,14 @@ def LineChart(
             elif ytickrotate is not None:
                 chart_dict["ytickrotate"] = ytickrotate
 
-            if vlines is not None and isinstance(vlines, list) and i < len(vlines):
-                chart_dict["vlines"] = vlines[i]
-            elif vlines is not None and not isinstance(vlines, list):
+            if vlines is not None and isinstance(vlines, list):
+                chart_dict["vlines"] = vlines[i] if i < len(vlines) else None
+            elif vlines is not None:
                 chart_dict["vlines"] = vlines
 
-            if hlines is not None and isinstance(hlines, list) and i < len(hlines):
-                chart_dict["hlines"] = hlines[i]
-            elif hlines is not None and not isinstance(hlines, list):
+            if hlines is not None and isinstance(hlines, list):
+                chart_dict["hlines"] = hlines[i] if i < len(hlines) else None
+            elif hlines is not None:
                 chart_dict["hlines"] = hlines
 
             if x is not None and isinstance(x, list):
