@@ -4,8 +4,8 @@ from typing import Union, Tuple, Dict, List
 
 import matplotlib.pyplot as plt
 
-from ..config import config, Config
-from ..config.charts import CHART_CONFIGS
+from ...config import config, Config
+from ...config.charts import CHART_CONFIGS
 
 
 # ================================================

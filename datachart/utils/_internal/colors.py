@@ -26,7 +26,7 @@ from typing import List
 import numpy as np
 import matplotlib.colors as colors
 
-from ..constants import COLORS
+from ...constants import COLORS
 
 
 # ===============================================

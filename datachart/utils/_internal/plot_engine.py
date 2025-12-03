@@ -7,9 +7,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 
-from ..utils.colors import create_color_cycle, get_colormap
-from ..utils.stats import minimum, maximum
-from ..utils.attrs import (
+from .colors import create_color_cycle, get_colormap
+from ..stats import minimum, maximum
+from .config_helpers import (
     get_subplot_config,
     get_attr_value,
     get_area_style,
@@ -29,7 +29,7 @@ from ..utils.attrs import (
     configure_labels,
 )
 
-from ..typings import (
+from ...typings import (
     LineChartAttrs,
     BarSingleChartAttrs,
     HistogramSingleChartAttrs,
@@ -38,8 +38,8 @@ from ..typings import (
     HLinePlotAttrs,
     VLinePlotAttrs,
 )
-from ..constants import FIG_SIZE, ORIENTATION, VALFMT, SCALE
-from ..config import config
+from ...constants import FIG_SIZE, ORIENTATION, VALFMT, SCALE
+from ...config import config
 
 # ================================================
 # Defaults
@@ -918,3 +918,4 @@ def plot_heatmap(
                 fraction=0.1,
                 pad=0.05,
             )
+

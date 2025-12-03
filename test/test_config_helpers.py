@@ -1,7 +1,7 @@
 import unittest
 
 from datachart.config import config as _config
-from datachart.utils.attrs import (
+from datachart.utils._internal.config_helpers import (
     get_attr_value,
     create_config_dict,
     get_subplot_config,

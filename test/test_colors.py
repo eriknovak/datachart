@@ -1,6 +1,6 @@
 import unittest
 
-from datachart.utils.colors import (
+from datachart.utils._internal.colors import (
     get_color_scale,
     get_discrete_colors,
     COLOR_SCALE_MAPPING,

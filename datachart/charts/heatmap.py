@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from ..utils.charts import chart_plot_wrapper, plot_heatmap
+from ..utils._internal.plot_engine import chart_plot_wrapper, plot_heatmap
 from ..typings import HeatmapChartAttrs
 
 # ================================================
