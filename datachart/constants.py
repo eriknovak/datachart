@@ -349,6 +349,7 @@ class COLORS:
     PuBuGn = "PuBuGn"
 
     # Diverging
+    GnBu = "GnBu"
     RdBu = "RdBu"
     BrBG = "BrBG"
     PuOr = "PuOr"
