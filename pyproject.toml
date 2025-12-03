@@ -13,18 +13,17 @@ dynamic = ["dependencies", "version"]
 keywords = ["python", "dataviz", "visualization"]
 classifiers = [
     "Intended Audience :: Science/Research",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Visualization",
     "Topic :: Multimedia :: Graphics",
     "Framework :: Matplotlib",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 
 [project.urls]
 Source = "https://github.com/eriknovak/datachart"
