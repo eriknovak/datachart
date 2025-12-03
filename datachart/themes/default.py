@@ -9,7 +9,7 @@ from ..constants import (
 
 DEFAULT_THEME: StyleAttrs = {
     # general color style
-    "color_general_singular": COLORS.Blue,
+    "color_general_singular": COLORS.Blues,
     "color_general_multiple": COLORS.Spectral,
     # general font style
     "font_general_family": "sans-serif",
@@ -104,7 +104,7 @@ DEFAULT_THEME: StyleAttrs = {
     "plot_hline_width": 1,
     "plot_hline_alpha": 1.0,
     # plot heatmap style
-    "plot_heatmap_cmap": COLORS.Blue,
+    "plot_heatmap_cmap": COLORS.Blues,
     "plot_heatmap_alpha": 1.0,
     "plot_heatmap_font_size": 9,
     "plot_heatmap_font_color": "#000000",

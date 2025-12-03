@@ -284,57 +284,94 @@ class HISTOGRAM_TYPE:
 
 
 class COLORS:
-    """The predefined colors.
+    """The predefined colors using pypalettes (https://y-sunflower.github.io/pypalettes/).
+
+    All palette names are valid pypalettes identifiers. You can use any of the 2500+
+    palettes available in pypalettes by passing the palette name as a string.
 
     Examples:
         >>> from datachart.constants import COLORS
-        >>> COLORS.Blue
-        'blue'
+        >>> COLORS.Blues
+        'Blues'
 
     Attributes:
-        Blue (str): The single-hue blue color. Equals to `"blue"`.
-        Green (str): The single-hue green color. Equals to `"green"`.
-        Orange (str): The single-hue orange color. Equals to `"orange"`.
-        Purple (str): The single-hue purple color. Equals to `"purple"`.
-        Grey (str): The single-hue grey color. Equals to `"grey"`.
-        YlGnBu (str): The multi-hue yellow-green-blue colors. Equals to `"ylgnbu"`.
-        YlGn (str): The multi-hue yellow-green colors. Equals to `"ylgn"`.
-        BuGn (str): The multi-hue blue-green colors. Equals to `"bugn"`.
-        GnBu (str): The multi-hue green-blue colors. Equals to `"gnbu"`.
-        PuBu (str): The multi-hue purple-blue colors. Equals to `"pubu"`.
-        RdPu (str): The diverging red-purple colors. Equals to `"rdbn"`.
-        RdYlBu (str): The diverging red-yellow-blue colors. Equals to `"rdylbu"`.
-        BrNg (str): The diverging brown-grey colors. Equals to `"brng"`.
-        PuGn (str): The diverging purple-green colors. Equals to `"pugn"`.
-        OrPu (str): The diverging orange-purple colors. Equals to `"puor"`.
-        RdGy (str): The diverging red-gray colors. Equals to `"rdgy"`.
-        RdYlGn (str): The diverging red-yellow-green colors. Equals to `"rdylgn"`.
-        Spectral (str): The diverging spectral colors. Equals to `"spectral"`.
-        MixedLight (str): The quantitative light color mix. Equals to `"mixed_light"`.
-        MixedDark (str): The quantitative dark color mix. Equals to ` "mixed_dark"`.
+        # Sequential (Single-hue)
+        Blues (str): Sequential blue palette. Equals to `"Blues"`.
+        Greens (str): Sequential green palette. Equals to `"Greens"`.
+        Oranges (str): Sequential orange palette. Equals to `"Oranges"`.
+        Purples (str): Sequential purple palette. Equals to `"Purples"`.
+        Reds (str): Sequential red palette. Equals to `"Reds"`.
+
+        # Sequential (Multi-hue)
+        Sunset2 (str): Multi-hue sunset palette. Equals to `"Sunset2"`.
+        YlGnBu (str): Multi-hue yellow-green-blue palette. Equals to `"YlGnBu"`.
+        YlOrRd (str): Multi-hue yellow-orange-red palette. Equals to `"YlOrRd"`.
+        PuBuGn (str): Multi-hue purple-blue-green palette. Equals to `"PuBuGn"`.
+
+        # Diverging
+        RdBu (str): Diverging red-blue palette. Equals to `"RdBu"`.
+        BrBG (str): Diverging brown-blue-green palette. Equals to `"BrBG"`.
+        PuOr (str): Diverging purple-orange palette. Equals to `"PuOr"`.
+        Spectral (str): Diverging spectral palette. Equals to `"Spectral"`.
+        RdYlBu (str): Diverging red-yellow-blue palette. Equals to `"RdYlBu"`.
+        RdYlGn (str): Diverging red-yellow-green palette. Equals to `"RdYlGn"`.
+
+        # Categorical
+        Pastel (str): Soft pastel categorical palette. Equals to `"Pastel"`.
+        Set2 (str): ColorBrewer Set2 categorical palette. Equals to `"Set2"`.
+        Accent (str): ColorBrewer Accent categorical palette. Equals to `"Accent"`.
+        Dark2 (str): ColorBrewer Dark2 categorical palette. Equals to `"Dark2"`.
+        Paired (str): ColorBrewer Paired categorical palette (high contrast). Equals to `"Paired"`.
+        Set1 (str): ColorBrewer Set1 categorical palette (high contrast). Equals to `"Set1"`.
+
+        # Grayscale (print-friendly)
+        Greys (str): Grayscale palette for monochrome visualizations. Equals to `"Greys"`.
+
+        # Color-blind friendly / Accessible
+        Viridis (str): Perceptually uniform, color-blind friendly. Equals to `"Viridis"`.
+        Cividis (str): Color-blind friendly (optimized for CVD). Equals to `"Cividis"`.
+        Inferno (str): Perceptually uniform, color-blind friendly. Equals to `"Inferno"`.
+        Plasma (str): Perceptually uniform, color-blind friendly. Equals to `"Plasma"`.
 
     """
 
-    Blue = "blue"
-    Green = "green"
-    Orange = "orange"
-    Purple = "purple"
-    Grey = "grey"
-    YlGnBu = "ylgnbu"
-    YlGn = "ylgn"
-    BuGn = "bugn"
-    GnBu = "gnbu"
-    PuBu = "pubu"
-    RdBn = "rdbn"
-    RdYlBu = "rdylbu"
-    BrGn = "brgn"
-    PuGn = "pugn"
-    OrPu = "orpu"
-    RdGy = "rdgy"
-    RdYlGn = "rdylgn"
-    Spectral = "spectral"
-    MixedLight = "mixed_light"
-    MixedDark = "mixed_dark"
+    # Sequential (Single-hue)
+    Blues = "Blues"
+    Greens = "Greens"
+    Oranges = "Oranges"
+    Purples = "Purples"
+    Reds = "Reds"
+
+    # Sequential (Multi-hue)
+    Sunset2 = "Sunset2"
+    YlGnBu = "YlGnBu"
+    YlOrRd = "YlOrRd"
+    PuBuGn = "PuBuGn"
+
+    # Diverging
+    RdBu = "RdBu"
+    BrBG = "BrBG"
+    PuOr = "PuOr"
+    Spectral = "Spectral"
+    RdYlBu = "RdYlBu"
+    RdYlGn = "RdYlGn"
+
+    # Categorical
+    Pastel = "Pastel"
+    Set2 = "Set2"
+    Accent = "Accent"
+    Dark2 = "Dark2"
+    Paired = "Paired"
+    Set1 = "Set1"
+
+    # Grayscale (print-friendly)
+    Greys = "Greys"
+
+    # Color-blind friendly / Accessible
+    Viridis = "Viridis"
+    Cividis = "Cividis"
+    Inferno = "Inferno"
+    Plasma = "Plasma"
 
 
 class NORMALIZE:

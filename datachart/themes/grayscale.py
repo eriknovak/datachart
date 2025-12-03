@@ -9,8 +9,8 @@ from ..constants import (
 
 GREYSCALE_THEME: StyleAttrs = {
     # general color style
-    "color_general_singular": COLORS.Grey,
-    "color_general_multiple": COLORS.Grey,
+    "color_general_singular": COLORS.Greys,
+    "color_general_multiple": COLORS.Greys,
     # general font style
     "font_general_family": "sans-serif",
     "font_general_sansserif": ["Helvetica", "Arial"],
@@ -104,7 +104,7 @@ GREYSCALE_THEME: StyleAttrs = {
     "plot_hline_width": 1,
     "plot_hline_alpha": 1.0,
     # plot heatmap style
-    "plot_heatmap_cmap": COLORS.Grey,
+    "plot_heatmap_cmap": COLORS.Greys,
     "plot_heatmap_alpha": 1.0,
     "plot_heatmap_font_size": 9,
     "plot_heatmap_font_color": "#000000",
