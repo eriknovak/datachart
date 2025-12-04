@@ -94,6 +94,7 @@ nav:
       - how-to-guides/charts/index.md
       - Line Chart: how-to-guides/charts/linechart.ipynb
       - Bar Chart: how-to-guides/charts/barchart.ipynb
+      - Scatter Chart: how-to-guides/charts/scatterchart.ipynb
       - Histogram: how-to-guides/charts/histogram.ipynb
       - Heatmap: how-to-guides/charts/heatmap.ipynb
     - Utility:
