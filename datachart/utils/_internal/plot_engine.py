@@ -1102,6 +1102,10 @@ def _draw_regression(
     """
     from scipy import stats as scipy_stats
 
+    # Check if all x values are identical - cannot calculate regression in this case
+    if len(x) == 0 or len(np.unique(x)) <= 1:
+        return
+
     # Fit linear regression
     slope, intercept, r_value, p_value, std_err = scipy_stats.linregress(x, y)
 
@@ -1214,18 +1218,6 @@ def plot_scatter_chart(
                 group_style["c"] = group_color
 
                 ax.scatter(x_group, y_group, s=sizes, label=str(hue_val), **group_style)
-
-                # Draw regression per group if requested
-                if settings["show_regression"]:
-                    ci_level = settings["ci_level"] or DEFAULT_CI_LEVEL
-                    _draw_regression(
-                        ax,
-                        x_group,
-                        y_group,
-                        color=group_color,
-                        show_ci=settings["show_ci"],
-                        ci_level=ci_level,
-                    )
         else:
             # No hue grouping - single scatter
             if size_data is not None:
@@ -1268,6 +1260,17 @@ def plot_scatter_chart(
         # Show overall correlation for hue-grouped data
         if hue_data is not None and settings["show_correlation"]:
             _draw_correlation(ax, x_data, y_data)
+
+        # Show overall regression for hue-grouped data
+        if hue_data is not None and settings["show_regression"]:
+            ci_level = settings["ci_level"] or DEFAULT_CI_LEVEL
+            _draw_regression(
+                ax,
+                x_data,
+                y_data,
+                show_ci=settings["show_ci"],
+                ci_level=ci_level,
+            )
 
         # Apply scales
         if settings["scalex"]:
