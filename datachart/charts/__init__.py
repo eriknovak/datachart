@@ -13,6 +13,8 @@ Methods:
         Creates the heatmap.
     ScatterChart(attrs):
         Creates the scatter chart.
+    BoxPlot(attrs):
+        Creates the box plot.
 
 """
 
@@ -21,6 +23,7 @@ from .bar_chart import BarChart
 from .histogram import Histogram
 from .heatmap import Heatmap
 from .scatter_chart import ScatterChart
+from .box_plot import BoxPlot
 
 
-__all__ = ["LineChart", "BarChart", "Histogram", "Heatmap", "ScatterChart"]
+__all__ = ["LineChart", "BarChart", "Histogram", "Heatmap", "ScatterChart", "BoxPlot"]

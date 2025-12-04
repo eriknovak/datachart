@@ -21,4 +21,8 @@ CHART_CONFIGS = {
         "multiplot": True,
         "subplots": True,
     },
+    "boxplot": {
+        "multiplot": True,
+        "subplots": True,
+    },
 }

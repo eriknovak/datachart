@@ -2,23 +2,23 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import chart_plot_wrapper, plot_bar_chart
+from ..utils._internal.plot_engine import chart_plot_wrapper, plot_box_plot
 from ..utils._internal.chart_builder import build_charts_structure, build_attrs_dict
 from ..typings import (
-    BarDataPointAttrs,
-    BarStyleAttrs,
+    BoxDataPointAttrs,
+    BoxStyleAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
 )
-from ..constants import FIG_SIZE, SHOW_GRID, ORIENTATION, SCALE
+from ..constants import FIG_SIZE, SHOW_GRID, ORIENTATION
 
 # ================================================
 # Main Chart Definition
 # ================================================
 
 
-def BarChart(
-    data: Union[List[BarDataPointAttrs], List[List[BarDataPointAttrs]]],
+def BoxPlot(
+    data: Union[List[BoxDataPointAttrs], List[List[BoxDataPointAttrs]]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
@@ -31,15 +31,15 @@ def BarChart(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
-    show_yerr: Optional[bool] = None,
+    show_outliers: Optional[bool] = None,
+    show_notch: Optional[bool] = None,
     aspect_ratio: Optional[str] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
-    scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,
     sharey: Optional[bool] = None,
-    style: Optional[Union[BarStyleAttrs, List[Optional[BarStyleAttrs]]]] = None,
+    style: Optional[Union[BoxStyleAttrs, List[Optional[BoxStyleAttrs]]]] = None,
     xticks: Optional[
         Union[List[Union[int, float]], List[List[Union[int, float]]]]
     ] = None,
@@ -65,29 +65,30 @@ def BarChart(
         ]
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
-    y: Optional[Union[str, List[Optional[str]]]] = None,
-    yerr: Optional[Union[str, List[Optional[str]]]] = None,
+    value: Optional[Union[str, List[Optional[str]]]] = None,
 ) -> plt.Figure:
-    """Creates the bar chart.
+    """Creates the box plot.
 
     Examples:
-        >>> from datachart.charts import BarChart
-        >>> figure = BarChart(
+        >>> from datachart.charts import BoxPlot
+        >>> figure = BoxPlot(
         ...     data=[
-        ...         {"label": "cat1", "y": 5},
-        ...         {"label": "cat2", "y": 10},
-        ...         {"label": "cat3", "y": 15},
-        ...         {"label": "cat4", "y": 20},
-        ...         {"label": "cat5", "y": 25}
+        ...         {"label": "Group A", "value": 10},
+        ...         {"label": "Group A", "value": 15},
+        ...         {"label": "Group A", "value": 12},
+        ...         {"label": "Group B", "value": 20},
+        ...         {"label": "Group B", "value": 25},
+        ...         {"label": "Group B", "value": 22},
         ...     ],
-        ...     title="Basic Bar Chart",
-        ...     xlabel="LABEL",
-        ...     ylabel="Y"
+        ...     title="Basic Box Plot",
+        ...     xlabel="Group",
+        ...     ylabel="Value"
         ... )
 
     Args:
-        data: The data points for the bar chart(s). Can be a single list of data points
+        data: The data points for the box plot(s). Can be a single list of data points
             for one chart, or a list of lists for multiple charts/subplots.
+            Each data point should have a `label` (category) and `value` (numeric).
         title: The title of the chart.
         xlabel: The x-axis label.
         ylabel: The y-axis label.
@@ -99,15 +100,15 @@ def BarChart(
         ymax: The maximum y-axis value.
         show_legend: Whether to show the legend.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
-        show_yerr: Whether to show y-axis error bars.
+        show_outliers: Whether to show outliers. Defaults to True.
+        show_notch: Whether to show notched boxes for median confidence interval.
         aspect_ratio: The aspect ratio of the chart.
-        orientation: The orientation of the bars (vertical or horizontal).
-        scaley: The y-axis scale (e.g., "log", "linear").
+        orientation: The orientation of the boxes (vertical or horizontal).
         subplots: Whether to create separate subplots for each chart.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.
         sharey: Whether to share the y-axis in subplots.
-        style: Style configuration(s) for the bar(s).
+        style: Style configuration(s) for the box(es).
         xticks: Custom x-axis tick positions.
         xticklabels: Custom x-axis tick labels.
         xtickrotate: Rotation angle for x-axis tick labels.
@@ -116,12 +117,11 @@ def BarChart(
         ytickrotate: Rotation angle for y-axis tick labels.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
-        label: The key name in data for label values (default: "label").
-        y: The key name in data for y-axis values (default: "y").
-        yerr: The key name in data for y-axis error values (default: "yerr").
+        label: The key name in data for label/category values (default: "label").
+        value: The key name in data for numeric values (default: "value").
 
     Returns:
-        The figure containing the bar chart.
+        The figure containing the box plot.
 
     """
     # Build the charts structure using shared utility
@@ -138,13 +138,12 @@ def BarChart(
         vlines=vlines,
         hlines=hlines,
         label=label,
-        y=y,
-        yerr=yerr,
+        value=value,
     )
 
     # Build the attrs dict using shared utility
     attrs = build_attrs_dict(
-        "barchart",
+        "boxplot",
         charts,
         title=title,
         xlabel=xlabel,
@@ -161,9 +160,9 @@ def BarChart(
         max_cols=max_cols,
         sharex=sharex,
         sharey=sharey,
-        show_yerr=show_yerr,
+        show_outliers=show_outliers,
+        show_notch=show_notch,
         orientation=orientation,
-        scaley=scaley,
     )
 
-    return chart_plot_wrapper(plot_bar_chart)(attrs)
+    return chart_plot_wrapper(plot_box_plot)(attrs)

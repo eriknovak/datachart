@@ -10,8 +10,9 @@ It offers a wide range of chart types, including line charts, bar charts, histog
 
 | Chart                               | Description                        |
 | :---------------------------------- | :--------------------------------- |
-| [Line Chart](linechart.ipynb)       | The showcase of the line chart.    |
 | [Bar Chart](barchart.ipynb)         | The showcase of the bar chart.     |
-| [Scatter Chart](scatterchart.ipynb) | The showcase of the scatter chart. |
-| [Histogram](histogram.ipynb)        | The showcase of the histogram.     |
+| [Box Plot](boxplot.ipynb)           | The showcase of the box plot.      |
 | [Heatmap](heatmap.ipynb)            | The showcase of the heatmap.       |
+| [Histogram](histogram.ipynb)        | The showcase of the histogram.     |
+| [Line Chart](linechart.ipynb)       | The showcase of the line chart.    |
+| [Scatter Chart](scatterchart.ipynb) | The showcase of the scatter chart. |

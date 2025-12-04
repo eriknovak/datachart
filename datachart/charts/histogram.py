@@ -34,7 +34,7 @@ def Histogram(
     show_density: Optional[bool] = None,
     show_cumulative: Optional[bool] = None,
     aspect_ratio: Optional[str] = None,
-    orientation: Optional[Union[ORIENTATION, str]] = None,
+    orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
     num_bins: Optional[int] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,

@@ -24,6 +24,11 @@ from .config_helpers import (
     get_heatmap_font_style,
     get_scatter_style,
     get_regression_style,
+    get_box_style,
+    get_box_outlier_style,
+    get_box_median_style,
+    get_box_whisker_style,
+    get_box_cap_style,
     configure_axes_spines,
     configure_axis_ticks_style,
     configure_axis_ticks_position,
@@ -37,18 +42,12 @@ from ...typings import (
     HistogramSingleChartAttrs,
     HeatmapChartAttrs,
     ScatterSingleChartAttrs,
+    BoxSingleChartAttrs,
     ChartAttrs,
     HLinePlotAttrs,
     VLinePlotAttrs,
 )
-from ...constants import (
-    FIG_SIZE,
-    ORIENTATION,
-    VALFMT,
-    SCALE,
-    ASPECT_RATIO,
-    COLORBAR_LOCATION,
-)
+from ...constants import FIG_SIZE, ORIENTATION, VALFMT, ASPECT_RATIO, COLORBAR_LOCATION
 from ...config import config
 
 # ================================================
@@ -181,6 +180,8 @@ settings_attr_mapping = [
     {"name": "show_regression", "default": None},
     {"name": "show_ci", "default": None},
     {"name": "show_correlation", "default": None},
+    {"name": "show_outliers", "default": None},
+    {"name": "show_notch", "default": None},
     # chart specific attributes
     {"name": "orientation", "default": None},
     {"name": "scalex", "default": None},
@@ -207,6 +208,8 @@ settings_chart_mapping = [
     "show_regression",
     "show_ci",
     "show_correlation",
+    "show_outliers",
+    "show_notch",
     "orientation",
     "scalex",
     "scaley",
@@ -1258,6 +1261,163 @@ def plot_scatter_chart(
             ax.set(adjustable="box", aspect=settings["aspect_ratio"])
 
     # Show legend
+    if has_multi_subplots and settings["show_legend"]:
+        warnings.warn("The `show_legend` flag will be ignored for multi-subplots.")
+
+    if not has_multi_subplots and settings["show_legend"]:
+        axes[0].legend(title="Legend", **get_legend_style())
+
+
+# ================================================
+# Plot Box Plot
+# ================================================
+
+
+def plot_box_plot(
+    figure: plt.Figure,
+    axes: List[plt.Axes],
+    charts: List[BoxSingleChartAttrs],
+    settings: dict,
+) -> None:
+    """Plot the box plot.
+
+    Args:
+        figure: The figure.
+        axes: The axes list.
+        charts: The charts data.
+        settings: The general settings.
+
+    """
+
+    # assert the configuration
+    assert_chart_settings(
+        settings=settings,
+        supported_settings=[
+            "aspect_ratio",
+            "xmin",
+            "xmax",
+            "ymin",
+            "ymax",
+            "show_legend",
+            "show_grid",
+            "show_outliers",
+            "show_notch",
+            "orientation",
+        ],
+    )
+
+    has_multi_subplots = has_multiple_subplots(axes)
+
+    # Box plots require subplots=True when multiple datasets are provided
+    if charts.shape[0] > 1 and not has_multi_subplots:
+        raise ValueError(
+            "Multiple box plot datasets require `subplots=True`. "
+            "Box plots do not support overlaying multiple datasets on a single axis."
+        )
+
+    orientation = settings.get("orientation", DEFAULT_ORIENTATION)
+    show_outliers = settings.get("show_outliers", True)
+    show_notch = settings.get("show_notch", False)
+
+    color_cycle = custom_color_cycle(has_multi_subplots, charts.shape[0])
+
+    for chart, ax in zip(charts, axes):
+        # Get chart style attributes
+        style = chart.get("style", {})
+
+        # Retrieve chart data and group by label
+        label_attr = get_attr_value("label", chart, "label")
+        value_attr = get_attr_value("value", chart, "value")
+
+        data = chart.get("data", [])
+        if isinstance(data, list):
+            # Group values by label
+            grouped_data = {}
+            for d in data:
+                lbl = d.get(label_attr)
+                val = d.get(value_attr)
+                if lbl is not None and val is not None:
+                    if lbl not in grouped_data:
+                        grouped_data[lbl] = []
+                    grouped_data[lbl].append(val)
+
+            labels = list(grouped_data.keys())
+            values = [grouped_data[lbl] for lbl in labels]
+        else:
+            labels = []
+            values = []
+
+        if len(values) == 0:
+            warnings.warn("No data points found for box plot.")
+            continue
+
+        # Get style configurations
+        chart_hash = get_chart_hash(chart)
+        box_color = color_cycle[chart_hash].get("color")
+        box_style = get_box_style(style)
+        outlier_style = get_box_outlier_style(style)
+        median_style = get_box_median_style(style)
+        whisker_style = get_box_whisker_style(style)
+        cap_style = get_box_cap_style(style)
+
+        # Set default color if not specified
+        if "facecolor" not in box_style or box_style.get("facecolor") is None:
+            box_style["facecolor"] = box_color
+
+        # Build boxplot props
+        boxprops = {k: v for k, v in box_style.items() if v is not None}
+        flierprops = {k: v for k, v in outlier_style.items() if v is not None}
+        medianprops = {k: v for k, v in median_style.items() if v is not None}
+        whiskerprops = {k: v for k, v in whisker_style.items() if v is not None}
+        capprops = {k: v for k, v in cap_style.items() if v is not None}
+
+        bp = ax.boxplot(
+            values,
+            orientation=orientation,
+            patch_artist=True,
+            showfliers=show_outliers if show_outliers is not None else True,
+            notch=show_notch if show_notch is not None else False,
+            boxprops=boxprops if boxprops else None,
+            flierprops=flierprops if flierprops else None,
+            medianprops=medianprops if medianprops else None,
+            whiskerprops=whiskerprops if whiskerprops else None,
+            capprops=capprops if capprops else None,
+        )
+
+        # Apply facecolor and alpha to each box patch
+        alpha = box_style.get("alpha", 1.0)
+        for patch in bp["boxes"]:
+            if box_style.get("facecolor"):
+                patch.set_facecolor(box_style["facecolor"])
+            if alpha is not None:
+                patch.set_alpha(alpha)
+
+        # Set tick labels
+        if orientation == ORIENTATION.HORIZONTAL:
+            ax.set_yticks(range(1, len(labels) + 1))
+            ax.set_yticklabels(labels)
+        elif orientation == ORIENTATION.VERTICAL:
+            ax.set_xticks(range(1, len(labels) + 1))
+            ax.set_xticklabels(labels)
+
+        if settings["show_grid"]:
+            ax.grid(axis=settings["show_grid"], **get_grid_style(style))
+
+        # Draw vlines/hlines
+        if "vlines" in chart:
+            plot_vlines(ax, chart["vlines"])
+        if "hlines" in chart:
+            plot_hlines(ax, chart["hlines"])
+
+        # Configure axis
+        configure_axis_ticks_position(ax, chart)
+        configure_axis_limits(ax, settings)
+
+        # Set the aspect ratio of the chart
+        if settings["aspect_ratio"]:
+            ax.set(adjustable="box", aspect=settings["aspect_ratio"])
+
+    # Show legend in the last subplot
     if has_multi_subplots and settings["show_legend"]:
         warnings.warn("The `show_legend` flag will be ignored for multi-subplots.")
 

@@ -429,6 +429,108 @@ def get_regression_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Box Plot Style
+# -------------------------------------
+
+
+def get_box_style(chart_style: dict) -> dict:
+    """Get the box plot style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The box plot style setting.
+
+    """
+
+    config_attrs = [
+        ("facecolor", "plot_box_color"),
+        ("alpha", "plot_box_alpha"),
+        ("linewidth", "plot_box_linewidth"),
+        ("edgecolor", "plot_box_edgecolor"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+def get_box_outlier_style(chart_style: dict) -> dict:
+    """Get the box plot outlier style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The outlier style setting.
+
+    """
+
+    config_attrs = [
+        ("marker", "plot_box_outlier_marker"),
+        ("markersize", "plot_box_outlier_size"),
+        ("markerfacecolor", "plot_box_outlier_color"),
+        ("markeredgecolor", "plot_box_outlier_color"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+def get_box_median_style(chart_style: dict) -> dict:
+    """Get the box plot median line style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The median line style setting.
+
+    """
+
+    config_attrs = [
+        ("color", "plot_box_median_color"),
+        ("linewidth", "plot_box_median_linewidth"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+def get_box_whisker_style(chart_style: dict) -> dict:
+    """Get the box plot whisker style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The whisker style setting.
+
+    """
+
+    config_attrs = [
+        ("linewidth", "plot_box_whisker_linewidth"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+def get_box_cap_style(chart_style: dict) -> dict:
+    """Get the box plot cap style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The cap style setting.
+
+    """
+
+    config_attrs = [
+        ("linewidth", "plot_box_cap_linewidth"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+# -------------------------------------
 # Legend Style
 # -------------------------------------
 

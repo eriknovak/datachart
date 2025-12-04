@@ -25,6 +25,9 @@ Classes:
     ScatterChartAttrs: The scatter chart attributes.
     ScatterSingleChartAttrs: The single chart attributes for the scatter chart.
     ScatterDataPointAttrs: The data point attributes for the scatter chart.
+    BoxChartAttrs: The box plot chart attributes.
+    BoxSingleChartAttrs: The single chart attributes for the box plot.
+    BoxDataPointAttrs: The data point attributes for the box plot.
 
     StyleAttrs: The style typing.
     ColorGeneralStyleAttrs: The typing for the general color style.
@@ -41,6 +44,7 @@ Classes:
     HeatmapStyleAttrs: The typing for the heatmap style.
     ScatterStyleAttrs: The typing for the scatter chart style.
     RegressionStyleAttrs: The typing for the regression line style.
+    BoxStyleAttrs: The typing for the box plot style.
 
 """
 
@@ -415,6 +419,41 @@ class RegressionStyleAttrs(TypedDict):
     plot_regression_ci_alpha: Union[float, None]
 
 
+class BoxStyleAttrs(TypedDict):
+    """The typing for the box plot style.
+
+    Attributes:
+        plot_box_color (Union[str, None]): The box fill color.
+        plot_box_alpha (Union[float, None]): The alpha value of the box.
+        plot_box_linewidth (Union[int, float, None]): The line width of the box.
+        plot_box_edgecolor (Union[str, None]): The edge color of the box.
+        plot_box_outlier_marker (Union[LINE_MARKER, str, None]): The outlier marker style.
+        plot_box_outlier_size (Union[int, float, None]): The outlier marker size.
+        plot_box_outlier_color (Union[str, None]): The outlier marker color.
+        plot_box_median_color (Union[str, None]): The median line color.
+        plot_box_median_linewidth (Union[int, float, None]): The median line width.
+        plot_box_whisker_linewidth (Union[int, float, None]): The whisker line width.
+        plot_box_cap_linewidth (Union[int, float, None]): The cap line width.
+        plot_xticks_label_rotate (Union[int, float, None]): The label rotation of the xticks.
+        plot_yticks_label_rotate (Union[int, float, None]): The label rotation of the yticks.
+
+    """
+
+    plot_box_color: Union[str, None]
+    plot_box_alpha: Union[float, None]
+    plot_box_linewidth: Union[int, float, None]
+    plot_box_edgecolor: Union[str, None]
+    plot_box_outlier_marker: Union[LINE_MARKER, str, None]
+    plot_box_outlier_size: Union[int, float, None]
+    plot_box_outlier_color: Union[str, None]
+    plot_box_median_color: Union[str, None]
+    plot_box_median_linewidth: Union[int, float, None]
+    plot_box_whisker_linewidth: Union[int, float, None]
+    plot_box_cap_linewidth: Union[int, float, None]
+    plot_xticks_label_rotate: Union[int, float, None]
+    plot_yticks_label_rotate: Union[int, float, None]
+
+
 class StyleAttrs(
     ColorGeneralStyleAttrs,
     FontStyleAttrs,
@@ -430,6 +469,7 @@ class StyleAttrs(
     HeatmapStyleAttrs,
     ScatterStyleAttrs,
     RegressionStyleAttrs,
+    BoxStyleAttrs,
 ):
     """The style attributes. Combines all style typings."""
 
@@ -938,6 +978,83 @@ class ScatterChartAttrs(ChartCommonAttrs):
 
 
 # ================================================
+# Box Plot Attributes
+# ================================================
+
+
+class BoxDataPointAttrs(TypedDict):
+    """The data point attributes for the box plot.
+
+    Attributes:
+        label (str): The category label.
+        value (Union[int, float]): The numeric value.
+
+    """
+
+    label: str
+    value: Union[int, float]
+
+
+class BoxSingleChartAttrs(TypedDict):
+    """The single chart attributes for the box plot.
+
+    Attributes:
+        data (List[BoxDataPointAttrs]): The list of data points defining the box plot.
+        subtitle (Union[str, None]): The subtitle of the box plot. Also used as the label in the legend.
+        xlabel (Union[str, None]): The xlabel of the box plot.
+        ylabel (Union[str, None]): The ylabel of the box plot.
+        style (Union[BoxStyleAttrs, None]): The style of the box plot.
+        xticks (Union[int, float, None]): The xtick positions list.
+        xticklabels (Union[List[str], None]): The xtick labels.
+        xtickrotate (Union[int, None]): The xtick rotation value.
+        yticks (Union[int, float, None]): The ytick position list.
+        yticklabels (Union[List[str], None]): The ytick labels.
+        ytickrotate (Union[int, None]): The ytick rotation value.
+        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
+        label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
+        value (Union[str, None]): The key name in `data` that contains the value. Defaults to `"value"`.
+
+    """
+
+    data: List[BoxDataPointAttrs]
+    subtitle: Union[str, None]
+    xlabel: Union[str, None]
+    ylabel: Union[str, None]
+    style: Union[BoxStyleAttrs, None]
+
+    xticks: Union[int, float, None]
+    xticklabels: Union[List[str], None]
+    xtickrotate: Union[int, None]
+    yticks: Union[int, float, None]
+    yticklabels: Union[List[str], None]
+    ytickrotate: Union[int, None]
+
+    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
+    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
+
+    label: Union[str, None]  # the name of the label attribute in data
+    value: Union[str, None]  # the name of the value attribute in data
+
+
+class BoxChartAttrs(ChartCommonAttrs):
+    """The box plot chart attributes.
+
+    Attributes:
+        charts (Union[BoxSingleChartAttrs, List[BoxSingleChartAttrs]]): The box plot definitions.
+        show_outliers (Union[bool, None]): Whether or not to show outliers.
+        show_notch (Union[bool, None]): Whether or not to show notched boxes for median CI.
+        orientation (Union[ORIENTATION, str, None]): The orientation of the box plots.
+
+    """
+
+    charts: Union[BoxSingleChartAttrs, List[BoxSingleChartAttrs]]
+    show_outliers: Union[bool, None]
+    show_notch: Union[bool, None]
+    orientation: Union[ORIENTATION, str, None]
+
+
+# ================================================
 # Chart Attributes
 # ================================================
 
@@ -948,5 +1065,6 @@ ChartAttrs = Union[
     HistogramChartAttrs,
     HeatmapChartAttrs,
     ScatterChartAttrs,
+    BoxChartAttrs,
 ]
 """The union of all chart attributes."""

@@ -92,11 +92,12 @@ nav:
     - how-to-guides/index.md
     - Charts:
       - how-to-guides/charts/index.md
-      - Line Chart: how-to-guides/charts/linechart.ipynb
       - Bar Chart: how-to-guides/charts/barchart.ipynb
-      - Scatter Chart: how-to-guides/charts/scatterchart.ipynb
-      - Histogram: how-to-guides/charts/histogram.ipynb
+      - Box Plot: how-to-guides/charts/boxplot.ipynb
       - Heatmap: how-to-guides/charts/heatmap.ipynb
+      - Histogram: how-to-guides/charts/histogram.ipynb
+      - Line Chart: how-to-guides/charts/linechart.ipynb
+      - Scatter Chart: how-to-guides/charts/scatterchart.ipynb
     - Utility:
       - how-to-guides/utility/index.md
       - Statistics: how-to-guides/utility/stats.ipynb
