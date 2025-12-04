@@ -29,6 +29,15 @@ from .config_helpers import (
     get_box_median_style,
     get_box_whisker_style,
     get_box_cap_style,
+    get_parallel_coords_style,
+    get_parallel_axis_style,
+    get_parallel_tick_style,
+    get_parallel_tick_length,
+    get_parallel_tick_label_style,
+    get_parallel_tick_label_bbox,
+    get_parallel_dim_label_style,
+    get_parallel_dim_label_rotation,
+    get_parallel_dim_label_pad,
     configure_axes_spines,
     configure_axis_ticks_style,
     configure_axis_ticks_position,
@@ -43,6 +52,7 @@ from ...typings import (
     HeatmapChartAttrs,
     ScatterSingleChartAttrs,
     BoxSingleChartAttrs,
+    ParallelCoordsSingleChartAttrs,
     ChartAttrs,
     HLinePlotAttrs,
     VLinePlotAttrs,
@@ -1420,3 +1430,338 @@ def plot_box_plot(
 
     if not has_multi_subplots and settings["show_legend"]:
         axes[0].legend(title="Legend", **get_legend_style())
+
+
+# ================================================
+# Plot Parallel Coordinates
+# ================================================
+
+
+def plot_parallel_coords(
+    figure: plt.Figure,
+    axes: List[plt.Axes],
+    charts: List[ParallelCoordsSingleChartAttrs],
+    settings: dict,
+) -> None:
+    """Plots the parallel coordinates chart.
+
+    Args:
+        figure: The figure.
+        axes: The axes list.
+        charts: The charts data.
+        settings: The general settings.
+
+    """
+
+    # assert the configuration
+    assert_chart_settings(
+        settings=settings,
+        supported_settings=[
+            "aspect_ratio",
+            "show_legend",
+            "show_grid",
+        ],
+    )
+
+    # Parallel coordinates always use a single plot
+    ax = axes[0]
+
+    # Collect all data from all charts
+    all_data = []
+    all_hues = []
+    all_styles = []
+
+    for chart in charts:
+        data = chart.get("data", [])
+        hue_attr = chart.get("hue", "hue")
+        style = chart.get("style", {})
+        dimensions = chart.get("dimensions", None)
+
+        for d in data:
+            all_data.append(d)
+            all_hues.append(d.get(hue_attr, None))
+            all_styles.append(style)
+
+    if len(all_data) == 0:
+        warnings.warn("No data points found for parallel coordinates plot.")
+        return
+
+    # Determine dimensions from first data point if not specified
+    first_chart = charts[0]
+    dimensions = first_chart.get("dimensions", None)
+    hue_attr = first_chart.get("hue", "hue")
+
+    if dimensions is None:
+        # Auto-detect dimensions from first data point (numeric and string, excluding hue)
+        sample = all_data[0]
+        dimensions = [k for k, v in sample.items() if k != hue_attr and v is not None]
+
+    if len(dimensions) < 2:
+        raise ValueError("Parallel coordinates requires at least 2 dimensions.")
+
+    n_dims = len(dimensions)
+
+    # Extract raw values for each dimension and determine if categorical
+    dim_values_raw = {dim: [] for dim in dimensions}
+    for d in all_data:
+        for dim in dimensions:
+            val = d.get(dim, None)
+            dim_values_raw[dim].append(val)
+
+    # Get category_orders if provided
+    category_orders = first_chart.get("category_orders", None) or {}
+
+    # Determine which dimensions are categorical vs numeric
+    dim_is_categorical = {}
+    dim_categories = {}  # For categorical dims: ordered list of unique values
+    dim_category_map = {}  # For categorical dims: value -> normalized position
+
+    for dim in dimensions:
+        values = dim_values_raw[dim]
+        # Check if any non-None value is a string
+        non_none_values = [v for v in values if v is not None]
+        if len(non_none_values) > 0 and isinstance(non_none_values[0], str):
+            dim_is_categorical[dim] = True
+            # Get unique categories
+            unique_cats = set(v for v in values if v is not None)
+
+            # Use custom order if provided, otherwise sort alphabetically
+            if dim in category_orders:
+                # Start with the specified order
+                ordered_cats = [c for c in category_orders[dim] if c in unique_cats]
+                # Add any remaining categories not in the order (sorted)
+                remaining = sorted(unique_cats - set(ordered_cats))
+                categories = ordered_cats + remaining
+            else:
+                categories = sorted(unique_cats)
+
+            dim_categories[dim] = categories
+            # Map categories to normalized positions
+            if len(categories) == 1:
+                dim_category_map[dim] = {categories[0]: 0.5}
+            else:
+                dim_category_map[dim] = {
+                    cat: i / (len(categories) - 1) for i, cat in enumerate(categories)
+                }
+        else:
+            dim_is_categorical[dim] = False
+
+    # Convert values to normalized [0, 1] range
+    dim_values = {}
+    dim_min = {}
+    dim_max = {}
+    normalized = {}
+
+    for dim in dimensions:
+        if dim_is_categorical[dim]:
+            # Map categorical values to normalized positions
+            cat_map = dim_category_map[dim]
+            normalized[dim] = np.array(
+                [
+                    cat_map.get(v, np.nan) if v is not None else np.nan
+                    for v in dim_values_raw[dim]
+                ]
+            )
+            dim_min[dim] = 0
+            dim_max[dim] = len(dim_categories[dim]) - 1
+        else:
+            # Numeric dimension
+            dim_values[dim] = np.array(
+                [
+                    v if v is not None and isinstance(v, (int, float)) else np.nan
+                    for v in dim_values_raw[dim]
+                ],
+                dtype=float,
+            )
+            dim_min[dim] = np.nanmin(dim_values[dim])
+            dim_max[dim] = np.nanmax(dim_values[dim])
+            range_val = dim_max[dim] - dim_min[dim]
+            if range_val == 0:
+                normalized[dim] = np.zeros_like(dim_values[dim])
+            else:
+                normalized[dim] = (dim_values[dim] - dim_min[dim]) / range_val
+
+    # Create color mapping for hue categories
+    unique_hues = list(set(h for h in all_hues if h is not None))
+    unique_hues.sort()
+
+    # Get hue color palette from config
+    hue_palette = config.get("color_parallel_hue", "Set1")
+
+    if len(unique_hues) > 0:
+        color_cycle = create_color_cycle(hue_palette, len(unique_hues))
+        hue_colors = {hue: color_cycle[i]["color"] for i, hue in enumerate(unique_hues)}
+        default_color = color_cycle[0]["color"]
+    else:
+        hue_colors = {}
+        singular_cycle = create_color_cycle(hue_palette, 1)
+        default_color = singular_cycle[0]["color"]
+
+    # Set up x positions for the vertical axes
+    x_positions = np.arange(n_dims)
+
+    # Get shared style from first chart (used for axis, tick, and label styling)
+    shared_style = charts[0].get("style", {}) if charts else {}
+
+    # Get style configurations for axis, ticks, and labels
+    axis_style = get_parallel_axis_style(shared_style)
+    tick_style = get_parallel_tick_style(shared_style)
+    tick_length = get_parallel_tick_length(shared_style)
+    tick_label_style = get_parallel_tick_label_style(shared_style)
+    tick_label_bbox = get_parallel_tick_label_bbox(shared_style)
+    dim_label_style = get_parallel_dim_label_style(shared_style)
+    dim_label_rotation = get_parallel_dim_label_rotation(shared_style)
+    dim_label_pad = get_parallel_dim_label_pad(shared_style)
+
+    # Draw lines for each data point
+    for i, (data_point, hue_val, style) in enumerate(
+        zip(all_data, all_hues, all_styles)
+    ):
+        y_vals = [normalized[dim][i] for dim in dimensions]
+
+        # Determine color
+        if hue_val is not None and hue_val in hue_colors:
+            line_color = hue_colors[hue_val]
+        else:
+            line_color = default_color
+
+        # Get style configuration
+        line_style = get_parallel_coords_style(style)
+        if "color" not in line_style or line_style.get("color") is None:
+            line_style["color"] = line_color
+
+        # Draw data lines
+        ax.plot(x_positions, y_vals, **line_style)
+
+    # Configure x-axis with dimension labels
+    ax.set_xticks(x_positions)
+    ax.set_xlim(-0.1, n_dims - 0.9)
+
+    # Apply dimension label styling to x-axis tick labels
+    ax.set_xticklabels(
+        dimensions,
+        rotation=dim_label_rotation,
+        **dim_label_style,
+    )
+
+    # Set y-axis limits with padding to ensure edge tick marks are visible
+    ax.set_ylim(-0.02, 1.02)
+    ax.set_yticks([])
+
+    # Remove all spines
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+
+    # Hide x-axis tick marks but keep labels, apply dimension label padding
+    ax.tick_params(axis="x", length=0, pad=dim_label_pad)
+
+    # Draw vertical lines at each dimension position with tick marks
+    for i, dim in enumerate(dimensions):
+        # Draw vertical line only from 0 to 1 (not full y-axis range)
+        ax.plot([i, i], [0, 1], **axis_style)
+
+        # Position labels to the left for first axis, right for others
+        is_first_axis = i == 0
+        label_x_offset = -0.05 if is_first_axis else 0.05
+        label_ha = "right" if is_first_axis else "left"
+
+        def format_number(value):
+            """Format number in human-readable way, avoiding scientific notation."""
+            if value == 0:
+                return "0"
+            abs_val = abs(value)
+            if abs_val >= 1000:
+                return f"{value:,.0f}"
+            elif abs_val >= 100:
+                return f"{value:.1f}"
+            elif abs_val >= 10:
+                return f"{value:.1f}"
+            elif abs_val >= 1:
+                return f"{value:.2f}"
+            elif abs_val >= 0.1:
+                return f"{value:.2f}"
+            else:
+                return f"{value:.3f}"
+
+        # Tick marks extend toward the label side
+        if is_first_axis:
+            tick_start, tick_end = i - tick_length, i
+        else:
+            tick_start, tick_end = i, i + tick_length
+
+        # Get tick zorder (one above axis zorder)
+        tick_zorder = axis_style.get("zorder", 2) + 1
+
+        if dim_is_categorical[dim]:
+            # For categorical dimensions, show category labels
+            categories = dim_categories[dim]
+            cat_map = dim_category_map[dim]
+
+            for cat in categories:
+                tick_pos = cat_map[cat]
+
+                # Draw small horizontal tick mark
+                ax.plot(
+                    [tick_start, tick_end],
+                    [tick_pos, tick_pos],
+                    zorder=tick_zorder,
+                    **tick_style,
+                )
+
+                # Add category label
+                ax.text(
+                    i + label_x_offset,
+                    tick_pos,
+                    str(cat),
+                    ha=label_ha,
+                    va="center",
+                    bbox=tick_label_bbox,
+                    zorder=tick_zorder + 1,
+                    **tick_label_style,
+                )
+        else:
+            # For numeric dimensions, show value labels at regular intervals
+            tick_positions = [0.0, 0.25, 0.5, 0.75, 1.0]
+            dim_range = dim_max[dim] - dim_min[dim]
+
+            for tick_pos in tick_positions:
+                # Draw small horizontal tick mark
+                ax.plot(
+                    [tick_start, tick_end],
+                    [tick_pos, tick_pos],
+                    zorder=tick_zorder,
+                    **tick_style,
+                )
+
+                # Calculate actual value at this tick position
+                if dim_range != 0:
+                    actual_value = dim_min[dim] + tick_pos * dim_range
+                else:
+                    actual_value = dim_min[dim]
+
+                # Add value label with human-readable format
+                ax.text(
+                    i + label_x_offset,
+                    tick_pos,
+                    format_number(actual_value),
+                    ha=label_ha,
+                    va="center",
+                    bbox=tick_label_bbox,
+                    zorder=tick_zorder + 1,
+                    **tick_label_style,
+                )
+
+    if settings["show_grid"]:
+        ax.grid(axis="x", **get_grid_style(shared_style))
+
+    # Set the aspect ratio of the chart
+    if settings["aspect_ratio"]:
+        ax.set(adjustable="box", aspect=settings["aspect_ratio"])
+
+    # Add legend for hue categories
+    if settings["show_legend"] and len(unique_hues) > 0:
+        legend_handles = [
+            plt.Line2D([0], [0], color=hue_colors[hue], linewidth=2, label=hue)
+            for hue in unique_hues
+        ]
+        ax.legend(handles=legend_handles, title="Legend", **get_legend_style())

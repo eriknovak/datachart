@@ -92,7 +92,7 @@ title: Typings Module
 
 ::: datachart.typings.StyleAttrs
 
-::: datachart.typings.ColorGeneralStyleAttrs
+::: datachart.typings.ColorStyleAttrs
 
 ::: datachart.typings.FontStyleAttrs
 

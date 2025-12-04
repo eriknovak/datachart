@@ -12,6 +12,7 @@ GREYSCALE_THEME: StyleAttrs = {
     # general color style
     "color_general_singular": COLORS.Greys,
     "color_general_multiple": COLORS.Greys,
+    "color_parallel_hue": COLORS.Greys,
     # general font style
     "font_general_family": "sans-serif",
     "font_general_sansserif": ["Helvetica", "Arial"],

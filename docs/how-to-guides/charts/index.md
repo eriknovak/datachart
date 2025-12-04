@@ -8,11 +8,12 @@ The [datachart.charts](../../references/charts.md) module of the `datachart` pac
 
 It offers a wide range of chart types, including line charts, bar charts, histograms, and more. The module allows users to customize the look and feel of their charts by providing attributes to control the colors, labels, and titles of the charts. The module also includes methods to create subplots, i.e., to display multiple charts in the same figure. This makes it easy to compare different data sets and highlight the details of each chart.
 
-| Chart                               | Description                        |
-| :---------------------------------- | :--------------------------------- |
-| [Bar Chart](barchart.ipynb)         | The showcase of the bar chart.     |
-| [Box Plot](boxplot.ipynb)           | The showcase of the box plot.      |
-| [Heatmap](heatmap.ipynb)            | The showcase of the heatmap.       |
-| [Histogram](histogram.ipynb)        | The showcase of the histogram.     |
-| [Line Chart](linechart.ipynb)       | The showcase of the line chart.    |
-| [Scatter Chart](scatterchart.ipynb) | The showcase of the scatter chart. |
+| Chart                                         | Description                                  |
+| :-------------------------------------------- | :------------------------------------------- |
+| [Bar Chart](barchart.ipynb)                   | The showcase of the bar chart.               |
+| [Box Plot](boxplot.ipynb)                     | The showcase of the box plot.                |
+| [Heatmap](heatmap.ipynb)                      | The showcase of the heatmap.                 |
+| [Histogram](histogram.ipynb)                  | The showcase of the histogram.               |
+| [Line Chart](linechart.ipynb)                 | The showcase of the line chart.              |
+| [Parallel Coordinates](parallelcoords.ipynb)  | The showcase of the parallel coordinates.    |
+| [Scatter Chart](scatterchart.ipynb)           | The showcase of the scatter chart.           |

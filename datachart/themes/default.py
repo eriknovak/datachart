@@ -12,6 +12,7 @@ DEFAULT_THEME: StyleAttrs = {
     # general color style
     "color_general_singular": COLORS.Blues,
     "color_general_multiple": COLORS.Spectral,
+    "color_parallel_hue": COLORS.Hiroshige,
     # general font style
     "font_general_family": "sans-serif",
     "font_general_sansserif": ["Helvetica", "Arial"],
@@ -126,4 +127,25 @@ DEFAULT_THEME: StyleAttrs = {
     "plot_regression_width": 2,
     "plot_regression_style": LINE_STYLE.SOLID,
     "plot_regression_ci_alpha": 0.2,
+    # plot parallel coords style
+    "plot_parallel_color": None,
+    "plot_parallel_alpha": 0.5,
+    "plot_parallel_width": 1.0,
+    "plot_parallel_style": LINE_STYLE.SOLID,
+    "plot_parallel_marker": None,
+    "plot_parallel_zorder": 1,
+    "plot_parallel_axis_color": "#000000",
+    "plot_parallel_axis_width": 1.5,
+    "plot_parallel_axis_zorder": 2,
+    "plot_parallel_tick_color": "#000000",
+    "plot_parallel_tick_width": 1.5,
+    "plot_parallel_tick_length": 0.02,
+    "plot_parallel_tick_label_size": 8,
+    "plot_parallel_tick_label_color": "#000000",
+    "plot_parallel_tick_label_bg_color": "#FFFFFF",
+    "plot_parallel_tick_label_bg_alpha": 0.7,
+    "plot_parallel_dim_label_size": 9,
+    "plot_parallel_dim_label_color": "#000000",
+    "plot_parallel_dim_label_rotation": 0,
+    "plot_parallel_dim_label_pad": 8,
 }

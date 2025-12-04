@@ -28,9 +28,12 @@ Classes:
     BoxChartAttrs: The box plot chart attributes.
     BoxSingleChartAttrs: The single chart attributes for the box plot.
     BoxDataPointAttrs: The data point attributes for the box plot.
+    ParallelCoordsChartAttrs: The parallel coordinates chart attributes.
+    ParallelCoordsSingleChartAttrs: The single chart attributes for the parallel coordinates chart.
+    ParallelCoordsDataPointAttrs: The data point attributes for the parallel coordinates chart.
 
     StyleAttrs: The style typing.
-    ColorGeneralStyleAttrs: The typing for the general color style.
+    ColorStyleAttrs: The typing for the general color style.
     FontStyleAttrs: The typing for the font style.
     AxesStyleAttrs: The typing for the axes style.
     LegendStyleAttrs: The typing for the legend style.
@@ -45,10 +48,11 @@ Classes:
     ScatterStyleAttrs: The typing for the scatter chart style.
     RegressionStyleAttrs: The typing for the regression line style.
     BoxStyleAttrs: The typing for the box plot style.
+    ParallelCoordsStyleAttrs: The typing for the parallel coordinates chart style.
 
 """
 
-from typing import TypedDict, Union, Tuple, List, Optional
+from typing import TypedDict, Union, Tuple, List, Optional, Dict
 
 import matplotlib.colors as colors
 from .constants import (
@@ -74,17 +78,19 @@ from .constants import (
 # ================================================
 
 
-class ColorGeneralStyleAttrs(TypedDict):
+class ColorStyleAttrs(TypedDict):
     """The typing for the general color style.
 
     Attributes:
         color_general_singular (Union[COLORS, str, None]): The general color for the singular-typed charts.
         color_general_multiple (Union[COLORS, str, None]): The general color for the multiple-typed charts.
+        color_parallel_hue (Union[COLORS, str, None]): The color palette for parallel coords hue categories.
 
     """
 
     color_general_singular: Union[COLORS, str, None]
     color_general_multiple: Union[COLORS, str, None]
+    color_parallel_hue: Union[COLORS, str, None]
 
 
 class FontStyleAttrs(TypedDict):
@@ -454,8 +460,57 @@ class BoxStyleAttrs(TypedDict):
     plot_yticks_label_rotate: Union[int, float, None]
 
 
+class ParallelCoordsStyleAttrs(TypedDict):
+    """The typing for the parallel coordinates chart style.
+
+    Attributes:
+        plot_parallel_color (Union[str, None]): The line color.
+        plot_parallel_alpha (Union[float, None]): The alpha value of the lines.
+        plot_parallel_width (Union[int, float, None]): The line width.
+        plot_parallel_style (Union[LINE_STYLE, str, None]): The line style.
+        plot_parallel_marker (Union[LINE_MARKER, str, None]): The marker style for data points.
+        plot_parallel_zorder (Union[int, None]): The draw order of data lines.
+        plot_parallel_axis_color (Union[str, None]): The vertical axis line color.
+        plot_parallel_axis_width (Union[int, float, None]): The vertical axis line width.
+        plot_parallel_axis_zorder (Union[int, None]): The vertical axis line draw order.
+        plot_parallel_tick_color (Union[str, None]): The tick mark color.
+        plot_parallel_tick_width (Union[int, float, None]): The tick mark line width.
+        plot_parallel_tick_length (Union[float, None]): The tick mark length.
+        plot_parallel_tick_label_size (Union[int, float, None]): The tick label font size.
+        plot_parallel_tick_label_color (Union[str, None]): The tick label font color.
+        plot_parallel_tick_label_bg_color (Union[str, None]): The tick label background color.
+        plot_parallel_tick_label_bg_alpha (Union[float, None]): The tick label background alpha.
+        plot_parallel_dim_label_size (Union[int, float, None]): The dimension label font size.
+        plot_parallel_dim_label_color (Union[str, None]): The dimension label font color.
+        plot_parallel_dim_label_rotation (Union[int, float, None]): The dimension label rotation.
+        plot_parallel_dim_label_pad (Union[int, float, None]): The dimension label padding from axis.
+
+    """
+
+    plot_parallel_color: Union[str, None]
+    plot_parallel_alpha: Union[float, None]
+    plot_parallel_width: Union[int, float, None]
+    plot_parallel_style: Union[LINE_STYLE, str, None]
+    plot_parallel_marker: Union[LINE_MARKER, str, None]
+    plot_parallel_zorder: Union[int, None]
+    plot_parallel_axis_color: Union[str, None]
+    plot_parallel_axis_width: Union[int, float, None]
+    plot_parallel_axis_zorder: Union[int, None]
+    plot_parallel_tick_color: Union[str, None]
+    plot_parallel_tick_width: Union[int, float, None]
+    plot_parallel_tick_length: Union[float, None]
+    plot_parallel_tick_label_size: Union[int, float, None]
+    plot_parallel_tick_label_color: Union[str, None]
+    plot_parallel_tick_label_bg_color: Union[str, None]
+    plot_parallel_tick_label_bg_alpha: Union[float, None]
+    plot_parallel_dim_label_size: Union[int, float, None]
+    plot_parallel_dim_label_color: Union[str, None]
+    plot_parallel_dim_label_rotation: Union[int, float, None]
+    plot_parallel_dim_label_pad: Union[int, float, None]
+
+
 class StyleAttrs(
-    ColorGeneralStyleAttrs,
+    ColorStyleAttrs,
     FontStyleAttrs,
     AxesStyleAttrs,
     LegendStyleAttrs,
@@ -470,6 +525,7 @@ class StyleAttrs(
     ScatterStyleAttrs,
     RegressionStyleAttrs,
     BoxStyleAttrs,
+    ParallelCoordsStyleAttrs,
 ):
     """The style attributes. Combines all style typings."""
 
@@ -1055,6 +1111,57 @@ class BoxChartAttrs(ChartCommonAttrs):
 
 
 # ================================================
+# Parallel Coordinates Chart Attributes
+# ================================================
+
+
+class ParallelCoordsDataPointAttrs(TypedDict):
+    """The data point attributes for the parallel coordinates chart.
+
+    A dictionary where keys are dimension names and values are numeric values.
+    Can optionally include a 'hue' key for categorical coloring.
+
+    Attributes:
+        hue (Optional[str]): The category for color grouping.
+
+    """
+
+    hue: Optional[str]
+
+
+class ParallelCoordsSingleChartAttrs(TypedDict):
+    """The single chart attributes for the parallel coordinates chart.
+
+    Attributes:
+        data (List[ParallelCoordsDataPointAttrs]): The list of data points.
+        subtitle (Union[str, None]): The subtitle of the chart.
+        style (Union[ParallelCoordsStyleAttrs, None]): The style of the chart.
+        dimensions (Union[List[str], None]): The dimensions to include and their order.
+        hue (Union[str, None]): The key name in `data` for categorical coloring.
+        category_orders (Union[Dict[str, List[str]], None]): Custom order for categorical dimensions.
+
+    """
+
+    data: List[ParallelCoordsDataPointAttrs]
+    subtitle: Union[str, None]
+    style: Union[ParallelCoordsStyleAttrs, None]
+    dimensions: Union[List[str], None]
+    hue: Union[str, None]
+    category_orders: Union[Dict[str, List[str]], None]
+
+
+class ParallelCoordsChartAttrs(ChartCommonAttrs):
+    """The parallel coordinates chart attributes.
+
+    Attributes:
+        charts (Union[ParallelCoordsSingleChartAttrs, List[ParallelCoordsSingleChartAttrs]]): The chart definitions.
+
+    """
+
+    charts: Union[ParallelCoordsSingleChartAttrs, List[ParallelCoordsSingleChartAttrs]]
+
+
+# ================================================
 # Chart Attributes
 # ================================================
 
@@ -1066,5 +1173,6 @@ ChartAttrs = Union[
     HeatmapChartAttrs,
     ScatterChartAttrs,
     BoxChartAttrs,
+    ParallelCoordsChartAttrs,
 ]
 """The union of all chart attributes."""

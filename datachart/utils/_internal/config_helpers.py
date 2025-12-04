@@ -531,6 +531,183 @@ def get_box_cap_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Parallel Coordinates Style
+# -------------------------------------
+
+
+def get_parallel_coords_style(chart_style: dict) -> dict:
+    """Get the parallel coordinates chart style for data lines.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The parallel coordinates style setting.
+
+    """
+
+    config_attrs = [
+        ("color", "plot_parallel_color"),
+        ("alpha", "plot_parallel_alpha"),
+        ("linewidth", "plot_parallel_width"),
+        ("linestyle", "plot_parallel_style"),
+        ("marker", "plot_parallel_marker"),
+        ("zorder", "plot_parallel_zorder"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+def get_parallel_axis_style(chart_style: dict) -> dict:
+    """Get the parallel coordinates vertical axis line style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The vertical axis line style setting.
+
+    """
+
+    config_attrs = [
+        ("color", "plot_parallel_axis_color"),
+        ("linewidth", "plot_parallel_axis_width"),
+        ("zorder", "plot_parallel_axis_zorder"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+def get_parallel_tick_style(chart_style: dict) -> dict:
+    """Get the parallel coordinates tick mark style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The tick mark style setting.
+
+    """
+
+    config_attrs = [
+        ("color", "plot_parallel_tick_color"),
+        ("linewidth", "plot_parallel_tick_width"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+def get_parallel_tick_length(chart_style: dict) -> float:
+    """Get the parallel coordinates tick mark length.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The tick mark length.
+
+    """
+
+    return chart_style.get("plot_parallel_tick_length", config["plot_parallel_tick_length"])
+
+
+def get_parallel_tick_label_style(chart_style: dict) -> dict:
+    """Get the parallel coordinates tick label style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The tick label style setting.
+
+    """
+
+    config_attrs = [
+        ("fontsize", "plot_parallel_tick_label_size"),
+        ("color", "plot_parallel_tick_label_color"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+def get_parallel_tick_label_bbox(chart_style: dict) -> dict:
+    """Get the parallel coordinates tick label background box style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The tick label background box style setting.
+
+    """
+
+    bg_color = chart_style.get(
+        "plot_parallel_tick_label_bg_color", config["plot_parallel_tick_label_bg_color"]
+    )
+    bg_alpha = chart_style.get(
+        "plot_parallel_tick_label_bg_alpha", config["plot_parallel_tick_label_bg_alpha"]
+    )
+
+    return dict(
+        boxstyle="round,pad=0.15",
+        facecolor=bg_color,
+        alpha=bg_alpha,
+        edgecolor="none",
+    )
+
+
+def get_parallel_dim_label_style(chart_style: dict) -> dict:
+    """Get the parallel coordinates dimension label style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The dimension label style setting.
+
+    """
+
+    config_attrs = [
+        ("fontsize", "plot_parallel_dim_label_size"),
+        ("color", "plot_parallel_dim_label_color"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+def get_parallel_dim_label_rotation(chart_style: dict) -> float:
+    """Get the parallel coordinates dimension label rotation.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The dimension label rotation.
+
+    """
+
+    return chart_style.get(
+        "plot_parallel_dim_label_rotation", config["plot_parallel_dim_label_rotation"]
+    )
+
+
+def get_parallel_dim_label_pad(chart_style: dict) -> float:
+    """Get the parallel coordinates dimension label padding.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The dimension label padding.
+
+    """
+
+    return chart_style.get(
+        "plot_parallel_dim_label_pad", config["plot_parallel_dim_label_pad"]
+    )
+
+
+# -------------------------------------
 # Legend Style
 # -------------------------------------
 

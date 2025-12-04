@@ -97,6 +97,7 @@ nav:
       - Heatmap: how-to-guides/charts/heatmap.ipynb
       - Histogram: how-to-guides/charts/histogram.ipynb
       - Line Chart: how-to-guides/charts/linechart.ipynb
+      - Parallel Coordinates: how-to-guides/charts/parallelcoords.ipynb
       - Scatter Chart: how-to-guides/charts/scatterchart.ipynb
     - Utility:
       - how-to-guides/utility/index.md

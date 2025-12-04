@@ -38,7 +38,8 @@ class FIG_SIZE:
 
     Attributes:
         DEFAULT (Tuple[float, float]): The default figure size. Equals to `(6.4, 4.8)`.
-        A4 (Tuple[float, float]): The A4 figure size. Equals to `(8.2, 11.6)`.
+        A4 (Tuple[float, float]): The A4 portrait figure size. Equals to `(8.2, 11.6)`.
+        A4_LANDSCAPE (Tuple[float, float]): The A4 landscape figure size. Equals to `(11.6, 8.2)`.
         A4_NARROW (Tuple[float, float]): The flat, full-width figure size. Equals to `(8.2, 2.4)`.
         A4_REGULAR (Tuple[float, float]): The regular, full-width figure size. Equals to `(8.2, 4.8)`.
         A4_WIDE (Tuple[float, float]): The tall, full-width figure size. Equals to `(8.2, 7.2)`.
@@ -50,6 +51,7 @@ class FIG_SIZE:
 
     DEFAULT = (6.4, 4.8)
     A4 = (8.2, 11.6)
+    A4_LANDSCAPE = (11.6, 8.2)
     A4_NARROW = (8.2, 2.4)
     A4_REGULAR = (8.2, 4.8)
     A4_WIDE = (8.2, 7.2)
@@ -434,6 +436,10 @@ class COLORS:
     YlGnBu = "YlGnBu"
     YlOrRd = "YlOrRd"
     PuBuGn = "PuBuGn"
+    Egypt = "Egypt"
+    Hiroshige = "Hiroshige"
+    Lake = "Lake"
+    Neon = "Neon"
 
     # Diverging
     GnBu = "GnBu"
@@ -462,6 +468,8 @@ class COLORS:
     Plasma = "Plasma"
     Magma = "Magma"
     Turbo = "Turbo"
+    OkabeIto = "OkabeIto"
+    OkabeIto_Black = "OkabeIto_Black"
 
     # Additional Diverging
     Coolwarm = "coolwarm"

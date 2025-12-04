@@ -202,10 +202,10 @@ def build_chart_dict_single(
     if hlines is not None:
         chart_dict["hlines"] = hlines
 
-    # Add extra chart-specific attributes
+    # Add extra chart-specific attributes (preserve as-is, don't transform)
     for attr_name, attr_value in extra_attrs.items():
         if attr_value is not None:
-            chart_dict[attr_name] = _get_single_value(attr_value, str)
+            chart_dict[attr_name] = attr_value
 
     return chart_dict
 
@@ -364,4 +364,3 @@ def build_attrs_dict(
             attrs[key] = value
 
     return attrs
-

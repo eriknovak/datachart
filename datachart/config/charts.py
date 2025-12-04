@@ -25,4 +25,8 @@ CHART_CONFIGS = {
         "multiplot": True,
         "subplots": True,
     },
+    "parallelcoords": {
+        "multiplot": True,
+        "subplots": False,
+    },
 }

@@ -15,6 +15,8 @@ Methods:
         Creates the scatter chart.
     BoxPlot(attrs):
         Creates the box plot.
+    ParallelCoords(attrs):
+        Creates the parallel coordinates chart.
 
 """
 
@@ -24,6 +26,7 @@ from .histogram import Histogram
 from .heatmap import Heatmap
 from .scatter_chart import ScatterChart
 from .box_plot import BoxPlot
+from .parallel_coords import ParallelCoords
 
 
-__all__ = ["LineChart", "BarChart", "Histogram", "Heatmap", "ScatterChart", "BoxPlot"]
+__all__ = ["LineChart", "BarChart", "Histogram", "Heatmap", "ScatterChart", "BoxPlot", "ParallelCoords"]
