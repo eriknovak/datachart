@@ -86,6 +86,9 @@ DEFAULT_THEME: StyleAttrs = {
     "plot_bar_edge_width": 0.5,
     "plot_bar_edge_color": "#000000",
     "plot_bar_error_color": "#000000",
+    "plot_bar_value_fontsize": 9,
+    "plot_bar_value_color": "#000000",
+    "plot_bar_value_padding": 3,
     # plot hist style
     "plot_hist_color": None,
     "plot_hist_alpha": 1.0,

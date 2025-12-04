@@ -32,6 +32,8 @@ def BarChart(
     show_legend: Optional[bool] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_yerr: Optional[bool] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[str] = None,
     aspect_ratio: Optional[str] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -100,6 +102,8 @@ def BarChart(
         show_legend: Whether to show the legend.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_yerr: Whether to show y-axis error bars.
+        show_values: Whether to show bar value labels at the edge of each bar.
+        value_format: Format string for bar value labels (e.g., "{:.1f}%").
         aspect_ratio: The aspect ratio of the chart.
         orientation: The orientation of the bars (vertical or horizontal).
         scaley: The y-axis scale (e.g., "log", "linear").
@@ -162,6 +166,8 @@ def BarChart(
         sharex=sharex,
         sharey=sharey,
         show_yerr=show_yerr,
+        show_values=show_values,
+        value_format=value_format,
         orientation=orientation,
         scaley=scaley,
     )

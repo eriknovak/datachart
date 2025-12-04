@@ -280,6 +280,9 @@ class BarStyleAttrs(TypedDict):
         plot_bar_edge_width (Union[int, float, None]): The edge width of the bar.
         plot_bar_edge_color (Union[str, None]): The edge color of the bar.
         plot_bar_error_color (Union[str, None]): The color of the error line of the bar.
+        plot_bar_value_fontsize (Union[int, float, None]): The font size of the bar value labels.
+        plot_bar_value_color (Union[str, None]): The color of the bar value labels.
+        plot_bar_value_padding (Union[int, float, None]): The padding between bar edge and value label.
         plot_xticks_label_rotate (Union[int, float, None]): The label rotation of the xticks in the bar chart.
         plot_yticks_label_rotate (Union[int, float, None]): The label rotation of the yticks in the bar chart.
 
@@ -293,6 +296,9 @@ class BarStyleAttrs(TypedDict):
     plot_bar_edge_width: Union[int, float, None]
     plot_bar_edge_color: Union[str, None]
     plot_bar_error_color: Union[str, None]
+    plot_bar_value_fontsize: Union[int, float, None]
+    plot_bar_value_color: Union[str, None]
+    plot_bar_value_padding: Union[int, float, None]
     plot_xticks_label_rotate: Union[int, float, None]
     plot_yticks_label_rotate: Union[int, float, None]
 

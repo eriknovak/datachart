@@ -182,6 +182,7 @@ settings_attr_mapping = [
     {"name": "show_legend", "default": None},
     {"name": "show_grid", "default": None},
     {"name": "show_yerr", "default": None},
+    {"name": "show_values", "default": None},
     {"name": "show_area", "default": None},
     {"name": "show_density", "default": None},
     {"name": "show_cumulative", "default": None},
@@ -199,6 +200,7 @@ settings_attr_mapping = [
     {"name": "num_bins", "default": None},
     {"name": "ci_level", "default": None},
     {"name": "size_range", "default": None},
+    {"name": "value_format", "default": None},
 ]
 
 settings_chart_mapping = [
@@ -210,6 +212,7 @@ settings_chart_mapping = [
     "show_legend",
     "show_grid",
     "show_yerr",
+    "show_values",
     "show_area",
     "show_density",
     "show_cumulative",
@@ -226,6 +229,7 @@ settings_chart_mapping = [
     "num_bins",
     "ci_level",
     "size_range",
+    "value_format",
 ]
 
 
@@ -595,6 +599,8 @@ def plot_bar_chart(
             "show_legend",
             "show_grid",
             "show_yerr",
+            "show_values",
+            "value_format",
             "orientation",
             "scaley",
         ],
@@ -643,13 +649,33 @@ def plot_bar_chart(
         # draw the bar chart
         subtitle = chart.get("subtitle", None)
         draw_func = ax.barh if is_horizontal else ax.bar
-        draw_func(
+        bars = draw_func(
             x + x_offset,
             y + (1 if settings["scaley"] == "log" else 0),
             label=subtitle,
             **error_range,
             **bar_style,
         )
+
+        # add bar value labels if enabled
+        if settings.get("show_values"):
+            value_fmt = settings.get("value_format", "{:.1f}")
+            value_padding = style.get(
+                "plot_bar_value_padding", config["plot_bar_value_padding"]
+            )
+            value_fontsize = style.get(
+                "plot_bar_value_fontsize", config["plot_bar_value_fontsize"]
+            )
+            value_color = style.get(
+                "plot_bar_value_color", config["plot_bar_value_color"]
+            )
+            ax.bar_label(
+                bars,
+                fmt=value_fmt,
+                padding=value_padding,
+                fontsize=value_fontsize,
+                color=value_color,
+            )
 
         if settings["scaley"]:
             ax.set_yscale(settings["scaley"])
