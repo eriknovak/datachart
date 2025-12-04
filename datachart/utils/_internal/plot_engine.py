@@ -22,6 +22,8 @@ from .config_helpers import (
     get_hline_style,
     get_heatmap_style,
     get_heatmap_font_style,
+    get_scatter_style,
+    get_regression_style,
     configure_axes_spines,
     configure_axis_ticks_style,
     configure_axis_ticks_position,
@@ -34,11 +36,19 @@ from ...typings import (
     BarSingleChartAttrs,
     HistogramSingleChartAttrs,
     HeatmapChartAttrs,
+    ScatterSingleChartAttrs,
     ChartAttrs,
     HLinePlotAttrs,
     VLinePlotAttrs,
 )
-from ...constants import FIG_SIZE, ORIENTATION, VALFMT, SCALE
+from ...constants import (
+    FIG_SIZE,
+    ORIENTATION,
+    VALFMT,
+    SCALE,
+    ASPECT_RATIO,
+    COLORBAR_LOCATION,
+)
 from ...config import config
 
 # ================================================
@@ -48,6 +58,8 @@ from ...config import config
 DEFAULT_NUM_BINS = 20
 DEFAULT_ORIENTATION = ORIENTATION.VERTICAL
 DEFAULT_VALFMT = VALFMT.DEFAULT
+DEFAULT_CI_LEVEL = 0.95
+DEFAULT_SIZE_RANGE = (20, 200)
 
 
 # ================================================
@@ -111,6 +123,17 @@ def has_multiple_subplots(axes: list) -> bool:
     return not all([ax == axes[0] for ax in axes])
 
 
+class NumpyEncoder(json.JSONEncoder):
+    """Custom JSON encoder that handles numpy arrays and types."""
+
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, (np.integer, np.floating)):
+            return obj.item()
+        return super().default(obj)
+
+
 def get_chart_hash(chart: dict) -> str:
     """Get a hash of the chart.
 
@@ -122,7 +145,7 @@ def get_chart_hash(chart: dict) -> str:
 
     """
 
-    return hash(json.dumps(chart, sort_keys=True))
+    return hash(json.dumps(chart, sort_keys=True, cls=NumpyEncoder))
 
 
 # ------------------------------------------------
@@ -141,7 +164,7 @@ settings_attr_mapping = [
     {"name": "xmax", "default": None},
     {"name": "ymin", "default": None},
     {"name": "ymax", "default": None},
-    {"name": "aspect_ratio", "default": "auto"},
+    {"name": "aspect_ratio", "default": ASPECT_RATIO.AUTO},
     {"name": "subplots", "default": None},
     {"name": "max_cols", "default": 4},
     {"name": "sharex", "default": False},
@@ -155,11 +178,16 @@ settings_attr_mapping = [
     {"name": "show_cumulative", "default": None},
     {"name": "show_colorbars", "default": None},
     {"name": "show_heatmap_values", "default": None},
+    {"name": "show_regression", "default": None},
+    {"name": "show_ci", "default": None},
+    {"name": "show_correlation", "default": None},
     # chart specific attributes
     {"name": "orientation", "default": None},
     {"name": "scalex", "default": None},
     {"name": "scaley", "default": None},
     {"name": "num_bins", "default": None},
+    {"name": "ci_level", "default": None},
+    {"name": "size_range", "default": None},
 ]
 
 settings_chart_mapping = [
@@ -176,10 +204,15 @@ settings_chart_mapping = [
     "show_cumulative",
     "show_colorbars",
     "show_heatmap_values",
+    "show_regression",
+    "show_ci",
+    "show_correlation",
     "orientation",
     "scalex",
     "scaley",
     "num_bins",
+    "ci_level",
+    "size_range",
 ]
 
 
@@ -337,11 +370,11 @@ def plot_vlines(ax: plt.Axes, vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]
     """
 
     vlines = vlines if isinstance(vlines, list) else [vlines]
-    ymin, ymax = ax.get_ylim()
+    default_ymin, default_ymax = ax.get_ylim()
     for vline in vlines:
         x = vline.get("x")
-        ymin = vline.get("ymin", ymin)
-        ymax = vline.get("ymax", ymax)
+        line_ymin = vline.get("ymin", default_ymin)
+        line_ymax = vline.get("ymax", default_ymax)
         label = vline.get("label", "")
         style = get_vline_style(vline.get("style", {}))
 
@@ -351,7 +384,7 @@ def plot_vlines(ax: plt.Axes, vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]
             )
             continue
 
-        ax.vlines(x=x, ymin=ymin, ymax=ymax, label=label, **style)
+        ax.vlines(x=x, ymin=line_ymin, ymax=line_ymax, label=label, **style)
 
 
 # ================================================
@@ -370,12 +403,12 @@ def plot_hlines(ax: plt.Axes, hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]
 
     hlines = hlines if isinstance(hlines, list) else [hlines]
 
-    xmin, xmax = ax.get_xlim()
+    default_xmin, default_xmax = ax.get_xlim()
 
     for hline in hlines:
         y = hline.get("y")
-        xmin = hline.get("xmin", xmin)
-        xmax = hline.get("xmax", xmax)
+        line_xmin = hline.get("xmin", default_xmin)
+        line_xmax = hline.get("xmax", default_xmax)
         label = hline.get("label", "")
         style = get_hline_style(hline.get("style", {}))
 
@@ -385,7 +418,7 @@ def plot_hlines(ax: plt.Axes, hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]
             )
             continue
 
-        ax.hlines(y=y, xmin=xmin, xmax=xmax, label=label, **style)
+        ax.hlines(y=y, xmin=line_xmin, xmax=line_xmax, label=label, **style)
 
 
 # ================================================
@@ -909,7 +942,11 @@ def plot_heatmap(
         if settings["show_colorbars"]:
             # draw the colorbar
             orientation = colorbar.get("orientation", DEFAULT_ORIENTATION)
-            location = "right" if orientation == ORIENTATION.VERTICAL else "top"
+            location = (
+                COLORBAR_LOCATION.RIGHT
+                if orientation == ORIENTATION.VERTICAL
+                else COLORBAR_LOCATION.TOP
+            )
             figure.colorbar(
                 im,
                 ax=ax,
@@ -919,3 +956,310 @@ def plot_heatmap(
                 pad=0.05,
             )
 
+
+# ================================================
+# Plot Scatter Chart
+# ================================================
+
+
+def _normalize_sizes(sizes: np.ndarray, size_range: tuple) -> np.ndarray:
+    """Normalize size values to the specified range.
+
+    Args:
+        sizes: The size values to normalize.
+        size_range: The tuple of (min_size, max_size).
+
+    Returns:
+        The normalized size values.
+
+    """
+    min_size, max_size = size_range
+    if sizes.max() == sizes.min():
+        return np.full_like(sizes, (min_size + max_size) / 2, dtype=float)
+    normalized = (sizes - sizes.min()) / (sizes.max() - sizes.min())
+    return normalized * (max_size - min_size) + min_size
+
+
+def _draw_correlation(
+    ax: plt.Axes,
+    x: np.ndarray,
+    y: np.ndarray,
+    color: str = None,
+    position: str = "top_left",
+) -> None:
+    """Draw correlation coefficient annotation on the chart.
+
+    Args:
+        ax: The axes.
+        x: The x-axis data.
+        y: The y-axis data.
+        color: The color of the annotation text.
+        position: Position of the annotation ('top_left', 'top_right', 'bottom_left', 'bottom_right').
+
+    """
+    from ..stats import correlation
+
+    r = correlation(x, y)
+
+    # Set position coordinates based on position argument
+    pos_map = {
+        "top_left": (0.05, 0.95),
+        "top_right": (0.95, 0.95),
+        "bottom_left": (0.05, 0.05),
+        "bottom_right": (0.95, 0.05),
+    }
+    ha_map = {
+        "top_left": "left",
+        "top_right": "right",
+        "bottom_left": "left",
+        "bottom_right": "right",
+    }
+    va_map = {
+        "top_left": "top",
+        "top_right": "top",
+        "bottom_left": "bottom",
+        "bottom_right": "bottom",
+    }
+
+    xy = pos_map.get(position, (0.05, 0.95))
+    ha = ha_map.get(position, "left")
+    va = va_map.get(position, "top")
+
+    text_color = color if color else config.get("plot_text_color", "black")
+    fontsize = config.get("plot_annotation_fontsize", 10)
+
+    ax.annotate(
+        f"r = {r:.3f}",
+        xy=xy,
+        xycoords="axes fraction",
+        fontsize=fontsize,
+        color=text_color,
+        ha=ha,
+        va=va,
+        bbox=dict(
+            boxstyle="round,pad=0.3",
+            facecolor="white",
+            edgecolor="gray",
+            alpha=0.8,
+        ),
+    )
+
+
+def _draw_regression(
+    ax: plt.Axes,
+    x: np.ndarray,
+    y: np.ndarray,
+    color: str = None,
+    show_ci: bool = False,
+    ci_level: float = 0.95,
+) -> None:
+    """Draw regression line with optional confidence interval.
+
+    Args:
+        ax: The axes.
+        x: The x-axis data.
+        y: The y-axis data.
+        color: The color of the regression line.
+        show_ci: Whether to show the confidence interval.
+        ci_level: The confidence interval level.
+
+    """
+    from scipy import stats as scipy_stats
+
+    # Fit linear regression
+    slope, intercept, r_value, p_value, std_err = scipy_stats.linregress(x, y)
+
+    # Create regression line
+    x_line = np.linspace(x.min(), x.max(), 100)
+    y_line = slope * x_line + intercept
+
+    reg_style = get_regression_style({})
+    if color is not None:
+        reg_style["color"] = color
+
+    ax.plot(x_line, y_line, **reg_style)
+
+    if show_ci:
+        # Calculate confidence interval
+        n = len(x)
+        t_val = scipy_stats.t.ppf((1 + ci_level) / 2, n - 2)
+
+        # Standard error of the estimate
+        y_pred = slope * x + intercept
+        residuals = y - y_pred
+        s_err = np.sqrt(np.sum(residuals**2) / (n - 2))
+
+        # Confidence interval for the line
+        x_mean = np.mean(x)
+        ss_x = np.sum((x - x_mean) ** 2)
+
+        se_line = s_err * np.sqrt(1 / n + (x_line - x_mean) ** 2 / ss_x)
+        ci = t_val * se_line
+
+        ci_alpha = config["plot_regression_ci_alpha"]
+        ax.fill_between(
+            x_line,
+            y_line - ci,
+            y_line + ci,
+            alpha=ci_alpha,
+            color=color,
+        )
+
+
+def plot_scatter_chart(
+    figure: plt.Figure,
+    axes: List[plt.Axes],
+    charts: List[ScatterSingleChartAttrs],
+    settings: dict,
+) -> None:
+    """Plot the scatter chart.
+
+    Args:
+        figure: The figure.
+        axes: The axes list.
+        charts: The charts data.
+        settings: The general settings.
+
+    """
+
+    # assert the configuration
+    assert_chart_settings(
+        settings=settings,
+        supported_settings=[
+            "xmin",
+            "xmax",
+            "ymin",
+            "ymax",
+            "aspect_ratio",
+            "show_legend",
+            "show_grid",
+            "show_regression",
+            "show_ci",
+            "ci_level",
+            "show_correlation",
+            "scalex",
+            "scaley",
+            "size_range",
+        ],
+    )
+
+    has_multi_subplots = has_multiple_subplots(axes)
+
+    for chart, ax in zip(charts, axes):
+        # Retrieve chart data
+        x_data = get_chart_data("x", chart)
+        y_data = get_chart_data("y", chart)
+        size_data = get_chart_data("size", chart)
+        hue_data = get_chart_data("hue", chart)
+
+        style = chart.get("style", {})
+        scatter_style = get_scatter_style(style)
+
+        # Handle hue grouping
+        if hue_data is not None:
+            unique_hues = np.unique(hue_data)
+            n_hues = len(unique_hues)
+            color_cycle = custom_color_cycle(False, n_hues)
+
+            for i, hue_val in enumerate(unique_hues):
+                mask = hue_data == hue_val
+                x_group = x_data[mask]
+                y_group = y_data[mask]
+
+                # Get sizes for this group
+                if size_data is not None:
+                    size_range = settings["size_range"] or DEFAULT_SIZE_RANGE
+                    sizes = _normalize_sizes(size_data[mask], size_range)
+                else:
+                    sizes = scatter_style.get("s", config["plot_scatter_size"])
+
+                group_style = {k: v for k, v in scatter_style.items() if k != "s"}
+                group_color = color_cycle[i]["color"]
+                group_style["c"] = group_color
+
+                ax.scatter(x_group, y_group, s=sizes, label=str(hue_val), **group_style)
+
+                # Draw regression per group if requested
+                if settings["show_regression"]:
+                    ci_level = settings["ci_level"] or DEFAULT_CI_LEVEL
+                    _draw_regression(
+                        ax,
+                        x_group,
+                        y_group,
+                        color=group_color,
+                        show_ci=settings["show_ci"],
+                        ci_level=ci_level,
+                    )
+        else:
+            # No hue grouping - single scatter
+            if size_data is not None:
+                size_range = settings["size_range"] or DEFAULT_SIZE_RANGE
+                sizes = _normalize_sizes(size_data, size_range)
+            else:
+                sizes = scatter_style.get("s", config["plot_scatter_size"])
+
+            chart_hash = get_chart_hash(chart)
+            color_cycle = custom_color_cycle(has_multi_subplots, charts.shape[0])
+            base_style = {k: v for k, v in scatter_style.items() if k != "s"}
+            # Use user-specified color (c) if provided, otherwise use color_cycle
+            if "c" not in base_style or base_style["c"] is None:
+                base_style["c"] = color_cycle[chart_hash]["color"]
+
+            subtitle = chart.get("subtitle", None)
+            ax.scatter(x_data, y_data, s=sizes, label=subtitle, **base_style)
+
+            # Draw regression if requested
+            if settings["show_regression"]:
+                ci_level = settings["ci_level"] or DEFAULT_CI_LEVEL
+                _draw_regression(
+                    ax,
+                    x_data,
+                    y_data,
+                    color=base_style.get("c", base_style.get("color")),
+                    show_ci=settings["show_ci"],
+                    ci_level=ci_level,
+                )
+
+            # Draw correlation annotation if requested
+            if settings["show_correlation"]:
+                _draw_correlation(
+                    ax,
+                    x_data,
+                    y_data,
+                    color=base_style.get("c", base_style.get("color")),
+                )
+
+        # Show overall correlation for hue-grouped data
+        if hue_data is not None and settings["show_correlation"]:
+            _draw_correlation(ax, x_data, y_data)
+
+        # Apply scales
+        if settings["scalex"]:
+            ax.set_xscale(settings["scalex"])
+        if settings["scaley"]:
+            ax.set_yscale(settings["scaley"])
+
+        # Show grid
+        if settings["show_grid"]:
+            ax.grid(axis=settings["show_grid"], **get_grid_style(style))
+
+        # Configure axis
+        configure_axis_ticks_position(ax, chart)
+        configure_axis_limits(ax, settings)
+
+        # Draw vlines/hlines
+        if "vlines" in chart:
+            plot_vlines(ax, chart["vlines"])
+        if "hlines" in chart:
+            plot_hlines(ax, chart["hlines"])
+
+        # Set aspect ratio
+        if settings["aspect_ratio"]:
+            ax.set(adjustable="box", aspect=settings["aspect_ratio"])
+
+    # Show legend
+    if has_multi_subplots and settings["show_legend"]:
+        warnings.warn("The `show_legend` flag will be ignored for multi-subplots.")
+
+    if not has_multi_subplots and settings["show_legend"]:
+        axes[0].legend(title="Legend", **get_legend_style())

@@ -3,6 +3,7 @@ from typing import Union, List, Optional, Tuple
 import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import chart_plot_wrapper, plot_line_chart
+from ..utils._internal.chart_builder import build_charts_structure, build_attrs_dict
 from ..typings import (
     LineDataPointAttrs,
     LineStyleAttrs,
@@ -125,189 +126,47 @@ def LineChart(
         The figure containing the line chart.
 
     """
-    # Detect if data is for multiple charts
-    is_multi_chart = (
-        isinstance(data, list) and len(data) > 0 and isinstance(data[0], list)
+    # Build the charts structure using shared utility
+    charts = build_charts_structure(
+        data,
+        subtitle=subtitle,
+        style=style,
+        xticks=xticks,
+        xticklabels=xticklabels,
+        xtickrotate=xtickrotate,
+        yticks=yticks,
+        yticklabels=yticklabels,
+        ytickrotate=ytickrotate,
+        vlines=vlines,
+        hlines=hlines,
+        x=x,
+        y=y,
+        yerr=yerr,
     )
 
-    # Build the charts structure
-    if is_multi_chart:
-        charts = []
-        for i, chart_data in enumerate(data):
-            chart_dict = {"data": chart_data}
-
-            # Add per-chart attributes
-            if subtitle is not None and isinstance(subtitle, list):
-                chart_dict["subtitle"] = subtitle[i] if i < len(subtitle) else None
-            elif subtitle is not None:
-                chart_dict["subtitle"] = subtitle
-
-            if style is not None and isinstance(style, list):
-                style_val = style[i] if i < len(style) else None
-                chart_dict["style"] = style_val if style_val is not None else {}
-            elif style is not None:
-                chart_dict["style"] = style
-
-            if xticks is not None and isinstance(xticks[0] if xticks else None, list):
-                chart_dict["xticks"] = xticks[i] if i < len(xticks) else None
-            elif xticks is not None:
-                chart_dict["xticks"] = xticks
-
-            if xticklabels is not None and isinstance(
-                xticklabels[0] if xticklabels else None, list
-            ):
-                chart_dict["xticklabels"] = (
-                    xticklabels[i] if i < len(xticklabels) else None
-                )
-            elif xticklabels is not None:
-                chart_dict["xticklabels"] = xticklabels
-
-            if xtickrotate is not None and isinstance(xtickrotate, list):
-                chart_dict["xtickrotate"] = (
-                    xtickrotate[i] if i < len(xtickrotate) else None
-                )
-            elif xtickrotate is not None:
-                chart_dict["xtickrotate"] = xtickrotate
-
-            if yticks is not None and isinstance(yticks[0] if yticks else None, list):
-                chart_dict["yticks"] = yticks[i] if i < len(yticks) else None
-            elif yticks is not None:
-                chart_dict["yticks"] = yticks
-
-            if yticklabels is not None and isinstance(
-                yticklabels[0] if yticklabels else None, list
-            ):
-                chart_dict["yticklabels"] = (
-                    yticklabels[i] if i < len(yticklabels) else None
-                )
-            elif yticklabels is not None:
-                chart_dict["yticklabels"] = yticklabels
-
-            if ytickrotate is not None and isinstance(ytickrotate, list):
-                chart_dict["ytickrotate"] = (
-                    ytickrotate[i] if i < len(ytickrotate) else None
-                )
-            elif ytickrotate is not None:
-                chart_dict["ytickrotate"] = ytickrotate
-
-            if vlines is not None and isinstance(vlines, list):
-                chart_dict["vlines"] = vlines[i] if i < len(vlines) else None
-            elif vlines is not None:
-                chart_dict["vlines"] = vlines
-
-            if hlines is not None and isinstance(hlines, list):
-                chart_dict["hlines"] = hlines[i] if i < len(hlines) else None
-            elif hlines is not None:
-                chart_dict["hlines"] = hlines
-
-            if x is not None and isinstance(x, list):
-                chart_dict["x"] = x[i] if i < len(x) else None
-            elif x is not None:
-                chart_dict["x"] = x
-
-            if y is not None and isinstance(y, list):
-                chart_dict["y"] = y[i] if i < len(y) else None
-            elif y is not None:
-                chart_dict["y"] = y
-
-            if yerr is not None and isinstance(yerr, list):
-                chart_dict["yerr"] = yerr[i] if i < len(yerr) else None
-            elif yerr is not None:
-                chart_dict["yerr"] = yerr
-
-            charts.append(chart_dict)
-    else:
-        # Single chart
-        chart_dict = {"data": data}
-        if subtitle is not None:
-            chart_dict["subtitle"] = (
-                subtitle
-                if isinstance(subtitle, str)
-                else (subtitle[0] if subtitle else None)
-            )
-        if style is not None:
-            chart_dict["style"] = (
-                style if isinstance(style, dict) else (style[0] if style else None)
-            )
-        if xticks is not None:
-            chart_dict["xticks"] = xticks
-        if xticklabels is not None:
-            chart_dict["xticklabels"] = xticklabels
-        if xtickrotate is not None:
-            chart_dict["xtickrotate"] = (
-                xtickrotate
-                if isinstance(xtickrotate, int)
-                else (xtickrotate[0] if xtickrotate else None)
-            )
-        if yticks is not None:
-            chart_dict["yticks"] = yticks
-        if yticklabels is not None:
-            chart_dict["yticklabels"] = yticklabels
-        if ytickrotate is not None:
-            chart_dict["ytickrotate"] = (
-                ytickrotate
-                if isinstance(ytickrotate, int)
-                else (ytickrotate[0] if ytickrotate else None)
-            )
-        if vlines is not None:
-            chart_dict["vlines"] = vlines
-        if hlines is not None:
-            chart_dict["hlines"] = hlines
-        if x is not None:
-            chart_dict["x"] = x if isinstance(x, str) else (x[0] if x else None)
-        if y is not None:
-            chart_dict["y"] = y if isinstance(y, str) else (y[0] if y else None)
-        if yerr is not None:
-            chart_dict["yerr"] = (
-                yerr if isinstance(yerr, str) else (yerr[0] if yerr else None)
-            )
-
-        charts = chart_dict
-
-    # Build the attrs dict for the internal API
-    attrs = {
-        "type": "linechart",
-        "charts": charts,
-    }
-
-    # Add global attributes
-    if title is not None:
-        attrs["title"] = title
-    if xlabel is not None:
-        attrs["xlabel"] = xlabel
-    if ylabel is not None:
-        attrs["ylabel"] = ylabel
-    if figsize is not None:
-        attrs["figsize"] = figsize
-    if xmin is not None:
-        attrs["xmin"] = xmin
-    if xmax is not None:
-        attrs["xmax"] = xmax
-    if ymin is not None:
-        attrs["ymin"] = ymin
-    if ymax is not None:
-        attrs["ymax"] = ymax
-    if show_legend is not None:
-        attrs["show_legend"] = show_legend
-    if show_grid is not None:
-        attrs["show_grid"] = show_grid
-    if show_yerr is not None:
-        attrs["show_yerr"] = show_yerr
-    if show_area is not None:
-        attrs["show_area"] = show_area
-    if aspect_ratio is not None:
-        attrs["aspect_ratio"] = aspect_ratio
-    if scalex is not None:
-        attrs["scalex"] = scalex
-    if scaley is not None:
-        attrs["scaley"] = scaley
-    if subplots is not None:
-        attrs["subplots"] = subplots
-    if max_cols is not None:
-        attrs["max_cols"] = max_cols
-    if sharex is not None:
-        attrs["sharex"] = sharex
-    if sharey is not None:
-        attrs["sharey"] = sharey
+    # Build the attrs dict using shared utility
+    attrs = build_attrs_dict(
+        "linechart",
+        charts,
+        title=title,
+        xlabel=xlabel,
+        ylabel=ylabel,
+        figsize=figsize,
+        xmin=xmin,
+        xmax=xmax,
+        ymin=ymin,
+        ymax=ymax,
+        show_legend=show_legend,
+        show_grid=show_grid,
+        aspect_ratio=aspect_ratio,
+        subplots=subplots,
+        max_cols=max_cols,
+        sharex=sharex,
+        sharey=sharey,
+        show_yerr=show_yerr,
+        show_area=show_area,
+        scalex=scalex,
+        scaley=scaley,
+    )
 
     return chart_plot_wrapper(plot_line_chart)(attrs)

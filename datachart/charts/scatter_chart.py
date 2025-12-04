@@ -2,23 +2,23 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import chart_plot_wrapper, plot_histogram
+from ..utils._internal.plot_engine import chart_plot_wrapper, plot_scatter_chart
 from ..utils._internal.chart_builder import build_charts_structure, build_attrs_dict
 from ..typings import (
-    HistDataPointAttrs,
-    HistStyleAttrs,
+    ScatterDataPointAttrs,
+    ScatterStyleAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
 )
-from ..constants import FIG_SIZE, SHOW_GRID, ORIENTATION, SCALE
+from ..constants import FIG_SIZE, SHOW_GRID, SCALE
 
 # ================================================
 # Main Chart Definition
 # ================================================
 
 
-def Histogram(
-    data: Union[List[HistDataPointAttrs], List[List[HistDataPointAttrs]]],
+def ScatterChart(
+    data: Union[List[ScatterDataPointAttrs], List[List[ScatterDataPointAttrs]]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
@@ -31,17 +31,18 @@ def Histogram(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
-    show_density: Optional[bool] = None,
-    show_cumulative: Optional[bool] = None,
+    show_regression: Optional[bool] = None,
+    show_ci: Optional[bool] = None,
+    ci_level: Optional[float] = None,
+    show_correlation: Optional[bool] = None,
     aspect_ratio: Optional[str] = None,
-    orientation: Optional[Union[ORIENTATION, str]] = None,
-    num_bins: Optional[int] = None,
+    scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,
     sharey: Optional[bool] = None,
-    style: Optional[Union[HistStyleAttrs, List[Optional[HistStyleAttrs]]]] = None,
+    style: Optional[Union[ScatterStyleAttrs, List[Optional[ScatterStyleAttrs]]]] = None,
     xticks: Optional[
         Union[List[Union[int, float]], List[List[Union[int, float]]]]
     ] = None,
@@ -67,26 +68,65 @@ def Histogram(
         ]
     ] = None,
     x: Optional[Union[str, List[Optional[str]]]] = None,
+    y: Optional[Union[str, List[Optional[str]]]] = None,
+    size: Optional[Union[str, List[Optional[str]]]] = None,
+    hue: Optional[Union[str, List[Optional[str]]]] = None,
+    size_range: Optional[Tuple[float, float]] = None,
 ) -> plt.Figure:
-    """Creates the histogram.
+    """Creates a scatter chart.
 
     Examples:
-        >>> from datachart.charts import Histogram
-        >>> figure = Histogram(
+        >>> from datachart.charts import ScatterChart
+        >>> # Basic scatter plot
+        >>> figure = ScatterChart(
         ...     data=[
-        ...         {"x": 1},
-        ...         {"x": 2},
-        ...         {"x": 3},
-        ...         {"x": 4},
-        ...         {"x": 5}
+        ...         {"x": 1, "y": 5},
+        ...         {"x": 2, "y": 10},
+        ...         {"x": 3, "y": 15},
+        ...         {"x": 4, "y": 20},
+        ...         {"x": 5, "y": 25}
         ...     ],
-        ...     title="Basic Histogram",
+        ...     title="Basic Scatter Chart",
         ...     xlabel="X",
         ...     ylabel="Y"
         ... )
+        >>>
+        >>> # Scatter with hue grouping
+        >>> figure = ScatterChart(
+        ...     data=[
+        ...         {"x": 1, "y": 5, "category": "A"},
+        ...         {"x": 2, "y": 10, "category": "B"},
+        ...     ],
+        ...     hue="category",
+        ...     show_legend=True
+        ... )
+        >>>
+        >>> # Bubble chart with size variable
+        >>> figure = ScatterChart(
+        ...     data=[
+        ...         {"x": 1, "y": 5, "pop": 100},
+        ...         {"x": 2, "y": 10, "pop": 200}
+        ...     ],
+        ...     size="pop",
+        ...     size_range=(20, 200)
+        ... )
+        >>>
+        >>> # Scatter with regression line
+        >>> figure = ScatterChart(
+        ...     data=[...],
+        ...     show_regression=True,
+        ...     show_ci=True,
+        ...     ci_level=0.95
+        ... )
+        >>>
+        >>> # Scatter with correlation annotation
+        >>> figure = ScatterChart(
+        ...     data=[...],
+        ...     show_correlation=True
+        ... )
 
     Args:
-        data: The data points for the histogram(s). Can be a single list of data points
+        data: The data points for the scatter chart(s). Can be a single list of data points
             for one chart, or a list of lists for multiple charts/subplots.
         title: The title of the chart.
         xlabel: The x-axis label.
@@ -99,17 +139,18 @@ def Histogram(
         ymax: The maximum y-axis value.
         show_legend: Whether to show the legend.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
-        show_density: Whether to plot the density histogram.
-        show_cumulative: Whether to plot the cumulative histogram.
+        show_regression: Whether to show the regression line.
+        show_ci: Whether to show the confidence interval around the regression line.
+        ci_level: The confidence interval level (default 0.95).
+        show_correlation: Whether to show the Pearson correlation coefficient (r-value) as an annotation.
         aspect_ratio: The aspect ratio of the chart.
-        orientation: The orientation of the histogram (vertical or horizontal).
-        num_bins: The number of bins to split the data into.
+        scalex: The x-axis scale (e.g., "log", "linear").
         scaley: The y-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each chart.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.
         sharey: Whether to share the y-axis in subplots.
-        style: Style configuration(s) for the histogram(s).
+        style: Style configuration(s) for the scatter markers.
         xticks: Custom x-axis tick positions.
         xticklabels: Custom x-axis tick labels.
         xtickrotate: Rotation angle for x-axis tick labels.
@@ -119,9 +160,13 @@ def Histogram(
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
         x: The key name in data for x-axis values (default: "x").
+        y: The key name in data for y-axis values (default: "y").
+        size: The key name in data for marker size values (for bubble charts).
+        hue: The key name in data for color grouping (categorical variable).
+        size_range: Tuple of (min_size, max_size) for bubble charts (default: (20, 200)).
 
     Returns:
-        The figure containing the histogram.
+        The figure containing the scatter chart.
 
     """
     # Build the charts structure using shared utility
@@ -138,11 +183,14 @@ def Histogram(
         vlines=vlines,
         hlines=hlines,
         x=x,
+        y=y,
+        size=size,
+        hue=hue,
     )
 
     # Build the attrs dict using shared utility
     attrs = build_attrs_dict(
-        "histogram",
+        "scatterchart",
         charts,
         title=title,
         xlabel=xlabel,
@@ -159,11 +207,13 @@ def Histogram(
         max_cols=max_cols,
         sharex=sharex,
         sharey=sharey,
-        show_density=show_density,
-        show_cumulative=show_cumulative,
-        orientation=orientation,
-        num_bins=num_bins,
+        show_regression=show_regression,
+        show_ci=show_ci,
+        ci_level=ci_level,
+        show_correlation=show_correlation,
+        scalex=scalex,
         scaley=scaley,
+        size_range=size_range,
     )
 
-    return chart_plot_wrapper(plot_histogram)(attrs)
+    return chart_plot_wrapper(plot_scatter_chart)(attrs)

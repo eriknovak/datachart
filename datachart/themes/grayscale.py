@@ -5,6 +5,7 @@ from ..constants import (
     FONT_WEIGHT,
     LINE_DRAW_STYLE,
     COLORS,
+    LEGEND_LOCATION,
 )
 
 GREYSCALE_THEME: StyleAttrs = {
@@ -51,6 +52,7 @@ GREYSCALE_THEME: StyleAttrs = {
     "plot_legend_shadow": False,
     "plot_legend_frameon": True,
     "plot_legend_alignment": "left",
+    "plot_legend_location": LEGEND_LOCATION.BEST,
     "plot_legend_font_size": 9,
     "plot_legend_title_size": 10,
     "plot_legend_label_color": "#000000",
@@ -110,4 +112,18 @@ GREYSCALE_THEME: StyleAttrs = {
     "plot_heatmap_font_color": "#000000",
     "plot_heatmap_font_style": FONT_STYLE.NORMAL,
     "plot_heatmap_font_weight": FONT_WEIGHT.NORMAL,
+    # plot scatter style
+    "plot_scatter_color": None,
+    "plot_scatter_alpha": 0.7,
+    "plot_scatter_size": 36,
+    "plot_scatter_marker": "o",
+    "plot_scatter_zorder": 3,
+    "plot_scatter_edge_width": 0.5,
+    "plot_scatter_edge_color": "#FFFFFF",
+    # plot regression style
+    "plot_regression_color": "#000000",
+    "plot_regression_alpha": 1.0,
+    "plot_regression_width": 2,
+    "plot_regression_style": LINE_STYLE.SOLID,
+    "plot_regression_ci_alpha": 0.2,
 }

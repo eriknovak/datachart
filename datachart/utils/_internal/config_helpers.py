@@ -319,7 +319,7 @@ def get_hline_style(hline_style: dict) -> dict:
     """
 
     config_attrs = [
-        ("colors", "plot_hline_color"),
+        ("color", "plot_hline_color"),
         ("linestyle", "plot_hline_style"),
         ("linewidth", "plot_hline_width"),
         ("alpha", "plot_hline_alpha"),
@@ -374,6 +374,61 @@ def get_heatmap_font_style(heatmap_style: dict) -> dict:
 
 
 # -------------------------------------
+# Scatter Style
+# -------------------------------------
+
+
+def get_scatter_style(chart_style: dict) -> dict:
+    """Get the scatter chart style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The scatter style setting.
+
+    """
+
+    config_attrs = [
+        ("c", "plot_scatter_color"),
+        ("alpha", "plot_scatter_alpha"),
+        ("s", "plot_scatter_size"),
+        ("marker", "plot_scatter_marker"),
+        ("zorder", "plot_scatter_zorder"),
+        ("linewidths", "plot_scatter_edge_width"),
+        ("edgecolors", "plot_scatter_edge_color"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+# -------------------------------------
+# Regression Style
+# -------------------------------------
+
+
+def get_regression_style(chart_style: dict) -> dict:
+    """Get the regression line style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The regression line style setting.
+
+    """
+
+    config_attrs = [
+        ("color", "plot_regression_color"),
+        ("alpha", "plot_regression_alpha"),
+        ("linewidth", "plot_regression_width"),
+        ("linestyle", "plot_regression_style"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+# -------------------------------------
 # Legend Style
 # -------------------------------------
 
@@ -391,6 +446,7 @@ def get_legend_style() -> dict:
         ("frameon", "plot_legend_frameon"),
         ("fontsize", "plot_legend_font_size"),
         ("alignment", "plot_legend_alignment"),
+        ("loc", "plot_legend_location"),
         ("title_fontsize", "plot_legend_title_size"),
         ("labelcolor", "plot_legend_label_color"),
     ]

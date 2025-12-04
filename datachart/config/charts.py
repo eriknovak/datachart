@@ -17,4 +17,8 @@ CHART_CONFIGS = {
         "multiplot": False,
         "subplots": True,
     },
+    "scatterchart": {
+        "multiplot": True,
+        "subplots": True,
+    },
 }

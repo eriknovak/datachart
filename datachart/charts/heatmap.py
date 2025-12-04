@@ -3,6 +3,7 @@ from typing import Union, List, Optional, Tuple
 import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import chart_plot_wrapper, plot_heatmap
+from ..utils._internal.chart_builder import build_charts_structure, build_attrs_dict
 from ..typings import (
     HeatmapStyleAttrs,
     HeatmapColorbarAttrs,
@@ -97,188 +98,41 @@ def Heatmap(
         The figure containing the heatmap.
 
     """
-    # Detect if data is for multiple heatmaps
-    # A single heatmap has data as List[List[value]], multiple heatmaps have List[List[List[value]]]
-    is_multi_chart = (
-        isinstance(data, list)
-        and len(data) > 0
-        and isinstance(data[0], list)
-        and len(data[0]) > 0
-        and isinstance(data[0][0], list)
+    # Build the charts structure using shared utility
+    # Note: Heatmap data is 2D for single chart, so we use is_2d_data=True
+    charts = build_charts_structure(
+        data,
+        subtitle=subtitle,
+        style=style,
+        xticks=xticks,
+        xticklabels=xticklabels,
+        xtickrotate=xtickrotate,
+        yticks=yticks,
+        yticklabels=yticklabels,
+        ytickrotate=ytickrotate,
+        is_2d_data=True,
+        norm=norm,
+        vmin=vmin,
+        vmax=vmax,
+        valfmt=valfmt,
+        colorbar=colorbar,
     )
 
-    # Build the charts structure
-    if is_multi_chart:
-        charts = []
-        for i, chart_data in enumerate(data):
-            chart_dict = {"data": chart_data}
-
-            # Add per-chart attributes
-            if subtitle is not None and isinstance(subtitle, list):
-                chart_dict["subtitle"] = subtitle[i] if i < len(subtitle) else None
-            elif subtitle is not None:
-                chart_dict["subtitle"] = subtitle
-
-            if style is not None and isinstance(style, list):
-                style_val = style[i] if i < len(style) else None
-                chart_dict["style"] = style_val if style_val is not None else {}
-            elif style is not None:
-                chart_dict["style"] = style
-
-            if norm is not None and isinstance(norm, list):
-                chart_dict["norm"] = norm[i] if i < len(norm) else None
-            elif norm is not None:
-                chart_dict["norm"] = norm
-
-            if vmin is not None and isinstance(vmin, list):
-                chart_dict["vmin"] = vmin[i] if i < len(vmin) else None
-            elif vmin is not None:
-                chart_dict["vmin"] = vmin
-
-            if vmax is not None and isinstance(vmax, list):
-                chart_dict["vmax"] = vmax[i] if i < len(vmax) else None
-            elif vmax is not None:
-                chart_dict["vmax"] = vmax
-
-            if valfmt is not None and isinstance(valfmt, list):
-                chart_dict["valfmt"] = valfmt[i] if i < len(valfmt) else None
-            elif valfmt is not None:
-                chart_dict["valfmt"] = valfmt
-
-            if xticks is not None and isinstance(xticks[0] if xticks else None, list):
-                chart_dict["xticks"] = xticks[i] if i < len(xticks) else None
-            elif xticks is not None:
-                chart_dict["xticks"] = xticks
-
-            if xticklabels is not None and isinstance(
-                xticklabels[0] if xticklabels else None, list
-            ):
-                chart_dict["xticklabels"] = (
-                    xticklabels[i] if i < len(xticklabels) else None
-                )
-            elif xticklabels is not None:
-                chart_dict["xticklabels"] = xticklabels
-
-            if xtickrotate is not None and isinstance(xtickrotate, list):
-                chart_dict["xtickrotate"] = (
-                    xtickrotate[i] if i < len(xtickrotate) else None
-                )
-            elif xtickrotate is not None:
-                chart_dict["xtickrotate"] = xtickrotate
-
-            if yticks is not None and isinstance(yticks[0] if yticks else None, list):
-                chart_dict["yticks"] = yticks[i] if i < len(yticks) else None
-            elif yticks is not None:
-                chart_dict["yticks"] = yticks
-
-            if yticklabels is not None and isinstance(
-                yticklabels[0] if yticklabels else None, list
-            ):
-                chart_dict["yticklabels"] = (
-                    yticklabels[i] if i < len(yticklabels) else None
-                )
-            elif yticklabels is not None:
-                chart_dict["yticklabels"] = yticklabels
-
-            if ytickrotate is not None and isinstance(ytickrotate, list):
-                chart_dict["ytickrotate"] = (
-                    ytickrotate[i] if i < len(ytickrotate) else None
-                )
-            elif ytickrotate is not None:
-                chart_dict["ytickrotate"] = ytickrotate
-
-            if colorbar is not None and isinstance(colorbar, list):
-                chart_dict["colorbar"] = colorbar[i] if i < len(colorbar) else None
-            elif colorbar is not None:
-                chart_dict["colorbar"] = colorbar
-
-            charts.append(chart_dict)
-    else:
-        # Single heatmap
-        chart_dict = {"data": data}
-        if subtitle is not None:
-            chart_dict["subtitle"] = (
-                subtitle
-                if isinstance(subtitle, str)
-                else (subtitle[0] if subtitle else None)
-            )
-        if style is not None:
-            chart_dict["style"] = (
-                style if isinstance(style, dict) else (style[0] if style else None)
-            )
-        if norm is not None:
-            chart_dict["norm"] = (
-                norm if isinstance(norm, str) else (norm[0] if norm else None)
-            )
-        if vmin is not None:
-            chart_dict["vmin"] = (
-                vmin if isinstance(vmin, (int, float)) else (vmin[0] if vmin else None)
-            )
-        if vmax is not None:
-            chart_dict["vmax"] = (
-                vmax if isinstance(vmax, (int, float)) else (vmax[0] if vmax else None)
-            )
-        if valfmt is not None:
-            chart_dict["valfmt"] = (
-                valfmt if isinstance(valfmt, str) else (valfmt[0] if valfmt else None)
-            )
-        if xticks is not None:
-            chart_dict["xticks"] = xticks
-        if xticklabels is not None:
-            chart_dict["xticklabels"] = xticklabels
-        if xtickrotate is not None:
-            chart_dict["xtickrotate"] = (
-                xtickrotate
-                if isinstance(xtickrotate, int)
-                else (xtickrotate[0] if xtickrotate else None)
-            )
-        if yticks is not None:
-            chart_dict["yticks"] = yticks
-        if yticklabels is not None:
-            chart_dict["yticklabels"] = yticklabels
-        if ytickrotate is not None:
-            chart_dict["ytickrotate"] = (
-                ytickrotate
-                if isinstance(ytickrotate, int)
-                else (ytickrotate[0] if ytickrotate else None)
-            )
-        if colorbar is not None:
-            chart_dict["colorbar"] = (
-                colorbar
-                if isinstance(colorbar, dict)
-                else (colorbar[0] if colorbar else None)
-            )
-
-        charts = chart_dict
-
-    # Build the attrs dict for the internal API
-    attrs = {
-        "type": "heatmap",
-        "charts": charts,
-    }
-
-    # Add global attributes
-    if title is not None:
-        attrs["title"] = title
-    if xlabel is not None:
-        attrs["xlabel"] = xlabel
-    if ylabel is not None:
-        attrs["ylabel"] = ylabel
-    if figsize is not None:
-        attrs["figsize"] = figsize
-    if show_colorbars is not None:
-        attrs["show_colorbars"] = show_colorbars
-    if show_heatmap_values is not None:
-        attrs["show_heatmap_values"] = show_heatmap_values
-    if aspect_ratio is not None:
-        attrs["aspect_ratio"] = aspect_ratio
-    if subplots is not None:
-        attrs["subplots"] = subplots
-    if max_cols is not None:
-        attrs["max_cols"] = max_cols
-    if sharex is not None:
-        attrs["sharex"] = sharex
-    if sharey is not None:
-        attrs["sharey"] = sharey
+    # Build the attrs dict using shared utility
+    attrs = build_attrs_dict(
+        "heatmap",
+        charts,
+        title=title,
+        xlabel=xlabel,
+        ylabel=ylabel,
+        figsize=figsize,
+        aspect_ratio=aspect_ratio,
+        subplots=subplots,
+        max_cols=max_cols,
+        sharex=sharex,
+        sharey=sharey,
+        show_colorbars=show_colorbars,
+        show_heatmap_values=show_heatmap_values,
+    )
 
     return chart_plot_wrapper(plot_heatmap)(attrs)

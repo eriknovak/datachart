@@ -22,6 +22,9 @@ Classes:
     HeatmapChartAttrs: The heatmap chart attributes.
     HeatmapSingleChartAttrs: The single chart attributes for the heatmap chart.
     HeatmapColorbarAttrs: The heatmap colorbar attributes.
+    ScatterChartAttrs: The scatter chart attributes.
+    ScatterSingleChartAttrs: The single chart attributes for the scatter chart.
+    ScatterDataPointAttrs: The data point attributes for the scatter chart.
 
     StyleAttrs: The style typing.
     ColorGeneralStyleAttrs: The typing for the general color style.
@@ -36,6 +39,8 @@ Classes:
     VLineStyleAttrs: The typing for the vertical line style.
     HLineStyleAttrs: The typing for the horizontal line style.
     HeatmapStyleAttrs: The typing for the heatmap style.
+    ScatterStyleAttrs: The typing for the scatter chart style.
+    RegressionStyleAttrs: The typing for the regression line style.
 
 """
 
@@ -52,10 +57,12 @@ from .constants import (
     LINE_DRAW_STYLE,
     HISTOGRAM_TYPE,
     LEGEND_ALIGN,
+    LEGEND_LOCATION,
     ORIENTATION,
     COLORS,
     SHOW_GRID,
     SCALE,
+    ASPECT_RATIO,
 )
 
 # ================================================
@@ -170,6 +177,7 @@ class LegendStyleAttrs(TypedDict):
         plot_legend_shadow (Union[bool, None]): Show the legends shadow.
         plot_legend_frameon (Union[bool, None]): Show the legends frame.
         plot_legend_alignment (Union[LEGEND_ALIGN, str, None]): The legend alignment.
+        plot_legend_location (Union[LEGEND_LOCATION, str, None]): The legend location.
         plot_legend_font_size (Union[int, float, str, None]): The font size within the legend.
         plot_legend_title_size (Union[int, float, str, None]): The title size of the legend.
         plot_legend_label_color (Union[str, None]): The label color of the legend.
@@ -179,6 +187,7 @@ class LegendStyleAttrs(TypedDict):
     plot_legend_shadow: Union[bool, None]
     plot_legend_frameon: Union[bool, None]
     plot_legend_alignment: Union[LEGEND_ALIGN, str, None]
+    plot_legend_location: Union[LEGEND_LOCATION, str, None]
     plot_legend_font_size: Union[int, float, str, None]
     plot_legend_title_size: Union[int, float, str, None]
     plot_legend_label_color: Union[str, None]
@@ -364,6 +373,48 @@ class HeatmapStyleAttrs(TypedDict):
     plot_heatmap_font_weight: Union[FONT_WEIGHT, str, None]
 
 
+class ScatterStyleAttrs(TypedDict):
+    """The typing for the scatter chart style.
+
+    Attributes:
+        plot_scatter_color (Union[str, None]): The scatter marker color.
+        plot_scatter_alpha (Union[float, None]): The alpha value of the markers.
+        plot_scatter_size (Union[int, float, None]): The marker size.
+        plot_scatter_marker (Union[LINE_MARKER, str, None]): The marker shape.
+        plot_scatter_zorder (Union[int, float, None]): The zorder of the scatter.
+        plot_scatter_edge_width (Union[int, float, None]): The edge width of markers.
+        plot_scatter_edge_color (Union[str, None]): The edge color of markers.
+
+    """
+
+    plot_scatter_color: Union[str, None]
+    plot_scatter_alpha: Union[float, None]
+    plot_scatter_size: Union[int, float, None]
+    plot_scatter_marker: Union[LINE_MARKER, str, None]
+    plot_scatter_zorder: Union[int, float, None]
+    plot_scatter_edge_width: Union[int, float, None]
+    plot_scatter_edge_color: Union[str, None]
+
+
+class RegressionStyleAttrs(TypedDict):
+    """The typing for regression line style.
+
+    Attributes:
+        plot_regression_color (Union[str, None]): The regression line color.
+        plot_regression_alpha (Union[float, None]): The alpha of the regression line.
+        plot_regression_width (Union[int, float, None]): The line width.
+        plot_regression_style (Union[LINE_STYLE, str, None]): The line style.
+        plot_regression_ci_alpha (Union[float, None]): Confidence interval alpha.
+
+    """
+
+    plot_regression_color: Union[str, None]
+    plot_regression_alpha: Union[float, None]
+    plot_regression_width: Union[int, float, None]
+    plot_regression_style: Union[LINE_STYLE, str, None]
+    plot_regression_ci_alpha: Union[float, None]
+
+
 class StyleAttrs(
     ColorGeneralStyleAttrs,
     FontStyleAttrs,
@@ -377,6 +428,8 @@ class StyleAttrs(
     VLineStyleAttrs,
     HLineStyleAttrs,
     HeatmapStyleAttrs,
+    ScatterStyleAttrs,
+    RegressionStyleAttrs,
 ):
     """The style attributes. Combines all style typings."""
 
@@ -402,7 +455,7 @@ class ChartCommonAttrs(TypedDict):
         ymax (Union[int, float, None]): Determine the maximum y-axis value.
         show_legend (Union[bool, None]): Whether or not to show the legend.
         show_grid (Union[SHOW_GRID, str, None]): Determine which grid lines to show.
-        aspect_ratio (Union[str, None]): The aspect ratio of the charts.
+        aspect_ratio (Union[ASPECT_RATIO, str, None]): The aspect ratio of the charts.
 
         subplots (Union[bool, None]): Whether or not to create a separate subplot for each chart.
         max_cols (Union[int, None]): The maximum number of columns in the subplots. Active only when `subplots` is `True`.
@@ -422,7 +475,7 @@ class ChartCommonAttrs(TypedDict):
     # visibility attributes
     show_legend: Union[bool, None]
     show_grid: Union[SHOW_GRID, str, None]
-    aspect_ratio: Union[str, None]
+    aspect_ratio: Union[ASPECT_RATIO, str, None]
     # the subplot attributes
     subplots: Union[bool, None]
     max_cols: Union[int, None]
@@ -533,9 +586,9 @@ class LineSingleChartAttrs(TypedDict):
     vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
     hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
 
-    x: Union[str, None] = "x"  # the name of the x attribute in data
-    y: Union[str, None] = "y"  # the name of the y attribute in data
-    yerr: Union[str, None] = "yerr"  # the name of the yerr attribute in data
+    x: Union[str, None]  # the name of the x attribute in data (default: "x")
+    y: Union[str, None]  # the name of the y attribute in data (default: "y")
+    yerr: Union[str, None]  # the name of the yerr attribute in data (default: "yerr")
 
 
 class LineChartAttrs(ChartCommonAttrs):
@@ -794,11 +847,106 @@ class HeatmapChartAttrs(ChartCommonAttrs):
 
 
 # ================================================
+# Scatter Chart Attributes
+# ================================================
+
+
+class ScatterDataPointAttrs(TypedDict):
+    """The data point attributes for the scatter chart.
+
+    Attributes:
+        x (Union[int, float]): The x-axis value.
+        y (Union[int, float]): The y-axis value.
+        size (Optional[Union[int, float]]): The marker size (for bubble charts).
+        hue (Optional[str]): The category for color grouping.
+
+    """
+
+    x: Union[int, float]
+    y: Union[int, float]
+    size: Optional[Union[int, float]]
+    hue: Optional[str]
+
+
+class ScatterSingleChartAttrs(TypedDict):
+    """The single chart attributes for the scatter chart.
+
+    Attributes:
+        data (List[ScatterDataPointAttrs]): The list of data points defining the scatter chart.
+        subtitle (Union[str, None]): The subtitle of the scatter chart. Also used as the label in the legend.
+        xlabel (Union[str, None]): The xlabel of the scatter chart.
+        ylabel (Union[str, None]): The ylabel of the scatter chart.
+        style (Union[ScatterStyleAttrs, None]): The style of the scatter chart.
+        xticks (Union[int, float, None]): The xtick positions list.
+        xticklabels (Union[List[str], None]): The xtick labels.
+        xtickrotate (Union[int, None]): The xtick rotation value.
+        yticks (Union[int, float, None]): The ytick position list.
+        yticklabels (Union[List[str], None]): The ytick labels.
+        ytickrotate (Union[int, None]): The ytick rotation value.
+        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
+        x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
+        y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
+        size (Union[str, None]): The key name in `data` that contains the marker size value.
+        hue (Union[str, None]): The key name in `data` that contains the hue/category value.
+
+    """
+
+    data: List[ScatterDataPointAttrs]
+    subtitle: Union[str, None]
+    xlabel: Union[str, None]
+    ylabel: Union[str, None]
+    style: Union[ScatterStyleAttrs, None]
+
+    xticks: Union[int, float, None]
+    xticklabels: Union[List[str], None]
+    xtickrotate: Union[int, None]
+    yticks: Union[int, float, None]
+    yticklabels: Union[List[str], None]
+    ytickrotate: Union[int, None]
+
+    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
+    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
+
+    x: Union[str, None]
+    y: Union[str, None]
+    size: Union[str, None]
+    hue: Union[str, None]
+
+
+class ScatterChartAttrs(ChartCommonAttrs):
+    """The scatter chart attributes.
+
+    Attributes:
+        charts (Union[ScatterSingleChartAttrs, List[ScatterSingleChartAttrs]]): The scatter chart definitions.
+        show_regression (Union[bool, None]): Whether or not to show the regression line.
+        show_ci (Union[bool, None]): Whether or not to show the confidence interval around the regression.
+        ci_level (Union[float, None]): The confidence interval level (default 0.95).
+        scalex (Union[SCALE, str, None]): The scale of the x-axis.
+        scaley (Union[SCALE, str, None]): The scale of the y-axis.
+        size_range (Union[Tuple[float, float], None]): The min/max marker sizes for bubble charts.
+
+    """
+
+    charts: Union[ScatterSingleChartAttrs, List[ScatterSingleChartAttrs]]
+    show_regression: Union[bool, None]
+    show_ci: Union[bool, None]
+    ci_level: Union[float, None]
+    scalex: Union[SCALE, str, None]
+    scaley: Union[SCALE, str, None]
+    size_range: Union[Tuple[float, float], None]
+
+
+# ================================================
 # Chart Attributes
 # ================================================
 
 
 ChartAttrs = Union[
-    LineChartAttrs, BarChartAttrs, HistogramChartAttrs, HeatmapChartAttrs
+    LineChartAttrs,
+    BarChartAttrs,
+    HistogramChartAttrs,
+    HeatmapChartAttrs,
+    ScatterChartAttrs,
 ]
 """The union of all chart attributes."""

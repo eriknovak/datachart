@@ -1,25 +1,29 @@
 """Module containing the `constants`.
 
-The `constants` module procides a set of predefined constants used in the package.
+The `constants` module provides a set of predefined constants used in the package.
 These include figure size, format, style, and other figure manipulation values.
 
 Classes:
-    FIG_SIZE:        The predefined figure sizes.
-    FIG_FORMAT:      The supported figure formats.
-    FONT_STYLE:      The supported font styles.
-    FONT_WEIGHT:     The supported font weights.
-    LINE_MARKER:     The supported line markers.
-    LINE_STYLE:      The supported line styles.
-    LINE_DRAW_STYLE: The supported line draw styles.
-    HATCH_STYLE:     The supported hatch styles.
-    LEGEND_ALIGN:    The supported legend alignments.
-    HISTOGRAM_TYPE:  The supported histogram types.
-    COLORS:          The predefined colors.
-    NORMALIZE:       The supported normalization options.
-    ORIENTATION:     The supported orientations.
-    VALFMT:          The predefined value formats.
-    THEME:           The predefined themes.
-    SHOW_GRID:       The supported show grid options.
+    FIG_SIZE:           The predefined figure sizes.
+    FIG_FORMAT:         The supported figure formats.
+    FONT_STYLE:         The supported font styles.
+    FONT_WEIGHT:        The supported font weights.
+    LINE_MARKER:        The supported line markers.
+    LINE_STYLE:         The supported line styles.
+    LINE_DRAW_STYLE:    The supported line draw styles.
+    HATCH_STYLE:        The supported hatch styles.
+    LEGEND_ALIGN:       The supported legend alignments.
+    LEGEND_LOCATION:    The supported legend locations.
+    HISTOGRAM_TYPE:     The supported histogram types.
+    COLORS:             The predefined colors.
+    NORMALIZE:          The supported normalization options.
+    ORIENTATION:        The supported orientations.
+    VALFMT:             The predefined value formats.
+    THEME:              The predefined themes.
+    SHOW_GRID:          The supported show grid options.
+    SCALE:              The supported scale options.
+    ASPECT_RATIO:       The supported aspect ratio options.
+    COLORBAR_LOCATION:  The supported colorbar locations.
 
 """
 
@@ -69,6 +73,9 @@ class FIG_FORMAT:
         PDF (str): The pdf format. Equals to `"pdf"`.
         PNG (str): The png format. Equals to `"png"`.
         WEBP (str): The webp format. Equals to `"webp"`.
+        EPS (str): The eps format (Encapsulated PostScript). Equals to `"eps"`.
+        JPG (str): The jpg format. Equals to `"jpg"`.
+        TIFF (str): The tiff format. Equals to `"tiff"`.
 
     """
 
@@ -77,6 +84,9 @@ class FIG_FORMAT:
     PDF = "pdf"
     PNG = "png"
     WEBP = "webp"
+    EPS = "eps"
+    JPG = "jpg"
+    TIFF = "tiff"
 
 
 class FONT_STYLE:
@@ -114,9 +124,14 @@ class FONT_WEIGHT:
         ULTRA_LIGHT (str): The ultra light font weight. Equals to `"ultralight"`.
         LIGHT (str): The light font weight. Equals to `"light"`.
         NORMAL (str): The normal font weight. Equals to `"normal"`.
+        MEDIUM (str): The medium font weight. Equals to `"medium"`.
+        SEMIBOLD (str): The semibold font weight. Equals to `"semibold"`.
+        DEMI_BOLD (str): The demibold font weight. Equals to `"demibold"`.
         BOLD (str): The bold font weight. Equals to `"bold"`.
+        EXTRA_BOLD (str): The extra bold font weight. Equals to `"extra bold"`.
         HEAVY (str): The heavy font weight. Equals to `"heavy"`.
         ULTRA_HEAVY (str): The ultra heavy font weight. Equals to `"ultrabold"`.
+        BLACK (str): The black font weight. Equals to `"black"`.
 
     """
 
@@ -124,9 +139,14 @@ class FONT_WEIGHT:
     ULTRA_LIGHT = "ultralight"
     LIGHT = "light"
     NORMAL = "normal"
+    MEDIUM = "medium"
+    SEMIBOLD = "semibold"
+    DEMI_BOLD = "demibold"
     BOLD = "bold"
+    EXTRA_BOLD = "extra bold"
     HEAVY = "heavy"
     ULTRA_HEAVY = "ultrabold"
+    BLACK = "black"
 
 
 class LINE_MARKER:
@@ -138,29 +158,45 @@ class LINE_MARKER:
         ","
 
     Attributes:
+        NONE (str): No marker. Equals to `""`.
         PIXEL (str): The pixel line marker. Equals to `","`.
         POINT (str): The point line marker. Equals to `"."`.
         CIRCLE (str): The circle line marker. Equals to `"o"`.
-        TRIANGLE (str): The triangle line marker. Equals to `"^"`.
+        DIAMOND (str): The diamond line marker. Equals to `"D"`.
+        THIN_DIAMOND (str): The thin diamond line marker. Equals to `"d"`.
+        TRIANGLE (str): The triangle (up) line marker. Equals to `"^"`.
+        TRIANGLE_DOWN (str): The triangle down line marker. Equals to `"v"`.
+        TRIANGLE_LEFT (str): The triangle left line marker. Equals to `"<"`.
+        TRIANGLE_RIGHT (str): The triangle right line marker. Equals to `">"`.
         SQUARE (str): The square line marker. Equals to `"s"`.
         PENTAGON (str): The pentagon line marker. Equals to `"p"`.
         HEXAGON (str): The hexagon line marker. Equals to `"h"`.
         STAR (str): The star line marker. Equals to `"*"`.
         CROSS (str): The cross line marker. Equals to `"x"`.
         PLUS (str): The plus line marker. Equals to `"+"`.
+        VLINE (str): The vertical line marker. Equals to `"|"`.
+        HLINE (str): The horizontal line marker. Equals to `"_"`.
 
     """
 
+    NONE = ""
     PIXEL = ","
     POINT = "."
     CIRCLE = "o"
+    DIAMOND = "D"
+    THIN_DIAMOND = "d"
     TRIANGLE = "^"
+    TRIANGLE_DOWN = "v"
+    TRIANGLE_LEFT = "<"
+    TRIANGLE_RIGHT = ">"
     SQUARE = "s"
     PENTAGON = "p"
     HEXAGON = "h"
     STAR = "*"
     CROSS = "x"
     PLUS = "+"
+    VLINE = "|"
+    HLINE = "_"
 
 
 class LINE_STYLE:
@@ -172,6 +208,7 @@ class LINE_STYLE:
         "-"
 
     Attributes:
+        NONE (str): No line style. Equals to `""`.
         SOLID (str): The solid line style. Equals to `"-"`.
         DASHED (str): The dashed line style. Equals to `"--"`.
         DASHDOT (str): The dashdot line style. Equals to `"-."`.
@@ -179,6 +216,7 @@ class LINE_STYLE:
 
     """
 
+    NONE = ""
     SOLID = "-"
     DASHED = "--"
     DASHDOT = "-."
@@ -220,6 +258,7 @@ class HATCH_STYLE:
     Attributes:
         DEFAULT (str): The default hatch style. Equals to `None`.
         DIAGONAL (str): The diagonal hatch style. Equals to `"/"`.
+        BACK_DIAGONAL (str): The back diagonal hatch style. Equals to `"\\\\"`.
         VERTICAL (str): The vertical hatch style. Equals to `"|"`.
         HORIZONTAL (str): The horizontal hatch style. Equals to `"-"`.
         CROSSED (str): The crossed hatch style. Equals to `"+"`.
@@ -232,6 +271,7 @@ class HATCH_STYLE:
 
     DEFAULT = None
     DIAGONAL = "/"
+    BACK_DIAGONAL = "\\"
     VERTICAL = "|"
     HORIZONTAL = "-"
     CROSSED = "+"
@@ -263,6 +303,42 @@ class LEGEND_ALIGN:
     LEFT = "left"
 
 
+class LEGEND_LOCATION:
+    """The supported legend locations.
+
+    Examples:
+        >>> from datachart.constants import LEGEND_LOCATION
+        >>> LEGEND_LOCATION.BEST
+        "best"
+
+    Attributes:
+        BEST (str): Automatic best location. Equals to `"best"`.
+        UPPER_RIGHT (str): Upper right corner. Equals to `"upper right"`.
+        UPPER_LEFT (str): Upper left corner. Equals to `"upper left"`.
+        LOWER_LEFT (str): Lower left corner. Equals to `"lower left"`.
+        LOWER_RIGHT (str): Lower right corner. Equals to `"lower right"`.
+        RIGHT (str): Center right. Equals to `"right"`.
+        CENTER_LEFT (str): Center left. Equals to `"center left"`.
+        CENTER_RIGHT (str): Center right. Equals to `"center right"`.
+        LOWER_CENTER (str): Lower center. Equals to `"lower center"`.
+        UPPER_CENTER (str): Upper center. Equals to `"upper center"`.
+        CENTER (str): Center. Equals to `"center"`.
+
+    """
+
+    BEST = "best"
+    UPPER_RIGHT = "upper right"
+    UPPER_LEFT = "upper left"
+    LOWER_LEFT = "lower left"
+    LOWER_RIGHT = "lower right"
+    RIGHT = "right"
+    CENTER_LEFT = "center left"
+    CENTER_RIGHT = "center right"
+    LOWER_CENTER = "lower center"
+    UPPER_CENTER = "upper center"
+    CENTER = "center"
+
+
 class HISTOGRAM_TYPE:
     """The supported histogram types.
 
@@ -273,12 +349,14 @@ class HISTOGRAM_TYPE:
 
     Attributes:
         BAR (str): The bar histogram style. Equals to `"bar"`.
+        BAR_STACKED (str): The stacked bar histogram style. Equals to `"barstacked"`.
         STEP (str): The step histogram style. Equals to `"step"`.
         STEPFILLED (str): The stepfilled histogram style. Equals to `"stepfilled"`.
 
     """
 
     BAR = "bar"
+    BAR_STACKED = "barstacked"
     STEP = "step"
     STEPFILLED = "stepfilled"
 
@@ -332,6 +410,15 @@ class COLORS:
         Cividis (str): Color-blind friendly (optimized for CVD). Equals to `"Cividis"`.
         Inferno (str): Perceptually uniform, color-blind friendly. Equals to `"Inferno"`.
         Plasma (str): Perceptually uniform, color-blind friendly. Equals to `"Plasma"`.
+        Magma (str): Perceptually uniform, color-blind friendly. Equals to `"Magma"`.
+        Turbo (str): Rainbow-like but perceptually better. Equals to `"Turbo"`.
+
+        # Additional Diverging
+        Coolwarm (str): Diverging cool-warm palette. Equals to `"coolwarm"`.
+
+        # Tableau palettes (Categorical)
+        Tab10 (str): Tableau 10-color categorical palette. Equals to `"tab10"`.
+        Tab20 (str): Tableau 20-color categorical palette. Equals to `"tab20"`.
 
     """
 
@@ -373,6 +460,15 @@ class COLORS:
     Cividis = "Cividis"
     Inferno = "Inferno"
     Plasma = "Plasma"
+    Magma = "Magma"
+    Turbo = "Turbo"
+
+    # Additional Diverging
+    Coolwarm = "coolwarm"
+
+    # Tableau palettes (Categorical)
+    Tab10 = "tab10"
+    Tab20 = "tab20"
 
 
 class NORMALIZE:
@@ -428,15 +524,25 @@ class VALFMT:
     Attributes:
         DEFAULT (str): The default value format. Equals to `"{x}"`.
         INTEGER (str): The integer value format. Equals to `"{x:d}"`.
-        DECIMAL (str): The decimal value format. Equals to `"{x:.1f}"`.
-        PERCENT (str): The percentage value format. Equals to `"{x:.1%}"`.
+        DECIMAL (str): The decimal value format (1 decimal place). Equals to `"{x:.1f}"`.
+        DECIMAL_2 (str): The decimal value format (2 decimal places). Equals to `"{x:.2f}"`.
+        DECIMAL_3 (str): The decimal value format (3 decimal places). Equals to `"{x:.3f}"`.
+        PERCENT (str): The percentage value format (1 decimal place). Equals to `"{x:.1%}"`.
+        PERCENT_INT (str): The percentage value format (no decimals). Equals to `"{x:.0%}"`.
+        SCIENTIFIC (str): The scientific notation format. Equals to `"{x:.2e}"`.
+        THOUSANDS (str): The thousands separator format. Equals to `"{x:,.0f}"`.
 
     """
 
     DEFAULT = "{x}"
     INTEGER = "{x:d}"
     DECIMAL = "{x:.1f}"
+    DECIMAL_2 = "{x:.2f}"
+    DECIMAL_3 = "{x:.3f}"
     PERCENT = "{x:.1%}"
+    PERCENT_INT = "{x:.0%}"
+    SCIENTIFIC = "{x:.2e}"
+    THOUSANDS = "{x:,.0f}"
 
 
 class THEME:
@@ -495,6 +601,7 @@ class SCALE:
         LOG (str): The log scale. Equals to `"log"`.
         SYMLOG (str): The symlog scale. Equals to `"symlog"`.
         ASINH (str): The asinh scale. Equals to `"asinh"`.
+
     """
 
     DEFAULT = "linear"
@@ -502,3 +609,45 @@ class SCALE:
     LOG = "log"
     SYMLOG = "symlog"
     ASINH = "asinh"
+
+
+class ASPECT_RATIO:
+    """The supported aspect ratio options.
+
+    Examples:
+        >>> from datachart.constants import ASPECT_RATIO
+        >>> ASPECT_RATIO.DEFAULT
+        "auto"
+
+    Attributes:
+        DEFAULT (str): The default aspect ratio. Same as `ASPECT_RATIO.AUTO`.
+        AUTO (str): Automatic aspect ratio. Equals to `"auto"`.
+        EQUAL (str): Equal aspect ratio (1:1). Equals to `"equal"`.
+
+    """
+
+    DEFAULT = "auto"
+    AUTO = "auto"
+    EQUAL = "equal"
+
+
+class COLORBAR_LOCATION:
+    """The supported colorbar locations.
+
+    Examples:
+        >>> from datachart.constants import COLORBAR_LOCATION
+        >>> COLORBAR_LOCATION.RIGHT
+        "right"
+
+    Attributes:
+        RIGHT (str): Right side of the chart. Equals to `"right"`.
+        LEFT (str): Left side of the chart. Equals to `"left"`.
+        TOP (str): Top of the chart. Equals to `"top"`.
+        BOTTOM (str): Bottom of the chart. Equals to `"bottom"`.
+
+    """
+
+    RIGHT = "right"
+    LEFT = "left"
+    TOP = "top"
+    BOTTOM = "bottom"
