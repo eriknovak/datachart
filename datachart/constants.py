@@ -37,12 +37,37 @@ class FIG_SIZE:
         (6.4, 4.8)
 
     Attributes:
+        # Default
         DEFAULT (Tuple[float, float]): The default figure size. Equals to `(6.4, 4.8)`.
-        A4 (Tuple[float, float]): The A4 portrait figure size. Equals to `(8.2, 11.6)`.
+
+        # A4 formats
+        A4_PORTRAIT (Tuple[float, float]): The A4 portrait figure size. Equals to `(8.2, 11.6)`.
+        A4 (Tuple[float, float]): Alias for `A4_PORTRAIT`. Deprecated, use `A4_PORTRAIT` instead.
         A4_LANDSCAPE (Tuple[float, float]): The A4 landscape figure size. Equals to `(11.6, 8.2)`.
-        A4_NARROW (Tuple[float, float]): The flat, full-width figure size. Equals to `(8.2, 2.4)`.
-        A4_REGULAR (Tuple[float, float]): The regular, full-width figure size. Equals to `(8.2, 4.8)`.
-        A4_WIDE (Tuple[float, float]): The tall, full-width figure size. Equals to `(8.2, 7.2)`.
+        A4_NARROW (Tuple[float, float]): The flat, full-width A4 figure size. Equals to `(8.2, 2.4)`.
+        A4_REGULAR (Tuple[float, float]): The regular, full-width A4 figure size. Equals to `(8.2, 4.8)`.
+        A4_WIDE (Tuple[float, float]): The tall, full-width A4 figure size. Equals to `(8.2, 7.2)`.
+
+        # A4 half-width formats
+        A4_HALF_PORTRAIT (Tuple[float, float]): The A4 half-width portrait figure size. Equals to `(4.1, 5.8)`.
+        A4_HALF_LANDSCAPE (Tuple[float, float]): The A4 half-width landscape figure size. Equals to `(5.8, 4.1)`.
+        A4_HALF_NARROW (Tuple[float, float]): The flat, half-width A4 figure size. Equals to `(4.1, 2.4)`.
+        A4_HALF_REGULAR (Tuple[float, float]): The regular, half-width A4 figure size. Equals to `(4.1, 4.8)`.
+        A4_HALF_WIDE (Tuple[float, float]): The tall, half-width A4 figure size. Equals to `(4.1, 7.2)`.
+
+        # US Letter formats
+        LETTER_PORTRAIT (Tuple[float, float]): The US Letter portrait figure size. Equals to `(8.5, 11.0)`.
+        LETTER_LANDSCAPE (Tuple[float, float]): The US Letter landscape figure size. Equals to `(11.0, 8.5)`.
+        LETTER_NARROW (Tuple[float, float]): The flat, full-width Letter figure size. Equals to `(8.5, 2.4)`.
+        LETTER_REGULAR (Tuple[float, float]): The regular, full-width Letter figure size. Equals to `(8.5, 4.8)`.
+        LETTER_WIDE (Tuple[float, float]): The tall, full-width Letter figure size. Equals to `(8.5, 7.2)`.
+
+        # Tall formats
+        TALL_NARROW (Tuple[float, float]): The moderately tall, narrow figure size. Equals to `(4.1, 6.0)`.
+        TALL_REGULAR (Tuple[float, float]): The regular tall, narrow figure size. Equals to `(4.1, 8.0)`.
+        TALL_WIDE (Tuple[float, float]): The very tall, narrow figure size. Equals to `(4.1, 11.6)`.
+
+        # Square formats
         SQUARE (Tuple[float, float]): The regular square figure size. Equals to `(6.4, 6.4)`.
         SQUARE_SMALL (Tuple[float, float]): The small square figure size. Equals to `(4.8, 4.8)`.
         SQUARE_LARGE (Tuple[float, float]): The large square figure size. Equals to `(8.2, 8.2)`.
@@ -50,12 +75,35 @@ class FIG_SIZE:
     """
 
     DEFAULT = (6.4, 4.8)
-    A4 = (8.2, 11.6)
+
+    # A4 formats
+    A4_PORTRAIT = (8.2, 11.6)
+    A4 = A4_PORTRAIT  # Backward compatibility alias
     A4_LANDSCAPE = (11.6, 8.2)
     A4_NARROW = (8.2, 2.4)
     A4_REGULAR = (8.2, 4.8)
     A4_WIDE = (8.2, 7.2)
 
+    # A4 half-width formats
+    A4_HALF_PORTRAIT = (4.1, 5.8)
+    A4_HALF_LANDSCAPE = (5.8, 4.1)
+    A4_HALF_NARROW = (4.1, 2.4)
+    A4_HALF_REGULAR = (4.1, 4.8)
+    A4_HALF_WIDE = (4.1, 7.2)
+
+    # US Letter formats
+    LETTER_PORTRAIT = (8.5, 11.0)
+    LETTER_LANDSCAPE = (11.0, 8.5)
+    LETTER_NARROW = (8.5, 2.4)
+    LETTER_REGULAR = (8.5, 4.8)
+    LETTER_WIDE = (8.5, 7.2)
+
+    # Tall formats
+    TALL_NARROW = (4.1, 6.0)
+    TALL_REGULAR = (4.1, 8.0)
+    TALL_WIDE = (4.1, 11.6)
+
+    # Square formats
     SQUARE = (6.4, 6.4)
     SQUARE_SMALL = (4.8, 4.8)
     SQUARE_LARGE = (8.2, 8.2)
