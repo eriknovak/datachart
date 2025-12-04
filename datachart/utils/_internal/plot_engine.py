@@ -945,19 +945,16 @@ def plot_heatmap(
         if settings["show_colorbars"]:
             # draw the colorbar
             orientation = colorbar.get("orientation", DEFAULT_ORIENTATION)
-            location = (
-                COLORBAR_LOCATION.RIGHT
-                if orientation == ORIENTATION.VERTICAL
-                else COLORBAR_LOCATION.TOP
-            )
-            figure.colorbar(
-                im,
-                ax=ax,
-                orientation=orientation,
-                location=location,
-                fraction=0.1,
-                pad=0.05,
-            )
+
+            # Use inset_axes for colorbar - works with constrained_layout
+            # and ensures colorbar matches chart height
+            if orientation == ORIENTATION.VERTICAL:
+                # [x, y, width, height] in axes fraction coordinates
+                cax = ax.inset_axes([1.05, 0, 0.05, 1])
+                figure.colorbar(im, cax=cax, orientation=orientation)
+            else:
+                cax = ax.inset_axes([0, 1.05, 1, 0.05])
+                figure.colorbar(im, cax=cax, orientation=orientation)
 
 
 # ================================================
