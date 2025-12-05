@@ -21,7 +21,7 @@ import warnings
 from cycler import cycler
 from itertools import cycle
 from collections import defaultdict
-from typing import List
+from typing import List, Union
 
 import numpy as np
 import matplotlib.colors as colors
@@ -117,12 +117,12 @@ def get_colormap(
 
 
 def get_discrete_colors(
-    name: str = DEFAULT_COLOR, max_colors: int = DEFAULT_MAX_COLOR
+    name: Union[str, List[str]] = DEFAULT_COLOR, max_colors: int = DEFAULT_MAX_COLOR
 ) -> list:
     """Get a list of discrete colors.
 
     Args:
-        name: The name of the color scale (any valid pypalettes palette name).
+        name: The name of the color scale (any valid pypalettes palette name) or a list of hex color strings.
         max_colors: The maximum number of colors.
 
     Returns:
@@ -130,10 +130,21 @@ def get_discrete_colors(
 
     """
 
-    assert isinstance(name, str), "The name is not a string."
+    assert isinstance(name, (str, list)), "The name must be a string or a list."
     assert isinstance(max_colors, int), "The max_colors is not an integer."
     assert max_colors > 0, "The max_colors must be greater than 0."
 
+    # If name is a list of colors, use them directly
+    if isinstance(name, list):
+        assert all(isinstance(c, str) for c in name), "All color list items must be strings."
+        # Cycle through the provided colors if more colors are needed
+        if max_colors <= len(name):
+            return name[:max_colors]
+        else:
+            # Repeat the color list to get enough colors
+            return (name * ((max_colors // len(name)) + 1))[:max_colors]
+
+    # Otherwise use pypalettes
     color_scale = get_color_scale(name)
     if max_colors == 1:
         # the color scale is long enough
@@ -144,12 +155,12 @@ def get_discrete_colors(
 
 
 def create_color_cycle(
-    name: str = DEFAULT_COLOR, max_colors: int = DEFAULT_MAX_COLOR
+    name: Union[str, List[str]] = DEFAULT_COLOR, max_colors: int = DEFAULT_MAX_COLOR
 ) -> cycle:
     """Create a color cycle.
 
     Args:
-        name: The name of the color scale (any valid pypalettes palette name).
+        name: The name of the color scale (any valid pypalettes palette name) or a list of hex color strings.
         max_colors: The maximum number of colors.
 
     Returns:

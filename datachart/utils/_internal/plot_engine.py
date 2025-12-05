@@ -367,6 +367,9 @@ def chart_plot_wrapper(func: callable) -> callable:
             ],
         )
 
+        # Store chart metadata in figure for later use (e.g., combining figures)
+        figure._chart_metadata = attrs
+
         return figure
 
     return wrapper_func
@@ -1794,3 +1797,18 @@ def plot_parallel_coords(
             for hue in unique_hues
         ]
         ax.legend(handles=legend_handles, title="Legend", **get_legend_style())
+
+
+# ================================================
+# Chart Plotter Mapping
+# ================================================
+
+CHART_PLOTTERS = {
+    "linechart": plot_line_chart,
+    "barchart": plot_bar_chart,
+    "histogram": plot_histogram,
+    "heatmap": plot_heatmap,
+    "scatterchart": plot_scatter_chart,
+    "boxplot": plot_box_plot,
+    "parallelcoords": plot_parallel_coords,
+}

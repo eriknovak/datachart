@@ -469,7 +469,7 @@ def get_box_outlier_style(chart_style: dict) -> dict:
         ("marker", "plot_box_outlier_marker"),
         ("markersize", "plot_box_outlier_size"),
         ("markerfacecolor", "plot_box_outlier_color"),
-        ("markeredgecolor", "plot_box_outlier_color"),
+        ("markeredgecolor", "plot_box_outlier_edge_color"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -608,7 +608,9 @@ def get_parallel_tick_length(chart_style: dict) -> float:
 
     """
 
-    return chart_style.get("plot_parallel_tick_length", config["plot_parallel_tick_length"])
+    return chart_style.get(
+        "plot_parallel_tick_length", config["plot_parallel_tick_length"]
+    )
 
 
 def get_parallel_tick_label_style(chart_style: dict) -> dict:

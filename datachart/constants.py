@@ -617,6 +617,7 @@ class THEME:
 
     DEFAULT = "default"
     GREYSCALE = "greyscale"
+    PUBLICATION = "publication"
 
 
 class SHOW_GRID:

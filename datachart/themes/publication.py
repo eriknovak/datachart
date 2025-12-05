@@ -8,28 +8,14 @@ from ..constants import (
     LEGEND_LOCATION,
 )
 
-GREYSCALE_THEME: StyleAttrs = {
+PUBLICATION_THEME: StyleAttrs = {
     # general color style
-    "color_general_singular": COLORS.Greys,
-    "color_general_multiple": [
-        "#2C3E50",  # dark slate
-        "#5D6D7E",  # medium gray
-        "#85929E",  # light gray
-        "#ABB2B9",  # lighter gray
-        "#D5DBDB",  # very light gray
-        "#34495E",  # charcoal
-    ],
-    "color_parallel_hue": [
-        "#2C3E50",  # dark slate
-        "#5D6D7E",  # medium gray
-        "#85929E",  # light gray
-        "#ABB2B9",  # lighter gray
-        "#D5DBDB",  # very light gray
-        "#34495E",  # charcoal
-    ],
+    "color_general_singular": COLORS.Blues,
+    "color_general_multiple": COLORS.YlGnBu,
+    "color_parallel_hue": COLORS.YlGnBu,
     # general font style
     "font_general_family": "sans-serif",
-    "font_general_sansserif": ["Helvetica", "Arial"],
+    "font_general_sansserif": ["Helvetica", "Arial", "DejaVu Sans"],
     "font_general_color": "#000000",
     "font_general_size": 10,
     "font_general_style": FONT_STYLE.NORMAL,
@@ -114,30 +100,30 @@ GREYSCALE_THEME: StyleAttrs = {
     "plot_hist_edge_width": 0.8,
     "plot_hist_edge_color": "#000000",
     # plot vline style
-    "plot_vline_color": "#5D6D7E",
+    "plot_vline_color": "#7F8C8D",
     "plot_vline_style": LINE_STYLE.DASHED,
     "plot_vline_width": 1,
     "plot_vline_alpha": 0.7,
     # plot hline style
-    "plot_hline_color": "#5D6D7E",
+    "plot_hline_color": "#7F8C8D",
     "plot_hline_style": LINE_STYLE.DASHED,
     "plot_hline_width": 1,
     "plot_hline_alpha": 0.7,
     # plot heatmap style
-    "plot_heatmap_cmap": COLORS.Greys,
+    "plot_heatmap_cmap": COLORS.YlGnBu,
     "plot_heatmap_alpha": 0.95,
     "plot_heatmap_font_size": 8,
     "plot_heatmap_font_color": "#000000",
     "plot_heatmap_font_style": FONT_STYLE.NORMAL,
     "plot_heatmap_font_weight": FONT_WEIGHT.NORMAL,
     # plot scatter style
-    "plot_scatter_color": None,
+    "plot_scatter_color": "#FFFFFF",
     "plot_scatter_alpha": 0.75,
     "plot_scatter_size": 36,
     "plot_scatter_marker": "o",
     "plot_scatter_zorder": 3,
     "plot_scatter_edge_width": 0.5,
-    "plot_scatter_edge_color": "#FFFFFF",
+    "plot_scatter_edge_color": "#000000",
     # plot regression style
     "plot_regression_color": "#34495E",
     "plot_regression_alpha": 0.9,
@@ -151,30 +137,30 @@ GREYSCALE_THEME: StyleAttrs = {
     "plot_parallel_style": LINE_STYLE.SOLID,
     "plot_parallel_marker": None,
     "plot_parallel_zorder": 1,
-    "plot_parallel_axis_color": "#000000",
+    "plot_parallel_axis_color": "#34495E",
     "plot_parallel_axis_width": 1.5,
     "plot_parallel_axis_zorder": 2,
-    "plot_parallel_tick_color": "#000000",
+    "plot_parallel_tick_color": "#34495E",
     "plot_parallel_tick_width": 1.5,
     "plot_parallel_tick_length": 0.02,
-    "plot_parallel_tick_label_size": 7,
-    "plot_parallel_tick_label_color": "#000000",
+    "plot_parallel_tick_label_size": 8,
+    "plot_parallel_tick_label_color": "#34495E",
     "plot_parallel_tick_label_bg_color": "#FFFFFF",
     "plot_parallel_tick_label_bg_alpha": 0.8,
-    "plot_parallel_dim_label_size": 8,
-    "plot_parallel_dim_label_color": "#000000",
+    "plot_parallel_dim_label_size": 9,
+    "plot_parallel_dim_label_color": "#34495E",
     "plot_parallel_dim_label_rotation": 0,
     "plot_parallel_dim_label_pad": 8,
     # plot box style
     "plot_box_color": None,
     "plot_box_alpha": 0.85,
     "plot_box_linewidth": 0.8,
-    "plot_box_edgecolor": "#000000",
+    "plot_box_edgecolor": "#34495E",
     "plot_box_outlier_marker": "o",
     "plot_box_outlier_size": 5,
     "plot_box_outlier_color": "#FFFFFF",
     "plot_box_outlier_edge_color": "#000000",
-    "plot_box_median_color": "#E74C3C",
+    "plot_box_median_color": "#34495E",
     "plot_box_median_linewidth": 2,
     "plot_box_whisker_linewidth": 0.8,
     "plot_box_cap_linewidth": 0.8,

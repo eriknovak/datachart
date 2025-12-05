@@ -8,7 +8,7 @@ from datachart.typings import StyleAttrs
 from datachart.constants import THEME
 
 # import the themes
-from ..themes import DEFAULT_THEME, GREYSCALE_THEME
+from ..themes import DEFAULT_THEME, GREYSCALE_THEME, PUBLICATION_THEME
 
 
 class Config:
@@ -57,6 +57,9 @@ class Config:
         elif theme == THEME.GREYSCALE:
             self.config = copy.deepcopy(GREYSCALE_THEME)
             self.theme = THEME.GREYSCALE
+        elif theme == THEME.PUBLICATION:
+            self.config = copy.deepcopy(PUBLICATION_THEME)
+            self.theme = THEME.PUBLICATION
         else:
             warnings.warn(
                 f"Warning: {theme} is not a valid theme. Must be one of {[THEME.DEFAULT, THEME.GREYSCALE]}. Reverting to last active theme..."

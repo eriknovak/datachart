@@ -11,5 +11,6 @@ Attributes:
 
 from .default import DEFAULT_THEME
 from .grayscale import GREYSCALE_THEME
+from .publication import PUBLICATION_THEME
 
-__all__ = ["DEFAULT_THEME", "GREYSCALE_THEME"]
+__all__ = ["DEFAULT_THEME", "GREYSCALE_THEME", "PUBLICATION_THEME"]

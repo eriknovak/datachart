@@ -12,6 +12,8 @@ Public Modules:
 Public Methods:
     save_figure(figure, path, dpi, format, transparent):
         Saves the figure into a file using the provided format parameters.
+    combine_figures(figures, title, max_cols, figsize, sharex, sharey):
+        Combines multiple figure objects into a single grid layout.
 
 Note:
     The `_internal` submodule contains internal utilities (plot_engine, config_helpers,
@@ -20,8 +22,8 @@ Note:
 
 """
 
-from .figure import save_figure
+from .figure import save_figure, combine_figures
 from . import stats
 
 
-__all__ = ["save_figure", "stats"]
+__all__ = ["save_figure", "combine_figures", "stats"]

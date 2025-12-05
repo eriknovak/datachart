@@ -17,3 +17,9 @@ It offers a wide range of chart types, including line charts, bar charts, histog
 | [Line Chart](linechart.ipynb)                 | The showcase of the line chart.              |
 | [Parallel Coordinates](parallelcoords.ipynb)  | The showcase of the parallel coordinates.    |
 | [Scatter Chart](scatterchart.ipynb)           | The showcase of the scatter chart.           |
+
+Here are some utility functions, that could help you.
+
+| Utility                                       | Description                                  |
+| :-------------------------------------------- | :------------------------------------------- |
+| [Grid Layout](../utility/grid.ipynb)          | How to combine multiple charts in a grid.    |

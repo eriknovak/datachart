@@ -101,6 +101,7 @@ nav:
       - Scatter Chart: how-to-guides/charts/scatterchart.ipynb
     - Utility:
       - how-to-guides/utility/index.md
+      - Grid Layout: how-to-guides/utility/grid.ipynb
       - Statistics: how-to-guides/utility/stats.ipynb
     - Config: how-to-guides/config.ipynb
     - Themes: how-to-guides/themes.ipynb

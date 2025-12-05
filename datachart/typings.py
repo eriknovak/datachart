@@ -83,14 +83,14 @@ class ColorStyleAttrs(TypedDict):
 
     Attributes:
         color_general_singular (Union[COLORS, str, None]): The general color for the singular-typed charts.
-        color_general_multiple (Union[COLORS, str, None]): The general color for the multiple-typed charts.
-        color_parallel_hue (Union[COLORS, str, None]): The color palette for parallel coords hue categories.
+        color_general_multiple (Union[COLORS, str, List[str], None]): The general color for the multiple-typed charts (palette name or list of hex colors).
+        color_parallel_hue (Union[COLORS, str, List[str], None]): The color palette for parallel coords hue categories (palette name or list of hex colors).
 
     """
 
-    color_general_singular: Union[COLORS, str, None]
-    color_general_multiple: Union[COLORS, str, None]
-    color_parallel_hue: Union[COLORS, str, None]
+    color_general_singular: Union[COLORS, str, List[str], None]
+    color_general_multiple: Union[COLORS, str, List[str], None]
+    color_parallel_hue: Union[COLORS, str, List[str], None]
 
 
 class FontStyleAttrs(TypedDict):
@@ -442,6 +442,7 @@ class BoxStyleAttrs(TypedDict):
         plot_box_outlier_marker (Union[LINE_MARKER, str, None]): The outlier marker style.
         plot_box_outlier_size (Union[int, float, None]): The outlier marker size.
         plot_box_outlier_color (Union[str, None]): The outlier marker color.
+        plot_box_outlier_edge_color (Union[str, None]): The outlier marker edge color.
         plot_box_median_color (Union[str, None]): The median line color.
         plot_box_median_linewidth (Union[int, float, None]): The median line width.
         plot_box_whisker_linewidth (Union[int, float, None]): The whisker line width.
@@ -458,6 +459,7 @@ class BoxStyleAttrs(TypedDict):
     plot_box_outlier_marker: Union[LINE_MARKER, str, None]
     plot_box_outlier_size: Union[int, float, None]
     plot_box_outlier_color: Union[str, None]
+    plot_box_outlier_edge_color: Union[str, None]
     plot_box_median_color: Union[str, None]
     plot_box_median_linewidth: Union[int, float, None]
     plot_box_whisker_linewidth: Union[int, float, None]
