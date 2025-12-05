@@ -1,3 +1,22 @@
+### datachart-0.7.0 (2025-12-05)
+
+**Breaking Change**
+
+- All `chart` input parameters are now provided in a pythonic way (see documentation)
+- Changed Python support to version 3.10, 3.11, 3.12, 3.13
+
+**New Features**
+
+- Added `ScatterChart` for creating scatter plots
+- Added `BoxPlot` for creating box plots
+- Added `ParallelCoords` for creating parallel coordinate plots
+- Added `combine_figures` to create a combined grid layout of multiple figures
+- Updated existing themes and added `THEME.PUBLICATION` that might be suitable for publication charts
+- Added [pypalette](https://github.com/y-sunflower/pypalettes) dependancy; used for selecting colormaps
+- Added [scipy](https://scipy.org/) dependancy; used for calculating statistics and regression lines
+- Added new examples to the existing documentation
+
+
 ### datachart-0.6.3 (2024-10-17)
 
 **Bug Fixes:**
