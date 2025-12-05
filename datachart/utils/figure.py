@@ -5,16 +5,17 @@ The `figure` module provides a set of utilities for manipulating the images.
 Methods:
     save_figure(figure, path, dpi, format, transparent):
         Saves the figure into a file using the provided format parameters.
-    combine_figures(figures, title, max_cols, figsize, sharex, sharey):
-        Combines multiple figure objects into a single grid layout.
+    combine_figures(figures, title, layout_specs, max_cols, figsize, sharex, sharey):
+        Combines multiple figure objects into a single grid layout with optional custom layouts.
 
 """
 
 import math
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.gridspec import GridSpec
 
 from ..constants import FIG_FORMAT, FIG_SIZE
 from ._internal.plot_engine import CHART_PLOTTERS, get_settings, get_chart_settings
@@ -61,6 +62,7 @@ def combine_figures(
     figures: List[plt.Figure],
     *,
     title: Optional[str] = None,
+    layout_specs: Optional[List[Dict[str, int]]] = None,
     max_cols: Optional[int] = 4,
     figsize: Optional[Tuple[float, float]] = None,
     sharex: Optional[bool] = False,
@@ -80,11 +82,24 @@ def combine_figures(
         >>> fig2 = BarChart(data=[{"label": "A", "y": 10}, {"label": "B", "y": 20}], title="Bar Chart")
         >>> fig3 = ScatterChart(data=[{"x": i, "y": i*2} for i in range(10)], title="Scatter Chart")
         >>>
-        >>> # Combine into grid
+        >>> # Example 1: Uniform grid layout (default behavior)
         >>> combined = combine_figures(
         ...     [fig1, fig2, fig3],
         ...     title="Mixed Chart Grid",
         ...     max_cols=2,
+        ...     figsize=(12, 8)
+        ... )
+        >>>
+        >>> # Example 2: Custom layout with figure 1 spanning full width on top
+        >>> layout_specs = [
+        ...     {"row": 0, "col": 0, "rowspan": 1, "colspan": 2},  # fig1 spans 2 columns
+        ...     {"row": 1, "col": 0, "rowspan": 1, "colspan": 1},  # fig2 left column
+        ...     {"row": 1, "col": 1, "rowspan": 1, "colspan": 1},  # fig3 right column
+        ... ]
+        >>> combined = combine_figures(
+        ...     [fig1, fig2, fig3],
+        ...     layout_specs=layout_specs,
+        ...     title="Custom Layout",
         ...     figsize=(12, 8)
         ... )
 
@@ -92,7 +107,10 @@ def combine_figures(
         figures: List of matplotlib Figure objects to combine. Each figure must have
             `_chart_metadata` attribute (automatically added by datachart chart functions).
         title: Optional title for the combined figure.
-        max_cols: Maximum number of columns in the grid layout.
+        layout_specs: Optional list of layout specifications for custom grid layouts.
+            Each specification is a dict with keys: 'row', 'col', 'rowspan', 'colspan'.
+            If provided, overrides max_cols. If None, creates uniform grid layout.
+        max_cols: Maximum number of columns in the grid layout. Ignored if layout_specs is provided.
         figsize: Size of the combined figure (width, height) in inches.
             If None, will be calculated based on input figures.
         sharex: Whether to share the x-axis across all subplots.
@@ -102,35 +120,83 @@ def combine_figures(
         A new matplotlib Figure containing all charts in a grid layout.
 
     Raises:
-        ValueError: If figures list is empty or if a figure is missing metadata.
+        ValueError: If figures list is empty, if a figure is missing metadata,
+            or if layout_specs length doesn't match figures length.
     """
     if not figures:
         raise ValueError("At least one figure is required")
 
     n_figures = len(figures)
 
-    # Calculate grid layout
-    nrows = math.ceil(n_figures / max_cols)
-    ncols = min(max_cols, n_figures)
+    # Validate layout_specs if provided
+    if layout_specs is not None:
+        if len(layout_specs) != n_figures:
+            raise ValueError(
+                f"layout_specs length ({len(layout_specs)}) must match "
+                f"figures length ({n_figures})"
+            )
 
-    # Calculate figure size if not provided
-    if figsize is None:
-        # Use the size of the first figure as a base
-        base_size = figures[0].get_size_inches()
-        figsize = (base_size[0] * ncols, base_size[1] * nrows)
+        # Validate each layout spec
+        for idx, spec in enumerate(layout_specs):
+            required_keys = {"row", "col", "rowspan", "colspan"}
+            if not required_keys.issubset(spec.keys()):
+                missing = required_keys - set(spec.keys())
+                raise ValueError(
+                    f"layout_specs[{idx}] missing required keys: {missing}"
+                )
 
-    # Create new figure with subplots
-    combined_fig, axes = plt.subplots(
-        nrows=nrows,
-        ncols=ncols,
-        figsize=figsize,
-        sharex=sharex,
-        sharey=sharey,
-        constrained_layout=True,
-        squeeze=False,
-    )
+    # Create figure with custom or uniform layout
+    if layout_specs:
+        # Custom layout using GridSpec
+        # Determine grid size from layout specs
+        max_row = max(spec["row"] + spec["rowspan"] for spec in layout_specs)
+        max_col = max(spec["col"] + spec["colspan"] for spec in layout_specs)
 
-    axes = axes.flatten()
+        # Calculate figure size if not provided
+        if figsize is None:
+            base_size = figures[0].get_size_inches()
+            figsize = (base_size[0] * max_col, base_size[1] * max_row)
+
+        # Create figure and GridSpec
+        combined_fig = plt.figure(figsize=figsize, constrained_layout=True)
+        gs = GridSpec(max_row, max_col, figure=combined_fig)
+
+        # Create axes based on layout specs
+        axes = []
+        for spec in layout_specs:
+            ax = combined_fig.add_subplot(
+                gs[
+                    spec["row"] : spec["row"] + spec["rowspan"],
+                    spec["col"] : spec["col"] + spec["colspan"],
+                ],
+                sharex=sharex if sharex else None,
+                sharey=sharey if sharey else None,
+            )
+            axes.append(ax)
+    else:
+        # Uniform grid layout (original behavior)
+        # Calculate grid layout
+        nrows = math.ceil(n_figures / max_cols)
+        ncols = min(max_cols, n_figures)
+
+        # Calculate figure size if not provided
+        if figsize is None:
+            # Use the size of the first figure as a base
+            base_size = figures[0].get_size_inches()
+            figsize = (base_size[0] * ncols, base_size[1] * nrows)
+
+        # Create new figure with subplots
+        combined_fig, axes = plt.subplots(
+            nrows=nrows,
+            ncols=ncols,
+            figsize=figsize,
+            sharex=sharex,
+            sharey=sharey,
+            constrained_layout=True,
+            squeeze=False,
+        )
+
+        axes = axes.flatten()
 
     # Process each figure
     for idx, fig in enumerate(figures):
@@ -223,9 +289,10 @@ def combine_figures(
             settings=chart_settings,
         )
 
-    # Hide unused subplots
-    for idx in range(n_figures, len(axes)):
-        axes[idx].axis("off")
+    # Hide unused subplots (only applicable for uniform grid layout)
+    if not layout_specs:
+        for idx in range(n_figures, len(axes)):
+            axes[idx].axis("off")
 
     # Add global title if provided
     if title:
