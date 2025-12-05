@@ -1,3 +1,11 @@
+### datachart-0.7.2 (2025-12-05)
+
+**Bug Fixes**
+
+- Updated github workflows
+- Fix problems regarding release (v0.7.1 was not created correctly)
+
+
 ### datachart-0.7.1 (2025-12-05)
 
 **New Features**
