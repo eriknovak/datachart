@@ -149,14 +149,20 @@ def combine_figures(
         charts = metadata.get("charts")
 
         if chart_type is None:
-            raise ValueError(f"Figure at index {idx} has invalid metadata: missing 'type'")
+            raise ValueError(
+                f"Figure at index {idx} has invalid metadata: missing 'type'"
+            )
 
         if charts is None:
-            raise ValueError(f"Figure at index {idx} has invalid metadata: missing 'charts'")
+            raise ValueError(
+                f"Figure at index {idx} has invalid metadata: missing 'charts'"
+            )
 
         # Get the appropriate plotter function
         if chart_type not in CHART_PLOTTERS:
-            raise ValueError(f"Unknown chart type '{chart_type}' in figure at index {idx}")
+            raise ValueError(
+                f"Unknown chart type '{chart_type}' in figure at index {idx}"
+            )
 
         plotter = CHART_PLOTTERS[chart_type]
 
@@ -201,11 +207,11 @@ def combine_figures(
 
         # Configure local chart labels (subtitle, xlabel, ylabel)
         if "subtitle" in chart_data:
-            target_ax.set_title(chart_data.get("subtitle"))
-        if "xlabel" in chart_data:
-            target_ax.set_xlabel(chart_data.get("xlabel"))
-        if "ylabel" in chart_data:
-            target_ax.set_ylabel(chart_data.get("ylabel"))
+            configure_labels(chart_data, [("subtitle", target_ax.set_title)])
+        if settings.get("xlabel"):
+            configure_labels(settings, [("xlabel", target_ax.set_xlabel)])
+        if settings.get("ylabel"):
+            configure_labels(settings, [("ylabel", target_ax.set_ylabel)])
 
         # Call the plotter function with single chart and single axis
         # Convert chart_data to numpy array format expected by plotters
