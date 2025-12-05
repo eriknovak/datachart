@@ -69,7 +69,7 @@ pytest --nbmake ./docs/how-to-guides/**/*ipynb
 To start live-reloading the documentation, run:
 
 ```bash
-mkdocs serve
+mkdocs serve [-a localhost:9999]
 ```
 
 When suggesting changes, please refer to the [Material for MkDocs] documentation.

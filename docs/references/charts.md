@@ -12,7 +12,10 @@ title: Charts Module
 
 ## Chart Functions
 
-::: datachart.charts.LineChart
 ::: datachart.charts.BarChart
-::: datachart.charts.Histogram
+::: datachart.charts.BoxPlot
 ::: datachart.charts.Heatmap
+::: datachart.charts.Histogram
+::: datachart.charts.LineChart
+::: datachart.charts.ParallelCoords
+::: datachart.charts.ScatterChart

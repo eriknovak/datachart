@@ -13,3 +13,5 @@ title: Utils Module
 ## Functions
 
 ::: datachart.utils.save_figure
+
+::: datachart.utils.combine_figures

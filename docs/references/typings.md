@@ -88,6 +88,51 @@ title: Typings Module
         heading_level: 4
 
 
+### Scatter Chart Typings
+
+::: datachart.typings.ScatterChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.ScatterSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.ScatterDataPointAttrs
+    options:
+        heading_level: 4
+
+
+### Box Chart (Box Plot) Typings
+
+::: datachart.typings.BoxChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.BoxSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.BoxDataPointAttrs
+    options:
+        heading_level: 4
+
+
+### Parallel Coordinates Plot Typings
+
+::: datachart.typings.ParallelCoordsChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.ParallelCoordsSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.ParallelCoordsDataPointAttrs
+    options:
+        heading_level: 4
+
+
 ## Style Typings
 
 ::: datachart.typings.StyleAttrs
@@ -115,3 +160,11 @@ title: Typings Module
 ::: datachart.typings.HLineStyleAttrs
 
 ::: datachart.typings.HeatmapStyleAttrs
+
+::: datachart.typings.ScatterStyleAttrs
+
+::: datachart.typings.RegressionStyleAttrs
+
+::: datachart.typings.BoxStyleAttrs
+
+::: datachart.typings.ParallelCoordsStyleAttrs

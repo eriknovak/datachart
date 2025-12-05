@@ -6,6 +6,7 @@ the plots.
 Attributes:
     DEFAULT_THEME (datachart.typings.StyleAttrs): The default theme style.
     GREYSCALE_THEME (datachart.typings.StyleAttrs): The greyscale theme style.
+    PUBLICATION_THEME (datachart.typings.StyleAttrs): The publication theme style.
 
 """
 

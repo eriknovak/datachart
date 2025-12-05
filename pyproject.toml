@@ -37,6 +37,8 @@ dev = [
     "mkdocs-material",
     "mkdocs-jupyter",
     "mkdocstrings[python]",
+    "jupyter-contrib-nbextensions",
+    "notebook<7.0",
 ]
 test = [
     "coverage",
