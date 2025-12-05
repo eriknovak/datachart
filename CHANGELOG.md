@@ -1,3 +1,10 @@
+### datachart-0.7.1 (2025-12-05)
+
+**New Features**
+
+- Add support for custom layout grids in `combine_figures`
+
+
 ### datachart-0.7.0 (2025-12-05)
 
 **Breaking Change**
