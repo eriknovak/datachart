@@ -1,3 +1,10 @@
+### datachart-0.7.3 (2025-12-06)
+
+**Bug Fixes**
+
+- Fix input parameter handling in different charts
+- Rename `combine_figures` into `figure_grid_layout`
+
 ### datachart-0.7.2 (2025-12-05)
 
 **Bug Fixes**
