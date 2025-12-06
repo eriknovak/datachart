@@ -14,4 +14,4 @@ title: Utils Module
 
 ::: datachart.utils.save_figure
 
-::: datachart.utils.combine_figures
+::: datachart.utils.figure_grid_layout

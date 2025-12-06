@@ -12,13 +12,13 @@ Modules:
 Methods:
     save_figure(figure, path, dpi, format, transparent):
         Saves the figure into a file using the provided format parameters.
-    combine_figures(figures, title, max_cols, figsize, sharex, sharey):
+    figure_grid_layout(figures, title, max_cols, figsize, sharex, sharey):
         Combines multiple figure objects into a single grid layout.
 
 """
 
-from .figure import save_figure, combine_figures
+from .figure import save_figure, figure_grid_layout
 from . import stats
 
 
-__all__ = ["save_figure", "combine_figures", "stats"]
+__all__ = ["save_figure", "figure_grid_layout", "stats"]

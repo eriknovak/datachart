@@ -10,7 +10,7 @@ from ..typings import (
     VLinePlotAttrs,
     HLinePlotAttrs,
 )
-from ..constants import FIG_SIZE, SHOW_GRID, ORIENTATION
+from ..constants import FIG_SIZE, SHOW_GRID, ORIENTATION, SCALE
 
 # ================================================
 # Main Chart Definition
@@ -35,6 +35,7 @@ def BoxPlot(
     show_notch: Optional[bool] = None,
     aspect_ratio: Optional[str] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
+    scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,
@@ -104,6 +105,7 @@ def BoxPlot(
         show_notch: Whether to show notched boxes for median confidence interval.
         aspect_ratio: The aspect ratio of the chart.
         orientation: The orientation of the boxes (vertical or horizontal).
+        scaley: The y-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each chart.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.
@@ -163,6 +165,7 @@ def BoxPlot(
         show_outliers=show_outliers,
         show_notch=show_notch,
         orientation=orientation,
+        scaley=scaley,
     )
 
     return chart_plot_wrapper(plot_box_plot)(attrs)

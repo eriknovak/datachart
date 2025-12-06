@@ -19,9 +19,8 @@ Methods:
 
 import warnings
 from cycler import cycler
-from itertools import cycle
 from collections import defaultdict
-from typing import List, Union
+from typing import List, Union, Dict, Literal
 
 import numpy as np
 import matplotlib.colors as colors
@@ -54,7 +53,8 @@ def get_color_scale(name: str = DEFAULT_COLOR) -> List[str]:
 
     """
 
-    assert isinstance(name, str), "The name is not a string."
+    if not isinstance(name, str):
+        raise TypeError("The name must be a string.")
 
     try:
         palette = load_palette(name)
@@ -87,10 +87,10 @@ def create_colormap(
 
     """
 
-    assert isinstance(color_list, list), "The color_list is not a list."
-    assert all(
-        isinstance(c, str) for c in color_list
-    ), "The color_list items are not strings."
+    if not isinstance(color_list, list):
+        raise TypeError("The color_list is not a list.")
+    if not all(isinstance(c, str) for c in color_list):
+        raise TypeError("The color_list items are not strings.")
 
     return colors.LinearSegmentedColormap.from_list(name, color_list)
 
@@ -130,13 +130,18 @@ def get_discrete_colors(
 
     """
 
-    assert isinstance(name, (str, list)), "The name must be a string or a list."
-    assert isinstance(max_colors, int), "The max_colors is not an integer."
-    assert max_colors > 0, "The max_colors must be greater than 0."
+    if not isinstance(name, (str, list)):
+        raise TypeError("The name must be a string or a list.")
+    if not isinstance(max_colors, int):
+        raise TypeError("The max_colors is not an integer.")
+    if max_colors <= 0:
+        raise ValueError("The max_colors must be greater than 0.")
 
     # If name is a list of colors, use them directly
     if isinstance(name, list):
-        assert all(isinstance(c, str) for c in name), "All color list items must be strings."
+        if not all(isinstance(c, str) for c in name):
+            raise TypeError("All color list items must be strings.")
+
         # Cycle through the provided colors if more colors are needed
         if max_colors <= len(name):
             return name[:max_colors]
@@ -156,7 +161,7 @@ def get_discrete_colors(
 
 def create_color_cycle(
     name: Union[str, List[str]] = DEFAULT_COLOR, max_colors: int = DEFAULT_MAX_COLOR
-) -> cycle:
+) -> Dict[int, Dict[Literal["color"], str]]:
     """Create a color cycle.
 
     Args:

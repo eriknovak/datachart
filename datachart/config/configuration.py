@@ -62,7 +62,7 @@ class Config:
             self.theme = THEME.PUBLICATION
         else:
             warnings.warn(
-                f"Warning: {theme} is not a valid theme. Must be one of {[THEME.DEFAULT, THEME.GREYSCALE]}. Reverting to last active theme..."
+                f"Warning: {theme} is not a valid theme. Must be one of {[THEME.DEFAULT, THEME.GREYSCALE, THEME.PUBLICATION]}. Reverting to last active theme..."
             )
             self.set_theme(self.theme)
 

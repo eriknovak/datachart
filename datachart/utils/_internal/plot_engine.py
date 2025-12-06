@@ -1,7 +1,7 @@
 import json
 import warnings
 from itertools import cycle
-from typing import List, Union
+from typing import List, Union, Optional
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -76,7 +76,7 @@ DEFAULT_SIZE_RANGE = (20, 200)
 # ================================================
 
 
-def get_chart_data(attr: str, chart: dict) -> np.array:
+def get_chart_data(attr: str, chart: dict) -> Optional[np.array]:
     """Generate a numpy array of data from a given chart dictionary.
 
     Args:
@@ -94,8 +94,10 @@ def get_chart_data(attr: str, chart: dict) -> np.array:
         return chart["data"][attr_label] if attr_label in chart["data"] else None
 
     if isinstance(chart["data"], list):
-        data = np.array([d[attr_label] for d in chart["data"] if attr_label in d])
-        return data if len(data) > 0 else None
+        filtered = [d[attr_label] for d in chart["data"] if attr_label in d]
+        if not filtered:
+            return None
+        return np.array(filtered)
 
     return None
 
@@ -129,7 +131,7 @@ def has_multiple_subplots(axes: list) -> bool:
 
     """
 
-    return not all([ax == axes[0] for ax in axes])
+    return not all(ax == axes[0] for ax in axes)
 
 
 class NumpyEncoder(json.JSONEncoder):
@@ -615,11 +617,6 @@ def plot_bar_chart(
     )
 
     color_cycle = custom_color_cycle(has_multi_subplots, charts.shape[0])
-    if not has_multi_subplots and charts.shape[0] > 5:
-        warnings.warn(
-            "The number of charts is greater than 5. "
-            + "Please consider using a different plotting method or create subplots."
-        )
 
     # prepare the bar chart position variables
     x_start = np.arange(max([len(get_chart_data("label", chart)) for chart in charts]))
@@ -703,12 +700,17 @@ def plot_bar_chart(
             if axis == "xaxis":
                 ax.set_xticks(ticks_loc, labels)
                 ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
-                ax.set_xticklabels(
-                    labels, rotation=get_rotation_degrees(labels.shape[0])
-                )
+                # Use user-provided rotation if specified, else fall back to automatic
+                rotation = chart.get("xtickrotate")
+                if rotation is None:
+                    rotation = get_rotation_degrees(labels.shape[0])
+                ax.set_xticklabels(labels, rotation=rotation)
             elif axis == "yaxis":
                 ax.set_yticks(ticks_loc, labels)
                 ax.yaxis.set_major_locator(mticker.FixedLocator(ticks_loc))
+                # Use user-provided rotation if specified
+                rotation = chart.get("ytickrotate", 0)
+                ax.set_yticklabels(labels, rotation=rotation)
 
         # position the ticks in the middle of the group
         ticks_loc = x_start + (charts.shape[0] - 1) / 2 * x_width
@@ -935,6 +937,11 @@ def plot_heatmap(
         settings=settings,
         supported_settings=[
             "aspect_ratio",
+            "xmin",
+            "xmax",
+            "ymin",
+            "ymax",
+            "show_grid",
             "show_colorbars",
             "show_heatmap_values",
         ],
@@ -964,6 +971,10 @@ def plot_heatmap(
 
         # set the tick positions
         configure_axis_ticks_position(ax, chart)
+
+        # Set the aspect ratio of the chart
+        if settings["aspect_ratio"]:
+            ax.set(adjustable="box", aspect=settings["aspect_ratio"])
 
         if settings["show_heatmap_values"]:
             if isinstance(valfmt, str):
@@ -1342,6 +1353,7 @@ def plot_box_plot(
             "show_outliers",
             "show_notch",
             "orientation",
+            "scaley",
         ],
     )
 
@@ -1434,10 +1446,19 @@ def plot_box_plot(
         # Set tick labels
         if orientation == ORIENTATION.HORIZONTAL:
             ax.set_yticks(range(1, len(labels) + 1))
-            ax.set_yticklabels(labels)
+            rotation = chart.get("ytickrotate", 0)
+            ax.set_yticklabels(labels, rotation=rotation)
         elif orientation == ORIENTATION.VERTICAL:
             ax.set_xticks(range(1, len(labels) + 1))
-            ax.set_xticklabels(labels)
+            rotation = chart.get("xtickrotate", 0)
+            ax.set_xticklabels(labels, rotation=rotation)
+
+        # Apply scale
+        if settings["scaley"]:
+            if orientation == ORIENTATION.HORIZONTAL:
+                ax.set_xscale(settings["scaley"])
+            else:
+                ax.set_yscale(settings["scaley"])
 
         if settings["show_grid"]:
             ax.grid(axis=settings["show_grid"], **get_grid_style(style))

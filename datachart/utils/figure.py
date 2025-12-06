@@ -5,7 +5,7 @@ The `figure` module provides a set of utilities for manipulating the images.
 Methods:
     save_figure(figure, path, dpi, format, transparent):
         Saves the figure into a file using the provided format parameters.
-    combine_figures(figures, title, layout_specs, max_cols, figsize, sharex, sharey):
+    figure_grid_layout(figures, title, layout_specs, max_cols, figsize, sharex, sharey):
         Combines multiple figure objects into a single grid layout with optional custom layouts.
 
 """
@@ -58,7 +58,7 @@ def save_figure(
     figure.savefig(path, dpi=dpi, format=format, transparent=transparent)
 
 
-def combine_figures(
+def figure_grid_layout(
     figures: List[plt.Figure],
     *,
     title: Optional[str] = None,
@@ -75,7 +75,7 @@ def combine_figures(
 
     Examples:
         >>> from datachart.charts import LineChart, BarChart, ScatterChart
-        >>> from datachart.utils import combine_figures
+        >>> from datachart.utils import figure_grid_layout
         >>>
         >>> # Create individual charts
         >>> fig1 = LineChart(data=[{"x": i, "y": i**2} for i in range(10)], title="Line Chart")
@@ -83,7 +83,7 @@ def combine_figures(
         >>> fig3 = ScatterChart(data=[{"x": i, "y": i*2} for i in range(10)], title="Scatter Chart")
         >>>
         >>> # Example 1: Uniform grid layout (default behavior)
-        >>> combined = combine_figures(
+        >>> combined = figure_grid_layout(
         ...     [fig1, fig2, fig3],
         ...     title="Mixed Chart Grid",
         ...     max_cols=2,
@@ -96,7 +96,7 @@ def combine_figures(
         ...     {"row": 1, "col": 0, "rowspan": 1, "colspan": 1},  # fig2 left column
         ...     {"row": 1, "col": 1, "rowspan": 1, "colspan": 1},  # fig3 right column
         ... ]
-        >>> combined = combine_figures(
+        >>> combined = figure_grid_layout(
         ...     [fig1, fig2, fig3],
         ...     layout_specs=layout_specs,
         ...     title="Custom Layout",
@@ -246,12 +246,8 @@ def combine_figures(
             # Handle numpy array or other iterable
             charts_list = list(charts)
 
-        # For figures with multiple subplots, extract only the first chart
-        # (since we're placing one chart per grid position)
-        if len(charts_list) > 0:
-            chart_data = charts_list[0]
-        else:
-            # Empty chart, skip this position
+        # Skip empty charts
+        if len(charts_list) == 0:
             axes[idx].axis("off")
             continue
 
@@ -272,19 +268,25 @@ def combine_figures(
         configure_axis_ticks_style(target_ax, "yaxis")
 
         # Configure local chart labels (subtitle, xlabel, ylabel)
-        if "subtitle" in chart_data:
-            configure_labels(chart_data, [("subtitle", target_ax.set_title)])
+        # Use first chart's subtitle if available (for single-axis multi-series charts)
+        first_chart = charts_list[0]
+        if "subtitle" in first_chart:
+            configure_labels(first_chart, [("subtitle", target_ax.set_title)])
         if settings.get("xlabel"):
             configure_labels(settings, [("xlabel", target_ax.set_xlabel)])
         if settings.get("ylabel"):
             configure_labels(settings, [("ylabel", target_ax.set_ylabel)])
 
-        # Call the plotter function with single chart and single axis
-        # Convert chart_data to numpy array format expected by plotters
-        charts_array = np.array([chart_data])
+        # Convert charts to numpy array format expected by plotters
+        charts_array = np.array(charts_list)
+
+        # For charts with multiple data series on a single axis (e.g., grouped bars),
+        # we need to repeat the same axis for each chart, matching chart_plot_wrapper behavior
+        axes_for_plotter = [target_ax for _ in range(len(charts_list))]
+
         plotter(
             combined_fig,
-            [target_ax],
+            axes_for_plotter,
             charts_array,
             settings=chart_settings,
         )

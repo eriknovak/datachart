@@ -90,8 +90,14 @@ def get_subplot_config(
         subplots = False
 
     if subplots or not chart_config["multiplot"]:
-        assert n_charts > 0, "The number of charts must be greater than 0."
-        assert max_cols > 0, "The maximum number of columns must be greater than 0."
+        if not isinstance(n_charts, int):
+            raise TypeError("The number of charts is not an integer.")
+        if n_charts <= 0:
+            raise ValueError("The number of charts must be greater than 0.")
+        if not isinstance(max_cols, int):
+            raise TypeError("The maximum number of columns is not an integer.")
+        if max_cols <= 0:
+            raise ValueError("The maximum number of columns must be greater than 0.")
         # there are more subplots
         nrows = math.ceil(n_charts / max_cols)
         ncols = max_cols if n_charts >= max_cols else n_charts % max_cols

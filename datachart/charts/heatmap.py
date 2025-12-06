@@ -8,7 +8,7 @@ from ..typings import (
     HeatmapStyleAttrs,
     HeatmapColorbarAttrs,
 )
-from ..constants import FIG_SIZE
+from ..constants import FIG_SIZE, SHOW_GRID
 
 # ================================================
 # Main Chart Definition
@@ -25,6 +25,12 @@ def Heatmap(
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
+    xmin: Optional[Union[int, float]] = None,
+    xmax: Optional[Union[int, float]] = None,
+    ymin: Optional[Union[int, float]] = None,
+    ymax: Optional[Union[int, float]] = None,
+    show_legend: Optional[bool] = None,
+    show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_colorbars: Optional[bool] = None,
     show_heatmap_values: Optional[bool] = None,
     aspect_ratio: Optional[str] = None,
@@ -74,6 +80,12 @@ def Heatmap(
         ylabel: The y-axis label.
         subtitle: The subtitle(s) for individual charts.
         figsize: The size of the figure.
+        xmin: The minimum x-axis value.
+        xmax: The maximum x-axis value.
+        ymin: The minimum y-axis value.
+        ymax: The maximum y-axis value.
+        show_legend: Whether to show the legend (not typical for heatmaps).
+        show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_colorbars: Whether to show the colorbar(s).
         show_heatmap_values: Whether to show values on the heatmap cells.
         aspect_ratio: The aspect ratio of the chart.
@@ -126,6 +138,12 @@ def Heatmap(
         xlabel=xlabel,
         ylabel=ylabel,
         figsize=figsize,
+        xmin=xmin,
+        xmax=xmax,
+        ymin=ymin,
+        ymax=ymax,
+        show_legend=show_legend,
+        show_grid=show_grid,
         aspect_ratio=aspect_ratio,
         subplots=subplots,
         max_cols=max_cols,

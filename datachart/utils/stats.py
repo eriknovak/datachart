@@ -90,6 +90,8 @@ def mean(values: List[Union[int, float]]) -> float:
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    if len(values) == 0:
+        return np.nan
     return float(np.mean(values))
 
 
@@ -110,6 +112,8 @@ def median(values: List[Union[int, float]]) -> float:
 
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    if len(values) == 0:
+        return np.nan
     return float(np.median(values))
 
 
@@ -130,6 +134,8 @@ def stdev(values: List[Union[int, float]]) -> float:
 
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    if len(values) == 0:
+        return np.nan
     return float(np.std(values))
 
 
@@ -149,6 +155,8 @@ def variance(values: List[Union[int, float]]) -> float:
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    if len(values) == 0:
+        return np.nan
     return float(np.var(values))
 
 
@@ -169,7 +177,8 @@ def quantile(values: List[Union[int, float]], q: float) -> float:
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
-
+    if len(values) == 0:
+        return np.nan
     return float(np.percentile(values, q))
 
 
@@ -193,6 +202,8 @@ def iqr(values: List[Union[int, float]]) -> float:
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    if len(values) == 0:
+        return np.nan
     return float(np.percentile(values, 75) - np.percentile(values, 25))
 
 
@@ -213,6 +224,8 @@ def minimum(values: List[Union[int, float]]) -> float:
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    if len(values) == 0:
+        return np.nan
     return float(np.min(values))
 
 
@@ -233,6 +246,8 @@ def maximum(values: List[Union[int, float]]) -> float:
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    if len(values) == 0:
+        return np.nan
     return float(np.max(values))
 
 
@@ -266,6 +281,8 @@ def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float
         raise TypeError("The x variable must be a list or numpy array.")
     if not isinstance(y, (list, np.ndarray)):
         raise TypeError("The y variable must be a list or numpy array.")
+    if len(x) == 0 or len(y) == 0:
+        raise ValueError("x and y must have at least one value.")
     if len(x) != len(y):
         raise ValueError("x and y must have the same length.")
     return float(np.corrcoef(x, y)[0, 1])

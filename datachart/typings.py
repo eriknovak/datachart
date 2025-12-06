@@ -785,6 +785,8 @@ class BarChartAttrs(ChartCommonAttrs):
     Attributes:
         charts (Union[BarSingleChartAttrs, List[BarSingleChartAttrs]]): The bar chart definitions.
         show_yerr (Union[bool, None]): Whether or not to show the y-axis errors.
+        show_values (Union[bool, None]): Whether or not to show bar value labels at the edge of each bar.
+        value_format (Union[str, None]): Format string for bar value labels (e.g., "{:.1f}%").
         orientation (Union[ORIENTATION, str, None]): The orientation of the bar charts.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
 
@@ -792,6 +794,8 @@ class BarChartAttrs(ChartCommonAttrs):
 
     charts: Union[BarSingleChartAttrs, List[BarSingleChartAttrs]]
     show_yerr: Union[bool, None]
+    show_values: Union[bool, None]
+    value_format: Union[str, None]
     orientation: Union[ORIENTATION, str, None]
     scaley: Union[SCALE, str, None]
 
@@ -940,7 +944,7 @@ class HeatmapChartAttrs(ChartCommonAttrs):
 
     Attributes:
         charts (Union[HeatmapSingleChartAttrs, List[HeatmapSingleChartAttrs]]): The heatmap chart definitions.
-        show_colorbars (Union[bool, None]): Whether or not to plot the density histogram.
+        show_colorbars (Union[bool, None]): Whether or not to plot the colorbars.
         show_heatmap_values (Union[bool, None]): Whether or not to plot the heatmap values.
 
     """
@@ -1026,6 +1030,7 @@ class ScatterChartAttrs(ChartCommonAttrs):
         show_regression (Union[bool, None]): Whether or not to show the regression line.
         show_ci (Union[bool, None]): Whether or not to show the confidence interval around the regression.
         ci_level (Union[float, None]): The confidence interval level (default 0.95).
+        show_correlation (Union[bool, None]): Whether or not to show the Pearson correlation coefficient as an annotation.
         scalex (Union[SCALE, str, None]): The scale of the x-axis.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
         size_range (Union[Tuple[float, float], None]): The min/max marker sizes for bubble charts.
@@ -1036,6 +1041,7 @@ class ScatterChartAttrs(ChartCommonAttrs):
     show_regression: Union[bool, None]
     show_ci: Union[bool, None]
     ci_level: Union[float, None]
+    show_correlation: Union[bool, None]
     scalex: Union[SCALE, str, None]
     scaley: Union[SCALE, str, None]
     size_range: Union[Tuple[float, float], None]
@@ -1109,6 +1115,7 @@ class BoxChartAttrs(ChartCommonAttrs):
         show_outliers (Union[bool, None]): Whether or not to show outliers.
         show_notch (Union[bool, None]): Whether or not to show notched boxes for median CI.
         orientation (Union[ORIENTATION, str, None]): The orientation of the box plots.
+        scaley (Union[SCALE, str, None]): The scale of the y-axis.
 
     """
 
@@ -1116,6 +1123,7 @@ class BoxChartAttrs(ChartCommonAttrs):
     show_outliers: Union[bool, None]
     show_notch: Union[bool, None]
     orientation: Union[ORIENTATION, str, None]
+    scaley: Union[SCALE, str, None]
 
 
 # ================================================
@@ -1143,6 +1151,8 @@ class ParallelCoordsSingleChartAttrs(TypedDict):
     Attributes:
         data (List[ParallelCoordsDataPointAttrs]): The list of data points.
         subtitle (Union[str, None]): The subtitle of the chart.
+        xlabel (Union[str, None]): The xlabel of the chart.
+        ylabel (Union[str, None]): The ylabel of the chart.
         style (Union[ParallelCoordsStyleAttrs, None]): The style of the chart.
         dimensions (Union[List[str], None]): The dimensions to include and their order.
         hue (Union[str, None]): The key name in `data` for categorical coloring.
@@ -1152,6 +1162,8 @@ class ParallelCoordsSingleChartAttrs(TypedDict):
 
     data: List[ParallelCoordsDataPointAttrs]
     subtitle: Union[str, None]
+    xlabel: Union[str, None]
+    ylabel: Union[str, None]
     style: Union[ParallelCoordsStyleAttrs, None]
     dimensions: Union[List[str], None]
     hue: Union[str, None]
