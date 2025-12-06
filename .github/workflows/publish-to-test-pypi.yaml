@@ -34,6 +34,13 @@ jobs:
       - name: Build a binary wheel and a source tarball
         run: >-
           python -m build --sdist --wheel --outdir dist/ .
+      - name: Remove existing publish attestations
+        run: |
+          echo "Checking dist/ contents:"
+          ls -la dist || true
+          echo "Removing any existing .publish.attestation files"
+          rm -f dist/*.publish.attestation || true
+        shell: bash
       - name: Publish to Test PyPI
         if: github.event_name == 'release' || github.event.inputs.target == 'test-pypi' || github.event.inputs.target == 'both'
         uses: pypa/gh-action-pypi-publish@release/v1
