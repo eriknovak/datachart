@@ -15,3 +15,4 @@ title: Themes Module
 ::: datachart.themes.DEFAULT_THEME
 ::: datachart.themes.GREYSCALE_THEME
 ::: datachart.themes.PUBLICATION_THEME
+::: datachart.themes.BACKGROUND_THEME
