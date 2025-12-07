@@ -631,7 +631,7 @@ def OverlayChart(
     if not charts:
         raise ValueError("At least one chart is required")
 
-    # Get auto threshold from config if not provided
+    # Require user to specify auto_secondary_axis
     if auto_secondary_axis is None:
         auto_secondary_axis = config.get("overlay_auto_threshold", 3.0)
 
@@ -713,5 +713,44 @@ def OverlayChart(
     # Combine legends
     if show_legend:
         _combine_legends(ax_left, ax_right)
+
+    # Store chart metadata for compatibility with FigureGridLayout
+    # Extract all charts from the input figures
+    all_charts = []
+    for chart_config in chart_configs:
+        chart_data = chart_config["chart_data"]
+        all_charts.extend(chart_data["charts"])
+
+    # Store chart_configs for proper reconstruction in FigureGridLayout
+    # This preserves the grouping and type information
+    stored_chart_configs = []
+    for chart_config in chart_configs:
+        stored_chart_configs.append(
+            {
+                "chart_data": chart_config["chart_data"],
+                "z_order": chart_config.get("z_order"),
+            }
+        )
+
+    fig._chart_metadata = {
+        "type": "overlay",
+        "charts": all_charts,
+        "chart_configs": stored_chart_configs,  # Store structured data
+        "title": title,
+        "xlabel": xlabel,
+        "ylabel": ylabel_left,
+        "ylabel_right": ylabel_right,
+        "figsize": figsize,
+        "show_legend": show_legend,
+        "show_grid": show_grid,
+        "xmin": xmin,
+        "xmax": xmax,
+        "ymin": ymin,
+        "ymax": ymax,
+        "auto_secondary_axis": auto_secondary_axis,
+        "axis_assignments": axis_assignments,
+        "theme": config.theme,
+        "config_snapshot": config.config.copy(),
+    }
 
     return fig

@@ -157,6 +157,115 @@ def _figure_grid_layout_impl(
                 f"Figure at index {idx} has invalid metadata: missing 'charts'"
             )
 
+        # Special handling for overlay charts
+        # Overlay charts store metadata and need to be re-rendered
+        if chart_type == "overlay":
+            # Import overlay rendering functions
+            from .overlay import _plot_chart_on_axis, _combine_legends
+            from ._internal.config_helpers import (
+                configure_axes_spines,
+                configure_axis_ticks_style,
+                get_grid_style,
+            )
+
+            # Get the target axis
+            target_ax = axes[idx]
+
+            # Configure axes spines and ticks
+            configure_axes_spines(target_ax)
+            configure_axis_ticks_style(target_ax, "xaxis")
+            configure_axis_ticks_style(target_ax, "yaxis")
+
+            # Get overlay metadata
+            axis_assignments = metadata.get("axis_assignments", [])
+            needs_secondary = "right" in axis_assignments
+
+            # Create secondary axis if needed
+            target_ax_right = None
+            if needs_secondary:
+                target_ax_right = target_ax.twinx()
+                configure_axis_ticks_style(target_ax_right, "yaxis")
+
+            # Get the stored chart_configs if available (new format)
+            chart_configs = metadata.get("chart_configs", None)
+
+            if chart_configs is not None:
+                # New format: use stored chart_configs
+                for i, (chart_config, axis_assignment) in enumerate(
+                    zip(chart_configs, axis_assignments)
+                ):
+                    target_axis = (
+                        target_ax_right if axis_assignment == "right" else target_ax
+                    )
+
+                    _plot_chart_on_axis(
+                        target_axis,
+                        chart_config["chart_data"],
+                        z_order=chart_config.get("z_order"),
+                    )
+            else:
+                # Fallback for old format: try to reconstruct from flattened charts
+                # This is a best-effort approach for backward compatibility
+                overlay_charts = metadata.get("charts", [])
+
+                # Group charts and plot them
+                # Assume each chart is separate for backward compatibility
+                for i, (chart, axis_assignment) in enumerate(
+                    zip(overlay_charts, axis_assignments)
+                ):
+                    target_axis = (
+                        target_ax_right if axis_assignment == "right" else target_ax
+                    )
+
+                    # Wrap each chart in a minimal chart_data structure
+                    chart_data = {
+                        "type": "linechart",  # Default fallback
+                        "charts": [chart],
+                        "metadata": metadata,
+                    }
+
+                    _plot_chart_on_axis(
+                        target_axis,
+                        chart_data,
+                        z_order=None,
+                    )
+
+            # Configure labels
+            if metadata.get("xlabel"):
+                target_ax.set_xlabel(metadata["xlabel"])
+            if metadata.get("ylabel"):
+                target_ax.set_ylabel(metadata["ylabel"])
+            if metadata.get("ylabel_right") and target_ax_right:
+                target_ax_right.set_ylabel(metadata["ylabel_right"])
+            if metadata.get("title"):
+                target_ax.set_title(metadata["title"])
+
+            # Configure axis limits
+            if metadata.get("xmin") is not None or metadata.get("xmax") is not None:
+                target_ax.set_xlim(
+                    left=metadata.get("xmin"), right=metadata.get("xmax")
+                )
+            if metadata.get("ymin") is not None or metadata.get("ymax") is not None:
+                target_ax.set_ylim(
+                    bottom=metadata.get("ymin"), top=metadata.get("ymax")
+                )
+
+            # Show grid if specified
+            show_grid = metadata.get("show_grid")
+            if show_grid:
+                target_ax.grid(axis=show_grid, **get_grid_style({}))
+
+            # Combine legends
+            if metadata.get("show_legend", True):
+                _combine_legends(target_ax, target_ax_right)
+
+            # Show the axis
+            target_ax.axis("on")
+            if target_ax_right:
+                target_ax_right.axis("on")
+
+            continue
+
         # Get the appropriate plotter function
         if chart_type not in CHART_PLOTTERS:
             raise ValueError(

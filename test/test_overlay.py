@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from datachart.charts import LineChart, BarChart, ScatterChart, Histogram
-from datachart.utils import OverlayChart
+from datachart.utils import OverlayChart, FigureGridLayout
 
 
 class TestOverlayChart:
@@ -351,3 +351,74 @@ class TestOverlayChart:
         plt.close(line_fig)
         plt.close(scatter_fig)
         plt.close(hist_fig)
+
+    def test_overlay_chart_metadata_exists(self):
+        """Test that OverlayChart has required metadata."""
+        bar_data = [{"label": f"Cat{i}", "y": i * 10} for i in range(5)]
+        bar_fig = BarChart(data=bar_data)
+
+        line_data = [{"x": i, "y": i * 8} for i in range(5)]
+        line_fig = LineChart(data=line_data)
+
+        # Create overlay chart
+        overlay_fig = OverlayChart(
+            charts=[
+                {"figure": bar_fig},
+                {"figure": line_fig},
+            ],
+            title="Test Overlay",
+        )
+
+        # Test metadata exists
+        assert hasattr(
+            overlay_fig, "_chart_metadata"
+        ), "OverlayChart missing _chart_metadata attribute"
+
+        # Test required metadata fields
+        metadata = overlay_fig._chart_metadata
+        assert "type" in metadata, "Missing 'type' in metadata"
+        assert "charts" in metadata, "Missing 'charts' in metadata"
+        assert (
+            metadata["type"] == "overlay"
+        ), f"Expected type 'overlay', got '{metadata['type']}'"
+        assert len(metadata["charts"]) > 0, "Charts list should not be empty"
+
+        plt.close(overlay_fig)
+        plt.close(bar_fig)
+        plt.close(line_fig)
+
+    def test_overlay_chart_in_figure_grid_layout(self):
+        """Test that OverlayChart can be used in FigureGridLayout."""
+        bar_data = [{"label": f"Cat{i}", "y": i * 10} for i in range(5)]
+        bar_fig = BarChart(data=bar_data, title="Bar Chart")
+
+        line_data = [{"x": i, "y": i * 8} for i in range(5)]
+        line_fig = LineChart(data=line_data, title="Line Chart")
+
+        # Create overlay chart
+        overlay_fig = OverlayChart(
+            charts=[
+                {"figure": bar_fig, "y_axis": "left"},
+                {"figure": line_fig, "y_axis": "right"},
+            ],
+            title="Overlay Chart",
+        )
+
+        # Test that OverlayChart can be used in FigureGridLayout
+        combined_fig = FigureGridLayout(
+            charts=[
+                {"figure": bar_fig},
+                {"figure": line_fig},
+                {"figure": overlay_fig},
+            ],
+            title="Grid with Overlay",
+            max_cols=2,
+        )
+
+        assert combined_fig is not None
+        assert isinstance(combined_fig, plt.Figure)
+
+        plt.close(combined_fig)
+        plt.close(overlay_fig)
+        plt.close(bar_fig)
+        plt.close(line_fig)
