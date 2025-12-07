@@ -553,7 +553,7 @@ def OverlayChart(
     ylabel_left: Optional[str] = None,
     ylabel_right: Optional[str] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
-    show_legend: Optional[bool] = True,
+    show_legend: Optional[bool] = False,
     show_grid: Optional[str] = None,
     auto_secondary_axis: Optional[float] = None,
     xmin: Optional[float] = None,
