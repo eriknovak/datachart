@@ -7,11 +7,13 @@ Attributes:
     DEFAULT_THEME (datachart.typings.StyleAttrs): The default theme style.
     GREYSCALE_THEME (datachart.typings.StyleAttrs): The greyscale theme style.
     PUBLICATION_THEME (datachart.typings.StyleAttrs): The publication theme style.
+    BACKGROUND_THEME (datachart.typings.StyleAttrs): The background theme style (light gray for de-emphasized elements).
 
 """
 
 from .default import DEFAULT_THEME
 from .grayscale import GREYSCALE_THEME
 from .publication import PUBLICATION_THEME
+from .background import BACKGROUND_THEME
 
-__all__ = ["DEFAULT_THEME", "GREYSCALE_THEME", "PUBLICATION_THEME"]
+__all__ = ["DEFAULT_THEME", "GREYSCALE_THEME", "PUBLICATION_THEME", "BACKGROUND_THEME"]

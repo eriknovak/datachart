@@ -612,12 +612,15 @@ class THEME:
     Attributes:
         DEFAULT (str): The default theme. Equals to `"default"`.
         GREYSCALE (str): The greyscale theme. Equals to `"greyscale"`.
+        PUBLICATION (str): The publication theme. Equals to `"publication"`.
+        BACKGROUND (str): The background theme (light gray for de-emphasized elements). Equals to `"background"`.
 
     """
 
     DEFAULT = "default"
     GREYSCALE = "greyscale"
     PUBLICATION = "publication"
+    BACKGROUND = "background"
 
 
 class SHOW_GRID:

@@ -464,35 +464,50 @@ def _plot_chart_on_axis(
     # Determine if we have multiple subplots (should be False for overlay)
     has_multi = False
 
-    # Get default z-order based on chart type
-    if z_order is None:
-        if chart_type == "barchart":
-            z_order = config.get("overlay_default_zorder_bar", 1)
-        elif chart_type == "linechart":
-            z_order = config.get("overlay_default_zorder_line", 2)
+    # Preserve the current config and temporarily apply the chart's original config
+    original_config = config.config.copy()
+    original_theme = config.theme
+
+    # If this chart has a saved config snapshot, apply it temporarily
+    if "config_snapshot" in metadata:
+        config.config = metadata["config_snapshot"].copy()
+        if "theme" in metadata:
+            config.theme = metadata["theme"]
+
+    try:
+        # Get default z-order based on chart type
+        if z_order is None:
+            if chart_type == "barchart":
+                z_order = config.get("overlay_default_zorder_bar", 1)
+            elif chart_type == "linechart":
+                z_order = config.get("overlay_default_zorder_line", 2)
+            elif chart_type == "scatterchart":
+                z_order = config.get("overlay_default_zorder_scatter", 2)
+            elif chart_type == "histogram":
+                z_order = config.get("overlay_default_zorder_hist", 1)
+            else:
+                z_order = 1
+
+        # Get color cycle
+        color_cycle = custom_color_cycle(has_multi, len(charts))
+
+        # Plot based on chart type
+        if chart_type == "linechart":
+            _plot_line_on_axis(ax, charts, settings, color_cycle, z_order, color_override)
+        elif chart_type == "barchart":
+            _plot_bar_on_axis(ax, charts, settings, color_cycle, z_order, color_override)
         elif chart_type == "scatterchart":
-            z_order = config.get("overlay_default_zorder_scatter", 2)
+            _plot_scatter_on_axis(
+                ax, charts, settings, color_cycle, z_order, color_override
+            )
         elif chart_type == "histogram":
-            z_order = config.get("overlay_default_zorder_hist", 1)
-        else:
-            z_order = 1
-
-    # Get color cycle
-    color_cycle = custom_color_cycle(has_multi, len(charts))
-
-    # Plot based on chart type
-    if chart_type == "linechart":
-        _plot_line_on_axis(ax, charts, settings, color_cycle, z_order, color_override)
-    elif chart_type == "barchart":
-        _plot_bar_on_axis(ax, charts, settings, color_cycle, z_order, color_override)
-    elif chart_type == "scatterchart":
-        _plot_scatter_on_axis(
-            ax, charts, settings, color_cycle, z_order, color_override
-        )
-    elif chart_type == "histogram":
-        _plot_histogram_on_axis(
-            ax, charts, settings, color_cycle, z_order, color_override
-        )
+            _plot_histogram_on_axis(
+                ax, charts, settings, color_cycle, z_order, color_override
+            )
+    finally:
+        # Restore the original config
+        config.config = original_config
+        config.theme = original_theme
 
 
 def _combine_legends(ax_left: plt.Axes, ax_right: Optional[plt.Axes] = None) -> None:

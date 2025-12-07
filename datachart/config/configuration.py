@@ -8,7 +8,7 @@ from datachart.typings import StyleAttrs
 from datachart.constants import THEME
 
 # import the themes
-from ..themes import DEFAULT_THEME, GREYSCALE_THEME, PUBLICATION_THEME
+from ..themes import DEFAULT_THEME, GREYSCALE_THEME, PUBLICATION_THEME, BACKGROUND_THEME
 
 
 class Config:
@@ -60,9 +60,12 @@ class Config:
         elif theme == THEME.PUBLICATION:
             self.config = copy.deepcopy(PUBLICATION_THEME)
             self.theme = THEME.PUBLICATION
+        elif theme == THEME.BACKGROUND:
+            self.config = copy.deepcopy(BACKGROUND_THEME)
+            self.theme = THEME.BACKGROUND
         else:
             warnings.warn(
-                f"Warning: {theme} is not a valid theme. Must be one of {[THEME.DEFAULT, THEME.GREYSCALE, THEME.PUBLICATION]}. Reverting to last active theme..."
+                f"Warning: {theme} is not a valid theme. Must be one of {[THEME.DEFAULT, THEME.GREYSCALE, THEME.PUBLICATION, THEME.BACKGROUND]}. Reverting to last active theme..."
             )
             self.set_theme(self.theme)
 

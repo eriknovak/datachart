@@ -1,0 +1,198 @@
+from ..typings import StyleAttrs
+from ..constants import (
+    LINE_STYLE,
+    FONT_STYLE,
+    FONT_WEIGHT,
+    LINE_DRAW_STYLE,
+    COLORS,
+    LEGEND_LOCATION,
+)
+
+BACKGROUND_THEME: StyleAttrs = {
+    # general color style - light grays for background/de-emphasized elements
+    "color_general_singular": [
+        "#CCCCCC",  # very light gray
+        "#D3D3D3",  # light gray
+        "#DCDCDC",  # gainsboro
+        "#E0E0E0",  # lighter gray
+        "#E8E8E8",  # very light
+        "#F0F0F0",  # almost white
+    ],
+    "color_general_multiple": [
+        "#CCCCCC",  # very light gray
+        "#D3D3D3",  # light gray
+        "#DCDCDC",  # gainsboro
+        "#E0E0E0",  # lighter gray
+        "#E8E8E8",  # very light
+        "#F0F0F0",  # almost white
+    ],
+    "color_parallel_hue": [
+        "#CCCCCC",  # very light gray
+        "#D3D3D3",  # light gray
+        "#DCDCDC",  # gainsboro
+        "#E0E0E0",  # lighter gray
+        "#E8E8E8",  # very light
+        "#F0F0F0",  # almost white
+    ],
+    # general font style
+    "font_general_family": "sans-serif",
+    "font_general_sansserif": ["Helvetica", "Arial"],
+    "font_general_color": "#000000",
+    "font_general_size": 10,
+    "font_general_style": FONT_STYLE.NORMAL,
+    "font_general_weight": FONT_WEIGHT.NORMAL,
+    # title size style
+    "font_title_size": 14,
+    "font_title_color": "#000000",
+    "font_title_style": FONT_STYLE.NORMAL,
+    "font_title_weight": FONT_WEIGHT.NORMAL,
+    # subtitle size style
+    "font_subtitle_size": 10,
+    "font_subtitle_color": "#000000",
+    "font_subtitle_style": FONT_STYLE.NORMAL,
+    "font_subtitle_weight": FONT_WEIGHT.NORMAL,
+    # xlabel size style
+    "font_xlabel_size": 9,
+    "font_xlabel_color": "#000000",
+    "font_xlabel_style": FONT_STYLE.NORMAL,
+    "font_xlabel_weight": FONT_WEIGHT.NORMAL,
+    # ylabel size style
+    "font_ylabel_size": 9,
+    "font_ylabel_color": "#000000",
+    "font_ylabel_style": FONT_STYLE.NORMAL,
+    "font_ylabel_weight": FONT_WEIGHT.NORMAL,
+    # plot axes style
+    "axes_spines_top_visible": True,
+    "axes_spines_right_visible": True,
+    "axes_spines_bottom_visible": True,
+    "axes_spines_left_visible": True,
+    "axes_spines_width": 0.8,
+    "axes_spines_zorder": 100,
+    "axes_ticks_length": 3,
+    "axes_ticks_label_size": 8,
+    # plot legend style
+    "plot_legend_shadow": False,
+    "plot_legend_frameon": True,
+    "plot_legend_alignment": "left",
+    "plot_legend_location": LEGEND_LOCATION.BEST,
+    "plot_legend_font_size": 8,
+    "plot_legend_title_size": 9,
+    "plot_legend_label_color": "#000000",
+    # plot area style - subtle background fill
+    "plot_area_alpha": 0.15,
+    "plot_area_color": None,
+    "plot_area_linewidth": 0,
+    "plot_area_hatch": None,
+    "plot_area_zorder": 3,
+    # plot grid style
+    "plot_grid_alpha": 0.5,
+    "plot_grid_color": "#E6E6E6",
+    "plot_grid_linewidth": 0.5,
+    "plot_grid_linestyle": LINE_STYLE.SOLID,
+    "plot_grid_zorder": 0,
+    # plot line style - light gray with reduced opacity
+    "plot_line_color": None,
+    "plot_line_style": LINE_STYLE.SOLID,
+    "plot_line_marker": None,
+    "plot_line_width": 1.2,
+    "plot_line_alpha": 0.4,
+    "plot_line_drawstyle": LINE_DRAW_STYLE.DEFAULT,
+    "plot_line_zorder": 3,
+    # plot bar style - light gray with reduced opacity
+    "plot_bar_color": None,
+    "plot_bar_alpha": 0.3,
+    "plot_bar_width": 0.8,
+    "plot_bar_zorder": 3,
+    "plot_bar_hatch": None,
+    "plot_bar_edge_width": 0.5,
+    "plot_bar_edge_color": "#B0B0B0",
+    "plot_bar_error_color": "#B0B0B0",
+    "plot_bar_value_fontsize": 8,
+    "plot_bar_value_color": "#B0B0B0",
+    "plot_bar_value_padding": 3,
+    # plot hist style - light gray with reduced opacity
+    "plot_hist_color": None,
+    "plot_hist_alpha": 0.3,
+    "plot_hist_zorder": 3,
+    "plot_hist_fill": None,
+    "plot_hist_hatch": None,
+    "plot_hist_type": "bar",
+    "plot_hist_align": "mid",
+    "plot_hist_edge_width": 0.5,
+    "plot_hist_edge_color": "#B0B0B0",
+    # plot vline style
+    "plot_vline_color": "#CCCCCC",
+    "plot_vline_style": LINE_STYLE.DASHED,
+    "plot_vline_width": 1,
+    "plot_vline_alpha": 0.5,
+    # plot hline style
+    "plot_hline_color": "#CCCCCC",
+    "plot_hline_style": LINE_STYLE.DASHED,
+    "plot_hline_width": 1,
+    "plot_hline_alpha": 0.5,
+    # plot heatmap style
+    "plot_heatmap_cmap": COLORS.Greys,
+    "plot_heatmap_alpha": 0.95,
+    "plot_heatmap_font_size": 8,
+    "plot_heatmap_font_color": "#000000",
+    "plot_heatmap_font_style": FONT_STYLE.NORMAL,
+    "plot_heatmap_font_weight": FONT_WEIGHT.NORMAL,
+    # plot scatter style - light gray with reduced opacity
+    "plot_scatter_color": None,
+    "plot_scatter_alpha": 0.4,
+    "plot_scatter_size": 36,
+    "plot_scatter_marker": "o",
+    "plot_scatter_zorder": 3,
+    "plot_scatter_edge_width": 0.5,
+    "plot_scatter_edge_color": "#D0D0D0",
+    # plot regression style
+    "plot_regression_color": "#CCCCCC",
+    "plot_regression_alpha": 0.5,
+    "plot_regression_width": 2,
+    "plot_regression_style": LINE_STYLE.SOLID,
+    "plot_regression_ci_alpha": 0.1,
+    # plot parallel coords style
+    "plot_parallel_color": None,
+    "plot_parallel_alpha": 0.3,
+    "plot_parallel_width": 1.2,
+    "plot_parallel_style": LINE_STYLE.SOLID,
+    "plot_parallel_marker": None,
+    "plot_parallel_zorder": 1,
+    "plot_parallel_axis_color": "#000000",
+    "plot_parallel_axis_width": 1.5,
+    "plot_parallel_axis_zorder": 2,
+    "plot_parallel_tick_color": "#000000",
+    "plot_parallel_tick_width": 1.5,
+    "plot_parallel_tick_length": 0.02,
+    "plot_parallel_tick_label_size": 8,
+    "plot_parallel_tick_label_color": "#000000",
+    "plot_parallel_tick_label_bg_color": "#FFFFFF",
+    "plot_parallel_tick_label_bg_alpha": 0.8,
+    "plot_parallel_dim_label_size": 9,
+    "plot_parallel_dim_label_color": "#000000",
+    "plot_parallel_dim_label_rotation": 0,
+    "plot_parallel_dim_label_pad": 8,
+    # plot box style - light gray with reduced opacity
+    "plot_box_color": None,
+    "plot_box_alpha": 0.3,
+    "plot_box_linewidth": 0.8,
+    "plot_box_edgecolor": "#B0B0B0",
+    "plot_box_outlier_marker": "o",
+    "plot_box_outlier_size": 5,
+    "plot_box_outlier_color": "#E0E0E0",
+    "plot_box_outlier_edge_color": "#B0B0B0",
+    "plot_box_median_color": "#999999",
+    "plot_box_median_linewidth": 2,
+    "plot_box_whisker_linewidth": 0.8,
+    "plot_box_cap_linewidth": 0.8,
+    "plot_xticks_label_rotate": None,
+    "plot_yticks_label_rotate": None,
+    # overlay chart style
+    "overlay_auto_threshold": 3.0,
+    "overlay_bar_alpha": 0.25,
+    "overlay_hist_alpha": 0.25,
+    "overlay_default_zorder_bar": 1,
+    "overlay_default_zorder_line": 2,
+    "overlay_default_zorder_scatter": 2,
+    "overlay_default_zorder_hist": 1,
+}

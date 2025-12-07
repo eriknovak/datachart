@@ -370,6 +370,9 @@ def chart_plot_wrapper(func: callable) -> callable:
         )
 
         # Store chart metadata in figure for later use (e.g., combining figures)
+        # Also store the current theme so it can be preserved during overlay
+        attrs["theme"] = config.theme
+        attrs["config_snapshot"] = config.config.copy()
         figure._chart_metadata = attrs
 
         return figure
