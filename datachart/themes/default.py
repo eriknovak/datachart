@@ -166,4 +166,12 @@ DEFAULT_THEME: StyleAttrs = {
     "plot_box_cap_linewidth": 0.8,
     "plot_xticks_label_rotate": None,
     "plot_yticks_label_rotate": None,
+    # overlay chart style
+    "overlay_auto_threshold": 3.0,
+    "overlay_bar_alpha": 0.7,
+    "overlay_hist_alpha": 0.6,
+    "overlay_default_zorder_bar": 1,
+    "overlay_default_zorder_line": 2,
+    "overlay_default_zorder_scatter": 2,
+    "overlay_default_zorder_hist": 1,
 }

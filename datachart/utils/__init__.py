@@ -12,13 +12,24 @@ Modules:
 Methods:
     save_figure(figure, path, dpi, format, transparent):
         Saves the figure into a file using the provided format parameters.
-    figure_grid_layout(figures, title, max_cols, figsize, sharex, sharey):
+    FigureGridLayout(charts, title, max_cols, figsize, sharex, sharey):
         Combines multiple figure objects into a single grid layout.
+    figure_grid_layout(figures, title, max_cols, figsize, sharex, sharey):
+        (Deprecated) Legacy function for combining figures. Use FigureGridLayout instead.
+    OverlayChart(charts, title, xlabel, ylabel_left, ylabel_right, figsize, show_legend, auto_secondary_axis):
+        Overlays multiple charts on a single plot with optional dual y-axes.
 
 """
 
-from .figure import save_figure, figure_grid_layout
+from .figure import save_figure, FigureGridLayout, figure_grid_layout
+from .overlay import OverlayChart
 from . import stats
 
 
-__all__ = ["save_figure", "figure_grid_layout", "stats"]
+__all__ = [
+    "save_figure",
+    "FigureGridLayout",
+    "figure_grid_layout",
+    "OverlayChart",
+    "stats",
+]
