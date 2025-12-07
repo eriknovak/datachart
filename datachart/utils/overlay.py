@@ -493,9 +493,13 @@ def _plot_chart_on_axis(
 
         # Plot based on chart type
         if chart_type == "linechart":
-            _plot_line_on_axis(ax, charts, settings, color_cycle, z_order, color_override)
+            _plot_line_on_axis(
+                ax, charts, settings, color_cycle, z_order, color_override
+            )
         elif chart_type == "barchart":
-            _plot_bar_on_axis(ax, charts, settings, color_cycle, z_order, color_override)
+            _plot_bar_on_axis(
+                ax, charts, settings, color_cycle, z_order, color_override
+            )
         elif chart_type == "scatterchart":
             _plot_scatter_on_axis(
                 ax, charts, settings, color_cycle, z_order, color_override
@@ -552,6 +556,10 @@ def OverlayChart(
     show_legend: Optional[bool] = True,
     show_grid: Optional[str] = None,
     auto_secondary_axis: Optional[float] = None,
+    xmin: Optional[float] = None,
+    xmax: Optional[float] = None,
+    ymin: Optional[float] = None,
+    ymax: Optional[float] = None,
 ) -> plt.Figure:
     """Overlay multiple charts on a single plot with optional dual y-axes.
 
@@ -609,6 +617,10 @@ def OverlayChart(
         auto_secondary_axis: Threshold ratio for automatic secondary axis creation.
             If the ratio of data ranges exceeds this threshold, a secondary axis is created.
             Default is taken from config (overlay_auto_threshold, default 3.0).
+        xmin: Minimum value for x-axis limits.
+        xmax: Maximum value for x-axis limits.
+        ymin: Minimum value for y-axis limits (applies to left y-axis).
+        ymax: Maximum value for y-axis limits (applies to left y-axis).
 
     Returns:
         A matplotlib Figure containing the overlaid charts.
@@ -687,6 +699,12 @@ def OverlayChart(
         ax_right.set_ylabel(ylabel_right)
     if title:
         fig.suptitle(title)
+
+    # Configure axis limits
+    if xmin is not None or xmax is not None:
+        ax_left.set_xlim(left=xmin, right=xmax)
+    if ymin is not None or ymax is not None:
+        ax_left.set_ylim(bottom=ymin, top=ymax)
 
     # Show grid
     if show_grid:
