@@ -1,0 +1,39 @@
+/* style modifications for jupyter-wrapper */
+
+.jp-Notebook {
+    padding: 0px !important;
+}
+
+.jupyter-wrapper .jp-Collapser,
+.jupyter-wrapper .jp-CodeCell .jp-Cell-inputWrapper .jp-InputPrompt,
+.jupyter-wrapper .jp-Notebook .jp-Cell:not(.jp-mod-active) .jp-OutputPrompt,
+.jupyter-wrapper .jp-OutputArea-prompt:empty {
+    display: none !important;
+}
+
+.jupyter-wrapper .highlight {
+    font-size: smaller;
+}
+
+.jupyter-wrapper .jp-InputArea-editor {
+    border: 0px !important;
+}
+
+.jupyter-wrapper .zeroclipboard-container {
+    top: .5em !important;
+    right: .5em !important;
+    cursor: pointer;
+}
+
+.jupyter-wrapper .highlight-ipynb {
+    background-color: var(--md-code-bg-color) !important;
+    padding: .7720588235em 1.1764705882em !important;
+}
+
+.jupyter-wrapper .jp-Cell {
+    padding: var(--jp-cell-padding) 0px !important;
+}
+
+[data-md-color-scheme=slate] .highlight pre {
+    background-color: var(--md-code-bg-color) !important;
+}
