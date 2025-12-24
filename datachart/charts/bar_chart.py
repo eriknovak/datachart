@@ -36,6 +36,7 @@ def BarChart(
     value_format: Optional[str] = None,
     aspect_ratio: Optional[str] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
+    scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
@@ -106,7 +107,8 @@ def BarChart(
         value_format: Format string for bar value labels (e.g., "{:.1f}%").
         aspect_ratio: The aspect ratio of the chart.
         orientation: The orientation of the bars (vertical or horizontal).
-        scaley: The y-axis scale (e.g., "log", "linear").
+        scalex: The x-axis scale (e.g., "log", "linear"). Useful for horizontal bars.
+        scaley: The y-axis scale (e.g., "log", "linear"). Useful for vertical bars.
         subplots: Whether to create separate subplots for each chart.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.
@@ -169,6 +171,7 @@ def BarChart(
         show_values=show_values,
         value_format=value_format,
         orientation=orientation,
+        scalex=scalex,
         scaley=scaley,
     )
 

@@ -22,7 +22,7 @@ CHART_CONFIGS = {
         "subplots": True,
     },
     "boxplot": {
-        "multiplot": True,
+        "multiplot": False,
         "subplots": True,
     },
     "parallelcoords": {

@@ -610,6 +610,7 @@ def plot_bar_chart(
             "show_values",
             "value_format",
             "orientation",
+            "scalex",
             "scaley",
         ],
     )
@@ -679,6 +680,9 @@ def plot_bar_chart(
                 fontsize=value_fontsize,
                 color=value_color,
             )
+
+        if settings["scalex"]:
+            ax.set_xscale(settings["scalex"])
 
         if settings["scaley"]:
             ax.set_yscale(settings["scaley"])
@@ -792,6 +796,7 @@ def plot_histogram(
             "show_cumulative",
             "num_bins",
             "orientation",
+            "scalex",
             "scaley",
         ],
     )
@@ -836,6 +841,9 @@ def plot_histogram(
             orientation=orientation,
             **hist_style,
         )
+
+        if settings["scalex"]:
+            axes[0].set_xscale(settings["scalex"])
 
         if settings["scaley"]:
             axes[0].set_yscale(settings["scaley"])
@@ -885,6 +893,9 @@ def plot_histogram(
                 orientation=orientation,
                 **hist_style,
             )
+
+            if settings["scalex"]:
+                ax.set_xscale(settings["scalex"])
 
             if settings["scaley"]:
                 ax.set_yscale(settings["scaley"])

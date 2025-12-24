@@ -36,6 +36,7 @@ def Histogram(
     aspect_ratio: Optional[str] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
     num_bins: Optional[int] = None,
+    scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
@@ -104,6 +105,7 @@ def Histogram(
         aspect_ratio: The aspect ratio of the chart.
         orientation: The orientation of the histogram (vertical or horizontal).
         num_bins: The number of bins to split the data into.
+        scalex: The x-axis scale (e.g., "log", "linear"). Useful for log-distributed data.
         scaley: The y-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each chart.
         max_cols: Maximum number of columns in subplots (when subplots=True).
@@ -163,6 +165,7 @@ def Histogram(
         show_cumulative=show_cumulative,
         orientation=orientation,
         num_bins=num_bins,
+        scalex=scalex,
         scaley=scaley,
     )
 
