@@ -174,4 +174,7 @@ DEFAULT_THEME: StyleAttrs = {
     "overlay_default_zorder_line": 2,
     "overlay_default_zorder_scatter": 2,
     "overlay_default_zorder_hist": 1,
+    "overlay_bar_mode": "group",
+    "overlay_warn_thin_bars": True,
+    "overlay_warn_scale_groups": True,
 }

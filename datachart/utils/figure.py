@@ -202,6 +202,8 @@ def _figure_grid_layout_impl(
                         target_axis,
                         chart_config["chart_data"],
                         z_order=chart_config.get("z_order"),
+                        legend_label=chart_config.get("legend_label"),
+                        bar_mode=metadata.get("bar_mode", "group"),
                     )
             else:
                 # Fallback for old format: try to reconstruct from flattened charts
@@ -248,6 +250,10 @@ def _figure_grid_layout_impl(
             if metadata.get("ymin") is not None or metadata.get("ymax") is not None:
                 target_ax.set_ylim(
                     bottom=metadata.get("ymin"), top=metadata.get("ymax")
+                )
+            if target_ax_right and (metadata.get("ymin_right") is not None or metadata.get("ymax_right") is not None):
+                target_ax_right.set_ylim(
+                    bottom=metadata.get("ymin_right"), top=metadata.get("ymax_right")
                 )
 
             # Show grid if specified

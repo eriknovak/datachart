@@ -155,10 +155,71 @@ def _scale_compatible(
     return ratio < threshold
 
 
+def _cluster_by_scale_compatibility(
+    chart_configs: List[Dict[str, Any]], auto_threshold: float = 3.0
+) -> List[List[int]]:
+    """Cluster charts into groups based on scale compatibility.
+
+    Uses a simple union-find approach to group charts that have compatible scales.
+
+    Args:
+        chart_configs: List of chart configuration dictionaries.
+        auto_threshold: Threshold for automatic secondary axis detection.
+
+    Returns:
+        List of groups, where each group is a list of chart indices.
+    """
+    n = len(chart_configs)
+    if n == 0:
+        return []
+    if n == 1:
+        return [[0]]
+
+    # Build adjacency matrix of compatible charts
+    compatible = [[False] * n for _ in range(n)]
+    for i in range(n):
+        compatible[i][i] = True  # Chart is compatible with itself
+        for j in range(i + 1, n):
+            range_i = chart_configs[i]["data_range"]
+            range_j = chart_configs[j]["data_range"]
+            if _scale_compatible(range_i, range_j, auto_threshold):
+                compatible[i][j] = True
+                compatible[j][i] = True
+
+    # Simple clustering: group charts that are mutually compatible
+    groups = []
+    assigned = [False] * n
+
+    for i in range(n):
+        if assigned[i]:
+            continue
+
+        # Start a new group
+        group = [i]
+        assigned[i] = True
+
+        # Find all charts compatible with this group
+        for j in range(i + 1, n):
+            if assigned[j]:
+                continue
+
+            # Check if j is compatible with all charts in the current group
+            if all(compatible[j][k] for k in group):
+                group.append(j)
+                assigned[j] = True
+
+        groups.append(group)
+
+    return groups
+
+
 def _determine_axis_assignment(
     chart_configs: List[Dict[str, Any]], auto_threshold: float = 3.0
 ) -> List[str]:
     """Determine which axis (left or right) each chart should use.
+
+    Uses a clustering-based approach when all charts have auto assignment.
+    Falls back to sequential assignment when there are explicit assignments.
 
     Args:
         chart_configs: List of chart configuration dictionaries.
@@ -167,37 +228,105 @@ def _determine_axis_assignment(
     Returns:
         List of axis assignments ("left" or "right") for each chart.
     """
-    assignments = []
+    n = len(chart_configs)
+    if n == 0:
+        return []
 
-    for i, chart_config in enumerate(chart_configs):
-        # Check if explicit assignment is provided
-        y_axis = chart_config.get("y_axis", "auto")
+    # Check if all assignments are auto
+    explicit_assignments = [
+        chart_config.get("y_axis", "auto") for chart_config in chart_configs
+    ]
+    all_auto = all(a == "auto" for a in explicit_assignments)
 
-        if y_axis in ["left", "right"]:
-            assignments.append(y_axis)
-        else:
-            # Auto mode: compare with charts already assigned to left axis
-            chart_data = chart_config["chart_data"]
-            current_range = chart_config["data_range"]
+    if all_auto and config.get("overlay_warn_scale_groups", True):
+        # Use clustering-based approach for optimal grouping
+        groups = _cluster_by_scale_compatibility(chart_configs, auto_threshold)
 
-            # First chart always goes on left
-            if i == 0:
-                assignments.append("left")
+        # Sort groups by size (descending)
+        sorted_groups = sorted(groups, key=len, reverse=True)
+
+        # Assign groups to axes
+        assignments = ["left"] * n
+        if len(sorted_groups) > 1:
+            # Assign second-largest group to right axis
+            for chart_idx in sorted_groups[1]:
+                assignments[chart_idx] = "right"
+
+        # Warn if there are more than 2 groups
+        if len(sorted_groups) > 2:
+            warnings.warn(
+                f"Found {len(sorted_groups)} scale-incompatible groups but only 2 axes available. "
+                f"Groups: {[len(g) for g in sorted_groups]}. "
+                "Some charts may be difficult to read. Consider using explicit y_axis assignment or FigureGridLayout."
+            )
+    else:
+        # Use sequential assignment when there are explicit assignments
+        assignments = []
+
+        for i, chart_config in enumerate(chart_configs):
+            # Check if explicit assignment is provided
+            y_axis = chart_config.get("y_axis", "auto")
+
+            if y_axis in ["left", "right"]:
+                assignments.append(y_axis)
             else:
-                # Find existing left axis charts
-                left_compatible = False
-                for j in range(i):
-                    if assignments[j] == "left":
-                        prev_range = chart_configs[j]["data_range"]
-                        if _scale_compatible(current_range, prev_range, auto_threshold):
-                            left_compatible = True
-                            break
+                # Auto mode: compare with charts already assigned to left axis
+                current_range = chart_config["data_range"]
 
-                # Assign to left if compatible, otherwise right
-                if left_compatible:
+                # First chart always goes on left
+                if i == 0:
                     assignments.append("left")
                 else:
-                    assignments.append("right")
+                    # Find existing left axis charts
+                    left_compatible = False
+                    for j in range(i):
+                        if assignments[j] == "left":
+                            prev_range = chart_configs[j]["data_range"]
+                            if _scale_compatible(current_range, prev_range, auto_threshold):
+                                left_compatible = True
+                                break
+
+                    # Assign to left if compatible, otherwise right
+                    if left_compatible:
+                        assignments.append("left")
+                    else:
+                        assignments.append("right")
+
+        # Check for scale incompatibilities and issue warnings (only in non-clustering mode)
+        left_charts = [i for i, a in enumerate(assignments) if a == "left"]
+        right_charts = [i for i, a in enumerate(assignments) if a == "right"]
+
+        # Warn if multiple charts on right axis have incompatible scales
+        if len(right_charts) > 1:
+            for i in range(len(right_charts)):
+                for j in range(i + 1, len(right_charts)):
+                    idx_i, idx_j = right_charts[i], right_charts[j]
+                    if not _scale_compatible(
+                        chart_configs[idx_i]["data_range"],
+                        chart_configs[idx_j]["data_range"],
+                        auto_threshold,
+                    ):
+                        warnings.warn(
+                            f"Charts at indices {idx_i} and {idx_j} are both on the right axis but have "
+                            "incompatible scales. Consider using explicit y_axis assignment or FigureGridLayout."
+                        )
+                        break
+
+        # Warn if multiple charts on left axis have incompatible scales
+        if len(left_charts) > 1:
+            for i in range(len(left_charts)):
+                for j in range(i + 1, len(left_charts)):
+                    idx_i, idx_j = left_charts[i], left_charts[j]
+                    if not _scale_compatible(
+                        chart_configs[idx_i]["data_range"],
+                        chart_configs[idx_j]["data_range"],
+                        auto_threshold,
+                    ):
+                        warnings.warn(
+                            f"Charts at indices {idx_i} and {idx_j} are both on the left axis but have "
+                            "incompatible scales. Consider using explicit y_axis assignment or FigureGridLayout."
+                        )
+                        break
 
     return assignments
 
@@ -209,6 +338,7 @@ def _plot_line_on_axis(
     color_cycle: Any,
     z_order: int,
     color_override: Optional[str] = None,
+    legend_label: Optional[str] = None,
 ) -> None:
     """Plot line chart on axis."""
     for chart in charts:
@@ -252,8 +382,9 @@ def _plot_line_on_axis(
             )
             ax.fill_between(x, y, step=step, **area_style)
 
-        subtitle = chart.get("subtitle", None)
-        ax.plot(x, y, **line_style, label=subtitle)
+        # Use legend_label if provided, otherwise fall back to subtitle
+        label = legend_label if legend_label is not None else chart.get("subtitle", None)
+        ax.plot(x, y, **line_style, label=label)
 
 
 def _plot_bar_on_axis(
@@ -263,19 +394,45 @@ def _plot_bar_on_axis(
     color_cycle: Any,
     z_order: int,
     color_override: Optional[str] = None,
+    legend_label: Optional[str] = None,
+    bar_mode: Optional[str] = None,
 ) -> None:
     """Plot bar chart on axis."""
     from ..constants import ORIENTATION
 
     orientation = settings.get("orientation", "vertical")
     is_horizontal = orientation == ORIENTATION.HORIZONTAL
-
-    # For overlay, we need to adjust bar positions to avoid overlap
     n_charts = len(charts)
-    x_width = config.get("plot_bar_width", 0.8) / n_charts
+
+    # Get bar_mode from config if not provided
+    if bar_mode is None:
+        bar_mode = config.get("overlay_bar_mode", "group")
+
+    # Validate bar_mode
+    if bar_mode not in ["group", "stack", "overlay"]:
+        warnings.warn(
+            f"Invalid bar_mode '{bar_mode}'. Using 'group' instead. "
+            "Valid options are: 'group', 'stack', 'overlay'."
+        )
+        bar_mode = "group"
+
+    # For group mode, adjust bar positions to avoid overlap
+    if bar_mode == "group":
+        x_width = config.get("plot_bar_width", 0.8) / n_charts
+    else:
+        # For stack and overlay modes, use full width
+        x_width = config.get("plot_bar_width", 0.8)
 
     # Get overlay alpha
-    alpha = config.get("overlay_bar_alpha", 0.7) if n_charts > 1 else None
+    alpha = config.get("overlay_bar_alpha", 0.7) if n_charts > 1 and bar_mode == "overlay" else None
+
+    # For stacked bars, track cumulative bottoms
+    bar_bottoms = None
+    if bar_mode == "stack":
+        # Get the number of positions from the first chart
+        first_chart_labels = get_chart_data("label", charts[0])
+        if first_chart_labels is not None:
+            bar_bottoms = np.zeros(len(first_chart_labels))
 
     for idx, chart in enumerate(charts):
         y = get_chart_data("y", chart)
@@ -286,7 +443,12 @@ def _plot_bar_on_axis(
             continue
 
         x = np.arange(len(labels))
-        x_offset = idx * x_width if n_charts > 1 else 0
+
+        # Calculate x_offset based on mode
+        if bar_mode == "group":
+            x_offset = idx * x_width
+        else:
+            x_offset = 0  # No offset for stack and overlay
 
         style = chart.get("style", {})
         chart_hash = get_chart_hash(chart)
@@ -303,14 +465,26 @@ def _plot_bar_on_axis(
         tmp_attr = "height" if is_horizontal else "width"
         bar_style[tmp_attr] = x_width
 
-        # Error bars
+        # Error bars (only on the top bar for stacked mode)
         show_yerr = settings.get("show_yerr", False)
         tmp_attr = "xerr" if is_horizontal else "yerr"
-        error_range = {tmp_attr: yerr if show_yerr and yerr is not None else None}
+        # For stacked bars, only show error bars on the last chart
+        show_error = show_yerr and yerr is not None and (bar_mode != "stack" or idx == len(charts) - 1)
+        error_range = {tmp_attr: yerr if show_error else None}
 
-        subtitle = chart.get("subtitle", None)
+        # Use legend_label if provided, otherwise fall back to subtitle
+        label = legend_label if legend_label is not None else chart.get("subtitle", None)
         draw_func = ax.barh if is_horizontal else ax.bar
-        draw_func(x + x_offset, y, label=subtitle, **error_range, **bar_style)
+
+        # Add bottom parameter for stacked bars
+        if bar_mode == "stack" and bar_bottoms is not None:
+            bottom_attr = "left" if is_horizontal else "bottom"
+            bar_style[bottom_attr] = bar_bottoms
+            draw_func(x + x_offset, y, label=label, **error_range, **bar_style)
+            # Update bottoms for next chart
+            bar_bottoms = bar_bottoms + np.array(y)
+        else:
+            draw_func(x + x_offset, y, label=label, **error_range, **bar_style)
 
 
 def _plot_scatter_on_axis(
@@ -320,6 +494,7 @@ def _plot_scatter_on_axis(
     color_cycle: Any,
     z_order: int,
     color_override: Optional[str] = None,
+    legend_label: Optional[str] = None,
 ) -> None:
     """Plot scatter chart on axis."""
     for chart in charts:
@@ -376,8 +551,9 @@ def _plot_scatter_on_axis(
             if color_override:
                 base_style["c"] = color_override
 
-            subtitle = chart.get("subtitle", None)
-            ax.scatter(x, y, s=sizes, label=subtitle, **base_style)
+            # Use legend_label if provided, otherwise fall back to subtitle
+            label = legend_label if legend_label is not None else chart.get("subtitle", None)
+            ax.scatter(x, y, s=sizes, label=label, **base_style)
 
 
 def _plot_histogram_on_axis(
@@ -387,6 +563,7 @@ def _plot_histogram_on_axis(
     color_cycle: Any,
     z_order: int,
     color_override: Optional[str] = None,
+    legend_label: Optional[str] = None,
 ) -> None:
     """Plot histogram on axis."""
     num_bins = settings.get("num_bins", 20)
@@ -419,11 +596,12 @@ def _plot_histogram_on_axis(
         if alpha is not None:
             hist_style["alpha"] = alpha
 
-        subtitle = chart.get("subtitle", None)
+        # Use legend_label if provided, otherwise fall back to subtitle
+        label = legend_label if legend_label is not None else chart.get("subtitle", None)
         ax.hist(
             x,
             bins=bins,
-            label=subtitle,
+            label=label,
             density=settings.get("show_density", False),
             cumulative=settings.get("show_cumulative", False),
             orientation=orientation,
@@ -445,6 +623,8 @@ def _plot_chart_on_axis(
     chart_data: Dict[str, Any],
     z_order: Optional[int] = None,
     color_override: Optional[str] = None,
+    legend_label: Optional[str] = None,
+    bar_mode: Optional[str] = None,
 ) -> None:
     """Plot a chart on the specified axis.
 
@@ -453,6 +633,8 @@ def _plot_chart_on_axis(
         chart_data: Dictionary containing chart type and data.
         z_order: Optional z-order for layering control.
         color_override: Optional color to override chart colors.
+        legend_label: Optional custom legend label to override subtitle.
+        bar_mode: Bar chart overlay mode ("group", "stack", or "overlay").
     """
     chart_type = chart_data["type"]
     charts = chart_data["charts"]
@@ -494,19 +676,19 @@ def _plot_chart_on_axis(
         # Plot based on chart type
         if chart_type == "linechart":
             _plot_line_on_axis(
-                ax, charts, settings, color_cycle, z_order, color_override
+                ax, charts, settings, color_cycle, z_order, color_override, legend_label
             )
         elif chart_type == "barchart":
             _plot_bar_on_axis(
-                ax, charts, settings, color_cycle, z_order, color_override
+                ax, charts, settings, color_cycle, z_order, color_override, legend_label, bar_mode
             )
         elif chart_type == "scatterchart":
             _plot_scatter_on_axis(
-                ax, charts, settings, color_cycle, z_order, color_override
+                ax, charts, settings, color_cycle, z_order, color_override, legend_label
             )
         elif chart_type == "histogram":
             _plot_histogram_on_axis(
-                ax, charts, settings, color_cycle, z_order, color_override
+                ax, charts, settings, color_cycle, z_order, color_override, legend_label
             )
     finally:
         # Restore the original config
@@ -560,6 +742,9 @@ def OverlayChart(
     xmax: Optional[float] = None,
     ymin: Optional[float] = None,
     ymax: Optional[float] = None,
+    ymin_right: Optional[float] = None,
+    ymax_right: Optional[float] = None,
+    bar_mode: Optional[str] = None,
 ) -> plt.Figure:
     """Overlay multiple charts on a single plot with optional dual y-axes.
 
@@ -607,6 +792,7 @@ def OverlayChart(
             - "figure": A matplotlib Figure from datachart chart functions
             - "y_axis" (optional): "left", "right", or "auto" (default: "auto")
             - "z_order" (optional): Integer for layering control (higher values on top)
+            - "legend_label" (optional): Custom legend label (overrides chart subtitle)
         title: Title for the combined chart.
         xlabel: Label for x-axis.
         ylabel_left: Label for left y-axis.
@@ -621,6 +807,10 @@ def OverlayChart(
         xmax: Maximum value for x-axis limits.
         ymin: Minimum value for y-axis limits (applies to left y-axis).
         ymax: Maximum value for y-axis limits (applies to left y-axis).
+        ymin_right: Minimum value for right y-axis limits.
+        ymax_right: Maximum value for right y-axis limits.
+        bar_mode: Bar chart overlay mode: "group" (side-by-side), "stack" (stacked), or "overlay" (overlapping).
+            Default is taken from config (overlay_bar_mode, default "group").
 
     Returns:
         A matplotlib Figure containing the overlaid charts.
@@ -634,6 +824,10 @@ def OverlayChart(
     # Require user to specify auto_secondary_axis
     if auto_secondary_axis is None:
         auto_secondary_axis = config.get("overlay_auto_threshold", 3.0)
+
+    # Get default bar_mode from config if not provided
+    if bar_mode is None:
+        bar_mode = config.get("overlay_bar_mode", "group")
 
     # Get default figsize from config if not provided
     if figsize is None:
@@ -655,6 +849,7 @@ def OverlayChart(
                 "data_range": data_range,
                 "y_axis": chart_config.get("y_axis", "auto"),
                 "z_order": chart_config.get("z_order", None),
+                "legend_label": chart_config.get("legend_label", None),
             }
         )
 
@@ -663,6 +858,20 @@ def OverlayChart(
 
     # Check if we need a secondary axis
     needs_secondary = "right" in axis_assignments
+
+    # Warn about cramped bar charts
+    if bar_mode == "group" and config.get("overlay_warn_thin_bars", True):
+        # Count bar charts
+        bar_chart_count = sum(
+            1 for cc in chart_configs if cc["chart_data"]["type"] == "barchart"
+        )
+        if bar_chart_count > 1:
+            x_width = config.get("plot_bar_width", 0.8) / bar_chart_count
+            if x_width < 0.15:
+                warnings.warn(
+                    f"Bar width ({x_width:.2f}) is very small with {bar_chart_count} bar charts. "
+                    "Consider using bar_mode='stack', bar_mode='overlay', or FigureGridLayout for better readability."
+                )
 
     # Create figure and axes
     fig, ax_left = plt.subplots(figsize=figsize, constrained_layout=True)
@@ -688,6 +897,8 @@ def OverlayChart(
             target_ax,
             chart_config["chart_data"],
             z_order=chart_config["z_order"],
+            legend_label=chart_config["legend_label"],
+            bar_mode=bar_mode,
         )
 
     # Configure labels
@@ -705,6 +916,8 @@ def OverlayChart(
         ax_left.set_xlim(left=xmin, right=xmax)
     if ymin is not None or ymax is not None:
         ax_left.set_ylim(bottom=ymin, top=ymax)
+    if ax_right and (ymin_right is not None or ymax_right is not None):
+        ax_right.set_ylim(bottom=ymin_right, top=ymax_right)
 
     # Show grid
     if show_grid:
@@ -729,6 +942,7 @@ def OverlayChart(
             {
                 "chart_data": chart_config["chart_data"],
                 "z_order": chart_config.get("z_order"),
+                "legend_label": chart_config.get("legend_label"),
             }
         )
 
@@ -747,6 +961,9 @@ def OverlayChart(
         "xmax": xmax,
         "ymin": ymin,
         "ymax": ymax,
+        "ymin_right": ymin_right,
+        "ymax_right": ymax_right,
+        "bar_mode": bar_mode,
         "auto_secondary_axis": auto_secondary_axis,
         "axis_assignments": axis_assignments,
         "theme": config.theme,
