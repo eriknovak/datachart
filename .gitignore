@@ -160,3 +160,6 @@ cython_debug/
 #.idea/
 
 .vscode
+
+# figures written by the save_figure examples in the docs notebooks
+fig_*.png

@@ -2,14 +2,11 @@ from ._base import make_theme
 from ..typings import StyleAttrs
 from ..constants import LINE_STYLE, COLORS
 
-# diversified YlGnBu, contrast-ordered for legibility on white
-PAPER_YLGNBU = ["#225EA8", "#7FCDBB", "#0C2C84", "#C7E9B4", "#41B6C4", "#1D91C0"]
-
 PUBLICATION_THEME: StyleAttrs = make_theme(
     {
         "color_general_singular": COLORS.Blues,
-        "color_general_multiple": PAPER_YLGNBU,
-        "color_parallel_hue": PAPER_YLGNBU,
+        "color_general_multiple": COLORS.PaperYlGnBu,
+        "color_parallel_hue": COLORS.PaperYlGnBu,
         "color_parallel_hue_continuous": [
             "#C7E9B4",
             "#7FCDBB",

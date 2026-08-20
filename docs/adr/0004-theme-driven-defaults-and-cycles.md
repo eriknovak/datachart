@@ -32,8 +32,11 @@ An explicit per-chart hatch style wins over the cycle.
 - **Hatch assignment lives in the `Panel`**, beside color assignment — layers
   receive the resolved hatch via `DrawContext`, never consult the config at
   draw time.
-- **Existing themes ship `None` defaults and no hatch cycle** (except
-  `ACADEMIC`'s hatch cycle), so applying this change alone alters no output.
+- **A theme with `None` defaults and no hatch cycle behaves exactly as
+  before** — the mechanism alone alters no output. The modernized themes that
+  ship alongside this ADR do exercise it: every theme carries a muted grid
+  default (`"y"`), `MINIMAL`/`MATERIAL`/`ACADEMIC` default bar value labels
+  on, and `ACADEMIC` carries the only hatch cycle.
 
 ## Considered options
 

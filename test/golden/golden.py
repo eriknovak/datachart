@@ -33,8 +33,6 @@ from datachart.config import config
 from datachart.constants import THEME
 
 # Cases whose output intentionally changed since the last published baseline.
-# The theme refresh (ADR 0004) restyled every theme, so baselines regenerated
-# from scratch and no per-case exceptions remain.
 EXPECTED_CHANGES = set()
 
 
