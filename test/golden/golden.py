@@ -49,6 +49,8 @@ EXPECTED_CHANGES = {
     # publication multiple palette drops YlGnBu's illegible pale end
     "theme_publication_line",
     "overlay_theme_snapshot",
+    # no empty legend frame when nothing carries a label
+    "theme_greyscale_bar",
 }
 
 

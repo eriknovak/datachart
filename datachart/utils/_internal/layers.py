@@ -1435,8 +1435,10 @@ class Panel:
             elif s.get("legend_mode") == "combined":
                 self._combine_legends(ax, ax_right, legend_style)
             elif not any(isinstance(l, ParallelCoordsLayer) for l in layers):
-                # parallel coords only carry a legend when hue groups exist
-                ax.legend(title="Legend", **legend_style)
+                # parallel coords only carry a legend when hue groups exist;
+                # unlabeled panels get no empty legend frame
+                if ax.get_legend_handles_labels()[1]:
+                    ax.legend(title="Legend", **legend_style)
 
     def _apply_bar_ticks(self, ax, bar_ticks, slot_width, bar_layers) -> None:
         is_horizontal = bar_layers[0].is_horizontal
