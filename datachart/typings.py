@@ -3,32 +3,22 @@
 The `typings` module contains the typings for all chart components. The module
 is intended to contain the typings for easier input value format checkup.
 
-Attributes:
-    ChartAttrs: The union of all chart attributes.
-
 Classes:
     ChartCommonAttrs: The chart attributes common to all chart types.
     VLinePlotAttrs: The vertical line plot attributes.
     HLinePlotAttrs: The horizontal line plot attributes.
-    LineChartAttrs: The line chart attributes.
     LineSingleChartAttrs: The single chart attributes for the line chart.
     LineDataPointAttrs: The data point attributes for the line chart.
-    BarChartAttrs: The bar chart attributes.
     BarSingleChartAttrs: The single chart attributes for the bar chart.
     BarDataPointAttrs: The data point attributes for the bar chart.
-    HistogramChartAttrs: The histogram chart attributes.
     HistogramSingleChartAttrs: The single chart attributes for the histogram chart.
     HistDataPointAttrs: The data point attributes for the histogram chart.
-    HeatmapChartAttrs: The heatmap chart attributes.
     HeatmapSingleChartAttrs: The single chart attributes for the heatmap chart.
     HeatmapColorbarAttrs: The heatmap colorbar attributes.
-    ScatterChartAttrs: The scatter chart attributes.
     ScatterSingleChartAttrs: The single chart attributes for the scatter chart.
     ScatterDataPointAttrs: The data point attributes for the scatter chart.
-    BoxChartAttrs: The box plot chart attributes.
     BoxSingleChartAttrs: The single chart attributes for the box plot.
     BoxDataPointAttrs: The data point attributes for the box plot.
-    ParallelCoordsChartAttrs: The parallel coordinates chart attributes.
     ParallelCoordsSingleChartAttrs: The single chart attributes for the parallel coordinates chart.
     ParallelCoordsDataPointAttrs: The data point attributes for the parallel coordinates chart.
 
@@ -52,6 +42,7 @@ Classes:
 
 """
 
+import warnings
 from typing import TypedDict, Union, Tuple, List, Optional, Dict
 
 import matplotlib.colors as colors
@@ -695,7 +686,7 @@ class LineSingleChartAttrs(TypedDict):
     yerr: Union[str, None]  # the name of the yerr attribute in data (default: "yerr")
 
 
-class LineChartAttrs(ChartCommonAttrs):
+class _LineChartAttrs(ChartCommonAttrs):
     """The line chart attributes.
 
     Attributes:
@@ -779,7 +770,7 @@ class BarSingleChartAttrs(TypedDict):
     yerr: Union[str, None]  # the name of the yerr attribute in data
 
 
-class BarChartAttrs(ChartCommonAttrs):
+class _BarChartAttrs(ChartCommonAttrs):
     """The bar chart attributes.
 
     Attributes:
@@ -857,7 +848,7 @@ class HistogramSingleChartAttrs(TypedDict):
     x: Union[str, None]  # the name of the x attribute in data
 
 
-class HistogramChartAttrs(ChartCommonAttrs):
+class _HistogramChartAttrs(ChartCommonAttrs):
     """The histogram chart attributes.
 
     Attributes:
@@ -939,7 +930,7 @@ class HeatmapSingleChartAttrs(TypedDict):
     colorbar: Union[HeatmapColorbarAttrs, None]
 
 
-class HeatmapChartAttrs(ChartCommonAttrs):
+class _HeatmapChartAttrs(ChartCommonAttrs):
     """The heatmap chart attributes.
 
     Attributes:
@@ -1022,7 +1013,7 @@ class ScatterSingleChartAttrs(TypedDict):
     hue: Union[str, None]
 
 
-class ScatterChartAttrs(ChartCommonAttrs):
+class _ScatterChartAttrs(ChartCommonAttrs):
     """The scatter chart attributes.
 
     Attributes:
@@ -1107,7 +1098,7 @@ class BoxSingleChartAttrs(TypedDict):
     value: Union[str, None]  # the name of the value attribute in data
 
 
-class BoxChartAttrs(ChartCommonAttrs):
+class _BoxChartAttrs(ChartCommonAttrs):
     """The box plot chart attributes.
 
     Attributes:
@@ -1170,7 +1161,7 @@ class ParallelCoordsSingleChartAttrs(TypedDict):
     category_orders: Union[Dict[str, List[str]], None]
 
 
-class ParallelCoordsChartAttrs(ChartCommonAttrs):
+class _ParallelCoordsChartAttrs(ChartCommonAttrs):
     """The parallel coordinates chart attributes.
 
     Attributes:
@@ -1186,13 +1177,43 @@ class ParallelCoordsChartAttrs(ChartCommonAttrs):
 # ================================================
 
 
-ChartAttrs = Union[
-    LineChartAttrs,
-    BarChartAttrs,
-    HistogramChartAttrs,
-    HeatmapChartAttrs,
-    ScatterChartAttrs,
-    BoxChartAttrs,
-    ParallelCoordsChartAttrs,
+_ChartAttrs = Union[
+    _LineChartAttrs,
+    _BarChartAttrs,
+    _HistogramChartAttrs,
+    _HeatmapChartAttrs,
+    _ScatterChartAttrs,
+    _BoxChartAttrs,
+    _ParallelCoordsChartAttrs,
 ]
 """The union of all chart attributes."""
+
+
+# ================================================
+# Deprecated Aliases
+# ================================================
+
+
+_DEPRECATED_TYPINGS = {
+    "ChartAttrs": _ChartAttrs,
+    "LineChartAttrs": _LineChartAttrs,
+    "BarChartAttrs": _BarChartAttrs,
+    "HistogramChartAttrs": _HistogramChartAttrs,
+    "HeatmapChartAttrs": _HeatmapChartAttrs,
+    "ScatterChartAttrs": _ScatterChartAttrs,
+    "BoxChartAttrs": _BoxChartAttrs,
+    "ParallelCoordsChartAttrs": _ParallelCoordsChartAttrs,
+}
+
+
+def __getattr__(name: str):
+    # deprecated for one release (ADR 0003): the chart fronts are the API surface
+    if name in _DEPRECATED_TYPINGS:
+        warnings.warn(
+            f"datachart.typings.{name} is deprecated; the chart functions document "
+            "their parameters — see datachart.charts.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return _DEPRECATED_TYPINGS[name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

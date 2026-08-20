@@ -35,8 +35,9 @@ _Avoid_: settings (for this), kwargs
 
 **Chart front**:
 A public chart function (`LineChart`, `BarChart`, …) — a thin front that validates
-input and builds layers; it does not draw.
-_Avoid_: chart class, chart type (for the function)
+input and hands the engine an explicit charts structure and settings dict; it does
+not draw, and its signature is the allowlist of what the chart supports.
+_Avoid_: chart class, chart type (for the function), attrs dict
 
 **Metadata transport**:
 The chart spec riding on a rendered figure (`figure._chart_metadata`) so composition

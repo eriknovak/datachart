@@ -96,9 +96,9 @@ from datachart.config import config
 ### Chart Creation Flow
 
 1. User calls a chart front (e.g., `LineChart(...)`) in `datachart/charts/line_chart.py`
-2. The front builds the attrs dict using `build_charts_structure()` and `build_attrs_dict()` from `chart_builder.py`
+2. The front builds the charts structure via `build_charts_structure()` from `chart_builder.py` and an explicit settings dict, then calls `render_chart(chart_type, charts, settings)` (ADR 0003)
 3. `render_chart()` in `plot_engine.py`:
-   - Extracts and validates settings, calculates the subplot layout
+   - Calculates the subplot layout; `None` settings resolve to defaults at point of use
    - Builds the layers via `build_layers()` — style is resolved here, once
    - Assembles one `Panel` per coordinate space (one for single plots, one per subplot otherwise) and calls `panel.render(ax)`
    - Applies figure-level labels and stores the metadata transport on the figure
@@ -116,7 +116,7 @@ figure._chart_metadata = {
 }
 ```
 
-The transport carries only what composition consumes — never the raw attrs dicts.
+The transport carries only what composition consumes — never the fronts' inputs.
 
 `Panel` concatenates the source figures' layer groups into one panel with
 twin-axis assignment; `Grid` renders each figure's stored panel into a grid
