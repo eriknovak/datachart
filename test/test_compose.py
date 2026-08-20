@@ -1,5 +1,6 @@
 """Tests for the public Panel/Grid composition fronts (ADR 0002)."""
 
+import copy
 import io
 import warnings
 
@@ -7,6 +8,8 @@ import pytest
 import matplotlib.pyplot as plt
 
 from datachart.charts import LineChart, BarChart
+from datachart.config import config
+from datachart.constants import THEME
 from datachart.utils import (
     Panel,
     Grid,
@@ -170,6 +173,44 @@ class TestGrid:
         fig = Grid([[panel_fig, _line_fig()]])
         assert len(fig.axes) >= 2
         plt.close("all")
+
+
+class TestStyleFreeze:
+    """Layer styles freeze at chart build, and composing never touches the config.
+
+    Swapping the global theme between building a chart and composing it must not
+    change the composed output (CONTEXT.md: "Style resolution"). Panel-level
+    furniture is resolved when the panel is built — at the compose call — so
+    these scenarios keep grid/legend off, where the freeze is fully observable.
+    """
+
+    # fixture instead of the file's inline plt.close: reset must survive a failed assert
+    @pytest.fixture(autouse=True)
+    def _reset_config(self):
+        yield
+        config.reset_config()
+        plt.close("all")
+
+    def test_panel_ignores_theme_swap(self):
+        bar, line = _bar_fig(), _line_fig()
+        before = _png_bytes(Panel([bar, line]))
+        config.set_theme(THEME.GREYSCALE)
+        after = _png_bytes(Panel([bar, line]))
+        assert before == after
+
+    def test_grid_ignores_theme_swap(self):
+        bar, line = _bar_fig(), _line_fig()
+        before = _png_bytes(Grid([[bar, line]]))
+        config.set_theme(THEME.GREYSCALE)
+        after = _png_bytes(Grid([[bar, line]]))
+        assert before == after
+
+    def test_compose_does_not_mutate_config(self):
+        """The retired save/restore dance: composing must leave the config alone."""
+        snapshot = copy.deepcopy(config.config)
+        Panel([_bar_fig(), _line_fig()], show_grid="both", show_legend=True)
+        Grid([[_bar_fig(), _line_fig()]])
+        assert config.config == snapshot
 
 
 class TestDeprecations:
