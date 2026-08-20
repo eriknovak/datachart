@@ -44,6 +44,8 @@ EXPECTED_CHANGES = {
     "overlay_bar_bar_line",
     "overlay_hist_hist",
     "grid_with_overlay",
+    # grids rebuild a subplot figure's arrangement inside its cell
+    "grid_subplot_figure",
 }
 
 

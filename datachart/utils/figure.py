@@ -163,6 +163,20 @@ def _figure_grid_layout_impl(
             target_ax.axis("off")
             continue
 
+        # a multi-subplot figure rebuilds its subplot arrangement in the cell
+        subplot_panels = metadata.get("panels")
+        if subplot_panels and len(subplot_panels) > 1:
+            nrows_sub, ncols_sub = metadata.get("shape", (1, len(subplot_panels)))
+            sub_gs = target_ax.get_subplotspec().subgridspec(nrows_sub, ncols_sub)
+            target_ax.remove()
+            for p_idx, subplot_panel in enumerate(subplot_panels):
+                sub_ax = combined_fig.add_subplot(
+                    sub_gs[p_idx // ncols_sub, p_idx % ncols_sub]
+                )
+                sub_ax.axis("off")
+                subplot_panel.render(sub_ax)
+            continue
+
         target_ax.axis("off")
         panel.render(target_ax)
 

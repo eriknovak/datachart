@@ -149,4 +149,33 @@ def render_chart(
         ),
     }
 
+    # multi-subplot figures also carry one panel per subplot, so grids can
+    # rebuild the subplot arrangement inside a cell
+    if not is_single_plot:
+        subplot_panels = []
+        for layer in layers:
+            sub_settings = build_chart_panel_settings(
+                chart_type, settings, "composition", layer.style
+            )
+            sub_settings["show_legend"] = False
+            sub_settings["bar_slotting"] = False
+            sub_settings["bar_ticks"] = "subplot"
+            sub_settings["hist_bins_override"] = hist_bins
+            sub_settings["title"] = layer.chart.get("subtitle")
+            xlabel, ylabel = layer.chart.get("xlabel"), layer.chart.get("ylabel")
+            if is_horizontal_bar:
+                xlabel, ylabel = ylabel, xlabel
+            sub_settings["xlabel"] = xlabel
+            sub_settings["ylabel"] = ylabel
+            subplot_panels.append(
+                Panel(
+                    [group_from_chart([layer], settings, mode="singular")], sub_settings
+                )
+            )
+        figure._chart_metadata["panels"] = subplot_panels
+        figure._chart_metadata["shape"] = (
+            subplot_config["nrows"],
+            subplot_config["ncols"],
+        )
+
     return figure
