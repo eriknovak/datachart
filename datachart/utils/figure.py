@@ -6,9 +6,10 @@ Methods:
     save_figure(figure, path, dpi, format, transparent):
         Saves the figure into a file using the provided format parameters.
     FigureGridLayout(charts, title, max_cols, figsize, sharex, sharey):
-        Combines multiple figure objects into a single grid layout with optional custom layouts.
+        (Deprecated) Use datachart.utils.Grid instead, which delegates to the
+        same implementation (`_grid_from_dicts`).
     figure_grid_layout(figures, title, layout_specs, max_cols, figsize, sharex, sharey):
-        (Deprecated) Legacy function for combining figures. Use FigureGridLayout instead.
+        (Deprecated) Use datachart.utils.Grid instead.
 
 """
 
@@ -17,12 +18,9 @@ import warnings
 from typing import List, Optional, Tuple, Dict, Any
 
 import matplotlib.pyplot as plt
-import numpy as np
 from matplotlib.gridspec import GridSpec
 
-from ..constants import FIG_FORMAT, FIG_SIZE
-from ._internal.plot_engine import CHART_PLOTTERS, get_settings, get_chart_settings
-from ._internal.config_helpers import configure_labels
+from ..constants import FIG_FORMAT
 
 # =====================================
 # Helper functions
@@ -41,8 +39,9 @@ def _figure_grid_layout_impl(
 ) -> plt.Figure:
     """Internal implementation for figure grid layout.
 
-    This is the core implementation used by both FigureGridLayout and
-    the legacy figure_grid_layout function.
+    The core implementation behind every grid front: `Grid` (nested rows and
+    flat form via `_grid_from_dicts`), `FigureGridLayout`, and the legacy
+    `figure_grid_layout`.
 
     Args:
         figures: List of matplotlib Figure objects to combine.
@@ -102,8 +101,9 @@ def _figure_grid_layout_impl(
                     spec["row"] : spec["row"] + spec["rowspan"],
                     spec["col"] : spec["col"] + spec["colspan"],
                 ],
-                sharex=sharex if sharex else None,
-                sharey=sharey if sharey else None,
+                # add_subplot shares against an Axes, not a bool
+                sharex=axes[0] if sharex and axes else None,
+                sharey=axes[0] if sharey and axes else None,
             )
             axes.append(ax)
     else:
@@ -131,12 +131,12 @@ def _figure_grid_layout_impl(
 
         axes = axes.flatten()
 
-    # Process each figure
+    # Process each figure: every figure's metadata carries a Panel that can
+    # redraw the chart into any axes (the single drawing seam, ADR 0001).
     for idx, fig in enumerate(figures):
         if idx >= len(axes):
             break
 
-        # Check for metadata
         if not hasattr(fig, "_chart_metadata"):
             raise ValueError(
                 f"Figure at index {idx} is missing chart metadata. "
@@ -144,200 +144,32 @@ def _figure_grid_layout_impl(
             )
 
         metadata = fig._chart_metadata
-        chart_type = metadata.get("type")
-        charts = metadata.get("charts")
-
-        if chart_type is None:
+        if metadata.get("type") is None:
             raise ValueError(
                 f"Figure at index {idx} has invalid metadata: missing 'type'"
             )
-
-        if charts is None:
+        if metadata.get("type") == "grid":
+            raise ValueError(
+                f"Figure at index {idx} is a Grid figure; grid figures cannot be nested"
+            )
+        if metadata.get("charts") is None:
             raise ValueError(
                 f"Figure at index {idx} has invalid metadata: missing 'charts'"
             )
 
-        # Special handling for overlay charts
-        # Overlay charts store metadata and need to be re-rendered
-        if chart_type == "overlay":
-            # Import overlay rendering functions
-            from .overlay import _plot_chart_on_axis, _combine_legends
-            from ._internal.config_helpers import (
-                configure_axes_spines,
-                configure_axis_ticks_style,
-                get_grid_style,
-            )
-
-            # Get the target axis
-            target_ax = axes[idx]
-
-            # Configure axes spines and ticks
-            configure_axes_spines(target_ax)
-            configure_axis_ticks_style(target_ax, "xaxis")
-            configure_axis_ticks_style(target_ax, "yaxis")
-
-            # Get overlay metadata
-            axis_assignments = metadata.get("axis_assignments", [])
-            needs_secondary = "right" in axis_assignments
-
-            # Create secondary axis if needed
-            target_ax_right = None
-            if needs_secondary:
-                target_ax_right = target_ax.twinx()
-                configure_axis_ticks_style(target_ax_right, "yaxis")
-
-            # Get the stored chart_configs if available (new format)
-            chart_configs = metadata.get("chart_configs", None)
-
-            if chart_configs is not None:
-                # New format: use stored chart_configs
-                for i, (chart_config, axis_assignment) in enumerate(
-                    zip(chart_configs, axis_assignments)
-                ):
-                    target_axis = (
-                        target_ax_right if axis_assignment == "right" else target_ax
-                    )
-
-                    _plot_chart_on_axis(
-                        target_axis,
-                        chart_config["chart_data"],
-                        z_order=chart_config.get("z_order"),
-                        legend_label=chart_config.get("legend_label"),
-                        bar_mode=metadata.get("bar_mode", "group"),
-                    )
-            else:
-                # Fallback for old format: try to reconstruct from flattened charts
-                # This is a best-effort approach for backward compatibility
-                overlay_charts = metadata.get("charts", [])
-
-                # Group charts and plot them
-                # Assume each chart is separate for backward compatibility
-                for i, (chart, axis_assignment) in enumerate(
-                    zip(overlay_charts, axis_assignments)
-                ):
-                    target_axis = (
-                        target_ax_right if axis_assignment == "right" else target_ax
-                    )
-
-                    # Wrap each chart in a minimal chart_data structure
-                    chart_data = {
-                        "type": "linechart",  # Default fallback
-                        "charts": [chart],
-                        "metadata": metadata,
-                    }
-
-                    _plot_chart_on_axis(
-                        target_axis,
-                        chart_data,
-                        z_order=None,
-                    )
-
-            # Configure labels
-            if metadata.get("xlabel"):
-                target_ax.set_xlabel(metadata["xlabel"])
-            if metadata.get("ylabel"):
-                target_ax.set_ylabel(metadata["ylabel"])
-            if metadata.get("ylabel_right") and target_ax_right:
-                target_ax_right.set_ylabel(metadata["ylabel_right"])
-            if metadata.get("title"):
-                target_ax.set_title(metadata["title"])
-
-            # Configure axis limits
-            if metadata.get("xmin") is not None or metadata.get("xmax") is not None:
-                target_ax.set_xlim(
-                    left=metadata.get("xmin"), right=metadata.get("xmax")
-                )
-            if metadata.get("ymin") is not None or metadata.get("ymax") is not None:
-                target_ax.set_ylim(
-                    bottom=metadata.get("ymin"), top=metadata.get("ymax")
-                )
-            if target_ax_right and (metadata.get("ymin_right") is not None or metadata.get("ymax_right") is not None):
-                target_ax_right.set_ylim(
-                    bottom=metadata.get("ymin_right"), top=metadata.get("ymax_right")
-                )
-
-            # Show grid if specified
-            show_grid = metadata.get("show_grid")
-            if show_grid:
-                target_ax.grid(axis=show_grid, **get_grid_style({}))
-
-            # Combine legends
-            if metadata.get("show_legend", True):
-                _combine_legends(target_ax, target_ax_right)
-
-            # Show the axis
-            target_ax.axis("on")
-            if target_ax_right:
-                target_ax_right.axis("on")
-
-            continue
-
-        # Get the appropriate plotter function
-        if chart_type not in CHART_PLOTTERS:
+        panel = metadata.get("panel")
+        if panel is None:
             raise ValueError(
-                f"Unknown chart type '{chart_type}' in figure at index {idx}"
+                f"Figure at index {idx} has invalid metadata: missing 'panel'"
             )
 
-        plotter = CHART_PLOTTERS[chart_type]
-
-        # Extract settings from metadata
-        settings = get_settings(metadata)
-        chart_settings = get_chart_settings(settings)
-
-        # Convert charts to list if needed
-        # Charts in metadata can be a dict (single chart) or list (multiple charts)
-        if isinstance(charts, dict):
-            charts_list = [charts]
-        elif isinstance(charts, list):
-            charts_list = charts
-        else:
-            # Handle numpy array or other iterable
-            charts_list = list(charts)
-
-        # Skip empty charts
-        if len(charts_list) == 0:
-            axes[idx].axis("off")
+        target_ax = axes[idx]
+        if not panel.layers:
+            target_ax.axis("off")
             continue
 
-        # Get the target axis
-        target_ax = axes[idx]
-
-        # Hide the axis initially (will be configured by plotter)
         target_ax.axis("off")
-
-        # Configure axes spines and ticks (matching chart_plot_wrapper behavior)
-        from ._internal.config_helpers import (
-            configure_axes_spines,
-            configure_axis_ticks_style,
-        )
-
-        configure_axes_spines(target_ax)
-        configure_axis_ticks_style(target_ax, "xaxis")
-        configure_axis_ticks_style(target_ax, "yaxis")
-
-        # Configure local chart labels (subtitle, xlabel, ylabel)
-        # Use first chart's subtitle if available (for single-axis multi-series charts)
-        first_chart = charts_list[0]
-        if "subtitle" in first_chart:
-            configure_labels(first_chart, [("subtitle", target_ax.set_title)])
-        if settings.get("xlabel"):
-            configure_labels(settings, [("xlabel", target_ax.set_xlabel)])
-        if settings.get("ylabel"):
-            configure_labels(settings, [("ylabel", target_ax.set_ylabel)])
-
-        # Convert charts to numpy array format expected by plotters
-        charts_array = np.array(charts_list)
-
-        # For charts with multiple data series on a single axis (e.g., grouped bars),
-        # we need to repeat the same axis for each chart, matching chart_plot_wrapper behavior
-        axes_for_plotter = [target_ax for _ in range(len(charts_list))]
-
-        plotter(
-            combined_fig,
-            axes_for_plotter,
-            charts_array,
-            settings=chart_settings,
-        )
+        panel.render(target_ax)
 
     # Hide unused subplots (only applicable for uniform grid layout)
     if not layout_specs:
@@ -347,6 +179,9 @@ def _figure_grid_layout_impl(
     # Add global title if provided
     if title:
         combined_fig.suptitle(title)
+
+    # grid figures carry no panel and cannot be composed further (ADR 0002)
+    combined_fig._chart_metadata = {"type": "grid"}
 
     return combined_fig
 
@@ -388,7 +223,7 @@ def save_figure(
     figure.savefig(path, dpi=dpi, format=format, transparent=transparent)
 
 
-def FigureGridLayout(
+def _grid_from_dicts(
     charts: List[Dict[str, Any]],
     *,
     title: Optional[str] = None,
@@ -397,72 +232,12 @@ def FigureGridLayout(
     sharex: bool = False,
     sharey: bool = False,
 ) -> plt.Figure:
-    """Combine multiple existing figure objects into a single grid layout.
+    """Render chart dicts into a grid figure.
 
-    This function extracts chart metadata from each figure and recreates them
-    in a grid layout. Supports mixing different chart types in the same grid.
-    Each chart can have custom layout specifications or use automatic uniform grid.
-
-    Examples:
-        >>> from datachart.charts import LineChart, BarChart, ScatterChart
-        >>> from datachart.utils import FigureGridLayout
-        >>>
-        >>> # Create individual charts
-        >>> fig1 = LineChart(data=[{"x": i, "y": i**2} for i in range(10)], title="Line Chart")
-        >>> fig2 = BarChart(data=[{"label": "A", "y": 10}, {"label": "B", "y": 20}], title="Bar Chart")
-        >>> fig3 = ScatterChart(data=[{"x": i, "y": i*2} for i in range(10)], title="Scatter Chart")
-        >>>
-        >>> # Example 1: Automatic uniform grid layout
-        >>> combined = FigureGridLayout(
-        ...     charts=[
-        ...         {"figure": fig1},
-        ...         {"figure": fig2},
-        ...         {"figure": fig3},
-        ...     ],
-        ...     title="Mixed Chart Grid",
-        ...     max_cols=2,
-        ...     figsize=(12, 8)
-        ... )
-        >>>
-        >>> # Example 2: Custom layout with fig1 spanning full width on top
-        >>> combined = FigureGridLayout(
-        ...     charts=[
-        ...         {"figure": fig1, "layout_spec": {"row": 0, "col": 0, "rowspan": 1, "colspan": 2}},
-        ...         {"figure": fig2, "layout_spec": {"row": 1, "col": 0, "rowspan": 1, "colspan": 1}},
-        ...         {"figure": fig3, "layout_spec": {"row": 1, "col": 1, "rowspan": 1, "colspan": 1}},
-        ...     ],
-        ...     title="Custom Layout",
-        ...     figsize=(12, 8)
-        ... )
-        >>>
-        >>> # Example 3: Mixed auto and custom layout
-        >>> combined = FigureGridLayout(
-        ...     charts=[
-        ...         {"figure": fig1, "layout_spec": {"row": 0, "col": 0, "rowspan": 2, "colspan": 1}},
-        ...         {"figure": fig2},  # Auto-placed
-        ...         {"figure": fig3},  # Auto-placed
-        ...     ],
-        ...     title="Mixed Layout"
-        ... )
-
-    Args:
-        charts: List of chart configuration dictionaries. Each dict must contain:
-            - "figure": A matplotlib Figure from datachart chart functions
-            - "layout_spec" (optional): Dict with keys 'row', 'col', 'rowspan', 'colspan'
-                for custom grid positioning. If omitted, automatic uniform grid layout is used.
-        title: Optional title for the combined figure.
-        max_cols: Maximum number of columns for automatic grid layout (when layout_spec not provided).
-        figsize: Size of the combined figure (width, height) in inches.
-            If None, will be calculated based on input figures.
-        sharex: Whether to share the x-axis across all subplots.
-        sharey: Whether to share the y-axis across all subplots.
-
-    Returns:
-        A new matplotlib Figure containing all charts in a grid layout.
-
-    Raises:
-        ValueError: If charts list is empty, if a chart is missing 'figure' key,
-            if a figure is missing metadata, or if layout_spec is invalid.
+    Shared implementation behind `Grid`'s flat form and the deprecated
+    `FigureGridLayout`; see `datachart.utils.Grid` for the full parameter
+    documentation. Each chart dict must contain a "figure" key and may
+    carry a "layout_spec" dict — all charts or none.
     """
     if not charts:
         raise ValueError("At least one chart is required")
@@ -515,6 +290,49 @@ def FigureGridLayout(
         figures=figures,
         title=title,
         layout_specs=layout_specs,
+        max_cols=max_cols,
+        figsize=figsize,
+        sharex=sharex,
+        sharey=sharey,
+    )
+
+
+def FigureGridLayout(
+    charts: List[Dict[str, Any]],
+    *,
+    title: Optional[str] = None,
+    max_cols: int = 4,
+    figsize: Optional[Tuple[float, float]] = None,
+    sharex: bool = False,
+    sharey: bool = False,
+) -> plt.Figure:
+    """Combine multiple existing figure objects into a single grid layout.
+
+    .. deprecated::
+        Use :func:`datachart.utils.Grid` instead — same behavior, and it also
+        accepts bare figures and nested rows that define the layout directly.
+
+    Args:
+        charts: List of chart configuration dictionaries. Each dict must contain
+            a "figure" key and may contain a "layout_spec" dict with keys
+            'row', 'col', 'rowspan', 'colspan' for custom grid positioning.
+        title: Optional title for the combined figure.
+        max_cols: Maximum number of columns for automatic grid layout.
+        figsize: Size of the combined figure (width, height) in inches.
+        sharex: Whether to share the x-axis across all subplots.
+        sharey: Whether to share the y-axis across all subplots.
+
+    Returns:
+        A new matplotlib Figure containing all charts in a grid layout.
+    """
+    warnings.warn(
+        "FigureGridLayout is deprecated. Use datachart.utils.Grid instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return _grid_from_dicts(
+        charts,
+        title=title,
         max_cols=max_cols,
         figsize=figsize,
         sharex=sharex,
@@ -597,8 +415,7 @@ def figure_grid_layout(
             or if layout_specs length doesn't match figures length.
     """
     warnings.warn(
-        "figure_grid_layout is deprecated. Use FigureGridLayout instead, "
-        "which provides a cleaner API where figures and layout specs are combined.",
+        "figure_grid_layout is deprecated. Use datachart.utils.Grid instead.",
         DeprecationWarning,
         stacklevel=2,
     )

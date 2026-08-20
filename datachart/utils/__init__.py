@@ -12,22 +12,28 @@ Modules:
 Methods:
     save_figure(figure, path, dpi, format, transparent):
         Saves the figure into a file using the provided format parameters.
+    Panel(charts, title, xlabel, ylabel_left, ylabel_right, figsize, show_legend, ...):
+        Overlays rendered chart figures on a single plot with optional dual y-axes.
+    Grid(charts, title, max_cols, figsize, sharex, sharey):
+        Arranges rendered chart figures in a grid; nested rows define the layout.
+    OverlayChart(charts, ...):
+        (Deprecated) Use Panel instead.
     FigureGridLayout(charts, title, max_cols, figsize, sharex, sharey):
-        Combines multiple figure objects into a single grid layout.
+        (Deprecated) Use Grid instead.
     figure_grid_layout(figures, title, max_cols, figsize, sharex, sharey):
-        (Deprecated) Legacy function for combining figures. Use FigureGridLayout instead.
-    OverlayChart(charts, title, xlabel, ylabel_left, ylabel_right, figsize, show_legend, auto_secondary_axis):
-        Overlays multiple charts on a single plot with optional dual y-axes.
+        (Deprecated) Use Grid instead.
 
 """
 
 from .figure import save_figure, FigureGridLayout, figure_grid_layout
 from .overlay import OverlayChart
+from .compose import Panel, Grid
 from . import stats
-
 
 __all__ = [
     "save_figure",
+    "Panel",
+    "Grid",
     "FigureGridLayout",
     "figure_grid_layout",
     "OverlayChart",

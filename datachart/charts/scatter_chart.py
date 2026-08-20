@@ -2,7 +2,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import chart_plot_wrapper, plot_scatter_chart
+from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure, build_attrs_dict
 from ..typings import (
     ScatterDataPointAttrs,
@@ -216,4 +216,4 @@ def ScatterChart(
         size_range=size_range,
     )
 
-    return chart_plot_wrapper(plot_scatter_chart)(attrs)
+    return render_chart(attrs)
