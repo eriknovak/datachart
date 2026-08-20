@@ -377,11 +377,10 @@ class TestOverlayChart:
         # Test required metadata fields
         metadata = overlay_fig._chart_metadata
         assert "type" in metadata, "Missing 'type' in metadata"
-        assert "charts" in metadata, "Missing 'charts' in metadata"
         assert (
             metadata["type"] == "overlay"
         ), f"Expected type 'overlay', got '{metadata['type']}'"
-        assert len(metadata["charts"]) > 0, "Charts list should not be empty"
+        assert "panel" in metadata, "Missing 'panel' in metadata"
 
         plt.close(overlay_fig)
         plt.close(bar_fig)

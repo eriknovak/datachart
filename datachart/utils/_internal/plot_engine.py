@@ -356,10 +356,11 @@ def render_chart(attrs: ChartAttrs) -> plt.Figure:
         chart_type, settings, "composition", first_style
     )
     composition_settings["title"] = charts[0].get("subtitle", None)
-    metadata = dict(attrs)
-    metadata["panel"] = Panel(
-        [group_from_chart(layers, settings, mode="multiple")], composition_settings
-    )
-    figure._chart_metadata = metadata
+    figure._chart_metadata = {
+        "type": chart_type,
+        "panel": Panel(
+            [group_from_chart(layers, settings, mode="multiple")], composition_settings
+        ),
+    }
 
     return figure

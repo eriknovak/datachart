@@ -111,12 +111,12 @@ Figures store metadata for composition operations (Panel, Grid):
 
 ```python
 figure._chart_metadata = {
-    "charts": [...],        # the raw chart dicts
     "type": "linechart",    # or "overlay"
     "panel": Panel(...),    # Layer objects + panel settings; redraws into any axes
-    # ... other attributes
 }
 ```
+
+The transport carries only what composition consumes — never the raw attrs dicts.
 
 `Panel` concatenates the source figures' layer groups into one panel with
 twin-axis assignment; `Grid` renders each figure's stored panel into a grid

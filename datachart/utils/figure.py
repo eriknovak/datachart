@@ -152,11 +152,6 @@ def _figure_grid_layout_impl(
             raise ValueError(
                 f"Figure at index {idx} is a Grid figure; grid figures cannot be nested"
             )
-        if metadata.get("charts") is None:
-            raise ValueError(
-                f"Figure at index {idx} has invalid metadata: missing 'charts'"
-            )
-
         panel = metadata.get("panel")
         if panel is None:
             raise ValueError(
