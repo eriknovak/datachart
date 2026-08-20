@@ -70,7 +70,8 @@ The package is organized into six main modules:
 
 The `_internal` submodule contains implementation details not exposed to users:
 
-- **plot_engine.py**: Core plotting engine with chart wrapper, plot functions for each chart type, and CHART_PLOTTERS mapping
+- **layers.py**: The single drawing seam (ADR 0001): `Layer` classes per chart type with `draw(ax, ctx)`, `Panel` owning every cross-layer concern (colors, bar slotting, shared bins, scales, limits, legend, twin axes), `LayerGroup`, and the frozen `DrawContext`
+- **plot_engine.py**: Figure assembly: `render_chart()` builds layers, assembles panels, renders them, and stores the metadata transport
 - **chart_builder.py**: Chart attribute building and validation logic
 - **config_helpers.py**: Helper functions for retrieving and applying style configurations
 - **colors.py**: Color cycle creation and colormap utilities
@@ -89,24 +90,20 @@ from datachart.config import config
 **Key points:**
 - The `config` object is instantiated once in `datachart/config/configuration.py` as `config: Config = Config()`
 - Chart functions access styles via `config[attr_name]` or `config.get(attr_name, default)`
-- Chart metadata includes a snapshot of the current theme and config for overlay operations
+- Style is resolved against the config when layers are built, never at draw time — composition needs no config snapshots
 - The config is deep-copied when setting themes to prevent mutation
 
 ### Chart Creation Flow
 
-1. User calls a chart function (e.g., `LineChart(attrs)`) in `datachart/charts/line_chart.py`
-2. Chart function builds the chart attributes using `build_chart_attrs()` from `chart_builder.py`
-3. The `chart_plot_wrapper` decorator in `plot_engine.py` handles:
-   - Settings extraction and validation
-   - Subplot layout calculation
-   - Figure and axes creation with matplotlib
-   - Chart metadata storage on the figure object
-4. The specific plot function (e.g., `plot_line_chart()`) draws the chart using:
-   - Style helpers from `config_helpers.py`
-   - Color cycles from `colors.py`
-   - Global config values
-5. Post-processing applies labels, legends, and axis configurations
-6. Returns the matplotlib Figure object
+1. User calls a chart front (e.g., `LineChart(...)`) in `datachart/charts/line_chart.py`
+2. The front builds the attrs dict using `build_charts_structure()` and `build_attrs_dict()` from `chart_builder.py`
+3. `render_chart()` in `plot_engine.py`:
+   - Extracts and validates settings, calculates the subplot layout
+   - Builds the layers via `build_layers()` — style is resolved here, once
+   - Assembles one `Panel` per coordinate space (one for single plots, one per subplot otherwise) and calls `panel.render(ax)`
+   - Applies figure-level labels and stores the metadata transport on the figure
+4. `Panel.render(ax)` assigns colors, computes bar slots and shared histogram bins, draws each layer with a frozen `DrawContext`, then applies scales, grid, ticks, limits, reference lines, and legend
+5. Returns the matplotlib Figure object
 
 ### Chart Metadata
 
@@ -114,13 +111,16 @@ Figures store metadata for composition operations (FigureGridLayout, OverlayChar
 
 ```python
 figure._chart_metadata = {
-    "charts": [...],
-    "type": "linechart",
-    "theme": THEME.DEFAULT,
-    "config_snapshot": {...},
+    "charts": [...],        # the raw chart dicts
+    "type": "linechart",    # or "overlay"
+    "panel": Panel(...),    # Layer objects + panel settings; redraws into any axes
     # ... other attributes
 }
 ```
+
+`OverlayChart` concatenates the source figures' layer groups into one panel with
+twin-axis assignment; `FigureGridLayout` renders each figure's stored panel into
+a grid cell. Both consume the panel — there is no second drawing path.
 
 ### Theme System
 
@@ -141,6 +141,7 @@ Tests are organized by functionality:
 - `test_config_helpers.py`: Style helper functions
 - `test_overlay.py`: Figure overlay functionality
 - `test_stats.py`: Statistical utility functions
+- `test/golden/golden.py`: Golden-image harness — `python test/golden/golden.py baseline|candidate` renders ~40 chart/overlay/grid cases and pixel-diffs candidate against baseline
 
 Notebook tests validate all documentation examples to ensure they execute without errors.
 
@@ -148,14 +149,13 @@ Notebook tests validate all documentation examples to ensure they execute withou
 
 ### Color Cycles
 
-The `create_color_cycle()` function in `colors.py` creates itertools.cycle objects from palette names or color lists. Chart plotting functions use `custom_color_cycle()` to determine whether to use singular or multiple colors based on subplot configuration.
+The `create_color_cycle()` function in `colors.py` creates cycle-backed color lookups from palette names or color lists. A `Panel` builds one cycle per `LayerGroup` (singular palette for subplots, multiple palette otherwise) and hands each layer its color through the `DrawContext`.
 
 ### Subplot Management
 
-The `chart_plot_wrapper` handles both single plots and multi-subplot layouts:
-- Single plots: All charts overlay on the same axes
-- Multi-subplots: Each chart gets its own subplot in a grid
-- The `has_multiple_subplots()` helper determines the mode
+`render_chart` handles both single plots and multi-subplot layouts:
+- Single plots: all layers go into one `Panel` on the same axes
+- Multi-subplots: each layer gets its own single-layer `Panel` in a grid
 
 ### Style Override Hierarchy
 
@@ -166,8 +166,22 @@ Styles are applied in this order (later overrides earlier):
 
 ### Chart Hash for Color Assignment
 
-Charts use `get_chart_hash()` to generate stable hashes for consistent color assignment across multiple charts. This ensures the same chart gets the same color even when redrawn.
+Layers use `get_chart_hash()` (in `layers.py`) to key color assignment, so the same chart data gets the same color even when redrawn.
 
 ### Axes Configuration
 
 The `configure_axes_spines()`, `configure_axis_ticks_style()`, and `configure_axis_ticks_position()` functions apply global config styles to matplotlib axes objects. This centralized approach ensures consistency across all chart types.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live as GitHub issues in `eriknovak/datachart`, managed via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five canonical triage roles, label strings unchanged. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.

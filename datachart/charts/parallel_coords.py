@@ -2,7 +2,7 @@ from typing import Union, List, Optional, Tuple, Dict
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import chart_plot_wrapper, plot_parallel_coords
+from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure, build_attrs_dict
 from ..typings import (
     ParallelCoordsDataPointAttrs,
@@ -104,4 +104,4 @@ def ParallelCoords(
         aspect_ratio=aspect_ratio,
     )
 
-    return chart_plot_wrapper(plot_parallel_coords)(attrs)
+    return render_chart(attrs)

@@ -17,12 +17,9 @@ import warnings
 from typing import List, Optional, Tuple, Dict, Any
 
 import matplotlib.pyplot as plt
-import numpy as np
 from matplotlib.gridspec import GridSpec
 
-from ..constants import FIG_FORMAT, FIG_SIZE
-from ._internal.plot_engine import CHART_PLOTTERS, get_settings, get_chart_settings
-from ._internal.config_helpers import configure_labels
+from ..constants import FIG_FORMAT
 
 # =====================================
 # Helper functions
@@ -131,12 +128,12 @@ def _figure_grid_layout_impl(
 
         axes = axes.flatten()
 
-    # Process each figure
+    # Process each figure: every figure's metadata carries a Panel that can
+    # redraw the chart into any axes (the single drawing seam, ADR 0001).
     for idx, fig in enumerate(figures):
         if idx >= len(axes):
             break
 
-        # Check for metadata
         if not hasattr(fig, "_chart_metadata"):
             raise ValueError(
                 f"Figure at index {idx} is missing chart metadata. "
@@ -144,200 +141,28 @@ def _figure_grid_layout_impl(
             )
 
         metadata = fig._chart_metadata
-        chart_type = metadata.get("type")
-        charts = metadata.get("charts")
-
-        if chart_type is None:
+        if metadata.get("type") is None:
             raise ValueError(
                 f"Figure at index {idx} has invalid metadata: missing 'type'"
             )
-
-        if charts is None:
+        if metadata.get("charts") is None:
             raise ValueError(
                 f"Figure at index {idx} has invalid metadata: missing 'charts'"
             )
 
-        # Special handling for overlay charts
-        # Overlay charts store metadata and need to be re-rendered
-        if chart_type == "overlay":
-            # Import overlay rendering functions
-            from .overlay import _plot_chart_on_axis, _combine_legends
-            from ._internal.config_helpers import (
-                configure_axes_spines,
-                configure_axis_ticks_style,
-                get_grid_style,
-            )
-
-            # Get the target axis
-            target_ax = axes[idx]
-
-            # Configure axes spines and ticks
-            configure_axes_spines(target_ax)
-            configure_axis_ticks_style(target_ax, "xaxis")
-            configure_axis_ticks_style(target_ax, "yaxis")
-
-            # Get overlay metadata
-            axis_assignments = metadata.get("axis_assignments", [])
-            needs_secondary = "right" in axis_assignments
-
-            # Create secondary axis if needed
-            target_ax_right = None
-            if needs_secondary:
-                target_ax_right = target_ax.twinx()
-                configure_axis_ticks_style(target_ax_right, "yaxis")
-
-            # Get the stored chart_configs if available (new format)
-            chart_configs = metadata.get("chart_configs", None)
-
-            if chart_configs is not None:
-                # New format: use stored chart_configs
-                for i, (chart_config, axis_assignment) in enumerate(
-                    zip(chart_configs, axis_assignments)
-                ):
-                    target_axis = (
-                        target_ax_right if axis_assignment == "right" else target_ax
-                    )
-
-                    _plot_chart_on_axis(
-                        target_axis,
-                        chart_config["chart_data"],
-                        z_order=chart_config.get("z_order"),
-                        legend_label=chart_config.get("legend_label"),
-                        bar_mode=metadata.get("bar_mode", "group"),
-                    )
-            else:
-                # Fallback for old format: try to reconstruct from flattened charts
-                # This is a best-effort approach for backward compatibility
-                overlay_charts = metadata.get("charts", [])
-
-                # Group charts and plot them
-                # Assume each chart is separate for backward compatibility
-                for i, (chart, axis_assignment) in enumerate(
-                    zip(overlay_charts, axis_assignments)
-                ):
-                    target_axis = (
-                        target_ax_right if axis_assignment == "right" else target_ax
-                    )
-
-                    # Wrap each chart in a minimal chart_data structure
-                    chart_data = {
-                        "type": "linechart",  # Default fallback
-                        "charts": [chart],
-                        "metadata": metadata,
-                    }
-
-                    _plot_chart_on_axis(
-                        target_axis,
-                        chart_data,
-                        z_order=None,
-                    )
-
-            # Configure labels
-            if metadata.get("xlabel"):
-                target_ax.set_xlabel(metadata["xlabel"])
-            if metadata.get("ylabel"):
-                target_ax.set_ylabel(metadata["ylabel"])
-            if metadata.get("ylabel_right") and target_ax_right:
-                target_ax_right.set_ylabel(metadata["ylabel_right"])
-            if metadata.get("title"):
-                target_ax.set_title(metadata["title"])
-
-            # Configure axis limits
-            if metadata.get("xmin") is not None or metadata.get("xmax") is not None:
-                target_ax.set_xlim(
-                    left=metadata.get("xmin"), right=metadata.get("xmax")
-                )
-            if metadata.get("ymin") is not None or metadata.get("ymax") is not None:
-                target_ax.set_ylim(
-                    bottom=metadata.get("ymin"), top=metadata.get("ymax")
-                )
-            if target_ax_right and (metadata.get("ymin_right") is not None or metadata.get("ymax_right") is not None):
-                target_ax_right.set_ylim(
-                    bottom=metadata.get("ymin_right"), top=metadata.get("ymax_right")
-                )
-
-            # Show grid if specified
-            show_grid = metadata.get("show_grid")
-            if show_grid:
-                target_ax.grid(axis=show_grid, **get_grid_style({}))
-
-            # Combine legends
-            if metadata.get("show_legend", True):
-                _combine_legends(target_ax, target_ax_right)
-
-            # Show the axis
-            target_ax.axis("on")
-            if target_ax_right:
-                target_ax_right.axis("on")
-
-            continue
-
-        # Get the appropriate plotter function
-        if chart_type not in CHART_PLOTTERS:
+        panel = metadata.get("panel")
+        if panel is None:
             raise ValueError(
-                f"Unknown chart type '{chart_type}' in figure at index {idx}"
+                f"Figure at index {idx} has invalid metadata: missing 'panel'"
             )
 
-        plotter = CHART_PLOTTERS[chart_type]
-
-        # Extract settings from metadata
-        settings = get_settings(metadata)
-        chart_settings = get_chart_settings(settings)
-
-        # Convert charts to list if needed
-        # Charts in metadata can be a dict (single chart) or list (multiple charts)
-        if isinstance(charts, dict):
-            charts_list = [charts]
-        elif isinstance(charts, list):
-            charts_list = charts
-        else:
-            # Handle numpy array or other iterable
-            charts_list = list(charts)
-
-        # Skip empty charts
-        if len(charts_list) == 0:
-            axes[idx].axis("off")
+        target_ax = axes[idx]
+        if not panel.layers:
+            target_ax.axis("off")
             continue
 
-        # Get the target axis
-        target_ax = axes[idx]
-
-        # Hide the axis initially (will be configured by plotter)
         target_ax.axis("off")
-
-        # Configure axes spines and ticks (matching chart_plot_wrapper behavior)
-        from ._internal.config_helpers import (
-            configure_axes_spines,
-            configure_axis_ticks_style,
-        )
-
-        configure_axes_spines(target_ax)
-        configure_axis_ticks_style(target_ax, "xaxis")
-        configure_axis_ticks_style(target_ax, "yaxis")
-
-        # Configure local chart labels (subtitle, xlabel, ylabel)
-        # Use first chart's subtitle if available (for single-axis multi-series charts)
-        first_chart = charts_list[0]
-        if "subtitle" in first_chart:
-            configure_labels(first_chart, [("subtitle", target_ax.set_title)])
-        if settings.get("xlabel"):
-            configure_labels(settings, [("xlabel", target_ax.set_xlabel)])
-        if settings.get("ylabel"):
-            configure_labels(settings, [("ylabel", target_ax.set_ylabel)])
-
-        # Convert charts to numpy array format expected by plotters
-        charts_array = np.array(charts_list)
-
-        # For charts with multiple data series on a single axis (e.g., grouped bars),
-        # we need to repeat the same axis for each chart, matching chart_plot_wrapper behavior
-        axes_for_plotter = [target_ax for _ in range(len(charts_list))]
-
-        plotter(
-            combined_fig,
-            axes_for_plotter,
-            charts_array,
-            settings=chart_settings,
-        )
+        panel.render(target_ax)
 
     # Hide unused subplots (only applicable for uniform grid layout)
     if not layout_specs:
