@@ -85,6 +85,53 @@ class TestPanel:
             Panel([])
 
 
+class TestGroupedBarAlignment:
+    """Grouped bars center on the category position, with category ticks."""
+
+    @staticmethod
+    def _assert_pairs_center_on_categories(ax, n):
+        centers = sorted(p.get_x() + p.get_width() / 2 for p in ax.patches)
+        # two slots per category, symmetric around the category position
+        for i in range(n):
+            left, right = centers[2 * i], centers[2 * i + 1]
+            assert (left + right) / 2 == pytest.approx(i)
+
+    def test_panel_bar_ticks_show_category_labels(self):
+        fig = Panel([_bar_fig(), _bar_fig()])
+        ax = fig.axes[0]
+        assert [t.get_text() for t in ax.get_xticklabels()] == list("ABCD")
+        assert list(ax.get_xticks()) == [0, 1, 2, 3]
+        plt.close("all")
+
+    def test_panel_grouped_bars_center_on_category(self):
+        fig = Panel([_bar_fig(), _bar_fig()])
+        self._assert_pairs_center_on_categories(fig.axes[0], 4)
+        plt.close("all")
+
+    def test_barchart_grouped_series_center_on_category(self):
+        data = [{"label": c, "y": v} for c, v in zip("ABCD", [3, 1, 4, 2])]
+        fig = BarChart(data=[data, data])
+        ax = fig.axes[0]
+        assert list(ax.get_xticks()) == [0, 1, 2, 3]
+        self._assert_pairs_center_on_categories(ax, 4)
+        plt.close("all")
+
+    def test_panel_ragged_categories_use_widest_labels(self):
+        short = BarChart(data=[{"label": c, "y": v} for c, v in zip("AB", [2, 5])])
+        fig = Panel([_bar_fig(), short])
+        ax = fig.axes[0]
+        assert [t.get_text() for t in ax.get_xticklabels()] == list("ABCD")
+        plt.close("all")
+
+    def test_panel_stacked_bars_center_on_category(self):
+        fig = Panel([_bar_fig(), _bar_fig()], bar_mode="stack")
+        centers = {
+            round(p.get_x() + p.get_width() / 2, 6) for p in fig.axes[0].patches
+        }
+        assert centers == {0, 1, 2, 3}
+        plt.close("all")
+
+
 class TestGrid:
     """Test suite for the Grid composition front."""
 

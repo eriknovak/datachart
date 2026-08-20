@@ -1244,9 +1244,12 @@ class Panel:
                         f"Bar width ({slot_width:.2f}) is very small with {len(bar_layers)} bar charts. "
                         "Consider using bar_mode='stack', bar_mode='overlay', or FigureGridLayout for better readability."
                     )
+                # the group centers on the category position, so numeric-x
+                # layers and ticks line up with group centers
                 for idx, layer in enumerate(bar_layers):
                     bar_slots[id(layer)] = BarSlot(
-                        offset=idx * slot_width, width=slot_width
+                        offset=(idx - (len(bar_layers) - 1) / 2) * slot_width,
+                        width=slot_width,
                     )
             elif bar_mode == "stack":
                 bottoms = None
@@ -1335,7 +1338,7 @@ class Panel:
                 )
                 layer.draw(target_ax, ctx)
 
-        self._finalize(ax, ax_right, slot_width, bar_layers)
+        self._finalize(ax, ax_right, bar_layers)
 
     def _draw_hist_stack(self, ax, group, hist_layers, cycle, bins) -> None:
         """Draw a group's histograms as one stacked call — a cross-layer concern."""
@@ -1365,7 +1368,7 @@ class Panel:
             color=hist_style["color"],
         )
 
-    def _finalize(self, ax, ax_right, slot_width, bar_layers) -> None:
+    def _finalize(self, ax, ax_right, bar_layers) -> None:
         s = self.settings
         layers = self.layers
 
@@ -1388,7 +1391,7 @@ class Panel:
         # bar category ticks
         bar_ticks = s.get("bar_ticks")
         if bar_ticks and bar_layers:
-            self._apply_bar_ticks(ax, bar_ticks, slot_width, bar_layers)
+            self._apply_bar_ticks(ax, bar_ticks, bar_layers)
 
         # user-provided tick positions
         for layer in layers:
@@ -1440,34 +1443,30 @@ class Panel:
                 if ax.get_legend_handles_labels()[1]:
                     ax.legend(title="Legend", **legend_style)
 
-    def _apply_bar_ticks(self, ax, bar_ticks, slot_width, bar_layers) -> None:
-        is_horizontal = bar_layers[0].is_horizontal
-        n = len(bar_layers)
-        x_start = np.arange(max(len(l.labels()) for l in bar_layers))
+    def _apply_bar_ticks(self, ax, bar_ticks, bar_layers) -> None:
+        # the widest layer supplies the labels when category counts differ
+        layer = max(bar_layers, key=lambda l: len(l.labels()))
+        labels = layer.labels()
+        # ticks sit on the category positions; slotted groups center on them
+        ticks_loc = np.arange(labels.shape[0])
 
-        for layer in bar_layers:
-            labels = layer.labels()
-            x = np.arange(labels.shape[0])
+        if bar_ticks == "group":
+            rotation_default = 0
+        else:  # one bar layer per subplot
+            n_labels = labels.shape[0]
+            rotation_default = 90 if n_labels >= 7 else (45 if n_labels >= 4 else 0)
 
-            if bar_ticks == "group":
-                ticks_loc = x_start + (n - 1) / 2 * slot_width
-                rotation_default = 0
-            else:  # one bar layer per subplot
-                ticks_loc = x
-                n_labels = labels.shape[0]
-                rotation_default = 90 if n_labels >= 7 else (45 if n_labels >= 4 else 0)
-
-            if is_horizontal:
-                ax.set_yticks(ticks_loc, labels)
-                ax.yaxis.set_major_locator(mticker.FixedLocator(list(ticks_loc)))
-                ax.set_yticklabels(labels, rotation=layer.chart.get("ytickrotate", 0))
-            else:
-                ax.set_xticks(ticks_loc, labels)
-                ax.xaxis.set_major_locator(mticker.FixedLocator(list(ticks_loc)))
-                rotation = layer.chart.get("xtickrotate")
-                if rotation is None:
-                    rotation = rotation_default
-                ax.set_xticklabels(labels, rotation=rotation)
+        if layer.is_horizontal:
+            ax.set_yticks(ticks_loc, labels)
+            ax.yaxis.set_major_locator(mticker.FixedLocator(list(ticks_loc)))
+            ax.set_yticklabels(labels, rotation=layer.chart.get("ytickrotate", 0))
+        else:
+            ax.set_xticks(ticks_loc, labels)
+            ax.xaxis.set_major_locator(mticker.FixedLocator(list(ticks_loc)))
+            rotation = layer.chart.get("xtickrotate")
+            if rotation is None:
+                rotation = rotation_default
+            ax.set_xticklabels(labels, rotation=rotation)
 
     @staticmethod
     def _combine_legends(ax_left, ax_right, legend_style) -> None:

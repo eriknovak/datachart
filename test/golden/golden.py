@@ -34,23 +34,12 @@ from datachart.constants import THEME
 
 # Cases whose output intentionally changed since the last published baseline.
 EXPECTED_CHANGES = {
-    # panel-wide palette pooling: composed figures get distinct colors
-    "overlay_line_line",
+    # composed panels with bars adopt category ticks; groups center on the
+    # category position
     "overlay_line_bar_dual",
-    "overlay_auto_assign",
-    "overlay_hist_line",
-    "overlay_zorder_grid",
     "overlay_bar_bar",
     "overlay_bar_bar_line",
-    "overlay_hist_hist",
     "grid_with_overlay",
-    # grids rebuild a subplot figure's arrangement inside its cell
-    "grid_subplot_figure",
-    # publication multiple palette drops YlGnBu's illegible pale end
-    "theme_publication_line",
-    "overlay_theme_snapshot",
-    # no empty legend frame when nothing carries a label
-    "theme_greyscale_bar",
 }
 
 

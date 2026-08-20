@@ -140,6 +140,7 @@ def _overlay_impl(
         "warn_scale_groups": config.get("overlay_warn_scale_groups", True),
         "warn_thin_bars": config.get("overlay_warn_thin_bars", True),
         "bar_mode": bar_mode,
+        "bar_ticks": "group",
         "bar_width": config.get("plot_bar_width", 0.8),
         "bar_overlay_alpha": config.get("overlay_bar_alpha", 0.7),
         "hist_mode": "overlay",
