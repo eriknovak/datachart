@@ -46,6 +46,9 @@ EXPECTED_CHANGES = {
     "grid_with_overlay",
     # grids rebuild a subplot figure's arrangement inside its cell
     "grid_subplot_figure",
+    # publication multiple palette drops YlGnBu's illegible pale end
+    "theme_publication_line",
+    "overlay_theme_snapshot",
 }
 
 
