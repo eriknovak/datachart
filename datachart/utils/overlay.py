@@ -56,9 +56,6 @@ def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
         raise ValueError(
             f"Figure at index {index} is a Grid figure; grid figures cannot be overlaid"
         )
-    if metadata.get("charts") is None:
-        raise ValueError("Figure has invalid metadata: missing 'charts'")
-
     panel = metadata.get("panel")
     if panel is None:
         raise ValueError("Figure has invalid metadata: missing 'panel'")
@@ -121,7 +118,6 @@ def _overlay_impl(
 
     # collect the layer groups from every source figure, tagged with prefs
     groups = []
-    all_charts = []
     for i, chart_config in enumerate(charts):
         if "figure" not in chart_config:
             raise ValueError(f"Chart at index {i} is missing 'figure' key")
@@ -135,11 +131,6 @@ def _overlay_impl(
                     legend_label=chart_config.get("legend_label", None),
                 )
             )
-        metadata_charts = figure._chart_metadata.get("charts")
-        if isinstance(metadata_charts, dict):
-            all_charts.append(metadata_charts)
-        else:
-            all_charts.extend(list(metadata_charts))
 
     # panel-level settings are resolved against the config here, at build time
     panel_settings = {
@@ -188,10 +179,7 @@ def _overlay_impl(
 
     fig._chart_metadata = {
         "type": "overlay",
-        "charts": all_charts,
         "panel": panel,
-        "title": title,
-        "figsize": figsize,
     }
 
     return fig
