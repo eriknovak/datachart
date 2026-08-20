@@ -151,7 +151,7 @@ Notebook tests validate all documentation examples to ensure they execute withou
 
 ### Color Cycles
 
-The `create_color_cycle()` function in `colors.py` creates cycle-backed color lookups from palette names or color lists. A `Panel` builds one cycle per `LayerGroup` (singular palette for subplots, multiple palette otherwise) and hands each layer its color through the `DrawContext`.
+The `create_color_cycle()` function in `colors.py` creates cycle-backed color lookups from palette names or color lists. A `Panel` builds one cycle per palette, pooled across its `LayerGroup`s (singular palette for subplots, multiple palette otherwise), so composed single-series figures draw in distinct colors; each layer receives its color through the `DrawContext`.
 
 ### Subplot Management
 

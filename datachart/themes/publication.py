@@ -11,8 +11,10 @@ from ..constants import (
 PUBLICATION_THEME: StyleAttrs = {
     # general color style
     "color_general_singular": COLORS.Blues,
-    "color_general_multiple": COLORS.YlGnBu,
-    "color_parallel_hue": COLORS.YlGnBu,
+    # dark half of YlGnBu, contrast-ordered: the colormap's pale yellow end
+    # is illegible on white
+    "color_general_multiple": ["#0c2c84", "#41b6c4", "#225ea8", "#7fcdbb", "#1d91c0"],
+    "color_parallel_hue": ["#0c2c84", "#41b6c4", "#225ea8", "#7fcdbb", "#1d91c0"],
     # general font style
     "font_general_family": "sans-serif",
     "font_general_sansserif": ["Helvetica", "Arial", "DejaVu Sans"],

@@ -10,6 +10,7 @@ frozen DrawContext with its per-layer instructions.
 
 import json
 import warnings
+from collections import defaultdict
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
@@ -1280,12 +1281,30 @@ class Panel:
         zorder_defaults = s.get("zorder_defaults", {})
 
         # draw the layers group by group, in order
+        # one color cycle per palette, pooled across the panel's groups, so
+        # composed single-series figures draw in distinct colors
+        def palette_key(group):
+            return (
+                tuple(group.palette)
+                if isinstance(group.palette, list)
+                else group.palette
+            )
+
+        pooled_colors = defaultdict(int)
+        for group in self.groups:
+            pooled_colors[palette_key(group)] += group.max_colors
+        cycles = {}
+        for group in self.groups:
+            key = palette_key(group)
+            if key not in cycles:
+                cycles[key] = create_color_cycle(group.palette, pooled_colors[key])
+
         group_axes = []
         for group, assignment in zip(self.groups, assignments):
             target_ax = ax_right if assignment == "right" else ax
             group_axes.append(target_ax)
 
-            cycle = create_color_cycle(group.palette, group.max_colors)
+            cycle = cycles[palette_key(group)]
             bins = s.get("hist_bins_override")
             if bins is None:
                 bins = group.hist_bins()
@@ -1416,8 +1435,10 @@ class Panel:
             elif s.get("legend_mode") == "combined":
                 self._combine_legends(ax, ax_right, legend_style)
             elif not any(isinstance(l, ParallelCoordsLayer) for l in layers):
-                # parallel coords only carry a legend when hue groups exist
-                ax.legend(title="Legend", **legend_style)
+                # parallel coords only carry a legend when hue groups exist;
+                # unlabeled panels get no empty legend frame
+                if ax.get_legend_handles_labels()[1]:
+                    ax.legend(title="Legend", **legend_style)
 
     def _apply_bar_ticks(self, ax, bar_ticks, slot_width, bar_layers) -> None:
         is_horizontal = bar_layers[0].is_horizontal

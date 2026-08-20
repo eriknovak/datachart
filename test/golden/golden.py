@@ -32,12 +32,25 @@ from datachart.utils import OverlayChart, FigureGridLayout
 from datachart.config import config
 from datachart.constants import THEME
 
-# Cases where the refactor intentionally changes output (ADR 0001).
+# Cases whose output intentionally changed since the last published baseline.
 EXPECTED_CHANGES = {
-    "overlay_bar_bar",          # bar collision fix: cross-layer group offsets
-    "overlay_bar_bar_line",     # cross-layer bar counting
-    "overlay_hist_hist",        # overlay alpha now counts hists across the panel
-    "grid_theme_mutation",      # grid renders with construction-time style, not current config
+    # panel-wide palette pooling: composed figures get distinct colors
+    "overlay_line_line",
+    "overlay_line_bar_dual",
+    "overlay_auto_assign",
+    "overlay_hist_line",
+    "overlay_zorder_grid",
+    "overlay_bar_bar",
+    "overlay_bar_bar_line",
+    "overlay_hist_hist",
+    "grid_with_overlay",
+    # grids rebuild a subplot figure's arrangement inside its cell
+    "grid_subplot_figure",
+    # publication multiple palette drops YlGnBu's illegible pale end
+    "theme_publication_line",
+    "overlay_theme_snapshot",
+    # no empty legend frame when nothing carries a label
+    "theme_greyscale_bar",
 }
 
 
