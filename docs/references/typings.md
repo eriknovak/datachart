@@ -15,10 +15,6 @@ title: Typings Module
 
 ### Common Chart Typings
 
-::: datachart.typings.ChartAttrs
-    options:
-        heading_level: 4
-
 ::: datachart.typings.ChartCommonAttrs
     options:
         heading_level: 4
@@ -33,10 +29,6 @@ title: Typings Module
 
 ### Line Chart Typings
 
-::: datachart.typings.LineChartAttrs
-    options:
-        heading_level: 4
-
 ::: datachart.typings.LineSingleChartAttrs
     options:
         heading_level: 4
@@ -46,10 +38,6 @@ title: Typings Module
         heading_level: 4
 
 ### Bar Chart Typings
-
-::: datachart.typings.BarChartAttrs
-    options:
-        heading_level: 4
 
 ::: datachart.typings.BarSingleChartAttrs
     options:
@@ -61,10 +49,6 @@ title: Typings Module
 
 ### Histogram Typings
 
-::: datachart.typings.HistogramChartAttrs
-    options:
-        heading_level: 4
-
 ::: datachart.typings.HistogramSingleChartAttrs
     options:
         heading_level: 4
@@ -74,10 +58,6 @@ title: Typings Module
         heading_level: 4
 
 ### Heatmap Typings
-
-::: datachart.typings.HeatmapChartAttrs
-    options:
-        heading_level: 4
 
 ::: datachart.typings.HeatmapSingleChartAttrs
     options:
@@ -90,10 +70,6 @@ title: Typings Module
 
 ### Scatter Chart Typings
 
-::: datachart.typings.ScatterChartAttrs
-    options:
-        heading_level: 4
-
 ::: datachart.typings.ScatterSingleChartAttrs
     options:
         heading_level: 4
@@ -105,10 +81,6 @@ title: Typings Module
 
 ### Box Chart (Box Plot) Typings
 
-::: datachart.typings.BoxChartAttrs
-    options:
-        heading_level: 4
-
 ::: datachart.typings.BoxSingleChartAttrs
     options:
         heading_level: 4
@@ -119,10 +91,6 @@ title: Typings Module
 
 
 ### Parallel Coordinates Plot Typings
-
-::: datachart.typings.ParallelCoordsChartAttrs
-    options:
-        heading_level: 4
 
 ::: datachart.typings.ParallelCoordsSingleChartAttrs
     options:

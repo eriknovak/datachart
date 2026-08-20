@@ -3,7 +3,7 @@ from typing import Union, List, Optional, Tuple, Dict
 import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure, build_attrs_dict
+from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
     ParallelCoordsDataPointAttrs,
     ParallelCoordsStyleAttrs,
@@ -91,17 +91,15 @@ def ParallelCoords(
         category_orders=category_orders,
     )
 
-    # Build the attrs dict using shared utility
-    attrs = build_attrs_dict(
-        "parallelcoords",
-        charts,
-        title=title,
-        xlabel=xlabel,
-        ylabel=ylabel,
-        figsize=figsize,
-        show_legend=show_legend,
-        show_grid=show_grid,
-        aspect_ratio=aspect_ratio,
-    )
+    # Figure-level settings; None values resolve to defaults downstream
+    settings = {
+        "title": title,
+        "xlabel": xlabel,
+        "ylabel": ylabel,
+        "figsize": figsize,
+        "show_legend": show_legend,
+        "show_grid": show_grid,
+        "aspect_ratio": aspect_ratio,
+    }
 
-    return render_chart(attrs)
+    return render_chart("parallelcoords", charts, settings)

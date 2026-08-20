@@ -3,7 +3,7 @@
 This module provides helper functions to reduce boilerplate in chart definitions.
 """
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 
 
 def _get_indexed_value(value: Any, index: int, is_list_type: bool = False) -> Any:
@@ -286,81 +286,3 @@ def build_charts_structure(
         ]
     else:
         return build_chart_dict_single(data, **common_args)
-
-
-def build_attrs_dict(
-    chart_type: str,
-    charts: Union[Dict[str, Any], List[Dict[str, Any]]],
-    *,
-    title: Optional[str] = None,
-    xlabel: Optional[str] = None,
-    ylabel: Optional[str] = None,
-    figsize: Any = None,
-    xmin: Any = None,
-    xmax: Any = None,
-    ymin: Any = None,
-    ymax: Any = None,
-    show_legend: Optional[bool] = None,
-    show_grid: Any = None,
-    aspect_ratio: Optional[str] = None,
-    subplots: Optional[bool] = None,
-    max_cols: Optional[int] = None,
-    sharex: Optional[bool] = None,
-    sharey: Optional[bool] = None,
-    **extra_attrs: Any,
-) -> Dict[str, Any]:
-    """Build the attrs dictionary for the internal API.
-
-    Args:
-        chart_type: The type of chart (e.g., "linechart").
-        charts: The charts structure.
-        title: The title.
-        xlabel: The x-axis label.
-        ylabel: The y-axis label.
-        figsize: The figure size.
-        xmin: The minimum x-axis value.
-        xmax: The maximum x-axis value.
-        ymin: The minimum y-axis value.
-        ymax: The maximum y-axis value.
-        show_legend: Whether to show the legend.
-        show_grid: Which grid lines to show.
-        aspect_ratio: The aspect ratio.
-        subplots: Whether to create subplots.
-        max_cols: Maximum columns in subplots.
-        sharex: Whether to share x-axis.
-        sharey: Whether to share y-axis.
-        **extra_attrs: Extra chart-specific attributes.
-
-    Returns:
-        The attrs dictionary.
-    """
-    attrs: Dict[str, Any] = {
-        "type": chart_type,
-        "charts": charts,
-    }
-
-    # Add common global attributes
-    optional_attrs = {
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "xmin": xmin,
-        "xmax": xmax,
-        "ymin": ymin,
-        "ymax": ymax,
-        "show_legend": show_legend,
-        "show_grid": show_grid,
-        "aspect_ratio": aspect_ratio,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "sharex": sharex,
-        "sharey": sharey,
-        **extra_attrs,
-    }
-
-    for key, value in optional_attrs.items():
-        if value is not None:
-            attrs[key] = value
-
-    return attrs

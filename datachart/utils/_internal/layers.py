@@ -51,7 +51,7 @@ from .config_helpers import (
     configure_axis_limits,
 )
 from ..stats import minimum, maximum
-from ...constants import ORIENTATION, VALFMT
+from ...constants import ASPECT_RATIO, ORIENTATION, VALFMT
 from ...config import config
 
 DEFAULT_NUM_BINS = 20
@@ -1489,7 +1489,11 @@ def build_chart_panel_settings(
         "xmax": settings.get("xmax"),
         "ymin": settings.get("ymin"),
         "ymax": settings.get("ymax"),
-        "aspect_ratio": settings.get("aspect_ratio"),
+        "aspect_ratio": (
+            ASPECT_RATIO.AUTO
+            if settings.get("aspect_ratio") is None
+            else settings["aspect_ratio"]
+        ),
         "legend_style": get_legend_style(),
         "bar_width": config["plot_bar_width"],
         "bar_mode": settings.get("bar_mode") or "group",

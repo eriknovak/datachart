@@ -3,7 +3,7 @@ from typing import Union, List, Optional, Tuple
 import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure, build_attrs_dict
+from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
     BarDataPointAttrs,
     BarStyleAttrs,
@@ -151,32 +151,30 @@ def BarChart(
         yerr=yerr,
     )
 
-    # Build the attrs dict using shared utility
-    attrs = build_attrs_dict(
-        "barchart",
-        charts,
-        title=title,
-        xlabel=xlabel,
-        ylabel=ylabel,
-        figsize=figsize,
-        xmin=xmin,
-        xmax=xmax,
-        ymin=ymin,
-        ymax=ymax,
-        show_legend=show_legend,
-        show_grid=show_grid,
-        aspect_ratio=aspect_ratio,
-        subplots=subplots,
-        max_cols=max_cols,
-        sharex=sharex,
-        sharey=sharey,
-        show_yerr=show_yerr,
-        show_values=show_values,
-        value_format=value_format,
-        orientation=orientation,
-        bar_mode=bar_mode,
-        scalex=scalex,
-        scaley=scaley,
-    )
+    # Figure-level settings; None values resolve to defaults downstream
+    settings = {
+        "title": title,
+        "xlabel": xlabel,
+        "ylabel": ylabel,
+        "figsize": figsize,
+        "xmin": xmin,
+        "xmax": xmax,
+        "ymin": ymin,
+        "ymax": ymax,
+        "show_legend": show_legend,
+        "show_grid": show_grid,
+        "aspect_ratio": aspect_ratio,
+        "subplots": subplots,
+        "max_cols": max_cols,
+        "sharex": sharex,
+        "sharey": sharey,
+        "show_yerr": show_yerr,
+        "show_values": show_values,
+        "value_format": value_format,
+        "orientation": orientation,
+        "bar_mode": bar_mode,
+        "scalex": scalex,
+        "scaley": scaley,
+    }
 
-    return render_chart(attrs)
+    return render_chart("barchart", charts, settings)
