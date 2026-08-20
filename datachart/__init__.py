@@ -24,7 +24,6 @@ from . import themes
 from . import constants
 from . import typings
 
-
 __all__ = [
     "charts",
     "utils",

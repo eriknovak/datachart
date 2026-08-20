@@ -125,9 +125,7 @@ class TestGroupedBarAlignment:
 
     def test_panel_stacked_bars_center_on_category(self):
         fig = Panel([_bar_fig(), _bar_fig()], bar_mode="stack")
-        centers = {
-            round(p.get_x() + p.get_width() / 2, 6) for p in fig.axes[0].patches
-        }
+        centers = {round(p.get_x() + p.get_width() / 2, 6) for p in fig.axes[0].patches}
         assert centers == {0, 1, 2, 3}
         plt.close("all")
 

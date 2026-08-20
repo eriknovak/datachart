@@ -33,14 +33,9 @@ from datachart.config import config
 from datachart.constants import THEME
 
 # Cases whose output intentionally changed since the last published baseline.
-EXPECTED_CHANGES = {
-    # composed panels with bars adopt category ticks; groups center on the
-    # category position
-    "overlay_line_bar_dual",
-    "overlay_bar_bar",
-    "overlay_bar_bar_line",
-    "grid_with_overlay",
-}
+# The theme refresh (ADR 0004) restyled every theme, so baselines regenerated
+# from scratch and no per-case exceptions remain.
+EXPECTED_CHANGES = set()
 
 
 def _reset():
@@ -69,6 +64,7 @@ def case(fn):
 
 
 # ----- single charts -----
+
 
 @case
 def line_single():
@@ -128,7 +124,10 @@ def line_log():
 @case
 def line_ticks():
     return LineChart(
-        data=LINE1, xticks=[0, 3, 6, 9], xticklabels=["a", "b", "c", "d"], xtickrotate=45
+        data=LINE1,
+        xticks=[0, 3, 6, 9],
+        xticklabels=["a", "b", "c", "d"],
+        xtickrotate=45,
     )
 
 
@@ -146,9 +145,7 @@ def bar_multi_grouped():
 
 @case
 def bar_multi_subplots():
-    return BarChart(
-        data=[BAR1, BAR2], subtitle=["s1", "s2"], subplots=True, max_cols=2
-    )
+    return BarChart(data=[BAR1, BAR2], subtitle=["s1", "s2"], subplots=True, max_cols=2)
 
 
 @case
@@ -279,6 +276,7 @@ def parallel_basic():
 
 # ----- themes -----
 
+
 @case
 def theme_publication_line():
     config.set_theme(THEME.PUBLICATION)
@@ -293,6 +291,7 @@ def theme_greyscale_bar():
 
 # ----- overlays -----
 
+
 @case
 def overlay_line_line():
     f1 = LineChart(data=LINE1, subtitle="sq")
@@ -304,7 +303,9 @@ def overlay_line_line():
 
 @case
 def overlay_line_bar_dual():
-    fb = BarChart(data=[{"label": c, "y": v * 100} for c, v in zip("ABCD", [1, 2, 3, 2])])
+    fb = BarChart(
+        data=[{"label": c, "y": v * 100} for c, v in zip("ABCD", [1, 2, 3, 2])]
+    )
     fl = LineChart(data=[{"x": i, "y": i * 2} for i in range(4)])
     return OverlayChart(
         charts=[
@@ -332,7 +333,9 @@ def overlay_auto_assign():
 def overlay_hist_line():
     fh = Histogram(data=hist_data(), num_bins=20)
     xs = np.linspace(-3, 3, 50)
-    fl = LineChart(data=[{"x": float(x), "y": float(30 * np.exp(-x * x / 2))} for x in xs])
+    fl = LineChart(
+        data=[{"x": float(x), "y": float(30 * np.exp(-x * x / 2))} for x in xs]
+    )
     return OverlayChart(
         charts=[{"figure": fh, "y_axis": "left"}, {"figure": fl, "y_axis": "left"}],
         show_legend=True,
@@ -389,6 +392,7 @@ def overlay_hist_hist():
 
 # ----- grids -----
 
+
 @case
 def grid_uniform_mixed():
     f1 = LineChart(data=LINE1, subtitle="line")
@@ -410,9 +414,18 @@ def grid_custom_layout():
     f3 = ScatterChart(data=SCAT1)
     return FigureGridLayout(
         charts=[
-            {"figure": f1, "layout_spec": {"row": 0, "col": 0, "rowspan": 1, "colspan": 2}},
-            {"figure": f2, "layout_spec": {"row": 1, "col": 0, "rowspan": 1, "colspan": 1}},
-            {"figure": f3, "layout_spec": {"row": 1, "col": 1, "rowspan": 1, "colspan": 1}},
+            {
+                "figure": f1,
+                "layout_spec": {"row": 0, "col": 0, "rowspan": 1, "colspan": 2},
+            },
+            {
+                "figure": f2,
+                "layout_spec": {"row": 1, "col": 0, "rowspan": 1, "colspan": 1},
+            },
+            {
+                "figure": f3,
+                "layout_spec": {"row": 1, "col": 1, "rowspan": 1, "colspan": 1},
+            },
         ],
         title="Custom",
         figsize=(10, 8),

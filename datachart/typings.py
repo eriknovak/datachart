@@ -39,6 +39,7 @@ Classes:
     RegressionStyleAttrs: The typing for the regression line style.
     BoxStyleAttrs: The typing for the box plot style.
     ParallelCoordsStyleAttrs: The typing for the parallel coordinates chart style.
+    ThemeDefaultAttrs: The typing for theme-driven defaults and cycles.
 
 """
 
@@ -76,12 +77,14 @@ class ColorStyleAttrs(TypedDict):
         color_general_singular (Union[COLORS, str, None]): The general color for the singular-typed charts.
         color_general_multiple (Union[COLORS, str, List[str], None]): The general color for the multiple-typed charts (palette name or list of hex colors).
         color_parallel_hue (Union[COLORS, str, List[str], None]): The color palette for parallel coords hue categories (palette name or list of hex colors).
+        color_parallel_hue_continuous (Union[COLORS, str, List[str], None]): The sequential ramp for parallel coords numeric hue columns (palette name or list of hex colors).
 
     """
 
     color_general_singular: Union[COLORS, str, List[str], None]
     color_general_multiple: Union[COLORS, str, List[str], None]
     color_parallel_hue: Union[COLORS, str, List[str], None]
+    color_parallel_hue_continuous: Union[COLORS, str, List[str], None]
 
 
 class FontStyleAttrs(TypedDict):
@@ -90,6 +93,7 @@ class FontStyleAttrs(TypedDict):
     Attributes:
         font_general_family (Union[str, None]): The general font family.
         font_general_sansserif (Union[List[str], None]): The general sans-serif font.
+        font_general_serif (Union[List[str], None]): The general serif font stack, used when the family is "serif".
         font_general_color (Union[str, None]): The general font color.
         font_general_size (Union[int, float, str, None]): The general font size.
         font_general_style (Union[FONT_STYLE, str, None]): The general font style.
@@ -120,6 +124,7 @@ class FontStyleAttrs(TypedDict):
     # general font style
     font_general_family: Union[str, None]
     font_general_sansserif: Union[List[str], None]
+    font_general_serif: Union[List[str], None]
     font_general_color: Union[str, None]
     font_general_size: Union[int, float, str, None]
     font_general_style: Union[FONT_STYLE, str, None]
@@ -369,6 +374,7 @@ class HeatmapStyleAttrs(TypedDict):
         plot_heatmap_font_color (Union[str, None]): The font color of the heatmap.
         plot_heatmap_font_style (Union[FONT_STYLE, str, None]): The font style of the heatmap.
         plot_heatmap_font_weight (Union[FONT_WEIGHT, str, None]): The font weight of the heatmap.
+        plot_heatmap_frame_color (Union[str, None]): The color of the frame always drawn around heatmap axes.
 
     """
 
@@ -378,6 +384,7 @@ class HeatmapStyleAttrs(TypedDict):
     plot_heatmap_font_color: Union[str, None]
     plot_heatmap_font_style: Union[FONT_STYLE, str, None]
     plot_heatmap_font_weight: Union[FONT_WEIGHT, str, None]
+    plot_heatmap_frame_color: Union[str, None]
 
 
 class ScatterStyleAttrs(TypedDict):
@@ -508,6 +515,27 @@ class ParallelCoordsStyleAttrs(TypedDict):
     plot_parallel_dim_label_pad: Union[int, float, None]
 
 
+class ThemeDefaultAttrs(TypedDict):
+    """The typing for theme-driven defaults and cycles (ADR 0004).
+
+    Attributes:
+        chart_default_show_grid (Union[SHOW_GRID, str, None]): The theme default
+            for `show_grid`, applied when a chart call leaves it unset. Never
+            applies to heatmaps. `None` means the theme has no opinion.
+        chart_default_show_values (Union[bool, None]): The theme default for
+            `show_values`, applied when a chart call leaves it unset. `None`
+            means the theme has no opinion.
+        plot_hatch_cycle (Union[List[str], None]): The hatch patterns assigned
+            per bar/histogram series, parallel to the color cycle. An explicit
+            per-chart hatch style wins. `None` disables the cycle.
+
+    """
+
+    chart_default_show_grid: Union[SHOW_GRID, str, None]
+    chart_default_show_values: Union[bool, None]
+    plot_hatch_cycle: Union[List[str], None]
+
+
 class StyleAttrs(
     ColorStyleAttrs,
     FontStyleAttrs,
@@ -525,6 +553,7 @@ class StyleAttrs(
     RegressionStyleAttrs,
     BoxStyleAttrs,
     ParallelCoordsStyleAttrs,
+    ThemeDefaultAttrs,
 ):
     """The style attributes. Combines all style typings."""
 

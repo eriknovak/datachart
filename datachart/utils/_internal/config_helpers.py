@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 from ...config import config, Config
 from ...config.charts import CHART_CONFIGS
 
-
 # ================================================
 # Helper Functions
 # ================================================
@@ -110,6 +109,29 @@ def get_subplot_config(
 # -------------------------------------
 
 
+def resolve_font_family(family: Union[str, None] = None) -> Union[str, List[str]]:
+    """Resolve a generic font family into the theme's concrete font stack.
+
+    Args:
+        family: The font family; falls back to `font_general_family`.
+
+    Returns:
+        The theme's font stack (ending in the generic family as a fallback),
+        or the family itself when the theme defines no stack for it.
+
+    """
+
+    family = family if family is not None else config.get("font_general_family")
+    family = family or "sans-serif"
+    if family == "serif":
+        stack = config.get("font_general_serif")
+    elif family == "sans-serif":
+        stack = config.get("font_general_sansserif")
+    else:
+        stack = None
+    return list(stack) + [family] if stack else family
+
+
 def get_text_style(text_type: str = "") -> dict:
     """Get the text style.
 
@@ -129,13 +151,15 @@ def get_text_style(text_type: str = "") -> dict:
         ("family", "font_{type}_family"),
     ]
 
-    return {
+    style = {
         key: config.get(
             attr.format(type=text_type),
             config.get(attr.format(type="general")),
         )
         for key, attr in config_attrs
     }
+    style["family"] = resolve_font_family(style.get("family"))
+    return style
 
 
 # -------------------------------------

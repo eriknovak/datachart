@@ -470,6 +470,10 @@ class COLORS:
         Tab10 (str): Tableau 10-color categorical palette. Equals to `"tab10"`.
         Tab20 (str): Tableau 20-color categorical palette. Equals to `"tab20"`.
 
+        # Custom datachart palettes
+        PaperYlGnBu (str): Diversified YlGnBu categorical palette for publications. Equals to `"PaperYlGnBu"`.
+        PaperAccent (str): Two-color blue/red accent pair for publications. Equals to `"PaperAccent"`.
+
     """
 
     # Sequential (Single-hue)
@@ -525,6 +529,10 @@ class COLORS:
     # Tableau palettes (Categorical)
     Tab10 = "tab10"
     Tab20 = "tab20"
+
+    # Custom datachart palettes (registered locally, not in pypalettes)
+    PaperYlGnBu = "PaperYlGnBu"
+    PaperAccent = "PaperAccent"
 
 
 class NORMALIZE:
@@ -614,6 +622,9 @@ class THEME:
         GREYSCALE (str): The greyscale theme. Equals to `"greyscale"`.
         PUBLICATION (str): The publication theme. Equals to `"publication"`.
         BACKGROUND (str): The background theme (light gray for de-emphasized elements). Equals to `"background"`.
+        MINIMAL (str): The minimal theme (accent blue, no spines, flat bars). Equals to `"minimal"`.
+        MATERIAL (str): The material theme (Google palette, light grid). Equals to `"material"`.
+        ACADEMIC (str): The academic theme (serif fonts, hatch cycle). Equals to `"academic"`.
 
     """
 
@@ -621,6 +632,9 @@ class THEME:
     GREYSCALE = "greyscale"
     PUBLICATION = "publication"
     BACKGROUND = "background"
+    MINIMAL = "minimal"
+    MATERIAL = "material"
+    ACADEMIC = "academic"
 
 
 class SHOW_GRID:

@@ -14,5 +14,4 @@ Classes:
 # import configuration object
 from .configuration import config, Config
 
-
 __all__ = ["config", "Config"]

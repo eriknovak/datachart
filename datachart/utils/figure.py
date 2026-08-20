@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 from ..constants import FIG_FORMAT
+from ._internal.config_helpers import get_text_style
 
 # =====================================
 # Helper functions
@@ -187,7 +188,7 @@ def _figure_grid_layout_impl(
 
     # Add global title if provided
     if title:
-        combined_fig.suptitle(title)
+        combined_fig.suptitle(title, **get_text_style("title"))
 
     # grid figures carry no panel and cannot be composed further (ADR 0002)
     combined_fig._chart_metadata = {"type": "grid"}

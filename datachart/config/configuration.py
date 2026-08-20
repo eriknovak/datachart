@@ -8,7 +8,25 @@ from datachart.typings import StyleAttrs
 from datachart.constants import THEME
 
 # import the themes
-from ..themes import DEFAULT_THEME, GREYSCALE_THEME, PUBLICATION_THEME, BACKGROUND_THEME
+from ..themes import (
+    DEFAULT_THEME,
+    GREYSCALE_THEME,
+    PUBLICATION_THEME,
+    BACKGROUND_THEME,
+    MINIMAL_THEME,
+    MATERIAL_THEME,
+    ACADEMIC_THEME,
+)
+
+THEMES = {
+    THEME.DEFAULT: DEFAULT_THEME,
+    THEME.GREYSCALE: GREYSCALE_THEME,
+    THEME.PUBLICATION: PUBLICATION_THEME,
+    THEME.BACKGROUND: BACKGROUND_THEME,
+    THEME.MINIMAL: MINIMAL_THEME,
+    THEME.MATERIAL: MATERIAL_THEME,
+    THEME.ACADEMIC: ACADEMIC_THEME,
+}
 
 
 class Config:
@@ -51,21 +69,12 @@ class Config:
             theme: The theme to be set.
 
         """
-        if theme == THEME.DEFAULT:
-            self.config = copy.deepcopy(DEFAULT_THEME)
-            self.theme = THEME.DEFAULT
-        elif theme == THEME.GREYSCALE:
-            self.config = copy.deepcopy(GREYSCALE_THEME)
-            self.theme = THEME.GREYSCALE
-        elif theme == THEME.PUBLICATION:
-            self.config = copy.deepcopy(PUBLICATION_THEME)
-            self.theme = THEME.PUBLICATION
-        elif theme == THEME.BACKGROUND:
-            self.config = copy.deepcopy(BACKGROUND_THEME)
-            self.theme = THEME.BACKGROUND
+        if theme in THEMES:
+            self.config = copy.deepcopy(THEMES[theme])
+            self.theme = theme
         else:
             warnings.warn(
-                f"Warning: {theme} is not a valid theme. Must be one of {[THEME.DEFAULT, THEME.GREYSCALE, THEME.PUBLICATION, THEME.BACKGROUND]}. Reverting to last active theme..."
+                f"Warning: {theme} is not a valid theme. Must be one of {list(THEMES)}. Reverting to last active theme..."
             )
             self.set_theme(self.theme)
 
