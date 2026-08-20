@@ -85,6 +85,41 @@ class TestPanel:
             Panel([])
 
 
+class TestGroupedBarAlignment:
+    """Grouped bars center on the category position, with category ticks."""
+
+    @staticmethod
+    def _bar_centers(ax):
+        return sorted(p.get_x() + p.get_width() / 2 for p in ax.patches)
+
+    def test_panel_bar_ticks_show_category_labels(self):
+        fig = Panel([_bar_fig(), _bar_fig()])
+        ax = fig.axes[0]
+        assert [t.get_text() for t in ax.get_xticklabels()] == list("ABCD")
+        assert list(ax.get_xticks()) == [0, 1, 2, 3]
+        plt.close("all")
+
+    def test_panel_grouped_bars_center_on_category(self):
+        fig = Panel([_bar_fig(), _bar_fig()])
+        centers = self._bar_centers(fig.axes[0])
+        # two slots per category, symmetric around the category position
+        for i in range(4):
+            left, right = centers[2 * i], centers[2 * i + 1]
+            assert (left + right) / 2 == pytest.approx(i)
+        plt.close("all")
+
+    def test_barchart_grouped_series_center_on_category(self):
+        data = [{"label": c, "y": v} for c, v in zip("ABCD", [3, 1, 4, 2])]
+        fig = BarChart(data=[data, data])
+        ax = fig.axes[0]
+        assert list(ax.get_xticks()) == [0, 1, 2, 3]
+        centers = self._bar_centers(ax)
+        for i in range(4):
+            left, right = centers[2 * i], centers[2 * i + 1]
+            assert (left + right) / 2 == pytest.approx(i)
+        plt.close("all")
+
+
 class TestGrid:
     """Test suite for the Grid composition front."""
 

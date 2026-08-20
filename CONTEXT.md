@@ -28,6 +28,12 @@ blank cell) or a flat list with `max_cols`/`layout_spec`, and redraws each
 figure's panel into its cell.
 _Avoid_: grid layout (for the front), figure grid
 
+**Bar slot**:
+A bar layer's assigned lane within a category's group of bars. Slots divide the
+bar width between the panel's bar layers, and the group is centered on the
+category position — so numeric-x layers and ticks line up with group centers.
+_Avoid_: bar offset (for the concept), dodge
+
 **DrawContext**:
 The frozen per-layer instructions a panel hands to a layer at draw time — z-order,
 legend label, assigned color, and bar slot placement.
