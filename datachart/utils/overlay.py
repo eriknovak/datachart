@@ -5,7 +5,8 @@ ScatterChart, Histogram) on a single plot with support for multiple y-axes.
 
 Methods:
     OverlayChart(charts, title, xlabel, ylabel_left, ylabel_right, figsize, show_legend, auto_secondary_axis):
-        Combines multiple chart figures into a single overlay plot with optional dual y-axes.
+        (Deprecated) Use datachart.utils.Panel instead, which delegates to the
+        same implementation (`_overlay_impl`).
 
 """
 
@@ -51,6 +52,10 @@ def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
     metadata = figure._chart_metadata
     if metadata.get("type") is None:
         raise ValueError("Figure has invalid metadata: missing 'type'")
+    if metadata.get("type") == "grid":
+        raise ValueError(
+            f"Figure at index {index} is a Grid figure; grid figures cannot be overlaid"
+        )
     if metadata.get("charts") is None:
         raise ValueError("Figure has invalid metadata: missing 'charts'")
 
@@ -78,7 +83,7 @@ def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
     return groups
 
 
-def OverlayChart(
+def _overlay_impl(
     charts: List[Dict[str, Any]],
     *,
     title: Optional[str] = None,
@@ -97,77 +102,12 @@ def OverlayChart(
     ymax_right: Optional[float] = None,
     bar_mode: Optional[str] = None,
 ) -> plt.Figure:
-    """Overlay multiple charts on a single plot with optional dual y-axes.
+    """Render the overlay panel for a normalized list of chart dicts.
 
-    This function combines different chart types (LineChart, BarChart, ScatterChart, Histogram)
-    on a single plot. Charts are drawn in the order provided. Multiple y-axes (left and right)
-    are supported for handling different scales.
-
-    Examples:
-        >>> from datachart.charts import LineChart, BarChart
-        >>> from datachart.utils import OverlayChart
-        >>>
-        >>> # Create individual charts
-        >>> bar_fig = BarChart(
-        ...     data=[{"label": "A", "y": 100}, {"label": "B", "y": 200}],
-        ... )
-        >>> line_fig = LineChart(
-        ...     data=[{"x": 0, "y": 5}, {"x": 1, "y": 15}],
-        ... )
-        >>>
-        >>> # Combine with dual axes
-        >>> combined_fig = OverlayChart(
-        ...     charts=[
-        ...         {"figure": bar_fig, "y_axis": "left"},
-        ...         {"figure": line_fig, "y_axis": "right"},
-        ...     ],
-        ...     title="Sales Analysis",
-        ...     xlabel="Category",
-        ...     ylabel_left="Count",
-        ...     ylabel_right="Average",
-        ...     show_legend=True,
-        ... )
-        >>>
-        >>> # Automatic axis assignment
-        >>> combined_fig = OverlayChart(
-        ...     charts=[
-        ...         {"figure": bar_fig},
-        ...         {"figure": line_fig},
-        ...     ],
-        ...     title="Automatic Axis Assignment",
-        ...     auto_secondary_axis=3.0,  # threshold
-        ... )
-
-    Args:
-        charts: List of chart configuration dictionaries. Each dict must contain:
-            - "figure": A matplotlib Figure from datachart chart functions
-            - "y_axis" (optional): "left", "right", or "auto" (default: "auto")
-            - "z_order" (optional): Integer for layering control (higher values on top)
-            - "legend_label" (optional): Custom legend label (overrides chart subtitle)
-        title: Title for the combined chart.
-        xlabel: Label for x-axis.
-        ylabel_left: Label for left y-axis.
-        ylabel_right: Label for right y-axis (if using dual axes).
-        figsize: Size of the figure (width, height) in inches.
-        show_legend: Whether to show the legend.
-        show_grid: Which grid lines to show ("x", "y", "both", or None).
-        auto_secondary_axis: Threshold ratio for automatic secondary axis creation.
-            If the ratio of data ranges exceeds this threshold, a secondary axis is created.
-            Default is taken from config (overlay_auto_threshold, default 3.0).
-        xmin: Minimum value for x-axis limits.
-        xmax: Maximum value for x-axis limits.
-        ymin: Minimum value for y-axis limits (applies to left y-axis).
-        ymax: Maximum value for y-axis limits (applies to left y-axis).
-        ymin_right: Minimum value for right y-axis limits.
-        ymax_right: Maximum value for right y-axis limits.
-        bar_mode: Bar chart overlay mode: "group" (side-by-side), "stack" (stacked), or "overlay" (overlapping).
-            Default is taken from config (overlay_bar_mode, default "group").
-
-    Returns:
-        A matplotlib Figure containing the overlaid charts.
-
-    Raises:
-        ValueError: If charts list is empty or if figures are missing metadata.
+    Shared implementation behind `Panel` and the deprecated `OverlayChart`;
+    see `datachart.utils.Panel` for the full parameter documentation. Each
+    chart dict must contain a "figure" key and may carry "y_axis",
+    "z_order", and "legend_label".
     """
     if not charts:
         raise ValueError("At least one chart is required")
@@ -255,3 +195,75 @@ def OverlayChart(
     }
 
     return fig
+
+
+def OverlayChart(
+    charts: List[Dict[str, Any]],
+    *,
+    title: Optional[str] = None,
+    xlabel: Optional[str] = None,
+    ylabel_left: Optional[str] = None,
+    ylabel_right: Optional[str] = None,
+    figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
+    show_legend: Optional[bool] = False,
+    show_grid: Optional[str] = None,
+    auto_secondary_axis: Optional[float] = None,
+    xmin: Optional[float] = None,
+    xmax: Optional[float] = None,
+    ymin: Optional[float] = None,
+    ymax: Optional[float] = None,
+    ymin_right: Optional[float] = None,
+    ymax_right: Optional[float] = None,
+    bar_mode: Optional[str] = None,
+) -> plt.Figure:
+    """Overlay multiple charts on a single plot with optional dual y-axes.
+
+    .. deprecated::
+        Use :func:`datachart.utils.Panel` instead — same behavior, and it also
+        accepts bare figures. This function only accepts dict items.
+
+    Args:
+        charts: List of chart configuration dictionaries. Each dict must contain
+            a "figure" key and may contain "y_axis", "z_order", "legend_label".
+        title: Title for the combined chart.
+        xlabel: Label for x-axis.
+        ylabel_left: Label for left y-axis.
+        ylabel_right: Label for right y-axis (if using dual axes).
+        figsize: Size of the figure (width, height) in inches.
+        show_legend: Whether to show the legend.
+        show_grid: Which grid lines to show ("x", "y", "both", or None).
+        auto_secondary_axis: Threshold ratio for automatic secondary axis creation.
+        xmin: Minimum value for x-axis limits.
+        xmax: Maximum value for x-axis limits.
+        ymin: Minimum value for y-axis limits (applies to left y-axis).
+        ymax: Maximum value for y-axis limits (applies to left y-axis).
+        ymin_right: Minimum value for right y-axis limits.
+        ymax_right: Maximum value for right y-axis limits.
+        bar_mode: Bar chart overlay mode: "group", "stack", or "overlay".
+
+    Returns:
+        A matplotlib Figure containing the overlaid charts.
+    """
+    warnings.warn(
+        "OverlayChart is deprecated. Use datachart.utils.Panel instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return _overlay_impl(
+        charts,
+        title=title,
+        xlabel=xlabel,
+        ylabel_left=ylabel_left,
+        ylabel_right=ylabel_right,
+        figsize=figsize,
+        show_legend=show_legend,
+        show_grid=show_grid,
+        auto_secondary_axis=auto_secondary_axis,
+        xmin=xmin,
+        xmax=xmax,
+        ymin=ymin,
+        ymax=ymax,
+        ymin_right=ymin_right,
+        ymax_right=ymax_right,
+        bar_mode=bar_mode,
+    )

@@ -14,10 +14,14 @@ title: Utils Module
 
 ::: datachart.utils.save_figure
 
-::: datachart.utils.FigureGridLayout
+::: datachart.utils.Panel
+
+::: datachart.utils.Grid
+
+## Deprecated
 
 ::: datachart.utils.OverlayChart
 
-## Deprecated
+::: datachart.utils.FigureGridLayout
 
 ::: datachart.utils.figure_grid_layout

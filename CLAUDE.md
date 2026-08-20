@@ -60,7 +60,7 @@ python -m build --sdist --wheel --outdir dist/
 The package is organized into six main modules:
 
 - **charts**: Chart creation functions (BarChart, LineChart, ScatterChart, Heatmap, Histogram, BoxPlot, ParallelCoords)
-- **utils**: Utilities including FigureGridLayout, OverlayChart, save_figure, and stats functions
+- **utils**: Utilities including the Panel/Grid composition fronts (ADR 0002; OverlayChart, FigureGridLayout, and figure_grid_layout are their deprecated predecessors), save_figure, and stats functions
 - **config**: Global configuration system with the singleton `config` instance
 - **themes**: Predefined style themes (DEFAULT_THEME, GREYSCALE_THEME, PUBLICATION_THEME, BACKGROUND_THEME)
 - **constants**: Enums and constants (THEME, FIG_SIZE, ORIENTATION, COLORS, etc.)
@@ -107,7 +107,7 @@ from datachart.config import config
 
 ### Chart Metadata
 
-Figures store metadata for composition operations (FigureGridLayout, OverlayChart):
+Figures store metadata for composition operations (Panel, Grid):
 
 ```python
 figure._chart_metadata = {
@@ -118,9 +118,11 @@ figure._chart_metadata = {
 }
 ```
 
-`OverlayChart` concatenates the source figures' layer groups into one panel with
-twin-axis assignment; `FigureGridLayout` renders each figure's stored panel into
-a grid cell. Both consume the panel — there is no second drawing path.
+`Panel` concatenates the source figures' layer groups into one panel with
+twin-axis assignment; `Grid` renders each figure's stored panel into a grid
+cell (nested rows define the layout; `layout_spec` dicts are the escape hatch).
+Both consume the panel — there is no second drawing path. Grid figures carry
+only `{"type": "grid"}` and cannot be composed further.
 
 ### Theme System
 

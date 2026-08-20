@@ -17,8 +17,16 @@ _Avoid_: plotter, series (for the drawable), plot function
 **Panel**:
 A group of layers sharing one coordinate space. Owns everything cross-layer: color
 assignment, bar slotting, axis scale and limits, grid, ticks, legend assembly, and
-twin-axis (left/right) assignment.
+twin-axis (left/right) assignment. Also the public composition front
+(`datachart.utils.Panel`) that overlays rendered figures into one panel.
 _Avoid_: overlay (for the concept), subplot, axes group
+
+**Grid**:
+An arrangement of figures in rows and columns — the public front
+(`datachart.utils.Grid`) takes nested rows (the layout you can see; `None` for a
+blank cell) or a flat list with `max_cols`/`layout_spec`, and redraws each
+figure's panel into its cell.
+_Avoid_: grid layout (for the front), figure grid
 
 **DrawContext**:
 The frozen per-layer instructions a panel hands to a layer at draw time — z-order,
@@ -32,8 +40,8 @@ _Avoid_: chart class, chart type (for the function)
 
 **Metadata transport**:
 The chart spec riding on a rendered figure (`figure._chart_metadata`) so composition
-functions (`OverlayChart`, `FigureGridLayout`) can rebuild it. Carries layers and
-panel settings, not raw attribute dicts.
+functions (`Panel`, `Grid`) can rebuild it. Carries layers and panel settings, not
+raw attribute dicts.
 _Avoid_: snapshot (for this), chart data
 
 ### Styling
