@@ -1,7 +1,9 @@
 import math
 import warnings
+from functools import lru_cache
 from typing import Union, Tuple, Dict, List
 
+import matplotlib.font_manager as font_manager
 import matplotlib.pyplot as plt
 
 from ...config import config, Config
@@ -109,6 +111,19 @@ def get_subplot_config(
 # -------------------------------------
 
 
+@lru_cache(maxsize=None)
+def _font_available(name: str) -> bool:
+    """Whether the font is installed; missing names would make matplotlib warn."""
+
+    try:
+        font_manager.findfont(
+            font_manager.FontProperties(family=name), fallback_to_default=False
+        )
+        return True
+    except ValueError:
+        return False
+
+
 def resolve_font_family(family: Union[str, None] = None) -> Union[str, List[str]]:
     """Resolve a generic font family into the theme's concrete font stack.
 
@@ -129,6 +144,9 @@ def resolve_font_family(family: Union[str, None] = None) -> Union[str, List[str]
         stack = config.get("font_general_sansserif")
     else:
         stack = None
+    if stack:
+        # drop fonts not installed here; they would only trigger findfont warnings
+        stack = [name for name in stack if _font_available(name)]
     return list(stack) + [family] if stack else family
 
 

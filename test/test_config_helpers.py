@@ -66,8 +66,14 @@ class TestAttrs(unittest.TestCase):
             self.assertEqual(config["fontweight"], _config[f"font_{key}_weight"])
             self.assertEqual(config["color"], _config[f"font_{key}_color"])
             self.assertEqual(config["style"], _config[f"font_{key}_style"])
-            # the generic family resolves into the theme's font stack
-            self.assertEqual(config["family"], ["Helvetica", "Arial", "sans-serif"])
+            # the generic family resolves into the theme's installed font stack
+            family = config["family"]
+            if isinstance(family, list):
+                self.assertEqual(family[-1], "sans-serif")
+                for name in family[:-1]:
+                    self.assertIn(name, _config["font_general_sansserif"])
+            else:
+                self.assertEqual(family, "sans-serif")
 
     def test_get_line_style(self):
         config = get_line_style({"plot_line_color": "#FF0000"})
