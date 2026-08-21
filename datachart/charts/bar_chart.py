@@ -10,7 +10,7 @@ from ..typings import (
     VLinePlotAttrs,
     HLinePlotAttrs,
 )
-from ..constants import FIG_SIZE, SHOW_GRID, ORIENTATION, SCALE
+from ..constants import EMPHASIS, FIG_SIZE, SHOW_GRID, ORIENTATION, SCALE
 
 # ================================================
 # Main Chart Definition
@@ -24,6 +24,7 @@ def BarChart(
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
+    emphasis: Optional[Union[EMPHASIS, str, List[Optional[str]]]] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     xmin: Optional[Union[int, float]] = None,
     xmax: Optional[Union[int, float]] = None,
@@ -96,6 +97,10 @@ def BarChart(
         xlabel: The x-axis label.
         ylabel: The y-axis label.
         subtitle: The subtitle(s) for individual charts. Used as legend labels.
+        emphasis: The emphasis role(s) for individual charts, aligned like
+            `style`: "background" mutes a chart (theme muted color, lowered
+            alpha, behind the others, no legend entry), "highlight" bolds
+            its edges and brings it to the front, None leaves it unchanged.
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -137,6 +142,7 @@ def BarChart(
     charts = build_charts_structure(
         data,
         subtitle=subtitle,
+        emphasis=emphasis,
         style=style,
         xticks=xticks,
         xticklabels=xticklabels,

@@ -26,9 +26,16 @@ from ._internal.layers import (
     BarLayer,
     ScatterLayer,
     HistogramLayer,
+    ParallelCoordsLayer,
 )
 
-OVERLAYABLE_LAYERS = (LineLayer, BarLayer, ScatterLayer, HistogramLayer)
+OVERLAYABLE_LAYERS = (
+    LineLayer,
+    BarLayer,
+    ScatterLayer,
+    HistogramLayer,
+    ParallelCoordsLayer,
+)
 
 
 def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
@@ -79,6 +86,7 @@ def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
                     y_axis=group.y_axis,
                     z_order=group.z_order,
                     legend_label=group.legend_label,
+                    emphasis=group.emphasis,
                 )
             )
     return groups
@@ -136,6 +144,7 @@ def _overlay_impl(
                     y_axis=chart_config.get("y_axis", None),
                     z_order=chart_config.get("z_order", None),
                     legend_label=chart_config.get("legend_label", None),
+                    emphasis=chart_config.get("emphasis", None),
                 )
             )
 

@@ -2,7 +2,7 @@ from ._base import make_theme
 from ..typings import StyleAttrs
 from ..constants import LINE_STYLE, COLORS
 
-ACADEMIC_THEME: StyleAttrs = make_theme(
+HATCH_THEME: StyleAttrs = make_theme(
     {
         "color_general_singular": COLORS.Blues,
         "color_general_multiple": [
@@ -19,9 +19,7 @@ ACADEMIC_THEME: StyleAttrs = make_theme(
             "#5B84C4",
             "#2E4E8F",
         ],
-        "font_general_family": "serif",
-        # matplotlib-bundled fonts preferred, so output is portable
-        "font_general_serif": ["STIXGeneral", "Times New Roman", "DejaVu Serif"],
+        "font_general_sansserif": ["Helvetica", "Arial", "DejaVu Sans"],
         "chart_default_show_values": True,
         "plot_hatch_cycle": ["", "//", ".."],
         "plot_grid_color": "#D0D0D0",

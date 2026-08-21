@@ -2,7 +2,7 @@ from ._base import make_theme
 from ..typings import StyleAttrs
 from ..constants import LINE_STYLE, COLORS
 
-PUBLICATION_THEME: StyleAttrs = make_theme(
+INK_THEME: StyleAttrs = make_theme(
     {
         "color_general_singular": COLORS.Blues,
         "color_general_multiple": COLORS.PaperYlGnBu,

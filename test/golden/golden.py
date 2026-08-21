@@ -34,14 +34,17 @@ from datachart.constants import THEME
 
 # Cases whose output intentionally changed since the last published baseline.
 EXPECTED_CHANGES = {
-    # Panel figures now carry themed label furniture (title/xlabel/ylabel/ylabel_right)
-    "overlay_line_bar_dual",
-    "overlay_nested_panel",
-    "grid_with_overlay",
-    # nested grids render in the parent gridspec so cell envelopes align;
-    # nested titles demote to subtitle-styled heading rows (ADR 0007)
-    "grid_nested_grid",
-    "grid_mixed_panel_and_grid",
+    # theme renames: PUBLICATION -> INK (same style, new case name)
+    "theme_ink_line",
+    # new emphasis cases (ADR 0009)
+    "emphasis_line_walks",
+    "emphasis_line_walks_material",
+    "emphasis_scatter_cohort",
+    "emphasis_parallel_rows",
+    "emphasis_parallel_composed",
+    "emphasis_hist_reference",
+    "emphasis_box_labels",
+    "emphasis_panel_cross_type",
 }
 
 
@@ -285,8 +288,8 @@ def parallel_basic():
 
 
 @case
-def theme_publication_line():
-    config.set_theme(THEME.PUBLICATION)
+def theme_ink_line():
+    config.set_theme(THEME.INK)
     return LineChart(data=[LINE1, LINE2], subtitle=["a", "b"], show_legend=True)
 
 
@@ -294,6 +297,121 @@ def theme_publication_line():
 def theme_greyscale_bar():
     config.set_theme(THEME.GREYSCALE)
     return BarChart(data=[BAR1, BAR2], show_legend=True)
+
+
+# ----- emphasis (ADR 0009) -----
+
+
+def walk_data(seed, n=40):
+    rng = np.random.RandomState(seed)
+    return [{"x": i, "y": float(v)} for i, v in enumerate(np.cumsum(rng.randn(n)))]
+
+
+def _emphasis_walks():
+    walks = [walk_data(seed) for seed in range(6)]
+    return LineChart(
+        data=walks,
+        subtitle=[f"run {i}" for i in range(6)],
+        emphasis=["background"] * 3 + [None, "highlight", "background"],
+        show_legend=True,
+        title="One walk among many",
+    )
+
+
+@case
+def emphasis_line_walks():
+    return _emphasis_walks()
+
+
+@case
+def emphasis_line_walks_material():
+    config.set_theme(THEME.MATERIAL)
+    return _emphasis_walks()
+
+
+@case
+def emphasis_scatter_cohort():
+    cohort = [{"x": i, "y": 2 * i + (i * 3) % 5} for i in range(25)]
+    rest = [{"x": i, "y": i + (i * 7) % 9} for i in range(25)]
+    return ScatterChart(
+        data=[rest, cohort],
+        subtitle=["all points", "cohort"],
+        emphasis=["background", "highlight"],
+        show_legend=True,
+    )
+
+
+@case
+def emphasis_parallel_rows():
+    rng = np.random.RandomState(11)
+    data = [
+        {
+            "speed": float(rng.rand() * 10),
+            "cost": float(rng.rand() * 100),
+            "score": float(rng.rand()),
+        }
+        for _ in range(15)
+    ]
+    best = [2, 7]
+    return ParallelCoords(
+        data=data,
+        dimensions=["speed", "cost", "score"],
+        emphasis=["highlight" if i in best else "background" for i in range(len(data))],
+        title="Best runs",
+    )
+
+
+@case
+def emphasis_parallel_composed():
+    rng = np.random.RandomState(13)
+    ctx = [{"a": float(rng.rand() * 5), "b": float(rng.rand() * 20)} for _ in range(12)]
+    runs = [{"a": float(2 + i), "b": float(60 + 5 * i)} for i in range(3)]
+    f1 = ParallelCoords(data=ctx, dimensions=["a", "b"])
+    f2 = ParallelCoords(data=runs, dimensions=["a", "b"])
+    return Panel(
+        [{"figure": f1, "emphasis": "background"}, {"figure": f2}],
+        title="Composed parallel",
+    )
+
+
+@case
+def emphasis_hist_reference():
+    return Histogram(
+        data=[hist_data(300, 0.5, 1.4), hist_data(150, 2.0, 0.8)],
+        subtitle=["reference", "cohort"],
+        emphasis=["background", None],
+        num_bins=18,
+        show_legend=True,
+    )
+
+
+@case
+def emphasis_box_labels():
+    rng = np.random.RandomState(9)
+    data = [
+        {"label": lab, "value": float(v)}
+        for lab in "ABCD"
+        for v in rng.randn(30) + {"A": 0, "B": 2, "C": 1, "D": 3}[lab]
+    ]
+    return BoxPlot(data=data, emphasis=["background", None, "highlight", "background"])
+
+
+@case
+def emphasis_panel_cross_type():
+    fh = Histogram(data=hist_data(), num_bins=20, subtitle="observations")
+    xs = np.linspace(-3, 3, 50)
+    fl = LineChart(
+        data=[{"x": float(x), "y": float(30 * np.exp(-x * x / 2))} for x in xs],
+        subtitle="trend",
+    )
+    return Panel(
+        [
+            {"figure": fh, "emphasis": "background"},
+            {"figure": fl, "emphasis": "highlight"},
+        ],
+        title="Trend over observations",
+        show_legend=True,
+    )
 
 
 # ----- overlays -----
@@ -386,7 +504,7 @@ def overlay_zorder_grid():
 
 @case
 def overlay_theme_snapshot():
-    config.set_theme(THEME.PUBLICATION)
+    config.set_theme(THEME.INK)
     f1 = LineChart(data=LINE1, subtitle="pub")
     config.set_theme(THEME.DEFAULT)
     f2 = LineChart(data=LINE2, subtitle="def")
@@ -566,7 +684,9 @@ def main():
         for name in CASES:
             bp, cp = (os.path.join(d, name + ".png") for d in (base, outdir))
             if not (os.path.exists(bp) and os.path.exists(cp)):
-                changed.append((name, "missing file"))
+                (expected if name in EXPECTED_CHANGES else changed).append(
+                    (name, "missing file")
+                )
                 continue
             if sha(bp) == sha(cp):
                 same.append(name)

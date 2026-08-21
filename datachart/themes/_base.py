@@ -30,6 +30,9 @@ BASE_THEME: StyleAttrs = {
     ],
     "color_parallel_hue": COLORS.Tab10,
     "color_parallel_hue_continuous": ["#C6DBEF", "#6BAED6", "#2171B5", "#08306B"],
+    # muted style, applied to background-emphasis layers (ADR 0009)
+    "muted_color": "#CFCFCF",
+    "muted_alpha": 0.5,
     # general font style
     "font_general_family": "sans-serif",
     "font_general_sansserif": ["Helvetica", "Arial"],

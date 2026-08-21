@@ -76,30 +76,18 @@ class TestThemeDefaults(unittest.TestCase):
         self.assertGreater(labeled.axes[0].get_ylim()[1], plain.axes[0].get_ylim()[1])
 
     def test_heatmap_contrast_skips_light_colormaps(self):
-        """Light colormaps (e.g. BACKGROUND's) never flip value text to white."""
-        config.set_theme(THEME.BACKGROUND)
-        figure = Heatmap([[0.0, 1.0]], show_heatmap_values=True)
+        """Light colormaps never flip value text to white."""
+        figure = Heatmap(
+            [[0.0, 1.0]],
+            show_heatmap_values=True,
+            style={"plot_heatmap_cmap": ["#F7F7F7", "#B0B0B0"]},
+        )
         colors = {text.get_color() for text in figure.axes[0].texts}
         self.assertNotIn("#FFFFFF", colors)
 
-    def test_background_box_furniture_is_light(self):
-        """BACKGROUND's box whiskers, caps, and median stay light gray."""
-        from datachart.charts import BoxPlot
-
-        config.set_theme(THEME.BACKGROUND)
-        data = [{"label": "A", "value": float(v)} for v in [1, 2, 3, 4, 5, 6, 7, 20]]
-        figure = BoxPlot(data)
-        line_colors = {
-            line.get_color()
-            for line in figure.axes[0].lines
-            # outlier artists are marker-only lines; their line color never draws
-            if line.get_linestyle() != "None"
-        }
-        self.assertEqual(line_colors, {"#B0B0B0"})
-
-    def test_new_theme_constants_are_valid(self):
-        """The new THEME constants apply without warnings."""
-        for theme in [THEME.MINIMAL, THEME.MATERIAL, THEME.ACADEMIC]:
+    def test_theme_constants_are_valid(self):
+        """Every THEME constant applies without warnings."""
+        for theme in [THEME.MINIMAL, THEME.MATERIAL, THEME.INK, THEME.HATCH]:
             config.set_theme(theme)
             self.assertEqual(config.theme, theme)
 
@@ -111,7 +99,7 @@ class TestHatchCycle(unittest.TestCase):
 
     def test_hatch_cycle_assigns_per_series(self):
         """The theme's hatch cycle assigns one pattern per bar series."""
-        config.set_theme(THEME.ACADEMIC)
+        config.set_theme(THEME.HATCH)
         figure = BarChart([BAR, BAR2], show_values=False)
         hatches = [
             container.patches[0].get_hatch() for container in figure.axes[0].containers
@@ -120,7 +108,7 @@ class TestHatchCycle(unittest.TestCase):
 
     def test_explicit_hatch_style_wins(self):
         """An explicit per-chart hatch beats the cycle."""
-        config.set_theme(THEME.ACADEMIC)
+        config.set_theme(THEME.HATCH)
         figure = BarChart(
             [BAR, BAR2],
             style=[{"plot_bar_hatch": "xx"}, {"plot_bar_hatch": "oo"}],
