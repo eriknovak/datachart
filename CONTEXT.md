@@ -66,8 +66,10 @@ _Avoid_: pyplot figure, open figure
 
 **Show**:
 The explicit act of displaying an unmanaged figure, via its `show()` method —
-inline display in notebooks, a GUI window in scripts. Defining a figure and
-showing it are separate decisions; nothing shows implicitly.
+inline display in notebooks, a GUI window in scripts, and the only way a
+figure appears in either. Defining a figure and showing it are separate
+decisions; a figure left as a cell's last expression renders only its text
+repr.
 _Avoid_: plot (for the act), display (for the method name)
 
 ### Styling

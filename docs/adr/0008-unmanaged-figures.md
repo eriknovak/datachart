@@ -19,26 +19,29 @@ call is needed and the warning cannot occur.
 
 The trade-off is display: pyplot no longer auto-shows figures at notebook
 cell end, and `plt.show()` in scripts does not see them. Displaying becomes
-explicit — matplotlib's stock `Figure.show()` raises on unmanaged figures,
-so the subclass overrides it: in notebooks it displays the figure inline; in
-scripts it adopts the figure into a pyplot manager and opens the GUI window.
-Unmanaged figures also never trigger IPython's matplotlib integration (that
-only activates when a pyplot API runs in the kernel), so the subclass carries
-`_repr_png_` — inline display works with no pyplot call anywhere.
+explicit, and `show()` is the only way a figure appears — matplotlib's stock
+`Figure.show()` raises on unmanaged figures, so the subclass overrides it: in
+notebooks it displays the figure inline as a raw PNG payload (needing no
+pyplot call, repr hook, or IPython matplotlib integration — and therefore
+unable to display twice); in scripts it adopts the figure into a pyplot
+manager and opens the GUI window. The subclass deliberately carries no
+`_repr_png_`: a bare figure at cell end, or `display(figure)`, renders only
+a text repr, so which figures appear is always the author's explicit choice.
 
 ## Commitments
 
 - **No datachart seam creates a pyplot-managed figure.** All three creation
   sites construct the subclass directly; rendering N charts registers
   nothing in pyplot's figure manager (pinned by a regression test).
-- **Nothing shows implicitly.** Notebook display is by last expression,
-  `display(fig)`, or `fig.show()`; script display is `fig.show()` only.
+- **Nothing shows without `show()`.** In notebooks and scripts alike,
+  `fig.show()` is the single display affordance; bare expressions and
+  `display(fig)` render text, never the chart. Composition docs show only
+  the composed figure — source figures feeding a Panel/Grid are not shown.
 - **`plt.close(fig)` stays a harmless no-op** on datachart figures, so
   existing user cleanup code keeps working.
 - **The subclass is invisible surface.** It passes every
-  `isinstance(fig, plt.Figure)` check and adds only `show()` and the
-  `_repr_png_` display hook; composition fronts keep consuming the metadata
-  transport unchanged.
+  `isinstance(fig, plt.Figure)` check and adds only `show()`; composition
+  fronts keep consuming the metadata transport unchanged.
 - **Golden parity must hold** — the move changes lifecycle, not pixels.
 
 ## Considered options

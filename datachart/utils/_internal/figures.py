@@ -25,19 +25,13 @@ class DatachartFigure(Figure):
     window in scripts.
     """
 
-    def _repr_png_(self):
-        # unmanaged figures never activate IPython's matplotlib integration,
-        # so inline display needs the figure to speak the repr protocol itself
-        buffer = io.BytesIO()
-        self.savefig(buffer, format="png", bbox_inches="tight")
-        return buffer.getvalue()
-
     def show(self, warn=True):
         """Display the figure.
 
-        In notebooks the figure is displayed inline. Elsewhere it is adopted
-        into pyplot's figure manager and shown via `plt.show()`, so a GUI
-        window opens where a backend supports one.
+        Showing is the only way a figure appears: in notebooks the figure is
+        displayed inline as a PNG payload; elsewhere it is adopted into
+        pyplot's figure manager and shown via `plt.show()`, so a GUI window
+        opens where a backend supports one.
 
         Args:
             warn: If True, warn when the backend cannot open a window.
@@ -46,7 +40,14 @@ class DatachartFigure(Figure):
         if any(key in backend for key in _NOTEBOOK_BACKENDS):
             from IPython.display import display
 
-            display(self)
+            # a raw payload needs no repr hook, pyplot, or IPython
+            # matplotlib integration — and therefore cannot display twice
+            buffer = io.BytesIO()
+            self.savefig(buffer, format="png", bbox_inches="tight")
+            display(
+                {"image/png": buffer.getvalue(), "text/plain": repr(self)},
+                raw=True,
+            )
             return
 
         import matplotlib.pyplot as plt

@@ -58,10 +58,12 @@ class TestUnmanagedFigures:
         figure = _line_fig()
         assert isinstance(figure, plt.Figure)
 
-    def test_figures_display_inline_via_repr_png(self):
-        """The repr hook yields PNG bytes for inline display."""
-        png = _line_fig()._repr_png_()
-        assert png.startswith(b"\x89PNG")
+    def test_figures_carry_no_repr_display_hooks(self):
+        """A bare figure at cell end renders as text; only show() displays."""
+        figure = _line_fig()
+        assert not hasattr(figure, "_repr_png_")
+        # matplotlib's stock hook renders only on web backends
+        assert figure._repr_html_() is None
 
     def test_plt_close_is_a_noop_on_unmanaged_figures(self):
         """plt.close on an unmanaged figure does nothing and raises nothing."""
@@ -78,6 +80,30 @@ class TestShow:
 
     def teardown_method(self):
         plt.close("all")
+
+    def test_show_displays_inline_once_on_notebook_backends(self, monkeypatch):
+        """On a notebook backend show() emits exactly one raw PNG payload."""
+        import IPython.display
+
+        import datachart.utils._internal.figures as figures_module
+
+        calls = []
+        monkeypatch.setattr(
+            figures_module.matplotlib,
+            "get_backend",
+            lambda: "module://matplotlib_inline.backend_inline",
+        )
+        monkeypatch.setattr(
+            IPython.display,
+            "display",
+            lambda data, raw=False: calls.append((data, raw)),
+        )
+        _line_fig().show()
+        assert len(calls) == 1
+        data, raw = calls[0]
+        assert raw is True
+        assert data["image/png"].startswith(b"\x89PNG")
+        assert plt.get_fignums() == []
 
     def test_show_adopts_figure_into_pyplot(self):
         """show() registers the figure with pyplot's manager."""
