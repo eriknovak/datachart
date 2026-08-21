@@ -10,7 +10,7 @@ from ..typings import (
     VLinePlotAttrs,
     HLinePlotAttrs,
 )
-from ..constants import FIG_SIZE, SHOW_GRID, SCALE
+from ..constants import EMPHASIS, FIG_SIZE, SHOW_GRID, SCALE
 
 # ================================================
 # Main Chart Definition
@@ -24,7 +24,7 @@ def ScatterChart(
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
-    emphasis: Optional[Union[str, List[Optional[str]]]] = None,
+    emphasis: Optional[Union[EMPHASIS, str, List[Optional[str]]]] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     xmin: Optional[Union[int, float]] = None,
     xmax: Optional[Union[int, float]] = None,

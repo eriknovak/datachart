@@ -54,7 +54,7 @@ from .config_helpers import (
     configure_axis_limits,
 )
 from ..stats import minimum, maximum
-from ...constants import ASPECT_RATIO, ORIENTATION, VALFMT
+from ...constants import ASPECT_RATIO, EMPHASIS, ORIENTATION, VALFMT
 from ...config import config
 
 DEFAULT_NUM_BINS = 20
@@ -64,8 +64,8 @@ DEFAULT_CI_LEVEL = 0.95
 DEFAULT_SIZE_RANGE = (20, 200)
 DEFAULT_BAR_VALUE_FORMAT = "%g"
 # emphasis roles (ADR 0009): background mutes, highlight bolds, None is today
-EMPHASIS_BACKGROUND = "background"
-EMPHASIS_HIGHLIGHT = "highlight"
+EMPHASIS_BACKGROUND = EMPHASIS.BACKGROUND
+EMPHASIS_HIGHLIGHT = EMPHASIS.HIGHLIGHT
 # offsets keep emphasized layers among the data layers, below panel furniture
 EMPHASIS_Z_OFFSET = {EMPHASIS_BACKGROUND: -0.5, EMPHASIS_HIGHLIGHT: 0.5}
 MUTED_WIDTH_SCALE = 0.75
@@ -274,9 +274,13 @@ class Layer:
         return merged
 
     def _apply_emphasis(
-        self, style: dict, role: Optional[str], width_key: str = "linewidth"
+        self,
+        style: dict,
+        role: Optional[str],
+        width_key: str = "linewidth",
+        color_key: Optional[str] = "color",
     ) -> None:
-        """Apply an emphasis role's stroke/alpha/z transform to a style dict."""
+        """Apply an emphasis role's color/stroke/alpha/z transform to a style dict."""
 
         if role is None:
             return
@@ -284,6 +288,8 @@ class Layer:
         width = style.get(width_key)
         if role == EMPHASIS_BACKGROUND:
             style["alpha"] = self.muted_alpha
+            if color_key is not None:
+                style[color_key] = self.muted_color
             if width is not None:
                 style[width_key] = width * MUTED_WIDTH_SCALE
         elif width is not None:
@@ -331,8 +337,6 @@ class LineLayer(Layer):
         if ctx.z_order is not None:
             line_style["zorder"] = ctx.z_order
         self._apply_emphasis(line_style, ctx.emphasis)
-        if ctx.emphasis == EMPHASIS_BACKGROUND:
-            line_style["color"] = self.muted_color
 
         draw_yerr = (
             self.show_yerr and isinstance(yerr, np.ndarray) and len(yerr) == len(y)
@@ -406,8 +410,6 @@ class BarLayer(Layer):
         if ctx.hatch is not None and "hatch" not in bar_style:
             bar_style["hatch"] = ctx.hatch or None
         self._apply_emphasis(bar_style, ctx.emphasis)
-        if ctx.emphasis == EMPHASIS_BACKGROUND:
-            bar_style["color"] = self.muted_color
 
         slot = ctx.bar_slot
         x_offset = 0.0
@@ -474,8 +476,6 @@ class HistogramLayer(Layer):
         if ctx.hatch is not None and "hatch" not in hist_style:
             hist_style["hatch"] = ctx.hatch or None
         self._apply_emphasis(hist_style, ctx.emphasis)
-        if ctx.emphasis == EMPHASIS_BACKGROUND:
-            hist_style["color"] = self.muted_color
 
         bins = ctx.bins if ctx.bins is not None else self.num_bins
         ax.hist(
@@ -593,7 +593,9 @@ class ScatterLayer(Layer):
         scatter_style = dict(self.scatter_style)
         if ctx.z_order is not None:
             scatter_style["zorder"] = ctx.z_order
-        self._apply_emphasis(scatter_style, ctx.emphasis, width_key="linewidths")
+        self._apply_emphasis(
+            scatter_style, ctx.emphasis, width_key="linewidths", color_key=None
+        )
         if ctx.emphasis == EMPHASIS_HIGHLIGHT:
             scatter_style["edgecolors"] = self.highlight_edge_color
 
@@ -977,9 +979,8 @@ class ParallelCoordsLayer(Layer):
             warnings.warn("No data points found for parallel coordinates plot.")
             return
 
+        # the panel always supplies the shared stats (single drawing path)
         stats = ctx.parallel_stats
-        if stats is None:
-            stats = compute_parallel_stats([self])
 
         dimensions = stats["dimensions"]
         x_positions = np.arange(len(dimensions))
@@ -998,8 +999,6 @@ class ParallelCoordsLayer(Layer):
             if style.get("color") is None:
                 style["color"] = line_color
             self._apply_emphasis(style, role)
-            if role == EMPHASIS_BACKGROUND:
-                style["color"] = self.muted_color
             ax.plot(x_positions, y_vals, **style)
 
         if ctx.parallel_axes:
@@ -1621,8 +1620,7 @@ class Panel:
                     group.palette, max(pooled_colors[key], 1)
                 )
 
-        # shared parallel normalization: a cross-layer concern the panel owns;
-        # the last parallel layer draws the axis furniture, once, over the rows
+        # panel-owned parallel normalization (ADR 0009); furniture draws once
         parallel_layers = [l for l in self.layers if isinstance(l, ParallelCoordsLayer)]
         parallel_stats = compute_parallel_stats(parallel_layers)
         parallel_axes_owner = parallel_layers[-1] if parallel_layers else None
@@ -1638,8 +1636,7 @@ class Panel:
                 bins = group.hist_bins()
 
             group_hists = [l for l in group.layers if isinstance(l, HistogramLayer)]
-            # stacking a muted background is meaningless: emphasized groups
-            # draw their histograms as individual overlaid calls instead
+            # stacking a muted background is meaningless: draw individually
             stack_hists = (
                 hist_mode == "stack"
                 and len(group_hists) > 0
@@ -1724,8 +1721,7 @@ class Panel:
         if len(hist_layers) == 1:
             patch_sets = [patch_sets]
 
-        # the single stacked call shares the first layer's alpha; restore each
-        # layer's own resolved alpha on its patches
+        # the stacked call shares one alpha; restore each layer's own
         first_alpha = first.hist_style.get("alpha")
         for layer, patches in zip(hist_layers, patch_sets):
             alpha = layer.hist_style.get("alpha")

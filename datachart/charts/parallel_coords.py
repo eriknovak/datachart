@@ -8,7 +8,7 @@ from ..typings import (
     ParallelCoordsDataPointAttrs,
     ParallelCoordsStyleAttrs,
 )
-from ..constants import FIG_SIZE, SHOW_GRID
+from ..constants import EMPHASIS, FIG_SIZE, SHOW_GRID
 
 # ================================================
 # Main Chart Definition
@@ -24,7 +24,7 @@ def ParallelCoords(
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
-    emphasis: Optional[Union[str, List[Optional[str]]]] = None,
+    emphasis: Optional[Union[EMPHASIS, str, List[Optional[str]]]] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     show_legend: Optional[bool] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,

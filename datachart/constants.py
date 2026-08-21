@@ -20,6 +20,7 @@ Classes:
     ORIENTATION:        The supported orientations.
     VALFMT:             The predefined value formats.
     THEME:              The predefined themes.
+    EMPHASIS:           The supported emphasis roles.
     SHOW_GRID:          The supported show grid options.
     SCALE:              The supported scale options.
     ASPECT_RATIO:       The supported aspect ratio options.
@@ -633,6 +634,27 @@ class THEME:
     HATCH = "hatch"
     MINIMAL = "minimal"
     MATERIAL = "material"
+
+
+class EMPHASIS:
+    """The supported emphasis roles (ADR 0009).
+
+    Examples:
+        >>> from datachart.constants import EMPHASIS
+        >>> EMPHASIS.BACKGROUND
+        "background"
+
+    Attributes:
+        BACKGROUND (str): Mute a series into context: theme muted color, lowered
+            alpha, thinner strokes, behind the others, no legend entry.
+            Equals to `"background"`.
+        HIGHLIGHT (str): Bold a series and bring it to the front of the data
+            layers; it keeps its color and legend entry. Equals to `"highlight"`.
+
+    """
+
+    BACKGROUND = "background"
+    HIGHLIGHT = "highlight"
 
 
 class SHOW_GRID:

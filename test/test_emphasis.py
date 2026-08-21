@@ -47,6 +47,12 @@ class TestThemeRenames(unittest.TestCase):
         for name in ("PUBLICATION", "ACADEMIC", "BACKGROUND"):
             self.assertFalse(hasattr(THEME, name))
 
+    def test_emphasis_constants(self):
+        from datachart.constants import EMPHASIS
+
+        self.assertEqual(EMPHASIS.BACKGROUND, "background")
+        self.assertEqual(EMPHASIS.HIGHLIGHT, "highlight")
+
     def test_new_themes_apply(self):
         for theme in (THEME.INK, THEME.HATCH):
             config.set_theme(theme)
