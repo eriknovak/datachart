@@ -163,3 +163,6 @@ cython_debug/
 
 # figures written by the save_figure examples in the docs notebooks
 fig_*.png
+
+.claude/worktrees/
+.claude/devflow/
