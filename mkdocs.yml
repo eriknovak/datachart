@@ -55,6 +55,16 @@ plugins:
   - search:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   - mkdocs-jupyter
+  # redirects must come after mkdocs-jupyter so notebook pages are registered
+  - redirects:
+      # keys are .md stand-ins for the renamed notebooks' old URLs
+      redirect_maps:
+        how-to-guides/utility/overlay.md: how-to-guides/utility/panel.ipynb
+        how-to-guides/config.md: how-to-guides/styling/config.ipynb
+        how-to-guides/themes.md: how-to-guides/styling/themes.ipynb
+        how-to-guides/theme-gallery.md: how-to-guides/styling/theme-gallery.ipynb
+        how-to-guides/highlighting.md: how-to-guides/styling/highlighting.ipynb
+        how-to-guides/colormaps.md: how-to-guides/styling/colormaps.ipynb
   - mkdocstrings:
       handlers:
         python:
@@ -104,16 +114,18 @@ nav:
       - Line Chart: how-to-guides/charts/linechart.ipynb
       - Parallel Coordinates: how-to-guides/charts/parallelcoords.ipynb
       - Scatter Chart: how-to-guides/charts/scatterchart.ipynb
-    - Utility:
+    - Composition & Utilities:
       - how-to-guides/utility/index.md
+      - Panel: how-to-guides/utility/panel.ipynb
       - Grid: how-to-guides/utility/grid.ipynb
-      - Panel (Overlay): how-to-guides/utility/overlay.ipynb
       - Statistics: how-to-guides/utility/stats.ipynb
-    - Config: how-to-guides/config.ipynb
-    - Themes: how-to-guides/themes.ipynb
-    - Theme Gallery: how-to-guides/theme-gallery.ipynb
-    - Highlighting: how-to-guides/highlighting.ipynb
-    - Colormaps: how-to-guides/colormaps.ipynb
+    - Styling:
+      - how-to-guides/styling/index.md
+      - Config: how-to-guides/styling/config.ipynb
+      - Themes: how-to-guides/styling/themes.ipynb
+      - Theme Gallery: how-to-guides/styling/theme-gallery.ipynb
+      - Highlighting: how-to-guides/styling/highlighting.ipynb
+      - Colormaps: how-to-guides/styling/colormaps.ipynb
 
 
   - API Reference:

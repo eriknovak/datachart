@@ -4,13 +4,10 @@ title: How-to Guides
 
 # How-to Guides
 
-The how-to guides showcases how to utilize the `datachart` package to create charts, reflecting the data and the message the user wants to send with it, how to leverage the existing utility module to prepare the data, and how to create a custom theme and configure the package to reflect it.
+The how-to guides showcase how to utilize the `datachart` package: creating charts that reflect the data and the message the user wants to send, composing multiple charts into panels and grids, and styling everything through themes and the global configuration.
 
-| Section                      | Description                                                                          |
-| :--------------------------- | :----------------------------------------------------------------------------------- |
-| [charts](charts/index.md)    | Showcases the creation and customization of charts available in the `charts` module. |
-| [utility](utility/index.md)  | Showcases the available methods in the `utils` module.                               |
-| [config](config.ipynb)       | Showcases the use of the `config` module to customize the global style.              |
-| [themes](themes.ipynb)       | How to apply the predefined themes and create your own.                              |
-| [theme gallery](theme-gallery.ipynb) | Showcases the themes across basic charts and research-style figures.         |
-| [colormaps](colormaps.ipynb) | Showcases the existing colormaps available via the `COLORS` constant.                |
+| Section                                          | Description                                                                            |
+| :----------------------------------------------- | :------------------------------------------------------------------------------------- |
+| [charts](charts/index.md)                        | Showcases the creation and customization of charts available in the `charts` module.   |
+| [composition & utilities](utility/index.md)      | Composing figures with `Panel` and `Grid`, plus the statistics and saving utilities.   |
+| [styling](styling/index.md)                      | Configuring the global style, applying and creating themes, emphasis, and colormaps.   |
