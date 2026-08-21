@@ -15,6 +15,12 @@
     font-size: smaller;
 }
 
+/* restore Material's negative margin that mkdocs-jupyter resets, so
+   tables in notebooks align flush with the text like on .md pages */
+.jupyter-wrapper .md-typeset__scrollwrap {
+    margin: 0 -0.8rem !important;
+}
+
 .jupyter-wrapper .jp-InputArea-editor {
     border: 0px !important;
 }
