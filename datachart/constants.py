@@ -577,8 +577,8 @@ class NORMALIZE:
     """The supported normalization options.
 
     Passed as the heatmap's `norm` attribute: normalizes the cell values
-    before they are mapped to colors. Distinct from `SCALE`, which sets an
-    axis scale.
+    before they are mapped to colors. Distinct from
+    [`SCALE`][datachart.constants.SCALE], which sets an axis scale.
 
     Examples:
         >>> from datachart.constants import NORMALIZE
@@ -662,7 +662,8 @@ class VALUE_FORMAT:
 class THEME:
     """The predefined themes.
 
-    Applied with `config.set_theme`. Every theme applied to the same set of
+    Applied with [`config.set_theme`][datachart.config.Config.set_theme].
+    Every theme applied to the same set of
     charts is shown in the
     [Theme Gallery](../../how-to-guides/theme-gallery/).
 
@@ -693,7 +694,7 @@ class EMPHASIS:
     """The supported emphasis roles.
 
     Set per chart via the `emphasis` key in a charts list, or per figure via
-    the `emphasis` argument of `Panel`.
+    the `emphasis` argument of [`Panel`][datachart.utils.Panel].
 
     Examples:
         >>> from datachart.constants import EMPHASIS
@@ -741,7 +742,8 @@ class SCALE:
     """The supported scale options.
 
     Passed as the `scalex`/`scaley` chart settings to set an axis scale.
-    Distinct from `NORMALIZE`, which normalizes heatmap colors.
+    Distinct from [`NORMALIZE`][datachart.constants.NORMALIZE], which
+    normalizes heatmap colors.
 
     Examples:
         >>> from datachart.constants import SCALE
