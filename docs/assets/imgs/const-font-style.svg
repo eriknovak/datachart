@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="410.816125pt" height="97.56pt" viewBox="0 0 410.816125 97.56" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="518.4pt" height="87.12pt" viewBox="0 0 518.4 87.12" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-08-21T21:18:32.916536</dc:date>
+    <dc:date>2026-08-21T21:27:07.889676</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -21,17 +21,17 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 97.56 
-L 410.816125 97.56 
-L 410.816125 -0 
-L 0 -0 
+   <path d="M 0 87.12 
+L 518.4 87.12 
+L 518.4 0 
+L 0 0 
 z
 " style="fill: #ffffff"/>
   </g>
   <g id="axes_1">
    <g id="text_1">
     <!-- FONT_STYLE.NORMAL -->
-    <g transform="translate(7.2 23.657656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 21.917656) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSansMono-29" d="M 728 4666 
 L 3475 4666 
@@ -254,7 +254,7 @@ z
    </g>
    <g id="text_2">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(155.628 23.917852) scale(0.11 -0.11)">
+    <g transform="translate(188.64 22.177852) scale(0.11 -0.11)">
      <defs>
       <path id="DejaVuSans-37" d="M -19 4666 
 L 3928 4666 
@@ -858,7 +858,7 @@ z
    </g>
    <g id="text_3">
     <!-- FONT_STYLE.ITALIC -->
-    <g transform="translate(7.2 51.377656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 46.157656) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSansMono-2c" d="M 628 4666 
 L 3219 4666 
@@ -918,7 +918,7 @@ z
    </g>
    <g id="text_4">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(155.628 51.637852) scale(0.11 -0.11)">
+    <g transform="translate(188.64 46.417852) scale(0.11 -0.11)">
      <defs>
       <path id="DejaVuSans-Oblique-37" d="M 378 4666 
 L 4325 4666 
@@ -1590,7 +1590,7 @@ z
    </g>
    <g id="text_5">
     <!-- FONT_STYLE.OBLIQUE -->
-    <g transform="translate(7.2 79.097656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 70.397656) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSansMono-25" d="M 1153 2228 
 L 1153 519 
@@ -1698,7 +1698,7 @@ z
    </g>
    <g id="text_6">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(155.628 79.357852) scale(0.11 -0.11)">
+    <g transform="translate(188.64 70.657852) scale(0.11 -0.11)">
      <use xlink:href="#DejaVuSans-Oblique-37"/>
      <use xlink:href="#DejaVuSans-Oblique-4b" transform="translate(61.078125 0)"/>
      <use xlink:href="#DejaVuSans-Oblique-48" transform="translate(124.453125 0)"/>

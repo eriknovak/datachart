@@ -46,18 +46,16 @@ def save(fig, name):
     print(f"wrote {IMGS / name}")
 
 
-def text_rows(rows, name, sample_kw, sample_family=None):
-    """One row per member: constant name on the left, styled sample text right.
-
-    Saves when a name is given; otherwise returns the figure for annotation.
-    """
-    fig, ax = plt.subplots(figsize=(7, 0.4 * len(rows) + 0.3))
+def text_rows(rows, name, sample_kw, sample_family=None, footnote=None):
+    """One row per member: constant name on the left, styled sample text right."""
+    fig, ax = plt.subplots(figsize=(7, 0.32 * len(rows) + (0.3 if footnote else 0.05)))
+    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
     family = sample_family or plt.rcParams["font.family"]
     for i, (label, value) in enumerate(rows):
         y = 1 - (i + 0.5) / len(rows)
         ax.text(0.0, y, label, va="center", fontsize=10, color=INK, family="monospace")
         ax.text(
-            0.38,
+            0.36,
             y,
             SAMPLE,
             va="center",
@@ -66,11 +64,16 @@ def text_rows(rows, name, sample_kw, sample_family=None):
             family=family,
             **{sample_kw: value},
         )
+    if footnote:
+        pad = 0.8 / len(rows)
+        ax.text(
+            0.0, -pad, footnote, va="center", fontsize=8.5, color=INK, style="italic"
+        )
+        ax.set_ylim(-2 * pad / 1.6, 1)
+    else:
+        ax.set_ylim(0, 1)
     ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
     ax.axis("off")
-    if name is None:
-        return fig
     save(fig, name)
 
 
@@ -96,21 +99,13 @@ def font_weight():
         ("FONT_WEIGHT.BLACK", FONT_WEIGHT.BLACK),
     ]
     # a family with many weight cuts; DejaVu would collapse them to two
-    fig = text_rows(
+    text_rows(
         rows,
-        None,
+        "const-font-weight.svg",
         "fontweight",
         sample_family=["Avenir Next", "Helvetica Neue", "DejaVu Sans"],
+        footnote="The visible steps depend on the weights the active font family provides.",
     )
-    fig.text(
-        0.0,
-        -0.04,
-        "The visible steps depend on the weights the active font family provides.",
-        fontsize=8.5,
-        color=INK,
-        style="italic",
-    )
-    save(fig, "const-font-weight.svg")
 
 
 def line_marker():
