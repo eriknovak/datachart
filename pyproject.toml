@@ -36,6 +36,8 @@ dev = [
     "python-githooks",
     "mkdocs-material",
     "mkdocs-jupyter",
+    # <1.2.3: 1.2.3 pulls in the properdocs fork of mkdocs and a build-time banner
+    "mkdocs-redirects<1.2.3",
     "mkdocstrings[python]",
 ]
 test = [

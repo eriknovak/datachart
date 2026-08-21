@@ -16,12 +16,6 @@ Methods:
         Overlays rendered chart figures on a single plot with optional dual y-axes.
     Grid(charts, title, max_cols, figsize, sharex, sharey):
         Arranges rendered chart figures in a grid; nested rows define the layout.
-    OverlayChart(charts, ...):
-        (Deprecated) Use Panel instead.
-    FigureGridLayout(charts, title, max_cols, figsize, sharex, sharey):
-        (Deprecated) Use Grid instead.
-    figure_grid_layout(figures, title, max_cols, figsize, sharex, sharey):
-        (Deprecated) Use Grid instead.
 
 """
 

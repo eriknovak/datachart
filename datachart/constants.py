@@ -446,7 +446,7 @@ class COLORS:
     Accepted anywhere a palette is: the `color_general_singular` and
     `color_general_multiple` config attributes, and the heatmap and parallel
     coords color settings. All predefined palettes are rendered in the
-    [Colormaps guide](../../how-to-guides/colormaps/).
+    [Colormaps guide](../../how-to-guides/styling/colormaps/).
 
     Examples:
         >>> from datachart.constants import COLORS
@@ -665,7 +665,7 @@ class THEME:
     Applied with [`config.set_theme`][datachart.config.Config.set_theme].
     Every theme applied to the same set of
     charts is shown in the
-    [Theme Gallery](../../how-to-guides/theme-gallery/).
+    [Theme Gallery](../../how-to-guides/styling/theme-gallery/).
 
     Examples:
         >>> from datachart.constants import THEME

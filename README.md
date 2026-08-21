@@ -27,7 +27,13 @@
 
 ---
 
-The datachart package is a python package for creating data visualizations. It is designed to be simple to use and highly customizable, i.e. it is easy to change the look and feel of the charts.
+The datachart package is a python package for creating data visualizations, built on top of [matplotlib](https://matplotlib.org/). It is designed to be simple to use and highly customizable, i.e. it is easy to change the look and feel of the charts.
+
+**Features:**
+
+- **Charts.** Bar charts, line charts, scatter charts, histograms, heatmaps, box plots, and parallel coordinates — each created with a single function call from plain lists of dicts.
+- **Composition.** Combine rendered charts with `Panel` (overlay charts on a single plot, with optional dual y-axes) and `Grid` (arrange charts in a grid; grids nest).
+- **Themes & configuration.** Six predefined themes, each named for its visual trait, plus a global `config` for tweaking any style attribute — per-chart `style` overrides included.
 
 ## Requirements
 Before starting the project make sure these requirements are available:
@@ -46,9 +52,35 @@ pip install datachart
 pip install datachart --upgrade
 ```
 
-## Examples
+## Example
 
-The examples showcases on how to use the `datachart` package are available
+Set a theme once and every chart follows it. The example below uses the `INK` theme:
+
+```python
+from datachart.charts import LineChart
+from datachart.config import config
+from datachart.constants import THEME
+
+config.set_theme(THEME.INK)
+
+figure = LineChart(
+    [
+        [{"x": x, "y": y} for x, y in enumerate([40, 45, 43, 50, 56, 54, 61])],
+        [{"x": x, "y": y} for x, y in enumerate([38, 40, 44, 43, 48, 52, 55])],
+    ],
+    title="Line",
+    subtitle=["Run 1", "Run 2"],
+    show_legend=True,
+)
+```
+
+The same theme, across chart types and composed with `Grid`:
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/eriknovak/datachart/main/docs/assets/imgs/example-ink.png" alt="INK theme example charts" width="720" />
+</p>
+
+More examples on how to use the `datachart` package are available
 on the official [How-to Guides](https://eriknovak.github.io/datachart/how-to-guides/).
 
 ## Acknowledgements

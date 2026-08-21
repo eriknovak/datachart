@@ -17,9 +17,3 @@ title: Utils Module
 ::: datachart.utils.Panel
 
 ::: datachart.utils.Grid
-
-## Deprecated
-
-::: datachart.utils.FigureGridLayout
-
-::: datachart.utils.figure_grid_layout
