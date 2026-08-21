@@ -106,7 +106,7 @@ class FIG_SIZE:
 class FIG_FORMAT:
     """The supported figure formats.
 
-    Passed as the `format` argument of `save_figure`.
+    Passed as the `format` argument of [`save_figure`][datachart.utils.save_figure].
 
     Examples:
         >>> from datachart.constants import FIG_FORMAT
