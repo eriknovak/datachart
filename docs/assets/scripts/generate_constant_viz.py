@@ -46,17 +46,25 @@ def save(fig, name):
     print(f"wrote {IMGS / name}")
 
 
-def text_rows(rows, name, sample_kw):
+def text_rows(rows, name, sample_kw, sample_family=None):
     """One row per member: constant name on the left, styled sample text right.
 
     Saves when a name is given; otherwise returns the figure for annotation.
     """
     fig, ax = plt.subplots(figsize=(7, 0.4 * len(rows) + 0.3))
+    family = sample_family or plt.rcParams["font.family"]
     for i, (label, value) in enumerate(rows):
         y = 1 - (i + 0.5) / len(rows)
         ax.text(0.0, y, label, va="center", fontsize=10, color=INK, family="monospace")
         ax.text(
-            0.38, y, SAMPLE, va="center", fontsize=11, color=INK, **{sample_kw: value}
+            0.38,
+            y,
+            SAMPLE,
+            va="center",
+            fontsize=11,
+            color=INK,
+            family=family,
+            **{sample_kw: value},
         )
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
@@ -87,11 +95,17 @@ def font_weight():
         ("FONT_WEIGHT.HEAVY", FONT_WEIGHT.HEAVY),
         ("FONT_WEIGHT.BLACK", FONT_WEIGHT.BLACK),
     ]
-    fig = text_rows(rows, None, "fontweight")
+    # a family with many weight cuts; DejaVu would collapse them to two
+    fig = text_rows(
+        rows,
+        None,
+        "fontweight",
+        sample_family=["Avenir Next", "Helvetica Neue", "DejaVu Sans"],
+    )
     fig.text(
         0.0,
         -0.04,
-        "Rendered weight depends on the font family; the default provides regular and bold only.",
+        "The visible steps depend on the weights the active font family provides.",
         fontsize=8.5,
         color=INK,
         style="italic",
@@ -172,12 +186,12 @@ def line_draw_style():
         ("STEPS_POST", LINE_DRAW_STYLE.STEPS_POST),
     ]
     x, y = [0, 1, 2, 3], [1, 3, 2, 4]
-    fig, axs = plt.subplots(1, 4, figsize=(7, 1.9), sharey=True)
-    for ax, (label, value) in zip(axs, members):
+    fig, axs = plt.subplots(2, 2, figsize=(7, 4.6), sharex=True, sharey=True)
+    for ax, (label, value) in zip(axs.flat, members):
         ax.plot(x, y, drawstyle=value, color=DARK, lw=1.8)
         ax.plot(x, y, linestyle="", marker="o", markersize=4, color=MID)
         ax.set_title(
-            f"LINE_DRAW_STYLE.\n{label}", fontsize=8, color=INK, family="monospace"
+            f"LINE_DRAW_STYLE.{label}", fontsize=9, color=INK, family="monospace"
         )
         ax.set_xticks([])
         ax.set_yticks([])
@@ -236,7 +250,7 @@ def legend_align():
         ("CENTER", LEGEND_ALIGN.CENTER),
         ("RIGHT", LEGEND_ALIGN.RIGHT),
     ]
-    fig, axs = plt.subplots(1, 3, figsize=(7, 1.7))
+    fig, axs = plt.subplots(1, 3, figsize=(7, 1.05))
     for ax, (label, value) in zip(axs, members):
         handles = [
             plt.Line2D([], [], color=DARK, lw=2, label="alpha"),
@@ -364,9 +378,9 @@ def colorbar_location():
         ("BOTTOM", COLORBAR_LOCATION.BOTTOM),
     ]
     data = np.linspace(0, 1, 16).reshape(4, 4)
-    fig = plt.figure(figsize=(7, 2.6), layout="constrained")
+    fig = plt.figure(figsize=(7, 6.2), layout="constrained")
     # subfigures keep each title above its own colorbar, whatever its location
-    for subfig, (label, value) in zip(fig.subfigures(1, 4), members):
+    for subfig, (label, value) in zip(fig.subfigures(2, 2).flat, members):
         ax = subfig.subplots()
         image = ax.imshow(data, cmap="Blues")
         subfig.colorbar(image, ax=ax, location=value, fraction=0.15, pad=0.06)
