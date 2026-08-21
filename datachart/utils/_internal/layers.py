@@ -1,4 +1,4 @@
-"""The single drawing seam: Layer, LayerGroup, Panel, DrawContext (ADR 0001).
+"""The single drawing seam: Layer, LayerGroup, Panel, DrawContext.
 
 A Layer is one drawable unit that puts its marks on a matplotlib Axes. Its style
 is resolved from the global config when the layer is built — never at draw time.

@@ -1,4 +1,4 @@
-"""Unmanaged figure construction (ADR 0008).
+"""Unmanaged figure construction.
 
 Figures are created directly — never through pyplot — so they are owned by the
 caller and garbage-collected like any object instead of accumulating in

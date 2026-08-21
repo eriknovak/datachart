@@ -30,7 +30,7 @@ from ._internal.figures import new_figure
 
 
 def _cell_content(figure: plt.Figure, idx: int) -> Dict[str, Any]:
-    """Build one transport cell's content from a figure's metadata (ADR 0006).
+    """Build one transport cell's content from a figure's metadata.
 
     Returns one of: `{"grid": node}` for a nested grid figure, `{"panels", "shape"}`
     for a multi-subplot figure, or `{"panel": Panel}` for everything else.
@@ -92,12 +92,12 @@ def _render_cell(owner: plt.Figure, cell: Dict[str, Any], target_ax: plt.Axes) -
 def _render_grid_node(
     owner: plt.Figure, node: Dict[str, Any], subplot_spec: SubplotSpec
 ) -> None:
-    """Rebuild a nested grid inside one parent cell (ADR 0006).
+    """Rebuild a nested grid inside one parent cell.
 
     The node is the nested grid figure's own metadata: its cell tree, layout
     shape, title, and sharex/sharey. The subgrid nests in the owner figure's
     gridspec so one constrained-layout pass aligns its axes envelope with
-    sibling cells (ADR 0007). A title reserves a thin heading row rendered in
+    sibling cells. A title reserves a thin heading row rendered in
     the subtitle style — a section heading, not the figure's title; sharing
     stays local to the node, anchored on its first shareable axes.
     """

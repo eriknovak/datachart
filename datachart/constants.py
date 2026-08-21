@@ -30,7 +30,7 @@ Classes:
 
 
 class FIG_SIZE:
-    """The predefined figure sizes (ADR 0010).
+    """The predefined figure sizes.
 
     All values are `(width, height)` in inches, matplotlib's `figsize` unit.
     Paper figures are anchored to the printable area of an A4 page with
@@ -631,7 +631,7 @@ class THEME:
 
 
 class EMPHASIS:
-    """The supported emphasis roles (ADR 0009).
+    """The supported emphasis roles.
 
     Examples:
         >>> from datachart.constants import EMPHASIS
