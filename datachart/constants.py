@@ -620,21 +620,19 @@ class THEME:
     Attributes:
         DEFAULT (str): The default theme. Equals to `"default"`.
         GREYSCALE (str): The greyscale theme. Equals to `"greyscale"`.
-        PUBLICATION (str): The publication theme. Equals to `"publication"`.
-        BACKGROUND (str): The background theme (light gray for de-emphasized elements). Equals to `"background"`.
+        INK (str): The ink theme (dark-ink accents, print-ready). Equals to `"ink"`.
+        HATCH (str): The hatch theme (hatch cycle, value labels, dotted grid). Equals to `"hatch"`.
         MINIMAL (str): The minimal theme (accent blue, no spines, flat bars). Equals to `"minimal"`.
         MATERIAL (str): The material theme (Google palette, light grid). Equals to `"material"`.
-        ACADEMIC (str): The academic theme (serif fonts, hatch cycle). Equals to `"academic"`.
 
     """
 
     DEFAULT = "default"
     GREYSCALE = "greyscale"
-    PUBLICATION = "publication"
-    BACKGROUND = "background"
+    INK = "ink"
+    HATCH = "hatch"
     MINIMAL = "minimal"
     MATERIAL = "material"
-    ACADEMIC = "academic"
 
 
 class SHOW_GRID:

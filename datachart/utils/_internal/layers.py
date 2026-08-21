@@ -63,6 +63,17 @@ DEFAULT_VALFMT = VALFMT.DEFAULT
 DEFAULT_CI_LEVEL = 0.95
 DEFAULT_SIZE_RANGE = (20, 200)
 DEFAULT_BAR_VALUE_FORMAT = "%g"
+# emphasis roles (ADR 0009): background mutes, highlight bolds, None is today
+EMPHASIS_BACKGROUND = "background"
+EMPHASIS_HIGHLIGHT = "highlight"
+# offsets keep emphasized layers among the data layers, below panel furniture
+EMPHASIS_Z_OFFSET = {EMPHASIS_BACKGROUND: -0.5, EMPHASIS_HIGHLIGHT: 0.5}
+MUTED_WIDTH_SCALE = 0.75
+HIGHLIGHT_WIDTH_SCALE = 2.0
+DEFAULT_MUTED_COLOR = "#CFCFCF"
+DEFAULT_MUTED_ALPHA = 0.5
+# matplotlib skips underscore-prefixed labels when assembling the legend
+NO_LEGEND = "_nolegend_"
 # fraction of the value-axis span added so bar value labels stay inside
 VALUE_HEADROOM_VERTICAL = 0.08
 VALUE_HEADROOM_HORIZONTAL = 0.12
@@ -73,6 +84,17 @@ HEATMAP_TEXT_CONTRAST_THRESHOLD = 0.55
 # ================================================
 # Data Helpers
 # ================================================
+
+
+def validate_emphasis(value, context: str = "emphasis"):
+    """Validate a single emphasis role; None means no emphasis."""
+
+    if value is not None and value not in (EMPHASIS_BACKGROUND, EMPHASIS_HIGHLIGHT):
+        raise ValueError(
+            f"Invalid {context} value {value!r}. "
+            f"Must be '{EMPHASIS_BACKGROUND}', '{EMPHASIS_HIGHLIGHT}', or None."
+        )
+    return value
 
 
 def get_chart_data(attr: str, chart: dict) -> Optional[np.ndarray]:
@@ -192,6 +214,9 @@ class DrawContext:
     bar_slot: Optional[BarSlot] = None
     bins: Optional[np.ndarray] = None
     hatch: Optional[str] = None
+    emphasis: Optional[str] = None
+    parallel_stats: Optional[dict] = None
+    parallel_axes: bool = True
 
 
 # ================================================
@@ -212,7 +237,15 @@ class Layer:
         self.chart_hash = get_chart_hash(chart)
         self.vlines = _resolve_ref_lines(chart, "vlines")
         self.hlines = _resolve_ref_lines(chart, "hlines")
+        self.emphasis = self._resolve_emphasis(chart.get("emphasis"))
+        # snapshot at build so muting harmonizes with the layer's own theme
+        muted_alpha = config.get("muted_alpha")
+        self.muted_color = config.get("muted_color") or DEFAULT_MUTED_COLOR
+        self.muted_alpha = DEFAULT_MUTED_ALPHA if muted_alpha is None else muted_alpha
         self._resolve_style()
+
+    def _resolve_emphasis(self, value):
+        return validate_emphasis(value)
 
     def _resolve_style(self) -> None:
         """Collapse config → theme → chart style into concrete style dicts."""
@@ -240,6 +273,22 @@ class Layer:
         merged.update(style)
         return merged
 
+    def _apply_emphasis(
+        self, style: dict, role: Optional[str], width_key: str = "linewidth"
+    ) -> None:
+        """Apply an emphasis role's stroke/alpha/z transform to a style dict."""
+
+        if role is None:
+            return
+        style["zorder"] = style.get("zorder", 0) + EMPHASIS_Z_OFFSET[role]
+        width = style.get(width_key)
+        if role == EMPHASIS_BACKGROUND:
+            style["alpha"] = self.muted_alpha
+            if width is not None:
+                style[width_key] = width * MUTED_WIDTH_SCALE
+        elif width is not None:
+            style[width_key] = width * HIGHLIGHT_WIDTH_SCALE
+
 
 class LineLayer(Layer):
     kind = "line"
@@ -262,6 +311,14 @@ class LineLayer(Layer):
             return None
         return (minimum(x), maximum(x))
 
+    def _resolved_area_style(self, ctx):
+        area_style = self._merge_color("color", ctx.color, self.area_style)
+        if ctx.z_order is not None:
+            area_style["zorder"] = ctx.z_order - 0.1
+        if ctx.emphasis == EMPHASIS_BACKGROUND:
+            area_style["color"] = self.muted_color
+        return area_style
+
     def draw(self, ax, ctx):
         x = get_chart_data("x", self.chart)
         y = get_chart_data("y", self.chart)
@@ -273,24 +330,21 @@ class LineLayer(Layer):
         line_style = self._merge_color("color", ctx.color, self.line_style)
         if ctx.z_order is not None:
             line_style["zorder"] = ctx.z_order
+        self._apply_emphasis(line_style, ctx.emphasis)
+        if ctx.emphasis == EMPHASIS_BACKGROUND:
+            line_style["color"] = self.muted_color
 
         draw_yerr = (
             self.show_yerr and isinstance(yerr, np.ndarray) and len(yerr) == len(y)
         )
 
         if draw_yerr:
-            area_style = self._merge_color("color", ctx.color, self.area_style)
-            if ctx.z_order is not None:
-                area_style["zorder"] = ctx.z_order - 0.1
-            ax.fill_between(x, y - yerr, y + yerr, **area_style)
+            ax.fill_between(x, y - yerr, y + yerr, **self._resolved_area_style(ctx))
 
         if self.show_area:
-            area_style = self._merge_color("color", ctx.color, self.area_style)
-            if ctx.z_order is not None:
-                area_style["zorder"] = ctx.z_order - 0.1
             drawstyle = line_style.get("drawstyle", "")
             step = drawstyle.split("-")[1] if "steps-" in drawstyle else None
-            ax.fill_between(x, y, step=step, **area_style)
+            ax.fill_between(x, y, step=step, **self._resolved_area_style(ctx))
 
         ax.plot(x, y, **line_style, label=self.label(ctx))
 
@@ -351,6 +405,9 @@ class BarLayer(Layer):
             bar_style["alpha"] = ctx.alpha
         if ctx.hatch is not None and "hatch" not in bar_style:
             bar_style["hatch"] = ctx.hatch or None
+        self._apply_emphasis(bar_style, ctx.emphasis)
+        if ctx.emphasis == EMPHASIS_BACKGROUND:
+            bar_style["color"] = self.muted_color
 
         slot = ctx.bar_slot
         x_offset = 0.0
@@ -416,6 +473,9 @@ class HistogramLayer(Layer):
             hist_style["alpha"] = ctx.alpha
         if ctx.hatch is not None and "hatch" not in hist_style:
             hist_style["hatch"] = ctx.hatch or None
+        self._apply_emphasis(hist_style, ctx.emphasis)
+        if ctx.emphasis == EMPHASIS_BACKGROUND:
+            hist_style["color"] = self.muted_color
 
         bins = ctx.bins if ctx.bins is not None else self.num_bins
         ax.hist(
@@ -440,6 +500,8 @@ class ScatterLayer(Layer):
         self.ci_level = self.settings.get("ci_level") or DEFAULT_CI_LEVEL
         self.show_correlation = self.settings.get("show_correlation")
         self.default_size = config["plot_scatter_size"]
+        # a highlight edge contrasts in the theme's own text color
+        self.highlight_edge_color = config.get("font_general_color") or "#000000"
         self.regression_style = get_regression_style({})
         self.regression_ci_alpha = config["plot_regression_ci_alpha"]
         self.annotation_color = config.get("plot_text_color", "black")
@@ -531,6 +593,9 @@ class ScatterLayer(Layer):
         scatter_style = dict(self.scatter_style)
         if ctx.z_order is not None:
             scatter_style["zorder"] = ctx.z_order
+        self._apply_emphasis(scatter_style, ctx.emphasis, width_key="linewidths")
+        if ctx.emphasis == EMPHASIS_HIGHLIGHT:
+            scatter_style["edgecolors"] = self.highlight_edge_color
 
         if hue_data is not None:
             unique_hues = np.unique(hue_data)
@@ -543,11 +608,15 @@ class ScatterLayer(Layer):
                 )
                 group_style = {k: v for k, v in scatter_style.items() if k != "s"}
                 group_style["c"] = self.hue_colors[i]
+                label = str(hue_val)
+                if ctx.emphasis == EMPHASIS_BACKGROUND:
+                    group_style["c"] = self.muted_color
+                    label = NO_LEGEND
                 ax.scatter(
                     x_data[mask],
                     y_data[mask],
                     s=group_sizes,
-                    label=str(hue_val),
+                    label=label,
                     **group_style,
                 )
 
@@ -560,6 +629,8 @@ class ScatterLayer(Layer):
             base_style = {k: v for k, v in scatter_style.items() if k != "s"}
             if base_style.get("c") is None:
                 base_style["c"] = ctx.color
+            if ctx.emphasis == EMPHASIS_BACKGROUND:
+                base_style["c"] = self.muted_color
 
             ax.scatter(x_data, y_data, s=sizes, label=self.label(ctx), **base_style)
 
@@ -572,6 +643,14 @@ class ScatterLayer(Layer):
 
 class BoxLayer(Layer):
     kind = "box"
+
+    def _resolve_emphasis(self, value):
+        # box charts never overlay; emphasis aligns with the box labels instead
+        if isinstance(value, list):
+            for item in value:
+                validate_emphasis(item)
+            return value
+        return validate_emphasis(value)
 
     def _resolve_style(self):
         self.orientation = self.settings.get("orientation") or DEFAULT_ORIENTATION
@@ -639,12 +718,51 @@ class BoxLayer(Layer):
             if alpha is not None:
                 patch.set_alpha(alpha)
 
+        self._apply_box_emphasis(bp, labels)
+
         if self.orientation == ORIENTATION.HORIZONTAL:
             ax.set_yticks(range(1, len(labels) + 1))
             ax.set_yticklabels(labels, rotation=self.chart.get("ytickrotate", 0))
         else:
             ax.set_xticks(range(1, len(labels) + 1))
             ax.set_xticklabels(labels, rotation=self.chart.get("xtickrotate", 0))
+
+    def _apply_box_emphasis(self, bp: dict, labels: list) -> None:
+        """Apply per-label roles; whiskers, caps, medians, and outliers follow the box."""
+
+        roles = self.emphasis
+        if roles is None:
+            return
+        if isinstance(roles, str):
+            roles = [roles] * len(labels)
+        elif len(roles) != len(labels):
+            raise ValueError(
+                f"`emphasis` length ({len(roles)}) must match the number of "
+                f"box labels ({len(labels)})."
+            )
+
+        for i, role in enumerate(roles):
+            if role is None:
+                continue
+            box = bp["boxes"][i]
+            median = bp["medians"][i]
+            strokes = bp["whiskers"][2 * i : 2 * i + 2] + bp["caps"][2 * i : 2 * i + 2]
+            fliers = bp["fliers"][i : i + 1]
+            if role == EMPHASIS_BACKGROUND:
+                box.set_facecolor(self.muted_color)
+                box.set_edgecolor(self.muted_color)
+                box.set_alpha(self.muted_alpha)
+                box.set_linewidth(box.get_linewidth() * MUTED_WIDTH_SCALE)
+                for line in strokes + [median]:
+                    line.set_color(self.muted_color)
+                    line.set_linewidth(line.get_linewidth() * MUTED_WIDTH_SCALE)
+                for flier in fliers:
+                    flier.set_markerfacecolor(self.muted_color)
+                    flier.set_markeredgecolor(self.muted_color)
+                    flier.set_alpha(self.muted_alpha)
+            else:
+                box.set_linewidth(box.get_linewidth() * HIGHLIGHT_WIDTH_SCALE)
+                median.set_linewidth(median.get_linewidth() * HIGHLIGHT_WIDTH_SCALE)
 
 
 class HeatmapLayer(Layer):
@@ -729,6 +847,28 @@ class ParallelCoordsLayer(Layer):
         self.charts = charts
         super().__init__(charts[0], settings)
 
+    def _resolve_emphasis(self, value):
+        # emphasis aligns with the data rows of each source chart
+        self.row_emphasis = []
+        for chart in self.charts:
+            roles = chart.get("emphasis")
+            n_rows = len(chart.get("data", []) or [])
+            if roles is None:
+                self.row_emphasis.extend([None] * n_rows)
+            elif isinstance(roles, str):
+                validate_emphasis(roles)
+                self.row_emphasis.extend([roles] * n_rows)
+            else:
+                for item in roles:
+                    validate_emphasis(item)
+                if len(roles) != n_rows:
+                    raise ValueError(
+                        f"`emphasis` length ({len(roles)}) must match the "
+                        f"number of data rows ({n_rows})."
+                    )
+                self.row_emphasis.extend(list(roles))
+        return None
+
     def _resolve_style(self):
         shared_style = self.style
         self.axis_style = get_parallel_axis_style(shared_style)
@@ -752,7 +892,13 @@ class ParallelCoordsLayer(Layer):
             for d in chart.get("data", []):
                 all_hues.append(d.get(hue_attr, None))
 
-        non_null_hues = [h for h in all_hues if h is not None]
+        # background rows are muted: they claim no hue color and no legend entry
+        non_bg_hues = [
+            h
+            for h, role in zip(all_hues, self.row_emphasis)
+            if role != EMPHASIS_BACKGROUND
+        ]
+        non_null_hues = [h for h in non_bg_hues if h is not None]
         self.continuous_hue = bool(non_null_hues) and all(
             isinstance(h, (int, float)) and not isinstance(h, bool)
             for h in non_null_hues
@@ -804,6 +950,20 @@ class ParallelCoordsLayer(Layer):
             for hue in self.unique_hues
         ]
 
+    def _normalize_value(self, value, dim: str, stats: dict) -> float:
+        """Normalize one cell against the panel-shared per-dimension ranges."""
+
+        if stats["is_categorical"][dim]:
+            if value is None:
+                return np.nan
+            return stats["category_map"][dim].get(value, np.nan)
+        range_val = stats["dim_max"][dim] - stats["dim_min"][dim]
+        if range_val == 0:
+            return 0.0
+        if value is None or not isinstance(value, (int, float)):
+            return np.nan
+        return (value - stats["dim_min"][dim]) / range_val
+
     def draw(self, ax, ctx):
         all_data, all_hues, all_styles = [], [], []
         for chart, line_style in zip(self.charts, self.line_styles):
@@ -817,91 +977,44 @@ class ParallelCoordsLayer(Layer):
             warnings.warn("No data points found for parallel coordinates plot.")
             return
 
-        first_chart = self.charts[0]
-        dimensions = first_chart.get("dimensions", None)
-        hue_attr = first_chart.get("hue", "hue")
+        stats = ctx.parallel_stats
+        if stats is None:
+            stats = compute_parallel_stats([self])
 
-        if dimensions is None:
-            sample = all_data[0]
-            dimensions = [
-                k for k, v in sample.items() if k != hue_attr and v is not None
-            ]
+        dimensions = stats["dimensions"]
+        x_positions = np.arange(len(dimensions))
 
-        if len(dimensions) < 2:
-            raise ValueError("Parallel coordinates requires at least 2 dimensions.")
-
-        n_dims = len(dimensions)
-
-        dim_values_raw = {
-            dim: [d.get(dim, None) for d in all_data] for dim in dimensions
-        }
-        category_orders = first_chart.get("category_orders", None) or {}
-
-        dim_is_categorical = {}
-        dim_categories = {}
-        dim_category_map = {}
-
-        for dim in dimensions:
-            values = dim_values_raw[dim]
-            non_none = [v for v in values if v is not None]
-            if len(non_none) > 0 and isinstance(non_none[0], str):
-                dim_is_categorical[dim] = True
-                unique_cats = set(v for v in values if v is not None)
-                if dim in category_orders:
-                    ordered = [c for c in category_orders[dim] if c in unique_cats]
-                    categories = ordered + sorted(unique_cats - set(ordered))
-                else:
-                    categories = sorted(unique_cats)
-                dim_categories[dim] = categories
-                if len(categories) == 1:
-                    dim_category_map[dim] = {categories[0]: 0.5}
-                else:
-                    dim_category_map[dim] = {
-                        cat: i / (len(categories) - 1)
-                        for i, cat in enumerate(categories)
-                    }
-            else:
-                dim_is_categorical[dim] = False
-
-        dim_min, dim_max, normalized = {}, {}, {}
-        for dim in dimensions:
-            if dim_is_categorical[dim]:
-                cat_map = dim_category_map[dim]
-                normalized[dim] = np.array(
-                    [
-                        cat_map.get(v, np.nan) if v is not None else np.nan
-                        for v in dim_values_raw[dim]
-                    ]
-                )
-                dim_min[dim] = 0
-                dim_max[dim] = len(dim_categories[dim]) - 1
-            else:
-                vals = np.array(
-                    [
-                        v if v is not None and isinstance(v, (int, float)) else np.nan
-                        for v in dim_values_raw[dim]
-                    ],
-                    dtype=float,
-                )
-                dim_min[dim] = np.nanmin(vals)
-                dim_max[dim] = np.nanmax(vals)
-                range_val = dim_max[dim] - dim_min[dim]
-                if range_val == 0:
-                    normalized[dim] = np.zeros_like(vals)
-                else:
-                    normalized[dim] = (vals - dim_min[dim]) / range_val
-
-        x_positions = np.arange(n_dims)
-
-        for i, (data_point, hue_val, line_style) in enumerate(
-            zip(all_data, all_hues, all_styles)
+        for data_point, hue_val, line_style, row_role in zip(
+            all_data, all_hues, all_styles, self.row_emphasis
         ):
-            y_vals = [normalized[dim][i] for dim in dimensions]
+            # the panel-level (per-figure) role wins over per-row roles
+            role = ctx.emphasis if ctx.emphasis is not None else row_role
+            y_vals = [
+                self._normalize_value(data_point.get(dim, None), dim, stats)
+                for dim in dimensions
+            ]
             line_color = self._hue_color(hue_val)
             style = dict(line_style)
             if style.get("color") is None:
                 style["color"] = line_color
+            self._apply_emphasis(style, role)
+            if role == EMPHASIS_BACKGROUND:
+                style["color"] = self.muted_color
             ax.plot(x_positions, y_vals, **style)
+
+        if ctx.parallel_axes:
+            self._draw_axis_furniture(ax, stats)
+
+    def _draw_axis_furniture(self, ax, stats: dict) -> None:
+        """Draw the axis lines, ticks, and labels — once per panel."""
+
+        dimensions = stats["dimensions"]
+        n_dims = len(dimensions)
+        dim_is_categorical = stats["is_categorical"]
+        dim_categories = stats["categories"]
+        dim_category_map = stats["category_map"]
+        dim_min, dim_max = stats["dim_min"], stats["dim_max"]
+        x_positions = np.arange(n_dims)
 
         ax.set_xticks(x_positions)
         ax.set_xlim(-0.1, n_dims - 0.9)
@@ -988,6 +1101,97 @@ class ParallelCoordsLayer(Layer):
                     )
 
 
+def compute_parallel_stats(layers: List["ParallelCoordsLayer"]) -> Optional[dict]:
+    """Shared per-dimension ranges across a panel's parallel layers.
+
+    A cross-layer concern (like shared histogram bins): every layer normalizes
+    against the combined ranges, so composed parallel charts share axis scales
+    and the axis end labels show the combined range.
+    """
+
+    all_data = []
+    for layer in layers:
+        for chart in layer.charts:
+            all_data.extend(chart.get("data", []) or [])
+    if not all_data:
+        return None
+
+    def layer_dimensions(layer):
+        first_chart = layer.charts[0]
+        dimensions = first_chart.get("dimensions", None)
+        if dimensions is not None:
+            return list(dimensions)
+        hue_attr = first_chart.get("hue", "hue")
+        for chart in layer.charts:
+            for d in chart.get("data", []) or []:
+                return [k for k, v in d.items() if k != hue_attr and v is not None]
+        return []
+
+    dimensions = layer_dimensions(layers[0])
+    for layer in layers[1:]:
+        if layer_dimensions(layer) != dimensions:
+            raise ValueError(
+                "Composed parallel coordinates charts must share the same "
+                f"dimensions; got {dimensions} and {layer_dimensions(layer)}."
+            )
+
+    if len(dimensions) < 2:
+        raise ValueError("Parallel coordinates requires at least 2 dimensions.")
+
+    dim_values_raw = {dim: [d.get(dim, None) for d in all_data] for dim in dimensions}
+    category_orders = layers[0].charts[0].get("category_orders", None) or {}
+
+    dim_is_categorical = {}
+    dim_categories = {}
+    dim_category_map = {}
+
+    for dim in dimensions:
+        values = dim_values_raw[dim]
+        non_none = [v for v in values if v is not None]
+        if len(non_none) > 0 and isinstance(non_none[0], str):
+            dim_is_categorical[dim] = True
+            unique_cats = set(v for v in values if v is not None)
+            if dim in category_orders:
+                ordered = [c for c in category_orders[dim] if c in unique_cats]
+                categories = ordered + sorted(unique_cats - set(ordered))
+            else:
+                categories = sorted(unique_cats)
+            dim_categories[dim] = categories
+            if len(categories) == 1:
+                dim_category_map[dim] = {categories[0]: 0.5}
+            else:
+                dim_category_map[dim] = {
+                    cat: i / (len(categories) - 1) for i, cat in enumerate(categories)
+                }
+        else:
+            dim_is_categorical[dim] = False
+
+    dim_min, dim_max = {}, {}
+    for dim in dimensions:
+        if dim_is_categorical[dim]:
+            dim_min[dim] = 0
+            dim_max[dim] = len(dim_categories[dim]) - 1
+        else:
+            vals = np.array(
+                [
+                    v if v is not None and isinstance(v, (int, float)) else np.nan
+                    for v in dim_values_raw[dim]
+                ],
+                dtype=float,
+            )
+            dim_min[dim] = np.nanmin(vals)
+            dim_max[dim] = np.nanmax(vals)
+
+    return {
+        "dimensions": dimensions,
+        "is_categorical": dim_is_categorical,
+        "categories": dim_categories,
+        "category_map": dim_category_map,
+        "dim_min": dim_min,
+        "dim_max": dim_max,
+    }
+
+
 LAYER_TYPES = {
     "linechart": LineLayer,
     "barchart": BarLayer,
@@ -1037,6 +1241,7 @@ class LayerGroup:
         y_axis: str = "auto",
         z_order: Optional[float] = None,
         legend_label: Optional[str] = None,
+        emphasis: Optional[str] = None,
     ):
         self.layers = layers
         self.palette = (
@@ -1047,8 +1252,11 @@ class LayerGroup:
         self.y_axis = y_axis
         self.z_order = z_order
         self.legend_label = legend_label
+        self.emphasis = validate_emphasis(emphasis)
 
-    def with_prefs(self, *, y_axis, z_order, legend_label) -> "LayerGroup":
+    def with_prefs(
+        self, *, y_axis, z_order, legend_label, emphasis=None
+    ) -> "LayerGroup":
         return LayerGroup(
             self.layers,
             palette=self.palette,
@@ -1059,7 +1267,15 @@ class LayerGroup:
             legend_label=(
                 legend_label if legend_label is not None else self.legend_label
             ),
+            emphasis=emphasis if emphasis is not None else self.emphasis,
         )
+
+    def layer_role(self, layer: Layer) -> Optional[str]:
+        """The layer's effective emphasis role; the group's pref wins."""
+
+        if self.emphasis is not None:
+            return self.emphasis
+        return layer.emphasis if isinstance(layer.emphasis, str) else None
 
     def data_range(self) -> tuple:
         """The combined y-range of the group's layers, for axis clustering."""
@@ -1390,14 +1606,26 @@ class Panel:
                 else group.palette
             )
 
+        # background layers do not consume a color-cycle slot
         pooled_colors = defaultdict(int)
         for group in self.groups:
-            pooled_colors[palette_key(group)] += group.max_colors
+            n_background = sum(
+                1 for l in group.layers if group.layer_role(l) == EMPHASIS_BACKGROUND
+            )
+            pooled_colors[palette_key(group)] += max(group.max_colors - n_background, 0)
         cycles = {}
         for group in self.groups:
             key = palette_key(group)
             if key not in cycles:
-                cycles[key] = create_color_cycle(group.palette, pooled_colors[key])
+                cycles[key] = create_color_cycle(
+                    group.palette, max(pooled_colors[key], 1)
+                )
+
+        # shared parallel normalization: a cross-layer concern the panel owns;
+        # the last parallel layer draws the axis furniture, once, over the rows
+        parallel_layers = [l for l in self.layers if isinstance(l, ParallelCoordsLayer)]
+        parallel_stats = compute_parallel_stats(parallel_layers)
+        parallel_axes_owner = parallel_layers[-1] if parallel_layers else None
 
         group_axes = []
         for group, assignment in zip(self.groups, assignments):
@@ -1410,23 +1638,38 @@ class Panel:
                 bins = group.hist_bins()
 
             group_hists = [l for l in group.layers if isinstance(l, HistogramLayer)]
-            if hist_mode == "stack" and len(group_hists) > 0:
+            # stacking a muted background is meaningless: emphasized groups
+            # draw their histograms as individual overlaid calls instead
+            stack_hists = (
+                hist_mode == "stack"
+                and len(group_hists) > 0
+                and all(group.layer_role(l) is None for l in group_hists)
+            )
+            if stack_hists:
                 self._draw_hist_stack(
                     target_ax, group, group_hists, cycle, bins, hatch_assignments
                 )
 
             for layer in group.layers:
-                if isinstance(layer, HistogramLayer) and hist_mode == "stack":
+                if isinstance(layer, HistogramLayer) and stack_hists:
                     continue
 
                 z_order = group.z_order
                 if z_order is None:
                     z_order = zorder_defaults.get(layer.kind)
 
+                role = group.layer_role(layer)
+
                 ctx = DrawContext(
-                    color=cycle[layer.chart_hash]["color"],
+                    color=(
+                        None
+                        if role == EMPHASIS_BACKGROUND
+                        else cycle[layer.chart_hash]["color"]
+                    ),
                     z_order=z_order,
-                    legend_label=group.legend_label,
+                    legend_label=(
+                        NO_LEGEND if role == EMPHASIS_BACKGROUND else group.legend_label
+                    ),
                     alpha=(
                         bar_alpha
                         if isinstance(layer, BarLayer)
@@ -1440,6 +1683,9 @@ class Panel:
                         and isinstance(layer, (BarLayer, HistogramLayer))
                         else None
                     ),
+                    emphasis=role,
+                    parallel_stats=parallel_stats,
+                    parallel_axes=layer is parallel_axes_owner,
                 )
                 layer.draw(target_ax, ctx)
 
@@ -1455,9 +1701,9 @@ class Panel:
         for layer in hist_layers:
             xall.append(layer.x_values())
             labels.append(layer.subtitle)
-            # the first layer's style is shared; only the cycle color varies
+            # each layer's own resolved color; the cycle fills the gaps
             colors.append(
-                first.hist_style.get("color", cycle[layer.chart_hash]["color"])
+                layer.hist_style.get("color", cycle[layer.chart_hash]["color"])
             )
 
         hist_style = dict(first.hist_style)
@@ -1475,10 +1721,20 @@ class Panel:
             color=hist_style["color"],
         )
 
+        if len(hist_layers) == 1:
+            patch_sets = [patch_sets]
+
+        # the single stacked call shares the first layer's alpha; restore each
+        # layer's own resolved alpha on its patches
+        first_alpha = first.hist_style.get("alpha")
+        for layer, patches in zip(hist_layers, patch_sets):
+            alpha = layer.hist_style.get("alpha")
+            if alpha != first_alpha:
+                for patch in patches:
+                    patch.set_alpha(alpha)
+
         # the stack shares the first layer's style, so its explicit hatch wins
         if hatch_assignments is not None and "hatch" not in first.hist_style:
-            if len(hist_layers) == 1:
-                patch_sets = [patch_sets]
             for layer, patches in zip(hist_layers, patch_sets):
                 hatch = hatch_assignments[layer.chart_hash]
                 for patch in patches:
@@ -1559,10 +1815,14 @@ class Panel:
         if s.get("show_legend"):
             legend_style = s.get("legend_style", {})
             custom_handles = None
-            for layer in layers:
-                handles = getattr(layer, "legend_handles", lambda: None)()
-                if handles:
-                    custom_handles = (custom_handles or []) + handles
+            for group in self.groups:
+                for layer in group.layers:
+                    # background layers carry no legend entries
+                    if group.layer_role(layer) == EMPHASIS_BACKGROUND:
+                        continue
+                    handles = getattr(layer, "legend_handles", lambda: None)()
+                    if handles:
+                        custom_handles = (custom_handles or []) + handles
             if custom_handles is not None:
                 ax.legend(handles=custom_handles, title="Legend", **legend_style)
             elif s.get("legend_mode") == "combined":

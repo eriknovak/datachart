@@ -14,8 +14,7 @@ title: Themes Module
 
 ::: datachart.themes.DEFAULT_THEME
 ::: datachart.themes.GREYSCALE_THEME
-::: datachart.themes.PUBLICATION_THEME
-::: datachart.themes.BACKGROUND_THEME
+::: datachart.themes.INK_THEME
+::: datachart.themes.HATCH_THEME
 ::: datachart.themes.MINIMAL_THEME
 ::: datachart.themes.MATERIAL_THEME
-::: datachart.themes.ACADEMIC_THEME

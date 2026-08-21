@@ -24,6 +24,7 @@ def Heatmap(
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
+    emphasis: None = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     xmin: Optional[Union[int, float]] = None,
     xmax: Optional[Union[int, float]] = None,
@@ -79,6 +80,8 @@ def Heatmap(
         xlabel: The x-axis label.
         ylabel: The y-axis label.
         subtitle: The subtitle(s) for individual charts.
+        emphasis: Not supported: a heatmap is a single raster layer with no
+            series to mute or highlight. Passing a value raises `ValueError`.
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -110,6 +113,12 @@ def Heatmap(
         The figure containing the heatmap.
 
     """
+    if emphasis is not None:
+        raise ValueError(
+            "Heatmap does not support `emphasis`: a heatmap is a single "
+            "raster layer with no series to mute or highlight."
+        )
+
     # Build the charts structure using shared utility
     # Note: Heatmap data is 2D for single chart, so we use is_2d_data=True
     charts = build_charts_structure(

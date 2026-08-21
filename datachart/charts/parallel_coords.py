@@ -24,6 +24,7 @@ def ParallelCoords(
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
+    emphasis: Optional[Union[str, List[Optional[str]]]] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     show_legend: Optional[bool] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
@@ -64,6 +65,11 @@ def ParallelCoords(
         xlabel: The x-axis label.
         ylabel: The y-axis label.
         subtitle: The subtitle(s) for individual charts.
+        emphasis: The emphasis role(s), aligned with the data rows (a single
+            value applies to every row): "background" mutes a row (theme muted
+            color, lowered alpha, thinner line, behind the others, no hue
+            legend entry), "highlight" bolds it and brings it to the front
+            among the data rows, None leaves it unchanged.
         figsize: The size of the figure.
         show_legend: Whether to show the legend (for hue categories).
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
@@ -87,6 +93,7 @@ def ParallelCoords(
     charts = build_charts_structure(
         data,
         subtitle=subtitle,
+        emphasis=emphasis,
         style=style,
         dimensions=dimensions,
         hue=hue,

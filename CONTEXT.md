@@ -16,8 +16,8 @@ _Avoid_: plotter, series (for the drawable), plot function
 
 **Panel**:
 A group of layers sharing one coordinate space. Owns everything cross-layer: color
-assignment, bar slotting, axis scale and limits, grid, ticks, legend assembly, and
-twin-axis (left/right) assignment. Also the public composition front
+assignment, bar slotting, shared parallel-coords normalization, axis scale and
+limits, grid, ticks, legend assembly, and twin-axis (left/right) assignment. Also the public composition front
 (`datachart.utils.Panel`) that overlays rendered figures into one panel.
 Panel figures nest: a nested panel flattens into the outer one, keeping its
 per-figure prefs while the outermost call supplies all panel-level furniture.
@@ -75,9 +75,25 @@ _Avoid_: plot (for the act), display (for the method name)
 ### Styling
 
 **Theme**:
-A complete, named set of style attributes (`DEFAULT`, `GREYSCALE`, `PUBLICATION`,
-`BACKGROUND`, `MINIMAL`, `MATERIAL`, `ACADEMIC`). Applying one replaces the
-whole global configuration.
+A complete, named set of style attributes (`DEFAULT`, `GREYSCALE`, `MINIMAL`,
+`MATERIAL`, `INK`, `HATCH`). Applying one replaces the whole global
+configuration. Themes are named for their visual trait, never for a use case
+or audience.
+_Avoid_: publication, academic, background (former role-based theme names)
+
+**Emphasis**:
+A per-chart (and, in `Panel`, per-figure) role — `"background"`, `"highlight"`,
+or unset — deciding how a layer reads relative to its siblings: background
+layers are muted and dropped from the legend, highlight layers are nudged
+forward (front z-order, slightly bolder). Styling, not data.
+_Avoid_: background theme, de-emphasis flag
+
+**Muted**:
+The style transform emphasis applies to a background layer: theme's muted color,
+lowered alpha, thinner strokes, pushed-back z-order, no legend entry. Defined
+once, derived from the active theme's `muted_*` attributes — never a separate
+theme.
+_Avoid_: greyed-out, background style
 
 **Theme-level default**:
 A nullable theme attribute that supplies the default for a per-chart setting
@@ -88,7 +104,7 @@ _Avoid_: forced setting, theme override
 **Hatch cycle**:
 A theme-defined sequence of hatch patterns the panel assigns per bar/histogram
 series, the same way it assigns colors. Off (`None`) in every theme but
-`ACADEMIC`; an explicit per-chart hatch style wins.
+`HATCH`; an explicit per-chart hatch style wins.
 _Avoid_: hatch palette
 
 **Style resolution**:

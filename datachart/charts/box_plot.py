@@ -24,6 +24,7 @@ def BoxPlot(
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
+    emphasis: Optional[Union[str, List[Optional[str]]]] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     xmin: Optional[Union[int, float]] = None,
     xmax: Optional[Union[int, float]] = None,
@@ -94,6 +95,11 @@ def BoxPlot(
         xlabel: The x-axis label.
         ylabel: The y-axis label.
         subtitle: The subtitle(s) for individual charts. Used as legend labels.
+        emphasis: The emphasis role(s), aligned with the box labels of one
+            call (a single value applies to every box): "background" mutes
+            a box and its whiskers, caps, median, and outliers,
+            "highlight" bolds the box edges and median, None leaves it
+            unchanged.
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -130,6 +136,7 @@ def BoxPlot(
     charts = build_charts_structure(
         data,
         subtitle=subtitle,
+        emphasis=emphasis,
         style=style,
         xticks=xticks,
         xticklabels=xticklabels,

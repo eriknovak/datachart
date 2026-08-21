@@ -86,6 +86,11 @@ def Panel(
               "auto"; a nested panel's figures keep their own assignment)
             - "z_order": Integer for layering control (higher values on top)
             - "legend_label": Custom legend label (overrides chart subtitle)
+            - "emphasis": "background" or "highlight" role for every layer of
+              this figure. Background layers are muted (theme muted color,
+              lowered alpha, behind the others) and excluded from the legend;
+              highlight layers are bolded and brought to the front among the
+              data layers. A nested panel's figures keep their own roles.
         title: Title for the combined chart.
         xlabel: Label for x-axis.
         ylabel_left: Label for left y-axis.

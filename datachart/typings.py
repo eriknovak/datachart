@@ -78,6 +78,8 @@ class ColorStyleAttrs(TypedDict):
         color_general_multiple (Union[COLORS, str, List[str], None]): The general color for the multiple-typed charts (palette name or list of hex colors).
         color_parallel_hue (Union[COLORS, str, List[str], None]): The color palette for parallel coords hue categories (palette name or list of hex colors).
         color_parallel_hue_continuous (Union[COLORS, str, List[str], None]): The sequential ramp for parallel coords numeric hue columns (palette name or list of hex colors).
+        muted_color (Union[str, None]): The color applied to background-emphasis layers.
+        muted_alpha (Union[float, None]): The alpha applied to background-emphasis layers.
 
     """
 
@@ -85,6 +87,8 @@ class ColorStyleAttrs(TypedDict):
     color_general_multiple: Union[COLORS, str, List[str], None]
     color_parallel_hue: Union[COLORS, str, List[str], None]
     color_parallel_hue_continuous: Union[COLORS, str, List[str], None]
+    muted_color: Union[str, None]
+    muted_alpha: Union[float, None]
 
 
 class FontStyleAttrs(TypedDict):
