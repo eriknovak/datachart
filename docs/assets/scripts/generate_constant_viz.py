@@ -424,7 +424,7 @@ def colorbar_location():
         )
         colorbar.ax.tick_params(labelsize=FS_LABEL)
         subfig.suptitle(
-            f"COLORBAR_LOCATION.\n{label}",
+            f"COLORBAR_LOCATION.{label}",
             fontsize=FS_LABEL,
             color=INK,
             family="monospace",
