@@ -3,6 +3,8 @@ site_author: Erik Novak
 site_description: >-
   Data visualization package, simple to use, highly customizable
 
+site_url: https://eriknovak.github.io/datachart/
+
 repo_name: eriknovak/datachart
 repo_url: https://github.com/eriknovak/datachart
 
