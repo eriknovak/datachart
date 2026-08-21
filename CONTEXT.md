@@ -28,8 +28,9 @@ An arrangement of figures in rows and columns — the public front
 (`datachart.utils.Grid`) takes nested rows (the layout you can see; `None` for a
 blank cell) or a flat list with `max_cols`/`layout_spec`, and redraws each
 figure's panel into its cell. Grid figures nest inside Grid (never inside
-Panel): a nested grid occupies one cell and rebuilds its own layout there,
-keeping its title and axis sharing.
+Panel): a nested grid occupies one cell and rebuilds its own layout there in
+the parent's gridspec, so its axes envelope aligns with sibling cells; its
+title becomes a subtitle-sized heading row and its axis sharing stays local.
 _Avoid_: grid layout (for the front), figure grid
 
 **Bar slot**:
