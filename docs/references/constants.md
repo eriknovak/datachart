@@ -53,13 +53,9 @@ title: Constants Module
     options:
         heading_level: 3
 
-All predefined palettes are rendered in the [Colormaps guide](../how-to-guides/colormaps.ipynb).
-
 ::: datachart.constants.THEME
     options:
         heading_level: 3
-
-Every theme applied to the same set of charts is shown in the [Theme Gallery](../how-to-guides/theme-gallery.ipynb).
 
 ::: datachart.constants.EMPHASIS
     options:

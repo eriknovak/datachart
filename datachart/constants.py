@@ -38,7 +38,7 @@ class FIG_SIZE:
     `FULL` spans the text-block width; `HALF` spans one of two columns
     separated by a 0.3 in (0.8 cm) gap (3.0 in / 7.6 cm each). Widths cross
     with a height — `SHORT` (2.4 in / 6.1 cm), `MEDIUM` (4.8 in / 12.2 cm),
-    or `TALL` (7.2 in / 18.3 cm).
+    or `TALL` (7.2 in / 18.3 cm). Passed as the `figsize` chart setting.
 
     ![FIG_SIZE at a glance](../../assets/imgs/fig-sizes.svg){ width="100%" }
 
@@ -106,6 +106,8 @@ class FIG_SIZE:
 class FIG_FORMAT:
     """The supported figure formats.
 
+    Passed as the `format` argument of `save_figure`.
+
     Examples:
         >>> from datachart.constants import FIG_FORMAT
         >>> FIG_FORMAT.DEFAULT
@@ -160,6 +162,9 @@ class FONT_STYLE:
 class FONT_WEIGHT:
     """The supported font weights.
 
+    Used by the `font_*_weight` style attributes (general, title, subtitle,
+    axis labels).
+
     ![FONT_WEIGHT at a glance](../../assets/imgs/const-font-weight.svg){ width="100%" }
 
     Examples:
@@ -195,6 +200,9 @@ class FONT_WEIGHT:
 
 class LINE_MARKER:
     """The supported line markers.
+
+    Used by the `plot_line_marker` (line charts) and `plot_scatter_marker`
+    (scatter charts) style attributes.
 
     ![LINE_MARKER at a glance](../../assets/imgs/const-line-marker.svg){ width="100%" }
 
@@ -248,6 +256,8 @@ class LINE_MARKER:
 class LINE_STYLE:
     """The supported line styles.
 
+    Used by the `plot_line_style` style attribute of line charts.
+
     ![LINE_STYLE at a glance](../../assets/imgs/const-line-style.svg){ width="100%" }
 
     Examples:
@@ -274,6 +284,8 @@ class LINE_STYLE:
 class LINE_DRAW_STYLE:
     """The supported line draw styles.
 
+    Used by the `plot_line_drawstyle` style attribute of line charts.
+
     ![LINE_DRAW_STYLE at a glance](../../assets/imgs/const-line-draw-style.svg){ width="100%" }
 
     Examples:
@@ -297,6 +309,9 @@ class LINE_DRAW_STYLE:
 
 class HATCH_STYLE:
     """The supported hatch styles.
+
+    Used by the `plot_bar_hatch` and `plot_hist_hatch` style attributes, and
+    by the `HATCH` theme's hatch cycle.
 
     ![HATCH_STYLE at a glance](../../assets/imgs/const-hatch-style.svg){ width="100%" }
 
@@ -334,6 +349,9 @@ class HATCH_STYLE:
 class LEGEND_ALIGN:
     """The supported legend alignments.
 
+    Used by the `plot_legend_alignment` style attribute; aligns the legend's
+    title and entries against each other.
+
     ![LEGEND_ALIGN at a glance](../../assets/imgs/const-legend-align.svg){ width="100%" }
 
     Examples:
@@ -357,6 +375,9 @@ class LEGEND_ALIGN:
 
 class LEGEND_LOCATION:
     """The supported legend locations.
+
+    Used by the `plot_legend_location` style attribute; places the legend
+    within the chart.
 
     ![LEGEND_LOCATION at a glance](../../assets/imgs/const-legend-location.svg){ width="100%" }
 
@@ -396,6 +417,8 @@ class LEGEND_LOCATION:
 class HISTOGRAM_TYPE:
     """The supported histogram types.
 
+    Passed as the `plot_hist_type` style attribute of histograms.
+
     Examples:
         >>> from datachart.constants import HISTOGRAM_TYPE
         >>> HISTOGRAM_TYPE.BAR
@@ -420,6 +443,10 @@ class COLORS:
 
     All palette names are valid pypalettes identifiers. You can use any of the 2500+
     palettes available in pypalettes by passing the palette name as a string.
+    Accepted anywhere a palette is: the `color_general_singular` and
+    `color_general_multiple` config attributes, and the heatmap and parallel
+    coords color settings. All predefined palettes are rendered in the
+    [Colormaps guide](../../how-to-guides/colormaps/).
 
     Examples:
         >>> from datachart.constants import COLORS
@@ -549,6 +576,10 @@ class COLORS:
 class NORMALIZE:
     """The supported normalization options.
 
+    Passed as the heatmap's `norm` attribute: normalizes the cell values
+    before they are mapped to colors. Distinct from `SCALE`, which sets an
+    axis scale.
+
     Examples:
         >>> from datachart.constants import NORMALIZE
         >>> NORMALIZE.LINEAR
@@ -573,6 +604,9 @@ class NORMALIZE:
 class ORIENTATION:
     """The supported orientations.
 
+    Passed as the `orientation` setting of bar charts, histograms, and box
+    plots.
+
     Examples:
         >>> from datachart.constants import ORIENTATION
         >>> ORIENTATION.HORIZONTAL
@@ -590,6 +624,9 @@ class ORIENTATION:
 
 class VALUE_FORMAT:
     """The predefined value formats.
+
+    Passed as the heatmap's `valfmt` attribute: formats the values drawn in
+    the heatmap cells.
 
     ![VALUE_FORMAT at a glance](../../assets/imgs/const-value-format.svg){ width="100%" }
 
@@ -625,6 +662,10 @@ class VALUE_FORMAT:
 class THEME:
     """The predefined themes.
 
+    Applied with `config.set_theme`. Every theme applied to the same set of
+    charts is shown in the
+    [Theme Gallery](../../how-to-guides/theme-gallery/).
+
     Examples:
         >>> from datachart.constants import THEME
         >>> THEME.DEFAULT
@@ -650,6 +691,9 @@ class THEME:
 
 class EMPHASIS:
     """The supported emphasis roles.
+
+    Set per chart via the `emphasis` key in a charts list, or per figure via
+    the `emphasis` argument of `Panel`.
 
     Examples:
         >>> from datachart.constants import EMPHASIS
@@ -695,6 +739,9 @@ class SHOW_GRID:
 
 class SCALE:
     """The supported scale options.
+
+    Passed as the `scalex`/`scaley` chart settings to set an axis scale.
+    Distinct from `NORMALIZE`, which normalizes heatmap colors.
 
     Examples:
         >>> from datachart.constants import SCALE
