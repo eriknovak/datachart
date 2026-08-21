@@ -22,6 +22,7 @@ from matplotlib.gridspec import GridSpec, SubplotSpec
 
 from ..constants import FIG_FORMAT
 from ._internal.config_helpers import get_text_style
+from ._internal.figures import new_figure
 
 # =====================================
 # Helper functions
@@ -210,7 +211,7 @@ def _figure_grid_layout_impl(
             figsize = (base_size[0] * max_col, base_size[1] * max_row)
 
         # Create figure and GridSpec
-        combined_fig = plt.figure(figsize=figsize, constrained_layout=True)
+        combined_fig = new_figure(figsize=figsize)
         gs = GridSpec(max_row, max_col, figure=combined_fig)
         grid_shape = (max_row, max_col)
 
@@ -240,13 +241,12 @@ def _figure_grid_layout_impl(
             figsize = (base_size[0] * ncols, base_size[1] * nrows)
 
         # Create new figure with subplots
-        combined_fig, axes = plt.subplots(
+        combined_fig = new_figure(figsize=figsize)
+        axes = combined_fig.subplots(
             nrows=nrows,
             ncols=ncols,
-            figsize=figsize,
             sharex=sharex,
             sharey=sharey,
-            constrained_layout=True,
             squeeze=False,
         )
 

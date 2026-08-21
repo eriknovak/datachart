@@ -13,6 +13,7 @@ from typing import Dict, List, Union
 import matplotlib.pyplot as plt
 
 from .config_helpers import get_subplot_config, configure_labels
+from .figures import new_figure
 from .layers import (
     Panel,
     LayerGroup,
@@ -63,11 +64,10 @@ def render_chart(
     figsize = settings.get("figsize")
     sharex = settings.get("sharex")
     sharey = settings.get("sharey")
-    figure, axes = plt.subplots(
-        figsize=FIG_SIZE.DEFAULT if figsize is None else figsize,
+    figure = new_figure(figsize=FIG_SIZE.DEFAULT if figsize is None else figsize)
+    axes = figure.subplots(
         sharex=False if sharex is None else sharex,
         sharey=False if sharey is None else sharey,
-        constrained_layout=True,
         squeeze=False,
         **subplot_config,
     )

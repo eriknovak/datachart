@@ -56,6 +56,22 @@ functions (`Panel`, `Grid`) can rebuild it. Carries layers and panel settings, n
 raw attribute dicts; grid figures carry a recursive cell tree instead of a panel.
 _Avoid_: snapshot (for this), chart data
 
+### Figure lifecycle
+
+**Unmanaged figure**:
+A figure datachart returns: owned by the caller and garbage-collected like any
+object, never registered in pyplot's global figure manager. Creating one never
+displays it and never accumulates global state; `plt.close` on it is a no-op.
+_Avoid_: pyplot figure, open figure
+
+**Show**:
+The explicit act of displaying an unmanaged figure, via its `show()` method —
+inline display in notebooks, a GUI window in scripts, and the only way a
+figure appears in either. Defining a figure and showing it are separate
+decisions; a figure left as a cell's last expression renders only its text
+repr.
+_Avoid_: plot (for the act), display (for the method name)
+
 ### Styling
 
 **Theme**:
