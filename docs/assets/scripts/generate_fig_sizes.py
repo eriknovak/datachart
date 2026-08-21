@@ -27,19 +27,26 @@ BOX_EDGE = "#3d6f9e"
 GHOST_EDGE = "#8fb2d4"
 LABEL_COLOR = "#333333"
 
-# (name, size, ghost twin for side-by-side half-width figures)
-PAPER_SIZES = [
-    ("FULL_SHORT", FIG_SIZE.FULL_SHORT, False),
-    ("FULL_MEDIUM", FIG_SIZE.FULL_MEDIUM, False),
-    ("FULL_TALL", FIG_SIZE.FULL_TALL, False),
-    ("HALF_SHORT", FIG_SIZE.HALF_SHORT, True),
-    ("HALF_MEDIUM", FIG_SIZE.HALF_MEDIUM, True),
-    ("HALF_TALL", FIG_SIZE.HALF_TALL, True),
-    ("HALF_SQUARE", FIG_SIZE.HALF_SQUARE, True),
-    ("A4_PORTRAIT", FIG_SIZE.A4_PORTRAIT, False),
-    ("A4_LANDSCAPE", FIG_SIZE.A4_LANDSCAPE, False),
-    ("SQUARE", FIG_SIZE.SQUARE, False),
-    ("DEFAULT", FIG_SIZE.DEFAULT, False),
+# (name, size, ghost twin for side-by-side half-width figures);
+# rows of at most four pages keep the image narrow enough for the docs column
+PAPER_ROWS = [
+    [
+        ("FULL_SHORT", FIG_SIZE.FULL_SHORT, False),
+        ("FULL_MEDIUM", FIG_SIZE.FULL_MEDIUM, False),
+        ("FULL_TALL", FIG_SIZE.FULL_TALL, False),
+        ("A4_PORTRAIT", FIG_SIZE.A4_PORTRAIT, False),
+    ],
+    [
+        ("HALF_SHORT", FIG_SIZE.HALF_SHORT, True),
+        ("HALF_MEDIUM", FIG_SIZE.HALF_MEDIUM, True),
+        ("HALF_TALL", FIG_SIZE.HALF_TALL, True),
+        ("HALF_SQUARE", FIG_SIZE.HALF_SQUARE, True),
+    ],
+    [
+        ("A4_LANDSCAPE", FIG_SIZE.A4_LANDSCAPE, False),
+        ("SQUARE", FIG_SIZE.SQUARE, False),
+        ("DEFAULT", FIG_SIZE.DEFAULT, False),
+    ],
 ]
 
 SLIDE_SIZES = [
@@ -125,16 +132,17 @@ def draw_slide(ax, x0, y0, name, size):
 
 def main():
     out = pathlib.Path(__file__).resolve().parents[1] / "imgs" / "fig-sizes.svg"
-    gap = 1.2
+    gap = 1.0
     label_h = 4.2
     row_step = A4_H + label_h
+    n_rows = len(PAPER_ROWS)
 
     # one axes with equal aspect keeps every mockup at the same physical scale
-    fig, ax = plt.subplots(figsize=(13.5, 12))
-    row_specs = [(PAPER_SIZES[:6], 2 * row_step), (PAPER_SIZES[6:], row_step)]
+    fig, ax = plt.subplots(figsize=(9, 15))
 
     max_x = 0.0
-    for row, y0 in row_specs:
+    for i, row in enumerate(PAPER_ROWS):
+        y0 = (n_rows - i) * row_step
         x0 = 0.0
         for name, size, ghost in row:
             draw_page_with_box(ax, x0, y0, name, size, ghost)
@@ -151,11 +159,12 @@ def main():
 
     ax.text(
         max_x / 2,
-        2 * row_step + A4_H + 1.0,
-        "FIG_SIZE on an A4 page — dotted: the 2.5 cm print margins; dashed: a second half-width figure beside",
+        n_rows * row_step + A4_H + 1.0,
+        "FIG_SIZE on an A4 page\ndotted: the 2.5 cm print margins; dashed: a second half-width figure beside",
         ha="center",
         fontsize=13,
         color=LABEL_COLOR,
+        linespacing=1.6,
     )
     ax.text(
         max_x / 2,
@@ -166,7 +175,7 @@ def main():
         color=LABEL_COLOR,
     )
     ax.set_xlim(-0.4, max_x + 0.4)
-    ax.set_ylim(-label_h, 2 * row_step + A4_H + 2.2)
+    ax.set_ylim(-label_h, n_rows * row_step + A4_H + 4.4)
     ax.set_aspect("equal")
     ax.axis("off")
     fig.tight_layout()
