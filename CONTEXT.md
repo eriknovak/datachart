@@ -27,7 +27,9 @@ _Avoid_: overlay (for the concept), subplot, axes group
 An arrangement of figures in rows and columns — the public front
 (`datachart.utils.Grid`) takes nested rows (the layout you can see; `None` for a
 blank cell) or a flat list with `max_cols`/`layout_spec`, and redraws each
-figure's panel into its cell.
+figure's panel into its cell. Grid figures nest inside Grid (never inside
+Panel): a nested grid occupies one cell and rebuilds its own layout there,
+keeping its title and axis sharing.
 _Avoid_: grid layout (for the front), figure grid
 
 **Bar slot**:
@@ -50,7 +52,7 @@ _Avoid_: chart class, chart type (for the function), attrs dict
 **Metadata transport**:
 The chart spec riding on a rendered figure (`figure._chart_metadata`) so composition
 functions (`Panel`, `Grid`) can rebuild it. Carries layers and panel settings, not
-raw attribute dicts.
+raw attribute dicts; grid figures carry a recursive cell tree instead of a panel.
 _Avoid_: snapshot (for this), chart data
 
 ### Styling

@@ -213,6 +213,13 @@ def Grid(
     grid governed by `max_cols`, with a `layout_spec` escape hatch for
     irregular grids (rowspans).
 
+    Grids nest: a Grid figure placed in a cell occupies exactly that cell and
+    rebuilds its internal layout inside it, to any depth. The nested grid
+    keeps its own title (a heading spanning its subgrid) and its own
+    sharex/sharey among its own cells; the outer grid's sharex/sharey applies
+    only to its top-level cells. Panel figures also nest in a cell; the
+    reverse — a Grid figure inside a Panel — stays an error.
+
     Examples:
         >>> from datachart.charts import LineChart, BarChart, ScatterChart
         >>> from datachart.utils import Grid
@@ -229,6 +236,13 @@ def Grid(
         >>>
         >>> # Flat list: automatic uniform grid
         >>> combined = Grid([fig1, fig2, fig3], max_cols=2)
+        >>>
+        >>> # Grids nest: a grid figure occupies one cell of the outer grid
+        >>> inner = Grid([[fig1, fig2], [fig3]], title="Inner")
+        >>> combined = Grid([inner, fig1], title="Outer")
+        >>>
+        >>> # Nested rows can hold grid (and Panel) figures too
+        >>> combined = Grid([[inner, fig1], [fig2]])
         >>>
         >>> # Flat list with the layout_spec escape hatch (rowspans)
         >>> combined = Grid(
@@ -257,8 +271,7 @@ def Grid(
 
     Raises:
         ValueError: If charts is empty, rows are mixed with flat items, a cell
-            is invalid, or a figure cannot be composed (missing metadata,
-            Grid figure).
+            is invalid, or a figure cannot be composed (missing metadata).
     """
     if not charts:
         raise ValueError("At least one chart is required")
