@@ -203,12 +203,6 @@ class TestGrid:
         with pytest.raises(ValueError):
             Grid([[_line_fig()], []])
 
-    def test_rejects_grid_in_grid(self):
-        inner = Grid([_line_fig(), _bar_fig()])
-        with pytest.raises(ValueError, match="[Gg]rid"):
-            Grid([inner, _line_fig()])
-        plt.close("all")
-
     def test_rejects_empty_list(self):
         with pytest.raises(ValueError):
             Grid([])
@@ -217,6 +211,122 @@ class TestGrid:
         panel_fig = Panel([_bar_fig(), _line_fig()])
         fig = Grid([[panel_fig, _line_fig()]])
         assert len(fig.axes) >= 2
+        plt.close("all")
+
+    def test_panel_output_nests_in_flat_grid(self):
+        panel_fig = Panel([_bar_fig(), _line_fig()])
+        fig = Grid([panel_fig, _line_fig()])
+        assert len(fig.axes) == 2
+        plt.close("all")
+
+
+class TestNestedGrid:
+    """Grid figures nest inside Grid via the recursive cell tree (ADR 0006)."""
+
+    def test_grid_metadata_carries_cell_tree(self):
+        fig = Grid([_line_fig(), _bar_fig()], title="Inner", sharex=True)
+        md = fig._chart_metadata
+        assert md["type"] == "grid"
+        assert md["title"] == "Inner"
+        assert md["sharex"] is True
+        assert md["sharey"] is False
+        assert md["shape"] == (1, 2)
+        assert [c["spec"] for c in md["cells"]] == [
+            {"row": 0, "col": 0, "rowspan": 1, "colspan": 1},
+            {"row": 0, "col": 1, "rowspan": 1, "colspan": 1},
+        ]
+        assert all("panel" in c for c in md["cells"])
+        plt.close("all")
+
+    def test_grid_nests_in_grid(self):
+        inner = Grid([_line_fig(), _bar_fig()])
+        fig = Grid([inner, _line_fig()])
+        # the nested grid occupies one cell and rebuilds its two cells inside it
+        assert len(fig.axes) == 3
+        cells = fig._chart_metadata["cells"]
+        assert "grid" in cells[0]
+        assert "panel" in cells[1]
+        assert len(cells[0]["grid"]["cells"]) == 2
+        plt.close("all")
+
+    def test_nesting_composes_to_depth_three(self):
+        level1 = Grid([_line_fig(), _bar_fig()])
+        level2 = Grid([level1, _line_fig()])
+        level3 = Grid([level2, _bar_fig()])
+        assert len(level3.axes) == 4
+        node = level3._chart_metadata["cells"][0]["grid"]
+        assert "grid" in node["cells"][0]
+        assert len(node["cells"][0]["grid"]["cells"]) == 2
+        plt.close("all")
+
+    def test_nested_grid_in_nested_rows(self):
+        inner = Grid([[_line_fig(), _bar_fig()]])
+        fig = Grid([[inner, _line_fig()], [_bar_fig()]])
+        assert len(fig.axes) == 4
+        plt.close("all")
+
+    def test_blank_cells_preserved_inside_nested_grid(self):
+        inner = Grid([[_line_fig(), None], [_bar_fig(), _line_fig()]])
+        fig = Grid([inner, _bar_fig()])
+        # the inner blank cell stays blank: only 3 inner axes plus 1 outer
+        assert len(fig.axes) == 4
+        plt.close("all")
+
+    def test_nested_grid_keeps_own_furniture(self):
+        inner = Grid([_line_fig(), _line_fig()], title="Inner", sharey=True)
+        outer = Grid([inner, _bar_fig()], title="Outer")
+        assert outer._suptitle.get_text() == "Outer"
+        # the nested title renders as a heading spanning the subgrid
+        assert any(t.get_text() == "Inner" for sf in outer.subfigs for t in sf.texts)
+        # inner sharey holds among the inner cells only
+        in_a, in_b = outer.subfigs[0].axes
+        assert in_a.get_shared_y_axes().joined(in_a, in_b)
+        outer_ax = [ax for ax in outer.axes if ax.figure is outer][0]
+        assert not in_a.get_shared_y_axes().joined(in_a, outer_ax)
+        plt.close("all")
+
+    def test_parent_sharing_stops_at_nesting_boundary(self):
+        inner = Grid([_line_fig(), _line_fig()])
+        outer = Grid([_line_fig(), inner, _line_fig()], sharex=True)
+        top = [ax for ax in outer.axes if ax.figure is outer]
+        assert top[0].get_shared_x_axes().joined(top[0], top[1])
+        in_a, in_b = outer.subfigs[0].axes
+        assert not in_a.get_shared_x_axes().joined(in_a, in_b)
+        assert not in_a.get_shared_x_axes().joined(in_a, top[0])
+        plt.close("all")
+
+    def test_multi_subplot_figure_nests_inside_nested_grid(self):
+        sub = LineChart(
+            data=[[{"x": i, "y": i} for i in range(5)] for _ in range(2)],
+            subplots=True,
+        )
+        inner = Grid([sub, _bar_fig()])
+        fig = Grid([inner, _line_fig()])
+        # 2 subplot axes + 1 bar + 1 outer line
+        assert len(fig.axes) == 4
+        plt.close("all")
+
+    def test_nested_sharing_skips_multi_subplot_cells(self):
+        # a multi-subplot cell's spanning axes is removed during render, so it
+        # must never anchor the nested grid's sharex/sharey group
+        sub = LineChart(
+            data=[[{"x": i, "y": i} for i in range(5)] for _ in range(2)],
+            subplots=True,
+        )
+        inner = Grid([sub, _line_fig(), _line_fig()], sharex=True)
+        fig = Grid([inner, _bar_fig()])
+        # creation order inside the subfigure: 2 subplot axes, then 2 line axes
+        in_axes = fig.subfigs[0].axes
+        assert len(in_axes) == 4
+        line_a, line_b = in_axes[2], in_axes[3]
+        assert line_a.get_shared_x_axes().joined(line_a, line_b)
+        assert not line_a.get_shared_x_axes().joined(line_a, in_axes[0])
+        plt.close("all")
+
+    def test_grid_in_panel_still_raises(self):
+        grid_fig = Grid([_line_fig(), _bar_fig()])
+        with pytest.raises(ValueError, match="[Gg]rid"):
+            Panel([grid_fig])
         plt.close("all")
 
 

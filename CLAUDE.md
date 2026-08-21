@@ -121,8 +121,10 @@ The transport carries only what composition consumes — never the fronts' input
 `Panel` concatenates the source figures' layer groups into one panel with
 twin-axis assignment; `Grid` renders each figure's stored panel into a grid
 cell (nested rows define the layout; `layout_spec` dicts are the escape hatch).
-Both consume the panel — there is no second drawing path. Grid figures carry
-only `{"type": "grid"}` and cannot be composed further.
+Both consume the panel — there is no second drawing path. Grid figures carry a
+recursive cell tree (`{"type": "grid", "cells": [...], ...}`, ADR 0006) so they
+nest inside `Grid` — each occupies one cell and rebuilds its layout there —
+but stay rejected in `Panel`.
 
 ### Theme System
 

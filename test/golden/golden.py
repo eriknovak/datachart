@@ -28,7 +28,7 @@ from datachart.charts import (
     BoxPlot,
     ParallelCoords,
 )
-from datachart.utils import OverlayChart, FigureGridLayout, Panel
+from datachart.utils import OverlayChart, FigureGridLayout, Panel, Grid
 from datachart.config import config
 from datachart.constants import THEME
 
@@ -476,6 +476,25 @@ def grid_subplot_figure():
     return FigureGridLayout(
         charts=[{"figure": f}, {"figure": g}], max_cols=2, figsize=(10, 4)
     )
+
+
+@case
+def grid_nested_grid():
+    f1 = LineChart(data=LINE1, subtitle="line")
+    f2 = BarChart(data=BAR1, subtitle="bar")
+    f3 = ScatterChart(data=SCAT1, subtitle="scatter")
+    f4 = Histogram(data=hist_data(), subtitle="hist", num_bins=10)
+    inner = Grid([[f1, f2], [f3]], title="Inner", sharex=True)
+    return Grid([inner, f4], title="Nested", figsize=(12, 5))
+
+
+@case
+def grid_mixed_panel_and_grid():
+    fb = BarChart(data=BAR1, title="Bar")
+    fl = LineChart(data=LINE2, title="Line")
+    panel = Panel([fb, fl], title="Panel", show_legend=True)
+    grid_fig = Grid([LineChart(data=LINE1), ScatterChart(data=SCAT1)], title="Sub")
+    return Grid([panel, grid_fig], figsize=(12, 5))
 
 
 @case

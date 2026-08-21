@@ -18,7 +18,8 @@ import warnings
 from typing import List, Optional, Tuple, Dict, Any
 
 import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
+from matplotlib.figure import FigureBase
+from matplotlib.gridspec import GridSpec, SubplotSpec
 
 from ..constants import FIG_FORMAT
 from ._internal.config_helpers import get_text_style
@@ -26,6 +27,104 @@ from ._internal.config_helpers import get_text_style
 # =====================================
 # Helper functions
 # =====================================
+
+
+def _cell_content(figure: plt.Figure, idx: int) -> Dict[str, Any]:
+    """Build one transport cell's content from a figure's metadata (ADR 0006).
+
+    Returns one of: `{"grid": node}` for a nested grid figure, `{"panels", "shape"}`
+    for a multi-subplot figure, or `{"panel": Panel}` for everything else.
+    """
+    if not hasattr(figure, "_chart_metadata"):
+        raise ValueError(
+            f"Figure at index {idx} is missing chart metadata. "
+            "This figure was likely not created by a datachart chart function."
+        )
+
+    metadata = figure._chart_metadata
+    if metadata.get("type") is None:
+        raise ValueError(f"Figure at index {idx} has invalid metadata: missing 'type'")
+    if metadata.get("type") == "grid":
+        if "cells" not in metadata:
+            raise ValueError(
+                f"Figure at index {idx} is a Grid figure without a cell tree; "
+                "it cannot be nested"
+            )
+        return {"grid": metadata}
+    panel = metadata.get("panel")
+    if panel is None:
+        raise ValueError(f"Figure at index {idx} has invalid metadata: missing 'panel'")
+
+    subplot_panels = metadata.get("panels")
+    if panel.layers and subplot_panels and len(subplot_panels) > 1:
+        return {
+            "panels": subplot_panels,
+            "shape": metadata.get("shape", (1, len(subplot_panels))),
+        }
+    return {"panel": panel}
+
+
+def _render_cell(owner: FigureBase, cell: Dict[str, Any], target_ax: plt.Axes) -> None:
+    """Draw one transport cell into its pre-created axes."""
+    if "grid" in cell:
+        subplot_spec = target_ax.get_subplotspec()
+        target_ax.remove()
+        _render_grid_node(owner, cell["grid"], subplot_spec)
+        return
+
+    # a multi-subplot figure rebuilds its subplot arrangement in the cell
+    panels = cell.get("panels")
+    if panels:
+        nrows_sub, ncols_sub = cell["shape"]
+        sub_gs = target_ax.get_subplotspec().subgridspec(nrows_sub, ncols_sub)
+        target_ax.remove()
+        for p_idx, subplot_panel in enumerate(panels):
+            sub_ax = owner.add_subplot(sub_gs[p_idx // ncols_sub, p_idx % ncols_sub])
+            sub_ax.axis("off")
+            subplot_panel.render(sub_ax)
+        return
+
+    target_ax.axis("off")
+    if cell["panel"].layers:
+        cell["panel"].render(target_ax)
+
+
+def _render_grid_node(
+    owner: FigureBase, node: Dict[str, Any], subplot_spec: SubplotSpec
+) -> None:
+    """Rebuild a nested grid inside one parent cell (ADR 0006).
+
+    The node is the nested grid figure's own metadata: its cell tree, layout
+    shape, title, and sharex/sharey. A subfigure keeps its furniture local —
+    the title spans only the subgrid and sharing never crosses the boundary.
+    """
+    subfig = owner.add_subfigure(subplot_spec)
+    if node.get("title"):
+        subfig.suptitle(node["title"], **get_text_style("title"))
+
+    nrows, ncols = node["shape"]
+    sub_gs = subfig.add_gridspec(nrows, ncols)
+    first_ax = None
+    for cell in node["cells"]:
+        layout = cell["spec"]
+        cell_spec = sub_gs[
+            layout["row"] : layout["row"] + layout["rowspan"],
+            layout["col"] : layout["col"] + layout["colspan"],
+        ]
+        if "grid" in cell:
+            _render_grid_node(subfig, cell["grid"], cell_spec)
+            continue
+        # a multi-subplot cell's spanning axes is removed during render — it
+        # must neither anchor nor join the share group (dead-axes crash)
+        shareable = "panels" not in cell
+        ax = subfig.add_subplot(
+            cell_spec,
+            sharex=first_ax if node["sharex"] and shareable else None,
+            sharey=first_ax if node["sharey"] and shareable else None,
+        )
+        if shareable and first_ax is None:
+            first_ax = ax
+        _render_cell(subfig, cell, ax)
 
 
 def _figure_grid_layout_impl(
@@ -93,6 +192,7 @@ def _figure_grid_layout_impl(
         # Create figure and GridSpec
         combined_fig = plt.figure(figsize=figsize, constrained_layout=True)
         gs = GridSpec(max_row, max_col, figure=combined_fig)
+        grid_shape = (max_row, max_col)
 
         # Create axes based on layout specs
         axes = []
@@ -131,55 +231,29 @@ def _figure_grid_layout_impl(
         )
 
         axes = axes.flatten()
+        grid_shape = (nrows, ncols)
 
     # Process each figure: every figure's metadata carries a Panel that can
-    # redraw the chart into any axes (the single drawing seam, ADR 0001).
+    # redraw the chart into any axes (the single drawing seam, ADR 0001),
+    # or — for a nested grid figure — a recursive cell tree (ADR 0006).
+    cells = []
     for idx, fig in enumerate(figures):
         if idx >= len(axes):
             break
 
-        if not hasattr(fig, "_chart_metadata"):
-            raise ValueError(
-                f"Figure at index {idx} is missing chart metadata. "
-                "This figure was likely not created by a datachart chart function."
-            )
-
-        metadata = fig._chart_metadata
-        if metadata.get("type") is None:
-            raise ValueError(
-                f"Figure at index {idx} has invalid metadata: missing 'type'"
-            )
-        if metadata.get("type") == "grid":
-            raise ValueError(
-                f"Figure at index {idx} is a Grid figure; grid figures cannot be nested"
-            )
-        panel = metadata.get("panel")
-        if panel is None:
-            raise ValueError(
-                f"Figure at index {idx} has invalid metadata: missing 'panel'"
-            )
-
-        target_ax = axes[idx]
-        if not panel.layers:
-            target_ax.axis("off")
-            continue
-
-        # a multi-subplot figure rebuilds its subplot arrangement in the cell
-        subplot_panels = metadata.get("panels")
-        if subplot_panels and len(subplot_panels) > 1:
-            nrows_sub, ncols_sub = metadata.get("shape", (1, len(subplot_panels)))
-            sub_gs = target_ax.get_subplotspec().subgridspec(nrows_sub, ncols_sub)
-            target_ax.remove()
-            for p_idx, subplot_panel in enumerate(subplot_panels):
-                sub_ax = combined_fig.add_subplot(
-                    sub_gs[p_idx // ncols_sub, p_idx % ncols_sub]
-                )
-                sub_ax.axis("off")
-                subplot_panel.render(sub_ax)
-            continue
-
-        target_ax.axis("off")
-        panel.render(target_ax)
+        cell = _cell_content(fig, idx)
+        cell["spec"] = (
+            dict(layout_specs[idx])
+            if layout_specs
+            else {
+                "row": idx // grid_shape[1],
+                "col": idx % grid_shape[1],
+                "rowspan": 1,
+                "colspan": 1,
+            }
+        )
+        cells.append(cell)
+        _render_cell(combined_fig, cell, axes[idx])
 
     # Hide unused subplots (only applicable for uniform grid layout)
     if not layout_specs:
@@ -190,8 +264,15 @@ def _figure_grid_layout_impl(
     if title:
         combined_fig.suptitle(title, **get_text_style("title"))
 
-    # grid figures carry no panel and cannot be composed further (ADR 0002)
-    combined_fig._chart_metadata = {"type": "grid"}
+    # the recursive cell tree lets this grid nest inside another Grid (ADR 0006)
+    combined_fig._chart_metadata = {
+        "type": "grid",
+        "cells": cells,
+        "shape": grid_shape,
+        "title": title,
+        "sharex": sharex,
+        "sharey": sharey,
+    }
 
     return combined_fig
 
