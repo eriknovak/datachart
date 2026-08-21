@@ -82,7 +82,8 @@ def Panel(
             Figure created by a datachart chart function — including another
             Panel figure, which flattens into this one — or a dict with a
             "figure" key plus optional per-figure options:
-            - "y_axis": "left", "right", or "auto" (default: "auto")
+            - "y_axis": "left", "right", or "auto" (chart figures default to
+              "auto"; a nested panel's figures keep their own assignment)
             - "z_order": Integer for layering control (higher values on top)
             - "legend_label": Custom legend label (overrides chart subtitle)
         title: Title for the combined chart.

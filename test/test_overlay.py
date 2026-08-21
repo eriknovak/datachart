@@ -392,18 +392,20 @@ class TestOverlayChart:
         line2 = [{"x": i, "y": i * 12} for i in range(5)]
         line3 = [{"x": i, "y": i * 15} for i in range(5)]
 
-        def render(charts):
+        def render(compose):
             figs = [LineChart(data=d) for d in (line1, line2, line3)]
-            fig = charts(figs)
+            fig = compose(figs)
             fig.canvas.draw()
             pixels = np.asarray(fig.canvas.buffer_rgba()).copy()
             plt.close("all")
             return pixels
 
-        flat = render(lambda figs: Panel(figs))
+        flat = render(Panel)
         nested = render(lambda figs: Panel([Panel(figs[:2]), figs[2]]))
+        deep = render(lambda figs: Panel([Panel([Panel(figs[:1]), figs[1]]), figs[2]]))
         assert flat.shape == nested.shape
         assert np.array_equal(flat, nested)
+        assert np.array_equal(flat, deep)
 
     def test_nested_panel_preserves_inner_prefs(self):
         """Test that a nested Panel keeps its per-figure prefs when flattened."""
