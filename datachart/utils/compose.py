@@ -46,6 +46,13 @@ def Panel(
     on a single plot, drawn in the order provided. Multiple y-axes (left and
     right) are supported for handling different scales.
 
+    Panel figures nest: ``Panel([Panel([f1, f2]), f3])`` is equivalent to
+    ``Panel([f1, f2, f3])``, to any depth. A nested panel contributes its
+    figures with their per-figure options intact, while panel-level settings
+    (title, labels, limits, ...) always come from the outermost call. Dict
+    options on a nested panel override its per-figure options only when
+    explicitly given.
+
     Examples:
         >>> from datachart.charts import LineChart, BarChart
         >>> from datachart.utils import Panel
@@ -55,6 +62,9 @@ def Panel(
         >>>
         >>> # Bare figures: automatic axis assignment
         >>> combined = Panel([bar_fig, line_fig], title="Sales Analysis")
+        >>>
+        >>> # Panels nest: add a figure to an existing panel
+        >>> extended = Panel([combined, line_fig])
         >>>
         >>> # Dicts carry per-figure options
         >>> combined = Panel(
@@ -69,8 +79,9 @@ def Panel(
 
     Args:
         charts: The figures to overlay. Each item is either a bare matplotlib
-            Figure created by a datachart chart function (all defaults), or a
-            dict with a "figure" key plus optional per-figure options:
+            Figure created by a datachart chart function — including another
+            Panel figure, which flattens into this one — or a dict with a
+            "figure" key plus optional per-figure options:
             - "y_axis": "left", "right", or "auto" (default: "auto")
             - "z_order": Integer for layering control (higher values on top)
             - "legend_label": Custom legend label (overrides chart subtitle)

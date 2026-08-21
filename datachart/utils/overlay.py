@@ -75,6 +75,9 @@ def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
                     palette=group.palette,
                     max_colors=group.max_colors,
                     num_bins=group.num_bins,
+                    y_axis=group.y_axis,
+                    z_order=group.z_order,
+                    legend_label=group.legend_label,
                 )
             )
     return groups
@@ -126,9 +129,10 @@ def _overlay_impl(
 
         figure = chart_config["figure"]
         for group in _extract_groups(figure, i):
+            # None leaves the group's own pref (from a nested panel) in place
             groups.append(
                 group.with_prefs(
-                    y_axis=chart_config.get("y_axis", "auto"),
+                    y_axis=chart_config.get("y_axis", None),
                     z_order=chart_config.get("z_order", None),
                     legend_label=chart_config.get("legend_label", None),
                 )

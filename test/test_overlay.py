@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from datachart.charts import LineChart, BarChart, ScatterChart, Histogram
-from datachart.utils import OverlayChart, FigureGridLayout
+from datachart.utils import OverlayChart, FigureGridLayout, Panel
 
 
 class TestOverlayChart:
@@ -385,6 +385,73 @@ class TestOverlayChart:
         plt.close(overlay_fig)
         plt.close(bar_fig)
         plt.close(line_fig)
+
+    def test_nested_panel_equals_flat(self):
+        """Test that a nested Panel flattens into the same figure as the flat form."""
+        line1 = [{"x": i, "y": i * 10} for i in range(5)]
+        line2 = [{"x": i, "y": i * 12} for i in range(5)]
+        line3 = [{"x": i, "y": i * 15} for i in range(5)]
+
+        def render(charts):
+            figs = [LineChart(data=d) for d in (line1, line2, line3)]
+            fig = charts(figs)
+            fig.canvas.draw()
+            pixels = np.asarray(fig.canvas.buffer_rgba()).copy()
+            plt.close("all")
+            return pixels
+
+        flat = render(lambda figs: Panel(figs))
+        nested = render(lambda figs: Panel([Panel(figs[:2]), figs[2]]))
+        assert flat.shape == nested.shape
+        assert np.array_equal(flat, nested)
+
+    def test_nested_panel_preserves_inner_prefs(self):
+        """Test that a nested Panel keeps its per-figure prefs when flattened."""
+        bar_fig = BarChart(data=[{"label": f"Cat{i}", "y": i * 100} for i in range(5)])
+        line_fig = LineChart(data=[{"x": i, "y": i * 2} for i in range(5)])
+        extra_fig = LineChart(data=[{"x": i, "y": i * 3} for i in range(5)])
+
+        inner = Panel(
+            [
+                {"figure": bar_fig, "y_axis": "left", "z_order": 5},
+                {"figure": line_fig, "y_axis": "right", "legend_label": "inner"},
+            ]
+        )
+        outer = Panel([inner, extra_fig])
+
+        groups = outer._chart_metadata["panel"].groups
+        assert [g.y_axis for g in groups] == ["left", "right", "auto"]
+        assert [g.z_order for g in groups] == [5, None, None]
+        assert [g.legend_label for g in groups] == [None, "inner", None]
+        plt.close("all")
+
+    def test_nested_panel_outer_options_override(self):
+        """Test that explicit outer dict options override the inner prefs."""
+        line1_fig = LineChart(data=[{"x": i, "y": i * 10} for i in range(5)])
+        line2_fig = LineChart(data=[{"x": i, "y": i * 12} for i in range(5)])
+
+        inner = Panel(
+            [
+                {"figure": line1_fig, "y_axis": "right", "legend_label": "inner"},
+                line2_fig,
+            ]
+        )
+        outer = Panel([{"figure": inner, "y_axis": "left", "legend_label": "outer"}])
+
+        groups = outer._chart_metadata["panel"].groups
+        assert [g.y_axis for g in groups] == ["left", "left"]
+        assert [g.legend_label for g in groups] == ["outer", "outer"]
+        plt.close("all")
+
+    def test_nested_panel_arbitrary_depth(self):
+        """Test that panels nest to arbitrary depth."""
+        figs = [
+            LineChart(data=[{"x": i, "y": i * (10 + k)} for i in range(5)])
+            for k in range(3)
+        ]
+        deep = Panel([Panel([Panel([figs[0]]), figs[1]]), figs[2]])
+        assert len(deep._chart_metadata["panel"].groups) == 3
+        plt.close("all")
 
     def test_overlay_chart_in_figure_grid_layout(self):
         """Test that OverlayChart can be used in FigureGridLayout."""
