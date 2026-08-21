@@ -167,6 +167,7 @@ def _overlay_impl(
         "xlabel": xlabel,
         "ylabel": ylabel_left,
         "ylabel_right": ylabel_right,
+        "label_styles": Panel.snapshot_label_styles(),
         "xmin": xmin,
         "xmax": xmax,
         "ymin": ymin,

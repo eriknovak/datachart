@@ -174,7 +174,7 @@ Layers use `get_chart_hash()` (in `layers.py`) to key color assignment, so the s
 
 ### Axes Configuration
 
-The `configure_axes_spines()`, `configure_axis_ticks_style()`, and `configure_axis_ticks_position()` functions apply global config styles to matplotlib axes objects. This centralized approach ensures consistency across all chart types.
+Spine and tick styles are snapshotted from the config at build time by `Panel.snapshot_furniture()` and applied to every axes in `Panel.render()`; `configure_axis_ticks_position()` applies user-provided tick positions. This centralized approach ensures consistency across all chart types.
 
 ## Agent skills
 
