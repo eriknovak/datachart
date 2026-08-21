@@ -40,6 +40,8 @@ class FIG_SIZE:
     with a height — `SHORT` (2.4 in / 6.1 cm), `MEDIUM` (4.8 in / 12.2 cm),
     or `TALL` (7.2 in / 18.3 cm).
 
+    ![FIG_SIZE at a glance](../../assets/imgs/fig-sizes.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import FIG_SIZE
         >>> FIG_SIZE.DEFAULT
@@ -134,6 +136,8 @@ class FIG_FORMAT:
 class FONT_STYLE:
     """The supported font styles.
 
+    ![FONT_STYLE at a glance](../../assets/imgs/const-font-style.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import FONT_STYLE
         >>> FONT_STYLE.DEFAULT
@@ -155,6 +159,8 @@ class FONT_STYLE:
 
 class FONT_WEIGHT:
     """The supported font weights.
+
+    ![FONT_WEIGHT at a glance](../../assets/imgs/const-font-weight.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import FONT_WEIGHT
@@ -189,6 +195,8 @@ class FONT_WEIGHT:
 
 class LINE_MARKER:
     """The supported line markers.
+
+    ![LINE_MARKER at a glance](../../assets/imgs/const-line-marker.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import LINE_MARKER
@@ -240,6 +248,8 @@ class LINE_MARKER:
 class LINE_STYLE:
     """The supported line styles.
 
+    ![LINE_STYLE at a glance](../../assets/imgs/const-line-style.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import LINE_STYLE
         >>> LINE_STYLE.SOLID
@@ -264,6 +274,8 @@ class LINE_STYLE:
 class LINE_DRAW_STYLE:
     """The supported line draw styles.
 
+    ![LINE_DRAW_STYLE at a glance](../../assets/imgs/const-line-draw-style.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import LINE_DRAW_STYLE
         >>> LINE_DRAW_STYLE.DEFAULT
@@ -285,6 +297,8 @@ class LINE_DRAW_STYLE:
 
 class HATCH_STYLE:
     """The supported hatch styles.
+
+    ![HATCH_STYLE at a glance](../../assets/imgs/const-hatch-style.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import HATCH_STYLE
@@ -320,6 +334,8 @@ class HATCH_STYLE:
 class LEGEND_ALIGN:
     """The supported legend alignments.
 
+    ![LEGEND_ALIGN at a glance](../../assets/imgs/const-legend-align.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import LEGEND_ALIGN
         >>> LEGEND_ALIGN.DEFAULT
@@ -341,6 +357,8 @@ class LEGEND_ALIGN:
 
 class LEGEND_LOCATION:
     """The supported legend locations.
+
+    ![LEGEND_LOCATION at a glance](../../assets/imgs/const-legend-location.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import LEGEND_LOCATION
@@ -573,6 +591,8 @@ class ORIENTATION:
 class VALUE_FORMAT:
     """The predefined value formats.
 
+    ![VALUE_FORMAT at a glance](../../assets/imgs/const-value-format.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import VALUE_FORMAT
         >>> VALUE_FORMAT.DEFAULT
@@ -719,6 +739,8 @@ class ASPECT_RATIO:
 
 class COLORBAR_LOCATION:
     """The supported colorbar locations.
+
+    ![COLORBAR_LOCATION at a glance](../../assets/imgs/const-colorbar-location.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import COLORBAR_LOCATION

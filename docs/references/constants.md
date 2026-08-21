@@ -15,15 +15,6 @@ title: Constants Module
     options:
         heading_level: 3
 
-#### Figure sizes at a glance
-
-Every `FIG_SIZE` drawn to scale: paper sizes as the shaded area they occupy on
-an A4 page (dotted outline: the standard 2.5 cm print margins the sizes are
-anchored to; dashed outline: a second half-width figure placed beside), and
-presentation sizes as standalone frames at the same physical scale.
-
-![FIG_SIZE paper real estate](../assets/imgs/fig-sizes.svg){ width="100%" }
-
 ::: datachart.constants.FIG_FORMAT
     options:
         heading_level: 3
@@ -34,13 +25,9 @@ presentation sizes as standalone frames at the same physical scale.
     options:
         heading_level: 3
 
-![FONT_STYLE at a glance](../assets/imgs/const-font-style.svg){ width="100%" }
-
 ::: datachart.constants.FONT_WEIGHT
     options:
         heading_level: 3
-
-![FONT_WEIGHT at a glance](../assets/imgs/const-font-weight.svg){ width="100%" }
 
 ## Line Constants
 
@@ -48,27 +35,19 @@ presentation sizes as standalone frames at the same physical scale.
     options:
         heading_level: 3
 
-![LINE_MARKER at a glance](../assets/imgs/const-line-marker.svg){ width="100%" }
-
 ::: datachart.constants.LINE_STYLE
     options:
         heading_level: 3
 
-![LINE_STYLE at a glance](../assets/imgs/const-line-style.svg){ width="100%" }
-
 ::: datachart.constants.LINE_DRAW_STYLE
     options:
         heading_level: 3
-
-![LINE_DRAW_STYLE at a glance](../assets/imgs/const-line-draw-style.svg){ width="100%" }
 
 ## Style Constants
 
 ::: datachart.constants.HATCH_STYLE
     options:
         heading_level: 3
-
-![HATCH_STYLE at a glance](../assets/imgs/const-hatch-style.svg){ width="100%" }
 
 ::: datachart.constants.COLORS
     options:
@@ -92,13 +71,9 @@ Every theme applied to the same set of charts is shown in the [Theme Gallery](..
     options:
         heading_level: 3
 
-![LEGEND_ALIGN at a glance](../assets/imgs/const-legend-align.svg){ width="100%" }
-
 ::: datachart.constants.LEGEND_LOCATION
     options:
         heading_level: 3
-
-![LEGEND_LOCATION at a glance](../assets/imgs/const-legend-location.svg){ width="100%" }
 
 ## Chart Constants
 
@@ -118,8 +93,6 @@ Every theme applied to the same set of charts is shown in the [Theme Gallery](..
     options:
         heading_level: 3
 
-![VALUE_FORMAT at a glance](../assets/imgs/const-value-format.svg){ width="100%" }
-
 ::: datachart.constants.SHOW_GRID
     options:
         heading_level: 3
@@ -135,5 +108,3 @@ Every theme applied to the same set of charts is shown in the [Theme Gallery](..
 ::: datachart.constants.COLORBAR_LOCATION
     options:
         heading_level: 3
-
-![COLORBAR_LOCATION at a glance](../assets/imgs/const-colorbar-location.svg){ width="100%" }
