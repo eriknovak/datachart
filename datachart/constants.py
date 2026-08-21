@@ -33,10 +33,12 @@ class FIG_SIZE:
     """The predefined figure sizes (ADR 0010).
 
     All values are `(width, height)` in inches, matplotlib's `figsize` unit.
-    Paper figures are anchored to the A4 text block: `FULL` is its full width
-    (8.2 in / 20.8 cm), `HALF` half of it (4.1 in / 10.4 cm), crossed with a
-    height — `SHORT` (2.4 in / 6.1 cm), `MEDIUM` (4.8 in / 12.2 cm), or `TALL`
-    (7.2 in / 18.3 cm).
+    Paper figures are anchored to the printable area of an A4 page with
+    standard 2.5 cm margins — a 6.3 x 9.7 in (16.0 x 24.6 cm) text block.
+    `FULL` spans the text-block width; `HALF` spans one of two columns
+    separated by a 0.3 in (0.8 cm) gap (3.0 in / 7.6 cm each). Widths cross
+    with a height — `SHORT` (2.4 in / 6.1 cm), `MEDIUM` (4.8 in / 12.2 cm),
+    or `TALL` (7.2 in / 18.3 cm).
 
     Examples:
         >>> from datachart.constants import FIG_SIZE
@@ -47,19 +49,19 @@ class FIG_SIZE:
         DEFAULT (Tuple[float, float]): The default figure size. Equals to `(6.4, 4.8)` in (16.3 x 12.2 cm).
 
         # Full-width paper figures (A4 text-block width)
-        FULL_SHORT (Tuple[float, float]): The short, full-width figure size. Equals to `(8.2, 2.4)` in (20.8 x 6.1 cm).
-        FULL_MEDIUM (Tuple[float, float]): The medium, full-width figure size. Equals to `(8.2, 4.8)` in (20.8 x 12.2 cm).
-        FULL_TALL (Tuple[float, float]): The tall, full-width figure size. Equals to `(8.2, 7.2)` in (20.8 x 18.3 cm).
+        FULL_SHORT (Tuple[float, float]): The short, full-width figure size. Equals to `(6.3, 2.4)` in (16.0 x 6.1 cm).
+        FULL_MEDIUM (Tuple[float, float]): The medium, full-width figure size. Equals to `(6.3, 4.8)` in (16.0 x 12.2 cm).
+        FULL_TALL (Tuple[float, float]): The tall, full-width figure size. Equals to `(6.3, 7.2)` in (16.0 x 18.3 cm).
 
-        # Half-width paper figures (for side-by-side placement)
-        HALF_SHORT (Tuple[float, float]): The short, half-width figure size. Equals to `(4.1, 2.4)` in (10.4 x 6.1 cm).
-        HALF_MEDIUM (Tuple[float, float]): The medium, half-width figure size. Equals to `(4.1, 4.8)` in (10.4 x 12.2 cm).
-        HALF_TALL (Tuple[float, float]): The tall, half-width figure size. Equals to `(4.1, 7.2)` in (10.4 x 18.3 cm).
-        HALF_SQUARE (Tuple[float, float]): The square, half-width figure size. Equals to `(4.1, 4.1)` in (10.4 x 10.4 cm).
+        # Half-width paper figures (one of two columns, 0.3 in gap)
+        HALF_SHORT (Tuple[float, float]): The short, half-width figure size. Equals to `(3.0, 2.4)` in (7.6 x 6.1 cm).
+        HALF_MEDIUM (Tuple[float, float]): The medium, half-width figure size. Equals to `(3.0, 4.8)` in (7.6 x 12.2 cm).
+        HALF_TALL (Tuple[float, float]): The tall, half-width figure size. Equals to `(3.0, 7.2)` in (7.6 x 18.3 cm).
+        HALF_SQUARE (Tuple[float, float]): The square, half-width figure size. Equals to `(3.0, 3.0)` in (7.6 x 7.6 cm).
 
-        # A4 full pages
-        A4_PORTRAIT (Tuple[float, float]): The A4 portrait figure size. Equals to `(8.2, 11.6)` in (20.8 x 29.5 cm).
-        A4_LANDSCAPE (Tuple[float, float]): The A4 landscape figure size. Equals to `(11.6, 8.2)` in (29.5 x 20.8 cm).
+        # A4 printable area (2.5 cm margins)
+        A4_PORTRAIT (Tuple[float, float]): The A4 portrait printable-area figure size. Equals to `(6.3, 9.7)` in (16.0 x 24.6 cm).
+        A4_LANDSCAPE (Tuple[float, float]): The A4 landscape printable-area figure size. Equals to `(9.7, 6.3)` in (24.6 x 16.0 cm).
 
         # Square
         SQUARE (Tuple[float, float]): The square figure size. Equals to `(4.8, 4.8)` in (12.2 x 12.2 cm).
@@ -75,19 +77,19 @@ class FIG_SIZE:
     DEFAULT = (6.4, 4.8)
 
     # Full-width paper figures (A4 text-block width)
-    FULL_SHORT = (8.2, 2.4)
-    FULL_MEDIUM = (8.2, 4.8)
-    FULL_TALL = (8.2, 7.2)
+    FULL_SHORT = (6.3, 2.4)
+    FULL_MEDIUM = (6.3, 4.8)
+    FULL_TALL = (6.3, 7.2)
 
-    # Half-width paper figures (for side-by-side placement)
-    HALF_SHORT = (4.1, 2.4)
-    HALF_MEDIUM = (4.1, 4.8)
-    HALF_TALL = (4.1, 7.2)
-    HALF_SQUARE = (4.1, 4.1)
+    # Half-width paper figures (one of two columns, 0.3 in gap)
+    HALF_SHORT = (3.0, 2.4)
+    HALF_MEDIUM = (3.0, 4.8)
+    HALF_TALL = (3.0, 7.2)
+    HALF_SQUARE = (3.0, 3.0)
 
-    # A4 full pages
-    A4_PORTRAIT = (8.2, 11.6)
-    A4_LANDSCAPE = (11.6, 8.2)
+    # A4 printable area (2.5 cm margins)
+    A4_PORTRAIT = (6.3, 9.7)
+    A4_LANDSCAPE = (9.7, 6.3)
 
     # Square
     SQUARE = (4.8, 4.8)

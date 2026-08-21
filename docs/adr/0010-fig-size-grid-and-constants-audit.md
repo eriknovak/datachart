@@ -10,17 +10,21 @@ wide but tall, `NARROW` meant flat. The `LETTER_*` and `TALL_*` families and
 most `A4_HALF_*` variants had zero uses in the package, tests, or docs.
 
 We rebuild `FIG_SIZE` around the sizes the package is actually for — paper
-figures anchored to the A4 text block — plus presentation frames. The grid
-names carry no paper-format prefix: the A4 anchor is documentation (the
-docstring states the reference and each size in inches and cm), not naming.
+figures anchored to the printable area of an A4 page — plus presentation
+frames. The grid names carry no paper-format prefix: the A4 anchor is
+documentation (the docstring states the reference and each size in inches
+and cm), not naming. Sizes respect print margins: the reference is A4 with
+standard 2.5 cm margins (a 6.3 × 9.7 in text block), not the physical sheet,
+and half-width figures account for a 0.3 in column gap.
 
-- **Width axis**: `FULL_*` (8.2 in, the A4 text-block width) and `HALF_*`
-  (4.1 in, half of it, for side-by-side figures).
+- **Width axis**: `FULL_*` (6.3 in, the text-block width) and `HALF_*`
+  (3.0 in, one of two columns separated by the gap).
 - **Height axis**: `SHORT` (2.4), `MEDIUM` (4.8), `TALL` (7.2) — height
   words for heights, replacing `NARROW`/`REGULAR`/`WIDE`.
-- **Full pages**: `A4_PORTRAIT`, `A4_LANDSCAPE` stay.
+- **Printable pages**: `A4_PORTRAIT = (6.3, 9.7)`, `A4_LANDSCAPE =
+  (9.7, 6.3)` — the printable area, not the 8.27 × 11.69 in sheet.
 - **Squares**: `SQUARE = (4.8, 4.8)` (the only square size ever used) and
-  `HALF_SQUARE = (4.1, 4.1)` (a square filling one column);
+  `HALF_SQUARE = (3.0, 3.0)` (a square filling one column);
   `SQUARE_SMALL`/`SQUARE_LARGE` are removed.
 - **Presentation**: both families — `SLIDE_16_9 = (13.33, 7.5)` and
   `SLIDE_4_3 = (10.0, 7.5)` (PowerPoint/Google-scale, where slides are
@@ -58,3 +62,7 @@ carries stays: it documents what you get when you don't ask.
 - **Beamer-only slide sizes.** Rejected: presentations are mostly made in
   PowerPoint/Google Slides; beamer frames kept alongside as the
   LaTeX-native anchor.
+- **Full-sheet anchoring** (the former 8.2 in width, nearly the physical A4
+  width). Rejected: printed figures live inside margins; a "full-width"
+  figure sized to the sheet gets scaled down or clipped in every real
+  document.

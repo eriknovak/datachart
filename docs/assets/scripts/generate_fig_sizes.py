@@ -17,7 +17,8 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
 from datachart.constants import FIG_SIZE
 
 A4_W, A4_H = 8.27, 11.69
-TOP_MARGIN = 1.0
+MARGIN = 2.5 / 2.54  # the 2.5 cm print margin the paper sizes are anchored to
+COLUMN_GAP = 0.3
 
 PAGE_COLOR = "#ffffff"
 PAGE_EDGE = "#9e9e9e"
@@ -62,16 +63,29 @@ def draw_page_with_box(ax, x0, y0, name, size, ghost):
             (x0, y0), page_w, page_h, facecolor=PAGE_COLOR, edgecolor=PAGE_EDGE, lw=1
         )
     )
-    # full-page sizes sit centered; figures hang from a 1 in top margin
-    box_y = y0 + max(page_h - TOP_MARGIN - h, (page_h - h) / 2)
-    box_x = x0 + (page_w - w) / 2 if not ghost else x0 + (page_w - 2 * w - 0.05) / 2
+    ax.add_patch(
+        Rectangle(
+            (x0 + MARGIN, y0 + MARGIN),
+            page_w - 2 * MARGIN,
+            page_h - 2 * MARGIN,
+            facecolor="none",
+            edgecolor=PAGE_EDGE,
+            lw=0.8,
+            linestyle=":",
+        )
+    )
+    # figures hang from the top of the text block
+    box_y = y0 + page_h - MARGIN - h
+    box_x = (
+        x0 + (page_w - w) / 2 if not ghost else x0 + (page_w - 2 * w - COLUMN_GAP) / 2
+    )
     ax.add_patch(
         Rectangle((box_x, box_y), w, h, facecolor=BOX_FACE, edgecolor=BOX_EDGE, lw=1.2)
     )
     if ghost:
         ax.add_patch(
             Rectangle(
-                (box_x + w + 0.05, box_y),
+                (box_x + w + COLUMN_GAP, box_y),
                 w,
                 h,
                 facecolor="none",
@@ -138,7 +152,7 @@ def main():
     ax.text(
         max_x / 2,
         2 * row_step + A4_H + 1.0,
-        "FIG_SIZE on an A4 page (dashed: a second half-width figure placed beside)",
+        "FIG_SIZE on an A4 page — dotted: the 2.5 cm print margins; dashed: a second half-width figure beside",
         ha="center",
         fontsize=13,
         color=LABEL_COLOR,
