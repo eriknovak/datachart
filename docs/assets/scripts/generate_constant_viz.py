@@ -39,6 +39,16 @@ MUTED = DEFAULT_THEME["muted_color"]
 INK = DEFAULT_THEME["font_general_color"]
 SAMPLE = "The quick brown fox jumps over the lazy dog"
 
+# one scheme across all images: equal pt at equal 7 in content width renders equal
+FS_LABEL = 9
+FS_BODY = 10
+FS_NOTE = 8.5
+
+
+def full_width(fig):
+    """Axes flush to the figure edges, so every SVG crops to the same width."""
+    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+
 
 def save(fig, name):
     fig.savefig(IMGS / name, format="svg", bbox_inches="tight")
@@ -49,17 +59,19 @@ def save(fig, name):
 def text_rows(rows, name, sample_kw, sample_family=None, footnote=None):
     """One row per member: constant name on the left, styled sample text right."""
     fig, ax = plt.subplots(figsize=(7, 0.32 * len(rows) + (0.3 if footnote else 0.05)))
-    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+    full_width(fig)
     family = sample_family or plt.rcParams["font.family"]
     for i, (label, value) in enumerate(rows):
         y = 1 - (i + 0.5) / len(rows)
-        ax.text(0.0, y, label, va="center", fontsize=10, color=INK, family="monospace")
+        ax.text(
+            0.0, y, label, va="center", fontsize=FS_LABEL, color=INK, family="monospace"
+        )
         ax.text(
             0.36,
             y,
             SAMPLE,
             va="center",
-            fontsize=11,
+            fontsize=FS_BODY,
             color=INK,
             family=family,
             **{sample_kw: value},
@@ -67,7 +79,13 @@ def text_rows(rows, name, sample_kw, sample_family=None, footnote=None):
     if footnote:
         pad = 0.8 / len(rows)
         ax.text(
-            0.0, -pad, footnote, va="center", fontsize=8.5, color=INK, style="italic"
+            0.0,
+            -pad,
+            footnote,
+            va="center",
+            fontsize=FS_NOTE,
+            color=INK,
+            style="italic",
         )
         ax.set_ylim(-2 * pad / 1.6, 1)
     else:
@@ -132,12 +150,19 @@ def line_marker():
     cols = 6
     rows = -(-len(members) // cols)
     fig, ax = plt.subplots(figsize=(7, 1.5 * rows))
+    full_width(fig)
     for i, (label, value) in enumerate(members):
         cx, cy = i % cols + 0.5, rows - (i // cols) - 0.5
         if value:
             ax.plot([cx], [cy], marker=value, markersize=11, color=DARK, linestyle="")
         ax.text(
-            cx, cy - 0.38, label, ha="center", fontsize=8, color=INK, family="monospace"
+            cx,
+            cy - 0.38,
+            label,
+            ha="center",
+            fontsize=FS_LABEL,
+            color=INK,
+            family="monospace",
         )
     ax.set_xlim(0, cols)
     ax.set_ylim(0, rows)
@@ -154,6 +179,7 @@ def line_style():
         ("DOTTED", LINE_STYLE.DOTTED),
     ]
     fig, ax = plt.subplots(figsize=(7, 0.4 * len(members) + 0.3))
+    full_width(fig)
     for i, (label, value) in enumerate(members):
         y = 1 - (i + 0.5) / len(members)
         ax.text(
@@ -161,7 +187,7 @@ def line_style():
             y,
             f"LINE_STYLE.{label}",
             va="center",
-            fontsize=10,
+            fontsize=FS_LABEL,
             color=INK,
             family="monospace",
         )
@@ -182,11 +208,14 @@ def line_draw_style():
     ]
     x, y = [0, 1, 2, 3], [1, 3, 2, 4]
     fig, axs = plt.subplots(2, 2, figsize=(7, 4.6), sharex=True, sharey=True)
+    fig.subplots_adjust(
+        left=0, right=1, top=0.93, bottom=0.01, wspace=0.06, hspace=0.22
+    )
     for ax, (label, value) in zip(axs.flat, members):
         ax.plot(x, y, drawstyle=value, color=DARK, lw=1.8)
         ax.plot(x, y, linestyle="", marker="o", markersize=4, color=MID)
         ax.set_title(
-            f"LINE_DRAW_STYLE.{label}", fontsize=9, color=INK, family="monospace"
+            f"LINE_DRAW_STYLE.{label}", fontsize=FS_LABEL, color=INK, family="monospace"
         )
         ax.set_xticks([])
         ax.set_yticks([])
@@ -211,6 +240,7 @@ def hatch_style():
     cols = 5
     rows = -(-len(members) // cols)
     fig, ax = plt.subplots(figsize=(7, 1.7 * rows))
+    full_width(fig)
     for i, (label, value) in enumerate(members):
         cx, cy = i % cols, rows - (i // cols) - 1
         ax.add_patch(
@@ -229,7 +259,7 @@ def hatch_style():
             cy + 0.14,
             label,
             ha="center",
-            fontsize=8,
+            fontsize=FS_LABEL,
             color=INK,
             family="monospace",
         )
@@ -246,6 +276,7 @@ def legend_align():
         ("RIGHT", LEGEND_ALIGN.RIGHT),
     ]
     fig, axs = plt.subplots(1, 3, figsize=(7, 1.05))
+    fig.subplots_adjust(left=0, right=1, top=0.78, bottom=0.02, wspace=0.06)
     for ax, (label, value) in zip(axs, members):
         handles = [
             plt.Line2D([], [], color=DARK, lw=2, label="alpha"),
@@ -256,11 +287,13 @@ def legend_align():
             title="A wide legend title",
             alignment=value,
             loc="center",
-            fontsize=8,
-            title_fontsize=8,
+            fontsize=FS_LABEL,
+            title_fontsize=FS_LABEL,
         )
         legend.get_frame().set_edgecolor(MUTED)
-        ax.set_title(f"LEGEND_ALIGN.{label}", fontsize=9, color=INK, family="monospace")
+        ax.set_title(
+            f"LEGEND_ALIGN.{label}", fontsize=FS_LABEL, color=INK, family="monospace"
+        )
         ax.axis("off")
     save(fig, "const-legend-align.svg")
 
@@ -278,6 +311,7 @@ def legend_location():
         "LOWER_RIGHT": (0.96, 0.07, "right", "bottom"),
     }
     fig, ax = plt.subplots(figsize=(7, 4.2))
+    fig.subplots_adjust(left=0.002, right=0.998, top=0.995, bottom=0.12)
     for label, (x, y, ha, va) in spots.items():
         ax.text(
             x,
@@ -285,7 +319,7 @@ def legend_location():
             label,
             ha=ha,
             va=va,
-            fontsize=9,
+            fontsize=FS_LABEL,
             color=INK,
             family="monospace",
             bbox=dict(boxstyle="round,pad=0.35", facecolor=FACE, edgecolor=DARK, lw=1),
@@ -296,7 +330,7 @@ def legend_location():
         "BEST picks the least-crowded spot automatically; RIGHT is an alias of CENTER_RIGHT",
         ha="center",
         va="top",
-        fontsize=9,
+        fontsize=FS_NOTE,
         color=INK,
     )
     for spine in ax.spines.values():
@@ -319,6 +353,7 @@ def value_format():
         ("THOUSANDS", VALUE_FORMAT.THOUSANDS),
     ]
     fig, ax = plt.subplots(figsize=(7, 0.4 * (len(members) + 1) + 0.3))
+    full_width(fig)
     n = len(members) + 1
     header_y = 1 - 0.5 / n
     for x, text in (
@@ -327,7 +362,13 @@ def value_format():
         (0.62, "1234.5678 (0.4321 for %) →"),
     ):
         ax.text(
-            x, header_y, text, va="center", fontsize=9, color=INK, fontweight="bold"
+            x,
+            header_y,
+            text,
+            va="center",
+            fontsize=FS_LABEL,
+            color=INK,
+            fontweight="bold",
         )
     for i, (label, value) in enumerate(members):
         y = 1 - (i + 1.5) / n
@@ -337,7 +378,7 @@ def value_format():
             y,
             f"VALUE_FORMAT.{label}",
             va="center",
-            fontsize=9.5,
+            fontsize=FS_LABEL,
             color=INK,
             family="monospace",
         )
@@ -346,7 +387,7 @@ def value_format():
             y,
             f'"{value}"',
             va="center",
-            fontsize=9.5,
+            fontsize=FS_LABEL,
             color=INK,
             family="monospace",
         )
@@ -355,7 +396,7 @@ def value_format():
             y,
             value.format(x=sample),
             va="center",
-            fontsize=9.5,
+            fontsize=FS_LABEL,
             color=DARK,
             family="monospace",
         )
@@ -378,9 +419,15 @@ def colorbar_location():
     for subfig, (label, value) in zip(fig.subfigures(2, 2).flat, members):
         ax = subfig.subplots()
         image = ax.imshow(data, cmap="Blues")
-        subfig.colorbar(image, ax=ax, location=value, fraction=0.15, pad=0.06)
+        colorbar = subfig.colorbar(
+            image, ax=ax, location=value, fraction=0.15, pad=0.06
+        )
+        colorbar.ax.tick_params(labelsize=FS_LABEL)
         subfig.suptitle(
-            f"COLORBAR_LOCATION.\n{label}", fontsize=8, color=INK, family="monospace"
+            f"COLORBAR_LOCATION.\n{label}",
+            fontsize=FS_LABEL,
+            color=INK,
+            family="monospace",
         )
         ax.set_xticks([])
         ax.set_yticks([])

@@ -145,7 +145,9 @@ def main():
     n_rows = len(PAPER_ROWS)
 
     # one axes with equal aspect keeps every mockup at the same physical scale
-    fig, ax = plt.subplots(figsize=(9, 15))
+    # width matches the other constants images so on-page text sizes agree
+    fig, ax = plt.subplots(figsize=(7, 14))
+    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
 
     max_x = 0.0
     for i, row in enumerate(PAPER_ROWS):
@@ -169,7 +171,7 @@ def main():
         n_rows * row_step + A4_H + 1.0,
         "FIG_SIZE on an A4 page\ndotted: the 2.5 cm print margins; dashed: a second half-width figure beside",
         ha="center",
-        fontsize=13,
+        fontsize=11,
         color=LABEL_COLOR,
         linespacing=1.6,
     )
@@ -178,14 +180,13 @@ def main():
         slide_h + 1.0,
         "Presentation sizes, at the same scale as the pages above",
         ha="center",
-        fontsize=13,
+        fontsize=11,
         color=LABEL_COLOR,
     )
     ax.set_xlim(-0.4, max_x + 0.4)
     ax.set_ylim(-label_h, n_rows * row_step + A4_H + 4.4)
     ax.set_aspect("equal")
     ax.axis("off")
-    fig.tight_layout()
     fig.savefig(out, format="svg", bbox_inches="tight")
     print(f"wrote {out}")
 

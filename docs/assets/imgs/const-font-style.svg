@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-08-21T21:27:07.889676</dc:date>
+    <dc:date>2026-08-21T21:30:17.872799</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -31,7 +31,7 @@ z
   <g id="axes_1">
    <g id="text_1">
     <!-- FONT_STYLE.NORMAL -->
-    <g transform="translate(7.2 21.917656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 21.657891) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSansMono-29" d="M 728 4666 
 L 3475 4666 
@@ -254,7 +254,7 @@ z
    </g>
    <g id="text_2">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(188.64 22.177852) scale(0.11 -0.11)">
+    <g transform="translate(188.64 21.918047) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-37" d="M -19 4666 
 L 3928 4666 
@@ -858,7 +858,7 @@ z
    </g>
    <g id="text_3">
     <!-- FONT_STYLE.ITALIC -->
-    <g transform="translate(7.2 46.157656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 45.897891) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSansMono-2c" d="M 628 4666 
 L 3219 4666 
@@ -918,7 +918,7 @@ z
    </g>
    <g id="text_4">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(188.64 46.417852) scale(0.11 -0.11)">
+    <g transform="translate(188.64 46.158047) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-Oblique-37" d="M 378 4666 
 L 4325 4666 
@@ -1590,7 +1590,7 @@ z
    </g>
    <g id="text_5">
     <!-- FONT_STYLE.OBLIQUE -->
-    <g transform="translate(7.2 70.397656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 70.137891) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSansMono-25" d="M 1153 2228 
 L 1153 519 
@@ -1698,7 +1698,7 @@ z
    </g>
    <g id="text_6">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(188.64 70.657852) scale(0.11 -0.11)">
+    <g transform="translate(188.64 70.398047) scale(0.1 -0.1)">
      <use xlink:href="#DejaVuSans-Oblique-37"/>
      <use xlink:href="#DejaVuSans-Oblique-4b" transform="translate(61.078125 0)"/>
      <use xlink:href="#DejaVuSans-Oblique-48" transform="translate(124.453125 0)"/>

@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-08-21T21:27:07.943006</dc:date>
+    <dc:date>2026-08-21T21:30:17.925852</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -31,7 +31,7 @@ z
   <g id="axes_1">
    <g id="text_1">
     <!-- FONT_WEIGHT.ULTRA_LIGHT -->
-    <g transform="translate(7.2 21.245656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 20.985891) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSansMono-29" d="M 728 4666 
 L 3475 4666 
@@ -297,7 +297,7 @@ z
    </g>
    <g id="text_2">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(188.64 22.135) scale(0.11 -0.11)">
+    <g transform="translate(188.64 21.818) scale(0.1 -0.1)">
      <defs>
       <path id="AvenirNext-UltraLight-37" d="M 1798 4403 
 L 1798 0 
@@ -1151,7 +1151,7 @@ z
    </g>
    <g id="text_3">
     <!-- FONT_WEIGHT.LIGHT -->
-    <g transform="translate(7.2 44.141656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 43.881891) scale(0.09 -0.09)">
      <use xlink:href="#DejaVuSansMono-29"/>
      <use xlink:href="#DejaVuSansMono-32" transform="translate(60.203125 0)"/>
      <use xlink:href="#DejaVuSansMono-31" transform="translate(120.40625 0)"/>
@@ -1173,7 +1173,7 @@ z
    </g>
    <g id="text_4">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(188.64 45.031) scale(0.11 -0.11)">
+    <g transform="translate(188.64 44.714) scale(0.1 -0.1)">
      <use xlink:href="#AvenirNext-UltraLight-37"/>
      <use xlink:href="#AvenirNext-UltraLight-4b" transform="translate(52.203125 0)"/>
      <use xlink:href="#AvenirNext-UltraLight-48" transform="translate(109.109375 0)"/>
@@ -1221,7 +1221,7 @@ z
    </g>
    <g id="text_5">
     <!-- FONT_WEIGHT.NORMAL -->
-    <g transform="translate(7.2 67.037656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 66.777891) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSansMono-30" d="M 269 4666 
 L 1113 4666 
@@ -1262,7 +1262,7 @@ z
    </g>
    <g id="text_6">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(188.64 67.927) scale(0.11 -0.11)">
+    <g transform="translate(188.64 67.61) scale(0.1 -0.1)">
      <defs>
       <path id="AvenirNext-Regular-37" d="M 2054 0 
 L 1594 0 
@@ -2067,7 +2067,7 @@ z
    </g>
    <g id="text_7">
     <!-- FONT_WEIGHT.MEDIUM -->
-    <g transform="translate(7.2 89.933656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 89.673891) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSansMono-27" d="M 1363 519 
 Q 2159 519 2475 911 
@@ -2111,7 +2111,7 @@ z
    </g>
    <g id="text_8">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(188.64 90.823) scale(0.11 -0.11)">
+    <g transform="translate(188.64 90.506) scale(0.1 -0.1)">
      <defs>
       <path id="AvenirNext-Medium-37" d="M 2138 0 
 L 1504 0 
@@ -2916,7 +2916,7 @@ z
    </g>
    <g id="text_9">
     <!-- FONT_WEIGHT.SEMIBOLD -->
-    <g transform="translate(7.2 112.829656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 112.569891) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSansMono-36" d="M 3163 4506 
 L 3163 3866 
@@ -3006,7 +3006,7 @@ z
    </g>
    <g id="text_10">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(188.64 113.719) scale(0.11 -0.11)">
+    <g transform="translate(188.64 113.402) scale(0.1 -0.1)">
      <defs>
       <path id="AvenirNext-DemiBold-37" d="M 1414 3827 
 L 26 3827 
@@ -3817,7 +3817,7 @@ z
    </g>
    <g id="text_11">
     <!-- FONT_WEIGHT.BOLD -->
-    <g transform="translate(7.2 135.725656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 135.465891) scale(0.09 -0.09)">
      <use xlink:href="#DejaVuSansMono-29"/>
      <use xlink:href="#DejaVuSansMono-32" transform="translate(60.203125 0)"/>
      <use xlink:href="#DejaVuSansMono-31" transform="translate(120.40625 0)"/>
@@ -3838,7 +3838,7 @@ z
    </g>
    <g id="text_12">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(188.64 136.615) scale(0.11 -0.11)">
+    <g transform="translate(188.64 136.298) scale(0.1 -0.1)">
      <defs>
       <path id="AvenirNext-Bold-37" d="M 2406 3597 
 L 2406 0 
@@ -4642,7 +4642,7 @@ z
    </g>
    <g id="text_13">
     <!-- FONT_WEIGHT.EXTRA_BOLD -->
-    <g transform="translate(7.2 158.621656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 158.361891) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSansMono-3b" d="M 269 4666 
 L 947 4666 
@@ -4686,7 +4686,7 @@ z
    </g>
    <g id="text_14">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(188.64 159.511) scale(0.11 -0.11)">
+    <g transform="translate(188.64 159.194) scale(0.1 -0.1)">
      <use xlink:href="#AvenirNext-Bold-37"/>
      <use xlink:href="#AvenirNext-Bold-4b" transform="translate(56.296875 0)"/>
      <use xlink:href="#AvenirNext-Bold-48" transform="translate(118 0)"/>
@@ -4734,7 +4734,7 @@ z
    </g>
    <g id="text_15">
     <!-- FONT_WEIGHT.HEAVY -->
-    <g transform="translate(7.2 181.517656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 181.257891) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSansMono-39" d="M 1925 531 
 L 3022 4666 
@@ -4780,7 +4780,7 @@ z
    </g>
    <g id="text_16">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(188.64 182.407) scale(0.11 -0.11)">
+    <g transform="translate(188.64 182.09) scale(0.1 -0.1)">
      <use xlink:href="#AvenirNext-Bold-37"/>
      <use xlink:href="#AvenirNext-Bold-4b" transform="translate(56.296875 0)"/>
      <use xlink:href="#AvenirNext-Bold-48" transform="translate(118 0)"/>
@@ -4828,7 +4828,7 @@ z
    </g>
    <g id="text_17">
     <!-- FONT_WEIGHT.BLACK -->
-    <g transform="translate(7.2 204.413656) scale(0.1 -0.1)">
+    <g transform="translate(7.2 204.153891) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSansMono-26" d="M 3353 166 
 Q 3113 38 2859 -26 
@@ -4888,7 +4888,7 @@ z
    </g>
    <g id="text_18">
     <!-- The quick brown fox jumps over the lazy dog -->
-    <g transform="translate(188.64 205.303) scale(0.11 -0.11)">
+    <g transform="translate(188.64 204.986) scale(0.1 -0.1)">
      <defs>
       <path id="AvenirNext-Heavy-37" d="M 2682 0 
 L 1158 0 
