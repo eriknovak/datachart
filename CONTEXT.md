@@ -108,10 +108,11 @@ series, the same way it assigns colors. Off (`None`) in every theme but
 _Avoid_: hatch palette
 
 **Figure size grid**:
-The `FIG_SIZE` vocabulary: an A4 text-block width axis (`A4_*` full-width,
-`A4_HALF_*` half-width) crossed with a height axis (`SHORT`, `MEDIUM`, `TALL`),
-plus full pages, one square, and slide frames (`SLIDE_*` PowerPoint-scale,
-`BEAMER_*` LaTeX-scale). Height words describe heights; width words widths.
+The `FIG_SIZE` vocabulary: a width axis (`FULL_*`, `HALF_*` — anchored to the
+A4 text-block width, stated in the docstring in in/cm) crossed with a height
+axis (`SHORT`, `MEDIUM`, `TALL`), plus A4 full pages, one square, and slide
+frames (`SLIDE_*` PowerPoint-scale, `BEAMER_*` LaTeX-scale). Height words
+describe heights; width words widths.
 _Avoid_: narrow/regular/wide (former height suffixes), Letter sizes
 
 **Style resolution**:

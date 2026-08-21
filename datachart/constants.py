@@ -32,9 +32,11 @@ Classes:
 class FIG_SIZE:
     """The predefined figure sizes (ADR 0010).
 
-    Paper sizes are anchored to the A4 text block: full-width (8.2 in) or
-    half-width (4.1 in), crossed with a height — `SHORT` (2.4), `MEDIUM` (4.8),
-    or `TALL` (7.2).
+    All values are `(width, height)` in inches, matplotlib's `figsize` unit.
+    Paper figures are anchored to the A4 text block: `FULL` is its full width
+    (8.2 in / 20.8 cm), `HALF` half of it (4.1 in / 10.4 cm), crossed with a
+    height — `SHORT` (2.4 in / 6.1 cm), `MEDIUM` (4.8 in / 12.2 cm), or `TALL`
+    (7.2 in / 18.3 cm).
 
     Examples:
         >>> from datachart.constants import FIG_SIZE
@@ -42,44 +44,44 @@ class FIG_SIZE:
         (6.4, 4.8)
 
     Attributes:
-        DEFAULT (Tuple[float, float]): The default figure size. Equals to `(6.4, 4.8)`.
+        DEFAULT (Tuple[float, float]): The default figure size. Equals to `(6.4, 4.8)` in (16.3 x 12.2 cm).
 
-        # A4 full-width figures
-        A4_SHORT (Tuple[float, float]): The short, full-width A4 figure size. Equals to `(8.2, 2.4)`.
-        A4_MEDIUM (Tuple[float, float]): The medium, full-width A4 figure size. Equals to `(8.2, 4.8)`.
-        A4_TALL (Tuple[float, float]): The tall, full-width A4 figure size. Equals to `(8.2, 7.2)`.
+        # Full-width paper figures (A4 text-block width)
+        FULL_SHORT (Tuple[float, float]): The short, full-width figure size. Equals to `(8.2, 2.4)` in (20.8 x 6.1 cm).
+        FULL_MEDIUM (Tuple[float, float]): The medium, full-width figure size. Equals to `(8.2, 4.8)` in (20.8 x 12.2 cm).
+        FULL_TALL (Tuple[float, float]): The tall, full-width figure size. Equals to `(8.2, 7.2)` in (20.8 x 18.3 cm).
 
-        # A4 half-width figures
-        A4_HALF_SHORT (Tuple[float, float]): The short, half-width A4 figure size. Equals to `(4.1, 2.4)`.
-        A4_HALF_MEDIUM (Tuple[float, float]): The medium, half-width A4 figure size. Equals to `(4.1, 4.8)`.
-        A4_HALF_TALL (Tuple[float, float]): The tall, half-width A4 figure size. Equals to `(4.1, 7.2)`.
+        # Half-width paper figures (for side-by-side placement)
+        HALF_SHORT (Tuple[float, float]): The short, half-width figure size. Equals to `(4.1, 2.4)` in (10.4 x 6.1 cm).
+        HALF_MEDIUM (Tuple[float, float]): The medium, half-width figure size. Equals to `(4.1, 4.8)` in (10.4 x 12.2 cm).
+        HALF_TALL (Tuple[float, float]): The tall, half-width figure size. Equals to `(4.1, 7.2)` in (10.4 x 18.3 cm).
 
         # A4 full pages
-        A4_PORTRAIT (Tuple[float, float]): The A4 portrait figure size. Equals to `(8.2, 11.6)`.
-        A4_LANDSCAPE (Tuple[float, float]): The A4 landscape figure size. Equals to `(11.6, 8.2)`.
+        A4_PORTRAIT (Tuple[float, float]): The A4 portrait figure size. Equals to `(8.2, 11.6)` in (20.8 x 29.5 cm).
+        A4_LANDSCAPE (Tuple[float, float]): The A4 landscape figure size. Equals to `(11.6, 8.2)` in (29.5 x 20.8 cm).
 
         # Square
-        SQUARE (Tuple[float, float]): The square figure size. Equals to `(4.8, 4.8)`.
+        SQUARE (Tuple[float, float]): The square figure size. Equals to `(4.8, 4.8)` in (12.2 x 12.2 cm).
 
         # Presentation slides
-        SLIDE_16_9 (Tuple[float, float]): The 16:9 slide figure size (PowerPoint/Google Slides). Equals to `(13.33, 7.5)`.
-        SLIDE_4_3 (Tuple[float, float]): The 4:3 slide figure size (PowerPoint/Google Slides). Equals to `(10.0, 7.5)`.
-        BEAMER_16_9 (Tuple[float, float]): The 16:9 beamer frame figure size (160x90 mm). Equals to `(6.3, 3.54)`.
-        BEAMER_4_3 (Tuple[float, float]): The 4:3 beamer frame figure size (128x96 mm). Equals to `(5.04, 3.78)`.
+        SLIDE_16_9 (Tuple[float, float]): The 16:9 slide figure size (PowerPoint/Google Slides). Equals to `(13.33, 7.5)` in (33.9 x 19.1 cm).
+        SLIDE_4_3 (Tuple[float, float]): The 4:3 slide figure size (PowerPoint/Google Slides). Equals to `(10.0, 7.5)` in (25.4 x 19.1 cm).
+        BEAMER_16_9 (Tuple[float, float]): The 16:9 beamer frame figure size. Equals to `(6.3, 3.54)` in (16.0 x 9.0 cm).
+        BEAMER_4_3 (Tuple[float, float]): The 4:3 beamer frame figure size. Equals to `(5.04, 3.78)` in (12.8 x 9.6 cm).
 
     """
 
     DEFAULT = (6.4, 4.8)
 
-    # A4 full-width figures
-    A4_SHORT = (8.2, 2.4)
-    A4_MEDIUM = (8.2, 4.8)
-    A4_TALL = (8.2, 7.2)
+    # Full-width paper figures (A4 text-block width)
+    FULL_SHORT = (8.2, 2.4)
+    FULL_MEDIUM = (8.2, 4.8)
+    FULL_TALL = (8.2, 7.2)
 
-    # A4 half-width figures
-    A4_HALF_SHORT = (4.1, 2.4)
-    A4_HALF_MEDIUM = (4.1, 4.8)
-    A4_HALF_TALL = (4.1, 7.2)
+    # Half-width paper figures (for side-by-side placement)
+    HALF_SHORT = (4.1, 2.4)
+    HALF_MEDIUM = (4.1, 4.8)
+    HALF_TALL = (4.1, 7.2)
 
     # A4 full pages
     A4_PORTRAIT = (8.2, 11.6)

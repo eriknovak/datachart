@@ -10,10 +10,12 @@ wide but tall, `NARROW` meant flat. The `LETTER_*` and `TALL_*` families and
 most `A4_HALF_*` variants had zero uses in the package, tests, or docs.
 
 We rebuild `FIG_SIZE` around the sizes the package is actually for — paper
-figures anchored to the A4 text block — plus presentation frames:
+figures anchored to the A4 text block — plus presentation frames. The grid
+names carry no paper-format prefix: the A4 anchor is documentation (the
+docstring states the reference and each size in inches and cm), not naming.
 
-- **Width axis**: `A4_*` (8.2 in, full text-block width) and `A4_HALF_*`
-  (4.1 in, half width, for side-by-side figures).
+- **Width axis**: `FULL_*` (8.2 in, the A4 text-block width) and `HALF_*`
+  (4.1 in, half of it, for side-by-side figures).
 - **Height axis**: `SHORT` (2.4), `MEDIUM` (4.8), `TALL` (7.2) — height
   words for heights, replacing `NARROW`/`REGULAR`/`WIDE`.
 - **Full pages**: `A4_PORTRAIT`, `A4_LANDSCAPE` stay.
@@ -42,9 +44,12 @@ carries stays: it documents what you get when you don't ask.
 
 ## Considered options
 
-- **Purpose-named sizes** (`PAPER_FULL_WIDTH`, `BANNER`, …). Rejected: the
-  A4 anchor *is* the purpose, and keeps continuity with the two names
-  carrying nearly all existing usage.
+- **A4-prefixed grid names** (`A4_SHORT`, `A4_HALF_SHORT`, …). Rejected: the
+  prefix names the reference, not the size — `FULL`/`HALF` say what the
+  figure occupies, and the A4 anchor lives in the docstring with concrete
+  in/cm dimensions.
+- **Purpose-named sizes** (`PAPER_FULL_WIDTH`, `BANNER`, …). Rejected:
+  longer names for the same information as the `FULL`/`HALF` axis.
 - **Deprecation aliases for one release.** Rejected: metaclass machinery for
   a pre-1.0 package with no external users.
 - **Keep `LETTER_*` for US users.** Rejected: zero uses anywhere; a Letter
