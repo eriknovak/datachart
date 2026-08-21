@@ -18,7 +18,6 @@ import warnings
 from typing import List, Optional, Tuple, Dict, Any
 
 import matplotlib.pyplot as plt
-from matplotlib.figure import FigureBase
 from matplotlib.gridspec import GridSpec, SubplotSpec
 
 from ..constants import FIG_FORMAT
@@ -64,7 +63,7 @@ def _cell_content(figure: plt.Figure, idx: int) -> Dict[str, Any]:
     return {"panel": panel}
 
 
-def _render_cell(owner: FigureBase, cell: Dict[str, Any], target_ax: plt.Axes) -> None:
+def _render_cell(owner: plt.Figure, cell: Dict[str, Any], target_ax: plt.Axes) -> None:
     """Draw one transport cell into its pre-created axes."""
     if "grid" in cell:
         subplot_spec = target_ax.get_subplotspec()
@@ -90,41 +89,62 @@ def _render_cell(owner: FigureBase, cell: Dict[str, Any], target_ax: plt.Axes) -
 
 
 def _render_grid_node(
-    owner: FigureBase, node: Dict[str, Any], subplot_spec: SubplotSpec
+    owner: plt.Figure, node: Dict[str, Any], subplot_spec: SubplotSpec
 ) -> None:
     """Rebuild a nested grid inside one parent cell (ADR 0006).
 
     The node is the nested grid figure's own metadata: its cell tree, layout
-    shape, title, and sharex/sharey. A subfigure keeps its furniture local —
-    the title spans only the subgrid and sharing never crosses the boundary.
+    shape, title, and sharex/sharey. The subgrid nests in the owner figure's
+    gridspec so one constrained-layout pass aligns its axes envelope with
+    sibling cells (ADR 0007). A title reserves a thin heading row rendered in
+    the subtitle style — a section heading, not the figure's title; sharing
+    stays local to the node, anchored on its first shareable axes.
     """
-    subfig = owner.add_subfigure(subplot_spec)
-    if node.get("title"):
-        subfig.suptitle(node["title"], **get_text_style("title"))
-
     nrows, ncols = node["shape"]
-    sub_gs = subfig.add_gridspec(nrows, ncols)
+    title = node.get("title")
+    if title:
+        # 0.12: thin heading row, roughly one subtitle text line (ADR 0007)
+        sub_gs = subplot_spec.subgridspec(
+            nrows + 1, ncols, height_ratios=[0.12] + [1] * nrows
+        )
+        heading_ax = owner.add_subplot(sub_gs[0, :])
+        heading_ax.axis("off")
+        heading_ax.text(
+            0.5,
+            0.0,
+            title,
+            ha="center",
+            va="bottom",
+            transform=heading_ax.transAxes,
+            **get_text_style("subtitle"),
+        )
+        row_offset = 1
+    else:
+        sub_gs = subplot_spec.subgridspec(nrows, ncols)
+        row_offset = 0
+
     first_ax = None
     for cell in node["cells"]:
         layout = cell["spec"]
+        row = layout["row"] + row_offset
         cell_spec = sub_gs[
-            layout["row"] : layout["row"] + layout["rowspan"],
+            row : row + layout["rowspan"],
             layout["col"] : layout["col"] + layout["colspan"],
         ]
         if "grid" in cell:
-            _render_grid_node(subfig, cell["grid"], cell_spec)
+            _render_grid_node(owner, cell["grid"], cell_spec)
             continue
         # a multi-subplot cell's spanning axes is removed during render — it
         # must neither anchor nor join the share group (dead-axes crash)
         shareable = "panels" not in cell
-        ax = subfig.add_subplot(
+        ax = owner.add_subplot(
             cell_spec,
             sharex=first_ax if node["sharex"] and shareable else None,
             sharey=first_ax if node["sharey"] and shareable else None,
         )
         if shareable and first_ax is None:
             first_ax = ax
-        _render_cell(subfig, cell, ax)
+        _render_cell(owner, cell, ax)
 
 
 def _figure_grid_layout_impl(

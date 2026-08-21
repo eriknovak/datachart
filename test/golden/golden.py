@@ -33,11 +33,14 @@ from datachart.config import config
 from datachart.constants import THEME
 
 # Cases whose output intentionally changed since the last published baseline.
-# Panel figures now carry themed label furniture (title/xlabel/ylabel/ylabel_right).
 EXPECTED_CHANGES = {
+    # Panel figures now carry themed label furniture (title/xlabel/ylabel/ylabel_right)
     "overlay_line_bar_dual",
     "overlay_nested_panel",
     "grid_with_overlay",
+    # nested grids render in the parent gridspec so cell envelopes align;
+    # nested titles demote to subtitle-styled heading rows (ADR 0007)
+    "grid_nested_grid",
     "grid_mixed_panel_and_grid",
 }
 
