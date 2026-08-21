@@ -1,6 +1,6 @@
 from ._base import make_theme
 from ..typings import StyleAttrs
-from ..constants import LINE_STYLE, COLORS
+from ..constants import LINE_STYLE
 
 # light grays for background/de-emphasized elements
 LIGHT_GREYS = [
@@ -36,7 +36,7 @@ BACKGROUND_THEME: StyleAttrs = make_theme(
         "plot_hline_color": "#CCCCCC",
         "plot_hline_style": LINE_STYLE.DASHED,
         "plot_hline_alpha": 0.5,
-        "plot_heatmap_cmap": COLORS.Greys,
+        "plot_heatmap_cmap": ["#F7F7F7", "#B0B0B0"],
         "plot_heatmap_frame_color": "#B0B0B0",
         "plot_scatter_alpha": 0.4,
         "plot_scatter_edge_color": "#D0D0D0",
@@ -44,11 +44,15 @@ BACKGROUND_THEME: StyleAttrs = make_theme(
         "plot_regression_alpha": 0.5,
         "plot_regression_ci_alpha": 0.1,
         "plot_parallel_alpha": 0.3,
+        "plot_parallel_axis_color": "#B0B0B0",
+        "plot_parallel_tick_color": "#B0B0B0",
         "plot_box_alpha": 0.3,
         "plot_box_edgecolor": "#B0B0B0",
         "plot_box_outlier_color": "#E0E0E0",
         "plot_box_outlier_edge_color": "#B0B0B0",
-        "plot_box_median_color": "#999999",
+        "plot_box_median_color": "#B0B0B0",
+        "plot_box_whisker_color": "#B0B0B0",
+        "plot_box_cap_color": "#B0B0B0",
         "overlay_bar_alpha": 0.25,
         "overlay_hist_alpha": 0.25,
     }

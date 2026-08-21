@@ -554,6 +554,7 @@ def get_box_whisker_style(chart_style: dict) -> dict:
     """
 
     config_attrs = [
+        ("color", "plot_box_whisker_color"),
         ("linewidth", "plot_box_whisker_linewidth"),
     ]
 
@@ -572,6 +573,7 @@ def get_box_cap_style(chart_style: dict) -> dict:
     """
 
     config_attrs = [
+        ("color", "plot_box_cap_color"),
         ("linewidth", "plot_box_cap_linewidth"),
     ]
 

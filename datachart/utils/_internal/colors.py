@@ -124,6 +124,9 @@ def get_colormap(
 
     """
 
+    if isinstance(name, list):
+        return create_colormap(name)
+
     if isinstance(name, str) and name in CUSTOM_PALETTES:
         return create_colormap(CUSTOM_PALETTES[name], name)
 

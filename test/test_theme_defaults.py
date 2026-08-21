@@ -74,6 +74,28 @@ class TestThemeDefaults(unittest.TestCase):
         labeled = BarChart(BAR, show_values=True)
         self.assertGreater(labeled.axes[0].get_ylim()[1], plain.axes[0].get_ylim()[1])
 
+    def test_heatmap_contrast_skips_light_colormaps(self):
+        """Light colormaps (e.g. BACKGROUND's) never flip value text to white."""
+        config.set_theme(THEME.BACKGROUND)
+        figure = Heatmap([[0.0, 1.0]], show_heatmap_values=True)
+        colors = {text.get_color() for text in figure.axes[0].texts}
+        self.assertNotIn("#FFFFFF", colors)
+
+    def test_background_box_furniture_is_light(self):
+        """BACKGROUND's box whiskers, caps, and median stay light gray."""
+        from datachart.charts import BoxPlot
+
+        config.set_theme(THEME.BACKGROUND)
+        data = [{"label": "A", "value": float(v)} for v in [1, 2, 3, 4, 5, 6, 7, 20]]
+        figure = BoxPlot(data)
+        line_colors = {
+            line.get_color()
+            for line in figure.axes[0].lines
+            # outlier artists are marker-only lines; their line color never draws
+            if line.get_linestyle() != "None"
+        }
+        self.assertEqual(line_colors, {"#B0B0B0"})
+
     def test_new_theme_constants_are_valid(self):
         """The new THEME constants apply without warnings."""
         for theme in [THEME.MINIMAL, THEME.MATERIAL, THEME.ACADEMIC]:

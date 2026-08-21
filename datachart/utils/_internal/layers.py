@@ -662,6 +662,9 @@ class HeatmapLayer(Layer):
             config.get("plot_heatmap_frame_color") or "#000000",
         )
         self.frame_width = config.get("axes_spines_width") or 0.8
+        # white value text only helps when the cmap's high end is actually dark
+        r, g, b = heatmap_style["cmap"](1.0)[:3]
+        self.contrast_values = (0.2126 * r + 0.7152 * g + 0.0722 * b) < 0.5
 
     def draw(self, ax, ctx):
         data = np.array(self.chart.get("data"))
@@ -686,8 +689,10 @@ class HeatmapLayer(Layer):
                 for j in range(len(data[i])):
                     value = data[i][j]
                     font_style = dict(self.font_style)
-                    if not np.isnan(value) and (
-                        float(im.norm(value)) > HEATMAP_TEXT_CONTRAST_THRESHOLD
+                    if (
+                        self.contrast_values
+                        and not np.isnan(value)
+                        and float(im.norm(value)) > HEATMAP_TEXT_CONTRAST_THRESHOLD
                     ):
                         font_style["color"] = "#FFFFFF"
                     ax.text(

@@ -368,7 +368,7 @@ class HeatmapStyleAttrs(TypedDict):
     """The typing for the heatmap chart style.
 
     Attributes:
-        plot_heatmap_cmap (Union[str, colors.LinearSegmentedColormap, None]): The color map of the heatmap.
+        plot_heatmap_cmap (Union[str, List[str], colors.LinearSegmentedColormap, None]): The color map of the heatmap (palette name, list of hex colors, or colormap).
         plot_heatmap_alpha (Union[float, None]): The alpha value of the heatmap.
         plot_heatmap_font_size (Union[int, float, str, None]): The font size of the heatmap.
         plot_heatmap_font_color (Union[str, None]): The font color of the heatmap.
@@ -378,7 +378,7 @@ class HeatmapStyleAttrs(TypedDict):
 
     """
 
-    plot_heatmap_cmap: Union[str, colors.LinearSegmentedColormap, None]
+    plot_heatmap_cmap: Union[str, List[str], colors.LinearSegmentedColormap, None]
     plot_heatmap_alpha: Union[float, None]
     plot_heatmap_font_size: Union[int, float, str, None]
     plot_heatmap_font_color: Union[str, None]
@@ -443,7 +443,9 @@ class BoxStyleAttrs(TypedDict):
         plot_box_outlier_edge_color (Union[str, None]): The outlier marker edge color.
         plot_box_median_color (Union[str, None]): The median line color.
         plot_box_median_linewidth (Union[int, float, None]): The median line width.
+        plot_box_whisker_color (Union[str, None]): The whisker line color.
         plot_box_whisker_linewidth (Union[int, float, None]): The whisker line width.
+        plot_box_cap_color (Union[str, None]): The cap line color.
         plot_box_cap_linewidth (Union[int, float, None]): The cap line width.
         plot_xticks_label_rotate (Union[int, float, None]): The label rotation of the xticks.
         plot_yticks_label_rotate (Union[int, float, None]): The label rotation of the yticks.
@@ -460,7 +462,9 @@ class BoxStyleAttrs(TypedDict):
     plot_box_outlier_edge_color: Union[str, None]
     plot_box_median_color: Union[str, None]
     plot_box_median_linewidth: Union[int, float, None]
+    plot_box_whisker_color: Union[str, None]
     plot_box_whisker_linewidth: Union[int, float, None]
+    plot_box_cap_color: Union[str, None]
     plot_box_cap_linewidth: Union[int, float, None]
     plot_xticks_label_rotate: Union[int, float, None]
     plot_yticks_label_rotate: Union[int, float, None]
