@@ -1,12 +1,13 @@
 import math
 import warnings
+from functools import lru_cache
 from typing import Union, Tuple, Dict, List
 
+import matplotlib.font_manager as font_manager
 import matplotlib.pyplot as plt
 
 from ...config import config, Config
 from ...config.charts import CHART_CONFIGS
-
 
 # ================================================
 # Helper Functions
@@ -110,6 +111,45 @@ def get_subplot_config(
 # -------------------------------------
 
 
+@lru_cache(maxsize=None)
+def _font_available(name: str) -> bool:
+    """Whether the font is installed; missing names would make matplotlib warn."""
+
+    try:
+        font_manager.findfont(
+            font_manager.FontProperties(family=name), fallback_to_default=False
+        )
+        return True
+    except ValueError:
+        return False
+
+
+def resolve_font_family(family: Union[str, None] = None) -> Union[str, List[str]]:
+    """Resolve a generic font family into the theme's concrete font stack.
+
+    Args:
+        family: The font family; falls back to `font_general_family`.
+
+    Returns:
+        The theme's font stack (ending in the generic family as a fallback),
+        or the family itself when the theme defines no stack for it.
+
+    """
+
+    family = family if family is not None else config.get("font_general_family")
+    family = family or "sans-serif"
+    if family == "serif":
+        stack = config.get("font_general_serif")
+    elif family == "sans-serif":
+        stack = config.get("font_general_sansserif")
+    else:
+        stack = None
+    if stack:
+        # drop fonts not installed here; they would only trigger findfont warnings
+        stack = [name for name in stack if _font_available(name)]
+    return list(stack) + [family] if stack else family
+
+
 def get_text_style(text_type: str = "") -> dict:
     """Get the text style.
 
@@ -129,13 +169,15 @@ def get_text_style(text_type: str = "") -> dict:
         ("family", "font_{type}_family"),
     ]
 
-    return {
+    style = {
         key: config.get(
             attr.format(type=text_type),
             config.get(attr.format(type="general")),
         )
         for key, attr in config_attrs
     }
+    style["family"] = resolve_font_family(style.get("family"))
+    return style
 
 
 # -------------------------------------
@@ -512,6 +554,7 @@ def get_box_whisker_style(chart_style: dict) -> dict:
     """
 
     config_attrs = [
+        ("color", "plot_box_whisker_color"),
         ("linewidth", "plot_box_whisker_linewidth"),
     ]
 
@@ -530,6 +573,7 @@ def get_box_cap_style(chart_style: dict) -> dict:
     """
 
     config_attrs = [
+        ("color", "plot_box_cap_color"),
         ("linewidth", "plot_box_cap_linewidth"),
     ]
 

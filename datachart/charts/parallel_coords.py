@@ -71,8 +71,10 @@ def ParallelCoords(
         style: Style configuration(s) for the lines.
         dimensions: List of dimension names to include and their order. If None,
             all columns (except hue) are auto-detected.
-        hue: The key name in data for categorical coloring. Data points with the
-            same hue value will be colored the same.
+        hue: The key name in data for line coloring. String values color
+            categorically: data points with the same hue value get the same
+            color from `color_parallel_hue`. Numeric values color continuously
+            along the theme's `color_parallel_hue_continuous` ramp.
         category_orders: Dictionary mapping dimension names to lists of category
             values in the desired order. Example: {"rating": ["Low", "Medium", "High"]}.
             Categories not in the list will be appended at the end (sorted).

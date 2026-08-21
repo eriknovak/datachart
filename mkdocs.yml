@@ -106,6 +106,7 @@ nav:
       - Statistics: how-to-guides/utility/stats.ipynb
     - Config: how-to-guides/config.ipynb
     - Themes: how-to-guides/themes.ipynb
+    - Theme Gallery: how-to-guides/theme-gallery.ipynb
     - Colormaps: how-to-guides/colormaps.ipynb
 
 

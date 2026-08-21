@@ -8,7 +8,6 @@ from datachart.utils._internal.colors import (
 )
 from datachart.constants import COLORS
 
-
 # Use a pypalettes palette for testing
 TEST_COLOR_SCALE = COLORS.Blues
 
@@ -84,6 +83,26 @@ class TestColors(unittest.TestCase):
             self.assertGreater(
                 len(color_scale), 0, f"Palette {palette_name} returned empty list."
             )
+
+    def test_custom_palettes(self):
+        """Test that the datachart-registered palettes resolve before pypalettes."""
+        self.assertEqual(
+            get_color_scale(COLORS.PaperYlGnBu),
+            ["#225EA8", "#7FCDBB", "#0C2C84", "#C7E9B4", "#41B6C4", "#1D91C0"],
+        )
+        self.assertEqual(get_color_scale(COLORS.PaperAccent), ["#5B84C4", "#C85450"])
+
+    def test_custom_palettes_cycle_not_interpolate(self):
+        """Test that custom palettes cycle like explicit color lists."""
+        colors = get_discrete_colors(COLORS.PaperAccent, 3)
+        self.assertEqual(colors, ["#5B84C4", "#C85450", "#5B84C4"])
+        colors = get_discrete_colors(COLORS.PaperYlGnBu, 2)
+        self.assertEqual(colors, ["#225EA8", "#7FCDBB"])
+
+    def test_custom_palettes_colormap(self):
+        """Test that custom palettes produce a usable colormap."""
+        cmap = get_colormap(COLORS.PaperYlGnBu)
+        self.assertTrue(callable(cmap), "Custom palette colormap is not callable.")
 
 
 if __name__ == "__main__":

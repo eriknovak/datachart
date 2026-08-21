@@ -1,0 +1,143 @@
+"""Tests for theme-driven defaults and cycles (ADR 0004) and the value-label fixes."""
+
+import unittest
+
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+from datachart.charts import BarChart, Heatmap
+from datachart.config import config
+from datachart.constants import THEME
+
+BAR = [{"label": label, "y": y} for label, y in zip("ABC", [3.0, 5.0, 4.0])]
+BAR2 = [{"label": label, "y": y} for label, y in zip("ABC", [2.0, 6.0, 1.0])]
+HEAT = [[0.0, 0.5], [0.8, 1.0]]
+
+
+def grid_visible(ax, axis):
+    lines = ax.yaxis.get_gridlines() if axis == "y" else ax.xaxis.get_gridlines()
+    return any(line.get_visible() for line in lines)
+
+
+class TestThemeDefaults(unittest.TestCase):
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_theme_grid_default_applies(self):
+        """A theme's grid default applies when the chart call leaves it unset."""
+        figure = BarChart(BAR)
+        self.assertTrue(grid_visible(figure.axes[0], "y"))
+
+    def test_explicit_show_grid_wins(self):
+        """An explicit chart setting always wins over the theme default."""
+        figure = BarChart(BAR, show_grid="x")
+        self.assertTrue(grid_visible(figure.axes[0], "x"))
+        self.assertFalse(grid_visible(figure.axes[0], "y"))
+
+    def test_none_theme_default_leaves_grid_off(self):
+        """A `None` theme default preserves the no-grid behavior."""
+        config.update_config({"chart_default_show_grid": None})
+        figure = BarChart(BAR)
+        self.assertFalse(grid_visible(figure.axes[0], "y"))
+        self.assertFalse(grid_visible(figure.axes[0], "x"))
+
+    def test_grid_default_skips_heatmaps(self):
+        """The theme grid default never applies to heatmaps."""
+        figure = Heatmap(HEAT)
+        self.assertFalse(grid_visible(figure.axes[0], "y"))
+
+    def test_theme_show_values_default_applies(self):
+        """Themes shipping `chart_default_show_values` label bars by default."""
+        config.set_theme(THEME.MINIMAL)
+        figure = BarChart(BAR)
+        labels = [text.get_text() for text in figure.axes[0].texts]
+        self.assertEqual(labels, ["3", "5", "4"])
+
+    def test_explicit_show_values_wins(self):
+        """`show_values=False` beats the theme's on-by-default."""
+        config.set_theme(THEME.MINIMAL)
+        figure = BarChart(BAR, show_values=False)
+        self.assertEqual(list(figure.axes[0].texts), [])
+
+    def test_show_values_without_format_does_not_crash(self):
+        """`show_values=True` with no `value_format` defaults the format."""
+        figure = BarChart(BAR, show_values=True)
+        labels = [text.get_text() for text in figure.axes[0].texts]
+        self.assertEqual(labels, ["3", "5", "4"])
+
+    def test_value_headroom_expands_axis(self):
+        """Value labels expand the value-axis limits so they stay inside."""
+        plain = BarChart(BAR)
+        labeled = BarChart(BAR, show_values=True)
+        self.assertGreater(labeled.axes[0].get_ylim()[1], plain.axes[0].get_ylim()[1])
+
+    def test_heatmap_contrast_skips_light_colormaps(self):
+        """Light colormaps (e.g. BACKGROUND's) never flip value text to white."""
+        config.set_theme(THEME.BACKGROUND)
+        figure = Heatmap([[0.0, 1.0]], show_heatmap_values=True)
+        colors = {text.get_color() for text in figure.axes[0].texts}
+        self.assertNotIn("#FFFFFF", colors)
+
+    def test_background_box_furniture_is_light(self):
+        """BACKGROUND's box whiskers, caps, and median stay light gray."""
+        from datachart.charts import BoxPlot
+
+        config.set_theme(THEME.BACKGROUND)
+        data = [{"label": "A", "value": float(v)} for v in [1, 2, 3, 4, 5, 6, 7, 20]]
+        figure = BoxPlot(data)
+        line_colors = {
+            line.get_color()
+            for line in figure.axes[0].lines
+            # outlier artists are marker-only lines; their line color never draws
+            if line.get_linestyle() != "None"
+        }
+        self.assertEqual(line_colors, {"#B0B0B0"})
+
+    def test_new_theme_constants_are_valid(self):
+        """The new THEME constants apply without warnings."""
+        for theme in [THEME.MINIMAL, THEME.MATERIAL, THEME.ACADEMIC]:
+            config.set_theme(theme)
+            self.assertEqual(config.theme, theme)
+
+
+class TestHatchCycle(unittest.TestCase):
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_hatch_cycle_assigns_per_series(self):
+        """The theme's hatch cycle assigns one pattern per bar series."""
+        config.set_theme(THEME.ACADEMIC)
+        figure = BarChart([BAR, BAR2], show_values=False)
+        hatches = [
+            container.patches[0].get_hatch() for container in figure.axes[0].containers
+        ]
+        self.assertEqual(hatches, [None, "//"])
+
+    def test_explicit_hatch_style_wins(self):
+        """An explicit per-chart hatch beats the cycle."""
+        config.set_theme(THEME.ACADEMIC)
+        figure = BarChart(
+            [BAR, BAR2],
+            style=[{"plot_bar_hatch": "xx"}, {"plot_bar_hatch": "oo"}],
+            show_values=False,
+        )
+        hatches = [
+            container.patches[0].get_hatch() for container in figure.axes[0].containers
+        ]
+        self.assertEqual(hatches, ["xx", "oo"])
+
+    def test_no_cycle_means_no_hatches(self):
+        """Themes without a hatch cycle draw unhatched bars."""
+        figure = BarChart([BAR, BAR2])
+        hatches = [
+            container.patches[0].get_hatch() for container in figure.axes[0].containers
+        ]
+        self.assertEqual(hatches, [None, None])
+
+
+if __name__ == "__main__":
+    unittest.main()

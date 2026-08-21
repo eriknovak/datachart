@@ -55,7 +55,20 @@ _Avoid_: snapshot (for this), chart data
 
 **Theme**:
 A complete, named set of style attributes (`DEFAULT`, `GREYSCALE`, `PUBLICATION`,
-`BACKGROUND`). Applying one replaces the whole global configuration.
+`BACKGROUND`, `MINIMAL`, `MATERIAL`, `ACADEMIC`). Applying one replaces the
+whole global configuration.
+
+**Theme-level default**:
+A nullable theme attribute that supplies the default for a per-chart setting
+(grid visibility, bar value labels) when the chart call leaves it unset. An
+explicit chart setting always wins.
+_Avoid_: forced setting, theme override
+
+**Hatch cycle**:
+A theme-defined sequence of hatch patterns the panel assigns per bar/histogram
+series, the same way it assigns colors. Off (`None`) in every theme but
+`ACADEMIC`; an explicit per-chart hatch style wins.
+_Avoid_: hatch palette
 
 **Style resolution**:
 Collapsing `global config → theme → chart-specific style` into one concrete style,

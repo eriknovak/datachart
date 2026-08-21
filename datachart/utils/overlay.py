@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 from ..constants import FIG_SIZE
 from ..config import config
-from ._internal.config_helpers import get_grid_style, get_legend_style
+from ._internal.config_helpers import get_grid_style, get_legend_style, get_text_style
 from ._internal.layers import (
     Panel,
     LayerGroup,
@@ -113,6 +113,8 @@ def _overlay_impl(
         auto_secondary_axis = config.get("overlay_auto_threshold", 3.0)
     if bar_mode is None:
         bar_mode = config.get("overlay_bar_mode", "group")
+    if show_grid is None:
+        show_grid = config.get("chart_default_show_grid")
     if figsize is None:
         figsize = FIG_SIZE.DEFAULT
 
@@ -153,6 +155,7 @@ def _overlay_impl(
         },
         "show_grid": show_grid,
         "grid_style": get_grid_style({}),
+        "hatch_cycle": config.get("plot_hatch_cycle"),
         "show_legend": show_legend,
         "legend_mode": "combined",
         "legend_style": get_legend_style(),
@@ -176,7 +179,7 @@ def _overlay_impl(
     panel.render(ax)
     panel.settings = panel_settings
     if title:
-        fig.suptitle(title)
+        fig.suptitle(title, **get_text_style("title"))
 
     fig._chart_metadata = {
         "type": "overlay",

@@ -136,3 +136,4 @@ title: Typings Module
 ::: datachart.typings.BoxStyleAttrs
 
 ::: datachart.typings.ParallelCoordsStyleAttrs
+::: datachart.typings.ThemeDefaultAttrs

@@ -14,4 +14,3 @@ Note:
     Use the public API exported from `datachart.utils` instead.
 
 """
-

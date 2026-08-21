@@ -29,13 +29,25 @@ from pypalettes import load_palette, load_cmap
 
 from ...constants import COLORS
 
-
 # ===============================================
 # Constants
 # ===============================================
 
 DEFAULT_COLOR = COLORS.Spectral
 DEFAULT_MAX_COLOR = 5
+
+# datachart-defined palettes, consulted before pypalettes
+CUSTOM_PALETTES: Dict[str, List[str]] = {
+    COLORS.PaperYlGnBu: [
+        "#225EA8",
+        "#7FCDBB",
+        "#0C2C84",
+        "#C7E9B4",
+        "#41B6C4",
+        "#1D91C0",
+    ],
+    COLORS.PaperAccent: ["#5B84C4", "#C85450"],
+}
 
 # ===============================================
 # Main Function
@@ -55,6 +67,9 @@ def get_color_scale(name: str = DEFAULT_COLOR) -> List[str]:
 
     if not isinstance(name, str):
         raise TypeError("The name must be a string.")
+
+    if name in CUSTOM_PALETTES:
+        return list(CUSTOM_PALETTES[name])
 
     try:
         palette = load_palette(name)
@@ -109,6 +124,12 @@ def get_colormap(
 
     """
 
+    if isinstance(name, list):
+        return create_colormap(name)
+
+    if isinstance(name, str) and name in CUSTOM_PALETTES:
+        return create_colormap(CUSTOM_PALETTES[name], name)
+
     try:
         return load_cmap(name, cmap_type=cmap_type)
     except Exception:
@@ -136,6 +157,10 @@ def get_discrete_colors(
         raise TypeError("The max_colors is not an integer.")
     if max_colors <= 0:
         raise ValueError("The max_colors must be greater than 0.")
+
+    # custom palettes cycle like explicit color lists instead of interpolating
+    if isinstance(name, str) and name in CUSTOM_PALETTES:
+        name = list(CUSTOM_PALETTES[name])
 
     # If name is a list of colors, use them directly
     if isinstance(name, list):

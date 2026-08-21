@@ -12,15 +12,17 @@ import json
 import warnings
 from collections import defaultdict
 from dataclasses import dataclass
+from itertools import cycle as iter_cycle
 from typing import List, Optional, Union
 
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 
-from .colors import create_color_cycle, get_colormap
+from .colors import create_color_cycle, create_colormap, get_colormap
 from .config_helpers import (
     get_attr_value,
+    resolve_font_family,
     get_area_style,
     get_grid_style,
     get_line_style,
@@ -60,6 +62,12 @@ DEFAULT_ORIENTATION = ORIENTATION.VERTICAL
 DEFAULT_VALFMT = VALFMT.DEFAULT
 DEFAULT_CI_LEVEL = 0.95
 DEFAULT_SIZE_RANGE = (20, 200)
+DEFAULT_BAR_VALUE_FORMAT = "%g"
+# fraction of the value-axis span added so bar value labels stay inside
+VALUE_HEADROOM_VERTICAL = 0.08
+VALUE_HEADROOM_HORIZONTAL = 0.12
+# normalized cell value above which heatmap value text switches to white
+HEATMAP_TEXT_CONTRAST_THRESHOLD = 0.55
 
 
 # ================================================
@@ -183,6 +191,7 @@ class DrawContext:
     alpha: Optional[float] = None
     bar_slot: Optional[BarSlot] = None
     bins: Optional[np.ndarray] = None
+    hatch: Optional[str] = None
 
 
 # ================================================
@@ -294,8 +303,15 @@ class BarLayer(Layer):
         self.is_horizontal = orientation == ORIENTATION.HORIZONTAL
         self.bar_style = get_bar_style(self.style, self.is_horizontal)
         self.show_yerr = self.settings.get("show_yerr")
-        self.show_values = self.settings.get("show_values")
-        self.value_format = self.settings.get("value_format")
+        show_values = self.settings.get("show_values")
+        if show_values is None:
+            show_values = config.get("chart_default_show_values")
+        self.show_values = show_values
+        value_format = self.settings.get("value_format")
+        self.value_format = (
+            DEFAULT_BAR_VALUE_FORMAT if value_format is None else value_format
+        )
+        self.value_font_family = resolve_font_family()
         self.log_offset = 1 if self.settings.get("scaley") == "log" else 0
         self.value_padding = self.style.get(
             "plot_bar_value_padding", config["plot_bar_value_padding"]
@@ -333,6 +349,8 @@ class BarLayer(Layer):
             bar_style["zorder"] = ctx.z_order
         if ctx.alpha is not None:
             bar_style["alpha"] = ctx.alpha
+        if ctx.hatch is not None and "hatch" not in bar_style:
+            bar_style["hatch"] = ctx.hatch or None
 
         slot = ctx.bar_slot
         x_offset = 0.0
@@ -362,6 +380,7 @@ class BarLayer(Layer):
                 padding=self.value_padding,
                 fontsize=self.value_fontsize,
                 color=self.value_color,
+                family=self.value_font_family,
             )
 
 
@@ -395,6 +414,8 @@ class HistogramLayer(Layer):
             hist_style["zorder"] = ctx.z_order
         if ctx.alpha is not None:
             hist_style["alpha"] = ctx.alpha
+        if ctx.hatch is not None and "hatch" not in hist_style:
+            hist_style["hatch"] = ctx.hatch or None
 
         bins = ctx.bins if ctx.bins is not None else self.num_bins
         ax.hist(
@@ -636,6 +657,14 @@ class HeatmapLayer(Layer):
         heatmap_style["cmap"] = get_colormap(heatmap_style["cmap"])
         self.heatmap_style = heatmap_style
         self.font_style = get_heatmap_font_style(self.style)
+        self.frame_color = self.style.get(
+            "plot_heatmap_frame_color",
+            config.get("plot_heatmap_frame_color") or "#000000",
+        )
+        self.frame_width = config.get("axes_spines_width") or 0.8
+        # white value text only helps when the cmap's high end is actually dark
+        r, g, b = heatmap_style["cmap"](1.0)[:3]
+        self.contrast_values = (0.2126 * r + 0.7152 * g + 0.0722 * b) < 0.5
 
     def draw(self, ax, ctx):
         data = np.array(self.chart.get("data"))
@@ -658,13 +687,21 @@ class HeatmapLayer(Layer):
                 valfmt = mticker.StrMethodFormatter(valfmt)
             for i in range(len(data)):
                 for j in range(len(data[i])):
+                    value = data[i][j]
+                    font_style = dict(self.font_style)
+                    if (
+                        self.contrast_values
+                        and not np.isnan(value)
+                        and float(im.norm(value)) > HEATMAP_TEXT_CONTRAST_THRESHOLD
+                    ):
+                        font_style["color"] = "#FFFFFF"
                     ax.text(
                         j,
                         i,
-                        valfmt(data[i][j], None),
+                        valfmt(value, None),
                         ha="center",
                         va="center",
-                        **self.font_style,
+                        **font_style,
                     )
 
         if self.show_colorbars:
@@ -675,6 +712,12 @@ class HeatmapLayer(Layer):
             else:
                 cax = ax.inset_axes([0, 1.05, 1, 0.05])
             ax.figure.colorbar(im, cax=cax, orientation=orientation)
+
+        # heatmaps always draw a full frame, regardless of theme spine visibility
+        for spine in ax.spines.values():
+            spine.set_visible(True)
+            spine.set_color(self.frame_color)
+            spine.set_linewidth(self.frame_width)
 
 
 class ParallelCoordsLayer(Layer):
@@ -708,7 +751,31 @@ class ParallelCoordsLayer(Layer):
             hue_attr = chart.get("hue", "hue")
             for d in chart.get("data", []):
                 all_hues.append(d.get(hue_attr, None))
-        unique_hues = sorted(set(h for h in all_hues if h is not None))
+
+        non_null_hues = [h for h in all_hues if h is not None]
+        self.continuous_hue = bool(non_null_hues) and all(
+            isinstance(h, (int, float)) and not isinstance(h, bool)
+            for h in non_null_hues
+        )
+        if self.continuous_hue:
+            ramp = (
+                config.get("color_parallel_hue_continuous")
+                or config.get("color_general_singular")
+                or "Blues"
+            )
+            self.hue_cmap = (
+                create_colormap(list(ramp))
+                if isinstance(ramp, list)
+                else get_colormap(ramp)
+            )
+            self.hue_min = float(min(non_null_hues))
+            self.hue_max = float(max(non_null_hues))
+            self.hue_colors = {}
+            self.default_color = self.hue_cmap(0.5)
+            self.unique_hues = []
+            return
+
+        unique_hues = sorted(set(non_null_hues))
 
         if len(unique_hues) > 0:
             cycle = create_color_cycle(self.hue_palette, len(unique_hues))
@@ -721,6 +788,13 @@ class ParallelCoordsLayer(Layer):
             singular = create_color_cycle(self.hue_palette, 1)
             self.default_color = singular[0]["color"]
         self.unique_hues = unique_hues
+
+    def _hue_color(self, hue_val):
+        if self.continuous_hue and hue_val is not None:
+            span = self.hue_max - self.hue_min
+            t = 0.5 if span == 0 else (float(hue_val) - self.hue_min) / span
+            return self.hue_cmap(t)
+        return self.hue_colors.get(hue_val, self.default_color)
 
     def legend_handles(self):
         if not self.unique_hues:
@@ -823,7 +897,7 @@ class ParallelCoordsLayer(Layer):
             zip(all_data, all_hues, all_styles)
         ):
             y_vals = [normalized[dim][i] for dim in dimensions]
-            line_color = self.hue_colors.get(hue_val, self.default_color)
+            line_color = self._hue_color(hue_val)
             style = dict(line_style)
             if style.get("color") is None:
                 style["color"] = line_color
@@ -1180,6 +1254,8 @@ class Panel:
                 "length": config["axes_ticks_length"],
                 "labelsize": config["axes_ticks_label_size"],
             },
+            # tick_params cannot set a font family; applied to the labels directly
+            "font_family": resolve_font_family(),
         }
 
     def _apply_furniture(self, ax: plt.Axes, axes_types=("xaxis", "yaxis")) -> None:
@@ -1283,6 +1359,13 @@ class Panel:
 
         zorder_defaults = s.get("zorder_defaults", {})
 
+        # hatch cycle: per bar/histogram series, parallel to the color cycle
+        hatch_patterns = s.get("hatch_cycle")
+        hatch_assignments = None
+        if hatch_patterns:
+            hatch_iter = iter_cycle(hatch_patterns)
+            hatch_assignments = defaultdict(lambda: next(hatch_iter))
+
         # draw the layers group by group, in order
         # one color cycle per palette, pooled across the panel's groups, so
         # composed single-series figures draw in distinct colors
@@ -1314,7 +1397,9 @@ class Panel:
 
             group_hists = [l for l in group.layers if isinstance(l, HistogramLayer)]
             if hist_mode == "stack" and len(group_hists) > 0:
-                self._draw_hist_stack(target_ax, group, group_hists, cycle, bins)
+                self._draw_hist_stack(
+                    target_ax, group, group_hists, cycle, bins, hatch_assignments
+                )
 
             for layer in group.layers:
                 if isinstance(layer, HistogramLayer) and hist_mode == "stack":
@@ -1335,12 +1420,20 @@ class Panel:
                     ),
                     bar_slot=bar_slots.get(id(layer)),
                     bins=bins,
+                    hatch=(
+                        hatch_assignments[layer.chart_hash]
+                        if hatch_assignments is not None
+                        and isinstance(layer, (BarLayer, HistogramLayer))
+                        else None
+                    ),
                 )
                 layer.draw(target_ax, ctx)
 
         self._finalize(ax, ax_right, bar_layers)
 
-    def _draw_hist_stack(self, ax, group, hist_layers, cycle, bins) -> None:
+    def _draw_hist_stack(
+        self, ax, group, hist_layers, cycle, bins, hatch_assignments=None
+    ) -> None:
         """Draw a group's histograms as one stacked call — a cross-layer concern."""
 
         first = hist_layers[0]
@@ -1356,7 +1449,7 @@ class Panel:
         hist_style = dict(first.hist_style)
         hist_style["color"] = colors if colors.count(None) == 0 else None
 
-        ax.hist(
+        *_, patch_sets = ax.hist(
             xall,
             bins=bins if bins is not None else first.num_bins,
             label=labels,
@@ -1367,6 +1460,15 @@ class Panel:
             **{k: v for k, v in hist_style.items() if k != "color"},
             color=hist_style["color"],
         )
+
+        # the stack shares the first layer's style, so its explicit hatch wins
+        if hatch_assignments is not None and "hatch" not in first.hist_style:
+            if len(hist_layers) == 1:
+                patch_sets = [patch_sets]
+            for layer, patches in zip(hist_layers, patch_sets):
+                hatch = hatch_assignments[layer.chart_hash]
+                for patch in patches:
+                    patch.set_hatch(hatch or None)
 
     def _finalize(self, ax, ax_right, bar_layers) -> None:
         s = self.settings
@@ -1396,6 +1498,19 @@ class Panel:
         # user-provided tick positions
         for layer in layers:
             configure_axis_ticks_position(ax, layer.chart)
+
+        # value-label headroom: expand the value axis so bar labels stay
+        # inside; diverging bars get padding on both ends
+        value_layers = [l for l in bar_layers if l.show_values]
+        if value_layers:
+            horizontal = value_layers[0].is_horizontal
+            lo, hi = ax.get_xlim() if horizontal else ax.get_ylim()
+            pad = (hi - lo) * (
+                VALUE_HEADROOM_HORIZONTAL if horizontal else VALUE_HEADROOM_VERTICAL
+            )
+            lo = lo - pad if lo < 0 else lo
+            hi = hi + pad
+            (ax.set_xlim if horizontal else ax.set_ylim)(lo, hi)
 
         # axis limits
         limits = {k: s.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
@@ -1442,6 +1557,20 @@ class Panel:
                 # unlabeled panels get no empty legend frame
                 if ax.get_legend_handles_labels()[1]:
                     ax.legend(title="Legend", **legend_style)
+
+        # tick labels and legend text cannot take the font family through
+        # tick_params/legend kwargs; restyle them directly
+        family = (s.get("furniture") or {}).get("font_family")
+        if family:
+            for target in [ax] + ([ax_right] if ax_right is not None else []):
+                for label in target.get_xticklabels() + target.get_yticklabels():
+                    label.set_fontfamily(family)
+            legend = ax.get_legend()
+            if legend is not None:
+                for text in legend.get_texts():
+                    text.set_fontfamily(family)
+                if legend.get_title() is not None:
+                    legend.get_title().set_fontfamily(family)
 
     def _apply_bar_ticks(self, ax, bar_ticks, bar_layers) -> None:
         # the widest layer supplies the labels when category counts differ
@@ -1499,12 +1628,17 @@ def build_chart_panel_settings(
     per axes), "composition" (the metadata panel used by grids).
     """
 
+    show_grid = settings.get("show_grid")
+    if show_grid is None and chart_type != "heatmap":
+        show_grid = config.get("chart_default_show_grid")
+
     panel_settings = {
         "furniture": Panel.snapshot_furniture(),
         "scalex": settings.get("scalex"),
         "scaley": settings.get("scaley"),
-        "show_grid": settings.get("show_grid"),
+        "show_grid": show_grid,
         "grid_style": get_grid_style(first_style),
+        "hatch_cycle": config.get("plot_hatch_cycle"),
         "xmin": settings.get("xmin"),
         "xmax": settings.get("xmax"),
         "ymin": settings.get("ymin"),

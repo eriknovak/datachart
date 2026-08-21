@@ -141,7 +141,12 @@ def render_chart(
     composition_settings = build_chart_panel_settings(
         chart_type, settings, "composition", first_style
     )
-    composition_settings["title"] = charts[0].get("subtitle", None)
+    # grid cells keep the figure title; single-chart subtitles are the fallback
+    composition_settings["title"] = (
+        settings.get("title")
+        if settings.get("title") is not None
+        else charts[0].get("subtitle", None)
+    )
     figure._chart_metadata = {
         "type": chart_type,
         "panel": Panel(
