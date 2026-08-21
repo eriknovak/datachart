@@ -18,7 +18,7 @@ Classes:
     COLORS:             The predefined colors.
     NORMALIZE:          The supported normalization options.
     ORIENTATION:        The supported orientations.
-    VALFMT:             The predefined value formats.
+    VALUE_FORMAT:       The predefined value formats.
     THEME:              The predefined themes.
     EMPHASIS:           The supported emphasis roles.
     SHOW_GRID:          The supported show grid options.
@@ -30,7 +30,11 @@ Classes:
 
 
 class FIG_SIZE:
-    """The predefined figure sizes.
+    """The predefined figure sizes (ADR 0010).
+
+    Paper sizes are anchored to the A4 text block: full-width (8.2 in) or
+    half-width (4.1 in), crossed with a height — `SHORT` (2.4), `MEDIUM` (4.8),
+    or `TALL` (7.2).
 
     Examples:
         >>> from datachart.constants import FIG_SIZE
@@ -38,76 +42,57 @@ class FIG_SIZE:
         (6.4, 4.8)
 
     Attributes:
-        # Default
         DEFAULT (Tuple[float, float]): The default figure size. Equals to `(6.4, 4.8)`.
 
-        # A4 formats
+        # A4 full-width figures
+        A4_SHORT (Tuple[float, float]): The short, full-width A4 figure size. Equals to `(8.2, 2.4)`.
+        A4_MEDIUM (Tuple[float, float]): The medium, full-width A4 figure size. Equals to `(8.2, 4.8)`.
+        A4_TALL (Tuple[float, float]): The tall, full-width A4 figure size. Equals to `(8.2, 7.2)`.
+
+        # A4 half-width figures
+        A4_HALF_SHORT (Tuple[float, float]): The short, half-width A4 figure size. Equals to `(4.1, 2.4)`.
+        A4_HALF_MEDIUM (Tuple[float, float]): The medium, half-width A4 figure size. Equals to `(4.1, 4.8)`.
+        A4_HALF_TALL (Tuple[float, float]): The tall, half-width A4 figure size. Equals to `(4.1, 7.2)`.
+
+        # A4 full pages
         A4_PORTRAIT (Tuple[float, float]): The A4 portrait figure size. Equals to `(8.2, 11.6)`.
-        A4 (Tuple[float, float]): Alias for `A4_PORTRAIT`. Deprecated, use `A4_PORTRAIT` instead.
         A4_LANDSCAPE (Tuple[float, float]): The A4 landscape figure size. Equals to `(11.6, 8.2)`.
-        A4_NARROW (Tuple[float, float]): The flat, full-width A4 figure size. Equals to `(8.2, 2.4)`.
-        A4_REGULAR (Tuple[float, float]): The regular, full-width A4 figure size. Equals to `(8.2, 4.8)`.
-        A4_WIDE (Tuple[float, float]): The tall, full-width A4 figure size. Equals to `(8.2, 7.2)`.
 
-        # A4 half-width formats
-        A4_HALF_PORTRAIT (Tuple[float, float]): The A4 half-width portrait figure size. Equals to `(4.1, 5.8)`.
-        A4_HALF_LANDSCAPE (Tuple[float, float]): The A4 half-width landscape figure size. Equals to `(5.8, 4.1)`.
-        A4_HALF_NARROW (Tuple[float, float]): The flat, half-width A4 figure size. Equals to `(4.1, 2.4)`.
-        A4_HALF_REGULAR (Tuple[float, float]): The regular, half-width A4 figure size. Equals to `(4.1, 4.8)`.
-        A4_HALF_WIDE (Tuple[float, float]): The tall, half-width A4 figure size. Equals to `(4.1, 7.2)`.
+        # Square
+        SQUARE (Tuple[float, float]): The square figure size. Equals to `(4.8, 4.8)`.
 
-        # US Letter formats
-        LETTER_PORTRAIT (Tuple[float, float]): The US Letter portrait figure size. Equals to `(8.5, 11.0)`.
-        LETTER_LANDSCAPE (Tuple[float, float]): The US Letter landscape figure size. Equals to `(11.0, 8.5)`.
-        LETTER_NARROW (Tuple[float, float]): The flat, full-width Letter figure size. Equals to `(8.5, 2.4)`.
-        LETTER_REGULAR (Tuple[float, float]): The regular, full-width Letter figure size. Equals to `(8.5, 4.8)`.
-        LETTER_WIDE (Tuple[float, float]): The tall, full-width Letter figure size. Equals to `(8.5, 7.2)`.
-
-        # Tall formats
-        TALL_NARROW (Tuple[float, float]): The moderately tall, narrow figure size. Equals to `(4.1, 6.0)`.
-        TALL_REGULAR (Tuple[float, float]): The regular tall, narrow figure size. Equals to `(4.1, 8.0)`.
-        TALL_WIDE (Tuple[float, float]): The very tall, narrow figure size. Equals to `(4.1, 11.6)`.
-
-        # Square formats
-        SQUARE (Tuple[float, float]): The regular square figure size. Equals to `(6.4, 6.4)`.
-        SQUARE_SMALL (Tuple[float, float]): The small square figure size. Equals to `(4.8, 4.8)`.
-        SQUARE_LARGE (Tuple[float, float]): The large square figure size. Equals to `(8.2, 8.2)`.
+        # Presentation slides
+        SLIDE_16_9 (Tuple[float, float]): The 16:9 slide figure size (PowerPoint/Google Slides). Equals to `(13.33, 7.5)`.
+        SLIDE_4_3 (Tuple[float, float]): The 4:3 slide figure size (PowerPoint/Google Slides). Equals to `(10.0, 7.5)`.
+        BEAMER_16_9 (Tuple[float, float]): The 16:9 beamer frame figure size (160x90 mm). Equals to `(6.3, 3.54)`.
+        BEAMER_4_3 (Tuple[float, float]): The 4:3 beamer frame figure size (128x96 mm). Equals to `(5.04, 3.78)`.
 
     """
 
     DEFAULT = (6.4, 4.8)
 
-    # A4 formats
+    # A4 full-width figures
+    A4_SHORT = (8.2, 2.4)
+    A4_MEDIUM = (8.2, 4.8)
+    A4_TALL = (8.2, 7.2)
+
+    # A4 half-width figures
+    A4_HALF_SHORT = (4.1, 2.4)
+    A4_HALF_MEDIUM = (4.1, 4.8)
+    A4_HALF_TALL = (4.1, 7.2)
+
+    # A4 full pages
     A4_PORTRAIT = (8.2, 11.6)
-    A4 = A4_PORTRAIT  # Backward compatibility alias
     A4_LANDSCAPE = (11.6, 8.2)
-    A4_NARROW = (8.2, 2.4)
-    A4_REGULAR = (8.2, 4.8)
-    A4_WIDE = (8.2, 7.2)
 
-    # A4 half-width formats
-    A4_HALF_PORTRAIT = (4.1, 5.8)
-    A4_HALF_LANDSCAPE = (5.8, 4.1)
-    A4_HALF_NARROW = (4.1, 2.4)
-    A4_HALF_REGULAR = (4.1, 4.8)
-    A4_HALF_WIDE = (4.1, 7.2)
+    # Square
+    SQUARE = (4.8, 4.8)
 
-    # US Letter formats
-    LETTER_PORTRAIT = (8.5, 11.0)
-    LETTER_LANDSCAPE = (11.0, 8.5)
-    LETTER_NARROW = (8.5, 2.4)
-    LETTER_REGULAR = (8.5, 4.8)
-    LETTER_WIDE = (8.5, 7.2)
-
-    # Tall formats
-    TALL_NARROW = (4.1, 6.0)
-    TALL_REGULAR = (4.1, 8.0)
-    TALL_WIDE = (4.1, 11.6)
-
-    # Square formats
-    SQUARE = (6.4, 6.4)
-    SQUARE_SMALL = (4.8, 4.8)
-    SQUARE_LARGE = (8.2, 8.2)
+    # Presentation slides
+    SLIDE_16_9 = (13.33, 7.5)
+    SLIDE_4_3 = (10.0, 7.5)
+    BEAMER_16_9 = (6.3, 3.54)
+    BEAMER_4_3 = (5.04, 3.78)
 
 
 class FIG_FORMAT:
@@ -177,7 +162,6 @@ class FONT_WEIGHT:
         NORMAL (str): The normal font weight. Equals to `"normal"`.
         MEDIUM (str): The medium font weight. Equals to `"medium"`.
         SEMIBOLD (str): The semibold font weight. Equals to `"semibold"`.
-        DEMI_BOLD (str): The demibold font weight. Equals to `"demibold"`.
         BOLD (str): The bold font weight. Equals to `"bold"`.
         EXTRA_BOLD (str): The extra bold font weight. Equals to `"extra bold"`.
         HEAVY (str): The heavy font weight. Equals to `"heavy"`.
@@ -192,7 +176,6 @@ class FONT_WEIGHT:
     NORMAL = "normal"
     MEDIUM = "medium"
     SEMIBOLD = "semibold"
-    DEMI_BOLD = "demibold"
     BOLD = "bold"
     EXTRA_BOLD = "extra bold"
     HEAVY = "heavy"
@@ -284,7 +267,6 @@ class LINE_DRAW_STYLE:
 
     Attributes:
         DEFAULT (str): The default line draw style. Equals to `"default"`.
-        STEPS (str): The steps line draw style. Equals to `"steps-pre"`.
         STEPS_PRE (str): The pre-steps line draw style. Equals to `"steps-pre"`.
         STEPS_MID (str): The mid-steps line draw style. Equals to `"steps-mid"`.
         STEPS_POST (str): The post-steps line draw style. Equals to `"steps-post"`.
@@ -292,7 +274,6 @@ class LINE_DRAW_STYLE:
     """
 
     DEFAULT = "default"
-    STEPS = "steps-pre"
     STEPS_PRE = "steps-pre"
     STEPS_MID = "steps-mid"
     STEPS_POST = "steps-post"
@@ -402,14 +383,14 @@ class HISTOGRAM_TYPE:
         BAR (str): The bar histogram style. Equals to `"bar"`.
         BAR_STACKED (str): The stacked bar histogram style. Equals to `"barstacked"`.
         STEP (str): The step histogram style. Equals to `"step"`.
-        STEPFILLED (str): The stepfilled histogram style. Equals to `"stepfilled"`.
+        STEP_FILLED (str): The filled step histogram style. Equals to `"stepfilled"`.
 
     """
 
     BAR = "bar"
     BAR_STACKED = "barstacked"
     STEP = "step"
-    STEPFILLED = "stepfilled"
+    STEP_FILLED = "stepfilled"
 
 
 class COLORS:
@@ -436,6 +417,11 @@ class COLORS:
         YlGnBu (str): Multi-hue yellow-green-blue palette. Equals to `"YlGnBu"`.
         YlOrRd (str): Multi-hue yellow-orange-red palette. Equals to `"YlOrRd"`.
         PuBuGn (str): Multi-hue purple-blue-green palette. Equals to `"PuBuGn"`.
+        GnBu (str): Multi-hue green-blue palette. Equals to `"GnBu"`.
+        Egypt (str): Multi-hue Egypt palette. Equals to `"Egypt"`.
+        Hiroshige (str): Multi-hue Hiroshige palette. Equals to `"Hiroshige"`.
+        Lake (str): Multi-hue lake palette. Equals to `"Lake"`.
+        Neon (str): Multi-hue neon palette. Equals to `"Neon"`.
 
         # Diverging
         RdBu (str): Diverging red-blue palette. Equals to `"RdBu"`.
@@ -463,6 +449,8 @@ class COLORS:
         Plasma (str): Perceptually uniform, color-blind friendly. Equals to `"Plasma"`.
         Magma (str): Perceptually uniform, color-blind friendly. Equals to `"Magma"`.
         Turbo (str): Rainbow-like but perceptually better. Equals to `"Turbo"`.
+        OkabeIto (str): Okabe-Ito categorical palette, color-blind safe. Equals to `"OkabeIto"`.
+        OkabeIto_Black (str): Okabe-Ito palette including black. Equals to `"OkabeIto_Black"`.
 
         # Additional Diverging
         Coolwarm (str): Diverging cool-warm palette. Equals to `"coolwarm"`.
@@ -489,13 +477,13 @@ class COLORS:
     YlGnBu = "YlGnBu"
     YlOrRd = "YlOrRd"
     PuBuGn = "PuBuGn"
+    GnBu = "GnBu"
     Egypt = "Egypt"
     Hiroshige = "Hiroshige"
     Lake = "Lake"
     Neon = "Neon"
 
     # Diverging
-    GnBu = "GnBu"
     RdBu = "RdBu"
     BrBG = "BrBG"
     PuOr = "PuOr"
@@ -578,17 +566,17 @@ class ORIENTATION:
     VERTICAL = "vertical"
 
 
-class VALFMT:
+class VALUE_FORMAT:
     """The predefined value formats.
 
     Examples:
-        >>> from datachart.constants import VALFMT
-        >>> VALFMT.DEFAULT
+        >>> from datachart.constants import VALUE_FORMAT
+        >>> VALUE_FORMAT.DEFAULT
         "{x}"
 
     Attributes:
         DEFAULT (str): The default value format. Equals to `"{x}"`.
-        INTEGER (str): The integer value format. Equals to `"{x:d}"`.
+        INTEGER (str): The integer value format (works on floats too). Equals to `"{x:.0f}"`.
         DECIMAL (str): The decimal value format (1 decimal place). Equals to `"{x:.1f}"`.
         DECIMAL_2 (str): The decimal value format (2 decimal places). Equals to `"{x:.2f}"`.
         DECIMAL_3 (str): The decimal value format (3 decimal places). Equals to `"{x:.3f}"`.
@@ -600,7 +588,7 @@ class VALFMT:
     """
 
     DEFAULT = "{x}"
-    INTEGER = "{x:d}"
+    INTEGER = "{x:.0f}"
     DECIMAL = "{x:.1f}"
     DECIMAL_2 = "{x:.2f}"
     DECIMAL_3 = "{x:.3f}"
