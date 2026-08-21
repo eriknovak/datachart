@@ -1237,6 +1237,19 @@ class Panel:
     # ---------------- furniture ----------------
 
     @staticmethod
+    def snapshot_label_styles() -> dict:
+        """Capture label text styles from the config at build time.
+
+        Cell titles read as per-cell headings, hence the subtitle style.
+        """
+
+        return {
+            "title": get_text_style("subtitle"),
+            "xlabel": get_text_style("xlabel"),
+            "ylabel": get_text_style("ylabel"),
+        }
+
+    @staticmethod
     def snapshot_furniture() -> dict:
         """Capture spine/tick styling from the config at build time."""
 
@@ -1539,6 +1552,7 @@ class Panel:
             if s.get(key):
                 action(s[key], **(label_styles.get(key) or {}))
         if s.get("ylabel_right") and ax_right is not None:
+            # the right axis label shares the left label's text style
             ax_right.set_ylabel(s["ylabel_right"], **(label_styles.get("ylabel") or {}))
 
         # legend
@@ -1666,10 +1680,6 @@ def build_chart_panel_settings(
     if mode == "composition":
         panel_settings["xlabel"] = settings.get("xlabel")
         panel_settings["ylabel"] = settings.get("ylabel")
-        panel_settings["label_styles"] = {
-            "title": get_text_style("subtitle"),
-            "xlabel": get_text_style("xlabel"),
-            "ylabel": get_text_style("ylabel"),
-        }
+        panel_settings["label_styles"] = Panel.snapshot_label_styles()
 
     return panel_settings

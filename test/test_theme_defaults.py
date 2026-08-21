@@ -7,9 +7,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from datachart.charts import BarChart, Heatmap
+from datachart.charts import BarChart, Heatmap, LineChart
 from datachart.config import config
 from datachart.constants import THEME
+from datachart.utils import Grid, Panel
 
 BAR = [{"label": label, "y": y} for label, y in zip("ABC", [3.0, 5.0, 4.0])]
 BAR2 = [{"label": label, "y": y} for label, y in zip("ABC", [2.0, 6.0, 1.0])]
@@ -148,9 +149,6 @@ class TestFurnitureConsistency(unittest.TestCase):
 
     @staticmethod
     def _twin_panel():
-        from datachart.charts import LineChart
-        from datachart.utils import Panel
-
         left = LineChart([{"x": x, "y": x} for x in range(5)])
         right = LineChart([{"x": x, "y": x * 100} for x in range(5)])
         panel = Panel(
@@ -176,10 +174,15 @@ class TestFurnitureConsistency(unittest.TestCase):
             ax_right.yaxis.label.get_fontsize(), config["font_ylabel_size"]
         )
 
+    def test_standalone_panel_title_stays_suptitle(self):
+        """A standalone Panel keeps its title as a title-styled suptitle."""
+        panel = self._twin_panel()
+        self.assertEqual(panel._suptitle.get_text(), "Twin")
+        self.assertEqual(panel._suptitle.get_fontsize(), config["font_title_size"])
+        self.assertEqual(panel.axes[0].get_title(), "")
+
     def test_grid_cell_titles_share_subtitle_style(self):
         """Plain-chart and Panel cells title at the same (subtitle) size."""
-        from datachart.utils import Grid
-
         bar = BarChart(BAR, title="Bar")
         panel = self._twin_panel()
         grid = Grid([bar, panel])
@@ -203,11 +206,24 @@ class TestFurnitureConsistency(unittest.TestCase):
         figure = BarChart(BAR)
         label = figure.axes[0].yaxis.get_ticklabels()[0]
         self.assertEqual(label.get_color(), config["font_general_color"])
+        panel = self._twin_panel()
+        for ax in panel.axes:
+            for tick_label in ax.yaxis.get_ticklabels():
+                self.assertEqual(tick_label.get_color(), config["font_general_color"])
 
     def test_grayscale_keeps_base_parallel_label_sizes(self):
+        """GREYSCALE inherits the base parallel-coords label sizes unchanged."""
+        config.set_theme(THEME.DEFAULT)
+        base_sizes = {
+            key: config[key]
+            for key in (
+                "plot_parallel_tick_label_size",
+                "plot_parallel_dim_label_size",
+            )
+        }
         config.set_theme(THEME.GREYSCALE)
-        self.assertEqual(config["plot_parallel_tick_label_size"], 8)
-        self.assertEqual(config["plot_parallel_dim_label_size"], 9)
+        for key, value in base_sizes.items():
+            self.assertEqual(config[key], value)
 
 
 if __name__ == "__main__":
