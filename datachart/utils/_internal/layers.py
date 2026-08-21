@@ -1253,6 +1253,7 @@ class Panel:
                 "width": config["axes_spines_width"],
                 "length": config["axes_ticks_length"],
                 "labelsize": config["axes_ticks_label_size"],
+                "labelcolor": config["font_general_color"],
             },
             # tick_params cannot set a font family; applied to the labels directly
             "font_family": resolve_font_family(),
@@ -1538,7 +1539,7 @@ class Panel:
             if s.get(key):
                 action(s[key], **(label_styles.get(key) or {}))
         if s.get("ylabel_right") and ax_right is not None:
-            ax_right.set_ylabel(s["ylabel_right"])
+            ax_right.set_ylabel(s["ylabel_right"], **(label_styles.get("ylabel") or {}))
 
         # legend
         if s.get("show_legend"):

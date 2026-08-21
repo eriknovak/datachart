@@ -139,5 +139,76 @@ class TestHatchCycle(unittest.TestCase):
         self.assertEqual(hatches, [None, None])
 
 
+class TestFurnitureConsistency(unittest.TestCase):
+    """Composed figures carry the same themed label/tick furniture as fronts."""
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    @staticmethod
+    def _twin_panel():
+        from datachart.charts import LineChart
+        from datachart.utils import Panel
+
+        left = LineChart([{"x": x, "y": x} for x in range(5)])
+        right = LineChart([{"x": x, "y": x * 100} for x in range(5)])
+        panel = Panel(
+            [
+                {"figure": left, "y_axis": "left"},
+                {"figure": right, "y_axis": "right"},
+            ],
+            title="Twin",
+            xlabel="X",
+            ylabel_left="L",
+            ylabel_right="R",
+        )
+        plt.close(left)
+        plt.close(right)
+        return panel
+
+    def test_panel_axis_labels_take_theme_fonts(self):
+        panel = self._twin_panel()
+        ax_left, ax_right = panel.axes[0], panel.axes[1]
+        self.assertEqual(ax_left.xaxis.label.get_fontsize(), config["font_xlabel_size"])
+        self.assertEqual(ax_left.yaxis.label.get_fontsize(), config["font_ylabel_size"])
+        self.assertEqual(
+            ax_right.yaxis.label.get_fontsize(), config["font_ylabel_size"]
+        )
+
+    def test_grid_cell_titles_share_subtitle_style(self):
+        """Plain-chart and Panel cells title at the same (subtitle) size."""
+        from datachart.utils import Grid
+
+        bar = BarChart(BAR, title="Bar")
+        panel = self._twin_panel()
+        grid = Grid([bar, panel])
+        titles = {
+            ax.get_title(): ax.title.get_fontsize()
+            for ax in grid.axes
+            if ax.get_title()
+        }
+        self.assertEqual(
+            titles,
+            {
+                "Bar": config["font_subtitle_size"],
+                "Twin": config["font_subtitle_size"],
+            },
+        )
+        plt.close(bar)
+        plt.close(panel)
+
+    def test_tick_labels_take_theme_font_color(self):
+        config.set_theme(THEME.MINIMAL)
+        figure = BarChart(BAR)
+        label = figure.axes[0].yaxis.get_ticklabels()[0]
+        self.assertEqual(label.get_color(), config["font_general_color"])
+
+    def test_grayscale_keeps_base_parallel_label_sizes(self):
+        config.set_theme(THEME.GREYSCALE)
+        self.assertEqual(config["plot_parallel_tick_label_size"], 8)
+        self.assertEqual(config["plot_parallel_dim_label_size"], 9)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -789,45 +789,6 @@ def get_legend_style() -> dict:
 # ================================================
 
 
-def configure_axes_spines(ax: plt.Axes):
-    """Configure axes spines.
-
-    Args:
-        ax: The axes.
-
-    """
-
-    # Turn on the axes
-    ax.axis("on")
-
-    # Loop through each axis and configure spines
-    for axis in ["top", "bottom", "left", "right"]:
-        # Set the linewidth and visibility of the spine
-        ax.spines[axis].set(
-            linewidth=config["axes_spines_width"],
-            visible=config[f"axes_spines_{axis}_visible"],
-            zorder=config["axes_spines_zorder"],
-        )
-
-
-def configure_axis_ticks_style(ax: plt.Axes, axis_type: str):
-    """Configure axis ticks.
-
-    Args:
-        ax: The axes.
-        axis_type: The axis type. Options: "xaxis", "yaxis".
-
-    """
-
-    # Set tick parameters for major ticks
-    getattr(ax, axis_type).set_tick_params(
-        which="major",
-        width=config["axes_spines_width"],
-        length=config["axes_ticks_length"],
-        labelsize=config["axes_ticks_label_size"],
-    )
-
-
 def configure_axis_ticks_position(ax: plt.Axes, chart: dict):
     """Configure axis ticks position.
 

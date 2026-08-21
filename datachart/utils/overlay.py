@@ -167,6 +167,12 @@ def _overlay_impl(
         "xlabel": xlabel,
         "ylabel": ylabel_left,
         "ylabel_right": ylabel_right,
+        # cell titles read as per-cell headings, hence the subtitle style
+        "label_styles": {
+            "title": get_text_style("subtitle"),
+            "xlabel": get_text_style("xlabel"),
+            "ylabel": get_text_style("ylabel"),
+        },
         "xmin": xmin,
         "xmax": xmax,
         "ymin": ymin,
