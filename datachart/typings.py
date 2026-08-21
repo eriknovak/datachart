@@ -524,7 +524,7 @@ class ParallelCoordsStyleAttrs(TypedDict):
 
 
 class ThemeDefaultAttrs(TypedDict):
-    """The typing for theme-driven defaults and cycles (ADR 0004).
+    """The typing for theme-driven defaults and cycles.
 
     Attributes:
         chart_default_show_grid (Union[SHOW_GRID, str, None]): The theme default

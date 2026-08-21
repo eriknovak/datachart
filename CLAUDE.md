@@ -41,6 +41,10 @@ mkdocs serve
 mkdocs gh-deploy --force
 ```
 
+ADRs are internal records: never reference them in docstrings or anything else
+mkdocs renders (`docs/adr/` and `docs/agents/` are excluded from the site via
+`exclude_docs`). Citing ADRs in code comments is fine — comments never render.
+
 ### Building and Publishing
 ```bash
 # Install package in development mode

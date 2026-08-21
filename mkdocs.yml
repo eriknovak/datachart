@@ -6,6 +6,11 @@ site_description: >-
 repo_name: eriknovak/datachart
 repo_url: https://github.com/eriknovak/datachart
 
+# internal records (ADRs, agent docs) never ship with the site
+exclude_docs: |
+  adr/
+  agents/
+
 theme:
   name: material
   features:

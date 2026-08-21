@@ -107,6 +107,15 @@ series, the same way it assigns colors. Off (`None`) in every theme but
 `HATCH`; an explicit per-chart hatch style wins.
 _Avoid_: hatch palette
 
+**Figure size grid**:
+The `FIG_SIZE` vocabulary: a width axis (`FULL_*` the A4 text block at
+standard print margins, `HALF_*` one of its two columns, gap included; in/cm
+stated in the docstring) crossed with a height axis (`SHORT`, `MEDIUM`,
+`TALL`, `SQUARE`), plus the A4 printable area in both orientations, one
+free-standing square, and slide frames (`SLIDE_*` PowerPoint-scale,
+`BEAMER_*` LaTeX-scale). Height words describe heights; width words widths.
+_Avoid_: narrow/regular/wide (former height suffixes), Letter sizes
+
 **Style resolution**:
 Collapsing `global config → theme → chart-specific style` into one concrete style,
 performed once when a layer is built — never at draw time.

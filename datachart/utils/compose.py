@@ -1,4 +1,4 @@
-"""The public composition vocabulary (ADR 0002).
+"""The public composition vocabulary.
 
 Two constructors mirror the internal drawing seam: `Panel` overlays rendered
 figures into one coordinate space, `Grid` arranges them in rows and columns.

@@ -1,4 +1,4 @@
-"""The single drawing seam: Layer, LayerGroup, Panel, DrawContext (ADR 0001).
+"""The single drawing seam: Layer, LayerGroup, Panel, DrawContext.
 
 A Layer is one drawable unit that puts its marks on a matplotlib Axes. Its style
 is resolved from the global config when the layer is built — never at draw time.
@@ -54,12 +54,12 @@ from .config_helpers import (
     configure_axis_limits,
 )
 from ..stats import minimum, maximum
-from ...constants import ASPECT_RATIO, EMPHASIS, ORIENTATION, VALFMT
+from ...constants import ASPECT_RATIO, EMPHASIS, ORIENTATION, VALUE_FORMAT
 from ...config import config
 
 DEFAULT_NUM_BINS = 20
 DEFAULT_ORIENTATION = ORIENTATION.VERTICAL
-DEFAULT_VALFMT = VALFMT.DEFAULT
+DEFAULT_VALUE_FORMAT = VALUE_FORMAT.DEFAULT
 DEFAULT_CI_LEVEL = 0.95
 DEFAULT_SIZE_RANGE = (20, 200)
 DEFAULT_BAR_VALUE_FORMAT = "%g"
@@ -791,7 +791,7 @@ class HeatmapLayer(Layer):
         assert len(data.shape) == 2, "The `data` attribute is not a 2-dimensional array"
 
         data = [[(np.nan if item is None else item) for item in row] for row in data]
-        valfmt = self.chart.get("valfmt", DEFAULT_VALFMT)
+        valfmt = self.chart.get("valfmt", DEFAULT_VALUE_FORMAT)
         colorbar = self.chart.get("colorbar", {})
 
         im = ax.imshow(
