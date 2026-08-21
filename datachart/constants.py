@@ -55,6 +55,7 @@ class FIG_SIZE:
         HALF_SHORT (Tuple[float, float]): The short, half-width figure size. Equals to `(4.1, 2.4)` in (10.4 x 6.1 cm).
         HALF_MEDIUM (Tuple[float, float]): The medium, half-width figure size. Equals to `(4.1, 4.8)` in (10.4 x 12.2 cm).
         HALF_TALL (Tuple[float, float]): The tall, half-width figure size. Equals to `(4.1, 7.2)` in (10.4 x 18.3 cm).
+        HALF_SQUARE (Tuple[float, float]): The square, half-width figure size. Equals to `(4.1, 4.1)` in (10.4 x 10.4 cm).
 
         # A4 full pages
         A4_PORTRAIT (Tuple[float, float]): The A4 portrait figure size. Equals to `(8.2, 11.6)` in (20.8 x 29.5 cm).
@@ -82,6 +83,7 @@ class FIG_SIZE:
     HALF_SHORT = (4.1, 2.4)
     HALF_MEDIUM = (4.1, 4.8)
     HALF_TALL = (4.1, 7.2)
+    HALF_SQUARE = (4.1, 4.1)
 
     # A4 full pages
     A4_PORTRAIT = (8.2, 11.6)

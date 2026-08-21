@@ -19,7 +19,8 @@ docstring states the reference and each size in inches and cm), not naming.
 - **Height axis**: `SHORT` (2.4), `MEDIUM` (4.8), `TALL` (7.2) — height
   words for heights, replacing `NARROW`/`REGULAR`/`WIDE`.
 - **Full pages**: `A4_PORTRAIT`, `A4_LANDSCAPE` stay.
-- **Square**: one `SQUARE = (4.8, 4.8)` (the only square size ever used);
+- **Squares**: `SQUARE = (4.8, 4.8)` (the only square size ever used) and
+  `HALF_SQUARE = (4.1, 4.1)` (a square filling one column);
   `SQUARE_SMALL`/`SQUARE_LARGE` are removed.
 - **Presentation**: both families — `SLIDE_16_9 = (13.33, 7.5)` and
   `SLIDE_4_3 = (10.0, 7.5)` (PowerPoint/Google-scale, where slides are

@@ -34,6 +34,7 @@ PAPER_SIZES = [
     ("HALF_SHORT", FIG_SIZE.HALF_SHORT, True),
     ("HALF_MEDIUM", FIG_SIZE.HALF_MEDIUM, True),
     ("HALF_TALL", FIG_SIZE.HALF_TALL, True),
+    ("HALF_SQUARE", FIG_SIZE.HALF_SQUARE, True),
     ("A4_PORTRAIT", FIG_SIZE.A4_PORTRAIT, False),
     ("A4_LANDSCAPE", FIG_SIZE.A4_LANDSCAPE, False),
     ("SQUARE", FIG_SIZE.SQUARE, False),
@@ -63,14 +64,14 @@ def draw_page_with_box(ax, x0, y0, name, size, ghost):
     )
     # full-page sizes sit centered; figures hang from a 1 in top margin
     box_y = y0 + max(page_h - TOP_MARGIN - h, (page_h - h) / 2)
-    box_x = x0 + (page_w - w) / 2 if not ghost else x0 + (page_w - 2 * w - 0.2) / 2
+    box_x = x0 + (page_w - w) / 2 if not ghost else x0 + (page_w - 2 * w - 0.05) / 2
     ax.add_patch(
         Rectangle((box_x, box_y), w, h, facecolor=BOX_FACE, edgecolor=BOX_EDGE, lw=1.2)
     )
     if ghost:
         ax.add_patch(
             Rectangle(
-                (box_x + w + 0.2, box_y),
+                (box_x + w + 0.05, box_y),
                 w,
                 h,
                 facecolor="none",
@@ -116,7 +117,7 @@ def main():
 
     # one axes with equal aspect keeps every mockup at the same physical scale
     fig, ax = plt.subplots(figsize=(13.5, 12))
-    row_specs = [(PAPER_SIZES[:5], 2 * row_step), (PAPER_SIZES[5:], row_step)]
+    row_specs = [(PAPER_SIZES[:6], 2 * row_step), (PAPER_SIZES[6:], row_step)]
 
     max_x = 0.0
     for row, y0 in row_specs:
