@@ -12,5 +12,5 @@ The how-to guides showcases how to utilize the `datachart` package to create cha
 | [utility](utility/index.md)  | Showcases the available methods in the `utils` module.                               |
 | [config](config.ipynb)       | Showcases the use of the `config` module to customize the global style.              |
 | [themes](themes.ipynb)       | How to apply the predefined themes and create your own.                              |
-| [theme gallery](theme-gallery.ipynb) | Renders all seven themes across basic charts and research-style figures.     |
+| [theme gallery](theme-gallery.ipynb) | Showcases the themes across basic charts and research-style figures.         |
 | [colormaps](colormaps.ipynb) | Showcases the existing colormaps available via the `COLORS` constant.                |
