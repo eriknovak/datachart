@@ -33,7 +33,12 @@ from datachart.config import config
 from datachart.constants import THEME
 
 # Cases whose output intentionally changed since the last published baseline.
-EXPECTED_CHANGES = set()
+EXPECTED_CHANGES = {
+    # nested grids render in the parent gridspec so cell envelopes align;
+    # nested titles demote to subtitle-styled heading rows (ADR 0007)
+    "grid_nested_grid",
+    "grid_mixed_panel_and_grid",
+}
 
 
 def _reset():

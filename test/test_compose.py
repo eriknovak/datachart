@@ -6,6 +6,7 @@ import warnings
 
 import pytest
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpecFromSubplotSpec
 
 from datachart.charts import LineChart, BarChart
 from datachart.config import config
@@ -17,6 +18,7 @@ from datachart.utils import (
     FigureGridLayout,
     figure_grid_layout,
 )
+from datachart.utils._internal.config_helpers import get_text_style
 
 
 def _png_bytes(figure):
@@ -220,8 +222,18 @@ class TestGrid:
         plt.close("all")
 
 
+def _nested_axes(fig):
+    """Axes rendered through a nested gridspec (heading axes included)."""
+    return [
+        ax
+        for ax in fig.axes
+        if isinstance(ax.get_subplotspec().get_gridspec(), GridSpecFromSubplotSpec)
+    ]
+
+
 class TestNestedGrid:
-    """Grid figures nest inside Grid via the recursive cell tree (ADR 0006)."""
+    """Grid figures nest inside Grid via the recursive cell tree (ADR 0006),
+    rendered in the parent's gridspec so cell envelopes align (ADR 0007)."""
 
     def test_grid_metadata_carries_cell_tree(self):
         fig = Grid([_line_fig(), _bar_fig()], title="Inner", sharex=True)
@@ -272,25 +284,96 @@ class TestNestedGrid:
         assert len(fig.axes) == 4
         plt.close("all")
 
+    def test_nested_grid_renders_in_parent_figure(self):
+        inner = Grid([_line_fig(), _bar_fig()], title="Inner")
+        fig = Grid([inner, _line_fig()])
+        assert not fig.subfigs
+        assert all(ax.figure is fig for ax in fig.axes)
+        plt.close("all")
+
+    def test_nested_title_renders_in_heading_row(self):
+        inner = Grid([_line_fig(), _bar_fig()], title="Inner")
+        fig = Grid([inner, _line_fig()])
+        headings = [
+            ax for ax in fig.axes if any(t.get_text() == "Inner" for t in ax.texts)
+        ]
+        assert len(headings) == 1
+        hax = headings[0]
+        assert not hax.axison
+        # the heading occupies a reserved extra top row spanning the subgrid
+        spec = hax.get_subplotspec()
+        assert spec.get_gridspec().get_geometry() == (2, 2)
+        assert spec.rowspan == range(0, 1)
+        assert spec.colspan == range(0, 2)
+        # demoted from title: inside a composition it is a section heading
+        text = next(t for t in hax.texts if t.get_text() == "Inner")
+        subtitle = get_text_style("subtitle")
+        assert text.get_fontsize() == subtitle["fontsize"]
+        assert text.get_fontweight() == subtitle["fontweight"]
+        assert text.get_color() == subtitle["color"]
+        plt.close("all")
+
+    def test_untitled_nested_grid_reserves_no_heading_row(self):
+        inner = Grid([_line_fig(), _bar_fig()])
+        fig = Grid([inner, _line_fig()])
+        nested = _nested_axes(fig)
+        assert len(nested) == 2
+        # the subgrid keeps the node's own shape — no heading row
+        assert all(
+            ax.get_subplotspec().get_gridspec().get_geometry() == (1, 2)
+            for ax in nested
+        )
+        plt.close("all")
+
+    def test_untitled_nested_grid_aligns_with_siblings(self):
+        inner = Grid([_line_fig(), _line_fig()])
+        fig = Grid([inner, _bar_fig()])
+        fig.canvas.draw()
+        sibling = next(ax for ax in fig.axes if ax not in _nested_axes(fig))
+        for ax in _nested_axes(fig):
+            assert ax.get_position().y1 == pytest.approx(
+                sibling.get_position().y1, abs=1e-3
+            )
+            assert ax.get_position().y0 == pytest.approx(
+                sibling.get_position().y0, abs=1e-3
+            )
+        plt.close("all")
+
+    def test_titled_nested_grid_aligns_bottom_top_pays_heading(self):
+        inner = Grid([_line_fig(), _line_fig()], title="Inner")
+        fig = Grid([inner, _bar_fig()])
+        fig.canvas.draw()
+        sibling = next(ax for ax in fig.axes if ax not in _nested_axes(fig))
+        cells = [ax for ax in _nested_axes(fig) if ax.axison]
+        for ax in cells:
+            assert ax.get_position().y0 == pytest.approx(
+                sibling.get_position().y0, abs=1e-3
+            )
+            # the top edge sits lower by the heading row only
+            assert ax.get_position().y1 < sibling.get_position().y1
+        plt.close("all")
+
     def test_nested_grid_keeps_own_furniture(self):
         inner = Grid([_line_fig(), _line_fig()], title="Inner", sharey=True)
         outer = Grid([inner, _bar_fig()], title="Outer")
         assert outer._suptitle.get_text() == "Outer"
         # the nested title renders as a heading spanning the subgrid
-        assert any(t.get_text() == "Inner" for sf in outer.subfigs for t in sf.texts)
+        assert any(
+            t.get_text() == "Inner" for ax in _nested_axes(outer) for t in ax.texts
+        )
         # inner sharey holds among the inner cells only
-        in_a, in_b = outer.subfigs[0].axes
+        in_a, in_b = [ax for ax in _nested_axes(outer) if ax.axison]
         assert in_a.get_shared_y_axes().joined(in_a, in_b)
-        outer_ax = [ax for ax in outer.axes if ax.figure is outer][0]
+        outer_ax = next(ax for ax in outer.axes if ax not in _nested_axes(outer))
         assert not in_a.get_shared_y_axes().joined(in_a, outer_ax)
         plt.close("all")
 
     def test_parent_sharing_stops_at_nesting_boundary(self):
         inner = Grid([_line_fig(), _line_fig()])
         outer = Grid([_line_fig(), inner, _line_fig()], sharex=True)
-        top = [ax for ax in outer.axes if ax.figure is outer]
+        top = [ax for ax in outer.axes if ax not in _nested_axes(outer)]
         assert top[0].get_shared_x_axes().joined(top[0], top[1])
-        in_a, in_b = outer.subfigs[0].axes
+        in_a, in_b = _nested_axes(outer)
         assert not in_a.get_shared_x_axes().joined(in_a, in_b)
         assert not in_a.get_shared_x_axes().joined(in_a, top[0])
         plt.close("all")
@@ -315,8 +398,8 @@ class TestNestedGrid:
         )
         inner = Grid([sub, _line_fig(), _line_fig()], sharex=True)
         fig = Grid([inner, _bar_fig()])
-        # creation order inside the subfigure: 2 subplot axes, then 2 line axes
-        in_axes = fig.subfigs[0].axes
+        # creation order inside the subgrid: 2 subplot axes, then 2 line axes
+        in_axes = _nested_axes(fig)
         assert len(in_axes) == 4
         line_a, line_b = in_axes[2], in_axes[3]
         assert line_a.get_shared_x_axes().joined(line_a, line_b)
