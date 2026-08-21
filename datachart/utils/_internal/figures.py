@@ -9,12 +9,20 @@ pyplot's global figure manager. Displaying is explicit via
 import io
 import warnings
 
-import matplotlib
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
 
-# backends that render inline in a notebook; showing there is IPython display
-_NOTEBOOK_BACKENDS = ("inline", "ipympl", "nbagg", "widget")
+
+def _in_notebook_kernel() -> bool:
+    # kernel detection beats backend sniffing: the backend may resolve to
+    # Agg inside Jupyter (MPLBACKEND, matplotlibrc) and inline display
+    # must still win there
+    try:
+        from IPython.core.getipython import get_ipython
+    except ImportError:
+        return False
+    shell = get_ipython()
+    return shell is not None and shell.__class__.__name__ == "ZMQInteractiveShell"
 
 
 class DatachartFigure(Figure):
@@ -36,8 +44,7 @@ class DatachartFigure(Figure):
         Args:
             warn: If True, warn when the backend cannot open a window.
         """
-        backend = matplotlib.get_backend().lower()
-        if any(key in backend for key in _NOTEBOOK_BACKENDS):
+        if _in_notebook_kernel():
             from IPython.display import display
 
             # a raw payload needs no repr hook, pyplot, or IPython

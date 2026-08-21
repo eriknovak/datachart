@@ -81,18 +81,14 @@ class TestShow:
     def teardown_method(self):
         plt.close("all")
 
-    def test_show_displays_inline_once_on_notebook_backends(self, monkeypatch):
-        """On a notebook backend show() emits exactly one raw PNG payload."""
+    def test_show_displays_inline_once_in_notebook_kernels(self, monkeypatch):
+        """In a Jupyter kernel show() emits exactly one raw PNG payload."""
+        import IPython.core.getipython
         import IPython.display
 
-        import datachart.utils._internal.figures as figures_module
-
+        shell = type("ZMQInteractiveShell", (), {})()
+        monkeypatch.setattr(IPython.core.getipython, "get_ipython", lambda: shell)
         calls = []
-        monkeypatch.setattr(
-            figures_module.matplotlib,
-            "get_backend",
-            lambda: "module://matplotlib_inline.backend_inline",
-        )
         monkeypatch.setattr(
             IPython.display,
             "display",
