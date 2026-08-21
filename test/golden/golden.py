@@ -33,7 +33,13 @@ from datachart.config import config
 from datachart.constants import THEME
 
 # Cases whose output intentionally changed since the last published baseline.
-EXPECTED_CHANGES = set()
+# Panel figures now carry themed label furniture (title/xlabel/ylabel/ylabel_right).
+EXPECTED_CHANGES = {
+    "overlay_line_bar_dual",
+    "overlay_nested_panel",
+    "grid_with_overlay",
+    "grid_mixed_panel_and_grid",
+}
 
 
 def _reset():
