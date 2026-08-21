@@ -439,7 +439,7 @@ class HISTOGRAM_TYPE:
 
 
 class COLORS:
-    """The predefined colors using pypalettes (https://y-sunflower.github.io/pypalettes/).
+    """The predefined colors using [pypalettes](https://y-sunflower.github.io/pypalettes/).
 
     All palette names are valid pypalettes identifiers. You can use any of the 2500+
     palettes available in pypalettes by passing the palette name as a string.
