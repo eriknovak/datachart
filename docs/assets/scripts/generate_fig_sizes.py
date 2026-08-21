@@ -11,21 +11,28 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.colors import to_rgba
 from matplotlib.patches import Rectangle
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
 from datachart.constants import FIG_SIZE
+from datachart.themes import DEFAULT_THEME
+from datachart.utils._internal.colors import create_color_cycle
 
 A4_W, A4_H = 8.27, 11.69
 MARGIN = 2.5 / 2.54  # the 2.5 cm print margin the paper sizes are anchored to
 COLUMN_GAP = 0.3
 
+# colors come from the DEFAULT theme: its singular Blues cycle and font color
+_cycle = create_color_cycle(DEFAULT_THEME["color_general_singular"], 3)
+_, _MID, _DARK = (_cycle[key]["color"] for key in ("a", "b", "c"))
 PAGE_COLOR = "#ffffff"
-PAGE_EDGE = "#9e9e9e"
-BOX_FACE = "#aecbe8"
-BOX_EDGE = "#3d6f9e"
-GHOST_EDGE = "#8fb2d4"
-LABEL_COLOR = "#333333"
+PAGE_EDGE = "#000000"
+MARGIN_EDGE = DEFAULT_THEME["muted_color"]
+BOX_FACE = to_rgba(_MID, 0.45)
+BOX_EDGE = _DARK
+GHOST_EDGE = _MID
+LABEL_COLOR = DEFAULT_THEME["font_general_color"]
 
 # (name, size, ghost twin for side-by-side half-width figures);
 # rows of at most four pages keep the image narrow enough for the docs column
@@ -76,7 +83,7 @@ def draw_page_with_box(ax, x0, y0, name, size, ghost):
             page_w - 2 * MARGIN,
             page_h - 2 * MARGIN,
             facecolor="none",
-            edgecolor=PAGE_EDGE,
+            edgecolor=MARGIN_EDGE,
             lw=0.8,
             linestyle=":",
         )
