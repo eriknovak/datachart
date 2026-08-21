@@ -28,7 +28,7 @@ from datachart.charts import (
     BoxPlot,
     ParallelCoords,
 )
-from datachart.utils import OverlayChart, FigureGridLayout
+from datachart.utils import OverlayChart, FigureGridLayout, Panel
 from datachart.config import config
 from datachart.constants import THEME
 
@@ -324,6 +324,28 @@ def overlay_auto_assign():
     fl = LineChart(data=[{"x": i, "y": i * 2} for i in range(5)])
     return OverlayChart(
         charts=[{"figure": fb}, {"figure": fl}], auto_secondary_axis=3.0
+    )
+
+
+@case
+def overlay_nested_panel():
+    fb = BarChart(
+        data=[{"label": c, "y": v * 100} for c, v in zip("ABCD", [1, 2, 3, 2])]
+    )
+    fl = LineChart(data=[{"x": i, "y": i * 2} for i in range(4)])
+    inner = Panel(
+        [
+            {"figure": fb, "y_axis": "left"},
+            {"figure": fl, "y_axis": "right", "legend_label": "trend"},
+        ]
+    )
+    f2 = LineChart(data=[{"x": i, "y": i * 3} for i in range(4)], subtitle="extra")
+    return Panel(
+        [inner, f2],
+        title="Nested",
+        ylabel_left="count",
+        ylabel_right="value",
+        show_legend=True,
     )
 
 

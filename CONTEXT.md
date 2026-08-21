@@ -19,6 +19,8 @@ A group of layers sharing one coordinate space. Owns everything cross-layer: col
 assignment, bar slotting, axis scale and limits, grid, ticks, legend assembly, and
 twin-axis (left/right) assignment. Also the public composition front
 (`datachart.utils.Panel`) that overlays rendered figures into one panel.
+Panel figures nest: a nested panel flattens into the outer one, keeping its
+per-figure prefs while the outermost call supplies all panel-level furniture.
 _Avoid_: overlay (for the concept), subplot, axes group
 
 **Grid**:

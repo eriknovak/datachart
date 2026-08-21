@@ -20,8 +20,6 @@ title: Utils Module
 
 ## Deprecated
 
-::: datachart.utils.OverlayChart
-
 ::: datachart.utils.FigureGridLayout
 
 ::: datachart.utils.figure_grid_layout
