@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 from ..constants import FIG_SIZE
 from ..config import config
 from ._internal.config_helpers import get_grid_style, get_legend_style, get_text_style
+from ._internal.figures import new_figure
 from ._internal.layers import (
     Panel,
     LayerGroup,
@@ -178,7 +179,8 @@ def _overlay_impl(
 
     panel = Panel(groups, panel_settings)
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    fig = new_figure(figsize=figsize)
+    ax = fig.subplots()
     # the panel title renders as the figure suptitle when the panel is the figure
     panel.settings = {**panel_settings, "title": None}
     panel.render(ax)

@@ -1,0 +1,81 @@
+"""Unmanaged figure construction (ADR 0008).
+
+Figures are created directly — never through pyplot — so they are owned by the
+caller and garbage-collected like any object instead of accumulating in
+pyplot's global figure manager. Displaying is explicit via
+`DatachartFigure.show`.
+"""
+
+import io
+import warnings
+
+import matplotlib
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.figure import Figure
+
+# backends that render inline in a notebook; showing there is IPython display
+_NOTEBOOK_BACKENDS = ("inline", "ipympl", "nbagg", "widget")
+
+
+class DatachartFigure(Figure):
+    """A figure owned by the caller, never registered with pyplot.
+
+    Creating a chart never displays it and never accumulates global state;
+    call `show()` to display the figure — inline in notebooks, in a GUI
+    window in scripts.
+    """
+
+    def _repr_png_(self):
+        # unmanaged figures never activate IPython's matplotlib integration,
+        # so inline display needs the figure to speak the repr protocol itself
+        buffer = io.BytesIO()
+        self.savefig(buffer, format="png", bbox_inches="tight")
+        return buffer.getvalue()
+
+    def show(self, warn=True):
+        """Display the figure.
+
+        In notebooks the figure is displayed inline. Elsewhere it is adopted
+        into pyplot's figure manager and shown via `plt.show()`, so a GUI
+        window opens where a backend supports one.
+
+        Args:
+            warn: If True, warn when the backend cannot open a window.
+        """
+        backend = matplotlib.get_backend().lower()
+        if any(key in backend for key in _NOTEBOOK_BACKENDS):
+            from IPython.display import display
+
+            display(self)
+            return
+
+        import matplotlib.pyplot as plt
+
+        if self.canvas is None or self.canvas.manager is None:
+            # adopt into pyplot: steal a fresh manager and point it at us
+            dummy = plt.figure(figsize=self.get_size_inches())
+            manager = dummy.canvas.manager
+            manager.canvas.figure = self
+            self.set_canvas(manager.canvas)
+        with warnings.catch_warnings():
+            if not warn:
+                warnings.simplefilter("ignore")
+            plt.show()
+
+
+def new_figure(figsize=None) -> DatachartFigure:
+    """Create an unmanaged, constrained-layout figure.
+
+    An Agg canvas is attached so `figure.canvas.draw()` and pixel-buffer
+    access work without pyplot; `show()` swaps in an interactive canvas.
+
+    Args:
+        figsize: The figure size in inches; `None` uses the matplotlib default.
+
+    Returns:
+        The unmanaged figure.
+
+    """
+    figure = DatachartFigure(figsize=figsize, layout="constrained")
+    FigureCanvasAgg(figure)
+    return figure
