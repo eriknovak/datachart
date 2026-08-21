@@ -34,9 +34,13 @@ presentation sizes as standalone frames at the same physical scale.
     options:
         heading_level: 3
 
+![FONT_STYLE at a glance](../assets/imgs/const-font-style.svg)
+
 ::: datachart.constants.FONT_WEIGHT
     options:
         heading_level: 3
+
+![FONT_WEIGHT at a glance](../assets/imgs/const-font-weight.svg)
 
 ## Line Constants
 
@@ -44,13 +48,19 @@ presentation sizes as standalone frames at the same physical scale.
     options:
         heading_level: 3
 
+![LINE_MARKER at a glance](../assets/imgs/const-line-marker.svg)
+
 ::: datachart.constants.LINE_STYLE
     options:
         heading_level: 3
 
+![LINE_STYLE at a glance](../assets/imgs/const-line-style.svg)
+
 ::: datachart.constants.LINE_DRAW_STYLE
     options:
         heading_level: 3
+
+![LINE_DRAW_STYLE at a glance](../assets/imgs/const-line-draw-style.svg)
 
 ## Style Constants
 
@@ -58,13 +68,19 @@ presentation sizes as standalone frames at the same physical scale.
     options:
         heading_level: 3
 
+![HATCH_STYLE at a glance](../assets/imgs/const-hatch-style.svg)
+
 ::: datachart.constants.COLORS
     options:
         heading_level: 3
 
+All predefined palettes are rendered in the [Colormaps guide](../how-to-guides/colormaps.ipynb).
+
 ::: datachart.constants.THEME
     options:
         heading_level: 3
+
+Every theme applied to the same set of charts is shown in the [Theme Gallery](../how-to-guides/theme-gallery.ipynb).
 
 ::: datachart.constants.EMPHASIS
     options:
@@ -76,9 +92,13 @@ presentation sizes as standalone frames at the same physical scale.
     options:
         heading_level: 3
 
+![LEGEND_ALIGN at a glance](../assets/imgs/const-legend-align.svg)
+
 ::: datachart.constants.LEGEND_LOCATION
     options:
         heading_level: 3
+
+![LEGEND_LOCATION at a glance](../assets/imgs/const-legend-location.svg)
 
 ## Chart Constants
 
@@ -98,6 +118,8 @@ presentation sizes as standalone frames at the same physical scale.
     options:
         heading_level: 3
 
+![VALUE_FORMAT at a glance](../assets/imgs/const-value-format.svg)
+
 ::: datachart.constants.SHOW_GRID
     options:
         heading_level: 3
@@ -113,3 +135,5 @@ presentation sizes as standalone frames at the same physical scale.
 ::: datachart.constants.COLORBAR_LOCATION
     options:
         heading_level: 3
+
+![COLORBAR_LOCATION at a glance](../assets/imgs/const-colorbar-location.svg)

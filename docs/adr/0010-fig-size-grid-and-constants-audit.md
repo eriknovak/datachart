@@ -43,7 +43,8 @@ The same audit lands the smaller fixes: `VALFMT` is renamed `VALUE_FORMAT`
 `HISTOGRAM_TYPE.STEPFILLED` becomes `STEP_FILLED` (value unchanged); exact
 duplicates are dropped (`LINE_DRAW_STYLE.STEPS` = `STEPS_PRE`,
 `FONT_WEIGHT.DEMI_BOLD` = `SEMIBOLD` at weight 600, the deprecated
-`FIG_SIZE.A4` alias); the `COLORS` docstring is synced with the actual
+`FIG_SIZE.A4` alias); `FONT_WEIGHT.ULTRA_HEAVY` is removed because its
+value `"ultrabold"` is not a matplotlib weight and raised `ValueError`; the `COLORS` docstring is synced with the actual
 members and `GnBu` re-filed as sequential. The `DEFAULT` member every class
 carries stays: it documents what you get when you don't ask.
 

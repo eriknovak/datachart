@@ -171,7 +171,6 @@ class FONT_WEIGHT:
         BOLD (str): The bold font weight. Equals to `"bold"`.
         EXTRA_BOLD (str): The extra bold font weight. Equals to `"extra bold"`.
         HEAVY (str): The heavy font weight. Equals to `"heavy"`.
-        ULTRA_HEAVY (str): The ultra heavy font weight. Equals to `"ultrabold"`.
         BLACK (str): The black font weight. Equals to `"black"`.
 
     """
@@ -185,7 +184,6 @@ class FONT_WEIGHT:
     BOLD = "bold"
     EXTRA_BOLD = "extra bold"
     HEAVY = "heavy"
-    ULTRA_HEAVY = "ultrabold"
     BLACK = "black"
 
 
