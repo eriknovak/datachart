@@ -63,6 +63,9 @@ DEFAULT_VALUE_FORMAT = VALUE_FORMAT.DEFAULT
 DEFAULT_CI_LEVEL = 0.95
 DEFAULT_SIZE_RANGE = (20, 200)
 DEFAULT_BAR_VALUE_FORMAT = "%g"
+# show_area fills this many data magnitudes below the line; the axes clip it,
+# so the fill meets the floor whatever limits sharey, ymin or a re-render set
+AREA_FLOOR_FACTOR = 1e6
 # emphasis roles (ADR 0009): background mutes, highlight bolds, None is today
 EMPHASIS_BACKGROUND = EMPHASIS.BACKGROUND
 EMPHASIS_HIGHLIGHT = EMPHASIS.HIGHLIGHT
@@ -345,12 +348,24 @@ class LineLayer(Layer):
         if draw_yerr:
             ax.fill_between(x, y - yerr, y + yerr, **self._resolved_area_style(ctx))
 
+        ax.plot(x, y, **line_style, label=self.label(ctx))
+
         if self.show_area:
             drawstyle = line_style.get("drawstyle", "")
             step = drawstyle.split("-")[1] if "steps-" in drawstyle else None
-            ax.fill_between(x, y, step=step, **self._resolved_area_style(ctx))
+            self._fill_to_floor(ax, x, y, step, self._resolved_area_style(ctx))
 
-        ax.plot(x, y, **line_style, label=self.label(ctx))
+    def _fill_to_floor(self, ax, x, y, step, area_style):
+        """Fill under the line past any plausible axis floor, outside the autoscale."""
+
+        values = np.asarray(y, dtype=float)
+        values = values[np.isfinite(values)]
+        if values.size == 0:
+            return
+        floor = values.min() - AREA_FLOOR_FACTOR * max(np.abs(values).max(), 1.0)
+        data_lim = ax.dataLim.frozen()
+        ax.fill_between(x, y, floor, step=step, **area_style)
+        ax.dataLim.set(data_lim)
 
 
 class BarLayer(Layer):
