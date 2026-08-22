@@ -471,3 +471,51 @@ class TestDeprecations:
             fig = figure_grid_layout([_line_fig()])
         assert isinstance(fig, plt.Figure)
         plt.close("all")
+
+
+def _bar_widths(figure):
+    return [round(p.get_width(), 3) for p in figure.axes[0].patches]
+
+
+class TestBarWidth:
+    """A per-chart plot_bar_width style must reach the drawn bars."""
+
+    data = [{"label": "a", "y": 1}, {"label": "b", "y": 2}]
+
+    def test_single_chart_style_width(self):
+        figure = BarChart(data=self.data, style={"plot_bar_width": 0.4})
+        assert _bar_widths(figure) == [0.4, 0.4]
+        plt.close(figure)
+
+    def test_grouped_layers_keep_own_width(self):
+        figure = BarChart(
+            data=[self.data, self.data],
+            style=[{"plot_bar_width": 0.8}, {"plot_bar_width": 0.4}],
+        )
+        assert _bar_widths(figure) == [0.4, 0.4, 0.2, 0.2]
+        plt.close(figure)
+
+    def test_stacked_layers_keep_own_width(self):
+        figure = BarChart(
+            data=[self.data, self.data],
+            style=[{"plot_bar_width": 0.8}, {"plot_bar_width": 0.4}],
+            bar_mode="stack",
+        )
+        assert _bar_widths(figure) == [0.8, 0.8, 0.4, 0.4]
+        plt.close(figure)
+
+    def test_horizontal_style_width(self):
+        figure = BarChart(
+            data=self.data, style={"plot_bar_width": 0.4}, orientation="horizontal"
+        )
+        assert [round(p.get_height(), 3) for p in figure.axes[0].patches] == [0.4, 0.4]
+        plt.close(figure)
+
+    def test_config_width_still_applies(self):
+        config.update_config({"plot_bar_width": 0.5})
+        try:
+            figure = BarChart(data=[self.data, self.data])
+            assert _bar_widths(figure) == [0.25, 0.25, 0.25, 0.25]
+            plt.close(figure)
+        finally:
+            config.reset_config()
