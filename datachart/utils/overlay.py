@@ -15,7 +15,7 @@ from typing import List, Dict, Optional, Tuple, Union, Any
 
 import matplotlib.pyplot as plt
 
-from ..constants import FIG_SIZE
+from ..constants import BAR_MODE, FIG_SIZE
 from ..config import config
 from ._internal.config_helpers import get_grid_style, get_legend_style, get_text_style
 from ._internal.figures import new_figure
@@ -109,7 +109,7 @@ def _overlay_impl(
     ymax: Optional[float] = None,
     ymin_right: Optional[float] = None,
     ymax_right: Optional[float] = None,
-    bar_mode: Optional[str] = None,
+    bar_mode: Optional[Union[BAR_MODE, str]] = None,
 ) -> plt.Figure:
     """Render the overlay panel for a normalized list of chart dicts.
 
@@ -222,7 +222,7 @@ def OverlayChart(
     ymax: Optional[float] = None,
     ymin_right: Optional[float] = None,
     ymax_right: Optional[float] = None,
-    bar_mode: Optional[str] = None,
+    bar_mode: Optional[Union[BAR_MODE, str]] = None,
 ) -> plt.Figure:
     """Overlay multiple charts on a single plot with optional dual y-axes.
 
@@ -247,7 +247,8 @@ def OverlayChart(
         ymax: Maximum value for y-axis limits (applies to left y-axis).
         ymin_right: Minimum value for right y-axis limits.
         ymax_right: Maximum value for right y-axis limits.
-        bar_mode: Bar chart overlay mode: "group", "stack", or "overlay".
+        bar_mode: Bar chart overlay mode: "group", "stack", or "overlay". See
+            `BAR_MODE`.
 
     Returns:
         A matplotlib Figure containing the overlaid charts.

@@ -10,7 +10,7 @@ from ..typings import (
     VLinePlotAttrs,
     HLinePlotAttrs,
 )
-from ..constants import EMPHASIS, FIG_SIZE, SHOW_GRID, SCALE
+from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID, SCALE
 
 # ================================================
 # Main Chart Definition
@@ -36,7 +36,7 @@ def ScatterChart(
     show_ci: Optional[bool] = None,
     ci_level: Optional[float] = None,
     show_correlation: Optional[bool] = None,
-    aspect_ratio: Optional[str] = None,
+    aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
@@ -149,7 +149,8 @@ def ScatterChart(
         show_ci: Whether to show the confidence interval around the regression line.
         ci_level: The confidence interval level (default 0.95).
         show_correlation: Whether to show the Pearson correlation coefficient (r-value) as an annotation.
-        aspect_ratio: The aspect ratio of the chart.
+        aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
+            `ASPECT_RATIO`.
         scalex: The x-axis scale (e.g., "log", "linear").
         scaley: The y-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each chart.

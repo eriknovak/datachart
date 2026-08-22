@@ -10,7 +10,7 @@ from ..typings import (
     VLinePlotAttrs,
     HLinePlotAttrs,
 )
-from ..constants import EMPHASIS, FIG_SIZE, SHOW_GRID, SCALE
+from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID, SCALE
 
 # ================================================
 # Main Chart Definition
@@ -34,7 +34,7 @@ def LineChart(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_yerr: Optional[bool] = None,
     show_area: Optional[bool] = None,
-    aspect_ratio: Optional[str] = None,
+    aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
@@ -108,7 +108,8 @@ def LineChart(
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_yerr: Whether to show y-axis error bars.
         show_area: Whether to show the area under the line.
-        aspect_ratio: The aspect ratio of the chart.
+        aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
+            `ASPECT_RATIO`.
         scalex: The x-axis scale (e.g., "log", "linear").
         scaley: The y-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each chart.

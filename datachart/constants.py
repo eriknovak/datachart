@@ -15,6 +15,7 @@ Classes:
     LEGEND_ALIGN:       The supported legend alignments.
     LEGEND_LOCATION:    The supported legend locations.
     HISTOGRAM_TYPE:     The supported histogram types.
+    BAR_MODE:           The supported bar modes.
     COLORS:             The predefined colors.
     NORMALIZE:          The supported normalization options.
     ORIENTATION:        The supported orientations.
@@ -438,6 +439,31 @@ class HISTOGRAM_TYPE:
     STEP_FILLED = "stepfilled"
 
 
+class BAR_MODE:
+    """The supported bar modes.
+
+    Passed as the `bar_mode` setting of bar charts and
+    [`Panel`][datachart.utils.Panel]: how multiple bar series share the axis.
+
+    Examples:
+        >>> from datachart.constants import BAR_MODE
+        >>> BAR_MODE.DEFAULT
+        "group"
+
+    Attributes:
+        DEFAULT (str): The default bar mode. Same as `BAR_MODE.GROUP`.
+        GROUP (str): The series are drawn side by side. Equals to `"group"`.
+        STACK (str): The series are stacked on top of each other. Equals to `"stack"`.
+        OVERLAY (str): The series are drawn over each other at the same position. Equals to `"overlay"`.
+
+    """
+
+    DEFAULT = "group"
+    GROUP = "group"
+    STACK = "stack"
+    OVERLAY = "overlay"
+
+
 class COLORS:
     """The predefined colors using [pypalettes](https://y-sunflower.github.io/pypalettes/).
 
@@ -625,8 +651,8 @@ class ORIENTATION:
 class VALUE_FORMAT:
     """The predefined value formats.
 
-    Passed as the heatmap's `valfmt` attribute: formats the values drawn in
-    the heatmap cells.
+    Passed as the heatmap's `valfmt` attribute (the values drawn in the cells)
+    or the bar chart's `value_format` attribute (the bar value labels).
 
     ![VALUE_FORMAT at a glance](../../assets/imgs/const-value-format.svg){ width="100%" }
 

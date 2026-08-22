@@ -8,7 +8,7 @@ from ..typings import (
     HeatmapStyleAttrs,
     HeatmapColorbarAttrs,
 )
-from ..constants import FIG_SIZE, SHOW_GRID
+from ..constants import ASPECT_RATIO, FIG_SIZE, SHOW_GRID, VALUE_FORMAT
 
 # ================================================
 # Main Chart Definition
@@ -34,7 +34,7 @@ def Heatmap(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_colorbars: Optional[bool] = None,
     show_heatmap_values: Optional[bool] = None,
-    aspect_ratio: Optional[str] = None,
+    aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,
@@ -43,7 +43,7 @@ def Heatmap(
     norm: Optional[Union[str, List[Optional[str]]]] = None,
     vmin: Optional[Union[float, List[Optional[float]]]] = None,
     vmax: Optional[Union[float, List[Optional[float]]]] = None,
-    valfmt: Optional[Union[str, List[Optional[str]]]] = None,
+    valfmt: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
     xticks: Optional[
         Union[List[Union[int, float]], List[List[Union[int, float]]]]
     ] = None,
@@ -91,7 +91,8 @@ def Heatmap(
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_colorbars: Whether to show the colorbar(s).
         show_heatmap_values: Whether to show values on the heatmap cells.
-        aspect_ratio: The aspect ratio of the chart.
+        aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
+            `ASPECT_RATIO`.
         subplots: Whether to create separate subplots for each heatmap.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.
@@ -100,7 +101,8 @@ def Heatmap(
         norm: Value normalization method(s).
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
-        valfmt: Format string(s) for cell values.
+        valfmt: Format string(s) for cell values, with the value named `x`
+            (e.g., `"{x:.1f}"`). See `VALUE_FORMAT`.
         xticks: Custom x-axis tick positions.
         xticklabels: Custom x-axis tick labels.
         xtickrotate: Rotation angle for x-axis tick labels.

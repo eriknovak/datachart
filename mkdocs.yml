@@ -56,7 +56,11 @@ plugins:
   - autorefs
   - search:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
-  - mkdocs-jupyter
+  - mkdocs-jupyter:
+      # cells tagged `remove_input` still execute; only their source is hidden
+      remove_tag_config:
+        remove_input_tags:
+          - remove_input
   # redirects must come after mkdocs-jupyter so notebook pages are registered
   - redirects:
       # keys are .md stand-ins for the renamed notebooks' old URLs

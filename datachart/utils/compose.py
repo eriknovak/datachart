@@ -16,7 +16,7 @@ from typing import List, Dict, Optional, Tuple, Union, Any
 
 import matplotlib.pyplot as plt
 
-from ..constants import FIG_SIZE
+from ..constants import BAR_MODE, FIG_SIZE
 from .overlay import _overlay_impl
 from .figure import _grid_from_dicts, _figure_grid_layout_impl
 
@@ -38,7 +38,7 @@ def Panel(
     ymax: Optional[float] = None,
     ymin_right: Optional[float] = None,
     ymax_right: Optional[float] = None,
-    bar_mode: Optional[str] = None,
+    bar_mode: Optional[Union[BAR_MODE, str]] = None,
 ) -> plt.Figure:
     """Overlay rendered chart figures in one coordinate space.
 
@@ -108,7 +108,7 @@ def Panel(
         ymax_right: Maximum value for right y-axis limits.
         bar_mode: Bar chart overlay mode: "group" (side-by-side), "stack"
             (stacked), or "overlay" (overlapping). Default is taken from config
-            (overlay_bar_mode, default "group").
+            (overlay_bar_mode, default "group"). See `BAR_MODE`.
 
     Returns:
         A matplotlib Figure containing the overlaid charts.

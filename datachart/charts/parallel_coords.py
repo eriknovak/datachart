@@ -8,7 +8,7 @@ from ..typings import (
     ParallelCoordsDataPointAttrs,
     ParallelCoordsStyleAttrs,
 )
-from ..constants import EMPHASIS, FIG_SIZE, SHOW_GRID
+from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID
 
 # ================================================
 # Main Chart Definition
@@ -28,7 +28,7 @@ def ParallelCoords(
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     show_legend: Optional[bool] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
-    aspect_ratio: Optional[str] = None,
+    aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     style: Optional[
         Union[ParallelCoordsStyleAttrs, List[Optional[ParallelCoordsStyleAttrs]]]
     ] = None,
@@ -73,7 +73,8 @@ def ParallelCoords(
         figsize: The size of the figure.
         show_legend: Whether to show the legend (for hue categories).
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
-        aspect_ratio: The aspect ratio of the chart.
+        aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
+            `ASPECT_RATIO`.
         style: Style configuration(s) for the lines.
         dimensions: List of dimension names to include and their order. If None,
             all columns (except hue) are auto-detected.

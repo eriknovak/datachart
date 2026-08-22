@@ -393,6 +393,12 @@ class BarLayer(Layer):
             return None
         return (float(np.min(y)), float(np.max(y)))
 
+    @property
+    def bar_width(self) -> float:
+        """The layer's resolved `plot_bar_width`, as a fraction of the category width."""
+        key = "height" if self.is_horizontal else "width"
+        return self.bar_style.get(key, config["plot_bar_width"])
+
     def draw(self, ax, ctx):
         y = self.y_values()
         labels = self.labels()
@@ -433,9 +439,14 @@ class BarLayer(Layer):
         )
 
         if self.show_values:
+            value_format = self.value_format
+            # VALUE_FORMAT strings name the value `x`, which bar_label's own
+            # {}-style formatting cannot resolve
+            if isinstance(value_format, str) and "{x" in value_format:
+                value_format = mticker.StrMethodFormatter(value_format)
             ax.bar_label(
                 bars,
-                fmt=self.value_format,
+                fmt=value_format,
                 padding=self.value_padding,
                 fontsize=self.value_fontsize,
                 color=self.value_color,
@@ -1536,7 +1547,9 @@ class Panel:
             bar_mode = "group"
 
         bar_slots = {}
-        bar_width = s.get("bar_width", 0.8)
+        # the group spans the widest layer; each layer keeps its own
+        # plot_bar_width inside its slot
+        bar_width = max((l.bar_width for l in bar_layers), default=0.0)
         slot_width = bar_width / len(bar_layers) if bar_layers else bar_width
         if bar_layers and s.get("bar_slotting", True):
             if bar_mode == "group":
@@ -1554,7 +1567,7 @@ class Panel:
                 for idx, layer in enumerate(bar_layers):
                     bar_slots[id(layer)] = BarSlot(
                         offset=(idx - (len(bar_layers) - 1) / 2) * slot_width,
-                        width=slot_width,
+                        width=layer.bar_width / len(bar_layers),
                     )
             elif bar_mode == "stack":
                 bottoms = None
@@ -1564,7 +1577,7 @@ class Panel:
                 for idx, layer in enumerate(bar_layers):
                     bar_slots[id(layer)] = BarSlot(
                         offset=0.0,
-                        width=bar_width,
+                        width=layer.bar_width,
                         bottom=None if bottoms is None else bottoms.copy(),
                         show_yerr=idx == len(bar_layers) - 1,
                     )
@@ -1573,7 +1586,7 @@ class Panel:
                         bottoms = bottoms + np.array(y)
             else:  # overlay
                 for layer in bar_layers:
-                    bar_slots[id(layer)] = BarSlot(offset=0.0, width=bar_width)
+                    bar_slots[id(layer)] = BarSlot(offset=0.0, width=layer.bar_width)
 
         bar_alpha = None
         if bar_mode == "overlay" and len(bar_layers) > 1:
@@ -1920,7 +1933,6 @@ def build_chart_panel_settings(
             else settings["aspect_ratio"]
         ),
         "legend_style": get_legend_style(),
-        "bar_width": config["plot_bar_width"],
         "bar_mode": settings.get("bar_mode") or "group",
         "tighten_xlim": chart_type == "linechart",
     }
