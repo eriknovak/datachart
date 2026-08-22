@@ -45,6 +45,8 @@ EXPECTED_CHANGES = {
     "emphasis_hist_reference",
     "emphasis_box_labels",
     "emphasis_panel_cross_type",
+    # show_area now fills down to the axis floor instead of y=0
+    "line_area_styled",
 }
 
 
