@@ -18,6 +18,8 @@ from typing import List, Optional, Union
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+from matplotlib.collections import PathCollection
+from matplotlib.legend_handler import HandlerPathCollection
 
 from .colors import create_color_cycle, create_colormap, get_colormap
 from .config_helpers import (
@@ -77,6 +79,19 @@ DEFAULT_MUTED_COLOR = "#CFCFCF"
 DEFAULT_MUTED_ALPHA = 0.5
 # matplotlib skips underscore-prefixed labels when assembling the legend
 NO_LEGEND = "_nolegend_"
+
+
+def _scatter_legend_handle(legend_handle, orig_handle):
+    legend_handle.update_from(orig_handle)
+    size = getattr(orig_handle, "datachart_legend_size", None)
+    if size is not None:
+        legend_handle.set_sizes([size])
+
+
+# bubble charts size markers by data; their legend entries keep the base size
+LEGEND_HANDLER_MAP = {
+    PathCollection: HandlerPathCollection(update_func=_scatter_legend_handle)
+}
 # fraction of the value-axis span added so bar value labels stay inside
 VALUE_HEADROOM_VERTICAL = 0.08
 VALUE_HEADROOM_HORIZONTAL = 0.12
@@ -553,6 +568,12 @@ class ScatterLayer(Layer):
             return _normalize_sizes(size_data, self.size_range)
         return self.scatter_style.get("s", self.default_size)
 
+    def _mark_legend_size(self, collection, size_data):
+        if size_data is not None:
+            collection.datachart_legend_size = self.scatter_style.get(
+                "s", self.default_size
+            )
+
     def _draw_regression(self, ax, x, y, color):
         from scipy import stats as scipy_stats
 
@@ -640,13 +661,14 @@ class ScatterLayer(Layer):
                 if ctx.emphasis == EMPHASIS_BACKGROUND:
                     group_style["c"] = self.muted_color
                     label = NO_LEGEND
-                ax.scatter(
+                collection = ax.scatter(
                     x_data[mask],
                     y_data[mask],
                     s=group_sizes,
                     label=label,
                     **group_style,
                 )
+                self._mark_legend_size(collection, size_data)
 
             if self.show_correlation:
                 self._draw_correlation(ax, x_data, y_data, color=None)
@@ -660,7 +682,10 @@ class ScatterLayer(Layer):
             if ctx.emphasis == EMPHASIS_BACKGROUND:
                 base_style["c"] = self.muted_color
 
-            ax.scatter(x_data, y_data, s=sizes, label=self.label(ctx), **base_style)
+            collection = ax.scatter(
+                x_data, y_data, s=sizes, label=self.label(ctx), **base_style
+            )
+            self._mark_legend_size(collection, size_data)
 
             color = base_style.get("c", base_style.get("color"))
             if self.show_regression:
@@ -1837,7 +1862,10 @@ class Panel:
 
         # legend
         if s.get("show_legend"):
-            legend_style = s.get("legend_style", {})
+            legend_style = {
+                **s.get("legend_style", {}),
+                "handler_map": LEGEND_HANDLER_MAP,
+            }
             custom_handles = None
             for group in self.groups:
                 for layer in group.layers:
