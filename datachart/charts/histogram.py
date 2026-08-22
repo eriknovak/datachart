@@ -10,7 +10,7 @@ from ..typings import (
     VLinePlotAttrs,
     HLinePlotAttrs,
 )
-from ..constants import EMPHASIS, FIG_SIZE, SHOW_GRID, ORIENTATION, SCALE
+from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID, ORIENTATION, SCALE
 
 # ================================================
 # Main Chart Definition
@@ -34,7 +34,7 @@ def Histogram(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_density: Optional[bool] = None,
     show_cumulative: Optional[bool] = None,
-    aspect_ratio: Optional[str] = None,
+    aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
     num_bins: Optional[int] = None,
     scalex: Optional[Union[SCALE, str]] = None,
@@ -109,7 +109,8 @@ def Histogram(
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_density: Whether to plot the density histogram.
         show_cumulative: Whether to plot the cumulative histogram.
-        aspect_ratio: The aspect ratio of the chart.
+        aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
+            `ASPECT_RATIO`.
         orientation: The orientation of the histogram (vertical or horizontal).
         num_bins: The number of bins to split the data into.
         scalex: The x-axis scale (e.g., "log", "linear"). Useful for log-distributed data.

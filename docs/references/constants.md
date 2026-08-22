@@ -77,6 +77,10 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.BAR_MODE
+    options:
+        heading_level: 3
+
 ::: datachart.constants.NORMALIZE
     options:
         heading_level: 3

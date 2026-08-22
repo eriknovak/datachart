@@ -15,6 +15,7 @@ Classes:
     LEGEND_ALIGN:       The supported legend alignments.
     LEGEND_LOCATION:    The supported legend locations.
     HISTOGRAM_TYPE:     The supported histogram types.
+    BAR_MODE:           The supported bar modes.
     COLORS:             The predefined colors.
     NORMALIZE:          The supported normalization options.
     ORIENTATION:        The supported orientations.
@@ -436,6 +437,31 @@ class HISTOGRAM_TYPE:
     BAR_STACKED = "barstacked"
     STEP = "step"
     STEP_FILLED = "stepfilled"
+
+
+class BAR_MODE:
+    """The supported bar modes.
+
+    Passed as the `bar_mode` setting of bar charts and
+    [`Panel`][datachart.utils.Panel]: how multiple bar series share the axis.
+
+    Examples:
+        >>> from datachart.constants import BAR_MODE
+        >>> BAR_MODE.DEFAULT
+        "group"
+
+    Attributes:
+        DEFAULT (str): The default bar mode. Same as `BAR_MODE.GROUP`.
+        GROUP (str): The series are drawn side by side. Equals to `"group"`.
+        STACK (str): The series are stacked on top of each other. Equals to `"stack"`.
+        OVERLAY (str): The series are drawn over each other at the same position. Equals to `"overlay"`.
+
+    """
+
+    DEFAULT = "group"
+    GROUP = "group"
+    STACK = "stack"
+    OVERLAY = "overlay"
 
 
 class COLORS:

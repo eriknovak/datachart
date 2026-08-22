@@ -10,7 +10,7 @@ from matplotlib.gridspec import GridSpecFromSubplotSpec
 
 from datachart.charts import LineChart, BarChart
 from datachart.config import config
-from datachart.constants import THEME, VALUE_FORMAT
+from datachart.constants import BAR_MODE, THEME, VALUE_FORMAT
 from datachart.utils import (
     Panel,
     Grid,
@@ -499,7 +499,7 @@ class TestBarWidth:
         figure = BarChart(
             data=[self.data, self.data],
             style=[{"plot_bar_width": 0.8}, {"plot_bar_width": 0.4}],
-            bar_mode="stack",
+            bar_mode=BAR_MODE.STACK,
         )
         assert _bar_widths(figure) == [0.8, 0.8, 0.4, 0.4]
         plt.close(figure)

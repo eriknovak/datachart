@@ -10,7 +10,16 @@ from ..typings import (
     VLinePlotAttrs,
     HLinePlotAttrs,
 )
-from ..constants import EMPHASIS, FIG_SIZE, SHOW_GRID, ORIENTATION, SCALE
+from ..constants import (
+    ASPECT_RATIO,
+    BAR_MODE,
+    EMPHASIS,
+    FIG_SIZE,
+    SHOW_GRID,
+    ORIENTATION,
+    SCALE,
+    VALUE_FORMAT,
+)
 
 # ================================================
 # Main Chart Definition
@@ -34,10 +43,10 @@ def BarChart(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_yerr: Optional[bool] = None,
     show_values: Optional[bool] = None,
-    value_format: Optional[str] = None,
-    aspect_ratio: Optional[str] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
-    bar_mode: Optional[str] = None,
+    bar_mode: Optional[Union[BAR_MODE, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
@@ -101,23 +110,28 @@ def BarChart(
             `style`: "background" mutes a chart (theme muted color, lowered
             alpha, behind the others, no legend entry), "highlight" bolds
             its edges and brings it to the front, None leaves it unchanged.
-        figsize: The size of the figure.
+            See `EMPHASIS`.
+        figsize: The size of the figure as (width, height) in inches. See `FIG_SIZE`.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
         ymin: The minimum y-axis value.
         ymax: The maximum y-axis value.
         show_legend: Whether to show the legend.
-        show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_grid: Which grid lines to show ("both", "x", "y"). See `SHOW_GRID`.
         show_yerr: Whether to show y-axis error bars.
         show_values: Whether to show bar value labels at the edge of each bar.
         value_format: Format string for bar value labels: a `VALUE_FORMAT`
             constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
-        aspect_ratio: The aspect ratio of the chart.
+        aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
+            `ASPECT_RATIO`.
         bar_mode: How multiple bar series share the axis: "group" (side-by-side),
-            "stack" (stacked), or "overlay" (overlapping).
-        orientation: The orientation of the bars (vertical or horizontal).
-        scalex: The x-axis scale (e.g., "log", "linear"). Useful for horizontal bars.
-        scaley: The y-axis scale (e.g., "log", "linear"). Useful for vertical bars.
+            "stack" (stacked), or "overlay" (overlapping). See `BAR_MODE`.
+        orientation: The orientation of the bars ("vertical" or "horizontal").
+            See `ORIENTATION`.
+        scalex: The x-axis scale ("linear", "log", "symlog", "asinh"). Useful
+            for horizontal bars. See `SCALE`.
+        scaley: The y-axis scale ("linear", "log", "symlog", "asinh"). Useful
+            for vertical bars. See `SCALE`.
         subplots: Whether to create separate subplots for each chart.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.
