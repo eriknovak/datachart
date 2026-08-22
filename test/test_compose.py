@@ -10,7 +10,7 @@ from matplotlib.gridspec import GridSpecFromSubplotSpec
 
 from datachart.charts import LineChart, BarChart
 from datachart.config import config
-from datachart.constants import THEME
+from datachart.constants import THEME, VALUE_FORMAT
 from datachart.utils import (
     Panel,
     Grid,
@@ -519,3 +519,23 @@ class TestBarWidth:
             plt.close(figure)
         finally:
             config.reset_config()
+
+
+class TestBarValueFormat:
+    """value_format accepts VALUE_FORMAT ({x}-style), {}-style, and %-style."""
+
+    data = [{"label": "a", "y": 1234.5}, {"label": "b", "y": 0.25}]
+
+    def _labels(self, value_format):
+        figure = BarChart(data=self.data, show_values=True, value_format=value_format)
+        labels = [t.get_text() for t in figure.axes[0].texts]
+        plt.close(figure)
+        return labels
+
+    def test_value_format_constant(self):
+        assert self._labels(VALUE_FORMAT.THOUSANDS) == ["1,234", "0"]
+        assert self._labels(VALUE_FORMAT.PERCENT_INT) == ["123450%", "25%"]
+
+    def test_positional_and_percent_styles(self):
+        assert self._labels("{:.1f}%") == ["1234.5%", "0.2%"]
+        assert self._labels("%g") == ["1234.5", "0.25"]

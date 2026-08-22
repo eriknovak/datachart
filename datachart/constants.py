@@ -625,8 +625,8 @@ class ORIENTATION:
 class VALUE_FORMAT:
     """The predefined value formats.
 
-    Passed as the heatmap's `valfmt` attribute: formats the values drawn in
-    the heatmap cells.
+    Passed as the heatmap's `valfmt` attribute (the values drawn in the cells)
+    or the bar chart's `value_format` attribute (the bar value labels).
 
     ![VALUE_FORMAT at a glance](../../assets/imgs/const-value-format.svg){ width="100%" }
 

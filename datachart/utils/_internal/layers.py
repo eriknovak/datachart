@@ -439,9 +439,14 @@ class BarLayer(Layer):
         )
 
         if self.show_values:
+            value_format = self.value_format
+            # VALUE_FORMAT strings name the value `x`, which bar_label's own
+            # {}-style formatting cannot resolve
+            if isinstance(value_format, str) and "{x" in value_format:
+                value_format = mticker.StrMethodFormatter(value_format)
             ax.bar_label(
                 bars,
-                fmt=self.value_format,
+                fmt=value_format,
                 padding=self.value_padding,
                 fontsize=self.value_fontsize,
                 color=self.value_color,

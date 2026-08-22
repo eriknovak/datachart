@@ -110,7 +110,8 @@ def BarChart(
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_yerr: Whether to show y-axis error bars.
         show_values: Whether to show bar value labels at the edge of each bar.
-        value_format: Format string for bar value labels (e.g., "{:.1f}%").
+        value_format: Format string for bar value labels: a `VALUE_FORMAT`
+            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
         aspect_ratio: The aspect ratio of the chart.
         bar_mode: How multiple bar series share the axis: "group" (side-by-side),
             "stack" (stacked), or "overlay" (overlapping).
