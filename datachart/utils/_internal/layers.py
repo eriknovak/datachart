@@ -236,6 +236,7 @@ class DrawContext:
     emphasis: Optional[str] = None
     parallel_stats: Optional[dict] = None
     parallel_axes: bool = True
+    transpose: bool = False
 
 
 # ================================================
@@ -247,6 +248,8 @@ class Layer:
     """One drawable unit; owns its resolved style, knows nothing about siblings."""
 
     kind: str = ""
+    # None for layers without an orientation; they follow the panel
+    is_horizontal: Optional[bool] = None
 
     def __init__(self, chart: dict, settings: dict):
         self.chart = chart
@@ -361,17 +364,22 @@ class LineLayer(Layer):
             self.show_yerr and isinstance(yerr, np.ndarray) and len(yerr) == len(y)
         )
 
-        if draw_yerr:
-            ax.fill_between(x, y - yerr, y + yerr, **self._resolved_area_style(ctx))
+        # in a horizontal panel x runs along the category axis (y)
+        fill = ax.fill_betweenx if ctx.transpose else ax.fill_between
+        plot = (lambda x, y, **kw: ax.plot(y, x, **kw)) if ctx.transpose else ax.plot
 
-        ax.plot(x, y, **line_style, label=self.label(ctx))
+        if draw_yerr:
+            fill(x, y - yerr, y + yerr, **self._resolved_area_style(ctx))
+
+        plot(x, y, **line_style, label=self.label(ctx))
 
         if self.show_area:
             drawstyle = line_style.get("drawstyle", "")
             step = drawstyle.split("-")[1] if "steps-" in drawstyle else None
-            self._fill_to_floor(ax, x, y, step, self._resolved_area_style(ctx))
+            self._fill_to_floor(fill, ax, x, y, step, self._resolved_area_style(ctx))
 
-    def _fill_to_floor(self, ax, x, y, step, area_style):
+    @staticmethod
+    def _fill_to_floor(fill, ax, x, y, step, area_style):
         """Fill under the line past any plausible axis floor, outside the autoscale."""
 
         values = np.asarray(y, dtype=float)
@@ -380,7 +388,7 @@ class LineLayer(Layer):
             return
         floor = values.min() - AREA_FLOOR_FACTOR * max(np.abs(values).max(), 1.0)
         data_lim = ax.dataLim.frozen()
-        ax.fill_between(x, y, floor, step=step, **area_style)
+        fill(x, y, floor, step=step, **area_style)
         ax.dataLim.set(data_lim)
 
 
@@ -491,6 +499,7 @@ class HistogramLayer(Layer):
     def _resolve_style(self):
         self.hist_style = get_hist_style(self.style)
         self.orientation = self.settings.get("orientation") or DEFAULT_ORIENTATION
+        self.is_horizontal = self.orientation == ORIENTATION.HORIZONTAL
         self.show_density = self.settings.get("show_density")
         self.show_cumulative = self.settings.get("show_cumulative")
         self.num_bins = self.settings.get("num_bins") or DEFAULT_NUM_BINS
@@ -575,11 +584,14 @@ class ScatterLayer(Layer):
                 "s", self.default_size
             )
 
-    def _draw_regression(self, ax, x, y, color):
+    def _draw_regression(self, ax, x, y, color, transpose=False):
         from scipy import stats as scipy_stats
 
         if len(x) == 0 or len(np.unique(x)) <= 1:
             return
+
+        plot = (lambda x, y, **kw: ax.plot(y, x, **kw)) if transpose else ax.plot
+        fill = ax.fill_betweenx if transpose else ax.fill_between
 
         slope, intercept, _, _, _ = scipy_stats.linregress(x, y)
         x_line = np.linspace(x.min(), x.max(), 100)
@@ -588,7 +600,7 @@ class ScatterLayer(Layer):
         reg_style = dict(self.regression_style)
         if color is not None:
             reg_style["color"] = color
-        ax.plot(x_line, y_line, **reg_style)
+        plot(x_line, y_line, **reg_style)
 
         if self.show_ci:
             n = len(x)
@@ -600,7 +612,7 @@ class ScatterLayer(Layer):
             ss_x = np.sum((x - x_mean) ** 2)
             se_line = s_err * np.sqrt(1 / n + (x_line - x_mean) ** 2 / ss_x)
             ci = t_val * se_line
-            ax.fill_between(
+            fill(
                 x_line,
                 y_line - ci,
                 y_line + ci,
@@ -647,6 +659,11 @@ class ScatterLayer(Layer):
         if ctx.emphasis == EMPHASIS_HIGHLIGHT:
             scatter_style["edgecolors"] = self.highlight_edge_color
 
+        # in a horizontal panel x runs along the category axis (y)
+        scatter = (
+            (lambda x, y, **kw: ax.scatter(y, x, **kw)) if ctx.transpose else ax.scatter
+        )
+
         if hue_data is not None:
             unique_hues = np.unique(hue_data)
 
@@ -662,7 +679,7 @@ class ScatterLayer(Layer):
                 if ctx.emphasis == EMPHASIS_BACKGROUND:
                     group_style["c"] = self.muted_color
                     label = NO_LEGEND
-                collection = ax.scatter(
+                collection = scatter(
                     x_data[mask],
                     y_data[mask],
                     s=group_sizes,
@@ -674,7 +691,9 @@ class ScatterLayer(Layer):
             if self.show_correlation:
                 self._draw_correlation(ax, x_data, y_data, color=None)
             if self.show_regression:
-                self._draw_regression(ax, x_data, y_data, color=None)
+                self._draw_regression(
+                    ax, x_data, y_data, color=None, transpose=ctx.transpose
+                )
         else:
             sizes = self._sizes(size_data)
             base_style = {k: v for k, v in scatter_style.items() if k != "s"}
@@ -683,14 +702,16 @@ class ScatterLayer(Layer):
             if ctx.emphasis == EMPHASIS_BACKGROUND:
                 base_style["c"] = self.muted_color
 
-            collection = ax.scatter(
+            collection = scatter(
                 x_data, y_data, s=sizes, label=self.label(ctx), **base_style
             )
             self._mark_legend_size(collection, size_data)
 
             color = base_style.get("c", base_style.get("color"))
             if self.show_regression:
-                self._draw_regression(ax, x_data, y_data, color=color)
+                self._draw_regression(
+                    ax, x_data, y_data, color=color, transpose=ctx.transpose
+                )
             if self.show_correlation:
                 self._draw_correlation(ax, x_data, y_data, color=color)
 
@@ -708,6 +729,7 @@ class BoxLayer(Layer):
 
     def _resolve_style(self):
         self.orientation = self.settings.get("orientation") or DEFAULT_ORIENTATION
+        self.is_horizontal = self.orientation == ORIENTATION.HORIZONTAL
         self.show_outliers = self.settings.get("show_outliers")
         self.show_notch = self.settings.get("show_notch")
         self.box_style = get_box_style(self.style)
@@ -1440,7 +1462,7 @@ def _cluster_by_scale_compatibility(
 def determine_axis_assignment(
     groups: List[LayerGroup], threshold: float, warn_scale_groups: bool = True
 ) -> List[str]:
-    """Assign each layer group to the left or right y-axis."""
+    """Assign each layer group to the primary ("left") or secondary ("right") value axis."""
 
     n = len(groups)
     if n == 0:
@@ -1463,7 +1485,7 @@ def determine_axis_assignment(
             warnings.warn(
                 f"Found {len(sorted_clusters)} scale-incompatible groups but only 2 axes available. "
                 f"Groups: {[len(g) for g in sorted_clusters]}. "
-                "Some charts may be difficult to read. Consider using explicit y_axis assignment or FigureGridLayout."
+                "Some charts may be difficult to read. Consider using explicit y_axis assignment or Grid."
             )
         return assignments
 
@@ -1481,16 +1503,20 @@ def determine_axis_assignment(
             )
             assignments.append("left" if left_compatible else "right")
 
+    # an explicitly assigned pair is the user's call; only warn when an
+    # automatic assignment had nowhere compatible to go
     for side in ("right", "left"):
         side_idx = [i for i, a in enumerate(assignments) if a == side]
         found = False
         for i in range(len(side_idx)):
             for j in range(i + 1, len(side_idx)):
                 a, b = side_idx[i], side_idx[j]
+                if prefs[a] != "auto" and prefs[b] != "auto":
+                    continue
                 if not _scale_compatible(ranges[a], ranges[b], threshold):
                     warnings.warn(
                         f"Charts at indices {a} and {b} are both on the {side} axis but have "
-                        "incompatible scales. Consider using explicit y_axis assignment or FigureGridLayout."
+                        "incompatible scales. Consider using explicit y_axis assignment or Grid."
                     )
                     found = True
                     break
@@ -1515,6 +1541,22 @@ class Panel:
     @property
     def layers(self) -> List[Layer]:
         return [layer for group in self.groups for layer in group.layers]
+
+    @property
+    def horizontal(self) -> bool:
+        """Whether the panel's value axis is x: true iff every orientable layer is.
+
+        Raises:
+            ValueError: If orientable layers of both orientations share the panel.
+        """
+
+        flags = {l.is_horizontal for l in self.layers if l.is_horizontal is not None}
+        if len(flags) > 1:
+            raise ValueError(
+                "Cannot mix horizontal and vertical charts in one panel. "
+                "One coordinate space holds one orientation; use `Grid` instead."
+            )
+        return flags == {True}
 
     # ---------------- furniture ----------------
 
@@ -1554,11 +1596,14 @@ class Panel:
             "font_family": resolve_font_family(),
         }
 
-    def _apply_furniture(self, ax: plt.Axes, axes_types=("xaxis", "yaxis")) -> None:
+    def _apply_furniture(self, ax: plt.Axes, axes_types=None) -> None:
+        """Style the axes' spines and ticks; a twin axis restyles only its own ticks."""
+
         furniture = self.settings.get("furniture")
         if furniture is None:
             return
-        if "xaxis" in axes_types:
+        if axes_types is None:
+            axes_types = ("xaxis", "yaxis")
             ax.axis("on")
             for axis, spine_style in furniture["spines"].items():
                 ax.spines[axis].set(**spine_style)
@@ -1577,9 +1622,10 @@ class Panel:
                 "Box plots do not support overlaying multiple datasets on a single axis."
             )
 
+        horizontal = self.horizontal
         self._apply_furniture(ax)
 
-        # twin-axis assignment
+        # twin-axis assignment: the secondary axis is always a value axis
         assignments = ["left"] * len(self.groups)
         ax_right = None
         if s.get("twin_axes"):
@@ -1589,8 +1635,10 @@ class Panel:
                 s.get("warn_scale_groups", True),
             )
             if "right" in assignments:
-                ax_right = ax.twinx()
-                self._apply_furniture(ax_right, axes_types=("yaxis",))
+                ax_right = ax.twiny() if horizontal else ax.twinx()
+                self._apply_furniture(
+                    ax_right, axes_types=("xaxis",) if horizontal else ("yaxis",)
+                )
 
         # bar slotting across every layer in the panel
         bar_layers = [l for l in self.layers if isinstance(l, BarLayer)]
@@ -1616,7 +1664,7 @@ class Panel:
                 ):
                     warnings.warn(
                         f"Bar width ({slot_width:.2f}) is very small with {len(bar_layers)} bar charts. "
-                        "Consider using bar_mode='stack', bar_mode='overlay', or FigureGridLayout for better readability."
+                        "Consider using bar_mode='stack', bar_mode='overlay', or Grid for better readability."
                     )
                 # the group centers on the category position, so numeric-x
                 # layers and ticks line up with group centers
@@ -1752,10 +1800,11 @@ class Panel:
                     emphasis=role,
                     parallel_stats=parallel_stats,
                     parallel_axes=layer is parallel_axes_owner,
+                    transpose=horizontal and layer.is_horizontal is None,
                 )
                 layer.draw(target_ax, ctx)
 
-        self._finalize(ax, ax_right, bar_layers)
+        self._finalize(ax, ax_right, bar_layers, horizontal)
 
     def _draw_hist_stack(
         self, ax, group, hist_layers, cycle, bins, hatch_assignments=None
@@ -1805,7 +1854,7 @@ class Panel:
                 for patch in patches:
                     patch.set_hatch(hatch or None)
 
-    def _finalize(self, ax, ax_right, bar_layers) -> None:
+    def _finalize(self, ax, ax_right, bar_layers, horizontal) -> None:
         s = self.settings
         layers = self.layers
 
@@ -1817,13 +1866,14 @@ class Panel:
         if s.get("show_grid"):
             ax.grid(axis=s["show_grid"], **s.get("grid_style", {}))
 
-        # line charts pin the x-limits to their data range
+        # line charts pin the category-axis limits to their data range
         if s.get("tighten_xlim"):
+            set_category_lim = ax.set_ylim if horizontal else ax.set_xlim
             for layer in layers:
                 if isinstance(layer, LineLayer):
                     rng = layer.x_range()
                     if rng is not None:
-                        ax.set_xlim(xmin=rng[0], xmax=rng[1])
+                        set_category_lim(rng[0], rng[1])
 
         # bar category ticks
         bar_ticks = s.get("bar_ticks")
@@ -1853,7 +1903,9 @@ class Panel:
         if ax_right is not None and (
             s.get("ymin_right") is not None or s.get("ymax_right") is not None
         ):
-            ax_right.set_ylim(bottom=s.get("ymin_right"), top=s.get("ymax_right"))
+            (ax_right.set_xlim if horizontal else ax_right.set_ylim)(
+                s.get("ymin_right"), s.get("ymax_right")
+            )
 
         # reference lines
         for layer, target_ax in zip(layers, [ax] * len(layers)):
@@ -1873,8 +1925,10 @@ class Panel:
             if s.get(key):
                 action(s[key], **(label_styles.get(key) or {}))
         if s.get("ylabel_right") and ax_right is not None:
-            # the right axis label shares the left label's text style
-            ax_right.set_ylabel(s["ylabel_right"], **(label_styles.get("ylabel") or {}))
+            # the secondary value-axis label shares the primary label's text style
+            (ax_right.set_xlabel if horizontal else ax_right.set_ylabel)(
+                s["ylabel_right"], **(label_styles.get("ylabel") or {})
+            )
 
         # legend
         if s.get("show_legend"):
@@ -1894,7 +1948,7 @@ class Panel:
             if custom_handles is not None:
                 ax.legend(handles=custom_handles, title="Legend", **legend_style)
             elif s.get("legend_mode") == "combined":
-                self._combine_legends(ax, ax_right, legend_style)
+                self._combine_legends(ax, ax_right, legend_style, horizontal)
             elif not any(isinstance(l, ParallelCoordsLayer) for l in layers):
                 # parallel coords only carry a legend when hue groups exist;
                 # unlabeled panels get no empty legend frame
@@ -1941,13 +1995,14 @@ class Panel:
             ax.set_xticklabels(labels, rotation=rotation)
 
     @staticmethod
-    def _combine_legends(ax_left, ax_right, legend_style) -> None:
+    def _combine_legends(ax_left, ax_right, legend_style, horizontal=False) -> None:
         handles_left, labels_left = ax_left.get_legend_handles_labels()
 
         if ax_right is not None:
             handles_right, labels_right = ax_right.get_legend_handles_labels()
-            labels_left = [f"{label} (L)" for label in labels_left]
-            labels_right = [f"{label} (R)" for label in labels_right]
+            primary, secondary = ("B", "T") if horizontal else ("L", "R")
+            labels_left = [f"{label} ({primary})" for label in labels_left]
+            labels_right = [f"{label} ({secondary})" for label in labels_right]
             handles = handles_left + handles_right
             labels = labels_left + labels_right
         else:
