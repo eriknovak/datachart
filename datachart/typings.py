@@ -379,6 +379,8 @@ class HeatmapStyleAttrs(TypedDict):
         plot_heatmap_font_style (Union[FONT_STYLE, str, None]): The font style of the heatmap.
         plot_heatmap_font_weight (Union[FONT_WEIGHT, str, None]): The font weight of the heatmap.
         plot_heatmap_frame_color (Union[str, None]): The color of the frame always drawn around heatmap axes.
+        plot_heatmap_edge_width (Union[int, float, None]): The width of the borders drawn between the cells (0 draws none).
+        plot_heatmap_edge_color (Union[str, None]): The color of the borders drawn between the cells.
 
     """
 
@@ -389,6 +391,8 @@ class HeatmapStyleAttrs(TypedDict):
     plot_heatmap_font_style: Union[FONT_STYLE, str, None]
     plot_heatmap_font_weight: Union[FONT_WEIGHT, str, None]
     plot_heatmap_frame_color: Union[str, None]
+    plot_heatmap_edge_width: Union[int, float, None]
+    plot_heatmap_edge_color: Union[str, None]
 
 
 class ScatterStyleAttrs(TypedDict):

@@ -85,6 +85,30 @@ class TestThemeDefaults(unittest.TestCase):
         colors = {text.get_color() for text in figure.axes[0].texts}
         self.assertNotIn("#FFFFFF", colors)
 
+    def test_heatmap_cell_borders_off_by_default(self):
+        """Without an edge width the heatmap draws no lines between cells."""
+        figure = Heatmap(HEAT)
+        self.assertEqual(len(figure.axes[0].collections), 0)
+
+    def test_heatmap_cell_borders_follow_edge_style(self):
+        """The edge style draws one line along every interior cell boundary."""
+        figure = Heatmap(
+            [[1, 2, 3], [4, 5, 6]],
+            style={
+                "plot_heatmap_edge_width": 2.0,
+                "plot_heatmap_edge_color": "#FF0000",
+            },
+        )
+        ax = figure.axes[0]
+        self.assertEqual(len(ax.collections), 1)
+        borders = ax.collections[0]
+        # one horizontal boundary between 2 rows, two vertical between 3 columns
+        self.assertEqual(len(borders.get_segments()), 3)
+        self.assertEqual(list(borders.get_linewidths()), [2.0])
+        self.assertEqual(matplotlib.colors.to_hex(borders.get_colors()[0]), "#ff0000")
+        # the borders never widen the axes beyond the image
+        self.assertEqual(ax.get_xlim(), (-0.5, 2.5))
+
     def test_theme_constants_are_valid(self):
         """Every THEME constant applies without warnings."""
         for theme in [THEME.MINIMAL, THEME.MATERIAL, THEME.INK, THEME.HATCH]:
