@@ -16,18 +16,29 @@ from matplotlib.colors import to_rgba
 from matplotlib.patches import FancyBboxPatch, Rectangle
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
+from datachart.charts import BarChart, Heatmap, Histogram, LineChart, ScatterChart
+from datachart.config import config
 from datachart.constants import (
+    ASPECT_RATIO,
+    BAR_MODE,
     COLORBAR_LOCATION,
+    EMPHASIS,
     FONT_STYLE,
     FONT_WEIGHT,
     HATCH_STYLE,
+    HISTOGRAM_TYPE,
     LEGEND_ALIGN,
     LINE_DRAW_STYLE,
     LINE_MARKER,
     LINE_STYLE,
+    NORMALIZE,
+    ORIENTATION,
+    SCALE,
+    SHOW_GRID,
     VALUE_FORMAT,
 )
 from datachart.themes import DEFAULT_THEME
+from datachart.utils import Grid
 from datachart.utils._internal.colors import create_color_cycle
 
 IMGS = pathlib.Path(__file__).resolve().parents[1] / "imgs"
@@ -434,6 +445,223 @@ def colorbar_location():
     save(fig, "const-colorbar-location.svg")
 
 
+def chart_grid(figs, name, height, cols=None, footnote=None):
+    """Compose chart-front figures with Grid, restyled to the const-* look.
+
+    Chart-setting constants are rendered through the datachart fronts, so the
+    figures show the package's actual behavior (ADR 0013).
+    """
+    fig = Grid(figs, max_cols=cols or len(figs), figsize=(7, height))
+    for ax in fig.axes:
+        ax.title.set_fontfamily("monospace")
+        ax.title.set_fontsize(FS_LABEL)
+    if footnote:
+        fig.text(0.0, -0.03, footnote, fontsize=FS_NOTE, color=INK, style="italic")
+    save(fig, name)
+
+
+BAR_SERIES = [
+    [{"label": label, "y": y} for label, y in zip("wxyz", ys)]
+    for ys in ([4, 6, 3, 5], [2, 3, 5, 2], [3, 1, 2, 4])
+]
+
+
+def bar_mode():
+    members = [
+        ("GROUP", BAR_MODE.GROUP),
+        ("STACK", BAR_MODE.STACK),
+        ("OVERLAY", BAR_MODE.OVERLAY),
+    ]
+    figs = [
+        BarChart(data=BAR_SERIES, bar_mode=value, title=f"BAR_MODE.{label}")
+        for label, value in members
+    ]
+    chart_grid(figs, "const-bar-mode.svg", 2.2)
+
+
+def histogram_type():
+    members = [
+        ("BAR", HISTOGRAM_TYPE.BAR),
+        ("BAR_STACKED", HISTOGRAM_TYPE.BAR_STACKED),
+        ("STEP", HISTOGRAM_TYPE.STEP),
+        ("STEP_FILLED", HISTOGRAM_TYPE.STEP_FILLED),
+    ]
+    values = np.random.default_rng(42).normal(0, 1, 400)
+    figs = [
+        Histogram(
+            data=[{"x": x} for x in values],
+            # STEP draws only the edge, which the DEFAULT theme paints white
+            style={
+                "plot_hist_type": value,
+                **(
+                    {"plot_hist_edge_color": DARK, "plot_hist_edge_width": 1.2}
+                    if value == HISTOGRAM_TYPE.STEP
+                    else {}
+                ),
+            },
+            title=f"HISTOGRAM_TYPE.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-histogram-type.svg",
+        3.8,
+        cols=2,
+        footnote="Each series draws separately, so BAR_STACKED renders like BAR; "
+        "STEP shows the edge only (recolored here from the theme's white).",
+    )
+
+
+def orientation():
+    members = [
+        ("VERTICAL", ORIENTATION.VERTICAL),
+        ("HORIZONTAL", ORIENTATION.HORIZONTAL),
+    ]
+    figs = [
+        BarChart(
+            data=BAR_SERIES[0],
+            orientation=value,
+            title=f"ORIENTATION.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(figs, "const-orientation.svg", 2.6)
+
+
+def show_grid():
+    members = [
+        ("NONE", SHOW_GRID.NONE),
+        ("X", SHOW_GRID.X),
+        ("Y", SHOW_GRID.Y),
+        ("BOTH", SHOW_GRID.BOTH),
+    ]
+    data = [{"x": x, "y": y} for x, y in zip(range(6), [1, 3, 2, 5, 4, 6])]
+    # mute the theme's grid opinion so NONE means no grid, and darken the
+    # grid lines so the panels differ at thumbnail size
+    config.update_config(
+        {
+            "chart_default_show_grid": None,
+            "plot_grid_color": "#9A9A9A",
+            "plot_grid_linewidth": 0.8,
+            "plot_grid_alpha": 0.8,
+        }
+    )
+    figs = [
+        LineChart(data=data, show_grid=value, title=f"SHOW_GRID.{label}")
+        for label, value in members
+    ]
+    config.reset_config()
+    chart_grid(
+        figs,
+        "const-show-grid.svg",
+        1.9,
+        footnote="Grid lines darkened for visibility; when show_grid is unset "
+        "or NONE, the theme's chart_default_show_grid fills in.",
+    )
+
+
+def scale():
+    members = [
+        ("LINEAR", SCALE.LINEAR),
+        ("LOG", SCALE.LOG),
+        ("SYMLOG", SCALE.SYMLOG),
+        ("ASINH", SCALE.ASINH),
+    ]
+    data = [{"x": x, "y": 10**x} for x in range(6)]
+    figs = [
+        LineChart(data=data, scaley=value, title=f"SCALE.{label}")
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-scale.svg",
+        1.9,
+        footnote="Same growth data on each value axis; "
+        "SYMLOG and ASINH also accept zero and negative values.",
+    )
+
+
+def normalize():
+    members = [
+        ("LINEAR", NORMALIZE.LINEAR),
+        ("LOG", NORMALIZE.LOG),
+        ("SYMLOG", NORMALIZE.SYMLOG),
+        ("ASINH", NORMALIZE.ASINH),
+        ("LOGIT", NORMALIZE.LOGIT),
+    ]
+    # values in (0, 1) with a wide dynamic range, legal for every norm
+    data = np.geomspace(0.001, 0.95, 16).reshape(4, 4).tolist()
+    figs = [
+        Heatmap(
+            data=data,
+            norm=value,
+            show_colorbars=False,
+            title=f"NORMALIZE.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-normalize.svg",
+        1.7,
+        footnote="Same cell values under each norm; "
+        "SYMLOG and ASINH also accept zero and negative values.",
+    )
+
+
+def emphasis():
+    members = [
+        ("BACKGROUND", EMPHASIS.BACKGROUND),
+        ("HIGHLIGHT", EMPHASIS.HIGHLIGHT),
+    ]
+    series = [
+        [{"x": x, "y": y + offset} for x, y in zip(range(6), [1, 3, 2, 5, 4, 6])]
+        for offset in (0, 1.5, 3)
+    ]
+    figs = [
+        LineChart(
+            data=series,
+            subtitle=["alpha", "beta", "gamma"],
+            emphasis=[None, value, None],
+            show_legend=True,
+            title=f"EMPHASIS.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-emphasis.svg",
+        2.4,
+        footnote='The "beta" series carries the emphasis role; '
+        "BACKGROUND also drops its legend entry.",
+    )
+
+
+def aspect_ratio():
+    members = [
+        ("AUTO", ASPECT_RATIO.AUTO),
+        ("EQUAL", ASPECT_RATIO.EQUAL),
+    ]
+    rng = np.random.default_rng(7)
+    points = rng.uniform(0, 1, size=(40, 2)) * (2, 4)
+    figs = [
+        ScatterChart(
+            data=[{"x": x, "y": y} for x, y in points],
+            aspect_ratio=value,
+            title=f"ASPECT_RATIO.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-aspect-ratio.svg",
+        2.6,
+        footnote="The y range is twice the x range; AUTO stretches the data to "
+        "fill the box, EQUAL keeps one unit equal on both axes.",
+    )
+
+
 def main():
     font_style()
     font_weight()
@@ -445,6 +673,14 @@ def main():
     legend_location()
     value_format()
     colorbar_location()
+    bar_mode()
+    histogram_type()
+    orientation()
+    show_grid()
+    scale()
+    normalize()
+    emphasis()
+    aspect_ratio()
 
 
 if __name__ == "__main__":

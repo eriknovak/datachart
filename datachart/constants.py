@@ -420,6 +420,8 @@ class HISTOGRAM_TYPE:
 
     Passed as the `plot_hist_type` style attribute of histograms.
 
+    ![HISTOGRAM_TYPE at a glance](../../assets/imgs/const-histogram-type.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import HISTOGRAM_TYPE
         >>> HISTOGRAM_TYPE.BAR
@@ -444,6 +446,8 @@ class BAR_MODE:
 
     Passed as the `bar_mode` setting of bar charts and
     [`Panel`][datachart.utils.Panel]: how multiple bar series share the axis.
+
+    ![BAR_MODE at a glance](../../assets/imgs/const-bar-mode.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import BAR_MODE
@@ -606,6 +610,8 @@ class NORMALIZE:
     before they are mapped to colors. Distinct from
     [`SCALE`][datachart.constants.SCALE], which sets an axis scale.
 
+    ![NORMALIZE at a glance](../../assets/imgs/const-normalize.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import NORMALIZE
         >>> NORMALIZE.LINEAR
@@ -632,6 +638,8 @@ class ORIENTATION:
 
     Passed as the `orientation` setting of bar charts, histograms, and box
     plots.
+
+    ![ORIENTATION at a glance](../../assets/imgs/const-orientation.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import ORIENTATION
@@ -722,6 +730,8 @@ class EMPHASIS:
     Set per chart via the `emphasis` key in a charts list, or per figure via
     the `emphasis` argument of [`Panel`][datachart.utils.Panel].
 
+    ![EMPHASIS at a glance](../../assets/imgs/const-emphasis.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import EMPHASIS
         >>> EMPHASIS.BACKGROUND
@@ -743,6 +753,11 @@ class EMPHASIS:
 class SHOW_GRID:
     """The supported show grid options.
 
+    Passed as the `show_grid` chart setting: which grid lines to draw. When
+    unset (or `NONE`), the theme's `chart_default_show_grid` fills in.
+
+    ![SHOW_GRID at a glance](../../assets/imgs/const-show-grid.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import SHOW_GRID
         >>> SHOW_GRID.DEFAULT
@@ -750,7 +765,7 @@ class SHOW_GRID:
 
     Attributes:
         DEFAULT (str): The default show grid. Same as `SHOW_GRID.NONE`.
-        NONE (None): Do not show the grid. Equals to `None`.
+        NONE (None): No explicit grid; the theme default applies. Equals to `None`.
         X (str): Show the x-axis grid. Equals to `"x"`.
         Y (str): Show the y-axis grid. Equals to `"y"`.
         BOTH (str): Show both the x- and y-axis grid. Equals to `"both"`.
@@ -770,6 +785,8 @@ class SCALE:
     Passed as the `scalex`/`scaley` chart settings to set an axis scale.
     Distinct from [`NORMALIZE`][datachart.constants.NORMALIZE], which
     normalizes heatmap colors.
+
+    ![SCALE at a glance](../../assets/imgs/const-scale.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import SCALE
@@ -794,6 +811,11 @@ class SCALE:
 
 class ASPECT_RATIO:
     """The supported aspect ratio options.
+
+    Passed as the `aspect_ratio` chart setting: the ratio of the y-unit to
+    the x-unit on screen.
+
+    ![ASPECT_RATIO at a glance](../../assets/imgs/const-aspect-ratio.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import ASPECT_RATIO
