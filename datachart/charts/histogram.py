@@ -10,7 +10,15 @@ from ..typings import (
     VLinePlotAttrs,
     HLinePlotAttrs,
 )
-from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID, ORIENTATION, SCALE
+from ..constants import (
+    ASPECT_RATIO,
+    BAR_MODE,
+    EMPHASIS,
+    FIG_SIZE,
+    SHOW_GRID,
+    ORIENTATION,
+    SCALE,
+)
 
 # ================================================
 # Main Chart Definition
@@ -36,6 +44,7 @@ def Histogram(
     show_cumulative: Optional[bool] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
+    bar_mode: Optional[Union[BAR_MODE, str]] = None,
     num_bins: Optional[int] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -112,6 +121,10 @@ def Histogram(
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             `ASPECT_RATIO`.
         orientation: The orientation of the histogram (vertical or horizontal).
+        bar_mode: How multiple histogram series share the axis: "stack"
+            (stacked on shared bins, the default) or "overlay" (each series
+            drawn individually over the others). "group" has no histogram
+            meaning and behaves like "overlay". See `BAR_MODE`.
         num_bins: The number of bins to split the data into.
         scalex: The x-axis scale (e.g., "log", "linear"). Useful for log-distributed data.
         scaley: The y-axis scale (e.g., "log", "linear").
@@ -171,6 +184,7 @@ def Histogram(
         "show_density": show_density,
         "show_cumulative": show_cumulative,
         "orientation": orientation,
+        "bar_mode": bar_mode,
         "num_bins": num_bins,
         "scalex": scalex,
         "scaley": scaley,
