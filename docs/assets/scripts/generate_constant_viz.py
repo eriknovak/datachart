@@ -459,7 +459,17 @@ def chart_grid(figs, name, height, cols=None, footnote=None):
         ax.title.set_fontfamily("monospace")
         ax.title.set_fontsize(FS_LABEL)
     if footnote:
-        fig.text(0.0, -0.03, footnote, fontsize=FS_NOTE, color=INK, style="italic")
+        # centered so a note wider than the grid cannot push it off-center,
+        # with a fixed 0.22 in gap whatever the figure height
+        fig.text(
+            0.5,
+            -0.22 / height,
+            footnote,
+            ha="center",
+            fontsize=FS_NOTE,
+            color=INK,
+            style="italic",
+        )
     save(fig, name)
 
 
