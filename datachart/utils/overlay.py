@@ -117,6 +117,10 @@ def _overlay_impl(
     see `datachart.utils.Panel` for the full parameter documentation. Each
     chart dict must contain a "figure" key and may carry "y_axis",
     "z_order", and "legend_label".
+
+    The label and limit parameters address the value and category axes by
+    role; the panel's orientation (inferred from the layers, an error when
+    mixed) decides which matplotlib axis each one lands on.
     """
     if not charts:
         raise ValueError("At least one chart is required")
@@ -147,6 +151,11 @@ def _overlay_impl(
                     emphasis=chart_config.get("emphasis", None),
                 )
             )
+
+    # the panel takes literal x/y keys; the orientation (raises on a mix) maps them
+    if Panel(groups).horizontal:
+        xlabel, ylabel_left = ylabel_left, xlabel
+        xmin, xmax, ymin, ymax = ymin, ymax, xmin, xmax
 
     # panel-level settings are resolved against the config here, at build time
     panel_settings = {
@@ -224,29 +233,34 @@ def OverlayChart(
     ymax_right: Optional[float] = None,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
 ) -> plt.Figure:
-    """Overlay multiple charts on a single plot with optional dual y-axes.
+    """Overlay multiple charts on a single plot with optional dual value axes.
 
     .. deprecated::
         Use :func:`datachart.utils.Panel` instead — same behavior, and it also
         accepts bare figures. This function only accepts dict items.
 
+    The panel is horizontal when every bar chart and histogram in it is
+    (mixing orientations raises ``ValueError``); the label and limit
+    parameters then address the value axis (x) and category axis (y) by role,
+    exactly as documented for `Panel`.
+
     Args:
         charts: List of chart configuration dictionaries. Each dict must contain
             a "figure" key and may contain "y_axis", "z_order", "legend_label".
         title: Title for the combined chart.
-        xlabel: Label for x-axis.
-        ylabel_left: Label for left y-axis.
-        ylabel_right: Label for right y-axis (if using dual axes).
+        xlabel: Label for the category axis.
+        ylabel_left: Label for the primary value axis.
+        ylabel_right: Label for the secondary value axis (if using dual axes).
         figsize: Size of the figure (width, height) in inches.
         show_legend: Whether to show the legend.
         show_grid: Which grid lines to show ("x", "y", "both", or None).
         auto_secondary_axis: Threshold ratio for automatic secondary axis creation.
-        xmin: Minimum value for x-axis limits.
-        xmax: Maximum value for x-axis limits.
-        ymin: Minimum value for y-axis limits (applies to left y-axis).
-        ymax: Maximum value for y-axis limits (applies to left y-axis).
-        ymin_right: Minimum value for right y-axis limits.
-        ymax_right: Maximum value for right y-axis limits.
+        xmin: Minimum value for the category-axis limits.
+        xmax: Maximum value for the category-axis limits.
+        ymin: Minimum value for the primary value-axis limits.
+        ymax: Maximum value for the primary value-axis limits.
+        ymin_right: Minimum value for the secondary value-axis limits.
+        ymax_right: Maximum value for the secondary value-axis limits.
         bar_mode: Bar chart overlay mode: "group", "stack", or "overlay". See
             `BAR_MODE`.
 
