@@ -38,7 +38,11 @@ Two content rules ride along:
   inline — guides never download.
 - **Per-chart emphasis sections stay thin duplicates.** The highlighting
   guide remains the cross-chart deep-dive (themes, composition); each chart
-  guide shows the `emphasis` parameter once, in its own vocabulary.
+  guide shows the `emphasis` parameter once, in its own vocabulary. Heatmap
+  is the exception: it rejects `emphasis` (a single raster layer has no
+  series to mute or highlight), so its guide documents that boundary and
+  points to the highlighting guide, and the highlighting guide stays
+  heatmap-free.
 
 ## Considered options
 
