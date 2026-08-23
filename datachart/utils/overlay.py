@@ -152,10 +152,8 @@ def _overlay_impl(
                 )
             )
 
-    # the panel's orientation (raises on a mix) decides which matplotlib axis
-    # the value-axis parameters address: the panel itself takes literal keys
-    panel = Panel(groups)
-    if panel.horizontal:
+    # the panel takes literal x/y keys; the orientation (raises on a mix) maps them
+    if Panel(groups).horizontal:
         xlabel, ylabel_left = ylabel_left, xlabel
         xmin, xmax, ymin, ymax = ymin, ymax, xmin, xmax
 
@@ -197,7 +195,7 @@ def _overlay_impl(
         "ymax_right": ymax_right,
     }
 
-    panel.settings = panel_settings
+    panel = Panel(groups, panel_settings)
 
     fig = new_figure(figsize=figsize)
     ax = fig.subplots()

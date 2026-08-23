@@ -244,6 +244,18 @@ class DrawContext:
 # ================================================
 
 
+def _oriented(ax: plt.Axes, transpose: bool) -> tuple:
+    """The plot, fill and scatter calls of `ax`; x and y swapped when transposed."""
+
+    if not transpose:
+        return ax.plot, ax.fill_between, ax.scatter
+    return (
+        lambda x, y, **kw: ax.plot(y, x, **kw),
+        ax.fill_betweenx,
+        lambda x, y, **kw: ax.scatter(y, x, **kw),
+    )
+
+
 class Layer:
     """One drawable unit; owns its resolved style, knows nothing about siblings."""
 
@@ -364,9 +376,7 @@ class LineLayer(Layer):
             self.show_yerr and isinstance(yerr, np.ndarray) and len(yerr) == len(y)
         )
 
-        # in a horizontal panel x runs along the category axis (y)
-        fill = ax.fill_betweenx if ctx.transpose else ax.fill_between
-        plot = (lambda x, y, **kw: ax.plot(y, x, **kw)) if ctx.transpose else ax.plot
+        plot, fill, _ = _oriented(ax, ctx.transpose)
 
         if draw_yerr:
             fill(x, y - yerr, y + yerr, **self._resolved_area_style(ctx))
@@ -590,8 +600,7 @@ class ScatterLayer(Layer):
         if len(x) == 0 or len(np.unique(x)) <= 1:
             return
 
-        plot = (lambda x, y, **kw: ax.plot(y, x, **kw)) if transpose else ax.plot
-        fill = ax.fill_betweenx if transpose else ax.fill_between
+        plot, fill, _ = _oriented(ax, transpose)
 
         slope, intercept, _, _, _ = scipy_stats.linregress(x, y)
         x_line = np.linspace(x.min(), x.max(), 100)
@@ -659,10 +668,7 @@ class ScatterLayer(Layer):
         if ctx.emphasis == EMPHASIS_HIGHLIGHT:
             scatter_style["edgecolors"] = self.highlight_edge_color
 
-        # in a horizontal panel x runs along the category axis (y)
-        scatter = (
-            (lambda x, y, **kw: ax.scatter(y, x, **kw)) if ctx.transpose else ax.scatter
-        )
+        _, _, scatter = _oriented(ax, ctx.transpose)
 
         if hue_data is not None:
             unique_hues = np.unique(hue_data)
@@ -1462,7 +1468,7 @@ def _cluster_by_scale_compatibility(
 def determine_axis_assignment(
     groups: List[LayerGroup], threshold: float, warn_scale_groups: bool = True
 ) -> List[str]:
-    """Assign each layer group to the primary ("left") or secondary ("right") value axis."""
+    """Assign each layer group to the primary (left) or secondary (right) value axis."""
 
     n = len(groups)
     if n == 0:
@@ -1503,8 +1509,7 @@ def determine_axis_assignment(
             )
             assignments.append("left" if left_compatible else "right")
 
-    # an explicitly assigned pair is the user's call; only warn when an
-    # automatic assignment had nowhere compatible to go
+    # an explicitly assigned pair is the user's call: warn on auto placements only
     for side in ("right", "left"):
         side_idx = [i for i, a in enumerate(assignments) if a == side]
         found = False
@@ -1596,14 +1601,13 @@ class Panel:
             "font_family": resolve_font_family(),
         }
 
-    def _apply_furniture(self, ax: plt.Axes, axes_types=None) -> None:
-        """Style the axes' spines and ticks; a twin axis restyles only its own ticks."""
-
+    def _apply_furniture(
+        self, ax: plt.Axes, axes_types=("xaxis", "yaxis"), spines=True
+    ) -> None:
         furniture = self.settings.get("furniture")
         if furniture is None:
             return
-        if axes_types is None:
-            axes_types = ("xaxis", "yaxis")
+        if spines:
             ax.axis("on")
             for axis, spine_style in furniture["spines"].items():
                 ax.spines[axis].set(**spine_style)
@@ -1637,7 +1641,9 @@ class Panel:
             if "right" in assignments:
                 ax_right = ax.twiny() if horizontal else ax.twinx()
                 self._apply_furniture(
-                    ax_right, axes_types=("xaxis",) if horizontal else ("yaxis",)
+                    ax_right,
+                    axes_types=("xaxis",) if horizontal else ("yaxis",),
+                    spines=False,
                 )
 
         # bar slotting across every layer in the panel
@@ -1855,6 +1861,8 @@ class Panel:
                     patch.set_hatch(hatch or None)
 
     def _finalize(self, ax, ax_right, bar_layers, horizontal) -> None:
+        """Apply the furniture; x/y keys are literal, `*_right` keys address the twin."""
+
         s = self.settings
         layers = self.layers
 
@@ -1888,7 +1896,6 @@ class Panel:
         # inside; diverging bars get padding on both ends
         value_layers = [l for l in bar_layers if l.show_values]
         if value_layers:
-            horizontal = value_layers[0].is_horizontal
             lo, hi = ax.get_xlim() if horizontal else ax.get_ylim()
             pad = (hi - lo) * (
                 VALUE_HEADROOM_HORIZONTAL if horizontal else VALUE_HEADROOM_VERTICAL
