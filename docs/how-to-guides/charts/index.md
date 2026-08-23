@@ -22,4 +22,5 @@ Here are some utility functions, that could help you.
 
 | Utility                                       | Description                                  |
 | :-------------------------------------------- | :------------------------------------------- |
+| [Panel](../utility/panel.ipynb)               | How to overlay multiple charts in one plot.  |
 | [Grid Layout](../utility/grid.ipynb)          | How to combine multiple charts in a grid.    |
