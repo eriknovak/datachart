@@ -43,8 +43,22 @@ def Panel(
     """Overlay rendered chart figures in one coordinate space.
 
     Combines different chart types (LineChart, BarChart, ScatterChart, Histogram)
-    on a single plot, drawn in the order provided. Multiple y-axes (left and
-    right) are supported for handling different scales.
+    on a single plot, drawn in the order provided. Two value axes (primary and
+    secondary) are supported for handling different scales.
+
+    A panel has an orientation, inferred from its figures: it is horizontal
+    when every bar chart and histogram in it is horizontal, vertical otherwise.
+    Mixing the two orientations raises ``ValueError``. The *value axis* carries
+    the quantities — y in a vertical panel, x in a horizontal one — and the
+    *category axis* is the other. The parameters keep their spelling but
+    address the axis by role: ``ylabel_left``/``ylabel_right``, ``ymin``/``ymax``
+    and ``ymin_right``/``ymax_right`` set the primary/secondary value axis,
+    ``xlabel`` and ``xmin``/``xmax`` the category axis. In a horizontal panel
+    the secondary value axis sits at the top, so ``"y_axis": "left"`` means the
+    bottom axis and ``"right"`` the top one, and the legend suffixes become
+    ``(B)``/``(T)``. Line and scatter figures follow the panel: in a horizontal
+    panel their ``x`` runs along the category axis and their ``y`` along the
+    value axis, so the same ``LineChart`` overlays vertical and horizontal bars.
 
     Panel figures nest: ``Panel([Panel([f1, f2]), f3])`` is equivalent to
     ``Panel([f1, f2, f3])``, to any depth. A nested panel contributes its
@@ -76,6 +90,19 @@ def Panel(
         ...     ylabel_right="Average",
         ...     show_legend=True,
         ... )
+        >>>
+        >>> # Horizontal bars make a horizontal panel: the line runs along the
+        >>> # categories and "right" is the top value axis
+        >>> hbar_fig = BarChart(
+        ...     data=[{"label": "A", "y": 100}, {"label": "B", "y": 200}],
+        ...     orientation="horizontal",
+        ... )
+        >>> combined = Panel(
+        ...     [hbar_fig, {"figure": line_fig, "y_axis": "right"}],
+        ...     xlabel="Category",
+        ...     ylabel_left="Count",
+        ...     ylabel_right="Average",
+        ... )
 
     Args:
         charts: The figures to overlay. Each item is either a bare matplotlib
@@ -83,7 +110,9 @@ def Panel(
             Panel figure, which flattens into this one — or a dict with a
             "figure" key plus optional per-figure options:
             - "y_axis": "left", "right", or "auto" (chart figures default to
-              "auto"; a nested panel's figures keep their own assignment)
+              "auto"; a nested panel's figures keep their own assignment).
+              "left"/"right" name the primary/secondary value axis — the
+              bottom/top axis in a horizontal panel
             - "z_order": Integer for layering control (higher values on top)
             - "legend_label": Custom legend label (overrides chart subtitle)
             - "emphasis": "background" or "highlight" role for every layer of
@@ -92,20 +121,21 @@ def Panel(
               highlight layers are bolded and brought to the front among the
               data layers. A nested panel's figures keep their own roles.
         title: Title for the combined chart.
-        xlabel: Label for x-axis.
-        ylabel_left: Label for left y-axis.
-        ylabel_right: Label for right y-axis (if using dual axes).
+        xlabel: Label for the category axis.
+        ylabel_left: Label for the primary value axis.
+        ylabel_right: Label for the secondary value axis (if using dual axes).
         figsize: Size of the figure (width, height) in inches.
         show_legend: Whether to show the legend.
-        show_grid: Which grid lines to show ("x", "y", "both", or None).
+        show_grid: Which grid lines to show ("x", "y", "both", or None); these
+            name the matplotlib axes literally.
         auto_secondary_axis: Threshold ratio for automatic secondary axis creation.
             Default is taken from config (overlay_auto_threshold, default 3.0).
-        xmin: Minimum value for x-axis limits.
-        xmax: Maximum value for x-axis limits.
-        ymin: Minimum value for y-axis limits (applies to left y-axis).
-        ymax: Maximum value for y-axis limits (applies to left y-axis).
-        ymin_right: Minimum value for right y-axis limits.
-        ymax_right: Maximum value for right y-axis limits.
+        xmin: Minimum value for the category-axis limits.
+        xmax: Maximum value for the category-axis limits.
+        ymin: Minimum value for the primary value-axis limits.
+        ymax: Maximum value for the primary value-axis limits.
+        ymin_right: Minimum value for the secondary value-axis limits.
+        ymax_right: Maximum value for the secondary value-axis limits.
         bar_mode: Bar chart overlay mode: "group" (side-by-side), "stack"
             (stacked), or "overlay" (overlapping). Default is taken from config
             (overlay_bar_mode, default "group"). See `BAR_MODE`.
@@ -115,7 +145,8 @@ def Panel(
 
     Raises:
         ValueError: If charts is empty, an item is not a figure or a valid dict,
-            or a figure cannot be overlaid (missing metadata, Grid figure).
+            a figure cannot be overlaid (missing metadata, Grid figure), or the
+            figures mix horizontal and vertical orientations.
     """
     items = []
     for i, item in enumerate(charts):

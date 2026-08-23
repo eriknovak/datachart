@@ -17,11 +17,22 @@ _Avoid_: plotter, series (for the drawable), plot function
 **Panel**:
 A group of layers sharing one coordinate space. Owns everything cross-layer: color
 assignment, bar slotting, shared parallel-coords normalization, axis scale and
-limits, grid, ticks, legend assembly, and twin-axis (left/right) assignment. Also the public composition front
+limits, grid, ticks, legend assembly, and twin-axis assignment. Also the public composition front
 (`datachart.utils.Panel`) that overlays rendered figures into one panel.
 Panel figures nest: a nested panel flattens into the outer one, keeping its
 per-figure prefs while the outermost call supplies all panel-level furniture.
+A panel has an orientation, inferred from its orientable layers (horizontal
+only when all of them are); its value axis follows it.
 _Avoid_: overlay (for the concept), subplot, axes group
+
+**Value axis / category axis**:
+The two axes of a panel named by role, not by letter: the value axis carries
+the quantities (y in a vertical panel, x in a horizontal one), the category
+axis the positions or labels. The secondary axis is always a second value axis
+(`twinx` vertical, `twiny` horizontal); the `y_axis`, `ylabel_*`, `ymin*`/`ymax*`
+parameters address the value axis in either orientation, `xlabel`/`xmin`/`xmax`
+the category axis.
+_Avoid_: left/right axis (for the concept — those are the vertical spellings)
 
 **Grid**:
 An arrangement of figures in rows and columns — the public front

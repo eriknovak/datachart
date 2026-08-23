@@ -47,6 +47,9 @@ EXPECTED_CHANGES = {
     "emphasis_panel_cross_type",
     # show_area now fills down to the axis floor instead of y=0
     "line_area_styled",
+    # new horizontal panel cases (ADR 0012)
+    "overlay_horizontal_bar_line_dual",
+    "overlay_horizontal_bar_bar_line",
 }
 
 
@@ -530,6 +533,34 @@ def overlay_bar_bar_line():
         bar_mode="stack",
         show_legend=True,
     )
+
+
+@case
+def overlay_horizontal_bar_line_dual():
+    fb = BarChart(
+        data=[{"label": c, "y": v * 100} for c, v in zip("ABCD", [1, 2, 3, 2])],
+        orientation="horizontal",
+        subtitle="count",
+    )
+    fl = LineChart(data=[{"x": i, "y": i * 2} for i in range(4)], subtitle="trend")
+    return Panel(
+        [{"figure": fb, "y_axis": "left"}, {"figure": fl, "y_axis": "right"}],
+        title="Horizontal dual",
+        xlabel="cat",
+        ylabel_left="count",
+        ylabel_right="value",
+        ymin=0,
+        ymin_right=0,
+        show_legend=True,
+    )
+
+
+@case
+def overlay_horizontal_bar_bar_line():
+    f1 = BarChart(data=BAR1, orientation="horizontal", subtitle="s1")
+    f2 = BarChart(data=BAR2, orientation="horizontal", subtitle="s2")
+    f3 = LineChart(data=[{"x": i, "y": 20} for i in range(5)], subtitle="ref")
+    return Panel([f1, f2, f3], bar_mode="stack", show_legend=True, show_grid="x")
 
 
 @case
