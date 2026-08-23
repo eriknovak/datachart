@@ -421,6 +421,25 @@ def get_heatmap_font_style(heatmap_style: dict) -> dict:
     return create_config_dict(heatmap_style, config_attrs)
 
 
+def get_heatmap_edge_style(heatmap_style: dict) -> dict:
+    """Get the style of the borders drawn between heatmap cells.
+
+    Args:
+        heatmap_style: The heatmap style dictionary.
+
+    Returns:
+        The cell border style setting.
+
+    """
+
+    config_attrs = [
+        ("linewidth", "plot_heatmap_edge_width"),
+        ("color", "plot_heatmap_edge_color"),
+    ]
+
+    return create_config_dict(heatmap_style, config_attrs)
+
+
 # -------------------------------------
 # Scatter Style
 # -------------------------------------

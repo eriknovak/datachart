@@ -18,7 +18,7 @@ from typing import List, Optional, Union
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
-from matplotlib.collections import PathCollection
+from matplotlib.collections import LineCollection, PathCollection
 from matplotlib.legend_handler import HandlerPathCollection
 
 from .colors import create_color_cycle, create_colormap, get_colormap
@@ -35,6 +35,7 @@ from .config_helpers import (
     get_hline_style,
     get_heatmap_style,
     get_heatmap_font_style,
+    get_heatmap_edge_style,
     get_scatter_style,
     get_regression_style,
     get_box_style,
@@ -828,6 +829,7 @@ class HeatmapLayer(Layer):
         heatmap_style["cmap"] = get_colormap(heatmap_style["cmap"])
         self.heatmap_style = heatmap_style
         self.font_style = get_heatmap_font_style(self.style)
+        self.edge_style = get_heatmap_edge_style(self.style)
         self.frame_color = self.style.get(
             "plot_heatmap_frame_color",
             config.get("plot_heatmap_frame_color") or "#000000",
@@ -875,6 +877,9 @@ class HeatmapLayer(Layer):
                         **font_style,
                     )
 
+        if self.edge_style.get("linewidth"):
+            self._draw_cell_borders(ax, len(data), len(data[0]))
+
         if self.show_colorbars:
             orientation = colorbar.get("orientation", DEFAULT_ORIENTATION)
             # inset_axes keeps the colorbar aligned under constrained_layout
@@ -889,6 +894,17 @@ class HeatmapLayer(Layer):
             spine.set_visible(True)
             spine.set_color(self.frame_color)
             spine.set_linewidth(self.frame_width)
+
+    def _draw_cell_borders(self, ax, n_rows, n_cols):
+        # imshow centers cell (i, j) on (j, i), so the boundaries sit at half-integers
+        left, right = -0.5, n_cols - 0.5
+        top, bottom = -0.5, n_rows - 0.5
+        segments = [[(left, i + 0.5), (right, i + 0.5)] for i in range(n_rows - 1)]
+        segments += [[(j + 0.5, top), (j + 0.5, bottom)] for j in range(n_cols - 1)]
+        # autolim=False keeps the borders from widening the image's tight limits
+        ax.add_collection(
+            LineCollection(segments, zorder=1, **self.edge_style), autolim=False
+        )
 
 
 class ParallelCoordsLayer(Layer):

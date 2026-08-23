@@ -142,6 +142,8 @@ BASE_THEME: StyleAttrs = {
     "plot_heatmap_font_style": FONT_STYLE.NORMAL,
     "plot_heatmap_font_weight": FONT_WEIGHT.NORMAL,
     "plot_heatmap_frame_color": "#333333",
+    "plot_heatmap_edge_width": 0,
+    "plot_heatmap_edge_color": "#FFFFFF",
     # plot scatter style
     "plot_scatter_color": None,
     "plot_scatter_alpha": 0.75,
