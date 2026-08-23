@@ -1,5 +1,8 @@
 """Generates docs/assets/imgs/const-*.svg — one at-a-glance visualization per
-constants class (fonts, lines, hatches, legends, value formats, colorbars).
+constants class. Text-like constants (fonts, lines, hatches, legends, value
+formats, colorbars) are drawn with raw matplotlib; chart-setting constants
+(bar modes, histogram types, orientation, grid, scales, norms, emphasis,
+aspect ratios) render through the chart fronts (ADR 0013).
 
 Run from the repo root: python docs/assets/scripts/generate_constant_viz.py
 """
@@ -547,11 +550,13 @@ def show_grid():
             "plot_grid_alpha": 0.8,
         }
     )
-    figs = [
-        LineChart(data=data, show_grid=value, title=f"SHOW_GRID.{label}")
-        for label, value in members
-    ]
-    config.reset_config()
+    try:
+        figs = [
+            LineChart(data=data, show_grid=value, title=f"SHOW_GRID.{label}")
+            for label, value in members
+        ]
+    finally:
+        config.reset_config()
     chart_grid(
         figs,
         "const-show-grid.svg",
