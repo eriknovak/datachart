@@ -83,14 +83,4 @@ The same theme, across chart types and composed with `Grid`:
 More examples on how to use the `datachart` package are available
 on the official [How-to Guides](https://eriknovak.github.io/datachart/how-to-guides/).
 
-## Acknowledgements
-
-[Datachart](https://eriknovak.github.io/datachart/) is developed by the
-[Department for Artificial Intelligence](http://ailab.ijs.si/) at the
-[Jozef Stefan Institute](http://www.ijs.si/), and other contributors.
-
-<figure >
-  <img src="https://github.com/eriknovak/datachart/blob/main/docs/assets/imgs/EU.png?raw=true" alt="European Union flag" width="80" />
-</figure>
-
 [python]: https://www.python.org/
