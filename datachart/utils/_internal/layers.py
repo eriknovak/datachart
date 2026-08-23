@@ -1861,7 +1861,7 @@ class Panel:
                     patch.set_hatch(hatch or None)
 
     def _finalize(self, ax, ax_right, bar_layers, horizontal) -> None:
-        """Apply the furniture; x/y keys are literal, `*_right` keys address the twin."""
+        """Apply the furniture; x/y keys are literal, `*_right` keys hit the twin."""
 
         s = self.settings
         layers = self.layers
