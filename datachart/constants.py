@@ -296,6 +296,8 @@ class ARROW_STYLE:
     override single properties of the chosen look. A raw matplotlib arrow
     style string (e.g. `"-|>"`) is also accepted.
 
+    ![ARROW_STYLE at a glance](../../assets/imgs/const-arrow-style.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import ARROW_STYLE
         >>> ARROW_STYLE.CURVE
