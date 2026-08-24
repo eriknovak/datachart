@@ -16,18 +16,21 @@ Methods:
         Overlays rendered chart figures on a single plot with optional dual y-axes.
     Grid(charts, title, max_cols, figsize, sharex, sharey):
         Arranges rendered chart figures in a grid; nested rows define the layout.
+    Annotate(figure, texts):
+        Returns a new figure with text annotations added to a rendered figure.
 
 """
 
 from .figure import save_figure, FigureGridLayout, figure_grid_layout
 from .overlay import OverlayChart
-from .compose import Panel, Grid
+from .compose import Panel, Grid, Annotate
 from . import stats
 
 __all__ = [
     "save_figure",
     "Panel",
     "Grid",
+    "Annotate",
     "FigureGridLayout",
     "figure_grid_layout",
     "OverlayChart",

@@ -22,6 +22,8 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_vline_style": LINE_STYLE.DASHED,
         "plot_hline_color": "#7F8C8D",
         "plot_hline_style": LINE_STYLE.DASHED,
+        "plot_text_box_edgecolor": "#34495E",
+        "plot_text_arrow_color": "#7F8C8D",
         "plot_heatmap_cmap": COLORS.YlGnBu,
         "plot_heatmap_frame_color": "#0B1F44",
         "plot_scatter_edge_width": 0.6,

@@ -9,6 +9,7 @@ from ..typings import (
     BoxStyleAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
+    TextAttrs,
 )
 from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID, ORIENTATION, SCALE
 
@@ -64,6 +65,13 @@ def BoxPlot(
             HLinePlotAttrs,
             List[HLinePlotAttrs],
             List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]],
+        ]
+    ] = None,
+    texts: Optional[
+        Union[
+            TextAttrs,
+            List[TextAttrs],
+            List[Union[TextAttrs, List[TextAttrs], None]],
         ]
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
@@ -126,6 +134,7 @@ def BoxPlot(
         ytickrotate: Rotation angle for y-axis tick labels.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
+        texts: Text annotation(s) to draw.
         label: The key name in data for label/category values (default: "label").
         value: The key name in data for numeric values (default: "value").
 
@@ -147,6 +156,7 @@ def BoxPlot(
         ytickrotate=ytickrotate,
         vlines=vlines,
         hlines=hlines,
+        texts=texts,
         label=label,
         value=value,
     )

@@ -115,6 +115,26 @@ class TestThemeDefaults(unittest.TestCase):
             config.set_theme(theme)
             self.assertEqual(config.theme, theme)
 
+    def test_every_theme_defines_the_text_family(self):
+        """Every theme carries the complete plot_text_* family (ADR 0018)."""
+        from datachart.typings import TextStyleAttrs
+
+        for theme in [
+            THEME.DEFAULT,
+            THEME.GREYSCALE,
+            THEME.INK,
+            THEME.HATCH,
+            THEME.MINIMAL,
+            THEME.MATERIAL,
+        ]:
+            config.set_theme(theme)
+            for key in TextStyleAttrs.__annotations__:
+                self.assertIn(key, config.config, f"{theme}: missing {key}")
+            # the connector must stay visible when the theme changes
+            self.assertIsNotNone(
+                config["plot_text_arrow_color"], f"{theme}: arrow color unset"
+            )
+
 
 class TestHatchCycle(unittest.TestCase):
     def tearDown(self):

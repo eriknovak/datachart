@@ -9,6 +9,7 @@ from ..typings import (
     LineStyleAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
+    TextAttrs,
 )
 from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID, SCALE
 
@@ -64,6 +65,13 @@ def LineChart(
             HLinePlotAttrs,
             List[HLinePlotAttrs],
             List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]],
+        ]
+    ] = None,
+    texts: Optional[
+        Union[
+            TextAttrs,
+            List[TextAttrs],
+            List[Union[TextAttrs, List[TextAttrs], None]],
         ]
     ] = None,
     x: Optional[Union[str, List[Optional[str]]]] = None,
@@ -125,6 +133,7 @@ def LineChart(
         ytickrotate: Rotation angle for y-axis tick labels.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
+        texts: Text annotation(s) to draw.
         x: The key name in data for x-axis values (default: "x").
         y: The key name in data for y-axis values (default: "y").
         yerr: The key name in data for y-axis error values (default: "yerr").
@@ -147,6 +156,7 @@ def LineChart(
         ytickrotate=ytickrotate,
         vlines=vlines,
         hlines=hlines,
+        texts=texts,
         x=x,
         y=y,
         yerr=yerr,

@@ -8,6 +8,7 @@ import copy
 
 from ..typings import StyleAttrs
 from ..constants import (
+    ARROW_STYLE,
     LINE_STYLE,
     FONT_STYLE,
     FONT_WEIGHT,
@@ -134,6 +135,23 @@ BASE_THEME: StyleAttrs = {
     "plot_hline_style": LINE_STYLE.SOLID,
     "plot_hline_width": 1,
     "plot_hline_alpha": 0.7,
+    # plot text (annotation) style
+    "plot_text_color": None,
+    "plot_text_size": 9.5,
+    "plot_text_weight": FONT_WEIGHT.NORMAL,
+    "plot_text_halign": "left",
+    "plot_text_valign": "center",
+    "plot_text_alpha": 1.0,
+    "plot_text_box_visible": True,
+    "plot_text_box_style": "round,pad=0.4",
+    "plot_text_box_facecolor": "#FFFFFF",
+    "plot_text_box_edgecolor": "#B4BCC4",
+    "plot_text_box_edge_width": 0.8,
+    "plot_text_box_alpha": 0.92,
+    "plot_text_arrow_style": ARROW_STYLE.CURVE,
+    "plot_text_arrow_curve": None,
+    "plot_text_arrow_color": "#7F8C8D",
+    "plot_text_arrow_width": 1.0,
     # plot heatmap style
     "plot_heatmap_cmap": COLORS.Blues,
     "plot_heatmap_alpha": 0.95,

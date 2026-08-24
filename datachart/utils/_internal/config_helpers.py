@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 from ...config import config, Config
 from ...config.charts import CHART_CONFIGS
+from ...constants import ARROW_STYLE
 
 # ================================================
 # Helper Functions
@@ -374,6 +375,109 @@ def get_hline_style(hline_style: dict) -> dict:
     ]
 
     return create_config_dict(hline_style, config_attrs)
+
+
+# -------------------------------------
+# Text Annotation Style
+# -------------------------------------
+
+
+# each connector look expands to (arrow style, curvature, text-side gap in points)
+ARROW_STYLE_PRESETS = {
+    ARROW_STYLE.CURVE: ("-", 0.2, 6.0),
+    ARROW_STYLE.CURVE_ARROW: ("->", 0.2, 6.0),
+    ARROW_STYLE.TOUCHING: ("-", 0.0, 0.0),
+    ARROW_STYLE.ARROW: ("->", 0.0, 6.0),
+}
+# the connector always stops short of the target point (points)
+TEXT_ARROW_TARGET_GAP = 5.0
+
+
+def get_plot_text_style(text_style: dict) -> dict:
+    """Get the text annotation font style.
+
+    Args:
+        text_style: The text style dictionary.
+
+    Returns:
+        The text font style setting, as `ax.annotate` keyword arguments.
+
+    """
+
+    config_attrs = [
+        ("fontsize", "plot_text_size"),
+        ("fontweight", "plot_text_weight"),
+        ("color", "plot_text_color"),
+        ("ha", "plot_text_halign"),
+        ("va", "plot_text_valign"),
+        ("alpha", "plot_text_alpha"),
+    ]
+
+    style = create_config_dict(text_style, config_attrs)
+    if "color" not in style:
+        style["color"] = config.get("font_general_color")
+    style["family"] = resolve_font_family()
+    return style
+
+
+def get_plot_text_box_style(text_style: dict) -> Union[dict, None]:
+    """Get the text annotation background box style.
+
+    Args:
+        text_style: The text style dictionary.
+
+    Returns:
+        The box style setting for the annotation `bbox`, or `None` when the
+        box is hidden.
+
+    """
+
+    visible = get_attr_value("plot_text_box_visible", text_style, config)
+    if not visible:
+        return None
+
+    config_attrs = [
+        ("boxstyle", "plot_text_box_style"),
+        ("facecolor", "plot_text_box_facecolor"),
+        ("edgecolor", "plot_text_box_edgecolor"),
+        ("linewidth", "plot_text_box_edge_width"),
+        ("alpha", "plot_text_box_alpha"),
+    ]
+
+    return create_config_dict(text_style, config_attrs)
+
+
+def get_plot_text_arrow_style(text_style: dict) -> dict:
+    """Get the text annotation connector style.
+
+    The `plot_text_arrow_style` look (see `ARROW_STYLE`) expands to the arrow
+    style, curvature, and text-side gap; individual `plot_text_arrow_*` keys
+    override single properties. A raw matplotlib arrow style passes through.
+
+    Args:
+        text_style: The text style dictionary.
+
+    Returns:
+        The connector style setting, as annotation `arrowprops`.
+
+    """
+
+    look = get_attr_value("plot_text_arrow_style", text_style, config)
+    arrowstyle, curve, text_gap = ARROW_STYLE_PRESETS.get(
+        look, (look, 0.0, ARROW_STYLE_PRESETS[ARROW_STYLE.CURVE][2])
+    )
+    curve_override = get_attr_value("plot_text_arrow_curve", text_style, config)
+    if curve_override is not None:
+        curve = curve_override
+
+    return {
+        "arrowstyle": arrowstyle,
+        "connectionstyle": f"arc3,rad={curve}",
+        "color": get_attr_value("plot_text_arrow_color", text_style, config),
+        "linewidth": get_attr_value("plot_text_arrow_width", text_style, config),
+        "shrinkA": text_gap,
+        "shrinkB": TEXT_ARROW_TARGET_GAP,
+    }
 
 
 # -------------------------------------

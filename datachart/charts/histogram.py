@@ -9,6 +9,7 @@ from ..typings import (
     HistStyleAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
+    TextAttrs,
 )
 from ..constants import (
     ASPECT_RATIO,
@@ -77,6 +78,13 @@ def Histogram(
             List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]],
         ]
     ] = None,
+    texts: Optional[
+        Union[
+            TextAttrs,
+            List[TextAttrs],
+            List[Union[TextAttrs, List[TextAttrs], None]],
+        ]
+    ] = None,
     x: Optional[Union[str, List[Optional[str]]]] = None,
 ) -> plt.Figure:
     """Creates the histogram.
@@ -141,6 +149,7 @@ def Histogram(
         ytickrotate: Rotation angle for y-axis tick labels.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
+        texts: Text annotation(s) to draw.
         x: The key name in data for x-axis values (default: "x").
 
     Returns:
@@ -161,6 +170,7 @@ def Histogram(
         ytickrotate=ytickrotate,
         vlines=vlines,
         hlines=hlines,
+        texts=texts,
         x=x,
     )
 

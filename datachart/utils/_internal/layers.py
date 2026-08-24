@@ -53,6 +53,9 @@ from .config_helpers import (
     get_parallel_dim_label_rotation,
     get_parallel_dim_label_pad,
     get_text_style,
+    get_plot_text_style,
+    get_plot_text_box_style,
+    get_plot_text_arrow_style,
     configure_axis_ticks_position,
     configure_axis_limits,
 )
@@ -203,6 +206,78 @@ def _resolve_ref_lines(chart: dict, key: str) -> List[tuple]:
     return [(line, get_style(line.get("style", {}))) for line in lines]
 
 
+TEXT_COORDS = ("data", "axes")
+# annotations sit above the data marks (zorder 3), below the panel furniture
+TEXT_ANNOTATION_ZORDER = 5
+
+
+def _resolve_texts(chart: dict) -> List[tuple]:
+    """Resolve text annotation styles at build time (ADR 0018)."""
+
+    texts = chart.get("texts")
+    if texts is None:
+        return []
+    texts = texts if isinstance(texts, list) else [texts]
+    resolved = []
+    for text in texts:
+        style = text.get("style") or {}
+        resolved.append(
+            (
+                text,
+                {
+                    "font": get_plot_text_style(style),
+                    "bbox": get_plot_text_box_style(style),
+                    "arrowprops": get_plot_text_arrow_style(style),
+                },
+            )
+        )
+    return resolved
+
+
+def _draw_texts(ax: plt.Axes, texts: List[tuple]) -> None:
+    """Draw the pre-resolved text annotations."""
+
+    for text, style in texts:
+        content = text.get("text")
+        x, y = text.get("x"), text.get("y")
+        if content is None or x is None or y is None:
+            warnings.warn(
+                "A text annotation requires the `text`, `x`, and `y` "
+                "attributes. Skipping it..."
+            )
+            continue
+        coords = text.get("coords") or "data"
+        if coords not in TEXT_COORDS:
+            raise ValueError(
+                f"Invalid text `coords` value {coords!r}. "
+                f"Must be one of {list(TEXT_COORDS)}."
+            )
+        textcoords = "data" if coords == "data" else "axes fraction"
+
+        kwargs = dict(style["font"])
+        kwargs["zorder"] = TEXT_ANNOTATION_ZORDER
+        if style["bbox"] is not None:
+            kwargs["bbox"] = dict(style["bbox"])
+
+        target = text.get("target")
+        if target is not None:
+            # the text bbox becomes patchA, so the connector never crosses
+            # the box border (flush at gap 0, the TOUCHING look)
+            arrowprops = dict(style["arrowprops"])
+            arrowprops["zorder"] = TEXT_ANNOTATION_ZORDER
+            ax.annotate(
+                content,
+                xy=tuple(target),
+                xycoords="data",
+                xytext=(x, y),
+                textcoords=textcoords,
+                arrowprops=arrowprops,
+                **kwargs,
+            )
+        else:
+            ax.annotate(content, xy=(x, y), xycoords=textcoords, **kwargs)
+
+
 def _draw_ref_lines(ax: plt.Axes, vlines: List[tuple], hlines: List[tuple]) -> None:
     """Draw the pre-resolved vertical and horizontal reference lines."""
 
@@ -315,6 +390,7 @@ class Layer:
         self.chart_hash = get_chart_hash(chart)
         self.vlines = _resolve_ref_lines(chart, "vlines")
         self.hlines = _resolve_ref_lines(chart, "hlines")
+        self.texts = _resolve_texts(chart)
         self.emphasis = self._resolve_emphasis(chart.get("emphasis"))
         # snapshot at build so muting harmonizes with the layer's own theme
         muted_alpha = config.get("muted_alpha")
@@ -662,8 +738,9 @@ class ScatterLayer(Layer):
         self.highlight_edge_color = config.get("font_general_color") or "#000000"
         self.regression_style = get_regression_style({})
         self.regression_ci_alpha = config["plot_regression_ci_alpha"]
-        self.annotation_color = config.get("plot_text_color", "black")
-        self.annotation_fontsize = config.get("plot_annotation_fontsize", 10)
+        # the correlation box wears the plot_text_* family (ADR 0018)
+        self.correlation_font = get_plot_text_style({})
+        self.correlation_bbox = get_plot_text_box_style({})
 
         hue_data = get_chart_data("hue", self.chart)
         self.hue_colors = None
@@ -730,22 +807,14 @@ class ScatterLayer(Layer):
         from ..stats import correlation
 
         r = correlation(x, y)
-        text_color = color if color else self.annotation_color
-        ax.annotate(
-            f"r = {r:.3f}",
-            xy=(0.05, 0.95),
-            xycoords="axes fraction",
-            fontsize=self.annotation_fontsize,
-            color=text_color,
-            ha="left",
-            va="top",
-            bbox=dict(
-                boxstyle="round,pad=0.3",
-                facecolor="white",
-                edgecolor="gray",
-                alpha=0.8,
-            ),
-        )
+        font = dict(self.correlation_font)
+        if color is not None:
+            font["color"] = color
+        # the corner placement pins the alignment; only the look is styleable
+        font["ha"], font["va"] = "left", "top"
+        if self.correlation_bbox is not None:
+            font["bbox"] = dict(self.correlation_bbox)
+        ax.annotate(f"r = {r:.3f}", xy=(0.05, 0.95), xycoords="axes fraction", **font)
 
     def draw(self, ax, ctx):
         x_data = get_chart_data("x", self.chart)
@@ -1040,6 +1109,8 @@ class ParallelCoordsLayer(Layer):
     def __init__(self, charts: List[dict], settings: dict):
         self.charts = charts
         super().__init__(charts[0], settings)
+        # texts pool across the source charts, like the data rows
+        self.texts = [t for chart in charts for t in _resolve_texts(chart)]
 
     def _resolve_emphasis(self, value):
         # emphasis aligns with the data rows of each source chart
@@ -1626,6 +1697,23 @@ class RadialHistogramLayer(RadialLayer):
         )
 
 
+class TextLayer(Layer):
+    """A carrier for post-hoc text annotations (ADR 0018).
+
+    Appended to a figure's panel by `Annotate`; it draws no marks and claims
+    no color-cycle slot, legend entry, hatch, orientation, or projection.
+    """
+
+    kind = "text"
+    projection = None
+
+    def __init__(self, texts):
+        super().__init__({"texts": texts}, {})
+
+    def draw(self, ax, ctx):
+        """No marks; the panel draws the texts with the other annotations."""
+
+
 LAYER_TYPES = {
     "linechart": LineLayer,
     "barchart": BarLayer,
@@ -1958,7 +2046,8 @@ class Panel:
             ValueError: If layers of both projections share the panel.
         """
 
-        kinds = {l.projection for l in self.layers}
+        # text carrier layers have no projection; they follow the panel
+        kinds = {l.projection for l in self.layers if l.projection is not None}
         if len(kinds) > 1:
             raise ValueError(
                 "Cannot mix polar and cartesian charts in one panel. "
@@ -2044,11 +2133,20 @@ class Panel:
         assignments = ["left"] * len(self.groups)
         ax_right = None
         if s.get("twin_axes") and not polar:
-            assignments = determine_axis_assignment(
-                self.groups,
+            # text carrier groups hold no data: they stay on the primary axis
+            # and never enter the scale clustering
+            data_indices = [
+                i
+                for i, group in enumerate(self.groups)
+                if any(l.kind != "text" for l in group.layers)
+            ]
+            data_assignments = determine_axis_assignment(
+                [self.groups[i] for i in data_indices],
                 s.get("auto_threshold", 3.0),
                 s.get("warn_scale_groups", True),
             )
+            for i, assignment in zip(data_indices, data_assignments):
+                assignments[i] = assignment
             if "right" in assignments:
                 ax_right = ax.twiny() if horizontal else ax.twinx()
                 self._apply_furniture(
@@ -2343,9 +2441,10 @@ class Panel:
         if polar:
             self._apply_radial_furniture(ax)
 
-        # reference lines
+        # reference lines and text annotations, after scales and limits
         for layer, target_ax in zip(layers, [ax] * len(layers)):
             _draw_ref_lines(target_ax, layer.vlines, layer.hlines)
+            _draw_texts(target_ax, layer.texts)
 
         # aspect ratio (a polar axes keeps its own fixed aspect)
         if s.get("aspect_ratio") and not polar:

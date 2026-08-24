@@ -68,6 +68,7 @@ def build_chart_dict_multi(
     ytickrotate: Any = None,
     vlines: Any = None,
     hlines: Any = None,
+    texts: Any = None,
     **extra_attrs: Any,
 ) -> Dict[str, Any]:
     """Build a chart dictionary for multi-chart mode.
@@ -85,6 +86,7 @@ def build_chart_dict_multi(
         ytickrotate: The ytick rotation.
         vlines: The vertical lines.
         hlines: The horizontal lines.
+        texts: The text annotations.
         **extra_attrs: Extra chart-specific attributes.
 
     Returns:
@@ -128,6 +130,9 @@ def build_chart_dict_multi(
     if hlines is not None:
         chart_dict["hlines"] = _get_indexed_value(hlines, index)
 
+    if texts is not None:
+        chart_dict["texts"] = _get_indexed_value(texts, index)
+
     # Add extra chart-specific attributes
     for attr_name, attr_value in extra_attrs.items():
         if attr_value is not None:
@@ -149,6 +154,7 @@ def build_chart_dict_single(
     ytickrotate: Any = None,
     vlines: Any = None,
     hlines: Any = None,
+    texts: Any = None,
     **extra_attrs: Any,
 ) -> Dict[str, Any]:
     """Build a chart dictionary for single-chart mode.
@@ -165,6 +171,7 @@ def build_chart_dict_single(
         ytickrotate: The ytick rotation.
         vlines: The vertical lines.
         hlines: The horizontal lines.
+        texts: The text annotations.
         **extra_attrs: Extra chart-specific attributes.
 
     Returns:
@@ -202,6 +209,9 @@ def build_chart_dict_single(
     if hlines is not None:
         chart_dict["hlines"] = hlines
 
+    if texts is not None:
+        chart_dict["texts"] = texts
+
     # Add extra chart-specific attributes (preserve as-is, don't transform)
     for attr_name, attr_value in extra_attrs.items():
         if attr_value is not None:
@@ -223,6 +233,7 @@ def build_charts_structure(
     ytickrotate: Any = None,
     vlines: Any = None,
     hlines: Any = None,
+    texts: Any = None,
     is_2d_data: bool = False,
     **extra_attrs: Any,
 ) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
@@ -242,6 +253,7 @@ def build_charts_structure(
         ytickrotate: The ytick rotation.
         vlines: The vertical lines.
         hlines: The horizontal lines.
+        texts: The text annotations.
         is_2d_data: If True, data for a single chart is 2D (e.g., heatmap).
             Multi-chart detection checks for 3D structure instead.
         **extra_attrs: Extra chart-specific attributes.
@@ -276,6 +288,7 @@ def build_charts_structure(
         "ytickrotate": ytickrotate,
         "vlines": vlines,
         "hlines": hlines,
+        "texts": texts,
         **extra_attrs,
     }
 

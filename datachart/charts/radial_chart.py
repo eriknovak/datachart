@@ -10,6 +10,7 @@ from ..typings import (
     BarStyleAttrs,
     HistStyleAttrs,
     ScatterStyleAttrs,
+    TextAttrs,
 )
 from ..constants import (
     BAR_MODE,
@@ -71,6 +72,13 @@ def RadialChart(
     sharex: Optional[bool] = None,
     sharey: Optional[bool] = None,
     style: Optional[Union[_RadialStyleAttrs, List[Optional[_RadialStyleAttrs]]]] = None,
+    texts: Optional[
+        Union[
+            TextAttrs,
+            List[TextAttrs],
+            List[Union[TextAttrs, List[TextAttrs], None]],
+        ]
+    ] = None,
     vlines: Optional[dict] = None,
     hlines: Optional[dict] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
@@ -142,6 +150,9 @@ def RadialChart(
         style: Style configuration(s) for the chart(s); radial visuals obey the
             matching cartesian style family (`plot_line_*`, `plot_bar_*`,
             `plot_hist_*`, `plot_scatter_*`).
+        texts: Text annotation(s) to draw. On the polar axes, data
+            coordinates are (angle in radians, radius); axes-fraction
+            coordinates (`"coords": "axes"`) are often easier.
         vlines: Not supported on a polar axes. Raises when passed.
         hlines: Not supported on a polar axes. Raises when passed.
         label: The key name in data for the category labels (default: "label").
@@ -189,6 +200,7 @@ def RadialChart(
         subtitle=subtitle,
         emphasis=emphasis,
         style=style,
+        texts=texts,
         label=label,
         x=x,
         y=y,
