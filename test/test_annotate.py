@@ -23,6 +23,10 @@ def annotation_texts(figure, content):
     return [t for ax in figure.axes for t in ax.texts if t.get_text() == content]
 
 
+def annotation_texts_on(ax, content):
+    return [t for t in ax.texts if t.get_text() == content]
+
+
 class TestTextsParameter(unittest.TestCase):
     def tearDown(self):
         config.set_theme(THEME.DEFAULT)
@@ -100,6 +104,26 @@ class TestTextsParameter(unittest.TestCase):
         self.assertEqual(len(annotation_texts(panel, "note")), 1)
         grid = Grid([figure, other])
         self.assertEqual(len(annotation_texts(grid, "note")), 1)
+
+    def test_texts_render_on_the_topmost_axes(self):
+        """In a twin-axis panel, texts land on the twin so nothing covers them."""
+        left = LineChart(
+            [{"x": x, "y": x} for x in range(5)],
+            texts={"text": "note", "x": 1, "y": 2, "target": (3, 3)},
+        )
+        right = LineChart([{"x": x, "y": x * 100} for x in range(5)])
+        panel = Panel(
+            [
+                {"figure": left, "y_axis": "left"},
+                {"figure": right, "y_axis": "right"},
+            ]
+        )
+        ax_left, ax_right = panel.axes[0], panel.axes[1]
+        self.assertEqual(annotation_texts_on(ax_left, "note"), [])
+        (text,) = annotation_texts_on(ax_right, "note")
+        # the position still reads the owning (left) axis data coordinates
+        self.assertEqual(text.get_position(), (1, 2))
+        self.assertIs(text.xycoords, ax_left.transData)
 
     def test_theme_styles_the_connector(self):
         config.set_theme(THEME.INK)

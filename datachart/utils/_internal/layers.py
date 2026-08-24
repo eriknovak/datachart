@@ -235,9 +235,15 @@ def _resolve_texts(chart: dict) -> List[tuple]:
     return resolved
 
 
-def _draw_texts(ax: plt.Axes, texts: List[tuple]) -> None:
-    """Draw the pre-resolved text annotations."""
+def _draw_texts(ax: plt.Axes, texts: List[tuple], data_ax: plt.Axes = None) -> None:
+    """Draw the pre-resolved text annotations.
 
+    The artists land on `ax` — the panel's topmost axes, so they cover
+    twin-axis marks — while data coordinates read from `data_ax`, the
+    owning layer's axes.
+    """
+
+    data_ax = data_ax if data_ax is not None else ax
     for text, style in texts:
         content = text.get("text")
         x, y = text.get("x"), text.get("y")
@@ -253,7 +259,9 @@ def _draw_texts(ax: plt.Axes, texts: List[tuple]) -> None:
                 f"Invalid text `coords` value {coords!r}. "
                 f"Must be one of {list(TEXT_COORDS)}."
             )
-        textcoords = "data" if coords == "data" else "axes fraction"
+        # the host and its twin share the axes rectangle, so axes fractions
+        # need no owner transform
+        textcoords = data_ax.transData if coords == "data" else "axes fraction"
 
         kwargs = dict(style["font"])
         kwargs["zorder"] = TEXT_ANNOTATION_ZORDER
@@ -269,7 +277,7 @@ def _draw_texts(ax: plt.Axes, texts: List[tuple]) -> None:
             ax.annotate(
                 content,
                 xy=tuple(target),
-                xycoords="data",
+                xycoords=data_ax.transData,
                 xytext=(x, y),
                 textcoords=textcoords,
                 arrowprops=arrowprops,
@@ -2346,9 +2354,9 @@ class Panel:
                 )
                 layer.draw(target_ax, ctx)
 
-        self._finalize(ax, ax_right, bar_layers, horizontal)
+        self._finalize(ax, ax_right, bar_layers, horizontal, group_axes)
 
-    def _finalize(self, ax, ax_right, bar_layers, horizontal) -> None:
+    def _finalize(self, ax, ax_right, bar_layers, horizontal, group_axes=None) -> None:
         """Apply the furniture; x/y keys are literal, `*_right` keys hit the twin."""
 
         s = self.settings
@@ -2448,7 +2456,15 @@ class Panel:
         # reference lines and text annotations, after scales and limits
         for layer, target_ax in zip(layers, [ax] * len(layers)):
             _draw_ref_lines(target_ax, layer.vlines, layer.hlines)
-            _draw_texts(target_ax, layer.texts)
+
+        # a twin axes renders entirely above its host, so texts live on the
+        # topmost axes while data coordinates read the owning layer's axes
+        top_ax = ax_right if ax_right is not None else ax
+        if group_axes is None:
+            group_axes = [ax] * len(self.groups)
+        for group, owner_ax in zip(self.groups, group_axes):
+            for layer in group.layers:
+                _draw_texts(top_ax, layer.texts, owner_ax)
 
         # aspect ratio (a polar axes keeps its own fixed aspect)
         if s.get("aspect_ratio") and not polar:
