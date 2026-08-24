@@ -199,6 +199,64 @@ class TestValueLabelEmphasis:
         assert right.get_anchor() == "W"
 
 
+class TestTipTexts:
+    def test_tip_labels_replace_the_ring_labels(self):
+        ax = RadialChart(data=WIND, type=RADIAL_TYPE.BAR, show_tip_labels=True).axes[0]
+        assert all(t.get_text() == "" for t in ax.get_xticklabels())
+        tip_texts = {t.get_text() for t in ax.texts}
+        assert {d["label"] for d in WIND} <= tip_texts
+
+    def test_tip_labels_sit_beyond_the_marks(self):
+        ax = RadialChart(data=WIND, type=RADIAL_TYPE.BAR, show_tip_labels=True).axes[0]
+        tops = {
+            round(p.get_x() + p.get_width() / 2, 6): p.get_y() + p.get_height()
+            for p in ax.patches
+        }
+        labels = {d["label"] for d in WIND}
+        for t in ax.texts:
+            if t.get_text() in labels:
+                theta, r = t.get_position()
+                assert r > tops[round(theta, 6)]
+
+    def test_tip_labels_flip_on_the_left_half(self):
+        ax = RadialChart(data=WIND, type=RADIAL_TYPE.BAR, show_tip_labels=True).axes[0]
+        by_text = {t.get_text(): t for t in ax.texts}
+        # N points up (screen 90°) and W sits on the left half (screen 180°)
+        assert by_text["N"].get_ha() == "left"
+        assert by_text["W"].get_ha() == "right"
+        assert by_text["W"].get_rotation() != by_text["N"].get_rotation()
+
+    def test_show_values_writes_each_value(self):
+        ax = RadialChart(
+            data=WIND, type=RADIAL_TYPE.BAR, show_values=True, value_format="{x:.1f}"
+        ).axes[0]
+        texts = {t.get_text() for t in ax.texts}
+        assert {f"{d['y']:.1f}" for d in WIND} <= texts
+
+    def test_show_values_on_line_points(self):
+        ax = RadialChart(data=WIND, show_values=True).axes[0]
+        texts = {t.get_text() for t in ax.texts}
+        assert {f"{d['y']:g}" for d in WIND} <= texts
+
+    def test_stacked_values_per_segment(self):
+        fig = RadialChart(
+            data=[WIND, WIND2], type=RADIAL_TYPE.BAR, bar_mode="stack", show_values=True
+        )
+        texts = [t.get_text() for t in fig.axes[0].texts]
+        for d in WIND:
+            assert f"{d['y']:g}" in texts
+
+
+class TestBorder:
+    def test_border_shown_by_default(self):
+        ax = RadialChart(data=WIND).axes[0]
+        assert ax.spines["polar"].get_visible()
+
+    def test_border_hidden_on_request(self):
+        ax = RadialChart(data=WIND, show_border=False).axes[0]
+        assert all(not spine.get_visible() for spine in ax.spines.values())
+
+
 class TestRendering:
     def test_all_types_render(self):
         for radial_type, data in [

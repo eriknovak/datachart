@@ -1276,6 +1276,10 @@ class _RadialChartAttrs(ChartCommonAttrs):
         type (Union[RADIAL_TYPE, str, None]): The visual the whole figure draws.
         show_yerr (Union[bool, None]): Whether or not to show the radial error band (line visual).
         show_area (Union[bool, None]): Whether or not to fill the area inside the lines (line visual).
+        show_values (Union[bool, None]): Whether or not to write each mark's value at its tip.
+        show_tip_labels (Union[bool, None]): Whether or not to write the category labels at the mark tips instead of around the circle.
+        show_border (Union[bool, None]): Whether or not to draw the outer border circle.
+        value_format (Union[str, None]): The format of the values written by `show_values`.
         bar_mode (Union[BAR_MODE, str, None]): How multiple bar series share the circle (bar visual).
         num_bins (Union[int, None]): The number of angular bins over [0, 360) (histogram visual).
         startangle (Union[str, int, float, None]): The compass location or bearing where the first point sits.
@@ -1289,6 +1293,10 @@ class _RadialChartAttrs(ChartCommonAttrs):
     type: Union[RADIAL_TYPE, str, None]
     show_yerr: Union[bool, None]
     show_area: Union[bool, None]
+    show_values: Union[bool, None]
+    show_tip_labels: Union[bool, None]
+    show_border: Union[bool, None]
+    value_format: Union[str, None]
     bar_mode: Union[BAR_MODE, str, None]
     num_bins: Union[int, None]
     startangle: Union[str, int, float, None]

@@ -99,6 +99,11 @@ DEFAULT_SPINE_ZORDER = 100
 # axis labels on a polar axes pad past the category labels around the circle
 RADIAL_XLABEL_PAD = 15
 RADIAL_YLABEL_PAD = 30
+# tip texts sit just past the mark along its spoke, as fractions of the r span
+RADIAL_TIP_VALUE_PAD = 0.03
+RADIAL_TIP_LABEL_PAD = 0.06
+# extra radial room so tip labels stay inside the border circle
+RADIAL_TIP_LABEL_HEADROOM = 0.25
 
 
 def _scatter_legend_handle(legend_handle, orig_handle):
@@ -1324,6 +1329,9 @@ class RadialLayer(Layer):
     projection = "polar"
     # categorical layers place their labels evenly around the circle
     is_categorical = True
+    # (theta, tip radius, value, category index) per mark, recorded at draw
+    # time so the panel can write tip texts with the final orientation
+    _tips = ()
 
     def labels(self) -> Optional[np.ndarray]:
         return get_chart_data("label", self.chart)
@@ -1364,6 +1372,9 @@ class RadialLineLayer(RadialLayer):
             return
 
         theta = _radial_theta(len(y))
+        self._tips = [
+            (float(t), float(v), float(v), i) for i, (t, v) in enumerate(zip(theta, y))
+        ]
         # close the polygon: the first point repeats one full turn later, so
         # the closing segment sweeps the short arc forward
         theta = np.append(theta, theta[0] + 2 * np.pi)
@@ -1439,6 +1450,13 @@ class RadialBarLayer(RadialLayer):
         else:
             bar_style["width"] = self.bar_width * sector
 
+        bottoms = bar_style.get("bottom")
+        tops = np.asarray(y, dtype=float) + (0.0 if bottoms is None else bottoms)
+        self._tips = [
+            (float(t + theta_offset), float(r), float(v), i)
+            for i, (t, r, v) in enumerate(zip(theta, tops, y))
+        ]
+
         ax.bar(theta + theta_offset, y, yerr=yerr, label=self.label(ctx), **bar_style)
 
 
@@ -1469,7 +1487,11 @@ class RadialScatterLayer(RadialLayer):
         if ctx.emphasis == EMPHASIS_BACKGROUND:
             scatter_style["c"] = self.muted_color
 
-        ax.scatter(_radial_theta(len(y)), y, label=self.label(ctx), **scatter_style)
+        theta = _radial_theta(len(y))
+        self._tips = [
+            (float(t), float(v), float(v), i) for i, (t, v) in enumerate(zip(theta, y))
+        ]
+        ax.scatter(theta, y, label=self.label(ctx), **scatter_style)
 
 
 class RadialHistogramLayer(RadialLayer):
@@ -1521,6 +1543,9 @@ class RadialHistogramLayer(RadialLayer):
         counts, edges = binned
         theta_edges = np.deg2rad(edges)
         centers = (theta_edges[:-1] + theta_edges[1:]) / 2
+        self._tips = [
+            (float(c), float(n), float(n), None) for c, n in zip(centers, counts)
+        ]
         ax.bar(
             centers,
             counts,
@@ -2193,7 +2218,8 @@ class Panel:
         if bar_ticks and bar_layers and not polar:
             self._apply_bar_ticks(ax, bar_ticks, bar_layers)
 
-        # angular category ticks: labels sit evenly around the circle
+        # angular category ticks: labels sit evenly around the circle, unless
+        # tip labels carry them at the marks instead
         if polar:
             label_sets = [
                 l.labels()
@@ -2205,7 +2231,10 @@ class Panel:
                 # the widest layer supplies the labels when counts differ
                 cat_labels = max(label_sets, key=len)
                 ax.set_xticks(_radial_theta(len(cat_labels)))
-                ax.set_xticklabels(cat_labels)
+                if s.get("show_tip_labels"):
+                    ax.set_xticklabels([""] * len(cat_labels))
+                else:
+                    ax.set_xticklabels(cat_labels)
 
         # user-provided tick positions
         for layer in layers:
@@ -2213,15 +2242,27 @@ class Panel:
 
         # value-label headroom: expand the value axis so bar labels stay
         # inside; diverging bars get padding on both ends
-        value_layers = [l for l in bar_layers if l.show_values]
-        if value_layers:
-            lo, hi = ax.get_xlim() if horizontal else ax.get_ylim()
-            pad = (hi - lo) * (
-                VALUE_HEADROOM_HORIZONTAL if horizontal else VALUE_HEADROOM_VERTICAL
-            )
-            lo = lo - pad if lo < 0 else lo
-            hi = hi + pad
-            (ax.set_xlim if horizontal else ax.set_ylim)(lo, hi)
+        if polar:
+            # tip texts run along the spokes; give them radial room so they
+            # stay inside the border circle
+            extra = 0.0
+            if s.get("show_values"):
+                extra += VALUE_HEADROOM_VERTICAL
+            if s.get("show_tip_labels"):
+                extra += RADIAL_TIP_LABEL_HEADROOM
+            if extra:
+                lo, hi = ax.get_ylim()
+                ax.set_ylim(lo, hi + (hi - lo) * extra)
+        else:
+            value_layers = [l for l in bar_layers if l.show_values]
+            if value_layers:
+                lo, hi = ax.get_xlim() if horizontal else ax.get_ylim()
+                pad = (hi - lo) * (
+                    VALUE_HEADROOM_HORIZONTAL if horizontal else VALUE_HEADROOM_VERTICAL
+                )
+                lo = lo - pad if lo < 0 else lo
+                hi = hi + pad
+                (ax.set_xlim if horizontal else ax.set_ylim)(lo, hi)
 
         # axis limits
         limits = {k: s.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
@@ -2362,7 +2403,12 @@ class Panel:
             # fraction of the drawn radial extent
             ax.set_rorigin(rmin - innerradius / (1 - innerradius) * (rmax - rmin))
 
+        if s.get("show_border") is False:
+            for spine in ax.spines.values():
+                spine.set_visible(False)
+
         self._elevate_radial_value_labels(ax)
+        self._draw_radial_tip_texts(ax)
 
     def _spine_zorder(self) -> float:
         """The build-time spine zorder; the polar top-of-stack reference."""
@@ -2407,6 +2453,109 @@ class Panel:
                     alpha=0.6,
                 ),
             )
+
+    def _draw_radial_tip_texts(self, ax) -> None:
+        """Write values and category labels at the mark tips, along the spokes.
+
+        Texts rotate with their spoke's final screen angle and flip on the
+        left half so they always read outward.
+        """
+
+        s = self.settings
+        show_values = s.get("show_values")
+        show_tip_labels = s.get("show_tip_labels")
+        if not show_values and not show_tip_labels:
+            return
+        tips = [
+            tip
+            for layer in self.layers
+            if isinstance(layer, RadialLayer)
+            for tip in layer._tips
+        ]
+        if not tips:
+            return
+
+        rmin, rmax = ax.get_ylim()
+        span = (rmax - rmin) or 1.0
+        z_order = self._spine_zorder() + RADIAL_LABEL_Z_OVER_SPINE
+        furniture = s.get("furniture") or {}
+        tick_style = furniture.get("ticks", {})
+        family = furniture.get("font_family")
+        offset = ax.get_theta_offset()
+        direction = ax.get_theta_direction()
+
+        def spoke_rotation(theta):
+            screen = np.rad2deg(direction * theta + offset) % 360
+            if 90 < screen <= 270:
+                return screen + 180, "right"
+            return screen, "left"
+
+        if show_values:
+            value_format = s.get("value_format") or DEFAULT_BAR_VALUE_FORMAT
+            # VALUE_FORMAT strings name the value `x` (see BarLayer.draw)
+            if isinstance(value_format, str) and "{x" in value_format:
+                formatter = mticker.StrMethodFormatter(value_format)
+
+                def format_value(v):
+                    return formatter(v, None)
+
+            else:
+
+                def format_value(v):
+                    return value_format % v
+
+            value_style = s.get("tip_value_style") or {}
+            for theta, r_tip, value, _ in tips:
+                rotation, ha = spoke_rotation(theta)
+                ax.text(
+                    theta,
+                    r_tip + RADIAL_TIP_VALUE_PAD * span,
+                    format_value(value),
+                    rotation=rotation,
+                    rotation_mode="anchor",
+                    ha=ha,
+                    va="center",
+                    zorder=z_order,
+                    fontfamily=family,
+                    **value_style,
+                )
+
+        if show_tip_labels:
+            label_sets = [
+                l.labels()
+                for l in self.layers
+                if isinstance(l, RadialLayer) and l.is_categorical
+            ]
+            label_sets = [lbl for lbl in label_sets if lbl is not None and len(lbl)]
+            if not label_sets:
+                return
+            cat_labels = max(label_sets, key=len)
+            theta_positions = _radial_theta(len(cat_labels))
+            # each label hugs the outermost mark on its own spoke
+            outer = {}
+            for _, r_tip, _, index in tips:
+                if index is not None:
+                    outer[index] = max(outer.get(index, rmin), r_tip)
+            pad = RADIAL_TIP_LABEL_PAD + (
+                RADIAL_TIP_VALUE_PAD * 2 if show_values else 0
+            )
+            for i, label in enumerate(cat_labels):
+                if i not in outer:
+                    continue
+                rotation, ha = spoke_rotation(theta_positions[i])
+                ax.text(
+                    theta_positions[i],
+                    outer[i] + pad * span,
+                    str(label),
+                    rotation=rotation,
+                    rotation_mode="anchor",
+                    ha=ha,
+                    va="center",
+                    zorder=z_order,
+                    fontsize=tick_style.get("labelsize"),
+                    color=tick_style.get("labelcolor"),
+                    fontfamily=family,
+                )
 
     @staticmethod
     def _combine_legends(ax_left, ax_right, legend_style, horizontal=False) -> None:
@@ -2467,6 +2616,14 @@ def build_chart_panel_settings(
         "startangle": settings.get("startangle"),
         "direction": settings.get("direction"),
         "innerradius": settings.get("innerradius"),
+        "show_border": settings.get("show_border"),
+        "show_values": settings.get("show_values"),
+        "show_tip_labels": settings.get("show_tip_labels"),
+        "value_format": settings.get("value_format"),
+        "tip_value_style": {
+            "fontsize": config["plot_bar_value_fontsize"],
+            "color": config["plot_bar_value_color"],
+        },
     }
 
     if mode == "subplot":

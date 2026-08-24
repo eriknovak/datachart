@@ -203,7 +203,16 @@ def _overlay_impl(
     if projection == "polar":
         # the merged panel keeps the first source figure's radial furniture
         source_settings = charts[0]["figure"]._chart_metadata["panel"].settings
-        for key in ("startangle", "direction", "innerradius"):
+        for key in (
+            "startangle",
+            "direction",
+            "innerradius",
+            "show_border",
+            "show_values",
+            "show_tip_labels",
+            "value_format",
+            "tip_value_style",
+        ):
             panel_settings[key] = source_settings.get(key)
 
     panel = Panel(groups, panel_settings)

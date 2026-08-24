@@ -60,6 +60,8 @@ EXPECTED_CHANGES = {
     "radial_hist_rose",
     "radial_panel_two",
     "radial_grid_mixed",
+    "radial_bar_tip_labels",
+    "radial_line_values",
 }
 
 
@@ -713,6 +715,28 @@ def radial_scatter():
 @case
 def radial_hist_rose():
     return RadialChart(data=wind_directions(), type="histogram", num_bins=16)
+
+
+@case
+def radial_bar_tip_labels():
+    labels = [f"Set {i + 1}" for i in range(16)]
+    rng = np.random.RandomState(5)
+    s1 = [{"label": l, "y": int(v)} for l, v in zip(labels, rng.randint(20, 80, 16))]
+    s2 = [{"label": l, "y": int(v)} for l, v in zip(labels, rng.randint(10, 60, 16))]
+    return RadialChart(
+        data=[s1, s2],
+        type="bar",
+        bar_mode="stack",
+        show_tip_labels=True,
+        show_border=False,
+        innerradius=0.3,
+        figsize=(7, 7),
+    )
+
+
+@case
+def radial_line_values():
+    return RadialChart(data=RAD1, show_values=True, value_format="%.0f")
 
 
 @case

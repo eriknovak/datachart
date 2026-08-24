@@ -55,6 +55,10 @@ def RadialChart(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_yerr: Optional[bool] = None,
     show_area: Optional[bool] = None,
+    show_values: Optional[bool] = None,
+    show_tip_labels: Optional[bool] = None,
+    show_border: Optional[bool] = None,
+    value_format: Optional[str] = None,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
     num_bins: Optional[int] = None,
     startangle: Optional[Union[str, int, float]] = None,
@@ -110,6 +114,15 @@ def RadialChart(
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_yerr: Whether to show the radial error band (line visual).
         show_area: Whether to fill the area inside the line (line visual).
+        show_values: Whether to write each mark's value at its tip, rotated
+            along the spoke.
+        show_tip_labels: Whether to write the category labels at the mark
+            tips, rotated along their spokes, instead of around the circle.
+        show_border: Whether to draw the outer border circle. Defaults to the
+            theme's spine visibility; `False` hides it.
+        value_format: Format for the values written by `show_values` — a
+            printf format (e.g. `"%.1f"`) or a `{x}`-style string. See
+            `VALUE_FORMAT`.
         bar_mode: How multiple bar series share the circle: "group",
             "stack", or "overlay" (bar visual). See `BAR_MODE`.
         num_bins: The number of angular bins over [0, 360) (histogram visual).
@@ -195,6 +208,10 @@ def RadialChart(
         "show_grid": show_grid,
         "show_yerr": show_yerr,
         "show_area": show_area,
+        "show_values": show_values,
+        "show_tip_labels": show_tip_labels,
+        "show_border": show_border,
+        "value_format": value_format,
         "bar_mode": bar_mode,
         "num_bins": num_bins,
         "startangle": startangle,
