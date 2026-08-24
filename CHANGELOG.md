@@ -1,3 +1,37 @@
+### datachart-0.8.0 (2026-08-24)
+
+**Breaking Changes**
+
+- Renamed the themes for their visual trait: `THEME.DEFAULT`, `THEME.GREYSCALE`, `THEME.INK`, `THEME.HATCH`, `THEME.MINIMAL`, `THEME.MATERIAL`; removed `THEME.PUBLICATION` and `THEME.BACKGROUND`
+- Replaced the background theme with `EMPHASIS` roles, set per chart or per figure
+- `FIG_SIZE` is now an A4-anchored size grid; paper sizes respect print margins and the column gap
+- Figures are no longer shown implicitly; showing goes through `Figure.show()` (inline display in Jupyter still works)
+- Histogram stacking is now controlled via `bar_mode`
+
+**New Features**
+
+- Added `PyramidChart` for creating population pyramid charts
+- Added `RadialChart` for creating radial bar charts
+- Added text annotations to every chart and a post-hoc `Annotate` utility, with connectors placed by geometry and data
+- Added the public `Panel` and `Grid` composition utilities; `Grid` figures nest recursively inside `Grid`, `Panel` figures flatten losslessly
+- Added the `BAR_MODE` constant and support for `VALUE_FORMAT` constants in bar value labels
+- Added heatmap cell borders via `plot_heatmap_edge_width` and `plot_heatmap_edge_color`
+- Panels infer their orientation and orient the value axis accordingly
+- Themes now drive chart defaults and support hatch cycles
+- Revamped the documentation: how-to guides built around real-world datasets, a theme gallery, at-a-glance visualizations for all visual constants, and `llms.txt` endpoints generated at build
+
+**Deprecations**
+
+- `OverlayChart`, `FigureGridLayout`, and `figure_grid_layout` are deprecated; use `Panel` and `Grid` instead
+
+**Bug Fixes**
+
+- Center grouped bars, honor a per-chart `plot_bar_width`, and guard category ticks against ragged category counts
+- Fill the area under lines down to the axis floor
+- Keep bubble chart legend markers at the base marker size
+- Apply themed label and tick furniture uniformly across composed figures; align nested grid axes with the host grid's columns
+- Skip the legend when no handle carries a label
+
 ### datachart-0.7.3 (2025-12-06)
 
 **Bug Fixes**
