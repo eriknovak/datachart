@@ -44,6 +44,20 @@ the parent's gridspec, so its axes envelope aligns with sibling cells; its
 title becomes a subtitle-sized heading row and its axis sharing stays local.
 _Avoid_: grid layout (for the front), figure grid
 
+**Projection**:
+The coordinate space kind of a panel — cartesian or polar. Inferred from the
+panel's layers, carried on the metadata transport, and honored when composition
+recreates axes: `Panel` merges like with like (mixed projections are an error,
+as with orientations), `Grid` gives each cell its own projection.
+_Avoid_: polar mode, chart geometry
+
+**Radial visual**:
+The mark family a `RadialChart` draws — line, bar, scatter, or histogram —
+selected by its `type` parameter for the whole figure. The one figure-level
+visual switch in the package; mixing visuals in one radial panel is `Panel`'s
+job.
+_Avoid_: radial chart type (for the parameter), sub-chart
+
 **Bar slot**:
 A bar layer's assigned lane within a category's group of bars. Slots divide the
 bar width between the panel's bar layers, and the group is centered on the
