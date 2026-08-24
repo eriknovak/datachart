@@ -446,12 +446,32 @@ class LineLayer(Layer):
         ax.dataLim.set(data_lim)
 
 
+def _abs_bar_value_fmt(value_format):
+    """A bar_label fmt callable that formats the absolute value.
+
+    Pyramid sides draw as signed data but display positive magnitudes
+    (ADR 0017); the resolved format applies after the sign is dropped.
+    """
+
+    def format_abs(value):
+        magnitude = abs(value)
+        if isinstance(value_format, mticker.Formatter):
+            return value_format(magnitude)
+        try:
+            return value_format % (magnitude,)
+        except (TypeError, ValueError):
+            return value_format.format(magnitude)
+
+    return format_abs
+
+
 class BarLayer(Layer):
     kind = "bar"
 
     def _resolve_style(self):
         orientation = self.settings.get("orientation") or DEFAULT_ORIENTATION
         self.is_horizontal = orientation == ORIENTATION.HORIZONTAL
+        self.is_pyramid = bool(self.settings.get("pyramid"))
         self.bar_style = get_bar_style(self.style, self.is_horizontal)
         self.show_yerr = self.settings.get("show_yerr")
         show_values = self.settings.get("show_values")
@@ -537,6 +557,8 @@ class BarLayer(Layer):
             # {}-style formatting cannot resolve
             if isinstance(value_format, str) and "{x" in value_format:
                 value_format = mticker.StrMethodFormatter(value_format)
+            if self.is_pyramid:
+                value_format = _abs_bar_value_fmt(value_format)
             ax.bar_label(
                 bars,
                 fmt=value_format,
@@ -1606,6 +1628,8 @@ class RadialHistogramLayer(RadialLayer):
 LAYER_TYPES = {
     "linechart": LineLayer,
     "barchart": BarLayer,
+    # a pyramid is the bar seam under mirrored panel furniture (ADR 0017)
+    "pyramidchart": BarLayer,
     "histogram": HistogramLayer,
     "scatterchart": ScatterLayer,
     "boxplot": BoxLayer,
@@ -2088,7 +2112,8 @@ class Panel:
                     bar_slots[id(layer)] = BarSlot(offset=0.0, width=layer.bar_width)
 
         bar_alpha = None
-        if bar_mode == "overlay" and len(bar_layers) > 1:
+        # pyramid sides never truly overlap, so overlay slots keep full alpha
+        if bar_mode == "overlay" and len(bar_layers) > 1 and not s.get("pyramid"):
             bar_alpha = s.get("bar_overlay_alpha")
 
         # bar_mode drives histograms too: "stack" stacks on shared bins,
@@ -2299,6 +2324,10 @@ class Panel:
                 hi = hi + pad
                 (ax.set_xlim if horizontal else ax.set_ylim)(lo, hi)
 
+        # pyramid mirror furniture reads the value axis after the headroom pad
+        if s.get("pyramid"):
+            self._apply_pyramid_mirror(ax)
+
         # axis limits
         limits = {k: s.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
         configure_axis_limits(ax, limits)
@@ -2388,6 +2417,49 @@ class Panel:
                     text.set_fontfamily(family)
                 if legend.get_title() is not None:
                     legend.get_title().set_fontfamily(family)
+
+    def _apply_pyramid_mirror(self, ax) -> None:
+        """The pyramid's mirror furniture (ADR 0017).
+
+        Symmetric value limits around zero, absolute-value tick display, and
+        user ticks mirrored to both halves — both sides read as positive
+        magnitudes.
+        """
+
+        s = self.settings
+
+        limit = s.get("pyramid_xmax")
+        if limit is None:
+            lo, hi = ax.get_xlim()
+            limit = max(abs(lo), abs(hi))
+        ax.set_xlim(-limit, limit)
+
+        ax.xaxis.set_major_formatter(
+            mticker.FuncFormatter(lambda value, _pos: f"{abs(value):g}")
+        )
+
+        ticks = s.get("pyramid_xticks")
+        if ticks is not None:
+            labels = s.get("pyramid_xticklabels")
+            if labels is not None and len(labels) != len(ticks):
+                warnings.warn(
+                    "The values of `xticks` and `xticklabels` are of different lengths. "
+                    "Please provide the same number of values. "
+                    "Ignoring `xticklabels` values..."
+                )
+                labels = None
+            label_at = {}
+            for index, tick in enumerate(ticks):
+                label = labels[index] if labels is not None else None
+                label_at[-float(tick)] = label
+                label_at[float(tick)] = label
+            positions = sorted(label_at)
+            ax.set_xticks(positions)
+            if labels is not None:
+                ax.set_xticklabels([label_at[p] for p in positions])
+        rotation = s.get("pyramid_xtickrotate")
+        if rotation:
+            ax.xaxis.set_tick_params(labelrotation=rotation)
 
     def _apply_bar_ticks(self, ax, bar_ticks, bar_layers) -> None:
         # the widest layer supplies the labels when category counts differ
@@ -2658,6 +2730,17 @@ def build_chart_panel_settings(
             "color": config["plot_bar_value_color"],
         },
     }
+
+    if chart_type == "pyramidchart":
+        # the mirror is panel furniture (ADR 0017): overlay slots give both
+        # sides full width at offset zero, the panel owns limits and ticks
+        panel_settings["pyramid"] = True
+        panel_settings["bar_mode"] = "overlay"
+        panel_settings["pyramid_xmax"] = settings.get("xmax")
+        panel_settings["xmax"] = None
+        panel_settings["pyramid_xticks"] = settings.get("xticks")
+        panel_settings["pyramid_xticklabels"] = settings.get("xticklabels")
+        panel_settings["pyramid_xtickrotate"] = settings.get("xtickrotate")
 
     if mode == "subplot":
         panel_settings["show_legend"] = False

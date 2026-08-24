@@ -33,4 +33,8 @@ CHART_CONFIGS = {
         "multiplot": True,
         "subplots": True,
     },
+    "pyramidchart": {
+        "multiplot": True,
+        "subplots": False,
+    },
 }

@@ -27,6 +27,7 @@ from datachart.charts import (
     Heatmap,
     BoxPlot,
     ParallelCoords,
+    PyramidChart,
     RadialChart,
 )
 from datachart.utils import OverlayChart, FigureGridLayout, Panel, Grid
@@ -62,6 +63,11 @@ EXPECTED_CHANGES = {
     "radial_grid_mixed",
     "radial_bar_tip_labels",
     "radial_line_values",
+    # new pyramid chart cases (ADR 0017)
+    "pyramid_basic",
+    "pyramid_values_xmax",
+    "pyramid_styled_ticks",
+    "pyramid_grid_pair",
 }
 
 
@@ -751,6 +757,52 @@ def radial_grid_mixed():
     fr = RadialChart(data=RAD1, type="bar", title="Rose")
     fl = LineChart(data=LINE1, title="Line")
     return Grid([fr, fl], max_cols=2, figsize=(10, 4))
+
+
+PYR_LABELS = ["0-14", "15-29", "30-44", "45-59", "60+"]
+PYR1 = [{"label": a, "y": v} for a, v in zip(PYR_LABELS, [14, 19, 22, 17, 11])]
+PYR2 = [{"label": a, "y": v} for a, v in zip(PYR_LABELS, [13, 20, 24, 18, 14])]
+
+
+@case
+def pyramid_basic():
+    return PyramidChart(
+        data=[PYR1, PYR2],
+        subtitle=["Group A", "Group B"],
+        title="Pyramid",
+        xlabel="Share",
+        ylabel="Age band",
+        show_legend=True,
+    )
+
+
+@case
+def pyramid_values_xmax():
+    return PyramidChart(
+        data=[PYR1, PYR2],
+        show_values=True,
+        value_format="%.0f",
+        xmax=30,
+        show_grid="x",
+    )
+
+
+@case
+def pyramid_styled_ticks():
+    styles = [{"plot_bar_hatch": "//"}, {"plot_bar_edge_color": "#222222"}]
+    return PyramidChart(
+        data=[PYR1, PYR2],
+        style=styles,
+        xticks=[0, 10, 20],
+        xticklabels=["0", "10k", "20k"],
+    )
+
+
+@case
+def pyramid_grid_pair():
+    fa = PyramidChart(data=[PYR1, PYR2], subtitle=["A", "B"], title="2010")
+    fb = PyramidChart(data=[PYR2, PYR1], subtitle=["A", "B"], title="2020")
+    return Grid([fa, fb], max_cols=2, figsize=(10, 4))
 
 
 @case

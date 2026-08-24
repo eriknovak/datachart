@@ -66,6 +66,12 @@ def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
         raise ValueError(
             f"Figure at index {index} is a Grid figure; grid figures cannot be overlaid"
         )
+    if metadata.get("type") == "pyramidchart":
+        # unmirrored data on a mirrored axis would silently mangle (ADR 0017)
+        raise ValueError(
+            f"Figure at index {index} is a pyramid figure; "
+            "pyramid figures cannot be overlaid"
+        )
     panel = metadata.get("panel")
     if panel is None:
         raise ValueError("Figure has invalid metadata: missing 'panel'")
