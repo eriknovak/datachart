@@ -18,4 +18,5 @@ title: Charts Module
 ::: datachart.charts.Histogram
 ::: datachart.charts.LineChart
 ::: datachart.charts.ParallelCoords
+::: datachart.charts.RadialChart
 ::: datachart.charts.ScatterChart

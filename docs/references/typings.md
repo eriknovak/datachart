@@ -101,6 +101,17 @@ title: Typings Module
         heading_level: 4
 
 
+### Radial Chart Typings
+
+::: datachart.typings.RadialSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.RadialDataPointAttrs
+    options:
+        heading_level: 4
+
+
 ## Style Typings
 
 ::: datachart.typings.StyleAttrs
