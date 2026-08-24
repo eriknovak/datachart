@@ -68,6 +68,11 @@ EXPECTED_CHANGES = {
     "pyramid_values_xmax",
     "pyramid_styled_ticks",
     "pyramid_grid_pair",
+    # nested/subplot grid cells now align their axes with the host columns
+    "grid_with_overlay",
+    "grid_subplot_figure",
+    "grid_mixed_panel_and_grid",
+    "grid_theme_mutation",
 }
 
 

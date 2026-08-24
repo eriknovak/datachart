@@ -161,6 +161,70 @@ def _render_grid_node(
         _render_cell(owner, cell, ax)
 
 
+def _column_window(subplot_spec: SubplotSpec) -> Tuple[float, float]:
+    """The horizontal span of a gridspec cell as fractions of the figure width."""
+    chain = []
+    ss = subplot_spec
+    while ss is not None:
+        chain.append(ss)
+        # a subgridspec's parent cell; None once the outermost gridspec is reached
+        ss = getattr(ss.get_gridspec(), "_subplot_spec", None)
+    x0, x1 = 0.0, 1.0
+    for ss in reversed(chain):
+        ncols = ss.get_gridspec().ncols
+        cols = ss.colspan
+        width = x1 - x0
+        x0, x1 = (
+            x0 + width * cols.start / ncols,
+            x0 + width * cols.stop / ncols,
+        )
+    return (x0, x1)
+
+
+def _align_axes_columns(figure: plt.Figure) -> None:
+    """Align axes columns across gridspec nesting levels.
+
+    Constrained layout aligns margins only within one gridspec level, so axes
+    inside a nested grid or a multi-subplot cell drift horizontally from the
+    host grid's columns. After the layout solves, axes whose cells start (or
+    end) on the same fractional column edge are pinned to a shared spine
+    position; when that moves anything, the layout is frozen so the alignment
+    survives later draws.
+    """
+    figure.canvas.draw()
+
+    lefts: Dict[float, List[plt.Axes]] = {}
+    rights: Dict[float, List[plt.Axes]] = {}
+    for ax in figure.axes:
+        get_ss = getattr(ax, "get_subplotspec", None)
+        ss = get_ss() if get_ss is not None else None
+        # fixed-aspect axes (polar, heatmaps) re-inset their box at draw time,
+        # so their edges neither anchor nor follow a column
+        if ss is None or ax.get_aspect() != "auto":
+            continue
+        x0f, x1f = _column_window(ss)
+        lefts.setdefault(round(x0f, 6), []).append(ax)
+        rights.setdefault(round(x1f, 6), []).append(ax)
+
+    moved = False
+    for group in lefts.values():
+        target = max(ax.get_position().x0 for ax in group)
+        for ax in group:
+            pos = ax.get_position()
+            if abs(pos.x0 - target) > 1e-9 and pos.x1 - target > 0.01:
+                ax.set_position([target, pos.y0, pos.x1 - target, pos.height])
+                moved = True
+    for group in rights.values():
+        target = min(ax.get_position().x1 for ax in group)
+        for ax in group:
+            pos = ax.get_position()
+            if abs(pos.x1 - target) > 1e-9 and target - pos.x0 > 0.01:
+                ax.set_position([pos.x0, pos.y0, target - pos.x0, pos.height])
+                moved = True
+    if moved:
+        figure.set_layout_engine("none")
+
+
 def _figure_grid_layout_impl(
     figures: List[plt.Figure],
     *,
@@ -296,6 +360,8 @@ def _figure_grid_layout_impl(
     # Add global title if provided
     if title:
         combined_fig.suptitle(title, **get_text_style("title"))
+
+    _align_axes_columns(combined_fig)
 
     # the recursive cell tree lets this grid nest inside another Grid (ADR 0006)
     combined_fig._chart_metadata = {

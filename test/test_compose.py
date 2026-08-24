@@ -291,6 +291,29 @@ class TestNestedGrid:
         assert all(ax.figure is fig for ax in fig.axes)
         plt.close("all")
 
+    def test_nested_grid_axes_align_with_host_columns(self):
+        # a two-column nested grid spanning a two-column host row: each inner
+        # chart's spines line up with the host column above it
+        inner = Grid([[_line_fig(), _bar_fig()]], title="Inner")
+        fig = Grid([[_line_fig(), _bar_fig()], [inner]])
+        nested = _nested_axes(fig)
+        inner_charts = sorted(
+            (ax for ax in nested if ax.axison), key=lambda ax: ax.get_position().x0
+        )
+        outer_charts = sorted(
+            (ax for ax in fig.axes if ax not in nested),
+            key=lambda ax: ax.get_position().x0,
+        )
+        assert len(inner_charts) == len(outer_charts) == 2
+        for outer, inner_ax in zip(outer_charts, inner_charts):
+            assert outer.get_position().x0 == pytest.approx(
+                inner_ax.get_position().x0, abs=1e-6
+            )
+            assert outer.get_position().x1 == pytest.approx(
+                inner_ax.get_position().x1, abs=1e-6
+            )
+        plt.close("all")
+
     def test_nested_title_renders_in_heading_row(self):
         inner = Grid([_line_fig(), _bar_fig()], title="Inner")
         fig = Grid([inner, _line_fig()])
