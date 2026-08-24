@@ -1,0 +1,13 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "datachart",
+  "description": "Python data visualization package built on matplotlib: simple chart functions, figure composition via Panel and Grid, and a global configuration system with predefined themes",
+  "folders": ["docs"],
+  "excludeFolders": ["docs/adr", "docs/agents", "docs/hooks", "docs/assets", "docs/css"],
+  "excludeFiles": ["changelog.md", "development.md"],
+  "rules": [
+    "Every chart function returns a matplotlib Figure; save it with datachart.utils.save_figure",
+    "Set global style with config.set_theme or config.update_config; per-chart overrides go in the chart's style parameter",
+    "Combine rendered figures with Panel (overlay on shared axes, optional dual y-axes) and Grid (grid layout, grids nest)"
+  ]
+}

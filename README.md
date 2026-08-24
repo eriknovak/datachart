@@ -83,4 +83,17 @@ The same theme, across chart types and composed with `Grid`:
 More examples on how to use the `datachart` package are available
 on the official [How-to Guides](https://eriknovak.github.io/datachart/how-to-guides/).
 
+## Using with LLMs
+
+The documentation is available in LLM-friendly formats:
+
+- [llms.txt](https://eriknovak.github.io/datachart/llms.txt) — index of the documentation with descriptions
+- [llms-full.txt](https://eriknovak.github.io/datachart/llms-full.txt) — full documentation in a single file
+- Every documentation page is also available as plain markdown by appending `index.md` to its URL, e.g. [how-to-guides/charts/linechart/index.md](https://eriknovak.github.io/datachart/how-to-guides/charts/linechart/index.md)
+
+You can also connect your AI assistant directly:
+
+- [Context7](https://context7.com/eriknovak/datachart) — up-to-date, version-aware docs for AI coding assistants
+- [GitMCP](https://gitmcp.io/eriknovak/datachart) — an MCP server serving this repository's documentation
+
 [python]: https://www.python.org/
