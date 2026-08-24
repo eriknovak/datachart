@@ -157,6 +157,15 @@ class TestAnnotate(unittest.TestCase):
         grid = Grid([annotated, LineChart(LINE2)])
         self.assertEqual(len(annotation_texts(grid, "note")), 1)
 
+    def test_carrier_claims_no_color_in_composition(self):
+        """A composed annotated figure keeps the unannotated panel's colors."""
+        plain = Panel([LineChart(LINE1), LineChart(LINE2)])
+        baseline = [line.get_color() for ax in plain.axes for line in ax.lines]
+        annotated = Annotate(LineChart(LINE1), NOTE)
+        panel = Panel([annotated, LineChart(LINE2)])
+        colors = [line.get_color() for ax in panel.axes for line in ax.lines]
+        self.assertEqual(colors, baseline)
+
     def test_annotate_radial_figure(self):
         radial = RadialChart(
             [{"label": c, "y": v} for c, v in zip("NESW", [1, 2, 3, 4])]

@@ -211,8 +211,9 @@ TEXT_COORDS = ("data", "axes")
 TEXT_ANNOTATION_ZORDER = 5
 
 
+# build-time resolution keeps texts on the reference-line seam (ADR 0018)
 def _resolve_texts(chart: dict) -> List[tuple]:
-    """Resolve text annotation styles at build time (ADR 0018)."""
+    """Resolve text annotation styles at build time."""
 
     texts = chart.get("texts")
     if texts is None:
@@ -1697,8 +1698,9 @@ class RadialHistogramLayer(RadialLayer):
         )
 
 
+# the carrier keeps post-hoc texts on the layer seam (ADR 0018)
 class TextLayer(Layer):
-    """A carrier for post-hoc text annotations (ADR 0018).
+    """A carrier for post-hoc text annotations.
 
     Appended to a figure's panel by `Annotate`; it draws no marks and claims
     no color-cycle slot, legend entry, hatch, orientation, or projection.
@@ -2300,9 +2302,11 @@ class Panel:
                 role = group.layer_role(layer)
 
                 ctx = DrawContext(
+                    # a text carrier lookup would advance the pooled cycle
+                    # and shift the colors of later composed figures
                     color=(
                         None
-                        if role == EMPHASIS_BACKGROUND
+                        if role == EMPHASIS_BACKGROUND or layer.kind == "text"
                         else cycle[layer.chart_hash]["color"]
                     ),
                     z_order=z_order,

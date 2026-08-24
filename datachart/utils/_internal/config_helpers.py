@@ -383,11 +383,12 @@ def get_hline_style(hline_style: dict) -> dict:
 
 
 # each connector look expands to (arrow style, curvature, text-side gap in points)
+TEXT_ARROW_TEXT_GAP = 6.0
 ARROW_STYLE_PRESETS = {
-    ARROW_STYLE.CURVE: ("-", 0.2, 6.0),
-    ARROW_STYLE.CURVE_ARROW: ("->", 0.2, 6.0),
+    ARROW_STYLE.CURVE: ("-", 0.2, TEXT_ARROW_TEXT_GAP),
+    ARROW_STYLE.CURVE_ARROW: ("->", 0.2, TEXT_ARROW_TEXT_GAP),
     ARROW_STYLE.TOUCHING: ("-", 0.0, 0.0),
-    ARROW_STYLE.ARROW: ("->", 0.0, 6.0),
+    ARROW_STYLE.ARROW: ("->", 0.0, TEXT_ARROW_TEXT_GAP),
 }
 # the connector always stops short of the target point (points)
 TEXT_ARROW_TARGET_GAP = 5.0
@@ -464,7 +465,7 @@ def get_plot_text_arrow_style(text_style: dict) -> dict:
 
     look = get_attr_value("plot_text_arrow_style", text_style, config)
     arrowstyle, curve, text_gap = ARROW_STYLE_PRESETS.get(
-        look, (look, 0.0, ARROW_STYLE_PRESETS[ARROW_STYLE.CURVE][2])
+        look, (look, 0.0, TEXT_ARROW_TEXT_GAP)
     )
     curve_override = get_attr_value("plot_text_arrow_curve", text_style, config)
     if curve_override is not None:

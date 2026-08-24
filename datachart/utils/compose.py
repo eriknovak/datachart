@@ -254,9 +254,8 @@ def Annotate(
     if panel is None:
         raise ValueError("Figure has invalid metadata: missing 'panel'")
 
-    # the carrier group claims no color-cycle slot (max_colors=0) and the
-    # panel keeps it off the twin-axis assignment; existing groups are shared,
-    # never copied or mutated, preserving the chart-hash -> color invariant
+    # existing groups are shared, never mutated: the chart-hash -> color
+    # invariant holds, and the carrier claims no color-cycle slot (ADR 0018)
     carrier = LayerGroup([TextLayer(texts)], max_colors=0)
     new_panel = _PanelSeam(panel.groups + [carrier], panel.settings)
 
