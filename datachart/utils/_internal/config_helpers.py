@@ -455,11 +455,17 @@ def get_plot_text_arrow_style(text_style: dict) -> dict:
     style, curvature, and text-side gap; individual `plot_text_arrow_*` keys
     override single properties. A raw matplotlib arrow style passes through.
 
+    The curvature is returned as `curve` with a `curve_pinned` flag rather
+    than a finished `connectionstyle`: for a curved look left on its default,
+    the panel picks the bow side and depth against the data at draw time,
+    while an explicit `plot_text_arrow_curve` pins the bow exactly.
+
     Args:
         text_style: The text style dictionary.
 
     Returns:
-        The connector style setting, as annotation `arrowprops`.
+        The connector style setting; `curve`/`curve_pinned` plus annotation
+        `arrowprops` entries.
 
     """
 
@@ -468,12 +474,14 @@ def get_plot_text_arrow_style(text_style: dict) -> dict:
         look, (look, 0.0, TEXT_ARROW_TEXT_GAP)
     )
     curve_override = get_attr_value("plot_text_arrow_curve", text_style, config)
-    if curve_override is not None:
+    pinned = curve_override is not None
+    if pinned:
         curve = curve_override
 
     return {
         "arrowstyle": arrowstyle,
-        "connectionstyle": f"arc3,rad={curve}",
+        "curve": curve,
+        "curve_pinned": pinned,
         "color": get_attr_value("plot_text_arrow_color", text_style, config),
         "linewidth": get_attr_value("plot_text_arrow_width", text_style, config),
         "shrinkA": text_gap,

@@ -209,6 +209,101 @@ def _resolve_ref_lines(chart: dict, key: str) -> List[tuple]:
 TEXT_COORDS = ("data", "axes")
 # annotations sit above the data marks (zorder 3), below the panel furniture
 TEXT_ANNOTATION_ZORDER = 5
+# connector placement (ADR 0018): the bow side and depth are chosen at draw
+# time against the panel's data, unless plot_text_arrow_curve pins them
+TEXT_BOW_CANDIDATES = (0.2, -0.2, 0.35, -0.35, 0.5, -0.5)
+# beyond this clearance (px) an arc is "clear of the data"; flatter wins
+TEXT_BOW_CLEARANCE_CAP = 14.0
+# the final approach always meets the data at the target: score the body only
+TEXT_BOW_BODY = 0.75
+# approximate half-extent of the text box (px), for connector-length checks
+TEXT_BOX_PAD = 18.0
+# short connectors (px past the box) straighten with tiny gaps, then vanish
+TEXT_SHORT_STRAIGHT = 40.0
+TEXT_SHORT_NONE = 14.0
+TEXT_SHORT_GAP = 1.5
+
+
+def _facing_relpos(start: np.ndarray, target: np.ndarray) -> tuple:
+    """The point on the text box border facing the target, as box fractions."""
+
+    dx, dy = target - start
+    if dx == 0 and dy == 0:
+        return (0.5, 0.5)
+    if abs(dx) >= abs(dy):
+        return (1.0 if dx > 0 else 0.0, min(max(0.5 + 0.5 * dy / abs(dx), 0.0), 1.0))
+    return (min(max(0.5 + 0.5 * dx / abs(dy), 0.0), 1.0), 1.0 if dy > 0 else 0.0)
+
+
+def _arc_points(start: np.ndarray, target: np.ndarray, rad: float) -> np.ndarray:
+    """Sample the arc3 connector path; positive rad bulges clockwise."""
+
+    span = target - start
+    length = np.hypot(*span)
+    if length == 0:
+        return start[None, :]
+    perp = np.array([-span[1], span[0]]) / length
+    control = (start + target) / 2 - rad * length * perp
+    t = np.linspace(0.0, TEXT_BOW_BODY, 24)[:, None]
+    return (1 - t) ** 2 * start + 2 * t * (1 - t) * control + t**2 * target
+
+
+def _bow_rad(start: np.ndarray, target: np.ndarray, clearance_pts, bbox) -> float:
+    """The candidate bow with the most open space; flatter wins past the cap.
+
+    An arc that leaves the axes loses to any arc that stays inside.
+    """
+
+    def score(rad):
+        pts = _arc_points(start, target, rad)
+        inside = (
+            (pts[:, 0] >= bbox.x0)
+            & (pts[:, 0] <= bbox.x1)
+            & (pts[:, 1] >= bbox.y0)
+            & (pts[:, 1] <= bbox.y1)
+        )
+        clearance = TEXT_BOW_CLEARANCE_CAP
+        if clearance_pts is not None and len(clearance_pts):
+            gaps = np.hypot(
+                pts[:, None, 0] - clearance_pts[None, :, 0],
+                pts[:, None, 1] - clearance_pts[None, :, 1],
+            )
+            clearance = min(float(gaps.min()), TEXT_BOW_CLEARANCE_CAP)
+        return (float(inside.mean()), clearance, -abs(rad))
+
+    return max(TEXT_BOW_CANDIDATES, key=score)
+
+
+def _densify(pts: np.ndarray, k: int = 4) -> np.ndarray:
+    """Add interior samples along each polyline segment."""
+
+    if len(pts) < 2:
+        return pts
+    t = np.linspace(0.0, 1.0, k, endpoint=False)[1:]
+    segments = pts[1:] - pts[:-1]
+    extra = (pts[:-1, None, :] + t[None, :, None] * segments[:, None, :]).reshape(-1, 2)
+    return np.vstack([pts, extra])
+
+
+def _layer_clearance_xy(layer: "Layer", transpose: bool):
+    """The layer's data as (x, y) pairs in its drawing orientation, or None."""
+
+    if layer.kind == "bar":
+        y = get_chart_data("y", layer.chart)
+        if y is None:
+            return None
+        xy = np.column_stack([np.arange(len(y), dtype=float), y])
+        return xy[:, ::-1] if layer.is_horizontal else xy
+    if layer.kind not in ("line", "scatter"):
+        return None
+    x = get_chart_data("x", layer.chart)
+    y = get_chart_data("y", layer.chart)
+    if x is None or y is None or len(x) != len(y):
+        return None
+    xy = np.column_stack([x, y]).astype(float)
+    if transpose and layer.is_horizontal is None:
+        xy = xy[:, ::-1]
+    return _densify(xy) if layer.kind == "line" else xy
 
 
 # build-time resolution keeps texts on the reference-line seam (ADR 0018)
@@ -235,12 +330,16 @@ def _resolve_texts(chart: dict) -> List[tuple]:
     return resolved
 
 
-def _draw_texts(ax: plt.Axes, texts: List[tuple], data_ax: plt.Axes = None) -> None:
+def _draw_texts(
+    ax: plt.Axes, texts: List[tuple], data_ax: plt.Axes = None, clearance=None
+) -> None:
     """Draw the pre-resolved text annotations.
 
     The artists land on `ax` — the panel's topmost axes, so they cover
     twin-axis marks — while data coordinates read from `data_ax`, the
-    owning layer's axes.
+    owning layer's axes. `clearance` holds the panel's data in display
+    coordinates; a curved connector left on its default bows toward the
+    side with the most open space.
     """
 
     data_ax = data_ax if data_ax is not None else ax
@@ -269,22 +368,46 @@ def _draw_texts(ax: plt.Axes, texts: List[tuple], data_ax: plt.Axes = None) -> N
             kwargs["bbox"] = dict(style["bbox"])
 
         target = text.get("target")
-        if target is not None:
-            # the text bbox becomes patchA, so the connector never crosses
-            # the box border (flush at gap 0, the TOUCHING look)
-            arrowprops = dict(style["arrowprops"])
-            arrowprops["zorder"] = TEXT_ANNOTATION_ZORDER
-            ax.annotate(
-                content,
-                xy=tuple(target),
-                xycoords=data_ax.transData,
-                xytext=(x, y),
-                textcoords=textcoords,
-                arrowprops=arrowprops,
-                **kwargs,
-            )
-        else:
+        if target is None:
             ax.annotate(content, xy=(x, y), xycoords=textcoords, **kwargs)
+            continue
+
+        text_tr = data_ax.transData if coords == "data" else ax.transAxes
+        start = np.asarray(text_tr.transform((x, y)), dtype=float)
+        end = np.asarray(data_ax.transData.transform(tuple(target)), dtype=float)
+        length = np.hypot(*(end - start)) - TEXT_BOX_PAD
+
+        # a connector shorter than the gaps that frame it is pure noise
+        if length < TEXT_SHORT_NONE:
+            ax.annotate(content, xy=(x, y), xycoords=textcoords, **kwargs)
+            continue
+
+        arrowprops = dict(style["arrowprops"])
+        curve = arrowprops.pop("curve")
+        pinned = arrowprops.pop("curve_pinned")
+        if length < TEXT_SHORT_STRAIGHT:
+            rad = 0.0
+            arrowprops["shrinkA"] = min(arrowprops["shrinkA"], TEXT_SHORT_GAP)
+            arrowprops["shrinkB"] = min(arrowprops["shrinkB"], TEXT_SHORT_GAP)
+        elif curve and not pinned:
+            rad = _bow_rad(start, end, clearance, ax.bbox)
+        else:
+            rad = curve
+        arrowprops["connectionstyle"] = f"arc3,rad={rad}"
+        # leave the box from the side facing the target, never under the text
+        arrowprops["relpos"] = _facing_relpos(start, end)
+        arrowprops["zorder"] = TEXT_ANNOTATION_ZORDER
+        # the text bbox becomes patchA, so the connector never crosses the
+        # box border (flush at gap 0, the TOUCHING look)
+        ax.annotate(
+            content,
+            xy=tuple(target),
+            xycoords=data_ax.transData,
+            xytext=(x, y),
+            textcoords=textcoords,
+            arrowprops=arrowprops,
+            **kwargs,
+        )
 
 
 def _draw_ref_lines(ax: plt.Axes, vlines: List[tuple], hlines: List[tuple]) -> None:
@@ -2462,9 +2585,12 @@ class Panel:
         top_ax = ax_right if ax_right is not None else ax
         if group_axes is None:
             group_axes = [ax] * len(self.groups)
+        clearance = None
+        if any(layer.texts for layer in layers):
+            clearance = self._clearance_points(group_axes, horizontal)
         for group, owner_ax in zip(self.groups, group_axes):
             for layer in group.layers:
-                _draw_texts(top_ax, layer.texts, owner_ax)
+                _draw_texts(top_ax, layer.texts, owner_ax, clearance)
 
         # aspect ratio (a polar axes keeps its own fixed aspect)
         if s.get("aspect_ratio") and not polar:
@@ -2537,6 +2663,23 @@ class Panel:
                     text.set_fontfamily(family)
                 if legend.get_title() is not None:
                     legend.get_title().set_fontfamily(family)
+
+    def _clearance_points(self, group_axes, horizontal):
+        """The panel's data in display coordinates, for connector scoring."""
+
+        points = []
+        for group, owner_ax in zip(self.groups, group_axes):
+            for layer in group.layers:
+                try:
+                    xy = _layer_clearance_xy(layer, horizontal)
+                except (TypeError, ValueError):
+                    xy = None
+                if xy is None or len(xy) == 0:
+                    continue
+                xy = xy[np.isfinite(xy).all(axis=1)]
+                if len(xy):
+                    points.append(owner_ax.transData.transform(xy))
+        return np.vstack(points) if points else None
 
     def _apply_pyramid_mirror(self, ax) -> None:
         """The pyramid's mirror furniture (ADR 0017).

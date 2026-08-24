@@ -32,7 +32,7 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_scatter_edge_color": "#000000",
         "plot_scatter_edge_width": 0.6,
         "plot_text_box_edgecolor": "#000000",
-        "plot_text_arrow_color": "#404040",
+        "plot_text_arrow_color": "#000000",
         "plot_heatmap_cmap": COLORS.Blues,
         "plot_heatmap_frame_color": "#000000",
     }

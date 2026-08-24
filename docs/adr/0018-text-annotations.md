@@ -51,3 +51,11 @@ attribute on the reference-line seam.
   (straight line with an arrowhead). A preset expands to arrow style,
   curvature, and gap; individual `plot_text_arrow_*` keys override single
   properties. The docs guide shows the variants image.
+- **The connector places itself.** Where it starts and which way it bows are
+  decided at draw time, when the panel holds every layer's data and the final
+  limits: the connector leaves the box from the border point facing the
+  target; a curved look left on its default tries several bows to either side
+  and keeps the flattest arc whose body clears the data (the final approach
+  is exempt — the target sits on the data); a connector shorter than its own
+  gaps straightens with minimal gaps, then disappears entirely. An explicit
+  `plot_text_arrow_curve` pins the bow — side and depth — exactly.

@@ -105,6 +105,57 @@ class TestTextsParameter(unittest.TestCase):
         grid = Grid([figure, other])
         self.assertEqual(len(annotation_texts(grid, "note")), 1)
 
+    def test_bow_side_follows_open_space(self):
+        """The default curve flips its bow away from the data when needed."""
+        hump = [0.8, 2.4, 6.8, 11.5, 16.2, 20.1, 22.0, 21.4, 16.6, 11.5, 5.9, 1.3]
+        data = [{"x": i, "y": v} for i, v in enumerate(hump)]
+        # the default clockwise bow would cut through the rising slope here
+        figure = LineChart(
+            data, texts={"text": "n", "x": 1.2, "y": 14.7, "target": (6, 22.0)}
+        )
+        (text,) = annotation_texts(figure, "n")
+        self.assertLess(text.arrow_patch.get_connectionstyle().rad, 0)
+
+    def test_bow_keeps_the_flattest_clear_arc(self):
+        """With open space on both sides, the flattest default bow wins."""
+        flat = [{"x": x, "y": 5} for x in range(11)]
+        figure = LineChart(flat, texts={"text": "n", "x": 2, "y": 1, "target": (8, 5)})
+        (text,) = annotation_texts(figure, "n")
+        self.assertEqual(text.arrow_patch.get_connectionstyle().rad, 0.2)
+
+    def test_pinned_curve_opts_out_of_the_bow_choice(self):
+        """An explicit plot_text_arrow_curve pins the bow exactly."""
+        flat = [{"x": x, "y": 5} for x in range(11)]
+        figure = LineChart(
+            flat,
+            texts={
+                "text": "n",
+                "x": 2,
+                "y": 9,
+                "target": (8, 5),
+                "style": {"plot_text_arrow_curve": 0.4},
+            },
+        )
+        (text,) = annotation_texts(figure, "n")
+        self.assertEqual(text.arrow_patch.get_connectionstyle().rad, 0.4)
+
+    def test_connector_exits_the_facing_side(self):
+        """The connector leaves the box from the side facing the target."""
+        figure = LineChart(
+            LINE1, texts={"text": "n", "x": 1, "y": 60, "target": (8, 64)}
+        )
+        (text,) = annotation_texts(figure, "n")
+        # target to the right: the exit point sits on the right box edge
+        self.assertEqual(text.arrowprops["relpos"][0], 1.0)
+
+    def test_short_connector_is_dropped(self):
+        """A text sitting on its target draws no connector at all."""
+        figure = LineChart(
+            LINE1, texts={"text": "n", "x": 5.2, "y": 26, "target": (5, 25)}
+        )
+        (text,) = annotation_texts(figure, "n")
+        self.assertIsNone(text.arrow_patch)
+
     def test_texts_render_on_the_topmost_axes(self):
         """In a twin-axis panel, texts land on the twin so nothing covers them."""
         left = LineChart(

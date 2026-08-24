@@ -179,7 +179,8 @@ class TestAttrs(unittest.TestCase):
         for look, (arrowstyle, curve, gap) in cases.items():
             config = get_plot_text_arrow_style({"plot_text_arrow_style": look})
             self.assertEqual(config["arrowstyle"], arrowstyle)
-            self.assertEqual(config["connectionstyle"], f"arc3,rad={curve}")
+            self.assertEqual(config["curve"], curve)
+            self.assertFalse(config["curve_pinned"])
             self.assertEqual(config["shrinkA"], gap)
             self.assertEqual(config["color"], _config["plot_text_arrow_color"])
             self.assertEqual(config["linewidth"], _config["plot_text_arrow_width"])
@@ -188,7 +189,8 @@ class TestAttrs(unittest.TestCase):
         """Individual plot_text_arrow_* keys override one preset property."""
         config = get_plot_text_arrow_style({"plot_text_arrow_curve": 0.5})
         self.assertEqual(config["arrowstyle"], "-")
-        self.assertEqual(config["connectionstyle"], "arc3,rad=0.5")
+        self.assertEqual(config["curve"], 0.5)
+        self.assertTrue(config["curve_pinned"])
 
         config = get_plot_text_arrow_style({"plot_text_arrow_color": "#FF0000"})
         self.assertEqual(config["color"], "#FF0000")
@@ -197,7 +199,8 @@ class TestAttrs(unittest.TestCase):
         """A raw matplotlib arrow style passes through, straight by default."""
         config = get_plot_text_arrow_style({"plot_text_arrow_style": "-|>"})
         self.assertEqual(config["arrowstyle"], "-|>")
-        self.assertEqual(config["connectionstyle"], "arc3,rad=0.0")
+        self.assertEqual(config["curve"], 0.0)
+        self.assertFalse(config["curve_pinned"])
 
     def test_get_legend_style(self):
         config = get_legend_style()

@@ -290,9 +290,11 @@ class ARROW_STYLE:
 
     Used by the `plot_text_arrow_style` style attribute of text annotations.
     Each value names a complete connector look — the line shape, curvature,
-    and the gap on the text side. Individual `plot_text_arrow_*` style
-    attributes override single properties of the chosen look. A raw
-    matplotlib arrow style string (e.g. `"-|>"`) is also accepted.
+    and the gap on the text side. A curved look bows toward the side with
+    the most open space around the chart's data; `plot_text_arrow_curve`
+    pins the bow exactly, and the other `plot_text_arrow_*` style attributes
+    override single properties of the chosen look. A raw matplotlib arrow
+    style string (e.g. `"-|>"`) is also accepted.
 
     Examples:
         >>> from datachart.constants import ARROW_STYLE

@@ -31,7 +31,7 @@ MATERIAL_THEME: StyleAttrs = make_theme(
         "plot_bar_edge_width": 0,
         "plot_hist_edge_width": 0,
         "plot_line_width": 2.0,
-        "plot_text_box_edgecolor": "#E0E0E0",
+        "plot_text_box_edgecolor": "#757575",
         "plot_text_arrow_color": "#757575",
         "plot_heatmap_cmap": COLORS.Blues,
         "plot_heatmap_frame_color": "#000000",
