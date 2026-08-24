@@ -8,10 +8,15 @@ site_url: https://eriknovak.github.io/datachart/
 repo_name: eriknovak/datachart
 repo_url: https://github.com/eriknovak/datachart
 
-# internal records (ADRs, agent docs) never ship with the site
+# internal records (ADRs, agent docs) and build hooks never ship with the site
 exclude_docs: |
   adr/
   agents/
+  hooks/
+
+# fails the build when a nav page is missing from llmstxt sections (ADR 0016)
+hooks:
+  - docs/hooks/llmstxt_guard.py
 
 theme:
   name: material
@@ -87,6 +92,56 @@ plugins:
             separate_signature: true
             annotations_path: source
             docstring_section_style: spacy
+  # generates llms.txt, llms-full.txt, and per-page .md endpoints (ADR 0016)
+  - llmstxt:
+      full_output: llms-full.txt
+      preprocess: docs/hooks/llmstxt_preprocess.py
+      markdown_description: |
+        datachart is a Python data visualization package built on matplotlib.
+        It provides simple chart functions (BarChart, LineChart, ScatterChart,
+        Histogram, Heatmap, BoxPlot, ParallelCoords, RadialChart), figure
+        composition via Panel (overlaying charts on shared axes) and Grid
+        (arranging charts in a grid), and a global configuration system with
+        predefined themes.
+
+        Install with `pip install datachart`. All charts return a matplotlib
+        Figure. Style is controlled globally via `datachart.config.config` and
+        themes; per-chart overrides go in each chart's `style` parameter.
+      sections:
+        Getting Started:
+          - index.md: Package overview, installation, and a first example.
+          - how-to-guides/index.md: "Map of the guide sections: charts, composition & utilities, styling."
+        Charts:
+          - how-to-guides/charts/index.md: The chart functions, their common data format, and how to save figures.
+          - how-to-guides/charts/barchart.ipynb: Bar chart input attributes, single and multiple datasets, customization, and saving.
+          - how-to-guides/charts/boxplot.ipynb: Box plot input attributes and customization; multiple datasets require subplots.
+          - how-to-guides/charts/heatmap.ipynb: Heatmap input attributes, single and multiple datasets, customization, and saving.
+          - how-to-guides/charts/histogram.ipynb: Histogram input attributes, single and multiple datasets, and histogram views.
+          - how-to-guides/charts/linechart.ipynb: Line chart input attributes, single and multiple datasets, customization, and saving.
+          - how-to-guides/charts/parallelcoords.ipynb: Parallel coordinates input attributes and customization for multivariate data.
+          - how-to-guides/charts/radialchart.ipynb: Radial chart input attributes, the line, bar, scatter, and histogram visuals, and polar settings (start angle, direction, inner radius).
+          - how-to-guides/charts/scatterchart.ipynb: Scatter chart input attributes, single and multiple datasets, customization, and saving.
+        Composition & Utilities:
+          - how-to-guides/utility/index.md: Map of Panel, Grid, statistics, and figure saving.
+          - how-to-guides/utility/panel.ipynb: "Overlaying multiple charts on one plot with Panel: dual y-axes, z-order, emphasis, and nesting panels."
+          - how-to-guides/utility/grid.ipynb: Arranging multiple charts in a grid layout with Grid, including nested rows and layout specs.
+          - how-to-guides/utility/stats.ipynb: Statistical utilities for preparing chart data.
+        Styling:
+          - how-to-guides/styling/index.md: Map of configuration, themes, emphasis, and colormaps.
+          - how-to-guides/styling/config.ipynb: "Customizing the global style via the config singleton: set_theme, update_config, reset_config."
+          - how-to-guides/styling/themes.ipynb: Applying the predefined themes and creating custom ones.
+          - how-to-guides/styling/theme-gallery.ipynb: Every predefined theme rendered across the chart types.
+          - how-to-guides/styling/highlighting.ipynb: Emphasizing and muting data series with the emphasis option.
+          - how-to-guides/styling/colormaps.ipynb: The colormaps available via the COLORS constant.
+        API Reference:
+          - references/index.md: Top-level module reference.
+          - references/charts.md: Chart function signatures and parameters.
+          - references/utils/index.md: Panel, Grid, and save_figure signatures.
+          - references/utils/stats.md: Statistical function signatures.
+          - references/config.md: The Config class and the global config instance.
+          - references/themes.md: The predefined theme dictionaries.
+          - references/constants.md: Enums and constants (THEME, FIG_SIZE, ORIENTATION, COLORS, ...).
+          - references/typings.md: TypedDict definitions for chart data and style attributes.
 
 markdown_extensions:
   - admonition
