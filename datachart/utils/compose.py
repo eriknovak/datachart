@@ -136,8 +136,9 @@ def Panel(
         ymax: Maximum value for the primary value-axis limits.
         ymin_right: Minimum value for the secondary value-axis limits.
         ymax_right: Maximum value for the secondary value-axis limits.
-        bar_mode: Bar chart overlay mode: "group" (side-by-side), "stack"
-            (stacked), or "overlay" (overlapping). Default is taken from config
+        bar_mode: How bar and histogram series share the axis: "group"
+            (side-by-side bars; histograms overlay), "stack" (stacked), or
+            "overlay" (overlapping). Default is taken from config
             (overlay_bar_mode, default "group"). See `BAR_MODE`.
 
     Returns:
