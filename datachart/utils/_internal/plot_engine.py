@@ -79,12 +79,34 @@ def render_chart(
     for ax in axes:
         ax.axis("off")
 
+    # square polar axes leave slack in wide grid slots; anchor the outer
+    # rows/columns toward the center so the circles read as one figure
+    if chart_type == "radialchart" and not is_single_plot:
+        nrows, ncols = subplot_config["nrows"], subplot_config["ncols"]
+        for idx, ax in enumerate(axes):
+            row, col = divmod(idx, ncols)
+            vert = (
+                "S" if row < (nrows - 1) / 2 else "N" if row > (nrows - 1) / 2 else ""
+            )
+            horiz = (
+                "E" if col < (ncols - 1) / 2 else "W" if col > (ncols - 1) / 2 else ""
+            )
+            ax.set_anchor(vert + horiz or "C")
+
     first_style = charts[0].get("style", {}) or {}
 
     if is_single_plot:
+        panel_settings = build_chart_panel_settings(
+            chart_type, settings, "single", first_style
+        )
+        if chart_type == "radialchart":
+            # sup-labels sit at the figure edge, far from the circle; polar
+            # axis labels attach to the axes instead
+            panel_settings["xlabel"] = settings.get("xlabel")
+            panel_settings["ylabel"] = settings.get("ylabel")
+            panel_settings["label_styles"] = Panel.snapshot_label_styles()
         panel = Panel(
-            [group_from_chart(layers, settings, mode="multiple")],
-            build_chart_panel_settings(chart_type, settings, "single", first_style),
+            [group_from_chart(layers, settings, mode="multiple")], panel_settings
         )
         panel.render(axes[0])
     else:
@@ -128,15 +150,16 @@ def render_chart(
             )
             panel.render(ax)
 
-    # global figure labels
-    configure_labels(
-        settings,
-        [
-            ("title", figure.suptitle),
-            ("xlabel", figure.supxlabel),
-            ("ylabel", figure.supylabel),
-        ],
-    )
+    # global figure labels; a single polar plot carries its axis labels on
+    # the axes, so only the title stays at the figure level
+    figure_labels = [
+        ("title", figure.suptitle),
+        ("xlabel", figure.supxlabel),
+        ("ylabel", figure.supylabel),
+    ]
+    if chart_type == "radialchart" and is_single_plot:
+        figure_labels = figure_labels[:1]
+    configure_labels(settings, figure_labels)
 
     # metadata transport: the layers and panel settings compositions consume
     composition_settings = build_chart_panel_settings(

@@ -174,8 +174,29 @@ class TestValueLabelEmphasis:
         assert all(t.get_text() == "" for t in ax.get_yticklabels())
         elevated = [t for t in ax.texts if t.get_color() == "#000000"]
         assert elevated
-        mark_z = max(p.get_zorder() for p in ax.patches)
-        assert all(t.get_zorder() > mark_z for t in elevated)
+        # above the marks AND the border circle, so nothing strikes through
+        top_z = max(
+            max(p.get_zorder() for p in ax.patches),
+            ax.spines["polar"].get_zorder(),
+        )
+        assert all(t.get_zorder() > top_z for t in elevated)
+
+    def test_legend_sits_above_the_border(self):
+        fig = RadialChart(data=[WIND, WIND2], subtitle=["a", "b"], show_legend=True)
+        ax = fig.axes[0]
+        legend = ax.get_legend()
+        assert legend.get_zorder() > ax.spines["polar"].get_zorder()
+
+    def test_axis_labels_attach_to_the_axes(self):
+        ax = RadialChart(data=WIND, ylabel="Wind speed (km/h)").axes[0]
+        assert ax.get_ylabel() == "Wind speed (km/h)"
+        assert ax.figure.get_supylabel() == ""
+
+    def test_subplot_columns_anchor_toward_each_other(self):
+        fig = RadialChart(data=[WIND, WIND2], subplots=True, max_cols=2)
+        left, right = fig.axes[:2]
+        assert left.get_anchor() == "E"
+        assert right.get_anchor() == "W"
 
 
 class TestRendering:

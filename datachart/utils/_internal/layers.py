@@ -91,8 +91,14 @@ NO_LEGEND = "_nolegend_"
 DEFAULT_STARTANGLE = "N"
 DEFAULT_DIRECTION = DIRECTION.CLOCKWISE
 COMPASS_LOCATIONS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
-# polar r-value labels are redrawn above every data mark (grid stays below)
-RADIAL_VALUE_LABEL_Z = 6
+# the polar border circle crosses the plot area, so the r-value labels and
+# the legend stack above the spine zorder, not just above the marks
+RADIAL_LABEL_Z_OVER_SPINE = 1
+RADIAL_LEGEND_Z_OVER_SPINE = 2
+DEFAULT_SPINE_ZORDER = 100
+# axis labels on a polar axes pad past the category labels around the circle
+RADIAL_XLABEL_PAD = 15
+RADIAL_YLABEL_PAD = 30
 
 
 def _scatter_legend_handle(legend_handle, orig_handle):
@@ -2247,7 +2253,13 @@ class Panel:
             ("ylabel", ax.set_ylabel),
         ]:
             if s.get(key):
-                action(s[key], **(label_styles.get(key) or {}))
+                style = dict(label_styles.get(key) or {})
+                if polar and key != "title":
+                    # clear the category labels sitting around the circle
+                    style["labelpad"] = (
+                        RADIAL_YLABEL_PAD if key == "ylabel" else RADIAL_XLABEL_PAD
+                    )
+                action(s[key], **style)
         if s.get("ylabel_right") and ax_right is not None:
             # the secondary value-axis label shares the primary label's text style
             (ax_right.set_xlabel if horizontal else ax_right.set_ylabel)(
@@ -2278,6 +2290,14 @@ class Panel:
                 # unlabeled panels get no empty legend frame
                 if ax.get_legend_handles_labels()[1]:
                     ax.legend(title="Legend", **legend_style)
+
+        # the polar border circle crosses the plot area; the legend covers it
+        # fully — above the spine, with an opaque frame so nothing shows through
+        if polar:
+            legend = ax.get_legend()
+            if legend is not None:
+                legend.set_zorder(self._spine_zorder() + RADIAL_LEGEND_Z_OVER_SPINE)
+                legend.get_frame().set_alpha(1.0)
 
         # tick labels and legend text cannot take the font family through
         # tick_params/legend kwargs; restyle them directly
@@ -2344,8 +2364,15 @@ class Panel:
 
         self._elevate_radial_value_labels(ax)
 
+    def _spine_zorder(self) -> float:
+        """The build-time spine zorder; the polar top-of-stack reference."""
+
+        furniture = self.settings.get("furniture") or {}
+        spines = furniture.get("spines") or {}
+        return spines.get("bottom", {}).get("zorder", DEFAULT_SPINE_ZORDER)
+
     def _elevate_radial_value_labels(self, ax) -> None:
-        """Redraw the r tick labels above the marks, in black.
+        """Redraw the r tick labels above the marks and the border, in black.
 
         The native axis draws grid lines and tick labels in one layer, so the
         labels cannot sit above the data while the grid stays below it.
@@ -2371,7 +2398,7 @@ class Panel:
                 fontsize=tick_style.get("labelsize"),
                 fontfamily=furniture.get("font_family"),
                 color="#000000",
-                zorder=RADIAL_VALUE_LABEL_Z,
+                zorder=self._spine_zorder() + RADIAL_LABEL_Z_OVER_SPINE,
                 # a soft halo keeps the label legible over dark marks
                 bbox=dict(
                     boxstyle="round,pad=0.15",
