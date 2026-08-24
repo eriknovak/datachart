@@ -27,6 +27,10 @@ title: Typings Module
     options:
         heading_level: 4
 
+::: datachart.typings.TextAttrs
+    options:
+        heading_level: 4
+
 ### Line Chart Typings
 
 ::: datachart.typings.LineSingleChartAttrs
@@ -137,6 +141,8 @@ title: Typings Module
 ::: datachart.typings.VLineStyleAttrs
 
 ::: datachart.typings.HLineStyleAttrs
+
+::: datachart.typings.TextStyleAttrs
 
 ::: datachart.typings.HeatmapStyleAttrs
 
