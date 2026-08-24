@@ -420,7 +420,9 @@ class LEGEND_LOCATION:
 class HISTOGRAM_TYPE:
     """The supported histogram types.
 
-    Passed as the `plot_hist_type` style attribute of histograms.
+    Passed as the `plot_hist_type` style attribute of histograms: how each
+    series is rendered. How multiple series share the axis is the `bar_mode`
+    setting's job — see `BAR_MODE`.
 
     ![HISTOGRAM_TYPE at a glance](../../assets/imgs/const-histogram-type.svg){ width="100%" }
 
@@ -431,14 +433,14 @@ class HISTOGRAM_TYPE:
 
     Attributes:
         BAR (str): The bar histogram style. Equals to `"bar"`.
-        BAR_STACKED (str): The stacked bar histogram style. Equals to `"barstacked"`.
-        STEP (str): The step histogram style. Equals to `"step"`.
+        STEP (str): The step histogram style: an unfilled outline in the
+            series color. Stacked series draw as `STEP_FILLED`, since a stack
+            needs area. Equals to `"step"`.
         STEP_FILLED (str): The filled step histogram style. Equals to `"stepfilled"`.
 
     """
 
     BAR = "bar"
-    BAR_STACKED = "barstacked"
     STEP = "step"
     STEP_FILLED = "stepfilled"
 
@@ -446,8 +448,10 @@ class HISTOGRAM_TYPE:
 class BAR_MODE:
     """The supported bar modes.
 
-    Passed as the `bar_mode` setting of bar charts and
-    [`Panel`][datachart.utils.Panel]: how multiple bar series share the axis.
+    Passed as the `bar_mode` setting of bar charts, histograms, and
+    [`Panel`][datachart.utils.Panel]: how multiple series share the axis.
+    Bar charts and panels default to `GROUP`; histograms default to `STACK`,
+    and treat `GROUP` (which has no histogram meaning) as `OVERLAY`.
 
     ![BAR_MODE at a glance](../../assets/imgs/const-bar-mode.svg){ width="100%" }
 

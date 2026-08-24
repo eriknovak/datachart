@@ -504,34 +504,37 @@ def bar_mode():
 def histogram_type():
     members = [
         ("BAR", HISTOGRAM_TYPE.BAR),
-        ("BAR_STACKED", HISTOGRAM_TYPE.BAR_STACKED),
         ("STEP", HISTOGRAM_TYPE.STEP),
         ("STEP_FILLED", HISTOGRAM_TYPE.STEP_FILLED),
     ]
-    values = np.random.default_rng(42).normal(0, 1, 400)
+    rng = np.random.default_rng(42)
+    values = rng.normal(0, 1, 400)
     figs = [
         Histogram(
             data=[{"x": x} for x in values],
-            # STEP draws only the edge, which the DEFAULT theme paints white
-            style={
-                "plot_hist_type": value,
-                **(
-                    {"plot_hist_edge_color": DARK, "plot_hist_edge_width": 1.2}
-                    if value == HISTOGRAM_TYPE.STEP
-                    else {}
-                ),
-            },
+            style={"plot_hist_type": value},
             title=f"HISTOGRAM_TYPE.{label}",
         )
         for label, value in members
     ]
+    # the fourth panel shows the orthogonal axis: series sharing via bar_mode
+    figs.append(
+        Histogram(
+            data=[
+                [{"x": x} for x in values],
+                [{"x": x} for x in rng.normal(2.5, 0.8, 250)],
+            ],
+            bar_mode="stack",
+            title='bar_mode="stack"',
+        )
+    )
     chart_grid(
         figs,
         "const-histogram-type.svg",
         3.8,
         cols=2,
-        footnote="Each series draws separately, so BAR_STACKED renders like BAR; "
-        "STEP shows the edge only (recolored here from the theme's white).",
+        footnote="The type renders one series; how several series share the "
+        "axis is bar_mode's job.",
     )
 
 

@@ -50,6 +50,7 @@ from typing import TypedDict, Union, Tuple, List, Optional, Dict
 
 import matplotlib.colors as colors
 from .constants import (
+    BAR_MODE,
     FIG_SIZE,
     FONT_STYLE,
     FONT_WEIGHT,
@@ -900,6 +901,7 @@ class _HistogramChartAttrs(ChartCommonAttrs):
     Attributes:
         charts (Union[HistogramSingleChartAttrs, List[HistogramSingleChartAttrs]]): The histogram chart definitions.
         orientation (Union[ORIENTATION, str, None]): The orientation of the histogram charts.
+        bar_mode (Union[BAR_MODE, str, None]): How multiple histogram series share the axis.
         num_bins (Union[int, None]): The number of bins the data points are split in to create the histogram.
         show_density (Union[bool, None]): Whether or not to plot the density histogram.
         show_cumulative (Union[bool, None]): Whether or not to plot the cumulative histogram.
@@ -909,6 +911,7 @@ class _HistogramChartAttrs(ChartCommonAttrs):
 
     charts: Union[HistogramSingleChartAttrs, List[HistogramSingleChartAttrs]]
     orientation: Union[ORIENTATION, str, None]
+    bar_mode: Union[BAR_MODE, str, None]
     num_bins: Union[int, None]
     show_density: Union[bool, None]
     show_cumulative: Union[bool, None]

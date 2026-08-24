@@ -61,6 +61,7 @@ from ...constants import (
     ASPECT_RATIO,
     DIRECTION,
     EMPHASIS,
+    HISTOGRAM_TYPE,
     ORIENTATION,
     RADIAL_TYPE,
     VALUE_FORMAT,
@@ -254,6 +255,15 @@ class BarSlot:
 
 
 @dataclass(frozen=True)
+class HistSlot:
+    """A histogram layer's precomputed heights and offset within the panel stack."""
+
+    bins: np.ndarray
+    heights: np.ndarray
+    bottom: np.ndarray
+
+
+@dataclass(frozen=True)
 class DrawContext:
     """Frozen per-layer instructions a Panel hands to a Layer at draw time."""
 
@@ -262,6 +272,7 @@ class DrawContext:
     legend_label: Optional[str] = None
     alpha: Optional[float] = None
     bar_slot: Optional[BarSlot] = None
+    hist_slot: Optional[HistSlot] = None
     bins: Optional[np.ndarray] = None
     hatch: Optional[str] = None
     emphasis: Optional[str] = None
@@ -546,6 +557,11 @@ class HistogramLayer(Layer):
         self.show_density = self.settings.get("show_density")
         self.show_cumulative = self.settings.get("show_cumulative")
         self.num_bins = self.settings.get("num_bins") or DEFAULT_NUM_BINS
+        # step's outline is the series mark: it follows the cycle color and
+        # the theme line width unless the chart style pins them (ADR 0014)
+        self.step_edge_color_auto = "plot_hist_edge_color" not in self.style
+        self.step_edge_width_auto = "plot_hist_edge_width" not in self.style
+        self.step_edge_width = config["plot_line_width"]
 
     def x_values(self) -> Optional[np.ndarray]:
         return get_chart_data("x", self.chart)
@@ -563,6 +579,16 @@ class HistogramLayer(Layer):
             return
 
         hist_style = self._merge_color("color", ctx.color, self.hist_style)
+        if hist_style.get("histtype") == HISTOGRAM_TYPE.STEP:
+            if ctx.hist_slot is not None:
+                # a stack needs area: step stacks as its filled equivalent (ADR 0014)
+                hist_style["histtype"] = HISTOGRAM_TYPE.STEP_FILLED
+            else:
+                if self.step_edge_color_auto:
+                    # dropping the theme edge lets `color` drive the outline
+                    hist_style.pop("edgecolor", None)
+                if self.step_edge_width_auto:
+                    hist_style["linewidth"] = self.step_edge_width
         if ctx.z_order is not None:
             hist_style["zorder"] = ctx.z_order
         if ctx.alpha is not None:
@@ -570,6 +596,21 @@ class HistogramLayer(Layer):
         if ctx.hatch is not None and "hatch" not in hist_style:
             hist_style["hatch"] = ctx.hatch or None
         self._apply_emphasis(hist_style, ctx.emphasis)
+
+        if ctx.hist_slot is not None:
+            # weighted bin centers reproduce the precomputed stack heights
+            # exactly; density/cumulative are already encoded in them
+            slot = ctx.hist_slot
+            ax.hist(
+                (slot.bins[:-1] + slot.bins[1:]) / 2,
+                bins=slot.bins,
+                weights=slot.heights,
+                bottom=slot.bottom,
+                label=self.label(ctx),
+                orientation=self.orientation,
+                **hist_style,
+            )
+            return
 
         bins = ctx.bins if ctx.bins is not None else self.num_bins
         ax.hist(
@@ -1709,6 +1750,34 @@ def group_from_chart(
     )
 
 
+def _hist_stack_slots(hist_layers: List[HistogramLayer], bins: np.ndarray) -> dict:
+    """Per-layer stacked heights and bottoms on shared bin edges.
+
+    Mirrors matplotlib's stacked-hist math: density normalizes the whole
+    stack's area to 1, cumulative accumulates after the density transform.
+    """
+
+    first = hist_layers[0]
+    density = bool(first.show_density)
+    cumulative = bool(first.show_cumulative)
+    counts = [
+        np.histogram(layer.x_values(), bins=bins)[0].astype(float)
+        for layer in hist_layers
+    ]
+    db = np.diff(bins)
+    total = sum(c.sum() for c in counts)
+
+    slots, bottom = {}, np.zeros(len(db))
+    for layer, heights in zip(hist_layers, counts):
+        if density and total > 0:
+            heights = heights / db / total
+        if cumulative:
+            heights = np.cumsum(heights * db) if density else np.cumsum(heights)
+        slots[id(layer)] = HistSlot(bins=bins, heights=heights, bottom=bottom)
+        bottom = bottom + heights
+    return slots
+
+
 # ================================================
 # Axis Assignment (scale clustering)
 # ================================================
@@ -2022,12 +2091,33 @@ class Panel:
         if bar_mode == "overlay" and len(bar_layers) > 1:
             bar_alpha = s.get("bar_overlay_alpha")
 
-        # histogram handling: shared bins per group, panel-wide overlay alpha
-        hist_layers = [l for l in self.layers if isinstance(l, HistogramLayer)]
-        hist_mode = s.get("hist_mode", "stack")
+        # bar_mode drives histograms too: "stack" stacks on shared bins,
+        # "overlay"/"group" draw each series individually (ADR 0014)
+        hist_pairs = [
+            (group, l)
+            for group in self.groups
+            for l in group.layers
+            if isinstance(l, HistogramLayer) and l.x_values() is not None
+        ]
         hist_alpha = None
-        if hist_mode == "overlay" and len(hist_layers) > 1:
+        if bar_mode != "stack" and len(hist_pairs) > 1:
             hist_alpha = s.get("hist_overlay_alpha")
+
+        # stacking a muted background is meaningless: draw individually
+        hist_slots = {}
+        if (
+            bar_mode == "stack"
+            and len(hist_pairs) > 1
+            and all(group.layer_role(l) is None for group, l in hist_pairs)
+        ):
+            stack_bins = s.get("hist_bins_override")
+            if stack_bins is None:
+                # panel-shared edges, pooled across every stacked layer
+                stack_bins = np.histogram(
+                    np.hstack(tuple(l.x_values() for _, l in hist_pairs)),
+                    bins=hist_pairs[0][0].num_bins,
+                )[1]
+            hist_slots = _hist_stack_slots([l for _, l in hist_pairs], stack_bins)
 
         zorder_defaults = s.get("zorder_defaults", {})
 
@@ -2078,22 +2168,7 @@ class Panel:
             if bins is None:
                 bins = group.hist_bins()
 
-            group_hists = [l for l in group.layers if isinstance(l, HistogramLayer)]
-            # stacking a muted background is meaningless: draw individually
-            stack_hists = (
-                hist_mode == "stack"
-                and len(group_hists) > 0
-                and all(group.layer_role(l) is None for l in group_hists)
-            )
-            if stack_hists:
-                self._draw_hist_stack(
-                    target_ax, group, group_hists, cycle, bins, hatch_assignments
-                )
-
             for layer in group.layers:
-                if isinstance(layer, HistogramLayer) and stack_hists:
-                    continue
-
                 z_order = group.z_order
                 if z_order is None:
                     z_order = zorder_defaults.get(layer.kind)
@@ -2120,6 +2195,7 @@ class Panel:
                         )
                     ),
                     bar_slot=bar_slots.get(id(layer)),
+                    hist_slot=hist_slots.get(id(layer)),
                     bins=bins,
                     hatch=(
                         hatch_assignments[layer.chart_hash]
@@ -2143,54 +2219,6 @@ class Panel:
                 layer.draw(target_ax, ctx)
 
         self._finalize(ax, ax_right, bar_layers, horizontal)
-
-    def _draw_hist_stack(
-        self, ax, group, hist_layers, cycle, bins, hatch_assignments=None
-    ) -> None:
-        """Draw a group's histograms as one stacked call — a cross-layer concern."""
-
-        first = hist_layers[0]
-        xall, labels, colors = [], [], []
-        for layer in hist_layers:
-            xall.append(layer.x_values())
-            labels.append(layer.subtitle)
-            # each layer's own resolved color; the cycle fills the gaps
-            colors.append(
-                layer.hist_style.get("color", cycle[layer.chart_hash]["color"])
-            )
-
-        hist_style = dict(first.hist_style)
-        hist_style["color"] = colors if colors.count(None) == 0 else None
-
-        *_, patch_sets = ax.hist(
-            xall,
-            bins=bins if bins is not None else first.num_bins,
-            label=labels,
-            stacked=True,
-            density=first.show_density,
-            cumulative=first.show_cumulative,
-            orientation=first.orientation,
-            **{k: v for k, v in hist_style.items() if k != "color"},
-            color=hist_style["color"],
-        )
-
-        if len(hist_layers) == 1:
-            patch_sets = [patch_sets]
-
-        # the stacked call shares one alpha; restore each layer's own
-        first_alpha = first.hist_style.get("alpha")
-        for layer, patches in zip(hist_layers, patch_sets):
-            alpha = layer.hist_style.get("alpha")
-            if alpha != first_alpha:
-                for patch in patches:
-                    patch.set_alpha(alpha)
-
-        # the stack shares the first layer's style, so its explicit hatch wins
-        if hatch_assignments is not None and "hatch" not in first.hist_style:
-            for layer, patches in zip(hist_layers, patch_sets):
-                hatch = hatch_assignments[layer.chart_hash]
-                for patch in patches:
-                    patch.set_hatch(hatch or None)
 
     def _finalize(self, ax, ax_right, bar_layers, horizontal) -> None:
         """Apply the furniture; x/y keys are literal, `*_right` keys hit the twin."""
@@ -2613,7 +2641,9 @@ def build_chart_panel_settings(
             else settings["aspect_ratio"]
         ),
         "legend_style": get_legend_style(),
-        "bar_mode": settings.get("bar_mode") or "group",
+        # histograms stack by default; bars group (ADR 0014)
+        "bar_mode": settings.get("bar_mode")
+        or ("stack" if chart_type == "histogram" else "group"),
         "tighten_xlim": chart_type == "linechart",
         # radial furniture; only polar panels read these
         "startangle": settings.get("startangle"),

@@ -173,7 +173,6 @@ def _overlay_impl(
         "bar_ticks": "group",
         "bar_width": config.get("plot_bar_width", 0.8),
         "bar_overlay_alpha": config.get("overlay_bar_alpha", 0.7),
-        "hist_mode": "overlay",
         "hist_overlay_alpha": config.get("overlay_hist_alpha", 0.6),
         "zorder_defaults": {
             "bar": config.get("overlay_default_zorder_bar", 1),
@@ -283,8 +282,8 @@ def OverlayChart(
         ymax: Maximum value for the primary value-axis limits.
         ymin_right: Minimum value for the secondary value-axis limits.
         ymax_right: Maximum value for the secondary value-axis limits.
-        bar_mode: Bar chart overlay mode: "group", "stack", or "overlay". See
-            `BAR_MODE`.
+        bar_mode: How bar and histogram series share the axis: "group",
+            "stack", or "overlay". See `BAR_MODE`.
 
     Returns:
         A matplotlib Figure containing the overlaid charts.
