@@ -10,6 +10,7 @@ Classes:
     FONT_WEIGHT:        The supported font weights.
     LINE_MARKER:        The supported line markers.
     LINE_STYLE:         The supported line styles.
+    ARROW_STYLE:        The supported text annotation connector looks.
     LINE_DRAW_STYLE:    The supported line draw styles.
     HATCH_STYLE:        The supported hatch styles.
     LEGEND_ALIGN:       The supported legend alignments.
@@ -282,6 +283,38 @@ class LINE_STYLE:
     DASHED = "--"
     DASHDOT = "-."
     DOTTED = ":"
+
+
+class ARROW_STYLE:
+    """The supported text annotation connector looks.
+
+    Used by the `plot_text_arrow_style` style attribute of text annotations.
+    Each value names a complete connector look — the line shape, curvature,
+    and the gap on the text side. A curved look bows toward the side with
+    the most open space around the chart's data; `plot_text_arrow_curve`
+    pins the bow exactly, and the other `plot_text_arrow_*` style attributes
+    override single properties of the chosen look. A raw matplotlib arrow
+    style string (e.g. `"-|>"`) is also accepted.
+
+    ![ARROW_STYLE at a glance](../../assets/imgs/const-arrow-style.svg){ width="100%" }
+
+    Examples:
+        >>> from datachart.constants import ARROW_STYLE
+        >>> ARROW_STYLE.CURVE
+        "curve"
+
+    Attributes:
+        CURVE (str): A curved plain line with a small text-side gap. The default. Equals to `"curve"`.
+        CURVE_ARROW (str): The same curve with an arrowhead at the target. Equals to `"curve-arrow"`.
+        TOUCHING (str): A straight plain line starting flush at the text box border. Equals to `"touching"`.
+        ARROW (str): A straight line with an arrowhead at the target. Equals to `"arrow"`.
+
+    """
+
+    CURVE = "curve"
+    CURVE_ARROW = "curve-arrow"
+    TOUCHING = "touching"
+    ARROW = "arrow"
 
 
 class LINE_DRAW_STYLE:

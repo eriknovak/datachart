@@ -43,6 +43,10 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.ARROW_STYLE
+    options:
+        heading_level: 3
+
 ## Style Constants
 
 ::: datachart.constants.HATCH_STYLE

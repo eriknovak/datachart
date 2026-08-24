@@ -7,6 +7,7 @@ from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
     ParallelCoordsDataPointAttrs,
     ParallelCoordsStyleAttrs,
+    TextAttrs,
 )
 from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID
 
@@ -35,6 +36,13 @@ def ParallelCoords(
     dimensions: Optional[List[str]] = None,
     hue: Optional[Union[str, List[Optional[str]]]] = None,
     category_orders: Optional[Dict[str, List[str]]] = None,
+    texts: Optional[
+        Union[
+            TextAttrs,
+            List[TextAttrs],
+            List[Union[TextAttrs, List[TextAttrs], None]],
+        ]
+    ] = None,
 ) -> plt.Figure:
     """Creates the parallel coordinates chart.
 
@@ -85,6 +93,7 @@ def ParallelCoords(
         category_orders: Dictionary mapping dimension names to lists of category
             values in the desired order. Example: {"rating": ["Low", "Medium", "High"]}.
             Categories not in the list will be appended at the end (sorted).
+        texts: Text annotation(s) to draw.
 
     Returns:
         The figure containing the parallel coordinates chart.
@@ -99,6 +108,7 @@ def ParallelCoords(
         dimensions=dimensions,
         hue=hue,
         category_orders=category_orders,
+        texts=texts,
     )
 
     # Figure-level settings; None values resolve to defaults downstream

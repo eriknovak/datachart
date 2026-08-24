@@ -2,12 +2,16 @@
 
 Two constructors mirror the internal drawing seam: `Panel` overlays rendered
 figures into one coordinate space, `Grid` arranges them in rows and columns.
+`Annotate` adds text annotations to an already rendered figure on the same
+seam, so they survive both compositions.
 
 Methods:
     Panel(charts, title, xlabel, ylabel_left, ylabel_right, figsize, show_legend, ...):
         Overlays rendered chart figures on a single plot with optional dual y-axes.
     Grid(charts, title, max_cols, figsize, sharex, sharey):
         Arranges rendered chart figures in a grid; nested rows define the layout.
+    Annotate(figure, texts):
+        Returns a new figure with text annotations added to a rendered figure.
 
 """
 
@@ -17,8 +21,12 @@ from typing import List, Dict, Optional, Tuple, Union, Any
 import matplotlib.pyplot as plt
 
 from ..constants import BAR_MODE, FIG_SIZE
+from ..typings import TextAttrs
 from .overlay import _overlay_impl
 from .figure import _grid_from_dicts, _figure_grid_layout_impl
+from ._internal.config_helpers import get_text_style
+from ._internal.figures import new_figure
+from ._internal.layers import LayerGroup, Panel as _PanelSeam, TextLayer
 
 
 def Panel(
@@ -178,6 +186,99 @@ def Panel(
         ymax_right=ymax_right,
         bar_mode=bar_mode,
     )
+
+
+def Annotate(
+    figure: plt.Figure,
+    texts: Union[TextAttrs, List[TextAttrs]],
+) -> plt.Figure:
+    """Add text annotations to an already rendered figure.
+
+    Returns a new figure with the annotations riding the figure's chart
+    metadata, styled by the current theme at call time — so they follow
+    themes and survive `Panel` and `Grid` composition. The source figure and
+    its charts are never modified.
+
+    Works on any figure whose charts share one coordinate space: chart
+    figures (including polar ones) and `Panel` output. Grid figures and
+    multi-subplot figures (`subplots=True`) are rejected — annotate the
+    sources before composing.
+
+    Examples:
+        >>> from datachart.charts import LineChart
+        >>> from datachart.utils import Annotate
+        >>>
+        >>> figure = LineChart(data=[{"x": i, "y": i**2} for i in range(10)])
+        >>> annotated = Annotate(
+        ...     figure,
+        ...     texts={
+        ...         "text": "growth accelerates",
+        ...         "x": 4,
+        ...         "y": 60,
+        ...         "target": (7, 49),
+        ...     },
+        ... )
+
+    Args:
+        figure: A figure created by a datachart chart function or `Panel`.
+        texts: The text annotation(s) to add. Each annotation places `text`
+            at (`x`, `y`) — data coordinates by default, axes fractions with
+            `"coords": "axes"` — draws a connector to the optional `target`
+            data point, and takes a per-text `style` override.
+
+    Returns:
+        A new matplotlib Figure with the annotations added.
+
+    Raises:
+        ValueError: If the figure has no chart metadata, is a Grid figure,
+            or is a multi-subplot figure.
+    """
+    metadata = getattr(figure, "_chart_metadata", None)
+    if metadata is None or metadata.get("type") is None:
+        raise ValueError(
+            "Figure is missing chart metadata. "
+            "This figure was likely not created by a datachart chart function."
+        )
+    if metadata.get("type") == "grid":
+        raise ValueError(
+            "Grid figures cannot be annotated; annotate the source figures "
+            "before composing them with Grid."
+        )
+    if metadata.get("panels") is not None:
+        raise ValueError(
+            "Multi-subplot figures cannot be annotated: the texts have no "
+            "single coordinate space to land in. Annotate single-chart "
+            "figures before composing them."
+        )
+    panel = metadata.get("panel")
+    if panel is None:
+        raise ValueError("Figure has invalid metadata: missing 'panel'")
+
+    # existing groups are shared, never mutated: the chart-hash -> color
+    # invariant holds, and the carrier claims no color-cycle slot (ADR 0018)
+    carrier = LayerGroup([TextLayer(texts)], max_colors=0)
+    new_panel = _PanelSeam(panel.groups + [carrier], panel.settings)
+
+    fig = new_figure(figsize=tuple(figure.get_size_inches()))
+    ax = fig.subplots(
+        subplot_kw=(
+            {"projection": "polar"} if new_panel.projection == "polar" else None
+        )
+    )
+    # the panel title renders as the figure suptitle when the panel is the figure
+    title = panel.settings.get("title")
+    new_panel.settings = {**panel.settings, "title": None}
+    new_panel.render(ax)
+    new_panel.settings = panel.settings
+    if title:
+        fig.suptitle(title, **get_text_style("title"))
+
+    fig._chart_metadata = {
+        "type": metadata["type"],
+        "panel": new_panel,
+    }
+
+    return fig
 
 
 def _grid_from_rows(

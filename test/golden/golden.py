@@ -30,9 +30,9 @@ from datachart.charts import (
     PyramidChart,
     RadialChart,
 )
-from datachart.utils import OverlayChart, FigureGridLayout, Panel, Grid
+from datachart.utils import OverlayChart, FigureGridLayout, Panel, Grid, Annotate
 from datachart.config import config
-from datachart.constants import THEME
+from datachart.constants import ARROW_STYLE, THEME
 
 # Cases whose output intentionally changed since the last published baseline.
 EXPECTED_CHANGES = {
@@ -73,6 +73,11 @@ EXPECTED_CHANGES = {
     "grid_subplot_figure",
     "grid_mixed_panel_and_grid",
     "grid_theme_mutation",
+    # new text annotation cases (ADR 0018)
+    "line_texts_annotated",
+    "overlay_annotated",
+    # the scatter correlation box now wears the plot_text_* family (ADR 0018)
+    "scatter_regression",
 }
 
 
@@ -309,6 +314,46 @@ def parallel_basic():
     ]
     return ParallelCoords(
         data=data, dimensions=["alpha", "beta", "cat"], hue="hue", show_legend=True
+    )
+
+
+# ----- text annotations (ADR 0018) -----
+
+
+@case
+def line_texts_annotated():
+    return LineChart(
+        data=LINE1,
+        title="Annotated",
+        texts=[
+            {"text": "curve look", "x": 1, "y": 55, "target": (6, 36)},
+            {
+                "text": "arrow look",
+                "x": 0.55,
+                "y": 0.2,
+                "coords": "axes",
+                "target": (8, 64),
+                "style": {"plot_text_arrow_style": ARROW_STYLE.ARROW},
+            },
+            {
+                "text": "boxless",
+                "x": 0.05,
+                "y": 0.9,
+                "coords": "axes",
+                "style": {"plot_text_box_visible": False},
+            },
+        ],
+    )
+
+
+@case
+def overlay_annotated():
+    fb = BarChart(data=BAR1)
+    fl = LineChart(data=LINE2)
+    panel = Panel([fb, fl], title="Annotated panel", show_legend=True)
+    return Annotate(
+        panel,
+        {"text": "peak", "x": 0.75, "y": 0.85, "coords": "axes", "target": (3, 30)},
     )
 
 

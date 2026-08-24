@@ -2,7 +2,8 @@
 constants class. Text-like constants (fonts, lines, hatches, legends, value
 formats, colorbars) are drawn with raw matplotlib; chart-setting constants
 (bar modes, histogram types, orientation, grid, scales, norms, emphasis,
-aspect ratios) render through the chart fronts (ADR 0013).
+aspect ratios, annotation connectors) render through the chart fronts
+(ADR 0013).
 
 Run from the repo root: python docs/assets/scripts/generate_constant_viz.py
 """
@@ -29,6 +30,7 @@ from datachart.charts import (
 )
 from datachart.config import config
 from datachart.constants import (
+    ARROW_STYLE,
     ASPECT_RATIO,
     BAR_MODE,
     COLORBAR_LOCATION,
@@ -290,6 +292,41 @@ def hatch_style():
     ax.set_ylim(0, rows)
     ax.axis("off")
     save(fig, "const-hatch-style.svg")
+
+
+def arrow_style():
+    members = [
+        ("CURVE", ARROW_STYLE.CURVE),
+        ("CURVE_ARROW", ARROW_STYLE.CURVE_ARROW),
+        ("TOUCHING", ARROW_STYLE.TOUCHING),
+        ("ARROW", ARROW_STYLE.ARROW),
+    ]
+    data = [
+        {"x": x, "y": y} for x, y in zip(range(10), [1, 3, 5, 8, 10, 11, 10, 8, 5, 3])
+    ]
+    figs = [
+        LineChart(
+            data=data,
+            title=f"ARROW_STYLE.{label}",
+            texts={
+                "text": "note",
+                "x": 0.78,
+                "y": 0.25,
+                "coords": "axes",
+                "target": (5, 11),
+                "style": {"plot_text_arrow_style": value},
+            },
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-arrow-style.svg",
+        3.4,
+        cols=2,
+        footnote="Same annotation under each look; curved looks pick their bow "
+        "side and depth against the data, TOUCHING starts flush at the box border.",
+    )
 
 
 def legend_align():
@@ -750,6 +787,7 @@ def main():
     line_style()
     line_draw_style()
     hatch_style()
+    arrow_style()
     legend_align()
     legend_location()
     value_format()

@@ -17,3 +17,5 @@ title: Utils Module
 ::: datachart.utils.Panel
 
 ::: datachart.utils.Grid
+
+::: datachart.utils.Annotate

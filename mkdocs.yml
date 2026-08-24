@@ -127,6 +127,7 @@ plugins:
           - how-to-guides/utility/index.md: Map of Panel, Grid, statistics, and figure saving.
           - how-to-guides/utility/panel.ipynb: "Overlaying multiple charts on one plot with Panel: dual y-axes, z-order, emphasis, and nesting panels."
           - how-to-guides/utility/grid.ipynb: Arranging multiple charts in a grid layout with Grid, including nested rows and layout specs.
+          - how-to-guides/utility/annotations.ipynb: "Text annotations on any chart: placement and coordinates, connector looks, text and box styling, and annotating finished figures with Annotate."
           - how-to-guides/utility/stats.ipynb: Statistical utilities for preparing chart data.
         Styling:
           - how-to-guides/styling/index.md: Map of configuration, themes, emphasis, and colormaps.
@@ -183,6 +184,7 @@ nav:
       - how-to-guides/utility/index.md
       - Panel: how-to-guides/utility/panel.ipynb
       - Grid: how-to-guides/utility/grid.ipynb
+      - Text Annotations: how-to-guides/utility/annotations.ipynb
       - Statistics: how-to-guides/utility/stats.ipynb
     - Styling:
       - how-to-guides/styling/index.md

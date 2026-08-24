@@ -28,6 +28,7 @@ from ._internal.layers import (
     HistogramLayer,
     ParallelCoordsLayer,
     RadialLayer,
+    TextLayer,
 )
 
 OVERLAYABLE_LAYERS = (
@@ -37,6 +38,7 @@ OVERLAYABLE_LAYERS = (
     HistogramLayer,
     ParallelCoordsLayer,
     RadialLayer,
+    TextLayer,
 )
 
 

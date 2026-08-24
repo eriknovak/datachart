@@ -29,6 +29,8 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         "plot_vline_style": LINE_STYLE.DASHED,
         "plot_hline_color": "#5D6D7E",
         "plot_hline_style": LINE_STYLE.DASHED,
+        "plot_text_box_edgecolor": "#B0B0B0",
+        "plot_text_arrow_color": "#5D6D7E",
         "plot_heatmap_cmap": COLORS.Greys,
         "plot_heatmap_frame_color": "#000000",
         "plot_regression_color": "#34495E",

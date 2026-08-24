@@ -9,6 +9,7 @@ from ..typings import (
     BarStyleAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
+    TextAttrs,
 )
 from ..constants import (
     FIG_SIZE,
@@ -46,6 +47,7 @@ def PyramidChart(
     ytickrotate: Optional[int] = None,
     vlines: Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs]]] = None,
     hlines: Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs]]] = None,
+    texts: Optional[Union[TextAttrs, List[TextAttrs]]] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
     y: Optional[Union[str, List[Optional[str]]]] = None,
     yerr: Optional[Union[str, List[Optional[str]]]] = None,
@@ -111,6 +113,7 @@ def PyramidChart(
         ytickrotate: Rotation angle for category-axis tick labels.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
+        texts: Text annotation(s) to draw.
         label: The key name in data for label values (default: "label").
         y: The key name in data for the bar values (default: "y").
         yerr: The key name in data for the bar error values (default: "yerr").
@@ -155,6 +158,7 @@ def PyramidChart(
         ytickrotate=ytickrotate,
         vlines=vlines,
         hlines=hlines,
+        texts=texts,
         label=label,
         y=y,
         yerr=yerr,

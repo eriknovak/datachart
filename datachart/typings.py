@@ -7,6 +7,7 @@ Classes:
     ChartCommonAttrs: The chart attributes common to all chart types.
     VLinePlotAttrs: The vertical line plot attributes.
     HLinePlotAttrs: The horizontal line plot attributes.
+    TextAttrs: The text annotation attributes.
     LineSingleChartAttrs: The single chart attributes for the line chart.
     LineDataPointAttrs: The data point attributes for the line chart.
     BarSingleChartAttrs: The single chart attributes for the bar chart.
@@ -36,6 +37,7 @@ Classes:
     HistStyleAttrs: The typing for the histogram style.
     VLineStyleAttrs: The typing for the vertical line style.
     HLineStyleAttrs: The typing for the horizontal line style.
+    TextStyleAttrs: The typing for the text annotation style.
     HeatmapStyleAttrs: The typing for the heatmap style.
     ScatterStyleAttrs: The typing for the scatter chart style.
     RegressionStyleAttrs: The typing for the regression line style.
@@ -50,6 +52,7 @@ from typing import TypedDict, Union, Tuple, List, Optional, Dict
 
 import matplotlib.colors as colors
 from .constants import (
+    ARROW_STYLE,
     BAR_MODE,
     FIG_SIZE,
     FONT_STYLE,
@@ -374,6 +377,47 @@ class HLineStyleAttrs(TypedDict):
     plot_hline_alpha: Union[float, None]
 
 
+class TextStyleAttrs(TypedDict):
+    """The typing for the text annotation style.
+
+    Attributes:
+        plot_text_color (Union[str, None]): The text color; falls back to the general font color.
+        plot_text_size (Union[int, float, str, None]): The text font size.
+        plot_text_weight (Union[FONT_WEIGHT, str, None]): The text font weight.
+        plot_text_halign (Union[str, None]): The horizontal alignment of the text.
+        plot_text_valign (Union[str, None]): The vertical alignment of the text.
+        plot_text_alpha (Union[float, None]): The alpha value of the text.
+        plot_text_box_visible (Union[bool, None]): Whether to draw the background box.
+        plot_text_box_style (Union[str, None]): The matplotlib box style (e.g. `"round,pad=0.4"`).
+        plot_text_box_facecolor (Union[str, None]): The face color of the box.
+        plot_text_box_edgecolor (Union[str, None]): The edge color of the box.
+        plot_text_box_edge_width (Union[int, float, None]): The edge width of the box.
+        plot_text_box_alpha (Union[float, None]): The alpha value of the box.
+        plot_text_arrow_style (Union[ARROW_STYLE, str, None]): The connector look (see `ARROW_STYLE`) or a raw matplotlib arrow style.
+        plot_text_arrow_curve (Union[float, None]): The connector curvature; overrides the look's own.
+        plot_text_arrow_color (Union[str, None]): The connector color.
+        plot_text_arrow_width (Union[int, float, None]): The connector line width.
+
+    """
+
+    plot_text_color: Union[str, None]
+    plot_text_size: Union[int, float, str, None]
+    plot_text_weight: Union[FONT_WEIGHT, str, None]
+    plot_text_halign: Union[str, None]
+    plot_text_valign: Union[str, None]
+    plot_text_alpha: Union[float, None]
+    plot_text_box_visible: Union[bool, None]
+    plot_text_box_style: Union[str, None]
+    plot_text_box_facecolor: Union[str, None]
+    plot_text_box_edgecolor: Union[str, None]
+    plot_text_box_edge_width: Union[int, float, None]
+    plot_text_box_alpha: Union[float, None]
+    plot_text_arrow_style: Union[ARROW_STYLE, str, None]
+    plot_text_arrow_curve: Union[float, None]
+    plot_text_arrow_color: Union[str, None]
+    plot_text_arrow_width: Union[int, float, None]
+
+
 class HeatmapStyleAttrs(TypedDict):
     """The typing for the heatmap chart style.
 
@@ -566,6 +610,7 @@ class StyleAttrs(
     HistStyleAttrs,
     VLineStyleAttrs,
     HLineStyleAttrs,
+    TextStyleAttrs,
     HeatmapStyleAttrs,
     ScatterStyleAttrs,
     RegressionStyleAttrs,
@@ -669,6 +714,35 @@ class HLinePlotAttrs(TypedDict):
 
 
 # ================================================
+# Text Annotation Attributes
+# ================================================
+
+
+class TextAttrs(TypedDict):
+    """The text annotation attributes.
+
+    Attributes:
+        text (str): The annotation text.
+        x (Union[int, float]): The x-axis position of the text.
+        y (Union[int, float]): The y-axis position of the text.
+        coords (Union[str, None]): The coordinate system of the text position:
+            `"data"` (default) or `"axes"` (axes fraction, `0`–`1`).
+        target (Union[Tuple[Union[int, float], Union[int, float]], None]): The
+            data point the connector points to, always in data coordinates.
+            When present, a connector is drawn from the text to the target.
+        style (Union[TextStyleAttrs, None]): The per-text style attributes.
+
+    """
+
+    text: str
+    x: Union[int, float]
+    y: Union[int, float]
+    coords: Union[str, None]
+    target: Union[Tuple[Union[int, float], Union[int, float]], None]
+    style: Union[TextStyleAttrs, None]
+
+
+# ================================================
 # Line Chart Attributes
 # ================================================
 
@@ -706,6 +780,7 @@ class LineSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
         x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
         y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
         yerr (Union[str, None]): The key name in `data` that contains the y-axis error value. Defaults to `"yerr"`.
@@ -727,6 +802,7 @@ class LineSingleChartAttrs(TypedDict):
 
     vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
     hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
+    texts: Union[TextAttrs, List[TextAttrs]]
 
     x: Union[str, None]  # the name of the x attribute in data (default: "x")
     y: Union[str, None]  # the name of the y attribute in data (default: "y")
@@ -790,6 +866,7 @@ class BarSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
         label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
         y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
         yerr (Union[str, None]): The key name in `data` that contains the y-axis error value. Defaults to `"yerr"`.
@@ -811,6 +888,7 @@ class BarSingleChartAttrs(TypedDict):
 
     vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
     hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
+    texts: Union[TextAttrs, List[TextAttrs]]
 
     label: Union[str, None]  # the name of the label attribute in data
     y: Union[str, None]  # the name of the y attribute in data
@@ -872,6 +950,7 @@ class HistogramSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
         x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
 
     """
@@ -891,6 +970,7 @@ class HistogramSingleChartAttrs(TypedDict):
 
     vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
     hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
+    texts: Union[TextAttrs, List[TextAttrs]]
 
     x: Union[str, None]  # the name of the x attribute in data
 
@@ -956,6 +1036,7 @@ class HeatmapSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
 
         colorbar (Union[HeatmapColorbarAttrs, None]): The heatmap colorbar attributes.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
 
     """
 
@@ -977,6 +1058,7 @@ class HeatmapSingleChartAttrs(TypedDict):
     ytickrotate: Union[int, None]
 
     colorbar: Union[HeatmapColorbarAttrs, None]
+    texts: Union[TextAttrs, List[TextAttrs]]
 
 
 class _HeatmapChartAttrs(ChartCommonAttrs):
@@ -1033,6 +1115,7 @@ class ScatterSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
         x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
         y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
         size (Union[str, None]): The key name in `data` that contains the marker size value.
@@ -1055,6 +1138,7 @@ class ScatterSingleChartAttrs(TypedDict):
 
     vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
     hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
+    texts: Union[TextAttrs, List[TextAttrs]]
 
     x: Union[str, None]
     y: Union[str, None]
@@ -1122,6 +1206,7 @@ class BoxSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
         label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
         value (Union[str, None]): The key name in `data` that contains the value. Defaults to `"value"`.
 
@@ -1142,6 +1227,7 @@ class BoxSingleChartAttrs(TypedDict):
 
     vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
     hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
+    texts: Union[TextAttrs, List[TextAttrs]]
 
     label: Union[str, None]  # the name of the label attribute in data
     value: Union[str, None]  # the name of the value attribute in data
@@ -1197,6 +1283,7 @@ class ParallelCoordsSingleChartAttrs(TypedDict):
         dimensions (Union[List[str], None]): The dimensions to include and their order.
         hue (Union[str, None]): The key name in `data` for categorical coloring.
         category_orders (Union[Dict[str, List[str]], None]): Custom order for categorical dimensions.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
 
     """
 
@@ -1208,6 +1295,7 @@ class ParallelCoordsSingleChartAttrs(TypedDict):
     dimensions: Union[List[str], None]
     hue: Union[str, None]
     category_orders: Union[Dict[str, List[str]], None]
+    texts: Union[TextAttrs, List[TextAttrs]]
 
 
 class _ParallelCoordsChartAttrs(ChartCommonAttrs):
@@ -1254,6 +1342,7 @@ class RadialSingleChartAttrs(TypedDict):
         data (List[RadialDataPointAttrs]): The list of data points defining the radial chart.
         subtitle (Union[str, None]): The subtitle of the radial chart. Also used as the label in the legend.
         style (Union[LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs, None]): The style of the radial chart, matching its visual.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
         label (Union[str, None]): The key name in `data` that contains the category label. Defaults to `"label"`.
         x (Union[str, None]): The key name in `data` that contains the angular observation. Defaults to `"x"`.
         y (Union[str, None]): The key name in `data` that contains the radial value. Defaults to `"y"`.
@@ -1264,6 +1353,7 @@ class RadialSingleChartAttrs(TypedDict):
     data: List[RadialDataPointAttrs]
     subtitle: Union[str, None]
     style: Union[LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs, None]
+    texts: Union[TextAttrs, List[TextAttrs]]
 
     label: Union[str, None]
     x: Union[str, None]

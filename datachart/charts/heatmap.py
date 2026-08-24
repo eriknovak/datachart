@@ -7,6 +7,7 @@ from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
     HeatmapStyleAttrs,
     HeatmapColorbarAttrs,
+    TextAttrs,
 )
 from ..constants import ASPECT_RATIO, FIG_SIZE, SHOW_GRID, VALUE_FORMAT
 
@@ -56,6 +57,13 @@ def Heatmap(
     ytickrotate: Optional[Union[int, List[Optional[int]]]] = None,
     colorbar: Optional[
         Union[HeatmapColorbarAttrs, List[Optional[HeatmapColorbarAttrs]]]
+    ] = None,
+    texts: Optional[
+        Union[
+            TextAttrs,
+            List[TextAttrs],
+            List[Union[TextAttrs, List[TextAttrs], None]],
+        ]
     ] = None,
 ) -> plt.Figure:
     """Creates the heatmap.
@@ -110,6 +118,7 @@ def Heatmap(
         yticklabels: Custom y-axis tick labels.
         ytickrotate: Rotation angle for y-axis tick labels.
         colorbar: Colorbar configuration(s).
+        texts: Text annotation(s) to draw.
 
     Returns:
         The figure containing the heatmap.
@@ -139,6 +148,7 @@ def Heatmap(
         vmax=vmax,
         valfmt=valfmt,
         colorbar=colorbar,
+        texts=texts,
     )
 
     # Figure-level settings; None values resolve to defaults downstream
