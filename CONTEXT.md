@@ -75,6 +75,25 @@ input and hands the engine an explicit charts structure and settings dict; it do
 not draw, and its signature is the allowlist of what the chart supports.
 _Avoid_: chart class, chart type (for the function), attrs dict
 
+**Pyramid**:
+A back-to-back horizontal bar figure (`PyramidChart`): exactly two sides sharing
+one category axis, drawn in opposite horizontal directions from a common zero
+line. Always horizontal; one call makes one pyramid, small multiples come from
+`Grid`, and `Panel` rejects pyramid figures.
+_Avoid_: population pyramid (for the front), tornado chart, butterfly chart
+
+**Side**:
+One of a pyramid's two bar series — the first is the left side, the second the
+right. Sides are supplied and displayed as positive quantities; users never
+write or see a signed value.
+_Avoid_: wing, half, direction
+
+**Mirror**:
+The pyramid's furniture treatment of the value axis: symmetric limits around
+zero and absolute-value display on ticks and value labels, so both sides read
+as positive magnitudes.
+_Avoid_: negative axis, diverging axis
+
 **Metadata transport**:
 The chart spec riding on a rendered figure (`figure._chart_metadata`) so composition
 functions (`Panel`, `Grid`) can rebuild it. Carries layers and panel settings, not
