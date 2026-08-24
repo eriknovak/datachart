@@ -38,6 +38,8 @@ dev = [
     "mkdocs-jupyter",
     # <1.2.3: 1.2.3 pulls in the properdocs fork of mkdocs and a build-time banner
     "mkdocs-redirects<1.2.3",
+    # pinned: upstream is in maintenance mode (ADR 0016)
+    "mkdocs-llmstxt==0.5.0",
     "mkdocstrings[python]",
 ]
 test = [
