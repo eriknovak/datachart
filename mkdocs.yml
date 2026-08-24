@@ -99,7 +99,8 @@ plugins:
       markdown_description: |
         datachart is a Python data visualization package built on matplotlib.
         It provides simple chart functions (BarChart, LineChart, ScatterChart,
-        Histogram, Heatmap, BoxPlot, ParallelCoords, RadialChart), figure
+        Histogram, Heatmap, BoxPlot, ParallelCoords, PyramidChart,
+        RadialChart), figure
         composition via Panel (overlaying charts on shared axes) and Grid
         (arranging charts in a grid), and a global configuration system with
         predefined themes.
@@ -119,6 +120,7 @@ plugins:
           - how-to-guides/charts/histogram.ipynb: Histogram input attributes, single and multiple datasets, and histogram views.
           - how-to-guides/charts/linechart.ipynb: Line chart input attributes, single and multiple datasets, customization, and saving.
           - how-to-guides/charts/parallelcoords.ipynb: Parallel coordinates input attributes and customization for multivariate data.
+          - how-to-guides/charts/pyramidchart.ipynb: Pyramid chart input attributes, the two-sides data contract, mirrored value axis controls, and composing pyramids with Grid.
           - how-to-guides/charts/radialchart.ipynb: Radial chart input attributes, the line, bar, scatter, and histogram visuals, and polar settings (start angle, direction, inner radius).
           - how-to-guides/charts/scatterchart.ipynb: Scatter chart input attributes, single and multiple datasets, customization, and saving.
         Composition & Utilities:
@@ -174,6 +176,7 @@ nav:
       - Histogram: how-to-guides/charts/histogram.ipynb
       - Line Chart: how-to-guides/charts/linechart.ipynb
       - Parallel Coordinates: how-to-guides/charts/parallelcoords.ipynb
+      - Pyramid Chart: how-to-guides/charts/pyramidchart.ipynb
       - Radial Chart: how-to-guides/charts/radialchart.ipynb
       - Scatter Chart: how-to-guides/charts/scatterchart.ipynb
     - Composition & Utilities:

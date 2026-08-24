@@ -16,6 +16,7 @@ It offers a wide range of chart types, including line charts, bar charts, histog
 | [Histogram](histogram.ipynb)                  | The showcase of the histogram.               |
 | [Line Chart](linechart.ipynb)                 | The showcase of the line chart.              |
 | [Parallel Coordinates](parallelcoords.ipynb)  | The showcase of the parallel coordinates.    |
+| [Pyramid Chart](pyramidchart.ipynb)           | The showcase of the pyramid chart.           |
 | [Radial Chart](radialchart.ipynb)             | The showcase of the radial chart.            |
 | [Scatter Chart](scatterchart.ipynb)           | The showcase of the scatter chart.           |
 

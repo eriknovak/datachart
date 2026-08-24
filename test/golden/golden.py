@@ -27,6 +27,7 @@ from datachart.charts import (
     Heatmap,
     BoxPlot,
     ParallelCoords,
+    PyramidChart,
     RadialChart,
 )
 from datachart.utils import OverlayChart, FigureGridLayout, Panel, Grid
@@ -62,6 +63,16 @@ EXPECTED_CHANGES = {
     "radial_grid_mixed",
     "radial_bar_tip_labels",
     "radial_line_values",
+    # new pyramid chart cases (ADR 0017)
+    "pyramid_basic",
+    "pyramid_values_xmax",
+    "pyramid_styled_ticks",
+    "pyramid_grid_pair",
+    # nested/subplot grid cells now align their axes with the host columns
+    "grid_with_overlay",
+    "grid_subplot_figure",
+    "grid_mixed_panel_and_grid",
+    "grid_theme_mutation",
 }
 
 
@@ -751,6 +762,95 @@ def radial_grid_mixed():
     fr = RadialChart(data=RAD1, type="bar", title="Rose")
     fl = LineChart(data=LINE1, title="Line")
     return Grid([fr, fl], max_cols=2, figsize=(10, 4))
+
+
+def pyr_side(base, boom_age, boom_size, taper, phase):
+    """A deterministic single-year age distribution: 80 bands per side."""
+    return [
+        {
+            "label": str(age),
+            "y": round(
+                max(
+                    base
+                    - age * taper
+                    + boom_size * np.exp(-((age - boom_age) ** 2) / 120)
+                    + 55 * np.sin(age / 5.5 + phase),
+                    40.0,
+                ),
+                1,
+            ),
+        }
+        for age in range(80)
+    ]
+
+
+def pyr_bands(side, width=2):
+    """Aggregate a single-year side into `width`-year bands."""
+    return [
+        {
+            "label": f"{lo}-{lo + width - 1}",
+            "y": round(sum(p["y"] for p in side[lo : lo + width]), 1),
+        }
+        for lo in range(0, len(side), width)
+    ]
+
+
+PYR1 = pyr_side(base=920, boom_age=31, boom_size=380, taper=6.5, phase=0.4)
+PYR2 = pyr_side(base=860, boom_age=42, boom_size=430, taper=5.8, phase=2.1)
+
+
+@case
+def pyramid_basic():
+    return PyramidChart(
+        data=[PYR1, PYR2],
+        subtitle=["Group A", "Group B"],
+        title="Pyramid",
+        xlabel="Residents",
+        ylabel="Age",
+        show_legend=True,
+        yticks=list(range(0, 80, 10)),
+    )
+
+
+@case
+def pyramid_values_xmax():
+    return PyramidChart(
+        data=[pyr_bands(PYR1), pyr_bands(PYR2)],
+        show_values=True,
+        value_format="%.0f",
+        style={"plot_bar_value_fontsize": 6},
+        xmax=2600,
+        show_grid="x",
+        figsize=(10, 8),
+    )
+
+
+@case
+def pyramid_styled_ticks():
+    styles = [{"plot_bar_hatch": "//"}, {"plot_bar_edge_color": "#222222"}]
+    return PyramidChart(
+        data=[pyr_bands(PYR1), pyr_bands(PYR2)],
+        style=styles,
+        xticks=[0, 1000, 2000],
+        xticklabels=["0", "1k", "2k"],
+    )
+
+
+@case
+def pyramid_grid_pair():
+    fa = PyramidChart(
+        data=[PYR1, PYR2],
+        subtitle=["A", "B"],
+        title="2010",
+        yticks=list(range(0, 80, 10)),
+    )
+    fb = PyramidChart(
+        data=[PYR2, PYR1],
+        subtitle=["A", "B"],
+        title="2020",
+        yticks=list(range(0, 80, 10)),
+    )
+    return Grid([fa, fb], max_cols=2, figsize=(10, 4))
 
 
 @case
