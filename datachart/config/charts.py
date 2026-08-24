@@ -29,4 +29,8 @@ CHART_CONFIGS = {
         "multiplot": True,
         "subplots": False,
     },
+    "radialchart": {
+        "multiplot": True,
+        "subplots": True,
+    },
 }

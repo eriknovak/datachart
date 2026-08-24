@@ -27,6 +27,7 @@ from datachart.charts import (
     Heatmap,
     BoxPlot,
     ParallelCoords,
+    RadialChart,
 )
 from datachart.utils import OverlayChart, FigureGridLayout, Panel, Grid
 from datachart.config import config
@@ -50,6 +51,15 @@ EXPECTED_CHANGES = {
     # new horizontal panel cases (ADR 0012)
     "overlay_horizontal_bar_line_dual",
     "overlay_horizontal_bar_bar_line",
+    # new radial chart cases (ADR 0014)
+    "radial_line",
+    "radial_line_area_donut",
+    "radial_bar",
+    "radial_bar_stacked",
+    "radial_scatter",
+    "radial_hist_rose",
+    "radial_panel_two",
+    "radial_grid_mixed",
 }
 
 
@@ -655,6 +665,68 @@ def grid_mixed_panel_and_grid():
     panel = Panel([fb, fl], title="Panel", show_legend=True)
     grid_fig = Grid([LineChart(data=LINE1), ScatterChart(data=SCAT1)], title="Sub")
     return Grid([panel, grid_fig], figsize=(12, 5))
+
+
+COMPASS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+RAD1 = [{"label": d, "y": v} for d, v in zip(COMPASS, [4, 7, 6, 3, 5, 8, 2, 6])]
+RAD2 = [{"label": d, "y": v} for d, v in zip(COMPASS, [6, 3, 5, 7, 2, 4, 8, 3])]
+
+
+def wind_directions(n=200):
+    rng = np.random.RandomState(11)
+    return [{"x": float(v % 360)} for v in rng.vonmises(np.pi / 4, 2, n) * 180 / np.pi]
+
+
+@case
+def radial_line():
+    return RadialChart(
+        data=[RAD1, RAD2], subtitle=["a", "b"], show_legend=True, title="Radar"
+    )
+
+
+@case
+def radial_line_area_donut():
+    return RadialChart(data=RAD1, show_area=True, innerradius=0.25, startangle="E")
+
+
+@case
+def radial_bar():
+    return RadialChart(data=RAD1, type="bar", title="Circular bars", show_grid="both")
+
+
+@case
+def radial_bar_stacked():
+    return RadialChart(
+        data=[RAD1, RAD2],
+        type="bar",
+        bar_mode="stack",
+        subtitle=["a", "b"],
+        show_legend=True,
+    )
+
+
+@case
+def radial_scatter():
+    return RadialChart(data=RAD1, type="scatter", direction="counterclockwise")
+
+
+@case
+def radial_hist_rose():
+    return RadialChart(data=wind_directions(), type="histogram", num_bins=16)
+
+
+@case
+def radial_panel_two():
+    f1 = RadialChart(data=RAD1, subtitle="a")
+    f2 = RadialChart(data=RAD2, type="bar", subtitle="b")
+    return Panel([f2, f1], title="Radial panel", show_legend=True)
+
+
+@case
+def radial_grid_mixed():
+    fr = RadialChart(data=RAD1, type="bar", title="Rose")
+    fl = LineChart(data=LINE1, title="Line")
+    return Grid([fr, fl], max_cols=2, figsize=(10, 4))
 
 
 @case

@@ -79,10 +79,20 @@ def _render_cell(owner: plt.Figure, cell: Dict[str, Any], target_ax: plt.Axes) -
         sub_gs = target_ax.get_subplotspec().subgridspec(nrows_sub, ncols_sub)
         target_ax.remove()
         for p_idx, subplot_panel in enumerate(panels):
-            sub_ax = owner.add_subplot(sub_gs[p_idx // ncols_sub, p_idx % ncols_sub])
+            sub_ax = owner.add_subplot(
+                sub_gs[p_idx // ncols_sub, p_idx % ncols_sub],
+                projection=("polar" if subplot_panel.projection == "polar" else None),
+            )
             sub_ax.axis("off")
             subplot_panel.render(sub_ax)
         return
+
+    # each cell's axes carries its panel's projection; polar cells swap
+    # the pre-created rectilinear axes for a polar one in the same slot
+    if cell["panel"].layers and cell["panel"].projection == "polar":
+        subplot_spec = target_ax.get_subplotspec()
+        target_ax.remove()
+        target_ax = owner.add_subplot(subplot_spec, projection="polar")
 
     target_ax.axis("off")
     if cell["panel"].layers:
@@ -136,8 +146,11 @@ def _render_grid_node(
             _render_grid_node(owner, cell["grid"], cell_spec)
             continue
         # a multi-subplot cell's spanning axes is removed during render — it
-        # must neither anchor nor join the share group (dead-axes crash)
-        shareable = "panels" not in cell
+        # must neither anchor nor join the share group (dead-axes crash);
+        # polar cells swap their axes and share no cartesian limits either
+        shareable = "panels" not in cell and (
+            not cell["panel"].layers or cell["panel"].projection != "polar"
+        )
         ax = owner.add_subplot(
             cell_spec,
             sharex=first_ax if node["sharex"] and shareable else None,

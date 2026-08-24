@@ -57,7 +57,14 @@ from .config_helpers import (
     configure_axis_limits,
 )
 from ..stats import minimum, maximum
-from ...constants import ASPECT_RATIO, EMPHASIS, ORIENTATION, VALUE_FORMAT
+from ...constants import (
+    ASPECT_RATIO,
+    DIRECTION,
+    EMPHASIS,
+    ORIENTATION,
+    RADIAL_TYPE,
+    VALUE_FORMAT,
+)
 from ...config import config
 
 DEFAULT_NUM_BINS = 20
@@ -80,6 +87,12 @@ DEFAULT_MUTED_COLOR = "#CFCFCF"
 DEFAULT_MUTED_ALPHA = 0.5
 # matplotlib skips underscore-prefixed labels when assembling the legend
 NO_LEGEND = "_nolegend_"
+# radial furniture defaults: compass and calendar conventions (ADR 0014)
+DEFAULT_STARTANGLE = "N"
+DEFAULT_DIRECTION = DIRECTION.CLOCKWISE
+COMPASS_LOCATIONS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
+# polar r-value labels are redrawn above every data mark (grid stays below)
+RADIAL_VALUE_LABEL_Z = 6
 
 
 def _scatter_legend_handle(legend_handle, orig_handle):
@@ -262,6 +275,8 @@ class Layer:
     kind: str = ""
     # None for layers without an orientation; they follow the panel
     is_horizontal: Optional[bool] = None
+    # the coordinate space the layer draws in; a panel property (ADR 0014)
+    projection: str = "cartesian"
 
     def __init__(self, chart: dict, settings: dict):
         self.chart = chart
@@ -1286,6 +1301,229 @@ def compute_parallel_stats(layers: List["ParallelCoordsLayer"]) -> Optional[dict
     }
 
 
+# ================================================
+# Radial Layers
+# ================================================
+
+
+def _radial_theta(n: int) -> np.ndarray:
+    """Evenly spaced angular category positions, in radians."""
+
+    return np.linspace(0, 2 * np.pi, n, endpoint=False)
+
+
+class RadialLayer(Layer):
+    """A layer drawn on a polar axes; angles are degrees in, radians internally."""
+
+    projection = "polar"
+    # categorical layers place their labels evenly around the circle
+    is_categorical = True
+
+    def labels(self) -> Optional[np.ndarray]:
+        return get_chart_data("label", self.chart)
+
+    def y_range(self):
+        y = get_chart_data("y", self.chart)
+        if y is None or len(y) == 0:
+            return None
+        return (float(np.min(y)), float(np.max(y)))
+
+    def apply_scales(self, ax, scalex, scaley):
+        # a polar axes rejects set_xscale; only the radial (value) axis scales
+        if scaley:
+            ax.set_yscale(scaley)
+
+
+class RadialLineLayer(RadialLayer):
+    kind = "radial-line"
+
+    def _resolve_style(self):
+        self.line_style = get_line_style(self.style)
+        self.area_style = get_area_style(self.style)
+        self.show_yerr = self.settings.get("show_yerr")
+        self.show_area = self.settings.get("show_area")
+
+    def _resolved_area_style(self, ctx):
+        area_style = self._merge_color("color", ctx.color, self.area_style)
+        if ctx.z_order is not None:
+            area_style["zorder"] = ctx.z_order - 0.1
+        if ctx.emphasis == EMPHASIS_BACKGROUND:
+            area_style["color"] = self.muted_color
+        return area_style
+
+    def draw(self, ax, ctx):
+        y = get_chart_data("y", self.chart)
+        labels = self.labels()
+        if y is None or labels is None:
+            return
+
+        theta = _radial_theta(len(y))
+        # close the polygon: the first point repeats one full turn later, so
+        # the closing segment sweeps the short arc forward
+        theta = np.append(theta, theta[0] + 2 * np.pi)
+        y = np.append(y, y[0])
+
+        line_style = self._merge_color("color", ctx.color, self.line_style)
+        if ctx.z_order is not None:
+            line_style["zorder"] = ctx.z_order
+        self._apply_emphasis(line_style, ctx.emphasis)
+
+        yerr = get_chart_data("yerr", self.chart)
+        if self.show_yerr and isinstance(yerr, np.ndarray) and len(yerr) == len(y) - 1:
+            yerr = np.append(yerr, yerr[0])
+            ax.fill_between(theta, y - yerr, y + yerr, **self._resolved_area_style(ctx))
+
+        ax.plot(theta, y, **line_style, label=self.label(ctx))
+
+        if self.show_area:
+            # the fill reaches the center (or the innerradius hole clips it)
+            ax.fill_between(theta, 0.0, y, **self._resolved_area_style(ctx))
+
+
+class RadialBarLayer(RadialLayer):
+    kind = "radial-bar"
+    show_values = False
+
+    def _resolve_style(self):
+        self.bar_style = get_bar_style(self.style)
+        self.show_yerr = self.settings.get("show_yerr")
+
+    def labels(self) -> Optional[np.ndarray]:
+        return get_chart_data("label", self.chart)
+
+    def y_values(self) -> Optional[np.ndarray]:
+        return get_chart_data("y", self.chart)
+
+    @property
+    def bar_width(self) -> float:
+        """The layer's resolved `plot_bar_width`, as a fraction of the sector width."""
+        return self.bar_style.get("width", config["plot_bar_width"])
+
+    def draw(self, ax, ctx):
+        y = self.y_values()
+        labels = self.labels()
+        if y is None or labels is None:
+            return
+
+        sector = 2 * np.pi / len(labels)
+        theta = _radial_theta(len(labels))
+
+        bar_style = self._merge_color("color", ctx.color, self.bar_style)
+        if ctx.z_order is not None:
+            bar_style["zorder"] = ctx.z_order
+        if ctx.alpha is not None:
+            bar_style["alpha"] = ctx.alpha
+        if ctx.hatch is not None and "hatch" not in bar_style:
+            bar_style["hatch"] = ctx.hatch or None
+        self._apply_emphasis(bar_style, ctx.emphasis, width_key="linewidth")
+
+        yerr = get_chart_data("yerr", self.chart) if self.show_yerr else None
+
+        # panel bar slots are fractions of the category width; here a
+        # category is one sector, so the slot scales to radians at draw time
+        slot = ctx.bar_slot
+        theta_offset = 0.0
+        if slot is not None:
+            bar_style["width"] = slot.width * sector
+            theta_offset = slot.offset * sector
+            if slot.bottom is not None:
+                bar_style["bottom"] = slot.bottom
+            if not slot.show_yerr:
+                yerr = None
+        else:
+            bar_style["width"] = self.bar_width * sector
+
+        ax.bar(theta + theta_offset, y, yerr=yerr, label=self.label(ctx), **bar_style)
+
+
+class RadialScatterLayer(RadialLayer):
+    kind = "radial-scatter"
+
+    def _resolve_style(self):
+        self.scatter_style = get_scatter_style(self.style)
+        # a highlight edge contrasts in the theme's own text color
+        self.highlight_edge_color = config.get("font_general_color") or "#000000"
+
+    def draw(self, ax, ctx):
+        y = get_chart_data("y", self.chart)
+        labels = self.labels()
+        if y is None or labels is None:
+            return
+
+        scatter_style = dict(self.scatter_style)
+        if ctx.z_order is not None:
+            scatter_style["zorder"] = ctx.z_order
+        self._apply_emphasis(
+            scatter_style, ctx.emphasis, width_key="linewidths", color_key=None
+        )
+        if ctx.emphasis == EMPHASIS_HIGHLIGHT:
+            scatter_style["edgecolors"] = self.highlight_edge_color
+        if scatter_style.get("c") is None:
+            scatter_style["c"] = ctx.color
+        if ctx.emphasis == EMPHASIS_BACKGROUND:
+            scatter_style["c"] = self.muted_color
+
+        ax.scatter(_radial_theta(len(y)), y, label=self.label(ctx), **scatter_style)
+
+
+class RadialHistogramLayer(RadialLayer):
+    kind = "radial-histogram"
+    is_categorical = False
+
+    def _resolve_style(self):
+        hist_style = get_hist_style(self.style)
+        # the rose draws through ax.bar; histtype/align are ax.hist-only knobs
+        hist_style.pop("histtype", None)
+        hist_style.pop("align", None)
+        self.hist_style = hist_style
+        self.num_bins = self.settings.get("num_bins") or DEFAULT_NUM_BINS
+
+    def x_values(self) -> Optional[np.ndarray]:
+        return get_chart_data("x", self.chart)
+
+    def _counts(self) -> Optional[tuple]:
+        x = self.x_values()
+        if x is None or len(x) == 0:
+            return None
+        # observations are degrees; the fixed [0, 360) domain keeps bin edges
+        # shared across every radial histogram in a panel
+        return np.histogram(
+            np.asarray(x, dtype=float) % 360.0, bins=self.num_bins, range=(0.0, 360.0)
+        )
+
+    def y_range(self):
+        binned = self._counts()
+        if binned is None:
+            return None
+        counts, _ = binned
+        return (float(np.min(counts)), float(np.max(counts)))
+
+    def draw(self, ax, ctx):
+        binned = self._counts()
+        if binned is None:
+            return
+
+        hist_style = self._merge_color("color", ctx.color, self.hist_style)
+        if ctx.z_order is not None:
+            hist_style["zorder"] = ctx.z_order
+        if ctx.alpha is not None:
+            hist_style["alpha"] = ctx.alpha
+        if ctx.hatch is not None and "hatch" not in hist_style:
+            hist_style["hatch"] = ctx.hatch or None
+        self._apply_emphasis(hist_style, ctx.emphasis, width_key="linewidth")
+
+        counts, edges = binned
+        theta_edges = np.deg2rad(edges)
+        centers = (theta_edges[:-1] + theta_edges[1:]) / 2
+        ax.bar(
+            centers,
+            counts,
+            width=np.diff(theta_edges),
+            label=self.label(ctx),
+            **hist_style,
+        )
+
+
 LAYER_TYPES = {
     "linechart": LineLayer,
     "barchart": BarLayer,
@@ -1295,12 +1533,29 @@ LAYER_TYPES = {
     "heatmap": HeatmapLayer,
 }
 
+RADIAL_LAYER_TYPES = {
+    RADIAL_TYPE.LINE: RadialLineLayer,
+    RADIAL_TYPE.BAR: RadialBarLayer,
+    RADIAL_TYPE.SCATTER: RadialScatterLayer,
+    RADIAL_TYPE.HISTOGRAM: RadialHistogramLayer,
+}
+
 
 def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[Layer]:
     """Build the layers for a chart front; style resolution happens here."""
 
     if chart_type == "parallelcoords":
         return [ParallelCoordsLayer(list(charts), settings)]
+
+    if chart_type == "radialchart":
+        visual = settings.get("radial_type") or RADIAL_TYPE.LINE
+        if visual not in RADIAL_LAYER_TYPES:
+            raise ValueError(
+                f"Invalid radial `type` value {visual!r}. "
+                f"Must be one of {sorted(RADIAL_LAYER_TYPES)}."
+            )
+        layer_cls = RADIAL_LAYER_TYPES[visual]
+        return [layer_cls(chart, settings) for chart in charts]
 
     layer_cls = LAYER_TYPES[chart_type]
     layers = [layer_cls(chart, settings) for chart in charts]
@@ -1563,6 +1818,22 @@ class Panel:
             )
         return flags == {True}
 
+    @property
+    def projection(self) -> str:
+        """The panel's coordinate space kind: "cartesian" or "polar".
+
+        Raises:
+            ValueError: If layers of both projections share the panel.
+        """
+
+        kinds = {l.projection for l in self.layers}
+        if len(kinds) > 1:
+            raise ValueError(
+                "Cannot mix polar and cartesian charts in one panel. "
+                "One coordinate space holds one projection; use `Grid` instead."
+            )
+        return "polar" if kinds == {"polar"} else "cartesian"
+
     # ---------------- furniture ----------------
 
     @staticmethod
@@ -1609,8 +1880,14 @@ class Panel:
             return
         if spines:
             ax.axis("on")
-            for axis, spine_style in furniture["spines"].items():
-                ax.spines[axis].set(**spine_style)
+            if ax.name == "polar":
+                # a polar axes has no top/bottom/left/right; every polar spine
+                # ('polar', 'start', 'end', 'inner') wears the category-axis style
+                for spine in ax.spines.values():
+                    spine.set(**furniture["spines"]["bottom"])
+            else:
+                for axis, spine_style in furniture["spines"].items():
+                    ax.spines[axis].set(**spine_style)
         for axis_type in axes_types:
             getattr(ax, axis_type).set_tick_params(which="major", **furniture["ticks"])
 
@@ -1627,12 +1904,14 @@ class Panel:
             )
 
         horizontal = self.horizontal
+        polar = self.projection == "polar"
         self._apply_furniture(ax)
 
-        # twin-axis assignment: the secondary axis is always a value axis
+        # twin-axis assignment: the secondary axis is always a value axis;
+        # a polar panel has one value axis, so twins never apply
         assignments = ["left"] * len(self.groups)
         ax_right = None
-        if s.get("twin_axes"):
+        if s.get("twin_axes") and not polar:
             assignments = determine_axis_assignment(
                 self.groups,
                 s.get("auto_threshold", 3.0),
@@ -1646,8 +1925,11 @@ class Panel:
                     spines=False,
                 )
 
-        # bar slotting across every layer in the panel
-        bar_layers = [l for l in self.layers if isinstance(l, BarLayer)]
+        # bar slotting across every layer in the panel; radial bars share the
+        # machinery — their slots are sector fractions, scaled at draw time
+        bar_layers = [
+            l for l in self.layers if isinstance(l, (BarLayer, RadialBarLayer))
+        ]
         bar_mode = s.get("bar_mode") or "group"
         if bar_mode not in ["group", "stack", "overlay"]:
             warnings.warn(
@@ -1792,15 +2074,27 @@ class Panel:
                     ),
                     alpha=(
                         bar_alpha
-                        if isinstance(layer, BarLayer)
-                        else (hist_alpha if isinstance(layer, HistogramLayer) else None)
+                        if isinstance(layer, (BarLayer, RadialBarLayer))
+                        else (
+                            hist_alpha
+                            if isinstance(layer, (HistogramLayer, RadialHistogramLayer))
+                            else None
+                        )
                     ),
                     bar_slot=bar_slots.get(id(layer)),
                     bins=bins,
                     hatch=(
                         hatch_assignments[layer.chart_hash]
                         if hatch_assignments is not None
-                        and isinstance(layer, (BarLayer, HistogramLayer))
+                        and isinstance(
+                            layer,
+                            (
+                                BarLayer,
+                                HistogramLayer,
+                                RadialBarLayer,
+                                RadialHistogramLayer,
+                            ),
+                        )
                         else None
                     ),
                     emphasis=role,
@@ -1865,6 +2159,7 @@ class Panel:
 
         s = self.settings
         layers = self.layers
+        polar = self.projection == "polar"
 
         # scales (a layer may remap them, e.g. horizontal box plots)
         if layers and (s.get("scalex") or s.get("scaley")):
@@ -1873,6 +2168,10 @@ class Panel:
         # grid
         if s.get("show_grid"):
             ax.grid(axis=s["show_grid"], **s.get("grid_style", {}))
+        if polar:
+            # the marks sit above the grid; the r-value labels are redrawn
+            # above the marks in _apply_radial_furniture
+            ax.set_axisbelow(True)
 
         # line charts pin the category-axis limits to their data range
         if s.get("tighten_xlim"):
@@ -1885,8 +2184,22 @@ class Panel:
 
         # bar category ticks
         bar_ticks = s.get("bar_ticks")
-        if bar_ticks and bar_layers:
+        if bar_ticks and bar_layers and not polar:
             self._apply_bar_ticks(ax, bar_ticks, bar_layers)
+
+        # angular category ticks: labels sit evenly around the circle
+        if polar:
+            label_sets = [
+                l.labels()
+                for l in layers
+                if isinstance(l, RadialLayer) and l.is_categorical
+            ]
+            label_sets = [lbl for lbl in label_sets if lbl is not None and len(lbl)]
+            if label_sets:
+                # the widest layer supplies the labels when counts differ
+                cat_labels = max(label_sets, key=len)
+                ax.set_xticks(_radial_theta(len(cat_labels)))
+                ax.set_xticklabels(cat_labels)
 
         # user-provided tick positions
         for layer in layers:
@@ -1914,12 +2227,16 @@ class Panel:
                 s.get("ymin_right"), s.get("ymax_right")
             )
 
+        # radial furniture reads the final r limits, so it follows them
+        if polar:
+            self._apply_radial_furniture(ax)
+
         # reference lines
         for layer, target_ax in zip(layers, [ax] * len(layers)):
             _draw_ref_lines(target_ax, layer.vlines, layer.hlines)
 
-        # aspect ratio
-        if s.get("aspect_ratio"):
+        # aspect ratio (a polar axes keeps its own fixed aspect)
+        if s.get("aspect_ratio") and not polar:
             ax.set(adjustable="box", aspect=s["aspect_ratio"])
 
         # panel-level labels (used when a panel renders into a grid cell)
@@ -2001,6 +2318,69 @@ class Panel:
                 rotation = rotation_default
             ax.set_xticklabels(labels, rotation=rotation)
 
+    def _apply_radial_furniture(self, ax) -> None:
+        """Apply start angle, direction, and inner radius; elevate the r labels."""
+
+        s = self.settings
+
+        startangle = s.get("startangle")
+        startangle = DEFAULT_STARTANGLE if startangle is None else startangle
+        if isinstance(startangle, str):
+            ax.set_theta_zero_location(startangle)
+        else:
+            # a numeric startangle is a compass bearing: degrees clockwise
+            # from north, matching the compass-string form
+            ax.set_theta_zero_location("N", offset=-float(startangle))
+
+        direction = s.get("direction") or DEFAULT_DIRECTION
+        ax.set_theta_direction(-1 if direction == DIRECTION.CLOCKWISE else 1)
+
+        innerradius = s.get("innerradius") or 0.0
+        if innerradius:
+            rmin, rmax = ax.get_ylim()
+            # r = rorigin maps to the center: the hole takes the given
+            # fraction of the drawn radial extent
+            ax.set_rorigin(rmin - innerradius / (1 - innerradius) * (rmax - rmin))
+
+        self._elevate_radial_value_labels(ax)
+
+    def _elevate_radial_value_labels(self, ax) -> None:
+        """Redraw the r tick labels above the marks, in black.
+
+        The native axis draws grid lines and tick labels in one layer, so the
+        labels cannot sit above the data while the grid stays below it.
+        """
+
+        rmin, rmax = ax.get_ylim()
+        ticks = [t for t in ax.yaxis.get_ticklocs() if rmin < t <= rmax]
+        if not ticks:
+            return
+        texts = ax.yaxis.get_major_formatter().format_ticks(ticks)
+        ax.set_yticks(ticks, labels=[""] * len(ticks))
+
+        furniture = self.settings.get("furniture") or {}
+        tick_style = furniture.get("ticks", {})
+        theta = np.deg2rad(ax.get_rlabel_position())
+        for r, text in zip(ticks, texts):
+            ax.text(
+                theta,
+                r,
+                text,
+                ha="center",
+                va="center",
+                fontsize=tick_style.get("labelsize"),
+                fontfamily=furniture.get("font_family"),
+                color="#000000",
+                zorder=RADIAL_VALUE_LABEL_Z,
+                # a soft halo keeps the label legible over dark marks
+                bbox=dict(
+                    boxstyle="round,pad=0.15",
+                    facecolor="#FFFFFF",
+                    edgecolor="none",
+                    alpha=0.6,
+                ),
+            )
+
     @staticmethod
     def _combine_legends(ax_left, ax_right, legend_style, horizontal=False) -> None:
         handles_left, labels_left = ax_left.get_legend_handles_labels()
@@ -2056,6 +2436,10 @@ def build_chart_panel_settings(
         "legend_style": get_legend_style(),
         "bar_mode": settings.get("bar_mode") or "group",
         "tighten_xlim": chart_type == "linechart",
+        # radial furniture; only polar panels read these
+        "startangle": settings.get("startangle"),
+        "direction": settings.get("direction"),
+        "innerradius": settings.get("innerradius"),
     }
 
     if mode == "subplot":

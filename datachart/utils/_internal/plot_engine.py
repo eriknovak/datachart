@@ -69,6 +69,7 @@ def render_chart(
         sharex=False if sharex is None else sharex,
         sharey=False if sharey is None else sharey,
         squeeze=False,
+        subplot_kw=({"projection": "polar"} if chart_type == "radialchart" else None),
         **subplot_config,
     )
 
