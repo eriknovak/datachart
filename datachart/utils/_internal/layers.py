@@ -457,6 +457,7 @@ def _abs_bar_value_fmt(value_format):
         magnitude = abs(value)
         if isinstance(value_format, mticker.Formatter):
             return value_format(magnitude)
+        # printf first, {}-style on failure: mirrors bar_label's own fmt handling
         try:
             return value_format % (magnitude,)
         except (TypeError, ValueError):

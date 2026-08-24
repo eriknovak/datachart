@@ -3,7 +3,7 @@ from typing import Union, List, Optional, Tuple
 import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.chart_builder import build_charts_structure, _get_indexed_value
 from ..typings import (
     BarDataPointAttrs,
     BarStyleAttrs,
@@ -20,13 +20,6 @@ from ..constants import (
 # ================================================
 # Main Chart Definition
 # ================================================
-
-
-def _side_value(value, index: int):
-    """Resolve a per-side option: lists index by side, scalars apply to both."""
-    if isinstance(value, list):
-        return value[index] if index < len(value) else None
-    return value
 
 
 def PyramidChart(
@@ -147,7 +140,7 @@ def PyramidChart(
         )
 
     # the left side draws in the negative direction; users pass positive values
-    left_y_key = _side_value(y, 0) or "y"
+    left_y_key = _get_indexed_value(y, 0) or "y"
     left_side = [
         {**point, left_y_key: -point[left_y_key]} if left_y_key in point else point
         for point in data[0]
