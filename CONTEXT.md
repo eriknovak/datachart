@@ -94,6 +94,21 @@ zero and absolute-value display on ticks and value labels, so both sides read
 as positive magnitudes.
 _Avoid_: negative axis, diverging axis
 
+**Text**:
+A per-chart annotation — a string placed at a position (data coordinates by
+default, axes-fraction on request) with an optional arrow to a target point,
+a styleable font, background box, and connector. Declared with the chart
+(`texts=`) like reference lines, stored on the layer, drawn by the panel after
+limits are set — so it survives composition.
+_Avoid_: annotation (for the API name), callout, note
+
+**Annotate**:
+The post-hoc front (`datachart.utils.Annotate`) that adds texts to an already
+rendered figure by appending a carrier text layer (no data, no legend or color
+participation) to its panel and re-rendering. Rejects grid figures — annotate
+the sources before composing.
+_Avoid_: overlay text, label function
+
 **Metadata transport**:
 The chart spec riding on a rendered figure (`figure._chart_metadata`) so composition
 functions (`Panel`, `Grid`) can rebuild it. Carries layers and panel settings, not
