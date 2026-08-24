@@ -21,6 +21,8 @@ Classes:
     BoxDataPointAttrs: The data point attributes for the box plot.
     ParallelCoordsSingleChartAttrs: The single chart attributes for the parallel coordinates chart.
     ParallelCoordsDataPointAttrs: The data point attributes for the parallel coordinates chart.
+    RadialSingleChartAttrs: The single chart attributes for the radial chart.
+    RadialDataPointAttrs: The data point attributes for the radial chart.
 
     StyleAttrs: The style typing.
     ColorStyleAttrs: The typing for the general color style.
@@ -60,6 +62,9 @@ from .constants import (
     LEGEND_ALIGN,
     LEGEND_LOCATION,
     ORIENTATION,
+    BAR_MODE,
+    DIRECTION,
+    RADIAL_TYPE,
     COLORS,
     SHOW_GRID,
     SCALE,
@@ -1217,6 +1222,93 @@ class _ParallelCoordsChartAttrs(ChartCommonAttrs):
 
 
 # ================================================
+# Radial Chart Attributes
+# ================================================
+
+
+class RadialDataPointAttrs(TypedDict):
+    """The data point attributes for the radial chart.
+
+    The line, bar, and scatter visuals take `label`/`y` points whose labels
+    are placed evenly around the circle; the histogram visual takes numeric
+    `x` observations in degrees.
+
+    Attributes:
+        label (str): The category label (line, bar, and scatter visuals).
+        y (Union[int, float]): The radial value (line, bar, and scatter visuals).
+        yerr (Optional[Union[int, float]]): The radial error value.
+        x (Optional[Union[int, float]]): The angular observation in degrees (histogram visual).
+
+    """
+
+    label: str
+    y: Union[int, float]
+    yerr: Optional[Union[int, float]]
+    x: Optional[Union[int, float]]
+
+
+class RadialSingleChartAttrs(TypedDict):
+    """The single chart attributes for the radial chart.
+
+    Attributes:
+        data (List[RadialDataPointAttrs]): The list of data points defining the radial chart.
+        subtitle (Union[str, None]): The subtitle of the radial chart. Also used as the label in the legend.
+        style (Union[LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs, None]): The style of the radial chart, matching its visual.
+        label (Union[str, None]): The key name in `data` that contains the category label. Defaults to `"label"`.
+        x (Union[str, None]): The key name in `data` that contains the angular observation. Defaults to `"x"`.
+        y (Union[str, None]): The key name in `data` that contains the radial value. Defaults to `"y"`.
+        yerr (Union[str, None]): The key name in `data` that contains the radial error value. Defaults to `"yerr"`.
+
+    """
+
+    data: List[RadialDataPointAttrs]
+    subtitle: Union[str, None]
+    style: Union[LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs, None]
+
+    label: Union[str, None]
+    x: Union[str, None]
+    y: Union[str, None]
+    yerr: Union[str, None]
+
+
+class _RadialChartAttrs(ChartCommonAttrs):
+    """The radial chart attributes.
+
+    Attributes:
+        charts (Union[RadialSingleChartAttrs, List[RadialSingleChartAttrs]]): The radial chart definitions.
+        type (Union[RADIAL_TYPE, str, None]): The visual the whole figure draws.
+        show_yerr (Union[bool, None]): Whether or not to show the radial error band (line visual).
+        show_area (Union[bool, None]): Whether or not to fill the area inside the lines (line visual).
+        show_values (Union[bool, None]): Whether or not to write each mark's value at its tip.
+        show_tip_labels (Union[bool, None]): Whether or not to write the category labels at the mark tips instead of around the circle.
+        show_border (Union[bool, None]): Whether or not to draw the outer border circle.
+        value_format (Union[str, None]): The format of the values written by `show_values`.
+        bar_mode (Union[BAR_MODE, str, None]): How multiple bar series share the circle (bar visual).
+        num_bins (Union[int, None]): The number of angular bins over [0, 360) (histogram visual).
+        startangle (Union[str, int, float, None]): The compass location or bearing where the first point sits.
+        direction (Union[DIRECTION, str, None]): Which way the angles increase.
+        innerradius (Union[float, None]): The donut hole, as a fraction of the radial extent.
+        scaley (Union[SCALE, str, None]): The scale of the radial axis.
+
+    """
+
+    charts: Union[RadialSingleChartAttrs, List[RadialSingleChartAttrs]]
+    type: Union[RADIAL_TYPE, str, None]
+    show_yerr: Union[bool, None]
+    show_area: Union[bool, None]
+    show_values: Union[bool, None]
+    show_tip_labels: Union[bool, None]
+    show_border: Union[bool, None]
+    value_format: Union[str, None]
+    bar_mode: Union[BAR_MODE, str, None]
+    num_bins: Union[int, None]
+    startangle: Union[str, int, float, None]
+    direction: Union[DIRECTION, str, None]
+    innerradius: Union[float, None]
+    scaley: Union[SCALE, str, None]
+
+
+# ================================================
 # Chart Attributes
 # ================================================
 
@@ -1229,6 +1321,7 @@ _ChartAttrs = Union[
     _ScatterChartAttrs,
     _BoxChartAttrs,
     _ParallelCoordsChartAttrs,
+    _RadialChartAttrs,
 ]
 """The union of all chart attributes."""
 

@@ -27,6 +27,7 @@ from ._internal.layers import (
     ScatterLayer,
     HistogramLayer,
     ParallelCoordsLayer,
+    RadialLayer,
 )
 
 OVERLAYABLE_LAYERS = (
@@ -35,6 +36,7 @@ OVERLAYABLE_LAYERS = (
     ScatterLayer,
     HistogramLayer,
     ParallelCoordsLayer,
+    RadialLayer,
 )
 
 
@@ -152,8 +154,11 @@ def _overlay_impl(
                 )
             )
 
-    # the panel takes literal x/y keys; the orientation (raises on a mix) maps them
-    if Panel(groups).horizontal:
+    # the panel takes literal x/y keys; the orientation (raises on a mix) maps
+    # them, and the projection (also raising on a mix) picks the axes kind
+    probe = Panel(groups)
+    projection = probe.projection
+    if probe.horizontal:
         xlabel, ylabel_left = ylabel_left, xlabel
         xmin, xmax, ymin, ymax = ymin, ymax, xmin, xmax
 
@@ -194,10 +199,27 @@ def _overlay_impl(
         "ymax_right": ymax_right,
     }
 
+    if projection == "polar":
+        # the merged panel keeps the first source figure's radial furniture
+        source_settings = charts[0]["figure"]._chart_metadata["panel"].settings
+        for key in (
+            "startangle",
+            "direction",
+            "innerradius",
+            "show_border",
+            "show_values",
+            "show_tip_labels",
+            "value_format",
+            "tip_value_style",
+        ):
+            panel_settings[key] = source_settings.get(key)
+
     panel = Panel(groups, panel_settings)
 
     fig = new_figure(figsize=figsize)
-    ax = fig.subplots()
+    ax = fig.subplots(
+        subplot_kw={"projection": "polar"} if projection == "polar" else None
+    )
     # the panel title renders as the figure suptitle when the panel is the figure
     panel.settings = {**panel_settings, "title": None}
     panel.render(ax)

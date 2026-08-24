@@ -19,6 +19,8 @@ Classes:
     COLORS:             The predefined colors.
     NORMALIZE:          The supported normalization options.
     ORIENTATION:        The supported orientations.
+    RADIAL_TYPE:        The supported radial chart visuals.
+    DIRECTION:          The supported angular directions.
     VALUE_FORMAT:       The predefined value formats.
     THEME:              The predefined themes.
     EMPHASIS:           The supported emphasis roles.
@@ -658,6 +660,57 @@ class ORIENTATION:
 
     HORIZONTAL = "horizontal"
     VERTICAL = "vertical"
+
+
+class RADIAL_TYPE:
+    """The supported radial chart visuals.
+
+    Passed as the `type` setting of radial charts: the mark family the whole
+    figure draws. The area visual is the line visual with `show_area=True`;
+    stacked bars are the bar visual with `bar_mode="stack"`.
+
+    ![RADIAL_TYPE at a glance](../../assets/imgs/const-radial-type.svg){ width="100%" }
+
+    Examples:
+        >>> from datachart.constants import RADIAL_TYPE
+        >>> RADIAL_TYPE.LINE
+        "line"
+
+    Attributes:
+        LINE (str): The line (radar) visual. Equals to `"line"`.
+        BAR (str): The bar visual, one sector per label. Equals to `"bar"`.
+        SCATTER (str): The scatter visual. Equals to `"scatter"`.
+        HISTOGRAM (str): The angular histogram (wind rose) visual. Equals to `"histogram"`.
+
+    """
+
+    LINE = "line"
+    BAR = "bar"
+    SCATTER = "scatter"
+    HISTOGRAM = "histogram"
+
+
+class DIRECTION:
+    """The supported angular directions.
+
+    Passed as the `direction` setting of radial charts: which way the angles
+    increase around the circle.
+
+    ![DIRECTION at a glance](../../assets/imgs/const-direction.svg){ width="100%" }
+
+    Examples:
+        >>> from datachart.constants import DIRECTION
+        >>> DIRECTION.CLOCKWISE
+        "clockwise"
+
+    Attributes:
+        CLOCKWISE (str): The angles increase clockwise. Equals to `"clockwise"`.
+        COUNTERCLOCKWISE (str): The angles increase counterclockwise. Equals to `"counterclockwise"`.
+
+    """
+
+    CLOCKWISE = "clockwise"
+    COUNTERCLOCKWISE = "counterclockwise"
 
 
 class VALUE_FORMAT:

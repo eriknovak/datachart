@@ -89,6 +89,14 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.RADIAL_TYPE
+    options:
+        heading_level: 3
+
+::: datachart.constants.DIRECTION
+    options:
+        heading_level: 3
+
 ::: datachart.constants.VALUE_FORMAT
     options:
         heading_level: 3

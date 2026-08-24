@@ -15,6 +15,8 @@ Methods:
         Creates the line chart.
     ParallelCoords(attrs):
         Creates the parallel coordinates chart.
+    RadialChart(attrs):
+        Creates the radial chart.
     ScatterChart(attrs):
         Creates the scatter chart.
 
@@ -26,6 +28,7 @@ from .heatmap import Heatmap
 from .histogram import Histogram
 from .line_chart import LineChart
 from .parallel_coords import ParallelCoords
+from .radial_chart import RadialChart
 from .scatter_chart import ScatterChart
 
 __all__ = [
@@ -35,5 +38,6 @@ __all__ = [
     "Histogram",
     "LineChart",
     "ParallelCoords",
+    "RadialChart",
     "ScatterChart",
 ]

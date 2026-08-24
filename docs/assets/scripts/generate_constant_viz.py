@@ -19,12 +19,20 @@ from matplotlib.colors import to_rgba
 from matplotlib.patches import FancyBboxPatch, Rectangle
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
-from datachart.charts import BarChart, Heatmap, Histogram, LineChart, ScatterChart
+from datachart.charts import (
+    BarChart,
+    Heatmap,
+    Histogram,
+    LineChart,
+    RadialChart,
+    ScatterChart,
+)
 from datachart.config import config
 from datachart.constants import (
     ASPECT_RATIO,
     BAR_MODE,
     COLORBAR_LOCATION,
+    DIRECTION,
     EMPHASIS,
     FONT_STYLE,
     FONT_WEIGHT,
@@ -36,6 +44,7 @@ from datachart.constants import (
     LINE_STYLE,
     NORMALIZE,
     ORIENTATION,
+    RADIAL_TYPE,
     SCALE,
     SHOW_GRID,
     VALUE_FORMAT,
@@ -545,6 +554,60 @@ def orientation():
     chart_grid(figs, "const-orientation.svg", 2.6)
 
 
+def radial_type():
+    members = [
+        ("LINE", RADIAL_TYPE.LINE),
+        ("BAR", RADIAL_TYPE.BAR),
+        ("SCATTER", RADIAL_TYPE.SCATTER),
+        ("HISTOGRAM", RADIAL_TYPE.HISTOGRAM),
+    ]
+    compass = [
+        {"label": d, "y": y}
+        for d, y in zip("N NE E SE S SW W NW".split(), [4, 7, 6, 3, 5, 8, 2, 6])
+    ]
+    degrees = [
+        {"x": float(v % 360)}
+        for v in np.random.default_rng(11).vonmises(0.8, 2, 200) * 180 / np.pi
+    ]
+    figs = [
+        RadialChart(
+            data=degrees if value == RADIAL_TYPE.HISTOGRAM else compass,
+            type=value,
+            num_bins=16,
+            title=f"RADIAL_TYPE.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-radial-type.svg",
+        2.2,
+        footnote="LINE, BAR, and SCATTER place labels evenly around the circle; "
+        "HISTOGRAM bins numeric degrees over [0, 360).",
+    )
+
+
+def direction():
+    members = [
+        ("CLOCKWISE", DIRECTION.CLOCKWISE),
+        ("COUNTERCLOCKWISE", DIRECTION.COUNTERCLOCKWISE),
+    ]
+    months = [
+        {"label": m, "y": y}
+        for m, y in zip(["Jan", "Feb", "Mar", "Apr", "May", "Jun"], [3, 5, 7, 6, 4, 2])
+    ]
+    figs = [
+        RadialChart(
+            data=months,
+            type=RADIAL_TYPE.BAR,
+            direction=value,
+            title=f"DIRECTION.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(figs, "const-direction.svg", 2.6)
+
+
 def show_grid():
     members = [
         ("NONE", SHOW_GRID.NONE),
@@ -694,6 +757,8 @@ def main():
     bar_mode()
     histogram_type()
     orientation()
+    radial_type()
+    direction()
     show_grid()
     scale()
     normalize()
