@@ -230,8 +230,18 @@ class TestTipTexts:
         ax = RadialChart(
             data=WIND, type=RADIAL_TYPE.BAR, show_values=True, value_format="{x:.1f}"
         ).axes[0]
-        texts = {t.get_text() for t in ax.texts}
-        assert {f"{d['y']:.1f}" for d in WIND} <= texts
+        expected = {f"{d['y']:.1f}" for d in WIND}
+        value_texts = [t for t in ax.texts if t.get_text() in expected]
+        assert {t.get_text() for t in value_texts} == expected
+        # the halo backs every tip text, like the axis value labels
+        assert all(t.get_bbox_patch() is not None for t in value_texts)
+
+    def test_tip_labels_carry_a_halo(self):
+        ax = RadialChart(data=WIND, type=RADIAL_TYPE.BAR, show_tip_labels=True).axes[0]
+        labels = {d["label"] for d in WIND}
+        tip_texts = [t for t in ax.texts if t.get_text() in labels]
+        assert tip_texts
+        assert all(t.get_bbox_patch() is not None for t in tip_texts)
 
     def test_show_values_on_line_points(self):
         ax = RadialChart(data=WIND, show_values=True).axes[0]

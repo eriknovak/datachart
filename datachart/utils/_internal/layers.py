@@ -102,6 +102,13 @@ RADIAL_YLABEL_PAD = 30
 # tip texts sit just past the mark along its spoke, as fractions of the r span
 RADIAL_TIP_VALUE_PAD = 0.03
 RADIAL_TIP_LABEL_PAD = 0.06
+# a soft halo keeps polar text legible over marks, grid spokes, and the border
+RADIAL_TEXT_HALO = {
+    "boxstyle": "round,pad=0.15",
+    "facecolor": "#FFFFFF",
+    "edgecolor": "none",
+    "alpha": 0.6,
+}
 # extra radial room so tip labels stay inside the border circle
 RADIAL_TIP_LABEL_HEADROOM = 0.25
 
@@ -2445,13 +2452,7 @@ class Panel:
                 fontfamily=furniture.get("font_family"),
                 color="#000000",
                 zorder=self._spine_zorder() + RADIAL_LABEL_Z_OVER_SPINE,
-                # a soft halo keeps the label legible over dark marks
-                bbox=dict(
-                    boxstyle="round,pad=0.15",
-                    facecolor="#FFFFFF",
-                    edgecolor="none",
-                    alpha=0.6,
-                ),
+                bbox=RADIAL_TEXT_HALO,
             )
 
     def _draw_radial_tip_texts(self, ax) -> None:
@@ -2517,6 +2518,7 @@ class Panel:
                     va="center",
                     zorder=z_order,
                     fontfamily=family,
+                    bbox=RADIAL_TEXT_HALO,
                     **value_style,
                 )
 
@@ -2555,6 +2557,7 @@ class Panel:
                     fontsize=tick_style.get("labelsize"),
                     color=tick_style.get("labelcolor"),
                     fontfamily=family,
+                    bbox=RADIAL_TEXT_HALO,
                 )
 
     @staticmethod
