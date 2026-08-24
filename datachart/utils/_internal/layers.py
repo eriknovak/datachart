@@ -88,7 +88,7 @@ DEFAULT_MUTED_COLOR = "#CFCFCF"
 DEFAULT_MUTED_ALPHA = 0.5
 # matplotlib skips underscore-prefixed labels when assembling the legend
 NO_LEGEND = "_nolegend_"
-# radial furniture defaults: compass and calendar conventions (ADR 0014)
+# radial furniture defaults: compass and calendar conventions (ADR 0015)
 DEFAULT_STARTANGLE = "N"
 DEFAULT_DIRECTION = DIRECTION.CLOCKWISE
 COMPASS_LOCATIONS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
@@ -304,7 +304,7 @@ class Layer:
     kind: str = ""
     # None for layers without an orientation; they follow the panel
     is_horizontal: Optional[bool] = None
-    # the coordinate space the layer draws in; a panel property (ADR 0014)
+    # the coordinate space the layer draws in; a panel property (ADR 0015)
     projection: str = "cartesian"
 
     def __init__(self, chart: dict, settings: dict):

@@ -51,7 +51,7 @@ EXPECTED_CHANGES = {
     # new horizontal panel cases (ADR 0012)
     "overlay_horizontal_bar_line_dual",
     "overlay_horizontal_bar_bar_line",
-    # new radial chart cases (ADR 0014)
+    # new radial chart cases (ADR 0015)
     "radial_line",
     "radial_line_area_donut",
     "radial_bar",
