@@ -165,6 +165,9 @@ class TestValueLabelEmphasis:
     def test_marks_sit_above_the_grid(self):
         ax = RadialChart(data=WIND, type=RADIAL_TYPE.BAR, show_grid="both").axes[0]
         assert ax.get_axisbelow() is True
+        # the grid draws at the axis artists' zorder; every mark must beat it
+        axis_z = max(ax.xaxis.get_zorder(), ax.yaxis.get_zorder())
+        assert all(p.get_zorder() > axis_z for p in ax.patches)
 
     def test_value_labels_redrawn_on_top_in_black(self):
         ax = RadialChart(data=WIND, type=RADIAL_TYPE.BAR).axes[0]
