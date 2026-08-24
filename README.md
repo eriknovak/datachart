@@ -31,14 +31,14 @@ The datachart package is a python package for creating data visualizations, buil
 
 **Features:**
 
-- **Charts.** Bar charts, line charts, scatter charts, histograms, heatmaps, box plots, and parallel coordinates — each created with a single function call from plain lists of dicts.
+- **Charts.** Bar charts, line charts, scatter charts, histograms, heatmaps, box plots, pyramid charts, radial charts, and parallel coordinates — each created with a single function call from plain lists of dicts.
 - **Composition.** Combine rendered charts with `Panel` (overlay charts on a single plot, with optional dual y-axes) and `Grid` (arrange charts in a grid; grids nest).
 - **Themes & configuration.** Six predefined themes, each named for its visual trait, plus a global `config` for tweaking any style attribute — per-chart `style` overrides included.
 
 ## Requirements
 Before starting the project make sure these requirements are available:
 
-- [python]. The python programming language (v3.8 or higher).
+- [python]. The python programming language (v3.10 or higher).
 
 ## Install
 
