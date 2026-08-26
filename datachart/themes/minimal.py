@@ -35,6 +35,7 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "plot_hist_edge_width": 0,
         "plot_line_width": 2.0,
         "plot_scatter_edge_color": "#FFFFFF",
+        "plot_swarm_edge_color": "#FFFFFF",
         "plot_text_box_edgecolor": "#CFD8DC",
         "plot_text_arrow_color": "#9AA4AE",
         "plot_heatmap_cmap": COLORS.Blues,

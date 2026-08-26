@@ -582,6 +582,30 @@ def get_scatter_style(chart_style: dict) -> dict:
     return create_config_dict(chart_style, config_attrs)
 
 
+def get_swarm_style(chart_style: dict) -> dict:
+    """Get the swarm chart style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The swarm style setting.
+
+    """
+
+    config_attrs = [
+        ("c", "plot_swarm_color"),
+        ("alpha", "plot_swarm_alpha"),
+        ("s", "plot_swarm_size"),
+        ("marker", "plot_swarm_marker"),
+        ("zorder", "plot_swarm_zorder"),
+        ("linewidths", "plot_swarm_edge_width"),
+        ("edgecolors", "plot_swarm_edge_color"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
 # -------------------------------------
 # Regression Style
 # -------------------------------------

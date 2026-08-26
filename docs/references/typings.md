@@ -94,6 +94,17 @@ title: Typings Module
         heading_level: 4
 
 
+### Swarm Chart Typings
+
+::: datachart.typings.SwarmSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.SwarmDataPointAttrs
+    options:
+        heading_level: 4
+
+
 ### Parallel Coordinates Plot Typings
 
 ::: datachart.typings.ParallelCoordsSingleChartAttrs
@@ -151,6 +162,8 @@ title: Typings Module
 ::: datachart.typings.RegressionStyleAttrs
 
 ::: datachart.typings.BoxStyleAttrs
+
+::: datachart.typings.SwarmStyleAttrs
 
 ::: datachart.typings.ParallelCoordsStyleAttrs
 ::: datachart.typings.ThemeDefaultAttrs

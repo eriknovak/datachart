@@ -50,9 +50,10 @@ def Panel(
 ) -> plt.Figure:
     """Overlay rendered chart figures in one coordinate space.
 
-    Combines different chart types (LineChart, BarChart, ScatterChart, Histogram)
-    on a single plot, drawn in the order provided. Two value axes (primary and
-    secondary) are supported for handling different scales.
+    Combines different chart types (LineChart, BarChart, ScatterChart,
+    Histogram, BoxPlot, SwarmChart) on a single plot, drawn in the order
+    provided. Two value axes (primary and secondary) are supported for
+    handling different scales.
 
     A panel has an orientation, inferred from its figures: it is horizontal
     when every bar chart and histogram in it is horizontal, vertical otherwise.

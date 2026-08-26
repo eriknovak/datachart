@@ -20,6 +20,8 @@ Classes:
     ScatterDataPointAttrs: The data point attributes for the scatter chart.
     BoxSingleChartAttrs: The single chart attributes for the box plot.
     BoxDataPointAttrs: The data point attributes for the box plot.
+    SwarmSingleChartAttrs: The single chart attributes for the swarm chart.
+    SwarmDataPointAttrs: The data point attributes for the swarm chart.
     ParallelCoordsSingleChartAttrs: The single chart attributes for the parallel coordinates chart.
     ParallelCoordsDataPointAttrs: The data point attributes for the parallel coordinates chart.
     RadialSingleChartAttrs: The single chart attributes for the radial chart.
@@ -42,6 +44,7 @@ Classes:
     ScatterStyleAttrs: The typing for the scatter chart style.
     RegressionStyleAttrs: The typing for the regression line style.
     BoxStyleAttrs: The typing for the box plot style.
+    SwarmStyleAttrs: The typing for the swarm chart style.
     ParallelCoordsStyleAttrs: The typing for the parallel coordinates chart style.
     ThemeDefaultAttrs: The typing for theme-driven defaults and cycles.
 
@@ -68,6 +71,7 @@ from .constants import (
     BAR_MODE,
     DIRECTION,
     RADIAL_TYPE,
+    SWARM_MODE,
     COLORS,
     SHOW_GRID,
     SCALE,
@@ -528,6 +532,29 @@ class BoxStyleAttrs(TypedDict):
     plot_yticks_label_rotate: Union[int, float, None]
 
 
+class SwarmStyleAttrs(TypedDict):
+    """The typing for the swarm chart style.
+
+    Attributes:
+        plot_swarm_color (Union[str, None]): The point color.
+        plot_swarm_alpha (Union[float, None]): The alpha value of the points.
+        plot_swarm_size (Union[int, float, None]): The point size.
+        plot_swarm_marker (Union[LINE_MARKER, str, None]): The point marker shape.
+        plot_swarm_zorder (Union[int, float, None]): The zorder of the points.
+        plot_swarm_edge_width (Union[int, float, None]): The edge width of the points.
+        plot_swarm_edge_color (Union[str, None]): The edge color of the points.
+
+    """
+
+    plot_swarm_color: Union[str, None]
+    plot_swarm_alpha: Union[float, None]
+    plot_swarm_size: Union[int, float, None]
+    plot_swarm_marker: Union[LINE_MARKER, str, None]
+    plot_swarm_zorder: Union[int, float, None]
+    plot_swarm_edge_width: Union[int, float, None]
+    plot_swarm_edge_color: Union[str, None]
+
+
 class ParallelCoordsStyleAttrs(TypedDict):
     """The typing for the parallel coordinates chart style.
 
@@ -615,6 +642,7 @@ class StyleAttrs(
     ScatterStyleAttrs,
     RegressionStyleAttrs,
     BoxStyleAttrs,
+    SwarmStyleAttrs,
     ParallelCoordsStyleAttrs,
     ThemeDefaultAttrs,
 ):
@@ -1248,6 +1276,87 @@ class _BoxChartAttrs(ChartCommonAttrs):
     charts: Union[BoxSingleChartAttrs, List[BoxSingleChartAttrs]]
     show_outliers: Union[bool, None]
     show_notch: Union[bool, None]
+    orientation: Union[ORIENTATION, str, None]
+    scaley: Union[SCALE, str, None]
+
+
+# ================================================
+# Swarm Chart Attributes
+# ================================================
+
+
+class SwarmDataPointAttrs(TypedDict):
+    """The data point attributes for the swarm chart.
+
+    Attributes:
+        label (str): The category label.
+        value (Union[int, float]): The numeric value.
+
+    """
+
+    label: str
+    value: Union[int, float]
+
+
+class SwarmSingleChartAttrs(TypedDict):
+    """The single chart attributes for the swarm chart.
+
+    Attributes:
+        data (List[SwarmDataPointAttrs]): The list of data points defining the swarm chart.
+        subtitle (Union[str, None]): The subtitle of the swarm chart. Also used as the label in the legend.
+        xlabel (Union[str, None]): The xlabel of the swarm chart.
+        ylabel (Union[str, None]): The ylabel of the swarm chart.
+        style (Union[SwarmStyleAttrs, None]): The style of the swarm chart.
+        xticks (Union[int, float, None]): The xtick positions list.
+        xticklabels (Union[List[str], None]): The xtick labels.
+        xtickrotate (Union[int, None]): The xtick rotation value.
+        yticks (Union[int, float, None]): The ytick position list.
+        yticklabels (Union[List[str], None]): The ytick labels.
+        ytickrotate (Union[int, None]): The ytick rotation value.
+        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
+        value (Union[str, None]): The key name in `data` that contains the value. Defaults to `"value"`.
+
+    """
+
+    data: List[SwarmDataPointAttrs]
+    subtitle: Union[str, None]
+    xlabel: Union[str, None]
+    ylabel: Union[str, None]
+    style: Union[SwarmStyleAttrs, None]
+
+    xticks: Union[int, float, None]
+    xticklabels: Union[List[str], None]
+    xtickrotate: Union[int, None]
+    yticks: Union[int, float, None]
+    yticklabels: Union[List[str], None]
+    ytickrotate: Union[int, None]
+
+    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
+    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
+    texts: Union[TextAttrs, List[TextAttrs]]
+
+    label: Union[str, None]  # the name of the label attribute in data
+    value: Union[str, None]  # the name of the value attribute in data
+
+
+class _SwarmChartAttrs(ChartCommonAttrs):
+    """The swarm chart attributes.
+
+    Attributes:
+        charts (Union[SwarmSingleChartAttrs, List[SwarmSingleChartAttrs]]): The swarm chart definitions.
+        mode (Union[SWARM_MODE, str, None]): The point spread mode: beeswarm or strip.
+        jitter (Union[float, None]): The strip jitter width as a fraction of the category width.
+        orientation (Union[ORIENTATION, str, None]): The orientation of the swarms.
+        scaley (Union[SCALE, str, None]): The scale of the y-axis.
+
+    """
+
+    charts: Union[SwarmSingleChartAttrs, List[SwarmSingleChartAttrs]]
+    mode: Union[SWARM_MODE, str, None]
+    jitter: Union[float, None]
     orientation: Union[ORIENTATION, str, None]
     scaley: Union[SCALE, str, None]
 

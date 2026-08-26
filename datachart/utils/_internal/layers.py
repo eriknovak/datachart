@@ -43,6 +43,7 @@ from .config_helpers import (
     get_box_median_style,
     get_box_whisker_style,
     get_box_cap_style,
+    get_swarm_style,
     get_parallel_coords_style,
     get_parallel_axis_style,
     get_parallel_tick_style,
@@ -66,6 +67,7 @@ from ...constants import (
     EMPHASIS,
     HISTOGRAM_TYPE,
     ORIENTATION,
+    SWARM_MODE,
     RADIAL_TYPE,
     VALUE_FORMAT,
 )
@@ -76,6 +78,12 @@ DEFAULT_ORIENTATION = ORIENTATION.VERTICAL
 DEFAULT_VALUE_FORMAT = VALUE_FORMAT.DEFAULT
 DEFAULT_CI_LEVEL = 0.95
 DEFAULT_SIZE_RANGE = (20, 200)
+DEFAULT_SWARM_MODE = SWARM_MODE.SWARM
+DEFAULT_SWARM_JITTER = 0.4
+# a swarm never reaches past the box edges: half the category width
+SWARM_MAX_OFFSET = 0.4
+# breathing room between packed markers, as a fraction of the diameter
+SWARM_GAP = 1.05
 DEFAULT_BAR_VALUE_FORMAT = "%g"
 # show_area fills this many data magnitudes below the line; the axes clip it,
 # so the fill meets the floor whatever limits sharey, ymin or a re-render set
@@ -486,6 +494,8 @@ class DrawContext:
     parallel_stats: Optional[dict] = None
     parallel_axes: bool = True
     transpose: bool = False
+    # label -> position of the panel's category axis (ADR 0019)
+    category_index: Optional[dict] = None
 
 
 # ================================================
@@ -1020,11 +1030,11 @@ class ScatterLayer(Layer):
                 self._draw_correlation(ax, x_data, y_data, color=color)
 
 
-class BoxLayer(Layer):
-    kind = "box"
+class GroupLayer(Layer):
+    """A layer of labeled groups placed on the panel's category index (ADR 0019)."""
 
     def _resolve_emphasis(self, value):
-        # box charts never overlay; emphasis aligns with the box labels instead
+        # group layers never dodge; emphasis aligns with the group labels
         if isinstance(value, list):
             for item in value:
                 validate_emphasis(item)
@@ -1034,6 +1044,58 @@ class BoxLayer(Layer):
     def _resolve_style(self):
         self.orientation = self.settings.get("orientation") or DEFAULT_ORIENTATION
         self.is_horizontal = self.orientation == ORIENTATION.HORIZONTAL
+
+    def grouped_values(self) -> dict:
+        """The layer's values keyed by label, in first-seen label order."""
+
+        label_attr = get_attr_value("label", self.chart, "label")
+        value_attr = get_attr_value("value", self.chart, "value")
+        grouped = {}
+        data = self.chart.get("data", [])
+        if isinstance(data, list):
+            for d in data:
+                lbl, val = d.get(label_attr), d.get(value_attr)
+                if lbl is not None and val is not None:
+                    grouped.setdefault(lbl, []).append(val)
+        return grouped
+
+    def labels(self) -> list:
+        return list(self.grouped_values().keys())
+
+    def y_range(self):
+        values = [v for vals in self.grouped_values().values() for v in vals]
+        if not values:
+            return None
+        return (float(np.min(values)), float(np.max(values)))
+
+    def apply_scales(self, ax, scalex, scaley):
+        if scaley:
+            if self.is_horizontal:
+                ax.set_xscale(scaley)
+            else:
+                ax.set_yscale(scaley)
+
+    def _group_roles(self, labels: list) -> list:
+        """One emphasis role per label; a single value applies to every group."""
+
+        roles = self.emphasis
+        if roles is None:
+            return [None] * len(labels)
+        if isinstance(roles, str):
+            return [roles] * len(labels)
+        if len(roles) != len(labels):
+            raise ValueError(
+                f"`emphasis` length ({len(roles)}) must match the number of "
+                f"{self.kind} labels ({len(labels)})."
+            )
+        return list(roles)
+
+
+class BoxLayer(GroupLayer):
+    kind = "box"
+
+    def _resolve_style(self):
+        super()._resolve_style()
         self.show_outliers = self.settings.get("show_outliers")
         self.show_notch = self.settings.get("show_notch")
         self.box_style = get_box_style(self.style)
@@ -1042,31 +1104,17 @@ class BoxLayer(Layer):
         self.whisker_style = get_box_whisker_style(self.style)
         self.cap_style = get_box_cap_style(self.style)
 
-    def apply_scales(self, ax, scalex, scaley):
-        if scaley:
-            if self.orientation == ORIENTATION.HORIZONTAL:
-                ax.set_xscale(scaley)
-            else:
-                ax.set_yscale(scaley)
-
     def draw(self, ax, ctx):
-        label_attr = get_attr_value("label", self.chart, "label")
-        value_attr = get_attr_value("value", self.chart, "value")
-
-        data = self.chart.get("data", [])
-        labels, values = [], []
-        if isinstance(data, list):
-            grouped = {}
-            for d in data:
-                lbl, val = d.get(label_attr), d.get(value_attr)
-                if lbl is not None and val is not None:
-                    grouped.setdefault(lbl, []).append(val)
-            labels = list(grouped.keys())
-            values = [grouped[lbl] for lbl in labels]
+        grouped = self.grouped_values()
+        labels = list(grouped.keys())
+        values = [grouped[lbl] for lbl in labels]
 
         if len(values) == 0:
             warnings.warn("No data points found for box plot.")
             return
+
+        index = ctx.category_index or {lbl: i + 1 for i, lbl in enumerate(labels)}
+        positions = [index[lbl] for lbl in labels]
 
         box_style = dict(self.box_style)
         if box_style.get("facecolor") is None:
@@ -1080,6 +1128,7 @@ class BoxLayer(Layer):
 
         bp = ax.boxplot(
             values,
+            positions=positions,
             orientation=self.orientation,
             patch_artist=True,
             showfliers=self.show_outliers if self.show_outliers is not None else True,
@@ -1100,28 +1149,10 @@ class BoxLayer(Layer):
 
         self._apply_box_emphasis(bp, labels)
 
-        if self.orientation == ORIENTATION.HORIZONTAL:
-            ax.set_yticks(range(1, len(labels) + 1))
-            ax.set_yticklabels(labels, rotation=self.chart.get("ytickrotate", 0))
-        else:
-            ax.set_xticks(range(1, len(labels) + 1))
-            ax.set_xticklabels(labels, rotation=self.chart.get("xtickrotate", 0))
-
     def _apply_box_emphasis(self, bp: dict, labels: list) -> None:
         """Apply per-label roles; whiskers, caps, medians, and outliers follow the box."""
 
-        roles = self.emphasis
-        if roles is None:
-            return
-        if isinstance(roles, str):
-            roles = [roles] * len(labels)
-        elif len(roles) != len(labels):
-            raise ValueError(
-                f"`emphasis` length ({len(roles)}) must match the number of "
-                f"box labels ({len(labels)})."
-            )
-
-        for i, role in enumerate(roles):
+        for i, role in enumerate(self._group_roles(labels)):
             if role is None:
                 continue
             box = bp["boxes"][i]
@@ -1143,6 +1174,173 @@ class BoxLayer(Layer):
             else:
                 box.set_linewidth(box.get_linewidth() * HIGHLIGHT_WIDTH_SCALE)
                 median.set_linewidth(median.get_linewidth() * HIGHLIGHT_WIDTH_SCALE)
+
+
+def beeswarm_offsets(values_px: np.ndarray, diameter_px: float) -> np.ndarray:
+    """Non-overlapping offsets across the category axis, in pixels.
+
+    Greedy placement in sorted-value order: each point takes the candidate
+    offset nearest the center that keeps it a diameter away from every point
+    already placed within a diameter along the value axis.
+    """
+
+    values_px = np.asarray(values_px, dtype=float)
+    order = np.argsort(values_px, kind="stable")
+    d2 = diameter_px**2
+    placed_off, placed_val = [], []
+    offsets = np.zeros(len(values_px))
+    for i in order:
+        v = values_px[i]
+        if placed_val:
+            offs = np.asarray(placed_off)
+            vals = np.asarray(placed_val)
+            near = np.abs(vals - v) < diameter_px
+            offs, vals = offs[near], vals[near]
+        else:
+            offs = vals = np.empty(0)
+        dv2 = (vals - v) ** 2
+        # candidates: the center, then tangent to each neighbor on either side
+        spread = np.sqrt(np.maximum(d2 - dv2, 0.0))
+        cands = np.concatenate([[0.0], offs + spread, offs - spread])
+        cands = cands[np.argsort(np.abs(cands), kind="stable")]
+        chosen = 0.0
+        for c in cands:
+            if np.all((c - offs) ** 2 + dv2 >= d2 * 0.999):
+                chosen = c
+                break
+        offsets[i] = chosen
+        placed_off.append(chosen)
+        placed_val.append(v)
+    return offsets
+
+
+def strip_offsets(n: int, jitter: float) -> np.ndarray:
+    """Seeded uniform jitter across the category axis, in data units."""
+
+    return np.random.default_rng(0).uniform(-jitter / 2, jitter / 2, n)
+
+
+class SwarmLayer(GroupLayer):
+    kind = "swarm"
+
+    def _resolve_style(self):
+        super()._resolve_style()
+        self.mode = self.settings.get("mode") or DEFAULT_SWARM_MODE
+        if self.mode not in (SWARM_MODE.SWARM, SWARM_MODE.STRIP):
+            raise ValueError(
+                f"Invalid swarm mode '{self.mode}'. "
+                f"Must be one of ['{SWARM_MODE.SWARM}', '{SWARM_MODE.STRIP}']."
+            )
+        jitter = self.settings.get("jitter")
+        self.jitter = DEFAULT_SWARM_JITTER if jitter is None else float(jitter)
+        self.swarm_style = get_swarm_style(self.style)
+        self.default_size = config["plot_swarm_size"]
+        # a highlight edge contrasts in the theme's own text color
+        self.highlight_edge_color = config.get("font_general_color") or "#000000"
+
+    def _offsets(self, ax, position: float, values: np.ndarray) -> np.ndarray:
+        """Per-point offsets from the category center, in data units."""
+
+        if self.mode == SWARM_MODE.STRIP:
+            return strip_offsets(len(values), self.jitter)
+
+        size = self.swarm_style.get("s")
+        if size is None:
+            size = self.default_size
+        diameter_px = np.sqrt(size) / 72 * ax.figure.dpi * SWARM_GAP
+        centers = np.full(len(values), position, dtype=float)
+        points = (
+            np.column_stack([values, centers])
+            if self.is_horizontal
+            else np.column_stack([centers, values])
+        )
+        px = ax.transData.transform(points)
+        value_px = px[:, 0] if self.is_horizontal else px[:, 1]
+        offsets_px = beeswarm_offsets(value_px, diameter_px)
+        # pixels per data unit along the category axis
+        unit = ax.transData.transform([[0, 1]] if self.is_horizontal else [[1, 0]])
+        origin = ax.transData.transform([[0, 0]])
+        scale = (unit - origin)[0][1 if self.is_horizontal else 0]
+        return np.clip(offsets_px / scale, -SWARM_MAX_OFFSET, SWARM_MAX_OFFSET)
+
+    def draw(self, ax, ctx):
+        grouped = self.grouped_values()
+        labels = list(grouped.keys())
+        if not labels:
+            warnings.warn("No data points found for swarm chart.")
+            return
+
+        index = ctx.category_index or {lbl: i + 1 for i, lbl in enumerate(labels)}
+        roles = self._group_roles(labels)
+
+        base_style = dict(self.swarm_style)
+        if ctx.z_order is not None:
+            base_style["zorder"] = ctx.z_order
+        if base_style.get("c") is None:
+            base_style["c"] = ctx.color
+        if base_style.get("s") is None:
+            base_style["s"] = self.default_size
+        # the layer's own roles resolve per group; the panel role wins
+        if ctx.emphasis is not None:
+            roles = [ctx.emphasis] * len(labels)
+
+        # the value scale must be in force for the pixel-space packing
+        self.apply_scales(ax, None, self.settings.get("scaley"))
+
+        # one collection per role; the layer carries a single legend entry
+        collections = []
+        legend_taken = False
+        for role in (None, EMPHASIS_HIGHLIGHT, EMPHASIS_BACKGROUND):
+            members = [lbl for lbl, r in zip(labels, roles) if r == role]
+            if not members:
+                continue
+            style = dict(base_style)
+            self._apply_emphasis(style, role, width_key="linewidths", color_key="c")
+            if role == EMPHASIS_HIGHLIGHT:
+                style["edgecolors"] = self.highlight_edge_color
+            label = NO_LEGEND
+            if role != EMPHASIS_BACKGROUND and not legend_taken:
+                label = self.label(ctx)
+                legend_taken = True
+            centers = np.concatenate(
+                [np.full(len(grouped[lbl]), index[lbl], dtype=float) for lbl in members]
+            )
+            values = np.concatenate(
+                [np.asarray(grouped[lbl], dtype=float) for lbl in members]
+            )
+            x, y = (values, centers) if self.is_horizontal else (centers, values)
+            collections.append((members, ax.scatter(x, y, label=label, **style)))
+
+        # the category axis spans every group's full width, edge to edge like
+        # a box plot, and the view is settled before the packing reads it
+        positions = list(index.values())
+        lo, hi = min(positions) - 0.5, max(positions) + 0.5
+        for _, collection in collections:
+            edges = (
+                collection.sticky_edges.y
+                if self.is_horizontal
+                else collection.sticky_edges.x
+            )
+            edges[:] = [lo, hi]
+        interval = ax.dataLim.intervaly if self.is_horizontal else ax.dataLim.intervalx
+        interval[:] = (min(interval[0], lo), max(interval[1], hi))
+        ax.autoscale_view()
+        # user limits move the view after draw; applying them first keeps the
+        # packing exact (the panel re-applies them, idempotently)
+        configure_axis_limits(
+            ax, {k: self.settings.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
+        )
+
+        for members, collection in collections:
+            offsets = np.concatenate(
+                [
+                    self._offsets(ax, index[lbl], np.asarray(grouped[lbl], dtype=float))
+                    for lbl in members
+                ]
+            )
+            xy = np.asarray(collection.get_offsets()).copy()
+            xy[:, 1 if self.is_horizontal else 0] += offsets
+            collection.set_offsets(xy)
 
 
 class HeatmapLayer(Layer):
@@ -1855,6 +2053,7 @@ LAYER_TYPES = {
     "histogram": HistogramLayer,
     "scatterchart": ScatterLayer,
     "boxplot": BoxLayer,
+    "swarmchart": SwarmLayer,
     "heatmap": HeatmapLayer,
 }
 
@@ -2378,6 +2577,10 @@ class Panel:
 
         zorder_defaults = s.get("zorder_defaults", {})
 
+        # group layers share one category axis (ADR 0019)
+        group_layers = [l for l in self.layers if isinstance(l, GroupLayer)]
+        category_index = self.category_index(group_layers)
+
         # hatch cycle: per bar/histogram series, parallel to the color cycle
         hatch_patterns = s.get("hatch_cycle")
         hatch_assignments = None
@@ -2474,10 +2677,37 @@ class Panel:
                     parallel_stats=parallel_stats,
                     parallel_axes=layer is parallel_axes_owner,
                     transpose=horizontal and layer.is_horizontal is None,
+                    category_index=category_index,
                 )
                 layer.draw(target_ax, ctx)
 
+        if category_index:
+            self._apply_category_ticks(ax, category_index, group_layers, horizontal)
+
         self._finalize(ax, ax_right, bar_layers, horizontal, group_axes)
+
+    @staticmethod
+    def category_index(layers: List[Layer]) -> Optional[dict]:
+        """Label -> position (1..n), the first-seen union across group layers."""
+
+        index = {}
+        for layer in layers:
+            if isinstance(layer, GroupLayer):
+                for label in layer.labels():
+                    index.setdefault(label, len(index) + 1)
+        return index or None
+
+    @staticmethod
+    def _apply_category_ticks(ax, index, group_layers, horizontal) -> None:
+        # the first group layer's rotation applies; user ticks override later
+        chart = group_layers[0].chart
+        labels = list(index.keys())
+        if horizontal:
+            ax.set_yticks(list(index.values()))
+            ax.set_yticklabels(labels, rotation=chart.get("ytickrotate", 0))
+        else:
+            ax.set_xticks(list(index.values()))
+            ax.set_xticklabels(labels, rotation=chart.get("xtickrotate", 0))
 
     def _finalize(self, ax, ax_right, bar_layers, horizontal, group_axes=None) -> None:
         """Apply the furniture; x/y keys are literal, `*_right` keys hit the twin."""

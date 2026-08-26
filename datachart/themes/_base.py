@@ -212,6 +212,14 @@ BASE_THEME: StyleAttrs = {
     "plot_box_whisker_linewidth": 0.8,
     "plot_box_cap_color": "#000000",
     "plot_box_cap_linewidth": 0.8,
+    # plot swarm style; zorder sits above the box patches and strokes
+    "plot_swarm_color": None,
+    "plot_swarm_size": 18,
+    "plot_swarm_alpha": 0.85,
+    "plot_swarm_marker": "o",
+    "plot_swarm_edge_width": 0.5,
+    "plot_swarm_edge_color": "#FFFFFF",
+    "plot_swarm_zorder": 3,
     "plot_xticks_label_rotate": None,
     "plot_yticks_label_rotate": None,
     # overlay chart style

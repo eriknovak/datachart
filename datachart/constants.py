@@ -21,6 +21,7 @@ Classes:
     NORMALIZE:          The supported normalization options.
     ORIENTATION:        The supported orientations.
     RADIAL_TYPE:        The supported radial chart visuals.
+    SWARM_MODE:         The supported swarm chart modes.
     DIRECTION:          The supported angular directions.
     VALUE_FORMAT:       The predefined value formats.
     THEME:              The predefined themes.
@@ -693,6 +694,28 @@ class ORIENTATION:
 
     HORIZONTAL = "horizontal"
     VERTICAL = "vertical"
+
+
+class SWARM_MODE:
+    """The supported swarm chart modes.
+
+    Passed as the `mode` setting of swarm charts: how the points of one group
+    spread across the category width.
+
+    Examples:
+        >>> from datachart.constants import SWARM_MODE
+        >>> SWARM_MODE.SWARM
+        "swarm"
+
+    Attributes:
+        SWARM (str): The beeswarm mode: non-overlapping offsets computed from
+            the marker size. Equals to `"swarm"`.
+        STRIP (str): The strip mode: seeded uniform jitter. Equals to `"strip"`.
+
+    """
+
+    SWARM = "swarm"
+    STRIP = "strip"
 
 
 class RADIAL_TYPE:

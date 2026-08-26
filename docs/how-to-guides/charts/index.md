@@ -19,6 +19,7 @@ It offers a wide range of chart types, including line charts, bar charts, histog
 | [Pyramid Chart](pyramidchart.ipynb)           | The showcase of the pyramid chart.           |
 | [Radial Chart](radialchart.ipynb)             | The showcase of the radial chart.            |
 | [Scatter Chart](scatterchart.ipynb)           | The showcase of the scatter chart.           |
+| [Swarm Chart](swarmchart.ipynb)               | The showcase of the swarm chart.             |
 
 Here are some utility functions, that could help you.
 

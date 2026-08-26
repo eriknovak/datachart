@@ -99,8 +99,8 @@ plugins:
       markdown_description: |
         datachart is a Python data visualization package built on matplotlib.
         It provides simple chart functions (BarChart, LineChart, ScatterChart,
-        Histogram, Heatmap, BoxPlot, ParallelCoords, PyramidChart,
-        RadialChart), figure
+        Histogram, Heatmap, BoxPlot, SwarmChart, ParallelCoords,
+        PyramidChart, RadialChart), figure
         composition via Panel (overlaying charts on shared axes) and Grid
         (arranging charts in a grid), and a global configuration system with
         predefined themes.
@@ -123,6 +123,7 @@ plugins:
           - how-to-guides/charts/pyramidchart.ipynb: Pyramid chart input attributes, the two-sides data contract, mirrored value axis controls, and composing pyramids with Grid.
           - how-to-guides/charts/radialchart.ipynb: Radial chart input attributes, the line, bar, scatter, and histogram visuals, and polar settings (start angle, direction, inner radius).
           - how-to-guides/charts/scatterchart.ipynb: Scatter chart input attributes, single and multiple datasets, customization, and saving.
+          - how-to-guides/charts/swarmchart.ipynb: Swarm chart input attributes, swarm and strip modes, emphasis, overlaying a box plot with Panel, multiple datasets, and saving.
         Composition & Utilities:
           - how-to-guides/utility/index.md: Map of Panel, Grid, statistics, and figure saving.
           - how-to-guides/utility/panel.ipynb: "Overlaying multiple charts on one plot with Panel: dual y-axes, z-order, emphasis, and nesting panels."
@@ -180,6 +181,7 @@ nav:
       - Pyramid Chart: how-to-guides/charts/pyramidchart.ipynb
       - Radial Chart: how-to-guides/charts/radialchart.ipynb
       - Scatter Chart: how-to-guides/charts/scatterchart.ipynb
+      - Swarm Chart: how-to-guides/charts/swarmchart.ipynb
     - Composition & Utilities:
       - how-to-guides/utility/index.md
       - Panel: how-to-guides/utility/panel.ipynb

@@ -25,6 +25,10 @@ CHART_CONFIGS = {
         "multiplot": False,
         "subplots": True,
     },
+    "swarmchart": {
+        "multiplot": True,
+        "subplots": True,
+    },
     "parallelcoords": {
         "multiplot": True,
         "subplots": False,
