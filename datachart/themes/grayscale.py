@@ -35,5 +35,7 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         "plot_heatmap_frame_color": "#000000",
         "plot_regression_color": "#34495E",
         "plot_box_median_color": "#000000",
+        "plot_violin_edgecolor": "#000000",
+        "plot_violin_inner_color": "#000000",
     }
 )

@@ -99,8 +99,8 @@ plugins:
       markdown_description: |
         datachart is a Python data visualization package built on matplotlib.
         It provides simple chart functions (BarChart, LineChart, ScatterChart,
-        Histogram, Heatmap, BoxPlot, ParallelCoords, PyramidChart,
-        RadialChart), figure
+        Histogram, Heatmap, BoxPlot, ViolinPlot, ParallelCoords,
+        PyramidChart, RadialChart), figure
         composition via Panel (overlaying charts on shared axes) and Grid
         (arranging charts in a grid), and a global configuration system with
         predefined themes.
@@ -123,6 +123,7 @@ plugins:
           - how-to-guides/charts/pyramidchart.ipynb: Pyramid chart input attributes, the two-sides data contract, mirrored value axis controls, and composing pyramids with Grid.
           - how-to-guides/charts/radialchart.ipynb: Radial chart input attributes, the line, bar, scatter, and histogram visuals, and polar settings (start angle, direction, inner radius).
           - how-to-guides/charts/scatterchart.ipynb: Scatter chart input attributes, single and multiple datasets, customization, and saving.
+          - how-to-guides/charts/violinplot.ipynb: Violin plot input attributes, inner marks, bandwidth, split violins, composing violins with box plots, and subplots.
         Composition & Utilities:
           - how-to-guides/utility/index.md: Map of Panel, Grid, statistics, and figure saving.
           - how-to-guides/utility/panel.ipynb: "Overlaying multiple charts on one plot with Panel: dual y-axes, z-order, emphasis, and nesting panels."
@@ -173,6 +174,7 @@ nav:
       - how-to-guides/charts/index.md
       - Bar Chart: how-to-guides/charts/barchart.ipynb
       - Box Plot: how-to-guides/charts/boxplot.ipynb
+      - Violin Plot: how-to-guides/charts/violinplot.ipynb
       - Heatmap: how-to-guides/charts/heatmap.ipynb
       - Histogram: how-to-guides/charts/histogram.ipynb
       - Line Chart: how-to-guides/charts/linechart.ipynb

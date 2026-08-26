@@ -94,6 +94,26 @@ zero and absolute-value display on ticks and value labels, so both sides read
 as positive magnitudes.
 _Avoid_: negative axis, diverging axis
 
+**Violin**:
+A per-label kernel-density body (`ViolinPlot`) drawn at the same positions
+and with the same API as a box group, so violin and box figures over the same
+labels line up in `Panel`. Multiple datasets require subplots, as for boxes.
+_Avoid_: density plot, bean plot
+
+**Inner**:
+The summary marks a violin draws inside its body from the data: `"box"` (thin
+quartile bar, 1.5·IQR whisker, median dot), `"quartiles"` (dashed/dotted lines
+clipped to the body), `"median"` (one line), or `None`. One enum, never
+matplotlib's `showmeans`/`showextrema`/`quantiles` switches.
+_Avoid_: inner box flag, show_median
+
+**Split**:
+A violin's two halves, one per distinct value of a named point key, colored
+from the multiple palette and listed in the legend. Exactly two values;
+otherwise an error. Declared by key name like `label`/`value`, never as
+nested data.
+_Avoid_: hue, half violin, paired violin
+
 **Text**:
 A per-chart annotation — a string placed at a position (data coordinates by
 default, axes-fraction on request) with an optional arrow to a target point,

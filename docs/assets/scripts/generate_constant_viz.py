@@ -27,11 +27,13 @@ from datachart.charts import (
     LineChart,
     RadialChart,
     ScatterChart,
+    ViolinPlot,
 )
 from datachart.config import config
 from datachart.constants import (
     ARROW_STYLE,
     ASPECT_RATIO,
+    BANDWIDTH,
     BAR_MODE,
     COLORBAR_LOCATION,
     DIRECTION,
@@ -50,6 +52,7 @@ from datachart.constants import (
     SCALE,
     SHOW_GRID,
     VALUE_FORMAT,
+    VIOLIN_INNER,
 )
 from datachart.themes import DEFAULT_THEME
 from datachart.utils import Grid
@@ -591,6 +594,53 @@ def orientation():
     chart_grid(figs, "const-orientation.svg", 2.6)
 
 
+def _violin_data():
+    rng = np.random.default_rng(7)
+    return [
+        {"label": label, "value": float(v)}
+        for label, (mu, sd) in zip("abc", ((0, 1), (2, 1.5), (1, 0.6)))
+        for v in rng.normal(mu, sd, 60)
+    ]
+
+
+def violin_inner():
+    members = [
+        ("BOX", VIOLIN_INNER.BOX),
+        ("QUARTILES", VIOLIN_INNER.QUARTILES),
+        ("MEDIAN", VIOLIN_INNER.MEDIAN),
+        ("None", None),
+    ]
+    figs = [
+        ViolinPlot(
+            data=_violin_data(),
+            inner=value,
+            title=f"VIOLIN_INNER.{label}" if value else "None",
+        )
+        for label, value in members
+    ]
+    chart_grid(figs, "const-violin-inner.svg", 2.2)
+
+
+def bandwidth():
+    members = [
+        ("BANDWIDTH.SCOTT", BANDWIDTH.SCOTT),
+        ("BANDWIDTH.SILVERMAN", BANDWIDTH.SILVERMAN),
+        ("0.25", 0.25),
+        ("1.0", 1.0),
+    ]
+    figs = [
+        ViolinPlot(data=_violin_data(), bandwidth=value, inner=None, title=label)
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-bandwidth.svg",
+        2.2,
+        footnote="The two rules differ by a constant 6%; a number is a factor on "
+        "the standard deviation of the values.",
+    )
+
+
 def radial_type():
     members = [
         ("LINE", RADIAL_TYPE.LINE),
@@ -795,6 +845,8 @@ def main():
     bar_mode()
     histogram_type()
     orientation()
+    violin_inner()
+    bandwidth()
     radial_type()
     direction()
     show_grid()

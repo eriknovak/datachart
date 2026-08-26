@@ -212,6 +212,16 @@ BASE_THEME: StyleAttrs = {
     "plot_box_whisker_linewidth": 0.8,
     "plot_box_cap_color": "#000000",
     "plot_box_cap_linewidth": 0.8,
+    # plot violin style
+    "plot_violin_color": None,
+    "plot_violin_alpha": 1.0,
+    "plot_violin_linewidth": 1.0,
+    "plot_violin_edgecolor": None,
+    "plot_violin_width": 0.8,
+    "plot_violin_inner_color": None,
+    "plot_violin_inner_linewidth": 1.0,
+    "plot_violin_median_color": "#FFFFFF",
+    "plot_violin_median_size": 4,
     "plot_xticks_label_rotate": None,
     "plot_yticks_label_rotate": None,
     # overlay chart style
