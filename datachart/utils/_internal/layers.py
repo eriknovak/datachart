@@ -1047,6 +1047,34 @@ class GroupLayer(Layer):
     def _resolve_style(self):
         self.orientation = self.settings.get("orientation") or DEFAULT_ORIENTATION
         self.is_horizontal = self.orientation == ORIENTATION.HORIZONTAL
+        # a raincloud colors its groups from the multiple palette (ADR 0021);
+        # the cycle is built once so sibling layers of one chart agree
+        self.color_by_group = bool(self.settings.get("color_by_group"))
+        self.group_colors = (
+            create_color_cycle(
+                config["color_general_multiple"], max(len(self.labels()), 1)
+            )
+            if self.color_by_group
+            else None
+        )
+
+    def group_color(self, index: int, ctx_color: Optional[str]) -> Optional[str]:
+        """The color of the group at `index`: its own palette slot, or the layer's."""
+
+        if self.group_colors is None:
+            return ctx_color
+        return self.group_colors[index]["color"]
+
+    def group_legend_handles(self, roles: list) -> Optional[list]:
+        """One patch per group when coloring by group; background groups stay out."""
+
+        if self.group_colors is None:
+            return None
+        return [
+            Patch(facecolor=self.group_colors[i]["color"], label=str(label))
+            for i, (label, role) in enumerate(zip(self.labels(), roles))
+            if role != EMPHASIS_BACKGROUND
+        ]
 
     def grouped_values(self) -> dict:
         """The layer's values keyed by label, in first-seen label order."""
@@ -1101,11 +1129,40 @@ class BoxLayer(GroupLayer):
         super()._resolve_style()
         self.show_outliers = self.settings.get("show_outliers")
         self.show_notch = self.settings.get("show_notch")
+        self.offset = self.settings.get("offset") or 0.0
+        self.width = self.settings.get("width")
+        self.zorder = self.settings.get("zorder")
         self.box_style = get_box_style(self.style)
         self.outlier_style = get_box_outlier_style(self.style)
         self.median_style = get_box_median_style(self.style)
         self.whisker_style = get_box_whisker_style(self.style)
         self.cap_style = get_box_cap_style(self.style)
+        if self.settings.get("outline"):
+            self._apply_outline()
+
+    def _apply_outline(self) -> None:
+        """A raincloud box is a stroke in the font color over the rain (ADR 0021)."""
+
+        stroke = config.get("font_general_color") or "#000000"
+        overrides = [
+            (self.box_style, "facecolor", "plot_box_color", "none"),
+            (self.box_style, "edgecolor", "plot_box_edgecolor", stroke),
+            (self.outlier_style, "marker", "plot_box_outlier_marker", "o"),
+            (self.outlier_style, "markerfacecolor", "plot_box_outlier_color", stroke),
+            (
+                self.outlier_style,
+                "markeredgecolor",
+                "plot_box_outlier_edge_color",
+                stroke,
+            ),
+            (self.median_style, "color", "plot_box_median_color", stroke),
+            (self.whisker_style, "color", "plot_box_whisker_color", stroke),
+            (self.cap_style, "color", "plot_box_cap_color", stroke),
+        ]
+        # an explicit chart style still wins over the outline defaults
+        for style, key, style_key, value in overrides:
+            if style_key not in self.style:
+                style[key] = value
 
     def draw(self, ax, ctx):
         grouped = self.grouped_values()
@@ -1116,7 +1173,7 @@ class BoxLayer(GroupLayer):
             warnings.warn("No data points found for box plot.")
             return
 
-        positions = [ctx.category_index[lbl] for lbl in labels]
+        positions = [ctx.category_index[lbl] + self.offset for lbl in labels]
 
         box_style = dict(self.box_style)
         if box_style.get("facecolor") is None:
@@ -1131,6 +1188,8 @@ class BoxLayer(GroupLayer):
         bp = ax.boxplot(
             values,
             positions=positions,
+            widths=self.width,
+            zorder=self.zorder,
             orientation=self.orientation,
             patch_artist=True,
             showfliers=self.show_outliers if self.show_outliers is not None else True,
@@ -1235,6 +1294,10 @@ class SwarmLayer(GroupLayer):
             )
         jitter = self.settings.get("jitter")
         self.jitter = DEFAULT_SWARM_JITTER if jitter is None else float(jitter)
+        # a raincloud's rain sits off-center in a narrower cell (ADR 0021)
+        self.offset = self.settings.get("offset") or 0.0
+        spread = self.settings.get("spread")
+        self.max_offset = SWARM_MAX_OFFSET if spread is None else float(spread)
         self.swarm_style = get_swarm_style(self.style)
         self.default_size = config["plot_swarm_size"]
         # a highlight edge contrasts in the theme's own text color
@@ -1246,7 +1309,10 @@ class SwarmLayer(GroupLayer):
         """Per-point offsets from the category center, in data units."""
 
         if self.mode == SWARM_MODE.STRIP:
-            return strip_offsets(len(values), self.jitter)
+            # the jitter width scales with the cell the points may spread over
+            return strip_offsets(
+                len(values), self.jitter * self.max_offset / SWARM_MAX_OFFSET
+            )
 
         size = self.swarm_style.get("s")
         if size is None:
@@ -1265,7 +1331,7 @@ class SwarmLayer(GroupLayer):
         unit = ax.transData.transform([[0, 1]] if self.is_horizontal else [[1, 0]])
         origin = ax.transData.transform([[0, 0]])
         scale = (unit - origin)[0][1 if self.is_horizontal else 0]
-        return np.clip(offsets_px / scale, -SWARM_MAX_OFFSET, SWARM_MAX_OFFSET)
+        return np.clip(offsets_px / scale, -self.max_offset, self.max_offset)
 
     def draw(self, ax, ctx):
         grouped = self.grouped_values()
@@ -1285,15 +1351,26 @@ class SwarmLayer(GroupLayer):
         if base_style.get("s") is None:
             base_style["s"] = self.default_size
 
-        # one collection per role; the layer carries a single legend entry
+        # one collection per role with a single legend entry; colored by
+        # group, one collection per label and the cloud's legend lists them
         positions = list(index.values())
         lo, hi = min(positions) - 0.5, max(positions) + 0.5
-        legend_taken = False
-        for role in (None, EMPHASIS_HIGHLIGHT, EMPHASIS_BACKGROUND):
-            members = [lbl for lbl, r in zip(labels, roles) if r == role]
+        if self.color_by_group:
+            batches = [
+                ([lbl], role, i) for i, (lbl, role) in enumerate(zip(labels, roles))
+            ]
+        else:
+            batches = [
+                ([lbl for lbl, r in zip(labels, roles) if r == role], role, None)
+                for role in (None, EMPHASIS_HIGHLIGHT, EMPHASIS_BACKGROUND)
+            ]
+        legend_taken = self.color_by_group
+        for members, role, group_index in batches:
             if not members:
                 continue
             style = dict(base_style)
+            if group_index is not None and self.swarm_style.get("c") is None:
+                style["c"] = self.group_color(group_index, ctx.color)
             self._apply_emphasis(style, role, width_key="linewidths", color_key="c")
             if role == EMPHASIS_HIGHLIGHT:
                 style["edgecolors"] = self.highlight_edge_color
@@ -1302,7 +1379,8 @@ class SwarmLayer(GroupLayer):
                 label = self.label(ctx)
                 legend_taken = True
             groups = [
-                (index[lbl], np.asarray(grouped[lbl], dtype=float)) for lbl in members
+                (index[lbl] + self.offset, np.asarray(grouped[lbl], dtype=float))
+                for lbl in members
             ]
             centers = np.concatenate([np.full(len(v), pos) for pos, v in groups])
             values = np.concatenate([v for _, v in groups])
@@ -1331,6 +1409,12 @@ class SwarmLayer(GroupLayer):
 
 # keeps the two inner boxes of a split violin off the shared seam
 SPLIT_INNER_OFFSET = 0.05
+# raincloud geometry (ADR 0021), in category-axis units around the position:
+# the rain and the box sit opposite the cloud, the rain spread and the box
+# width keep both inside the cell
+RAINCLOUD_RAIN_OFFSET = 0.22
+RAINCLOUD_RAIN_SPREAD = 0.14
+RAINCLOUD_BOX_WIDTH = 0.15
 INNER_QUARTILE_WIDTH_SCALE = 5.0
 
 
@@ -1344,6 +1428,9 @@ class ViolinLayer(GroupLayer):
         self.inner = self.settings.get("inner")
         self.bandwidth = self.settings.get("bandwidth")
         self.split = self.settings.get("split")
+        # a raincloud keeps one half of the body: -1 the low side, +1 the high
+        self.side = self.settings.get("side") or 0
+        self._legend_roles = []
         self.violin_style = get_violin_style(self.style)
         self.inner_style = get_violin_inner_style(self.style)
         # split halves take the multiple palette; a layer receives one ctx color
@@ -1355,6 +1442,8 @@ class ViolinLayer(GroupLayer):
         self.split_values = []
 
     def legend_handles(self):
+        if self.color_by_group:
+            return self.group_legend_handles(self._legend_roles)
         # split values are known once draw() has grouped the data
         if not self.split or not self.split_values:
             return None
@@ -1399,7 +1488,8 @@ class ViolinLayer(GroupLayer):
             body_style["facecolor"] = ctx.color
         roles = self._group_roles(labels, ctx.emphasis)
         # (split value, side): -1 draws the low half, +1 the high half, 0 both
-        sides = list(zip(self.split_values, (-1, 1))) or [(None, 0)]
+        sides = list(zip(self.split_values, (-1, 1))) or [(None, self.side)]
+        self._legend_roles = roles
 
         for i, label in enumerate(labels):
             position = ctx.category_index[label]
@@ -1415,6 +1505,8 @@ class ViolinLayer(GroupLayer):
                 style = dict(body_style)
                 if self.split:
                     style["facecolor"] = self.split_colors[j]["color"]
+                elif self.color_by_group and self.violin_style.get("facecolor") is None:
+                    style["facecolor"] = self.group_color(i, ctx.color)
                 artists = [self._draw_body(ax, values, position, width, style, side)]
                 artists += self._draw_inner(ax, values, position, width, side)
                 self._apply_violin_emphasis(artists, roles[i])
@@ -2259,6 +2351,13 @@ def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[La
         layer_cls = RADIAL_LAYER_TYPES[visual]
         return [layer_cls(chart, settings) for chart in charts]
 
+    if chart_type == "raincloudplot":
+        return [
+            layer
+            for chart in charts
+            for layer in build_raincloud_layers(chart, settings)
+        ]
+
     layer_cls = LAYER_TYPES[chart_type]
     layers = [layer_cls(chart, settings) for chart in charts]
 
@@ -2272,6 +2371,58 @@ def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[La
             + "Only one of them should be True."
         )
     return layers
+
+
+def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
+    """The cloud, rain, and box of one raincloud dataset (ADR 0021).
+
+    The cloud keeps the low side when vertical and the high side when
+    horizontal; the rain and the box share the opposite side.
+    """
+
+    horizontal = settings.get("orientation") == ORIENTATION.HORIZONTAL
+    sign = -1 if horizontal else 1
+    cloud = ViolinLayer(
+        chart,
+        {
+            **settings,
+            "inner": None,
+            "split": None,
+            "side": -sign,
+            "color_by_group": True,
+        },
+    )
+    rain = SwarmLayer(
+        chart,
+        {
+            **settings,
+            "offset": sign * RAINCLOUD_RAIN_OFFSET,
+            "spread": RAINCLOUD_RAIN_SPREAD,
+            "color_by_group": True,
+        },
+    )
+    box = BoxLayer(
+        chart,
+        {
+            **settings,
+            "show_notch": None,
+            "offset": sign * RAINCLOUD_RAIN_OFFSET,
+            "width": RAINCLOUD_BOX_WIDTH,
+            "outline": True,
+            # the box reads over the rain
+            "zorder": (rain.swarm_style.get("zorder") or 2) + 1,
+        },
+    )
+    return [cloud, rain, box]
+
+
+def layers_per_chart(layers: List[Layer]) -> List[List[Layer]]:
+    """Group the layers by their source chart, in order; one list per dataset."""
+
+    grouped = {}
+    for layer in layers:
+        grouped.setdefault(id(layer.chart), []).append(layer)
+    return list(grouped.values())
 
 
 # ================================================
@@ -2363,7 +2514,9 @@ def group_from_chart(
     if mode == "singular":
         palette, max_colors = config["color_general_singular"], 1
     else:
-        palette, max_colors = config["color_general_multiple"], max(len(layers), 1)
+        # one color per dataset: a raincloud's three layers share one chart
+        n_charts = len(layers_per_chart(layers))
+        palette, max_colors = config["color_general_multiple"], max(n_charts, 1)
 
     return LayerGroup(
         layers,

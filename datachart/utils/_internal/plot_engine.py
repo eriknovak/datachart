@@ -19,6 +19,7 @@ from .layers import (
     LayerGroup,
     build_layers,
     group_from_chart,
+    layers_per_chart,
     build_chart_panel_settings,
 )
 from ...constants import FIG_SIZE, ORIENTATION
@@ -125,7 +126,9 @@ def render_chart(
             and settings.get("orientation") == ORIENTATION.HORIZONTAL
         )
 
-        for layer, ax in zip(layers, axes):
+        # one dataset per axes; a raincloud dataset is three layers
+        for chart_layers, ax in zip(layers_per_chart(layers), axes):
+            layer = chart_layers[0]
             configure_labels(
                 layer.chart,
                 [
@@ -145,7 +148,7 @@ def render_chart(
             )
             panel_settings["hist_bins_override"] = hist_bins
             panel = Panel(
-                [group_from_chart([layer], settings, mode="singular")],
+                [group_from_chart(chart_layers, settings, mode="singular")],
                 panel_settings,
             )
             panel.render(ax)
@@ -182,7 +185,8 @@ def render_chart(
     # rebuild the subplot arrangement inside a cell
     if not is_single_plot:
         subplot_panels = []
-        for layer in layers:
+        for chart_layers in layers_per_chart(layers):
+            layer = chart_layers[0]
             sub_settings = build_chart_panel_settings(
                 chart_type, settings, "composition", layer.style
             )
@@ -198,7 +202,8 @@ def render_chart(
             sub_settings["ylabel"] = ylabel
             subplot_panels.append(
                 Panel(
-                    [group_from_chart([layer], settings, mode="singular")], sub_settings
+                    [group_from_chart(chart_layers, settings, mode="singular")],
+                    sub_settings,
                 )
             )
         figure._chart_metadata["panels"] = subplot_panels

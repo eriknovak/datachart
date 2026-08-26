@@ -24,6 +24,7 @@ title: Charts Module
 ::: datachart.charts.BoxPlot
 ::: datachart.charts.ViolinPlot
 ::: datachart.charts.SwarmPlot
+::: datachart.charts.RaincloudPlot
 
 
 ## Relationships

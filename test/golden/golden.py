@@ -30,6 +30,7 @@ from datachart.charts import (
     ParallelCoords,
     PyramidChart,
     RadialChart,
+    RaincloudPlot,
     ViolinPlot,
 )
 from datachart.utils import OverlayChart, FigureGridLayout, Panel, Grid, Annotate
@@ -90,6 +91,10 @@ EXPECTED_CHANGES = {
     "violin_split_quartiles",
     "violin_horizontal_median",
     "violin_panel_box",
+    # new raincloud plot cases (ADR 0021)
+    "raincloud_vertical",
+    "raincloud_horizontal",
+    "raincloud_emphasis",
 }
 
 
@@ -384,6 +389,25 @@ def box_swarm_overlay():
     return Panel(
         [BoxPlot(data=data, show_outliers=False), SwarmPlot(data=data)],
         title="box + swarm",
+    )
+
+
+@case
+def raincloud_vertical():
+    return RaincloudPlot(data=swarm_data(), title="raincloud", show_legend=True)
+
+
+@case
+def raincloud_horizontal():
+    return RaincloudPlot(
+        data=swarm_data(seed=6), orientation="horizontal", mode="strip", show_grid="x"
+    )
+
+
+@case
+def raincloud_emphasis():
+    return RaincloudPlot(
+        data=swarm_data(), emphasis=["background", None, "highlight"], bandwidth=0.3
     )
 
 

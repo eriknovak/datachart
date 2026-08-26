@@ -19,6 +19,8 @@ Methods:
         Creates the pyramid chart.
     RadialChart(attrs):
         Creates the radial chart.
+    RaincloudPlot(attrs):
+        Creates the raincloud plot.
     ScatterChart(attrs):
         Creates the scatter chart.
     SwarmPlot(attrs):
@@ -36,6 +38,7 @@ from .line_chart import LineChart
 from .parallel_coords import ParallelCoords
 from .pyramid_chart import PyramidChart
 from .radial_chart import RadialChart
+from .raincloud_plot import RaincloudPlot
 from .scatter_chart import ScatterChart
 from .swarm_plot import SwarmPlot
 from .violin_plot import ViolinPlot
@@ -49,6 +52,7 @@ __all__ = [
     "ParallelCoords",
     "PyramidChart",
     "RadialChart",
+    "RaincloudPlot",
     "ScatterChart",
     "SwarmPlot",
     "ViolinPlot",
