@@ -713,7 +713,7 @@ def get_box_cap_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
-# Violin Chart Style
+# Violin Plot Style
 # -------------------------------------
 
 

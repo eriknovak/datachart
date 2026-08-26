@@ -20,8 +20,8 @@ Classes:
     ScatterDataPointAttrs: The data point attributes for the scatter chart.
     BoxSingleChartAttrs: The single chart attributes for the box plot.
     BoxDataPointAttrs: The data point attributes for the box plot.
-    ViolinSingleChartAttrs: The single chart attributes for the violin chart.
-    ViolinDataPointAttrs: The data point attributes for the violin chart.
+    ViolinSingleChartAttrs: The single chart attributes for the violin plot.
+    ViolinDataPointAttrs: The data point attributes for the violin plot.
     ParallelCoordsSingleChartAttrs: The single chart attributes for the parallel coordinates chart.
     ParallelCoordsDataPointAttrs: The data point attributes for the parallel coordinates chart.
     RadialSingleChartAttrs: The single chart attributes for the radial chart.
@@ -44,7 +44,7 @@ Classes:
     ScatterStyleAttrs: The typing for the scatter chart style.
     RegressionStyleAttrs: The typing for the regression line style.
     BoxStyleAttrs: The typing for the box plot style.
-    ViolinStyleAttrs: The typing for the violin chart style.
+    ViolinStyleAttrs: The typing for the violin plot style.
     ParallelCoordsStyleAttrs: The typing for the parallel coordinates chart style.
     ThemeDefaultAttrs: The typing for theme-driven defaults and cycles.
 
@@ -533,7 +533,7 @@ class BoxStyleAttrs(TypedDict):
 
 
 class ViolinStyleAttrs(TypedDict):
-    """The typing for the violin chart style.
+    """The typing for the violin plot style.
 
     Attributes:
         plot_violin_color (Union[str, None]): The violin fill color.
@@ -1285,12 +1285,12 @@ class _BoxChartAttrs(ChartCommonAttrs):
 
 
 # ================================================
-# Violin Chart Attributes
+# Violin Plot Attributes
 # ================================================
 
 
 class ViolinDataPointAttrs(TypedDict):
-    """The data point attributes for the violin chart.
+    """The data point attributes for the violin plot.
 
     Attributes:
         label (str): The category label.
@@ -1303,14 +1303,14 @@ class ViolinDataPointAttrs(TypedDict):
 
 
 class ViolinSingleChartAttrs(TypedDict):
-    """The single chart attributes for the violin chart.
+    """The single chart attributes for the violin plot.
 
     Attributes:
-        data (List[ViolinDataPointAttrs]): The list of data points defining the violin chart.
-        subtitle (Union[str, None]): The subtitle of the violin chart. Also used as the label in the legend.
-        xlabel (Union[str, None]): The xlabel of the violin chart.
-        ylabel (Union[str, None]): The ylabel of the violin chart.
-        style (Union[ViolinStyleAttrs, None]): The style of the violin chart.
+        data (List[ViolinDataPointAttrs]): The list of data points defining the violin plot.
+        subtitle (Union[str, None]): The subtitle of the violin plot. Also used as the label in the legend.
+        xlabel (Union[str, None]): The xlabel of the violin plot.
+        ylabel (Union[str, None]): The ylabel of the violin plot.
+        style (Union[ViolinStyleAttrs, None]): The style of the violin plot.
         xticks (Union[int, float, None]): The xtick positions list.
         xticklabels (Union[List[str], None]): The xtick labels.
         xtickrotate (Union[int, None]): The xtick rotation value.
@@ -1346,11 +1346,11 @@ class ViolinSingleChartAttrs(TypedDict):
     value: Union[str, None]  # the name of the value attribute in data
 
 
-class _ViolinChartAttrs(ChartCommonAttrs):
-    """The violin chart attributes.
+class _ViolinPlotAttrs(ChartCommonAttrs):
+    """The violin plot attributes.
 
     Attributes:
-        charts (Union[ViolinSingleChartAttrs, List[ViolinSingleChartAttrs]]): The violin chart definitions.
+        charts (Union[ViolinSingleChartAttrs, List[ViolinSingleChartAttrs]]): The violin plot definitions.
         inner (Union[VIOLIN_INNER, str, None]): The inner marks drawn inside each body.
         bandwidth (Union[str, float, None]): The KDE bandwidth method or scalar factor.
         split (Union[str, None]): The key name in `data` whose two values split each violin.
@@ -1525,7 +1525,7 @@ _ChartAttrs = Union[
     _HeatmapChartAttrs,
     _ScatterChartAttrs,
     _BoxChartAttrs,
-    _ViolinChartAttrs,
+    _ViolinPlotAttrs,
     _ParallelCoordsChartAttrs,
     _RadialChartAttrs,
 ]

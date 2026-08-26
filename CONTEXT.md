@@ -95,7 +95,7 @@ as positive magnitudes.
 _Avoid_: negative axis, diverging axis
 
 **Violin**:
-A per-label kernel-density body (`ViolinChart`) drawn at the same positions
+A per-label kernel-density body (`ViolinPlot`) drawn at the same positions
 and with the same API as a box group, so violin and box figures over the same
 labels line up in `Panel`. Multiple datasets require subplots, as for boxes.
 _Avoid_: density plot, bean plot

@@ -29,7 +29,7 @@ from datachart.charts import (
     ParallelCoords,
     PyramidChart,
     RadialChart,
-    ViolinChart,
+    ViolinPlot,
 )
 from datachart.utils import OverlayChart, FigureGridLayout, Panel, Grid, Annotate
 from datachart.config import config
@@ -79,7 +79,7 @@ EXPECTED_CHANGES = {
     "overlay_annotated",
     # the scatter correlation box now wears the plot_text_* family (ADR 0018)
     "scatter_regression",
-    # new violin chart cases (ADR 0019)
+    # new violin plot cases (ADR 0019)
     "violin_basic",
     "violin_split_quartiles",
     "violin_horizontal_median",
@@ -309,12 +309,12 @@ def violin_data(seed=5, split=False):
 
 @case
 def violin_basic():
-    return ViolinChart(data=violin_data(), show_grid="y")
+    return ViolinPlot(data=violin_data(), show_grid="y")
 
 
 @case
 def violin_split_quartiles():
-    return ViolinChart(
+    return ViolinPlot(
         data=violin_data(split=True),
         split="sex",
         inner="quartiles",
@@ -325,7 +325,7 @@ def violin_split_quartiles():
 
 @case
 def violin_horizontal_median():
-    return ViolinChart(
+    return ViolinPlot(
         data=violin_data(seed=6),
         orientation="horizontal",
         inner="median",
@@ -337,7 +337,7 @@ def violin_horizontal_median():
 def violin_panel_box():
     data = violin_data(seed=7)
     return Panel(
-        [ViolinChart(data=data, inner=None), BoxPlot(data=data, show_outliers=False)],
+        [ViolinPlot(data=data, inner=None), BoxPlot(data=data, show_outliers=False)],
         title="Violin + box",
     )
 

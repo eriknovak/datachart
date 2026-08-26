@@ -12,7 +12,7 @@ It offers a wide range of chart types, including line charts, bar charts, histog
 | :-------------------------------------------- | :------------------------------------------- |
 | [Bar Chart](barchart.ipynb)                   | The showcase of the bar chart.               |
 | [Box Plot](boxplot.ipynb)                     | The showcase of the box plot.                |
-| [Violin Chart](violinchart.ipynb)             | The showcase of the violin chart.            |
+| [Violin Plot](violinplot.ipynb)             | The showcase of the violin plot.            |
 | [Heatmap](heatmap.ipynb)                      | The showcase of the heatmap.                 |
 | [Histogram](histogram.ipynb)                  | The showcase of the histogram.               |
 | [Line Chart](linechart.ipynb)                 | The showcase of the line chart.              |

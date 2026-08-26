@@ -676,7 +676,7 @@ class ORIENTATION:
     """The supported orientations.
 
     Passed as the `orientation` setting of bar charts, histograms, box
-    plots, and violin charts.
+    plots, and violin plots.
 
     ![ORIENTATION at a glance](../../assets/imgs/const-orientation.svg){ width="100%" }
 
@@ -698,7 +698,7 @@ class ORIENTATION:
 class VIOLIN_INNER:
     """The supported violin inner marks.
 
-    Passed as the `inner` setting of violin charts; `None` draws the body only.
+    Passed as the `inner` setting of violin plots; `None` draws the body only.
 
     Examples:
         >>> from datachart.constants import VIOLIN_INNER

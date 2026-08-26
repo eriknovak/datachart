@@ -2,7 +2,7 @@
 status: accepted
 ---
 
-# ViolinChart mirrors BoxPlot and draws its inner marks itself
+# ViolinPlot mirrors BoxPlot and draws its inner marks itself
 
 Box plots hide distribution shape; bio/ML publications default to violins.
 We add one chart front that speaks the `BoxPlot` API and shares its
@@ -10,7 +10,7 @@ positioning contract, so the two compose in `Panel` without a new seam.
 
 ## Commitments
 
-- **BoxPlot's shape, BoxPlot's contract.** `ViolinChart(data, ...)` takes
+- **BoxPlot's shape, BoxPlot's contract.** `ViolinPlot(data, ...)` takes
   the same `{"label", "value"}` points and the same common parameters as
   `BoxPlot` (`orientation`, `emphasis`, `scaley`, ticks, limits, `vlines`/
   `hlines`/`texts`, `label`/`value` key remaps). A list of lists requires

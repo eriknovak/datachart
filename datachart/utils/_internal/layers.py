@@ -1224,7 +1224,7 @@ class ViolinLayer(BoxLayer):
     def draw(self, ax, ctx):
         labels, grouped = self._group()
         if len(labels) == 0:
-            warnings.warn("No data points found for violin chart.")
+            warnings.warn("No data points found for violin plot.")
             return
 
         body_style = dict(self.violin_style)
@@ -2063,7 +2063,7 @@ LAYER_TYPES = {
     "histogram": HistogramLayer,
     "scatterchart": ScatterLayer,
     "boxplot": BoxLayer,
-    "violinchart": ViolinLayer,
+    "violinplot": ViolinLayer,
     "heatmap": HeatmapLayer,
 }
 
@@ -2460,7 +2460,7 @@ class Panel:
         s = self.settings
 
         # one dataset per kind: a violin and a box may share the positions
-        for kind, name in (("box", "box plot"), ("violin", "violin chart")):
+        for kind, name in (("box", "box plot"), ("violin", "violin plot")):
             if sum(1 for l in self.layers if l.kind == kind) > 1:
                 raise ValueError(
                     f"Multiple {name} datasets require `subplots=True`. "

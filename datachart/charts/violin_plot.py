@@ -29,7 +29,7 @@ BANDWIDTH_METHODS = ("scott", "silverman")
 # ================================================
 
 
-def ViolinChart(
+def ViolinPlot(
     data: Union[List[ViolinDataPointAttrs], List[List[ViolinDataPointAttrs]]],
     *,
     title: Optional[str] = None,
@@ -89,11 +89,11 @@ def ViolinChart(
     bandwidth: Optional[Union[str, float]] = None,
     split: Optional[str] = None,
 ) -> plt.Figure:
-    """Creates the violin chart.
+    """Creates the violin plot.
 
     Examples:
-        >>> from datachart.charts import ViolinChart
-        >>> figure = ViolinChart(
+        >>> from datachart.charts import ViolinPlot
+        >>> figure = ViolinPlot(
         ...     data=[
         ...         {"label": "Group A", "value": 10},
         ...         {"label": "Group A", "value": 15},
@@ -102,13 +102,13 @@ def ViolinChart(
         ...         {"label": "Group B", "value": 25},
         ...         {"label": "Group B", "value": 22},
         ...     ],
-        ...     title="Basic Violin Chart",
+        ...     title="Basic Violin Plot",
         ...     xlabel="Group",
         ...     ylabel="Value"
         ... )
 
     Args:
-        data: The data points for the violin chart(s). Can be a single list of data points
+        data: The data points for the violin plot(s). Can be a single list of data points
             for one chart, or a list of lists for multiple charts/subplots.
             Each data point should have a `label` (category) and `value` (numeric).
         title: The title of the chart.
@@ -156,7 +156,7 @@ def ViolinChart(
             palette and listed in the legend.
 
     Returns:
-        The figure containing the violin chart.
+        The figure containing the violin plot.
 
     """
     if inner not in INNER_OPTIONS:
@@ -215,4 +215,4 @@ def ViolinChart(
         "scaley": scaley,
     }
 
-    return render_chart("violinchart", charts, settings)
+    return render_chart("violinplot", charts, settings)

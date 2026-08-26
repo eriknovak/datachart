@@ -21,4 +21,4 @@ title: Charts Module
 ::: datachart.charts.PyramidChart
 ::: datachart.charts.RadialChart
 ::: datachart.charts.ScatterChart
-::: datachart.charts.ViolinChart
+::: datachart.charts.ViolinPlot

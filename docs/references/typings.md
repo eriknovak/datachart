@@ -94,7 +94,7 @@ title: Typings Module
         heading_level: 4
 
 
-### Violin Chart Typings
+### Violin Plot Typings
 
 ::: datachart.typings.ViolinSingleChartAttrs
     options:
