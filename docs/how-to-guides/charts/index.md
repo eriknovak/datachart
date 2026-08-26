@@ -13,6 +13,7 @@ It offers a wide range of chart types, including line charts, bar charts, histog
 | [Bar Chart](barchart.ipynb)                   | The showcase of the bar chart.               |
 | [Box Plot](boxplot.ipynb)                     | The showcase of the box plot.                |
 | [Violin Plot](violinplot.ipynb)             | The showcase of the violin plot.            |
+| [Swarm Plot](swarmplot.ipynb)               | The showcase of the swarm plot.             |
 | [Heatmap](heatmap.ipynb)                      | The showcase of the heatmap.                 |
 | [Histogram](histogram.ipynb)                  | The showcase of the histogram.               |
 | [Line Chart](linechart.ipynb)                 | The showcase of the line chart.              |
@@ -20,7 +21,6 @@ It offers a wide range of chart types, including line charts, bar charts, histog
 | [Pyramid Chart](pyramidchart.ipynb)           | The showcase of the pyramid chart.           |
 | [Radial Chart](radialchart.ipynb)             | The showcase of the radial chart.            |
 | [Scatter Chart](scatterchart.ipynb)           | The showcase of the scatter chart.           |
-| [Swarm Plot](swarmplot.ipynb)               | The showcase of the swarm plot.             |
 
 Here are some utility functions, that could help you.
 
