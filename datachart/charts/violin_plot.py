@@ -25,6 +25,20 @@ from ..constants import (
 INNER_OPTIONS = (VIOLIN_INNER.BOX, VIOLIN_INNER.QUARTILES, VIOLIN_INNER.MEDIAN, None)
 BANDWIDTH_RULES = (BANDWIDTH.SCOTT, BANDWIDTH.SILVERMAN)
 
+
+def validate_bandwidth(bandwidth) -> None:
+    """Raise unless `bandwidth` is None, a bandwidth rule, or a number."""
+
+    if bandwidth is not None and not (
+        bandwidth in BANDWIDTH_RULES
+        or (isinstance(bandwidth, (int, float)) and not isinstance(bandwidth, bool))
+    ):
+        raise ValueError(
+            f"Invalid `bandwidth` value {bandwidth!r}. "
+            f"Must be None, one of {BANDWIDTH_RULES}, or a number."
+        )
+
+
 # ================================================
 # Main Chart Definition
 # ================================================
@@ -164,14 +178,7 @@ def ViolinPlot(
         raise ValueError(
             f"Invalid `inner` value {inner!r}. Must be one of {INNER_OPTIONS}."
         )
-    if bandwidth is not None and not (
-        bandwidth in BANDWIDTH_RULES
-        or (isinstance(bandwidth, (int, float)) and not isinstance(bandwidth, bool))
-    ):
-        raise ValueError(
-            f"Invalid `bandwidth` value {bandwidth!r}. "
-            f"Must be None, one of {BANDWIDTH_RULES}, or a number."
-        )
+    validate_bandwidth(bandwidth)
 
     # Build the charts structure using shared utility
     charts = build_charts_structure(

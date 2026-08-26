@@ -1554,7 +1554,7 @@ class _RaincloudPlotAttrs(ChartCommonAttrs):
     Attributes:
         charts (Union[RaincloudSingleChartAttrs, List[RaincloudSingleChartAttrs]]): The raincloud plot definitions.
         mode (Union[SWARM_MODE, str, None]): The rain spread mode: beeswarm or strip.
-        jitter (Union[float, None]): The strip jitter width as a fraction of the rain width.
+        jitter (Union[float, None]): The strip jitter width as a fraction of the category width, scaled to the rain.
         bandwidth (Union[BANDWIDTH, str, float, None]): The cloud KDE bandwidth rule or scalar factor.
         show_outliers (Union[bool, None]): Whether or not the box shows outliers.
         orientation (Union[ORIENTATION, str, None]): The orientation of the rainclouds.

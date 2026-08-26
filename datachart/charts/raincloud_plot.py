@@ -21,7 +21,7 @@ from ..constants import (
     SCALE,
     SWARM_MODE,
 )
-from .violin_plot import BANDWIDTH_RULES
+from .violin_plot import validate_bandwidth
 
 # ================================================
 # Main Chart Definition
@@ -140,8 +140,9 @@ def RaincloudPlot(
         mode: How the rain spreads across its width. See `SWARM_MODE`:
             "swarm" packs the points so none overlap; "strip" jitters them
             uniformly.
-        jitter: The strip jitter width, as a fraction of the rain width.
-            Only used with `mode="strip"`.
+        jitter: The strip jitter width, as a fraction of the category width
+            like `SwarmPlot`, scaled down to the rain's narrower cell. Only
+            used with `mode="strip"`.
         bandwidth: The cloud's KDE bandwidth: None or "scott" (Scott's rule),
             "silverman" (Silverman's rule), or a scalar factor. See `BANDWIDTH`.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
@@ -170,14 +171,7 @@ def RaincloudPlot(
         The figure containing the raincloud plot.
 
     """
-    if bandwidth is not None and not (
-        bandwidth in BANDWIDTH_RULES
-        or (isinstance(bandwidth, (int, float)) and not isinstance(bandwidth, bool))
-    ):
-        raise ValueError(
-            f"Invalid `bandwidth` value {bandwidth!r}. "
-            f"Must be None, one of {BANDWIDTH_RULES}, or a number."
-        )
+    validate_bandwidth(bandwidth)
 
     charts = build_charts_structure(
         data,
