@@ -626,6 +626,7 @@ def bandwidth():
         ("BANDWIDTH.SCOTT", BANDWIDTH.SCOTT),
         ("BANDWIDTH.SILVERMAN", BANDWIDTH.SILVERMAN),
         ("0.25", 0.25),
+        ("1.0", 1.0),
     ]
     figs = [
         ViolinPlot(data=_violin_data(), bandwidth=value, inner=None, title=label)
@@ -635,7 +636,7 @@ def bandwidth():
         figs,
         "const-bandwidth.svg",
         2.2,
-        footnote="Silverman is about 6% wider than Scott; a number is a factor on "
+        footnote="The two rules differ by a constant 6%; a number is a factor on "
         "the standard deviation of the values.",
     )
 
