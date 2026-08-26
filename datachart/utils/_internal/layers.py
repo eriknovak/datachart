@@ -1266,6 +1266,8 @@ class ViolinLayer(BoxLayer):
             showmeans=False,
         )
         body = parts["bodies"][0]
+        # above the axis gridlines (zorder 1.5), like a box patch
+        body.set_zorder(2)
         facecolor = style.get("facecolor")
         if facecolor is not None:
             body.set_facecolor(facecolor)
