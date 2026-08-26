@@ -1,4 +1,4 @@
-"""Tests for the swarm chart and the panel category index (ADR 0019)."""
+"""Tests for the swarm chart and the panel category index."""
 
 import unittest
 import warnings
@@ -222,6 +222,34 @@ class TestCategoryIndex(unittest.TestCase):
         )
         ax = figure.axes[0]
         np.testing.assert_array_equal(ax.get_yticks(), [1, 2, 3])
+
+    def test_packing_reads_panel_limits_and_later_layers(self):
+        data = group_data(n=60)
+        figure = Panel([SwarmChart(data), BoxPlot(data)], ymin=0, ymax=40)
+        ax = figure.axes[0]
+        self.assertEqual(ax.get_ylim(), (0.0, 40.0))
+        diameter = np.sqrt(config["plot_swarm_size"]) / 72 * figure.dpi
+        xy = np.asarray(_swarm_collections(ax)[0].get_offsets())
+        for pos in (1, 2, 3):
+            px = ax.transData.transform(xy[np.abs(xy[:, 0] - pos) <= 0.5])
+            dist = np.sqrt(((px[:, None, :] - px[None, :, :]) ** 2).sum(-1))
+            dist[np.diag_indices_from(dist)] = np.inf
+            self.assertGreaterEqual(dist.min(), diameter * 0.99)
+
+    def test_panel_role_mutes_box_and_swarm(self):
+        data = group_data()
+        figure = Panel(
+            [
+                {"figure": BoxPlot(data), "emphasis": "background"},
+                {"figure": SwarmChart(data), "emphasis": "background"},
+            ]
+        )
+        ax = figure.axes[0]
+        boxes = [p for p in ax.patches if hasattr(p, "get_path")]
+        for box in boxes:
+            self.assertEqual(box.get_alpha(), config["muted_alpha"])
+        for collection in _swarm_collections(ax):
+            self.assertEqual(collection.get_alpha(), config["muted_alpha"])
 
     def test_multiple_boxes_still_require_subplots(self):
         data = group_data()

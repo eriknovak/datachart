@@ -20,8 +20,8 @@ the opposite of what a box + swarm overlay wants.
   center; multiple swarm layers overlay in distinct colors. Raincloud-style
   side offsets are a per-layer property set by that front, not panel slotting.
 - **Beeswarm is pixel-accurate at draw time.** Offsets are computed in display
-  space from the marker diameter after autoscaling, then clamped to half the
-  category width — like seaborn, and unlike a size-blind data-space packing
+  space from the marker diameter after autoscaling, then clamped to ±0.4 of
+  the category width — like seaborn, and unlike a size-blind data-space packing
   that drifts with figure size. Limits changed after draw can shift spacing
   slightly; documented, accepted.
 - **Strip jitter is deterministic.** `jitter` is a fraction of the category

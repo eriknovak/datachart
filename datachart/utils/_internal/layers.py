@@ -80,10 +80,8 @@ DEFAULT_CI_LEVEL = 0.95
 DEFAULT_SIZE_RANGE = (20, 200)
 DEFAULT_SWARM_MODE = SWARM_MODE.SWARM
 DEFAULT_SWARM_JITTER = 0.4
-# a swarm never reaches past the box edges: half the category width
+# swarm offsets stay inside the category cell, clear of its neighbors
 SWARM_MAX_OFFSET = 0.4
-# breathing room between packed markers, as a fraction of the diameter
-SWARM_GAP = 1.05
 DEFAULT_BAR_VALUE_FORMAT = "%g"
 # show_area fills this many data magnitudes below the line; the axes clip it,
 # so the fill meets the floor whatever limits sharey, ymin or a re-render set
@@ -1031,7 +1029,7 @@ class ScatterLayer(Layer):
 
 
 class GroupLayer(Layer):
-    """A layer of labeled groups placed on the panel's category index (ADR 0019)."""
+    """A layer of labeled groups placed on the panel's category index."""
 
     def _resolve_emphasis(self, value):
         # group layers never dodge; emphasis aligns with the group labels
@@ -1075,10 +1073,10 @@ class GroupLayer(Layer):
             else:
                 ax.set_yscale(scaley)
 
-    def _group_roles(self, labels: list) -> list:
-        """One emphasis role per label; a single value applies to every group."""
+    def _group_roles(self, labels: list, panel_role: Optional[str] = None) -> list:
+        """One emphasis role per label; the panel's role, or a single value, applies to all."""
 
-        roles = self.emphasis
+        roles = panel_role if panel_role is not None else self.emphasis
         if roles is None:
             return [None] * len(labels)
         if isinstance(roles, str):
@@ -1113,8 +1111,7 @@ class BoxLayer(GroupLayer):
             warnings.warn("No data points found for box plot.")
             return
 
-        index = ctx.category_index or {lbl: i + 1 for i, lbl in enumerate(labels)}
-        positions = [index[lbl] for lbl in labels]
+        positions = [ctx.category_index[lbl] for lbl in labels]
 
         box_style = dict(self.box_style)
         if box_style.get("facecolor") is None:
@@ -1147,12 +1144,12 @@ class BoxLayer(GroupLayer):
             if alpha is not None:
                 patch.set_alpha(alpha)
 
-        self._apply_box_emphasis(bp, labels)
+        self._apply_box_emphasis(bp, self._group_roles(labels, ctx.emphasis))
 
-    def _apply_box_emphasis(self, bp: dict, labels: list) -> None:
+    def _apply_box_emphasis(self, bp: dict, roles: list) -> None:
         """Apply per-label roles; whiskers, caps, medians, and outliers follow the box."""
 
-        for i, role in enumerate(self._group_roles(labels)):
+        for i, role in enumerate(roles):
             if role is None:
                 continue
             box = bp["boxes"][i]
@@ -1237,6 +1234,8 @@ class SwarmLayer(GroupLayer):
         self.default_size = config["plot_swarm_size"]
         # a highlight edge contrasts in the theme's own text color
         self.highlight_edge_color = config.get("font_general_color") or "#000000"
+        # collections drawn per axes, packed by the panel after limits settle
+        self._pending = {}
 
     def _offsets(self, ax, position: float, values: np.ndarray) -> np.ndarray:
         """Per-point offsets from the category center, in data units."""
@@ -1247,7 +1246,7 @@ class SwarmLayer(GroupLayer):
         size = self.swarm_style.get("s")
         if size is None:
             size = self.default_size
-        diameter_px = np.sqrt(size) / 72 * ax.figure.dpi * SWARM_GAP
+        diameter_px = np.sqrt(size) / 72 * ax.figure.dpi
         centers = np.full(len(values), position, dtype=float)
         points = (
             np.column_stack([values, centers])
@@ -1270,8 +1269,8 @@ class SwarmLayer(GroupLayer):
             warnings.warn("No data points found for swarm chart.")
             return
 
-        index = ctx.category_index or {lbl: i + 1 for i, lbl in enumerate(labels)}
-        roles = self._group_roles(labels)
+        index = ctx.category_index
+        roles = self._group_roles(labels, ctx.emphasis)
 
         base_style = dict(self.swarm_style)
         if ctx.z_order is not None:
@@ -1280,15 +1279,10 @@ class SwarmLayer(GroupLayer):
             base_style["c"] = ctx.color
         if base_style.get("s") is None:
             base_style["s"] = self.default_size
-        # the layer's own roles resolve per group; the panel role wins
-        if ctx.emphasis is not None:
-            roles = [ctx.emphasis] * len(labels)
-
-        # the value scale must be in force for the pixel-space packing
-        self.apply_scales(ax, None, self.settings.get("scaley"))
 
         # one collection per role; the layer carries a single legend entry
-        collections = []
+        positions = list(index.values())
+        lo, hi = min(positions) - 0.5, max(positions) + 0.5
         legend_taken = False
         for role in (None, EMPHASIS_HIGHLIGHT, EMPHASIS_BACKGROUND):
             members = [lbl for lbl, r in zip(labels, roles) if r == role]
@@ -1302,42 +1296,29 @@ class SwarmLayer(GroupLayer):
             if role != EMPHASIS_BACKGROUND and not legend_taken:
                 label = self.label(ctx)
                 legend_taken = True
-            centers = np.concatenate(
-                [np.full(len(grouped[lbl]), index[lbl], dtype=float) for lbl in members]
-            )
-            values = np.concatenate(
-                [np.asarray(grouped[lbl], dtype=float) for lbl in members]
-            )
+            groups = [
+                (index[lbl], np.asarray(grouped[lbl], dtype=float)) for lbl in members
+            ]
+            centers = np.concatenate([np.full(len(v), pos) for pos, v in groups])
+            values = np.concatenate([v for _, v in groups])
             x, y = (values, centers) if self.is_horizontal else (centers, values)
-            collections.append((members, ax.scatter(x, y, label=label, **style)))
-
-        # the category axis spans every group's full width, edge to edge like
-        # a box plot, and the view is settled before the packing reads it
-        positions = list(index.values())
-        lo, hi = min(positions) - 0.5, max(positions) + 0.5
-        for _, collection in collections:
+            collection = ax.scatter(x, y, label=label, **style)
+            # the category axis spans every group edge to edge, like a box plot
             edges = (
                 collection.sticky_edges.y
                 if self.is_horizontal
                 else collection.sticky_edges.x
             )
             edges[:] = [lo, hi]
+            self._pending.setdefault(id(ax), []).append((collection, groups))
         interval = ax.dataLim.intervaly if self.is_horizontal else ax.dataLim.intervalx
         interval[:] = (min(interval[0], lo), max(interval[1], hi))
-        ax.autoscale_view()
-        # user limits move the view after draw; applying them first keeps the
-        # packing exact (the panel re-applies them, idempotently)
-        configure_axis_limits(
-            ax, {k: self.settings.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
-        )
 
-        for members, collection in collections:
-            offsets = np.concatenate(
-                [
-                    self._offsets(ax, index[lbl], np.asarray(grouped[lbl], dtype=float))
-                    for lbl in members
-                ]
-            )
+    def pack(self, ax) -> None:
+        """Spread the points drawn into `ax`; the panel calls this once its view is final."""
+
+        for collection, groups in self._pending.pop(id(ax), []):
+            offsets = np.concatenate([self._offsets(ax, pos, v) for pos, v in groups])
             xy = np.asarray(collection.get_offsets()).copy()
             xy[:, 1 if self.is_horizontal else 0] += offsets
             collection.set_offsets(xy)
@@ -2806,6 +2787,15 @@ class Panel:
         if polar:
             self._apply_radial_furniture(ax)
 
+        # beeswarm packing reads the display transform, so it runs once the
+        # scales and limits are final (ADR 0019)
+        if group_axes is None:
+            group_axes = [ax] * len(self.groups)
+        for group, owner_ax in zip(self.groups, group_axes):
+            for layer in group.layers:
+                if isinstance(layer, SwarmLayer):
+                    layer.pack(owner_ax)
+
         # reference lines and text annotations, after scales and limits
         for layer, target_ax in zip(layers, [ax] * len(layers)):
             _draw_ref_lines(target_ax, layer.vlines, layer.hlines)
@@ -2813,8 +2803,6 @@ class Panel:
         # a twin axes renders entirely above its host, so texts live on the
         # topmost axes while data coordinates read the owning layer's axes
         top_ax = ax_right if ax_right is not None else ax
-        if group_axes is None:
-            group_axes = [ax] * len(self.groups)
         clearance = None
         if any(layer.texts for layer in layers):
             clearance = self._clearance_points(group_axes, horizontal)
