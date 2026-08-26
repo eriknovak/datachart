@@ -40,6 +40,8 @@ class Config:
             Resets the global configuration.
         update_config(config):
             Updates the global configuration.
+        register_theme(name, theme):
+            Registers a custom theme for use with `set_theme`.
         get(attr, default):
             Gets the associated configuration attribute.
 
@@ -75,6 +77,30 @@ class Config:
                 f"Warning: {theme} is not a valid theme. Must be one of {list(THEMES)}. Reverting to last active theme..."
             )
             self.set_theme(self.theme)
+
+    def register_theme(self, name: str, theme: StyleAttrs) -> None:
+        """Registers a custom theme so it can be applied with `set_theme`.
+
+        The theme must define every attribute of the default theme; missing
+        keys are filled from it, unknown keys are rejected.
+
+        Examples:
+            >>> from datachart.config import config
+            >>> from datachart.themes import DEFAULT_THEME
+            >>> config.register_theme("mine", {**DEFAULT_THEME, "font_general_size": 14})
+            >>> config.set_theme("mine")
+            >>> config.get("font_general_size")
+            14
+
+        Args:
+            name: The theme name, later passed to `set_theme`.
+            theme: The style attributes of the theme.
+
+        """
+        unknown = set(theme) - set(DEFAULT_THEME)
+        if unknown:
+            raise ValueError(f"Unknown theme attributes: {sorted(unknown)}")
+        THEMES[name] = {**copy.deepcopy(DEFAULT_THEME), **copy.deepcopy(theme)}
 
     def reset_config(self) -> None:
         """Resets the global configuration.
