@@ -93,6 +93,10 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.VIOLIN_INNER
+    options:
+        heading_level: 3
+
 ::: datachart.constants.RADIAL_TYPE
     options:
         heading_level: 3

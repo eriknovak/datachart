@@ -94,6 +94,17 @@ title: Typings Module
         heading_level: 4
 
 
+### Violin Chart Typings
+
+::: datachart.typings.ViolinSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.ViolinDataPointAttrs
+    options:
+        heading_level: 4
+
+
 ### Parallel Coordinates Plot Typings
 
 ::: datachart.typings.ParallelCoordsSingleChartAttrs
@@ -151,6 +162,8 @@ title: Typings Module
 ::: datachart.typings.RegressionStyleAttrs
 
 ::: datachart.typings.BoxStyleAttrs
+
+::: datachart.typings.ViolinStyleAttrs
 
 ::: datachart.typings.ParallelCoordsStyleAttrs
 ::: datachart.typings.ThemeDefaultAttrs
