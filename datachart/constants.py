@@ -704,6 +704,8 @@ class SWARM_MODE:
     Passed as the `mode` setting of swarm plots: how the points of one group
     spread across the category width.
 
+    ![SWARM_MODE at a glance](../../assets/imgs/const-swarm-mode.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import SWARM_MODE
         >>> SWARM_MODE.SWARM
