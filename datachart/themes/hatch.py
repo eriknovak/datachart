@@ -36,6 +36,5 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_heatmap_cmap": COLORS.Blues,
         "plot_heatmap_frame_color": "#000000",
         "plot_violin_edgecolor": "#000000",
-        "plot_violin_alpha": 1.0,
     }
 )

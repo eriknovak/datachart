@@ -214,7 +214,7 @@ BASE_THEME: StyleAttrs = {
     "plot_box_cap_linewidth": 0.8,
     # plot violin style
     "plot_violin_color": None,
-    "plot_violin_alpha": 0.75,
+    "plot_violin_alpha": 1.0,
     "plot_violin_linewidth": 1.0,
     "plot_violin_edgecolor": None,
     "plot_violin_width": 0.8,
