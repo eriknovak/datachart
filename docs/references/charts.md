@@ -10,16 +10,24 @@ title: Charts Module
         heading_level: 2
 
 
-## Chart Functions
+## Trends and Comparisons
 
-::: datachart.charts.BarChart
-::: datachart.charts.BoxPlot
-::: datachart.charts.Heatmap
-::: datachart.charts.Histogram
 ::: datachart.charts.LineChart
-::: datachart.charts.ParallelCoords
+::: datachart.charts.BarChart
 ::: datachart.charts.PyramidChart
 ::: datachart.charts.RadialChart
-::: datachart.charts.ScatterChart
-::: datachart.charts.SwarmPlot
+
+
+## Distributions
+
+::: datachart.charts.Histogram
+::: datachart.charts.BoxPlot
 ::: datachart.charts.ViolinPlot
+::: datachart.charts.SwarmPlot
+
+
+## Relationships
+
+::: datachart.charts.ScatterChart
+::: datachart.charts.Heatmap
+::: datachart.charts.ParallelCoords
