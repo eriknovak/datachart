@@ -25,6 +25,10 @@ CHART_CONFIGS = {
         "multiplot": False,
         "subplots": True,
     },
+    "violinchart": {
+        "multiplot": False,
+        "subplots": True,
+    },
     "parallelcoords": {
         "multiplot": True,
         "subplots": False,

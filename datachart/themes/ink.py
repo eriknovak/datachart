@@ -35,5 +35,7 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_parallel_dim_label_color": "#34495E",
         "plot_box_edgecolor": "#34495E",
         "plot_box_median_color": "#34495E",
+        "plot_violin_edgecolor": "#34495E",
+        "plot_violin_inner_color": "#34495E",
     }
 )

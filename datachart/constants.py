@@ -675,8 +675,8 @@ class NORMALIZE:
 class ORIENTATION:
     """The supported orientations.
 
-    Passed as the `orientation` setting of bar charts, histograms, and box
-    plots.
+    Passed as the `orientation` setting of bar charts, histograms, box
+    plots, and violin charts.
 
     ![ORIENTATION at a glance](../../assets/imgs/const-orientation.svg){ width="100%" }
 
@@ -693,6 +693,31 @@ class ORIENTATION:
 
     HORIZONTAL = "horizontal"
     VERTICAL = "vertical"
+
+
+class VIOLIN_INNER:
+    """The supported violin inner marks.
+
+    Passed as the `inner` setting of violin charts; `None` draws the body only.
+
+    Examples:
+        >>> from datachart.constants import VIOLIN_INNER
+        >>> VIOLIN_INNER.BOX
+        "box"
+
+    Attributes:
+        BOX (str): A thin quartile bar, a 1.5·IQR whisker line, and a median
+            dot. Equals to `"box"`.
+        QUARTILES (str): A dashed median line and dotted first and third
+            quartile lines, clipped to the body. Equals to `"quartiles"`.
+        MEDIAN (str): A single solid median line clipped to the body. Equals
+            to `"median"`.
+
+    """
+
+    BOX = "box"
+    QUARTILES = "quartiles"
+    MEDIAN = "median"
 
 
 class RADIAL_TYPE:
