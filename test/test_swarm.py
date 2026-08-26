@@ -1,4 +1,4 @@
-"""Tests for the swarm chart and the panel category index."""
+"""Tests for the swarm plot and the panel category index."""
 
 import unittest
 import warnings
@@ -9,7 +9,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from datachart.charts import BoxPlot, SwarmChart
+from datachart.charts import BoxPlot, SwarmPlot
 from datachart.config import config
 from datachart.constants import SWARM_MODE, THEME
 from datachart.utils import Panel
@@ -64,13 +64,13 @@ class TestStripOffsets(unittest.TestCase):
         self.assertLessEqual(np.abs(a).max(), 0.2)
 
 
-class TestSwarmChart(unittest.TestCase):
+class TestSwarmPlot(unittest.TestCase):
     def tearDown(self):
         plt.close("all")
         config.set_theme(THEME.DEFAULT)
 
     def test_category_ticks_and_limits(self):
-        figure = SwarmChart(group_data())
+        figure = SwarmPlot(group_data())
         ax = figure.axes[0]
         np.testing.assert_array_equal(ax.get_xticks(), [1, 2, 3])
         self.assertEqual([t.get_text() for t in ax.get_xticklabels()], ["A", "B", "C"])
@@ -79,13 +79,13 @@ class TestSwarmChart(unittest.TestCase):
     def test_swarm_clamps_to_category_width(self):
         # 400 identical values pack into one row wider than the category
         data = [{"label": "A", "value": 1.0} for _ in range(400)]
-        ax = SwarmChart(data).axes[0]
+        ax = SwarmPlot(data).axes[0]
         xs = np.concatenate([c.get_offsets()[:, 0] for c in _swarm_collections(ax)])
         self.assertLessEqual(np.abs(xs - 1).max(), SWARM_MAX_OFFSET + 1e-9)
         self.assertGreater(np.abs(xs - 1).max(), SWARM_MAX_OFFSET * 0.9)
 
     def test_swarm_points_do_not_overlap_in_pixels(self):
-        figure = SwarmChart(group_data(n=60))
+        figure = SwarmPlot(group_data(n=60))
         ax = figure.axes[0]
         size = config["plot_swarm_size"]
         diameter = np.sqrt(size) / 72 * figure.dpi
@@ -99,30 +99,30 @@ class TestSwarmChart(unittest.TestCase):
                 self.assertGreaterEqual(dist.min(), diameter * 0.99)
 
     def test_strip_is_deterministic(self):
-        first = SwarmChart(group_data(), mode=SWARM_MODE.STRIP).axes[0]
-        second = SwarmChart(group_data(), mode="strip").axes[0]
+        first = SwarmPlot(group_data(), mode=SWARM_MODE.STRIP).axes[0]
+        second = SwarmPlot(group_data(), mode="strip").axes[0]
         np.testing.assert_array_equal(
             _swarm_collections(first)[0].get_offsets(),
             _swarm_collections(second)[0].get_offsets(),
         )
 
     def test_strip_jitter_width(self):
-        ax = SwarmChart(group_data(), mode="strip", jitter=0.2).axes[0]
+        ax = SwarmPlot(group_data(), mode="strip", jitter=0.2).axes[0]
         xs = _swarm_collections(ax)[0].get_offsets()[:, 0]
         self.assertLessEqual(np.abs(xs - np.round(xs)).max(), 0.1)
 
     def test_invalid_mode_raises(self):
         with self.assertRaises(ValueError):
-            SwarmChart(group_data(), mode="dodge")
+            SwarmPlot(group_data(), mode="dodge")
 
     def test_horizontal_orientation(self):
-        ax = SwarmChart(group_data(), orientation="horizontal").axes[0]
+        ax = SwarmPlot(group_data(), orientation="horizontal").axes[0]
         np.testing.assert_array_equal(ax.get_yticks(), [1, 2, 3])
         self.assertEqual(ax.get_ylim(), (0.5, 3.5))
 
     def test_log_scale_packs_in_display_space(self):
         data = [{"label": "A", "value": float(v)} for v in np.logspace(0, 3, 120)]
-        figure = SwarmChart(data, scaley="log")
+        figure = SwarmPlot(data, scaley="log")
         ax = figure.axes[0]
         self.assertEqual(ax.get_yscale(), "log")
         diameter = np.sqrt(config["plot_swarm_size"]) / 72 * figure.dpi
@@ -132,7 +132,7 @@ class TestSwarmChart(unittest.TestCase):
         self.assertGreaterEqual(dist.min(), diameter * 0.99)
 
     def test_emphasis_per_group(self):
-        figure = SwarmChart(
+        figure = SwarmPlot(
             group_data(), emphasis=["background", None, "highlight"], subtitle="s"
         )
         ax = figure.axes[0]
@@ -149,7 +149,7 @@ class TestSwarmChart(unittest.TestCase):
 
     def test_emphasis_length_mismatch_raises(self):
         with self.assertRaises(ValueError):
-            SwarmChart(group_data(), emphasis=["background", None])
+            SwarmPlot(group_data(), emphasis=["background", None])
 
     def test_style_keys_in_every_theme(self):
         for theme in [
@@ -167,7 +167,7 @@ class TestSwarmChart(unittest.TestCase):
     def test_multiple_layers_overlay_at_the_center(self):
         first = group_data(seed=1)
         second = [{"label": "D", "value": 1.0}, {"label": "A", "value": 2.0}]
-        ax = SwarmChart([first, second], subtitle=["one", "two"]).axes[0]
+        ax = SwarmPlot([first, second], subtitle=["one", "two"]).axes[0]
         np.testing.assert_array_equal(ax.get_xticks(), [1, 2, 3, 4])
         self.assertEqual(
             [t.get_text() for t in ax.get_xticklabels()], ["A", "B", "C", "D"]
@@ -176,7 +176,7 @@ class TestSwarmChart(unittest.TestCase):
         np.testing.assert_allclose(np.round(xs), [4, 1])
 
     def test_subplots(self):
-        figure = SwarmChart([group_data(), group_data(seed=5)], subplots=True)
+        figure = SwarmPlot([group_data(), group_data(seed=5)], subplots=True)
         self.assertEqual(len(figure.axes), 2)
 
 
@@ -186,7 +186,7 @@ class TestCategoryIndex(unittest.TestCase):
 
     def test_unions_labels_in_first_seen_order(self):
         box = BoxPlot([{"label": l, "value": 1.0} for l in ["B", "A"]])
-        swarm = SwarmChart([{"label": l, "value": 1.0} for l in ["C", "A", "D"]])
+        swarm = SwarmPlot([{"label": l, "value": 1.0} for l in ["C", "A", "D"]])
         layers = [
             l
             for fig in (box, swarm)
@@ -201,7 +201,7 @@ class TestCategoryIndex(unittest.TestCase):
         data = group_data()
         with warnings.catch_warnings():
             warnings.simplefilter("error")
-            figure = Panel([BoxPlot(data), SwarmChart(data)], show_legend=True)
+            figure = Panel([BoxPlot(data), SwarmPlot(data)], show_legend=True)
         ax = figure.axes[0]
         np.testing.assert_array_equal(ax.get_xticks(), [1, 2, 3])
         self.assertEqual([t.get_text() for t in ax.get_xticklabels()], ["A", "B", "C"])
@@ -217,7 +217,7 @@ class TestCategoryIndex(unittest.TestCase):
         figure = Panel(
             [
                 BoxPlot(data, orientation="horizontal"),
-                SwarmChart(data, orientation="horizontal"),
+                SwarmPlot(data, orientation="horizontal"),
             ]
         )
         ax = figure.axes[0]
@@ -225,7 +225,7 @@ class TestCategoryIndex(unittest.TestCase):
 
     def test_packing_reads_panel_limits_and_later_layers(self):
         data = group_data(n=60)
-        figure = Panel([SwarmChart(data), BoxPlot(data)], ymin=0, ymax=40)
+        figure = Panel([SwarmPlot(data), BoxPlot(data)], ymin=0, ymax=40)
         ax = figure.axes[0]
         self.assertEqual(ax.get_ylim(), (0.0, 40.0))
         diameter = np.sqrt(config["plot_swarm_size"]) / 72 * figure.dpi
@@ -241,7 +241,7 @@ class TestCategoryIndex(unittest.TestCase):
         figure = Panel(
             [
                 {"figure": BoxPlot(data), "emphasis": "background"},
-                {"figure": SwarmChart(data), "emphasis": "background"},
+                {"figure": SwarmPlot(data), "emphasis": "background"},
             ]
         )
         ax = figure.axes[0]

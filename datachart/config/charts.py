@@ -25,7 +25,7 @@ CHART_CONFIGS = {
         "multiplot": False,
         "subplots": True,
     },
-    "swarmchart": {
+    "swarmplot": {
         "multiplot": True,
         "subplots": True,
     },

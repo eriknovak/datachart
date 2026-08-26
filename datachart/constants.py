@@ -21,7 +21,7 @@ Classes:
     NORMALIZE:          The supported normalization options.
     ORIENTATION:        The supported orientations.
     RADIAL_TYPE:        The supported radial chart visuals.
-    SWARM_MODE:         The supported swarm chart modes.
+    SWARM_MODE:         The supported swarm plot modes.
     DIRECTION:          The supported angular directions.
     VALUE_FORMAT:       The predefined value formats.
     THEME:              The predefined themes.
@@ -697,9 +697,9 @@ class ORIENTATION:
 
 
 class SWARM_MODE:
-    """The supported swarm chart modes.
+    """The supported swarm plot modes.
 
-    Passed as the `mode` setting of swarm charts: how the points of one group
+    Passed as the `mode` setting of swarm plots: how the points of one group
     spread across the category width.
 
     Examples:

@@ -26,7 +26,7 @@ from ..constants import (
 # ================================================
 
 
-def SwarmChart(
+def SwarmPlot(
     data: Union[List[SwarmDataPointAttrs], List[List[SwarmDataPointAttrs]]],
     *,
     title: Optional[str] = None,
@@ -85,7 +85,7 @@ def SwarmChart(
     label: Optional[Union[str, List[Optional[str]]]] = None,
     value: Optional[Union[str, List[Optional[str]]]] = None,
 ) -> plt.Figure:
-    """Creates the swarm chart.
+    """Creates the swarm plot.
 
     Every observation of a group is drawn as a point at the group's category
     position, spread across the category width so the points do not hide
@@ -93,8 +93,8 @@ def SwarmChart(
     with `Panel`.
 
     Examples:
-        >>> from datachart.charts import SwarmChart
-        >>> figure = SwarmChart(
+        >>> from datachart.charts import SwarmPlot
+        >>> figure = SwarmPlot(
         ...     data=[
         ...         {"label": "Group A", "value": 10},
         ...         {"label": "Group A", "value": 15},
@@ -103,13 +103,13 @@ def SwarmChart(
         ...         {"label": "Group B", "value": 25},
         ...         {"label": "Group B", "value": 22},
         ...     ],
-        ...     title="Basic Swarm Chart",
+        ...     title="Basic Swarm Plot",
         ...     xlabel="Group",
         ...     ylabel="Value"
         ... )
 
     Args:
-        data: The data points for the swarm chart(s). Can be a single list of data
+        data: The data points for the swarm plot(s). Can be a single list of data
             points for one chart, or a list of lists for multiple charts.
             Each data point should have a `label` (category) and `value` (numeric).
         title: The title of the chart.
@@ -155,7 +155,7 @@ def SwarmChart(
         value: The key name in data for numeric values (default: "value").
 
     Returns:
-        The figure containing the swarm chart.
+        The figure containing the swarm plot.
 
     """
     charts = build_charts_structure(
@@ -199,4 +199,4 @@ def SwarmChart(
         "scaley": scaley,
     }
 
-    return render_chart("swarmchart", charts, settings)
+    return render_chart("swarmplot", charts, settings)

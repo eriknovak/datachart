@@ -2,9 +2,9 @@
 status: accepted
 ---
 
-# SwarmChart aligns with boxes through a panel category index, not bar slots
+# SwarmPlot aligns with boxes through a panel category index, not bar slots
 
-`SwarmChart` (issue #62) draws raw observations per group and is meant to be
+`SwarmPlot` (issue #62) draws raw observations per group and is meant to be
 overlaid on `BoxPlot` (and later `ViolinChart`, #61; `RaincloudChart`, #63).
 Alignment needs one source of truth for group positions, and the obvious
 candidate — the panel's bar slotting — dodges layers side by side, which is

@@ -1266,7 +1266,7 @@ class SwarmLayer(GroupLayer):
         grouped = self.grouped_values()
         labels = list(grouped.keys())
         if not labels:
-            warnings.warn("No data points found for swarm chart.")
+            warnings.warn("No data points found for swarm plot.")
             return
 
         index = ctx.category_index
@@ -2034,7 +2034,7 @@ LAYER_TYPES = {
     "histogram": HistogramLayer,
     "scatterchart": ScatterLayer,
     "boxplot": BoxLayer,
-    "swarmchart": SwarmLayer,
+    "swarmplot": SwarmLayer,
     "heatmap": HeatmapLayer,
 }
 

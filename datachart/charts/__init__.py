@@ -21,8 +21,8 @@ Methods:
         Creates the radial chart.
     ScatterChart(attrs):
         Creates the scatter chart.
-    SwarmChart(attrs):
-        Creates the swarm chart.
+    SwarmPlot(attrs):
+        Creates the swarm plot.
 
 """
 
@@ -35,7 +35,7 @@ from .parallel_coords import ParallelCoords
 from .pyramid_chart import PyramidChart
 from .radial_chart import RadialChart
 from .scatter_chart import ScatterChart
-from .swarm_chart import SwarmChart
+from .swarm_plot import SwarmPlot
 
 __all__ = [
     "BarChart",
@@ -47,5 +47,5 @@ __all__ = [
     "PyramidChart",
     "RadialChart",
     "ScatterChart",
-    "SwarmChart",
+    "SwarmPlot",
 ]

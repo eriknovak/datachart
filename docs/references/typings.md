@@ -94,7 +94,7 @@ title: Typings Module
         heading_level: 4
 
 
-### Swarm Chart Typings
+### Swarm Plot Typings
 
 ::: datachart.typings.SwarmSingleChartAttrs
     options:

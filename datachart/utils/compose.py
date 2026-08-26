@@ -51,7 +51,7 @@ def Panel(
     """Overlay rendered chart figures in one coordinate space.
 
     Combines different chart types (LineChart, BarChart, ScatterChart,
-    Histogram, BoxPlot, SwarmChart) on a single plot, drawn in the order
+    Histogram, BoxPlot, SwarmPlot) on a single plot, drawn in the order
     provided. Two value axes (primary and secondary) are supported for
     handling different scales.
 

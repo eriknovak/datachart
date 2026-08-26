@@ -583,7 +583,7 @@ def get_scatter_style(chart_style: dict) -> dict:
 
 
 def get_swarm_style(chart_style: dict) -> dict:
-    """Get the swarm chart style.
+    """Get the swarm plot style.
 
     Args:
         chart_style: The chart style dictionary.

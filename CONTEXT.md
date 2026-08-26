@@ -72,7 +72,7 @@ sets the category ticks from it once; layers never place their own groups.
 _Avoid_: box positions, group order (for the map)
 
 **Swarm**:
-A `SwarmChart` layer — every raw observation of a group drawn as a point at
+A `SwarmPlot` layer — every raw observation of a group drawn as a point at
 that group's category-index position, spread across the category width in
 one of two modes: `swarm` (beeswarm — non-overlapping offsets computed from
 the marker size) or `strip` (seeded uniform jitter). Overlaid on a box of the

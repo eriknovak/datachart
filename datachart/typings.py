@@ -20,8 +20,8 @@ Classes:
     ScatterDataPointAttrs: The data point attributes for the scatter chart.
     BoxSingleChartAttrs: The single chart attributes for the box plot.
     BoxDataPointAttrs: The data point attributes for the box plot.
-    SwarmSingleChartAttrs: The single chart attributes for the swarm chart.
-    SwarmDataPointAttrs: The data point attributes for the swarm chart.
+    SwarmSingleChartAttrs: The single chart attributes for the swarm plot.
+    SwarmDataPointAttrs: The data point attributes for the swarm plot.
     ParallelCoordsSingleChartAttrs: The single chart attributes for the parallel coordinates chart.
     ParallelCoordsDataPointAttrs: The data point attributes for the parallel coordinates chart.
     RadialSingleChartAttrs: The single chart attributes for the radial chart.
@@ -44,7 +44,7 @@ Classes:
     ScatterStyleAttrs: The typing for the scatter chart style.
     RegressionStyleAttrs: The typing for the regression line style.
     BoxStyleAttrs: The typing for the box plot style.
-    SwarmStyleAttrs: The typing for the swarm chart style.
+    SwarmStyleAttrs: The typing for the swarm plot style.
     ParallelCoordsStyleAttrs: The typing for the parallel coordinates chart style.
     ThemeDefaultAttrs: The typing for theme-driven defaults and cycles.
 
@@ -533,7 +533,7 @@ class BoxStyleAttrs(TypedDict):
 
 
 class SwarmStyleAttrs(TypedDict):
-    """The typing for the swarm chart style.
+    """The typing for the swarm plot style.
 
     Attributes:
         plot_swarm_color (Union[str, None]): The point color.
@@ -1281,12 +1281,12 @@ class _BoxChartAttrs(ChartCommonAttrs):
 
 
 # ================================================
-# Swarm Chart Attributes
+# Swarm Plot Attributes
 # ================================================
 
 
 class SwarmDataPointAttrs(TypedDict):
-    """The data point attributes for the swarm chart.
+    """The data point attributes for the swarm plot.
 
     Attributes:
         label (str): The category label.
@@ -1299,14 +1299,14 @@ class SwarmDataPointAttrs(TypedDict):
 
 
 class SwarmSingleChartAttrs(TypedDict):
-    """The single chart attributes for the swarm chart.
+    """The single chart attributes for the swarm plot.
 
     Attributes:
-        data (List[SwarmDataPointAttrs]): The list of data points defining the swarm chart.
-        subtitle (Union[str, None]): The subtitle of the swarm chart. Also used as the label in the legend.
-        xlabel (Union[str, None]): The xlabel of the swarm chart.
-        ylabel (Union[str, None]): The ylabel of the swarm chart.
-        style (Union[SwarmStyleAttrs, None]): The style of the swarm chart.
+        data (List[SwarmDataPointAttrs]): The list of data points defining the swarm plot.
+        subtitle (Union[str, None]): The subtitle of the swarm plot. Also used as the label in the legend.
+        xlabel (Union[str, None]): The xlabel of the swarm plot.
+        ylabel (Union[str, None]): The ylabel of the swarm plot.
+        style (Union[SwarmStyleAttrs, None]): The style of the swarm plot.
         xticks (Union[int, float, None]): The xtick positions list.
         xticklabels (Union[List[str], None]): The xtick labels.
         xtickrotate (Union[int, None]): The xtick rotation value.
@@ -1342,11 +1342,11 @@ class SwarmSingleChartAttrs(TypedDict):
     value: Union[str, None]  # the name of the value attribute in data
 
 
-class _SwarmChartAttrs(ChartCommonAttrs):
-    """The swarm chart attributes.
+class _SwarmPlotAttrs(ChartCommonAttrs):
+    """The swarm plot attributes.
 
     Attributes:
-        charts (Union[SwarmSingleChartAttrs, List[SwarmSingleChartAttrs]]): The swarm chart definitions.
+        charts (Union[SwarmSingleChartAttrs, List[SwarmSingleChartAttrs]]): The swarm plot definitions.
         mode (Union[SWARM_MODE, str, None]): The point spread mode: beeswarm or strip.
         jitter (Union[float, None]): The strip jitter width as a fraction of the category width.
         orientation (Union[ORIENTATION, str, None]): The orientation of the swarms.
