@@ -19,6 +19,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from matplotlib.collections import LineCollection, PathCollection
+from matplotlib.mlab import GaussianKDE
+from matplotlib.patches import Patch
 from matplotlib.legend_handler import HandlerPathCollection
 
 from .colors import create_color_cycle, create_colormap, get_colormap
@@ -44,6 +46,8 @@ from .config_helpers import (
     get_box_whisker_style,
     get_box_cap_style,
     get_swarm_style,
+    get_violin_style,
+    get_violin_inner_style,
     get_parallel_coords_style,
     get_parallel_axis_style,
     get_parallel_tick_style,
@@ -70,6 +74,7 @@ from ...constants import (
     SWARM_MODE,
     RADIAL_TYPE,
     VALUE_FORMAT,
+    VIOLIN_INNER,
 )
 from ...config import config
 
@@ -492,7 +497,7 @@ class DrawContext:
     parallel_stats: Optional[dict] = None
     parallel_axes: bool = True
     transpose: bool = False
-    # label -> position of the panel's category axis (ADR 0019)
+    # label -> position of the panel's category axis (ADR 0020)
     category_index: Optional[dict] = None
 
 
@@ -1324,6 +1329,197 @@ class SwarmLayer(GroupLayer):
             collection.set_offsets(xy)
 
 
+# keeps the two inner boxes of a split violin off the shared seam
+SPLIT_INNER_OFFSET = 0.05
+INNER_QUARTILE_WIDTH_SCALE = 5.0
+
+
+class ViolinLayer(GroupLayer):
+    """A per-label KDE body with inner marks drawn from the data."""
+
+    kind = "violin"
+
+    def _resolve_style(self):
+        super()._resolve_style()
+        self.inner = self.settings.get("inner")
+        self.bandwidth = self.settings.get("bandwidth")
+        self.split = self.settings.get("split")
+        self.violin_style = get_violin_style(self.style)
+        self.inner_style = get_violin_inner_style(self.style)
+        # split halves take the multiple palette; a layer receives one ctx color
+        self.split_colors = (
+            create_color_cycle(config["color_general_multiple"], 2)
+            if self.split
+            else None
+        )
+        self.split_values = []
+
+    def legend_handles(self):
+        # split values are known once draw() has grouped the data
+        if not self.split or not self.split_values:
+            return None
+        return [
+            Patch(facecolor=self.split_colors[i]["color"], label=str(value))
+            for i, value in enumerate(self.split_values)
+        ]
+
+    def _group(self) -> tuple:
+        """Values per label (and per split value) in first-seen order."""
+
+        label_attr = get_attr_value("label", self.chart, "label")
+        value_attr = get_attr_value("value", self.chart, "value")
+        data = self.chart.get("data", [])
+        grouped, split_values = {}, []
+        if isinstance(data, list):
+            for d in data:
+                lbl, val = d.get(label_attr), d.get(value_attr)
+                if lbl is None or val is None:
+                    continue
+                side = d.get(self.split) if self.split else None
+                if self.split and side not in split_values:
+                    split_values.append(side)
+                grouped.setdefault(lbl, {}).setdefault(side, []).append(val)
+        if self.split and grouped and len(split_values) != 2:
+            raise ValueError(
+                f"`split` key {self.split!r} must take exactly two distinct "
+                f"values, found {len(split_values)}."
+            )
+        self.split_values = split_values
+        return list(grouped.keys()), grouped
+
+    def draw(self, ax, ctx):
+        labels, grouped = self._group()
+        if len(labels) == 0:
+            warnings.warn("No data points found for violin plot.")
+            return
+
+        body_style = dict(self.violin_style)
+        width = body_style.pop("width")
+        if body_style.get("facecolor") is None:
+            body_style["facecolor"] = ctx.color
+        roles = self._group_roles(labels, ctx.emphasis)
+        # (split value, side): -1 draws the low half, +1 the high half, 0 both
+        sides = list(zip(self.split_values, (-1, 1))) or [(None, 0)]
+
+        for i, label in enumerate(labels):
+            position = ctx.category_index[label]
+            for j, (split_value, side) in enumerate(sides):
+                values = grouped[label].get(split_value)
+                if not values:
+                    continue
+                if len(values) < 2:
+                    raise ValueError(
+                        f"Violin {label!r} needs at least two values to estimate "
+                        "a density."
+                    )
+                style = dict(body_style)
+                if self.split:
+                    style["facecolor"] = self.split_colors[j]["color"]
+                artists = [self._draw_body(ax, values, position, width, style, side)]
+                artists += self._draw_inner(ax, values, position, width, side)
+                self._apply_violin_emphasis(artists, roles[i])
+
+    def _draw_body(self, ax, values, position, width, style, side):
+        parts = ax.violinplot(
+            [values],
+            positions=[position],
+            widths=width,
+            orientation=self.orientation,
+            bw_method=self.bandwidth,
+            showextrema=False,
+            showmedians=False,
+            showmeans=False,
+        )
+        body = parts["bodies"][0]
+        # above the axis gridlines (zorder 1.5), like a box patch
+        body.set_zorder(2)
+        facecolor = style.get("facecolor")
+        if facecolor is not None:
+            body.set_facecolor(facecolor)
+        edgecolor = style.get("edgecolor")
+        body.set_edgecolor(edgecolor if edgecolor is not None else facecolor)
+        if style.get("alpha") is not None:
+            body.set_alpha(style["alpha"])
+        if style.get("linewidth") is not None:
+            body.set_linewidth(style["linewidth"])
+        if side:
+            axis = 1 if self.is_horizontal else 0
+            clip = np.minimum if side < 0 else np.maximum
+            for path in body.get_paths():
+                path.vertices[:, axis] = clip(path.vertices[:, axis], position)
+        return body
+
+    def _draw_inner(self, ax, values, position, width, side) -> list:
+        if self.inner is None:
+            return []
+        values = np.asarray(values, dtype=float)
+        q1, median, q3 = np.percentile(values, [25, 50, 75])
+        color = self.inner_style["color"]
+        linewidth = self.inner_style["linewidth"]
+        zorder = 3
+        xy = (lambda c, v: (v, c)) if self.is_horizontal else (lambda c, v: (c, v))
+
+        def line(c0, v0, c1, v1, **kwargs):
+            (x0, y0), (x1, y1) = xy(c0, v0), xy(c1, v1)
+            return ax.plot([x0, x1], [y0, y1], color=color, zorder=zorder, **kwargs)[0]
+
+        if self.inner == VIOLIN_INNER.BOX:
+            iqr = q3 - q1
+            inside = values[(values >= q1 - 1.5 * iqr) & (values <= q3 + 1.5 * iqr)]
+            lo, hi = float(inside.min()), float(inside.max())
+            centre = position + side * SPLIT_INNER_OFFSET
+            whisker = line(centre, lo, centre, hi, linewidth=linewidth)
+            bar = line(
+                centre, q1, centre, q3, linewidth=linewidth * INNER_QUARTILE_WIDTH_SCALE
+            )
+            x, y = xy(centre, median)
+            dot = ax.plot(
+                [x],
+                [y],
+                marker="o",
+                linestyle="none",
+                markersize=self.inner_style["median_size"],
+                markerfacecolor=self.inner_style["median_color"],
+                markeredgecolor="none",
+                zorder=zorder + 1,
+            )[0]
+            return [whisker, bar, dot]
+
+        # the line marks span the body width at their value
+        kde = GaussianKDE(values, self.bandwidth)
+        grid = np.linspace(values.min(), values.max(), 100)
+        peak = float(kde.evaluate(grid).max()) or 1.0
+
+        def span(value, linestyle):
+            h = float(kde.evaluate([value])[0]) / peak * width / 2
+            lo_c = position if side > 0 else position - h
+            hi_c = position if side < 0 else position + h
+            return line(
+                lo_c, value, hi_c, value, linewidth=linewidth, linestyle=linestyle
+            )
+
+        if self.inner == VIOLIN_INNER.MEDIAN:
+            return [span(median, "-")]
+        return [span(q1, ":"), span(median, "--"), span(q3, ":")]
+
+    def _apply_violin_emphasis(self, artists: list, role: Optional[str]) -> None:
+        if role is None:
+            return
+        body, marks = artists[0], artists[1:]
+        if role == EMPHASIS_BACKGROUND:
+            body.set_facecolor(self.muted_color)
+            body.set_edgecolor(self.muted_color)
+            body.set_alpha(self.muted_alpha)
+            body.set_linewidth(body.get_linewidth()[0] * MUTED_WIDTH_SCALE)
+            for mark in marks:
+                mark.set_color(self.muted_color)
+                mark.set_markerfacecolor(self.muted_color)
+                mark.set_alpha(self.muted_alpha)
+                mark.set_linewidth(mark.get_linewidth() * MUTED_WIDTH_SCALE)
+        else:
+            body.set_linewidth(body.get_linewidth()[0] * HIGHLIGHT_WIDTH_SCALE)
+
+
 class HeatmapLayer(Layer):
     kind = "heatmap"
 
@@ -2035,6 +2231,7 @@ LAYER_TYPES = {
     "scatterchart": ScatterLayer,
     "boxplot": BoxLayer,
     "swarmplot": SwarmLayer,
+    "violinplot": ViolinLayer,
     "heatmap": HeatmapLayer,
 }
 
@@ -2430,12 +2627,14 @@ class Panel:
     def render(self, ax: plt.Axes) -> None:
         s = self.settings
 
-        box_layers = [l for l in self.layers if isinstance(l, BoxLayer)]
-        if len(box_layers) > 1:
-            raise ValueError(
-                "Multiple box plot datasets require `subplots=True`. "
-                "Box plots do not support overlaying multiple datasets on a single axis."
-            )
+        # one dataset per kind: a violin and a box may share the positions
+        for kind, name in (("box", "box plot"), ("violin", "violin plot")):
+            if sum(1 for l in self.layers if l.kind == kind) > 1:
+                raise ValueError(
+                    f"Multiple {name} datasets require `subplots=True`. "
+                    f"{name.capitalize()}s do not support overlaying multiple "
+                    "datasets on a single axis."
+                )
 
         horizontal = self.horizontal
         polar = self.projection == "polar"
@@ -2558,7 +2757,7 @@ class Panel:
 
         zorder_defaults = s.get("zorder_defaults", {})
 
-        # group layers share one category axis (ADR 0019)
+        # group layers share one category axis (ADR 0020)
         group_layers = [l for l in self.layers if isinstance(l, GroupLayer)]
         category_index = self.category_index(group_layers)
 
@@ -2788,7 +2987,7 @@ class Panel:
             self._apply_radial_furniture(ax)
 
         # beeswarm packing reads the display transform, so it runs once the
-        # scales and limits are final (ADR 0019)
+        # scales and limits are final (ADR 0020)
         if group_axes is None:
             group_axes = [ax] * len(self.groups)
         for group, owner_ax in zip(self.groups, group_axes):

@@ -101,6 +101,13 @@ title: Typings Module
         heading_level: 4
 
 ::: datachart.typings.SwarmDataPointAttrs
+### Violin Plot Typings
+
+::: datachart.typings.ViolinSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.ViolinDataPointAttrs
     options:
         heading_level: 4
 
@@ -164,6 +171,7 @@ title: Typings Module
 ::: datachart.typings.BoxStyleAttrs
 
 ::: datachart.typings.SwarmStyleAttrs
+::: datachart.typings.ViolinStyleAttrs
 
 ::: datachart.typings.ParallelCoordsStyleAttrs
 ::: datachart.typings.ThemeDefaultAttrs

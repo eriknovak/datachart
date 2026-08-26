@@ -737,6 +737,57 @@ def get_box_cap_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Violin Plot Style
+# -------------------------------------
+
+
+def get_violin_style(chart_style: dict) -> dict:
+    """Get the violin body style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The violin body style setting.
+
+    """
+
+    config_attrs = [
+        ("facecolor", "plot_violin_color"),
+        ("alpha", "plot_violin_alpha"),
+        ("linewidth", "plot_violin_linewidth"),
+        ("edgecolor", "plot_violin_edgecolor"),
+        ("width", "plot_violin_width"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+def get_violin_inner_style(chart_style: dict) -> dict:
+    """Get the violin inner marks style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The inner marks style setting; `color` falls back to the font color.
+
+    """
+
+    config_attrs = [
+        ("color", "plot_violin_inner_color"),
+        ("linewidth", "plot_violin_inner_linewidth"),
+        ("median_color", "plot_violin_median_color"),
+        ("median_size", "plot_violin_median_size"),
+    ]
+
+    style = create_config_dict(chart_style, config_attrs)
+    if style.get("color") is None:
+        style["color"] = get_attr_value("font_general_color", chart_style, config)
+    return style
+
+
+# -------------------------------------
 # Parallel Coordinates Style
 # -------------------------------------
 

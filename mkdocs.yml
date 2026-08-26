@@ -99,7 +99,7 @@ plugins:
       markdown_description: |
         datachart is a Python data visualization package built on matplotlib.
         It provides simple chart functions (BarChart, LineChart, ScatterChart,
-        Histogram, Heatmap, BoxPlot, SwarmPlot, ParallelCoords,
+        Histogram, Heatmap, BoxPlot, ViolinPlot, SwarmPlot, ParallelCoords,
         PyramidChart, RadialChart), figure
         composition via Panel (overlaying charts on shared axes) and Grid
         (arranging charts in a grid), and a global configuration system with
@@ -123,6 +123,7 @@ plugins:
           - how-to-guides/charts/pyramidchart.ipynb: Pyramid chart input attributes, the two-sides data contract, mirrored value axis controls, and composing pyramids with Grid.
           - how-to-guides/charts/radialchart.ipynb: Radial chart input attributes, the line, bar, scatter, and histogram visuals, and polar settings (start angle, direction, inner radius).
           - how-to-guides/charts/scatterchart.ipynb: Scatter chart input attributes, single and multiple datasets, customization, and saving.
+          - how-to-guides/charts/violinplot.ipynb: Violin plot input attributes, inner marks, bandwidth, split violins, composing violins with box plots, and subplots.
           - how-to-guides/charts/swarmplot.ipynb: Swarm plot input attributes, swarm and strip modes, emphasis, overlaying a box plot with Panel, multiple datasets, and saving.
         Composition & Utilities:
           - how-to-guides/utility/index.md: Map of Panel, Grid, statistics, and figure saving.
@@ -174,6 +175,8 @@ nav:
       - how-to-guides/charts/index.md
       - Bar Chart: how-to-guides/charts/barchart.ipynb
       - Box Plot: how-to-guides/charts/boxplot.ipynb
+      - Violin Plot: how-to-guides/charts/violinplot.ipynb
+      - Swarm Plot: how-to-guides/charts/swarmplot.ipynb
       - Heatmap: how-to-guides/charts/heatmap.ipynb
       - Histogram: how-to-guides/charts/histogram.ipynb
       - Line Chart: how-to-guides/charts/linechart.ipynb
@@ -181,7 +184,6 @@ nav:
       - Pyramid Chart: how-to-guides/charts/pyramidchart.ipynb
       - Radial Chart: how-to-guides/charts/radialchart.ipynb
       - Scatter Chart: how-to-guides/charts/scatterchart.ipynb
-      - Swarm Plot: how-to-guides/charts/swarmplot.ipynb
     - Composition & Utilities:
       - how-to-guides/utility/index.md
       - Panel: how-to-guides/utility/panel.ipynb

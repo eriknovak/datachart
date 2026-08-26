@@ -20,6 +20,8 @@ Classes:
     COLORS:             The predefined colors.
     NORMALIZE:          The supported normalization options.
     ORIENTATION:        The supported orientations.
+    VIOLIN_INNER:       The supported violin inner marks.
+    BANDWIDTH:          The supported kernel density bandwidth rules.
     RADIAL_TYPE:        The supported radial chart visuals.
     SWARM_MODE:         The supported swarm plot modes.
     DIRECTION:          The supported angular directions.
@@ -676,8 +678,8 @@ class NORMALIZE:
 class ORIENTATION:
     """The supported orientations.
 
-    Passed as the `orientation` setting of bar charts, histograms, and box
-    plots.
+    Passed as the `orientation` setting of bar charts, histograms, box
+    plots, and violin plots.
 
     ![ORIENTATION at a glance](../../assets/imgs/const-orientation.svg){ width="100%" }
 
@@ -716,6 +718,63 @@ class SWARM_MODE:
 
     SWARM = "swarm"
     STRIP = "strip"
+
+
+class VIOLIN_INNER:
+    """The supported violin inner marks.
+
+    Passed as the `inner` setting of violin plots; `None` draws the body only.
+
+    ![VIOLIN_INNER at a glance](../../assets/imgs/const-violin-inner.svg){ width="100%" }
+
+    Examples:
+        >>> from datachart.constants import VIOLIN_INNER
+        >>> VIOLIN_INNER.BOX
+        "box"
+
+    Attributes:
+        BOX (str): A thin quartile bar, a 1.5·IQR whisker line, and a median
+            dot. Equals to `"box"`.
+        QUARTILES (str): A dashed median line and dotted first and third
+            quartile lines, clipped to the body. Equals to `"quartiles"`.
+        MEDIAN (str): A single solid median line clipped to the body. Equals
+            to `"median"`.
+
+    """
+
+    BOX = "box"
+    QUARTILES = "quartiles"
+    MEDIAN = "median"
+
+
+class BANDWIDTH:
+    """The supported kernel density bandwidth rules.
+
+    Passed as the `bandwidth` setting of violin plots: the rule of thumb that
+    sizes the Gaussian kernel. A number is also accepted, as a factor applied
+    to the standard deviation of the values — smaller is sharper, larger is
+    smoother.
+
+    ![BANDWIDTH at a glance](../../assets/imgs/const-bandwidth.svg){ width="100%" }
+
+    Examples:
+        >>> from datachart.constants import BANDWIDTH
+        >>> BANDWIDTH.DEFAULT
+        "scott"
+
+    Attributes:
+        DEFAULT (str): The default rule. Same as `BANDWIDTH.SCOTT`.
+        SCOTT (str): Scott's rule of thumb, `n ** (-1/5)` times the standard
+            deviation. Equals to `"scott"`.
+        SILVERMAN (str): Silverman's rule of thumb, `(3n/4) ** (-1/5)` times
+            the standard deviation — about 6% wider than Scott's, so the two
+            look nearly the same. Equals to `"silverman"`.
+
+    """
+
+    DEFAULT = "scott"
+    SCOTT = "scott"
+    SILVERMAN = "silverman"
 
 
 class RADIAL_TYPE:

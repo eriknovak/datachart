@@ -30,6 +30,7 @@ from datachart.charts import (
     ParallelCoords,
     PyramidChart,
     RadialChart,
+    ViolinPlot,
 )
 from datachart.utils import OverlayChart, FigureGridLayout, Panel, Grid, Annotate
 from datachart.config import config
@@ -79,11 +80,16 @@ EXPECTED_CHANGES = {
     "overlay_annotated",
     # the scatter correlation box now wears the plot_text_* family (ADR 0018)
     "scatter_regression",
-    # new swarm plot cases (ADR 0019)
+    # new swarm plot cases (ADR 0020)
     "swarm_vertical",
     "strip_horizontal",
     "box_swarm_overlay",
     "swarm_emphasis",
+    # new violin plot cases (ADR 0019)
+    "violin_basic",
+    "violin_split_quartiles",
+    "violin_horizontal_median",
+    "violin_panel_box",
 }
 
 
@@ -293,6 +299,53 @@ def box_basic():
         for v in rng.randn(30) + {"A": 0, "B": 2, "C": 1}[lab]
     ]
     return BoxPlot(data=data, show_outliers=True)
+
+
+def violin_data(seed=5, split=False):
+    rng = np.random.RandomState(seed)
+    data = []
+    for lab, off in [("A", 0), ("B", 2), ("C", 1)]:
+        for j, v in enumerate(rng.randn(40) + off):
+            point = {"label": lab, "value": float(v)}
+            if split:
+                point["sex"] = "F" if j % 2 else "M"
+            data.append(point)
+    return data
+
+
+@case
+def violin_basic():
+    return ViolinPlot(data=violin_data(), show_grid="y")
+
+
+@case
+def violin_split_quartiles():
+    return ViolinPlot(
+        data=violin_data(split=True),
+        split="sex",
+        inner="quartiles",
+        show_legend=True,
+        emphasis=["background", None, "highlight"],
+    )
+
+
+@case
+def violin_horizontal_median():
+    return ViolinPlot(
+        data=violin_data(seed=6),
+        orientation="horizontal",
+        inner="median",
+        bandwidth=0.3,
+    )
+
+
+@case
+def violin_panel_box():
+    data = violin_data(seed=7)
+    return Panel(
+        [ViolinPlot(data=data, inner=None), BoxPlot(data=data, show_outliers=False)],
+        title="Violin + box",
+    )
 
 
 @case

@@ -22,3 +22,4 @@ title: Charts Module
 ::: datachart.charts.RadialChart
 ::: datachart.charts.ScatterChart
 ::: datachart.charts.SwarmPlot
+::: datachart.charts.ViolinPlot
