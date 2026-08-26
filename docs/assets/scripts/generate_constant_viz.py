@@ -635,7 +635,8 @@ def bandwidth():
         figs,
         "const-bandwidth.svg",
         2.2,
-        footnote="A number is a factor on the standard deviation of the values.",
+        footnote="Silverman is about 6% wider than Scott; a number is a factor on "
+        "the standard deviation of the values.",
     )
 
 

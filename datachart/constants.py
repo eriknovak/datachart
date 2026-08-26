@@ -741,9 +741,11 @@ class BANDWIDTH:
 
     Attributes:
         DEFAULT (str): The default rule. Same as `BANDWIDTH.SCOTT`.
-        SCOTT (str): Scott's rule of thumb. Equals to `"scott"`.
-        SILVERMAN (str): Silverman's rule of thumb, slightly narrower for
-            skewed data. Equals to `"silverman"`.
+        SCOTT (str): Scott's rule of thumb, `n ** (-1/5)` times the standard
+            deviation. Equals to `"scott"`.
+        SILVERMAN (str): Silverman's rule of thumb, `(3n/4) ** (-1/5)` times
+            the standard deviation — about 6% wider than Scott's, so the two
+            look nearly the same. Equals to `"silverman"`.
 
     """
 
