@@ -25,6 +25,10 @@ CHART_CONFIGS = {
         "multiplot": False,
         "subplots": True,
     },
+    "swarmplot": {
+        "multiplot": True,
+        "subplots": True,
+    },
     "violinplot": {
         "multiplot": False,
         "subplots": True,

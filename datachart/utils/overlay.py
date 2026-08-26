@@ -30,6 +30,7 @@ from ._internal.layers import (
     ViolinLayer,
     ParallelCoordsLayer,
     RadialLayer,
+    GroupLayer,
     TextLayer,
 )
 
@@ -42,6 +43,7 @@ OVERLAYABLE_LAYERS = (
     ViolinLayer,
     ParallelCoordsLayer,
     RadialLayer,
+    GroupLayer,
     TextLayer,
 )
 

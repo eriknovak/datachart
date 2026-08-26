@@ -26,6 +26,7 @@ from datachart.charts import (
     ScatterChart,
     Heatmap,
     BoxPlot,
+    SwarmPlot,
     ParallelCoords,
     PyramidChart,
     RadialChart,
@@ -79,6 +80,11 @@ EXPECTED_CHANGES = {
     "overlay_annotated",
     # the scatter correlation box now wears the plot_text_* family (ADR 0018)
     "scatter_regression",
+    # new swarm plot cases (ADR 0020)
+    "swarm_vertical",
+    "strip_horizontal",
+    "box_swarm_overlay",
+    "swarm_emphasis",
     # new violin plot cases (ADR 0019)
     "violin_basic",
     "violin_split_quartiles",
@@ -351,6 +357,41 @@ def box_horizontal_notch():
         for v in rng.randn(40) + {"A": 0, "B": 3}[lab]
     ]
     return BoxPlot(data=data, orientation="horizontal", show_notch=True)
+
+
+def swarm_data(seed=5, n=45):
+    rng = np.random.RandomState(seed)
+    return [
+        {"label": lab, "value": float(v)}
+        for lab in ["A", "B", "C"]
+        for v in rng.randn(n) * 2 + {"A": 10, "B": 12, "C": 16}[lab]
+    ]
+
+
+@case
+def swarm_vertical():
+    return SwarmPlot(data=swarm_data(), title="swarm", show_grid="y")
+
+
+@case
+def strip_horizontal():
+    return SwarmPlot(data=swarm_data(), mode="strip", orientation="horizontal")
+
+
+@case
+def box_swarm_overlay():
+    data = swarm_data()
+    return Panel(
+        [BoxPlot(data=data, show_outliers=False), SwarmPlot(data=data)],
+        title="box + swarm",
+    )
+
+
+@case
+def swarm_emphasis():
+    return SwarmPlot(
+        data=swarm_data(), emphasis=["background", None, "highlight"], subtitle="obs"
+    )
 
 
 @case

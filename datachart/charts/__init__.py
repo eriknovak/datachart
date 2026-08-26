@@ -21,6 +21,8 @@ Methods:
         Creates the radial chart.
     ScatterChart(attrs):
         Creates the scatter chart.
+    SwarmPlot(attrs):
+        Creates the swarm plot.
     ViolinPlot(attrs):
         Creates the violin plot.
 
@@ -35,6 +37,7 @@ from .parallel_coords import ParallelCoords
 from .pyramid_chart import PyramidChart
 from .radial_chart import RadialChart
 from .scatter_chart import ScatterChart
+from .swarm_plot import SwarmPlot
 from .violin_plot import ViolinPlot
 
 __all__ = [
@@ -47,5 +50,6 @@ __all__ = [
     "PyramidChart",
     "RadialChart",
     "ScatterChart",
+    "SwarmPlot",
     "ViolinPlot",
 ]

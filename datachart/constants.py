@@ -23,6 +23,7 @@ Classes:
     VIOLIN_INNER:       The supported violin inner marks.
     BANDWIDTH:          The supported kernel density bandwidth rules.
     RADIAL_TYPE:        The supported radial chart visuals.
+    SWARM_MODE:         The supported swarm plot modes.
     DIRECTION:          The supported angular directions.
     VALUE_FORMAT:       The predefined value formats.
     THEME:              The predefined themes.
@@ -695,6 +696,30 @@ class ORIENTATION:
 
     HORIZONTAL = "horizontal"
     VERTICAL = "vertical"
+
+
+class SWARM_MODE:
+    """The supported swarm plot modes.
+
+    Passed as the `mode` setting of swarm plots: how the points of one group
+    spread across the category width.
+
+    ![SWARM_MODE at a glance](../../assets/imgs/const-swarm-mode.svg){ width="100%" }
+
+    Examples:
+        >>> from datachart.constants import SWARM_MODE
+        >>> SWARM_MODE.SWARM
+        "swarm"
+
+    Attributes:
+        SWARM (str): The beeswarm mode: non-overlapping offsets computed from
+            the marker size. Equals to `"swarm"`.
+        STRIP (str): The strip mode: seeded uniform jitter. Equals to `"strip"`.
+
+    """
+
+    SWARM = "swarm"
+    STRIP = "strip"
 
 
 class VIOLIN_INNER:

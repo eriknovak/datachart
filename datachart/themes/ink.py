@@ -28,6 +28,8 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_heatmap_frame_color": "#0B1F44",
         "plot_scatter_edge_width": 0.6,
         "plot_scatter_edge_color": "#0B1F44",
+        "plot_swarm_edge_width": 0.6,
+        "plot_swarm_edge_color": "#0B1F44",
         "plot_regression_color": "#34495E",
         "plot_parallel_axis_color": "#34495E",
         "plot_parallel_tick_color": "#34495E",

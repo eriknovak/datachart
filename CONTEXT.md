@@ -64,6 +64,22 @@ bar width between the panel's bar layers, and the group is centered on the
 category position — so numeric-x layers and ticks line up with group centers.
 _Avoid_: bar offset (for the concept), dodge
 
+**Category index**:
+A panel's shared map from group label to position on the category axis, built
+as the first-seen union of labels across its group-oriented layers (box,
+swarm, later violin) and handed to each through the `DrawContext`. The panel
+sets the category ticks from it once; layers never place their own groups.
+_Avoid_: box positions, group order (for the map)
+
+**Swarm**:
+A `SwarmPlot` layer — every raw observation of a group drawn as a point at
+that group's category-index position, spread across the category width in
+one of two modes: `swarm` (beeswarm — non-overlapping offsets computed from
+the marker size) or `strip` (seeded uniform jitter). Overlaid on a box of the
+same groups it shares the center; several swarm layers overlay at the same
+position in distinct colors rather than dodging.
+_Avoid_: beeswarm (for the chart), strip plot (for the chart), dot plot
+
 **DrawContext**:
 The frozen per-layer instructions a panel hands to a layer at draw time — z-order,
 legend label, assigned color, and bar slot placement.

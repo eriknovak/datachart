@@ -105,6 +105,10 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.SWARM_MODE
+    options:
+        heading_level: 3
+
 ::: datachart.constants.DIRECTION
     options:
         heading_level: 3

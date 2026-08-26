@@ -99,7 +99,7 @@ plugins:
       markdown_description: |
         datachart is a Python data visualization package built on matplotlib.
         It provides simple chart functions (BarChart, LineChart, ScatterChart,
-        Histogram, Heatmap, BoxPlot, ViolinPlot, ParallelCoords,
+        Histogram, Heatmap, BoxPlot, ViolinPlot, SwarmPlot, ParallelCoords,
         PyramidChart, RadialChart), figure
         composition via Panel (overlaying charts on shared axes) and Grid
         (arranging charts in a grid), and a global configuration system with
@@ -114,16 +114,17 @@ plugins:
           - how-to-guides/index.md: "Map of the guide sections: charts, composition & utilities, styling."
         Charts:
           - how-to-guides/charts/index.md: The chart functions, their common data format, and how to save figures.
-          - how-to-guides/charts/barchart.ipynb: Bar chart input attributes, single and multiple datasets, customization, and saving.
-          - how-to-guides/charts/boxplot.ipynb: Box plot input attributes and customization; multiple datasets require subplots.
-          - how-to-guides/charts/heatmap.ipynb: Heatmap input attributes, single and multiple datasets, customization, and saving.
-          - how-to-guides/charts/histogram.ipynb: Histogram input attributes, single and multiple datasets, and histogram views.
           - how-to-guides/charts/linechart.ipynb: Line chart input attributes, single and multiple datasets, customization, and saving.
-          - how-to-guides/charts/parallelcoords.ipynb: Parallel coordinates input attributes and customization for multivariate data.
+          - how-to-guides/charts/barchart.ipynb: Bar chart input attributes, single and multiple datasets, customization, and saving.
           - how-to-guides/charts/pyramidchart.ipynb: Pyramid chart input attributes, the two-sides data contract, mirrored value axis controls, and composing pyramids with Grid.
           - how-to-guides/charts/radialchart.ipynb: Radial chart input attributes, the line, bar, scatter, and histogram visuals, and polar settings (start angle, direction, inner radius).
+          - how-to-guides/charts/histogram.ipynb: Histogram input attributes, single and multiple datasets, and histogram views.
+          - how-to-guides/charts/boxplot.ipynb: Box plot input attributes and customization, composing boxes with swarm and violin plots; multiple datasets require subplots.
+          - how-to-guides/charts/violinplot.ipynb: Violin plot input attributes, inner marks, bandwidth, split violins, composing violins with box and swarm plots, and subplots.
+          - how-to-guides/charts/swarmplot.ipynb: Swarm plot input attributes, swarm and strip modes, emphasis, overlaying box and violin plots with Panel, multiple datasets, and saving.
           - how-to-guides/charts/scatterchart.ipynb: Scatter chart input attributes, single and multiple datasets, customization, and saving.
-          - how-to-guides/charts/violinplot.ipynb: Violin plot input attributes, inner marks, bandwidth, split violins, composing violins with box plots, and subplots.
+          - how-to-guides/charts/heatmap.ipynb: Heatmap input attributes, single and multiple datasets, customization, and saving.
+          - how-to-guides/charts/parallelcoords.ipynb: Parallel coordinates input attributes and customization for multivariate data.
         Composition & Utilities:
           - how-to-guides/utility/index.md: Map of Panel, Grid, statistics, and figure saving.
           - how-to-guides/utility/panel.ipynb: "Overlaying multiple charts on one plot with Panel: dual y-axes, z-order, emphasis, and nesting panels."
@@ -172,16 +173,20 @@ nav:
     - how-to-guides/index.md
     - Charts:
       - how-to-guides/charts/index.md
-      - Bar Chart: how-to-guides/charts/barchart.ipynb
-      - Box Plot: how-to-guides/charts/boxplot.ipynb
-      - Violin Plot: how-to-guides/charts/violinplot.ipynb
-      - Heatmap: how-to-guides/charts/heatmap.ipynb
-      - Histogram: how-to-guides/charts/histogram.ipynb
+      # trends and comparisons
       - Line Chart: how-to-guides/charts/linechart.ipynb
-      - Parallel Coordinates: how-to-guides/charts/parallelcoords.ipynb
+      - Bar Chart: how-to-guides/charts/barchart.ipynb
       - Pyramid Chart: how-to-guides/charts/pyramidchart.ipynb
       - Radial Chart: how-to-guides/charts/radialchart.ipynb
+      # distributions
+      - Histogram: how-to-guides/charts/histogram.ipynb
+      - Box Plot: how-to-guides/charts/boxplot.ipynb
+      - Violin Plot: how-to-guides/charts/violinplot.ipynb
+      - Swarm Plot: how-to-guides/charts/swarmplot.ipynb
+      # relationships
       - Scatter Chart: how-to-guides/charts/scatterchart.ipynb
+      - Heatmap: how-to-guides/charts/heatmap.ipynb
+      - Parallel Coordinates: how-to-guides/charts/parallelcoords.ipynb
     - Composition & Utilities:
       - how-to-guides/utility/index.md
       - Panel: how-to-guides/utility/panel.ipynb

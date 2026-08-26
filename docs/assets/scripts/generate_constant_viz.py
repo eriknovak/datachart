@@ -27,6 +27,7 @@ from datachart.charts import (
     LineChart,
     RadialChart,
     ScatterChart,
+    SwarmPlot,
     ViolinPlot,
 )
 from datachart.config import config
@@ -52,6 +53,7 @@ from datachart.constants import (
     SCALE,
     SHOW_GRID,
     VALUE_FORMAT,
+    SWARM_MODE,
     VIOLIN_INNER,
 )
 from datachart.themes import DEFAULT_THEME
@@ -641,6 +643,21 @@ def bandwidth():
     )
 
 
+def swarm_mode():
+    members = [("SWARM", SWARM_MODE.SWARM), ("STRIP", SWARM_MODE.STRIP)]
+    figs = [
+        SwarmPlot(data=_violin_data(), mode=value, title=f"SWARM_MODE.{label}")
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-swarm-mode.svg",
+        2.2,
+        footnote="A swarm packs the points from their size; a strip jitters them "
+        "uniformly across the jitter fraction of the category width.",
+    )
+
+
 def radial_type():
     members = [
         ("LINE", RADIAL_TYPE.LINE),
@@ -847,6 +864,7 @@ def main():
     orientation()
     violin_inner()
     bandwidth()
+    swarm_mode()
     radial_type()
     direction()
     show_grid()
