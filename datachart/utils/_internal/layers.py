@@ -1104,8 +1104,12 @@ class BoxLayer(Layer):
                 patch.set_alpha(alpha)
 
         self._apply_box_emphasis(bp, labels)
+        self._set_label_ticks(ax, labels)
 
-        if self.orientation == ORIENTATION.HORIZONTAL:
+    def _set_label_ticks(self, ax, labels: list) -> None:
+        """Label positions 1..n on the category axis."""
+
+        if self.is_horizontal:
             ax.set_yticks(range(1, len(labels) + 1))
             ax.set_yticklabels(labels, rotation=self.chart.get("ytickrotate", 0))
         else:
@@ -1158,11 +1162,9 @@ class BoxLayer(Layer):
                 median.set_linewidth(median.get_linewidth() * HIGHLIGHT_WIDTH_SCALE)
 
 
-# the inner box of a split violin sits just off the centre line
+# keeps the two inner boxes of a split violin off the shared seam
 SPLIT_INNER_OFFSET = 0.05
-# the quartile bar is a thick stroke over the whisker line
 INNER_QUARTILE_WIDTH_SCALE = 5.0
-INNER_LINESTYLES = {"median": "--", "q1": ":", "q3": ":"}
 
 
 class ViolinLayer(BoxLayer):
@@ -1187,6 +1189,7 @@ class ViolinLayer(BoxLayer):
         self.split_values = []
 
     def legend_handles(self):
+        # split values are known once draw() has grouped the data
         if not self.split or not self.split_values:
             return None
         return [
@@ -1225,34 +1228,33 @@ class ViolinLayer(BoxLayer):
             return
 
         body_style = dict(self.violin_style)
-        width = body_style.pop("width") or 0.8
+        width = body_style.pop("width")
         if body_style.get("facecolor") is None:
             body_style["facecolor"] = ctx.color
         roles = self._label_roles(labels) or [None] * len(labels)
-        sides = self.split_values if self.split else [None]
+        # (split value, side): -1 draws the low half, +1 the high half, 0 both
+        sides = list(zip(self.split_values, (-1, 1))) or [(None, 0)]
 
         for i, label in enumerate(labels):
             position = i + 1
-            for j, side in enumerate(sides):
-                values = grouped[label].get(side)
+            for j, (split_value, side) in enumerate(sides):
+                values = grouped[label].get(split_value)
                 if not values:
                     continue
+                if len(values) < 2:
+                    raise ValueError(
+                        f"Violin {label!r} needs at least two values to estimate "
+                        "a density."
+                    )
                 style = dict(body_style)
                 if self.split:
                     style["facecolor"] = self.split_colors[j]["color"]
-                half = None if not self.split else ("low" if j == 0 else "high")
-                artists = [self._draw_body(ax, values, position, width, style, half)]
-                artists += self._draw_inner(ax, values, position, width, half)
+                artists = [self._draw_body(ax, values, position, width, style, side)]
+                artists += self._draw_inner(ax, values, position, width, side)
                 self._apply_violin_emphasis(artists, roles[i])
+        self._set_label_ticks(ax, labels)
 
-        if self.is_horizontal:
-            ax.set_yticks(range(1, len(labels) + 1))
-            ax.set_yticklabels(labels, rotation=self.chart.get("ytickrotate", 0))
-        else:
-            ax.set_xticks(range(1, len(labels) + 1))
-            ax.set_xticklabels(labels, rotation=self.chart.get("xtickrotate", 0))
-
-    def _draw_body(self, ax, values, position, width, style, half):
+    def _draw_body(self, ax, values, position, width, style, side):
         parts = ax.violinplot(
             [values],
             positions=[position],
@@ -1273,23 +1275,21 @@ class ViolinLayer(BoxLayer):
             body.set_alpha(style["alpha"])
         if style.get("linewidth") is not None:
             body.set_linewidth(style["linewidth"])
-        if half is not None:
-            # clip the body to one side of the centre line
+        if side:
             axis = 1 if self.is_horizontal else 0
-            clip = np.minimum if half == "low" else np.maximum
+            clip = np.minimum if side < 0 else np.maximum
             for path in body.get_paths():
                 path.vertices[:, axis] = clip(path.vertices[:, axis], position)
         return body
 
-    def _draw_inner(self, ax, values, position, width, half) -> list:
+    def _draw_inner(self, ax, values, position, width, side) -> list:
         if self.inner is None:
             return []
         values = np.asarray(values, dtype=float)
         q1, median, q3 = np.percentile(values, [25, 50, 75])
         color = self.inner_style["color"]
-        linewidth = self.inner_style.get("linewidth") or 1.0
+        linewidth = self.inner_style["linewidth"]
         zorder = 3
-        # data coordinates: (category, value) -> swapped when horizontal
         xy = (lambda c, v: (v, c)) if self.is_horizontal else (lambda c, v: (c, v))
 
         def line(c0, v0, c1, v1, **kwargs):
@@ -1300,9 +1300,7 @@ class ViolinLayer(BoxLayer):
             iqr = q3 - q1
             inside = values[(values >= q1 - 1.5 * iqr) & (values <= q3 + 1.5 * iqr)]
             lo, hi = float(inside.min()), float(inside.max())
-            centre = (
-                position + {None: 0, "low": -1, "high": 1}[half] * SPLIT_INNER_OFFSET
-            )
+            centre = position + side * SPLIT_INNER_OFFSET
             whisker = line(centre, lo, centre, hi, linewidth=linewidth)
             bar = line(
                 centre, q1, centre, q3, linewidth=linewidth * INNER_QUARTILE_WIDTH_SCALE
@@ -1313,8 +1311,8 @@ class ViolinLayer(BoxLayer):
                 [y],
                 marker="o",
                 linestyle="none",
-                markersize=self.inner_style.get("median_size") or 4,
-                markerfacecolor=self.inner_style.get("median_color") or "#FFFFFF",
+                markersize=self.inner_style["median_size"],
+                markerfacecolor=self.inner_style["median_color"],
                 markeredgecolor="none",
                 zorder=zorder + 1,
             )[0]
@@ -1327,19 +1325,15 @@ class ViolinLayer(BoxLayer):
 
         def span(value, linestyle):
             h = float(kde.evaluate([value])[0]) / peak * width / 2
-            lo_c = position if half == "high" else position - h
-            hi_c = position if half == "low" else position + h
+            lo_c = position if side > 0 else position - h
+            hi_c = position if side < 0 else position + h
             return line(
                 lo_c, value, hi_c, value, linewidth=linewidth, linestyle=linestyle
             )
 
         if self.inner == VIOLIN_INNER.MEDIAN:
             return [span(median, "-")]
-        return [
-            span(q1, INNER_LINESTYLES["q1"]),
-            span(median, INNER_LINESTYLES["median"]),
-            span(q3, INNER_LINESTYLES["q3"]),
-        ]
+        return [span(q1, ":"), span(median, "--"), span(q3, ":")]
 
     def _apply_violin_emphasis(self, artists: list, role: Optional[str]) -> None:
         if role is None:

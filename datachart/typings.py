@@ -528,6 +528,8 @@ class BoxStyleAttrs(TypedDict):
     plot_box_whisker_linewidth: Union[int, float, None]
     plot_box_cap_color: Union[str, None]
     plot_box_cap_linewidth: Union[int, float, None]
+    plot_xticks_label_rotate: Union[int, float, None]
+    plot_yticks_label_rotate: Union[int, float, None]
 
 
 class ViolinStyleAttrs(TypedDict):
@@ -555,8 +557,6 @@ class ViolinStyleAttrs(TypedDict):
     plot_violin_inner_linewidth: Union[int, float, None]
     plot_violin_median_color: Union[str, None]
     plot_violin_median_size: Union[int, float, None]
-    plot_xticks_label_rotate: Union[int, float, None]
-    plot_yticks_label_rotate: Union[int, float, None]
 
 
 class ParallelCoordsStyleAttrs(TypedDict):

@@ -124,9 +124,13 @@ class TestViolinChart(unittest.TestCase):
             ViolinChart(violin_data(), emphasis=["background"])
 
     def test_label_value_remap(self):
-        data = [{"g": "A", "v": 1.0}, {"g": "A", "v": 2.0}, {"g": "B", "v": 3.0}]
+        data = [{"g": g, "v": v} for g in "AB" for v in (1.0, 2.0, 3.0)]
         figure = ViolinChart(data, label="g", value="v")
         self.assertEqual(len(bodies(figure.axes[0])), 2)
+
+    def test_single_value_label_raises(self):
+        with self.assertRaises(ValueError):
+            ViolinChart([{"label": "A", "value": 1.0}])
 
     def test_panel_with_box_plot(self):
         data = violin_data()

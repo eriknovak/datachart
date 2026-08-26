@@ -114,7 +114,7 @@ def ViolinChart(
         title: The title of the chart.
         xlabel: The x-axis label.
         ylabel: The y-axis label.
-        subtitle: The subtitle(s) for individual charts. Used as legend labels.
+        subtitle: The subtitle(s) for individual charts (subplots).
         emphasis: The emphasis role(s), aligned with the violin labels of one
             call (a single value applies to every violin): "background" mutes
             a violin body and its inner marks, "highlight" bolds the body
