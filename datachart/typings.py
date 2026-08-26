@@ -75,6 +75,7 @@ from .constants import (
     SHOW_GRID,
     SCALE,
     VIOLIN_INNER,
+    BANDWIDTH,
     ASPECT_RATIO,
 )
 
@@ -1352,7 +1353,7 @@ class _ViolinPlotAttrs(ChartCommonAttrs):
     Attributes:
         charts (Union[ViolinSingleChartAttrs, List[ViolinSingleChartAttrs]]): The violin plot definitions.
         inner (Union[VIOLIN_INNER, str, None]): The inner marks drawn inside each body.
-        bandwidth (Union[str, float, None]): The KDE bandwidth method or scalar factor.
+        bandwidth (Union[BANDWIDTH, str, float, None]): The KDE bandwidth rule or scalar factor.
         split (Union[str, None]): The key name in `data` whose two values split each violin.
         orientation (Union[ORIENTATION, str, None]): The orientation of the violins.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
@@ -1361,7 +1362,7 @@ class _ViolinPlotAttrs(ChartCommonAttrs):
 
     charts: Union[ViolinSingleChartAttrs, List[ViolinSingleChartAttrs]]
     inner: Union[VIOLIN_INNER, str, None]
-    bandwidth: Union[str, float, None]
+    bandwidth: Union[BANDWIDTH, str, float, None]
     split: Union[str, None]
     orientation: Union[ORIENTATION, str, None]
     scaley: Union[SCALE, str, None]

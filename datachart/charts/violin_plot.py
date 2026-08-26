@@ -19,10 +19,11 @@ from ..constants import (
     ORIENTATION,
     SCALE,
     VIOLIN_INNER,
+    BANDWIDTH,
 )
 
 INNER_OPTIONS = (VIOLIN_INNER.BOX, VIOLIN_INNER.QUARTILES, VIOLIN_INNER.MEDIAN, None)
-BANDWIDTH_METHODS = ("scott", "silverman")
+BANDWIDTH_RULES = (BANDWIDTH.SCOTT, BANDWIDTH.SILVERMAN)
 
 # ================================================
 # Main Chart Definition
@@ -86,7 +87,7 @@ def ViolinPlot(
     label: Optional[Union[str, List[Optional[str]]]] = None,
     value: Optional[Union[str, List[Optional[str]]]] = None,
     inner: Optional[Union[VIOLIN_INNER, str]] = VIOLIN_INNER.BOX,
-    bandwidth: Optional[Union[str, float]] = None,
+    bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
     split: Optional[str] = None,
 ) -> plt.Figure:
     """Creates the violin plot.
@@ -150,7 +151,7 @@ def ViolinPlot(
             whisker, median dot), "quartiles" (dashed median, dotted Q1/Q3),
             "median" (one line), or None (body only). See `VIOLIN_INNER`.
         bandwidth: The KDE bandwidth: None or "scott" (Scott's rule),
-            "silverman", or a scalar factor.
+            "silverman", or a scalar factor. See `BANDWIDTH`.
         split: The key name in data whose exactly two distinct values become the
             left and right halves of each violin, colored from the multiple
             palette and listed in the legend.
@@ -164,12 +165,12 @@ def ViolinPlot(
             f"Invalid `inner` value {inner!r}. Must be one of {INNER_OPTIONS}."
         )
     if bandwidth is not None and not (
-        bandwidth in BANDWIDTH_METHODS
+        bandwidth in BANDWIDTH_RULES
         or (isinstance(bandwidth, (int, float)) and not isinstance(bandwidth, bool))
     ):
         raise ValueError(
             f"Invalid `bandwidth` value {bandwidth!r}. "
-            f"Must be None, one of {BANDWIDTH_METHODS}, or a number."
+            f"Must be None, one of {BANDWIDTH_RULES}, or a number."
         )
 
     # Build the charts structure using shared utility

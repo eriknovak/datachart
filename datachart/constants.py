@@ -20,6 +20,8 @@ Classes:
     COLORS:             The predefined colors.
     NORMALIZE:          The supported normalization options.
     ORIENTATION:        The supported orientations.
+    VIOLIN_INNER:       The supported violin inner marks.
+    BANDWIDTH:          The supported kernel density bandwidth rules.
     RADIAL_TYPE:        The supported radial chart visuals.
     DIRECTION:          The supported angular directions.
     VALUE_FORMAT:       The predefined value formats.
@@ -700,6 +702,8 @@ class VIOLIN_INNER:
 
     Passed as the `inner` setting of violin plots; `None` draws the body only.
 
+    ![VIOLIN_INNER at a glance](../../assets/imgs/const-violin-inner.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import VIOLIN_INNER
         >>> VIOLIN_INNER.BOX
@@ -718,6 +722,34 @@ class VIOLIN_INNER:
     BOX = "box"
     QUARTILES = "quartiles"
     MEDIAN = "median"
+
+
+class BANDWIDTH:
+    """The supported kernel density bandwidth rules.
+
+    Passed as the `bandwidth` setting of violin plots: the rule of thumb that
+    sizes the Gaussian kernel. A number is also accepted, as a factor applied
+    to the standard deviation of the values — smaller is sharper, larger is
+    smoother.
+
+    ![BANDWIDTH at a glance](../../assets/imgs/const-bandwidth.svg){ width="100%" }
+
+    Examples:
+        >>> from datachart.constants import BANDWIDTH
+        >>> BANDWIDTH.DEFAULT
+        "scott"
+
+    Attributes:
+        DEFAULT (str): The default rule. Same as `BANDWIDTH.SCOTT`.
+        SCOTT (str): Scott's rule of thumb. Equals to `"scott"`.
+        SILVERMAN (str): Silverman's rule of thumb, slightly narrower for
+            skewed data. Equals to `"silverman"`.
+
+    """
+
+    DEFAULT = "scott"
+    SCOTT = "scott"
+    SILVERMAN = "silverman"
 
 
 class RADIAL_TYPE:
