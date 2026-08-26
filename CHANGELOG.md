@@ -1,3 +1,9 @@
+### datachart-0.8.1 (2026-08-26)
+
+**New Features**
+
+- Added `config.register_theme` for registering custom named themes usable with `set_theme`
+
 ### datachart-0.8.0 (2026-08-24)
 
 **Breaking Changes**
