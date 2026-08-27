@@ -39,7 +39,7 @@ def HexbinChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
-    show_colorbars: Optional[bool] = True,
+    show_colorbars: bool = True,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,

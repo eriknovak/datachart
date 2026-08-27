@@ -59,8 +59,15 @@ class TestHexbinStyle(unittest.TestCase):
             "plot_hexbin_edge_color",
             "plot_hexbin_gridsize",
         ]
-        themes = [THEME.DEFAULT, THEME.GREYSCALE, THEME.INK, THEME.HATCH]
-        for theme in themes + [THEME.MINIMAL, THEME.MATERIAL]:
+        themes = [
+            THEME.DEFAULT,
+            THEME.GREYSCALE,
+            THEME.INK,
+            THEME.HATCH,
+            THEME.MINIMAL,
+            THEME.MATERIAL,
+        ]
+        for theme in themes:
             config.set_theme(theme)
             for key in keys:
                 self.assertIn(key, config.config, f"{theme} lacks {key}")
@@ -75,6 +82,12 @@ class TestHexbinLayer(unittest.TestCase):
         self.assertEqual(layer.gridsize, config["plot_hexbin_gridsize"])
         layer = build_layers("hexbinchart", [{"data": points(), "gridsize": 12}], {})[0]
         self.assertEqual(layer.gridsize, 12)
+        layer = build_layers(
+            "hexbinchart",
+            [{"data": points(), "style": {"plot_hexbin_gridsize": 8}}],
+            {},
+        )[0]
+        self.assertEqual(layer.gridsize, 8)
 
     def test_reduce_defaults_to_mean_with_c_only(self):
         layer = build_layers("hexbinchart", [{"data": points()}], {})[0]

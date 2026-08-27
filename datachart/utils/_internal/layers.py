@@ -2030,7 +2030,7 @@ class HexbinLayer(Layer):
         self.x, self.y, self.c = self._columns()
         self.gridsize = self.chart.get("gridsize")
         if self.gridsize is None:
-            self.gridsize = config["plot_hexbin_gridsize"]
+            self.gridsize = get_attr_value("plot_hexbin_gridsize", self.style, config)
         self.mincnt = self.chart.get("mincnt")
         # counts need no reducer; `c` defaults to the mean
         self.reduce = None
@@ -2078,7 +2078,7 @@ class HexbinLayer(Layer):
             self.y,
             C=self.c,
             gridsize=self.gridsize,
-            reduce_C_function=self.reduce or np.mean,
+            reduce_C_function=self.reduce,
             mincnt=self.mincnt,
             norm=self.chart.get("norm", None),
             vmin=self.chart.get("vmin", None),
