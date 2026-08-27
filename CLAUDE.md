@@ -17,7 +17,7 @@ python -m unittest discover test
 python -m unittest test.test_colors
 
 # Test documentation notebooks
-pytest --nbmake ./docs/how-to-guides/**/*ipynb
+pytest
 ```
 
 ### Code Quality
@@ -32,7 +32,7 @@ python -m black datachart
 ### Documentation
 ```bash
 # Install package with dev dependencies
-pip install -e .[dev]
+uv sync --group dev
 
 # Build and serve documentation locally
 mkdocs serve
@@ -53,10 +53,10 @@ mkdocs renders (`docs/adr/` and `docs/agents/` are excluded from the site via
 ### Building and Publishing
 ```bash
 # Install package in development mode
-pip install -e .
+uv sync
 
 # Install with all dependencies (dev + test)
-pip install -e .[all]
+uv sync --group dev
 
 # Build distribution packages
 python -m build --sdist --wheel --outdir dist/
