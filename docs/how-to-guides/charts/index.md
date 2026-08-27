@@ -15,6 +15,7 @@ Values along an axis or across categories: how a quantity moves and how the cate
 | Chart                                         | Description                                  |
 | :-------------------------------------------- | :------------------------------------------- |
 | [Line Chart](linechart.ipynb)                 | The showcase of the line chart.              |
+| [Stacked Area Chart](stackedareachart.ipynb)  | The showcase of the stacked area chart.      |
 | [Bar Chart](barchart.ipynb)                   | The showcase of the bar chart.               |
 | [Pyramid Chart](pyramidchart.ipynb)           | The showcase of the pyramid chart.           |
 | [Radial Chart](radialchart.ipynb)             | The showcase of the radial chart.            |

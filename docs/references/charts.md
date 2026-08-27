@@ -13,6 +13,7 @@ title: Charts Module
 ## Trends and Comparisons
 
 ::: datachart.charts.LineChart
+::: datachart.charts.StackedAreaChart
 ::: datachart.charts.BarChart
 ::: datachart.charts.PyramidChart
 ::: datachart.charts.RadialChart

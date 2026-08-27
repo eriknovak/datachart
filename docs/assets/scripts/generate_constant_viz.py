@@ -29,6 +29,7 @@ from datachart.charts import (
     LineChart,
     RadialChart,
     ScatterChart,
+    StackedAreaChart,
     SwarmPlot,
     ViolinPlot,
 )
@@ -38,6 +39,7 @@ from datachart.constants import (
     ASPECT_RATIO,
     BANDWIDTH,
     BAR_MODE,
+    BASELINE,
     COLORBAR_LOCATION,
     CONTOUR_LEVELS,
     DIRECTION,
@@ -547,6 +549,32 @@ def bar_mode():
     chart_grid(figs, "const-bar-mode.svg", 2.2)
 
 
+AREA_SERIES = [
+    [{"x": x, "y": y} for x, y in enumerate(ys)]
+    for ys in ([2, 3, 4, 4, 5, 6], [3, 2, 3, 4, 3, 2], [1, 2, 2, 3, 4, 5])
+]
+
+
+def baseline():
+    members = [
+        ("ZERO", BASELINE.ZERO),
+        ("PERCENT", BASELINE.PERCENT),
+        ("SYM", BASELINE.SYM),
+        ("WIGGLE", BASELINE.WIGGLE),
+        ("WEIGHTED_WIGGLE", BASELINE.WEIGHTED_WIGGLE),
+    ]
+    figs = [
+        StackedAreaChart(data=AREA_SERIES, baseline=value, title=f"BASELINE.{label}")
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-baseline.svg",
+        1.7,
+        footnote="The same three series; the baseline moves where the first one starts.",
+    )
+
+
 def histogram_type():
     members = [
         ("BAR", HISTOGRAM_TYPE.BAR),
@@ -931,6 +959,7 @@ def main():
     value_format()
     colorbar_location()
     bar_mode()
+    baseline()
     histogram_type()
     orientation()
     violin_inner()
