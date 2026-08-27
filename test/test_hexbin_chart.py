@@ -215,7 +215,7 @@ class TestHexbinChart(unittest.TestCase):
         self.assertNotEqual(hexes.get_cmap().name, config["plot_heatmap_cmap"])
 
     def test_emphasis_rejected(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             HexbinChart(data=points(), emphasis="highlight")
 
     def test_subplots(self):
@@ -257,6 +257,8 @@ class TestHexbinCompose(unittest.TestCase):
     def test_metadata_type(self):
         figure = HexbinChart(data=points())
         self.assertEqual(figure._chart_metadata["type"], "hexbinchart")
+        layers = figure._chart_metadata["panel"].layers
+        self.assertEqual([layer.kind for layer in layers], ["hexbin"])
 
     def test_panel_with_scatter(self):
         data = points(n=100)

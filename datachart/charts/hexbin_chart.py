@@ -33,6 +33,7 @@ def HexbinChart(
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
+    emphasis: None = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     xmin: Optional[Union[int, float]] = None,
     xmax: Optional[Union[int, float]] = None,
@@ -123,6 +124,9 @@ def HexbinChart(
         xlabel: The x-axis label.
         ylabel: The y-axis label.
         subtitle: The subtitle(s) for individual charts.
+        emphasis: Not supported: a hexbin chart is a single colormapped layer
+            with no series to mute or highlight. Passing a value raises
+            `ValueError`.
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -168,6 +172,12 @@ def HexbinChart(
         The figure containing the hexbin chart.
 
     """
+    if emphasis is not None:
+        raise ValueError(
+            "HexbinChart does not support `emphasis`: a hexbin chart is a single "
+            "colormapped layer with no series to mute or highlight."
+        )
+
     # Build the charts structure using shared utility
     charts = build_charts_structure(
         data,

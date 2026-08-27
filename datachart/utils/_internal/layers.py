@@ -2035,7 +2035,9 @@ class HexbinLayer(Layer):
         # counts need no reducer; `c` defaults to the mean
         self.reduce = None
         if self.c is not None:
-            name = self.chart.get("reduce") or HEXBIN_REDUCE.DEFAULT
+            name = self.chart.get("reduce")
+            if name is None:
+                name = HEXBIN_REDUCE.DEFAULT
             if name not in HEXBIN_REDUCERS:
                 raise ValueError(
                     f"Invalid hexbin `reduce` value {name!r}. "
@@ -2083,7 +2085,6 @@ class HexbinLayer(Layer):
             norm=self.chart.get("norm", None),
             vmin=self.chart.get("vmin", None),
             vmax=self.chart.get("vmax", None),
-            label=self.label(ctx),
             **style,
         )
         if self.show_colorbars:
