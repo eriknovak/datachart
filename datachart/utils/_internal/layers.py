@@ -1444,8 +1444,8 @@ SPLIT_INNER_OFFSET = 0.05
 # rain starts past the box and packs outward, all inside the cell
 RAINCLOUD_BOX_OFFSET = 0.08
 RAINCLOUD_BOX_WIDTH = 0.1
-RAINCLOUD_RAIN_OFFSET = 0.14
-RAINCLOUD_RAIN_SPREAD = 0.3
+RAINCLOUD_RAIN_OFFSET = 0.16
+RAINCLOUD_RAIN_SPREAD = 0.28
 # the rain is denser than a standalone swarm, so its points are smaller
 RAINCLOUD_RAIN_SIZE = 6
 INNER_QUARTILE_WIDTH_SCALE = 5.0
