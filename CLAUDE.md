@@ -36,10 +36,16 @@ uv sync --group dev
 
 # Build and serve documentation locally
 mkdocs serve
-
-# Deploy documentation to GitHub Pages
-mkdocs gh-deploy --force
 ```
+
+The site is versioned with `mike` and deployed by CI: every push to `main`
+publishes `dev`, every GitHub release publishes `X.Y.Z` and moves the `latest`
+alias (the site default). Never run `mkdocs gh-deploy` by hand.
+
+Public fronts, config methods, stats functions, and theme constants carry an
+`!!! info "Added in vX.Y"` admonition in their docstring (charts: after the
+what/when paragraph, before `Examples:`). A new public front gets
+`!!! info "Added in Unreleased"`.
 
 `llms.txt`, `llms-full.txt`, and per-page `.md` endpoints are generated at build
 by the `llmstxt` plugin in mkdocs.yml — never hand-write them. A new guide or
@@ -61,6 +67,11 @@ uv sync --group dev
 # Build distribution packages
 python -m build --sdist --wheel --outdir dist/
 ```
+
+Release checklist: bump `__version__`, write the CHANGELOG section, and
+replace every `"Added in Unreleased"` docstring tag with the new version
+(`grep -rn "Added in Unreleased" datachart`). Publishing the GitHub release
+then triggers PyPI and the versioned docs.
 
 ## Architecture
 
