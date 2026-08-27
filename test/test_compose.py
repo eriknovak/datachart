@@ -227,6 +227,22 @@ class TestNestedGrid:
     """Grid figures nest inside Grid via the recursive cell tree (ADR 0006),
     rendered in the parent's gridspec so cell envelopes align (ADR 0007)."""
 
+    def test_grid_axis_labels_drawn_once(self):
+        f1 = LineChart(data=[{"x": 0, "y": 1}, {"x": 1, "y": 2}])
+        f2 = LineChart(data=[{"x": 0, "y": 2}, {"x": 1, "y": 1}])
+        grid = Grid([f1, f2], xlabel="Day", ylabel="Articles")
+        assert grid._supxlabel.get_text() == "Day"
+        assert grid._supylabel.get_text() == "Articles"
+        assert grid._chart_metadata["xlabel"] == "Day"
+        # nested, the labels render as text in the cell rather than figure labels
+        outer = Grid([grid, f1])
+        assert outer._supxlabel is None
+        texts = [t.get_text() for ax in outer.axes for t in ax.texts]
+        assert "Day" in texts
+        assert "Articles" in texts
+        for fig in (f1, f2, grid, outer):
+            plt.close(fig)
+
     def test_grid_metadata_carries_cell_tree(self):
         fig = Grid([_line_fig(), _bar_fig()], title="Inner", sharex=True)
         md = fig._chart_metadata

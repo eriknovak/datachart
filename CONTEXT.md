@@ -41,7 +41,9 @@ blank cell) or a flat list with `max_cols`/`layout_spec`, and redraws each
 figure's panel into its cell. Grid figures nest inside Grid (never inside
 Panel): a nested grid occupies one cell and rebuilds its own layout there in
 the parent's gridspec, so its axes envelope aligns with sibling cells; its
-title becomes a subtitle-sized heading row and its axis sharing stays local.
+title becomes a subtitle-sized heading row, its `xlabel`/`ylabel` a footer row
+and a left column (figure-level `supxlabel`/`supylabel` at the top level), and
+its axis sharing stays local.
 _Avoid_: grid layout (for the front), figure grid
 
 **Projection**:
