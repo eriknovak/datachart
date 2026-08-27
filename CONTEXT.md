@@ -41,7 +41,9 @@ blank cell) or a flat list with `max_cols`/`layout_spec`, and redraws each
 figure's panel into its cell. Grid figures nest inside Grid (never inside
 Panel): a nested grid occupies one cell and rebuilds its own layout there in
 the parent's gridspec, so its axes envelope aligns with sibling cells; its
-title becomes a subtitle-sized heading row and its axis sharing stays local.
+title becomes a subtitle-sized heading row, its `xlabel`/`ylabel` a footer row
+and a left column (figure-level `supxlabel`/`supylabel` at the top level), and
+its axis sharing stays local.
 _Avoid_: grid layout (for the front), figure grid
 
 **Projection**:
@@ -176,8 +178,16 @@ _Avoid_: matrix plot, image plot, colormesh
 A gridded surface (`ContourChart`: 1-D `x`, `y` axes and a 2-D `z` grid per
 chart) drawn as iso-lines in the chart's cycle color or, when `filled`, as
 colormapped bands between levels. Lists overlay on one axes like histograms
-do; `subplots=True` grids them. The rendering half of the 2-D density chart.
-_Avoid_: isoline chart, contourf chart, surface plot
+do; `subplots=True` grids them. Also the 2-D density chart: `stats.kde2d`
+estimates the grid, `ContourChart` draws it — there is no `KDEChart`.
+_Avoid_: isoline chart, contourf chart, surface plot, KDE chart
+
+**Density estimate**:
+A Gaussian kernel density (`stats.kde1d` → `{x, y}` points for `LineChart`,
+`stats.kde2d` → an `{x, y, z}` dict for `ContourChart`) on a grid that extends
+`cut` bandwidths past the data so the estimate tails off instead of being
+clipped. `bandwidth` takes a `BANDWIDTH` rule or a scalar factor, as violins do.
+_Avoid_: KDE plot, density chart (as a chart type)
 
 **Level**:
 One `z` value at which a contour line is drawn or a band boundary falls.

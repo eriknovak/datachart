@@ -9,6 +9,7 @@ frozen DrawContext with its per-layer instructions.
 """
 
 import json
+import math
 import warnings
 from collections import defaultdict
 from dataclasses import dataclass
@@ -18,6 +19,7 @@ from typing import List, Optional, Union
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+from matplotlib.ticker import MaxNLocator
 from matplotlib.collections import LineCollection, PathCollection
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.mlab import GaussianKDE
@@ -26,6 +28,7 @@ from matplotlib.legend_handler import HandlerPathCollection
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from .colors import create_color_cycle, create_colormap, get_colormap
+from .validate import validate_emphasis
 from .config_helpers import (
     get_attr_value,
     resolve_font_family,
@@ -68,10 +71,11 @@ from .config_helpers import (
     configure_axis_ticks_position,
     configure_axis_limits,
 )
-from ..stats import minimum, maximum, contour_levels
+from ..stats import minimum, maximum, iqr
 from ...constants import (
     ASPECT_RATIO,
     DIRECTION,
+    CONTOUR_LEVELS,
     EMPHASIS,
     HISTOGRAM_TYPE,
     ORIENTATION,
@@ -157,17 +161,6 @@ CONTOUR_SWATCH = 0.7
 # ================================================
 # Data Helpers
 # ================================================
-
-
-def validate_emphasis(value, context: str = "emphasis"):
-    """Validate a single emphasis role; None means no emphasis."""
-
-    if value is not None and value not in (EMPHASIS_BACKGROUND, EMPHASIS_HIGHLIGHT):
-        raise ValueError(
-            f"Invalid {context} value {value!r}. "
-            f"Must be '{EMPHASIS_BACKGROUND}', '{EMPHASIS_HIGHLIGHT}', or None."
-        )
-    return value
 
 
 def get_chart_data(attr: str, chart: dict) -> Optional[np.ndarray]:
@@ -850,8 +843,13 @@ class HistogramLayer(Layer):
         x = self.x_values()
         if x is None or len(x) == 0:
             return None
-        counts, _ = np.histogram(x, bins=self.num_bins)
-        return (float(np.min(counts)), float(np.max(counts)))
+        # the view decides the scale: densities and cumulative shares are not counts
+        heights, edges = np.histogram(x, bins=self.num_bins, density=self.show_density)
+        if self.show_cumulative:
+            heights = np.cumsum(
+                heights * np.diff(edges) if self.show_density else heights
+            )
+        return (float(np.min(heights)), float(np.max(heights)))
 
     def draw(self, ax, ctx):
         x = self.x_values()
@@ -1848,7 +1846,61 @@ class HeatmapLayer(Layer):
         )
 
 
-# one layer for lines and fills, shared with the density front (ADR 0022)
+# rule-of-thumb level counts stay readable in this range (ADR 0022)
+CONTOUR_LEVELS_MIN = 4
+CONTOUR_LEVELS_MAX = 20
+# the fd rule on a flat surface (IQR 0) has no bin width; match auto's density
+CONTOUR_LEVELS_FLAT = 8
+
+
+def contour_levels(
+    z: List[List[Union[int, float]]], rule: Union[str, int, List[float], None]
+) -> Union[List[float], int, None]:
+    """Picks the contour levels of a 2-D grid by a rule of thumb.
+
+    The rules of `CONTOUR_LEVELS` are evaluated on the per-axis resolution
+    of the grid, `n = sqrt(cells)`: `"rice"` targets `2 * n ** (1/3)` levels
+    and `"fd"` the value range over `2 * IQR * n ** (-1/3)`. The count is
+    clamped to the 4–20 range and snapped to round values across the range of
+    `z`. `"auto"` (or `None`) returns `None`, leaving the choice to
+    matplotlib; an integer or a list of level values passes through.
+
+    Args:
+        z: The 2-D grid of values.
+        rule: A rule of `CONTOUR_LEVELS`, a target level count, or an explicit
+            list of level values.
+
+    Returns:
+        The level values, the target count, or `None` for the automatic rule.
+
+    Raises:
+        ValueError: If the rule is not one of `CONTOUR_LEVELS`.
+    """
+    if rule is None or rule == CONTOUR_LEVELS.AUTO:
+        return None
+    if not isinstance(rule, str):
+        return rule
+    if rule not in (CONTOUR_LEVELS.RICE, CONTOUR_LEVELS.FD):
+        raise ValueError(
+            f"Invalid contour `levels` rule {rule!r}. Must be one of "
+            f"{[CONTOUR_LEVELS.AUTO, CONTOUR_LEVELS.RICE, CONTOUR_LEVELS.FD]}, "
+            "an integer, or a list of level values."
+        )
+
+    values = np.asarray(z, dtype=float).ravel()
+    values = values[np.isfinite(values)]
+    n = math.sqrt(values.size)
+    if rule == CONTOUR_LEVELS.RICE:
+        k = math.ceil(2 * n ** (1 / 3))
+    else:
+        h = 2 * iqr(values) * n ** (-1 / 3)
+        k = math.ceil(np.ptp(values) / h) if h > 0 else CONTOUR_LEVELS_FLAT
+    k = int(np.clip(k, CONTOUR_LEVELS_MIN, CONTOUR_LEVELS_MAX))
+    ticks = MaxNLocator(nbins=k).tick_values(values.min(), values.max())
+    return [float(t) for t in ticks]
+
+
+# one layer for lines and fills, also the 2-D density chart (ADR 0022)
 class ContourLayer(Layer):
     """A gridded surface drawn as iso-lines or filled bands."""
 
