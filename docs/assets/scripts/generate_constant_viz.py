@@ -570,7 +570,8 @@ def baseline():
     chart_grid(
         figs,
         "const-baseline.svg",
-        1.7,
+        4.0,
+        cols=3,
         footnote="The same three series; the baseline moves where the first one starts.",
     )
 
