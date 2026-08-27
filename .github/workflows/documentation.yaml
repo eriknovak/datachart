@@ -1,17 +1,26 @@
 name: Documentation
 
+# main -> `dev`; published releases -> `X.Y.Z` + `latest` (the site default)
 on:
   push:
     branches: [main]
+  release:
+    types: [published]
 
 permissions:
   contents: write
+
+concurrency:
+  group: docs
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: astral-sh/setup-uv@v6
       - uses: actions/setup-python@v5
         with:
@@ -24,4 +33,12 @@ jobs:
           restore-keys: |
             mkdocs-material-
       - run: uv sync --group docs
-      - run: uv run mkdocs gh-deploy --force
+      - run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - if: github.event_name == 'push'
+        run: uv run mike deploy --push dev
+      - if: github.event_name == 'release'
+        run: |
+          uv run mike deploy --push --update-aliases "${GITHUB_REF_NAME#v}" latest
+          uv run mike set-default --push latest
