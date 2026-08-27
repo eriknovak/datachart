@@ -182,6 +182,14 @@ do; `subplots=True` grids them. Also the 2-D density chart: `stats.kde2d`
 estimates the grid, `ContourChart` draws it — there is no `KDEChart`.
 _Avoid_: isoline chart, contourf chart, surface plot, KDE chart
 
+**Hexbin**:
+A hexagonal tiling of the plane (`HexbinChart`: 1-D `x`, `y` columns per
+chart, optional `c`) colored per tile by point count or, with `c`, by a
+`HEXBIN_REDUCE` aggregate. The dense-scatter alternative; shares the raster
+color attrs (`norm`, `vmin`, `vmax`, `colorbar`) and furniture (grid off,
+colorbar inset) with Heatmap and filled Contour.
+_Avoid_: hex density plot, hexagonal heatmap, 2-D histogram
+
 **Density estimate**:
 A Gaussian kernel density (`stats.kde1d` → `{x, y}` points for `LineChart`,
 `stats.kde2d` → an `{x, y, z}` dict for `ContourChart`) on a grid that extends
