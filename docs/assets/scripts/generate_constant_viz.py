@@ -22,6 +22,7 @@ from matplotlib.patches import FancyBboxPatch, Rectangle
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
 from datachart.charts import (
     BarChart,
+    ContourChart,
     Heatmap,
     Histogram,
     LineChart,
@@ -37,6 +38,7 @@ from datachart.constants import (
     BANDWIDTH,
     BAR_MODE,
     COLORBAR_LOCATION,
+    CONTOUR_LEVELS,
     DIRECTION,
     EMPHASIS,
     FONT_STYLE,
@@ -643,6 +645,37 @@ def bandwidth():
     )
 
 
+def contour_levels():
+    x = np.linspace(-3, 3, 120)
+    X, Y = np.meshgrid(x, x)
+    # the "peaks" surface: a few hills and hollows of different heights
+    z = (
+        3 * (1 - X) ** 2 * np.exp(-(X**2) - (Y + 1) ** 2)
+        - 10 * (X / 5 - X**3 - Y**5) * np.exp(-(X**2) - Y**2)
+        - np.exp(-((X + 1) ** 2) - Y**2) / 3
+    )
+    members = [
+        ("AUTO", CONTOUR_LEVELS.AUTO),
+        ("RICE", CONTOUR_LEVELS.RICE),
+        ("FD", CONTOUR_LEVELS.FD),
+    ]
+    figs = [
+        ContourChart(
+            data={"x": x, "y": x, "z": z},
+            levels=value,
+            title=f"CONTOUR_LEVELS.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-contour-levels.svg",
+        2.4,
+        footnote="The same 120×120 surface; the rules count levels from the "
+        "per-axis resolution, so a finer grid draws more of them.",
+    )
+
+
 def swarm_mode():
     members = [("SWARM", SWARM_MODE.SWARM), ("STRIP", SWARM_MODE.STRIP)]
     figs = [
@@ -864,6 +897,7 @@ def main():
     orientation()
     violin_inner()
     bandwidth()
+    contour_levels()
     swarm_mode()
     radial_type()
     direction()

@@ -31,4 +31,5 @@ title: Charts Module
 
 ::: datachart.charts.ScatterChart
 ::: datachart.charts.Heatmap
+::: datachart.charts.ContourChart
 ::: datachart.charts.ParallelCoords
