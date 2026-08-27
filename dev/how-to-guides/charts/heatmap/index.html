@@ -3062,9 +3062,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="heatmap-input-attributes">Heatmap Input Attributes<a class="anchor-link" href="#heatmap-input-attributes">¶</a></h2><p>The <code>Heatmap</code> function accepts keyword arguments for chart configuration. The main argument is <code>data</code>, which contains the heatmap matrix. For a single heatmap, <code>data</code> is a 2D list; a <code>None</code> cell is left blank. For multiple heatmaps, <code>data</code> is a list of 2D lists.</p>
+<h2 id="heatmap-input-attributes">Heatmap Input Attributes<a class="anchor-link" href="#heatmap-input-attributes">¶</a></h2><p>The <code>Heatmap</code> function accepts keyword arguments for chart configuration. The main argument is <code>data</code>, which contains the heatmap grid. For a single heatmap, <code>data</code> is a dictionary with the 2D matrix <code>z</code> (a <code>None</code> cell is left blank) and the optional <code>x</code> and <code>y</code> labels of its columns and rows. For multiple heatmaps, <code>data</code> is a list of such dictionaries.</p>
 <div class="highlight"><pre><span></span><span class="n">Heatmap</span><span class="p">(</span>
-    <span class="n">data</span><span class="o">=</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]],</span>          <span class="c1"># The heatmap matrix (or list of matrices for multiple charts)</span>
+    <span class="n">data</span><span class="o">=</span><span class="p">{</span>                                              <span class="c1"># The heatmap grid (or list of grids for multiple charts)</span>
+        <span class="s2">"x"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span>    <span class="c1"># The column labels, one per column of z (optional)</span>
+        <span class="s2">"y"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span>    <span class="c1"># The row labels, one per row of z (optional)</span>
+        <span class="s2">"z"</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]],</span>       <span class="c1"># The heatmap matrix</span>
+    <span class="p">},</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span>                                             <span class="c1"># The style of the heatmap (optional)</span>
         <span class="s2">"plot_heatmap_cmap"</span><span class="p">:</span>        <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span> <span class="c1"># The colormap (palette name or list of hex colors)</span>
         <span class="s2">"plot_heatmap_alpha"</span><span class="p">:</span>       <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>    <span class="c1"># The alpha of the heatmap (how visible it is)</span>
@@ -3148,7 +3152,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The data is a plain 2D list: each inner list is one row of the heatmap, and each value in it is one cell. The first row is drawn at the top, the first column at the left:</p>
+<p>The data is a dictionary: <code>z</code> is a plain 2D list where each inner list is one row of the heatmap and each value in it is one cell, while <code>x</code> and <code>y</code> name its columns and rows. The first row is drawn at the top, the first column at the left:</p>
 </div>
 </div>
 </div>
@@ -3171,9 +3175,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">temperatures</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">temperatures</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">temperatures[:2]</div>
+<div class="clipboard-copy-txt" id="cell-2">{key: value[:2] for key, value in temperatures.items()}</div>
 </div>
 </div>
 </div>
@@ -3199,7 +3203,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><strong>Basic example.</strong> Only the <code>data</code> argument is required to draw the heatmap. Every cell is colored by its value: the lowest value gets the first color of the colormap, the highest the last.</p>
+<p><strong>Basic example.</strong> Only the <code>data</code> argument is required to draw the heatmap. Every cell is colored by its value: the lowest value gets the first color of the colormap, the highest the last. The <code>x</code> and <code>y</code> labels become the tick labels of the axes; without them, the axes are ticked with the cell indices.</p>
 </div>
 </div>
 </div>
@@ -3427,7 +3431,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="ticks-and-labels">Ticks and labels<a class="anchor-link" href="#ticks-and-labels">¶</a></h3><p>A heatmap places column <em>j</em> at <code>x = j</code> and row <em>i</em> at <code>y = i</code>, counting from zero, so by default the axes are ticked with cell indices. To name the rows and columns instead, add the <code>xticks</code> and <code>yticks</code> attributes with the indices to tick and the <code>xticklabels</code> and <code>yticklabels</code> attributes with their labels — here every column gets its month and every row its city. Tick labels can be rotated with <code>xtickrotate</code> and <code>ytickrotate</code>.</p>
+<h3 id="ticks-and-labels">Ticks and labels<a class="anchor-link" href="#ticks-and-labels">¶</a></h3><p>A heatmap places column <em>j</em> at <code>x = j</code> and row <em>i</em> at <code>y = i</code>, counting from zero. The <code>x</code> and <code>y</code> labels of the data name these positions; to tick the axes differently, add the <code>xticks</code> and <code>yticks</code> attributes with the indices to tick and the <code>xticklabels</code> and <code>yticklabels</code> attributes with their labels — an explicit <code>xticks</code>/<code>xticklabels</code> (<code>yticks</code>/<code>yticklabels</code>) pair overrides the <code>x</code> (<code>y</code>) labels of the data. Here every third month is ticked. Tick labels can be rotated with <code>xtickrotate</code> and <code>ytickrotate</code>, whichever labels are shown.</p>
 </div>
 </div>
 </div>
@@ -3450,38 +3454,28 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">MONTH_TICKS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">MONTHS</span><span class="p">)))</span>
-<span class="n">CITY_TICKS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">CITIES</span><span class="p">)))</span>
-
-<span class="n">Heatmap</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">Heatmap</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">temperatures</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Mean monthly temperature"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
-    <span class="c1"># name the columns and rotate the labels</span>
-    <span class="n">xticks</span><span class="o">=</span><span class="n">MONTH_TICKS</span><span class="p">,</span>
-    <span class="n">xticklabels</span><span class="o">=</span><span class="n">MONTHS</span><span class="p">,</span>
-    <span class="n">xtickrotate</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
-    <span class="c1"># name the rows</span>
-    <span class="n">yticks</span><span class="o">=</span><span class="n">CITY_TICKS</span><span class="p">,</span>
-    <span class="n">yticklabels</span><span class="o">=</span><span class="n">CITIES</span><span class="p">,</span>
+    <span class="c1"># tick every third month instead of the `x` labels</span>
+    <span class="n">xticks</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span>
+    <span class="n">xticklabels</span><span class="o">=</span><span class="p">[</span><span class="s2">"Jan"</span><span class="p">,</span> <span class="s2">"Apr"</span><span class="p">,</span> <span class="s2">"Jul"</span><span class="p">,</span> <span class="s2">"Oct"</span><span class="p">],</span>
+    <span class="c1"># rotate the row labels</span>
+    <span class="n">ytickrotate</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">MONTH_TICKS = list(range(len(MONTHS)))
-CITY_TICKS = list(range(len(CITIES)))
-
-Heatmap(
+<div class="clipboard-copy-txt" id="cell-5">Heatmap(
     data=temperatures,
     title="Mean monthly temperature",
     xlabel="Month",
     ylabel="City",
-    # name the columns and rotate the labels
-    xticks=MONTH_TICKS,
-    xticklabels=MONTHS,
-    xtickrotate=45,
-    # name the rows
-    yticks=CITY_TICKS,
-    yticklabels=CITIES,
+    # tick every third month instead of the `x` labels
+    xticks=[0, 3, 6, 9],
+    xticklabels=["Jan", "Apr", "Jul", "Oct"],
+    # rotate the row labels
+    ytickrotate=45,
 ).show()</div>
 </div>
 </div>
@@ -3582,10 +3576,6 @@ Heatmap(
     <span class="n">title</span><span class="o">=</span><span class="s2">"Mean monthly temperature"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
-    <span class="n">xticks</span><span class="o">=</span><span class="n">MONTH_TICKS</span><span class="p">,</span>
-    <span class="n">xticklabels</span><span class="o">=</span><span class="n">MONTHS</span><span class="p">,</span>
-    <span class="n">yticks</span><span class="o">=</span><span class="n">CITY_TICKS</span><span class="p">,</span>
-    <span class="n">yticklabels</span><span class="o">=</span><span class="n">CITIES</span><span class="p">,</span>
     <span class="c1"># add to determine the figure size</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_SHORT</span><span class="p">,</span>
     <span class="c1"># keep the cells square</span>
@@ -3597,10 +3587,6 @@ Heatmap(
     title="Mean monthly temperature",
     xlabel="Month",
     ylabel="City",
-    xticks=MONTH_TICKS,
-    xticklabels=MONTHS,
-    yticks=CITY_TICKS,
-    yticklabels=CITIES,
     # add to determine the figure size
     figsize=FIG_SIZE.FULL_SHORT,
     # keep the cells square
@@ -3739,10 +3725,6 @@ Heatmap(
     <span class="n">title</span><span class="o">=</span><span class="s2">"Mean monthly temperature"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
-    <span class="n">xticks</span><span class="o">=</span><span class="n">MONTH_TICKS</span><span class="p">,</span>
-    <span class="n">xticklabels</span><span class="o">=</span><span class="n">MONTHS</span><span class="p">,</span>
-    <span class="n">yticks</span><span class="o">=</span><span class="n">CITY_TICKS</span><span class="p">,</span>
-    <span class="n">yticklabels</span><span class="o">=</span><span class="n">CITIES</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
     <span class="c1"># add to show the colorbar</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -3757,10 +3739,6 @@ Heatmap(
     title="Mean monthly temperature",
     xlabel="Month",
     ylabel="City",
-    xticks=MONTH_TICKS,
-    xticklabels=MONTHS,
-    yticks=CITY_TICKS,
-    yticklabels=CITIES,
     figsize=FIG_SIZE.FULL_MEDIUM,
     # add to show the colorbar
     show_colorbars=True,
@@ -3929,10 +3907,6 @@ Heatmap(
     <span class="n">title</span><span class="o">=</span><span class="s2">"Mean monthly temperature"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
-    <span class="n">xticks</span><span class="o">=</span><span class="n">MONTH_TICKS</span><span class="p">,</span>
-    <span class="n">xticklabels</span><span class="o">=</span><span class="n">MONTHS</span><span class="p">,</span>
-    <span class="n">yticks</span><span class="o">=</span><span class="n">CITY_TICKS</span><span class="p">,</span>
-    <span class="n">yticklabels</span><span class="o">=</span><span class="n">CITIES</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -3955,10 +3929,6 @@ Heatmap(
     title="Mean monthly temperature",
     xlabel="Month",
     ylabel="City",
-    xticks=MONTH_TICKS,
-    xticklabels=MONTHS,
-    yticks=CITY_TICKS,
-    yticklabels=CITIES,
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_colorbars=True,
     show_heatmap_values=True,
@@ -4021,10 +3991,6 @@ Heatmap(
     <span class="n">title</span><span class="o">=</span><span class="s2">"Mean monthly temperature"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
-    <span class="n">xticks</span><span class="o">=</span><span class="n">MONTH_TICKS</span><span class="p">,</span>
-    <span class="n">xticklabels</span><span class="o">=</span><span class="n">MONTHS</span><span class="p">,</span>
-    <span class="n">yticks</span><span class="o">=</span><span class="n">CITY_TICKS</span><span class="p">,</span>
-    <span class="n">yticklabels</span><span class="o">=</span><span class="n">CITIES</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -4040,10 +4006,6 @@ Heatmap(
     title="Mean monthly temperature",
     xlabel="Month",
     ylabel="City",
-    xticks=MONTH_TICKS,
-    xticklabels=MONTHS,
-    yticks=CITY_TICKS,
-    yticklabels=CITIES,
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_colorbars=True,
     show_heatmap_values=True,
@@ -4163,10 +4125,6 @@ Heatmap(
         <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Mean monthly precipitation with the '</span><span class="si">{</span><span class="n">norm</span><span class="si">}</span><span class="s2">' normalization"</span><span class="p">,</span>
         <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
         <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
-        <span class="n">xticks</span><span class="o">=</span><span class="n">MONTH_TICKS</span><span class="p">,</span>
-        <span class="n">xticklabels</span><span class="o">=</span><span class="n">MONTHS</span><span class="p">,</span>
-        <span class="n">yticks</span><span class="o">=</span><span class="n">CITY_TICKS</span><span class="p">,</span>
-        <span class="n">yticklabels</span><span class="o">=</span><span class="n">CITIES</span><span class="p">,</span>
         <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
         <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -4181,10 +4139,6 @@ Heatmap(
         title=f"Mean monthly precipitation with the '{norm}' normalization",
         xlabel="Month",
         ylabel="City",
-        xticks=MONTH_TICKS,
-        xticklabels=MONTHS,
-        yticks=CITY_TICKS,
-        yticklabels=CITIES,
         figsize=FIG_SIZE.FULL_MEDIUM,
         show_colorbars=True,
         show_heatmap_values=True,
@@ -4231,14 +4185,14 @@ Heatmap(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="multiple-heatmap-charts">Multiple Heatmap Charts<a class="anchor-link" href="#multiple-heatmap-charts">¶</a></h2><p>To create multiple heatmaps, pass a list of matrices to the <code>data</code> argument. Each matrix is drawn in its own subplot — two rasters cannot share one set of axes — with the <code>subtitle</code> at the top of each subplot and the <code>title</code>, <code>xlabel</code> and <code>ylabel</code> positioned to be global for all charts. Per-chart attributes like <code>subtitle</code>, <code>style</code>, <code>valfmt</code>, <code>norm</code>, <code>vmin</code>, <code>vmax</code> and <code>colorbar</code> can be passed as lists, where each element corresponds to a chart; a single value applies to every chart.</p>
+<h2 id="multiple-heatmap-charts">Multiple Heatmap Charts<a class="anchor-link" href="#multiple-heatmap-charts">¶</a></h2><p>To create multiple heatmaps, pass a list of grids to the <code>data</code> argument. Each grid is drawn in its own subplot — two rasters cannot share one set of axes — with the <code>subtitle</code> at the top of each subplot and the <code>title</code>, <code>xlabel</code> and <code>ylabel</code> positioned to be global for all charts. Per-chart attributes like <code>subtitle</code>, <code>style</code>, <code>valfmt</code>, <code>norm</code>, <code>vmin</code>, <code>vmax</code> and <code>colorbar</code> can be passed as lists, where each element corresponds to a chart; a single value applies to every chart.</p>
 <div class="admonition note">
 <p class="admonition-title">Multiple charts pattern</p>
 <p style="margin-top: .6rem; margin-bottom: .6rem">
-        For multiple charts, <code>data</code> becomes a list of matrices, and per-chart attributes like <code>subtitle</code>, <code>style</code> and <code>valfmt</code> become lists where each element applies to the corresponding chart.
+        For multiple charts, <code>data</code> becomes a list of grids, and per-chart attributes like <code>subtitle</code>, <code>style</code> and <code>valfmt</code> become lists where each element applies to the corresponding chart.
     </p>
 </div>
-<p>The example draws the temperatures and the precipitation of the six cities side by side. The two matrices hold different quantities, so each gets its own subtitle and its own colormap through a list of <code>style</code> dictionaries (<code>None</code> keeps the theme style for that chart). Twelve columns side by side leave no room for the cell values; the next section stacks the charts and writes them in.</p>
+<p>The example draws the temperatures and the precipitation of the six cities side by side. The two grids hold different quantities, so each gets its own subtitle and its own colormap through a list of <code>style</code> dictionaries (<code>None</code> keeps the theme style for that chart). Twelve columns side by side leave no room for the cell values; the next section stacks the charts and writes them in.</p>
 </div>
 </div>
 </div>
@@ -4262,7 +4216,7 @@ Heatmap(
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">Heatmap</span><span class="p">(</span>
-    <span class="c1"># use a list of matrices to define multiple heatmaps</span>
+    <span class="c1"># use a list of grids to define multiple heatmaps</span>
     <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">temperatures</span><span class="p">,</span> <span class="n">precipitation</span><span class="p">],</span>
     <span class="c1"># add a subtitle to each chart</span>
     <span class="n">subtitle</span><span class="o">=</span><span class="p">[</span><span class="s2">"Temperature (°C)"</span><span class="p">,</span> <span class="s2">"Precipitation (mm)"</span><span class="p">],</span>
@@ -4274,17 +4228,13 @@ Heatmap(
     <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly climate"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
-    <span class="n">xticks</span><span class="o">=</span><span class="n">MONTH_TICKS</span><span class="p">,</span>
-    <span class="n">xticklabels</span><span class="o">=</span><span class="n">MONTHS</span><span class="p">,</span>
     <span class="n">xtickrotate</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
-    <span class="n">yticks</span><span class="o">=</span><span class="n">CITY_TICKS</span><span class="p">,</span>
-    <span class="n">yticklabels</span><span class="o">=</span><span class="n">CITIES</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-15">Heatmap(
-    # use a list of matrices to define multiple heatmaps
+    # use a list of grids to define multiple heatmaps
     data=[temperatures, precipitation],
     # add a subtitle to each chart
     subtitle=["Temperature (°C)", "Precipitation (mm)"],
@@ -4296,11 +4246,7 @@ Heatmap(
     title="Monthly climate",
     xlabel="Month",
     ylabel="City",
-    xticks=MONTH_TICKS,
-    xticklabels=MONTHS,
     xtickrotate=90,
-    yticks=CITY_TICKS,
-    yticklabels=CITIES,
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_colorbars=True,
 ).show()</div>
@@ -4363,10 +4309,6 @@ Heatmap(
     <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly climate"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
-    <span class="n">xticks</span><span class="o">=</span><span class="n">MONTH_TICKS</span><span class="p">,</span>
-    <span class="n">xticklabels</span><span class="o">=</span><span class="n">MONTHS</span><span class="p">,</span>
-    <span class="n">yticks</span><span class="o">=</span><span class="n">CITY_TICKS</span><span class="p">,</span>
-    <span class="n">yticklabels</span><span class="o">=</span><span class="n">CITIES</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_TALL</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -4389,10 +4331,6 @@ Heatmap(
     title="Monthly climate",
     xlabel="Month",
     ylabel="City",
-    xticks=MONTH_TICKS,
-    xticklabels=MONTHS,
-    yticks=CITY_TICKS,
-    yticklabels=CITIES,
     figsize=FIG_SIZE.FULL_TALL,
     show_colorbars=True,
     show_heatmap_values=True,
@@ -4539,21 +4477,15 @@ figure.show()</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">VARIABLE_TICKS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">VARIABLES</span><span class="p">)))</span>
-
-<span class="n">Heatmap</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">Heatmap</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">correlations</span><span class="p">,</span>
     <span class="c1"># a diverging colormap, pinned so that zero sits on white</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_heatmap_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">Coolwarm</span><span class="p">},</span>
     <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Correlation of Palmer penguin measurements"</span><span class="p">,</span>
-    <span class="c1"># name the variables on both axes</span>
-    <span class="n">xticks</span><span class="o">=</span><span class="n">VARIABLE_TICKS</span><span class="p">,</span>
-    <span class="n">xticklabels</span><span class="o">=</span><span class="n">VARIABLES</span><span class="p">,</span>
+    <span class="c1"># the variable names come from the `x` and `y` labels of the data</span>
     <span class="n">xtickrotate</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
-    <span class="n">yticks</span><span class="o">=</span><span class="n">VARIABLE_TICKS</span><span class="p">,</span>
-    <span class="n">yticklabels</span><span class="o">=</span><span class="n">VARIABLES</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">SQUARE</span><span class="p">,</span>
     <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">ASPECT_RATIO</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -4561,21 +4493,15 @@ figure.show()</div>
     <span class="n">valfmt</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL_2</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-19">VARIABLE_TICKS = list(range(len(VARIABLES)))
-
-Heatmap(
+<div class="clipboard-copy-txt" id="cell-19">Heatmap(
     data=correlations,
     # a diverging colormap, pinned so that zero sits on white
     style={"plot_heatmap_cmap": COLORS.Coolwarm},
     vmin=-1,
     vmax=1,
     title="Correlation of Palmer penguin measurements",
-    # name the variables on both axes
-    xticks=VARIABLE_TICKS,
-    xticklabels=VARIABLES,
+    # the variable names come from the `x` and `y` labels of the data
     xtickrotate=45,
-    yticks=VARIABLE_TICKS,
-    yticklabels=VARIABLES,
     figsize=FIG_SIZE.SQUARE,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     show_colorbars=True,
@@ -4632,18 +4558,11 @@ Heatmap(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">TOPIC_TICKS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">TOPICS</span><span class="p">)))</span>
-
-<span class="n">Heatmap</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">Heatmap</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">confusion</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Topic classifier on 1,000 news articles"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Predicted topic"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"True topic"</span><span class="p">,</span>
-    <span class="c1"># name the classes on both axes</span>
-    <span class="n">xticks</span><span class="o">=</span><span class="n">TOPIC_TICKS</span><span class="p">,</span>
-    <span class="n">xticklabels</span><span class="o">=</span><span class="n">TOPICS</span><span class="p">,</span>
-    <span class="n">yticks</span><span class="o">=</span><span class="n">TOPIC_TICKS</span><span class="p">,</span>
-    <span class="n">yticklabels</span><span class="o">=</span><span class="n">TOPICS</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">SQUARE</span><span class="p">,</span>
     <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">ASPECT_RATIO</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span>
     <span class="c1"># write the counts into the cells</span>
@@ -4651,18 +4570,11 @@ Heatmap(
     <span class="n">valfmt</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-20">TOPIC_TICKS = list(range(len(TOPICS)))
-
-Heatmap(
+<div class="clipboard-copy-txt" id="cell-20">Heatmap(
     data=confusion,
     title="Topic classifier on 1,000 news articles",
     xlabel="Predicted topic",
     ylabel="True topic",
-    # name the classes on both axes
-    xticks=TOPIC_TICKS,
-    xticklabels=TOPICS,
-    yticks=TOPIC_TICKS,
-    yticklabels=TOPICS,
     figsize=FIG_SIZE.SQUARE,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     # write the counts into the cells
@@ -4723,7 +4635,7 @@ Heatmap(
 <span class="n">GITHUB_GREENS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"#ebedf0"</span><span class="p">,</span> <span class="s2">"#9be9a8"</span><span class="p">,</span> <span class="s2">"#40c463"</span><span class="p">,</span> <span class="s2">"#30a14e"</span><span class="p">,</span> <span class="s2">"#216e39"</span><span class="p">]</span>
 
 <span class="n">Heatmap</span><span class="p">(</span>
-    <span class="n">data</span><span class="o">=</span><span class="n">contributions</span><span class="p">,</span>
+    <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">"z"</span><span class="p">:</span> <span class="n">contributions</span><span class="p">},</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span>
         <span class="s2">"plot_heatmap_cmap"</span><span class="p">:</span> <span class="n">GITHUB_GREENS</span><span class="p">,</span>
         <span class="c1"># white borders separate the days like the gaps in the GitHub graph</span>
@@ -4748,7 +4660,7 @@ Heatmap(
 GITHUB_GREENS = ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"]
 
 Heatmap(
-    data=contributions,
+    data={"z": contributions},
     style={
         "plot_heatmap_cmap": GITHUB_GREENS,
         # white borders separate the days like the gaps in the GitHub graph
@@ -4831,11 +4743,7 @@ Heatmap(
     <span class="n">title</span><span class="o">=</span><span class="s2">"Topic classifiers on 1,000 news articles"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Predicted topic"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"True topic"</span><span class="p">,</span>
-    <span class="n">xticks</span><span class="o">=</span><span class="n">TOPIC_TICKS</span><span class="p">,</span>
-    <span class="n">xticklabels</span><span class="o">=</span><span class="n">TOPICS</span><span class="p">,</span>
     <span class="n">xtickrotate</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
-    <span class="n">yticks</span><span class="o">=</span><span class="n">TOPIC_TICKS</span><span class="p">,</span>
-    <span class="n">yticklabels</span><span class="o">=</span><span class="n">TOPICS</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">6.3</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span>
     <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">ASPECT_RATIO</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span>
     <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -4857,11 +4765,7 @@ Heatmap(
     title="Topic classifiers on 1,000 news articles",
     xlabel="Predicted topic",
     ylabel="True topic",
-    xticks=TOPIC_TICKS,
-    xticklabels=TOPICS,
     xtickrotate=45,
-    yticks=TOPIC_TICKS,
-    yticklabels=TOPICS,
     figsize=(6.3, 4.0),
     aspect_ratio=ASPECT_RATIO.EQUAL,
     show_heatmap_values=True,

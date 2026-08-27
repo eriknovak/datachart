@@ -6095,11 +6095,15 @@ from datachart.charts import Heatmap
 
 ## Heatmap Input Attributes
 
-The `Heatmap` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the heatmap matrix. For a single heatmap, `data` is a 2D list; a `None` cell is left blank. For multiple heatmaps, `data` is a list of 2D lists.
+The `Heatmap` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the heatmap grid. For a single heatmap, `data` is a dictionary with the 2D matrix `z` (a `None` cell is left blank) and the optional `x` and `y` labels of its columns and rows. For multiple heatmaps, `data` is a list of such dictionaries.
 
 ```
 Heatmap(
-    data=List[List[Union[int, float, None]]],          # The heatmap matrix (or list of matrices for multiple charts)
+    data={                                              # The heatmap grid (or list of grids for multiple charts)
+        "x": Optional[List[Union[str, int, float]]],    # The column labels, one per column of z (optional)
+        "y": Optional[List[Union[str, int, float]]],    # The row labels, one per row of z (optional)
+        "z": List[List[Union[int, float, None]]],       # The heatmap matrix
+    },
     style={                                             # The style of the heatmap (optional)
         "plot_heatmap_cmap":        Optional[Union[str, List[str]]], # The colormap (palette name or list of hex colors)
         "plot_heatmap_alpha":       Optional[float],    # The alpha of the heatmap (how visible it is)
@@ -6155,13 +6159,13 @@ For more details, see the [datachart.charts.Heatmap](https://eriknovak.github.io
 
 The examples in this guide share one dataset: the monthly climate of six cities. `temperatures` holds the mean air temperature (in °C) and `precipitation` the mean rainfall (in mm) of every month, rounded from the published 1991–2020 climate normals of the cities' weather stations. The data is hard-coded in a hidden cell; each matrix has one row per city, in the order of `CITIES`, and one column per month, in the order of `MONTHS`.
 
-The data is a plain 2D list: each inner list is one row of the heatmap, and each value in it is one cell. The first row is drawn at the top, the first column at the left:
+The data is a dictionary: `z` is a plain 2D list where each inner list is one row of the heatmap and each value in it is one cell, while `x` and `y` name its columns and rows. The first row is drawn at the top, the first column at the left:
 
 ```
-temperatures[:2]
+{key: value[:2] for key, value in temperatures.items()}
 ```
 
-**Basic example.** Only the `data` argument is required to draw the heatmap. Every cell is colored by its value: the lowest value gets the first color of the colormap, the highest the last.
+**Basic example.** Only the `data` argument is required to draw the heatmap. Every cell is colored by its value: the lowest value gets the first color of the colormap, the highest the last. The `x` and `y` labels become the tick labels of the axes; without them, the axes are ticked with the cell indices.
 
 ```
 Heatmap(
@@ -6213,24 +6217,19 @@ Heatmap(
 
 ### Ticks and labels
 
-A heatmap places column *j* at `x = j` and row *i* at `y = i`, counting from zero, so by default the axes are ticked with cell indices. To name the rows and columns instead, add the `xticks` and `yticks` attributes with the indices to tick and the `xticklabels` and `yticklabels` attributes with their labels — here every column gets its month and every row its city. Tick labels can be rotated with `xtickrotate` and `ytickrotate`.
+A heatmap places column *j* at `x = j` and row *i* at `y = i`, counting from zero. The `x` and `y` labels of the data name these positions; to tick the axes differently, add the `xticks` and `yticks` attributes with the indices to tick and the `xticklabels` and `yticklabels` attributes with their labels — an explicit `xticks`/`xticklabels` (`yticks`/`yticklabels`) pair overrides the `x` (`y`) labels of the data. Here every third month is ticked. Tick labels can be rotated with `xtickrotate` and `ytickrotate`, whichever labels are shown.
 
 ```
-MONTH_TICKS = list(range(len(MONTHS)))
-CITY_TICKS = list(range(len(CITIES)))
-
 Heatmap(
     data=temperatures,
     title="Mean monthly temperature",
     xlabel="Month",
     ylabel="City",
-    # name the columns and rotate the labels
-    xticks=MONTH_TICKS,
-    xticklabels=MONTHS,
-    xtickrotate=45,
-    # name the rows
-    yticks=CITY_TICKS,
-    yticklabels=CITIES,
+    # tick every third month instead of the `x` labels
+    xticks=[0, 3, 6, 9],
+    xticklabels=["Jan", "Apr", "Jul", "Oct"],
+    # rotate the row labels
+    ytickrotate=45,
 ).show()
 ```
 
@@ -6257,10 +6256,6 @@ Heatmap(
     title="Mean monthly temperature",
     xlabel="Month",
     ylabel="City",
-    xticks=MONTH_TICKS,
-    xticklabels=MONTHS,
-    yticks=CITY_TICKS,
-    yticklabels=CITIES,
     # add to determine the figure size
     figsize=FIG_SIZE.FULL_SHORT,
     # keep the cells square
@@ -6306,10 +6301,6 @@ Heatmap(
     title="Mean monthly temperature",
     xlabel="Month",
     ylabel="City",
-    xticks=MONTH_TICKS,
-    xticklabels=MONTHS,
-    yticks=CITY_TICKS,
-    yticklabels=CITIES,
     figsize=FIG_SIZE.FULL_MEDIUM,
     # add to show the colorbar
     show_colorbars=True,
@@ -6367,10 +6358,6 @@ Heatmap(
     title="Mean monthly temperature",
     xlabel="Month",
     ylabel="City",
-    xticks=MONTH_TICKS,
-    xticklabels=MONTHS,
-    yticks=CITY_TICKS,
-    yticklabels=CITIES,
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_colorbars=True,
     show_heatmap_values=True,
@@ -6394,10 +6381,6 @@ Heatmap(
     title="Mean monthly temperature",
     xlabel="Month",
     ylabel="City",
-    xticks=MONTH_TICKS,
-    xticklabels=MONTHS,
-    yticks=CITY_TICKS,
-    yticklabels=CITIES,
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_colorbars=True,
     show_heatmap_values=True,
@@ -6432,10 +6415,6 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
         title=f"Mean monthly precipitation with the '{norm}' normalization",
         xlabel="Month",
         ylabel="City",
-        xticks=MONTH_TICKS,
-        xticklabels=MONTHS,
-        yticks=CITY_TICKS,
-        yticklabels=CITIES,
         figsize=FIG_SIZE.FULL_MEDIUM,
         show_colorbars=True,
         show_heatmap_values=True,
@@ -6449,17 +6428,17 @@ The other charts accept an `emphasis` attribute that highlights one series and m
 
 ## Multiple Heatmap Charts
 
-To create multiple heatmaps, pass a list of matrices to the `data` argument. Each matrix is drawn in its own subplot — two rasters cannot share one set of axes — with the `subtitle` at the top of each subplot and the `title`, `xlabel` and `ylabel` positioned to be global for all charts. Per-chart attributes like `subtitle`, `style`, `valfmt`, `norm`, `vmin`, `vmax` and `colorbar` can be passed as lists, where each element corresponds to a chart; a single value applies to every chart.
+To create multiple heatmaps, pass a list of grids to the `data` argument. Each grid is drawn in its own subplot — two rasters cannot share one set of axes — with the `subtitle` at the top of each subplot and the `title`, `xlabel` and `ylabel` positioned to be global for all charts. Per-chart attributes like `subtitle`, `style`, `valfmt`, `norm`, `vmin`, `vmax` and `colorbar` can be passed as lists, where each element corresponds to a chart; a single value applies to every chart.
 
 Multiple charts pattern
 
-For multiple charts, `data` becomes a list of matrices, and per-chart attributes like `subtitle`, `style` and `valfmt` become lists where each element applies to the corresponding chart.
+For multiple charts, `data` becomes a list of grids, and per-chart attributes like `subtitle`, `style` and `valfmt` become lists where each element applies to the corresponding chart.
 
-The example draws the temperatures and the precipitation of the six cities side by side. The two matrices hold different quantities, so each gets its own subtitle and its own colormap through a list of `style` dictionaries (`None` keeps the theme style for that chart). Twelve columns side by side leave no room for the cell values; the next section stacks the charts and writes them in.
+The example draws the temperatures and the precipitation of the six cities side by side. The two grids hold different quantities, so each gets its own subtitle and its own colormap through a list of `style` dictionaries (`None` keeps the theme style for that chart). Twelve columns side by side leave no room for the cell values; the next section stacks the charts and writes them in.
 
 ```
 Heatmap(
-    # use a list of matrices to define multiple heatmaps
+    # use a list of grids to define multiple heatmaps
     data=[temperatures, precipitation],
     # add a subtitle to each chart
     subtitle=["Temperature (°C)", "Precipitation (mm)"],
@@ -6471,11 +6450,7 @@ Heatmap(
     title="Monthly climate",
     xlabel="Month",
     ylabel="City",
-    xticks=MONTH_TICKS,
-    xticklabels=MONTHS,
     xtickrotate=90,
-    yticks=CITY_TICKS,
-    yticklabels=CITIES,
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_colorbars=True,
 ).show()
@@ -6498,10 +6473,6 @@ figure = Heatmap(
     title="Monthly climate",
     xlabel="Month",
     ylabel="City",
-    xticks=MONTH_TICKS,
-    xticklabels=MONTHS,
-    yticks=CITY_TICKS,
-    yticklabels=CITIES,
     figsize=FIG_SIZE.FULL_TALL,
     show_colorbars=True,
     show_heatmap_values=True,
@@ -6536,8 +6507,6 @@ The following examples put the features above to work on real or realistic data.
 `correlations` holds the Pearson correlation between the four body measurements — bill length, bill depth, flipper length and body mass — of the 342 penguins of the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0). A correlation matrix is the textbook case for a diverging colormap: the sign matters as much as the size, so `COLORS.Coolwarm` is pinned to the −1 … 1 range with `vmin` and `vmax`, which puts white on zero and the same shade on equal correlations of either sign. The variable names label both axes, `VALUE_FORMAT.DECIMAL_2` writes the coefficients into the cells, and `ASPECT_RATIO.EQUAL` keeps the matrix square.
 
 ```
-VARIABLE_TICKS = list(range(len(VARIABLES)))
-
 Heatmap(
     data=correlations,
     # a diverging colormap, pinned so that zero sits on white
@@ -6545,12 +6514,8 @@ Heatmap(
     vmin=-1,
     vmax=1,
     title="Correlation of Palmer penguin measurements",
-    # name the variables on both axes
-    xticks=VARIABLE_TICKS,
-    xticklabels=VARIABLES,
+    # the variable names come from the `x` and `y` labels of the data
     xtickrotate=45,
-    yticks=VARIABLE_TICKS,
-    yticklabels=VARIABLES,
     figsize=FIG_SIZE.SQUARE,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     show_colorbars=True,
@@ -6564,18 +6529,11 @@ Heatmap(
 `confusion` holds the illustrative confusion matrix of a topic classifier evaluated on 1,000 news articles, 250 in each of four topics: each row is the true topic, each column the predicted one, and each cell the number of articles. The diagonal holds the correct predictions; the off-diagonal cells show which topics get mixed up — here business and politics articles for one another. The class names label both axes, `VALUE_FORMAT.INTEGER` writes the counts into the cells, and the sequential default colormap makes the diagonal stand out. The colorbar is left out — the cell values already carry the numbers.
 
 ```
-TOPIC_TICKS = list(range(len(TOPICS)))
-
 Heatmap(
     data=confusion,
     title="Topic classifier on 1,000 news articles",
     xlabel="Predicted topic",
     ylabel="True topic",
-    # name the classes on both axes
-    xticks=TOPIC_TICKS,
-    xticklabels=TOPICS,
-    yticks=TOPIC_TICKS,
-    yticklabels=TOPICS,
     figsize=FIG_SIZE.SQUARE,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     # write the counts into the cells
@@ -6593,7 +6551,7 @@ Heatmap(
 GITHUB_GREENS = ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"]
 
 Heatmap(
-    data=contributions,
+    data={"z": contributions},
     style={
         "plot_heatmap_cmap": GITHUB_GREENS,
         # white borders separate the days like the gaps in the GitHub graph
@@ -6633,11 +6591,7 @@ Heatmap(
     title="Topic classifiers on 1,000 news articles",
     xlabel="Predicted topic",
     ylabel="True topic",
-    xticks=TOPIC_TICKS,
-    xticklabels=TOPICS,
     xtickrotate=45,
-    yticks=TOPIC_TICKS,
-    yticklabels=TOPICS,
     figsize=(6.3, 4.0),
     aspect_ratio=ASPECT_RATIO.EQUAL,
     show_heatmap_values=True,
@@ -11411,10 +11365,7 @@ Examples:
 
 ```
 Heatmap(
-    data: Union[
-        List[List[Union[int, float, None]]],
-        List[List[List[Union[int, float, None]]]],
-    ],
+    data: Union[HeatmapDataAttrs, List[HeatmapDataAttrs]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
@@ -11506,52 +11457,56 @@ Examples:
 ```
 >>> from datachart.charts import Heatmap
 >>> figure = Heatmap(
-...     data=[
-...         [1, 2, 3],
-...         [4, 5, 6],
-...         [7, 8, 9]
-...     ],
+...     data={
+...         "x": ["a", "b", "c"],
+...         "y": ["p", "q", "r"],
+...         "z": [
+...             [1, 2, 3],
+...             [4, 5, 6],
+...             [7, 8, 9],
+...         ],
+...     },
 ...     title="Basic Heatmap",
 ...     xlabel="X",
 ...     ylabel="Y"
 ... )
 ```
 
-| PARAMETER             | DESCRIPTION                                                                                                                                                                                                                     |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`                | The data matrix for the heatmap(s). Can be a 2D array for one heatmap, or a list of 2D arrays for multiple heatmaps/subplots. **TYPE:** `Union[List[List[Union[int, float, None]]], List[List[List[Union[int, float, None]]]]]` |
-| `title`               | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                           |
-| `xlabel`              | The x-axis label. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                 |
-| `ylabel`              | The y-axis label. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                 |
-| `subtitle`            | The subtitle(s) for individual charts. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                |
-| `emphasis`            | Not supported: a heatmap is a single raster layer with no series to mute or highlight. Passing a value raises ValueError. **TYPE:** `None` **DEFAULT:** `None`                                                                  |
-| `figsize`             | The size of the figure. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                                                          |
-| `xmin`                | The minimum x-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                           |
-| `xmax`                | The maximum x-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                           |
-| `ymin`                | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                           |
-| `ymax`                | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                           |
-| `show_legend`         | Whether to show the legend (not typical for heatmaps). **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                           |
-| `show_grid`           | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                              |
-| `show_colorbars`      | Whether to show the colorbar(s). **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                 |
-| `show_heatmap_values` | Whether to show values on the heatmap cells. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                     |
-| `aspect_ratio`        | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                          |
-| `subplots`            | Whether to create separate subplots for each heatmap. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                            |
-| `max_cols`            | Maximum number of columns in subplots (when subplots=True). **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                       |
-| `sharex`              | Whether to share the x-axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                         |
-| `sharey`              | Whether to share the y-axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                         |
-| `style`               | Style configuration(s) for the heatmap(s). **TYPE:** `Optional[Union[HeatmapStyleAttrs, List[Optional[HeatmapStyleAttrs]]]]` **DEFAULT:** `None`                                                                                |
-| `norm`                | Value normalization method(s). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                        |
-| `vmin`                | Minimum value(s) for normalization. **TYPE:** `Optional[Union[float, List[Optional[float]]]]` **DEFAULT:** `None`                                                                                                               |
-| `vmax`                | Maximum value(s) for normalization. **TYPE:** `Optional[Union[float, List[Optional[float]]]]` **DEFAULT:** `None`                                                                                                               |
-| `valfmt`              | Format string(s) for cell values, with the value named x (e.g., "{x:.1f}"). See VALUE_FORMAT. **TYPE:** `Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]]` **DEFAULT:** `None`                                           |
-| `xticks`              | Custom x-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float]], List[List[Union[int, float]]]]]` **DEFAULT:** `None`                                                                                           |
-| `xticklabels`         | Custom x-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                          |
-| `xtickrotate`         | Rotation angle for x-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                |
-| `yticks`              | Custom y-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float]], List[List[Union[int, float]]]]]` **DEFAULT:** `None`                                                                                           |
-| `yticklabels`         | Custom y-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                          |
-| `ytickrotate`         | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                |
-| `colorbar`            | Colorbar configuration(s). **TYPE:** `Optional[Union[HeatmapColorbarAttrs, List[Optional[HeatmapColorbarAttrs]]]]` **DEFAULT:** `None`                                                                                          |
-| `texts`               | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                          |
+| PARAMETER             | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`                | The labelled grid(s) for the heatmap(s): one {x, y, z} dict, or a list of them for multiple heatmaps/subplots. z is the 2-D matrix of cell values (rows along y, columns along x; None cells stay blank); x and y are optional tick labels for its columns and rows (any values, the indices by default). An explicit xticks/xticklabels (yticks/yticklabels) overrides them. **TYPE:** `Union[HeatmapDataAttrs, List[HeatmapDataAttrs]]` |
+| `title`               | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                     |
+| `xlabel`              | The x-axis label. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                           |
+| `ylabel`              | The y-axis label. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                           |
+| `subtitle`            | The subtitle(s) for individual charts. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                          |
+| `emphasis`            | Not supported: a heatmap is a single raster layer with no series to mute or highlight. Passing a value raises ValueError. **TYPE:** `None` **DEFAULT:** `None`                                                                                                                                                                                                                                                                            |
+| `figsize`             | The size of the figure. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                    |
+| `xmin`                | The minimum x-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                     |
+| `xmax`                | The maximum x-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                     |
+| `ymin`                | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                     |
+| `ymax`                | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                     |
+| `show_legend`         | Whether to show the legend (not typical for heatmaps). **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                     |
+| `show_grid`           | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                        |
+| `show_colorbars`      | Whether to show the colorbar(s). **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                           |
+| `show_heatmap_values` | Whether to show values on the heatmap cells. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                               |
+| `aspect_ratio`        | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                    |
+| `subplots`            | Whether to create separate subplots for each heatmap. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                      |
+| `max_cols`            | Maximum number of columns in subplots (when subplots=True). **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                 |
+| `sharex`              | Whether to share the x-axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                   |
+| `sharey`              | Whether to share the y-axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                   |
+| `style`               | Style configuration(s) for the heatmap(s). **TYPE:** `Optional[Union[HeatmapStyleAttrs, List[Optional[HeatmapStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                          |
+| `norm`                | Value normalization method(s). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                  |
+| `vmin`                | Minimum value(s) for normalization. **TYPE:** `Optional[Union[float, List[Optional[float]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                         |
+| `vmax`                | Maximum value(s) for normalization. **TYPE:** `Optional[Union[float, List[Optional[float]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                         |
+| `valfmt`              | Format string(s) for cell values, with the value named x (e.g., "{x:.1f}"). See VALUE_FORMAT. **TYPE:** `Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                     |
+| `xticks`              | Custom x-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float]], List[List[Union[int, float]]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                     |
+| `xticklabels`         | Custom x-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                    |
+| `xtickrotate`         | Rotation angle for x-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                          |
+| `yticks`              | Custom y-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float]], List[List[Union[int, float]]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                     |
+| `yticklabels`         | Custom y-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                    |
+| `ytickrotate`         | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                          |
+| `colorbar`            | Colorbar configuration(s). **TYPE:** `Optional[Union[HeatmapColorbarAttrs, List[Optional[HeatmapColorbarAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                    |
+| `texts`               | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                    |
 
 | RETURNS      | DESCRIPTION                        |
 | ------------ | ---------------------------------- |
@@ -13715,6 +13670,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `HistogramSingleChartAttrs`      | The single chart attributes for the histogram chart.            |
 | `HistDataPointAttrs`             | The data point attributes for the histogram chart.              |
 | `HeatmapSingleChartAttrs`        | The single chart attributes for the heatmap chart.              |
+| `HeatmapDataAttrs`               | The data attributes for the heatmap chart.                      |
 | `HeatmapColorbarAttrs`           | The heatmap colorbar attributes.                                |
 | `ContourSingleChartAttrs`        | The single chart attributes for the contour chart.              |
 | `ContourDataAttrs`               | The data attributes for the contour chart.                      |
@@ -13953,7 +13909,7 @@ The single chart attributes for the heatmap chart.
 
 | ATTRIBUTE     | DESCRIPTION                                                                                           |
 | ------------- | ----------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the heatmap chart. **TYPE:** `List[List[Union[int, float, None]]]`   |
+| `data`        | The labelled grid defining the heatmap chart. **TYPE:** `HeatmapDataAttrs`                            |
 | `subtitle`    | The subtitle of the heatmap chart. Also used as the label in the legend. **TYPE:** `Union[str, None]` |
 | `xlabel`      | The xlabel of the heatmap chart. **TYPE:** `Union[str, None]`                                         |
 | `ylabel`      | The ylabel of the heatmap chart. **TYPE:** `Union[str, None]`                                         |
@@ -13969,6 +13925,18 @@ The single chart attributes for the heatmap chart.
 | `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                |
 | `colorbar`    | The heatmap colorbar attributes. **TYPE:** `Union[HeatmapColorbarAttrs, None]`                        |
 | `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                 |
+
+#### datachart.typings.HeatmapDataAttrs
+
+Bases: `TypedDict`
+
+The data attributes for the heatmap chart.
+
+| ATTRIBUTE | DESCRIPTION                                                                                                                   |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `x`       | The column labels, one per column of z. Defaults to the column indices. **TYPE:** `Union[List[Union[str, int, float]], None]` |
+| `y`       | The row labels, one per row of z. Defaults to the row indices. **TYPE:** `Union[List[Union[str, int, float]], None]`          |
+| `z`       | The 2-D grid of cell values, one row per y and one column per x. **TYPE:** `List[List[Union[int, float, None]]]`              |
 
 #### datachart.typings.HeatmapColorbarAttrs
 

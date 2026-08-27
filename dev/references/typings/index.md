@@ -19,6 +19,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `HistogramSingleChartAttrs`      | The single chart attributes for the histogram chart.            |
 | `HistDataPointAttrs`             | The data point attributes for the histogram chart.              |
 | `HeatmapSingleChartAttrs`        | The single chart attributes for the heatmap chart.              |
+| `HeatmapDataAttrs`               | The data attributes for the heatmap chart.                      |
 | `HeatmapColorbarAttrs`           | The heatmap colorbar attributes.                                |
 | `ContourSingleChartAttrs`        | The single chart attributes for the contour chart.              |
 | `ContourDataAttrs`               | The data attributes for the contour chart.                      |
@@ -257,7 +258,7 @@ The single chart attributes for the heatmap chart.
 
 | ATTRIBUTE     | DESCRIPTION                                                                                           |
 | ------------- | ----------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the heatmap chart. **TYPE:** `List[List[Union[int, float, None]]]`   |
+| `data`        | The labelled grid defining the heatmap chart. **TYPE:** `HeatmapDataAttrs`                            |
 | `subtitle`    | The subtitle of the heatmap chart. Also used as the label in the legend. **TYPE:** `Union[str, None]` |
 | `xlabel`      | The xlabel of the heatmap chart. **TYPE:** `Union[str, None]`                                         |
 | `ylabel`      | The ylabel of the heatmap chart. **TYPE:** `Union[str, None]`                                         |
@@ -273,6 +274,18 @@ The single chart attributes for the heatmap chart.
 | `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                |
 | `colorbar`    | The heatmap colorbar attributes. **TYPE:** `Union[HeatmapColorbarAttrs, None]`                        |
 | `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                 |
+
+#### datachart.typings.HeatmapDataAttrs
+
+Bases: `TypedDict`
+
+The data attributes for the heatmap chart.
+
+| ATTRIBUTE | DESCRIPTION                                                                                                                   |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `x`       | The column labels, one per column of z. Defaults to the column indices. **TYPE:** `Union[List[Union[str, int, float]], None]` |
+| `y`       | The row labels, one per row of z. Defaults to the row indices. **TYPE:** `Union[List[Union[str, int, float]], None]`          |
+| `z`       | The 2-D grid of cell values, one row per y and one column per x. **TYPE:** `List[List[Union[int, float, None]]]`              |
 
 #### datachart.typings.HeatmapColorbarAttrs
 

@@ -1952,6 +1952,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.typings.HeatmapDataAttrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;HeatmapDataAttrs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.typings.HeatmapColorbarAttrs" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2825,6 +2836,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.typings.HeatmapDataAttrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;HeatmapDataAttrs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.typings.HeatmapColorbarAttrs" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3507,6 +3529,14 @@ is intended to contain the typings for easier input value format checkup.</p>
             <td class="doc-class-details">
               <div class="doc-md-description">
                 <p>The single chart attributes for the heatmap chart.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HeatmapDataAttrs&lt;/span&gt;" href="#datachart.typings.HeatmapDataAttrs">HeatmapDataAttrs</a></code></td>
+            <td class="doc-class-details">
+              <div class="doc-md-description">
+                <p>The data attributes for the heatmap chart.</p>
               </div>
             </td>
           </tr>
@@ -5720,12 +5750,12 @@ When present, a connector is drawn from the text to the target.</p>
             <td><code><span title="datachart.typings.HeatmapSingleChartAttrs.data">data</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The list of data points defining the heatmap chart.</p>
+                <p>The labelled grid defining the heatmap chart.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
                     <b>TYPE:</b>
-                      <code><span title="typing.List">List</span>[<span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<span title="int">int</span>, <span title="float">float</span>, None]]]</code>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HeatmapDataAttrs&lt;/span&gt;" href="#datachart.typings.HeatmapDataAttrs">HeatmapDataAttrs</a></code>
                   </span>
               </p>
             </td>
@@ -5936,6 +5966,108 @@ When present, a connector is drawn from the text to the target.</p>
                   <span class="doc-attribute-annotation">
                     <b>TYPE:</b>
                       <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.TextAttrs&lt;/span&gt;" href="#datachart.typings.TextAttrs">TextAttrs</a>, <span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.TextAttrs&lt;/span&gt;" href="#datachart.typings.TextAttrs">TextAttrs</a>], None]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="datachart.typings.HeatmapDataAttrs" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.typings.HeatmapDataAttrs</span>
+
+
+</h4>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
+
+
+
+        <p>The data attributes for the heatmap chart.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">ATTRIBUTE</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.HeatmapDataAttrs.x">x</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The column labels, one per column of <code>z</code>. Defaults to the column indices.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<span title="str">str</span>, <span title="int">int</span>, <span title="float">float</span>]], None]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.HeatmapDataAttrs.y">y</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The row labels, one per row of <code>z</code>. Defaults to the row indices.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<span title="str">str</span>, <span title="int">int</span>, <span title="float">float</span>]], None]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.HeatmapDataAttrs.z">z</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The 2-D grid of cell values, one row per <code>y</code> and one column per <code>x</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.List">List</span>[<span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<span title="int">int</span>, <span title="float">float</span>, None]]]</code>
                   </span>
               </p>
             </td>
