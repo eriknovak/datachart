@@ -15,6 +15,7 @@ Classes:
     HistogramSingleChartAttrs: The single chart attributes for the histogram chart.
     HistDataPointAttrs: The data point attributes for the histogram chart.
     HeatmapSingleChartAttrs: The single chart attributes for the heatmap chart.
+    HeatmapDataAttrs: The data attributes for the heatmap chart.
     HeatmapColorbarAttrs: The heatmap colorbar attributes.
     ContourSingleChartAttrs: The single chart attributes for the contour chart.
     ContourDataAttrs: The data attributes for the contour chart.
@@ -1116,11 +1117,26 @@ class HeatmapColorbarAttrs(TypedDict):
     orientation: Union[ORIENTATION, str, None]
 
 
+class HeatmapDataAttrs(TypedDict):
+    """The data attributes for the heatmap chart.
+
+    Attributes:
+        x (Union[List[Union[str, int, float]], None]): The column labels, one per column of `z`. Defaults to the column indices.
+        y (Union[List[Union[str, int, float]], None]): The row labels, one per row of `z`. Defaults to the row indices.
+        z (List[List[Union[int, float, None]]]): The 2-D grid of cell values, one row per `y` and one column per `x`.
+
+    """
+
+    x: Union[List[Union[str, int, float]], None]
+    y: Union[List[Union[str, int, float]], None]
+    z: List[List[Union[int, float, None]]]
+
+
 class HeatmapSingleChartAttrs(TypedDict):
     """The single chart attributes for the heatmap chart.
 
     Attributes:
-        data (List[List[Union[int, float, None]]]): The list of data points defining the heatmap chart.
+        data (HeatmapDataAttrs): The labelled grid defining the heatmap chart.
         subtitle (Union[str, None]): The subtitle of the heatmap chart. Also used as the label in the legend.
         xlabel (Union[str, None]): The xlabel of the heatmap chart.
         ylabel (Union[str, None]): The ylabel of the heatmap chart.
@@ -1142,7 +1158,7 @@ class HeatmapSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[List[Union[int, float, None]]]
+    data: HeatmapDataAttrs
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]

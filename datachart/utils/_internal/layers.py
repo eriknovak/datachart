@@ -187,6 +187,32 @@ def get_chart_data(attr: str, chart: dict) -> Optional[np.ndarray]:
     return None
 
 
+def get_chart_grid(chart: dict, kind: str, dtype=float) -> tuple:
+    """The validated (x, y, z) of a gridded chart; x and y are None when absent."""
+
+    z = get_chart_data("z", chart)
+    if z is None:
+        raise ValueError(f"A {kind} chart requires the `z` grid in `data`.")
+    z = np.asarray(z, dtype=dtype)
+    if z.ndim != 2:
+        raise ValueError(
+            f"The {kind} `z` attribute must be a 2-D grid, got {z.ndim} dimension(s)."
+        )
+    n_rows, n_cols = z.shape
+    axes = []
+    for attr, extent, name in (("x", n_cols, "column"), ("y", n_rows, "row")):
+        values = get_chart_data(attr, chart)
+        if values is not None:
+            values = np.asarray(values)
+            if values.ndim != 1 or len(values) != extent:
+                raise ValueError(
+                    f"The {kind} `{attr}` attribute must hold one value per {name} "
+                    f"of `z` ({extent}), got {values.shape}."
+                )
+        axes.append(values)
+    return axes[0], axes[1], z
+
+
 class NumpyEncoder(json.JSONEncoder):
     """Custom JSON encoder that handles numpy arrays and types."""
 
@@ -1739,12 +1765,30 @@ class HeatmapLayer(Layer):
         # white value text only helps when the cmap's high end is actually dark
         r, g, b = heatmap_style["cmap"](1.0)[:3]
         self.contrast_values = (0.2126 * r + 0.7152 * g + 0.0722 * b) < 0.5
+        x, y, self.z = self._grid()
+        self._label_axes(x, y)
+
+    def _grid(self) -> tuple:
+        """The validated (x, y, z); x and y are None when not given, z lists."""
+
+        x, y, z = get_chart_grid(self.chart, "heatmap", dtype=object)
+        z = [[(np.nan if item is None else item) for item in row] for row in z]
+        return x, y, z
+
+    def _label_axes(self, x, y):
+        # x/y default the tick attrs so the panel applies them like explicit ones
+        chart = dict(self.chart)
+        for axis, labels in (("x", x), ("y", y)):
+            if labels is None or chart.get(f"{axis}ticks") is not None:
+                continue
+            chart[f"{axis}ticks"] = list(range(len(labels)))
+            chart[f"{axis}ticklabels"] = chart.get(f"{axis}ticklabels") or [
+                str(label) for label in labels
+            ]
+        self.chart = chart
 
     def draw(self, ax, ctx):
-        data = np.array(self.chart.get("data"))
-        assert len(data.shape) == 2, "The `data` attribute is not a 2-dimensional array"
-
-        data = [[(np.nan if item is None else item) for item in row] for row in data]
+        data = self.z
         valfmt = self.chart.get("valfmt", DEFAULT_VALUE_FORMAT)
         colorbar = self.chart.get("colorbar", {})
 
@@ -1832,29 +1876,10 @@ class ContourLayer(Layer):
     def _grid(self) -> tuple:
         """The validated (x, y, z) arrays; x and y default to the indices."""
 
-        z = get_chart_data("z", self.chart)
-        if z is None:
-            raise ValueError("A contour chart requires the `z` grid in `data`.")
-        z = np.asarray(z, dtype=float)
-        if z.ndim != 2:
-            raise ValueError(
-                f"The contour `z` attribute must be a 2-D grid, got {z.ndim} dimension(s)."
-            )
+        x, y, z = get_chart_grid(self.chart, "contour")
         n_rows, n_cols = z.shape
-        x = get_chart_data("x", self.chart)
-        y = get_chart_data("y", self.chart)
-        x = np.arange(n_cols) if x is None else np.asarray(x, dtype=float)
-        y = np.arange(n_rows) if y is None else np.asarray(y, dtype=float)
-        if x.ndim != 1 or len(x) != n_cols:
-            raise ValueError(
-                f"The contour `x` attribute must hold one value per column of `z` "
-                f"({n_cols}), got {x.shape}."
-            )
-        if y.ndim != 1 or len(y) != n_rows:
-            raise ValueError(
-                f"The contour `y` attribute must hold one value per row of `z` "
-                f"({n_rows}), got {y.shape}."
-            )
+        x = np.arange(n_cols) if x is None else x.astype(float)
+        y = np.arange(n_rows) if y is None else y.astype(float)
         return x, y, z
 
     def y_range(self):

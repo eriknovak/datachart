@@ -14,7 +14,7 @@ grid and hands it to the same layer, so the two never fork a drawing path.
 - **Input is a list of chart dicts, each `{x, y, z}`.** `x` and `y` are
   optional 1-D axes (index fallback), `z` a 2-D grid. Heatmap keeps its bare
   2-D list for now; migrating it to the same shape is a separate task, not
-  this one.
+  this one (done in ADR 0023).
 - **Histogram semantics for lists, not Heatmap's.** Several charts overlay on
   one axes by default; `subplots=True` grids them. Each chart gets a legend
   entry (a proxy line) and, for line contours, `emphasis` works as for lines.

@@ -165,6 +165,13 @@ participation) to its panel and re-rendering. Rejects grid figures — annotate
 the sources before composing.
 _Avoid_: overlay text, label function
 
+**Heatmap**:
+A per-cell matrix (`Heatmap`: a 2-D `z` grid per chart with optional `x`, `y`
+labels for its columns and rows) drawn as one colored cell per value at
+integer positions. `x`/`y` are tick labels, not coordinates — uneven spacing
+never changes cell size; that is the contour's job.
+_Avoid_: matrix plot, image plot, colormesh
+
 **Contour**:
 A gridded surface (`ContourChart`: 1-D `x`, `y` axes and a 2-D `z` grid per
 chart) drawn as iso-lines in the chart's cycle color or, when `filled`, as

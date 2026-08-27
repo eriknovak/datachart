@@ -14,7 +14,7 @@ from datachart.utils import Grid, Panel
 
 BAR = [{"label": label, "y": y} for label, y in zip("ABC", [3.0, 5.0, 4.0])]
 BAR2 = [{"label": label, "y": y} for label, y in zip("ABC", [2.0, 6.0, 1.0])]
-HEAT = [[0.0, 0.5], [0.8, 1.0]]
+HEAT = {"z": [[0.0, 0.5], [0.8, 1.0]]}
 
 
 def grid_visible(ax, axis):
@@ -78,7 +78,7 @@ class TestThemeDefaults(unittest.TestCase):
     def test_heatmap_contrast_skips_light_colormaps(self):
         """Light colormaps never flip value text to white."""
         figure = Heatmap(
-            [[0.0, 1.0]],
+            {"z": [[0.0, 1.0]]},
             show_heatmap_values=True,
             style={"plot_heatmap_cmap": ["#F7F7F7", "#B0B0B0"]},
         )
@@ -93,7 +93,7 @@ class TestThemeDefaults(unittest.TestCase):
     def test_heatmap_cell_borders_follow_edge_style(self):
         """The edge style draws one line along every interior cell boundary."""
         figure = Heatmap(
-            [[1, 2, 3], [4, 5, 6]],
+            {"z": [[1, 2, 3], [4, 5, 6]]},
             style={
                 "plot_heatmap_edge_width": 2.0,
                 "plot_heatmap_edge_color": "#FF0000",

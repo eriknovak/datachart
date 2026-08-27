@@ -809,7 +809,7 @@ def normalize():
         ("LOGIT", NORMALIZE.LOGIT),
     ]
     # values in (0, 1) with a wide dynamic range, legal for every norm
-    data = np.geomspace(0.001, 0.95, 16).reshape(4, 4).tolist()
+    data = {"z": np.geomspace(0.001, 0.95, 16).reshape(4, 4).tolist()}
     figs = [
         Heatmap(
             data=data,

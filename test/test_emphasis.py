@@ -111,7 +111,7 @@ class TestEmphasisValidation(unittest.TestCase):
 
     def test_heatmap_rejects_emphasis(self):
         with self.assertRaises(ValueError):
-            Heatmap([[1.0, 2.0], [3.0, 4.0]], emphasis="background")
+            Heatmap({"z": [[1.0, 2.0], [3.0, 4.0]]}, emphasis="background")
 
     def test_panel_rejects_invalid_emphasis(self):
         fig = LineChart(LINE1)

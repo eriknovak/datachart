@@ -98,6 +98,8 @@ EXPECTED_CHANGES = {
     "raincloud_emphasis",
     # colorbars are placed by the layout engine instead of an inset (ADR 0022)
     "heatmap_basic",
+    # new heatmap label case (ADR 0023)
+    "heatmap_labels",
     # new contour cases (ADR 0022)
     "contour_lines",
     "contour_filled_colorbar",
@@ -295,7 +297,7 @@ def scatter_multi_subplots():
 
 @case
 def heatmap_basic():
-    data = [[(i * j) % 7 for j in range(5)] for i in range(4)]
+    data = {"z": [[(i * j) % 7 for j in range(5)] for i in range(4)]}
     return Heatmap(data=data, show_heatmap_values=True, show_colorbars=True)
 
 
@@ -303,7 +305,17 @@ def heatmap_basic():
 def heatmap_multi():
     d1 = [[(i + j) % 4 for j in range(4)] for i in range(4)]
     d2 = [[(i * j) % 5 for j in range(4)] for i in range(4)]
-    return Heatmap(data=[d1, d2], subtitle=["m1", "m2"], max_cols=2)
+    return Heatmap(data=[{"z": d1}, {"z": d2}], subtitle=["m1", "m2"], max_cols=2)
+
+
+@case
+def heatmap_labels():
+    data = {
+        "x": ["mon", "tue", "wed", "thu", "fri"],
+        "y": ["q1", "q2", "q3", "q4"],
+        "z": [[(i * j) % 7 for j in range(5)] for i in range(4)],
+    }
+    return Heatmap(data=data, show_heatmap_values=True, xtickrotate=45)
 
 
 @case
