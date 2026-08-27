@@ -95,6 +95,7 @@ The `_internal` submodule contains implementation details not exposed to users:
 - **chart_builder.py**: Chart attribute building and validation logic
 - **config_helpers.py**: Helper functions for retrieving and applying style configurations
 - **colors.py**: Color cycle creation and colormap utilities
+- **validate.py**: Validation of user-facing values (bandwidth rules, emphasis roles); each raises `ValueError` with one message
 
 ### Global Configuration System
 

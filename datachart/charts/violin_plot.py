@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
-from ..utils.stats import validate_bandwidth
+from ..utils._internal.validate import validate_bandwidth
 from ..typings import (
     ViolinDataPointAttrs,
     ViolinStyleAttrs,

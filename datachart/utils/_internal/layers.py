@@ -26,6 +26,7 @@ from matplotlib.legend_handler import HandlerPathCollection
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from .colors import create_color_cycle, create_colormap, get_colormap
+from .validate import validate_emphasis
 from .config_helpers import (
     get_attr_value,
     resolve_font_family,
@@ -157,17 +158,6 @@ CONTOUR_SWATCH = 0.7
 # ================================================
 # Data Helpers
 # ================================================
-
-
-def validate_emphasis(value, context: str = "emphasis"):
-    """Validate a single emphasis role; None means no emphasis."""
-
-    if value is not None and value not in (EMPHASIS_BACKGROUND, EMPHASIS_HIGHLIGHT):
-        raise ValueError(
-            f"Invalid {context} value {value!r}. "
-            f"Must be '{EMPHASIS_BACKGROUND}', '{EMPHASIS_HIGHLIGHT}', or None."
-        )
-    return value
 
 
 def get_chart_data(attr: str, chart: dict) -> Optional[np.ndarray]:

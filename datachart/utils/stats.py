@@ -41,8 +41,7 @@ from matplotlib.mlab import GaussianKDE
 from matplotlib.ticker import MaxNLocator
 
 from ..constants import BANDWIDTH, CONTOUR_LEVELS
-
-BANDWIDTH_RULES = (BANDWIDTH.SCOTT, BANDWIDTH.SILVERMAN)
+from ._internal.validate import validate_bandwidth
 
 # rule-of-thumb level counts stay readable in this range (ADR 0022)
 CONTOUR_LEVELS_MIN = 4
@@ -375,19 +374,6 @@ def contour_levels(
 # ================================================
 # Kernel density estimates
 # ================================================
-
-
-def validate_bandwidth(bandwidth) -> None:
-    """Raise unless `bandwidth` is None, a bandwidth rule, or a number."""
-
-    if bandwidth is not None and not (
-        bandwidth in BANDWIDTH_RULES
-        or (isinstance(bandwidth, (int, float)) and not isinstance(bandwidth, bool))
-    ):
-        raise ValueError(
-            f"Invalid `bandwidth` value {bandwidth!r}. "
-            f"Must be None, one of {BANDWIDTH_RULES}, or a number."
-        )
 
 
 def _kde(points: np.ndarray, bandwidth, cut: float) -> Tuple[GaussianKDE, np.ndarray]:
