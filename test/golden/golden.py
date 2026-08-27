@@ -142,6 +142,14 @@ EXPECTED_CHANGES = {
     # line-only panels hug the data range like line charts (ADR 0025)
     "overlay_line_line",
     "overlay_theme_snapshot",
+    # panel grids sit below the marks, like single-chart grids
+    "overlay_line_bar_dual",
+    "overlay_auto_assign",
+    "overlay_nested_panel",
+    "overlay_hist_line",
+    "overlay_bar_bar",
+    "overlay_bar_bar_line",
+    "overlay_hist_hist",
     # nested gridspecs size their parent cell (ADR 0007, issue #86)
     "grid_nested_grid",
 }

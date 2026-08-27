@@ -3575,12 +3575,14 @@ class Panel:
         if layers and (s.get("scalex") or s.get("scaley")):
             layers[0].apply_scales(ax, s.get("scalex"), s.get("scaley"))
 
-        # grid
+        # grid; the marks sit above it whatever z-order the panel gave them
+        # (overlay defaults start at 1, below matplotlib's 2.5 gridlines)
         if s.get("show_grid"):
             ax.grid(axis=s["show_grid"], **s.get("grid_style", {}))
+            ax.set_axisbelow(True)
         if polar:
-            # the marks sit above the grid; the r-value labels are redrawn
-            # above the marks in _apply_radial_furniture
+            # the r-value labels are redrawn above the marks in
+            # _apply_radial_furniture
             ax.set_axisbelow(True)
 
         # line charts pin the category-axis limits to the union of their data ranges
