@@ -2890,7 +2890,7 @@ class SankeyLayer(Layer):
         self.column_label_style = get_text_style("subtitle")
         self.show_values = bool(self.settings.get("show_values"))
         self.value_format = _value_formatter(
-            self.settings.get("value_format") or DEFAULT_BAR_VALUE_FORMAT
+            self.settings.get("value_format") or VALUE_FORMAT.DEFAULT
         )
         self.value_style = {
             "fontsize": config["plot_bar_value_fontsize"],

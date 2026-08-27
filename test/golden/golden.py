@@ -47,6 +47,7 @@ from datachart.constants import (
     BASELINE,
     NORMALIZE,
     THEME,
+    VALUE_FORMAT,
 )
 from datachart.utils.stats import kde1d, kde2d
 
@@ -1458,6 +1459,7 @@ def sankey_values_labels():
         sankey_links(SANKEY_FUNNEL),
         column_labels=["Visit", "Signup", "Activation", "Plan"],
         show_values=True,
+        value_format=VALUE_FORMAT.INTEGER,
         title="Signup funnel",
     )
 

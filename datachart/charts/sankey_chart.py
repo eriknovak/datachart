@@ -72,8 +72,9 @@ def SankeyChart(
         column_labels: One heading per column, drawn above it; must match the
             number of columns.
         show_values: Whether to write each flow's value on its ribbon.
-        value_format: Format string for the ribbon values: a `VALUE_FORMAT`
-            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
+        value_format: The format of the ribbon values: a `VALUE_FORMAT`
+            constant (default `VALUE_FORMAT.DEFAULT`) or any `"{x:.1f}"`,
+            `"{:.1f}%"`, or `"%g"` style string.
         title: The title of the chart.
         subtitle: The subtitle(s) for individual charts.
         emphasis: Not supported: a Sankey has no series to mute or
