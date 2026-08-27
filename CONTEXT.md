@@ -200,6 +200,14 @@ normalising each `x` to 100 %.
 _Avoid_: stackplot, streamgraph (only the wiggle baselines), 100 % chart,
 area chart (that is `LineChart(show_area=True)`)
 
+**Sankey**:
+Weighted flows between nodes laid out in columns (`SankeyChart`: a `links`
+list of `{source, target, value}` records; a node is its name). Columns are
+the longest path from a source unless `nodes=[[...], ...]` sets them; ribbons
+are Bézier patches whose height is the value, coloured by source. One layer
+per chart, no furniture; rejected in `Panel`, a cell in `Grid`.
+_Avoid_: flow chart, alluvial (that implies time-ordered axes), network graph
+
 **Density estimate**:
 A Gaussian kernel density (`stats.kde1d` → `{x, y}` points for `LineChart`,
 `stats.kde2d` → an `{x, y, z}` dict for `ContourChart`) on a grid that extends
