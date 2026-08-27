@@ -707,7 +707,8 @@ def hexbin_reduce():
     chart_grid(
         figs,
         "const-hexbin-reduce.svg",
-        1.7,
+        3.6,
+        cols=3,
         footnote="The same 3,000 points and c values; each hexagon shows the "
         "aggregate of the c of its points.",
     )
