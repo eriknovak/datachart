@@ -54,6 +54,8 @@ sum_values(values: List[Union[int, float]]) -> float
 
 Calculates the sum of all values.
 
+Added in v0.7.0
+
 Examples:
 
 ```
@@ -150,6 +152,8 @@ variance(values: List[Union[int, float]]) -> float
 
 Calculates the variance of the values.
 
+Added in v0.7.0
+
 Examples:
 
 ```
@@ -200,6 +204,8 @@ iqr(values: List[Union[int, float]]) -> float
 ```
 
 Calculates the interquartile range (Q3 - Q1).
+
+Added in v0.7.0
 
 The interquartile range is the difference between the 75th percentile (Q3) and the 25th percentile (Q1). It is a measure of statistical dispersion and is useful for identifying outliers.
 
@@ -276,6 +282,8 @@ correlation(
 ```
 
 Calculates the Pearson correlation coefficient between two lists.
+
+Added in v0.7.0
 
 The Pearson correlation coefficient measures the linear relationship between two datasets. It ranges from -1 (perfect negative correlation) to 1 (perfect positive correlation), with 0 indicating no linear correlation.
 

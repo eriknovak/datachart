@@ -23,6 +23,10 @@ The `themes` module contains the predefined style themes that are used to visual
 DEFAULT_THEME: StyleAttrs = make_theme({})
 ```
 
+The default theme: the package's baseline palette and furniture.
+
+Added in v0.5.0
+
 ### datachart.themes.GREYSCALE_THEME
 
 ```
@@ -55,6 +59,10 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
     }
 )
 ```
+
+The greyscale theme: shades of grey for print or colorblind-safe output.
+
+Added in v0.5.0
 
 ### datachart.themes.INK_THEME
 
@@ -104,6 +112,10 @@ INK_THEME: StyleAttrs = make_theme(
 )
 ```
 
+The ink theme: dark-ink accents, print-ready.
+
+Added in v0.8.0
+
 ### datachart.themes.HATCH_THEME
 
 ```
@@ -151,6 +163,10 @@ HATCH_THEME: StyleAttrs = make_theme(
 )
 ```
 
+The hatch theme: hatch cycle, value labels, dotted grid.
+
+Added in v0.8.0
+
 ### datachart.themes.MINIMAL_THEME
 
 ```
@@ -196,6 +212,10 @@ MINIMAL_THEME: StyleAttrs = make_theme(
 )
 ```
 
+The minimal theme: accent blue, no spines, flat bars.
+
+Added in v0.8.0
+
 ### datachart.themes.MATERIAL_THEME
 
 ```
@@ -239,3 +259,7 @@ MATERIAL_THEME: StyleAttrs = make_theme(
     }
 )
 ```
+
+The material theme: Google palette, light grid.
+
+Added in v0.8.0

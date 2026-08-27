@@ -4,22 +4,22 @@
 
 Module containing the `charts`.
 
-The `charts` module contains the methods to create the plots and figures.
+The `charts` module contains the methods to create the plots and figures, grouped by the question they answer.
 
 | FUNCTION         | DESCRIPTION                             |
 | ---------------- | --------------------------------------- |
-| `BarChart`       | Creates the bar chart.                  |
-| `BoxPlot`        | Creates the box plot.                   |
-| `Heatmap`        | Creates the heatmap.                    |
-| `Histogram`      | Creates the histogram.                  |
 | `LineChart`      | Creates the line chart.                 |
-| `ParallelCoords` | Creates the parallel coordinates chart. |
+| `BarChart`       | Creates the bar chart.                  |
 | `PyramidChart`   | Creates the pyramid chart.              |
 | `RadialChart`    | Creates the radial chart.               |
+| `Histogram`      | Creates the histogram.                  |
+| `BoxPlot`        | Creates the box plot.                   |
+| `ViolinPlot`     | Creates the violin plot.                |
+| `SwarmPlot`      | Creates the swarm plot.                 |
 | `RaincloudPlot`  | Creates the raincloud plot.             |
 | `ScatterChart`   | Creates the scatter chart.              |
-| `SwarmPlot`      | Creates the swarm plot.                 |
-| `ViolinPlot`     | Creates the violin plot.                |
+| `Heatmap`        | Creates the heatmap.                    |
+| `ParallelCoords` | Creates the parallel coordinates chart. |
 
 ## Trends and Comparisons
 
@@ -128,6 +128,8 @@ LineChart(
 ```
 
 Creates the line chart.
+
+Lines connect ordered (x, y) points to show how a value changes along a continuous axis, typically time. Use it for trends, growth, and comparing the trajectories of several series on the same scale. For unordered categories use BarChart; for unconnected samples use ScatterChart.
 
 Examples:
 
@@ -298,6 +300,8 @@ BarChart(
 
 Creates the bar chart.
 
+Bars compare a numeric value across discrete categories: each label gets a bar whose length encodes its value. Use it when the categories are few and unordered (or ordinal) and the question is "which is bigger, and by how much"; several series can be grouped, stacked, or overlaid via `bar_mode`. For a continuous x-axis reach for LineChart, for distributions for Histogram.
+
 Examples:
 
 ```
@@ -409,9 +413,11 @@ PyramidChart(
 
 Creates the pyramid chart.
 
-A pyramid chart draws exactly two data series as horizontal bars extending in opposite directions from a shared zero line — the first series to the left, the second to the right. Both series are supplied as positive values, and every visible number (value ticks, value labels) displays the absolute value.
+A pyramid chart draws exactly two series as horizontal bars mirrored around a shared category axis, the first series to the left and the second to the right: the classic age-sex population pyramid. Use it to compare the distribution of two groups over the same ordered categories, such as age bands, where the symmetry (or lack of it) is the message.
 
-Unlike the other chart fronts, the axis parameters are spatial: `xlabel`, `xticks`, and `xmax` address the horizontal value axis, and `ylabel` the vertical category axis.
+Both series are supplied as positive values; value ticks and labels show absolute values. Unlike the other chart fronts, the axis parameters are spatial: `xlabel`, `xticks`, and `xmax` address the horizontal value axis, and `ylabel` the vertical category axis.
+
+Added in v0.8.0
 
 Examples:
 
@@ -535,6 +541,10 @@ RadialChart(
 ```
 
 Creates the radial chart.
+
+A radial chart plots series on polar axes: as a line (radar) profile, an area, bars, or a histogram, chosen with `type`. Use the radar form to compare a few entities across several metrics on a shared scale, and the bar and histogram forms for cyclic categories such as hours, weekdays, or compass directions.
+
+Added in v0.8.0
 
 Examples:
 
@@ -706,6 +716,8 @@ Histogram(
 
 Creates the histogram.
 
+A histogram bins a single numeric variable and draws the count (or density) per bin, revealing the shape of its distribution: center, spread, skew, modes, and outliers. Use it to inspect one variable or compare a few overlaid distributions. For side-by-side group summaries use BoxPlot or ViolinPlot.
+
 Examples:
 
 ```
@@ -871,6 +883,10 @@ BoxPlot(
 ```
 
 Creates the box plot.
+
+A box plot summarizes a numeric distribution per group by its median, quartiles, whiskers, and outliers. Use it to compare the level and spread of many groups compactly, or to spot skew and outliers, when the full distribution shape is not needed. For shape use ViolinPlot; for the raw points use SwarmPlot.
+
+Added in v0.7.0
 
 Examples:
 
@@ -1045,6 +1061,10 @@ ViolinPlot(
 
 Creates the violin plot.
 
+A violin plot draws the kernel density estimate of each group's numeric distribution as a mirrored profile, showing shape (multimodality, skew, tails) that a box plot hides. Use it to compare distributions across groups when shape matters and each group has enough samples for a density estimate.
+
+Added in Unreleased
+
 Examples:
 
 ```
@@ -1213,7 +1233,9 @@ SwarmPlot(
 
 Creates the swarm plot.
 
-Every observation of a group is drawn as a point at the group's category position, spread across the category width so the points do not hide each other. Groups share positions with `BoxPlot`, so the two overlay with `Panel`.
+A swarm plot draws every observation as a point at its group's category position, spread across the category width so the points do not hide each other, making counts and gaps visible. Use it for small-to-medium samples where each observation matters, or overlay it on a BoxPlot with `Panel` (the two share positions). For large samples prefer ViolinPlot.
+
+Added in Unreleased
 
 Examples:
 
@@ -1387,7 +1409,9 @@ RaincloudPlot(
 
 Creates the raincloud plot.
 
-Every group draws as a cloud (a half violin of its density), its rain (the raw observations), and a box (the quartile summary) side by side at one category position: the cloud on one side, the rain and the box on the other. Each group takes its own palette color, shared by the cloud and the rain. Vertical rainclouds keep the cloud on the left; horizontal ones keep it above.
+A raincloud plot draws each group as a cloud (a half violin of its density), its rain (the raw observations), and a box (the quartile summary) side by side at one category position, all in the group's palette color. Use it when you want the shape, the summary statistics, and the individual observations in a single view, for example when reporting experimental results per condition. Vertical rainclouds keep the cloud on the left; horizontal ones keep it above.
+
+Added in Unreleased
 
 Examples:
 
@@ -1563,6 +1587,10 @@ ScatterChart(
 ```
 
 Creates a scatter chart.
+
+Each point is one observation placed by two numeric variables, optionally with a third encoded as marker size. Use it to check whether two variables are related, spot clusters and outliers, and quantify the link with the optional regression line and correlation coefficient. For ordered series use LineChart.
+
+Added in v0.7.0
 
 Examples:
 
@@ -1753,6 +1781,10 @@ Heatmap(
 
 Creates the heatmap.
 
+A heatmap maps every cell of a 2-D matrix to a color, so structure in a grid of numbers (correlations, confusion matrices, feature-by-time tables) reads at a glance. Use it when both axes are categorical or gridded and the value is what matters; the color scale, colorbar, and cell value labels are all configurable.
+
+Added in v0.4.0
+
 Examples:
 
 ```
@@ -1854,7 +1886,9 @@ ParallelCoords(
 
 Creates the parallel coordinates chart.
 
-A parallel coordinates chart displays multivariate data by representing each variable as a vertical axis and connecting data points across all axes with lines. This is useful for visualizing patterns and relationships in high-dimensional data, and for comparing groups when using the `hue` parameter.
+Parallel coordinates draw each record as a polyline across one vertical axis per dimension. Use it to explore multivariate data: clusters show as bundles of similar lines, and correlations between neighboring dimensions show as parallel or crossing segments. Works best with a handful of dimensions; color the records by group with `hue` to compare groups.
+
+Added in v0.7.0
 
 Examples:
 

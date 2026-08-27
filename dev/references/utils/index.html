@@ -1971,6 +1971,12 @@ not be imported directly by external code.</p>
     <div class="doc doc-contents first">
 
         <p>Save the figure to a file.</p>
+<p>Writes the rendered figure to disk in the format given by <code>format</code> or,
+when omitted, by the file extension. Use a vector format (PDF, SVG) for
+print and papers, PNG with <code>dpi</code> &gt;= 300 for raster deliverables, and
+<code>transparent=True</code> to drop the figure background for slides and web
+pages. The theme is already baked into the figure, so saving never
+consults the global config.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -2151,6 +2157,9 @@ figures with their per-figure options intact, while panel-level settings
 (title, labels, limits, ...) always come from the outermost call. Dict
 options on a nested panel override its per-figure options only when
 explicitly given.</p>
+<div class="admonition info">
+<p class="admonition-title">Added in v0.8.0</p>
+</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -2629,6 +2638,9 @@ keeps its own title (a heading spanning its subgrid) and its own
 sharex/sharey among its own cells; the outer grid's sharex/sharey applies
 only to its top-level cells. Panel figures also nest in a cell; the
 reverse — a Grid figure inside a Panel — stays an error.</p>
+<div class="admonition info">
+<p class="admonition-title">Added in v0.8.0</p>
+</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -2877,6 +2889,9 @@ its charts are never modified.</p>
 figures (including polar ones) and <code>Panel</code> output. Grid figures and
 multi-subplot figures (<code>subplots=True</code>) are rejected — annotate the
 sources before composing.</p>
+<div class="admonition info">
+<p class="admonition-title">Added in v0.8.0</p>
+</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>

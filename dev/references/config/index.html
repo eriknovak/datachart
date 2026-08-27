@@ -2397,6 +2397,13 @@ to globally customize the chart and plot styles.</p>
     <div class="doc doc-contents ">
 
         <p>Sets the global configuration to match the theme.</p>
+<p>Replaces the whole style configuration with a deep copy of the theme:
+one of the <code>THEME</code> constants or a name registered with <code>register_theme</code>.
+Use it to switch the look of every chart rendered afterwards; call
+<code>update_config</code> on top for per-attribute tweaks.</p>
+<div class="admonition info">
+<p class="admonition-title">Added in v0.5.0</p>
+</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -2454,6 +2461,9 @@ to globally customize the chart and plot styles.</p>
     <div class="doc doc-contents ">
 
         <p>Registers a custom theme so it can be applied with <code>set_theme</code>.</p>
+<div class="admonition info">
+<p class="admonition-title">Added in v0.8.1</p>
+</div>
 <p>The theme must define every attribute of the default theme; missing
 keys are filled from it, unknown keys are rejected.</p>
 
@@ -2530,6 +2540,9 @@ keys are filled from it, unknown keys are rejected.</p>
     <div class="doc doc-contents ">
 
         <p>Resets the global configuration.</p>
+<p>Restores the default theme, discarding the current theme and every
+<code>update_config</code> override. Use it to return to a known state, for example
+at the start of a notebook section or between tests.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -2558,6 +2571,10 @@ keys are filled from it, unknown keys are rejected.</p>
     <div class="doc doc-contents ">
 
         <p>Updates the global configuration.</p>
+<p>Overrides individual style attributes on top of the current theme; the
+change persists until the next <code>set_theme</code> or <code>reset_config</code>. Use it for
+global tweaks such as font family or default colors; unknown attribute
+names are skipped with a warning.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -2693,6 +2710,9 @@ keys are filled from it, unknown keys are rejected.</p>
     <div class="doc doc-contents ">
 
         <p>Gets the associated configuration attribute.</p>
+<p>Reads one style attribute, falling back to <code>default</code> when it is not
+set. Use it to inspect the active configuration or to build style
+overrides relative to the current theme.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>

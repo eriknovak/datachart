@@ -35,6 +35,8 @@ save_figure(
 
 Save the figure to a file.
 
+Writes the rendered figure to disk in the format given by `format` or, when omitted, by the file extension. Use a vector format (PDF, SVG) for print and papers, PNG with `dpi` >= 300 for raster deliverables, and `transparent=True` to drop the figure background for slides and web pages. The theme is already baked into the figure, so saving never consults the global config.
+
 Examples:
 
 ```
@@ -92,6 +94,8 @@ Combines different chart types (LineChart, BarChart, ScatterChart, Histogram, Bo
 A panel has an orientation, inferred from its figures: it is horizontal when every bar chart and histogram in it is horizontal, vertical otherwise. Mixing the two orientations raises `ValueError`. The *value axis* carries the quantities — y in a vertical panel, x in a horizontal one — and the *category axis* is the other. The parameters keep their spelling but address the axis by role: `ylabel_left`/`ylabel_right`, `ymin`/`ymax` and `ymin_right`/`ymax_right` set the primary/secondary value axis, `xlabel` and `xmin`/`xmax` the category axis. In a horizontal panel the secondary value axis sits at the top, so `"y_axis": "left"` means the bottom axis and `"right"` the top one, and the legend suffixes become `(B)`/`(T)`. Line and scatter figures follow the panel: in a horizontal panel their `x` runs along the category axis and their `y` along the value axis, so the same `LineChart` overlays vertical and horizontal bars.
 
 Panel figures nest: `Panel([Panel([f1, f2]), f3])` is equivalent to `Panel([f1, f2, f3])`, to any depth. A nested panel contributes its figures with their per-figure options intact, while panel-level settings (title, labels, limits, ...) always come from the outermost call. Dict options on a nested panel override its per-figure options only when explicitly given.
+
+Added in v0.8.0
 
 Examples:
 
@@ -183,6 +187,8 @@ Each figure's chart is redrawn into its grid cell. Nested rows define the layout
 
 Grids nest: a Grid figure placed in a cell occupies exactly that cell and rebuilds its internal layout inside it, to any depth. The nested grid keeps its own title (a heading spanning its subgrid) and its own sharex/sharey among its own cells; the outer grid's sharex/sharey applies only to its top-level cells. Panel figures also nest in a cell; the reverse — a Grid figure inside a Panel — stays an error.
 
+Added in v0.8.0
+
 Examples:
 
 ```
@@ -250,6 +256,8 @@ Add text annotations to an already rendered figure.
 Returns a new figure with the annotations riding the figure's chart metadata, styled by the current theme at call time — so they follow themes and survive `Panel` and `Grid` composition. The source figure and its charts are never modified.
 
 Works on any figure whose charts share one coordinate space: chart figures (including polar ones) and `Panel` output. Grid figures and multi-subplot figures (`subplots=True`) are rejected — annotate the sources before composing.
+
+Added in v0.8.0
 
 Examples:
 
