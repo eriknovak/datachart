@@ -384,6 +384,18 @@ class TestNestedGrid:
             assert ax.get_position().y1 < sibling.get_position().y1
         plt.close("all")
 
+    def test_nested_grid_alone_in_row_keeps_row_height(self):
+        inner = Grid([_line_fig(), _line_fig()])
+        fig = Grid([_bar_fig(), _bar_fig(), _bar_fig(), inner], max_cols=3)
+        fig.canvas.draw()
+        sibling = next(ax for ax in fig.axes if ax not in _nested_axes(fig))
+        nested = [ax for ax in _nested_axes(fig) if ax.axison]
+        envelope = max(ax.get_position().y1 for ax in nested) - min(
+            ax.get_position().y0 for ax in nested
+        )
+        assert envelope == pytest.approx(sibling.get_position().height, abs=1e-2)
+        plt.close("all")
+
     def test_nested_grid_keeps_own_furniture(self):
         inner = Grid([_line_fig(), _line_fig()], title="Inner", sharey=True)
         outer = Grid([inner, _bar_fig()], title="Outer")

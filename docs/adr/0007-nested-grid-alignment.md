@@ -27,5 +27,12 @@ those already align — so one layout pass aligns every cell.
 - **One rendering mechanism for nested cells.** Nested grids and multi-subplot
   figures both rebuild via subgridspec in the owner figure; the subfigure path
   is deleted. The transport (recursive cell tree) is unchanged.
+- **A nested cell sizes its parent cell.** Constrained layout equalises the
+  inner height of a gridspec's rows, and a row holding only a nested
+  gridspec has no margins of its own, so it shrinks by its siblings' margins
+  — a nested grid alone in a host row collapsed (#86). The figure's layout
+  engine lifts every nested gridspec's outer margins onto its parent cell,
+  deepest first, so such a row keeps its siblings' height. This covers
+  multi-subplot cells too, which rebuild through the same subgridspec.
 - **Golden churn is the fix.** Nested-grid golden images change and are
   re-baselined deliberately; all non-nested cases stay pixel-identical.

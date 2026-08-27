@@ -9,8 +9,10 @@ pyplot's global figure manager. Displaying is explicit via
 import io
 import warnings
 
+import matplotlib._constrained_layout as _constrained_layout
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
+from matplotlib.layout_engine import ConstrainedLayoutEngine
 
 
 def _in_notebook_kernel() -> bool:
@@ -71,6 +73,60 @@ class DatachartFigure(Figure):
             plt.show()
 
 
+def _propagate_nested_margins(layoutgrids) -> None:
+    """Lift each nested gridspec's outer margins onto its parent cell.
+
+    Constrained layout equalises the *inner* height of a gridspec's rows, and
+    a row whose only content is a nested gridspec has no margins of its own,
+    so it shrinks by its siblings' margins — a nested Grid alone in a host
+    row collapses. Deepest nesting first, so margins reach the outermost grid.
+    """
+    nested = [gs for gs in layoutgrids if hasattr(gs, "_subplot_spec")]
+
+    def depth(gs):
+        d = 0
+        while hasattr(gs, "_subplot_spec"):
+            gs = gs._subplot_spec.get_gridspec()
+            d += 1
+        return d
+
+    for gs in sorted(nested, key=depth, reverse=True):
+        lg = layoutgrids[gs]
+        vals = lg.margin_vals
+        subplot_spec = gs._subplot_spec
+        parent = layoutgrids.get(subplot_spec.get_gridspec())
+        if parent is None:
+            continue
+        margin = {
+            "left": vals["left"][0],
+            "leftcb": vals["leftcb"][0],
+            "right": vals["right"][-1],
+            "rightcb": vals["rightcb"][-1],
+            "top": vals["top"][0],
+            "topcb": vals["topcb"][0],
+            "bottom": vals["bottom"][-1],
+            "bottomcb": vals["bottomcb"][-1],
+        }
+        parent.edit_outer_margin_mins(margin, subplot_spec)
+
+
+class NestedGridLayoutEngine(ConstrainedLayoutEngine):
+    """Constrained layout whose nested gridspecs size their parent cell."""
+
+    def execute(self, fig):
+        original = _constrained_layout.make_layout_margins
+
+        def make_layout_margins(layoutgrids, *args, **kwargs):
+            original(layoutgrids, *args, **kwargs)
+            _propagate_nested_margins(layoutgrids)
+
+        _constrained_layout.make_layout_margins = make_layout_margins
+        try:
+            return super().execute(fig)
+        finally:
+            _constrained_layout.make_layout_margins = original
+
+
 def new_figure(figsize=None) -> DatachartFigure:
     """Create an unmanaged, constrained-layout figure.
 
@@ -84,6 +140,6 @@ def new_figure(figsize=None) -> DatachartFigure:
         The unmanaged figure.
 
     """
-    figure = DatachartFigure(figsize=figsize, layout="constrained")
+    figure = DatachartFigure(figsize=figsize, layout=NestedGridLayoutEngine())
     FigureCanvasAgg(figure)
     return figure
