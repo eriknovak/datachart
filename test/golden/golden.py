@@ -1179,10 +1179,7 @@ def hist_kde1d():
     return Panel(
         [
             Histogram(data=hist_data(300), subtitle="binned", show_density=True),
-            {
-                "figure": LineChart(data=kde1d(values), subtitle="kde", show_area=True),
-                "y_axis": "left",
-            },
+            LineChart(data=kde1d(values), subtitle="kde", show_area=True),
         ],
         show_legend=True,
     )
