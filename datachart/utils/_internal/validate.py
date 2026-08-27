@@ -4,10 +4,17 @@ Each function raises ``ValueError`` when a value is not one the charts accept,
 so the fronts fail early with one message instead of deep inside matplotlib.
 """
 
-from ...constants import BANDWIDTH, EMPHASIS
+from ...constants import BANDWIDTH, BASELINE, EMPHASIS
 
 BANDWIDTH_RULES = (BANDWIDTH.SCOTT, BANDWIDTH.SILVERMAN)
 EMPHASIS_ROLES = (EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT)
+STACK_BASELINES = (
+    BASELINE.ZERO,
+    BASELINE.PERCENT,
+    BASELINE.SYM,
+    BASELINE.WIGGLE,
+    BASELINE.WEIGHTED_WIGGLE,
+)
 
 
 def validate_bandwidth(bandwidth) -> None:
@@ -21,6 +28,19 @@ def validate_bandwidth(bandwidth) -> None:
             f"Invalid `bandwidth` value {bandwidth!r}. "
             f"Must be None, one of {BANDWIDTH_RULES}, or a number."
         )
+
+
+def validate_baseline(baseline):
+    """Validate a stacked area baseline; None means the zero baseline."""
+
+    if baseline is None:
+        return BASELINE.ZERO
+    if baseline not in STACK_BASELINES:
+        raise ValueError(
+            f"Invalid `baseline` value {baseline!r}. "
+            f"Must be one of {STACK_BASELINES} or None."
+        )
+    return baseline
 
 
 def validate_shared_x(columns) -> None:

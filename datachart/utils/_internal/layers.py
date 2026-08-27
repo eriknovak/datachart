@@ -28,7 +28,7 @@ from matplotlib.legend_handler import HandlerPathCollection
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from .colors import create_color_cycle, create_colormap, get_colormap
-from .validate import validate_emphasis, validate_shared_x
+from .validate import validate_baseline, validate_emphasis, validate_shared_x
 from .config_helpers import (
     get_attr_value,
     resolve_font_family,
@@ -637,6 +637,15 @@ class Layer:
             style[width_key] = width * HIGHLIGHT_WIDTH_SCALE
 
 
+def _column_range(chart: dict, attr: str) -> Optional[tuple]:
+    """The (min, max) of a chart's data column; None when the column is absent."""
+
+    values = get_chart_data(attr, chart)
+    if values is None or len(values) == 0:
+        return None
+    return (minimum(values), maximum(values))
+
+
 class LineLayer(Layer):
     kind = "line"
 
@@ -647,16 +656,10 @@ class LineLayer(Layer):
         self.show_area = self.settings.get("show_area")
 
     def y_range(self):
-        y = get_chart_data("y", self.chart)
-        if y is None or len(y) == 0:
-            return None
-        return (float(np.min(y)), float(np.max(y)))
+        return _column_range(self.chart, "y")
 
     def x_range(self):
-        x = get_chart_data("x", self.chart)
-        if x is None or len(x) == 0:
-            return None
-        return (minimum(x), maximum(x))
+        return _column_range(self.chart, "x")
 
     def _resolved_area_style(self, ctx):
         area_style = self._merge_color("color", ctx.color, self.area_style)
@@ -728,16 +731,10 @@ class StackedAreaLayer(Layer):
         return None if y is None else np.asarray(y, dtype=float)
 
     def x_range(self):
-        x = self.x_values()
-        if x is None or len(x) == 0:
-            return None
-        return (minimum(x), maximum(x))
+        return _column_range(self.chart, "x")
 
     def y_range(self):
-        y = self.y_values()
-        if y is None or len(y) == 0:
-            return None
-        return (float(np.min(y)), float(np.max(y)))
+        return _column_range(self.chart, "y")
 
     def draw(self, ax, ctx):
         x = self.x_values()
@@ -775,30 +772,17 @@ def stack_first_line(y: np.ndarray, baseline: str) -> np.ndarray:
     m = y.shape[0]
     if baseline == BASELINE.WIGGLE:
         return (y * (m - 0.5 - np.arange(m)[:, None])).sum(0) / -m
-    if baseline == BASELINE.WEIGHTED_WIGGLE:
-        total = np.sum(y, 0)
-        inv_total = np.zeros_like(total)
-        mask = total > 0
-        inv_total[mask] = 1.0 / total[mask]
-        increase = np.hstack((y[:, 0:1], np.diff(y)))
-        below_size = total - np.cumsum(y, 0) + 0.5 * y
-        move_up = below_size * inv_total
-        move_up[:, 0] = 0.5
-        center = np.cumsum(((move_up - 0.5) * increase).sum(0))
-        return center - 0.5 * total
-    raise ValueError(
-        f"Invalid `baseline` value {baseline!r}. Must be one of "
-        f"{sorted(STACK_BASELINES)}."
-    )
-
-
-STACK_BASELINES = (
-    BASELINE.ZERO,
-    BASELINE.PERCENT,
-    BASELINE.SYM,
-    BASELINE.WIGGLE,
-    BASELINE.WEIGHTED_WIGGLE,
-)
+    validate_baseline(baseline)
+    total = np.sum(y, 0)
+    inv_total = np.zeros_like(total)
+    mask = total > 0
+    inv_total[mask] = 1.0 / total[mask]
+    increase = np.hstack((y[:, 0:1], np.diff(y)))
+    below_size = total - np.cumsum(y, 0) + 0.5 * y
+    move_up = below_size * inv_total
+    move_up[:, 0] = 0.5
+    center = np.cumsum(((move_up - 0.5) * increase).sum(0))
+    return center - 0.5 * total
 
 
 def _stack_slots(layers: List[StackedAreaLayer], baseline: str) -> dict:
@@ -3440,7 +3424,9 @@ class Panel:
         stack_layers = [l for l in self.layers if isinstance(l, StackedAreaLayer)]
         stack_slots = {}
         if stack_layers:
-            stack_slots = _stack_slots(stack_layers, s.get("baseline") or BASELINE.ZERO)
+            stack_slots = _stack_slots(
+                stack_layers, validate_baseline(s.get("baseline"))
+            )
 
         zorder_defaults = s.get("zorder_defaults", {})
 
@@ -3665,10 +3651,14 @@ class Panel:
         if s.get("pyramid"):
             self._apply_pyramid_mirror(ax)
 
-        # a stack from zero sits on the axis floor, like bars (ADR 0025)
-        if any(isinstance(l, StackedAreaLayer) for l in layers) and (
-            s.get("baseline") or BASELINE.ZERO
-        ) in (BASELINE.ZERO, BASELINE.PERCENT):
+        # a stack from zero sits on the axis floor, like bars (ADR 0025);
+        # a log value axis cannot reach zero, so it keeps its own floor
+        if (
+            any(isinstance(l, StackedAreaLayer) for l in layers)
+            and validate_baseline(s.get("baseline"))
+            in (BASELINE.ZERO, BASELINE.PERCENT)
+            and s.get("scalex" if horizontal else "scaley") != "log"
+        ):
             (ax.set_xlim if horizontal else ax.set_ylim)(0, None)
 
         # axis limits
@@ -4100,7 +4090,8 @@ def build_chart_panel_settings(
         "bar_mode": settings.get("bar_mode")
         or ("stack" if chart_type == "histogram" else "group"),
         "tighten_xlim": chart_type in ("linechart", "stackedareachart"),
-        "baseline": settings.get("baseline"),
+        # validated here so a bad value fails at the front, like the emphasis roles
+        "baseline": validate_baseline(settings.get("baseline")),
         # radial furniture; only polar panels read these
         "startangle": settings.get("startangle"),
         "direction": settings.get("direction"),

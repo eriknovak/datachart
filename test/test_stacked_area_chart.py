@@ -68,6 +68,10 @@ class TestStackedAreaStyle(unittest.TestCase):
                 self.assertIn(key, config.config, f"{theme} lacks {key}")
 
 
+def _charts(data):
+    return [{"data": d} for d in data]
+
+
 class TestStackOffsets(unittest.TestCase):
     def test_zero_starts_at_zero(self):
         np.testing.assert_array_equal(stack_first_line(Y, BASELINE.ZERO), 0)
@@ -115,10 +119,6 @@ class TestStackOffsets(unittest.TestCase):
             StackedAreaChart(data=[DATA[0], series([1, 2, 3])])
         with self.assertRaises(ValueError):
             StackedAreaChart(data=[DATA[0], series([1, 2, 3, 4], x=[3, 2, 1, 0])])
-
-
-def _charts(data):
-    return [{"data": d} for d in data]
 
 
 class TestStackedAreaChart(unittest.TestCase):
@@ -189,6 +189,25 @@ class TestStackedAreaChart(unittest.TestCase):
     def test_panel_of_line_layers_tightens_x(self):
         fig = Panel([StackedAreaChart(data=DATA), LineChart(data=DATA[0])])
         self.assertEqual(fig.axes[0].get_xlim(), (0.0, 3.0))
+
+    def test_log_scale_keeps_its_own_floor(self):
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            fig = StackedAreaChart(data=DATA, scaley="log")
+        self.assertGreater(fig.axes[0].get_ylim()[0], 0.0)
+
+    def test_panel_first_stacked_figure_baseline_wins(self):
+        fig = Panel(
+            [StackedAreaChart(data=DATA), StackedAreaChart(data=DATA, baseline="sym")]
+        )
+        self.assertEqual(fig._chart_metadata["panel"].settings["baseline"], "zero")
+        self.assertEqual(fig.axes[0].get_ylim()[0], 0.0)
+        fig = Panel(
+            [LineChart(data=DATA[0]), StackedAreaChart(data=DATA, baseline="sym")]
+        )
+        self.assertEqual(fig._chart_metadata["panel"].settings["baseline"], "sym")
 
     def test_panel_zero_pins_the_bottom(self):
         fig = Panel([StackedAreaChart(data=DATA), LineChart(data=DATA[0])])
