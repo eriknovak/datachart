@@ -42,3 +42,12 @@ jobs:
         run: |
           uv run mike deploy --push --update-aliases "${GITHUB_REF_NAME#v}" latest
           uv run mike set-default --push latest
+      # GitHub Pages only serves a root 404.html; mike writes one per version
+      - name: Copy latest 404 page to site root
+        run: |
+          git fetch origin gh-pages
+          git checkout gh-pages
+          cp latest/404.html 404.html
+          git add 404.html
+          git diff --cached --quiet || git commit -m "Copy latest 404 page to site root"
+          git push origin gh-pages
