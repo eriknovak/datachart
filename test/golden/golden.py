@@ -128,6 +128,8 @@ EXPECTED_CHANGES = {
     "hexbin_subplots",
     "hexbin_panel_scatter",
     "hexbin_grid",
+    # nested gridspecs size their parent cell (ADR 0007, issue #86)
+    "grid_nested_grid",
 }
 
 
