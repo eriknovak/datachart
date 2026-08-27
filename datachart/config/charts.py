@@ -21,6 +21,10 @@ CHART_CONFIGS = {
         "multiplot": True,
         "subplots": True,
     },
+    "hexbinchart": {
+        "multiplot": True,
+        "subplots": True,
+    },
     "scatterchart": {
         "multiplot": True,
         "subplots": True,

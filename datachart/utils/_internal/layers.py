@@ -45,6 +45,7 @@ from .config_helpers import (
     get_heatmap_edge_style,
     get_contour_style,
     get_contour_label_style,
+    get_hexbin_style,
     get_scatter_style,
     get_regression_style,
     get_box_style,
@@ -76,6 +77,7 @@ from ...constants import (
     ASPECT_RATIO,
     DIRECTION,
     CONTOUR_LEVELS,
+    HEXBIN_REDUCE,
     EMPHASIS,
     HISTOGRAM_TYPE,
     ORIENTATION,
@@ -2005,6 +2007,95 @@ class ContourLayer(Layer):
             ax.clabel(lines, **label_style)
 
 
+# the `reduce` attr of a hexbin chart, as the numpy reducer of a hexagon's `c`
+HEXBIN_REDUCERS = {
+    HEXBIN_REDUCE.MEAN: np.mean,
+    HEXBIN_REDUCE.SUM: np.sum,
+    HEXBIN_REDUCE.MEDIAN: np.median,
+    HEXBIN_REDUCE.MIN: np.min,
+    HEXBIN_REDUCE.MAX: np.max,
+}
+
+
+class HexbinLayer(Layer):
+    """Scattered points binned into hexagons, colored by count or by `c` (ADR 0024)."""
+
+    kind = "hexbin"
+
+    def _resolve_style(self):
+        self.show_colorbars = self.settings.get("show_colorbars")
+        style = get_hexbin_style(self.style)
+        style["cmap"] = get_colormap(style["cmap"])
+        self.hexbin_style = style
+        self.x, self.y, self.c = self._columns()
+        self.gridsize = self.chart.get("gridsize")
+        if self.gridsize is None:
+            self.gridsize = get_attr_value("plot_hexbin_gridsize", self.style, config)
+        self.mincnt = self.chart.get("mincnt")
+        # counts need no reducer; `c` defaults to the mean
+        self.reduce = None
+        if self.c is not None:
+            name = self.chart.get("reduce")
+            if name is None:
+                name = HEXBIN_REDUCE.DEFAULT
+            if name not in HEXBIN_REDUCERS:
+                raise ValueError(
+                    f"Invalid hexbin `reduce` value {name!r}. "
+                    f"Must be one of {sorted(HEXBIN_REDUCERS)}."
+                )
+            self.reduce = HEXBIN_REDUCERS[name]
+
+    def _columns(self) -> tuple:
+        """The validated (x, y, c) columns; c is None when absent."""
+
+        x = get_chart_data("x", self.chart)
+        y = get_chart_data("y", self.chart)
+        if x is None or y is None:
+            raise ValueError(
+                "A hexbin chart requires the `x` and `y` columns in `data`."
+            )
+        x = np.asarray(x, dtype=float)
+        y = np.asarray(y, dtype=float)
+        c = get_chart_data("c", self.chart)
+        c = None if c is None else np.asarray(c, dtype=float)
+        for name, column in (("y", y), ("c", c)):
+            if column is not None and column.shape != x.shape:
+                raise ValueError(
+                    f"The hexbin `{name}` column must hold one value per `x` "
+                    f"({len(x)}), got {len(column)}."
+                )
+        return x, y, c
+
+    def y_range(self):
+        if len(self.y) == 0:
+            return None
+        return (float(self.y.min()), float(self.y.max()))
+
+    def draw(self, ax, ctx):
+        style = dict(self.hexbin_style)
+        if ctx.z_order is not None:
+            style["zorder"] = ctx.z_order
+        tiles = ax.hexbin(
+            self.x,
+            self.y,
+            C=self.c,
+            gridsize=self.gridsize,
+            reduce_C_function=self.reduce,
+            mincnt=self.mincnt,
+            norm=self.chart.get("norm", None),
+            vmin=self.chart.get("vmin", None),
+            vmax=self.chart.get("vmax", None),
+            **style,
+        )
+        if self.show_colorbars:
+            colorbar = self.chart.get("colorbar", {})
+            _draw_colorbar(ax, tiles, colorbar, ctx.aspect_locked)
+            fmt = _value_formatter(self.chart.get("valfmt"))
+            if fmt is not None:
+                tiles.colorbar.formatter = fmt
+                tiles.colorbar.update_ticks()
+
+
 class ParallelCoordsLayer(Layer):
     """One parallel-coords set; holds every chart's data as a single drawable."""
 
@@ -2631,6 +2722,7 @@ LAYER_TYPES = {
     "violinplot": ViolinLayer,
     "heatmap": HeatmapLayer,
     "contourchart": ContourLayer,
+    "hexbinchart": HexbinLayer,
 }
 
 RADIAL_LAYER_TYPES = {
@@ -3841,8 +3933,8 @@ def build_chart_panel_settings(
     """
 
     show_grid = settings.get("show_grid")
-    # rasters (a heatmap, filled contour bands) cover the grid: leave it off
-    raster = chart_type == "heatmap" or (
+    # rasters (a heatmap, hexagons, filled contour bands) cover the grid: off
+    raster = chart_type in ("heatmap", "hexbinchart") or (
         chart_type == "contourchart" and settings.get("filled")
     )
     if show_grid is None and not raster:

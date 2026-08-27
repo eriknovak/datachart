@@ -23,6 +23,7 @@ Classes:
     VIOLIN_INNER:       The supported violin inner marks.
     BANDWIDTH:          The supported kernel density bandwidth rules.
     CONTOUR_LEVELS:     The supported contour level rules.
+    HEXBIN_REDUCE:      The supported hexbin aggregations.
     RADIAL_TYPE:        The supported radial chart visuals.
     SWARM_MODE:         The supported swarm plot modes.
     DIRECTION:          The supported angular directions.
@@ -813,6 +814,38 @@ class CONTOUR_LEVELS:
     AUTO = "auto"
     RICE = "rice"
     FD = "fd"
+
+
+class HEXBIN_REDUCE:
+    """The supported hexbin aggregations.
+
+    Passed as the `reduce` attribute of hexbin charts: how the `c` values of
+    the points in a hexagon collapse into the one value that colors it.
+    Ignored without `c`, where every hexagon shows its point count.
+
+    ![HEXBIN_REDUCE at a glance](../../assets/imgs/const-hexbin-reduce.svg){ width="100%" }
+
+    Examples:
+        >>> from datachart.constants import HEXBIN_REDUCE
+        >>> HEXBIN_REDUCE.DEFAULT
+        "mean"
+
+    Attributes:
+        DEFAULT (str): The default aggregation. Same as `HEXBIN_REDUCE.MEAN`.
+        MEAN (str): The mean of the `c` values. Equals to `"mean"`.
+        SUM (str): The sum of the `c` values. Equals to `"sum"`.
+        MEDIAN (str): The median of the `c` values. Equals to `"median"`.
+        MIN (str): The smallest `c` value. Equals to `"min"`.
+        MAX (str): The largest `c` value. Equals to `"max"`.
+
+    """
+
+    DEFAULT = "mean"
+    MEAN = "mean"
+    SUM = "sum"
+    MEDIAN = "median"
+    MIN = "min"
+    MAX = "max"
 
 
 class RADIAL_TYPE:

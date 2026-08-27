@@ -615,6 +615,37 @@ def get_contour_label_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Hexbin Style
+# -------------------------------------
+
+
+def get_hexbin_style(chart_style: dict) -> dict:
+    """Get the hexbin chart style.
+
+    The `cmap` falls back to the heatmap colormap when the hexbin key leaves
+    it unset.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The hexbin style setting.
+
+    """
+
+    config_attrs = [
+        ("cmap", "plot_hexbin_cmap"),
+        ("alpha", "plot_hexbin_alpha"),
+        ("linewidths", "plot_hexbin_edge_width"),
+        ("edgecolors", "plot_hexbin_edge_color"),
+    ]
+
+    style = create_config_dict(chart_style, config_attrs)
+    style.setdefault("cmap", get_attr_value("plot_heatmap_cmap", chart_style, config))
+    return style
+
+
+# -------------------------------------
 # Scatter Style
 # -------------------------------------
 
