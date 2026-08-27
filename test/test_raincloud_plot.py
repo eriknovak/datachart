@@ -139,6 +139,12 @@ class TestRaincloudLayers(unittest.TestCase):
         self.assertEqual(tuple(_swarm_collections(ax)[0].get_facecolor()[0][:3]), muted)
         self.assertEqual(tuple(_box_patches(ax)[0].get_edgecolor()[:3]), muted)
 
+    def test_rain_point_size_default_and_override(self):
+        figure = RaincloudPlot(group_data())
+        self.assertEqual(_swarm_collections(figure.axes[0])[0].get_sizes()[0], 6)
+        figure = RaincloudPlot(group_data(), style={"plot_swarm_size": 20})
+        self.assertEqual(_swarm_collections(figure.axes[0])[0].get_sizes()[0], 20)
+
     def test_invalid_bandwidth_raises(self):
         with self.assertRaises(ValueError):
             RaincloudPlot(group_data(), bandwidth="nope")

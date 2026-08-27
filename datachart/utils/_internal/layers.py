@@ -1323,6 +1323,10 @@ class SwarmLayer(GroupLayer):
         self.side = self.settings.get("side") or 0
         self.swarm_style = get_swarm_style(self.style)
         self.default_size = config["plot_swarm_size"]
+        # a front's point size replaces the theme's; a chart style still wins
+        size = self.settings.get("size")
+        if size is not None and "plot_swarm_size" not in self.style:
+            self.swarm_style["s"] = size
         # a highlight edge contrasts in the theme's own text color
         self.highlight_edge_color = config.get("font_general_color") or "#000000"
         # collections drawn per axes, packed by the panel after limits settle
@@ -1440,6 +1444,8 @@ SPLIT_INNER_OFFSET = 0.05
 RAINCLOUD_RAIN_OFFSET = 0.08
 RAINCLOUD_RAIN_SPREAD = 0.16
 RAINCLOUD_BOX_WIDTH = 0.15
+# the rain is denser than a standalone swarm, so its points are smaller
+RAINCLOUD_RAIN_SIZE = 6
 INNER_QUARTILE_WIDTH_SCALE = 5.0
 
 
@@ -2424,6 +2430,7 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
             "offset": sign * RAINCLOUD_RAIN_OFFSET,
             "spread": RAINCLOUD_RAIN_SPREAD,
             "side": sign,
+            "size": RAINCLOUD_RAIN_SIZE,
             "color_by_group": True,
         },
     )
