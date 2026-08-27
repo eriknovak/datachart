@@ -3,7 +3,7 @@
 > Data visualization package, simple to use, highly customizable
 
 datachart is a Python data visualization package built on matplotlib.
-It provides simple chart functions (BarChart, LineChart, ScatterChart,
+It provides simple chart functions (BarChart, LineChart, StackedAreaChart, ScatterChart,
 Histogram, Heatmap, ContourChart, HexbinChart, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot,
 ParallelCoords, PyramidChart, RadialChart), figure
 composition via Panel (overlaying charts on shared axes) and Grid
@@ -24,6 +24,7 @@ themes; per-chart overrides go in each chart's `style` parameter.
 
 - [Charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md): The chart functions, their common data format, and how to save figures.
 - [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md): Line chart input attributes, single and multiple datasets, customization, and saving.
+- [Stacked Area Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/stackedareachart/index.md): Stacked area chart input attributes, baselines (zero, percent, sym, wiggle), band style and outlines, emphasis, subplots, composing with Panel and Grid, and saving.
 - [Bar Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md): Bar chart input attributes, single and multiple datasets, customization, and saving.
 - [Pyramid Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/pyramidchart/index.md): Pyramid chart input attributes, the two-sides data contract, mirrored value axis controls, and composing pyramids with Grid.
 - [Radial Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/radialchart/index.md): Radial chart input attributes, the line, bar, scatter, and histogram visuals, and polar settings (start angle, direction, inner radius).

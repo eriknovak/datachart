@@ -14,6 +14,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `TextAttrs`                      | The text annotation attributes.                                 |
 | `LineSingleChartAttrs`           | The single chart attributes for the line chart.                 |
 | `LineDataPointAttrs`             | The data point attributes for the line chart.                   |
+| `StackedAreaSingleChartAttrs`    | The single chart attributes for the stacked area chart.         |
 | `BarSingleChartAttrs`            | The single chart attributes for the bar chart.                  |
 | `BarDataPointAttrs`              | The data point attributes for the bar chart.                    |
 | `HistogramSingleChartAttrs`      | The single chart attributes for the histogram chart.            |
@@ -47,6 +48,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `AreaStyleAttrs`                 | The typing for the area style.                                  |
 | `GridStyleAttrs`                 | The typing for the grid style.                                  |
 | `LineStyleAttrs`                 | The typing for the line style.                                  |
+| `StackedAreaStyleAttrs`          | The typing for the stacked area chart style.                    |
 | `BarStyleAttrs`                  | The typing for the bar style.                                   |
 | `HistStyleAttrs`                 | The typing for the histogram style.                             |
 | `VLineStyleAttrs`                | The typing for the vertical line style.                         |
@@ -564,7 +566,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `BarStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BarStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`
 
 The style attributes. Combines all style typings.
 

@@ -519,6 +519,8 @@
       
         
       
+        
+      
     
     
     
@@ -586,6 +588,34 @@
     
   
     Line Chart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../how-to-guides/charts/stackedareachart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stacked Area Chart
   
 
     
@@ -2080,6 +2110,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.constants.BASELINE" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;BASELINE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.constants.RADIAL_TYPE" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2647,6 +2688,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.constants.BASELINE" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;BASELINE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.constants.RADIAL_TYPE" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2941,6 +2993,14 @@ These include figure size, format, style, and other figure manipulation values.<
             <td class="doc-class-details">
               <div class="doc-md-description">
                 <p>The supported hexbin aggregations.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.BASELINE&lt;/span&gt;" href="#datachart.constants.BASELINE">BASELINE</a></code></td>
+            <td class="doc-class-details">
+              <div class="doc-md-description">
+                <p>The supported stacked area baselines.</p>
               </div>
             </td>
           </tr>
@@ -6943,6 +7003,158 @@ Ignored without <code>c</code>, where every hexagon shows its point count.</p>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
                 <p>The largest <code>c</code> value. Equals to <code>"max"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="datachart.constants.BASELINE" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.constants.BASELINE</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>The supported stacked area baselines.</p>
+<p>Passed as the <code>baseline</code> attribute of stacked area charts: where the
+first series starts, and so how the whole stack sits on the y-axis.</p>
+<p><img alt="BASELINE at a glance" src="../../assets/imgs/const-baseline.svg" width="100%" /></p>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">BASELINE</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">BASELINE</span><span class="o">.</span><span class="n">DEFAULT</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">"zero"</span>
+</code></pre></div>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">ATTRIBUTE</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.BASELINE.DEFAULT">DEFAULT</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The default baseline. Same as <code>BASELINE.ZERO</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.BASELINE.ZERO">ZERO</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The stack starts at zero. Equals to <code>"zero"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.BASELINE.PERCENT">PERCENT</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Each <code>x</code> is normalised so the stack spans 0 to 100. Equals to <code>"percent"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.BASELINE.SYM">SYM</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The stack is centred on zero. Equals to <code>"sym"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.BASELINE.WIGGLE">WIGGLE</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The baseline minimises the sum of squared slopes. Equals to <code>"wiggle"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.BASELINE.WEIGHTED_WIGGLE">WEIGHTED_WIGGLE</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The baseline minimises the size-weighted sum of squared slopes. Equals to <code>"weighted_wiggle"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">

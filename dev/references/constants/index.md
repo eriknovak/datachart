@@ -28,6 +28,7 @@ The `constants` module provides a set of predefined constants used in the packag
 | `BANDWIDTH`         | The supported kernel density bandwidth rules.  |
 | `CONTOUR_LEVELS`    | The supported contour level rules.             |
 | `HEXBIN_REDUCE`     | The supported hexbin aggregations.             |
+| `BASELINE`          | The supported stacked area baselines.          |
 | `RADIAL_TYPE`       | The supported radial chart visuals.            |
 | `SWARM_MODE`        | The supported swarm plot modes.                |
 | `DIRECTION`         | The supported angular directions.              |
@@ -593,6 +594,29 @@ Examples:
 | `MEDIAN`  | The median of the c values. Equals to "median". **TYPE:** `str`      |
 | `MIN`     | The smallest c value. Equals to "min". **TYPE:** `str`               |
 | `MAX`     | The largest c value. Equals to "max". **TYPE:** `str`                |
+
+### datachart.constants.BASELINE
+
+The supported stacked area baselines.
+
+Passed as the `baseline` attribute of stacked area charts: where the first series starts, and so how the whole stack sits on the y-axis.
+
+Examples:
+
+```
+>>> from datachart.constants import BASELINE
+>>> BASELINE.DEFAULT
+"zero"
+```
+
+| ATTRIBUTE         | DESCRIPTION                                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------------------ |
+| `DEFAULT`         | The default baseline. Same as BASELINE.ZERO. **TYPE:** `str`                                                 |
+| `ZERO`            | The stack starts at zero. Equals to "zero". **TYPE:** `str`                                                  |
+| `PERCENT`         | Each x is normalised so the stack spans 0 to 100. Equals to "percent". **TYPE:** `str`                       |
+| `SYM`             | The stack is centred on zero. Equals to "sym". **TYPE:** `str`                                               |
+| `WIGGLE`          | The baseline minimises the sum of squared slopes. Equals to "wiggle". **TYPE:** `str`                        |
+| `WEIGHTED_WIGGLE` | The baseline minimises the size-weighted sum of squared slopes. Equals to "weighted_wiggle". **TYPE:** `str` |
 
 ### datachart.constants.RADIAL_TYPE
 

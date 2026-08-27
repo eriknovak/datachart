@@ -6,22 +6,23 @@ Module containing the `charts`.
 
 The `charts` module contains the methods to create the plots and figures, grouped by the question they answer.
 
-| FUNCTION         | DESCRIPTION                             |
-| ---------------- | --------------------------------------- |
-| `LineChart`      | Creates the line chart.                 |
-| `BarChart`       | Creates the bar chart.                  |
-| `PyramidChart`   | Creates the pyramid chart.              |
-| `RadialChart`    | Creates the radial chart.               |
-| `Histogram`      | Creates the histogram.                  |
-| `BoxPlot`        | Creates the box plot.                   |
-| `ViolinPlot`     | Creates the violin plot.                |
-| `SwarmPlot`      | Creates the swarm plot.                 |
-| `RaincloudPlot`  | Creates the raincloud plot.             |
-| `ScatterChart`   | Creates the scatter chart.              |
-| `Heatmap`        | Creates the heatmap.                    |
-| `ContourChart`   | Creates the contour chart.              |
-| `HexbinChart`    | Creates the hexbin chart.               |
-| `ParallelCoords` | Creates the parallel coordinates chart. |
+| FUNCTION           | DESCRIPTION                             |
+| ------------------ | --------------------------------------- |
+| `LineChart`        | Creates the line chart.                 |
+| `StackedAreaChart` | Creates the stacked area chart.         |
+| `BarChart`         | Creates the bar chart.                  |
+| `PyramidChart`     | Creates the pyramid chart.              |
+| `RadialChart`      | Creates the radial chart.               |
+| `Histogram`        | Creates the histogram.                  |
+| `BoxPlot`          | Creates the box plot.                   |
+| `ViolinPlot`       | Creates the violin plot.                |
+| `SwarmPlot`        | Creates the swarm plot.                 |
+| `RaincloudPlot`    | Creates the raincloud plot.             |
+| `ScatterChart`     | Creates the scatter chart.              |
+| `Heatmap`          | Creates the heatmap.                    |
+| `ContourChart`     | Creates the contour chart.              |
+| `HexbinChart`      | Creates the hexbin chart.               |
+| `ParallelCoords`   | Creates the parallel coordinates chart. |
 
 ## Trends and Comparisons
 
@@ -192,6 +193,175 @@ Examples:
 | RETURNS      | DESCRIPTION                           |
 | ------------ | ------------------------------------- |
 | `plt.Figure` | The figure containing the line chart. |
+
+### datachart.charts.StackedAreaChart
+
+```
+StackedAreaChart(
+    data: Union[
+        List[LineDataPointAttrs],
+        List[List[LineDataPointAttrs]],
+    ],
+    *,
+    baseline: Optional[Union[BASELINE, str]] = None,
+    title: Optional[str] = None,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
+    subtitle: Optional[
+        Union[str, List[Optional[str]]]
+    ] = None,
+    emphasis: Optional[
+        Union[EMPHASIS, str, List[Optional[str]]]
+    ] = None,
+    figsize: Optional[
+        Union[FIG_SIZE, Tuple[float, float]]
+    ] = None,
+    xmin: Optional[Union[int, float]] = None,
+    xmax: Optional[Union[int, float]] = None,
+    ymin: Optional[Union[int, float]] = None,
+    ymax: Optional[Union[int, float]] = None,
+    show_legend: Optional[bool] = None,
+    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
+    scalex: Optional[Union[SCALE, str]] = None,
+    scaley: Optional[Union[SCALE, str]] = None,
+    subplots: Optional[bool] = None,
+    max_cols: Optional[int] = None,
+    sharex: Optional[bool] = None,
+    sharey: Optional[bool] = None,
+    style: Optional[
+        Union[
+            StackedAreaStyleAttrs,
+            List[Optional[StackedAreaStyleAttrs]],
+        ]
+    ] = None,
+    xticks: Optional[
+        Union[
+            List[Union[int, float]],
+            List[List[Union[int, float]]],
+        ]
+    ] = None,
+    xticklabels: Optional[
+        Union[List[str], List[List[str]]]
+    ] = None,
+    xtickrotate: Optional[
+        Union[int, List[Optional[int]]]
+    ] = None,
+    yticks: Optional[
+        Union[
+            List[Union[int, float]],
+            List[List[Union[int, float]]],
+        ]
+    ] = None,
+    yticklabels: Optional[
+        Union[List[str], List[List[str]]]
+    ] = None,
+    ytickrotate: Optional[
+        Union[int, List[Optional[int]]]
+    ] = None,
+    vlines: Optional[
+        Union[
+            VLinePlotAttrs,
+            List[VLinePlotAttrs],
+            List[
+                Union[
+                    VLinePlotAttrs,
+                    List[VLinePlotAttrs],
+                    None,
+                ]
+            ],
+        ]
+    ] = None,
+    hlines: Optional[
+        Union[
+            HLinePlotAttrs,
+            List[HLinePlotAttrs],
+            List[
+                Union[
+                    HLinePlotAttrs,
+                    List[HLinePlotAttrs],
+                    None,
+                ]
+            ],
+        ]
+    ] = None,
+    texts: Optional[
+        Union[
+            TextAttrs,
+            List[TextAttrs],
+            List[Union[TextAttrs, List[TextAttrs], None]],
+        ]
+    ] = None,
+    x: Optional[Union[str, List[Optional[str]]]] = None,
+    y: Optional[Union[str, List[Optional[str]]]] = None
+) -> plt.Figure
+```
+
+Creates the stacked area chart.
+
+Stacked areas fill each series on top of the previous one along an ordered axis, so the top edge traces the total and the bands show how it splits into parts — class proportions over time, traffic by channel per year. Every series must share the same `x` values. Use it for composition that changes along an axis; for the trajectories themselves use LineChart, and for composition at a few discrete categories use BarChart with `bar_mode="stack"`.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.charts import StackedAreaChart
+>>> figure = StackedAreaChart(
+...     data=[
+...         [{"x": 1, "y": 3}, {"x": 2, "y": 4}, {"x": 3, "y": 5}],
+...         [{"x": 1, "y": 2}, {"x": 2, "y": 3}, {"x": 3, "y": 1}],
+...     ],
+...     subtitle=["Mobile", "Desktop"],
+...     title="Traffic by Device",
+...     xlabel="Year",
+...     ylabel="Visits",
+... )
+```
+
+| PARAMETER      | DESCRIPTION                                                                                                                                                                                                                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `data`         | The data points for the stacked series. A single list of points draws one band; a list of lists draws one band per series, the first at the bottom. Every series must hold the same x values in the same order. **TYPE:** `Union[List[LineDataPointAttrs], List[List[LineDataPointAttrs]]]`      |
+| `baseline`     | Where the first series starts: "zero" (default), "percent" (each x normalised to 100), "sym" (centred on zero), "wiggle" or "weighted_wiggle" (streamgraph baselines). See BASELINE. **TYPE:** `Optional[Union[BASELINE, str]]` **DEFAULT:** `None`                                              |
+| `title`        | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                            |
+| `xlabel`       | The x-axis label. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                  |
+| `ylabel`       | The y-axis label. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                  |
+| `subtitle`     | The subtitle(s) for individual series. Used as legend labels. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                          |
+| `emphasis`     | The emphasis role(s) for individual series, aligned like style: "background" mutes a band (theme muted color, lowered alpha, no legend entry), "highlight" brings it to the front, None leaves it unchanged. **TYPE:** `Optional[Union[EMPHASIS, str, List[Optional[str]]]]` **DEFAULT:** `None` |
+| `figsize`      | The size of the figure. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                                                                                                                           |
+| `xmin`         | The minimum x-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                            |
+| `xmax`         | The maximum x-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                            |
+| `ymin`         | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                            |
+| `ymax`         | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                            |
+| `show_legend`  | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                       |
+| `show_grid`    | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                               |
+| `aspect_ratio` | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                           |
+| `scalex`       | The x-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                            |
+| `scaley`       | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                            |
+| `subplots`     | Whether to draw each series unstacked in its own subplot. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                         |
+| `max_cols`     | Maximum number of columns in subplots (when subplots=True). **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                        |
+| `sharex`       | Whether to share the x-axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                          |
+| `sharey`       | Whether to share the y-axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                          |
+| `style`        | Style configuration(s) for the band(s). **TYPE:** `Optional[Union[StackedAreaStyleAttrs, List[Optional[StackedAreaStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                                                            |
+| `xticks`       | Custom x-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float]], List[List[Union[int, float]]]]]` **DEFAULT:** `None`                                                                                                                                                            |
+| `xticklabels`  | Custom x-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                           |
+| `xtickrotate`  | Rotation angle for x-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                 |
+| `yticks`       | Custom y-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float]], List[List[Union[int, float]]]]]` **DEFAULT:** `None`                                                                                                                                                            |
+| `yticklabels`  | Custom y-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                           |
+| `ytickrotate`  | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                 |
+| `vlines`       | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                         |
+| `hlines`       | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                       |
+| `texts`        | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                           |
+| `x`            | The key name in data for x-axis values (default: "x"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                 |
+| `y`            | The key name in data for y-axis values (default: "y"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                 |
+
+| RETURNS      | DESCRIPTION                                   |
+| ------------ | --------------------------------------------- |
+| `plt.Figure` | The figure containing the stacked area chart. |
+
+| RAISES       | DESCRIPTION                                                                        |
+| ------------ | ---------------------------------------------------------------------------------- |
+| `ValueError` | If the series do not share the same x values, or baseline is not a BASELINE value. |
 
 ### datachart.charts.BarChart
 
