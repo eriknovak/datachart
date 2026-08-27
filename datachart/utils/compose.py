@@ -8,7 +8,7 @@ seam, so they survive both compositions.
 Methods:
     Panel(charts, title, xlabel, ylabel_left, ylabel_right, figsize, show_legend, ...):
         Overlays rendered chart figures on a single plot with optional dual y-axes.
-    Grid(charts, title, max_cols, figsize, sharex, sharey):
+    Grid(charts, title, xlabel, ylabel, max_cols, figsize, sharex, sharey):
         Arranges rendered chart figures in a grid; nested rows define the layout.
     Annotate(figure, texts):
         Returns a new figure with text annotations added to a rendered figure.
@@ -466,6 +466,8 @@ def _grid_from_rows(
     rows: List[List[Optional[plt.Figure]]],
     *,
     title: Optional[str],
+    xlabel: Optional[str],
+    ylabel: Optional[str],
     figsize: Optional[Tuple[float, float]],
     sharex: bool,
     sharey: bool,
@@ -505,6 +507,8 @@ def _grid_from_rows(
     return _figure_grid_layout_impl(
         figures=figures,
         title=title,
+        xlabel=xlabel,
+        ylabel=ylabel,
         layout_specs=specs,
         figsize=figsize,
         sharex=sharex,
@@ -519,6 +523,8 @@ def Grid(
     ],
     *,
     title: Optional[str] = None,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
     max_cols: int = 4,
     figsize: Optional[Tuple[float, float]] = None,
     sharex: bool = False,
@@ -581,6 +587,10 @@ def Grid(
             optional "layout_spec" dict ('row', 'col', 'rowspan', 'colspan').
             Nested rows and layout_spec cannot be mixed.
         title: Optional title for the combined figure.
+        xlabel: Optional x-axis label for the whole grid, drawn once below
+            every cell. A nested grid keeps its own as a footer of its cell.
+        ylabel: Optional y-axis label for the whole grid, drawn once to the
+            left of every cell. A nested grid keeps its own beside its cell.
         max_cols: Maximum number of columns for the flat-list automatic grid.
         figsize: Size of the combined figure (width, height) in inches.
             If None, calculated from the first figure's size.
@@ -606,6 +616,8 @@ def Grid(
         return _grid_from_rows(
             list(map(list, charts)),
             title=title,
+            xlabel=xlabel,
+            ylabel=ylabel,
             figsize=figsize,
             sharex=sharex,
             sharey=sharey,
@@ -623,6 +635,8 @@ def Grid(
     return _grid_from_dicts(
         items,
         title=title,
+        xlabel=xlabel,
+        ylabel=ylabel,
         max_cols=max_cols,
         figsize=figsize,
         sharex=sharex,

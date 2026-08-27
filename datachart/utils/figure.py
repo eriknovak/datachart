@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec, SubplotSpec
 
 from ..constants import FIG_FORMAT
-from ._internal.config_helpers import get_text_style
+from ._internal.config_helpers import configure_labels, get_text_style
 from ._internal.figures import new_figure
 
 # =====================================
@@ -99,42 +99,59 @@ def _render_grid_node(
     """Rebuild a nested grid inside one parent cell.
 
     The node is the nested grid figure's own metadata: its cell tree, layout
-    shape, title, and sharex/sharey. The subgrid nests in the owner figure's
-    gridspec so one constrained-layout pass aligns its axes envelope with
-    sibling cells. A title reserves a thin heading row rendered in
-    the subtitle style — a section heading, not the figure's title; sharing
-    stays local to the node, anchored on its first shareable axes.
+    shape, title, axis labels, and sharex/sharey. The subgrid nests in the
+    owner figure's gridspec so one constrained-layout pass aligns its axes
+    envelope with sibling cells. A title reserves a thin heading row rendered
+    in the subtitle style — a section heading, not the figure's title — and
+    the axis labels a footer row and a left column; sharing stays local to
+    the node, anchored on its first shareable axes.
     """
     nrows, ncols = node["shape"]
-    title = node.get("title")
+    title, xlabel, ylabel = node.get("title"), node.get("xlabel"), node.get("ylabel")
+    # 0.12: thin label rows and column, roughly one text line each (ADR 0007)
+    heights = ([0.12] if title else []) + [1] * nrows + ([0.12] if xlabel else [])
+    widths = ([0.12] if ylabel else []) + [1] * ncols
+    sub_gs = subplot_spec.subgridspec(
+        len(heights), len(widths), height_ratios=heights, width_ratios=widths
+    )
+    row_offset = 1 if title else 0
+    col_offset = 1 if ylabel else 0
+    body_rows = slice(row_offset, row_offset + nrows)
+    body_cols = slice(col_offset, col_offset + ncols)
     if title:
-        # 0.12: thin heading row, roughly one subtitle text line (ADR 0007)
-        sub_gs = subplot_spec.subgridspec(
-            nrows + 1, ncols, height_ratios=[0.12] + [1] * nrows
-        )
-        heading_ax = owner.add_subplot(sub_gs[0, :])
-        heading_ax.axis("off")
-        heading_ax.text(
-            0.5,
-            0.0,
+        _label_axes(
+            owner,
+            sub_gs[0, body_cols],
             title,
-            ha="center",
-            va="bottom",
-            transform=heading_ax.transAxes,
-            **get_text_style("subtitle"),
+            (0.5, 0.0),
+            "center",
+            "bottom",
+            "subtitle",
         )
-        row_offset = 1
-    else:
-        sub_gs = subplot_spec.subgridspec(nrows, ncols)
-        row_offset = 0
+    if xlabel:
+        _label_axes(
+            owner, sub_gs[-1, body_cols], xlabel, (0.5, 1.0), "center", "top", "xlabel"
+        )
+    if ylabel:
+        _label_axes(
+            owner,
+            sub_gs[body_rows, 0],
+            ylabel,
+            (1.0, 0.5),
+            "right",
+            "center",
+            "ylabel",
+            90,
+        )
 
     first_ax = None
     for cell in node["cells"]:
         layout = cell["spec"]
         row = layout["row"] + row_offset
+        col = layout["col"] + col_offset
         cell_spec = sub_gs[
             row : row + layout["rowspan"],
-            layout["col"] : layout["col"] + layout["colspan"],
+            col : col + layout["colspan"],
         ]
         if "grid" in cell:
             _render_grid_node(owner, cell["grid"], cell_spec)
@@ -153,6 +170,30 @@ def _render_grid_node(
         if shareable and first_ax is None:
             first_ax = ax
         _render_cell(owner, cell, ax)
+
+
+def _label_axes(
+    owner: plt.Figure,
+    spec: SubplotSpec,
+    text: str,
+    xy: Tuple[float, float],
+    ha: str,
+    va: str,
+    text_type: str,
+    rotation: int = 0,
+) -> None:
+    """An invisible axes in `spec` carrying one label of a nested grid."""
+    ax = owner.add_subplot(spec)
+    ax.axis("off")
+    ax.text(
+        *xy,
+        text,
+        ha=ha,
+        va=va,
+        rotation=rotation,
+        transform=ax.transAxes,
+        **get_text_style(text_type),
+    )
 
 
 def _column_window(subplot_spec: SubplotSpec) -> Tuple[float, float]:
@@ -223,6 +264,8 @@ def _figure_grid_layout_impl(
     figures: List[plt.Figure],
     *,
     title: Optional[str] = None,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
     layout_specs: Optional[List[Dict[str, int]]] = None,
     max_cols: int = 4,
     figsize: Optional[Tuple[float, float]] = None,
@@ -237,6 +280,8 @@ def _figure_grid_layout_impl(
     Args:
         figures: List of matplotlib Figure objects to combine.
         title: Optional title for the combined figure.
+        xlabel: Optional x-axis label for the whole grid.
+        ylabel: Optional y-axis label for the whole grid.
         layout_specs: Optional list of layout specifications for custom grid layouts.
         max_cols: Maximum number of columns in the grid layout.
         figsize: Size of the combined figure (width, height) in inches.
@@ -350,9 +395,16 @@ def _figure_grid_layout_impl(
         for idx in range(n_figures, len(axes)):
             axes[idx].axis("off")
 
-    # Add global title if provided
-    if title:
-        combined_fig.suptitle(title, **get_text_style("title"))
+    # global title and axis labels, one per figure
+    labels = {"title": title, "xlabel": xlabel, "ylabel": ylabel}
+    configure_labels(
+        {key: text for key, text in labels.items() if text},
+        [
+            ("title", combined_fig.suptitle),
+            ("xlabel", combined_fig.supxlabel),
+            ("ylabel", combined_fig.supylabel),
+        ],
+    )
 
     _align_axes_columns(combined_fig)
 
@@ -362,6 +414,8 @@ def _figure_grid_layout_impl(
         "cells": cells,
         "shape": grid_shape,
         "title": title,
+        "xlabel": xlabel,
+        "ylabel": ylabel,
         "sharex": sharex,
         "sharey": sharey,
     }
@@ -417,6 +471,8 @@ def _grid_from_dicts(
     charts: List[Dict[str, Any]],
     *,
     title: Optional[str] = None,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
     max_cols: int = 4,
     figsize: Optional[Tuple[float, float]] = None,
     sharex: bool = False,
@@ -478,6 +534,8 @@ def _grid_from_dicts(
     return _figure_grid_layout_impl(
         figures=figures,
         title=title,
+        xlabel=xlabel,
+        ylabel=ylabel,
         layout_specs=layout_specs,
         max_cols=max_cols,
         figsize=figsize,

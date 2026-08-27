@@ -89,7 +89,7 @@ class TestPanel:
             warnings.simplefilter("error")
             fig = Panel([hist, curve])
         # both integrate to 1, so no secondary axis is created
-        self.assertEqual(len(fig.axes), 1)
+        assert len(fig.axes) == 1
         plt.close(fig)
 
     def test_histogram_line_overlay(self):
