@@ -89,6 +89,12 @@ def Histogram(
 ) -> plt.Figure:
     """Creates the histogram.
 
+    A histogram bins a single numeric variable and draws the count (or density) per bin,
+    revealing the shape of its distribution: center, spread, skew, modes, and outliers.
+    Use it to inspect one variable or compare a few overlaid distributions. For
+    side-by-side group summaries use [`BoxPlot`][datachart.charts.BoxPlot] or
+    [`ViolinPlot`][datachart.charts.ViolinPlot].
+
     Examples:
         >>> from datachart.charts import Histogram
         >>> figure = Histogram(

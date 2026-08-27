@@ -41,3 +41,7 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_violin_inner_color": "#34495E",
     }
 )
+"""The ink theme: dark-ink accents, print-ready.
+
+!!! info "Added in v0.8.0"
+"""

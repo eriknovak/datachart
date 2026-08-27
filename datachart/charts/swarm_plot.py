@@ -87,10 +87,15 @@ def SwarmPlot(
 ) -> plt.Figure:
     """Creates the swarm plot.
 
-    Every observation of a group is drawn as a point at the group's category
-    position, spread across the category width so the points do not hide
-    each other. Groups share positions with `BoxPlot`, so the two overlay
-    with `Panel`.
+    A swarm plot draws every observation as a point at its group's category
+    position, spread across the category width so the points do not hide each
+    other, making counts and gaps visible. Use it for small-to-medium samples
+    where each observation matters, or overlay it on a
+    [`BoxPlot`][datachart.charts.BoxPlot] with `Panel` (the two share
+    positions). For large samples prefer
+    [`ViolinPlot`][datachart.charts.ViolinPlot].
+
+    !!! info "Added in Unreleased"
 
     Examples:
         >>> from datachart.charts import SwarmPlot

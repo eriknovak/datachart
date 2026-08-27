@@ -84,6 +84,14 @@ def ScatterChart(
 ) -> plt.Figure:
     """Creates a scatter chart.
 
+    Each point is one observation placed by two numeric variables, optionally
+    with a third encoded as marker size. Use it to check whether two variables
+    are related, spot clusters and outliers, and quantify the link with the
+    optional regression line and correlation coefficient. For ordered series
+    use [`LineChart`][datachart.charts.LineChart].
+
+    !!! info "Added in v0.7.0"
+
     Examples:
         >>> from datachart.charts import ScatterChart
         >>> # Basic scatter plot

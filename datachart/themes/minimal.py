@@ -42,3 +42,7 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "plot_heatmap_frame_color": "#9AA4AE",
     }
 )
+"""The minimal theme: accent blue, no spines, flat bars.
+
+!!! info "Added in v0.8.0"
+"""

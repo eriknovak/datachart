@@ -80,6 +80,12 @@ def LineChart(
 ) -> plt.Figure:
     """Creates the line chart.
 
+    Lines connect ordered (x, y) points to show how a value changes along a continuous
+    axis, typically time. Use it for trends, growth, and comparing the trajectories of
+    several series on the same scale. For unordered categories use
+    [`BarChart`][datachart.charts.BarChart]; for unconnected samples use
+    [`ScatterChart`][datachart.charts.ScatterChart].
+
     Examples:
         >>> from datachart.charts import LineChart
         >>> figure = LineChart(

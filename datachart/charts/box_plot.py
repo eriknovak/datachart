@@ -79,6 +79,14 @@ def BoxPlot(
 ) -> plt.Figure:
     """Creates the box plot.
 
+    A box plot summarizes a numeric distribution per group by its median, quartiles,
+    whiskers, and outliers. Use it to compare the level and spread of many groups
+    compactly, or to spot skew and outliers, when the full distribution shape is not
+    needed. For shape use [`ViolinPlot`][datachart.charts.ViolinPlot]; for the raw
+    points use [`SwarmPlot`][datachart.charts.SwarmPlot].
+
+    !!! info "Added in v0.7.0"
+
     Examples:
         >>> from datachart.charts import BoxPlot
         >>> figure = BoxPlot(

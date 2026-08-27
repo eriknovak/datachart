@@ -58,6 +58,13 @@ class Config:
     def set_theme(self, theme: THEME) -> None:
         """Sets the global configuration to match the theme.
 
+        Replaces the whole style configuration with a deep copy of the theme:
+        one of the `THEME` constants or a name registered with `register_theme`.
+        Use it to switch the look of every chart rendered afterwards; call
+        `update_config` on top for per-attribute tweaks.
+
+        !!! info "Added in v0.5.0"
+
         Examples:
             >>> from datachart.constants import THEME
             >>> from datachart.config import config
@@ -80,6 +87,8 @@ class Config:
 
     def register_theme(self, name: str, theme: StyleAttrs) -> None:
         """Registers a custom theme so it can be applied with `set_theme`.
+
+        !!! info "Added in v0.8.1"
 
         The theme must define every attribute of the default theme; missing
         keys are filled from it, unknown keys are rejected.
@@ -105,6 +114,10 @@ class Config:
     def reset_config(self) -> None:
         """Resets the global configuration.
 
+        Restores the default theme, discarding the current theme and every
+        `update_config` override. Use it to return to a known state, for example
+        at the start of a notebook section or between tests.
+
         Examples:
             >>> from datachart.config import config
             >>> config.reset_config()
@@ -116,6 +129,11 @@ class Config:
 
     def update_config(self, config: StyleAttrs) -> None:
         """Updates the global configuration.
+
+        Overrides individual style attributes on top of the current theme; the
+        change persists until the next `set_theme` or `reset_config`. Use it for
+        global tweaks such as font family or default colors; unknown attribute
+        names are skipped with a warning.
 
         Examples:
             >>> from datachart.config import config
@@ -153,6 +171,10 @@ class Config:
 
     def get(self, attr: str, default: Any = None) -> Any:
         """Gets the associated configuration attribute.
+
+        Reads one style attribute, falling back to `default` when it is not
+        set. Use it to inspect the active configuration or to build style
+        overrides relative to the current theme.
 
         Examples:
             >>> from datachart.config import config

@@ -92,6 +92,13 @@ def BarChart(
 ) -> plt.Figure:
     """Creates the bar chart.
 
+    Bars compare a numeric value across discrete categories: each label gets a bar whose
+    length encodes its value. Use it when the categories are few and unordered (or
+    ordinal) and the question is "which is bigger, and by how much"; several series can
+    be grouped, stacked, or overlaid via `bar_mode`. For a continuous x-axis reach for
+    [`LineChart`][datachart.charts.LineChart], for distributions for
+    [`Histogram`][datachart.charts.Histogram].
+
     Examples:
         >>> from datachart.charts import BarChart
         >>> figure = BarChart(

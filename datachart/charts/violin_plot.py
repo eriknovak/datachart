@@ -106,6 +106,14 @@ def ViolinPlot(
 ) -> plt.Figure:
     """Creates the violin plot.
 
+    A violin plot draws the kernel density estimate of each group's numeric
+    distribution as a mirrored profile, showing shape (multimodality, skew,
+    tails) that a box plot hides. Use it to compare distributions across groups
+    when shape matters and each group has enough samples for a density
+    estimate.
+
+    !!! info "Added in Unreleased"
+
     Examples:
         >>> from datachart.charts import ViolinPlot
         >>> figure = ViolinPlot(
