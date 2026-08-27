@@ -40,7 +40,7 @@ deactivate
 To install the requirements run:
 
 ```bash
-pip install -e .[all]
+uv sync --group dev
 ```
 
 **Githooks.** Githooks enable automatic commit and push hooks. The project is configured to run tests on each commit and to run tests and format the code on each push. See the configuration in `.githooks.ini`. To enable git hooks, run:
