@@ -56,7 +56,6 @@ Classes:
 
 """
 
-import warnings
 from typing import TypedDict, Union, Tuple, List, Optional, Dict
 
 import matplotlib.colors as colors
@@ -1715,53 +1714,3 @@ class _RadialChartAttrs(ChartCommonAttrs):
     direction: Union[DIRECTION, str, None]
     innerradius: Union[float, None]
     scaley: Union[SCALE, str, None]
-
-
-# ================================================
-# Chart Attributes
-# ================================================
-
-
-_ChartAttrs = Union[
-    _LineChartAttrs,
-    _BarChartAttrs,
-    _HistogramChartAttrs,
-    _HeatmapChartAttrs,
-    _ScatterChartAttrs,
-    _BoxChartAttrs,
-    _ViolinPlotAttrs,
-    _RaincloudPlotAttrs,
-    _ParallelCoordsChartAttrs,
-    _RadialChartAttrs,
-]
-"""The union of all chart attributes."""
-
-
-# ================================================
-# Deprecated Aliases
-# ================================================
-
-
-_DEPRECATED_TYPINGS = {
-    "ChartAttrs": _ChartAttrs,
-    "LineChartAttrs": _LineChartAttrs,
-    "BarChartAttrs": _BarChartAttrs,
-    "HistogramChartAttrs": _HistogramChartAttrs,
-    "HeatmapChartAttrs": _HeatmapChartAttrs,
-    "ScatterChartAttrs": _ScatterChartAttrs,
-    "BoxChartAttrs": _BoxChartAttrs,
-    "ParallelCoordsChartAttrs": _ParallelCoordsChartAttrs,
-}
-
-
-def __getattr__(name: str):
-    # deprecated for one release (ADR 0003): the chart fronts are the API surface
-    if name in _DEPRECATED_TYPINGS:
-        warnings.warn(
-            f"datachart.typings.{name} is deprecated; the chart functions document "
-            "their parameters — see datachart.charts.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return _DEPRECATED_TYPINGS[name]
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
