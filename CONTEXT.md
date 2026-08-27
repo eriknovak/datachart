@@ -176,8 +176,16 @@ _Avoid_: matrix plot, image plot, colormesh
 A gridded surface (`ContourChart`: 1-D `x`, `y` axes and a 2-D `z` grid per
 chart) drawn as iso-lines in the chart's cycle color or, when `filled`, as
 colormapped bands between levels. Lists overlay on one axes like histograms
-do; `subplots=True` grids them. The rendering half of the 2-D density chart.
-_Avoid_: isoline chart, contourf chart, surface plot
+do; `subplots=True` grids them. Also the 2-D density chart: `stats.kde2d`
+estimates the grid, `ContourChart` draws it — there is no `KDEChart`.
+_Avoid_: isoline chart, contourf chart, surface plot, KDE chart
+
+**Density estimate**:
+A Gaussian kernel density (`stats.kde1d` → `{x, y}` points for `LineChart`,
+`stats.kde2d` → an `{x, y, z}` dict for `ContourChart`) on a grid that extends
+`cut` bandwidths past the data so the estimate tails off instead of being
+clipped. `bandwidth` takes a `BANDWIDTH` rule or a scalar factor, as violins do.
+_Avoid_: KDE plot, density chart (as a chart type)
 
 **Level**:
 One `z` value at which a contour line is drawn or a band boundary falls.

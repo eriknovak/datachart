@@ -5,9 +5,9 @@ status: accepted
 # ContourChart draws a gridded surface as lines or fills through one layer
 
 A contour chart (issue #66) draws a 2-D grid `z` over axes `x`, `y` as
-iso-lines (`ax.contour`) or filled bands (`ax.contourf`). It is the rendering
-half of the 2-D density chart (issue #65): the density front only estimates a
-grid and hands it to the same layer, so the two never fork a drawing path.
+iso-lines (`ax.contour`) or filled bands (`ax.contourf`). It is also the 2-D
+density chart (issue #65): `stats.kde2d` estimates the grid and `ContourChart`
+draws it, so there is no separate density front and no second drawing path.
 
 ## Commitments
 
@@ -37,7 +37,13 @@ grid and hands it to the same layer, so the two never fork a drawing path.
 - **Inline labels are opt-in.** `show_labels=True` runs `ax.clabel`, formatted
   by `valfmt` in the heatmap format-string convention.
 - **One layer, no helper API.** `ContourLayer` reads the arrays from the chart
-  dict; the density front builds that dict from a `stats.kde2d` estimate.
+  dict; `stats.kde2d` builds that dict from a kernel density estimate.
+- **KDE is a stats function, not a chart.** `stats.kde2d(x, y)` returns the
+  `{x, y, z}` dict and `stats.kde1d(values)` the `{x, y}` points of a density
+  curve for `LineChart`, both padded by `cut` bandwidths so the estimate tails
+  off instead of being clipped. A `KDEChart` front would only wrap
+  `ContourChart`/`LineChart` around them, so it is not added; the guides show
+  the pairing instead.
 
 ## Considered options
 
@@ -46,3 +52,7 @@ grid and hands it to the same layer, so the two never fork a drawing path.
   overlay. Different layer, different furniture.
 - *A data-derived level rule as the default.* Rejected on the prototype
   renders (above): every rule tracks grid resolution, not the surface.
+- *A `KDEChart` front (1-D and 2-D).* Rejected: every rendering concern is
+  already covered by `LineChart` (curve, `show_area` fill) and `ContourChart`
+  (lines, fills, colorbar), so the front would duplicate two fronts' options
+  to save one function call.

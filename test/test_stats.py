@@ -11,6 +11,8 @@ from datachart.utils.stats import (
     iqr,
     correlation,
     contour_levels,
+    kde1d,
+    kde2d,
 )
 
 # =====================================
@@ -200,3 +202,47 @@ class TestStats(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    # Test kde1d / kde2d
+
+    def test_kde1d_curve_integrates_to_one(self):
+        values = np.random.RandomState(0).normal(size=300).tolist()
+        curve = kde1d(values)
+        self.assertEqual(len(curve), 100)
+        x = [point["x"] for point in curve]
+        y = [point["y"] for point in curve]
+        self.assertAlmostEqual(float(np.trapezoid(y, x)), 1.0, places=2)
+        # the grid extends past the values by `cut` bandwidths
+        self.assertLess(x[0], min(values))
+        self.assertGreater(x[-1], max(values))
+
+    def test_kde1d_cut_zero_spans_the_values(self):
+        curve = kde1d([1, 2, 3, 4], gridsize=4, cut=0)
+        self.assertEqual([point["x"] for point in curve], [1.0, 2.0, 3.0, 4.0])
+
+    def test_kde2d_shape_and_symmetry(self):
+        surface = kde2d([1, 2, 3, 4], [1, 3, 2, 4], gridsize=(3, 2), cut=0)
+        self.assertEqual(surface["x"], [1.0, 2.5, 4.0])
+        self.assertEqual(surface["y"], [1.0, 4.0])
+        z = np.asarray(surface["z"])
+        self.assertEqual(z.shape, (2, 3))
+        np.testing.assert_allclose(z[0], z[1][::-1])
+
+    def test_kde2d_bandwidth_smooths(self):
+        x = [1, 2, 3, 4, 5]
+        y = [5, 3, 1, 3, 5]
+        narrow = np.asarray(kde2d(x, y, bandwidth=0.2, gridsize=20)["z"])
+        wide = np.asarray(kde2d(x, y, bandwidth=2.0, gridsize=20)["z"])
+        self.assertGreater(narrow.max(), wide.max())
+
+    def test_kde_invalid_inputs(self):
+        with self.assertRaises(ValueError):
+            kde1d([1, 2, 3], bandwidth="gaussian")
+        with self.assertRaises(ValueError):
+            kde1d([1])
+        with self.assertRaises(ValueError):
+            kde1d([1, float("nan"), 3])
+        with self.assertRaises(ValueError):
+            kde2d([1, 2, 3], [1, 2])
+        with self.assertRaises(ValueError):
+            kde2d([1, 2, 3], [1, 2, 3], cut=-1)

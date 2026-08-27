@@ -27,15 +27,22 @@ Methods:
         Calculates the Pearson correlation coefficient between two lists.
     contour_levels(z, rule):
         Picks the contour levels of a 2-D grid by a rule of thumb.
+    kde1d(values, bandwidth, gridsize, cut):
+        Estimates the density of the values as a curve.
+    kde2d(x, y, bandwidth, gridsize, cut):
+        Estimates the density of the (x, y) points as a gridded surface.
 """
 
 import math
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
+from matplotlib.mlab import GaussianKDE
 from matplotlib.ticker import MaxNLocator
 
-from ..constants import CONTOUR_LEVELS
+from ..constants import BANDWIDTH, CONTOUR_LEVELS
+
+BANDWIDTH_RULES = (BANDWIDTH.SCOTT, BANDWIDTH.SILVERMAN)
 
 # rule-of-thumb level counts stay readable in this range (ADR 0022)
 CONTOUR_LEVELS_MIN = 4
@@ -363,3 +370,141 @@ def contour_levels(
     k = int(np.clip(k, CONTOUR_LEVELS_MIN, CONTOUR_LEVELS_MAX))
     ticks = MaxNLocator(nbins=k).tick_values(values.min(), values.max())
     return [float(t) for t in ticks]
+
+
+# ================================================
+# Kernel density estimates
+# ================================================
+
+
+def validate_bandwidth(bandwidth) -> None:
+    """Raise unless `bandwidth` is None, a bandwidth rule, or a number."""
+
+    if bandwidth is not None and not (
+        bandwidth in BANDWIDTH_RULES
+        or (isinstance(bandwidth, (int, float)) and not isinstance(bandwidth, bool))
+    ):
+        raise ValueError(
+            f"Invalid `bandwidth` value {bandwidth!r}. "
+            f"Must be None, one of {BANDWIDTH_RULES}, or a number."
+        )
+
+
+def _kde(points: np.ndarray, bandwidth, cut: float) -> Tuple[GaussianKDE, np.ndarray]:
+    """The kernel over the (n_dims, n_points) array and its per-axis padding."""
+
+    validate_bandwidth(bandwidth)
+    if points.shape[1] < 2:
+        raise ValueError("A density estimate needs at least two points.")
+    if not np.isfinite(points).all():
+        raise ValueError("The values must be finite numbers.")
+    if cut < 0:
+        raise ValueError("The `cut` must be a non-negative number.")
+    kde = GaussianKDE(points, bandwidth)
+    # the kernel spans roughly `factor * std` per axis; pad the grid by `cut` of them
+    padding = cut * kde.covariance_factor() * points.std(axis=1, ddof=1)
+    return kde, padding
+
+
+def kde1d(
+    values: List[Union[int, float]],
+    *,
+    bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
+    gridsize: int = 100,
+    cut: float = 3,
+) -> List[Dict[str, float]]:
+    """Estimates the density of the values as a curve.
+
+    A Gaussian kernel density estimate evaluated on `gridsize` evenly spaced
+    points over the range of the values, extended by `cut` bandwidths on each
+    side so the curve tails off instead of being clipped at the extremes. The
+    result is a list of `{x, y}` points ready for `LineChart`; the curve
+    integrates to 1, so it overlays a density `Histogram` of the same values.
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> from datachart.utils.stats import kde1d
+        >>> curve = kde1d([1, 2, 2, 3, 3, 3, 4, 4, 5], gridsize=5, cut=0)
+        >>> [round(point["x"], 2) for point in curve]
+        [1.0, 2.0, 3.0, 4.0, 5.0]
+        >>> round(sum(point["y"] for point in curve), 2)
+        0.94
+
+    Args:
+        values: The values to estimate the density of.
+        bandwidth: The kernel bandwidth: None or "scott" (Scott's rule),
+            "silverman", or a scalar factor. See `BANDWIDTH`.
+        gridsize: The number of points the curve is evaluated on.
+        cut: How many bandwidths to extend the grid past the extremes.
+
+    Returns:
+        The `{x, y}` points of the density curve.
+
+    Raises:
+        ValueError: If the bandwidth is invalid, there are fewer than two
+            values, or a value is not finite.
+    """
+    points = np.asarray(values, dtype=float).reshape(1, -1)
+    kde, (padding,) = _kde(points, bandwidth, cut)
+    grid = np.linspace(points.min() - padding, points.max() + padding, gridsize)
+    density = kde.evaluate(grid)
+    return [{"x": float(x), "y": float(y)} for x, y in zip(grid, density)]
+
+
+def kde2d(
+    x: List[Union[int, float]],
+    y: List[Union[int, float]],
+    *,
+    bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
+    gridsize: Union[int, Tuple[int, int]] = 100,
+    cut: float = 3,
+) -> Dict[str, List]:
+    """Estimates the density of the (x, y) points as a gridded surface.
+
+    A Gaussian kernel density estimate evaluated on a `gridsize` × `gridsize`
+    grid over the range of the points, extended by `cut` bandwidths on each
+    side so the outer contours close instead of being clipped. The result is
+    an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of
+    a scattered dataset is `ContourChart(kde2d(x, y))`.
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> from datachart.utils.stats import kde2d
+        >>> surface = kde2d([1, 2, 3, 4], [1, 3, 2, 4], gridsize=(3, 2), cut=0)
+        >>> surface["x"], surface["y"]
+        ([1.0, 2.5, 4.0], [1.0, 4.0])
+        >>> [[round(z, 3) for z in row] for row in surface["z"]]
+        [[0.075, 0.038, 0.001], [0.001, 0.038, 0.075]]
+
+    Args:
+        x: The x values of the points.
+        y: The y values of the points, one per x value.
+        bandwidth: The kernel bandwidth: None or "scott" (Scott's rule),
+            "silverman", or a scalar factor. See `BANDWIDTH`.
+        gridsize: The number of grid columns and rows, as one number or an
+            `(x, y)` pair.
+        cut: How many bandwidths to extend the grid past the extremes.
+
+    Returns:
+        The `{x, y, z}` chart dict of the density surface.
+
+    Raises:
+        ValueError: If the bandwidth is invalid, x and y differ in length,
+            there are fewer than two points, or a value is not finite.
+    """
+    if len(x) != len(y):
+        raise ValueError("x and y must have the same length.")
+    points = np.asarray([x, y], dtype=float)
+    kde, (pad_x, pad_y) = _kde(points, bandwidth, cut)
+    n_cols, n_rows = (gridsize, gridsize) if isinstance(gridsize, int) else gridsize
+    grid_x = np.linspace(points[0].min() - pad_x, points[0].max() + pad_x, n_cols)
+    grid_y = np.linspace(points[1].min() - pad_y, points[1].max() + pad_y, n_rows)
+    mesh_x, mesh_y = np.meshgrid(grid_x, grid_y)
+    density = kde.evaluate(np.vstack([mesh_x.ravel(), mesh_y.ravel()]))
+    return {
+        "x": grid_x.tolist(),
+        "y": grid_y.tolist(),
+        "z": density.reshape(mesh_x.shape).tolist(),
+    }

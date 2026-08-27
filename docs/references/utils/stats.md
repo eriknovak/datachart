@@ -23,3 +23,5 @@ title: Stats Module
 ::: datachart.utils.stats.maximum
 ::: datachart.utils.stats.correlation
 ::: datachart.utils.stats.contour_levels
+::: datachart.utils.stats.kde1d
+::: datachart.utils.stats.kde2d

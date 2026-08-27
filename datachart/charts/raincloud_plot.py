@@ -21,7 +21,7 @@ from ..constants import (
     SCALE,
     SWARM_MODE,
 )
-from .violin_plot import validate_bandwidth
+from ..utils.stats import validate_bandwidth
 
 # ================================================
 # Main Chart Definition
