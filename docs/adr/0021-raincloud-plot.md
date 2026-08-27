@@ -25,7 +25,7 @@ that redraws all three — would fork three drawing paths.
   raincloud front sets them from constants in `layers.py`: the cloud keeps the
   full body width on one side, the box is the rain-side half of a ≈ 0.15 wide
   box on the cloud's seam, the rain starts ≈ 0.1 past the seam and packs
-  one-sided over ≈ 0.16, anchored at the outer edge and packed toward the box. No user knob in v1.
+  one-sided, away from the box, over ≈ 0.16. No user knob in v1.
 - **Cloud left when vertical, above when horizontal.** The rain and box take
   the opposite side. The horizontal case follows the raincloud paper's layout.
 - **The box is a half outline between the cloud and the rain.** Clipped to

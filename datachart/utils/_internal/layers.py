@@ -1319,7 +1319,7 @@ class SwarmLayer(GroupLayer):
         self.offset = self.settings.get("offset") or 0.0
         spread = self.settings.get("spread")
         self.max_offset = SWARM_MAX_OFFSET if spread is None else float(spread)
-        # a raincloud's rain packs toward the box: -1 the low side, +1 high
+        # a raincloud's rain packs away from the box: -1 the low side, +1 high
         self.side = self.settings.get("side") or 0
         self.swarm_style = get_swarm_style(self.style)
         self.default_size = config["plot_swarm_size"]
@@ -1336,9 +1336,7 @@ class SwarmLayer(GroupLayer):
             offsets = strip_offsets(
                 len(values), self.jitter * self.max_offset / SWARM_MAX_OFFSET
             )
-            if not self.side:
-                return offsets
-            return (self.max_offset - np.abs(offsets) * 2) * self.side
+            return offsets if not self.side else (np.abs(offsets) * 2) * self.side
 
         size = self.swarm_style.get("s")
         if size is None:
@@ -1358,11 +1356,7 @@ class SwarmLayer(GroupLayer):
         origin = ax.transData.transform([[0, 0]])
         scale = (unit - origin)[0][1 if self.is_horizontal else 0]
         offsets = np.clip(offsets_px / scale, -self.max_offset, self.max_offset)
-        if not self.side:
-            return offsets
-        # anchored at the outer edge and packed inward, so a crowded row
-        # crams against the box rather than the neighbor cell
-        return (self.max_offset - offsets) * self.side
+        return offsets if not self.side else offsets * self.side
 
     def draw(self, ax, ctx):
         grouped = self.grouped_values()

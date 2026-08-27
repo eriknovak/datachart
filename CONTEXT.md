@@ -145,8 +145,8 @@ the summary.
 _Avoid_: half violin (for the concept), density half
 
 **Rain**:
-A raincloud's swarm, starting just past the half box and packed one-sided toward it,
-over a band narrower than a standalone swarm.
+A raincloud's swarm, starting just past the half box and packed one-sided,
+away from the cloud, over a band narrower than a standalone swarm.
 _Avoid_: strip (for the concept), drops
 
 **Text**:
