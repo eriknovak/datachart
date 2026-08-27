@@ -254,8 +254,8 @@ def build_charts_structure(
         vlines: The vertical lines.
         hlines: The horizontal lines.
         texts: The text annotations.
-        is_2d_data: If True, data for a single chart is 2D (a heatmap matrix
-            or a contour grid dict). Multi-chart detection checks for a list
+        is_2d_data: If True, data for a single chart is a grid dict (heatmap
+            or contour `{x, y, z}`). Multi-chart detection checks for a list
             of those instead.
         **extra_attrs: Extra chart-specific attributes.
 
@@ -264,18 +264,9 @@ def build_charts_structure(
     """
     # Detect if data is for multiple charts
     if is_2d_data:
-        # one 2D chart is a matrix (heatmap) or a grid dict (contour)
+        # one 2D chart is a grid dict; several are a list of them
         is_multi_chart = (
-            isinstance(data, list)
-            and len(data) > 0
-            and (
-                isinstance(data[0], dict)
-                or (
-                    isinstance(data[0], list)
-                    and len(data[0]) > 0
-                    and isinstance(data[0][0], list)
-                )
-            )
+            isinstance(data, list) and len(data) > 0 and isinstance(data[0], dict)
         )
     else:
         # For 1D data, multi-chart means List[List[...]]

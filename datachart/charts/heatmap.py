@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    HeatmapDataAttrs,
     HeatmapStyleAttrs,
     HeatmapColorbarAttrs,
     TextAttrs,
@@ -17,9 +18,7 @@ from ..constants import ASPECT_RATIO, FIG_SIZE, SHOW_GRID, VALUE_FORMAT
 
 
 def Heatmap(
-    data: Union[
-        List[List[Union[int, float, None]]], List[List[List[Union[int, float, None]]]]
-    ],
+    data: Union[HeatmapDataAttrs, List[HeatmapDataAttrs]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
@@ -79,19 +78,28 @@ def Heatmap(
     Examples:
         >>> from datachart.charts import Heatmap
         >>> figure = Heatmap(
-        ...     data=[
-        ...         [1, 2, 3],
-        ...         [4, 5, 6],
-        ...         [7, 8, 9]
-        ...     ],
+        ...     data={
+        ...         "x": ["a", "b", "c"],
+        ...         "y": ["p", "q", "r"],
+        ...         "z": [
+        ...             [1, 2, 3],
+        ...             [4, 5, 6],
+        ...             [7, 8, 9],
+        ...         ],
+        ...     },
         ...     title="Basic Heatmap",
         ...     xlabel="X",
         ...     ylabel="Y"
         ... )
 
     Args:
-        data: The data matrix for the heatmap(s). Can be a 2D array for one heatmap,
-            or a list of 2D arrays for multiple heatmaps/subplots.
+        data: The labelled grid(s) for the heatmap(s): one `{x, y, z}` dict,
+            or a list of them for multiple heatmaps/subplots. `z` is the 2-D
+            matrix of cell values (rows along `y`, columns along `x`; `None`
+            cells stay blank); `x` and `y` are optional tick labels for its
+            columns and rows (any values, the indices by default). An
+            explicit `xticks`/`xticklabels` (`yticks`/`yticklabels`)
+            overrides them.
         title: The title of the chart.
         xlabel: The x-axis label.
         ylabel: The y-axis label.
@@ -138,8 +146,14 @@ def Heatmap(
             "raster layer with no series to mute or highlight."
         )
 
-    # Build the charts structure using shared utility
-    # Note: Heatmap data is 2D for single chart, so we use is_2d_data=True
+    if not all(
+        isinstance(grid, dict) for grid in (data if isinstance(data, list) else [data])
+    ):
+        raise ValueError(
+            'Heatmap `data` must be a `{"z": [[...], ...]}` dict with optional '
+            '`"x"` column labels and `"y"` row labels, or a list of such dicts.'
+        )
+
     charts = build_charts_structure(
         data,
         subtitle=subtitle,

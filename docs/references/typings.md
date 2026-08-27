@@ -67,6 +67,10 @@ title: Typings Module
     options:
         heading_level: 4
 
+::: datachart.typings.HeatmapDataAttrs
+    options:
+        heading_level: 4
+
 ::: datachart.typings.HeatmapColorbarAttrs
     options:
         heading_level: 4
