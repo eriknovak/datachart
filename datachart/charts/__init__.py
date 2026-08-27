@@ -28,6 +28,8 @@ Methods:
         Creates the heatmap.
     ContourChart(attrs):
         Creates the contour chart.
+    HexbinChart(attrs):
+        Creates the hexbin chart.
     ParallelCoords(attrs):
         Creates the parallel coordinates chart.
 
@@ -50,6 +52,7 @@ from .raincloud_plot import RaincloudPlot
 from .scatter_chart import ScatterChart
 from .heatmap import Heatmap
 from .contour_chart import ContourChart
+from .hexbin_chart import HexbinChart
 from .parallel_coords import ParallelCoords
 
 __all__ = [
@@ -68,5 +71,6 @@ __all__ = [
     "ScatterChart",
     "Heatmap",
     "ContourChart",
+    "HexbinChart",
     "ParallelCoords",
 ]

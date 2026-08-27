@@ -171,6 +171,12 @@ BASE_THEME: StyleAttrs = {
     "plot_contour_zorder": 3,
     "plot_contour_label_font_size": None,
     "plot_contour_label_font_color": None,
+    # plot hexbin style; None cmap derives from the heatmap cmap (ADR 0024)
+    "plot_hexbin_cmap": None,
+    "plot_hexbin_alpha": 1.0,
+    "plot_hexbin_edge_width": 0,
+    "plot_hexbin_edge_color": "#FFFFFF",
+    "plot_hexbin_gridsize": 30,
     # plot scatter style
     "plot_scatter_color": None,
     "plot_scatter_alpha": 0.75,

@@ -19,6 +19,8 @@ Classes:
     HeatmapColorbarAttrs: The heatmap colorbar attributes.
     ContourSingleChartAttrs: The single chart attributes for the contour chart.
     ContourDataAttrs: The data attributes for the contour chart.
+    HexbinSingleChartAttrs: The single chart attributes for the hexbin chart.
+    HexbinDataAttrs: The data attributes for the hexbin chart.
     ScatterSingleChartAttrs: The single chart attributes for the scatter chart.
     ScatterDataPointAttrs: The data point attributes for the scatter chart.
     BoxSingleChartAttrs: The single chart attributes for the box plot.
@@ -49,6 +51,7 @@ Classes:
     TextStyleAttrs: The typing for the text annotation style.
     HeatmapStyleAttrs: The typing for the heatmap style.
     ContourStyleAttrs: The typing for the contour chart style.
+    HexbinStyleAttrs: The typing for the hexbin chart style.
     ScatterStyleAttrs: The typing for the scatter chart style.
     RegressionStyleAttrs: The typing for the regression line style.
     BoxStyleAttrs: The typing for the box plot style.
@@ -87,6 +90,7 @@ from .constants import (
     VIOLIN_INNER,
     BANDWIDTH,
     CONTOUR_LEVELS,
+    HEXBIN_REDUCE,
     ASPECT_RATIO,
 )
 
@@ -486,6 +490,25 @@ class ContourStyleAttrs(TypedDict):
     plot_contour_label_font_color: Union[str, None]
 
 
+class HexbinStyleAttrs(TypedDict):
+    """The typing for the hexbin chart style.
+
+    Attributes:
+        plot_hexbin_cmap (Union[str, List[str], colors.LinearSegmentedColormap, None]): The colormap of the hexagons (palette name, list of hex colors, or colormap); `None` takes the heatmap colormap.
+        plot_hexbin_alpha (Union[float, None]): The alpha value of the hexagons.
+        plot_hexbin_edge_width (Union[int, float, None]): The width of the hexagon edges; `0` draws none.
+        plot_hexbin_edge_color (Union[str, None]): The color of the hexagon edges.
+        plot_hexbin_gridsize (Union[int, None]): The number of hexagons across the x-axis when the chart sets no `gridsize`.
+
+    """
+
+    plot_hexbin_cmap: Union[str, List[str], colors.LinearSegmentedColormap, None]
+    plot_hexbin_alpha: Union[float, None]
+    plot_hexbin_edge_width: Union[int, float, None]
+    plot_hexbin_edge_color: Union[str, None]
+    plot_hexbin_gridsize: Union[int, None]
+
+
 class ScatterStyleAttrs(TypedDict):
     """The typing for the scatter chart style.
 
@@ -713,6 +736,7 @@ class StyleAttrs(
     TextStyleAttrs,
     HeatmapStyleAttrs,
     ContourStyleAttrs,
+    HexbinStyleAttrs,
     ScatterStyleAttrs,
     RegressionStyleAttrs,
     BoxStyleAttrs,
@@ -1286,6 +1310,104 @@ class _ContourChartAttrs(ChartCommonAttrs):
     levels: Union[CONTOUR_LEVELS, str, int, List[float], None]
     show_labels: Union[bool, None]
     show_colorbars: Union[bool, None]
+    scalex: Union[SCALE, str, None]
+    scaley: Union[SCALE, str, None]
+
+
+# ================================================
+# Hexbin Chart Attributes
+# ================================================
+
+
+class HexbinDataAttrs(TypedDict):
+    """The data attributes for the hexbin chart.
+
+    Attributes:
+        x (List[Union[int, float]]): The x values of the points.
+        y (List[Union[int, float]]): The y values of the points, one per `x`.
+        c (Union[List[Union[int, float]], None]): The value of each point, one per `x`; when given, every hexagon shows their `reduce` aggregate instead of its point count.
+
+    """
+
+    x: List[Union[int, float]]
+    y: List[Union[int, float]]
+    c: Union[List[Union[int, float]], None]
+
+
+class HexbinSingleChartAttrs(TypedDict):
+    """The single chart attributes for the hexbin chart.
+
+    Attributes:
+        data (HexbinDataAttrs): The points binned by the hexbin chart.
+        subtitle (Union[str, None]): The subtitle of the hexbin chart.
+        xlabel (Union[str, None]): The xlabel of the hexbin chart.
+        ylabel (Union[str, None]): The ylabel of the hexbin chart.
+        style (Union[HexbinStyleAttrs, None]): The style of the hexbin chart.
+
+        gridsize (Union[int, None]): The number of hexagons across the x-axis; `None` takes the `plot_hexbin_gridsize` config value.
+        reduce (Union[HEXBIN_REDUCE, str, None]): The aggregation of the `c` values in a hexagon; `None` takes the mean. Ignored without `c`.
+        mincnt (Union[int, None]): The point count below which a hexagon stays blank; `None` draws every hexagon.
+        norm (Union[NORMALIZE, str, None]): The value normalization of the hexagon colors.
+        vmin (Union[float, None]): The minimum value to normalize the hexagon values.
+        vmax (Union[float, None]): The maximum value to normalize the hexagon values.
+        valfmt (Union[VALUE_FORMAT, str, None]): The format of the colorbar tick labels.
+
+        xticks (Union[int, float, None]): The xtick positions list.
+        xticklabels (Union[List[str], None]): The xtick labels.
+        xtickrotate (Union[int, None]): The xtick rotation value.
+        yticks (Union[int, float, None]): the ytick position list.
+        yticklabels (Union[List[str], None]): The ytick labels.
+        ytickrotate (Union[int, None]): The ytick rotation value.
+
+        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
+        colorbar (Union[HeatmapColorbarAttrs, None]): The colorbar attributes.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+
+    """
+
+    data: HexbinDataAttrs
+    subtitle: Union[str, None]
+    xlabel: Union[str, None]
+    ylabel: Union[str, None]
+    style: Union[HexbinStyleAttrs, None]
+
+    gridsize: Union[int, None]
+    reduce: Union[HEXBIN_REDUCE, str, None]
+    mincnt: Union[int, None]
+    norm: Union[str, None]
+    vmin: Union[float, None]
+    vmax: Union[float, None]
+    valfmt: Union[str, None]
+
+    xticks: Union[int, float, None]
+    xticklabels: Union[List[str], None]
+    xtickrotate: Union[int, None]
+    yticks: Union[int, float, None]
+    yticklabels: Union[List[str], None]
+    ytickrotate: Union[int, None]
+
+    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
+    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
+    colorbar: Union[HeatmapColorbarAttrs, None]
+    texts: Union[TextAttrs, List[TextAttrs]]
+
+
+class _HexbinChartAttrs(ChartCommonAttrs):
+    """The hexbin chart attributes.
+
+    Attributes:
+        charts (Union[HexbinSingleChartAttrs, List[HexbinSingleChartAttrs]]): The hexbin chart definitions.
+        show_colorbars (Union[bool, None]): Whether or not to plot the colorbars.
+        aspect_ratio (Union[ASPECT_RATIO, str, None]): The aspect ratio of the axes.
+        scalex (Union[SCALE, str, None]): The scale of the x-axis.
+        scaley (Union[SCALE, str, None]): The scale of the y-axis.
+
+    """
+
+    charts: Union[HexbinSingleChartAttrs, List[HexbinSingleChartAttrs]]
+    show_colorbars: Union[bool, None]
+    aspect_ratio: Union[ASPECT_RATIO, str, None]
     scalex: Union[SCALE, str, None]
     scaley: Union[SCALE, str, None]
 

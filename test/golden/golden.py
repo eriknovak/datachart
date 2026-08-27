@@ -33,10 +33,18 @@ from datachart.charts import (
     RaincloudPlot,
     ViolinPlot,
     ContourChart,
+    HexbinChart,
 )
 from datachart.utils import Panel, Grid, Annotate
 from datachart.config import config
-from datachart.constants import ARROW_STYLE, CONTOUR_LEVELS, THEME
+from datachart.constants import (
+    ARROW_STYLE,
+    COLORS,
+    CONTOUR_LEVELS,
+    HEXBIN_REDUCE,
+    NORMALIZE,
+    THEME,
+)
 from datachart.utils.stats import kde1d, kde2d
 
 # Cases whose output intentionally changed since the last published baseline.
@@ -112,6 +120,14 @@ EXPECTED_CHANGES = {
     # new kernel density cases (ADR 0022)
     "contour_kde2d",
     "hist_kde1d",
+    # new hexbin cases (ADR 0024)
+    "hexbin_counts",
+    "hexbin_log",
+    "hexbin_c_mean",
+    "hexbin_edges",
+    "hexbin_subplots",
+    "hexbin_panel_scatter",
+    "hexbin_grid",
 }
 
 
@@ -1171,6 +1187,91 @@ def contour_kde2d():
         show_colorbars=True,
         levels=8,
     )
+
+
+def hexbin_points(n=4000, seed=5):
+    """Two gaussian clusters of unequal weight, as hexbin columns."""
+
+    rng = np.random.RandomState(seed)
+    pts = np.vstack(
+        [
+            rng.normal((-1.5, -1), (1.0, 0.7), (int(n * 0.7), 2)),
+            rng.normal((2, 1.5), (0.8, 1.2), (n - int(n * 0.7), 2)),
+        ]
+    )
+    return {"x": pts[:, 0].tolist(), "y": pts[:, 1].tolist()}
+
+
+@case
+def hexbin_counts():
+    return HexbinChart(data=hexbin_points(), title="counts")
+
+
+@case
+def hexbin_log():
+    return HexbinChart(data=hexbin_points(), norm=NORMALIZE.LOG, mincnt=1)
+
+
+@case
+def hexbin_c_mean():
+    data = hexbin_points()
+    data["c"] = [x - y for x, y in zip(data["x"], data["y"])]
+    return HexbinChart(
+        data=data,
+        reduce=HEXBIN_REDUCE.MEAN,
+        style={"plot_hexbin_cmap": COLORS.RdBu},
+        gridsize=20,
+    )
+
+
+@case
+def hexbin_edges():
+    return HexbinChart(
+        data=hexbin_points(),
+        style={"plot_hexbin_edge_width": 0.8, "plot_hexbin_edge_color": "#FFFFFF"},
+        gridsize=15,
+        show_colorbars=False,
+    )
+
+
+@case
+def hexbin_subplots():
+    return HexbinChart(
+        data=[hexbin_points(seed=1), hexbin_points(seed=2)],
+        subtitle=["run 1", "run 2"],
+        subplots=True,
+        max_cols=2,
+        sharex=True,
+        sharey=True,
+        figsize=(10, 4),
+    )
+
+
+@case
+def hexbin_panel_scatter():
+    data = hexbin_points(n=1500)
+    rng = np.random.RandomState(9)
+    sample = rng.choice(len(data["x"]), 40, replace=False)
+    scatter = ScatterChart(
+        data=[{"x": data["x"][i], "y": data["y"][i]} for i in sample],
+        subtitle="sample",
+    )
+    tiles = HexbinChart(
+        data=data,
+        style={"plot_hexbin_edge_width": 0.5, "plot_hexbin_edge_color": "#FFFFFF"},
+        show_colorbars=False,
+    )
+    return Panel([tiles, scatter], title="Panel", show_legend=True)
+
+
+@case
+def hexbin_grid():
+    top = HexbinChart(data=hexbin_points(), title="counts")
+    line = LineChart(data=LINE1, title="line")
+    data = hexbin_points()
+    data["c"] = [x + y for x, y in zip(data["x"], data["y"])]
+    right = HexbinChart(data=data, reduce=HEXBIN_REDUCE.MAX, title="max c")
+    return Grid([[top], [line, right]], figsize=(10, 7))
 
 
 @case
