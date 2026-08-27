@@ -1149,7 +1149,13 @@ class BoxLayer(GroupLayer):
         overrides = [
             (self.box_style, "edgecolor", "plot_box_edgecolor", stroke),
             (self.outlier_style, "marker", "plot_box_outlier_marker", "o"),
-            (self.outlier_style, "markerfacecolor", "plot_box_outlier_color", stroke),
+            (
+                self.outlier_style,
+                "markersize",
+                "plot_box_outlier_size",
+                RAINCLOUD_OUTLIER_SIZE,
+            ),
+            (self.outlier_style, "markerfacecolor", "plot_box_outlier_color", "none"),
             (
                 self.outlier_style,
                 "markeredgecolor",
@@ -1448,6 +1454,8 @@ RAINCLOUD_RAIN_OFFSET = 0.08
 RAINCLOUD_RAIN_SPREAD = 0.28
 # the rain is denser than a standalone swarm, so its points are smaller
 RAINCLOUD_RAIN_SIZE = 6
+# outliers are hollow rings, small enough not to outweigh the rain
+RAINCLOUD_OUTLIER_SIZE = 4
 INNER_QUARTILE_WIDTH_SCALE = 5.0
 
 

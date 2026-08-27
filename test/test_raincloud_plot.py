@@ -130,6 +130,13 @@ class TestRaincloudLayers(unittest.TestCase):
         medians = [l for l in ax.lines if len(l.get_xdata()) == 2]
         self.assertTrue(medians)
         self.assertEqual(matplotlib.colors.to_rgb(medians[0].get_color()), font)
+        # outliers: hollow rings stroked in the font color
+        fliers = [l for l in ax.lines if l.get_marker() == "o"]
+        self.assertTrue(fliers)
+        self.assertEqual(fliers[0].get_markerfacecolor(), "none")
+        self.assertEqual(
+            matplotlib.colors.to_rgb(fliers[0].get_markeredgecolor()), font
+        )
 
     def test_emphasis_applies_to_all_three_parts(self):
         figure = RaincloudPlot(group_data(), emphasis=["background", None, None])

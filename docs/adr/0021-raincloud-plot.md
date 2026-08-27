@@ -32,7 +32,7 @@ that redraws all three — would fork three drawing paths.
   overlap.
 - **The box is filled in the group color, stroked in the font color.**
   Edges, median, whiskers, and caps in the theme font color; outliers on by
-  default as circles (`show_outliers=True`). The cloud draws with
+  default as small hollow rings (`show_outliers=True`). The cloud draws with
   `inner=None`.
 - **Per-group colors.** A `color_by_group` layer setting, turned on by the
   raincloud front only, makes the violin, swarm, and box layers cycle the
