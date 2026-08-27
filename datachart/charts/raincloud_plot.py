@@ -5,47 +5,31 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
-    ViolinDataPointAttrs,
-    ViolinStyleAttrs,
+    RaincloudDataPointAttrs,
+    RaincloudStyleAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
     TextAttrs,
 )
 from ..constants import (
     ASPECT_RATIO,
+    BANDWIDTH,
     EMPHASIS,
     FIG_SIZE,
     SHOW_GRID,
     ORIENTATION,
     SCALE,
-    VIOLIN_INNER,
-    BANDWIDTH,
+    SWARM_MODE,
 )
-
-INNER_OPTIONS = (VIOLIN_INNER.BOX, VIOLIN_INNER.QUARTILES, VIOLIN_INNER.MEDIAN, None)
-BANDWIDTH_RULES = (BANDWIDTH.SCOTT, BANDWIDTH.SILVERMAN)
-
-
-def validate_bandwidth(bandwidth) -> None:
-    """Raise unless `bandwidth` is None, a bandwidth rule, or a number."""
-
-    if bandwidth is not None and not (
-        bandwidth in BANDWIDTH_RULES
-        or (isinstance(bandwidth, (int, float)) and not isinstance(bandwidth, bool))
-    ):
-        raise ValueError(
-            f"Invalid `bandwidth` value {bandwidth!r}. "
-            f"Must be None, one of {BANDWIDTH_RULES}, or a number."
-        )
-
+from .violin_plot import validate_bandwidth
 
 # ================================================
 # Main Chart Definition
 # ================================================
 
 
-def ViolinPlot(
-    data: Union[List[ViolinDataPointAttrs], List[List[ViolinDataPointAttrs]]],
+def RaincloudPlot(
+    data: Union[List[RaincloudDataPointAttrs], List[List[RaincloudDataPointAttrs]]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
@@ -59,6 +43,10 @@ def ViolinPlot(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_outliers: Optional[bool] = True,
+    mode: Union[SWARM_MODE, str] = SWARM_MODE.SWARM,
+    jitter: float = 0.4,
+    bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -66,7 +54,9 @@ def ViolinPlot(
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,
     sharey: Optional[bool] = None,
-    style: Optional[Union[ViolinStyleAttrs, List[Optional[ViolinStyleAttrs]]]] = None,
+    style: Optional[
+        Union[RaincloudStyleAttrs, List[Optional[RaincloudStyleAttrs]]]
+    ] = None,
     xticks: Optional[
         Union[List[Union[int, float]], List[List[Union[int, float]]]]
     ] = None,
@@ -100,15 +90,19 @@ def ViolinPlot(
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
     value: Optional[Union[str, List[Optional[str]]]] = None,
-    inner: Optional[Union[VIOLIN_INNER, str]] = VIOLIN_INNER.BOX,
-    bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
-    split: Optional[str] = None,
 ) -> plt.Figure:
-    """Creates the violin plot.
+    """Creates the raincloud plot.
+
+    Every group draws as a cloud (a half violin of its density), its rain
+    (the raw observations), and a box (the quartile summary) side by side at
+    one category position: the cloud on one side, the rain and the box on
+    the other. Each group takes its own palette color, shared by the cloud
+    and the rain. Vertical rainclouds keep the cloud on the left; horizontal
+    ones keep it above.
 
     Examples:
-        >>> from datachart.charts import ViolinPlot
-        >>> figure = ViolinPlot(
+        >>> from datachart.charts import RaincloudPlot
+        >>> figure = RaincloudPlot(
         ...     data=[
         ...         {"label": "Group A", "value": 10},
         ...         {"label": "Group A", "value": 15},
@@ -117,39 +111,50 @@ def ViolinPlot(
         ...         {"label": "Group B", "value": 25},
         ...         {"label": "Group B", "value": 22},
         ...     ],
-        ...     title="Basic Violin Plot",
+        ...     title="Basic Raincloud Plot",
         ...     xlabel="Group",
         ...     ylabel="Value"
         ... )
 
     Args:
-        data: The data points for the violin plot(s). Can be a single list of data points
-            for one chart, or a list of lists for multiple charts/subplots.
-            Each data point should have a `label` (category) and `value` (numeric).
+        data: The data points for the raincloud plot(s). Can be a single list of
+            data points for one chart, or a list of lists for multiple charts
+            (drawn as subplots). Each data point should have a `label`
+            (category) and `value` (numeric).
         title: The title of the chart.
         xlabel: The x-axis label.
         ylabel: The y-axis label.
-        subtitle: The subtitle(s) for individual charts (subplots).
-        emphasis: The emphasis role(s), aligned with the violin labels of one
-            call (a single value applies to every violin): "background" mutes
-            a violin body and its inner marks, "highlight" bolds the body
-            edge, None leaves it unchanged.
+        subtitle: The subtitle(s) for individual charts.
+        emphasis: The emphasis role(s), aligned with the group labels of one
+            call (a single value applies to every group): "background" mutes
+            a group's cloud, rain, and box, "highlight" bolds their edges,
+            None leaves them unchanged.
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
         ymin: The minimum y-axis value.
         ymax: The maximum y-axis value.
-        show_legend: Whether to show the legend.
+        show_legend: Whether to show the legend; one entry per group.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_outliers: Whether the box shows outliers.
+        mode: How the rain spreads across its width. See `SWARM_MODE`:
+            "swarm" packs the points so none overlap; "strip" jitters them
+            uniformly.
+        jitter: The strip jitter width, as a fraction of the category width
+            like `SwarmPlot`, scaled down to the rain's narrower cell. Only
+            used with `mode="strip"`.
+        bandwidth: The cloud's KDE bandwidth: None or "scott" (Scott's rule),
+            "silverman" (Silverman's rule), or a scalar factor. See `BANDWIDTH`.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             `ASPECT_RATIO`.
-        orientation: The orientation of the violins (vertical or horizontal).
+        orientation: The orientation of the rainclouds (vertical or horizontal).
         scaley: The y-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each chart.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.
         sharey: Whether to share the y-axis in subplots.
-        style: Style configuration(s) for the violin(s).
+        style: Style configuration(s); the violin keys style the cloud, the
+            swarm keys the rain, and the box keys the box.
         xticks: Custom x-axis tick positions.
         xticklabels: Custom x-axis tick labels.
         xtickrotate: Rotation angle for x-axis tick labels.
@@ -161,26 +166,13 @@ def ViolinPlot(
         texts: Text annotation(s) to draw.
         label: The key name in data for label/category values (default: "label").
         value: The key name in data for numeric values (default: "value").
-        inner: The marks drawn inside each body: "box" (quartile bar, 1.5·IQR
-            whisker, median dot), "quartiles" (dashed median, dotted Q1/Q3),
-            "median" (one line), or None (body only). See `VIOLIN_INNER`.
-        bandwidth: The KDE bandwidth: None or "scott" (Scott's rule),
-            "silverman", or a scalar factor. See `BANDWIDTH`.
-        split: The key name in data whose exactly two distinct values become the
-            left and right halves of each violin, colored from the multiple
-            palette and listed in the legend.
 
     Returns:
-        The figure containing the violin plot.
+        The figure containing the raincloud plot.
 
     """
-    if inner not in INNER_OPTIONS:
-        raise ValueError(
-            f"Invalid `inner` value {inner!r}. Must be one of {INNER_OPTIONS}."
-        )
     validate_bandwidth(bandwidth)
 
-    # Build the charts structure using shared utility
     charts = build_charts_structure(
         data,
         subtitle=subtitle,
@@ -211,16 +203,17 @@ def ViolinPlot(
         "ymax": ymax,
         "show_legend": show_legend,
         "show_grid": show_grid,
+        "show_outliers": show_outliers,
         "aspect_ratio": aspect_ratio,
         "subplots": subplots,
         "max_cols": max_cols,
         "sharex": sharex,
         "sharey": sharey,
-        "inner": inner,
+        "mode": mode,
+        "jitter": jitter,
         "bandwidth": bandwidth,
-        "split": split,
         "orientation": orientation,
         "scaley": scaley,
     }
 
-    return render_chart("violinplot", charts, settings)
+    return render_chart("raincloudplot", charts, settings)

@@ -24,6 +24,8 @@ Classes:
     SwarmDataPointAttrs: The data point attributes for the swarm plot.
     ViolinSingleChartAttrs: The single chart attributes for the violin plot.
     ViolinDataPointAttrs: The data point attributes for the violin plot.
+    RaincloudSingleChartAttrs: The single chart attributes for the raincloud plot.
+    RaincloudDataPointAttrs: The data point attributes for the raincloud plot.
     ParallelCoordsSingleChartAttrs: The single chart attributes for the parallel coordinates chart.
     ParallelCoordsDataPointAttrs: The data point attributes for the parallel coordinates chart.
     RadialSingleChartAttrs: The single chart attributes for the radial chart.
@@ -48,6 +50,7 @@ Classes:
     BoxStyleAttrs: The typing for the box plot style.
     SwarmStyleAttrs: The typing for the swarm plot style.
     ViolinStyleAttrs: The typing for the violin plot style.
+    RaincloudStyleAttrs: The typing for the raincloud plot style.
     ParallelCoordsStyleAttrs: The typing for the parallel coordinates chart style.
     ThemeDefaultAttrs: The typing for theme-driven defaults and cycles.
 
@@ -585,6 +588,15 @@ class ViolinStyleAttrs(TypedDict):
     plot_violin_inner_linewidth: Union[int, float, None]
     plot_violin_median_color: Union[str, None]
     plot_violin_median_size: Union[int, float, None]
+
+
+class RaincloudStyleAttrs(ViolinStyleAttrs, SwarmStyleAttrs, BoxStyleAttrs):
+    """The typing for the raincloud plot style.
+
+    The union of the violin (cloud), swarm (rain), and box style keys; each
+    key styles its own part of the raincloud.
+
+    """
 
 
 class ParallelCoordsStyleAttrs(TypedDict):
@@ -1475,6 +1487,91 @@ class _ViolinPlotAttrs(ChartCommonAttrs):
 
 
 # ================================================
+# Raincloud Plot Attributes
+# ================================================
+
+
+class RaincloudDataPointAttrs(TypedDict):
+    """The data point attributes for the raincloud plot.
+
+    Attributes:
+        label (str): The category label.
+        value (Union[int, float]): The numeric value.
+
+    """
+
+    label: str
+    value: Union[int, float]
+
+
+class RaincloudSingleChartAttrs(TypedDict):
+    """The single chart attributes for the raincloud plot.
+
+    Attributes:
+        data (List[RaincloudDataPointAttrs]): The list of data points defining the raincloud plot.
+        subtitle (Union[str, None]): The subtitle of the raincloud plot.
+        xlabel (Union[str, None]): The xlabel of the raincloud plot.
+        ylabel (Union[str, None]): The ylabel of the raincloud plot.
+        style (Union[RaincloudStyleAttrs, None]): The style of the raincloud plot.
+        xticks (Union[int, float, None]): The xtick positions list.
+        xticklabels (Union[List[str], None]): The xtick labels.
+        xtickrotate (Union[int, None]): The xtick rotation value.
+        yticks (Union[int, float, None]): The ytick position list.
+        yticklabels (Union[List[str], None]): The ytick labels.
+        ytickrotate (Union[int, None]): The ytick rotation value.
+        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
+        value (Union[str, None]): The key name in `data` that contains the value. Defaults to `"value"`.
+
+    """
+
+    data: List[RaincloudDataPointAttrs]
+    subtitle: Union[str, None]
+    xlabel: Union[str, None]
+    ylabel: Union[str, None]
+    style: Union[RaincloudStyleAttrs, None]
+
+    xticks: Union[int, float, None]
+    xticklabels: Union[List[str], None]
+    xtickrotate: Union[int, None]
+    yticks: Union[int, float, None]
+    yticklabels: Union[List[str], None]
+    ytickrotate: Union[int, None]
+
+    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
+    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
+    texts: Union[TextAttrs, List[TextAttrs]]
+
+    label: Union[str, None]  # the name of the label attribute in data
+    value: Union[str, None]  # the name of the value attribute in data
+
+
+class _RaincloudPlotAttrs(ChartCommonAttrs):
+    """The raincloud plot attributes.
+
+    Attributes:
+        charts (Union[RaincloudSingleChartAttrs, List[RaincloudSingleChartAttrs]]): The raincloud plot definitions.
+        mode (Union[SWARM_MODE, str, None]): The rain spread mode: beeswarm or strip.
+        jitter (Union[float, None]): The strip jitter width as a fraction of the category width, scaled to the rain.
+        bandwidth (Union[BANDWIDTH, str, float, None]): The cloud KDE bandwidth rule or scalar factor.
+        show_outliers (Union[bool, None]): Whether or not the box shows outliers.
+        orientation (Union[ORIENTATION, str, None]): The orientation of the rainclouds.
+        scaley (Union[SCALE, str, None]): The scale of the y-axis.
+
+    """
+
+    charts: Union[RaincloudSingleChartAttrs, List[RaincloudSingleChartAttrs]]
+    mode: Union[SWARM_MODE, str, None]
+    jitter: Union[float, None]
+    bandwidth: Union[BANDWIDTH, str, float, None]
+    show_outliers: Union[bool, None]
+    orientation: Union[ORIENTATION, str, None]
+    scaley: Union[SCALE, str, None]
+
+
+# ================================================
 # Parallel Coordinates Chart Attributes
 # ================================================
 
@@ -1633,6 +1730,7 @@ _ChartAttrs = Union[
     _ScatterChartAttrs,
     _BoxChartAttrs,
     _ViolinPlotAttrs,
+    _RaincloudPlotAttrs,
     _ParallelCoordsChartAttrs,
     _RadialChartAttrs,
 ]

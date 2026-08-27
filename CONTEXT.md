@@ -130,6 +130,26 @@ otherwise an error. Declared by key name like `label`/`value`, never as
 nested data.
 _Avoid_: hue, half violin, paired violin
 
+**Raincloud**:
+A `RaincloudPlot` group — a cloud, a box, and its rain read together at one
+category position: the box on the position, the cloud past it on the high
+side, and the rain past it on the low side, so nothing overlaps. Assembled
+from the violin, swarm, and box layers by the front; nothing new is drawn.
+Each group takes its own palette color, shared by cloud, box, and rain.
+_Avoid_: raincloud chart (for the front), half-violin plot, rain plot
+
+**Cloud**:
+The half of a raincloud's violin body kept on the high side — right in a
+vertical plot, above in a horizontal one — with no inner marks; the box is
+the summary.
+_Avoid_: half violin (for the concept), density half
+
+**Rain**:
+A raincloud's swarm, starting just past the box on the side opposite the
+cloud and packed one-sided away from it, over a band narrower than a
+standalone swarm so it stays inside the category cell.
+_Avoid_: strip (for the concept), drops
+
 **Text**:
 A per-chart annotation — a string placed at a position (data coordinates by
 default, axes-fraction on request) with an optional arrow to a target point,

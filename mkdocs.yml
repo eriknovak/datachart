@@ -99,7 +99,7 @@ plugins:
       markdown_description: |
         datachart is a Python data visualization package built on matplotlib.
         It provides simple chart functions (BarChart, LineChart, ScatterChart,
-        Histogram, Heatmap, BoxPlot, ViolinPlot, SwarmPlot, ParallelCoords,
+        Histogram, Heatmap, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot, ParallelCoords,
         PyramidChart, RadialChart), figure
         composition via Panel (overlaying charts on shared axes) and Grid
         (arranging charts in a grid), and a global configuration system with
@@ -122,6 +122,7 @@ plugins:
           - how-to-guides/charts/boxplot.ipynb: Box plot input attributes and customization, composing boxes with swarm and violin plots; multiple datasets require subplots.
           - how-to-guides/charts/violinplot.ipynb: Violin plot input attributes, inner marks, bandwidth, split violins, composing violins with box and swarm plots, and subplots.
           - how-to-guides/charts/swarmplot.ipynb: Swarm plot input attributes, swarm and strip modes, emphasis, overlaying box and violin plots with Panel, multiple datasets, and saving.
+          - how-to-guides/charts/raincloudplot.ipynb: Raincloud plot input attributes, the cloud, rain, and box parts and their styles, bandwidth, rain modes, orientation, emphasis, subplots, composing with Panel and Grid, and saving.
           - how-to-guides/charts/scatterchart.ipynb: Scatter chart input attributes, single and multiple datasets, customization, and saving.
           - how-to-guides/charts/heatmap.ipynb: Heatmap input attributes, single and multiple datasets, customization, and saving.
           - how-to-guides/charts/parallelcoords.ipynb: Parallel coordinates input attributes and customization for multivariate data.
@@ -183,6 +184,7 @@ nav:
       - Box Plot: how-to-guides/charts/boxplot.ipynb
       - Violin Plot: how-to-guides/charts/violinplot.ipynb
       - Swarm Plot: how-to-guides/charts/swarmplot.ipynb
+      - Raincloud Plot: how-to-guides/charts/raincloudplot.ipynb
       # relationships
       - Scatter Chart: how-to-guides/charts/scatterchart.ipynb
       - Heatmap: how-to-guides/charts/heatmap.ipynb

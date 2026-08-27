@@ -33,6 +33,10 @@ CHART_CONFIGS = {
         "multiplot": False,
         "subplots": True,
     },
+    "raincloudplot": {
+        "multiplot": False,
+        "subplots": True,
+    },
     "parallelcoords": {
         "multiplot": True,
         "subplots": False,

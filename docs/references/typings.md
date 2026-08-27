@@ -111,6 +111,16 @@ title: Typings Module
     options:
         heading_level: 4
 
+### Raincloud Plot Typings
+
+::: datachart.typings.RaincloudSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.RaincloudDataPointAttrs
+    options:
+        heading_level: 4
+
 
 ### Parallel Coordinates Plot Typings
 
@@ -172,6 +182,7 @@ title: Typings Module
 
 ::: datachart.typings.SwarmStyleAttrs
 ::: datachart.typings.ViolinStyleAttrs
+::: datachart.typings.RaincloudStyleAttrs
 
 ::: datachart.typings.ParallelCoordsStyleAttrs
 ::: datachart.typings.ThemeDefaultAttrs
