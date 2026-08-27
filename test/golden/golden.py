@@ -96,6 +96,8 @@ EXPECTED_CHANGES = {
     "raincloud_vertical",
     "raincloud_horizontal",
     "raincloud_emphasis",
+    # colorbars are placed by the layout engine instead of an inset (ADR 0022)
+    "heatmap_basic",
     # new contour cases (ADR 0022)
     "contour_lines",
     "contour_filled_colorbar",

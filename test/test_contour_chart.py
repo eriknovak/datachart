@@ -133,12 +133,12 @@ class TestContourDraw(unittest.TestCase):
         self.assertTrue(sets[0].filled)
         self.assertEqual(sets[0].get_cmap().name, config["plot_heatmap_cmap"])
         self.assertFalse(ax.yaxis.get_gridlines()[0].get_visible())
-        # the colorbar inset is a child axes of the plot axes
-        self.assertEqual(len(ax.child_axes), 1)
+        # the colorbar is a second, layout-managed axes of the figure
+        self.assertEqual(len(figure.axes), 2)
 
     def test_lines_without_colorbar(self):
         figure = ContourChart(data=surface(), show_colorbars=True)
-        self.assertEqual(len(figure.axes[0].child_axes), 0)
+        self.assertEqual(len(figure.axes), 1)
 
     def test_line_cmap_truncated_when_pinned(self):
         figure = ContourChart(

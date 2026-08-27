@@ -23,6 +23,7 @@ from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.mlab import GaussianKDE
 from matplotlib.patches import Patch
 from matplotlib.legend_handler import HandlerPathCollection
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from .colors import create_color_cycle, create_colormap, get_colormap
 from .config_helpers import (
@@ -506,6 +507,8 @@ class DrawContext:
     transpose: bool = False
     # label -> position of the panel's category axis (ADR 0020)
     category_index: Optional[dict] = None
+    # the panel pins its aspect ratio, so colorbars size to the axes box
+    aspect_locked: bool = False
 
 
 # ================================================
@@ -1667,16 +1670,46 @@ class ViolinLayer(GroupLayer):
             body.set_linewidth(body.get_linewidth()[0] * HIGHLIGHT_WIDTH_SCALE)
 
 
-def _draw_colorbar(ax: plt.Axes, mappable, colorbar: dict) -> None:
-    """Draw a colorbar inset beside (or above) the axes."""
+# the axes fraction a colorbar takes, and its gap from the axes
+COLORBAR_FRACTION = 0.05
+COLORBAR_PAD = 0.03
+COLORBAR_DIVIDER_PAD = 0.1
+
+
+def _draw_colorbar(
+    ax: plt.Axes, mappable, colorbar: dict, aspect_locked: bool = False
+) -> None:
+    """Draw a colorbar beside (or above) the axes.
+
+    The layout engine places it clear of titles and neighbouring axes; an
+    aspect-locked axes instead carves it from its own box, which the engine
+    would size to the grid cell rather than the box.
+    """
 
     orientation = colorbar.get("orientation", DEFAULT_ORIENTATION)
-    # inset_axes keeps the colorbar aligned under constrained_layout
-    if orientation == ORIENTATION.VERTICAL:
-        cax = ax.inset_axes([1.05, 0, 0.05, 1])
+    location = "right" if orientation == ORIENTATION.VERTICAL else "top"
+    if aspect_locked:
+        cax = make_axes_locatable(ax).append_axes(
+            location, size=f"{COLORBAR_FRACTION:.0%}", pad=COLORBAR_DIVIDER_PAD
+        )
+        ax.figure.colorbar(mappable, cax=cax, orientation=orientation)
+        return
+    # the layout engine keeps a colorbar at its own aspect (20:1 by default),
+    # which shortens it beside a narrow axes: size it to the axes slot instead
+    bbox = ax.get_position()
+    width, height = ax.figure.get_size_inches()
+    if location == "right":
+        aspect = (bbox.height * height) / (bbox.width * width * COLORBAR_FRACTION)
     else:
-        cax = ax.inset_axes([0, 1.05, 1, 0.05])
-    ax.figure.colorbar(mappable, cax=cax, orientation=orientation)
+        aspect = (bbox.width * width) / (bbox.height * height * COLORBAR_FRACTION)
+    ax.figure.colorbar(
+        mappable,
+        ax=ax,
+        location=location,
+        fraction=COLORBAR_FRACTION,
+        pad=COLORBAR_PAD,
+        aspect=aspect,
+    )
 
 
 def _value_formatter(valfmt):
@@ -1715,8 +1748,11 @@ class HeatmapLayer(Layer):
         valfmt = self.chart.get("valfmt", DEFAULT_VALUE_FORMAT)
         colorbar = self.chart.get("colorbar", {})
 
+        # the panel owns the aspect; imshow's own "equal" would size the
+        # colorbar to a box the panel then stretches
         im = ax.imshow(
             data,
+            aspect="auto",
             norm=self.chart.get("norm", None),
             vmin=self.chart.get("vmin", None),
             vmax=self.chart.get("vmax", None),
@@ -1748,7 +1784,7 @@ class HeatmapLayer(Layer):
             self._draw_cell_borders(ax, len(data), len(data[0]))
 
         if self.show_colorbars:
-            _draw_colorbar(ax, im, colorbar)
+            _draw_colorbar(ax, im, colorbar, ctx.aspect_locked)
 
         # heatmaps always draw a full frame, regardless of theme spine visibility
         for spine in ax.spines.values():
@@ -1852,7 +1888,9 @@ class ContourLayer(Layer):
             # a legend proxy: the contour set itself carries no legend handle
             ax.fill_between([], [], [], color=self.cmap(CONTOUR_SWATCH), label=label)
             if self.show_colorbars:
-                _draw_colorbar(ax, bands, self.chart.get("colorbar", {}))
+                _draw_colorbar(
+                    ax, bands, self.chart.get("colorbar", {}), ctx.aspect_locked
+                )
             return
 
         # a pinned line color beats the cmap; a muted background beats both
@@ -2987,6 +3025,11 @@ class Panel:
         polar = self.projection == "polar"
         self._apply_furniture(ax)
 
+        # a locked aspect shrinks the axes box; colorbars must follow the box
+        aspect_locked = (
+            s.get("aspect_ratio") not in (None, ASPECT_RATIO.AUTO) and not polar
+        )
+
         # twin-axis assignment: the secondary axis is always a value axis;
         # a polar panel has one value axis, so twins never apply
         assignments = ["left"] * len(self.groups)
@@ -3205,6 +3248,7 @@ class Panel:
                     parallel_axes=layer is parallel_axes_owner,
                     transpose=horizontal and layer.is_horizontal is None,
                     category_index=category_index,
+                    aspect_locked=aspect_locked,
                 )
                 layer.draw(target_ax, ctx)
 
