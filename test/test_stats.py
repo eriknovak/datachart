@@ -199,10 +199,6 @@ class TestStats(unittest.TestCase):
         with self.assertRaises(ValueError):
             contour_levels(self._surface(), "sturges")
 
-
-if __name__ == "__main__":
-    unittest.main()
-
     # Test kde1d / kde2d
 
     def test_kde1d_curve_integrates_to_one(self):
@@ -246,3 +242,7 @@ if __name__ == "__main__":
             kde2d([1, 2, 3], [1, 2])
         with self.assertRaises(ValueError):
             kde2d([1, 2, 3], [1, 2, 3], cut=-1)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -401,7 +401,7 @@ def _kde(points: np.ndarray, bandwidth, cut: float) -> Tuple[GaussianKDE, np.nda
     if cut < 0:
         raise ValueError("The `cut` must be a non-negative number.")
     kde = GaussianKDE(points, bandwidth)
-    # the kernel spans roughly `factor * std` per axis; pad the grid by `cut` of them
+    # pad each axis by `cut` kernel widths (about `factor * std`)
     padding = cut * kde.covariance_factor() * points.std(axis=1, ddof=1)
     return kde, padding
 

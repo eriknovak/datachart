@@ -37,6 +37,7 @@ from datachart.charts import (
 from datachart.utils import Panel, Grid, Annotate
 from datachart.config import config
 from datachart.constants import ARROW_STYLE, CONTOUR_LEVELS, THEME
+from datachart.utils.stats import kde1d, kde2d
 
 # Cases whose output intentionally changed since the last published baseline.
 EXPECTED_CHANGES = {
@@ -108,6 +109,9 @@ EXPECTED_CHANGES = {
     "contour_subplots",
     "contour_panel_scatter",
     "contour_grid",
+    # new kernel density cases (ADR 0022)
+    "contour_kde2d",
+    "hist_kde1d",
 }
 
 
@@ -1153,6 +1157,35 @@ def grid_theme_mutation():
     grid = Grid(charts=[{"figure": f1}], figsize=(6, 4))
     config.set_theme(THEME.DEFAULT)
     return grid
+
+
+@case
+def contour_kde2d():
+    rng = np.random.RandomState(3)
+    pts = np.vstack(
+        [rng.normal((-1, -1), 0.6, (150, 2)), rng.normal((1.5, 1), 0.8, (100, 2))]
+    )
+    return ContourChart(
+        data=kde2d(pts[:, 0].tolist(), pts[:, 1].tolist(), gridsize=60),
+        filled=True,
+        show_colorbars=True,
+        levels=8,
+    )
+
+
+@case
+def hist_kde1d():
+    values = [p["x"] for p in hist_data(300)]
+    return Panel(
+        [
+            Histogram(data=hist_data(300), subtitle="binned", show_density=True),
+            {
+                "figure": LineChart(data=kde1d(values), subtitle="kde", show_area=True),
+                "y_axis": "left",
+            },
+        ],
+        show_legend=True,
+    )
 
 
 # ----- runner -----
