@@ -313,14 +313,14 @@ def contour_levels(
 ) -> Union[List[float], int, None]:
     """Picks the contour levels of a 2-D grid by a rule of thumb.
 
-    !!! info "Added in Unreleased"
-
     The rules of `CONTOUR_LEVELS` are evaluated on the per-axis resolution
     of the grid, `n = sqrt(cells)`: `"rice"` targets `2 * n ** (1/3)` levels
     and `"fd"` the value range over `2 * IQR * n ** (-1/3)`. The count is
     clamped to the 4–20 range and snapped to round values across the range of
     `z`. `"auto"` (or `None`) returns `None`, leaving the choice to
     matplotlib; an integer or a list of level values passes through.
+
+    !!! info "Added in Unreleased"
 
     Examples:
         >>> import numpy as np

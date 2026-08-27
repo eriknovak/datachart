@@ -149,8 +149,8 @@ VALUE_HEADROOM_HORIZONTAL = 0.12
 HEATMAP_TEXT_CONTRAST_THRESHOLD = 0.55
 # the low end of a sequential cmap vanishes on white: iso-lines sample from here
 CONTOUR_LINE_CMAP_START = 0.3
-# the cmap sample that stands in for a filled contour in the legend
-CONTOUR_FILL_SWATCH = 0.7
+# the cmap sample that stands in for a cmap-colored contour in the legend
+CONTOUR_SWATCH = 0.7
 
 
 # ================================================
@@ -1724,8 +1724,7 @@ class HeatmapLayer(Layer):
         )
 
         if self.show_heatmap_values:
-            if isinstance(valfmt, str):
-                valfmt = mticker.StrMethodFormatter(valfmt)
+            valfmt = _value_formatter(valfmt)
             for i in range(len(data)):
                 for j in range(len(data[i])):
                     value = data[i][j]
@@ -1769,8 +1768,9 @@ class HeatmapLayer(Layer):
         )
 
 
+# one layer for lines and fills, shared with the density front (ADR 0022)
 class ContourLayer(Layer):
-    """A gridded surface drawn as iso-lines or filled bands (ADR 0022)."""
+    """A gridded surface drawn as iso-lines or filled bands."""
 
     kind = "contour"
 
@@ -1780,12 +1780,10 @@ class ContourLayer(Layer):
         self.show_colorbars = self.settings.get("show_colorbars")
         style = get_contour_style(self.style)
         self.cmap = get_colormap(style.pop("cmap"))
-        # lines take the cmap only when a contour cmap is pinned, sampled
-        # past its washed-out low end
+        # lines take a pinned contour cmap only, past its washed-out low end
         self.line_cmap = None
-        if not self.filled and (
-            "plot_contour_cmap" in self.style or config.get("plot_contour_cmap")
-        ):
+        cmap_pinned = get_attr_value("plot_contour_cmap", self.style, config)
+        if not self.filled and cmap_pinned is not None:
             self.line_cmap = LinearSegmentedColormap.from_list(
                 f"{self.cmap.name}_lines",
                 self.cmap(np.linspace(CONTOUR_LINE_CMAP_START, 1, 256)),
@@ -1852,19 +1850,23 @@ class ContourLayer(Layer):
                 **style,
             )
             # a legend proxy: the contour set itself carries no legend handle
-            ax.fill_between(
-                [], [], [], color=self.cmap(CONTOUR_FILL_SWATCH), label=label
-            )
+            ax.fill_between([], [], [], color=self.cmap(CONTOUR_SWATCH), label=label)
             if self.show_colorbars:
                 _draw_colorbar(ax, bands, self.chart.get("colorbar", {}))
             return
 
+        # a pinned line color beats the cmap; a muted background beats both
+        by_level = (
+            self.line_cmap is not None
+            and "color" not in style
+            and ctx.emphasis != EMPHASIS_BACKGROUND
+        )
         style = self._merge_color("color", ctx.color, style)
         self._apply_emphasis(style, ctx.emphasis, width_key="linewidths")
         color = style.pop("color", None)
-        if self.line_cmap is not None and "plot_contour_color" not in self.style:
+        if by_level:
             palette = {"cmap": self.line_cmap, **scaling}
-            color = self.line_cmap(CONTOUR_FILL_SWATCH)
+            color = self.line_cmap(CONTOUR_SWATCH)
         else:
             palette = {"colors": [color]}
         lines = ax.contour(

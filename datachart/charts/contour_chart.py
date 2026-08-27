@@ -182,7 +182,8 @@ def ContourChart(
         The figure containing the contour chart.
 
     """
-    if filled and emphasis is not None:
+    roles = emphasis if isinstance(emphasis, list) else [emphasis]
+    if filled and any(role is not None for role in roles):
         raise ValueError(
             "ContourChart does not support `emphasis` when `filled=True`: "
             "filled bands take the colormap, not a series color to mute or "
@@ -190,7 +191,6 @@ def ContourChart(
         )
 
     # Build the charts structure using shared utility
-    # Note: a contour chart's data is one grid dict, so we use is_2d_data=True
     charts = build_charts_structure(
         data,
         subtitle=subtitle,

@@ -174,7 +174,6 @@ class TestContourDraw(unittest.TestCase):
         self.assertEqual(ax.texts[0].get_fontsize(), config["font_general_size"] - 2)
 
     def test_levels_variants(self):
-        z = np.asarray(surface()["z"])
         explicit = ContourChart(data=surface(), levels=[50, 100, 200])
         np.testing.assert_array_equal(
             _contour_sets(explicit.axes[0])[0].levels, [50, 100, 200]
@@ -186,7 +185,28 @@ class TestContourDraw(unittest.TestCase):
         self.assertTrue(len(_contour_sets(auto.axes[0])[0].levels) > 1)
         count = ContourChart(data=surface(), levels=4)
         self.assertTrue(len(_contour_sets(count.axes[0])[0].levels) >= 3)
-        self.assertLessEqual(z.max(), 1e6)
+
+    def test_explicit_none_cmap_is_not_pinned(self):
+        figure = ContourChart(data=surface(), style={"plot_contour_cmap": None})
+        cs = _contour_sets(figure.axes[0])[0]
+        self.assertFalse(cs.get_cmap().name.endswith("_lines"))
+
+    def test_background_mutes_cmap_colored_lines(self):
+        figure = ContourChart(
+            data=[bump(-2, -1), bump(2, 1)],
+            style={"plot_contour_cmap": COLORS.Blues},
+            emphasis=["background", None],
+        )
+        sets = _contour_sets(figure.axes[0])
+        muted = matplotlib.colors.to_rgb(config["muted_color"])
+        self.assertEqual(tuple(sets[0].get_edgecolor()[0][:3]), muted)
+        self.assertTrue(sets[1].get_cmap().name.endswith("_lines"))
+
+    def test_all_none_emphasis_allowed_when_filled(self):
+        figure = ContourChart(
+            data=[bump(-2, -1), bump(2, 1)], filled=True, emphasis=[None, None]
+        )
+        self.assertEqual(len(_contour_sets(figure.axes[0])), 2)
 
     def test_overlay_legend_entries(self):
         figure = ContourChart(

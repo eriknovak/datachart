@@ -264,8 +264,7 @@ def build_charts_structure(
     """
     # Detect if data is for multiple charts
     if is_2d_data:
-        # For 2D data, one chart is a matrix (heatmap) or a grid dict (contour);
-        # multi-chart means a list of either
+        # one 2D chart is a matrix (heatmap) or a grid dict (contour)
         is_multi_chart = (
             isinstance(data, list)
             and len(data) > 0

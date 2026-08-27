@@ -22,3 +22,4 @@ title: Stats Module
 ::: datachart.utils.stats.minimum
 ::: datachart.utils.stats.maximum
 ::: datachart.utils.stats.correlation
+::: datachart.utils.stats.contour_levels

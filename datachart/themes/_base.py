@@ -162,8 +162,7 @@ BASE_THEME: StyleAttrs = {
     "plot_heatmap_frame_color": "#333333",
     "plot_heatmap_edge_width": 0,
     "plot_heatmap_edge_color": "#FFFFFF",
-    # plot contour style; None keys derive from the cycle, the heatmap cmap,
-    # the line width, the general font size, and the line color (ADR 0022)
+    # plot contour style; None derives from the line/heatmap/font keys (ADR 0022)
     "plot_contour_color": None,
     "plot_contour_cmap": None,
     "plot_contour_line_width": None,
