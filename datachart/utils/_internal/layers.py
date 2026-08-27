@@ -1437,7 +1437,7 @@ SPLIT_INNER_OFFSET = 0.05
 # raincloud geometry (ADR 0021), in category-axis units around the position:
 # the half box sits on the cloud's seam, the rain starts past it and packs
 # outward over its spread
-RAINCLOUD_RAIN_OFFSET = 0.085
+RAINCLOUD_RAIN_OFFSET = 0.08
 RAINCLOUD_RAIN_SPREAD = 0.16
 RAINCLOUD_BOX_WIDTH = 0.15
 INNER_QUARTILE_WIDTH_SCALE = 5.0
