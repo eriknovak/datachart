@@ -5,16 +5,10 @@ The `figure` module provides a set of utilities for manipulating the images.
 Methods:
     save_figure(figure, path, dpi, format, transparent):
         Saves the figure into a file using the provided format parameters.
-    FigureGridLayout(charts, title, max_cols, figsize, sharex, sharey):
-        (Deprecated) Use datachart.utils.Grid instead, which delegates to the
-        same implementation (`_grid_from_dicts`).
-    figure_grid_layout(figures, title, layout_specs, max_cols, figsize, sharex, sharey):
-        (Deprecated) Use datachart.utils.Grid instead.
 
 """
 
 import math
-import warnings
 from typing import List, Optional, Tuple, Dict, Any
 
 import matplotlib.pyplot as plt
@@ -238,8 +232,7 @@ def _figure_grid_layout_impl(
     """Internal implementation for figure grid layout.
 
     The core implementation behind every grid front: `Grid` (nested rows and
-    flat form via `_grid_from_dicts`), `FigureGridLayout`, and the legacy
-    `figure_grid_layout`.
+    flat form via `_grid_from_dicts`).
 
     Args:
         figures: List of matplotlib Figure objects to combine.
@@ -390,6 +383,13 @@ def save_figure(
 ) -> None:
     """Save the figure to a file.
 
+    Writes the rendered figure to disk in the format given by `format` or,
+    when omitted, by the file extension. Use a vector format (PDF, SVG) for
+    print and papers, PNG with `dpi` >= 300 for raster deliverables, and
+    `transparent=True` to drop the figure background for slides and web
+    pages. The theme is already baked into the figure, so saving never
+    consults the global config.
+
     Examples:
         >>> # 1. create the figure
         >>> from datachart.charts import LineChart
@@ -424,8 +424,7 @@ def _grid_from_dicts(
 ) -> plt.Figure:
     """Render chart dicts into a grid figure.
 
-    Shared implementation behind `Grid`'s flat form and the deprecated
-    `FigureGridLayout`; see `datachart.utils.Grid` for the full parameter
+    Implementation behind `Grid`'s flat form; see `datachart.utils.Grid` for the full parameter
     documentation. Each chart dict must contain a "figure" key and may
     carry a "layout_spec" dict — all charts or none.
     """
@@ -484,138 +483,4 @@ def _grid_from_dicts(
         figsize=figsize,
         sharex=sharex,
         sharey=sharey,
-    )
-
-
-def FigureGridLayout(
-    charts: List[Dict[str, Any]],
-    *,
-    title: Optional[str] = None,
-    max_cols: int = 4,
-    figsize: Optional[Tuple[float, float]] = None,
-    sharex: bool = False,
-    sharey: bool = False,
-) -> plt.Figure:
-    """Combine multiple existing figure objects into a single grid layout.
-
-    .. deprecated::
-        Use :func:`datachart.utils.Grid` instead — same behavior, and it also
-        accepts bare figures and nested rows that define the layout directly.
-
-    Args:
-        charts: List of chart configuration dictionaries. Each dict must contain
-            a "figure" key and may contain a "layout_spec" dict with keys
-            'row', 'col', 'rowspan', 'colspan' for custom grid positioning.
-        title: Optional title for the combined figure.
-        max_cols: Maximum number of columns for automatic grid layout.
-        figsize: Size of the combined figure (width, height) in inches.
-        sharex: Whether to share the x-axis across all subplots.
-        sharey: Whether to share the y-axis across all subplots.
-
-    Returns:
-        A new matplotlib Figure containing all charts in a grid layout.
-    """
-    warnings.warn(
-        "FigureGridLayout is deprecated. Use datachart.utils.Grid instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return _grid_from_dicts(
-        charts,
-        title=title,
-        max_cols=max_cols,
-        figsize=figsize,
-        sharex=sharex,
-        sharey=sharey,
-    )
-
-
-# =====================================
-# Legacy functions
-# =====================================
-
-
-def figure_grid_layout(
-    figures: List[plt.Figure],
-    *,
-    title: Optional[str] = None,
-    layout_specs: Optional[List[Dict[str, int]]] = None,
-    max_cols: Optional[int] = 4,
-    figsize: Optional[Tuple[float, float]] = None,
-    sharex: Optional[bool] = False,
-    sharey: Optional[bool] = False,
-) -> plt.Figure:
-    """Combine multiple existing figure objects into a single grid layout.
-
-    .. deprecated::
-        This function is deprecated. Use :func:`FigureGridLayout` instead,
-        which provides a cleaner API where figures and layout specs are combined.
-
-    This function extracts chart metadata from each figure and recreates them
-    in a grid layout. Supports mixing different chart types in the same grid.
-
-    Examples:
-        >>> from datachart.charts import LineChart, BarChart, ScatterChart
-        >>> from datachart.utils import figure_grid_layout
-        >>>
-        >>> # Create individual charts
-        >>> fig1 = LineChart(data=[{"x": i, "y": i**2} for i in range(10)], title="Line Chart")
-        >>> fig2 = BarChart(data=[{"label": "A", "y": 10}, {"label": "B", "y": 20}], title="Bar Chart")
-        >>> fig3 = ScatterChart(data=[{"x": i, "y": i*2} for i in range(10)], title="Scatter Chart")
-        >>>
-        >>> # Example 1: Uniform grid layout (default behavior)
-        >>> combined = figure_grid_layout(
-        ...     [fig1, fig2, fig3],
-        ...     title="Mixed Chart Grid",
-        ...     max_cols=2,
-        ...     figsize=(12, 8)
-        ... )
-        >>>
-        >>> # Example 2: Custom layout with figure 1 spanning full width on top
-        >>> layout_specs = [
-        ...     {"row": 0, "col": 0, "rowspan": 1, "colspan": 2},  # fig1 spans 2 columns
-        ...     {"row": 1, "col": 0, "rowspan": 1, "colspan": 1},  # fig2 left column
-        ...     {"row": 1, "col": 1, "rowspan": 1, "colspan": 1},  # fig3 right column
-        ... ]
-        >>> combined = figure_grid_layout(
-        ...     [fig1, fig2, fig3],
-        ...     layout_specs=layout_specs,
-        ...     title="Custom Layout",
-        ...     figsize=(12, 8)
-        ... )
-
-    Args:
-        figures: List of matplotlib Figure objects to combine. Each figure must have
-            `_chart_metadata` attribute (automatically added by datachart chart functions).
-        title: Optional title for the combined figure.
-        layout_specs: Optional list of layout specifications for custom grid layouts.
-            Each specification is a dict with keys: 'row', 'col', 'rowspan', 'colspan'.
-            If provided, overrides max_cols. If None, creates uniform grid layout.
-        max_cols: Maximum number of columns in the grid layout. Ignored if layout_specs is provided.
-        figsize: Size of the combined figure (width, height) in inches.
-            If None, will be calculated based on input figures.
-        sharex: Whether to share the x-axis across all subplots.
-        sharey: Whether to share the y-axis across all subplots.
-
-    Returns:
-        A new matplotlib Figure containing all charts in a grid layout.
-
-    Raises:
-        ValueError: If figures list is empty, if a figure is missing metadata,
-            or if layout_specs length doesn't match figures length.
-    """
-    warnings.warn(
-        "figure_grid_layout is deprecated. Use datachart.utils.Grid instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-
-    return _figure_grid_layout_impl(
-        figures=figures,
-        title=title,
-        layout_specs=layout_specs,
-        max_cols=max_cols if max_cols is not None else 4,
-        figsize=figsize,
-        sharex=sharex if sharex is not None else False,
-        sharey=sharey if sharey is not None else False,
     )

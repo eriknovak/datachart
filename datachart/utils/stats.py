@@ -58,6 +58,8 @@ def count(values: List[Union[int, float]]) -> int:
 def sum_values(values: List[Union[int, float]]) -> float:
     """Calculates the sum of all values.
 
+    !!! info "Added in v0.7.0"
+
     Examples:
         >>> from datachart.utils.stats import sum_values
         >>> sum_values([1, 2, 3, 4, 5])
@@ -142,6 +144,8 @@ def stdev(values: List[Union[int, float]]) -> float:
 def variance(values: List[Union[int, float]]) -> float:
     """Calculates the variance of the values.
 
+    !!! info "Added in v0.7.0"
+
     Examples:
         >>> from datachart.utils.stats import variance
         >>> variance([1, 2, 3, 4, 5])
@@ -184,6 +188,8 @@ def quantile(values: List[Union[int, float]], q: float) -> float:
 
 def iqr(values: List[Union[int, float]]) -> float:
     """Calculates the interquartile range (Q3 - Q1).
+
+    !!! info "Added in v0.7.0"
 
     The interquartile range is the difference between the 75th percentile
     (Q3) and the 25th percentile (Q1). It is a measure of statistical
@@ -253,6 +259,8 @@ def maximum(values: List[Union[int, float]]) -> float:
 
 def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
     """Calculates the Pearson correlation coefficient between two lists.
+
+    !!! info "Added in v0.7.0"
 
     The Pearson correlation coefficient measures the linear relationship
     between two datasets. It ranges from -1 (perfect negative correlation)

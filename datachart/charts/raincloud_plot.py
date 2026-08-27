@@ -93,12 +93,15 @@ def RaincloudPlot(
 ) -> plt.Figure:
     """Creates the raincloud plot.
 
-    Every group draws as a cloud (a half violin of its density), its rain
-    (the raw observations), and a box (the quartile summary) side by side at
-    one category position: the cloud on one side, the rain and the box on
-    the other. Each group takes its own palette color, shared by the cloud
-    and the rain. Vertical rainclouds keep the cloud on the left; horizontal
-    ones keep it above.
+    A raincloud plot draws each group as a cloud (a half violin of its
+    density), its rain (the raw observations), and a box (the quartile
+    summary) side by side at one category position, all in the group's palette
+    color. Use it when you want the shape, the summary statistics, and the
+    individual observations in a single view, for example when reporting
+    experimental results per condition. Vertical rainclouds keep the cloud on
+    the left; horizontal ones keep it above.
+
+    !!! info "Added in Unreleased"
 
     Examples:
         >>> from datachart.charts import RaincloudPlot

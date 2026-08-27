@@ -1,59 +1,68 @@
 """Module containing the `charts`.
 
-The `charts` module contains the methods to create the plots and figures.
+The `charts` module contains the methods to create the plots and figures,
+grouped by the question they answer.
 
 Methods:
-    BarChart(attrs):
-        Creates the bar chart.
-    BoxPlot(attrs):
-        Creates the box plot.
-    Heatmap(attrs):
-        Creates the heatmap.
-    Histogram(attrs):
-        Creates the histogram.
     LineChart(attrs):
         Creates the line chart.
-    ParallelCoords(attrs):
-        Creates the parallel coordinates chart.
+    BarChart(attrs):
+        Creates the bar chart.
     PyramidChart(attrs):
         Creates the pyramid chart.
     RadialChart(attrs):
         Creates the radial chart.
+    Histogram(attrs):
+        Creates the histogram.
+    BoxPlot(attrs):
+        Creates the box plot.
+    ViolinPlot(attrs):
+        Creates the violin plot.
+    SwarmPlot(attrs):
+        Creates the swarm plot.
     RaincloudPlot(attrs):
         Creates the raincloud plot.
     ScatterChart(attrs):
         Creates the scatter chart.
-    SwarmPlot(attrs):
-        Creates the swarm plot.
-    ViolinPlot(attrs):
-        Creates the violin plot.
+    Heatmap(attrs):
+        Creates the heatmap.
+    ParallelCoords(attrs):
+        Creates the parallel coordinates chart.
 
 """
 
-from .bar_chart import BarChart
-from .box_plot import BoxPlot
-from .heatmap import Heatmap
-from .histogram import Histogram
+# trends and comparisons
 from .line_chart import LineChart
-from .parallel_coords import ParallelCoords
+from .bar_chart import BarChart
 from .pyramid_chart import PyramidChart
 from .radial_chart import RadialChart
-from .raincloud_plot import RaincloudPlot
-from .scatter_chart import ScatterChart
-from .swarm_plot import SwarmPlot
+
+# distributions
+from .histogram import Histogram
+from .box_plot import BoxPlot
 from .violin_plot import ViolinPlot
+from .swarm_plot import SwarmPlot
+from .raincloud_plot import RaincloudPlot
+
+# relationships
+from .scatter_chart import ScatterChart
+from .heatmap import Heatmap
+from .parallel_coords import ParallelCoords
 
 __all__ = [
-    "BarChart",
-    "BoxPlot",
-    "Heatmap",
-    "Histogram",
+    # trends and comparisons
     "LineChart",
-    "ParallelCoords",
+    "BarChart",
     "PyramidChart",
     "RadialChart",
-    "RaincloudPlot",
-    "ScatterChart",
-    "SwarmPlot",
+    # distributions
+    "Histogram",
+    "BoxPlot",
     "ViolinPlot",
+    "SwarmPlot",
+    "RaincloudPlot",
+    # relationships
+    "ScatterChart",
+    "Heatmap",
+    "ParallelCoords",
 ]

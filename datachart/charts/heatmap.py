@@ -68,6 +68,14 @@ def Heatmap(
 ) -> plt.Figure:
     """Creates the heatmap.
 
+    A heatmap maps every cell of a 2-D matrix to a color, so structure in a
+    grid of numbers (correlations, confusion matrices, feature-by-time tables)
+    reads at a glance. Use it when both axes are categorical or gridded and
+    the value is what matters; the color scale, colorbar, and cell value labels
+    are all configurable.
+
+    !!! info "Added in v0.4.0"
+
     Examples:
         >>> from datachart.charts import Heatmap
         >>> figure = Heatmap(

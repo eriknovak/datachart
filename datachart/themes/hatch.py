@@ -40,3 +40,7 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_violin_edgecolor": "#000000",
     }
 )
+"""The hatch theme: hatch cycle, value labels, dotted grid.
+
+!!! info "Added in v0.8.0"
+"""

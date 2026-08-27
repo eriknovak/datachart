@@ -5,11 +5,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from datachart.charts import LineChart, BarChart, ScatterChart, Histogram
-from datachart.utils import OverlayChart, FigureGridLayout, Panel
+from datachart.utils import Panel, Grid
 
 
-class TestOverlayChart:
-    """Test suite for OverlayChart functionality."""
+class TestPanel:
+    """Test suite for Panel functionality."""
 
     def test_line_bar_overlay_dual_axes(self):
         """Test line + bar overlay with dual axes."""
@@ -32,7 +32,7 @@ class TestOverlayChart:
         line_fig = LineChart(data=line_data)
 
         # Combine with explicit axis assignment
-        combined_fig = OverlayChart(
+        combined_fig = Panel(
             charts=[
                 {"figure": bar_fig, "y_axis": "left"},
                 {"figure": line_fig, "y_axis": "right"},
@@ -61,7 +61,7 @@ class TestOverlayChart:
         line_fig = LineChart(data=line_data)
 
         # Combine with auto axis assignment
-        combined_fig = OverlayChart(
+        combined_fig = Panel(
             charts=[
                 {"figure": scatter_fig},
                 {"figure": line_fig},
@@ -91,7 +91,7 @@ class TestOverlayChart:
         line_fig = LineChart(data=line_data)
 
         # Combine
-        combined_fig = OverlayChart(
+        combined_fig = Panel(
             charts=[
                 {"figure": hist_fig, "y_axis": "left"},
                 {"figure": line_fig, "y_axis": "left"},
@@ -118,7 +118,7 @@ class TestOverlayChart:
         line_fig = LineChart(data=line_data)
 
         # Use auto mode with default threshold
-        combined_fig = OverlayChart(
+        combined_fig = Panel(
             charts=[
                 {"figure": bar_fig},  # auto
                 {"figure": line_fig},  # auto
@@ -146,7 +146,7 @@ class TestOverlayChart:
         scatter_fig = ScatterChart(data=scatter_data)
 
         # Combine with explicit z-order
-        combined_fig = OverlayChart(
+        combined_fig = Panel(
             charts=[
                 {"figure": bar_fig, "z_order": 1},
                 {"figure": line_fig, "z_order": 2},
@@ -172,7 +172,7 @@ class TestOverlayChart:
         line2_fig = LineChart(data=line2_data, subtitle="Series 2")
 
         # Combine with legend
-        combined_fig = OverlayChart(
+        combined_fig = Panel(
             charts=[
                 {"figure": line1_fig, "y_axis": "left"},
                 {"figure": line2_fig, "y_axis": "right"},
@@ -197,7 +197,7 @@ class TestOverlayChart:
         line2_fig = LineChart(data=line2_data)
 
         # Both should be on left axis with auto mode
-        combined_fig = OverlayChart(
+        combined_fig = Panel(
             charts=[
                 {"figure": line1_fig},
                 {"figure": line2_fig},
@@ -221,7 +221,7 @@ class TestOverlayChart:
         line_fig = LineChart(data=line_data)
 
         # Test with custom figsize
-        combined_fig = OverlayChart(
+        combined_fig = Panel(
             charts=[
                 {"figure": bar_fig},
                 {"figure": line_fig},
@@ -247,7 +247,7 @@ class TestOverlayChart:
         line_fig = LineChart(data=line_data)
 
         # Test with grid
-        combined_fig = OverlayChart(
+        combined_fig = Panel(
             charts=[
                 {"figure": bar_fig},
                 {"figure": line_fig},
@@ -264,7 +264,7 @@ class TestOverlayChart:
     def test_empty_charts_list(self):
         """Test error handling for empty charts list."""
         with pytest.raises(ValueError, match="At least one chart is required"):
-            OverlayChart(charts=[])
+            Panel(charts=[])
 
     def test_missing_figure_key(self):
         """Test error handling for missing figure key."""
@@ -272,7 +272,7 @@ class TestOverlayChart:
         bar_fig = BarChart(data=bar_data)
 
         with pytest.raises(ValueError, match="missing 'figure' key"):
-            OverlayChart(
+            Panel(
                 charts=[
                     {"figure": bar_fig},
                     {"y_axis": "right"},  # missing figure key
@@ -286,7 +286,7 @@ class TestOverlayChart:
         plain_fig = plt.figure()
 
         with pytest.raises(ValueError, match="missing chart metadata"):
-            OverlayChart(charts=[{"figure": plain_fig}])
+            Panel(charts=[{"figure": plain_fig}])
 
         plt.close(plain_fig)
 
@@ -299,7 +299,7 @@ class TestOverlayChart:
         bar2_fig = BarChart(data=bar2_data, subtitle="Series 2")
 
         # Combine multiple bar charts
-        combined_fig = OverlayChart(
+        combined_fig = Panel(
             charts=[
                 {"figure": bar1_fig},
                 {"figure": bar2_fig},
@@ -330,7 +330,7 @@ class TestOverlayChart:
         hist_fig = Histogram(data=hist_data, num_bins=10, subtitle="Histogram")
 
         # Combine all
-        combined_fig = OverlayChart(
+        combined_fig = Panel(
             charts=[
                 {"figure": bar_fig, "y_axis": "left", "z_order": 1},
                 {"figure": hist_fig, "y_axis": "left", "z_order": 1},
@@ -353,7 +353,7 @@ class TestOverlayChart:
         plt.close(hist_fig)
 
     def test_overlay_chart_metadata_exists(self):
-        """Test that OverlayChart has required metadata."""
+        """Test that Panel has required metadata."""
         bar_data = [{"label": f"Cat{i}", "y": i * 10} for i in range(5)]
         bar_fig = BarChart(data=bar_data)
 
@@ -361,7 +361,7 @@ class TestOverlayChart:
         line_fig = LineChart(data=line_data)
 
         # Create overlay chart
-        overlay_fig = OverlayChart(
+        overlay_fig = Panel(
             charts=[
                 {"figure": bar_fig},
                 {"figure": line_fig},
@@ -372,7 +372,7 @@ class TestOverlayChart:
         # Test metadata exists
         assert hasattr(
             overlay_fig, "_chart_metadata"
-        ), "OverlayChart missing _chart_metadata attribute"
+        ), "Panel missing _chart_metadata attribute"
 
         # Test required metadata fields
         metadata = overlay_fig._chart_metadata
@@ -455,8 +455,8 @@ class TestOverlayChart:
         assert len(deep._chart_metadata["panel"].groups) == 3
         plt.close("all")
 
-    def test_overlay_chart_in_figure_grid_layout(self):
-        """Test that OverlayChart can be used in FigureGridLayout."""
+    def test_overlay_chart_in_grid(self):
+        """Test that Panel can be used in Grid."""
         bar_data = [{"label": f"Cat{i}", "y": i * 10} for i in range(5)]
         bar_fig = BarChart(data=bar_data, title="Bar Chart")
 
@@ -464,7 +464,7 @@ class TestOverlayChart:
         line_fig = LineChart(data=line_data, title="Line Chart")
 
         # Create overlay chart
-        overlay_fig = OverlayChart(
+        overlay_fig = Panel(
             charts=[
                 {"figure": bar_fig, "y_axis": "left"},
                 {"figure": line_fig, "y_axis": "right"},
@@ -472,8 +472,8 @@ class TestOverlayChart:
             title="Overlay Chart",
         )
 
-        # Test that OverlayChart can be used in FigureGridLayout
-        combined_fig = FigureGridLayout(
+        # Test that Panel can be used in Grid
+        combined_fig = Grid(
             charts=[
                 {"figure": bar_fig},
                 {"figure": line_fig},

@@ -54,15 +54,18 @@ def PyramidChart(
 ) -> plt.Figure:
     """Creates the pyramid chart.
 
-    A pyramid chart draws exactly two data series as horizontal bars extending
-    in opposite directions from a shared zero line — the first series to the
-    left, the second to the right. Both series are supplied as positive
-    values, and every visible number (value ticks, value labels) displays the
-    absolute value.
+    A pyramid chart draws exactly two series as horizontal bars mirrored
+    around a shared category axis, the first series to the left and the second
+    to the right: the classic age-sex population pyramid. Use it to compare
+    the distribution of two groups over the same ordered categories, such as
+    age bands, where the symmetry (or lack of it) is the message.
 
-    Unlike the other chart fronts, the axis parameters are spatial: `xlabel`,
-    `xticks`, and `xmax` address the horizontal value axis, and `ylabel` the
-    vertical category axis.
+    Both series are supplied as positive values; value ticks and labels show
+    absolute values. Unlike the other chart fronts, the axis parameters are
+    spatial: `xlabel`, `xticks`, and `xmax` address the horizontal value axis,
+    and `ylabel` the vertical category axis.
+
+    !!! info "Added in v0.8.0"
 
     Examples:
         >>> from datachart.charts import PyramidChart

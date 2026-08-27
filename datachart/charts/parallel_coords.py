@@ -46,10 +46,13 @@ def ParallelCoords(
 ) -> plt.Figure:
     """Creates the parallel coordinates chart.
 
-    A parallel coordinates chart displays multivariate data by representing each
-    variable as a vertical axis and connecting data points across all axes with
-    lines. This is useful for visualizing patterns and relationships in high-dimensional
-    data, and for comparing groups when using the `hue` parameter.
+    Parallel coordinates draw each record as a polyline across one vertical
+    axis per dimension. Use it to explore multivariate data: clusters show as
+    bundles of similar lines, and correlations between neighboring dimensions
+    show as parallel or crossing segments. Works best with a handful of
+    dimensions; color the records by group with `hue` to compare groups.
+
+    !!! info "Added in v0.7.0"
 
     Examples:
         >>> from datachart.charts import ParallelCoords

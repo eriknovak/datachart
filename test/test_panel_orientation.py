@@ -336,6 +336,5 @@ class TestAssignmentWarnings:
             ._chart_metadata["panel"]
             .groups
         )
-        with pytest.warns(UserWarning, match="Grid") as record:
+        with pytest.warns(UserWarning, match="Grid"):
             assert determine_axis_assignment(groups, 3.0) == ["left", "right", "right"]
-        assert not any("FigureGridLayout" in str(w.message) for w in record)

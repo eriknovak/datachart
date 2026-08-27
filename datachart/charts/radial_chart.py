@@ -88,6 +88,14 @@ def RadialChart(
 ) -> plt.Figure:
     """Creates the radial chart.
 
+    A radial chart plots series on polar axes: as a line (radar) profile, an
+    area, bars, or a histogram, chosen with `type`. Use the radar form to
+    compare a few entities across several metrics on a shared scale, and the
+    bar and histogram forms for cyclic categories such as hours, weekdays, or
+    compass directions.
+
+    !!! info "Added in v0.8.0"
+
     Examples:
         >>> from datachart.charts import RadialChart
         >>> figure = RadialChart(

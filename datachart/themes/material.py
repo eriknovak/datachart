@@ -37,3 +37,7 @@ MATERIAL_THEME: StyleAttrs = make_theme(
         "plot_heatmap_frame_color": "#000000",
     }
 )
+"""The material theme: Google palette, light grid.
+
+!!! info "Added in v0.8.0"
+"""
