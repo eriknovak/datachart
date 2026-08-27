@@ -16,17 +16,104 @@ Methods:
 """
 
 import math
+import warnings
 from typing import List, Dict, Optional, Tuple, Union, Any
 
 import matplotlib.pyplot as plt
 
+from ..config import config
 from ..constants import BAR_MODE, FIG_SIZE
 from ..typings import TextAttrs
-from .overlay import _overlay_impl
 from .figure import _grid_from_dicts, _figure_grid_layout_impl
-from ._internal.config_helpers import get_text_style
+from ._internal.config_helpers import get_grid_style, get_legend_style, get_text_style
 from ._internal.figures import new_figure
-from ._internal.layers import LayerGroup, Panel as _PanelSeam, TextLayer
+from ._internal.layers import (
+    Panel as _PanelSeam,
+    LayerGroup,
+    LineLayer,
+    BarLayer,
+    ScatterLayer,
+    HistogramLayer,
+    BoxLayer,
+    ViolinLayer,
+    ParallelCoordsLayer,
+    RadialLayer,
+    GroupLayer,
+    TextLayer,
+)
+
+OVERLAYABLE_LAYERS = (
+    LineLayer,
+    BarLayer,
+    ScatterLayer,
+    HistogramLayer,
+    BoxLayer,
+    ViolinLayer,
+    ParallelCoordsLayer,
+    RadialLayer,
+    GroupLayer,
+    TextLayer,
+)
+
+
+def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
+    """Pull the layer groups out of a figure's metadata transport.
+
+    Args:
+        figure: A figure created by a datachart chart function.
+        index: The figure's position in the `charts` argument, for error messages.
+
+    Returns:
+        The figure's layer groups.
+
+    Raises:
+        ValueError: If the figure is missing or has invalid chart metadata.
+    """
+    if not hasattr(figure, "_chart_metadata"):
+        raise ValueError(
+            "Figure is missing chart metadata. "
+            "This figure was likely not created by a datachart chart function."
+        )
+
+    metadata = figure._chart_metadata
+    if metadata.get("type") is None:
+        raise ValueError("Figure has invalid metadata: missing 'type'")
+    if metadata.get("type") == "grid":
+        raise ValueError(
+            f"Figure at index {index} is a Grid figure; grid figures cannot be overlaid"
+        )
+    if metadata.get("type") == "pyramidchart":
+        # unmirrored data on a mirrored axis would silently mangle (ADR 0017)
+        raise ValueError(
+            f"Figure at index {index} is a pyramid figure; "
+            "pyramid figures cannot be overlaid"
+        )
+    panel = metadata.get("panel")
+    if panel is None:
+        raise ValueError("Figure has invalid metadata: missing 'panel'")
+
+    groups = []
+    for group in panel.groups:
+        supported = [l for l in group.layers if isinstance(l, OVERLAYABLE_LAYERS)]
+        if len(supported) < len(group.layers):
+            warnings.warn(
+                f"Chart at index {index} contains layers of type "
+                f"'{metadata.get('type')}' that cannot be overlaid. Skipping them..."
+            )
+        if supported:
+            groups.append(
+                LayerGroup(
+                    supported,
+                    palette=group.palette,
+                    max_colors=group.max_colors,
+                    num_bins=group.num_bins,
+                    y_axis=group.y_axis,
+                    z_order=group.z_order,
+                    legend_label=group.legend_label,
+                    emphasis=group.emphasis,
+                )
+            )
+    return groups
 
 
 def Panel(
@@ -75,6 +162,8 @@ def Panel(
     (title, labels, limits, ...) always come from the outermost call. Dict
     options on a nested panel override its per-figure options only when
     explicitly given.
+
+    !!! info "Added in v0.8.0"
 
     Examples:
         >>> from datachart.charts import LineChart, BarChart
@@ -169,24 +258,111 @@ def Panel(
         else:
             raise ValueError(f"Item at index {i} is not a matplotlib Figure or a dict")
 
-    return _overlay_impl(
-        items,
-        title=title,
-        xlabel=xlabel,
-        ylabel_left=ylabel_left,
-        ylabel_right=ylabel_right,
-        figsize=figsize,
-        show_legend=show_legend,
-        show_grid=show_grid,
-        auto_secondary_axis=auto_secondary_axis,
-        xmin=xmin,
-        xmax=xmax,
-        ymin=ymin,
-        ymax=ymax,
-        ymin_right=ymin_right,
-        ymax_right=ymax_right,
-        bar_mode=bar_mode,
+    if not items:
+        raise ValueError("At least one chart is required")
+
+    if auto_secondary_axis is None:
+        auto_secondary_axis = config.get("overlay_auto_threshold", 3.0)
+    if bar_mode is None:
+        bar_mode = config.get("overlay_bar_mode", "group")
+    if show_grid is None:
+        show_grid = config.get("chart_default_show_grid")
+    if figsize is None:
+        figsize = FIG_SIZE.DEFAULT
+
+    # collect the layer groups from every source figure, tagged with prefs
+    groups = []
+    for i, chart_config in enumerate(items):
+        for group in _extract_groups(chart_config["figure"], i):
+            # None leaves the group's own pref (from a nested panel) in place
+            groups.append(
+                group.with_prefs(
+                    y_axis=chart_config.get("y_axis", None),
+                    z_order=chart_config.get("z_order", None),
+                    legend_label=chart_config.get("legend_label", None),
+                    emphasis=chart_config.get("emphasis", None),
+                )
+            )
+
+    # the panel takes literal x/y keys; the orientation (raises on a mix) maps
+    # them, and the projection (also raising on a mix) picks the axes kind
+    probe = _PanelSeam(groups)
+    projection = probe.projection
+    if probe.horizontal:
+        xlabel, ylabel_left = ylabel_left, xlabel
+        xmin, xmax, ymin, ymax = ymin, ymax, xmin, xmax
+
+    # panel-level settings are resolved against the config here, at build time
+    panel_settings = {
+        "furniture": _PanelSeam.snapshot_furniture(),
+        "twin_axes": True,
+        "auto_threshold": auto_secondary_axis,
+        "warn_scale_groups": config.get("overlay_warn_scale_groups", True),
+        "warn_thin_bars": config.get("overlay_warn_thin_bars", True),
+        "bar_mode": bar_mode,
+        "bar_ticks": "group",
+        "bar_width": config.get("plot_bar_width", 0.8),
+        "bar_overlay_alpha": config.get("overlay_bar_alpha", 0.7),
+        "hist_overlay_alpha": config.get("overlay_hist_alpha", 0.6),
+        "zorder_defaults": {
+            "bar": config.get("overlay_default_zorder_bar", 1),
+            "line": config.get("overlay_default_zorder_line", 2),
+            "scatter": config.get("overlay_default_zorder_scatter", 2),
+            "histogram": config.get("overlay_default_zorder_hist", 1),
+        },
+        "show_grid": show_grid,
+        "grid_style": get_grid_style({}),
+        "hatch_cycle": config.get("plot_hatch_cycle"),
+        "show_legend": show_legend,
+        "legend_mode": "combined",
+        "legend_style": get_legend_style(),
+        "title": title,
+        "xlabel": xlabel,
+        "ylabel": ylabel_left,
+        "ylabel_right": ylabel_right,
+        "label_styles": _PanelSeam.snapshot_label_styles(),
+        "xmin": xmin,
+        "xmax": xmax,
+        "ymin": ymin,
+        "ymax": ymax,
+        "ymin_right": ymin_right,
+        "ymax_right": ymax_right,
+    }
+
+    if projection == "polar":
+        # the merged panel keeps the first source figure's radial furniture
+        source_settings = items[0]["figure"]._chart_metadata["panel"].settings
+        for key in (
+            "startangle",
+            "direction",
+            "innerradius",
+            "show_border",
+            "show_values",
+            "show_tip_labels",
+            "value_format",
+            "tip_value_style",
+        ):
+            panel_settings[key] = source_settings.get(key)
+
+    panel = _PanelSeam(groups, panel_settings)
+
+    fig = new_figure(figsize=figsize)
+    ax = fig.subplots(
+        subplot_kw={"projection": "polar"} if projection == "polar" else None
     )
+    # the panel title renders as the figure suptitle when the panel is the figure
+    panel.settings = {**panel_settings, "title": None}
+    panel.render(ax)
+    panel.settings = panel_settings
+    if title:
+        fig.suptitle(title, **get_text_style("title"))
+
+    fig._chart_metadata = {
+        "type": "overlay",
+        "panel": panel,
+    }
+
+    return fig
 
 
 def Annotate(
@@ -204,6 +380,8 @@ def Annotate(
     figures (including polar ones) and `Panel` output. Grid figures and
     multi-subplot figures (`subplots=True`) are rejected — annotate the
     sources before composing.
+
+    !!! info "Added in v0.8.0"
 
     Examples:
         >>> from datachart.charts import LineChart
@@ -358,6 +536,8 @@ def Grid(
     sharex/sharey among its own cells; the outer grid's sharex/sharey applies
     only to its top-level cells. Panel figures also nest in a cell; the
     reverse — a Grid figure inside a Panel — stays an error.
+
+    !!! info "Added in v0.8.0"
 
     Examples:
         >>> from datachart.charts import LineChart, BarChart, ScatterChart

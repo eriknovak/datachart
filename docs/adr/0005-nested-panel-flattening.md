@@ -4,7 +4,7 @@ status: accepted
 
 # Nested Panel figures flatten losslessly into the outer Panel
 
-`Panel` output already passes `_extract_groups` (its transport is
+`Panel` output already passes `_extract_groups` (in `compose.py`) (its transport is
 `{"type": "overlay", "panel": ...}`), so `Panel([Panel([f1, f2]), f3])` runs
 today — but lossily: extraction rebuilt `LayerGroup`s without their per-figure
 prefs, silently dropping the inner panel's `y_axis`, `z_order`, and

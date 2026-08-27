@@ -2,7 +2,6 @@
 
 import copy
 import io
-import warnings
 
 import pytest
 import matplotlib.pyplot as plt
@@ -14,9 +13,6 @@ from datachart.constants import BAR_MODE, THEME, VALUE_FORMAT
 from datachart.utils import (
     Panel,
     Grid,
-    OverlayChart,
-    FigureGridLayout,
-    figure_grid_layout,
 )
 from datachart.utils._internal.config_helpers import get_text_style
 
@@ -38,14 +34,12 @@ def _bar_fig():
 class TestPanel:
     """Test suite for the Panel composition front."""
 
-    def test_bare_figures_match_overlaychart(self):
-        """Panel with bare figures renders identically to OverlayChart with dicts."""
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            old = OverlayChart(
-                charts=[{"figure": _bar_fig()}, {"figure": _line_fig()}],
-                title="Combined",
-            )
+    def test_bare_figures_match_dict_items(self):
+        """Panel with bare figures renders identically to dict items."""
+        old = Panel(
+            [{"figure": _bar_fig()}, {"figure": _line_fig()}],
+            title="Combined",
+        )
         new = Panel([_bar_fig(), _line_fig()], title="Combined")
         assert _png_bytes(old) == _png_bytes(new)
         plt.close("all")
@@ -136,13 +130,11 @@ class TestGrid:
     """Test suite for the Grid composition front."""
 
     def test_flat_list_matches_figuregridlayout(self):
-        """Grid with a flat list renders identically to FigureGridLayout."""
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            old = FigureGridLayout(
-                charts=[{"figure": _line_fig()}, {"figure": _bar_fig()}],
-                title="Grid",
-            )
+        """Grid with bare figures renders identically to dict items."""
+        old = Grid(
+            [{"figure": _line_fig()}, {"figure": _bar_fig()}],
+            title="Grid",
+        )
         new = Grid([_line_fig(), _bar_fig()], title="Grid")
         assert _png_bytes(old) == _png_bytes(new)
         plt.close("all")
@@ -472,28 +464,6 @@ class TestStyleFreeze:
         Panel([_bar_fig(), _line_fig()], show_grid="both", show_legend=True)
         Grid([[_bar_fig(), _line_fig()]])
         assert config.config == snapshot
-
-
-class TestDeprecations:
-    """The old composition fronts warn and delegate."""
-
-    def test_overlaychart_warns(self):
-        with pytest.warns(DeprecationWarning, match="Panel"):
-            fig = OverlayChart(charts=[{"figure": _line_fig()}])
-        assert isinstance(fig, plt.Figure)
-        plt.close("all")
-
-    def test_figuregridlayout_warns(self):
-        with pytest.warns(DeprecationWarning, match="Grid"):
-            fig = FigureGridLayout(charts=[{"figure": _line_fig()}])
-        assert isinstance(fig, plt.Figure)
-        plt.close("all")
-
-    def test_figure_grid_layout_warns(self):
-        with pytest.warns(DeprecationWarning, match="Grid"):
-            fig = figure_grid_layout([_line_fig()])
-        assert isinstance(fig, plt.Figure)
-        plt.close("all")
 
 
 def _bar_widths(figure):

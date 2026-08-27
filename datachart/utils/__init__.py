@@ -21,8 +21,7 @@ Methods:
 
 """
 
-from .figure import save_figure, FigureGridLayout, figure_grid_layout
-from .overlay import OverlayChart
+from .figure import save_figure
 from .compose import Panel, Grid, Annotate
 from . import stats
 
@@ -31,8 +30,5 @@ __all__ = [
     "Panel",
     "Grid",
     "Annotate",
-    "FigureGridLayout",
-    "figure_grid_layout",
-    "OverlayChart",
     "stats",
 ]

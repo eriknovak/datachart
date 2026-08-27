@@ -69,7 +69,7 @@ python -m build --sdist --wheel --outdir dist/
 The package is organized into six main modules:
 
 - **charts**: Chart creation functions (BarChart, LineChart, ScatterChart, Heatmap, Histogram, BoxPlot, ViolinPlot, SwarmPlot, PyramidChart, RadialChart, ParallelCoords)
-- **utils**: Utilities including the Panel/Grid composition fronts (ADR 0002; OverlayChart, FigureGridLayout, and figure_grid_layout are their deprecated predecessors), save_figure, and stats functions
+- **utils**: Utilities including the Panel/Grid composition fronts (ADR 0002), save_figure, and stats functions
 - **config**: Global configuration system with the singleton `config` instance
 - **themes**: Predefined style themes (DEFAULT_THEME, GREYSCALE_THEME, INK_THEME, HATCH_THEME, MINIMAL_THEME, MATERIAL_THEME), named for their visual trait
 - **constants**: Enums and constants (THEME, FIG_SIZE, ORIENTATION, COLORS, etc.)

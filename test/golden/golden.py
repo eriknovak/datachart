@@ -33,7 +33,7 @@ from datachart.charts import (
     RaincloudPlot,
     ViolinPlot,
 )
-from datachart.utils import OverlayChart, FigureGridLayout, Panel, Grid, Annotate
+from datachart.utils import Panel, Grid, Annotate
 from datachart.config import config
 from datachart.constants import ARROW_STYLE, THEME
 
@@ -612,7 +612,7 @@ def emphasis_panel_cross_type():
 def overlay_line_line():
     f1 = LineChart(data=LINE1, subtitle="sq")
     f2 = LineChart(data=LINE2, subtitle="lin")
-    return OverlayChart(
+    return Panel(
         charts=[{"figure": f1}, {"figure": f2}], title="Two lines", show_legend=True
     )
 
@@ -623,7 +623,7 @@ def overlay_line_bar_dual():
         data=[{"label": c, "y": v * 100} for c, v in zip("ABCD", [1, 2, 3, 2])]
     )
     fl = LineChart(data=[{"x": i, "y": i * 2} for i in range(4)])
-    return OverlayChart(
+    return Panel(
         charts=[
             {"figure": fb, "y_axis": "left"},
             {"figure": fl, "y_axis": "right", "legend_label": "trend"},
@@ -640,9 +640,7 @@ def overlay_line_bar_dual():
 def overlay_auto_assign():
     fb = BarChart(data=[{"label": str(i), "y": i * 1000} for i in range(5)])
     fl = LineChart(data=[{"x": i, "y": i * 2} for i in range(5)])
-    return OverlayChart(
-        charts=[{"figure": fb}, {"figure": fl}], auto_secondary_axis=3.0
-    )
+    return Panel(charts=[{"figure": fb}, {"figure": fl}], auto_secondary_axis=3.0)
 
 
 @case
@@ -674,7 +672,7 @@ def overlay_hist_line():
     fl = LineChart(
         data=[{"x": float(x), "y": float(30 * np.exp(-x * x / 2))} for x in xs]
     )
-    return OverlayChart(
+    return Panel(
         charts=[{"figure": fh, "y_axis": "left"}, {"figure": fl, "y_axis": "left"}],
         show_legend=True,
     )
@@ -684,7 +682,7 @@ def overlay_hist_line():
 def overlay_zorder_grid():
     f1 = LineChart(data=LINE2, subtitle="l")
     f2 = ScatterChart(data=SCAT1, subtitle="s")
-    return OverlayChart(
+    return Panel(
         charts=[{"figure": f1, "z_order": 3}, {"figure": f2, "z_order": 2}],
         show_grid="both",
         show_legend=True,
@@ -699,14 +697,14 @@ def overlay_theme_snapshot():
     f1 = LineChart(data=LINE1, subtitle="pub")
     config.set_theme(THEME.DEFAULT)
     f2 = LineChart(data=LINE2, subtitle="def")
-    return OverlayChart(charts=[{"figure": f1}, {"figure": f2}], show_legend=True)
+    return Panel(charts=[{"figure": f1}, {"figure": f2}], show_legend=True)
 
 
 @case
 def overlay_bar_bar():
     f1 = BarChart(data=BAR1, subtitle="s1")
     f2 = BarChart(data=BAR2, subtitle="s2")
-    return OverlayChart(charts=[{"figure": f1}, {"figure": f2}], show_legend=True)
+    return Panel(charts=[{"figure": f1}, {"figure": f2}], show_legend=True)
 
 
 @case
@@ -714,7 +712,7 @@ def overlay_bar_bar_line():
     f1 = BarChart(data=BAR1, subtitle="s1")
     f2 = BarChart(data=BAR2, subtitle="s2")
     f3 = LineChart(data=[{"x": i, "y": 20} for i in range(5)], subtitle="ref")
-    return OverlayChart(
+    return Panel(
         charts=[{"figure": f1}, {"figure": f2}, {"figure": f3}],
         bar_mode="stack",
         show_legend=True,
@@ -753,7 +751,7 @@ def overlay_horizontal_bar_bar_line():
 def overlay_hist_hist():
     f1 = Histogram(data=hist_data(150, 0.0), subtitle="a", num_bins=12)
     f2 = Histogram(data=hist_data(150, 2.0), subtitle="b", num_bins=12)
-    return OverlayChart(charts=[{"figure": f1}, {"figure": f2}], show_legend=True)
+    return Panel(charts=[{"figure": f1}, {"figure": f2}], show_legend=True)
 
 
 # ----- grids -----
@@ -765,7 +763,7 @@ def grid_uniform_mixed():
     f2 = BarChart(data=BAR1, subtitle="bar")
     f3 = ScatterChart(data=SCAT1, subtitle="scatter")
     f4 = Histogram(data=hist_data(), subtitle="hist", num_bins=10)
-    return FigureGridLayout(
+    return Grid(
         charts=[{"figure": f} for f in (f1, f2, f3, f4)],
         title="Grid",
         max_cols=2,
@@ -778,7 +776,7 @@ def grid_custom_layout():
     f1 = LineChart(data=LINE1)
     f2 = BarChart(data=BAR1)
     f3 = ScatterChart(data=SCAT1)
-    return FigureGridLayout(
+    return Grid(
         charts=[
             {
                 "figure": f1,
@@ -802,12 +800,12 @@ def grid_custom_layout():
 def grid_with_overlay():
     fb = BarChart(data=BAR1, title="Bar")
     fl = LineChart(data=LINE2, title="Line")
-    fo = OverlayChart(
+    fo = Panel(
         charts=[{"figure": fb, "y_axis": "left"}, {"figure": fl, "y_axis": "right"}],
         title="Overlay",
         show_legend=True,
     )
-    return FigureGridLayout(
+    return Grid(
         charts=[{"figure": fb}, {"figure": fl}, {"figure": fo}],
         title="Grid+Overlay",
         max_cols=2,
@@ -819,9 +817,7 @@ def grid_with_overlay():
 def grid_subplot_figure():
     f = LineChart(data=[LINE1, LINE2], subtitle=["a", "b"], subplots=True, max_cols=2)
     g = BarChart(data=BAR1)
-    return FigureGridLayout(
-        charts=[{"figure": f}, {"figure": g}], max_cols=2, figsize=(10, 4)
-    )
+    return Grid(charts=[{"figure": f}, {"figure": g}], max_cols=2, figsize=(10, 4))
 
 
 @case
@@ -1020,7 +1016,7 @@ def pyramid_grid_pair():
 def grid_theme_mutation():
     f1 = LineChart(data=[LINE1, LINE2], subtitle=["a", "b"], show_legend=True)
     config.set_theme(THEME.GREYSCALE)
-    grid = FigureGridLayout(charts=[{"figure": f1}], figsize=(6, 4))
+    grid = Grid(charts=[{"figure": f1}], figsize=(6, 4))
     config.set_theme(THEME.DEFAULT)
     return grid
 
