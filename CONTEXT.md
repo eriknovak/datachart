@@ -132,8 +132,8 @@ _Avoid_: hue, half violin, paired violin
 
 **Raincloud**:
 A `RaincloudPlot` group — a cloud, a box, and its rain read together at one
-category position: the cloud on the high side, the box just past the seam
-on the low side, and the rain beyond the box, so nothing overlaps. Assembled
+category position: the box on the position, the cloud past it on the high
+side, and the rain past it on the low side, so nothing overlaps. Assembled
 from the violin, swarm, and box layers by the front; nothing new is drawn.
 Each group takes its own palette color, shared by cloud, box, and rain.
 _Avoid_: raincloud chart (for the front), half-violin plot, rain plot

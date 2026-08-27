@@ -27,8 +27,9 @@ that redraws all three — would fork three drawing paths.
   the seam, and the rain starts ≈ 0.16 below the seam and packs one-sided,
   away from the box, over ≈ 0.28. No user knob in v1.
 - **Cloud on the high side: right when vertical, above when horizontal.**
-  The box and the rain take the low side, the box nearest the seam, so the
-  three parts sit side by side and never overlap.
+  The box sits on the position itself, so the tick marks the summary; the
+  rain takes the low side. The three parts sit side by side and never
+  overlap.
 - **The box is filled in the group color, stroked in the font color.**
   Edges, median, whiskers, and caps in the theme font color; outliers on by
   default as circles (`show_outliers=True`). The cloud draws with

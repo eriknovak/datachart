@@ -1440,11 +1440,11 @@ class SwarmLayer(GroupLayer):
 # keeps the two inner boxes of a split violin off the shared seam
 SPLIT_INNER_OFFSET = 0.05
 # raincloud geometry (ADR 0021), in category-axis units around the position:
-# the cloud keeps the high side, the box sits just below the seam, and the
-# rain starts past the box and packs outward, all inside the cell
-RAINCLOUD_BOX_OFFSET = 0.08
+# the box is centered on the position, the cloud's seam sits past it on the
+# high side, and the rain starts past it on the low side and packs outward
 RAINCLOUD_BOX_WIDTH = 0.1
-RAINCLOUD_RAIN_OFFSET = 0.16
+RAINCLOUD_CLOUD_OFFSET = 0.08
+RAINCLOUD_RAIN_OFFSET = 0.08
 RAINCLOUD_RAIN_SPREAD = 0.28
 # the rain is denser than a standalone swarm, so its points are smaller
 RAINCLOUD_RAIN_SIZE = 6
@@ -1463,6 +1463,7 @@ class ViolinLayer(GroupLayer):
         self.split = self.settings.get("split")
         # a raincloud keeps one half of the body: -1 the low side, +1 the high
         self.side = self.settings.get("side") or 0
+        self.offset = self.settings.get("offset") or 0.0
         self._legend_roles = []
         self.violin_style = get_violin_style(self.style)
         self.inner_style = get_violin_inner_style(self.style)
@@ -1525,7 +1526,7 @@ class ViolinLayer(GroupLayer):
         self._legend_roles = roles
 
         for i, label in enumerate(labels):
-            position = ctx.category_index[label]
+            position = ctx.category_index[label] + self.offset
             for j, (split_value, side) in enumerate(sides):
                 values = grouped[label].get(split_value)
                 if not values:
@@ -2409,14 +2410,21 @@ def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[La
 def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
     """The cloud, rain, and box of one raincloud dataset (ADR 0021).
 
-    The cloud keeps the high side of the category position (right when
-    vertical, above when horizontal); the box and the rain sit on the low
-    side, the box nearest the seam.
+    The box is centered on the category position; the cloud keeps the high
+    side past it (right when vertical, above when horizontal) and the rain
+    falls on the low side.
     """
 
     cloud = ViolinLayer(
         chart,
-        {**settings, "inner": None, "split": None, "side": 1, "color_by_group": True},
+        {
+            **settings,
+            "inner": None,
+            "split": None,
+            "side": 1,
+            "offset": RAINCLOUD_CLOUD_OFFSET,
+            "color_by_group": True,
+        },
     )
     rain = SwarmLayer(
         chart,
@@ -2434,7 +2442,6 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
         {
             **settings,
             "show_notch": None,
-            "offset": -RAINCLOUD_BOX_OFFSET,
             "width": RAINCLOUD_BOX_WIDTH,
             "outline": True,
             "color_by_group": True,
