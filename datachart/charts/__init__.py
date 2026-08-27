@@ -6,6 +6,8 @@ grouped by the question they answer.
 Methods:
     LineChart(attrs):
         Creates the line chart.
+    StackedAreaChart(attrs):
+        Creates the stacked area chart.
     BarChart(attrs):
         Creates the bar chart.
     PyramidChart(attrs):
@@ -37,6 +39,7 @@ Methods:
 
 # trends and comparisons
 from .line_chart import LineChart
+from .stacked_area_chart import StackedAreaChart
 from .bar_chart import BarChart
 from .pyramid_chart import PyramidChart
 from .radial_chart import RadialChart
@@ -58,6 +61,7 @@ from .parallel_coords import ParallelCoords
 __all__ = [
     # trends and comparisons
     "LineChart",
+    "StackedAreaChart",
     "BarChart",
     "PyramidChart",
     "RadialChart",

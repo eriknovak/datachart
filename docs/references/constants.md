@@ -109,6 +109,10 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.BASELINE
+    options:
+        heading_level: 3
+
 ::: datachart.constants.RADIAL_TYPE
     options:
         heading_level: 3

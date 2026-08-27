@@ -300,6 +300,36 @@ def get_area_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Stacked Area Style
+# -------------------------------------
+
+
+def get_stackedarea_style(chart_style: dict) -> dict:
+    """Get the stacked area chart style.
+
+    The fill reuses the area color, hatch and zorder with the stack's own
+    alpha; `outline` says whether the line style draws each band's top edge.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The stacked area style setting.
+
+    """
+
+    config_attrs = [
+        ("alpha", "plot_stackedarea_alpha"),
+        ("color", "plot_area_color"),
+        ("hatch", "plot_area_hatch"),
+        ("zorder", "plot_area_zorder"),
+        ("outline", "plot_stackedarea_outline"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+# -------------------------------------
 # Grid Style
 # -------------------------------------
 

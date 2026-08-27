@@ -89,6 +89,9 @@ BASE_THEME: StyleAttrs = {
     "plot_area_linewidth": 0,
     "plot_area_hatch": None,
     "plot_area_zorder": 3,
+    # plot stackedarea style; the fill reuses the area keys (ADR 0025)
+    "plot_stackedarea_alpha": 0.8,
+    "plot_stackedarea_outline": False,
     # plot grid style
     "plot_grid_alpha": 0.5,
     "plot_grid_color": "#EAEAEA",

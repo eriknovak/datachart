@@ -103,7 +103,7 @@ plugins:
       preprocess: docs/hooks/llmstxt_preprocess.py
       markdown_description: |
         datachart is a Python data visualization package built on matplotlib.
-        It provides simple chart functions (BarChart, LineChart, ScatterChart,
+        It provides simple chart functions (BarChart, LineChart, StackedAreaChart, ScatterChart,
         Histogram, Heatmap, ContourChart, HexbinChart, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot,
         ParallelCoords, PyramidChart, RadialChart), figure
         composition via Panel (overlaying charts on shared axes) and Grid
@@ -120,6 +120,7 @@ plugins:
         Charts:
           - how-to-guides/charts/index.md: The chart functions, their common data format, and how to save figures.
           - how-to-guides/charts/linechart.ipynb: Line chart input attributes, single and multiple datasets, customization, and saving.
+          - how-to-guides/charts/stackedareachart.ipynb: Stacked area chart input attributes, baselines (zero, percent, sym, wiggle), band style and outlines, emphasis, subplots, composing with Panel and Grid, and saving.
           - how-to-guides/charts/barchart.ipynb: Bar chart input attributes, single and multiple datasets, customization, and saving.
           - how-to-guides/charts/pyramidchart.ipynb: Pyramid chart input attributes, the two-sides data contract, mirrored value axis controls, and composing pyramids with Grid.
           - how-to-guides/charts/radialchart.ipynb: Radial chart input attributes, the line, bar, scatter, and histogram visuals, and polar settings (start angle, direction, inner radius).
@@ -183,6 +184,7 @@ nav:
       - how-to-guides/charts/index.md
       # trends and comparisons
       - Line Chart: how-to-guides/charts/linechart.ipynb
+      - Stacked Area Chart: how-to-guides/charts/stackedareachart.ipynb
       - Bar Chart: how-to-guides/charts/barchart.ipynb
       - Pyramid Chart: how-to-guides/charts/pyramidchart.ipynb
       - Radial Chart: how-to-guides/charts/radialchart.ipynb

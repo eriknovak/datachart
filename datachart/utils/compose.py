@@ -38,6 +38,7 @@ from ._internal.layers import (
     ViolinLayer,
     ContourLayer,
     HexbinLayer,
+    StackedAreaLayer,
     ParallelCoordsLayer,
     RadialLayer,
     GroupLayer,
@@ -53,6 +54,7 @@ OVERLAYABLE_LAYERS = (
     ViolinLayer,
     ContourLayer,
     HexbinLayer,
+    StackedAreaLayer,
     ParallelCoordsLayer,
     RadialLayer,
     GroupLayer,
@@ -333,9 +335,26 @@ def Panel(
         "ymax_right": ymax_right,
     }
 
+    source_settings = [
+        item["figure"]._chart_metadata["panel"].settings for item in items
+    ]
+    # the x-axis hugs the data only when every source figure hugs it too
+    panel_settings["tighten_xlim"] = all(s.get("tighten_xlim") for s in source_settings)
+    # the first stacked source figure's baseline wins, like bar_mode (ADR 0025)
+    panel_settings["baseline"] = next(
+        (
+            s.get("baseline")
+            for s, item in zip(source_settings, items)
+            if any(
+                isinstance(l, StackedAreaLayer)
+                for l in item["figure"]._chart_metadata["panel"].layers
+            )
+        ),
+        None,
+    )
+
     if projection == "polar":
         # the merged panel keeps the first source figure's radial furniture
-        source_settings = items[0]["figure"]._chart_metadata["panel"].settings
         for key in (
             "startangle",
             "direction",
@@ -346,7 +365,7 @@ def Panel(
             "value_format",
             "tip_value_style",
         ):
-            panel_settings[key] = source_settings.get(key)
+            panel_settings[key] = source_settings[0].get(key)
 
     panel = _PanelSeam(groups, panel_settings)
 

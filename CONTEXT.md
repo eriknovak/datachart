@@ -190,6 +190,16 @@ color attrs (`norm`, `vmin`, `vmax`, `colorbar`) and furniture (grid off,
 colorbar inset) with Heatmap and filled Contour.
 _Avoid_: hex density plot, hexagonal heatmap, 2-D histogram
 
+**Stacked area**:
+Series filled on top of one another along an ordered axis
+(`StackedAreaChart`: `LineChart`'s multi-series `{x, y}` input, identical
+`x` across series). The stack offsets are a panel concern like bar slotting;
+`baseline` (a `BASELINE` constant: `ZERO`, `PERCENT`, `SYM`, `WIGGLE`,
+`WEIGHTED_WIGGLE`) picks where the first series starts, with `PERCENT`
+normalising each `x` to 100 %.
+_Avoid_: stackplot, streamgraph (only the wiggle baselines), 100 % chart,
+area chart (that is `LineChart(show_area=True)`)
+
 **Density estimate**:
 A Gaussian kernel density (`stats.kde1d` → `{x, y}` points for `LineChart`,
 `stats.kde2d` → an `{x, y, z}` dict for `ContourChart`) on a grid that extends

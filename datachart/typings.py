@@ -10,6 +10,7 @@ Classes:
     TextAttrs: The text annotation attributes.
     LineSingleChartAttrs: The single chart attributes for the line chart.
     LineDataPointAttrs: The data point attributes for the line chart.
+    StackedAreaSingleChartAttrs: The single chart attributes for the stacked area chart.
     BarSingleChartAttrs: The single chart attributes for the bar chart.
     BarDataPointAttrs: The data point attributes for the bar chart.
     HistogramSingleChartAttrs: The single chart attributes for the histogram chart.
@@ -44,6 +45,7 @@ Classes:
     AreaStyleAttrs: The typing for the area style.
     GridStyleAttrs: The typing for the grid style.
     LineStyleAttrs: The typing for the line style.
+    StackedAreaStyleAttrs: The typing for the stacked area chart style.
     BarStyleAttrs: The typing for the bar style.
     HistStyleAttrs: The typing for the histogram style.
     VLineStyleAttrs: The typing for the vertical line style.
@@ -91,6 +93,7 @@ from .constants import (
     BANDWIDTH,
     CONTOUR_LEVELS,
     HEXBIN_REDUCE,
+    BASELINE,
     ASPECT_RATIO,
 )
 
@@ -295,6 +298,22 @@ class LineStyleAttrs(TypedDict):
     plot_line_zorder: Union[int, float, None]
     plot_xticks_label_rotate: Union[int, float, None]
     plot_yticks_label_rotate: Union[int, float, None]
+
+
+class StackedAreaStyleAttrs(TypedDict):
+    """The typing for the stacked area chart style.
+
+    The fill takes the `plot_area_*` keys (color, hatch, zorder) and the
+    outline the `plot_line_*` keys; these two switch what is specific to a stack.
+
+    Attributes:
+        plot_stackedarea_alpha (Union[float, None]): The alpha value of the stacked bands.
+        plot_stackedarea_outline (Union[bool, None]): Whether each band draws its top edge as a line.
+
+    """
+
+    plot_stackedarea_alpha: Union[float, None]
+    plot_stackedarea_outline: Union[bool, None]
 
 
 class BarStyleAttrs(TypedDict):
@@ -729,6 +748,7 @@ class StyleAttrs(
     AreaStyleAttrs,
     GridStyleAttrs,
     LineStyleAttrs,
+    StackedAreaStyleAttrs,
     BarStyleAttrs,
     HistStyleAttrs,
     VLineStyleAttrs,
@@ -951,6 +971,74 @@ class _LineChartAttrs(ChartCommonAttrs):
     charts: Union[LineSingleChartAttrs, List[LineSingleChartAttrs]]
     show_yerr: Union[bool, None]
     show_area: Union[bool, None]
+    scalex: Union[SCALE, str, None]
+    scaley: Union[SCALE, str, None]
+
+
+# ================================================
+# Stacked Area Chart Attributes
+# ================================================
+
+
+class StackedAreaSingleChartAttrs(TypedDict):
+    """The single chart attributes for the stacked area chart.
+
+    Attributes:
+        data (List[LineDataPointAttrs]): The list of data points defining one series; every series shares the same `x` values.
+        subtitle (Union[str, None]): The subtitle of the series. Also used as the label in the legend.
+        xlabel (Union[str, None]): The xlabel of the chart.
+        ylabel (Union[str, None]): The ylabel of the chart.
+        style (Union[StackedAreaStyleAttrs, None]): The style of the series.
+        xticks (Union[int, float, None]): The xtick positions list.
+        xticklabels (Union[List[str], None]): The xtick labels.
+        xtickrotate (Union[int, None]): The xtick rotation value.
+        yticks (Union[int, float, None]): the ytick position list.
+        yticklabels (Union[List[str], None]): The ytick labels.
+        ytickrotate (Union[int, None]): The ytick rotation value.
+        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
+        y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
+
+    """
+
+    data: List[LineDataPointAttrs]
+    subtitle: Union[str, None]
+    xlabel: Union[str, None]
+    ylabel: Union[str, None]
+    style: Union[StackedAreaStyleAttrs, None]
+
+    xticks: Union[int, float, None]
+    xticklabels: Union[List[str], None]
+    xtickrotate: Union[int, None]
+    yticks: Union[int, float, None]
+    yticklabels: Union[List[str], None]
+    ytickrotate: Union[int, None]
+
+    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
+    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
+    texts: Union[TextAttrs, List[TextAttrs]]
+
+    x: Union[str, None]
+    y: Union[str, None]
+
+
+class _StackedAreaChartAttrs(ChartCommonAttrs):
+    """The stacked area chart attributes.
+
+    Attributes:
+        charts (Union[StackedAreaSingleChartAttrs, List[StackedAreaSingleChartAttrs]]): The series definitions.
+        baseline (Union[BASELINE, str, None]): Where the first series starts.
+        aspect_ratio (Union[ASPECT_RATIO, str, None]): The aspect ratio of the axes.
+        scalex (Union[SCALE, str, None]): The scale of the x-axis.
+        scaley (Union[SCALE, str, None]): The scale of the y-axis.
+
+    """
+
+    charts: Union[StackedAreaSingleChartAttrs, List[StackedAreaSingleChartAttrs]]
+    baseline: Union[BASELINE, str, None]
+    aspect_ratio: Union[ASPECT_RATIO, str, None]
     scalex: Union[SCALE, str, None]
     scaley: Union[SCALE, str, None]
 
