@@ -28,11 +28,12 @@ from matplotlib.legend_handler import HandlerPathCollection
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from .colors import create_color_cycle, create_colormap, get_colormap
-from .validate import validate_emphasis
+from .validate import validate_emphasis, validate_shared_x
 from .config_helpers import (
     get_attr_value,
     resolve_font_family,
     get_area_style,
+    get_stackedarea_style,
     get_grid_style,
     get_line_style,
     get_bar_style,
@@ -75,6 +76,7 @@ from .config_helpers import (
 from ..stats import minimum, maximum, iqr
 from ...constants import (
     ASPECT_RATIO,
+    BASELINE,
     DIRECTION,
     CONTOUR_LEVELS,
     HEXBIN_REDUCE,
@@ -511,6 +513,14 @@ class HistSlot:
 
 
 @dataclass(frozen=True)
+class StackSlot:
+    """A stacked area layer's band within the panel-wide stack (ADR 0025)."""
+
+    bottom: np.ndarray
+    top: np.ndarray
+
+
+@dataclass(frozen=True)
 class DrawContext:
     """Frozen per-layer instructions a Panel hands to a Layer at draw time."""
 
@@ -520,6 +530,7 @@ class DrawContext:
     alpha: Optional[float] = None
     bar_slot: Optional[BarSlot] = None
     hist_slot: Optional[HistSlot] = None
+    stack_slot: Optional[StackSlot] = None
     bins: Optional[np.ndarray] = None
     hatch: Optional[str] = None
     emphasis: Optional[str] = None
@@ -696,6 +707,116 @@ class LineLayer(Layer):
         data_lim = ax.dataLim.frozen()
         fill(x, y, floor, step=step, **area_style)
         ax.dataLim.set(data_lim)
+
+
+class StackedAreaLayer(Layer):
+    """One series of a stack; the panel computes its band (ADR 0025)."""
+
+    kind = "stackedarea"
+
+    def _resolve_style(self):
+        style = get_stackedarea_style(self.style)
+        self.outline = bool(style.pop("outline", False))
+        self.fill_style = style
+        self.line_style = get_line_style(self.style)
+
+    def x_values(self):
+        return get_chart_data("x", self.chart)
+
+    def y_values(self):
+        y = get_chart_data("y", self.chart)
+        return None if y is None else np.asarray(y, dtype=float)
+
+    def x_range(self):
+        x = self.x_values()
+        if x is None or len(x) == 0:
+            return None
+        return (minimum(x), maximum(x))
+
+    def y_range(self):
+        y = self.y_values()
+        if y is None or len(y) == 0:
+            return None
+        return (float(np.min(y)), float(np.max(y)))
+
+    def draw(self, ax, ctx):
+        x = self.x_values()
+        if x is None or ctx.stack_slot is None:
+            return
+
+        fill_style = self._merge_color("color", ctx.color, self.fill_style)
+        if ctx.z_order is not None:
+            fill_style["zorder"] = ctx.z_order
+        self._apply_emphasis(fill_style, ctx.emphasis)
+
+        plot, fill, _ = _oriented(ax, ctx.transpose)
+        fill(
+            x,
+            ctx.stack_slot.bottom,
+            ctx.stack_slot.top,
+            **fill_style,
+            label=self.label(ctx),
+        )
+
+        if self.outline:
+            line_style = self._merge_color("color", ctx.color, self.line_style)
+            line_style["zorder"] = fill_style.get("zorder", 0) + 0.1
+            self._apply_emphasis(line_style, ctx.emphasis)
+            plot(x, ctx.stack_slot.top, **line_style)
+
+
+def stack_first_line(y: np.ndarray, baseline: str) -> np.ndarray:
+    """Where the stack starts at each x; matplotlib's `stackplot` baselines."""
+
+    if baseline in (BASELINE.ZERO, BASELINE.PERCENT):
+        return np.zeros(y.shape[1])
+    if baseline == BASELINE.SYM:
+        return -0.5 * np.sum(y, 0)
+    m = y.shape[0]
+    if baseline == BASELINE.WIGGLE:
+        return (y * (m - 0.5 - np.arange(m)[:, None])).sum(0) / -m
+    if baseline == BASELINE.WEIGHTED_WIGGLE:
+        total = np.sum(y, 0)
+        inv_total = np.zeros_like(total)
+        mask = total > 0
+        inv_total[mask] = 1.0 / total[mask]
+        increase = np.hstack((y[:, 0:1], np.diff(y)))
+        below_size = total - np.cumsum(y, 0) + 0.5 * y
+        move_up = below_size * inv_total
+        move_up[:, 0] = 0.5
+        center = np.cumsum(((move_up - 0.5) * increase).sum(0))
+        return center - 0.5 * total
+    raise ValueError(
+        f"Invalid `baseline` value {baseline!r}. Must be one of "
+        f"{sorted(STACK_BASELINES)}."
+    )
+
+
+STACK_BASELINES = (
+    BASELINE.ZERO,
+    BASELINE.PERCENT,
+    BASELINE.SYM,
+    BASELINE.WIGGLE,
+    BASELINE.WEIGHTED_WIGGLE,
+)
+
+
+def _stack_slots(layers: List[StackedAreaLayer], baseline: str) -> dict:
+    """Per-layer (bottom, top) bands of the stack; series order is stack order."""
+
+    validate_shared_x([l.x_values() for l in layers])
+    y = np.vstack([l.y_values() for l in layers])
+    if baseline == BASELINE.PERCENT:
+        total = y.sum(0)
+        y = np.divide(y * 100.0, total, out=np.zeros_like(y), where=total != 0)
+    first_line = stack_first_line(y, baseline)
+    tops = np.cumsum(y, 0) + first_line
+    slots = {}
+    bottom = first_line
+    for layer, top in zip(layers, tops):
+        slots[id(layer)] = StackSlot(bottom=bottom, top=top)
+        bottom = top
+    return slots
 
 
 def _abs_bar_value_fmt(value_format):
@@ -2723,6 +2844,7 @@ LAYER_TYPES = {
     "heatmap": HeatmapLayer,
     "contourchart": ContourLayer,
     "hexbinchart": HexbinLayer,
+    "stackedareachart": StackedAreaLayer,
 }
 
 RADIAL_LAYER_TYPES = {
@@ -3314,6 +3436,12 @@ class Panel:
                 )[1]
             hist_slots = _hist_stack_slots([l for _, l in hist_pairs], stack_bins)
 
+        # stacked areas always stack; the baseline is a panel setting (ADR 0025)
+        stack_layers = [l for l in self.layers if isinstance(l, StackedAreaLayer)]
+        stack_slots = {}
+        if stack_layers:
+            stack_slots = _stack_slots(stack_layers, s.get("baseline") or BASELINE.ZERO)
+
         zorder_defaults = s.get("zorder_defaults", {})
 
         # group layers share one category axis (ADR 0020)
@@ -3397,6 +3525,7 @@ class Panel:
                     ),
                     bar_slot=bar_slots.get(id(layer)),
                     hist_slot=hist_slots.get(id(layer)),
+                    stack_slot=stack_slots.get(id(layer)),
                     bins=bins,
                     hatch=(
                         hatch_assignments[layer.chart_hash]
@@ -3472,7 +3601,7 @@ class Panel:
         if s.get("tighten_xlim"):
             set_category_lim = ax.set_ylim if horizontal else ax.set_xlim
             for layer in layers:
-                if isinstance(layer, LineLayer):
+                if isinstance(layer, (LineLayer, StackedAreaLayer)):
                     rng = layer.x_range()
                     if rng is not None:
                         set_category_lim(rng[0], rng[1])
@@ -3531,6 +3660,12 @@ class Panel:
         # pyramid mirror furniture reads the value axis after the headroom pad
         if s.get("pyramid"):
             self._apply_pyramid_mirror(ax)
+
+        # a stack from zero sits on the axis floor, like bars (ADR 0025)
+        if any(isinstance(l, StackedAreaLayer) for l in layers) and (
+            s.get("baseline") or BASELINE.ZERO
+        ) in (BASELINE.ZERO, BASELINE.PERCENT):
+            (ax.set_xlim if horizontal else ax.set_ylim)(0, None)
 
         # axis limits
         limits = {k: s.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
@@ -3960,7 +4095,8 @@ def build_chart_panel_settings(
         # histograms stack by default; bars group (ADR 0014)
         "bar_mode": settings.get("bar_mode")
         or ("stack" if chart_type == "histogram" else "group"),
-        "tighten_xlim": chart_type == "linechart",
+        "tighten_xlim": chart_type in ("linechart", "stackedareachart"),
+        "baseline": settings.get("baseline"),
         # radial furniture; only polar panels read these
         "startangle": settings.get("startangle"),
         "direction": settings.get("direction"),

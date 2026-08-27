@@ -34,6 +34,7 @@ from datachart.charts import (
     ViolinPlot,
     ContourChart,
     HexbinChart,
+    StackedAreaChart,
 )
 from datachart.utils import Panel, Grid, Annotate
 from datachart.config import config
@@ -42,6 +43,7 @@ from datachart.constants import (
     COLORS,
     CONTOUR_LEVELS,
     HEXBIN_REDUCE,
+    BASELINE,
     NORMALIZE,
     THEME,
 )
@@ -128,6 +130,15 @@ EXPECTED_CHANGES = {
     "hexbin_subplots",
     "hexbin_panel_scatter",
     "hexbin_grid",
+    # new stacked area cases (ADR 0025)
+    "stackedarea_zero",
+    "stackedarea_percent",
+    "stackedarea_sym",
+    "stackedarea_wiggle",
+    "stackedarea_outline",
+    "stackedarea_subplots",
+    "stackedarea_panel_line",
+    "stackedarea_grid",
     # nested gridspecs size their parent cell (ADR 0007, issue #86)
     "grid_nested_grid",
 }
@@ -1274,6 +1285,85 @@ def hexbin_grid():
     data["c"] = [x + y for x, y in zip(data["x"], data["y"])]
     right = HexbinChart(data=data, reduce=HEXBIN_REDUCE.MAX, title="max c")
     return Grid([[top], [line, right]], figsize=(10, 7))
+
+
+def stack_series(seed=3, n=12, k=3):
+    """`k` smooth positive series over the same x, as stacked area input."""
+
+    rng = np.random.RandomState(seed)
+    return [
+        [
+            {"x": i, "y": float(v)}
+            for i, v in enumerate(np.abs(rng.randn(n)).cumsum() + 1)
+        ]
+        for _ in range(k)
+    ]
+
+
+@case
+def stackedarea_zero():
+    return StackedAreaChart(
+        data=stack_series(), subtitle=["a", "b", "c"], title="zero", show_legend=True
+    )
+
+
+@case
+def stackedarea_percent():
+    return StackedAreaChart(data=stack_series(), baseline=BASELINE.PERCENT)
+
+
+@case
+def stackedarea_sym():
+    return StackedAreaChart(data=stack_series(), baseline=BASELINE.SYM)
+
+
+@case
+def stackedarea_wiggle():
+    return StackedAreaChart(data=stack_series(k=4), baseline=BASELINE.WIGGLE)
+
+
+@case
+def stackedarea_outline():
+    return StackedAreaChart(
+        data=stack_series(),
+        style={"plot_stackedarea_outline": True, "plot_stackedarea_alpha": 0.5},
+    )
+
+
+@case
+def stackedarea_subplots():
+    return StackedAreaChart(
+        data=stack_series(),
+        subtitle=["a", "b", "c"],
+        subplots=True,
+        max_cols=3,
+        sharey=True,
+        figsize=(12, 3.5),
+    )
+
+
+@case
+def stackedarea_panel_line():
+    data = stack_series()
+    total = [{"x": p[0]["x"], "y": sum(pt["y"] for pt in p)} for p in zip(*data)]
+    return Panel(
+        [
+            StackedAreaChart(data=data, subtitle=["a", "b", "c"]),
+            LineChart(data=total, subtitle="total"),
+        ],
+        title="Panel",
+        show_legend=True,
+    )
+
+
+@case
+def stackedarea_grid():
+    top = StackedAreaChart(data=stack_series(), title="zero")
+    left = StackedAreaChart(
+        data=stack_series(), baseline=BASELINE.PERCENT, title="percent"
+    )
+    right = LineChart(data=LINE1, title="line")
+    return Grid([[top], [left, right]], figsize=(10, 7))
 
 
 @case

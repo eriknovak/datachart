@@ -38,6 +38,7 @@ from ._internal.layers import (
     ViolinLayer,
     ContourLayer,
     HexbinLayer,
+    StackedAreaLayer,
     ParallelCoordsLayer,
     RadialLayer,
     GroupLayer,
@@ -53,6 +54,7 @@ OVERLAYABLE_LAYERS = (
     ViolinLayer,
     ContourLayer,
     HexbinLayer,
+    StackedAreaLayer,
     ParallelCoordsLayer,
     RadialLayer,
     GroupLayer,
@@ -332,6 +334,19 @@ def Panel(
         "ymin_right": ymin_right,
         "ymax_right": ymax_right,
     }
+
+    # the first source figure's stack baseline wins, like bar_mode (ADR 0025)
+    panel_settings["baseline"] = next(
+        (
+            b
+            for b in (
+                item["figure"]._chart_metadata["panel"].settings.get("baseline")
+                for item in items
+            )
+            if b is not None
+        ),
+        None,
+    )
 
     if projection == "polar":
         # the merged panel keeps the first source figure's radial furniture

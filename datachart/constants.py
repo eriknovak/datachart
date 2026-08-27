@@ -24,6 +24,7 @@ Classes:
     BANDWIDTH:          The supported kernel density bandwidth rules.
     CONTOUR_LEVELS:     The supported contour level rules.
     HEXBIN_REDUCE:      The supported hexbin aggregations.
+    BASELINE:           The supported stacked area baselines.
     RADIAL_TYPE:        The supported radial chart visuals.
     SWARM_MODE:         The supported swarm plot modes.
     DIRECTION:          The supported angular directions.
@@ -846,6 +847,37 @@ class HEXBIN_REDUCE:
     MEDIAN = "median"
     MIN = "min"
     MAX = "max"
+
+
+class BASELINE:
+    """The supported stacked area baselines.
+
+    Passed as the `baseline` attribute of stacked area charts: where the
+    first series starts, and so how the whole stack sits on the y-axis.
+
+    ![BASELINE at a glance](../../assets/imgs/const-baseline.svg){ width="100%" }
+
+    Examples:
+        >>> from datachart.constants import BASELINE
+        >>> BASELINE.DEFAULT
+        "zero"
+
+    Attributes:
+        DEFAULT (str): The default baseline. Same as `BASELINE.ZERO`.
+        ZERO (str): The stack starts at zero. Equals to `"zero"`.
+        PERCENT (str): Each `x` is normalised so the stack spans 0 to 100. Equals to `"percent"`.
+        SYM (str): The stack is centred on zero. Equals to `"sym"`.
+        WIGGLE (str): The baseline minimises the sum of squared slopes. Equals to `"wiggle"`.
+        WEIGHTED_WIGGLE (str): The baseline minimises the size-weighted sum of squared slopes. Equals to `"weighted_wiggle"`.
+
+    """
+
+    DEFAULT = "zero"
+    ZERO = "zero"
+    PERCENT = "percent"
+    SYM = "sym"
+    WIGGLE = "wiggle"
+    WEIGHTED_WIGGLE = "weighted_wiggle"
 
 
 class RADIAL_TYPE:

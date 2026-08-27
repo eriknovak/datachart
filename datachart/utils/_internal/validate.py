@@ -23,6 +23,20 @@ def validate_bandwidth(bandwidth) -> None:
         )
 
 
+def validate_shared_x(columns) -> None:
+    """Raise unless every `x` column holds the same values in the same order."""
+
+    if not columns or columns[0] is None:
+        raise ValueError("A stacked area chart requires the `x` and `y` columns.")
+    first = list(columns[0])
+    for i, column in enumerate(columns[1:], start=1):
+        if column is None or list(column) != first:
+            raise ValueError(
+                "Every stacked area series must share the same `x` values in the "
+                f"same order; series {i} differs from series 0."
+            )
+
+
 def validate_emphasis(value, context: str = "emphasis"):
     """Validate a single emphasis role; None means no emphasis."""
 
