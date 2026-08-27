@@ -45,7 +45,7 @@ def RaincloudPlot(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_outliers: Optional[bool] = True,
     mode: Union[SWARM_MODE, str] = SWARM_MODE.SWARM,
-    jitter: float = 0.2,
+    jitter: float = 0.4,
     bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,

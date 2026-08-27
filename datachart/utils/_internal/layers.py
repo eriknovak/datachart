@@ -1253,12 +1253,15 @@ class BoxLayer(GroupLayer):
                 median.set_linewidth(median.get_linewidth() * HIGHLIGHT_WIDTH_SCALE)
 
 
-def beeswarm_offsets(values_px: np.ndarray, diameter_px: float) -> np.ndarray:
+def beeswarm_offsets(
+    values_px: np.ndarray, diameter_px: float, one_sided: bool = False
+) -> np.ndarray:
     """Non-overlapping offsets across the category axis, in pixels.
 
     Greedy placement in sorted-value order: each point takes the candidate
     offset nearest the center that keeps it a diameter away from every point
-    already placed within a diameter along the value axis.
+    already placed within a diameter along the value axis. One-sided packing
+    only grows away from the center in the positive direction.
     """
 
     values_px = np.asarray(values_px, dtype=float)
@@ -1279,6 +1282,8 @@ def beeswarm_offsets(values_px: np.ndarray, diameter_px: float) -> np.ndarray:
         # candidates: the center, then tangent to each neighbor on either side
         spread = np.sqrt(np.maximum(d2 - dv2, 0.0))
         cands = np.concatenate([[0.0], offs + spread, offs - spread])
+        if one_sided:
+            cands = cands[cands >= 0]
         cands = cands[np.argsort(np.abs(cands), kind="stable")]
         chosen = 0.0
         for c in cands:
@@ -1314,6 +1319,8 @@ class SwarmLayer(GroupLayer):
         self.offset = self.settings.get("offset") or 0.0
         spread = self.settings.get("spread")
         self.max_offset = SWARM_MAX_OFFSET if spread is None else float(spread)
+        # a raincloud's rain packs away from the box: -1 the low side, +1 high
+        self.side = self.settings.get("side") or 0
         self.swarm_style = get_swarm_style(self.style)
         self.default_size = config["plot_swarm_size"]
         # a highlight edge contrasts in the theme's own text color
@@ -1326,9 +1333,10 @@ class SwarmLayer(GroupLayer):
 
         if self.mode == SWARM_MODE.STRIP:
             # the jitter width scales with the cell the points may spread over
-            return strip_offsets(
+            offsets = strip_offsets(
                 len(values), self.jitter * self.max_offset / SWARM_MAX_OFFSET
             )
+            return offsets if not self.side else (np.abs(offsets) * 2) * self.side
 
         size = self.swarm_style.get("s")
         if size is None:
@@ -1342,12 +1350,13 @@ class SwarmLayer(GroupLayer):
         )
         px = ax.transData.transform(points)
         value_px = px[:, 0] if self.is_horizontal else px[:, 1]
-        offsets_px = beeswarm_offsets(value_px, diameter_px)
+        offsets_px = beeswarm_offsets(value_px, diameter_px, bool(self.side))
         # pixels per data unit along the category axis
         unit = ax.transData.transform([[0, 1]] if self.is_horizontal else [[1, 0]])
         origin = ax.transData.transform([[0, 0]])
         scale = (unit - origin)[0][1 if self.is_horizontal else 0]
-        return np.clip(offsets_px / scale, -self.max_offset, self.max_offset)
+        offsets = np.clip(offsets_px / scale, -self.max_offset, self.max_offset)
+        return offsets if not self.side else offsets * self.side
 
     def draw(self, ax, ctx):
         grouped = self.grouped_values()
@@ -1426,10 +1435,10 @@ class SwarmLayer(GroupLayer):
 # keeps the two inner boxes of a split violin off the shared seam
 SPLIT_INNER_OFFSET = 0.05
 # raincloud geometry (ADR 0021), in category-axis units around the position:
-# the rain and the box sit opposite the cloud, the rain spread and the box
-# width keep both inside the cell
-RAINCLOUD_RAIN_OFFSET = 0.22
-RAINCLOUD_RAIN_SPREAD = 0.08
+# the half box sits on the cloud's seam, the rain starts past it and packs
+# outward over its spread
+RAINCLOUD_RAIN_OFFSET = 0.1
+RAINCLOUD_RAIN_SPREAD = 0.16
 RAINCLOUD_BOX_WIDTH = 0.15
 INNER_QUARTILE_WIDTH_SCALE = 5.0
 
@@ -2414,6 +2423,7 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
             **settings,
             "offset": sign * RAINCLOUD_RAIN_OFFSET,
             "spread": RAINCLOUD_RAIN_SPREAD,
+            "side": sign,
             "color_by_group": True,
         },
     )

@@ -63,15 +63,16 @@ class TestRaincloudLayers(unittest.TestCase):
             xs = np.concatenate([p.vertices[:, 0] for p in body.get_paths()])
             self.assertLessEqual(xs.max(), pos + 1e-9)
             self.assertLess(xs.min(), pos - 0.1)
-        # rain: points centered at p + offset, inside the spread
+        # rain: one-sided, packed outward from p + offset over the spread
         xy = np.concatenate([c.get_offsets() for c in _swarm_collections(ax)])
         for pos in (1, 2, 3):
-            xs = xy[np.abs(xy[:, 0] - pos - RAINCLOUD_RAIN_OFFSET) <= 0.5][:, 0]
+            xs = xy[np.abs(xy[:, 0] - pos) <= 0.5][:, 0] - pos
             self.assertTrue(len(xs))
+            self.assertGreaterEqual(xs.min(), RAINCLOUD_RAIN_OFFSET - 1e-9)
             self.assertLessEqual(
-                np.abs(xs - pos - RAINCLOUD_RAIN_OFFSET).max(),
-                RAINCLOUD_RAIN_SPREAD + 1e-9,
+                xs.max(), RAINCLOUD_RAIN_OFFSET + RAINCLOUD_RAIN_SPREAD + 1e-9
             )
+            self.assertGreater(xs.max() - xs.min(), 0.05)
         # box: the rain-side half on the cloud's seam, an outline
         boxes = _box_patches(ax)
         self.assertEqual(len(boxes), 3)
@@ -88,7 +89,7 @@ class TestRaincloudLayers(unittest.TestCase):
             ys = np.concatenate([p.vertices[:, 1] for p in body.get_paths()])
             self.assertGreaterEqual(ys.min(), pos - 1e-9)
         xy = np.concatenate([c.get_offsets() for c in _swarm_collections(ax)])
-        self.assertLess(xy[:, 1].max(), 3)
+        self.assertLessEqual(xy[:, 1].max(), 3 - RAINCLOUD_RAIN_OFFSET + 1e-9)
         for pos, box in enumerate(_box_patches(ax), start=1):
             ys = box.get_path().vertices[:, 1]
             self.assertAlmostEqual(ys.max(), pos)
