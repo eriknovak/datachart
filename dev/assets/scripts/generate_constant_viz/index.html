@@ -506,6 +506,8 @@
       
         
       
+        
+      
     
     
     
@@ -881,6 +883,34 @@
     
   
     Contour Chart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../how-to-guides/charts/hexbinchart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hexbin Chart
   
 
     
@@ -2491,7 +2521,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9e7ac07e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=607da494">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2534,7 +2564,7 @@ Run from the repo root: python docs/assets/scripts/generate_constant_viz.py
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b2a99b17">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=61b3fa6c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2563,7 +2593,7 @@ import sys</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d4a74ee3">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0317ce00">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2590,7 +2620,7 @@ import sys</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e4c66462">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=247c6108">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2625,7 +2655,7 @@ from matplotlib.patches import FancyBboxPatch, Rectangle</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9e1a68d0">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d695a633">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2648,6 +2678,7 @@ from matplotlib.patches import FancyBboxPatch, Rectangle</div>
     <span class="n">BarChart</span><span class="p">,</span>
     <span class="n">ContourChart</span><span class="p">,</span>
     <span class="n">Heatmap</span><span class="p">,</span>
+    <span class="n">HexbinChart</span><span class="p">,</span>
     <span class="n">Histogram</span><span class="p">,</span>
     <span class="n">LineChart</span><span class="p">,</span>
     <span class="n">RadialChart</span><span class="p">,</span>
@@ -2664,6 +2695,7 @@ from matplotlib.patches import FancyBboxPatch, Rectangle</div>
     <span class="n">COLORBAR_LOCATION</span><span class="p">,</span>
     <span class="n">CONTOUR_LEVELS</span><span class="p">,</span>
     <span class="n">DIRECTION</span><span class="p">,</span>
+    <span class="n">HEXBIN_REDUCE</span><span class="p">,</span>
     <span class="n">EMPHASIS</span><span class="p">,</span>
     <span class="n">FONT_STYLE</span><span class="p">,</span>
     <span class="n">FONT_WEIGHT</span><span class="p">,</span>
@@ -2691,6 +2723,7 @@ from datachart.charts import (
     BarChart,
     ContourChart,
     Heatmap,
+    HexbinChart,
     Histogram,
     LineChart,
     RadialChart,
@@ -2707,6 +2740,7 @@ from datachart.constants import (
     COLORBAR_LOCATION,
     CONTOUR_LEVELS,
     DIRECTION,
+    HEXBIN_REDUCE,
     EMPHASIS,
     FONT_STYLE,
     FONT_WEIGHT,
@@ -2734,7 +2768,7 @@ from datachart.utils._internal.colors import create_color_cycle</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a82c0999">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f76d6622">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2761,7 +2795,7 @@ from datachart.utils._internal.colors import create_color_cycle</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9ca24037">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=24ffdc88">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2798,7 +2832,7 @@ SAMPLE = "The quick brown fox jumps over the lazy dog"</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=de4bb298">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7fa712be">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2831,7 +2865,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c1bfa6d2">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9b1b04c3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2862,7 +2896,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=75b38e84">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=278541c8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2895,7 +2929,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=09572e31">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=79971e74">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2994,7 +3028,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8845f656">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=354c4403">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3033,7 +3067,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e9deebc9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2ce2944b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3098,7 +3132,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7f7273f1">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4bf977d3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3207,7 +3241,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2f2c34b1">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2a2d6998">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3286,7 +3320,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=44ce6a1a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a8c0a1dd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3357,7 +3391,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cee2b2b9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=66d91702">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3468,7 +3502,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0cb79f1c">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=602dc982">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3559,7 +3593,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=07051690">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=09c9875a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3638,7 +3672,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=200554a4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d1f06c12">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3743,7 +3777,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4817d869">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=09a2b59e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3896,7 +3930,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3f103494">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c5d46517">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3973,7 +4007,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=016548b0">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=548c8354">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4044,7 +4078,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1a6dc128">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d6d10a17">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4077,7 +4111,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fc294123">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=50ccb912">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4124,7 +4158,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=92239a67">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bf3d69fb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4219,7 +4253,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fd14f4b4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=247112f8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4272,7 +4306,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d22ba1f4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6e297871">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4311,7 +4345,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f4f08187">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e6650ef3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4368,7 +4402,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=530fb0e8">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4ef84cd4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4429,7 +4463,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=65fa68d0">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a8fbd21d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4512,7 +4546,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b2fd42f5">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=261b6fc3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4521,6 +4555,99 @@ FS_NOTE = 8.5</div>
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-32">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">hexbin_reduce</span><span class="p">():</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">pts</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">3000</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="c1"># a per-point value that rises along the diagonal, so the reducers differ</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"x"</span><span class="p">:</span> <span class="n">pts</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+        <span class="s2">"y"</span><span class="p">:</span> <span class="n">pts</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+        <span class="s2">"c"</span><span class="p">:</span> <span class="p">(</span><span class="n">pts</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">pts</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">3000</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+    <span class="p">}</span>
+    <span class="n">members</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">"MEAN"</span><span class="p">,</span> <span class="n">HEXBIN_REDUCE</span><span class="o">.</span><span class="n">MEAN</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"SUM"</span><span class="p">,</span> <span class="n">HEXBIN_REDUCE</span><span class="o">.</span><span class="n">SUM</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"MEDIAN"</span><span class="p">,</span> <span class="n">HEXBIN_REDUCE</span><span class="o">.</span><span class="n">MEDIAN</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"MIN"</span><span class="p">,</span> <span class="n">HEXBIN_REDUCE</span><span class="o">.</span><span class="n">MIN</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"MAX"</span><span class="p">,</span> <span class="n">HEXBIN_REDUCE</span><span class="o">.</span><span class="n">MAX</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">figs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">HexbinChart</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">reduce</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">gridsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+            <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"HEXBIN_REDUCE.</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">members</span>
+    <span class="p">]</span>
+    <span class="n">chart_grid</span><span class="p">(</span>
+        <span class="n">figs</span><span class="p">,</span>
+        <span class="s2">"const-hexbin-reduce.svg"</span><span class="p">,</span>
+        <span class="mf">3.6</span><span class="p">,</span>
+        <span class="n">cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">footnote</span><span class="o">=</span><span class="s2">"The same 3,000 points and c values; each hexagon shows the "</span>
+        <span class="s2">"aggregate of the c of its points."</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-32">def hexbin_reduce():
+    rng = np.random.RandomState(4)
+    pts = rng.normal(0, 1, (3000, 2))
+    # a per-point value that rises along the diagonal, so the reducers differ
+    data = {
+        "x": pts[:, 0].tolist(),
+        "y": pts[:, 1].tolist(),
+        "c": (pts[:, 0] + pts[:, 1] + rng.normal(0, 0.5, 3000)).tolist(),
+    }
+    members = [
+        ("MEAN", HEXBIN_REDUCE.MEAN),
+        ("SUM", HEXBIN_REDUCE.SUM),
+        ("MEDIAN", HEXBIN_REDUCE.MEDIAN),
+        ("MIN", HEXBIN_REDUCE.MIN),
+        ("MAX", HEXBIN_REDUCE.MAX),
+    ]
+    figs = [
+        HexbinChart(
+            data=data,
+            reduce=value,
+            gridsize=12,
+            show_colorbars=False,
+            title=f"HEXBIN_REDUCE.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-hexbin-reduce.svg",
+        3.6,
+        cols=3,
+        footnote="The same 3,000 points and c values; each hexagon shows the "
+        "aggregate of the c of its points.",
+    )</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bf53ad1c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-33">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4544,7 +4671,7 @@ FS_NOTE = 8.5</div>
         <span class="s2">"uniformly across the jitter fraction of the category width."</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-32">def swarm_mode():
+<div class="clipboard-copy-txt" id="cell-33">def swarm_mode():
     members = [("SWARM", SWARM_MODE.SWARM), ("STRIP", SWARM_MODE.STRIP)]
     figs = [
         SwarmPlot(data=_violin_data(), mode=value, title=f"SWARM_MODE.{label}")
@@ -4563,7 +4690,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4da59046">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d6920d4d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4571,7 +4698,7 @@ FS_NOTE = 8.5</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-33">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-34">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4613,7 +4740,7 @@ FS_NOTE = 8.5</div>
         <span class="s2">"HISTOGRAM bins numeric degrees over [0, 360)."</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-33">def radial_type():
+<div class="clipboard-copy-txt" id="cell-34">def radial_type():
     members = [
         ("LINE", RADIAL_TYPE.LINE),
         ("BAR", RADIAL_TYPE.BAR),
@@ -4650,7 +4777,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=df975a1d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a312ffac">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4658,7 +4785,7 @@ FS_NOTE = 8.5</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-34">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-35">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4688,7 +4815,7 @@ FS_NOTE = 8.5</div>
     <span class="p">]</span>
     <span class="n">chart_grid</span><span class="p">(</span><span class="n">figs</span><span class="p">,</span> <span class="s2">"const-direction.svg"</span><span class="p">,</span> <span class="mf">2.6</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-34">def direction():
+<div class="clipboard-copy-txt" id="cell-35">def direction():
     members = [
         ("CLOCKWISE", DIRECTION.CLOCKWISE),
         ("COUNTERCLOCKWISE", DIRECTION.COUNTERCLOCKWISE),
@@ -4713,7 +4840,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a3802f82">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9e911884">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4721,7 +4848,7 @@ FS_NOTE = 8.5</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-35">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-36">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4764,7 +4891,7 @@ FS_NOTE = 8.5</div>
         <span class="s2">"or NONE, the theme's chart_default_show_grid fills in."</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-35">def show_grid():
+<div class="clipboard-copy-txt" id="cell-36">def show_grid():
     members = [
         ("NONE", SHOW_GRID.NONE),
         ("X", SHOW_GRID.X),
@@ -4802,7 +4929,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a673bf07">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1ea7fc52">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4810,7 +4937,7 @@ FS_NOTE = 8.5</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-36">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-37">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4840,7 +4967,7 @@ FS_NOTE = 8.5</div>
         <span class="s2">"SYMLOG and ASINH also accept zero and negative values."</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-36">def scale():
+<div class="clipboard-copy-txt" id="cell-37">def scale():
     members = [
         ("LINEAR", SCALE.LINEAR),
         ("LOG", SCALE.LOG),
@@ -4865,7 +4992,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4060b930">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7ede3e3e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4873,7 +5000,7 @@ FS_NOTE = 8.5</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-37">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-38">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4910,7 +5037,7 @@ FS_NOTE = 8.5</div>
         <span class="s2">"SYMLOG and ASINH also accept zero and negative values."</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-37">def normalize():
+<div class="clipboard-copy-txt" id="cell-38">def normalize():
     members = [
         ("LINEAR", NORMALIZE.LINEAR),
         ("LOG", NORMALIZE.LOG),
@@ -4942,7 +5069,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7472f4a6">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f8e4f707">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4950,7 +5077,7 @@ FS_NOTE = 8.5</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-38">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-39">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4987,7 +5114,7 @@ FS_NOTE = 8.5</div>
         <span class="s2">"BACKGROUND also drops its legend entry."</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-38">def emphasis():
+<div class="clipboard-copy-txt" id="cell-39">def emphasis():
     members = [
         ("BACKGROUND", EMPHASIS.BACKGROUND),
         ("HIGHLIGHT", EMPHASIS.HIGHLIGHT),
@@ -5019,7 +5146,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=13966f09">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=33824b68">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -5027,7 +5154,7 @@ FS_NOTE = 8.5</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-39">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-40">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5060,7 +5187,7 @@ FS_NOTE = 8.5</div>
         <span class="s2">"fill the box, EQUAL keeps one unit equal on both axes."</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-39">def aspect_ratio():
+<div class="clipboard-copy-txt" id="cell-40">def aspect_ratio():
     members = [
         ("AUTO", ASPECT_RATIO.AUTO),
         ("EQUAL", ASPECT_RATIO.EQUAL),
@@ -5088,7 +5215,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8a8142d1">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6ca571c2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -5096,7 +5223,7 @@ FS_NOTE = 8.5</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-40">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-41">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5124,6 +5251,7 @@ FS_NOTE = 8.5</div>
     <span class="n">violin_inner</span><span class="p">()</span>
     <span class="n">bandwidth</span><span class="p">()</span>
     <span class="n">contour_levels</span><span class="p">()</span>
+    <span class="n">hexbin_reduce</span><span class="p">()</span>
     <span class="n">swarm_mode</span><span class="p">()</span>
     <span class="n">radial_type</span><span class="p">()</span>
     <span class="n">direction</span><span class="p">()</span>
@@ -5133,7 +5261,7 @@ FS_NOTE = 8.5</div>
     <span class="n">emphasis</span><span class="p">()</span>
     <span class="n">aspect_ratio</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-40">def main():
+<div class="clipboard-copy-txt" id="cell-41">def main():
     font_style()
     font_weight()
     line_marker()
@@ -5151,6 +5279,7 @@ FS_NOTE = 8.5</div>
     violin_inner()
     bandwidth()
     contour_levels()
+    hexbin_reduce()
     swarm_mode()
     radial_type()
     direction()
@@ -5165,7 +5294,7 @@ FS_NOTE = 8.5</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=88af82bc">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=859ed474">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -5173,7 +5302,7 @@ FS_NOTE = 8.5</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-41">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-42">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5186,7 +5315,7 @@ FS_NOTE = 8.5</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-41">if __name__ == "__main__":
+<div class="clipboard-copy-txt" id="cell-42">if __name__ == "__main__":
     main()</div>
 </div>
 </div>

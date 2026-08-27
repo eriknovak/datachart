@@ -27,6 +27,7 @@ The `constants` module provides a set of predefined constants used in the packag
 | `VIOLIN_INNER`      | The supported violin inner marks.              |
 | `BANDWIDTH`         | The supported kernel density bandwidth rules.  |
 | `CONTOUR_LEVELS`    | The supported contour level rules.             |
+| `HEXBIN_REDUCE`     | The supported hexbin aggregations.             |
 | `RADIAL_TYPE`       | The supported radial chart visuals.            |
 | `SWARM_MODE`        | The supported swarm plot modes.                |
 | `DIRECTION`         | The supported angular directions.              |
@@ -569,6 +570,29 @@ Examples:
 | `AUTO`    | Matplotlib's own choice, about eight round values across the surface. Equals to "auto". **TYPE:** `str`                                                    |
 | `RICE`    | The Rice rule, 2 * n \*\* (1/3) levels — about ten on a 120×120 grid. Equals to "rice". **TYPE:** `str`                                                    |
 | `FD`      | The Freedman–Diaconis rule, the value range over 2 * IQR * n \*\* (-1/3) — about twice as dense as Rice on a 120×120 grid. Equals to "fd". **TYPE:** `str` |
+
+### datachart.constants.HEXBIN_REDUCE
+
+The supported hexbin aggregations.
+
+Passed as the `reduce` attribute of hexbin charts: how the `c` values of the points in a hexagon collapse into the one value that colors it. Ignored without `c`, where every hexagon shows its point count.
+
+Examples:
+
+```
+>>> from datachart.constants import HEXBIN_REDUCE
+>>> HEXBIN_REDUCE.DEFAULT
+"mean"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                          |
+| --------- | -------------------------------------------------------------------- |
+| `DEFAULT` | The default aggregation. Same as HEXBIN_REDUCE.MEAN. **TYPE:** `str` |
+| `MEAN`    | The mean of the c values. Equals to "mean". **TYPE:** `str`          |
+| `SUM`     | The sum of the c values. Equals to "sum". **TYPE:** `str`            |
+| `MEDIAN`  | The median of the c values. Equals to "median". **TYPE:** `str`      |
+| `MIN`     | The smallest c value. Equals to "min". **TYPE:** `str`               |
+| `MAX`     | The largest c value. Equals to "max". **TYPE:** `str`                |
 
 ### datachart.constants.RADIAL_TYPE
 

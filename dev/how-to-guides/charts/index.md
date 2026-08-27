@@ -36,6 +36,7 @@ How two or more variables relate to each other.
 | [Scatter Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md)          | The showcase of the scatter chart.        |
 | [Heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md)                     | The showcase of the heatmap.              |
 | [Contour Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md)          | The showcase of the contour chart.        |
+| [Hexbin Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md)            | The showcase of the hexbin chart.         |
 | [Parallel Coordinates](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/parallelcoords/index.md) | The showcase of the parallel coordinates. |
 
 ## Composition

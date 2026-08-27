@@ -4,7 +4,7 @@
 
 datachart is a Python data visualization package built on matplotlib.
 It provides simple chart functions (BarChart, LineChart, ScatterChart,
-Histogram, Heatmap, ContourChart, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot,
+Histogram, Heatmap, ContourChart, HexbinChart, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot,
 ParallelCoords, PyramidChart, RadialChart), figure
 composition via Panel (overlaying charts on shared axes) and Grid
 (arranging charts in a grid), and a global configuration system with
@@ -35,6 +35,7 @@ themes; per-chart overrides go in each chart's `style` parameter.
 - [Scatter Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md): Scatter chart input attributes, single and multiple datasets, customization, and saving.
 - [Heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md): Heatmap input attributes, single and multiple datasets, customization, and saving.
 - [Contour Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md): Contour chart input attributes, iso-lines and filled bands, colorbars, inline labels, level rules, emphasis, multiple surfaces, composing with Panel and Grid, and saving.
+- [Hexbin Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md): Hexbin chart input attributes, point counts and log color scales, aggregating a per-point value, grid size and minimum count, hexagon edges, subplots, composing with Panel and Grid, and saving.
 - [Parallel Coordinates](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/parallelcoords/index.md): Parallel coordinates input attributes and customization for multivariate data.
 
 ## Composition & Utilities
