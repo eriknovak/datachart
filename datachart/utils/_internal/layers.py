@@ -1132,6 +1132,8 @@ class BoxLayer(GroupLayer):
         self.offset = self.settings.get("offset") or 0.0
         self.width = self.settings.get("width")
         self.zorder = self.settings.get("zorder")
+        # a raincloud keeps one half of the box: -1 the low side, +1 the high
+        self.side = self.settings.get("side") or 0
         self.box_style = get_box_style(self.style)
         self.outlier_style = get_box_outlier_style(self.style)
         self.median_style = get_box_median_style(self.style)
@@ -1208,7 +1210,21 @@ class BoxLayer(GroupLayer):
             if alpha is not None:
                 patch.set_alpha(alpha)
 
+        if self.side:
+            self._clip_to_side(bp, positions)
         self._apply_box_emphasis(bp, self._group_roles(labels, ctx.emphasis))
+
+    def _clip_to_side(self, bp: dict, positions: list) -> None:
+        """Keep the box, median, and caps on one side of each box center."""
+
+        axis = 1 if self.is_horizontal else 0
+        clip = np.minimum if self.side < 0 else np.maximum
+        for i, center in enumerate(positions):
+            verts = bp["boxes"][i].get_path().vertices
+            verts[:, axis] = clip(verts[:, axis], center)
+            for line in [bp["medians"][i]] + bp["caps"][2 * i : 2 * i + 2]:
+                data = np.asarray(line.get_xdata() if axis == 0 else line.get_ydata())
+                (line.set_xdata if axis == 0 else line.set_ydata)(clip(data, center))
 
     def _apply_box_emphasis(self, bp: dict, roles: list) -> None:
         """Apply per-label roles; whiskers, caps, medians, and outliers follow the box."""
@@ -1413,7 +1429,7 @@ SPLIT_INNER_OFFSET = 0.05
 # the rain and the box sit opposite the cloud, the rain spread and the box
 # width keep both inside the cell
 RAINCLOUD_RAIN_OFFSET = 0.22
-RAINCLOUD_RAIN_SPREAD = 0.14
+RAINCLOUD_RAIN_SPREAD = 0.08
 RAINCLOUD_BOX_WIDTH = 0.15
 INNER_QUARTILE_WIDTH_SCALE = 5.0
 
@@ -2406,8 +2422,9 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
         {
             **settings,
             "show_notch": None,
-            "offset": sign * RAINCLOUD_RAIN_OFFSET,
             "width": RAINCLOUD_BOX_WIDTH,
+            # the half on the rain's side of the seam the cloud is clipped at
+            "side": sign,
             "outline": True,
             # the box reads over the rain
             "zorder": (rain.swarm_style.get("zorder") or 2) + 1,

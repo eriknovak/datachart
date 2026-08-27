@@ -72,15 +72,13 @@ class TestRaincloudLayers(unittest.TestCase):
                 np.abs(xs - pos - RAINCLOUD_RAIN_OFFSET).max(),
                 RAINCLOUD_RAIN_SPREAD + 1e-9,
             )
-        # box: same center as the rain, RAINCLOUD_BOX_WIDTH wide, an outline
+        # box: the rain-side half on the cloud's seam, an outline
         boxes = _box_patches(ax)
         self.assertEqual(len(boxes), 3)
         for pos, box in enumerate(boxes, start=1):
             xs = box.get_path().vertices[:, 0]
-            self.assertAlmostEqual(xs.max() - xs.min(), RAINCLOUD_BOX_WIDTH)
-            self.assertAlmostEqual(
-                (xs.max() + xs.min()) / 2, pos + RAINCLOUD_RAIN_OFFSET
-            )
+            self.assertAlmostEqual(xs.min(), pos)
+            self.assertAlmostEqual(xs.max() - xs.min(), RAINCLOUD_BOX_WIDTH / 2)
             self.assertEqual(box.get_facecolor()[3], 0.0)
 
     def test_horizontal_cloud_above_rain_below(self):
@@ -93,9 +91,8 @@ class TestRaincloudLayers(unittest.TestCase):
         self.assertLess(xy[:, 1].max(), 3)
         for pos, box in enumerate(_box_patches(ax), start=1):
             ys = box.get_path().vertices[:, 1]
-            self.assertAlmostEqual(
-                (ys.max() + ys.min()) / 2, pos - RAINCLOUD_RAIN_OFFSET
-            )
+            self.assertAlmostEqual(ys.max(), pos)
+            self.assertAlmostEqual(ys.max() - ys.min(), RAINCLOUD_BOX_WIDTH / 2)
 
     def test_strip_rain_stays_inside_spread(self):
         figure = RaincloudPlot(group_data(), mode="strip")

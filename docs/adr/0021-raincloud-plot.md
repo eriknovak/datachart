@@ -23,12 +23,14 @@ that redraws all three — would fork three drawing paths.
   `side` setting (the clipping `split` already does); `SwarmLayer` and
   `BoxLayer` gain a category offset and, for the swarm, a spread. The
   raincloud front sets them from constants in `layers.py`: the cloud keeps the
-  full body width on one side, the rain and box sit at ≈ 0.22 on the other,
-  the rain spreads ≈ ±0.14, the box is ≈ 0.15 wide. No user knob in v1.
+  full body width on one side, the box is the rain-side half of a ≈ 0.15 wide
+  box on the cloud's seam, the rain sits at ≈ 0.22 past it and spreads
+  ≈ ±0.08. No user knob in v1.
 - **Cloud left when vertical, above when horizontal.** The rain and box take
   the opposite side. The horizontal case follows the raincloud paper's layout.
-- **The box is an outline drawn over the rain.** No fill; edges, median,
-  whiskers, and caps in the theme font color; outliers on by default as
+- **The box is a half outline between the cloud and the rain.** Clipped to
+  the rain's side of its center, so the three parts never overlap. No fill;
+  edges, median, whiskers, and caps in the theme font color; outliers on by default as
   circles (`show_outliers=True`). The cloud draws with `inner=None`.
 - **Per-group colors.** A `color_by_group` layer setting, turned on by the
   raincloud front only, makes the violin and swarm layers cycle the multiple
