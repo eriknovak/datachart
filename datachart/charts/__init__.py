@@ -26,6 +26,8 @@ Methods:
         Creates the scatter chart.
     Heatmap(attrs):
         Creates the heatmap.
+    ContourChart(attrs):
+        Creates the contour chart.
     ParallelCoords(attrs):
         Creates the parallel coordinates chart.
 
@@ -47,6 +49,7 @@ from .raincloud_plot import RaincloudPlot
 # relationships
 from .scatter_chart import ScatterChart
 from .heatmap import Heatmap
+from .contour_chart import ContourChart
 from .parallel_coords import ParallelCoords
 
 __all__ = [
@@ -64,5 +67,6 @@ __all__ = [
     # relationships
     "ScatterChart",
     "Heatmap",
+    "ContourChart",
     "ParallelCoords",
 ]

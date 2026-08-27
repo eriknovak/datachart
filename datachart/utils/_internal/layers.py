@@ -19,6 +19,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from matplotlib.collections import LineCollection, PathCollection
+from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.mlab import GaussianKDE
 from matplotlib.patches import Patch
 from matplotlib.legend_handler import HandlerPathCollection
@@ -38,6 +39,8 @@ from .config_helpers import (
     get_heatmap_style,
     get_heatmap_font_style,
     get_heatmap_edge_style,
+    get_contour_style,
+    get_contour_label_style,
     get_scatter_style,
     get_regression_style,
     get_box_style,
@@ -64,7 +67,7 @@ from .config_helpers import (
     configure_axis_ticks_position,
     configure_axis_limits,
 )
-from ..stats import minimum, maximum
+from ..stats import minimum, maximum, contour_levels
 from ...constants import (
     ASPECT_RATIO,
     DIRECTION,
@@ -144,6 +147,10 @@ VALUE_HEADROOM_VERTICAL = 0.08
 VALUE_HEADROOM_HORIZONTAL = 0.12
 # normalized cell value above which heatmap value text switches to white
 HEATMAP_TEXT_CONTRAST_THRESHOLD = 0.55
+# the low end of a sequential cmap vanishes on white: iso-lines sample from here
+CONTOUR_LINE_CMAP_START = 0.3
+# the cmap sample that stands in for a filled contour in the legend
+CONTOUR_FILL_SWATCH = 0.7
 
 
 # ================================================
@@ -1660,6 +1667,26 @@ class ViolinLayer(GroupLayer):
             body.set_linewidth(body.get_linewidth()[0] * HIGHLIGHT_WIDTH_SCALE)
 
 
+def _draw_colorbar(ax: plt.Axes, mappable, colorbar: dict) -> None:
+    """Draw a colorbar inset beside (or above) the axes."""
+
+    orientation = colorbar.get("orientation", DEFAULT_ORIENTATION)
+    # inset_axes keeps the colorbar aligned under constrained_layout
+    if orientation == ORIENTATION.VERTICAL:
+        cax = ax.inset_axes([1.05, 0, 0.05, 1])
+    else:
+        cax = ax.inset_axes([0, 1.05, 1, 0.05])
+    ax.figure.colorbar(mappable, cax=cax, orientation=orientation)
+
+
+def _value_formatter(valfmt):
+    """A `{x}`-style format string as a matplotlib formatter; others pass."""
+
+    if isinstance(valfmt, str) and "{x" in valfmt:
+        return mticker.StrMethodFormatter(valfmt)
+    return valfmt
+
+
 class HeatmapLayer(Layer):
     kind = "heatmap"
 
@@ -1722,13 +1749,7 @@ class HeatmapLayer(Layer):
             self._draw_cell_borders(ax, len(data), len(data[0]))
 
         if self.show_colorbars:
-            orientation = colorbar.get("orientation", DEFAULT_ORIENTATION)
-            # inset_axes keeps the colorbar aligned under constrained_layout
-            if orientation == ORIENTATION.VERTICAL:
-                cax = ax.inset_axes([1.05, 0, 0.05, 1])
-            else:
-                cax = ax.inset_axes([0, 1.05, 1, 0.05])
-            ax.figure.colorbar(im, cax=cax, orientation=orientation)
+            _draw_colorbar(ax, im, colorbar)
 
         # heatmaps always draw a full frame, regardless of theme spine visibility
         for spine in ax.spines.values():
@@ -1746,6 +1767,125 @@ class HeatmapLayer(Layer):
         ax.add_collection(
             LineCollection(segments, zorder=1, **self.edge_style), autolim=False
         )
+
+
+class ContourLayer(Layer):
+    """A gridded surface drawn as iso-lines or filled bands (ADR 0022)."""
+
+    kind = "contour"
+
+    def _resolve_style(self):
+        self.filled = bool(self.settings.get("filled"))
+        self.show_labels = self.settings.get("show_labels")
+        self.show_colorbars = self.settings.get("show_colorbars")
+        style = get_contour_style(self.style)
+        self.cmap = get_colormap(style.pop("cmap"))
+        # lines take the cmap only when a contour cmap is pinned, sampled
+        # past its washed-out low end
+        self.line_cmap = None
+        if not self.filled and (
+            "plot_contour_cmap" in self.style or config.get("plot_contour_cmap")
+        ):
+            self.line_cmap = LinearSegmentedColormap.from_list(
+                f"{self.cmap.name}_lines",
+                self.cmap(np.linspace(CONTOUR_LINE_CMAP_START, 1, 256)),
+            )
+        self.contour_style = style
+        self.label_style = get_contour_label_style(self.style)
+        self.x, self.y, self.z = self._grid()
+        self.levels = contour_levels(self.z, self.settings.get("levels"))
+
+    def _grid(self) -> tuple:
+        """The validated (x, y, z) arrays; x and y default to the indices."""
+
+        z = get_chart_data("z", self.chart)
+        if z is None:
+            raise ValueError("A contour chart requires the `z` grid in `data`.")
+        z = np.asarray(z, dtype=float)
+        if z.ndim != 2:
+            raise ValueError(
+                f"The contour `z` attribute must be a 2-D grid, got {z.ndim} dimension(s)."
+            )
+        n_rows, n_cols = z.shape
+        x = get_chart_data("x", self.chart)
+        y = get_chart_data("y", self.chart)
+        x = np.arange(n_cols) if x is None else np.asarray(x, dtype=float)
+        y = np.arange(n_rows) if y is None else np.asarray(y, dtype=float)
+        if x.ndim != 1 or len(x) != n_cols:
+            raise ValueError(
+                f"The contour `x` attribute must hold one value per column of `z` "
+                f"({n_cols}), got {x.shape}."
+            )
+        if y.ndim != 1 or len(y) != n_rows:
+            raise ValueError(
+                f"The contour `y` attribute must hold one value per row of `z` "
+                f"({n_rows}), got {y.shape}."
+            )
+        return x, y, z
+
+    def y_range(self):
+        return (float(self.y.min()), float(self.y.max()))
+
+    def draw(self, ax, ctx):
+        style = dict(self.contour_style)
+        if ctx.z_order is not None:
+            style["zorder"] = ctx.z_order
+        scaling = {
+            "norm": self.chart.get("norm", None),
+            "vmin": self.chart.get("vmin", None),
+            "vmax": self.chart.get("vmax", None),
+        }
+        label = self.label(ctx)
+
+        if self.filled:
+            for key in ("color", "linewidths", "linestyles"):
+                style.pop(key, None)
+            if ctx.emphasis == EMPHASIS_BACKGROUND:
+                style["alpha"] = self.muted_alpha
+            bands = ax.contourf(
+                self.x,
+                self.y,
+                self.z,
+                levels=self.levels,
+                cmap=self.cmap,
+                **scaling,
+                **style,
+            )
+            # a legend proxy: the contour set itself carries no legend handle
+            ax.fill_between(
+                [], [], [], color=self.cmap(CONTOUR_FILL_SWATCH), label=label
+            )
+            if self.show_colorbars:
+                _draw_colorbar(ax, bands, self.chart.get("colorbar", {}))
+            return
+
+        style = self._merge_color("color", ctx.color, style)
+        self._apply_emphasis(style, ctx.emphasis, width_key="linewidths")
+        color = style.pop("color", None)
+        if self.line_cmap is not None and "plot_contour_color" not in self.style:
+            palette = {"cmap": self.line_cmap, **scaling}
+            color = self.line_cmap(CONTOUR_FILL_SWATCH)
+        else:
+            palette = {"colors": [color]}
+        lines = ax.contour(
+            self.x, self.y, self.z, levels=self.levels, **palette, **style
+        )
+        ax.plot(
+            [],
+            [],
+            color=color,
+            linewidth=style["linewidths"],
+            linestyle=style["linestyles"],
+            label=label,
+        )
+        if self.show_labels:
+            label_style = dict(self.label_style)
+            fmt = _value_formatter(self.chart.get("valfmt"))
+            if fmt is not None:
+                label_style["fmt"] = fmt
+            if ctx.emphasis == EMPHASIS_BACKGROUND:
+                label_style["colors"] = self.muted_color
+            ax.clabel(lines, **label_style)
 
 
 class ParallelCoordsLayer(Layer):
@@ -2373,6 +2513,7 @@ LAYER_TYPES = {
     "swarmplot": SwarmLayer,
     "violinplot": ViolinLayer,
     "heatmap": HeatmapLayer,
+    "contourchart": ContourLayer,
 }
 
 RADIAL_LAYER_TYPES = {
@@ -3577,7 +3718,11 @@ def build_chart_panel_settings(
     """
 
     show_grid = settings.get("show_grid")
-    if show_grid is None and chart_type != "heatmap":
+    # rasters (a heatmap, filled contour bands) cover the grid: leave it off
+    raster = chart_type == "heatmap" or (
+        chart_type == "contourchart" and settings.get("filled")
+    )
+    if show_grid is None and not raster:
         show_grid = config.get("chart_default_show_grid")
 
     panel_settings = {

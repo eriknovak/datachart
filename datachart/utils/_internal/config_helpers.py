@@ -610,9 +610,7 @@ def get_contour_label_style(chart_style: dict) -> dict:
     ]
 
     style = create_config_dict(chart_style, config_attrs)
-    style.setdefault(
-        "fontsize", config["font_general_size"] - CONTOUR_LABEL_SIZE_STEP
-    )
+    style.setdefault("fontsize", config["font_general_size"] - CONTOUR_LABEL_SIZE_STEP)
     return style
 
 
