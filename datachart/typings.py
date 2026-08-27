@@ -16,6 +16,8 @@ Classes:
     HistDataPointAttrs: The data point attributes for the histogram chart.
     HeatmapSingleChartAttrs: The single chart attributes for the heatmap chart.
     HeatmapColorbarAttrs: The heatmap colorbar attributes.
+    ContourSingleChartAttrs: The single chart attributes for the contour chart.
+    ContourDataAttrs: The data attributes for the contour chart.
     ScatterSingleChartAttrs: The single chart attributes for the scatter chart.
     ScatterDataPointAttrs: The data point attributes for the scatter chart.
     BoxSingleChartAttrs: The single chart attributes for the box plot.
@@ -45,6 +47,7 @@ Classes:
     HLineStyleAttrs: The typing for the horizontal line style.
     TextStyleAttrs: The typing for the text annotation style.
     HeatmapStyleAttrs: The typing for the heatmap style.
+    ContourStyleAttrs: The typing for the contour chart style.
     ScatterStyleAttrs: The typing for the scatter chart style.
     RegressionStyleAttrs: The typing for the regression line style.
     BoxStyleAttrs: The typing for the box plot style.
@@ -82,6 +85,7 @@ from .constants import (
     SCALE,
     VIOLIN_INNER,
     BANDWIDTH,
+    CONTOUR_LEVELS,
     ASPECT_RATIO,
 )
 
@@ -456,6 +460,31 @@ class HeatmapStyleAttrs(TypedDict):
     plot_heatmap_edge_color: Union[str, None]
 
 
+class ContourStyleAttrs(TypedDict):
+    """The typing for the contour chart style.
+
+    Attributes:
+        plot_contour_color (Union[str, None]): The color of the iso-lines; `None` takes the panel's color cycle.
+        plot_contour_cmap (Union[str, List[str], colors.LinearSegmentedColormap, None]): The colormap of the filled bands (palette name, list of hex colors, or colormap); `None` takes the heatmap colormap. Iso-lines use it only when set.
+        plot_contour_line_width (Union[int, float, None]): The width of the iso-lines; `None` takes the line chart width.
+        plot_contour_line_style (Union[LINE_STYLE, str, None]): The style of the iso-lines.
+        plot_contour_alpha (Union[float, None]): The alpha value of the contour.
+        plot_contour_zorder (Union[int, float, None]): The z-order of the contour.
+        plot_contour_label_font_size (Union[int, float, None]): The font size of the inline level labels; `None` takes the general font size minus two.
+        plot_contour_label_font_color (Union[str, None]): The color of the inline level labels; `None` takes the line color.
+
+    """
+
+    plot_contour_color: Union[str, None]
+    plot_contour_cmap: Union[str, List[str], colors.LinearSegmentedColormap, None]
+    plot_contour_line_width: Union[int, float, None]
+    plot_contour_line_style: Union[LINE_STYLE, str, None]
+    plot_contour_alpha: Union[float, None]
+    plot_contour_zorder: Union[int, float, None]
+    plot_contour_label_font_size: Union[int, float, None]
+    plot_contour_label_font_color: Union[str, None]
+
+
 class ScatterStyleAttrs(TypedDict):
     """The typing for the scatter chart style.
 
@@ -682,6 +711,7 @@ class StyleAttrs(
     HLineStyleAttrs,
     TextStyleAttrs,
     HeatmapStyleAttrs,
+    ContourStyleAttrs,
     ScatterStyleAttrs,
     RegressionStyleAttrs,
     BoxStyleAttrs,
@@ -1146,6 +1176,102 @@ class _HeatmapChartAttrs(ChartCommonAttrs):
     charts: Union[HeatmapSingleChartAttrs, List[HeatmapSingleChartAttrs]]
     show_colorbars: Union[bool, None]
     show_heatmap_values: Union[bool, None]
+
+
+# ================================================
+# Contour Chart Attributes
+# ================================================
+
+
+class ContourDataAttrs(TypedDict):
+    """The data attributes for the contour chart.
+
+    Attributes:
+        x (Union[List[Union[int, float]], None]): The x-axis values, one per column of `z`. Defaults to the column indices.
+        y (Union[List[Union[int, float]], None]): The y-axis values, one per row of `z`. Defaults to the row indices.
+        z (List[List[Union[int, float]]]): The 2-D grid of surface values, one row per `y` and one column per `x`.
+
+    """
+
+    x: Union[List[Union[int, float]], None]
+    y: Union[List[Union[int, float]], None]
+    z: List[List[Union[int, float]]]
+
+
+class ContourSingleChartAttrs(TypedDict):
+    """The single chart attributes for the contour chart.
+
+    Attributes:
+        data (ContourDataAttrs): The gridded surface defining the contour chart.
+        subtitle (Union[str, None]): The subtitle of the contour chart. Also used as the label in the legend.
+        xlabel (Union[str, None]): The xlabel of the contour chart.
+        ylabel (Union[str, None]): The ylabel of the contour chart.
+        style (Union[ContourStyleAttrs, None]): The style of the contour chart.
+
+        norm (Union[NORMALIZE, str, None]): The value normalization of the filled bands.
+        vmin (Union[float, None]): The minimum value to normalize the surface values.
+        vmax (Union[float, None]): The maximum value to normalize the surface values.
+        valfmt (Union[VALUE_FORMAT, str, None]): The format of the inline level labels.
+
+        xticks (Union[int, float, None]): The xtick positions list.
+        xticklabels (Union[List[str], None]): The xtick labels.
+        xtickrotate (Union[int, None]): The xtick rotation value.
+        yticks (Union[int, float, None]): the ytick position list.
+        yticklabels (Union[List[str], None]): The ytick labels.
+        ytickrotate (Union[int, None]): The ytick rotation value.
+
+        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
+        colorbar (Union[HeatmapColorbarAttrs, None]): The colorbar attributes of a filled contour.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+
+    """
+
+    data: ContourDataAttrs
+    subtitle: Union[str, None]
+    xlabel: Union[str, None]
+    ylabel: Union[str, None]
+    style: Union[ContourStyleAttrs, None]
+
+    norm: Union[str, None]
+    vmin: Union[float, None]
+    vmax: Union[float, None]
+    valfmt: Union[str, None]
+
+    xticks: Union[int, float, None]
+    xticklabels: Union[List[str], None]
+    xtickrotate: Union[int, None]
+    yticks: Union[int, float, None]
+    yticklabels: Union[List[str], None]
+    ytickrotate: Union[int, None]
+
+    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
+    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
+    colorbar: Union[HeatmapColorbarAttrs, None]
+    texts: Union[TextAttrs, List[TextAttrs]]
+
+
+class _ContourChartAttrs(ChartCommonAttrs):
+    """The contour chart attributes.
+
+    Attributes:
+        charts (Union[ContourSingleChartAttrs, List[ContourSingleChartAttrs]]): The contour chart definitions.
+        filled (Union[bool, None]): Whether to fill the bands between the levels instead of drawing iso-lines.
+        levels (Union[CONTOUR_LEVELS, str, int, List[float], None]): The level rule, target count, or explicit level values.
+        show_labels (Union[bool, None]): Whether or not to write the level values along the iso-lines.
+        show_colorbars (Union[bool, None]): Whether or not to plot the colorbars of filled contours.
+        scalex (Union[SCALE, str, None]): The scale of the x-axis.
+        scaley (Union[SCALE, str, None]): The scale of the y-axis.
+
+    """
+
+    charts: Union[ContourSingleChartAttrs, List[ContourSingleChartAttrs]]
+    filled: Union[bool, None]
+    levels: Union[CONTOUR_LEVELS, str, int, List[float], None]
+    show_labels: Union[bool, None]
+    show_colorbars: Union[bool, None]
+    scalex: Union[SCALE, str, None]
+    scaley: Union[SCALE, str, None]
 
 
 # ================================================

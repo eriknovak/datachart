@@ -554,6 +554,67 @@ def get_heatmap_edge_style(heatmap_style: dict) -> dict:
 
 
 # -------------------------------------
+# Contour Style
+# -------------------------------------
+
+# inline level labels sit this much below the general font size
+CONTOUR_LABEL_SIZE_STEP = 2
+
+
+def get_contour_style(chart_style: dict) -> dict:
+    """Get the contour chart style.
+
+    The `cmap` falls back to the heatmap colormap and the `linewidths` to the
+    line chart width when the contour keys leave them unset.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The contour style setting.
+
+    """
+
+    config_attrs = [
+        ("color", "plot_contour_color"),
+        ("cmap", "plot_contour_cmap"),
+        ("linewidths", "plot_contour_line_width"),
+        ("linestyles", "plot_contour_line_style"),
+        ("alpha", "plot_contour_alpha"),
+        ("zorder", "plot_contour_zorder"),
+    ]
+
+    style = create_config_dict(chart_style, config_attrs)
+    style.setdefault("cmap", get_attr_value("plot_heatmap_cmap", chart_style, config))
+    style.setdefault(
+        "linewidths", get_attr_value("plot_line_width", chart_style, config)
+    )
+    return style
+
+
+def get_contour_label_style(chart_style: dict) -> dict:
+    """Get the style of the inline contour level labels.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The label style setting; `colors` is absent when the labels follow
+        the line color.
+
+    """
+
+    config_attrs = [
+        ("fontsize", "plot_contour_label_font_size"),
+        ("colors", "plot_contour_label_font_color"),
+    ]
+
+    style = create_config_dict(chart_style, config_attrs)
+    style.setdefault("fontsize", config["font_general_size"] - CONTOUR_LABEL_SIZE_STEP)
+    return style
+
+
+# -------------------------------------
 # Scatter Style
 # -------------------------------------
 

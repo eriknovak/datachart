@@ -101,6 +101,10 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.CONTOUR_LEVELS
+    options:
+        heading_level: 3
+
 ::: datachart.constants.RADIAL_TYPE
     options:
         heading_level: 3

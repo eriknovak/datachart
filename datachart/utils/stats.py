@@ -25,11 +25,23 @@ Methods:
         Gets the maximum of the values.
     correlation(x, y):
         Calculates the Pearson correlation coefficient between two lists.
+    contour_levels(z, rule):
+        Picks the contour levels of a 2-D grid by a rule of thumb.
 """
 
-from typing import List, Tuple, Union
+import math
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
+from matplotlib.ticker import MaxNLocator
+
+from ..constants import CONTOUR_LEVELS
+
+# rule-of-thumb level counts stay readable in this range (ADR 0022)
+CONTOUR_LEVELS_MIN = 4
+CONTOUR_LEVELS_MAX = 20
+# the fd rule on a flat surface (IQR 0) has no bin width; match auto's density
+CONTOUR_LEVELS_FLAT = 8
 
 # ================================================
 # Statistical values
@@ -294,3 +306,60 @@ def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float
     if len(x) != len(y):
         raise ValueError("x and y must have the same length.")
     return float(np.corrcoef(x, y)[0, 1])
+
+
+def contour_levels(
+    z: List[List[Union[int, float]]], rule: Union[str, int, List[float], None]
+) -> Union[List[float], int, None]:
+    """Picks the contour levels of a 2-D grid by a rule of thumb.
+
+    The rules of `CONTOUR_LEVELS` are evaluated on the per-axis resolution
+    of the grid, `n = sqrt(cells)`: `"rice"` targets `2 * n ** (1/3)` levels
+    and `"fd"` the value range over `2 * IQR * n ** (-1/3)`. The count is
+    clamped to the 4–20 range and snapped to round values across the range of
+    `z`. `"auto"` (or `None`) returns `None`, leaving the choice to
+    matplotlib; an integer or a list of level values passes through.
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> import numpy as np
+        >>> from datachart.utils.stats import contour_levels
+        >>> x = np.linspace(-5, 5, 120)
+        >>> X, Y = np.meshgrid(x, x)
+        >>> contour_levels(X**2 + Y**2, "rice")
+        [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0]
+
+    Args:
+        z: The 2-D grid of values.
+        rule: A rule of `CONTOUR_LEVELS`, a target level count, or an explicit
+            list of level values.
+
+    Returns:
+        The level values, the target count, or `None` for the automatic rule.
+
+    Raises:
+        ValueError: If the rule is not one of `CONTOUR_LEVELS`.
+    """
+    if rule is None or rule == CONTOUR_LEVELS.AUTO:
+        return None
+    if not isinstance(rule, str):
+        return rule
+    if rule not in (CONTOUR_LEVELS.RICE, CONTOUR_LEVELS.FD):
+        raise ValueError(
+            f"Invalid contour `levels` rule {rule!r}. Must be one of "
+            f"{[CONTOUR_LEVELS.AUTO, CONTOUR_LEVELS.RICE, CONTOUR_LEVELS.FD]}, "
+            "an integer, or a list of level values."
+        )
+
+    values = np.asarray(z, dtype=float).ravel()
+    values = values[np.isfinite(values)]
+    n = math.sqrt(values.size)
+    if rule == CONTOUR_LEVELS.RICE:
+        k = math.ceil(2 * n ** (1 / 3))
+    else:
+        h = 2 * iqr(values) * n ** (-1 / 3)
+        k = math.ceil(np.ptp(values) / h) if h > 0 else CONTOUR_LEVELS_FLAT
+    k = int(np.clip(k, CONTOUR_LEVELS_MIN, CONTOUR_LEVELS_MAX))
+    ticks = MaxNLocator(nbins=k).tick_values(values.min(), values.max())
+    return [float(t) for t in ticks]

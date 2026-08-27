@@ -22,6 +22,7 @@ Classes:
     ORIENTATION:        The supported orientations.
     VIOLIN_INNER:       The supported violin inner marks.
     BANDWIDTH:          The supported kernel density bandwidth rules.
+    CONTOUR_LEVELS:     The supported contour level rules.
     RADIAL_TYPE:        The supported radial chart visuals.
     SWARM_MODE:         The supported swarm plot modes.
     DIRECTION:          The supported angular directions.
@@ -777,6 +778,41 @@ class BANDWIDTH:
     DEFAULT = "scott"
     SCOTT = "scott"
     SILVERMAN = "silverman"
+
+
+class CONTOUR_LEVELS:
+    """The supported contour level rules.
+
+    Passed as the `levels` setting of contour charts: the rule that picks how
+    many iso-lines (or filled bands) cut the surface. An integer target count
+    or an explicit list of level values is also accepted. Every rule is
+    evaluated on the per-axis resolution of the grid (the square root of its
+    cell count), so a finer grid draws more levels; the count is clamped to
+    the 4–20 range and snapped to round values.
+
+    ![CONTOUR_LEVELS at a glance](../../assets/imgs/const-contour-levels.svg){ width="100%" }
+
+    Examples:
+        >>> from datachart.constants import CONTOUR_LEVELS
+        >>> CONTOUR_LEVELS.DEFAULT
+        "auto"
+
+    Attributes:
+        DEFAULT (str): The default rule. Same as `CONTOUR_LEVELS.AUTO`.
+        AUTO (str): Matplotlib's own choice, about eight round values across
+            the surface. Equals to `"auto"`.
+        RICE (str): The Rice rule, `2 * n ** (1/3)` levels — about ten on a
+            120×120 grid. Equals to `"rice"`.
+        FD (str): The Freedman–Diaconis rule, the value range over
+            `2 * IQR * n ** (-1/3)` — about twice as dense as Rice on a
+            120×120 grid. Equals to `"fd"`.
+
+    """
+
+    DEFAULT = "auto"
+    AUTO = "auto"
+    RICE = "rice"
+    FD = "fd"
 
 
 class RADIAL_TYPE:

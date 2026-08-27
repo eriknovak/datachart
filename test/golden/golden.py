@@ -32,10 +32,11 @@ from datachart.charts import (
     RadialChart,
     RaincloudPlot,
     ViolinPlot,
+    ContourChart,
 )
 from datachart.utils import Panel, Grid, Annotate
 from datachart.config import config
-from datachart.constants import ARROW_STYLE, THEME
+from datachart.constants import ARROW_STYLE, CONTOUR_LEVELS, THEME
 
 # Cases whose output intentionally changed since the last published baseline.
 EXPECTED_CHANGES = {
@@ -95,6 +96,16 @@ EXPECTED_CHANGES = {
     "raincloud_vertical",
     "raincloud_horizontal",
     "raincloud_emphasis",
+    # colorbars are placed by the layout engine instead of an inset (ADR 0022)
+    "heatmap_basic",
+    # new contour cases (ADR 0022)
+    "contour_lines",
+    "contour_filled_colorbar",
+    "contour_labels",
+    "contour_overlay",
+    "contour_subplots",
+    "contour_panel_scatter",
+    "contour_grid",
 }
 
 
@@ -1010,6 +1021,117 @@ def pyramid_grid_pair():
         yticks=list(range(0, 80, 10)),
     )
     return Grid([fa, fb], max_cols=2, figsize=(10, 4))
+
+
+def contour_grid_data(f, lo=-5, hi=5, n=80):
+    x = np.linspace(lo, hi, n)
+    X, Y = np.meshgrid(x, x)
+    return {"x": x, "y": x, "z": f(X, Y)}
+
+
+def himmelblau(X, Y):
+    return (X**2 + Y - 11) ** 2 + (X + Y**2 - 7) ** 2
+
+
+def peaks(X, Y):
+    return (
+        3 * (1 - X) ** 2 * np.exp(-(X**2) - (Y + 1) ** 2)
+        - 10 * (X / 5 - X**3 - Y**5) * np.exp(-(X**2) - Y**2)
+        - np.exp(-((X + 1) ** 2) - Y**2) / 3
+    )
+
+
+def gauss_bump(mx, my, sx=1.2, sy=0.8):
+    return lambda X, Y: np.exp(
+        -((X - mx) ** 2 / (2 * sx**2) + (Y - my) ** 2 / (2 * sy**2))
+    )
+
+
+@case
+def contour_lines():
+    return ContourChart(data=contour_grid_data(himmelblau), title="Himmelblau")
+
+
+@case
+def contour_filled_colorbar():
+    return ContourChart(
+        data=contour_grid_data(peaks, -3, 3),
+        filled=True,
+        show_colorbars=True,
+        levels=CONTOUR_LEVELS.FD,
+    )
+
+
+@case
+def contour_labels():
+    return ContourChart(
+        data=contour_grid_data(himmelblau),
+        show_labels=True,
+        valfmt="{x:.0f}",
+        levels=CONTOUR_LEVELS.RICE,
+    )
+
+
+@case
+def contour_overlay():
+    return ContourChart(
+        data=[
+            contour_grid_data(gauss_bump(-1.5, -1)),
+            contour_grid_data(gauss_bump(1.8, 1.2)),
+        ],
+        subtitle=["cluster A", "cluster B"],
+        levels=6,
+        show_legend=True,
+        emphasis=[None, "highlight"],
+    )
+
+
+@case
+def contour_subplots():
+    return ContourChart(
+        data=[
+            contour_grid_data(himmelblau),
+            contour_grid_data(
+                lambda X, Y: np.log1p((1 - X) ** 2 + 100 * (Y - X**2) ** 2), -2, 2
+            ),
+            contour_grid_data(peaks, -3, 3),
+        ],
+        subtitle=["Himmelblau", "Rosenbrock (log z)", "Peaks"],
+        filled=True,
+        subplots=True,
+        max_cols=3,
+        figsize=(12, 4),
+    )
+
+
+@case
+def contour_panel_scatter():
+    rng = np.random.RandomState(1)
+    pts = rng.normal((-1.5, -1), (1.0, 0.7), (200, 2))
+    scatter = ScatterChart(
+        data=[{"x": float(x), "y": float(y)} for x, y in pts], subtitle="points"
+    )
+    density = ContourChart(
+        data=contour_grid_data(gauss_bump(-1.5, -1, 1.0, 0.7)),
+        subtitle="density",
+        levels=6,
+    )
+    return Panel([scatter, density], title="Panel", show_legend=True)
+
+
+@case
+def contour_grid():
+    top = ContourChart(
+        data=contour_grid_data(peaks, -3, 3),
+        filled=True,
+        show_colorbars=True,
+        title="filled",
+    )
+    line = LineChart(data=LINE1, title="line")
+    lines = ContourChart(
+        data=contour_grid_data(himmelblau), show_labels=True, title="lines"
+    )
+    return Grid([[top], [line, lines]], figsize=(10, 7))
 
 
 @case

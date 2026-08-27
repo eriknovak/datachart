@@ -165,6 +165,20 @@ participation) to its panel and re-rendering. Rejects grid figures — annotate
 the sources before composing.
 _Avoid_: overlay text, label function
 
+**Contour**:
+A gridded surface (`ContourChart`: 1-D `x`, `y` axes and a 2-D `z` grid per
+chart) drawn as iso-lines in the chart's cycle color or, when `filled`, as
+colormapped bands between levels. Lists overlay on one axes like histograms
+do; `subplots=True` grids them. The rendering half of the 2-D density chart.
+_Avoid_: isoline chart, contourf chart, surface plot
+
+**Level**:
+One `z` value at which a contour line is drawn or a band boundary falls.
+Defaults to matplotlib's auto count; a `CONTOUR_LEVELS` rule (`AUTO`, `RICE`,
+`FD`), an int, or an explicit list overrides it. Rules are evaluated on the
+per-axis grid resolution, never on the raw cell count.
+_Avoid_: iso value, threshold, bin (for contours)
+
 **Metadata transport**:
 The chart spec riding on a rendered figure (`figure._chart_metadata`) so composition
 functions (`Panel`, `Grid`) can rebuild it. Carries layers and panel settings, not
