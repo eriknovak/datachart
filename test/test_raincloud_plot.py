@@ -18,6 +18,7 @@ from datachart.utils._internal.colors import create_color_cycle
 from datachart.utils._internal.layers import (
     RAINCLOUD_BOX_WIDTH,
     RAINCLOUD_CLOUD_OFFSET,
+    RAINCLOUD_CLOUD_WIDTH,
     RAINCLOUD_RAIN_OFFSET,
     RAINCLOUD_RAIN_SPREAD,
     build_layers,
@@ -64,6 +65,10 @@ class TestRaincloudLayers(unittest.TestCase):
             xs = np.concatenate([p.vertices[:, 0] for p in body.get_paths()])
             self.assertGreaterEqual(xs.min(), pos + RAINCLOUD_CLOUD_OFFSET - 1e-9)
             self.assertGreater(xs.max(), pos + 0.2)
+            self.assertLessEqual(
+                xs.max(),
+                pos + RAINCLOUD_CLOUD_OFFSET + RAINCLOUD_CLOUD_WIDTH / 2 + 1e-9,
+            )
         # rain: one-sided, packed outward from p - offset over the spread
         xy = np.concatenate([c.get_offsets() for c in _swarm_collections(ax)])
         for pos in (1, 2, 3):

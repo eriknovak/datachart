@@ -1450,6 +1450,8 @@ SPLIT_INNER_OFFSET = 0.05
 # high side, and the rain starts past it on the low side and packs outward
 RAINCLOUD_BOX_WIDTH = 0.1
 RAINCLOUD_CLOUD_OFFSET = 0.08
+# the full violin width; the cloud draws one half of it
+RAINCLOUD_CLOUD_WIDTH = 0.6
 RAINCLOUD_RAIN_OFFSET = 0.08
 RAINCLOUD_RAIN_SPREAD = 0.28
 # the rain is denser than a standalone swarm, so its points are smaller
@@ -1474,6 +1476,10 @@ class ViolinLayer(GroupLayer):
         self.offset = self.settings.get("offset") or 0.0
         self._legend_roles = []
         self.violin_style = get_violin_style(self.style)
+        # a front's body width replaces the theme's; a chart style still wins
+        width = self.settings.get("width")
+        if width is not None and "plot_violin_width" not in self.style:
+            self.violin_style["width"] = width
         self.inner_style = get_violin_inner_style(self.style)
         # split halves take the multiple palette; a layer receives one ctx color
         self.split_colors = (
@@ -2431,6 +2437,7 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
             "split": None,
             "side": 1,
             "offset": RAINCLOUD_CLOUD_OFFSET,
+            "width": RAINCLOUD_CLOUD_WIDTH,
             "color_by_group": True,
         },
     )
