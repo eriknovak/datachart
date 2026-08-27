@@ -40,6 +40,7 @@ How two or more variables relate to each other.
 | [Scatter Chart](scatterchart.ipynb)           | The showcase of the scatter chart.           |
 | [Heatmap](heatmap.ipynb)                      | The showcase of the heatmap.                 |
 | [Contour Chart](contourchart.ipynb)           | The showcase of the contour chart.           |
+| [Hexbin Chart](hexbinchart.ipynb)             | The showcase of the hexbin chart.            |
 | [Parallel Coordinates](parallelcoords.ipynb)  | The showcase of the parallel coordinates.    |
 
 ## Composition

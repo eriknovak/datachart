@@ -24,6 +24,7 @@ from datachart.charts import (
     BarChart,
     ContourChart,
     Heatmap,
+    HexbinChart,
     Histogram,
     LineChart,
     RadialChart,
@@ -40,6 +41,7 @@ from datachart.constants import (
     COLORBAR_LOCATION,
     CONTOUR_LEVELS,
     DIRECTION,
+    HEXBIN_REDUCE,
     EMPHASIS,
     FONT_STYLE,
     FONT_WEIGHT,
@@ -676,6 +678,41 @@ def contour_levels():
     )
 
 
+def hexbin_reduce():
+    rng = np.random.RandomState(4)
+    pts = rng.normal(0, 1, (3000, 2))
+    # a per-point value that rises along the diagonal, so the reducers differ
+    data = {
+        "x": pts[:, 0].tolist(),
+        "y": pts[:, 1].tolist(),
+        "c": (pts[:, 0] + pts[:, 1] + rng.normal(0, 0.5, 3000)).tolist(),
+    }
+    members = [
+        ("MEAN", HEXBIN_REDUCE.MEAN),
+        ("SUM", HEXBIN_REDUCE.SUM),
+        ("MEDIAN", HEXBIN_REDUCE.MEDIAN),
+        ("MIN", HEXBIN_REDUCE.MIN),
+        ("MAX", HEXBIN_REDUCE.MAX),
+    ]
+    figs = [
+        HexbinChart(
+            data=data,
+            reduce=value,
+            gridsize=12,
+            show_colorbars=False,
+            title=f"HEXBIN_REDUCE.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-hexbin-reduce.svg",
+        1.7,
+        footnote="The same 3,000 points and c values; each hexagon shows the "
+        "aggregate of the c of its points.",
+    )
+
+
 def swarm_mode():
     members = [("SWARM", SWARM_MODE.SWARM), ("STRIP", SWARM_MODE.STRIP)]
     figs = [
@@ -898,6 +935,7 @@ def main():
     violin_inner()
     bandwidth()
     contour_levels()
+    hexbin_reduce()
     swarm_mode()
     radial_type()
     direction()

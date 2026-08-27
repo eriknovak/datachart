@@ -105,6 +105,10 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.HEXBIN_REDUCE
+    options:
+        heading_level: 3
+
 ::: datachart.constants.RADIAL_TYPE
     options:
         heading_level: 3
