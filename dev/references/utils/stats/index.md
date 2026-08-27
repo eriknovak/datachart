@@ -6,19 +6,20 @@ The module containing the `stats` methods.
 
 The `stats` module provides methods for calculating statistics.
 
-| FUNCTION      | DESCRIPTION                                                       |
-| ------------- | ----------------------------------------------------------------- |
-| `count`       | Counts the number of elements in the list.                        |
-| `sum_values`  | Calculates the sum of the values.                                 |
-| `mean`        | Calculates the mean of the values.                                |
-| `median`      | Calculates the median of the values.                              |
-| `stdev`       | Calculates the standard deviation of the values.                  |
-| `variance`    | Calculates the variance of the values.                            |
-| `quantile`    | Calculates the quantile of the values.                            |
-| `iqr`         | Calculates the interquartile range (Q3 - Q1).                     |
-| `minimum`     | Gets the minimum of the values.                                   |
-| `maximum`     | Gets the maximum of the values.                                   |
-| `correlation` | Calculates the Pearson correlation coefficient between two lists. |
+| FUNCTION         | DESCRIPTION                                                       |
+| ---------------- | ----------------------------------------------------------------- |
+| `count`          | Counts the number of elements in the list.                        |
+| `sum_values`     | Calculates the sum of the values.                                 |
+| `mean`           | Calculates the mean of the values.                                |
+| `median`         | Calculates the median of the values.                              |
+| `stdev`          | Calculates the standard deviation of the values.                  |
+| `variance`       | Calculates the variance of the values.                            |
+| `quantile`       | Calculates the quantile of the values.                            |
+| `iqr`            | Calculates the interquartile range (Q3 - Q1).                     |
+| `minimum`        | Gets the minimum of the values.                                   |
+| `maximum`        | Gets the maximum of the values.                                   |
+| `correlation`    | Calculates the Pearson correlation coefficient between two lists. |
+| `contour_levels` | Picks the contour levels of a 2-D grid by a rule of thumb.        |
 
 ## Functions
 
@@ -310,3 +311,42 @@ Examples:
 | ------------ | --------------------------------------- |
 | `TypeError`  | If x or y is not a list or numpy array. |
 | `ValueError` | If x and y have different lengths.      |
+
+### datachart.utils.stats.contour_levels
+
+```
+contour_levels(
+    z: List[List[Union[int, float]]],
+    rule: Union[str, int, List[float], None],
+) -> Union[List[float], int, None]
+```
+
+Picks the contour levels of a 2-D grid by a rule of thumb.
+
+The rules of `CONTOUR_LEVELS` are evaluated on the per-axis resolution of the grid, `n = sqrt(cells)`: `"rice"` targets `2 * n ** (1/3)` levels and `"fd"` the value range over `2 * IQR * n ** (-1/3)`. The count is clamped to the 4–20 range and snapped to round values across the range of `z`. `"auto"` (or `None`) returns `None`, leaving the choice to matplotlib; an integer or a list of level values passes through.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> import numpy as np
+>>> from datachart.utils.stats import contour_levels
+>>> x = np.linspace(-5, 5, 120)
+>>> X, Y = np.meshgrid(x, x)
+>>> contour_levels(X**2 + Y**2, "rice")
+[0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0]
+```
+
+| PARAMETER | DESCRIPTION                                                                                                                         |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `z`       | The 2-D grid of values. **TYPE:** `List[List[Union[int, float]]]`                                                                   |
+| `rule`    | A rule of CONTOUR_LEVELS, a target level count, or an explicit list of level values. **TYPE:** `Union[str, int, List[float], None]` |
+
+| RETURNS                         | DESCRIPTION                                                         |
+| ------------------------------- | ------------------------------------------------------------------- |
+| `Union[List[float], int, None]` | The level values, the target count, or None for the automatic rule. |
+
+| RAISES       | DESCRIPTION                               |
+| ------------ | ----------------------------------------- |
+| `ValueError` | If the rule is not one of CONTOUR_LEVELS. |

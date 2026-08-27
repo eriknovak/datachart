@@ -26,6 +26,7 @@ The `constants` module provides a set of predefined constants used in the packag
 | `ORIENTATION`       | The supported orientations.                    |
 | `VIOLIN_INNER`      | The supported violin inner marks.              |
 | `BANDWIDTH`         | The supported kernel density bandwidth rules.  |
+| `CONTOUR_LEVELS`    | The supported contour level rules.             |
 | `RADIAL_TYPE`       | The supported radial chart visuals.            |
 | `SWARM_MODE`        | The supported swarm plot modes.                |
 | `DIRECTION`         | The supported angular directions.              |
@@ -547,6 +548,27 @@ Examples:
 | `DEFAULT`   | The default rule. Same as BANDWIDTH.SCOTT. **TYPE:** `str`                                                                                                                        |
 | `SCOTT`     | Scott's rule of thumb, n \*\* (-1/5) times the standard deviation. Equals to "scott". **TYPE:** `str`                                                                             |
 | `SILVERMAN` | Silverman's rule of thumb, (3n/4) \*\* (-1/5) times the standard deviation — about 6% wider than Scott's, so the two look nearly the same. Equals to "silverman". **TYPE:** `str` |
+
+### datachart.constants.CONTOUR_LEVELS
+
+The supported contour level rules.
+
+Passed as the `levels` setting of contour charts: the rule that picks how many iso-lines (or filled bands) cut the surface. An integer target count or an explicit list of level values is also accepted. Every rule is evaluated on the per-axis resolution of the grid (the square root of its cell count), so a finer grid draws more levels; the count is clamped to the 4–20 range and snapped to round values.
+
+Examples:
+
+```
+>>> from datachart.constants import CONTOUR_LEVELS
+>>> CONTOUR_LEVELS.DEFAULT
+"auto"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                                                                                                                |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT` | The default rule. Same as CONTOUR_LEVELS.AUTO. **TYPE:** `str`                                                                                             |
+| `AUTO`    | Matplotlib's own choice, about eight round values across the surface. Equals to "auto". **TYPE:** `str`                                                    |
+| `RICE`    | The Rice rule, 2 * n \*\* (1/3) levels — about ten on a 120×120 grid. Equals to "rice". **TYPE:** `str`                                                    |
+| `FD`      | The Freedman–Diaconis rule, the value range over 2 * IQR * n \*\* (-1/3) — about twice as dense as Rice on a 120×120 grid. Equals to "fd". **TYPE:** `str` |
 
 ### datachart.constants.RADIAL_TYPE
 

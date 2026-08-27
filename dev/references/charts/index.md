@@ -19,6 +19,7 @@ The `charts` module contains the methods to create the plots and figures, groupe
 | `RaincloudPlot`  | Creates the raincloud plot.             |
 | `ScatterChart`   | Creates the scatter chart.              |
 | `Heatmap`        | Creates the heatmap.                    |
+| `ContourChart`   | Creates the contour chart.              |
 | `ParallelCoords` | Creates the parallel coordinates chart. |
 
 ## Trends and Comparisons
@@ -1840,6 +1841,197 @@ Examples:
 | RETURNS      | DESCRIPTION                        |
 | ------------ | ---------------------------------- |
 | `plt.Figure` | The figure containing the heatmap. |
+
+### datachart.charts.ContourChart
+
+```
+ContourChart(
+    data: Union[ContourDataAttrs, List[ContourDataAttrs]],
+    *,
+    title: Optional[str] = None,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
+    subtitle: Optional[
+        Union[str, List[Optional[str]]]
+    ] = None,
+    emphasis: Optional[
+        Union[EMPHASIS, str, List[Optional[str]]]
+    ] = None,
+    figsize: Optional[
+        Union[FIG_SIZE, Tuple[float, float]]
+    ] = None,
+    xmin: Optional[Union[int, float]] = None,
+    xmax: Optional[Union[int, float]] = None,
+    ymin: Optional[Union[int, float]] = None,
+    ymax: Optional[Union[int, float]] = None,
+    show_legend: Optional[bool] = None,
+    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    filled: Optional[bool] = None,
+    levels: Optional[
+        Union[CONTOUR_LEVELS, str, int, List[float]]
+    ] = None,
+    show_labels: Optional[bool] = None,
+    show_colorbars: Optional[bool] = None,
+    aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
+    scalex: Optional[Union[SCALE, str]] = None,
+    scaley: Optional[Union[SCALE, str]] = None,
+    subplots: Optional[bool] = None,
+    max_cols: Optional[int] = None,
+    sharex: Optional[bool] = None,
+    sharey: Optional[bool] = None,
+    style: Optional[
+        Union[
+            ContourStyleAttrs,
+            List[Optional[ContourStyleAttrs]],
+        ]
+    ] = None,
+    norm: Optional[Union[str, List[Optional[str]]]] = None,
+    vmin: Optional[
+        Union[float, List[Optional[float]]]
+    ] = None,
+    vmax: Optional[
+        Union[float, List[Optional[float]]]
+    ] = None,
+    valfmt: Optional[
+        Union[VALUE_FORMAT, str, List[Optional[str]]]
+    ] = None,
+    xticks: Optional[
+        Union[
+            List[Union[int, float]],
+            List[List[Union[int, float]]],
+        ]
+    ] = None,
+    xticklabels: Optional[
+        Union[List[str], List[List[str]]]
+    ] = None,
+    xtickrotate: Optional[
+        Union[int, List[Optional[int]]]
+    ] = None,
+    yticks: Optional[
+        Union[
+            List[Union[int, float]],
+            List[List[Union[int, float]]],
+        ]
+    ] = None,
+    yticklabels: Optional[
+        Union[List[str], List[List[str]]]
+    ] = None,
+    ytickrotate: Optional[
+        Union[int, List[Optional[int]]]
+    ] = None,
+    vlines: Optional[
+        Union[
+            VLinePlotAttrs,
+            List[VLinePlotAttrs],
+            List[
+                Union[
+                    VLinePlotAttrs,
+                    List[VLinePlotAttrs],
+                    None,
+                ]
+            ],
+        ]
+    ] = None,
+    hlines: Optional[
+        Union[
+            HLinePlotAttrs,
+            List[HLinePlotAttrs],
+            List[
+                Union[
+                    HLinePlotAttrs,
+                    List[HLinePlotAttrs],
+                    None,
+                ]
+            ],
+        ]
+    ] = None,
+    colorbar: Optional[
+        Union[
+            HeatmapColorbarAttrs,
+            List[Optional[HeatmapColorbarAttrs]],
+        ]
+    ] = None,
+    texts: Optional[
+        Union[
+            TextAttrs,
+            List[TextAttrs],
+            List[Union[TextAttrs, List[TextAttrs], None]],
+        ]
+    ] = None
+) -> plt.Figure
+```
+
+Creates the contour chart.
+
+A contour chart draws a surface sampled on a grid — a loss landscape, a 2-D density, a terrain — as iso-lines of equal value, or as filled bands between them. Use it to read the shape of a function of two variables: where its minima and ridges sit and how steeply it changes. Lines overlay on other charts and on each other; fills stand alone, with an optional colorbar. For a per-cell view of a matrix use Heatmap; for the raw points behind a density use ScatterChart.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.charts import ContourChart
+>>> figure = ContourChart(
+...     data={
+...         "x": [0, 1, 2],
+...         "y": [0, 1, 2],
+...         "z": [
+...             [0, 1, 4],
+...             [1, 2, 5],
+...             [4, 5, 8],
+...         ],
+...     },
+...     title="Basic Contour Chart",
+...     xlabel="X",
+...     ylabel="Y"
+... )
+```
+
+| PARAMETER        | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`           | The gridded surface(s): a dictionary with the 2-D z grid and the optional x and y axis values (one per column and per row of z, the indices by default), or a list of them for multiple charts/subplots. **TYPE:** `Union[ContourDataAttrs, List[ContourDataAttrs]]`                                                                                                                                                            |
+| `title`          | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                           |
+| `xlabel`         | The x-axis label. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                 |
+| `ylabel`         | The y-axis label. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                 |
+| `subtitle`       | The subtitle(s) for individual charts. Used as legend labels. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                         |
+| `emphasis`       | The emphasis role(s) for individual line contours, aligned like style: "background" mutes a chart (theme muted color, lowered alpha, behind the others, no legend entry), "highlight" bolds it and brings it to the front, None leaves it unchanged. Not supported for filled contours: passing a value with filled=True raises ValueError. **TYPE:** `Optional[Union[EMPHASIS, str, List[Optional[str]]]]` **DEFAULT:** `None` |
+| `figsize`        | The size of the figure. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                          |
+| `xmin`           | The minimum x-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                           |
+| `xmax`           | The maximum x-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                           |
+| `ymin`           | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                           |
+| `ymax`           | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                           |
+| `show_legend`    | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                      |
+| `show_grid`      | Which grid lines to show (e.g., "both", "x", "y"). Off by default for filled contours. **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                          |
+| `filled`         | Whether to fill the bands between the levels (colored by the colormap) instead of drawing iso-lines (in the chart's color). **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                      |
+| `levels`         | Which levels cut the surface: a rule of CONTOUR_LEVELS ("auto", the default, leaves the choice to matplotlib), a target level count, or an explicit list of level values. **TYPE:** `Optional[Union[CONTOUR_LEVELS, str, int, List[float]]]` **DEFAULT:** `None`                                                                                                                                                                |
+| `show_labels`    | Whether to write the level values along the iso-lines. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                           |
+| `show_colorbars` | Whether to show the colorbar(s) of filled contours. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                              |
+| `aspect_ratio`   | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                          |
+| `scalex`         | The x-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                           |
+| `scaley`         | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                           |
+| `subplots`       | Whether to create separate subplots for each chart. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                              |
+| `max_cols`       | Maximum number of columns in subplots (when subplots=True). **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                       |
+| `sharex`         | Whether to share the x-axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                         |
+| `sharey`         | Whether to share the y-axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                         |
+| `style`          | Style configuration(s) for the contour chart(s). **TYPE:** `Optional[Union[ContourStyleAttrs, List[Optional[ContourStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                          |
+| `norm`           | Value normalization method(s) of the colormap. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                        |
+| `vmin`           | Minimum value(s) for normalization. **TYPE:** `Optional[Union[float, List[Optional[float]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                               |
+| `vmax`           | Maximum value(s) for normalization. **TYPE:** `Optional[Union[float, List[Optional[float]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                               |
+| `valfmt`         | Format string(s) for the inline level labels, with the value named x (e.g., "{x:.1f}"). See VALUE_FORMAT. **TYPE:** `Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                               |
+| `xticks`         | Custom x-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float]], List[List[Union[int, float]]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                           |
+| `xticklabels`    | Custom x-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                          |
+| `xtickrotate`    | Rotation angle for x-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                |
+| `yticks`         | Custom y-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float]], List[List[Union[int, float]]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                           |
+| `yticklabels`    | Custom y-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                          |
+| `ytickrotate`    | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                |
+| `vlines`         | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                        |
+| `hlines`         | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                      |
+| `colorbar`       | Colorbar configuration(s). **TYPE:** `Optional[Union[HeatmapColorbarAttrs, List[Optional[HeatmapColorbarAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                          |
+| `texts`          | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                          |
+
+| RETURNS      | DESCRIPTION                              |
+| ------------ | ---------------------------------------- |
+| `plt.Figure` | The figure containing the contour chart. |
 
 ### datachart.charts.ParallelCoords
 
