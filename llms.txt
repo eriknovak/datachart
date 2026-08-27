@@ -1,0 +1,66 @@
+# datachart
+
+> Data visualization package, simple to use, highly customizable
+
+datachart is a Python data visualization package built on matplotlib.
+It provides simple chart functions (BarChart, LineChart, ScatterChart,
+Histogram, Heatmap, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot, ParallelCoords,
+PyramidChart, RadialChart), figure
+composition via Panel (overlaying charts on shared axes) and Grid
+(arranging charts in a grid), and a global configuration system with
+predefined themes.
+
+Install with `pip install datachart`. All charts return a matplotlib
+Figure. Style is controlled globally via `datachart.config.config` and
+themes; per-chart overrides go in each chart's `style` parameter.
+
+
+## Getting Started
+
+- [Home](https://eriknovak.github.io/datachart/index.md): Package overview, installation, and a first example.
+- [How-to Guides](https://eriknovak.github.io/datachart/how-to-guides/index.md): Map of the guide sections: charts, composition & utilities, styling.
+
+## Charts
+
+- [Charts](https://eriknovak.github.io/datachart/how-to-guides/charts/index.md): The chart functions, their common data format, and how to save figures.
+- [Line Chart](https://eriknovak.github.io/datachart/how-to-guides/charts/linechart/index.md): Line chart input attributes, single and multiple datasets, customization, and saving.
+- [Bar Chart](https://eriknovak.github.io/datachart/how-to-guides/charts/barchart/index.md): Bar chart input attributes, single and multiple datasets, customization, and saving.
+- [Pyramid Chart](https://eriknovak.github.io/datachart/how-to-guides/charts/pyramidchart/index.md): Pyramid chart input attributes, the two-sides data contract, mirrored value axis controls, and composing pyramids with Grid.
+- [Radial Chart](https://eriknovak.github.io/datachart/how-to-guides/charts/radialchart/index.md): Radial chart input attributes, the line, bar, scatter, and histogram visuals, and polar settings (start angle, direction, inner radius).
+- [Histogram](https://eriknovak.github.io/datachart/how-to-guides/charts/histogram/index.md): Histogram input attributes, single and multiple datasets, and histogram views.
+- [Box Plot](https://eriknovak.github.io/datachart/how-to-guides/charts/boxplot/index.md): Box plot input attributes and customization, composing boxes with swarm and violin plots; multiple datasets require subplots.
+- [Violin Plot](https://eriknovak.github.io/datachart/how-to-guides/charts/violinplot/index.md): Violin plot input attributes, inner marks, bandwidth, split violins, composing violins with box and swarm plots, and subplots.
+- [Swarm Plot](https://eriknovak.github.io/datachart/how-to-guides/charts/swarmplot/index.md): Swarm plot input attributes, swarm and strip modes, emphasis, overlaying box and violin plots with Panel, multiple datasets, and saving.
+- [Raincloud Plot](https://eriknovak.github.io/datachart/how-to-guides/charts/raincloudplot/index.md): Raincloud plot input attributes, the cloud, rain, and box parts and their styles, bandwidth, rain modes, orientation, emphasis, subplots, composing with Panel and Grid, and saving.
+- [Scatter Chart](https://eriknovak.github.io/datachart/how-to-guides/charts/scatterchart/index.md): Scatter chart input attributes, single and multiple datasets, customization, and saving.
+- [Heatmap](https://eriknovak.github.io/datachart/how-to-guides/charts/heatmap/index.md): Heatmap input attributes, single and multiple datasets, customization, and saving.
+- [Parallel Coordinates](https://eriknovak.github.io/datachart/how-to-guides/charts/parallelcoords/index.md): Parallel coordinates input attributes and customization for multivariate data.
+
+## Composition & Utilities
+
+- [Composition & Utilities](https://eriknovak.github.io/datachart/how-to-guides/utility/index.md): Map of Panel, Grid, statistics, and figure saving.
+- [Panel](https://eriknovak.github.io/datachart/how-to-guides/utility/panel/index.md): Overlaying multiple charts on one plot with Panel: dual y-axes, z-order, emphasis, and nesting panels.
+- [Grid](https://eriknovak.github.io/datachart/how-to-guides/utility/grid/index.md): Arranging multiple charts in a grid layout with Grid, including nested rows and layout specs.
+- [Text Annotations](https://eriknovak.github.io/datachart/how-to-guides/utility/annotations/index.md): Text annotations on any chart: placement and coordinates, connector looks, text and box styling, and annotating finished figures with Annotate.
+- [Statistics](https://eriknovak.github.io/datachart/how-to-guides/utility/stats/index.md): Statistical utilities for preparing chart data.
+
+## Styling
+
+- [Styling](https://eriknovak.github.io/datachart/how-to-guides/styling/index.md): Map of configuration, themes, emphasis, and colormaps.
+- [Config](https://eriknovak.github.io/datachart/how-to-guides/styling/config/index.md): Customizing the global style via the config singleton: set_theme, update_config, reset_config.
+- [Themes](https://eriknovak.github.io/datachart/how-to-guides/styling/themes/index.md): Applying the predefined themes and creating custom ones.
+- [Theme Gallery](https://eriknovak.github.io/datachart/how-to-guides/styling/theme-gallery/index.md): Every predefined theme rendered across the chart types.
+- [Highlighting](https://eriknovak.github.io/datachart/how-to-guides/styling/highlighting/index.md): Emphasizing and muting data series with the emphasis option.
+- [Colormaps](https://eriknovak.github.io/datachart/how-to-guides/styling/colormaps/index.md): The colormaps available via the COLORS constant.
+
+## API Reference
+
+- [Datachart Module](https://eriknovak.github.io/datachart/references/index.md): Top-level module reference.
+- [charts](https://eriknovak.github.io/datachart/references/charts/index.md): Chart function signatures and parameters.
+- [Utils Module](https://eriknovak.github.io/datachart/references/utils/index.md): Panel, Grid, and save_figure signatures.
+- [stats](https://eriknovak.github.io/datachart/references/utils/stats/index.md): Statistical function signatures.
+- [config](https://eriknovak.github.io/datachart/references/config/index.md): The Config class and the global config instance.
+- [themes](https://eriknovak.github.io/datachart/references/themes/index.md): The predefined theme dictionaries.
+- [constants](https://eriknovak.github.io/datachart/references/constants/index.md): Enums and constants (THEME, FIG_SIZE, ORIENTATION, COLORS, ...).
+- [typings](https://eriknovak.github.io/datachart/references/typings/index.md): TypedDict definitions for chart data and style attributes.
+
