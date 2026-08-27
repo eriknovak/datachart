@@ -24,7 +24,7 @@ that redraws all three — would fork three drawing paths.
   `BoxLayer` gain a category offset and, for the swarm, a spread. The
   raincloud front sets them from constants in `layers.py`: the cloud keeps the
   full body width on one side, the box is the rain-side half of a ≈ 0.15 wide
-  box on the cloud's seam, the rain starts ≈ 0.1 past the seam and packs
+  box on the cloud's seam, the rain starts right past the box and packs
   one-sided, away from the box, over ≈ 0.16. No user knob in v1.
 - **Cloud left when vertical, above when horizontal.** The rain and box take
   the opposite side. The horizontal case follows the raincloud paper's layout.
