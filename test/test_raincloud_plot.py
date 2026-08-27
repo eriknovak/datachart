@@ -16,9 +16,10 @@ from datachart.constants import THEME
 from datachart.utils import Panel, Grid
 from datachart.utils._internal.colors import create_color_cycle
 from datachart.utils._internal.layers import (
+    RAINCLOUD_BOX_OFFSET,
+    RAINCLOUD_BOX_WIDTH,
     RAINCLOUD_RAIN_OFFSET,
     RAINCLOUD_RAIN_SPREAD,
-    RAINCLOUD_BOX_WIDTH,
     build_layers,
 )
 
@@ -55,34 +56,35 @@ class TestRaincloudLayers(unittest.TestCase):
         self.assertEqual([l.kind for l in layers], ["violin", "swarm", "box"] * 2)
         self.assertIs(layers[0].chart, layers[2].chart)
 
-    def test_vertical_cloud_left_rain_and_box_right(self):
+    def test_vertical_cloud_right_box_and_rain_left(self):
         figure = RaincloudPlot(group_data())
         ax = figure.axes[0]
-        # cloud: every body vertex stays at or left of its category position
+        # cloud: every body vertex stays at or right of its category position
         for pos, body in enumerate(_violin_bodies(ax), start=1):
             xs = np.concatenate([p.vertices[:, 0] for p in body.get_paths()])
-            self.assertLessEqual(xs.max(), pos + 1e-9)
-            self.assertLess(xs.min(), pos - 0.1)
-        # rain: one-sided, packed outward from p + offset over the spread
+            self.assertGreaterEqual(xs.min(), pos - 1e-9)
+            self.assertGreater(xs.max(), pos + 0.1)
+        # rain: one-sided, packed outward from p - offset over the spread
         xy = np.concatenate([c.get_offsets() for c in _swarm_collections(ax)])
         for pos in (1, 2, 3):
             xs = xy[np.abs(xy[:, 0] - pos) <= 0.5][:, 0] - pos
             self.assertTrue(len(xs))
-            self.assertGreaterEqual(xs.min(), RAINCLOUD_RAIN_OFFSET - 1e-9)
-            self.assertLessEqual(
-                xs.max(), RAINCLOUD_RAIN_OFFSET + RAINCLOUD_RAIN_SPREAD + 1e-9
+            self.assertLessEqual(xs.max(), -RAINCLOUD_RAIN_OFFSET + 1e-9)
+            self.assertGreaterEqual(
+                xs.min(), -RAINCLOUD_RAIN_OFFSET - RAINCLOUD_RAIN_SPREAD - 1e-9
             )
             self.assertGreater(xs.max() - xs.min(), 0.05)
-        # box: the rain-side half on the cloud's seam, an outline
+        # box: just below the seam, RAINCLOUD_BOX_WIDTH wide
         boxes = _box_patches(ax)
         self.assertEqual(len(boxes), 3)
         for pos, box in enumerate(boxes, start=1):
             xs = box.get_path().vertices[:, 0]
-            self.assertAlmostEqual(xs.min(), pos)
-            self.assertAlmostEqual(xs.max() - xs.min(), RAINCLOUD_BOX_WIDTH / 2)
-            self.assertEqual(box.get_facecolor()[3], 0.0)
+            self.assertAlmostEqual(
+                (xs.max() + xs.min()) / 2, pos - RAINCLOUD_BOX_OFFSET
+            )
+            self.assertAlmostEqual(xs.max() - xs.min(), RAINCLOUD_BOX_WIDTH)
 
-    def test_horizontal_cloud_above_rain_below(self):
+    def test_horizontal_cloud_above_box_and_rain_below(self):
         figure = RaincloudPlot(group_data(), orientation="horizontal")
         ax = figure.axes[0]
         for pos, body in enumerate(_violin_bodies(ax), start=1):
@@ -92,31 +94,33 @@ class TestRaincloudLayers(unittest.TestCase):
         self.assertLessEqual(xy[:, 1].max(), 3 - RAINCLOUD_RAIN_OFFSET + 1e-9)
         for pos, box in enumerate(_box_patches(ax), start=1):
             ys = box.get_path().vertices[:, 1]
-            self.assertAlmostEqual(ys.max(), pos)
-            self.assertAlmostEqual(ys.max() - ys.min(), RAINCLOUD_BOX_WIDTH / 2)
+            self.assertAlmostEqual(
+                (ys.max() + ys.min()) / 2, pos - RAINCLOUD_BOX_OFFSET
+            )
 
     def test_strip_rain_stays_inside_spread(self):
         figure = RaincloudPlot(group_data(), mode="strip")
         xy = np.concatenate(
             [c.get_offsets() for c in _swarm_collections(figure.axes[0])]
         )
-        off = (
-            xy[:, 0]
-            - np.round(xy[:, 0] - RAINCLOUD_RAIN_OFFSET)
-            - RAINCLOUD_RAIN_OFFSET
+        off = xy[:, 0] - np.round(xy[:, 0] + RAINCLOUD_RAIN_OFFSET)
+        self.assertLessEqual(off.max(), -RAINCLOUD_RAIN_OFFSET + 1e-9)
+        self.assertGreaterEqual(
+            off.min(), -RAINCLOUD_RAIN_OFFSET - RAINCLOUD_RAIN_SPREAD - 1e-9
         )
-        self.assertLessEqual(np.abs(off).max(), RAINCLOUD_RAIN_SPREAD + 1e-9)
 
-    def test_cloud_and_rain_share_group_color(self):
+    def test_cloud_rain_and_box_share_group_color(self):
         figure = RaincloudPlot(group_data(), show_legend=True)
         ax = figure.axes[0]
         cycle = create_color_cycle(config["color_general_multiple"], 3)
         expected = [matplotlib.colors.to_rgb(cycle[i]["color"]) for i in range(3)]
         bodies = _violin_bodies(ax)
+        boxes = _box_patches(ax)
         rain = _swarm_collections(ax)
         self.assertEqual(len(rain), 3)
         for i in range(3):
             self.assertEqual(tuple(bodies[i].get_facecolor()[0][:3]), expected[i])
+            self.assertEqual(tuple(boxes[i].get_facecolor()[:3]), expected[i])
             self.assertEqual(tuple(rain[i].get_facecolor()[0][:3]), expected[i])
         legend = ax.get_legend()
         self.assertEqual([t.get_text() for t in legend.get_texts()], ["A", "B", "C"])

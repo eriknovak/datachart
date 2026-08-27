@@ -23,19 +23,20 @@ that redraws all three — would fork three drawing paths.
   `side` setting (the clipping `split` already does); `SwarmLayer` and
   `BoxLayer` gain a category offset and, for the swarm, a spread. The
   raincloud front sets them from constants in `layers.py`: the cloud keeps the
-  full body width on one side, the box is the rain-side half of a ≈ 0.15 wide
-  box on the cloud's seam, the rain starts right past the box and packs
-  one-sided, away from the box, over ≈ 0.16. No user knob in v1.
-- **Cloud left when vertical, above when horizontal.** The rain and box take
-  the opposite side. The horizontal case follows the raincloud paper's layout.
-- **The box is a half outline between the cloud and the rain.** Clipped to
-  the rain's side of its center, so the three parts never overlap. No fill;
-  edges, median, whiskers, and caps in the theme font color; outliers on by default as
-  circles (`show_outliers=True`). The cloud draws with `inner=None`.
+  full body width on the high side, the box (≈ 0.1 wide) sits ≈ 0.08 below
+  the seam, and the rain starts ≈ 0.14 below the seam and packs one-sided,
+  away from the box, over ≈ 0.3. No user knob in v1.
+- **Cloud on the high side: right when vertical, above when horizontal.**
+  The box and the rain take the low side, the box nearest the seam, so the
+  three parts sit side by side and never overlap.
+- **The box is filled in the group color, stroked in the font color.**
+  Edges, median, whiskers, and caps in the theme font color; outliers on by
+  default as circles (`show_outliers=True`). The cloud draws with
+  `inner=None`.
 - **Per-group colors.** A `color_by_group` layer setting, turned on by the
-  raincloud front only, makes the violin and swarm layers cycle the multiple
-  palette per label instead of taking one `ctx.color`; the legend lists one
-  entry per group. The sibling fronts keep one color per dataset.
+  raincloud front only, makes the violin, swarm, and box layers cycle the
+  multiple palette per label instead of taking one `ctx.color`; the legend
+  lists one entry per group. The sibling fronts keep one color per dataset.
 - **Front surface.** `RaincloudPlot` takes the `SwarmPlot` common parameters
   plus `mode`/`jitter` (rain), `bandwidth` (cloud), and `show_outliers`
   (box); `orientation` defaults to vertical like the siblings. Cut:

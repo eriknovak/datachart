@@ -1143,11 +1143,10 @@ class BoxLayer(GroupLayer):
             self._apply_outline()
 
     def _apply_outline(self) -> None:
-        """A raincloud box is a stroke in the font color over the rain (ADR 0021)."""
+        """A raincloud box strokes its edges in the font color (ADR 0021)."""
 
         stroke = config.get("font_general_color") or "#000000"
         overrides = [
-            (self.box_style, "facecolor", "plot_box_color", "none"),
             (self.box_style, "edgecolor", "plot_box_edgecolor", stroke),
             (self.outlier_style, "marker", "plot_box_outlier_marker", "o"),
             (self.outlier_style, "markerfacecolor", "plot_box_outlier_color", stroke),
@@ -1204,9 +1203,11 @@ class BoxLayer(GroupLayer):
         )
 
         alpha = box_style.get("alpha", 1.0)
-        for patch in bp["boxes"]:
+        for i, patch in enumerate(bp["boxes"]):
             if box_style.get("facecolor"):
                 patch.set_facecolor(box_style["facecolor"])
+            if self.color_by_group and self.box_style.get("facecolor") is None:
+                patch.set_facecolor(self.group_color(i, ctx.color))
             if alpha is not None:
                 patch.set_alpha(alpha)
 
@@ -1439,11 +1440,12 @@ class SwarmLayer(GroupLayer):
 # keeps the two inner boxes of a split violin off the shared seam
 SPLIT_INNER_OFFSET = 0.05
 # raincloud geometry (ADR 0021), in category-axis units around the position:
-# the half box sits on the cloud's seam, the rain starts past it and packs
-# outward over its spread
-RAINCLOUD_RAIN_OFFSET = 0.08
-RAINCLOUD_RAIN_SPREAD = 0.16
-RAINCLOUD_BOX_WIDTH = 0.15
+# the cloud keeps the high side, the box sits just below the seam, and the
+# rain starts past the box and packs outward, all inside the cell
+RAINCLOUD_BOX_OFFSET = 0.08
+RAINCLOUD_BOX_WIDTH = 0.1
+RAINCLOUD_RAIN_OFFSET = 0.14
+RAINCLOUD_RAIN_SPREAD = 0.3
 # the rain is denser than a standalone swarm, so its points are smaller
 RAINCLOUD_RAIN_SIZE = 6
 INNER_QUARTILE_WIDTH_SCALE = 5.0
@@ -2407,29 +2409,22 @@ def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[La
 def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
     """The cloud, rain, and box of one raincloud dataset (ADR 0021).
 
-    The cloud keeps the low side when vertical and the high side when
-    horizontal; the rain and the box share the opposite side.
+    The cloud keeps the high side of the category position (right when
+    vertical, above when horizontal); the box and the rain sit on the low
+    side, the box nearest the seam.
     """
 
-    horizontal = settings.get("orientation") == ORIENTATION.HORIZONTAL
-    sign = -1 if horizontal else 1
     cloud = ViolinLayer(
         chart,
-        {
-            **settings,
-            "inner": None,
-            "split": None,
-            "side": -sign,
-            "color_by_group": True,
-        },
+        {**settings, "inner": None, "split": None, "side": 1, "color_by_group": True},
     )
     rain = SwarmLayer(
         chart,
         {
             **settings,
-            "offset": sign * RAINCLOUD_RAIN_OFFSET,
+            "offset": -RAINCLOUD_RAIN_OFFSET,
             "spread": RAINCLOUD_RAIN_SPREAD,
-            "side": sign,
+            "side": -1,
             "size": RAINCLOUD_RAIN_SIZE,
             "color_by_group": True,
         },
@@ -2439,10 +2434,10 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
         {
             **settings,
             "show_notch": None,
+            "offset": -RAINCLOUD_BOX_OFFSET,
             "width": RAINCLOUD_BOX_WIDTH,
-            # the half on the rain's side of the seam the cloud is clipped at
-            "side": sign,
             "outline": True,
+            "color_by_group": True,
             # the box reads over the rain
             "zorder": (rain.swarm_style.get("zorder") or 2) + 1,
         },
