@@ -50,7 +50,7 @@ class FIG_SIZE:
     with a height — `SHORT` (2.4 in / 6.1 cm), `MEDIUM` (4.8 in / 12.2 cm),
     or `TALL` (7.2 in / 18.3 cm). Passed as the `figsize` chart setting.
 
-    ![FIG_SIZE at a glance](../../assets/imgs/fig-sizes.svg){ width="100%" }
+    ![FIG_SIZE at a glance](../assets/imgs/fig-sizes.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import FIG_SIZE
@@ -59,26 +59,16 @@ class FIG_SIZE:
 
     Attributes:
         DEFAULT (Tuple[float, float]): The default figure size. Equals to `(6.4, 4.8)` in (16.3 x 12.2 cm).
-
-        # Full-width paper figures (A4 text-block width)
         FULL_SHORT (Tuple[float, float]): The short, full-width figure size. Equals to `(6.3, 2.4)` in (16.0 x 6.1 cm).
         FULL_MEDIUM (Tuple[float, float]): The medium, full-width figure size. Equals to `(6.3, 4.8)` in (16.0 x 12.2 cm).
         FULL_TALL (Tuple[float, float]): The tall, full-width figure size. Equals to `(6.3, 7.2)` in (16.0 x 18.3 cm).
-
-        # Half-width paper figures (one of two columns, 0.3 in gap)
         HALF_SHORT (Tuple[float, float]): The short, half-width figure size. Equals to `(3.0, 2.4)` in (7.6 x 6.1 cm).
         HALF_MEDIUM (Tuple[float, float]): The medium, half-width figure size. Equals to `(3.0, 4.8)` in (7.6 x 12.2 cm).
         HALF_TALL (Tuple[float, float]): The tall, half-width figure size. Equals to `(3.0, 7.2)` in (7.6 x 18.3 cm).
         HALF_SQUARE (Tuple[float, float]): The square, half-width figure size. Equals to `(3.0, 3.0)` in (7.6 x 7.6 cm).
-
-        # A4 printable area (2.5 cm margins)
         A4_PORTRAIT (Tuple[float, float]): The A4 portrait printable-area figure size. Equals to `(6.3, 9.7)` in (16.0 x 24.6 cm).
         A4_LANDSCAPE (Tuple[float, float]): The A4 landscape printable-area figure size. Equals to `(9.7, 6.3)` in (24.6 x 16.0 cm).
-
-        # Square
         SQUARE (Tuple[float, float]): The square figure size. Equals to `(4.8, 4.8)` in (12.2 x 12.2 cm).
-
-        # Presentation slides
         SLIDE_16_9 (Tuple[float, float]): The 16:9 slide figure size (PowerPoint/Google Slides). Equals to `(13.33, 7.5)` in (33.9 x 19.1 cm).
         SLIDE_4_3 (Tuple[float, float]): The 4:3 slide figure size (PowerPoint/Google Slides). Equals to `(10.0, 7.5)` in (25.4 x 19.1 cm).
         BEAMER_16_9 (Tuple[float, float]): The 16:9 beamer frame figure size. Equals to `(6.3, 3.54)` in (16.0 x 9.0 cm).
@@ -148,7 +138,7 @@ class FIG_FORMAT:
 class FONT_STYLE:
     """The supported font styles.
 
-    ![FONT_STYLE at a glance](../../assets/imgs/const-font-style.svg){ width="100%" }
+    ![FONT_STYLE at a glance](../assets/imgs/const-font-style.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import FONT_STYLE
@@ -175,7 +165,7 @@ class FONT_WEIGHT:
     Used by the `font_*_weight` style attributes (general, title, subtitle,
     axis labels).
 
-    ![FONT_WEIGHT at a glance](../../assets/imgs/const-font-weight.svg){ width="100%" }
+    ![FONT_WEIGHT at a glance](../assets/imgs/const-font-weight.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import FONT_WEIGHT
@@ -214,7 +204,7 @@ class LINE_MARKER:
     Used by the `plot_line_marker` (line charts) and `plot_scatter_marker`
     (scatter charts) style attributes.
 
-    ![LINE_MARKER at a glance](../../assets/imgs/const-line-marker.svg){ width="100%" }
+    ![LINE_MARKER at a glance](../assets/imgs/const-line-marker.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import LINE_MARKER
@@ -268,7 +258,7 @@ class LINE_STYLE:
 
     Used by the `plot_line_style` style attribute of line charts.
 
-    ![LINE_STYLE at a glance](../../assets/imgs/const-line-style.svg){ width="100%" }
+    ![LINE_STYLE at a glance](../assets/imgs/const-line-style.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import LINE_STYLE
@@ -302,7 +292,7 @@ class ARROW_STYLE:
     override single properties of the chosen look. A raw matplotlib arrow
     style string (e.g. `"-|>"`) is also accepted.
 
-    ![ARROW_STYLE at a glance](../../assets/imgs/const-arrow-style.svg){ width="100%" }
+    ![ARROW_STYLE at a glance](../assets/imgs/const-arrow-style.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import ARROW_STYLE
@@ -328,7 +318,7 @@ class LINE_DRAW_STYLE:
 
     Used by the `plot_line_drawstyle` style attribute of line charts.
 
-    ![LINE_DRAW_STYLE at a glance](../../assets/imgs/const-line-draw-style.svg){ width="100%" }
+    ![LINE_DRAW_STYLE at a glance](../assets/imgs/const-line-draw-style.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import LINE_DRAW_STYLE
@@ -355,7 +345,7 @@ class HATCH_STYLE:
     Used by the `plot_bar_hatch` and `plot_hist_hatch` style attributes, and
     by the `HATCH` theme's hatch cycle.
 
-    ![HATCH_STYLE at a glance](../../assets/imgs/const-hatch-style.svg){ width="100%" }
+    ![HATCH_STYLE at a glance](../assets/imgs/const-hatch-style.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import HATCH_STYLE
@@ -394,7 +384,7 @@ class LEGEND_ALIGN:
     Used by the `plot_legend_alignment` style attribute; aligns the legend's
     title and entries against each other.
 
-    ![LEGEND_ALIGN at a glance](../../assets/imgs/const-legend-align.svg){ width="100%" }
+    ![LEGEND_ALIGN at a glance](../assets/imgs/const-legend-align.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import LEGEND_ALIGN
@@ -421,7 +411,7 @@ class LEGEND_LOCATION:
     Used by the `plot_legend_location` style attribute; places the legend
     within the chart.
 
-    ![LEGEND_LOCATION at a glance](../../assets/imgs/const-legend-location.svg){ width="100%" }
+    ![LEGEND_LOCATION at a glance](../assets/imgs/const-legend-location.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import LEGEND_LOCATION
@@ -463,7 +453,7 @@ class HISTOGRAM_TYPE:
     series is rendered. How multiple series share the axis is the `bar_mode`
     setting's job — see `BAR_MODE`.
 
-    ![HISTOGRAM_TYPE at a glance](../../assets/imgs/const-histogram-type.svg){ width="100%" }
+    ![HISTOGRAM_TYPE at a glance](../assets/imgs/const-histogram-type.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import HISTOGRAM_TYPE
@@ -492,7 +482,7 @@ class BAR_MODE:
     Bar charts and panels default to `GROUP`; histograms default to `STACK`,
     and treat `GROUP` (which has no histogram meaning) as `OVERLAY`.
 
-    ![BAR_MODE at a glance](../../assets/imgs/const-bar-mode.svg){ width="100%" }
+    ![BAR_MODE at a glance](../assets/imgs/const-bar-mode.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import BAR_MODE
@@ -529,14 +519,11 @@ class COLORS:
         'Blues'
 
     Attributes:
-        # Sequential (Single-hue)
         Blues (str): Sequential blue palette. Equals to `"Blues"`.
         Greens (str): Sequential green palette. Equals to `"Greens"`.
         Oranges (str): Sequential orange palette. Equals to `"Oranges"`.
         Purples (str): Sequential purple palette. Equals to `"Purples"`.
         Reds (str): Sequential red palette. Equals to `"Reds"`.
-
-        # Sequential (Multi-hue)
         Sunset2 (str): Multi-hue sunset palette. Equals to `"Sunset2"`.
         YlGnBu (str): Multi-hue yellow-green-blue palette. Equals to `"YlGnBu"`.
         YlOrRd (str): Multi-hue yellow-orange-red palette. Equals to `"YlOrRd"`.
@@ -546,27 +533,19 @@ class COLORS:
         Hiroshige (str): Multi-hue Hiroshige palette. Equals to `"Hiroshige"`.
         Lake (str): Multi-hue lake palette. Equals to `"Lake"`.
         Neon (str): Multi-hue neon palette. Equals to `"Neon"`.
-
-        # Diverging
         RdBu (str): Diverging red-blue palette. Equals to `"RdBu"`.
         BrBG (str): Diverging brown-blue-green palette. Equals to `"BrBG"`.
         PuOr (str): Diverging purple-orange palette. Equals to `"PuOr"`.
         Spectral (str): Diverging spectral palette. Equals to `"Spectral"`.
         RdYlBu (str): Diverging red-yellow-blue palette. Equals to `"RdYlBu"`.
         RdYlGn (str): Diverging red-yellow-green palette. Equals to `"RdYlGn"`.
-
-        # Categorical
         Pastel (str): Soft pastel categorical palette. Equals to `"Pastel"`.
         Set2 (str): ColorBrewer Set2 categorical palette. Equals to `"Set2"`.
         Accent (str): ColorBrewer Accent categorical palette. Equals to `"Accent"`.
         Dark2 (str): ColorBrewer Dark2 categorical palette. Equals to `"Dark2"`.
         Paired (str): ColorBrewer Paired categorical palette (high contrast). Equals to `"Paired"`.
         Set1 (str): ColorBrewer Set1 categorical palette (high contrast). Equals to `"Set1"`.
-
-        # Grayscale (print-friendly)
         Greys (str): Grayscale palette for monochrome visualizations. Equals to `"Greys"`.
-
-        # Color-blind friendly / Accessible
         Viridis (str): Perceptually uniform, color-blind friendly. Equals to `"Viridis"`.
         Cividis (str): Color-blind friendly (optimized for CVD). Equals to `"Cividis"`.
         Inferno (str): Perceptually uniform, color-blind friendly. Equals to `"Inferno"`.
@@ -575,15 +554,9 @@ class COLORS:
         Turbo (str): Rainbow-like but perceptually better. Equals to `"Turbo"`.
         OkabeIto (str): Okabe-Ito categorical palette, color-blind safe. Equals to `"OkabeIto"`.
         OkabeIto_Black (str): Okabe-Ito palette including black. Equals to `"OkabeIto_Black"`.
-
-        # Additional Diverging
         Coolwarm (str): Diverging cool-warm palette. Equals to `"coolwarm"`.
-
-        # Tableau palettes (Categorical)
         Tab10 (str): Tableau 10-color categorical palette. Equals to `"tab10"`.
         Tab20 (str): Tableau 20-color categorical palette. Equals to `"tab20"`.
-
-        # Custom datachart palettes
         PaperYlGnBu (str): Diversified YlGnBu categorical palette for publications. Equals to `"PaperYlGnBu"`.
         PaperAccent (str): Two-color blue/red accent pair for publications. Equals to `"PaperAccent"`.
 
@@ -655,7 +628,7 @@ class NORMALIZE:
     before they are mapped to colors. Distinct from
     [`SCALE`][datachart.constants.SCALE], which sets an axis scale.
 
-    ![NORMALIZE at a glance](../../assets/imgs/const-normalize.svg){ width="100%" }
+    ![NORMALIZE at a glance](../assets/imgs/const-normalize.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import NORMALIZE
@@ -684,7 +657,7 @@ class ORIENTATION:
     Passed as the `orientation` setting of bar charts, histograms, box
     plots, and violin plots.
 
-    ![ORIENTATION at a glance](../../assets/imgs/const-orientation.svg){ width="100%" }
+    ![ORIENTATION at a glance](../assets/imgs/const-orientation.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import ORIENTATION
@@ -707,7 +680,7 @@ class SWARM_MODE:
     Passed as the `mode` setting of swarm plots: how the points of one group
     spread across the category width.
 
-    ![SWARM_MODE at a glance](../../assets/imgs/const-swarm-mode.svg){ width="100%" }
+    ![SWARM_MODE at a glance](../assets/imgs/const-swarm-mode.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import SWARM_MODE
@@ -730,7 +703,7 @@ class VIOLIN_INNER:
 
     Passed as the `inner` setting of violin plots; `None` draws the body only.
 
-    ![VIOLIN_INNER at a glance](../../assets/imgs/const-violin-inner.svg){ width="100%" }
+    ![VIOLIN_INNER at a glance](../assets/imgs/const-violin-inner.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import VIOLIN_INNER
@@ -760,7 +733,7 @@ class BANDWIDTH:
     to the standard deviation of the values — smaller is sharper, larger is
     smoother.
 
-    ![BANDWIDTH at a glance](../../assets/imgs/const-bandwidth.svg){ width="100%" }
+    ![BANDWIDTH at a glance](../assets/imgs/const-bandwidth.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import BANDWIDTH
@@ -792,7 +765,7 @@ class CONTOUR_LEVELS:
     cell count), so a finer grid draws more levels; the count is clamped to
     the 4–20 range and snapped to round values.
 
-    ![CONTOUR_LEVELS at a glance](../../assets/imgs/const-contour-levels.svg){ width="100%" }
+    ![CONTOUR_LEVELS at a glance](../assets/imgs/const-contour-levels.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import CONTOUR_LEVELS
@@ -824,7 +797,7 @@ class HEXBIN_REDUCE:
     the points in a hexagon collapse into the one value that colors it.
     Ignored without `c`, where every hexagon shows its point count.
 
-    ![HEXBIN_REDUCE at a glance](../../assets/imgs/const-hexbin-reduce.svg){ width="100%" }
+    ![HEXBIN_REDUCE at a glance](../assets/imgs/const-hexbin-reduce.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import HEXBIN_REDUCE
@@ -855,7 +828,7 @@ class BASELINE:
     Passed as the `baseline` attribute of stacked area charts: where the
     first series starts, and so how the whole stack sits on the y-axis.
 
-    ![BASELINE at a glance](../../assets/imgs/const-baseline.svg){ width="100%" }
+    ![BASELINE at a glance](../assets/imgs/const-baseline.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import BASELINE
@@ -887,7 +860,7 @@ class RADIAL_TYPE:
     figure draws. The area visual is the line visual with `show_area=True`;
     stacked bars are the bar visual with `bar_mode="stack"`.
 
-    ![RADIAL_TYPE at a glance](../../assets/imgs/const-radial-type.svg){ width="100%" }
+    ![RADIAL_TYPE at a glance](../assets/imgs/const-radial-type.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import RADIAL_TYPE
@@ -914,7 +887,7 @@ class DIRECTION:
     Passed as the `direction` setting of radial charts: which way the angles
     increase around the circle.
 
-    ![DIRECTION at a glance](../../assets/imgs/const-direction.svg){ width="100%" }
+    ![DIRECTION at a glance](../assets/imgs/const-direction.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import DIRECTION
@@ -937,7 +910,7 @@ class VALUE_FORMAT:
     Passed as the heatmap's `valfmt` attribute (the values drawn in the cells)
     or the bar chart's `value_format` attribute (the bar value labels).
 
-    ![VALUE_FORMAT at a glance](../../assets/imgs/const-value-format.svg){ width="100%" }
+    ![VALUE_FORMAT at a glance](../assets/imgs/const-value-format.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import VALUE_FORMAT
@@ -1005,7 +978,7 @@ class EMPHASIS:
     Set per chart via the `emphasis` key in a charts list, or per figure via
     the `emphasis` argument of [`Panel`][datachart.utils.Panel].
 
-    ![EMPHASIS at a glance](../../assets/imgs/const-emphasis.svg){ width="100%" }
+    ![EMPHASIS at a glance](../assets/imgs/const-emphasis.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import EMPHASIS
@@ -1031,7 +1004,7 @@ class SHOW_GRID:
     Passed as the `show_grid` chart setting: which grid lines to draw. When
     unset (or `NONE`), the theme's `chart_default_show_grid` fills in.
 
-    ![SHOW_GRID at a glance](../../assets/imgs/const-show-grid.svg){ width="100%" }
+    ![SHOW_GRID at a glance](../assets/imgs/const-show-grid.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import SHOW_GRID
@@ -1061,7 +1034,7 @@ class SCALE:
     Distinct from [`NORMALIZE`][datachart.constants.NORMALIZE], which
     normalizes heatmap colors.
 
-    ![SCALE at a glance](../../assets/imgs/const-scale.svg){ width="100%" }
+    ![SCALE at a glance](../assets/imgs/const-scale.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import SCALE
@@ -1090,7 +1063,7 @@ class ASPECT_RATIO:
     Passed as the `aspect_ratio` chart setting: the ratio of the y-unit to
     the x-unit on screen.
 
-    ![ASPECT_RATIO at a glance](../../assets/imgs/const-aspect-ratio.svg){ width="100%" }
+    ![ASPECT_RATIO at a glance](../assets/imgs/const-aspect-ratio.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import ASPECT_RATIO
@@ -1112,7 +1085,7 @@ class ASPECT_RATIO:
 class COLORBAR_LOCATION:
     """The supported colorbar locations.
 
-    ![COLORBAR_LOCATION at a glance](../../assets/imgs/const-colorbar-location.svg){ width="100%" }
+    ![COLORBAR_LOCATION at a glance](../assets/imgs/const-colorbar-location.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import COLORBAR_LOCATION
