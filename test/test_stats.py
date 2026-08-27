@@ -1,5 +1,8 @@
 import unittest
 
+import numpy as np
+
+from datachart.constants import CONTOUR_LEVELS
 from datachart.utils.stats import (
     minimum,
     maximum,
@@ -7,6 +10,7 @@ from datachart.utils.stats import (
     variance,
     iqr,
     correlation,
+    contour_levels,
 )
 
 # =====================================
@@ -139,6 +143,59 @@ class TestStats(unittest.TestCase):
             correlation("not a list", [1, 2, 3])
         with self.assertRaises(TypeError):
             correlation([1, 2, 3], "not a list")
+
+    # =====================================
+    # Test contour_levels
+    # =====================================
+
+    @staticmethod
+    def _surface(n=120):
+        x = np.linspace(-5, 5, n)
+        X, Y = np.meshgrid(x, x)
+        return (X**2 + Y - 11) ** 2 + (X + Y**2 - 7) ** 2
+
+    def test_contour_levels_auto_is_none(self):
+        self.assertIsNone(contour_levels(self._surface(), CONTOUR_LEVELS.AUTO))
+        self.assertIsNone(contour_levels(self._surface(), None))
+
+    def test_contour_levels_rice_counts_per_axis(self):
+        # rice on sqrt(cells): k = ceil(2 * 120 ** (1/3)) = 10 target bins
+        levels = contour_levels(self._surface(), CONTOUR_LEVELS.RICE)
+        z = self._surface()
+        self.assertTrue(4 <= len(levels) - 1 <= 20)
+        self.assertLessEqual(levels[0], z.min())
+        self.assertGreaterEqual(levels[-1], z.max())
+        self.assertEqual(levels, sorted(levels))
+
+    def test_contour_levels_fd_denser_than_rice(self):
+        z = self._surface()
+        rice = contour_levels(z, CONTOUR_LEVELS.RICE)
+        fd = contour_levels(z, CONTOUR_LEVELS.FD)
+        self.assertGreater(len(fd), len(rice))
+
+    def test_contour_levels_clamped(self):
+        # a 2x2 grid: rice gives k = ceil(2 * 2 ** (1/3)) = 3 -> clamped to 4
+        z = [[0.0, 1.0], [2.0, 3.0]]
+        levels = contour_levels(z, CONTOUR_LEVELS.RICE)
+        self.assertGreaterEqual(len(levels) - 1, 3)
+        # a huge grid saturates at the 20-level cap
+        levels = contour_levels(self._surface(2000), CONTOUR_LEVELS.FD)
+        self.assertLessEqual(len(levels) - 1, 21)
+
+    def test_contour_levels_fd_zero_iqr_falls_back(self):
+        # a flat surface with one spike: IQR is 0, so fd falls back to 8 bins
+        z = np.zeros((10, 10))
+        z[0, 0] = 10.0
+        levels = contour_levels(z, CONTOUR_LEVELS.FD)
+        self.assertTrue(6 <= len(levels) - 1 <= 10)
+
+    def test_contour_levels_passthrough(self):
+        self.assertEqual(contour_levels(self._surface(), [1, 2, 3]), [1, 2, 3])
+        self.assertEqual(contour_levels(self._surface(), 6), 6)
+
+    def test_contour_levels_invalid_rule(self):
+        with self.assertRaises(ValueError):
+            contour_levels(self._surface(), "sturges")
 
 
 if __name__ == "__main__":
