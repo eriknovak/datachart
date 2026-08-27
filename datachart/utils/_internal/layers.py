@@ -3597,14 +3597,18 @@ class Panel:
             # above the marks in _apply_radial_furniture
             ax.set_axisbelow(True)
 
-        # line charts pin the category-axis limits to their data range
+        # line charts pin the category-axis limits to the union of their data ranges
         if s.get("tighten_xlim"):
-            set_category_lim = ax.set_ylim if horizontal else ax.set_xlim
-            for layer in layers:
-                if isinstance(layer, (LineLayer, StackedAreaLayer)):
-                    rng = layer.x_range()
-                    if rng is not None:
-                        set_category_lim(rng[0], rng[1])
+            ranges = [
+                layer.x_range()
+                for layer in layers
+                if isinstance(layer, (LineLayer, StackedAreaLayer))
+            ]
+            ranges = [r for r in ranges if r is not None]
+            if ranges:
+                (ax.set_ylim if horizontal else ax.set_xlim)(
+                    min(r[0] for r in ranges), max(r[1] for r in ranges)
+                )
 
         # bar category ticks
         bar_ticks = s.get("bar_ticks")

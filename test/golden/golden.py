@@ -139,6 +139,9 @@ EXPECTED_CHANGES = {
     "stackedarea_subplots",
     "stackedarea_panel_line",
     "stackedarea_grid",
+    # line-only panels hug the data range like line charts (ADR 0025)
+    "overlay_line_line",
+    "overlay_theme_snapshot",
     # nested gridspecs size their parent cell (ADR 0007, issue #86)
     "grid_nested_grid",
 }

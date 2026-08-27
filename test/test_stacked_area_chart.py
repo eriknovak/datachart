@@ -186,6 +186,10 @@ class TestStackedAreaChart(unittest.TestCase):
         self.assertEqual(len(ax.lines), 1)
         self.assertEqual(fig._chart_metadata["panel"].settings["baseline"], "sym")
 
+    def test_panel_of_line_layers_tightens_x(self):
+        fig = Panel([StackedAreaChart(data=DATA), LineChart(data=DATA[0])])
+        self.assertEqual(fig.axes[0].get_xlim(), (0.0, 3.0))
+
     def test_panel_zero_pins_the_bottom(self):
         fig = Panel([StackedAreaChart(data=DATA), LineChart(data=DATA[0])])
         self.assertEqual(fig.axes[0].get_ylim()[0], 0.0)

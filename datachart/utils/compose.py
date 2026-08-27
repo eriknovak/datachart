@@ -335,6 +335,11 @@ def Panel(
         "ymax_right": ymax_right,
     }
 
+    # the x-axis hugs the data only when every source figure hugs it too
+    panel_settings["tighten_xlim"] = all(
+        item["figure"]._chart_metadata["panel"].settings.get("tighten_xlim")
+        for item in items
+    )
     # the first source figure's stack baseline wins, like bar_mode (ADR 0025)
     panel_settings["baseline"] = next(
         (
