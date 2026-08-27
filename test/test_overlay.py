@@ -1,6 +1,7 @@
 """Tests for the overlay module."""
 
 import pytest
+import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -77,6 +78,19 @@ class TestPanel:
         plt.close(combined_fig)
         plt.close(scatter_fig)
         plt.close(line_fig)
+
+    def test_density_histogram_shares_axis_with_density_curve(self):
+        from datachart.utils.stats import kde1d
+
+        values = list(np.random.RandomState(0).normal(size=200))
+        hist = Histogram(data=[{"x": v} for v in values], show_density=True)
+        curve = LineChart(data=kde1d(values))
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            fig = Panel([hist, curve])
+        # both integrate to 1, so no secondary axis is created
+        self.assertEqual(len(fig.axes), 1)
+        plt.close(fig)
 
     def test_histogram_line_overlay(self):
         """Test histogram + line overlay."""

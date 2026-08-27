@@ -840,8 +840,13 @@ class HistogramLayer(Layer):
         x = self.x_values()
         if x is None or len(x) == 0:
             return None
-        counts, _ = np.histogram(x, bins=self.num_bins)
-        return (float(np.min(counts)), float(np.max(counts)))
+        # the view decides the scale: densities and cumulative shares are not counts
+        heights, edges = np.histogram(x, bins=self.num_bins, density=self.show_density)
+        if self.show_cumulative:
+            heights = np.cumsum(
+                heights * np.diff(edges) if self.show_density else heights
+            )
+        return (float(np.min(heights)), float(np.max(heights)))
 
     def draw(self, ax, ctx):
         x = self.x_values()
