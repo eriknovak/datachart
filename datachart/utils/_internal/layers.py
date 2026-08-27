@@ -14,7 +14,7 @@ import warnings
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import cycle as iter_cycle
-from typing import List, Optional, Union
+from typing import List, NamedTuple, Optional, Union
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -43,7 +43,6 @@ from .config_helpers import (
     get_area_style,
     get_stackedarea_style,
     get_sankey_style,
-    get_text_style,
     get_grid_style,
     get_line_style,
     get_bar_style,
@@ -122,6 +121,13 @@ MUTED_WIDTH_SCALE = 0.75
 HIGHLIGHT_WIDTH_SCALE = 2.0
 DEFAULT_MUTED_COLOR = "#CFCFCF"
 DEFAULT_MUTED_ALPHA = 0.5
+# sankey labels: room past the outer columns, the gap to the node bar
+SANKEY_LABEL_MARGIN = 0.2
+SANKEY_LABEL_PAD = 0.01
+# column headings sit this far above the tallest column
+SANKEY_COLUMN_LABEL_PAD = 0.03
+SANKEY_COLUMN_LABEL_HEADROOM = 0.1
+SANKEY_GREY = "#9E9E9E"
 # matplotlib skips underscore-prefixed labels when assembling the legend
 NO_LEGEND = "_nolegend_"
 # radial furniture defaults: compass and calendar conventions (ADR 0015)
@@ -2829,11 +2835,27 @@ class TextLayer(Layer):
 # Sankey Layer
 # ================================================
 
-# horizontal room past the outer columns so the labels sit inside the axes
-SANKEY_LABEL_MARGIN = 0.2
-# gap between a node bar and its label, in data units
-SANKEY_LABEL_PAD = 0.01
-SANKEY_GREY = "#9E9E9E"
+
+def _format_sankey_value(value_format, value) -> str:
+    """Render a ribbon value with a formatter, a `%` string, or a `{}` string."""
+
+    if isinstance(value_format, mticker.Formatter):
+        return value_format(value)
+    if "%" in value_format:
+        return value_format % (value,)
+    return value_format.format(value)
+
+
+class NodeBox(NamedTuple):
+    """One Sankey node bar in the 0–1 data space."""
+
+    x: float
+    bottom: float
+    height: float
+
+    @property
+    def top(self) -> float:
+        return self.bottom + self.height
 
 
 class SankeyLayer(Layer):
@@ -2848,6 +2870,14 @@ class SankeyLayer(Layer):
     def __init__(self, chart: dict, settings: dict):
         self.links = chart["data"]["links"]
         self.columns = settings.get("nodes") or infer_sankey_columns(self.links)
+        self.column_labels = settings.get("column_labels")
+        if self.column_labels is not None and len(self.column_labels) != len(
+            self.columns
+        ):
+            raise ValueError(
+                f"`column_labels` has {len(self.column_labels)} entries but the "
+                f"Sankey has {len(self.columns)} columns."
+            )
         super().__init__(chart, settings)
 
     def _resolve_style(self) -> None:
@@ -2856,6 +2886,17 @@ class SankeyLayer(Layer):
             self.sankey_style.get("link_color")
         )
         self.label_style = get_text_style("general")
+        # column headings read as per-column subtitles
+        self.column_label_style = get_text_style("subtitle")
+        self.show_values = bool(self.settings.get("show_values"))
+        self.value_format = _value_formatter(
+            self.settings.get("value_format") or DEFAULT_BAR_VALUE_FORMAT
+        )
+        self.value_style = {
+            "fontsize": config["plot_bar_value_fontsize"],
+            "color": config["plot_bar_value_color"],
+            "family": self.label_style.get("family"),
+        }
         # one color per node in column-then-row order, keyed by name
         names = [node for column in self.columns for node in column]
         cycle = create_color_cycle(config["color_general_multiple"], len(names))
@@ -2889,7 +2930,7 @@ class SankeyLayer(Layer):
             x = ci * x_step if n_cols > 1 else (1 - node_width) / 2
             for name in column:
                 height = size[name] * scale
-                geometry[name] = (x, y - height, height)
+                geometry[name] = NodeBox(x, y - height, height)
                 y -= height + gap
         return geometry, scale
 
@@ -2906,12 +2947,12 @@ class SankeyLayer(Layer):
 
         for ci, column in enumerate(self.columns):
             for name in column:
-                x, bottom, height = geometry[name]
+                box = geometry[name]
                 ax.add_patch(
                     Rectangle(
-                        (x, bottom),
+                        (box.x, box.bottom),
                         node_width,
-                        height,
+                        box.height,
                         facecolor=self.node_colors[name],
                         edgecolor=style.get("edgecolor"),
                         linewidth=style.get("linewidth"),
@@ -2921,12 +2962,12 @@ class SankeyLayer(Layer):
                 )
                 # labels sit left of the first column, right of every other
                 if ci == 0:
-                    tx, ha = x - SANKEY_LABEL_PAD, "right"
+                    tx, ha = box.x - SANKEY_LABEL_PAD, "right"
                 else:
-                    tx, ha = x + node_width + SANKEY_LABEL_PAD, "left"
+                    tx, ha = box.x + node_width + SANKEY_LABEL_PAD, "left"
                 ax.text(
                     tx,
-                    bottom + height / 2,
+                    box.bottom + box.height / 2,
                     name,
                     ha=ha,
                     va="center",
@@ -2935,28 +2976,36 @@ class SankeyLayer(Layer):
                     **self.label_style,
                 )
 
+        if self.column_labels is not None:
+            for column, label in zip(self.columns, self.column_labels):
+                x = geometry[column[0]].x
+                ax.text(
+                    x + node_width / 2,
+                    1 + SANKEY_COLUMN_LABEL_PAD,
+                    label,
+                    ha="center",
+                    va="bottom",
+                    zorder=4,
+                    **self.column_label_style,
+                )
+
         # ribbons stack from the top of each node; drawing in order of
         # endpoint height keeps the crossings few
         source_used, target_used = defaultdict(float), defaultdict(float)
         order = sorted(
             self.links,
-            key=lambda r: (
-                geometry[r["source"]][1] + geometry[r["source"]][2],
-                geometry[r["target"]][1] + geometry[r["target"]][2],
-            ),
+            key=lambda r: (geometry[r["source"]].top, geometry[r["target"]].top),
             reverse=True,
         )
         for record in order:
             source, target = record["source"], record["target"]
             height = record["value"] * scale
-            sx, sb, sh = geometry[source]
-            tx, tb, th = geometry[target]
-            y_source = sb + sh - source_used[source]
-            y_target = tb + th - target_used[target]
+            y_source = geometry[source].top - source_used[source]
+            y_target = geometry[target].top - target_used[target]
             source_used[source] += height
             target_used[target] += height
 
-            x1, x2 = sx + node_width, tx
+            x1, x2 = geometry[source].x + node_width, geometry[target].x
             cx = (x1 + x2) / 2
             verts = [
                 (x1, y_source),
@@ -2994,9 +3043,21 @@ class SankeyLayer(Layer):
                     zorder=2,
                 )
             )
+            if self.show_values:
+                # at the ribbon's midpoint, where the Bézier crosses between nodes
+                ax.text(
+                    cx,
+                    (y_source + y_target - height) / 2,
+                    _format_sankey_value(self.value_format, record["value"]),
+                    ha="center",
+                    va="center",
+                    zorder=4,
+                    path_effects=effects,
+                    **self.value_style,
+                )
 
         ax.set_xlim(-SANKEY_LABEL_MARGIN, 1 + SANKEY_LABEL_MARGIN)
-        ax.set_ylim(0, 1)
+        ax.set_ylim(0, 1 + (SANKEY_COLUMN_LABEL_HEADROOM if self.column_labels else 0))
         ax.axis("off")
 
 

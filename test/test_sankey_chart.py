@@ -135,6 +135,13 @@ class TestValidation(unittest.TestCase):
             with self.subTest(links=links), self.assertRaises(ValueError):
                 validate_sankey_links(links)
 
+    def test_numpy_values_are_accepted(self):
+        import numpy as np
+
+        validate_sankey_links(
+            [link("a", "b", np.int64(3)), link("b", "c", np.float32(1.5))]
+        )
+
     def test_bad_data_shape_raises(self):
         with self.assertRaises(ValueError):
             SankeyChart(CHAIN)
@@ -147,7 +154,7 @@ class TestValidation(unittest.TestCase):
             [["a"], ["b"], ["c"]],
             [["a"], ["b"], ["c", "d", "e"]],
             [["a"], ["b", "b"], ["c", "d"]],
-            [["a", "b", "c", "d"]][0],
+            ["a", "b", "c", "d"],
         ):
             with self.subTest(nodes=nodes), self.assertRaises(ValueError):
                 validate_sankey_nodes(nodes, CHAIN)
@@ -199,6 +206,24 @@ class TestRendering(unittest.TestCase):
             self.assertEqual(len(_ribbons(fig.axes[0])), 3)
         with self.assertRaises(ValueError):
             SankeyChart({"links": CHAIN}, style={"plot_sankey_link_color": "nope"})
+
+    def test_column_labels(self):
+        fig = SankeyChart({"links": CHAIN}, column_labels=["w", "x", "y", "z"])
+        texts = [t.get_text() for t in fig.axes[0].texts]
+        self.assertTrue({"w", "x", "y", "z"} <= set(texts))
+        self.assertGreater(fig.axes[0].get_ylim()[1], 1)
+        with self.assertRaises(ValueError):
+            SankeyChart({"links": CHAIN}, column_labels=["w", "x"])
+
+    def test_show_values(self):
+        fig = SankeyChart({"links": FUNNEL}, show_values=True)
+        texts = [t.get_text() for t in fig.axes[0].texts]
+        self.assertEqual(len(texts), 7 + len(FUNNEL))
+        self.assertIn("300", texts)
+        fig = SankeyChart({"links": FUNNEL}, show_values=True, value_format="{x:.1f}k")
+        self.assertIn("300.0k", [t.get_text() for t in fig.axes[0].texts])
+        fig = SankeyChart({"links": FUNNEL}, show_values=True, value_format="%d!")
+        self.assertIn("300!", [t.get_text() for t in fig.axes[0].texts])
 
     def test_subplots(self):
         fig = SankeyChart(

@@ -46,7 +46,10 @@ height carries the value, and the axes carry nothing.
   (0.4), `plot_sankey_label_halo_width` (2; a white halo behind labels so
   they stay legible over ribbons, 0 disables). Labels use `font_general_*`.
 - **Labels** sit left of the first column and right of every other column.
-  No value annotations.
+  `column_labels` adds one heading above each column in the subtitle style;
+  `show_values` writes each flow's value at its ribbon's midpoint, formatted
+  by `value_format` as bar values are, in the bar value style behind the same
+  halo. Both are off by default.
 
 ## Considered options
 

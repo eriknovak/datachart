@@ -5,6 +5,7 @@ so the fronts fail early with one message instead of deep inside matplotlib.
 """
 
 from collections import defaultdict
+from numbers import Real
 
 from ...constants import BANDWIDTH, BASELINE, EMPHASIS
 
@@ -86,11 +87,7 @@ def validate_sankey_links(links) -> None:
                 f"Sankey link {i} must be a dict with `source`, `target`, and `value`."
             )
         value = record["value"]
-        if (
-            isinstance(value, bool)
-            or not isinstance(value, (int, float))
-            or not value > 0
-        ):
+        if isinstance(value, bool) or not isinstance(value, Real) or not value > 0:
             raise ValueError(f"Sankey link {i} must have a `value` greater than 0.")
         if record["source"] == record["target"]:
             raise ValueError(

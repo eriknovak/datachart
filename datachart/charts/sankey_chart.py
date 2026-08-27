@@ -6,7 +6,7 @@ from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..utils._internal.validate import validate_sankey_links, validate_sankey_nodes
 from ..typings import SankeySingleChartAttrs, SankeyStyleAttrs, TextAttrs
-from ..constants import FIG_SIZE
+from ..constants import FIG_SIZE, VALUE_FORMAT
 
 # ================================================
 # Main Chart Definition
@@ -17,6 +17,9 @@ def SankeyChart(
     data: Union[SankeySingleChartAttrs, List[SankeySingleChartAttrs]],
     *,
     nodes: Optional[List[List[str]]] = None,
+    column_labels: Optional[List[str]] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     title: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: None = None,
@@ -66,6 +69,11 @@ def SankeyChart(
             top to bottom. Must name every node in the links exactly once.
             When omitted, a node's column is its longest path from any
             source and nodes keep their first-seen order within a column.
+        column_labels: One heading per column, drawn above it; must match the
+            number of columns.
+        show_values: Whether to write each flow's value on its ribbon.
+        value_format: Format string for the ribbon values: a `VALUE_FORMAT`
+            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
         title: The title of the chart.
         subtitle: The subtitle(s) for individual charts.
         emphasis: Not supported: a Sankey has no series to mute or
@@ -75,7 +83,8 @@ def SankeyChart(
             charts always split into subplots.
         max_cols: Maximum number of columns in subplots.
         style: Style configuration(s) for the chart(s).
-        texts: Text annotation(s) to draw; the axes span 0–1 on both sides.
+        texts: Text annotation(s) to draw. The columns span 0–1 horizontally
+            and the tallest column 0–1 vertically.
 
     Returns:
         The figure containing the Sankey chart.
@@ -83,7 +92,8 @@ def SankeyChart(
     Raises:
         ValueError: If `emphasis` is given, the links are malformed (missing
             keys, a value not above zero, a self-link), the links form a
-            cycle, or `nodes` does not name exactly the linked nodes.
+            cycle, `nodes` does not name exactly the linked nodes, or
+            `column_labels` does not match the number of columns.
 
     """
     if emphasis is not None:
@@ -118,6 +128,9 @@ def SankeyChart(
         "subplots": subplots,
         "max_cols": max_cols,
         "nodes": nodes,
+        "column_labels": column_labels,
+        "show_values": show_values,
+        "value_format": value_format,
     }
 
     return render_chart("sankeychart", charts, settings)

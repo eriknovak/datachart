@@ -146,6 +146,7 @@ EXPECTED_CHANGES = {
     "sankey_link_target",
     "sankey_subplots",
     "sankey_grid",
+    "sankey_values_labels",
     # line-only panels hug the data range like line charts (ADR 0025)
     "overlay_line_line",
     "overlay_theme_snapshot",
@@ -1448,6 +1449,16 @@ def sankey_subplots():
         subtitle=["labels", "funnel"],
         subplots=True,
         figsize=(12, 4),
+    )
+
+
+@case
+def sankey_values_labels():
+    return SankeyChart(
+        sankey_links(SANKEY_FUNNEL),
+        column_labels=["Visit", "Signup", "Activation", "Plan"],
+        show_values=True,
+        title="Signup funnel",
     )
 
 

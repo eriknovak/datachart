@@ -98,6 +98,7 @@ from .constants import (
     HEXBIN_REDUCE,
     BASELINE,
     ASPECT_RATIO,
+    VALUE_FORMAT,
 )
 
 # ================================================
@@ -1113,11 +1114,17 @@ class _SankeyChartAttrs(ChartCommonAttrs):
     Attributes:
         charts (Union[SankeySingleChartAttrs, List[SankeySingleChartAttrs]]): The chart definitions.
         nodes (Union[List[List[str]], None]): The node columns, overriding the inferred layout.
+        column_labels (Union[List[str], None]): One heading per column.
+        show_values (Union[bool, None]): Whether to write each flow's value on its ribbon.
+        value_format (Union[VALUE_FORMAT, str, None]): The format of the ribbon values.
 
     """
 
     charts: Union[SankeySingleChartAttrs, List[SankeySingleChartAttrs]]
     nodes: Union[List[List[str]], None]
+    column_labels: Union[List[str], None]
+    show_values: Union[bool, None]
+    value_format: Union[VALUE_FORMAT, str, None]
 
 
 # ================================================
