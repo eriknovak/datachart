@@ -6,20 +6,21 @@ The module containing the `stats` methods.
 
 The `stats` module provides methods for calculating statistics.
 
-| FUNCTION         | DESCRIPTION                                                       |
-| ---------------- | ----------------------------------------------------------------- |
-| `count`          | Counts the number of elements in the list.                        |
-| `sum_values`     | Calculates the sum of the values.                                 |
-| `mean`           | Calculates the mean of the values.                                |
-| `median`         | Calculates the median of the values.                              |
-| `stdev`          | Calculates the standard deviation of the values.                  |
-| `variance`       | Calculates the variance of the values.                            |
-| `quantile`       | Calculates the quantile of the values.                            |
-| `iqr`            | Calculates the interquartile range (Q3 - Q1).                     |
-| `minimum`        | Gets the minimum of the values.                                   |
-| `maximum`        | Gets the maximum of the values.                                   |
-| `correlation`    | Calculates the Pearson correlation coefficient between two lists. |
-| `contour_levels` | Picks the contour levels of a 2-D grid by a rule of thumb.        |
+| FUNCTION      | DESCRIPTION                                                       |
+| ------------- | ----------------------------------------------------------------- |
+| `count`       | Counts the number of elements in the list.                        |
+| `sum_values`  | Calculates the sum of the values.                                 |
+| `mean`        | Calculates the mean of the values.                                |
+| `median`      | Calculates the median of the values.                              |
+| `stdev`       | Calculates the standard deviation of the values.                  |
+| `variance`    | Calculates the variance of the values.                            |
+| `quantile`    | Calculates the quantile of the values.                            |
+| `iqr`         | Calculates the interquartile range (Q3 - Q1).                     |
+| `minimum`     | Gets the minimum of the values.                                   |
+| `maximum`     | Gets the maximum of the values.                                   |
+| `correlation` | Calculates the Pearson correlation coefficient between two lists. |
+| `kde1d`       | Estimates the density of the values as a curve.                   |
+| `kde2d`       | Estimates the density of the (x, y) points as a gridded surface.  |
 
 ## Functions
 
@@ -312,41 +313,102 @@ Examples:
 | `TypeError`  | If x or y is not a list or numpy array. |
 | `ValueError` | If x and y have different lengths.      |
 
-### datachart.utils.stats.contour_levels
+### datachart.utils.stats.kde1d
 
 ```
-contour_levels(
-    z: List[List[Union[int, float]]],
-    rule: Union[str, int, List[float], None],
-) -> Union[List[float], int, None]
+kde1d(
+    values: List[Union[int, float]],
+    *,
+    bandwidth: Optional[
+        Union[BANDWIDTH, str, float]
+    ] = None,
+    gridsize: int = 100,
+    cut: float = 3,
+    xlim: Optional[Tuple[float, float]] = None
+) -> List[Dict[str, float]]
 ```
 
-Picks the contour levels of a 2-D grid by a rule of thumb.
+Estimates the density of the values as a curve.
 
-The rules of `CONTOUR_LEVELS` are evaluated on the per-axis resolution of the grid, `n = sqrt(cells)`: `"rice"` targets `2 * n ** (1/3)` levels and `"fd"` the value range over `2 * IQR * n ** (-1/3)`. The count is clamped to the 4–20 range and snapped to round values across the range of `z`. `"auto"` (or `None`) returns `None`, leaving the choice to matplotlib; an integer or a list of level values passes through.
+A Gaussian kernel density estimate evaluated on `gridsize` evenly spaced points over the range of the values, extended by `cut` bandwidths on each side so the curve tails off instead of being clipped at the extremes, or over an explicit `xlim` so several curves share one grid. The result is a list of `{x, y}` points ready for `LineChart`; the curve integrates to 1, so it overlays a density `Histogram` of the same values.
 
 Added in Unreleased
 
 Examples:
 
 ```
->>> import numpy as np
->>> from datachart.utils.stats import contour_levels
->>> x = np.linspace(-5, 5, 120)
->>> X, Y = np.meshgrid(x, x)
->>> contour_levels(X**2 + Y**2, "rice")
-[0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0]
+>>> from datachart.utils.stats import kde1d
+>>> curve = kde1d([1, 2, 2, 3, 3, 3, 4, 4, 5], gridsize=5, cut=0)
+>>> [round(point["x"], 2) for point in curve]
+[1.0, 2.0, 3.0, 4.0, 5.0]
+>>> round(sum(point["y"] for point in curve), 2)
+0.94
 ```
 
-| PARAMETER | DESCRIPTION                                                                                                                         |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `z`       | The 2-D grid of values. **TYPE:** `List[List[Union[int, float]]]`                                                                   |
-| `rule`    | A rule of CONTOUR_LEVELS, a target level count, or an explicit list of level values. **TYPE:** `Union[str, int, List[float], None]` |
+| PARAMETER   | DESCRIPTION                                                                                                                                                                  |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `values`    | The values to estimate the density of. **TYPE:** `List[Union[int, float]]`                                                                                                   |
+| `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** `Optional[Union[BANDWIDTH, str, float]]` **DEFAULT:** `None` |
+| `gridsize`  | The number of points the curve is evaluated on. **TYPE:** `int` **DEFAULT:** `100`                                                                                           |
+| `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                                                                 |
+| `xlim`      | The (min, max) range of the grid; overrides the padded range. **TYPE:** `Optional[Tuple[float, float]]` **DEFAULT:** `None`                                                  |
 
-| RETURNS                         | DESCRIPTION                                                         |
-| ------------------------------- | ------------------------------------------------------------------- |
-| `Union[List[float], int, None]` | The level values, the target count, or None for the automatic rule. |
+| RETURNS                  | DESCRIPTION                             |
+| ------------------------ | --------------------------------------- |
+| `List[Dict[str, float]]` | The {x, y} points of the density curve. |
 
-| RAISES       | DESCRIPTION                               |
-| ------------ | ----------------------------------------- |
-| `ValueError` | If the rule is not one of CONTOUR_LEVELS. |
+| RAISES       | DESCRIPTION                                                                             |
+| ------------ | --------------------------------------------------------------------------------------- |
+| `ValueError` | If the bandwidth is invalid, there are fewer than two values, or a value is not finite. |
+
+### datachart.utils.stats.kde2d
+
+```
+kde2d(
+    x: List[Union[int, float]],
+    y: List[Union[int, float]],
+    *,
+    bandwidth: Optional[
+        Union[BANDWIDTH, str, float]
+    ] = None,
+    gridsize: Union[int, Tuple[int, int]] = 100,
+    cut: float = 3,
+    xlim: Optional[Tuple[float, float]] = None,
+    ylim: Optional[Tuple[float, float]] = None
+) -> Dict[str, List]
+```
+
+Estimates the density of the (x, y) points as a gridded surface.
+
+A Gaussian kernel density estimate evaluated on a `gridsize` × `gridsize` grid over the range of the points, extended by `cut` bandwidths on each side so the outer contours close instead of being clipped, or over explicit `xlim`/`ylim` so several surfaces share one grid. The result is an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of a scattered dataset is `ContourChart(kde2d(x, y))`.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.utils.stats import kde2d
+>>> surface = kde2d([1, 2, 3, 4], [1, 3, 2, 4], gridsize=(3, 2), cut=0)
+>>> surface["x"], surface["y"]
+([1.0, 2.5, 4.0], [1.0, 4.0])
+>>> [[round(z, 3) for z in row] for row in surface["z"]]
+[[0.075, 0.038, 0.001], [0.001, 0.038, 0.075]]
+```
+
+| PARAMETER   | DESCRIPTION                                                                                                                                                                  |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `x`         | The x values of the points. **TYPE:** `List[Union[int, float]]`                                                                                                              |
+| `y`         | The y values of the points, one per x value. **TYPE:** `List[Union[int, float]]`                                                                                             |
+| `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** `Optional[Union[BANDWIDTH, str, float]]` **DEFAULT:** `None` |
+| `gridsize`  | The number of grid columns and rows, as one number or an (x, y) pair. **TYPE:** `Union[int, Tuple[int, int]]` **DEFAULT:** `100`                                             |
+| `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                                                                 |
+| `xlim`      | The (min, max) x range of the grid; overrides the padded range. **TYPE:** `Optional[Tuple[float, float]]` **DEFAULT:** `None`                                                |
+| `ylim`      | The (min, max) y range of the grid; overrides the padded range. **TYPE:** `Optional[Tuple[float, float]]` **DEFAULT:** `None`                                                |
+
+| RETURNS           | DESCRIPTION                                      |
+| ----------------- | ------------------------------------------------ |
+| `Dict[str, List]` | The {x, y, z} chart dict of the density surface. |
+
+| RAISES       | DESCRIPTION                                                                                                       |
+| ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If the bandwidth is invalid, x and y differ in length, there are fewer than two points, or a value is not finite. |

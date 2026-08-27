@@ -30,6 +30,8 @@ Grid(
         },
     ],
     title=Optional[str],                                # The title of the grid
+    xlabel=Optional[str],                               # The x-axis label of the whole grid, drawn once
+    ylabel=Optional[str],                               # The y-axis label of the whole grid, drawn once
     max_cols=int,                                       # The column cap of the flat-list automatic layout (default: 4)
     figsize=Optional[Tuple[float, float]],              # The figure size in inches (default: calculated from the first figure)
     sharex=bool,                                        # Whether the cells share the x-axis (default: False)
@@ -67,7 +69,8 @@ Every customization is either a keyword argument of `Grid` or the shape of the l
 
 | I want to…                           | Use                             | See                                                           |
 | ------------------------------------ | ------------------------------- | ------------------------------------------------------------- |
-| add a title over the whole grid      | `title`                         | [Title](#title)                                               |
+| add a title over the whole grid      | `title`                         | [Title and axis labels](#title-and-axis-labels)               |
+| label the axes once for every cell   | `xlabel`, `ylabel`              | [Title and axis labels](#title-and-axis-labels)               |
 | let the grid lay the figures out     | a flat list, `max_cols`         | [Automatic layout](#automatic-layout)                         |
 | set the rows myself                  | nested rows                     | [Nested rows](#nested-rows)                                   |
 | leave a cell blank                   | `None` in a row                 | [Nested rows](#nested-rows)                                   |
@@ -79,7 +82,7 @@ Every customization is either a keyword argument of `Grid` or the shape of the l
 
 The full list of parameters is in the [datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) function. The look of each figure — colors, line widths, markers, labels — is set on the chart itself through its attributes and `style`; see the guide of each chart in the [Charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md) section.
 
-### Title
+### Title and axis labels
 
 To add a title over the whole grid, add the `title` attribute. The heading of each cell comes from its own chart — the `title` given to the chart function — so the grid title names the composition and the cell headings name the parts:
 
@@ -88,6 +91,18 @@ Grid(
     [temperature, precipitation],
     # add the title of the whole grid
     title="Climate of Ljubljana",
+).show()
+```
+
+When every cell measures the same quantities, labeling each one repeats the same words. Add the `xlabel` and `ylabel` attributes instead: each is drawn once for the whole grid — below the bottom row and to the left of the leftmost column — while the cells keep their own headings. A nested grid keeps its own labels inside its cell.
+
+```
+Grid(
+    [temperature, precipitation],
+    title="Climate of Ljubljana",
+    # one label per axis for the whole grid
+    xlabel="Month",
+    ylabel="Monthly normal",
 ).show()
 ```
 
@@ -341,7 +356,10 @@ Grid(
     # identical axes make the eight cells comparable
     sharex=True,
     sharey=True,
-    title="Mean monthly temperature (°C)",
+    title="Mean monthly temperature",
+    # the shared quantity is named once, not in every cell
+    xlabel="Month",
+    ylabel="Temperature (°C)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```

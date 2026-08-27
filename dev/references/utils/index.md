@@ -174,6 +174,8 @@ Grid(
     ],
     *,
     title: Optional[str] = None,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
     max_cols: int = 4,
     figsize: Optional[Tuple[float, float]] = None,
     sharex: bool = False,
@@ -229,6 +231,8 @@ Examples:
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `charts`   | Either nested rows — each inner list is one grid row of bare matplotlib Figures (or None for a blank cell) — or a flat list whose items are bare figures or dicts with a "figure" key and an optional "layout_spec" dict ('row', 'col', 'rowspan', 'colspan'). Nested rows and layout_spec cannot be mixed. **TYPE:** `Union[List[Union[plt.Figure, Dict[str, Any]]], List[List[Optional[plt.Figure]]]]` |
 | `title`    | Optional title for the combined figure. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                    |
+| `xlabel`   | Optional x-axis label for the whole grid, drawn once below every cell. A nested grid keeps its own as a footer of its cell. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                |
+| `ylabel`   | Optional y-axis label for the whole grid, drawn once to the left of every cell. A nested grid keeps its own beside its cell. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                               |
 | `max_cols` | Maximum number of columns for the flat-list automatic grid. **TYPE:** `int` **DEFAULT:** `4`                                                                                                                                                                                                                                                                                                             |
 | `figsize`  | Size of the combined figure (width, height) in inches. If None, calculated from the first figure's size. **TYPE:** `Optional[Tuple[float, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                   |
 | `sharex`   | Whether to share the x-axis across all subplots. **TYPE:** `bool` **DEFAULT:** `False`                                                                                                                                                                                                                                                                                                                   |

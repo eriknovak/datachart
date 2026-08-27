@@ -2519,6 +2519,7 @@ Every customization is either a keyword argument of `Histogram` or a `plot_hist_
 | stack or overlay the series             | `bar_mode`                                                                                 | [Multiple Histograms](#multiple-histograms)                   |
 | draw each series in its own subplot     | `subplots`, `sharex`, `sharey`, `max_cols`                                                 | [Subplots](#subplots)                                         |
 | show densities or cumulative counts     | `show_density`, `show_cumulative`                                                          | [Histogram Views](#histogram-views)                           |
+| overlay a smooth density curve          | `stats.kde1d`, `Panel`                                                                     | [Density curve](#density-curve)                               |
 | use a logarithmic axis                  | `scalex`, `scaley`                                                                         | [Axis scales](#axis-scales)                                   |
 | plot data with other key names          | `x`                                                                                        | [Custom data keys](#custom-data-keys)                         |
 | save the chart to a file                | `save_figure`                                                                              | [Saving the Chart as an Image](#saving-the-chart-as-an-image) |
@@ -2896,6 +2897,38 @@ Histogram(
     sharey=True,
     # show the density instead of the count
     show_density=True,
+).show()
+```
+
+### Density curve
+
+A density histogram depends on where its bins fall; a kernel density estimate smooths the same values into a curve that does not. [datachart.utils.stats.kde1d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde1d) computes it and returns the `{x, y}` points a [datachart.charts.LineChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.LineChart) draws, so there is no separate density chart: overlay the curve on the density histogram with [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel). Both integrate to 1, so they share the y-axis. This is how a KDE chart is built from raw values: estimate the curve, then draw it. The `bandwidth` sets how smooth the curve is — a [datachart.constants.BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) rule (Scott's by default) or a scalar factor, where smaller values follow the values more closely — and `show_area` fills the curve, the way a density plot is usually drawn.
+
+```
+from datachart.charts import LineChart
+from datachart.utils import Panel
+from datachart.utils.stats import kde1d
+```
+
+```
+# the flipper lengths, smoothed into a density curve: what a KDE chart draws
+flipper_density = kde1d([point["x"] for point in penguins])
+flipper_density[:3]
+```
+
+```
+Panel(
+    [
+        Histogram(data=penguins, subtitle="binned", show_density=True),
+        # the curve over the bars
+        LineChart(data=flipper_density, subtitle="kernel density", show_area=True),
+    ],
+    title="Flipper length of Palmer penguins",
+    xlabel="Flipper length (mm)",
+    ylabel_left="Density",
+    show_legend=True,
+    show_grid=SHOW_GRID.Y,
+    figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
@@ -6710,24 +6743,25 @@ ContourChart(
 
 Every customization is either a keyword argument of `ContourChart` or a `plot_contour_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                             | Use                                                                 | See                                                           |
-| -------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------- |
-| add a title and axis labels            | `title`, `xlabel`, `ylabel`                                         | [Title and axis labels](#title-and-axis-labels)               |
-| resize the figure                      | `figsize`                                                           | [Figure size and grid](#figure-size-and-grid)                 |
-| show or hide the grid lines            | `show_grid`                                                         | [Figure size and grid](#figure-size-and-grid)                 |
-| fill the bands between the levels      | `filled=True`                                                       | [Filled contours and colorbar](#filled-contours-and-colorbar) |
-| add a colorbar                         | `show_colorbars=True`, `colorbar={"orientation": ...}`              | [Filled contours and colorbar](#filled-contours-and-colorbar) |
-| write the level values on the lines    | `show_labels=True`, `valfmt`                                        | [Inline labels](#inline-labels)                               |
-| choose how many levels cut the surface | `levels`                                                            | [Levels](#levels)                                             |
-| change the line color, width, or style | `style={"plot_contour_color": ..., "plot_contour_line_width": ...}` | [Contour style](#contour-style)                               |
-| change the colormap of the fills       | `style={"plot_contour_cmap": ...}`                                  | [Contour style](#contour-style)                               |
-| pin or rescale the colormap range      | `vmin`, `vmax`, `norm`                                              | [Normalization](#normalization)                               |
-| overlay several surfaces               | `data=[...]`, `subtitle`, `show_legend`                             | [Multiple Contour Charts](#multiple-contour-charts)           |
-| draw each surface in its own subplot   | `subplots=True`, `max_cols`, `sharex`, `sharey`                     | [Subplots and shared axes](#subplots-and-shared-axes)         |
-| highlight one surface among several    | `emphasis`                                                          | [Emphasis](#emphasis)                                         |
-| draw the contours over a scatter chart | `Panel`                                                             | [Composing contours](#composing-contours)                     |
-| keep one unit equal on both axes       | `aspect_ratio`                                                      | [Aspect ratio](#aspect-ratio)                                 |
-| mark a position with a reference line  | `vlines`, `hlines`                                                  | [Reference lines](#reference-lines)                           |
+| I want to…                               | Use                                                                 | See                                                           |
+| ---------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------- |
+| add a title and axis labels              | `title`, `xlabel`, `ylabel`                                         | [Title and axis labels](#title-and-axis-labels)               |
+| resize the figure                        | `figsize`                                                           | [Figure size and grid](#figure-size-and-grid)                 |
+| show or hide the grid lines              | `show_grid`                                                         | [Figure size and grid](#figure-size-and-grid)                 |
+| fill the bands between the levels        | `filled=True`                                                       | [Filled contours and colorbar](#filled-contours-and-colorbar) |
+| add a colorbar                           | `show_colorbars=True`, `colorbar={"orientation": ...}`              | [Filled contours and colorbar](#filled-contours-and-colorbar) |
+| write the level values on the lines      | `show_labels=True`, `valfmt`                                        | [Inline labels](#inline-labels)                               |
+| choose how many levels cut the surface   | `levels`                                                            | [Levels](#levels)                                             |
+| change the line color, width, or style   | `style={"plot_contour_color": ..., "plot_contour_line_width": ...}` | [Contour style](#contour-style)                               |
+| change the colormap of the fills         | `style={"plot_contour_cmap": ...}`                                  | [Contour style](#contour-style)                               |
+| pin or rescale the colormap range        | `vmin`, `vmax`, `norm`                                              | [Normalization](#normalization)                               |
+| overlay several surfaces                 | `data=[...]`, `subtitle`, `show_legend`                             | [Multiple Contour Charts](#multiple-contour-charts)           |
+| draw each surface in its own subplot     | `subplots=True`, `max_cols`, `sharex`, `sharey`                     | [Subplots and shared axes](#subplots-and-shared-axes)         |
+| highlight one surface among several      | `emphasis`                                                          | [Emphasis](#emphasis)                                         |
+| draw the contours over a scatter chart   | `Panel`                                                             | [Composing contours](#composing-contours)                     |
+| keep one unit equal on both axes         | `aspect_ratio`                                                      | [Aspect ratio](#aspect-ratio)                                 |
+| mark a position with a reference line    | `vlines`, `hlines`                                                  | [Reference lines](#reference-lines)                           |
+| estimate the density of scattered points | `stats.kde2d`, `bandwidth`                                          | [Density of scattered points](#density-of-scattered-points)   |
 
 ### Title and axis labels
 
@@ -6821,7 +6855,7 @@ The `levels` attribute chooses which values cut the surface. It takes one of the
 | an integer | A target number of levels, snapped to round values.                                                                            |
 | a list     | The exact level values to draw.                                                                                                |
 
-The `datachart` package provides the [datachart.constants.CONTOUR_LEVELS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.CONTOUR_LEVELS) constant with the rules; the [datachart.utils.stats.contour_levels](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.contour_levels) function computes the same level values outside a chart. The rules follow the grid resolution rather than the surface, so they are opt-ins; for a surface whose range spans orders of magnitude, an explicit list of levels is usually the best choice.
+The `datachart` package provides the [datachart.constants.CONTOUR_LEVELS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.CONTOUR_LEVELS) constant with the rules. The rules follow the grid resolution rather than the surface, so they are opt-ins; for a surface whose range spans orders of magnitude, an explicit list of levels is usually the best choice.
 
 ```
 from datachart.constants import CONTOUR_LEVELS
@@ -6945,7 +6979,48 @@ ContourChart(
 
 To create multiple contour charts, pass a list of surfaces to the `data` argument. Each surface is drawn as its own set of iso-lines on the same axes, in its own color, and the `subtitle` of each chart becomes its legend label; `subplots=True` draws each surface in its own subplot instead. Several filled contours would cover each other, so fills are best kept to subplots.
 
-`species_density` holds three surfaces from the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0): the density of the 342 penguins of each species over their flipper length and body mass, estimated with a Gaussian kernel on a 80×80 grid, in penguins per mm of flipper length and kg of body mass. The data is hard-coded in a hidden cell, which also keeps every penguin as a point in `penguin_points` for the later sections.
+`species_density` holds three surfaces from the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0): the density of the 342 penguins of each species over their flipper length and body mass. The measurements are hard-coded in a hidden cell as `PENGUINS`; the cell below turns them into surfaces with [datachart.utils.stats.kde2d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde2d) — this is how a KDE chart is built from raw points (see [Density of scattered points](#density-of-scattered-points)). Every species is evaluated on one shared 80×80 grid, the range of all penguins padded by 10%, so the surfaces line up in subplots; the density is scaled to penguins per mm of flipper length and kg of body mass. The cell also keeps every penguin as a point in `penguin_points` for the later sections.
+
+```
+from datachart.utils.stats import kde2d, minimum, maximum
+
+SPECIES = ["Adelie", "Chinstrap", "Gentoo"]
+
+# one grid shared by every species: the range of all penguins, padded by 10%
+ALL_LENGTHS = [length for record in PENGUINS for length in record["flipper_length"]]
+ALL_MASSES = [mass for record in PENGUINS for mass in record["body_mass"]]
+
+
+def padded_range(values, padding=0.1):
+    lo, hi = minimum(values), maximum(values)
+    return lo - padding * (hi - lo), hi + padding * (hi - lo)
+
+
+def density(records):
+    # a Gaussian kernel density of the (flipper length, body mass) points
+    surface = kde2d(
+        [length for record in records for length in record["flipper_length"]],
+        [mass for record in records for mass in record["body_mass"]],
+        gridsize=80,
+        xlim=padded_range(ALL_LENGTHS),
+        ylim=padded_range(ALL_MASSES),
+    )
+    # per mm of flipper length and kg of body mass
+    surface["z"] = (np.array(surface["z"]) * 1000).tolist()
+    return surface
+
+
+# one surface per species: what a KDE chart draws
+species_density = [
+    density([p for p in PENGUINS if p["species"] == species]) for species in SPECIES
+]
+# every penguin as a point
+penguin_points = [
+    {"x": length, "y": mass}
+    for record in PENGUINS
+    for length, mass in zip(record["flipper_length"], record["body_mass"])
+]
+```
 
 ```
 ContourChart(
@@ -7092,6 +7167,33 @@ ContourChart(
     title="Himmelblau function",
     xlabel="x",
     ylabel="y",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Density of scattered points
+
+A contour chart of a density is the two-dimensional counterpart of a histogram: it shows where scattered points concentrate. [datachart.utils.stats.kde2d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde2d) estimates that density with a Gaussian kernel and returns the `{x, y, z}` surface `ContourChart` takes, so there is no separate density chart — `ContourChart(kde2d(x, y))` is it. The `bandwidth` sets how smooth the estimate is: a [datachart.constants.BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) rule (Scott's by default) or a scalar factor that replaces the rule, where smaller values follow the points more closely. The grid extends past the points by `cut` bandwidths, so the outer contours close instead of being clipped; `xlim` and `ylim` fix the grid instead, so several surfaces share one — the per-species densities of this guide are all evaluated over the range of every penguin, padded by 10%, so they line up in subplots.
+
+Here the density of all 342 penguins over their flipper length and body mass is drawn as filled bands, with a colorbar for the density; the [Composing contours](#composing-contours) section overlays the per-species densities on the points themselves.
+
+```
+from datachart.utils.stats import kde2d
+```
+
+```
+ContourChart(
+    # the density of the penguins over flipper length and body mass
+    data=kde2d(
+        [point["x"] for point in penguin_points],
+        [point["y"] for point in penguin_points],
+    ),
+    filled=True,
+    show_colorbars=True,
+    levels=8,
+    title="Density of the Palmer penguins",
+    xlabel="Flipper length (mm)",
+    ylabel="Body mass (g)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
@@ -8270,6 +8372,8 @@ Grid(
         },
     ],
     title=Optional[str],                                # The title of the grid
+    xlabel=Optional[str],                               # The x-axis label of the whole grid, drawn once
+    ylabel=Optional[str],                               # The y-axis label of the whole grid, drawn once
     max_cols=int,                                       # The column cap of the flat-list automatic layout (default: 4)
     figsize=Optional[Tuple[float, float]],              # The figure size in inches (default: calculated from the first figure)
     sharex=bool,                                        # Whether the cells share the x-axis (default: False)
@@ -8307,7 +8411,8 @@ Every customization is either a keyword argument of `Grid` or the shape of the l
 
 | I want to…                           | Use                             | See                                                           |
 | ------------------------------------ | ------------------------------- | ------------------------------------------------------------- |
-| add a title over the whole grid      | `title`                         | [Title](#title)                                               |
+| add a title over the whole grid      | `title`                         | [Title and axis labels](#title-and-axis-labels)               |
+| label the axes once for every cell   | `xlabel`, `ylabel`              | [Title and axis labels](#title-and-axis-labels)               |
 | let the grid lay the figures out     | a flat list, `max_cols`         | [Automatic layout](#automatic-layout)                         |
 | set the rows myself                  | nested rows                     | [Nested rows](#nested-rows)                                   |
 | leave a cell blank                   | `None` in a row                 | [Nested rows](#nested-rows)                                   |
@@ -8319,7 +8424,7 @@ Every customization is either a keyword argument of `Grid` or the shape of the l
 
 The full list of parameters is in the [datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) function. The look of each figure — colors, line widths, markers, labels — is set on the chart itself through its attributes and `style`; see the guide of each chart in the [Charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md) section.
 
-### Title
+### Title and axis labels
 
 To add a title over the whole grid, add the `title` attribute. The heading of each cell comes from its own chart — the `title` given to the chart function — so the grid title names the composition and the cell headings name the parts:
 
@@ -8328,6 +8433,18 @@ Grid(
     [temperature, precipitation],
     # add the title of the whole grid
     title="Climate of Ljubljana",
+).show()
+```
+
+When every cell measures the same quantities, labeling each one repeats the same words. Add the `xlabel` and `ylabel` attributes instead: each is drawn once for the whole grid — below the bottom row and to the left of the leftmost column — while the cells keep their own headings. A nested grid keeps its own labels inside its cell.
+
+```
+Grid(
+    [temperature, precipitation],
+    title="Climate of Ljubljana",
+    # one label per axis for the whole grid
+    xlabel="Month",
+    ylabel="Monthly normal",
 ).show()
 ```
 
@@ -8581,7 +8698,10 @@ Grid(
     # identical axes make the eight cells comparable
     sharex=True,
     sharey=True,
-    title="Mean monthly temperature (°C)",
+    title="Mean monthly temperature",
+    # the shared quantity is named once, not in every cell
+    xlabel="Month",
+    ylabel="Temperature (°C)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
@@ -8968,6 +9088,30 @@ random_values_2
 
 ```
 correlation(random_values, random_values_2)
+```
+
+### Kernel density estimate
+
+The `kde1d` function estimates the density of a list of values with a Gaussian kernel and returns it as `{x, y}` points, ready to draw as a [datachart.charts.LineChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.LineChart) — over a density [datachart.charts.Histogram](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.Histogram) of the same values, for instance. The `bandwidth` is a rule of [datachart.constants.BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) or a scalar factor, `gridsize` the number of points, and `cut` how many bandwidths the curve extends past the extremes (`xlim` fixes the range instead).
+
+```
+from datachart.utils.stats import kde1d
+```
+
+```
+curve = kde1d(random_values, gridsize=5)
+curve
+```
+
+The `kde2d` function does the same for `(x, y)` points and returns the `{x, y, z}` surface a [datachart.charts.ContourChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.ContourChart) draws — the density contours of a scattered dataset. The `gridsize` can be one number or an `(x, y)` pair of column and row counts, and `xlim`/`ylim` fix the grid so several surfaces share it.
+
+```
+from datachart.utils.stats import kde2d
+```
+
+```
+surface = kde2d(random_values, random_values_2, gridsize=3)
+surface
 ```
 
 Under development
@@ -11967,6 +12111,8 @@ Grid(
     ],
     *,
     title: Optional[str] = None,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
     max_cols: int = 4,
     figsize: Optional[Tuple[float, float]] = None,
     sharex: bool = False,
@@ -12022,6 +12168,8 @@ Examples:
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `charts`   | Either nested rows — each inner list is one grid row of bare matplotlib Figures (or None for a blank cell) — or a flat list whose items are bare figures or dicts with a "figure" key and an optional "layout_spec" dict ('row', 'col', 'rowspan', 'colspan'). Nested rows and layout_spec cannot be mixed. **TYPE:** `Union[List[Union[plt.Figure, Dict[str, Any]]], List[List[Optional[plt.Figure]]]]` |
 | `title`    | Optional title for the combined figure. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                    |
+| `xlabel`   | Optional x-axis label for the whole grid, drawn once below every cell. A nested grid keeps its own as a footer of its cell. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                |
+| `ylabel`   | Optional y-axis label for the whole grid, drawn once to the left of every cell. A nested grid keeps its own beside its cell. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                               |
 | `max_cols` | Maximum number of columns for the flat-list automatic grid. **TYPE:** `int` **DEFAULT:** `4`                                                                                                                                                                                                                                                                                                             |
 | `figsize`  | Size of the combined figure (width, height) in inches. If None, calculated from the first figure's size. **TYPE:** `Optional[Tuple[float, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                   |
 | `sharex`   | Whether to share the x-axis across all subplots. **TYPE:** `bool` **DEFAULT:** `False`                                                                                                                                                                                                                                                                                                                   |
@@ -12091,20 +12239,21 @@ The module containing the `stats` methods.
 
 The `stats` module provides methods for calculating statistics.
 
-| FUNCTION         | DESCRIPTION                                                       |
-| ---------------- | ----------------------------------------------------------------- |
-| `count`          | Counts the number of elements in the list.                        |
-| `sum_values`     | Calculates the sum of the values.                                 |
-| `mean`           | Calculates the mean of the values.                                |
-| `median`         | Calculates the median of the values.                              |
-| `stdev`          | Calculates the standard deviation of the values.                  |
-| `variance`       | Calculates the variance of the values.                            |
-| `quantile`       | Calculates the quantile of the values.                            |
-| `iqr`            | Calculates the interquartile range (Q3 - Q1).                     |
-| `minimum`        | Gets the minimum of the values.                                   |
-| `maximum`        | Gets the maximum of the values.                                   |
-| `correlation`    | Calculates the Pearson correlation coefficient between two lists. |
-| `contour_levels` | Picks the contour levels of a 2-D grid by a rule of thumb.        |
+| FUNCTION      | DESCRIPTION                                                       |
+| ------------- | ----------------------------------------------------------------- |
+| `count`       | Counts the number of elements in the list.                        |
+| `sum_values`  | Calculates the sum of the values.                                 |
+| `mean`        | Calculates the mean of the values.                                |
+| `median`      | Calculates the median of the values.                              |
+| `stdev`       | Calculates the standard deviation of the values.                  |
+| `variance`    | Calculates the variance of the values.                            |
+| `quantile`    | Calculates the quantile of the values.                            |
+| `iqr`         | Calculates the interquartile range (Q3 - Q1).                     |
+| `minimum`     | Gets the minimum of the values.                                   |
+| `maximum`     | Gets the maximum of the values.                                   |
+| `correlation` | Calculates the Pearson correlation coefficient between two lists. |
+| `kde1d`       | Estimates the density of the values as a curve.                   |
+| `kde2d`       | Estimates the density of the (x, y) points as a gridded surface.  |
 
 ## Functions
 
@@ -12397,44 +12546,105 @@ Examples:
 | `TypeError`  | If x or y is not a list or numpy array. |
 | `ValueError` | If x and y have different lengths.      |
 
-### datachart.utils.stats.contour_levels
+### datachart.utils.stats.kde1d
 
 ```
-contour_levels(
-    z: List[List[Union[int, float]]],
-    rule: Union[str, int, List[float], None],
-) -> Union[List[float], int, None]
+kde1d(
+    values: List[Union[int, float]],
+    *,
+    bandwidth: Optional[
+        Union[BANDWIDTH, str, float]
+    ] = None,
+    gridsize: int = 100,
+    cut: float = 3,
+    xlim: Optional[Tuple[float, float]] = None
+) -> List[Dict[str, float]]
 ```
 
-Picks the contour levels of a 2-D grid by a rule of thumb.
+Estimates the density of the values as a curve.
 
-The rules of `CONTOUR_LEVELS` are evaluated on the per-axis resolution of the grid, `n = sqrt(cells)`: `"rice"` targets `2 * n ** (1/3)` levels and `"fd"` the value range over `2 * IQR * n ** (-1/3)`. The count is clamped to the 4–20 range and snapped to round values across the range of `z`. `"auto"` (or `None`) returns `None`, leaving the choice to matplotlib; an integer or a list of level values passes through.
+A Gaussian kernel density estimate evaluated on `gridsize` evenly spaced points over the range of the values, extended by `cut` bandwidths on each side so the curve tails off instead of being clipped at the extremes, or over an explicit `xlim` so several curves share one grid. The result is a list of `{x, y}` points ready for `LineChart`; the curve integrates to 1, so it overlays a density `Histogram` of the same values.
 
 Added in Unreleased
 
 Examples:
 
 ```
->>> import numpy as np
->>> from datachart.utils.stats import contour_levels
->>> x = np.linspace(-5, 5, 120)
->>> X, Y = np.meshgrid(x, x)
->>> contour_levels(X**2 + Y**2, "rice")
-[0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0]
+>>> from datachart.utils.stats import kde1d
+>>> curve = kde1d([1, 2, 2, 3, 3, 3, 4, 4, 5], gridsize=5, cut=0)
+>>> [round(point["x"], 2) for point in curve]
+[1.0, 2.0, 3.0, 4.0, 5.0]
+>>> round(sum(point["y"] for point in curve), 2)
+0.94
 ```
 
-| PARAMETER | DESCRIPTION                                                                                                                         |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `z`       | The 2-D grid of values. **TYPE:** `List[List[Union[int, float]]]`                                                                   |
-| `rule`    | A rule of CONTOUR_LEVELS, a target level count, or an explicit list of level values. **TYPE:** `Union[str, int, List[float], None]` |
+| PARAMETER   | DESCRIPTION                                                                                                                                                                  |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `values`    | The values to estimate the density of. **TYPE:** `List[Union[int, float]]`                                                                                                   |
+| `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** `Optional[Union[BANDWIDTH, str, float]]` **DEFAULT:** `None` |
+| `gridsize`  | The number of points the curve is evaluated on. **TYPE:** `int` **DEFAULT:** `100`                                                                                           |
+| `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                                                                 |
+| `xlim`      | The (min, max) range of the grid; overrides the padded range. **TYPE:** `Optional[Tuple[float, float]]` **DEFAULT:** `None`                                                  |
 
-| RETURNS                         | DESCRIPTION                                                         |
-| ------------------------------- | ------------------------------------------------------------------- |
-| `Union[List[float], int, None]` | The level values, the target count, or None for the automatic rule. |
+| RETURNS                  | DESCRIPTION                             |
+| ------------------------ | --------------------------------------- |
+| `List[Dict[str, float]]` | The {x, y} points of the density curve. |
 
-| RAISES       | DESCRIPTION                               |
-| ------------ | ----------------------------------------- |
-| `ValueError` | If the rule is not one of CONTOUR_LEVELS. |
+| RAISES       | DESCRIPTION                                                                             |
+| ------------ | --------------------------------------------------------------------------------------- |
+| `ValueError` | If the bandwidth is invalid, there are fewer than two values, or a value is not finite. |
+
+### datachart.utils.stats.kde2d
+
+```
+kde2d(
+    x: List[Union[int, float]],
+    y: List[Union[int, float]],
+    *,
+    bandwidth: Optional[
+        Union[BANDWIDTH, str, float]
+    ] = None,
+    gridsize: Union[int, Tuple[int, int]] = 100,
+    cut: float = 3,
+    xlim: Optional[Tuple[float, float]] = None,
+    ylim: Optional[Tuple[float, float]] = None
+) -> Dict[str, List]
+```
+
+Estimates the density of the (x, y) points as a gridded surface.
+
+A Gaussian kernel density estimate evaluated on a `gridsize` × `gridsize` grid over the range of the points, extended by `cut` bandwidths on each side so the outer contours close instead of being clipped, or over explicit `xlim`/`ylim` so several surfaces share one grid. The result is an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of a scattered dataset is `ContourChart(kde2d(x, y))`.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.utils.stats import kde2d
+>>> surface = kde2d([1, 2, 3, 4], [1, 3, 2, 4], gridsize=(3, 2), cut=0)
+>>> surface["x"], surface["y"]
+([1.0, 2.5, 4.0], [1.0, 4.0])
+>>> [[round(z, 3) for z in row] for row in surface["z"]]
+[[0.075, 0.038, 0.001], [0.001, 0.038, 0.075]]
+```
+
+| PARAMETER   | DESCRIPTION                                                                                                                                                                  |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `x`         | The x values of the points. **TYPE:** `List[Union[int, float]]`                                                                                                              |
+| `y`         | The y values of the points, one per x value. **TYPE:** `List[Union[int, float]]`                                                                                             |
+| `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** `Optional[Union[BANDWIDTH, str, float]]` **DEFAULT:** `None` |
+| `gridsize`  | The number of grid columns and rows, as one number or an (x, y) pair. **TYPE:** `Union[int, Tuple[int, int]]` **DEFAULT:** `100`                                             |
+| `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                                                                 |
+| `xlim`      | The (min, max) x range of the grid; overrides the padded range. **TYPE:** `Optional[Tuple[float, float]]` **DEFAULT:** `None`                                                |
+| `ylim`      | The (min, max) y range of the grid; overrides the padded range. **TYPE:** `Optional[Tuple[float, float]]` **DEFAULT:** `None`                                                |
+
+| RETURNS           | DESCRIPTION                                      |
+| ----------------- | ------------------------------------------------ |
+| `Dict[str, List]` | The {x, y, z} chart dict of the density surface. |
+
+| RAISES       | DESCRIPTION                                                                                                       |
+| ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If the bandwidth is invalid, x and y differ in length, there are fewer than two points, or a value is not finite. |
 
 # Config Module
 

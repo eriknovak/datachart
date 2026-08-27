@@ -166,6 +166,30 @@ random_values_2
 correlation(random_values, random_values_2)
 ```
 
+### Kernel density estimate
+
+The `kde1d` function estimates the density of a list of values with a Gaussian kernel and returns it as `{x, y}` points, ready to draw as a [datachart.charts.LineChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.LineChart) — over a density [datachart.charts.Histogram](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.Histogram) of the same values, for instance. The `bandwidth` is a rule of [datachart.constants.BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) or a scalar factor, `gridsize` the number of points, and `cut` how many bandwidths the curve extends past the extremes (`xlim` fixes the range instead).
+
+```
+from datachart.utils.stats import kde1d
+```
+
+```
+curve = kde1d(random_values, gridsize=5)
+curve
+```
+
+The `kde2d` function does the same for `(x, y)` points and returns the `{x, y, z}` surface a [datachart.charts.ContourChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.ContourChart) draws — the density contours of a scattered dataset. The `gridsize` can be one number or an `(x, y)` pair of column and row counts, and `xlim`/`ylim` fix the grid so several surfaces share it.
+
+```
+from datachart.utils.stats import kde2d
+```
+
+```
+surface = kde2d(random_values, random_values_2, gridsize=3)
+surface
+```
+
 Under development
 
 This theme is still under development. If you are interested in improving it, please let us know.

@@ -107,24 +107,25 @@ ContourChart(
 
 Every customization is either a keyword argument of `ContourChart` or a `plot_contour_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                             | Use                                                                 | See                                                           |
-| -------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------- |
-| add a title and axis labels            | `title`, `xlabel`, `ylabel`                                         | [Title and axis labels](#title-and-axis-labels)               |
-| resize the figure                      | `figsize`                                                           | [Figure size and grid](#figure-size-and-grid)                 |
-| show or hide the grid lines            | `show_grid`                                                         | [Figure size and grid](#figure-size-and-grid)                 |
-| fill the bands between the levels      | `filled=True`                                                       | [Filled contours and colorbar](#filled-contours-and-colorbar) |
-| add a colorbar                         | `show_colorbars=True`, `colorbar={"orientation": ...}`              | [Filled contours and colorbar](#filled-contours-and-colorbar) |
-| write the level values on the lines    | `show_labels=True`, `valfmt`                                        | [Inline labels](#inline-labels)                               |
-| choose how many levels cut the surface | `levels`                                                            | [Levels](#levels)                                             |
-| change the line color, width, or style | `style={"plot_contour_color": ..., "plot_contour_line_width": ...}` | [Contour style](#contour-style)                               |
-| change the colormap of the fills       | `style={"plot_contour_cmap": ...}`                                  | [Contour style](#contour-style)                               |
-| pin or rescale the colormap range      | `vmin`, `vmax`, `norm`                                              | [Normalization](#normalization)                               |
-| overlay several surfaces               | `data=[...]`, `subtitle`, `show_legend`                             | [Multiple Contour Charts](#multiple-contour-charts)           |
-| draw each surface in its own subplot   | `subplots=True`, `max_cols`, `sharex`, `sharey`                     | [Subplots and shared axes](#subplots-and-shared-axes)         |
-| highlight one surface among several    | `emphasis`                                                          | [Emphasis](#emphasis)                                         |
-| draw the contours over a scatter chart | `Panel`                                                             | [Composing contours](#composing-contours)                     |
-| keep one unit equal on both axes       | `aspect_ratio`                                                      | [Aspect ratio](#aspect-ratio)                                 |
-| mark a position with a reference line  | `vlines`, `hlines`                                                  | [Reference lines](#reference-lines)                           |
+| I want to…                               | Use                                                                 | See                                                           |
+| ---------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------- |
+| add a title and axis labels              | `title`, `xlabel`, `ylabel`                                         | [Title and axis labels](#title-and-axis-labels)               |
+| resize the figure                        | `figsize`                                                           | [Figure size and grid](#figure-size-and-grid)                 |
+| show or hide the grid lines              | `show_grid`                                                         | [Figure size and grid](#figure-size-and-grid)                 |
+| fill the bands between the levels        | `filled=True`                                                       | [Filled contours and colorbar](#filled-contours-and-colorbar) |
+| add a colorbar                           | `show_colorbars=True`, `colorbar={"orientation": ...}`              | [Filled contours and colorbar](#filled-contours-and-colorbar) |
+| write the level values on the lines      | `show_labels=True`, `valfmt`                                        | [Inline labels](#inline-labels)                               |
+| choose how many levels cut the surface   | `levels`                                                            | [Levels](#levels)                                             |
+| change the line color, width, or style   | `style={"plot_contour_color": ..., "plot_contour_line_width": ...}` | [Contour style](#contour-style)                               |
+| change the colormap of the fills         | `style={"plot_contour_cmap": ...}`                                  | [Contour style](#contour-style)                               |
+| pin or rescale the colormap range        | `vmin`, `vmax`, `norm`                                              | [Normalization](#normalization)                               |
+| overlay several surfaces                 | `data=[...]`, `subtitle`, `show_legend`                             | [Multiple Contour Charts](#multiple-contour-charts)           |
+| draw each surface in its own subplot     | `subplots=True`, `max_cols`, `sharex`, `sharey`                     | [Subplots and shared axes](#subplots-and-shared-axes)         |
+| highlight one surface among several      | `emphasis`                                                          | [Emphasis](#emphasis)                                         |
+| draw the contours over a scatter chart   | `Panel`                                                             | [Composing contours](#composing-contours)                     |
+| keep one unit equal on both axes         | `aspect_ratio`                                                      | [Aspect ratio](#aspect-ratio)                                 |
+| mark a position with a reference line    | `vlines`, `hlines`                                                  | [Reference lines](#reference-lines)                           |
+| estimate the density of scattered points | `stats.kde2d`, `bandwidth`                                          | [Density of scattered points](#density-of-scattered-points)   |
 
 ### Title and axis labels
 
@@ -218,7 +219,7 @@ The `levels` attribute chooses which values cut the surface. It takes one of the
 | an integer | A target number of levels, snapped to round values.                                                                            |
 | a list     | The exact level values to draw.                                                                                                |
 
-The `datachart` package provides the [datachart.constants.CONTOUR_LEVELS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.CONTOUR_LEVELS) constant with the rules; the [datachart.utils.stats.contour_levels](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.contour_levels) function computes the same level values outside a chart. The rules follow the grid resolution rather than the surface, so they are opt-ins; for a surface whose range spans orders of magnitude, an explicit list of levels is usually the best choice.
+The `datachart` package provides the [datachart.constants.CONTOUR_LEVELS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.CONTOUR_LEVELS) constant with the rules. The rules follow the grid resolution rather than the surface, so they are opt-ins; for a surface whose range spans orders of magnitude, an explicit list of levels is usually the best choice.
 
 ```
 from datachart.constants import CONTOUR_LEVELS
@@ -342,7 +343,48 @@ ContourChart(
 
 To create multiple contour charts, pass a list of surfaces to the `data` argument. Each surface is drawn as its own set of iso-lines on the same axes, in its own color, and the `subtitle` of each chart becomes its legend label; `subplots=True` draws each surface in its own subplot instead. Several filled contours would cover each other, so fills are best kept to subplots.
 
-`species_density` holds three surfaces from the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0): the density of the 342 penguins of each species over their flipper length and body mass, estimated with a Gaussian kernel on a 80×80 grid, in penguins per mm of flipper length and kg of body mass. The data is hard-coded in a hidden cell, which also keeps every penguin as a point in `penguin_points` for the later sections.
+`species_density` holds three surfaces from the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0): the density of the 342 penguins of each species over their flipper length and body mass. The measurements are hard-coded in a hidden cell as `PENGUINS`; the cell below turns them into surfaces with [datachart.utils.stats.kde2d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde2d) — this is how a KDE chart is built from raw points (see [Density of scattered points](#density-of-scattered-points)). Every species is evaluated on one shared 80×80 grid, the range of all penguins padded by 10%, so the surfaces line up in subplots; the density is scaled to penguins per mm of flipper length and kg of body mass. The cell also keeps every penguin as a point in `penguin_points` for the later sections.
+
+```
+from datachart.utils.stats import kde2d, minimum, maximum
+
+SPECIES = ["Adelie", "Chinstrap", "Gentoo"]
+
+# one grid shared by every species: the range of all penguins, padded by 10%
+ALL_LENGTHS = [length for record in PENGUINS for length in record["flipper_length"]]
+ALL_MASSES = [mass for record in PENGUINS for mass in record["body_mass"]]
+
+
+def padded_range(values, padding=0.1):
+    lo, hi = minimum(values), maximum(values)
+    return lo - padding * (hi - lo), hi + padding * (hi - lo)
+
+
+def density(records):
+    # a Gaussian kernel density of the (flipper length, body mass) points
+    surface = kde2d(
+        [length for record in records for length in record["flipper_length"]],
+        [mass for record in records for mass in record["body_mass"]],
+        gridsize=80,
+        xlim=padded_range(ALL_LENGTHS),
+        ylim=padded_range(ALL_MASSES),
+    )
+    # per mm of flipper length and kg of body mass
+    surface["z"] = (np.array(surface["z"]) * 1000).tolist()
+    return surface
+
+
+# one surface per species: what a KDE chart draws
+species_density = [
+    density([p for p in PENGUINS if p["species"] == species]) for species in SPECIES
+]
+# every penguin as a point
+penguin_points = [
+    {"x": length, "y": mass}
+    for record in PENGUINS
+    for length, mass in zip(record["flipper_length"], record["body_mass"])
+]
+```
 
 ```
 ContourChart(
@@ -489,6 +531,33 @@ ContourChart(
     title="Himmelblau function",
     xlabel="x",
     ylabel="y",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Density of scattered points
+
+A contour chart of a density is the two-dimensional counterpart of a histogram: it shows where scattered points concentrate. [datachart.utils.stats.kde2d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde2d) estimates that density with a Gaussian kernel and returns the `{x, y, z}` surface `ContourChart` takes, so there is no separate density chart — `ContourChart(kde2d(x, y))` is it. The `bandwidth` sets how smooth the estimate is: a [datachart.constants.BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) rule (Scott's by default) or a scalar factor that replaces the rule, where smaller values follow the points more closely. The grid extends past the points by `cut` bandwidths, so the outer contours close instead of being clipped; `xlim` and `ylim` fix the grid instead, so several surfaces share one — the per-species densities of this guide are all evaluated over the range of every penguin, padded by 10%, so they line up in subplots.
+
+Here the density of all 342 penguins over their flipper length and body mass is drawn as filled bands, with a colorbar for the density; the [Composing contours](#composing-contours) section overlays the per-species densities on the points themselves.
+
+```
+from datachart.utils.stats import kde2d
+```
+
+```
+ContourChart(
+    # the density of the penguins over flipper length and body mass
+    data=kde2d(
+        [point["x"] for point in penguin_points],
+        [point["y"] for point in penguin_points],
+    ),
+    filled=True,
+    show_colorbars=True,
+    levels=8,
+    title="Density of the Palmer penguins",
+    xlabel="Flipper length (mm)",
+    ylabel="Body mass (g)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```

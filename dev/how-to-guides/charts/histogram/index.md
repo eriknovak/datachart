@@ -116,6 +116,7 @@ Every customization is either a keyword argument of `Histogram` or a `plot_hist_
 | stack or overlay the series             | `bar_mode`                                                                                 | [Multiple Histograms](#multiple-histograms)                   |
 | draw each series in its own subplot     | `subplots`, `sharex`, `sharey`, `max_cols`                                                 | [Subplots](#subplots)                                         |
 | show densities or cumulative counts     | `show_density`, `show_cumulative`                                                          | [Histogram Views](#histogram-views)                           |
+| overlay a smooth density curve          | `stats.kde1d`, `Panel`                                                                     | [Density curve](#density-curve)                               |
 | use a logarithmic axis                  | `scalex`, `scaley`                                                                         | [Axis scales](#axis-scales)                                   |
 | plot data with other key names          | `x`                                                                                        | [Custom data keys](#custom-data-keys)                         |
 | save the chart to a file                | `save_figure`                                                                              | [Saving the Chart as an Image](#saving-the-chart-as-an-image) |
@@ -493,6 +494,38 @@ Histogram(
     sharey=True,
     # show the density instead of the count
     show_density=True,
+).show()
+```
+
+### Density curve
+
+A density histogram depends on where its bins fall; a kernel density estimate smooths the same values into a curve that does not. [datachart.utils.stats.kde1d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde1d) computes it and returns the `{x, y}` points a [datachart.charts.LineChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.LineChart) draws, so there is no separate density chart: overlay the curve on the density histogram with [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel). Both integrate to 1, so they share the y-axis. This is how a KDE chart is built from raw values: estimate the curve, then draw it. The `bandwidth` sets how smooth the curve is — a [datachart.constants.BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) rule (Scott's by default) or a scalar factor, where smaller values follow the values more closely — and `show_area` fills the curve, the way a density plot is usually drawn.
+
+```
+from datachart.charts import LineChart
+from datachart.utils import Panel
+from datachart.utils.stats import kde1d
+```
+
+```
+# the flipper lengths, smoothed into a density curve: what a KDE chart draws
+flipper_density = kde1d([point["x"] for point in penguins])
+flipper_density[:3]
+```
+
+```
+Panel(
+    [
+        Histogram(data=penguins, subtitle="binned", show_density=True),
+        # the curve over the bars
+        LineChart(data=flipper_density, subtitle="kernel density", show_area=True),
+    ],
+    title="Flipper length of Palmer penguins",
+    xlabel="Flipper length (mm)",
+    ylabel_left="Density",
+    show_legend=True,
+    show_grid=SHOW_GRID.Y,
+    figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
