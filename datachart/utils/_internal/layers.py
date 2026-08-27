@@ -23,17 +23,27 @@ from matplotlib.ticker import MaxNLocator
 from matplotlib.collections import LineCollection, PathCollection
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.mlab import GaussianKDE
-from matplotlib.patches import Patch
+from matplotlib.patches import Patch, PathPatch, Rectangle
+from matplotlib.path import Path
+import matplotlib.patheffects as patheffects
 from matplotlib.legend_handler import HandlerPathCollection
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from .colors import create_color_cycle, create_colormap, get_colormap
-from .validate import validate_baseline, validate_emphasis, validate_shared_x
+from .validate import (
+    infer_sankey_columns,
+    validate_baseline,
+    validate_emphasis,
+    validate_sankey_link_color,
+    validate_shared_x,
+)
 from .config_helpers import (
     get_attr_value,
     resolve_font_family,
     get_area_style,
     get_stackedarea_style,
+    get_sankey_style,
+    get_text_style,
     get_grid_style,
     get_line_style,
     get_bar_style,
@@ -2815,6 +2825,181 @@ class TextLayer(Layer):
         """No marks; the panel draws the texts with the other annotations."""
 
 
+# ================================================
+# Sankey Layer
+# ================================================
+
+# horizontal room past the outer columns so the labels sit inside the axes
+SANKEY_LABEL_MARGIN = 0.2
+# gap between a node bar and its label, in data units
+SANKEY_LABEL_PAD = 0.01
+SANKEY_GREY = "#9E9E9E"
+
+
+class SankeyLayer(Layer):
+    """One Sankey: every link of a chart as node bars and ribbons (ADR 0026).
+
+    The layer owns its axes: a fixed 0–1 data space with the axis off, so the
+    panel applies no furniture, scales, or limits around it.
+    """
+
+    kind = "sankey"
+
+    def __init__(self, chart: dict, settings: dict):
+        self.links = chart["data"]["links"]
+        self.columns = settings.get("nodes") or infer_sankey_columns(self.links)
+        super().__init__(chart, settings)
+
+    def _resolve_style(self) -> None:
+        self.sankey_style = get_sankey_style(self.style)
+        self.link_color = validate_sankey_link_color(
+            self.sankey_style.get("link_color")
+        )
+        self.label_style = get_text_style("general")
+        # one color per node in column-then-row order, keyed by name
+        names = [node for column in self.columns for node in column]
+        cycle = create_color_cycle(config["color_general_multiple"], len(names))
+        self.node_colors = {name: cycle[i]["color"] for i, name in enumerate(names)}
+
+    def _geometry(self) -> tuple:
+        """The (x, bottom, height) of every node and the shared height scale."""
+
+        style = self.sankey_style
+        node_width = style["node_width"]
+        node_pad = style["node_pad"]
+
+        outflow, inflow = defaultdict(float), defaultdict(float)
+        for record in self.links:
+            outflow[record["source"]] += record["value"]
+            inflow[record["target"]] += record["value"]
+        size = {n: max(outflow[n], inflow[n]) for col in self.columns for n in col}
+
+        # one scale for every column: the tallest column fills 1 - node_pad
+        max_total = max(sum(size[n] for n in col) for col in self.columns)
+        scale = (1 - node_pad) / max_total
+        n_cols = len(self.columns)
+        x_step = (1 - node_width) / (n_cols - 1) if n_cols > 1 else 0.0
+
+        geometry = {}
+        for ci, column in enumerate(self.columns):
+            gap = node_pad / (len(column) - 1) if len(column) > 1 else 0.0
+            total = sum(size[n] for n in column) * scale + gap * (len(column) - 1)
+            # shorter columns center on the tallest one
+            y = 1 - (1 - total) / 2
+            x = ci * x_step if n_cols > 1 else (1 - node_width) / 2
+            for name in column:
+                height = size[name] * scale
+                geometry[name] = (x, y - height, height)
+                y -= height + gap
+        return geometry, scale
+
+    def draw(self, ax: plt.Axes, ctx: DrawContext) -> None:
+        style = self.sankey_style
+        node_width = style["node_width"]
+        geometry, scale = self._geometry()
+        halo = style.get("halo_width") or 0
+        effects = (
+            [patheffects.withStroke(linewidth=halo, foreground="#FFFFFF")]
+            if halo > 0
+            else []
+        )
+
+        for ci, column in enumerate(self.columns):
+            for name in column:
+                x, bottom, height = geometry[name]
+                ax.add_patch(
+                    Rectangle(
+                        (x, bottom),
+                        node_width,
+                        height,
+                        facecolor=self.node_colors[name],
+                        edgecolor=style.get("edgecolor"),
+                        linewidth=style.get("linewidth"),
+                        zorder=3,
+                        label=name,
+                    )
+                )
+                # labels sit left of the first column, right of every other
+                if ci == 0:
+                    tx, ha = x - SANKEY_LABEL_PAD, "right"
+                else:
+                    tx, ha = x + node_width + SANKEY_LABEL_PAD, "left"
+                ax.text(
+                    tx,
+                    bottom + height / 2,
+                    name,
+                    ha=ha,
+                    va="center",
+                    zorder=4,
+                    path_effects=effects,
+                    **self.label_style,
+                )
+
+        # ribbons stack from the top of each node; drawing in order of
+        # endpoint height keeps the crossings few
+        source_used, target_used = defaultdict(float), defaultdict(float)
+        order = sorted(
+            self.links,
+            key=lambda r: (
+                geometry[r["source"]][1] + geometry[r["source"]][2],
+                geometry[r["target"]][1] + geometry[r["target"]][2],
+            ),
+            reverse=True,
+        )
+        for record in order:
+            source, target = record["source"], record["target"]
+            height = record["value"] * scale
+            sx, sb, sh = geometry[source]
+            tx, tb, th = geometry[target]
+            y_source = sb + sh - source_used[source]
+            y_target = tb + th - target_used[target]
+            source_used[source] += height
+            target_used[target] += height
+
+            x1, x2 = sx + node_width, tx
+            cx = (x1 + x2) / 2
+            verts = [
+                (x1, y_source),
+                (cx, y_source),
+                (cx, y_target),
+                (x2, y_target),
+                (x2, y_target - height),
+                (cx, y_target - height),
+                (cx, y_source - height),
+                (x1, y_source - height),
+                (x1, y_source),
+            ]
+            codes = [
+                Path.MOVETO,
+                Path.CURVE4,
+                Path.CURVE4,
+                Path.CURVE4,
+                Path.LINETO,
+                Path.CURVE4,
+                Path.CURVE4,
+                Path.CURVE4,
+                Path.CLOSEPOLY,
+            ]
+            color = {
+                "source": self.node_colors[source],
+                "target": self.node_colors[target],
+                "grey": SANKEY_GREY,
+            }[self.link_color]
+            ax.add_patch(
+                PathPatch(
+                    Path(verts, codes),
+                    facecolor=color,
+                    edgecolor="none",
+                    alpha=style.get("link_alpha"),
+                    zorder=2,
+                )
+            )
+
+        ax.set_xlim(-SANKEY_LABEL_MARGIN, 1 + SANKEY_LABEL_MARGIN)
+        ax.set_ylim(0, 1)
+        ax.axis("off")
+
+
 LAYER_TYPES = {
     "linechart": LineLayer,
     "barchart": BarLayer,
@@ -2829,6 +3014,7 @@ LAYER_TYPES = {
     "contourchart": ContourLayer,
     "hexbinchart": HexbinLayer,
     "stackedareachart": StackedAreaLayer,
+    "sankeychart": SankeyLayer,
 }
 
 RADIAL_LAYER_TYPES = {
@@ -3209,6 +3395,13 @@ class Panel:
         return flags == {True}
 
     @property
+    def bare(self) -> bool:
+        """Whether the layers own their axes: no furniture, scales, or limits."""
+
+        layers = self.layers
+        return bool(layers) and all(isinstance(l, SankeyLayer) for l in layers)
+
+    @property
     def projection(self) -> str:
         """The panel's coordinate space kind: "cartesian" or "polar".
 
@@ -3267,7 +3460,7 @@ class Panel:
         self, ax: plt.Axes, axes_types=("xaxis", "yaxis"), spines=True
     ) -> None:
         furniture = self.settings.get("furniture")
-        if furniture is None:
+        if furniture is None or self.bare:
             return
         if spines:
             ax.axis("on")
@@ -3570,14 +3763,15 @@ class Panel:
         s = self.settings
         layers = self.layers
         polar = self.projection == "polar"
+        bare = self.bare
 
         # scales (a layer may remap them, e.g. horizontal box plots)
-        if layers and (s.get("scalex") or s.get("scaley")):
+        if layers and not bare and (s.get("scalex") or s.get("scaley")):
             layers[0].apply_scales(ax, s.get("scalex"), s.get("scaley"))
 
         # grid; the marks sit above it whatever z-order the panel gave them
         # (overlay defaults start at 1, below matplotlib's 2.5 gridlines)
-        if s.get("show_grid"):
+        if s.get("show_grid") and not bare:
             ax.grid(axis=s["show_grid"], **s.get("grid_style", {}))
             ax.set_axisbelow(True)
         if polar:
@@ -3622,8 +3816,9 @@ class Panel:
                     ax.set_xticklabels(cat_labels)
 
         # user-provided tick positions
-        for layer in layers:
-            configure_axis_ticks_position(ax, layer.chart)
+        if not bare:
+            for layer in layers:
+                configure_axis_ticks_position(ax, layer.chart)
 
         # value-label headroom: expand the value axis so bar labels stay
         # inside; diverging bars get padding on both ends
@@ -3663,9 +3858,10 @@ class Panel:
         ):
             (ax.set_xlim if horizontal else ax.set_ylim)(0, None)
 
-        # axis limits
+        # axis limits; a bare layer fixed its own
         limits = {k: s.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
-        configure_axis_limits(ax, limits)
+        if not bare:
+            configure_axis_limits(ax, limits)
         if ax_right is not None and (
             s.get("ymin_right") is not None or s.get("ymax_right") is not None
         ):

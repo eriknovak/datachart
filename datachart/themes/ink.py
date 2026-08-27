@@ -17,6 +17,7 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_grid_color": "#DDE3E8",
         "plot_bar_edge_width": 1.0,
         "plot_bar_edge_color": "#0B1F44",
+        "plot_sankey_node_edge_color": "#0B1F44",
         "plot_hist_edge_color": "#0B1F44",
         "plot_vline_color": "#7F8C8D",
         "plot_vline_style": LINE_STYLE.DASHED,

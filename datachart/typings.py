@@ -11,6 +11,8 @@ Classes:
     LineSingleChartAttrs: The single chart attributes for the line chart.
     LineDataPointAttrs: The data point attributes for the line chart.
     StackedAreaSingleChartAttrs: The single chart attributes for the stacked area chart.
+    SankeySingleChartAttrs: The single chart attributes for the Sankey chart.
+    SankeyLinkAttrs: The link record attributes for the Sankey chart.
     BarSingleChartAttrs: The single chart attributes for the bar chart.
     BarDataPointAttrs: The data point attributes for the bar chart.
     HistogramSingleChartAttrs: The single chart attributes for the histogram chart.
@@ -46,6 +48,7 @@ Classes:
     GridStyleAttrs: The typing for the grid style.
     LineStyleAttrs: The typing for the line style.
     StackedAreaStyleAttrs: The typing for the stacked area chart style.
+    SankeyStyleAttrs: The typing for the Sankey chart style.
     BarStyleAttrs: The typing for the bar style.
     HistStyleAttrs: The typing for the histogram style.
     VLineStyleAttrs: The typing for the vertical line style.
@@ -314,6 +317,29 @@ class StackedAreaStyleAttrs(TypedDict):
 
     plot_stackedarea_alpha: Union[float, None]
     plot_stackedarea_outline: Union[bool, None]
+
+
+class SankeyStyleAttrs(TypedDict):
+    """The typing for the Sankey chart style.
+
+    Attributes:
+        plot_sankey_node_width (Union[float, None]): The node bar width as a fraction of the horizontal span.
+        plot_sankey_node_pad (Union[float, None]): The vertical span shared by the gaps of the tallest column.
+        plot_sankey_node_edge_color (Union[str, None]): The node stroke color.
+        plot_sankey_node_edge_width (Union[float, None]): The node stroke width.
+        plot_sankey_link_color (Union[str, None]): Which node colors a ribbon: "source", "target", or "grey".
+        plot_sankey_link_alpha (Union[float, None]): The ribbon alpha.
+        plot_sankey_label_halo_width (Union[float, None]): The width of the white halo behind labels; 0 disables it.
+
+    """
+
+    plot_sankey_node_width: Union[float, None]
+    plot_sankey_node_pad: Union[float, None]
+    plot_sankey_node_edge_color: Union[str, None]
+    plot_sankey_node_edge_width: Union[float, None]
+    plot_sankey_link_color: Union[str, None]
+    plot_sankey_link_alpha: Union[float, None]
+    plot_sankey_label_halo_width: Union[float, None]
 
 
 class BarStyleAttrs(TypedDict):
@@ -749,6 +775,7 @@ class StyleAttrs(
     GridStyleAttrs,
     LineStyleAttrs,
     StackedAreaStyleAttrs,
+    SankeyStyleAttrs,
     BarStyleAttrs,
     HistStyleAttrs,
     VLineStyleAttrs,
@@ -1041,6 +1068,56 @@ class _StackedAreaChartAttrs(ChartCommonAttrs):
     aspect_ratio: Union[ASPECT_RATIO, str, None]
     scalex: Union[SCALE, str, None]
     scaley: Union[SCALE, str, None]
+
+
+# ================================================
+# Sankey Chart Attributes
+# ================================================
+
+
+class SankeyLinkAttrs(TypedDict):
+    """The link record attributes for the Sankey chart.
+
+    Attributes:
+        source (str): The node the flow leaves.
+        target (str): The node the flow enters.
+        value (Union[int, float]): The size of the flow; must be greater than 0.
+
+    """
+
+    source: str
+    target: str
+    value: Union[int, float]
+
+
+class SankeySingleChartAttrs(TypedDict):
+    """The single chart attributes for the Sankey chart.
+
+    Attributes:
+        links (List[SankeyLinkAttrs]): The flows; a node is the string that names it.
+        subtitle (Union[str, None]): The subtitle of the chart.
+        style (Union[SankeyStyleAttrs, None]): The style of the chart.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+
+    """
+
+    links: List[SankeyLinkAttrs]
+    subtitle: Union[str, None]
+    style: Union[SankeyStyleAttrs, None]
+    texts: Union[TextAttrs, List[TextAttrs]]
+
+
+class _SankeyChartAttrs(ChartCommonAttrs):
+    """The Sankey chart attributes.
+
+    Attributes:
+        charts (Union[SankeySingleChartAttrs, List[SankeySingleChartAttrs]]): The chart definitions.
+        nodes (Union[List[List[str]], None]): The node columns, overriding the inferred layout.
+
+    """
+
+    charts: Union[SankeySingleChartAttrs, List[SankeySingleChartAttrs]]
+    nodes: Union[List[List[str]], None]
 
 
 # ================================================
