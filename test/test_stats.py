@@ -224,6 +224,13 @@ class TestStats(unittest.TestCase):
         self.assertEqual(z.shape, (2, 3))
         np.testing.assert_allclose(z[0], z[1][::-1])
 
+    def test_kde_limits_override_the_padded_range(self):
+        curve = kde1d([1, 2, 3], gridsize=3, xlim=(0, 10))
+        self.assertEqual([point["x"] for point in curve], [0.0, 5.0, 10.0])
+        surface = kde2d([1, 2, 3], [1, 3, 2], gridsize=2, xlim=(0, 4), ylim=(-1, 5))
+        self.assertEqual(surface["x"], [0.0, 4.0])
+        self.assertEqual(surface["y"], [-1.0, 5.0])
+
     def test_kde2d_bandwidth_smooths(self):
         x = [1, 2, 3, 4, 5]
         y = [5, 3, 1, 3, 5]

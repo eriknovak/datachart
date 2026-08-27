@@ -398,12 +398,14 @@ def kde1d(
     bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
     gridsize: int = 100,
     cut: float = 3,
+    xlim: Optional[Tuple[float, float]] = None,
 ) -> List[Dict[str, float]]:
     """Estimates the density of the values as a curve.
 
     A Gaussian kernel density estimate evaluated on `gridsize` evenly spaced
     points over the range of the values, extended by `cut` bandwidths on each
-    side so the curve tails off instead of being clipped at the extremes. The
+    side so the curve tails off instead of being clipped at the extremes, or
+    over an explicit `xlim` so several curves share one grid. The
     result is a list of `{x, y}` points ready for `LineChart`; the curve
     integrates to 1, so it overlays a density `Histogram` of the same values.
 
@@ -423,6 +425,7 @@ def kde1d(
             "silverman", or a scalar factor. See `BANDWIDTH`.
         gridsize: The number of points the curve is evaluated on.
         cut: How many bandwidths to extend the grid past the extremes.
+        xlim: The `(min, max)` range of the grid; overrides the padded range.
 
     Returns:
         The `{x, y}` points of the density curve.
@@ -433,7 +436,8 @@ def kde1d(
     """
     points = np.asarray(values, dtype=float).reshape(1, -1)
     kde, (padding,) = _kde(points, bandwidth, cut)
-    grid = np.linspace(points.min() - padding, points.max() + padding, gridsize)
+    lo, hi = xlim or (points.min() - padding, points.max() + padding)
+    grid = np.linspace(lo, hi, gridsize)
     density = kde.evaluate(grid)
     return [{"x": float(x), "y": float(y)} for x, y in zip(grid, density)]
 
@@ -445,12 +449,15 @@ def kde2d(
     bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
     gridsize: Union[int, Tuple[int, int]] = 100,
     cut: float = 3,
+    xlim: Optional[Tuple[float, float]] = None,
+    ylim: Optional[Tuple[float, float]] = None,
 ) -> Dict[str, List]:
     """Estimates the density of the (x, y) points as a gridded surface.
 
     A Gaussian kernel density estimate evaluated on a `gridsize` × `gridsize`
     grid over the range of the points, extended by `cut` bandwidths on each
-    side so the outer contours close instead of being clipped. The result is
+    side so the outer contours close instead of being clipped, or over explicit
+    `xlim`/`ylim` so several surfaces share one grid. The result is
     an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of
     a scattered dataset is `ContourChart(kde2d(x, y))`.
 
@@ -472,6 +479,8 @@ def kde2d(
         gridsize: The number of grid columns and rows, as one number or an
             `(x, y)` pair.
         cut: How many bandwidths to extend the grid past the extremes.
+        xlim: The `(min, max)` x range of the grid; overrides the padded range.
+        ylim: The `(min, max)` y range of the grid; overrides the padded range.
 
     Returns:
         The `{x, y, z}` chart dict of the density surface.
@@ -485,8 +494,10 @@ def kde2d(
     points = np.asarray([x, y], dtype=float)
     kde, (pad_x, pad_y) = _kde(points, bandwidth, cut)
     n_cols, n_rows = (gridsize, gridsize) if isinstance(gridsize, int) else gridsize
-    grid_x = np.linspace(points[0].min() - pad_x, points[0].max() + pad_x, n_cols)
-    grid_y = np.linspace(points[1].min() - pad_y, points[1].max() + pad_y, n_rows)
+    x_lo, x_hi = xlim or (points[0].min() - pad_x, points[0].max() + pad_x)
+    y_lo, y_hi = ylim or (points[1].min() - pad_y, points[1].max() + pad_y)
+    grid_x = np.linspace(x_lo, x_hi, n_cols)
+    grid_y = np.linspace(y_lo, y_hi, n_rows)
     mesh_x, mesh_y = np.meshgrid(grid_x, grid_y)
     density = kde.evaluate(np.vstack([mesh_x.ravel(), mesh_y.ravel()]))
     return {
