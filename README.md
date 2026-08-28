@@ -25,10 +25,10 @@
 </p>
 
 <p align="center">
-  <a href="https://eriknovak.github.io/datachart"><b>Documentation</b></a> ·
-  <a href="https://eriknovak.github.io/datachart/latest/how-to-guides/"><b>How-to Guides</b></a> ·
-  <a href="https://eriknovak.github.io/datachart/latest/references/"><b>API Reference</b></a> ·
-  <a href="https://github.com/eriknovak/datachart"><b>Source</b></a>
+<a href="https://eriknovak.github.io/datachart"><b>Documentation</b></a> ·
+<a href="https://eriknovak.github.io/datachart/latest/how-to-guides/"><b>How-to Guides</b></a> ·
+<a href="https://eriknovak.github.io/datachart/latest/references/"><b>API Reference</b></a> ·
+<a href="https://github.com/eriknovak/datachart"><b>Source</b></a>
 </p>
 
 ---
