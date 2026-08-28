@@ -189,7 +189,3 @@ from datachart.utils.stats import kde2d
 surface = kde2d(random_values, random_values_2, gridsize=3)
 surface
 ```
-
-Under development
-
-This theme is still under development. If you are interested in improving it, please let us know.
