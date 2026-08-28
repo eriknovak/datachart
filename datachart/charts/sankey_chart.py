@@ -44,7 +44,7 @@ def SankeyChart(
     quantity goes; for the totals per category alone use
     [`BarChart`][datachart.charts.BarChart].
 
-    !!! info "Added in Unreleased"
+    !!! info "Added in 0.9.0"
 
     Examples:
         >>> from datachart.charts import SankeyChart

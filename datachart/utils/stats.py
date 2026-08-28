@@ -342,7 +342,7 @@ def kde1d(
     result is a list of `{x, y}` points ready for `LineChart`; the curve
     integrates to 1, so it overlays a density `Histogram` of the same values.
 
-    !!! info "Added in Unreleased"
+    !!! info "Added in 0.9.0"
 
     Examples:
         >>> from datachart.utils.stats import kde1d
@@ -394,7 +394,7 @@ def kde2d(
     an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of
     a scattered dataset is `ContourChart(kde2d(x, y))`.
 
-    !!! info "Added in Unreleased"
+    !!! info "Added in 0.9.0"
 
     Examples:
         >>> from datachart.utils.stats import kde2d

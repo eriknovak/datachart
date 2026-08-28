@@ -1,3 +1,30 @@
+### datachart-0.9.0 (2026-08-28)
+
+**Breaking Changes**
+
+- `Heatmap` takes `{x, y, z}` chart dicts
+- Removed the deprecated composition fronts (`OverlayChart`, `FigureGridLayout`, `figure_grid_layout`) and the deprecated chart-attrs typing aliases
+
+**New Features**
+
+- Added `ViolinPlot` with inner marks, bandwidth control, and split halves, plus the `BANDWIDTH` constant
+- Added `SwarmPlot`, composable with box and violin plots on a shared category index
+- Added `RaincloudPlot`
+- Added `ContourChart` with `contour_levels` and the `CONTOUR_LEVELS` constant
+- Added `HexbinChart` with the `HEXBIN_REDUCE` constant
+- Added `StackedAreaChart` with the `BASELINE` constant
+- Added `SankeyChart` with column headings and ribbon values
+- Added `kde1d` and `kde2d` density estimates to `utils.stats`
+- Added figure-level `xlabel`/`ylabel` to `Grid`
+- Versioned documentation, grouped chart index, and a theme gallery covering every chart
+
+**Bug Fixes**
+
+- Draw the grid below the marks and hug the data range in line-only panels
+- Keep a host row's height when a nested grid sits alone in it
+- Place colorbars with the layout engine
+- Size the histogram y-range by its view
+
 ### datachart-0.8.1 (2026-08-26)
 
 **New Features**

@@ -101,7 +101,7 @@ def RaincloudPlot(
     experimental results per condition. Vertical rainclouds keep the cloud on
     the left; horizontal ones keep it above.
 
-    !!! info "Added in Unreleased"
+    !!! info "Added in 0.9.0"
 
     Examples:
         >>> from datachart.charts import RaincloudPlot

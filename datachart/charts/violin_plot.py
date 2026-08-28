@@ -98,7 +98,7 @@ def ViolinPlot(
     when shape matters and each group has enough samples for a density
     estimate.
 
-    !!! info "Added in Unreleased"
+    !!! info "Added in 0.9.0"
 
     Examples:
         >>> from datachart.charts import ViolinPlot

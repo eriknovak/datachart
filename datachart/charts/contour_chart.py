@@ -104,7 +104,7 @@ def ContourChart(
     [`Heatmap`][datachart.charts.Heatmap]; for the raw points behind a density
     use [`ScatterChart`][datachart.charts.ScatterChart].
 
-    !!! info "Added in Unreleased"
+    !!! info "Added in 0.9.0"
 
     Examples:
         >>> from datachart.charts import ContourChart
