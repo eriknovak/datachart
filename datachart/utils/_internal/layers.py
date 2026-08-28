@@ -127,6 +127,11 @@ SANKEY_LABEL_PAD = 0.01
 # column headings sit this far above the tallest column
 SANKEY_COLUMN_LABEL_PAD = 0.03
 SANKEY_COLUMN_LABEL_HEADROOM = 0.1
+# ribbon values try the midpoint first, then slide outward along the curve
+SANKEY_VALUE_POSITIONS = (0.5, 0.38, 0.62, 0.26, 0.74, 0.14, 0.86, 0.06, 0.94)
+# estimated glyph width and line height as multiples of the font size
+TEXT_WIDTH_PER_CHAR = 0.55
+TEXT_LINE_HEIGHT = 1.2
 SANKEY_GREY = "#9E9E9E"
 # matplotlib skips underscore-prefixed labels when assembling the legend
 NO_LEGEND = "_nolegend_"
@@ -2836,6 +2841,36 @@ class TextLayer(Layer):
 # ================================================
 
 
+def _ribbon_centerline(x1, y1, x2, y2, t):
+    """The point at `t` on a ribbon's centreline, a cubic Bézier bending at mid-x."""
+
+    cx = (x1 + x2) / 2
+    mt = 1 - t
+    x = mt**3 * x1 + 3 * mt**2 * t * cx + 3 * mt * t**2 * cx + t**3 * x2
+    y = mt**3 * y1 + 3 * mt**2 * t * y1 + 3 * mt * t**2 * y2 + t**3 * y2
+    return x, y
+
+
+def _text_box(ax, x, y, text, fontsize, ha, pad_points=0.0):
+    """A text's estimated (x0, y0, x1, y1) in data units, before any layout pass."""
+
+    fig_w, fig_h = ax.figure.get_size_inches()
+    pos = ax.get_position()
+    xlim, ylim = ax.get_xlim(), ax.get_ylim()
+    per_point_x = (xlim[1] - xlim[0]) / (fig_w * pos.width * 72)
+    per_point_y = (ylim[1] - ylim[0]) / (fig_h * pos.height * 72)
+    width = (TEXT_WIDTH_PER_CHAR * fontsize * len(text) + 2 * pad_points) * per_point_x
+    height = (TEXT_LINE_HEIGHT * fontsize + 2 * pad_points) * per_point_y
+    x0 = x - width / 2 if ha == "center" else x - width if ha == "right" else x
+    return (x0, y - height / 2, x0 + width, y + height / 2)
+
+
+def _overlap_area(a, b) -> float:
+    return max(0.0, min(a[2], b[2]) - max(a[0], b[0])) * max(
+        0.0, min(a[3], b[3]) - max(a[1], b[1])
+    )
+
+
 def _format_sankey_value(value_format, value) -> str:
     """Render a ribbon value with a formatter, a `%` string, or a `{}` string."""
 
@@ -2939,6 +2974,11 @@ class SankeyLayer(Layer):
         node_width = style["node_width"]
         geometry, scale = self._geometry()
         halo = style.get("halo_width") or 0
+        # the axes limits are fixed before any text so box estimates use them
+        ax.set_xlim(-SANKEY_LABEL_MARGIN, 1 + SANKEY_LABEL_MARGIN)
+        ax.set_ylim(0, 1 + (SANKEY_COLUMN_LABEL_HEADROOM if self.column_labels else 0))
+        # every label and value placed so far, for the ribbon values to avoid
+        occupied = []
         effects = (
             [patheffects.withStroke(linewidth=halo, foreground="#FFFFFF")]
             if halo > 0
@@ -2965,15 +3005,19 @@ class SankeyLayer(Layer):
                     tx, ha = box.x - SANKEY_LABEL_PAD, "right"
                 else:
                     tx, ha = box.x + node_width + SANKEY_LABEL_PAD, "left"
+                ty = box.bottom + box.height / 2
                 ax.text(
                     tx,
-                    box.bottom + box.height / 2,
+                    ty,
                     name,
                     ha=ha,
                     va="center",
                     zorder=4,
                     path_effects=effects,
                     **self.label_style,
+                )
+                occupied.append(
+                    _text_box(ax, tx, ty, name, self.label_style["fontsize"], ha, halo)
                 )
 
         if self.column_labels is not None:
@@ -2992,6 +3036,8 @@ class SankeyLayer(Layer):
         # ribbons stack from the top of each node; drawing in order of
         # endpoint height keeps the crossings few
         source_used, target_used = defaultdict(float), defaultdict(float)
+        # (height, centreline endpoints, text) of every ribbon value to place
+        values = []
         order = sorted(
             self.links,
             key=lambda r: (geometry[r["source"]].top, geometry[r["target"]].top),
@@ -3044,20 +3090,40 @@ class SankeyLayer(Layer):
                 )
             )
             if self.show_values:
-                # at the ribbon's midpoint, where the Bézier crosses between nodes
-                ax.text(
-                    cx,
-                    (y_source + y_target - height) / 2,
-                    _format_sankey_value(self.value_format, record["value"]),
-                    ha="center",
-                    va="center",
-                    zorder=4,
-                    path_effects=effects,
-                    **self.value_style,
+                values.append(
+                    (
+                        height,
+                        (x1, y_source - height / 2, x2, y_target - height / 2),
+                        _format_sankey_value(self.value_format, record["value"]),
+                    )
                 )
 
-        ax.set_xlim(-SANKEY_LABEL_MARGIN, 1 + SANKEY_LABEL_MARGIN)
-        ax.set_ylim(0, 1 + (SANKEY_COLUMN_LABEL_HEADROOM if self.column_labels else 0))
+        # the widest ribbons claim their midpoints first; the rest slide along
+        # their curve to the first spot clear of the labels and earlier values
+        for _, line, text in sorted(values, key=lambda v: v[0], reverse=True):
+            fontsize = self.value_style["fontsize"]
+            best = None
+            for t in SANKEY_VALUE_POSITIONS:
+                x, y = _ribbon_centerline(*line, t)
+                box = _text_box(ax, x, y, text, fontsize, "center", halo)
+                overlap = sum(_overlap_area(box, other) for other in occupied)
+                if best is None or overlap < best[0]:
+                    best = (overlap, x, y, box)
+                if overlap == 0:
+                    break
+            _, x, y, box = best
+            occupied.append(box)
+            ax.text(
+                x,
+                y,
+                text,
+                ha="center",
+                va="center",
+                zorder=4,
+                path_effects=effects,
+                **self.value_style,
+            )
+
         ax.axis("off")
 
 

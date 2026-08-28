@@ -225,6 +225,26 @@ class TestRendering(unittest.TestCase):
         fig = SankeyChart({"links": FUNNEL}, show_values=True, value_format="%d!")
         self.assertIn("300!", [t.get_text() for t in fig.axes[0].texts])
 
+    def test_values_avoid_labels_and_each_other(self):
+        from datachart.utils._internal.layers import _overlap_area, _text_box
+
+        fig = SankeyChart({"links": FUNNEL}, show_values=True)
+        ax = fig.axes[0]
+        boxes = [
+            _text_box(
+                ax,
+                *t.get_position(),
+                t.get_text(),
+                t.get_fontsize(),
+                t.get_ha(),
+                config["plot_sankey_label_halo_width"],
+            )
+            for t in ax.texts
+        ]
+        for i, a in enumerate(boxes):
+            for b in boxes[i + 1 :]:
+                self.assertEqual(_overlap_area(a, b), 0.0)
+
     def test_subplots(self):
         fig = SankeyChart(
             [{"links": CHAIN}, {"links": FUNNEL}],
