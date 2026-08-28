@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#datachart-081-2026-08-26" class="md-skip">
+        <a href="#datachart-090-2026-08-28" class="md-skip">
           Skip to content
         </a>
       
@@ -1844,6 +1844,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#datachart-090-2026-08-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        datachart-0.9.0 (2026-08-28)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#datachart-081-2026-08-26" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2090,6 +2101,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#datachart-090-2026-08-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        datachart-0.9.0 (2026-08-28)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#datachart-081-2026-08-26" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2295,6 +2317,32 @@
 
   <h1>Changelog</h1>
 
+<h3 id="datachart-090-2026-08-28">datachart-0.9.0 (2026-08-28)</h3>
+<p><strong>Breaking Changes</strong></p>
+<ul>
+<li><code>Heatmap</code> takes <code>{x, y, z}</code> chart dicts</li>
+<li>Removed the deprecated composition fronts (<code>OverlayChart</code>, <code>FigureGridLayout</code>, <code>figure_grid_layout</code>) and the deprecated chart-attrs typing aliases</li>
+</ul>
+<p><strong>New Features</strong></p>
+<ul>
+<li>Added <code>ViolinPlot</code> with inner marks, bandwidth control, and split halves, plus the <code>BANDWIDTH</code> constant</li>
+<li>Added <code>SwarmPlot</code>, composable with box and violin plots on a shared category index</li>
+<li>Added <code>RaincloudPlot</code></li>
+<li>Added <code>ContourChart</code> with <code>contour_levels</code> and the <code>CONTOUR_LEVELS</code> constant</li>
+<li>Added <code>HexbinChart</code> with the <code>HEXBIN_REDUCE</code> constant</li>
+<li>Added <code>StackedAreaChart</code> with the <code>BASELINE</code> constant</li>
+<li>Added <code>SankeyChart</code> with column headings and ribbon values</li>
+<li>Added <code>kde1d</code> and <code>kde2d</code> density estimates to <code>utils.stats</code></li>
+<li>Added figure-level <code>xlabel</code>/<code>ylabel</code> to <code>Grid</code></li>
+<li>Versioned documentation, grouped chart index, and a theme gallery covering every chart</li>
+</ul>
+<p><strong>Bug Fixes</strong></p>
+<ul>
+<li>Draw the grid below the marks and hug the data range in line-only panels</li>
+<li>Keep a host row's height when a nested grid sits alone in it</li>
+<li>Place colorbars with the layout engine</li>
+<li>Size the histogram y-range by its view</li>
+</ul>
 <h3 id="datachart-081-2026-08-26">datachart-0.8.1 (2026-08-26)</h3>
 <p><strong>New Features</strong></p>
 <ul>

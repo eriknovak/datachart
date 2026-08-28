@@ -332,7 +332,7 @@ Estimates the density of the values as a curve.
 
 A Gaussian kernel density estimate evaluated on `gridsize` evenly spaced points over the range of the values, extended by `cut` bandwidths on each side so the curve tails off instead of being clipped at the extremes, or over an explicit `xlim` so several curves share one grid. The result is a list of `{x, y}` points ready for `LineChart`; the curve integrates to 1, so it overlays a density `Histogram` of the same values.
 
-Added in Unreleased
+Added in 0.9.0
 
 Examples:
 
@@ -382,7 +382,7 @@ Estimates the density of the (x, y) points as a gridded surface.
 
 A Gaussian kernel density estimate evaluated on a `gridsize` × `gridsize` grid over the range of the points, extended by `cut` bandwidths on each side so the outer contours close instead of being clipped, or over explicit `xlim`/`ylim` so several surfaces share one grid. The result is an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of a scattered dataset is `ContourChart(kde2d(x, y))`.
 
-Added in Unreleased
+Added in 0.9.0
 
 Examples:
 

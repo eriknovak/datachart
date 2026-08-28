@@ -302,7 +302,7 @@ Creates the stacked area chart.
 
 Stacked areas fill each series on top of the previous one along an ordered axis, so the top edge traces the total and the bands show how it splits into parts — class proportions over time, traffic by channel per year. Every series must share the same `x` values. Use it for composition that changes along an axis; for the trajectories themselves use LineChart, and for composition at a few discrete categories use BarChart with `bar_mode="stack"`.
 
-Added in Unreleased
+Added in 0.9.0
 
 Examples:
 
@@ -1236,7 +1236,7 @@ Creates the violin plot.
 
 A violin plot draws the kernel density estimate of each group's numeric distribution as a mirrored profile, showing shape (multimodality, skew, tails) that a box plot hides. Use it to compare distributions across groups when shape matters and each group has enough samples for a density estimate.
 
-Added in Unreleased
+Added in 0.9.0
 
 Examples:
 
@@ -1408,7 +1408,7 @@ Creates the swarm plot.
 
 A swarm plot draws every observation as a point at its group's category position, spread across the category width so the points do not hide each other, making counts and gaps visible. Use it for small-to-medium samples where each observation matters, or overlay it on a BoxPlot with `Panel` (the two share positions). For large samples prefer ViolinPlot.
 
-Added in Unreleased
+Added in 0.9.0
 
 Examples:
 
@@ -1584,7 +1584,7 @@ Creates the raincloud plot.
 
 A raincloud plot draws each group as a cloud (a half violin of its density), its rain (the raw observations), and a box (the quartile summary) side by side at one category position, all in the group's palette color. Use it when you want the shape, the summary statistics, and the individual observations in a single view, for example when reporting experimental results per condition. Vertical rainclouds keep the cloud on the left; horizontal ones keep it above.
 
-Added in Unreleased
+Added in 0.9.0
 
 Examples:
 
@@ -2138,7 +2138,7 @@ Creates the contour chart.
 
 A contour chart draws a surface sampled on a grid — a loss landscape, a 2-D density, a terrain — as iso-lines of equal value, or as filled bands between them. Use it to read the shape of a function of two variables: where its minima and ridges sit and how steeply it changes. Lines overlay on other charts and on each other; fills stand alone, with an optional colorbar. For a per-cell view of a matrix use Heatmap; for the raw points behind a density use ScatterChart.
 
-Added in Unreleased
+Added in 0.9.0
 
 Examples:
 
@@ -2330,7 +2330,7 @@ Creates the hexbin chart.
 
 A hexbin chart tiles the plane with hexagons and colors each by the number of points falling in it — or, with a per-point `c`, by an aggregate of those values. Use it where a scatter chart turns into an opaque blob: thousands of points, overlapping clusters, or a value that varies across the plane. For the points themselves use ScatterChart; for a smooth density estimate use ContourChart on stats.kde2d.
 
-Added in Unreleased
+Added in 0.9.0
 
 Examples:
 
@@ -2524,7 +2524,7 @@ Creates the Sankey chart.
 
 A Sankey diagram draws weighted flows between categories: nodes are bars laid out in columns and each flow is a ribbon whose height carries its value — label transitions between annotators, attrition through a signup funnel, energy from source to use. Use it when the question is where a quantity goes; for the totals per category alone use BarChart.
 
-Added in Unreleased
+Added in 0.9.0
 
 Examples:
 
