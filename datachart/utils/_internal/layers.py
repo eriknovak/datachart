@@ -127,8 +127,9 @@ SANKEY_LABEL_PAD = 0.01
 # column headings sit this far above the tallest column
 SANKEY_COLUMN_LABEL_PAD = 0.03
 SANKEY_COLUMN_LABEL_HEADROOM = 0.1
-# ribbon values try the midpoint first, then slide outward along the curve
-SANKEY_VALUE_POSITIONS = (0.5, 0.38, 0.62, 0.26, 0.74, 0.14, 0.86, 0.06, 0.94)
+# a ribbon value sits at the ribbon's end, before the node it enters, where no
+# label lives; thin ribbons fall back to spots along the centreline
+SANKEY_VALUE_POSITIONS = (0.8, 0.65, 0.5, 0.35, 0.2)
 # estimated glyph width and line height as multiples of the font size
 TEXT_WIDTH_PER_CHAR = 0.55
 TEXT_LINE_HEIGHT = 1.2
@@ -3102,22 +3103,26 @@ class SankeyLayer(Layer):
         # their curve to the first spot clear of the labels and earlier values
         for _, line, text in sorted(values, key=lambda v: v[0], reverse=True):
             fontsize = self.value_style["fontsize"]
+            x1, y1, x2, y2 = line
+            candidates = [(x2 - SANKEY_LABEL_PAD, y2, "right")] + [
+                (*_ribbon_centerline(*line, t), "center")
+                for t in SANKEY_VALUE_POSITIONS
+            ]
             best = None
-            for t in SANKEY_VALUE_POSITIONS:
-                x, y = _ribbon_centerline(*line, t)
-                box = _text_box(ax, x, y, text, fontsize, "center", halo)
+            for x, y, ha in candidates:
+                box = _text_box(ax, x, y, text, fontsize, ha, halo)
                 overlap = sum(_overlap_area(box, other) for other in occupied)
                 if best is None or overlap < best[0]:
-                    best = (overlap, x, y, box)
+                    best = (overlap, x, y, ha, box)
                 if overlap == 0:
                     break
-            _, x, y, box = best
+            _, x, y, ha, box = best
             occupied.append(box)
             ax.text(
                 x,
                 y,
                 text,
-                ha="center",
+                ha=ha,
                 va="center",
                 zorder=4,
                 path_effects=effects,

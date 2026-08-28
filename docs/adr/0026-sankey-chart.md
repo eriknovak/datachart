@@ -47,7 +47,8 @@ height carries the value, and the axes carry nothing.
   they stay legible over ribbons, 0 disables). Labels use `font_general_*`.
 - **Labels** sit left of the first column and right of every other column.
   `column_labels` adds one heading above each column in the subtitle style;
-  `show_values` writes each flow's value at its ribbon's midpoint, formatted
+  `show_values` writes each flow's value at its ribbon's end, before the
+  node it enters (a thin ribbon slides it along the centreline), formatted
   by `value_format` as bar values are, in the bar value style behind the same
   halo. Both are off by default.
 
