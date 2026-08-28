@@ -42,12 +42,13 @@ jobs:
         run: |
           uv run mike deploy --push --update-aliases "${GITHUB_REF_NAME#v}" latest
           uv run mike set-default --push latest
-      # GitHub Pages only serves a root 404.html; mike writes one per version
-      - name: Copy latest 404 page to site root
+      # mike writes only version dirs at the root; GitHub Pages serves 404.html
+      # from the root alone, and llms.txt is expected at the site root (ADR 0016)
+      - name: Copy latest 404 page and llms files to site root
         run: |
           git fetch origin gh-pages
           git checkout gh-pages
-          cp latest/404.html 404.html
-          git add 404.html
-          git diff --cached --quiet || git commit -m "Copy latest 404 page to site root"
+          cp latest/404.html latest/llms.txt latest/llms-full.txt .
+          git add 404.html llms.txt llms-full.txt
+          git diff --cached --quiet || git commit -m "Copy latest 404 page and llms files to site root"
           git push origin gh-pages

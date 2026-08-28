@@ -34,6 +34,10 @@ behind the site again.
   guide and reference pages against the config so a new page without a
   description breaks `mkdocs build` instead of silently vanishing — drift
   is impossible, not discouraged.
+- **The root `llms.txt` is a CI copy of `latest/`.** mike deploys only
+  version directories, so the docs workflow copies `latest/llms.txt` and
+  `latest/llms-full.txt` to the gh-pages root alongside `404.html`; their
+  links stay pinned to the released version directory, which resolves.
 - **Registries are one-time submissions after deploy.** Context7 and the
   llms.txt directories (llmstxt.site, directory.llmstxt.cloud) are pointed
   at the deployed files; nothing in the repo tracks them.
