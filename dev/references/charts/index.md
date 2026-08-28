@@ -23,6 +23,7 @@ The `charts` module contains the methods to create the plots and figures, groupe
 | `ContourChart`     | Creates the contour chart.              |
 | `HexbinChart`      | Creates the hexbin chart.               |
 | `ParallelCoords`   | Creates the parallel coordinates chart. |
+| `SankeyChart`      | Creates the Sankey chart.               |
 
 ## Trends and Comparisons
 
@@ -2478,3 +2479,90 @@ Examples:
 | RETURNS      | DESCRIPTION                                           |
 | ------------ | ----------------------------------------------------- |
 | `plt.Figure` | The figure containing the parallel coordinates chart. |
+
+## Flows
+
+### datachart.charts.SankeyChart
+
+```
+SankeyChart(
+    data: Union[
+        SankeySingleChartAttrs, List[SankeySingleChartAttrs]
+    ],
+    *,
+    nodes: Optional[List[List[str]]] = None,
+    column_labels: Optional[List[str]] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    title: Optional[str] = None,
+    subtitle: Optional[
+        Union[str, List[Optional[str]]]
+    ] = None,
+    emphasis: None = None,
+    figsize: Optional[
+        Union[FIG_SIZE, Tuple[float, float]]
+    ] = None,
+    subplots: Optional[bool] = None,
+    max_cols: Optional[int] = None,
+    style: Optional[
+        Union[
+            SankeyStyleAttrs,
+            List[Optional[SankeyStyleAttrs]],
+        ]
+    ] = None,
+    texts: Optional[
+        Union[
+            TextAttrs,
+            List[TextAttrs],
+            List[Union[TextAttrs, List[TextAttrs], None]],
+        ]
+    ] = None
+) -> plt.Figure
+```
+
+Creates the Sankey chart.
+
+A Sankey diagram draws weighted flows between categories: nodes are bars laid out in columns and each flow is a ribbon whose height carries its value — label transitions between annotators, attrition through a signup funnel, energy from source to use. Use it when the question is where a quantity goes; for the totals per category alone use BarChart.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.charts import SankeyChart
+>>> figure = SankeyChart(
+...     data={
+...         "links": [
+...             {"source": "Visited", "target": "Signed up", "value": 300},
+...             {"source": "Visited", "target": "Bounced", "value": 700},
+...             {"source": "Signed up", "target": "Paid", "value": 90},
+...             {"source": "Signed up", "target": "Churned", "value": 210},
+...         ]
+...     },
+...     title="Signup funnel",
+... )
+```
+
+| PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                  |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `data`          | The chart data: a {"links": [...]} dict whose links are {"source", "target", "value"} records, or a list of such dicts drawing one Sankey per subplot. A node is the string that names it, which is also its drawn label. **TYPE:** `Union[SankeySingleChartAttrs, List[SankeySingleChartAttrs]]`            |
+| `nodes`         | The node columns, left to right, each a list of node names top to bottom. Must name every node in the links exactly once. When omitted, a node's column is its longest path from any source and nodes keep their first-seen order within a column. **TYPE:** `Optional[List[List[str]]]` **DEFAULT:** `None` |
+| `column_labels` | One heading per column, drawn above it; must match the number of columns. **TYPE:** `Optional[List[str]]` **DEFAULT:** `None`                                                                                                                                                                                |
+| `show_values`   | Whether to write each flow's value on its ribbon. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                             |
+| `value_format`  | The format of the ribbon values: a VALUE_FORMAT constant (default VALUE_FORMAT.DEFAULT) or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                |
+| `title`         | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                        |
+| `subtitle`      | The subtitle(s) for individual charts. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                             |
+| `emphasis`      | Not supported: a Sankey has no series to mute or highlight. Passing a value raises ValueError. **TYPE:** `None` **DEFAULT:** `None`                                                                                                                                                                          |
+| `figsize`       | The size of the figure. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                                                                                                                                       |
+| `subplots`      | Whether to show each chart in its own subplot; several charts always split into subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                     |
+| `max_cols`      | Maximum number of columns in subplots. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                         |
+| `style`         | Style configuration(s) for the chart(s). **TYPE:** `Optional[Union[SankeyStyleAttrs, List[Optional[SankeyStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                 |
+| `texts`         | Text annotation(s) to draw. The columns span 0–1 horizontally and the tallest column 0–1 vertically. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                              |
+
+| RETURNS      | DESCRIPTION                             |
+| ------------ | --------------------------------------- |
+| `plt.Figure` | The figure containing the Sankey chart. |
+
+| RAISES       | DESCRIPTION                                                                                                                                                                                                                     |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If emphasis is given, the links are malformed (missing keys, a value not above zero, a self-link), the links form a cycle, nodes does not name exactly the linked nodes, or column_labels does not match the number of columns. |

@@ -2,166 +2,170 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/changelog/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/development/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/assets/scripts/generate_constant_viz/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/assets/scripts/generate_fig_sizes/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/boxplot/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/parallelcoords/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/pyramidchart/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/radialchart/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/raincloudplot/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
+    </url>
+    <url>
+         <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/sankeychart/</loc>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/stackedareachart/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/swarmplot/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/charts/violinplot/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/styling/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/styling/colormaps/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/styling/config/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/utility/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/references/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/references/charts/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/references/config/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/references/constants/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/references/themes/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/references/typings/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/references/utils/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://eriknovak.github.io/datachart/dev/references/utils/stats/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
 </urlset>

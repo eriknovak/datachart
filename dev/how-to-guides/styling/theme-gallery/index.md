@@ -29,6 +29,12 @@ The modernized default: Tableau-style palette, white bar edges, open spines, sof
 
 ### Relationships
 
+### Flows
+
+```
+gallery["Flows"].show()
+```
+
 ### Composition
 
 ## Greyscale
@@ -40,6 +46,12 @@ Monochrome and print-friendly, with the same open spines and muted grid treatmen
 ### Distributions
 
 ### Relationships
+
+### Flows
+
+```
+gallery["Flows"].show()
+```
 
 ### Composition
 
@@ -53,6 +65,12 @@ The diversified YlGnBu palette (`COLORS.PaperYlGnBu`) with navy ink edges, print
 
 ### Relationships
 
+### Flows
+
+```
+gallery["Flows"].show()
+```
+
 ### Composition
 
 ## Minimal
@@ -64,6 +82,12 @@ Accent blue with deep grays, no spines or tick marks, flat bars — and bar valu
 ### Distributions
 
 ### Relationships
+
+### Flows
+
+```
+gallery["Flows"].show()
+```
 
 ### Composition
 
@@ -77,6 +101,12 @@ The Google palette with a bottom spine only and a light solid grid; value labels
 
 ### Relationships
 
+### Flows
+
+```
+gallery["Flows"].show()
+```
+
 ### Composition
 
 ## Hatch
@@ -88,6 +118,12 @@ Black edges, dotted grid — and the hatch cycle (`""`, `"//"`, `".."`) applied 
 ### Distributions
 
 ### Relationships
+
+### Flows
+
+```
+gallery["Flows"].show()
+```
 
 ### Composition
 

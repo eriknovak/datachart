@@ -40,6 +40,14 @@ How two or more variables relate to each other.
 | [Hexbin Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md)            | The showcase of the hexbin chart.         |
 | [Parallel Coordinates](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/parallelcoords/index.md) | The showcase of the parallel coordinates. |
 
+## Flows
+
+How a quantity moves between categories: where it comes from and where it goes.
+
+| Chart                                                                                               | Description                       |
+| --------------------------------------------------------------------------------------------------- | --------------------------------- |
+| [Sankey Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/sankeychart/index.md) | The showcase of the Sankey chart. |
+
 ## Composition
 
 Here are some utility functions, that could help you.

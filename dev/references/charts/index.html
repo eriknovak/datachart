@@ -521,6 +521,8 @@
       
         
       
+        
+      
     
     
     
@@ -980,6 +982,34 @@
     
   
     Parallel Coordinates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../how-to-guides/charts/sankeychart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sankey Chart
   
 
     
@@ -1799,6 +1829,34 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Flows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#datachart.charts.SankeyChart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;SankeyChart
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2337,6 +2395,34 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Flows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#datachart.charts.SankeyChart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;SankeyChart
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2499,6 +2585,14 @@ grouped by the question they answer.</p>
               <td class="doc-function-details">
                 <div class="doc-md-description">
                   <p>Creates the parallel coordinates chart.</p>
+                </div>
+              </td>
+            </tr>
+            <tr class="doc-section-item">
+              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;datachart.charts.SankeyChart&lt;/span&gt;" href="#datachart.charts.SankeyChart">SankeyChart</a></code></td>
+              <td class="doc-function-details">
+                <div class="doc-md-description">
+                  <p>Creates the Sankey chart.</p>
                 </div>
               </td>
             </tr>
@@ -15418,6 +15512,415 @@ Categories not in the list will be appended at the end (sorted).</p>
             <td class="doc-returns-details">
               <div class="doc-md-description">
                 <p>The figure containing the parallel coordinates chart.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div><h2 id="flows">Flows</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="datachart.charts.SankeyChart" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">datachart.charts.SankeyChart</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">SankeyChart</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="n">SankeySingleChartAttrs</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SankeySingleChartAttrs</span><span class="p">]</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="p">],</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">nodes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">column_labels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">show_values</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">value_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">VALUE_FORMAT</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">subtitle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">emphasis</span><span class="p">:</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">figsize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        <span class="n">Union</span><span class="p">[</span><span class="n">FIG_SIZE</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">subplots</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="n">max_cols</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="n">style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>        <span class="n">Union</span><span class="p">[</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>            <span class="n">SankeyStyleAttrs</span><span class="p">,</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>            <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">SankeyStyleAttrs</span><span class="p">]],</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>        <span class="p">]</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>    <span class="n">texts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>        <span class="n">Union</span><span class="p">[</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>            <span class="n">TextAttrs</span><span class="p">,</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>            <span class="n">List</span><span class="p">[</span><span class="n">TextAttrs</span><span class="p">],</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>            <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">TextAttrs</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">TextAttrs</span><span class="p">],</span> <span class="kc">None</span><span class="p">]],</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>        <span class="p">]</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Creates the Sankey chart.</p>
+<p>A Sankey diagram draws weighted flows between categories: nodes are bars
+laid out in columns and each flow is a ribbon whose height carries its
+value — label transitions between annotators, attrition through a signup
+funnel, energy from source to use. Use it when the question is where a
+quantity goes; for the totals per category alone use
+<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;datachart.charts.BarChart&lt;/span&gt;" href="#datachart.charts.BarChart"><code>BarChart</code></a>.</p>
+<div class="admonition info">
+<p class="admonition-title">Added in Unreleased</p>
+</div>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.charts</span><span class="w"> </span><span class="kn">import</span> <span class="n">SankeyChart</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">figure</span> <span class="o">=</span> <span class="n">SankeyChart</span><span class="p">(</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">... </span>    <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">... </span>        <span class="s2">"links"</span><span class="p">:</span> <span class="p">[</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">... </span>            <span class="p">{</span><span class="s2">"source"</span><span class="p">:</span> <span class="s2">"Visited"</span><span class="p">,</span> <span class="s2">"target"</span><span class="p">:</span> <span class="s2">"Signed up"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span> <span class="mi">300</span><span class="p">},</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">... </span>            <span class="p">{</span><span class="s2">"source"</span><span class="p">:</span> <span class="s2">"Visited"</span><span class="p">,</span> <span class="s2">"target"</span><span class="p">:</span> <span class="s2">"Bounced"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span> <span class="mi">700</span><span class="p">},</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="gp">... </span>            <span class="p">{</span><span class="s2">"source"</span><span class="p">:</span> <span class="s2">"Signed up"</span><span class="p">,</span> <span class="s2">"target"</span><span class="p">:</span> <span class="s2">"Paid"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span> <span class="mi">90</span><span class="p">},</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="gp">... </span>            <span class="p">{</span><span class="s2">"source"</span><span class="p">:</span> <span class="s2">"Signed up"</span><span class="p">,</span> <span class="s2">"target"</span><span class="p">:</span> <span class="s2">"Churned"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span> <span class="mi">210</span><span class="p">},</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="gp">... </span>        <span class="p">]</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="gp">... </span>    <span class="p">},</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s2">"Signup funnel"</span><span class="p">,</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="gp">... </span><span class="p">)</span>
+</code></pre></div>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The chart data: a <code>{"links": [...]}</code> dict whose links are
+<code>{"source", "target", "value"}</code> records, or a list of such dicts
+drawing one Sankey per subplot. A node is the string that names
+it, which is also its drawn label.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="datachart.typings.SankeySingleChartAttrs">SankeySingleChartAttrs</span>, <span title="typing.List">List</span>[<span title="datachart.typings.SankeySingleChartAttrs">SankeySingleChartAttrs</span>]]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>nodes</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The node columns, left to right, each a list of node names
+top to bottom. Must name every node in the links exactly once.
+When omitted, a node's column is its longest path from any
+source and nodes keep their first-seen order within a column.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.List">List</span>[<span title="typing.List">List</span>[<span title="str">str</span>]]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>column_labels</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>One heading per column, drawn above it; must match the
+number of columns.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.List">List</span>[<span title="str">str</span>]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>show_values</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Whether to write each flow's value on its ribbon.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="bool">bool</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>value_format</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The format of the ribbon values: a <code>VALUE_FORMAT</code>
+constant (default <code>VALUE_FORMAT.DEFAULT</code>) or any <code>"{x:.1f}"</code>,
+<code>"{:.1f}%"</code>, or <code>"%g"</code> style string.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.VALUE_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.VALUE_FORMAT">VALUE_FORMAT</a>, <span title="str">str</span>]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>title</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The title of the chart.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>subtitle</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The subtitle(s) for individual charts.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<span title="str">str</span>, <span title="typing.List">List</span>[<span title="typing.Optional">Optional</span>[<span title="str">str</span>]]]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>emphasis</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Not supported: a Sankey has no series to mute or
+highlight. Passing a value raises <code>ValueError</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>figsize</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The size of the figure.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_SIZE&lt;/span&gt;" href="../constants/#datachart.constants.FIG_SIZE">FIG_SIZE</a>, <span title="typing.Tuple">Tuple</span>[<span title="float">float</span>, <span title="float">float</span>]]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>subplots</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Whether to show each chart in its own subplot; several
+charts always split into subplots.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="bool">bool</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_cols</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Maximum number of columns in subplots.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="int">int</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>style</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Style configuration(s) for the chart(s).</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<span title="datachart.typings.SankeyStyleAttrs">SankeyStyleAttrs</span>, <span title="typing.List">List</span>[<span title="typing.Optional">Optional</span>[<span title="datachart.typings.SankeyStyleAttrs">SankeyStyleAttrs</span>]]]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>texts</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Text annotation(s) to draw. The columns span 0–1 horizontally
+and the tallest column 0–1 vertically.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.TextAttrs&lt;/span&gt;" href="../typings/#datachart.typings.TextAttrs">TextAttrs</a>, <span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.TextAttrs&lt;/span&gt;" href="../typings/#datachart.typings.TextAttrs">TextAttrs</a>], <span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.TextAttrs&lt;/span&gt;" href="../typings/#datachart.typings.TextAttrs">TextAttrs</a>, <span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.TextAttrs&lt;/span&gt;" href="../typings/#datachart.typings.TextAttrs">TextAttrs</a>], None]]]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><span title="matplotlib.pyplot">plt</span>.<span title="matplotlib.pyplot.Figure">Figure</span></code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>The figure containing the Sankey chart.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RAISES</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><span title="ValueError">ValueError</span></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If <code>emphasis</code> is given, the links are malformed (missing
+keys, a value not above zero, a self-link), the links form a
+cycle, <code>nodes</code> does not name exactly the linked nodes, or
+<code>column_labels</code> does not match the number of columns.</p>
               </div>
             </td>
           </tr>
