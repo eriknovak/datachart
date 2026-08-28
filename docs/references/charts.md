@@ -35,3 +35,8 @@ title: Charts Module
 ::: datachart.charts.ContourChart
 ::: datachart.charts.HexbinChart
 ::: datachart.charts.ParallelCoords
+
+
+## Flows
+
+::: datachart.charts.SankeyChart

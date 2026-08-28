@@ -44,6 +44,14 @@ How two or more variables relate to each other.
 | [Hexbin Chart](hexbinchart.ipynb)             | The showcase of the hexbin chart.            |
 | [Parallel Coordinates](parallelcoords.ipynb)  | The showcase of the parallel coordinates.    |
 
+## Flows
+
+How a quantity moves between categories: where it comes from and where it goes.
+
+| Chart                                         | Description                                  |
+| :-------------------------------------------- | :------------------------------------------- |
+| [Sankey Chart](sankeychart.ipynb)             | The showcase of the Sankey chart.            |
+
 ## Composition
 
 Here are some utility functions, that could help you.

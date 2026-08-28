@@ -24,6 +24,7 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         ],
         "plot_bar_edge_width": 0.8,
         "plot_bar_edge_color": "#000000",
+        "plot_sankey_node_edge_color": "#000000",
         "plot_hist_edge_color": "#000000",
         "plot_vline_color": "#5D6D7E",
         "plot_vline_style": LINE_STYLE.DASHED,

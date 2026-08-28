@@ -14,7 +14,7 @@ import warnings
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import cycle as iter_cycle
-from typing import List, Optional, Union
+from typing import List, NamedTuple, Optional, Union
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,17 +23,26 @@ from matplotlib.ticker import MaxNLocator
 from matplotlib.collections import LineCollection, PathCollection
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.mlab import GaussianKDE
-from matplotlib.patches import Patch
+from matplotlib.patches import Patch, PathPatch, Rectangle
+from matplotlib.path import Path
+import matplotlib.patheffects as patheffects
 from matplotlib.legend_handler import HandlerPathCollection
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from .colors import create_color_cycle, create_colormap, get_colormap
-from .validate import validate_baseline, validate_emphasis, validate_shared_x
+from .validate import (
+    infer_sankey_columns,
+    validate_baseline,
+    validate_emphasis,
+    validate_sankey_link_color,
+    validate_shared_x,
+)
 from .config_helpers import (
     get_attr_value,
     resolve_font_family,
     get_area_style,
     get_stackedarea_style,
+    get_sankey_style,
     get_grid_style,
     get_line_style,
     get_bar_style,
@@ -112,6 +121,19 @@ MUTED_WIDTH_SCALE = 0.75
 HIGHLIGHT_WIDTH_SCALE = 2.0
 DEFAULT_MUTED_COLOR = "#CFCFCF"
 DEFAULT_MUTED_ALPHA = 0.5
+# sankey labels: room past the outer columns, the gap to the node bar
+SANKEY_LABEL_MARGIN = 0.2
+SANKEY_LABEL_PAD = 0.01
+# column headings sit this far above the tallest column
+SANKEY_COLUMN_LABEL_PAD = 0.03
+SANKEY_COLUMN_LABEL_HEADROOM = 0.1
+# a ribbon value sits at the ribbon's end, before the node it enters, where no
+# label lives; thin ribbons fall back to spots along the centreline
+SANKEY_VALUE_POSITIONS = (0.8, 0.65, 0.5, 0.35, 0.2)
+# estimated glyph width and line height as multiples of the font size
+TEXT_WIDTH_PER_CHAR = 0.55
+TEXT_LINE_HEIGHT = 1.2
+SANKEY_GREY = "#9E9E9E"
 # matplotlib skips underscore-prefixed labels when assembling the legend
 NO_LEGEND = "_nolegend_"
 # radial furniture defaults: compass and calendar conventions (ADR 0015)
@@ -2815,6 +2837,301 @@ class TextLayer(Layer):
         """No marks; the panel draws the texts with the other annotations."""
 
 
+# ================================================
+# Sankey Layer
+# ================================================
+
+
+def _ribbon_centerline(x1, y1, x2, y2, t):
+    """The point at `t` on a ribbon's centreline, a cubic Bézier bending at mid-x."""
+
+    cx = (x1 + x2) / 2
+    mt = 1 - t
+    x = mt**3 * x1 + 3 * mt**2 * t * cx + 3 * mt * t**2 * cx + t**3 * x2
+    y = mt**3 * y1 + 3 * mt**2 * t * y1 + 3 * mt * t**2 * y2 + t**3 * y2
+    return x, y
+
+
+def _text_box(ax, x, y, text, fontsize, ha, pad_points=0.0):
+    """A text's estimated (x0, y0, x1, y1) in data units, before any layout pass."""
+
+    fig_w, fig_h = ax.figure.get_size_inches()
+    pos = ax.get_position()
+    xlim, ylim = ax.get_xlim(), ax.get_ylim()
+    per_point_x = (xlim[1] - xlim[0]) / (fig_w * pos.width * 72)
+    per_point_y = (ylim[1] - ylim[0]) / (fig_h * pos.height * 72)
+    width = (TEXT_WIDTH_PER_CHAR * fontsize * len(text) + 2 * pad_points) * per_point_x
+    height = (TEXT_LINE_HEIGHT * fontsize + 2 * pad_points) * per_point_y
+    x0 = x - width / 2 if ha == "center" else x - width if ha == "right" else x
+    return (x0, y - height / 2, x0 + width, y + height / 2)
+
+
+def _overlap_area(a, b) -> float:
+    return max(0.0, min(a[2], b[2]) - max(a[0], b[0])) * max(
+        0.0, min(a[3], b[3]) - max(a[1], b[1])
+    )
+
+
+def _format_sankey_value(value_format, value) -> str:
+    """Render a ribbon value with a formatter, a `%` string, or a `{}` string."""
+
+    if isinstance(value_format, mticker.Formatter):
+        return value_format(value)
+    if "%" in value_format:
+        return value_format % (value,)
+    return value_format.format(value)
+
+
+class NodeBox(NamedTuple):
+    """One Sankey node bar in the 0–1 data space."""
+
+    x: float
+    bottom: float
+    height: float
+
+    @property
+    def top(self) -> float:
+        return self.bottom + self.height
+
+
+class SankeyLayer(Layer):
+    """One Sankey: every link of a chart as node bars and ribbons (ADR 0026).
+
+    The layer owns its axes: a fixed 0–1 data space with the axis off, so the
+    panel applies no furniture, scales, or limits around it.
+    """
+
+    kind = "sankey"
+
+    def __init__(self, chart: dict, settings: dict):
+        self.links = chart["data"]["links"]
+        self.columns = settings.get("nodes") or infer_sankey_columns(self.links)
+        self.column_labels = settings.get("column_labels")
+        if self.column_labels is not None and len(self.column_labels) != len(
+            self.columns
+        ):
+            raise ValueError(
+                f"`column_labels` has {len(self.column_labels)} entries but the "
+                f"Sankey has {len(self.columns)} columns."
+            )
+        super().__init__(chart, settings)
+
+    def _resolve_style(self) -> None:
+        self.sankey_style = get_sankey_style(self.style)
+        self.link_color = validate_sankey_link_color(
+            self.sankey_style.get("link_color")
+        )
+        self.label_style = get_text_style("general")
+        # column headings read as per-column subtitles
+        self.column_label_style = get_text_style("subtitle")
+        self.show_values = bool(self.settings.get("show_values"))
+        self.value_format = _value_formatter(
+            self.settings.get("value_format") or VALUE_FORMAT.DEFAULT
+        )
+        self.value_style = {
+            "fontsize": config["plot_bar_value_fontsize"],
+            "color": config["plot_bar_value_color"],
+            "family": self.label_style.get("family"),
+        }
+        # one color per node in column-then-row order, keyed by name
+        names = [node for column in self.columns for node in column]
+        cycle = create_color_cycle(config["color_general_multiple"], len(names))
+        self.node_colors = {name: cycle[i]["color"] for i, name in enumerate(names)}
+
+    def _geometry(self) -> tuple:
+        """The (x, bottom, height) of every node and the shared height scale."""
+
+        style = self.sankey_style
+        node_width = style["node_width"]
+        node_pad = style["node_pad"]
+
+        outflow, inflow = defaultdict(float), defaultdict(float)
+        for record in self.links:
+            outflow[record["source"]] += record["value"]
+            inflow[record["target"]] += record["value"]
+        size = {n: max(outflow[n], inflow[n]) for col in self.columns for n in col}
+
+        # one scale for every column: the tallest column fills 1 - node_pad
+        max_total = max(sum(size[n] for n in col) for col in self.columns)
+        scale = (1 - node_pad) / max_total
+        n_cols = len(self.columns)
+        x_step = (1 - node_width) / (n_cols - 1) if n_cols > 1 else 0.0
+
+        geometry = {}
+        for ci, column in enumerate(self.columns):
+            gap = node_pad / (len(column) - 1) if len(column) > 1 else 0.0
+            total = sum(size[n] for n in column) * scale + gap * (len(column) - 1)
+            # shorter columns center on the tallest one
+            y = 1 - (1 - total) / 2
+            x = ci * x_step if n_cols > 1 else (1 - node_width) / 2
+            for name in column:
+                height = size[name] * scale
+                geometry[name] = NodeBox(x, y - height, height)
+                y -= height + gap
+        return geometry, scale
+
+    def draw(self, ax: plt.Axes, ctx: DrawContext) -> None:
+        style = self.sankey_style
+        node_width = style["node_width"]
+        geometry, scale = self._geometry()
+        halo = style.get("halo_width") or 0
+        # the axes limits are fixed before any text so box estimates use them
+        ax.set_xlim(-SANKEY_LABEL_MARGIN, 1 + SANKEY_LABEL_MARGIN)
+        ax.set_ylim(0, 1 + (SANKEY_COLUMN_LABEL_HEADROOM if self.column_labels else 0))
+        # every label and value placed so far, for the ribbon values to avoid
+        occupied = []
+        effects = (
+            [patheffects.withStroke(linewidth=halo, foreground="#FFFFFF")]
+            if halo > 0
+            else []
+        )
+
+        for ci, column in enumerate(self.columns):
+            for name in column:
+                box = geometry[name]
+                ax.add_patch(
+                    Rectangle(
+                        (box.x, box.bottom),
+                        node_width,
+                        box.height,
+                        facecolor=self.node_colors[name],
+                        edgecolor=style.get("edgecolor"),
+                        linewidth=style.get("linewidth"),
+                        zorder=3,
+                        label=name,
+                    )
+                )
+                # labels sit left of the first column, right of every other
+                if ci == 0:
+                    tx, ha = box.x - SANKEY_LABEL_PAD, "right"
+                else:
+                    tx, ha = box.x + node_width + SANKEY_LABEL_PAD, "left"
+                ty = box.bottom + box.height / 2
+                ax.text(
+                    tx,
+                    ty,
+                    name,
+                    ha=ha,
+                    va="center",
+                    zorder=4,
+                    path_effects=effects,
+                    **self.label_style,
+                )
+                occupied.append(
+                    _text_box(ax, tx, ty, name, self.label_style["fontsize"], ha, halo)
+                )
+
+        if self.column_labels is not None:
+            for column, label in zip(self.columns, self.column_labels):
+                x = geometry[column[0]].x
+                ax.text(
+                    x + node_width / 2,
+                    1 + SANKEY_COLUMN_LABEL_PAD,
+                    label,
+                    ha="center",
+                    va="bottom",
+                    zorder=4,
+                    **self.column_label_style,
+                )
+
+        # ribbons stack from the top of each node; drawing in order of
+        # endpoint height keeps the crossings few
+        source_used, target_used = defaultdict(float), defaultdict(float)
+        # (height, centreline endpoints, text) of every ribbon value to place
+        values = []
+        order = sorted(
+            self.links,
+            key=lambda r: (geometry[r["source"]].top, geometry[r["target"]].top),
+            reverse=True,
+        )
+        for record in order:
+            source, target = record["source"], record["target"]
+            height = record["value"] * scale
+            y_source = geometry[source].top - source_used[source]
+            y_target = geometry[target].top - target_used[target]
+            source_used[source] += height
+            target_used[target] += height
+
+            x1, x2 = geometry[source].x + node_width, geometry[target].x
+            cx = (x1 + x2) / 2
+            verts = [
+                (x1, y_source),
+                (cx, y_source),
+                (cx, y_target),
+                (x2, y_target),
+                (x2, y_target - height),
+                (cx, y_target - height),
+                (cx, y_source - height),
+                (x1, y_source - height),
+                (x1, y_source),
+            ]
+            codes = [
+                Path.MOVETO,
+                Path.CURVE4,
+                Path.CURVE4,
+                Path.CURVE4,
+                Path.LINETO,
+                Path.CURVE4,
+                Path.CURVE4,
+                Path.CURVE4,
+                Path.CLOSEPOLY,
+            ]
+            color = {
+                "source": self.node_colors[source],
+                "target": self.node_colors[target],
+                "grey": SANKEY_GREY,
+            }[self.link_color]
+            ax.add_patch(
+                PathPatch(
+                    Path(verts, codes),
+                    facecolor=color,
+                    edgecolor="none",
+                    alpha=style.get("link_alpha"),
+                    zorder=2,
+                )
+            )
+            if self.show_values:
+                values.append(
+                    (
+                        height,
+                        (x1, y_source - height / 2, x2, y_target - height / 2),
+                        _format_sankey_value(self.value_format, record["value"]),
+                    )
+                )
+
+        # the widest ribbons claim their midpoints first; the rest slide along
+        # their curve to the first spot clear of the labels and earlier values
+        for _, line, text in sorted(values, key=lambda v: v[0], reverse=True):
+            fontsize = self.value_style["fontsize"]
+            x1, y1, x2, y2 = line
+            candidates = [(x2 - SANKEY_LABEL_PAD, y2, "right")] + [
+                (*_ribbon_centerline(*line, t), "center")
+                for t in SANKEY_VALUE_POSITIONS
+            ]
+            best = None
+            for x, y, ha in candidates:
+                box = _text_box(ax, x, y, text, fontsize, ha, halo)
+                overlap = sum(_overlap_area(box, other) for other in occupied)
+                if best is None or overlap < best[0]:
+                    best = (overlap, x, y, ha, box)
+                if overlap == 0:
+                    break
+            _, x, y, ha, box = best
+            occupied.append(box)
+            ax.text(
+                x,
+                y,
+                text,
+                ha=ha,
+                va="center",
+                zorder=4,
+                path_effects=effects,
+                **self.value_style,
+            )
+
+        ax.axis("off")
+
+
 LAYER_TYPES = {
     "linechart": LineLayer,
     "barchart": BarLayer,
@@ -2829,6 +3146,7 @@ LAYER_TYPES = {
     "contourchart": ContourLayer,
     "hexbinchart": HexbinLayer,
     "stackedareachart": StackedAreaLayer,
+    "sankeychart": SankeyLayer,
 }
 
 RADIAL_LAYER_TYPES = {
@@ -3209,6 +3527,13 @@ class Panel:
         return flags == {True}
 
     @property
+    def bare(self) -> bool:
+        """Whether the layers own their axes: no furniture, scales, or limits."""
+
+        layers = self.layers
+        return bool(layers) and all(isinstance(l, SankeyLayer) for l in layers)
+
+    @property
     def projection(self) -> str:
         """The panel's coordinate space kind: "cartesian" or "polar".
 
@@ -3267,7 +3592,7 @@ class Panel:
         self, ax: plt.Axes, axes_types=("xaxis", "yaxis"), spines=True
     ) -> None:
         furniture = self.settings.get("furniture")
-        if furniture is None:
+        if furniture is None or self.bare:
             return
         if spines:
             ax.axis("on")
@@ -3570,14 +3895,15 @@ class Panel:
         s = self.settings
         layers = self.layers
         polar = self.projection == "polar"
+        bare = self.bare
 
         # scales (a layer may remap them, e.g. horizontal box plots)
-        if layers and (s.get("scalex") or s.get("scaley")):
+        if layers and not bare and (s.get("scalex") or s.get("scaley")):
             layers[0].apply_scales(ax, s.get("scalex"), s.get("scaley"))
 
         # grid; the marks sit above it whatever z-order the panel gave them
         # (overlay defaults start at 1, below matplotlib's 2.5 gridlines)
-        if s.get("show_grid"):
+        if s.get("show_grid") and not bare:
             ax.grid(axis=s["show_grid"], **s.get("grid_style", {}))
             ax.set_axisbelow(True)
         if polar:
@@ -3622,8 +3948,9 @@ class Panel:
                     ax.set_xticklabels(cat_labels)
 
         # user-provided tick positions
-        for layer in layers:
-            configure_axis_ticks_position(ax, layer.chart)
+        if not bare:
+            for layer in layers:
+                configure_axis_ticks_position(ax, layer.chart)
 
         # value-label headroom: expand the value axis so bar labels stay
         # inside; diverging bars get padding on both ends
@@ -3663,9 +3990,10 @@ class Panel:
         ):
             (ax.set_xlim if horizontal else ax.set_ylim)(0, None)
 
-        # axis limits
+        # axis limits; a bare layer fixed its own
         limits = {k: s.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
-        configure_axis_limits(ax, limits)
+        if not bare:
+            configure_axis_limits(ax, limits)
         if ax_right is not None and (
             s.get("ymin_right") is not None or s.get("ymax_right") is not None
         ):

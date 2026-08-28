@@ -330,6 +330,35 @@ def get_stackedarea_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Sankey Style
+# -------------------------------------
+
+
+def get_sankey_style(chart_style: dict) -> dict:
+    """Get the Sankey chart style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The Sankey style setting.
+
+    """
+
+    config_attrs = [
+        ("node_width", "plot_sankey_node_width"),
+        ("node_pad", "plot_sankey_node_pad"),
+        ("edgecolor", "plot_sankey_node_edge_color"),
+        ("linewidth", "plot_sankey_node_edge_width"),
+        ("link_color", "plot_sankey_link_color"),
+        ("link_alpha", "plot_sankey_link_alpha"),
+        ("halo_width", "plot_sankey_label_halo_width"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+# -------------------------------------
 # Grid Style
 # -------------------------------------
 

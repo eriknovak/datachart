@@ -92,6 +92,14 @@ BASE_THEME: StyleAttrs = {
     # plot stackedarea style; the fill reuses the area keys (ADR 0025)
     "plot_stackedarea_alpha": 0.8,
     "plot_stackedarea_outline": False,
+    # plot sankey style; the node stroke mirrors plot_bar_edge_* (ADR 0026)
+    "plot_sankey_node_width": 0.04,
+    "plot_sankey_node_pad": 0.10,
+    "plot_sankey_node_edge_color": "#FFFFFF",
+    "plot_sankey_node_edge_width": 0.6,
+    "plot_sankey_link_color": "source",
+    "plot_sankey_link_alpha": 0.4,
+    "plot_sankey_label_halo_width": 2,
     # plot grid style
     "plot_grid_alpha": 0.5,
     "plot_grid_color": "#EAEAEA",

@@ -35,6 +35,7 @@ from datachart.charts import (
     ContourChart,
     HexbinChart,
     StackedAreaChart,
+    SankeyChart,
 )
 from datachart.utils import Panel, Grid, Annotate
 from datachart.config import config
@@ -46,6 +47,7 @@ from datachart.constants import (
     BASELINE,
     NORMALIZE,
     THEME,
+    VALUE_FORMAT,
 )
 from datachart.utils.stats import kde1d, kde2d
 
@@ -139,6 +141,13 @@ EXPECTED_CHANGES = {
     "stackedarea_subplots",
     "stackedarea_panel_line",
     "stackedarea_grid",
+    # new sankey cases (ADR 0026)
+    "sankey_default",
+    "sankey_explicit_nodes",
+    "sankey_link_target",
+    "sankey_subplots",
+    "sankey_grid",
+    "sankey_values_labels",
     # line-only panels hug the data range like line charts (ADR 0025)
     "overlay_line_line",
     "overlay_theme_snapshot",
@@ -1375,6 +1384,91 @@ def stackedarea_grid():
     )
     right = LineChart(data=LINE1, title="line")
     return Grid([[top], [left, right]], figsize=(10, 7))
+
+
+SANKEY_LABELS = [
+    ("pos (A)", "pos (B)", 40),
+    ("pos (A)", "neu (B)", 8),
+    ("pos (A)", "neg (B)", 2),
+    ("neu (A)", "neu (B)", 25),
+    ("neu (A)", "pos (B)", 6),
+    ("neu (A)", "neg (B)", 5),
+    ("neg (A)", "neg (B)", 30),
+    ("neg (A)", "neu (B)", 4),
+    ("pos (B)", "pos", 44),
+    ("pos (B)", "neu", 2),
+    ("neu (B)", "neu", 33),
+    ("neu (B)", "pos", 2),
+    ("neu (B)", "neg", 2),
+    ("neg (B)", "neg", 35),
+    ("neg (B)", "neu", 2),
+]
+SANKEY_FUNNEL = [
+    ("Visited", "Signed up", 300),
+    ("Visited", "Bounced", 700),
+    ("Signed up", "Activated", 180),
+    ("Signed up", "Churned", 120),
+    ("Activated", "Paid", 90),
+    ("Activated", "Free tier", 90),
+]
+
+
+def sankey_links(rows):
+    return {"links": [{"source": s, "target": t, "value": v} for s, t, v in rows]}
+
+
+@case
+def sankey_default():
+    return SankeyChart(sankey_links(SANKEY_LABELS), title="Label transitions")
+
+
+@case
+def sankey_explicit_nodes():
+    return SankeyChart(
+        sankey_links(SANKEY_FUNNEL),
+        nodes=[
+            ["Visited"],
+            ["Bounced", "Signed up"],
+            ["Churned", "Activated"],
+            ["Free tier", "Paid"],
+        ],
+    )
+
+
+@case
+def sankey_link_target():
+    return SankeyChart(
+        sankey_links(SANKEY_FUNNEL),
+        style={"plot_sankey_link_color": "target", "plot_sankey_link_alpha": 0.6},
+    )
+
+
+@case
+def sankey_subplots():
+    return SankeyChart(
+        [sankey_links(SANKEY_LABELS), sankey_links(SANKEY_FUNNEL)],
+        subtitle=["labels", "funnel"],
+        subplots=True,
+        figsize=(12, 4),
+    )
+
+
+@case
+def sankey_values_labels():
+    return SankeyChart(
+        sankey_links(SANKEY_FUNNEL),
+        column_labels=["Visit", "Signup", "Activation", "Plan"],
+        show_values=True,
+        value_format=VALUE_FORMAT.INTEGER,
+        title="Signup funnel",
+    )
+
+
+@case
+def sankey_grid():
+    left = SankeyChart(sankey_links(SANKEY_FUNNEL), title="funnel")
+    right = LineChart(data=LINE1, title="line")
+    return Grid([[left, right]], figsize=(10, 4))
 
 
 @case

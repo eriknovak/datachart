@@ -61,4 +61,8 @@ CHART_CONFIGS = {
         "multiplot": True,
         "subplots": False,
     },
+    "sankeychart": {
+        "multiplot": False,
+        "subplots": True,
+    },
 }
