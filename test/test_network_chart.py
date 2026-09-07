@@ -25,6 +25,7 @@ from datachart.utils._internal.layers import (
     NetworkLayer,
 )
 from datachart.utils._internal.validate import (
+    infer_network_nodes,
     validate_network_edge_style,
     validate_network_records,
 )
@@ -179,8 +180,14 @@ class TestArrowStyleStraight(unittest.TestCase):
 
 class TestValidation(unittest.TestCase):
     def test_nodes_are_inferred_from_edges(self):
-        nodes = validate_network_records(None, EDGES, NETWORK_LAYOUT.SPRING)
+        nodes = infer_network_nodes(EDGES)
         self.assertEqual([n["id"] for n in nodes], ["A", "B", "C", "D"])
+        validate_network_records(nodes, EDGES, NETWORK_LAYOUT.SPRING)
+
+    def test_front_leaves_the_data_untouched(self):
+        data = {"edges": [edge("A", "B")]}
+        NetworkChart(data)
+        self.assertEqual(data, {"edges": [edge("A", "B")]})
 
     def test_duplicate_ids_raise(self):
         with self.assertRaisesRegex(ValueError, "unique"):
@@ -214,11 +221,11 @@ class TestValidation(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "`id`"):
             validate_network_records([{"label": "A"}], [], "spring")
         with self.assertRaisesRegex(ValueError, "`source`"):
-            validate_network_records(None, [{"source": "A"}], "spring")
+            validate_network_records([{"id": "A"}], [{"source": "A"}], "spring")
         with self.assertRaisesRegex(ValueError, "emphasis"):
             validate_network_records([{"id": "A", "emphasis": "bold"}], [], "spring")
         with self.assertRaisesRegex(ValueError, "at least one node"):
-            validate_network_records(None, [], "spring")
+            validate_network_records(infer_network_nodes([]), [], "spring")
 
     def test_fixed_layout_needs_x_and_y(self):
         with self.assertRaisesRegex(ValueError, "`x`"):
@@ -444,7 +451,8 @@ class TestEncoding(unittest.TestCase):
         ).axes[0]
         patch = _edges(ax)["A->B"]
         area = _nodes(ax).get_sizes()[1]
-        self.assertAlmostEqual(patch.shrinkB, np.sqrt(area / np.pi))
+        # a scatter size is the marker's bounding-box diameter squared
+        self.assertAlmostEqual(patch.shrinkB, np.sqrt(area) / 2)
 
     def test_subplots(self):
         figure = NetworkChart([DATA, {"edges": [edge("X", "Y")]}])

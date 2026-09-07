@@ -33,6 +33,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from .colors import create_color_cycle, create_colormap, get_colormap
 from .validate import (
+    infer_network_nodes,
     infer_sankey_columns,
     validate_baseline,
     validate_emphasis,
@@ -639,6 +640,24 @@ class Layer:
 
     def _resolve_style(self) -> None:
         """Collapse config → theme → chart style into concrete style dicts."""
+
+    def _resolve_value_labels(self) -> None:
+        """The label font, `show_values` flag, value formatter, and value font.
+
+        Shared by the bare layers, whose labels are drawn text in the general
+        font and whose values take the bar value style.
+        """
+
+        self.label_style = get_text_style("general")
+        self.show_values = bool(self.settings.get("show_values"))
+        self.value_format = _value_formatter(
+            self.settings.get("value_format") or VALUE_FORMAT.DEFAULT
+        )
+        self.value_style = {
+            "fontsize": config["plot_bar_value_fontsize"],
+            "color": config["plot_bar_value_color"],
+            "family": self.label_style.get("family"),
+        }
 
     def label(self, ctx: DrawContext) -> Optional[str]:
         return ctx.legend_label if ctx.legend_label is not None else self.subtitle
@@ -2971,18 +2990,9 @@ class SankeyLayer(Layer):
         self.link_color = validate_sankey_link_color(
             self.sankey_style.get("link_color")
         )
-        self.label_style = get_text_style("general")
+        self._resolve_value_labels()
         # column headings read as per-column subtitles
         self.column_label_style = get_text_style("subtitle")
-        self.show_values = bool(self.settings.get("show_values"))
-        self.value_format = _value_formatter(
-            self.settings.get("value_format") or VALUE_FORMAT.DEFAULT
-        )
-        self.value_style = {
-            "fontsize": config["plot_bar_value_fontsize"],
-            "color": config["plot_bar_value_color"],
-            "family": self.label_style.get("family"),
-        }
         # one color per node in column-then-row order, keyed by name
         names = [node for column in self.columns for node in column]
         cycle = create_color_cycle(config["color_general_multiple"], len(names))
@@ -3312,17 +3322,9 @@ class TreemapLayer(Layer):
 
     def _resolve_style(self) -> None:
         self.treemap_style = get_treemap_style(self.style)
-        self.label_style = get_text_style("general")
+        self._resolve_value_labels()
         # a group's header band reads as its subtitle
         self.band_style = get_text_style("subtitle")
-        self.show_values = bool(self.settings.get("show_values"))
-        self.value_format = _value_formatter(
-            self.settings.get("value_format") or VALUE_FORMAT.DEFAULT
-        )
-        self.value_style = {
-            "fontsize": config["plot_bar_value_fontsize"],
-            "color": config["plot_bar_value_color"],
-        }
         self.highlight_color = config["font_general_color"]
         # top-level records largest first; one palette color each, by label
         self.groups = sorted(self.records, key=_record_total, reverse=True)
@@ -3580,6 +3582,8 @@ def spring_layout(n: int, pairs: list, seed: int) -> np.ndarray:
 def circular_layout(n: int) -> np.ndarray:
     """`n` nodes evenly spaced on a circle, the first at the top, clockwise."""
 
+    if n < 2:
+        return np.full((n, 2), 0.5)
     angles = np.pi / 2 - np.linspace(0, 2 * np.pi, n, endpoint=False)
     radius = 0.5 - NETWORK_LAYOUT_MARGIN
     return 0.5 + radius * np.column_stack([np.cos(angles), np.sin(angles)])
@@ -3613,8 +3617,9 @@ class NetworkLayer(Layer):
 
     def __init__(self, chart: dict, settings: dict):
         data = chart["data"]
-        self.nodes = data["nodes"]
         self.edges = data["edges"]
+        nodes = data.get("nodes")
+        self.nodes = infer_network_nodes(self.edges) if nodes is None else nodes
         self.directed = bool(settings.get("directed"))
         self.layout = settings.get("layout") or NETWORK_LAYOUT.DEFAULT
         self.seed = 0 if settings.get("seed") is None else settings["seed"]
@@ -3624,16 +3629,7 @@ class NetworkLayer(Layer):
         style = get_network_style(self.style)
         self.network_style = style
         self.edge_style = validate_network_edge_style(style.get("edge_style"))
-        self.label_style = get_text_style("general")
-        self.show_values = bool(self.settings.get("show_values"))
-        self.value_format = _value_formatter(
-            self.settings.get("value_format") or VALUE_FORMAT.DEFAULT
-        )
-        self.value_style = {
-            "fontsize": config["plot_bar_value_fontsize"],
-            "color": config["plot_bar_value_color"],
-            "family": self.label_style.get("family"),
-        }
+        self._resolve_value_labels()
         self.highlight_color = config["font_general_color"]
 
         ids = [node["id"] for node in self.nodes]
@@ -3686,7 +3682,9 @@ class NetworkLayer(Layer):
             base = create_color_cycle(config["color_general_singular"], 1)[0]["color"]
             self.group_colors = {}
         self.node_colors = [self.group_colors.get(g, base) for g in groups]
-        self.roles = [node.get("emphasis") for node in self.nodes]
+        roles = [node.get("emphasis") for node in self.nodes]
+        self.muted = [role == EMPHASIS_BACKGROUND for role in roles]
+        self.highlighted = [role == EMPHASIS_HIGHLIGHT for role in roles]
 
     def _layout(self) -> np.ndarray:
         if self.layout == NETWORK_LAYOUT.FIXED:
@@ -3705,6 +3703,7 @@ class NetworkLayer(Layer):
                 marker=self.network_style["node_marker"],
                 linestyle="",
                 color=self.group_colors[g],
+                # half the default marker's diameter: a legend swatch, not a node
                 markersize=math.sqrt(self.network_style["node_size"]) / 2,
                 label=g,
             )
@@ -3719,17 +3718,18 @@ class NetworkLayer(Layer):
         ax.set_aspect("equal", adjustable="box")
         ax.axis("off")
         effects = _halo_effects(style.get("halo_width"))
-        muted = [role == EMPHASIS_BACKGROUND for role in self.roles]
-        radii = np.sqrt(self.areas / np.pi)
+        muted, highlighted = self.muted, self.highlighted
+        # scatter sizes are the marker's bounding-box diameter squared
+        radii = np.sqrt(self.areas) / 2
         curve = (
             0.0 if self.edge_style == ARROW_STYLE.STRAIGHT else style["edge_curve"]
         ) or 0.0
         connection = f"arc3,rad={curve}"
 
         for record, (i, j), width in zip(self.drawn_edges, self.pairs, self.widths):
-            dim = muted[i] or muted[j]
-            color = self.muted_color if dim else style["edge_color"]
-            alpha = self.muted_alpha if dim else style["edge_alpha"]
+            edge_muted = muted[i] or muted[j]
+            color = self.muted_color if edge_muted else style["edge_color"]
+            alpha = self.muted_alpha if edge_muted else style["edge_alpha"]
             gid = f"edge:{record['source']}->{record['target']}"
             if self.directed:
                 # one filled polygon: the shaft and the head share an outline,
@@ -3782,7 +3782,11 @@ class NetworkLayer(Layer):
                     gid=f"value:{record['source']}->{record['target']}",
                     **{
                         **self.value_style,
-                        "color": self.muted_color if dim else self.value_style["color"],
+                        "color": (
+                            self.muted_color
+                            if edge_muted
+                            else self.value_style["color"]
+                        ),
                     },
                 )
 
@@ -3794,7 +3798,6 @@ class NetworkLayer(Layer):
             self.muted_alpha if muted[k] else style["node_alpha"]
             for k in range(len(self.nodes))
         ]
-        highlight = [role == EMPHASIS_HIGHLIGHT for role in self.roles]
         ax.scatter(
             pos[:, 0],
             pos[:, 1],
@@ -3803,11 +3806,11 @@ class NetworkLayer(Layer):
             alpha=alpha,
             marker=style["node_marker"],
             edgecolors=[
-                self.highlight_color if h else style["edgecolor"] for h in highlight
+                self.highlight_color if h else style["edgecolor"] for h in highlighted
             ],
             linewidths=[
                 style["highlight_linewidth"] if h else style["linewidth"]
-                for h in highlight
+                for h in highlighted
             ],
             zorder=3,
             gid="nodes",

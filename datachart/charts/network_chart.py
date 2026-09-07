@@ -4,7 +4,10 @@ import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
-from ..utils._internal.validate import validate_network_records
+from ..utils._internal.validate import (
+    infer_network_nodes,
+    validate_network_records,
+)
 from ..typings import NetworkSingleChartAttrs, NetworkStyleAttrs, TextAttrs
 from ..constants import FIG_SIZE, NETWORK_LAYOUT, VALUE_FORMAT
 
@@ -125,9 +128,10 @@ def NetworkChart(
         )
     resolved_layout = NETWORK_LAYOUT.DEFAULT if layout is None else layout
     for dataset in datasets:
-        dataset["nodes"] = validate_network_records(
-            dataset.get("nodes"), dataset["edges"], resolved_layout
-        )
+        nodes = dataset.get("nodes")
+        if nodes is None:
+            nodes = infer_network_nodes(dataset["edges"])
+        validate_network_records(nodes, dataset["edges"], resolved_layout)
 
     charts = build_charts_structure(
         data,

@@ -110,8 +110,8 @@ def validate_sankey_link_color(value):
     return value
 
 
-def sankey_node_order(links) -> list:
-    """The node names in first-seen input order."""
+def first_seen_nodes(links) -> list:
+    """The node names of source/target records in first-seen input order."""
 
     nodes = []
     for record in links:
@@ -133,7 +133,7 @@ def infer_sankey_columns(links) -> list:
     for record in links:
         successors[record["source"]].append(record["target"])
         predecessors[record["target"]].append(record["source"])
-    nodes = sankey_node_order(links)
+    nodes = first_seen_nodes(links)
 
     depth = {}
 
@@ -169,7 +169,7 @@ def validate_sankey_nodes(nodes, links) -> None:
     named = [node for column in nodes for node in column]
     if len(named) != len(set(named)):
         raise ValueError("`nodes` names a node more than once.")
-    linked = set(sankey_node_order(links))
+    linked = set(first_seen_nodes(links))
     missing = linked - set(named)
     extra = set(named) - linked
     if missing or extra:
@@ -249,15 +249,21 @@ NETWORK_LAYOUTS = (NETWORK_LAYOUT.SPRING, NETWORK_LAYOUT.CIRCULAR, NETWORK_LAYOU
 NETWORK_EDGE_STYLES = (ARROW_STYLE.CURVE, ARROW_STYLE.STRAIGHT)
 
 
-def validate_network_records(nodes, edges, layout) -> list:
-    """Validate a network's nodes, edges, and layout; return the node records.
+def infer_network_nodes(edges) -> list:
+    """Node records for the edges' endpoints in first-seen order (ADR 0029)."""
+
+    return [{"id": node_id} for node_id in first_seen_nodes(edges)]
+
+
+def validate_network_records(nodes, edges, layout) -> None:
+    """Raise unless the network's nodes, edges, and layout are well formed.
 
     A node is a dict with a unique `id`; `size`, when given, is above zero,
     `emphasis` takes the emphasis roles, and under `NETWORK_LAYOUT.FIXED`
     every node carries `x` and `y`. An edge is a dict with a `source` and a
     `target` naming known nodes, never the same one, and a `weight` above
-    zero when given. Without `nodes`, the node set is the edges' endpoints
-    in first-seen order (ADR 0029).
+    zero when given. `nodes` is the explicit list or the inferred one; it is
+    never `None` here (ADR 0029).
     """
 
     if layout not in NETWORK_LAYOUTS:
@@ -282,12 +288,6 @@ def validate_network_records(nodes, edges, layout) -> list:
                 "self-loops are not drawn."
             )
 
-    if nodes is None:
-        seen = {}
-        for record in edges:
-            seen.setdefault(record["source"], None)
-            seen.setdefault(record["target"], None)
-        nodes = [{"id": node_id} for node_id in seen]
     if not isinstance(nodes, list):
         raise ValueError("A network chart's `nodes` must be a list of records.")
     if not nodes:
@@ -323,7 +323,6 @@ def validate_network_records(nodes, edges, layout) -> list:
                     f"Network edge {i} names an unknown node {record[key]!r} "
                     f"as its `{key}`."
                 )
-    return nodes
 
 
 def validate_network_edge_style(value):
