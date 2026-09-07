@@ -33,6 +33,10 @@ dependencies = [
     "pypalettes>=0.1",
 ]
 
+# zoom, pan, and hover via `figure.show(interactive=True)`
+[project.optional-dependencies]
+interactive = ["ipympl", "mplcursors"]
+
 [project.urls]
 Homepage = "https://eriknovak.github.io/datachart"
 Documentation = "https://eriknovak.github.io/datachart"
@@ -42,7 +46,7 @@ Changelog = "https://github.com/eriknovak/datachart/blob/main/CHANGELOG.md"
 
 # PEP 735 groups: contributor tooling, never shipped to users.
 [dependency-groups]
-test = ["coverage", "nbmake", "pytest"]
+test = ["coverage", "nbmake", "pytest", "datachart[interactive]"]
 docs = [
     "mike",
     "mkdocs-material",
