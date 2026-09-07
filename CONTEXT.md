@@ -216,7 +216,9 @@ target, weight?}`; nodes may be inferred from edges). `layout` takes a
 `CIRCULAR`; `FIXED` from per-node `x`/`y`); `directed` adds arrowheads.
 Weight maps to edge width only, size by square root to marker area, `group`
 to the multiple color cycle. One layer per chart, no furniture; rejected in
-`Panel`, a cell in `Grid`.
+`Panel`, a cell in `Grid`. Scale: one patch per edge and an O(n²) spring
+layout — comfortable up to ~1k nodes / 3k edges (spring) or ~5k / 15k
+(circular, fixed); documented as the practical ceiling, not enforced.
 _Avoid_: graph (a synonym for chart), node-link diagram, force graph
 
 **Connector style**:

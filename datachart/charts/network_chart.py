@@ -49,6 +49,16 @@ def NetworkChart(
     it when the question is what is connected to what; for weighted flows
     through ordered stages use [`SankeyChart`][datachart.charts.SankeyChart].
 
+    Every edge is its own patch and the spring layout weighs every pair of
+    nodes, so the chart is meant for networks that can be read, not for
+    whole graphs. Without a problem: up to about 1,000 nodes and 3,000
+    edges under the spring layout (a few seconds), up to about 5,000 nodes
+    and 15,000 edges under the circular or fixed layout (under a minute).
+    Beyond that the spring layout grows with the square of the node count —
+    2,000 nodes take half a minute, 5,000 several minutes and gigabytes of
+    memory — and every layout pays a few milliseconds per edge to draw and
+    again to save. Aggregate or filter a larger graph first.
+
     !!! info "Added in v0.9.1"
 
     Examples:
@@ -78,7 +88,9 @@ def NetworkChart(
             from the edges in first-seen order.
         layout: How the nodes are placed: a `NETWORK_LAYOUT` constant
             (default `NETWORK_LAYOUT.SPRING`). `FIXED` reads each node's
-            `x`/`y` in the 0–1 layout space.
+            `x`/`y` in the 0–1 layout space. `SPRING` costs the square of
+            the node count; past about 1,000 nodes prefer `CIRCULAR` or
+            `FIXED`.
         directed: Whether the edges end in an arrowhead at the target. When
             `False` (the default), an edge and its reverse draw as one line.
         seed: The seed of the spring layout (default 0); another seed gives
