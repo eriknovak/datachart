@@ -66,6 +66,14 @@ class TestSketchTheme(unittest.TestCase):
         self.assertEqual(patch.get_sketch_params(), (1, 100, 2))
         self.assertEqual(len(patch.get_path_effects()), 1)
 
+    def test_area_floor_fill_skips_sketch(self):
+        """The floor fill's off-screen edge stays unsketched; the line wobbles."""
+        config.set_theme(THEME.SKETCH)
+        figure = LineChart(LINE, show_area=True)
+        fill = figure.axes[0].collections[0]
+        self.assertIsNone(fill.get_sketch_params())
+        self.assertEqual(data_lines(figure)[0].get_sketch_params(), (1, 100, 2))
+
     def test_no_rc_leakage(self):
         before = {
             key: copy.deepcopy(matplotlib.rcParams[key])

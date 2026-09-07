@@ -731,8 +731,11 @@ class LineLayer(Layer):
             return
         floor = values.min() - AREA_FLOOR_FACTOR * max(np.abs(values).max(), 1.0)
         data_lim = ax.dataLim.frozen()
-        fill(x, y, floor, step=step, **area_style)
+        collection = fill(x, y, floor, step=step, **area_style)
         ax.dataLim.set(data_lim)
+        # the sketch filter would split the off-screen floor edge into millions
+        # of wobble segments; the top edge sits under the line and its halo
+        collection.set_sketch_params()
 
 
 class StackedAreaLayer(Layer):
