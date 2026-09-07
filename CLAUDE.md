@@ -42,6 +42,11 @@ The site is versioned with `mike` and deployed by CI: every push to `main`
 publishes `dev`, every GitHub release publishes `X.Y.Z` and moves the `latest`
 alias (the site default). Never run `mkdocs gh-deploy` by hand.
 
+The docs notebooks execute at build time (`mkdocs-jupyter` with
+`execute: true`), so the site always reflects the current library. Runs are
+cached by notebook content in `.cache/mkdocs-jupyter`; after changing
+`datachart`, delete that directory so `mkdocs serve` re-renders the outputs.
+
 Public fronts, config methods, stats functions, and theme constants carry an
 `!!! info "Added in vX.Y"` admonition in their docstring (charts: after the
 what/when paragraph, before `Examples:`). A new public front gets

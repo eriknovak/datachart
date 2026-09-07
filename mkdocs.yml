@@ -72,6 +72,13 @@ plugins:
   - search:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   - mkdocs-jupyter:
+      # notebooks run at build time, so the site never shows committed outputs
+      # that predate a library change; runs are cached by notebook content
+      # under .cache/mkdocs-jupyter — clear it after changing datachart
+      execute: true
+      allow_errors: false
+      # notebooks only: the docs asset scripts are not pages
+      include: ["*.ipynb"]
       # cells tagged `remove_input` still execute; only their source is hidden
       remove_tag_config:
         remove_input_tags:
