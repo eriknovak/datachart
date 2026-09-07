@@ -244,7 +244,13 @@ def _validate_treemap_record(record, name: str, nested: bool) -> None:
             )
 
 
-NETWORK_LAYOUTS = (NETWORK_LAYOUT.SPRING, NETWORK_LAYOUT.CIRCULAR, NETWORK_LAYOUT.FIXED)
+NETWORK_LAYOUTS = (
+    NETWORK_LAYOUT.SPRING,
+    NETWORK_LAYOUT.WEIGHTED,
+    NETWORK_LAYOUT.GROUPED,
+    NETWORK_LAYOUT.CIRCULAR,
+    NETWORK_LAYOUT.FIXED,
+)
 # the headless connector looks; directedness owns the arrowhead (ADR 0029)
 NETWORK_EDGE_STYLES = (ARROW_STYLE.CURVE, ARROW_STYLE.STRAIGHT)
 

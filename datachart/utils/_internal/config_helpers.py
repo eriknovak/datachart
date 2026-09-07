@@ -422,6 +422,7 @@ def get_network_style(chart_style: dict) -> dict:
         ("edge_width_max", "plot_network_edge_width_max"),
         ("highlight_linewidth", "plot_network_highlight_edge_width"),
         ("halo_width", "plot_network_label_halo_width"),
+        ("group_alpha", "plot_network_group_alpha"),
     ]
 
     return create_config_dict(chart_style, config_attrs)

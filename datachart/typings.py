@@ -399,6 +399,7 @@ class NetworkStyleAttrs(TypedDict):
         plot_network_edge_width_max (Union[int, float, None]): The width of the heaviest edge.
         plot_network_highlight_edge_width (Union[float, None]): The stroke width of a highlighted node.
         plot_network_label_halo_width (Union[float, None]): The width of the white halo behind labels; 0 disables it.
+        plot_network_group_alpha (Union[float, None]): The alpha of the disc in the group color behind each cluster of the grouped layout; 0 disables it.
 
     """
 
@@ -418,6 +419,7 @@ class NetworkStyleAttrs(TypedDict):
     plot_network_edge_width_max: Union[int, float, None]
     plot_network_highlight_edge_width: Union[float, None]
     plot_network_label_halo_width: Union[float, None]
+    plot_network_group_alpha: Union[float, None]
 
 
 class BarStyleAttrs(TypedDict):
@@ -1317,7 +1319,7 @@ class NetworkEdgeAttrs(TypedDict):
     Attributes:
         source (str): The id of the node the edge leaves.
         target (str): The id of the node the edge enters.
-        weight (Union[int, float, None]): The edge weight, mapped to its width; must be greater than 0.
+        weight (Union[int, float, None]): The edge weight, mapped to its width and, under the weighted layouts, its pull; must be greater than 0.
 
     """
 
@@ -1352,7 +1354,7 @@ class _NetworkChartAttrs(ChartCommonAttrs):
         charts (Union[NetworkSingleChartAttrs, List[NetworkSingleChartAttrs]]): The chart definitions.
         layout (Union[NETWORK_LAYOUT, str, None]): The node placement rule.
         directed (Union[bool, None]): Whether the edges end in arrowheads.
-        seed (Union[int, None]): The seed of the spring layout.
+        seed (Union[int, None]): The seed of the spring layouts.
         show_values (Union[bool, None]): Whether to write each edge's weight at its midpoint.
         value_format (Union[VALUE_FORMAT, str, None]): The format of the edge values.
         show_legend (Union[bool, None]): Whether to list the node groups in a legend.

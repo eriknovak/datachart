@@ -875,6 +875,16 @@ class NETWORK_LAYOUT:
         >>> NETWORK_LAYOUT.DEFAULT
         "spring"
 
+    Under `WEIGHTED`, and between the groups of `GROUPED`, an edge of weight
+    $w$ pulls its nodes together at $s(w)$ times the `SPRING` pull:
+
+    $$s(w) = 0.1 + 2.9\\,\\frac{w - w_{\\min}}{w_{\\max} - w_{\\min}}$$
+
+    The lightest edge pulls at a tenth, the heaviest at three times, the rest
+    linearly between; an edge without a weight pulls as the lightest. With no
+    weights, or all equal, every edge pulls at one and the picture is the
+    `SPRING` picture.
+
     Attributes:
         DEFAULT (str): The default layout. Same as `NETWORK_LAYOUT.SPRING`.
         SPRING (str): A force-directed (Fruchterman–Reingold) layout: linked
@@ -882,6 +892,18 @@ class NETWORK_LAYOUT:
             `seed` argument, so the same data renders the same picture. Costs
             the square of the node count: fine up to about 1,000 nodes, slow
             and memory-hungry past that. Equals to `"spring"`.
+        WEIGHTED (str): The spring layout with each edge's pull set by its
+            weight, as above: heavy edges draw their nodes close, light ones
+            let them drift. Same cost as `SPRING`. Equals to `"weighted"`.
+        GROUPED (str): The nodes clustered by their `group`, a node without
+            one being a group of its own. Each group is laid out by the
+            spring on its own edges; the groups are then laid out as a
+            smaller network by the weighted spring, an edge between two
+            groups weighing the sum of the edges joining them, so strongly
+            linked clusters sit close. A translucent disc in the group color
+            marks each cluster (`plot_network_group_alpha`; 0 disables it).
+            Costs about what `SPRING` costs at worst, far less when the
+            groups are many. Equals to `"grouped"`.
         CIRCULAR (str): The nodes evenly spaced on a circle in input order,
             starting at the top. Equals to `"circular"`.
         FIXED (str): Each node at its own `x`/`y`, in the 0–1 layout space;
@@ -891,6 +913,8 @@ class NETWORK_LAYOUT:
 
     DEFAULT = "spring"
     SPRING = "spring"
+    WEIGHTED = "weighted"
+    GROUPED = "grouped"
     CIRCULAR = "circular"
     FIXED = "fixed"
 

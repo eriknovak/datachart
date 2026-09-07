@@ -82,18 +82,23 @@ def NetworkChart(
             `{"source", "target"}` record naming node ids, with an optional
             `weight` above zero. A node is an `{"id"}` record with an optional
             `label` (defaults to the id; an empty string draws nothing),
-            `size` above zero, `group`, and `emphasis` role: `"background"`
+            `size` above zero, `group` (a node without one draws in the edge
+            color beside grouped nodes), and `emphasis` role: `"background"`
             mutes the node, its label, and its edges, `"highlight"` strokes
             its border. `nodes` may be omitted; the node set is then read
             from the edges in first-seen order.
         layout: How the nodes are placed: a `NETWORK_LAYOUT` constant
-            (default `NETWORK_LAYOUT.SPRING`). `FIXED` reads each node's
-            `x`/`y` in the 0–1 layout space. `SPRING` costs the square of
-            the node count; past about 1,000 nodes prefer `CIRCULAR` or
-            `FIXED`.
+            (default `NETWORK_LAYOUT.SPRING`). `WEIGHTED` lets each edge's
+            weight set how hard it pulls its nodes together; `GROUPED`
+            clusters the nodes by `group`, arranges the clusters by the
+            summed weight of the edges between them, and marks each with a
+            disc in the group color (`plot_network_group_alpha`). `FIXED` reads each
+            node's `x`/`y` in the 0–1 layout space. The three spring
+            layouts cost the square of the node count; past about 1,000
+            nodes prefer `CIRCULAR` or `FIXED`.
         directed: Whether the edges end in an arrowhead at the target. When
             `False` (the default), an edge and its reverse draw as one line.
-        seed: The seed of the spring layout (default 0); another seed gives
+        seed: The seed of the spring layouts (default 0); another seed gives
             another arrangement of the same data.
         show_values: Whether to write each edge's weight at its midpoint.
         value_format: The format of the edge values: a `VALUE_FORMAT`

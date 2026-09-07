@@ -8,7 +8,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import to_rgb
-from matplotlib.patches import ArrowStyle, FancyArrowPatch
+from matplotlib.patches import ArrowStyle, Circle, FancyArrowPatch
 
 from datachart.charts import NetworkChart, LineChart
 from datachart.config import config
@@ -21,8 +21,12 @@ from datachart.utils._internal.config_helpers import (
 )
 from datachart.utils._internal.layers import (
     circular_layout,
+    edge_strengths,
+    grouped_layout,
     spring_layout,
     NetworkLayer,
+    NETWORK_PULL_MIN,
+    NETWORK_PULL_MAX,
 )
 from datachart.utils._internal.validate import (
     infer_network_nodes,
@@ -57,6 +61,7 @@ NETWORK_KEYS = (
     "plot_network_edge_width_max",
     "plot_network_highlight_edge_width",
     "plot_network_label_halo_width",
+    "plot_network_group_alpha",
 )
 
 
@@ -232,6 +237,10 @@ class TestValidation(unittest.TestCase):
             validate_network_records([{"id": "A", "x": 0.5}], [], NETWORK_LAYOUT.FIXED)
         validate_network_records([{"id": "A", "x": 0.5, "y": 0.5}], [], "fixed")
 
+    def test_every_layout_member_validates(self):
+        for layout in ("spring", "weighted", "grouped", "circular"):
+            validate_network_records([{"id": "A"}], [], layout)
+
     def test_unknown_layout_raises(self):
         with self.assertRaisesRegex(ValueError, "layout"):
             validate_network_records(NODES, EDGES, "shell")
@@ -289,6 +298,110 @@ class TestLayouts(unittest.TestCase):
             NetworkChart(
                 {"nodes": [{"id": "A", "x": 0.1}], "edges": []}, layout="fixed"
             )
+
+    def test_edge_strengths_map_min_max_onto_the_pull_range(self):
+        # the lightest pulls at the minimum, the heaviest at the maximum,
+        # a missing weight as the lightest
+        strengths = edge_strengths([1, 5, None, 3])
+        self.assertAlmostEqual(strengths[0], NETWORK_PULL_MIN)
+        self.assertAlmostEqual(strengths[1], NETWORK_PULL_MAX)
+        self.assertAlmostEqual(strengths[2], NETWORK_PULL_MIN)
+        self.assertAlmostEqual(strengths[3], (NETWORK_PULL_MIN + NETWORK_PULL_MAX) / 2)
+        # no weights, or all equal: every edge pulls at one
+        self.assertEqual(edge_strengths([None, None]), [1.0, 1.0])
+        self.assertEqual(edge_strengths([2, 2, None]), [1.0, 1.0, 1.0])
+
+    def test_weighted_without_weights_is_the_spring_picture(self):
+        plain = _positions(NetworkChart(DATA))
+        weighted = _positions(NetworkChart(DATA, layout=NETWORK_LAYOUT.WEIGHTED))
+        np.testing.assert_array_equal(plain, weighted)
+
+    def test_weighted_pulls_the_heavy_edge_short(self):
+        # a path A-B-C-D: the heavy edge ends up the shortest
+        edges = [edge("A", "B", 1), edge("B", "C", 9), edge("C", "D", 1)]
+        pos = _positions(NetworkChart({"edges": edges}, layout="weighted"))
+        lengths = np.linalg.norm(np.diff(pos, axis=0), axis=1)
+        self.assertEqual(lengths.argmin(), 1)
+        plain = _positions(NetworkChart({"edges": edges}))
+        self.assertFalse(np.allclose(plain, pos))
+
+    def test_grouped_keeps_clusters_apart(self):
+        groups = ["x", "x", "x", "y", "y", None]
+        pairs = [(0, 1), (1, 2), (3, 4), (2, 3), (4, 5)]
+        pos, clusters = grouped_layout(groups, pairs, [None] * 5, seed=0)
+        self.assertTrue((pos >= 0).all() and (pos <= 1).all())
+        x, y, lone = pos[:3], pos[3:5], pos[5]
+        # every node sits closer to its own cluster's centre than to the other's
+        for point in x:
+            self.assertLess(
+                np.linalg.norm(point - x.mean(axis=0)),
+                np.linalg.norm(point - y.mean(axis=0)),
+            )
+        for point in y:
+            self.assertLess(
+                np.linalg.norm(point - y.mean(axis=0)),
+                np.linalg.norm(point - x.mean(axis=0)),
+            )
+        # the ungrouped node is a cluster of its own, apart from both
+        self.assertGreater(np.linalg.norm(pos[:5] - lone, axis=1).min(), 0.05)
+
+    def test_grouped_without_groups_is_one_cluster_per_node(self):
+        # every node a group of one: the group level places them all
+        pos, clusters = grouped_layout(
+            [None] * 4, [(0, 1), (1, 2), (2, 3)], [None] * 3, 0
+        )
+        self.assertEqual(clusters, [])
+        self.assertEqual(len({tuple(p) for p in pos.round(6)}), 4)
+        self.assertTrue((pos >= 0).all() and (pos <= 1).all())
+
+    def test_grouped_weighs_the_summed_links_between_groups(self):
+        # x-y: three edges summing to 6 (a missing weight counts one);
+        # x-z: one edge of 4. x sits nearer y.
+        nodes = [{"id": n, "group": n[0]} for n in ("x1", "x2", "y1", "y2", "z1", "z2")]
+        edges = [
+            edge("x1", "x2"),
+            edge("y1", "y2"),
+            edge("z1", "z2"),
+            edge("x1", "y1", 2),
+            edge("x2", "y2", 3),
+            edge("x1", "y2"),
+            edge("x2", "z1", 4),
+        ]
+        pos = _positions(
+            NetworkChart(
+                {"nodes": nodes, "edges": edges}, layout=NETWORK_LAYOUT.GROUPED
+            )
+        )
+        x, y, z = pos[:2].mean(axis=0), pos[2:4].mean(axis=0), pos[4:].mean(axis=0)
+        self.assertLess(np.linalg.norm(x - y), np.linalg.norm(x - z))
+
+    def test_grouped_holds_a_member_with_no_edge_inside_its_group(self):
+        # c has no edge inside group x; gravity keeps it with its cluster,
+        # and the linked pair a-b stays clear of each other
+        groups = ["x", "x", "x", "y", "y", "y"]
+        pairs = [(0, 1), (3, 4), (4, 5), (2, 3)]
+        pos, _ = grouped_layout(groups, pairs, [None] * 4, seed=0)
+        x, y = pos[:3], pos[3:]
+        self.assertLess(
+            np.linalg.norm(pos[2] - x.mean(axis=0)),
+            np.linalg.norm(pos[2] - y.mean(axis=0)),
+        )
+        self.assertGreater(np.linalg.norm(pos[0] - pos[1]), 0.02)
+        # a group with no link to any other still lands inside the space
+        lone, _ = grouped_layout(["x", "x", "y", "y"], [(0, 1), (2, 3)], [None] * 2, 0)
+        self.assertTrue((lone >= 0).all() and (lone <= 1).all())
+        self.assertGreater(np.linalg.norm(lone[:2].mean(0) - lone[2:].mean(0)), 0.2)
+
+    def test_grouped_is_seeded(self):
+        data = {
+            "nodes": [{"id": n, "group": n[0]} for n in ("a1", "a2", "b1", "b2")],
+            "edges": [edge("a1", "a2"), edge("b1", "b2"), edge("a2", "b1")],
+        }
+        same = _positions(NetworkChart(data, layout="grouped"))
+        again = _positions(NetworkChart(data, layout="grouped"))
+        other = _positions(NetworkChart(data, layout="grouped", seed=3))
+        np.testing.assert_array_equal(same, again)
+        self.assertFalse(np.allclose(same, other))
 
     def test_circular_front(self):
         figure = NetworkChart(DATA, layout=NETWORK_LAYOUT.CIRCULAR)
@@ -390,6 +503,40 @@ class TestEncoding(unittest.TestCase):
         colors = {tuple(c) for c in _nodes(ax).get_facecolors()}
         self.assertEqual(len(colors), 1)
         self.assertIsNone(ax.get_legend())
+
+    def test_grouped_draws_a_halo_behind_each_named_cluster(self):
+        nodes = [{"id": "A", "group": "x"}, {"id": "B", "group": "x"}, {"id": "C"}]
+        data = {"nodes": nodes, "edges": [edge("A", "B"), edge("B", "C")]}
+        figure = NetworkChart(data, layout=NETWORK_LAYOUT.GROUPED)
+        halos = [p for p in figure.axes[0].patches if isinstance(p, Circle)]
+        self.assertEqual([p.get_gid() for p in halos], ["group:x"])
+        halo = halos[0]
+        self.assertEqual(halo.get_alpha(), DEFAULT_THEME["plot_network_group_alpha"])
+        self.assertEqual(
+            to_rgb(halo.get_facecolor()),
+            to_rgb(DEFAULT_THEME["color_general_multiple"][0]),
+        )
+        # the disc, marker pad included, stays inside the axes
+        self.assertGreaterEqual(min(halo.center) - halo.radius, 0.0)
+        self.assertLessEqual(max(halo.center) + halo.radius, 1.0)
+        # the cluster's nodes sit inside the disc, the ungrouped node outside
+        pos = _positions(figure)
+        inside = np.linalg.norm(pos - halo.center, axis=1) <= halo.radius
+        self.assertEqual(inside.tolist(), [True, True, False])
+        # zero alpha disables it; the other layouts never draw one
+        for kwargs in (
+            dict(layout="grouped", style={"plot_network_group_alpha": 0}),
+            dict(layout="spring"),
+        ):
+            ax = NetworkChart(data, **kwargs).axes[0]
+            self.assertFalse([p for p in ax.patches if isinstance(p, Circle)])
+
+    def test_ungrouped_node_beside_groups_takes_the_edge_color(self):
+        nodes = [{"id": "A", "group": "x"}, {"id": "B"}]
+        ax = NetworkChart({"nodes": nodes, "edges": [edge("A", "B")]}).axes[0]
+        colors = [to_rgb(c) for c in _nodes(ax).get_facecolors()]
+        self.assertEqual(colors[0], to_rgb(DEFAULT_THEME["color_general_multiple"][0]))
+        self.assertEqual(colors[1], to_rgb(DEFAULT_THEME["plot_network_edge_color"]))
 
     def test_show_values_writes_formatted_weights(self):
         data = {"edges": [edge("A", "B", 2.5), edge("B", "C")]}
