@@ -70,74 +70,38 @@ Every chart type has hover support. Filled marks — bars, bands, boxes, bodies,
 
 The annotation on each chart, from the figure shown with `show(interactive=True)` and a mark hovered:
 
-**Line Chart** — a hovered point
+| **Line Chart** — a hovered point | **Stacked Area Chart** — a hovered band |
+| :-- | :-- |
+| ![A line chart with a hovered point](../../assets/imgs/hover-line.png) | ![A stacked area chart with a hovered band](../../assets/imgs/hover-stackedarea.png) |
 
-![A line chart with a hovered point](../../assets/imgs/hover-line.png)
+| **Bar Chart** — a hovered bar | **Pyramid Chart** — a hovered bar |
+| :-- | :-- |
+| ![A grouped bar chart with a hovered bar](../../assets/imgs/hover-bar.png) | ![A pyramid chart with a hovered bar](../../assets/imgs/hover-pyramid.png) |
 
-**Stacked Area Chart** — a hovered band
+| **Radial Chart** — a hovered bar | **Histogram** — a hovered bin |
+| :-- | :-- |
+| ![A radial bar chart with a hovered bar](../../assets/imgs/hover-radial.png) | ![A histogram with a hovered bin](../../assets/imgs/hover-histogram.png) |
 
-![A stacked area chart with a hovered band](../../assets/imgs/hover-stackedarea.png)
+| **Box Plot** — a hovered box | **Violin Plot** — a hovered body |
+| :-- | :-- |
+| ![A box plot with a hovered box](../../assets/imgs/hover-box.png) | ![A violin plot with a hovered body](../../assets/imgs/hover-violin.png) |
 
-**Bar Chart** — a hovered bar
+| **Swarm Plot** — a hovered point | **Raincloud Plot** — a hovered box |
+| :-- | :-- |
+| ![A swarm plot with a hovered point](../../assets/imgs/hover-swarm.png) | ![A raincloud plot with a hovered box](../../assets/imgs/hover-raincloud.png) |
 
-![A grouped bar chart with a hovered bar](../../assets/imgs/hover-bar.png)
+| **Scatter Chart** — a hovered point | **Heatmap** — a hovered cell |
+| :-- | :-- |
+| ![A scatter chart with a hovered point](../../assets/imgs/hover-scatter.png) | ![A heatmap with a hovered cell](../../assets/imgs/hover-heatmap.png) |
 
-**Pyramid Chart** — a hovered bar
+| **Contour Chart** — a hovered level line | **Hexbin Chart** — a hovered hexagon |
+| :-- | :-- |
+| ![A contour chart with a hovered level line](../../assets/imgs/hover-contour.png) | ![A hexbin chart with a hovered hexagon](../../assets/imgs/hover-hexbin.png) |
 
-![A pyramid chart with a hovered bar](../../assets/imgs/hover-pyramid.png)
+| **Parallel Coordinates** — a hovered row | **Network Chart** — a hovered node |
+| :-- | :-- |
+| ![A parallel coordinates chart with a hovered row](../../assets/imgs/hover-parallelcoords.png) | ![A network chart with a hovered node](../../assets/imgs/hover-network.png) |
 
-**Radial Chart** — a hovered bar
-
-![A radial bar chart with a hovered bar](../../assets/imgs/hover-radial.png)
-
-**Histogram** — a hovered bin
-
-![A histogram with a hovered bin](../../assets/imgs/hover-histogram.png)
-
-**Box Plot** — a hovered box
-
-![A box plot with a hovered box](../../assets/imgs/hover-box.png)
-
-**Violin Plot** — a hovered body
-
-![A violin plot with a hovered body](../../assets/imgs/hover-violin.png)
-
-**Swarm Plot** — a hovered point
-
-![A swarm plot with a hovered point](../../assets/imgs/hover-swarm.png)
-
-**Raincloud Plot** — a hovered box
-
-![A raincloud plot with a hovered box](../../assets/imgs/hover-raincloud.png)
-
-**Scatter Chart** — a hovered point
-
-![A scatter chart with a hovered point](../../assets/imgs/hover-scatter.png)
-
-**Heatmap** — a hovered cell
-
-![A heatmap with a hovered cell](../../assets/imgs/hover-heatmap.png)
-
-**Contour Chart** — a hovered level line
-
-![A contour chart with a hovered level line](../../assets/imgs/hover-contour.png)
-
-**Hexbin Chart** — a hovered hexagon
-
-![A hexbin chart with a hovered hexagon](../../assets/imgs/hover-hexbin.png)
-
-**Parallel Coordinates** — a hovered row
-
-![A parallel coordinates chart with a hovered row](../../assets/imgs/hover-parallelcoords.png)
-
-**Network Chart** — a hovered node
-
-![A network chart with a hovered node](../../assets/imgs/hover-network.png)
-
-**Sankey Chart** — a hovered link
-
-![A sankey chart with a hovered link](../../assets/imgs/hover-sankey.png)
-
-**Treemap** — a hovered tile
-
-![A treemap with a hovered tile](../../assets/imgs/hover-treemap.png)
+| **Sankey Chart** — a hovered link | **Treemap** — a hovered tile |
+| :-- | :-- |
+| ![A sankey chart with a hovered link](../../assets/imgs/hover-sankey.png) | ![A treemap with a hovered tile](../../assets/imgs/hover-treemap.png) |

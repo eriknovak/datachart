@@ -43,8 +43,8 @@ from datachart.charts import (
 )
 
 OUT = pathlib.Path(__file__).resolve().parents[1] / "imgs"
-FIGSIZE = (5.0, 3.4)
-DPI = 110
+FIGSIZE = (4.2, 3.0)
+DPI = 140
 
 rng = np.random.default_rng(7)
 GROUPS = {
