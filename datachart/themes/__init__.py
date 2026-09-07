@@ -11,6 +11,7 @@ Attributes:
     HATCH_THEME (datachart.typings.StyleAttrs): The hatch theme style (hatch cycle, value labels, dotted grid).
     MINIMAL_THEME (datachart.typings.StyleAttrs): The minimal theme style (accent blue, no spines, flat bars).
     MATERIAL_THEME (datachart.typings.StyleAttrs): The material theme style (Google palette, light grid).
+    SKETCH_THEME (datachart.typings.StyleAttrs): The sketch theme style (hand-drawn, xkcd-style wobble and halo, Comic Neue font).
 
 """
 
@@ -20,6 +21,7 @@ from .ink import INK_THEME
 from .hatch import HATCH_THEME
 from .minimal import MINIMAL_THEME
 from .material import MATERIAL_THEME
+from .sketch import SKETCH_THEME
 
 __all__ = [
     "DEFAULT_THEME",
@@ -28,4 +30,5 @@ __all__ = [
     "HATCH_THEME",
     "MINIMAL_THEME",
     "MATERIAL_THEME",
+    "SKETCH_THEME",
 ]

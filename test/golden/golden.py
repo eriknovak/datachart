@@ -161,6 +161,10 @@ EXPECTED_CHANGES = {
     "overlay_hist_hist",
     # nested gridspecs size their parent cell (ADR 0007, issue #86)
     "grid_nested_grid",
+    # new sketch theme cases (ADR 0027)
+    "theme_sketch_line",
+    "theme_sketch_bar",
+    "grid_sketch_panel_twin",
 }
 
 
@@ -564,6 +568,34 @@ def theme_ink_line():
 def theme_greyscale_bar():
     config.set_theme(THEME.GREYSCALE)
     return BarChart(data=[BAR1, BAR2], show_legend=True)
+
+
+@case
+def theme_sketch_line():
+    config.set_theme(THEME.SKETCH)
+    return LineChart(
+        data=[LINE1, LINE2], subtitle=["a", "b"], show_legend=True, show_area=True
+    )
+
+
+@case
+def theme_sketch_bar():
+    config.set_theme(THEME.SKETCH)
+    return BarChart(data=[BAR1, BAR2], show_legend=True)
+
+
+@case
+def grid_sketch_panel_twin():
+    """A sketch twin-axis panel keeps its look inside a grid built under DEFAULT."""
+    config.set_theme(THEME.SKETCH)
+    bars = BarChart(data=BAR1, subtitle="bars")
+    line = LineChart(
+        data=[{"x": i, "y": 1000 * (i + 1)} for i in range(5)], subtitle="line"
+    )
+    panel = Panel([bars, line], auto_secondary_axis=1, show_legend=True)
+    scatter = ScatterChart(data=SCAT1, title="scatter")
+    config.set_theme(THEME.DEFAULT)
+    return Grid([[panel, scatter]], figsize=(9, 4))
 
 
 # ----- emphasis (ADR 0009) -----

@@ -58,6 +58,9 @@ dev = ["black", "python-githooks", { include-group = "test" }, { include-group =
 [tool.setuptools.packages.find]
 include = ["datachart*"]
 
+[tool.setuptools.package-data]
+datachart = ["themes/_fonts/*.ttf", "themes/_fonts/OFL.txt"]
+
 [tool.setuptools.dynamic]
 version = { attr = "datachart.__version__" }
 

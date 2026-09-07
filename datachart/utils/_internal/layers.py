@@ -18,6 +18,7 @@ from typing import List, NamedTuple, Optional, Union
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import rc_context
 import matplotlib.ticker as mticker
 from matplotlib.ticker import MaxNLocator
 from matplotlib.collections import LineCollection, PathCollection
@@ -730,8 +731,11 @@ class LineLayer(Layer):
             return
         floor = values.min() - AREA_FLOOR_FACTOR * max(np.abs(values).max(), 1.0)
         data_lim = ax.dataLim.frozen()
-        fill(x, y, floor, step=step, **area_style)
+        collection = fill(x, y, floor, step=step, **area_style)
         ax.dataLim.set(data_lim)
+        # the sketch filter would split the off-screen floor edge into millions
+        # of wobble segments; the top edge sits under the line and its halo
+        collection.set_sketch_params()
 
 
 class StackedAreaLayer(Layer):
@@ -3586,7 +3590,31 @@ class Panel:
             },
             # tick_params cannot set a font family; applied to the labels directly
             "font_family": resolve_font_family(),
+            # render-scoped rc attributes (ADR 0027); None means off
+            "sketch_params": config.get("plot_sketch_params"),
+            "sketch_halo_width": config.get("plot_sketch_halo_width"),
         }
+
+    def _sketch_rc(self) -> dict:
+        """The rc override for the path wobble, empty when it is off."""
+
+        furniture = self.settings.get("furniture") or {}
+        if furniture.get("sketch_params") is None:
+            return {}
+        return {"path.sketch": tuple(furniture["sketch_params"])}
+
+    def _apply_halo(self, *axes) -> None:
+        """Stroke a white halo under the line artists; text and patches stay clean."""
+
+        furniture = self.settings.get("furniture") or {}
+        width = furniture.get("sketch_halo_width")
+        if width is None:
+            return
+        halo = [patheffects.withStroke(linewidth=width, foreground="#FFFFFF")]
+        for ax in axes:
+            if ax is not None:
+                for line in ax.get_lines():
+                    line.set_path_effects(halo)
 
     def _apply_furniture(
         self, ax: plt.Axes, axes_types=("xaxis", "yaxis"), spines=True
@@ -3604,12 +3632,23 @@ class Panel:
             else:
                 for axis, spine_style in furniture["spines"].items():
                     ax.spines[axis].set(**spine_style)
+            # the spines predate the render, so the rc context never saw them
+            sketch = self._sketch_rc().get("path.sketch")
+            if sketch is not None:
+                for spine in ax.spines.values():
+                    spine.set_sketch_params(*sketch)
         for axis_type in axes_types:
             getattr(ax, axis_type).set_tick_params(which="major", **furniture["ticks"])
 
     # ---------------- rendering ----------------
 
     def render(self, ax: plt.Axes) -> None:
+        # every artist created here copies the wobble from the rc context at
+        # construction (ADR 0027); nothing global changes
+        with rc_context(self._sketch_rc()):
+            self._render(ax)
+
+    def _render(self, ax: plt.Axes) -> None:
         s = self.settings
 
         # one dataset per kind: a violin and a box may share the positions
@@ -3864,6 +3903,7 @@ class Panel:
         if category_index:
             self._apply_category_ticks(ax, category_index, group_layers, horizontal)
 
+        self._apply_halo(ax, ax_right)
         self._finalize(ax, ax_right, bar_layers, horizontal, group_axes)
 
     @staticmethod
