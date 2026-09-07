@@ -44,11 +44,12 @@ themes; per-chart overrides go in each chart's `style` parameter.
 
 ## Composition & Utilities
 
-- [Composition & Utilities](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/index.md): Map of Panel, Grid, statistics, and figure saving.
+- [Composition & Utilities](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/index.md): Map of Panel, Grid, statistics, figure saving, and interactive figures.
 - [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md): Overlaying multiple charts on one plot with Panel: dual y-axes, z-order, emphasis, and nesting panels.
 - [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md): Arranging multiple charts in a grid layout with Grid, including nested rows and layout specs.
 - [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md): Text annotations on any chart: placement and coordinates, connector looks, text and box styling, and annotating finished figures with Annotate.
 - [Statistics](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md): Statistical utilities for preparing chart data.
+- [Interactive Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/interactive/index.md): Zooming, panning, and hovering over marks with show(interactive=True): the interactive extra, notebook and script behavior, and the chart types with hover support.
 
 ## Styling
 
