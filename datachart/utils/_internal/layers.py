@@ -556,6 +556,43 @@ def _draw_ref_lines(ax: plt.Axes, vlines: List[tuple], hlines: List[tuple]) -> N
         )
 
 
+def _draw_legend(ax, ax_right, legend_style: dict, handles, labels=None):
+    """Draw the legend on the panel's topmost axes.
+
+    A twin axes renders entirely above its host, so a legend on the host would
+    sit under every right-axis mark. matplotlib scores ``loc="best"`` against
+    the legend's own axes only; with a twin, the scoring is widened to both.
+    """
+
+    top_ax = ax if ax_right is None else ax_right
+    entries = (
+        {"handles": handles}
+        if labels is None
+        else {"handles": handles, "labels": labels}
+    )
+    legend = top_ax.legend(title="Legend", **entries, **legend_style)
+    if ax_right is None:
+        return legend
+
+    own_axes_data = legend._auto_legend_data
+
+    def both_axes_data(*args):
+        bboxes, lines, offsets = [], [], []
+        try:
+            for axes in (ax, ax_right):
+                legend.parent = axes
+                b, l, o = own_axes_data(*args)
+                bboxes += b
+                lines += l
+                offsets += list(o)
+        finally:
+            legend.parent = top_ax
+        return bboxes, lines, offsets
+
+    legend._auto_legend_data = both_axes_data
+    return legend
+
+
 # ================================================
 # DrawContext
 # ================================================
@@ -4980,7 +5017,7 @@ class Panel:
                 s["ylabel_right"], **(label_styles.get("ylabel") or {})
             )
 
-        # legend
+        # legend: on the topmost axes, so right-axis marks never cover it
         if s.get("show_legend"):
             legend_style = {
                 **s.get("legend_style", {}),
@@ -5000,19 +5037,24 @@ class Panel:
                     # the marks fill the axes: the legend sits beside them
                     legend_style["loc"] = "upper left"
                     legend_style["bbox_to_anchor"] = (1.0, 1.0)
-                ax.legend(handles=custom_handles, title="Legend", **legend_style)
+                _draw_legend(ax, ax_right, legend_style, custom_handles)
             elif s.get("legend_mode") == "combined":
-                self._combine_legends(ax, ax_right, legend_style, horizontal)
+                handles, labels = self._combined_legend_entries(
+                    ax, ax_right, horizontal
+                )
+                if handles:
+                    _draw_legend(ax, ax_right, legend_style, handles, labels)
             elif not any(isinstance(l, ParallelCoordsLayer) for l in layers):
                 # parallel coords only carry a legend when hue groups exist;
                 # unlabeled panels get no empty legend frame
-                if ax.get_legend_handles_labels()[1]:
-                    ax.legend(title="Legend", **legend_style)
+                handles, labels = ax.get_legend_handles_labels()
+                if labels:
+                    _draw_legend(ax, ax_right, legend_style, handles, labels)
 
         # the polar border circle crosses the plot area; the legend covers it
         # fully — above the spine, with an opaque frame so nothing shows through
         if polar:
-            legend = ax.get_legend()
+            legend = top_ax.get_legend()
             if legend is not None:
                 legend.set_zorder(self._spine_zorder() + RADIAL_LEGEND_Z_OVER_SPINE)
                 legend.get_frame().set_alpha(1.0)
@@ -5024,7 +5066,7 @@ class Panel:
             for target in [ax] + ([ax_right] if ax_right is not None else []):
                 for label in target.get_xticklabels() + target.get_yticklabels():
                     label.set_fontfamily(family)
-            legend = ax.get_legend()
+            legend = top_ax.get_legend()
             if legend is not None:
                 for text in legend.get_texts():
                     text.set_fontfamily(family)
@@ -5291,21 +5333,18 @@ class Panel:
                 )
 
     @staticmethod
-    def _combine_legends(ax_left, ax_right, legend_style, horizontal=False) -> None:
+    def _combined_legend_entries(ax_left, ax_right, horizontal=False) -> tuple:
+        """The legend handles and labels of both axes, labels tagged by side."""
+
         handles_left, labels_left = ax_left.get_legend_handles_labels()
+        if ax_right is None:
+            return handles_left, labels_left
 
-        if ax_right is not None:
-            handles_right, labels_right = ax_right.get_legend_handles_labels()
-            primary, secondary = ("B", "T") if horizontal else ("L", "R")
-            labels_left = [f"{label} ({primary})" for label in labels_left]
-            labels_right = [f"{label} ({secondary})" for label in labels_right]
-            handles = handles_left + handles_right
-            labels = labels_left + labels_right
-        else:
-            handles, labels = handles_left, labels_left
-
-        if handles:
-            ax_left.legend(handles, labels, title="Legend", **legend_style)
+        handles_right, labels_right = ax_right.get_legend_handles_labels()
+        primary, secondary = ("B", "T") if horizontal else ("L", "R")
+        labels_left = [f"{label} ({primary})" for label in labels_left]
+        labels_right = [f"{label} ({secondary})" for label in labels_right]
+        return handles_left + handles_right, labels_left + labels_right
 
 
 # ================================================

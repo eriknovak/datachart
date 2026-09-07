@@ -201,6 +201,30 @@ class TestPanel:
         plt.close(line1_fig)
         plt.close(line2_fig)
 
+    def test_legend_sits_on_the_twin_axes(self):
+        """A twin axes renders above its host, so the legend must live on it."""
+        line1_fig = LineChart(data=[{"x": i, "y": i} for i in range(10)], subtitle="A")
+        line2_fig = LineChart(
+            data=[{"x": i, "y": i * 100} for i in range(10)], subtitle="B"
+        )
+
+        combined_fig = Panel(
+            charts=[
+                {"figure": line1_fig, "y_axis": "left"},
+                {"figure": line2_fig, "y_axis": "right"},
+            ],
+            show_legend=True,
+        )
+
+        host, twin = combined_fig.axes
+        assert host.get_legend() is None
+        legend = twin.get_legend()
+        assert legend is not None
+        assert [t.get_text() for t in legend.get_texts()] == ["A (L)", "B (R)"]
+        plt.close(combined_fig)
+        plt.close(line1_fig)
+        plt.close(line2_fig)
+
     def test_scale_compatibility_detection(self):
         """Test scale compatibility detection."""
         # Create two charts with compatible scales
