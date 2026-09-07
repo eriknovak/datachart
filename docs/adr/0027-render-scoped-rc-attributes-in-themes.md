@@ -17,11 +17,15 @@ We add **sketch attributes**: an enumerated pair of nullable theme attributes,
 `plot_sketch_params` (the `(scale, length, randomness)` triple) and
 `plot_sketch_halo_width` (the white stroke width). `None` in both means off.
 `Panel.snapshot_furniture()` captures them at build time beside the spine and
-tick styles, and `Panel.render()` applies them inside a scoped
-`matplotlib.rc_context` around its artist creation. Spines predate the render,
-so the furniture pass sets their sketch and halo directly. Because matplotlib
-copies both values into each artist when it is created, composition redraws
-the look into new axes without any config access at draw time. `Grid` renders
+tick styles. `Panel.render()` applies the wobble inside a scoped
+`matplotlib.rc_context` around its artist creation, so matplotlib copies it
+into every artist as it is made; spines predate the render, so the furniture
+pass sets their sketch directly. The halo is deliberately narrower than
+matplotlib's xkcd mode: `Panel.render()` strokes it under the line artists
+after drawing, and text and patches stay clean — a halo around glyphs
+thickens them (and vanishes on white text), and bars already carry an edge.
+Both values live on the artists, so composition redraws the look into new
+axes without any config access at draw time. `Grid` renders
 each figure's stored panel, snapshot included, so a figure built under
 `SKETCH` stays sketched in a grid built under another theme; the `Panel` front
 builds one new panel and snapshots at compose time, so a composed panel wears

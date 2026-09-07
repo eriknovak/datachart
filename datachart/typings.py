@@ -780,7 +780,8 @@ class SketchStyleAttrs(TypedDict):
             wobble as matplotlib sketch parameters `(scale, length, randomness)`;
             `plt.xkcd()` uses `(1, 100, 2)`. `None` draws clean paths.
         plot_sketch_halo_width (Union[float, None]): The width of the white halo
-            stroked under every path and text. `None` draws no halo.
+            stroked under the lines, so crossing lines read as cut-outs; text
+            and patches stay clean. `None` draws no halo.
 
     """
 

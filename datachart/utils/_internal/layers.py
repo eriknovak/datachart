@@ -3596,19 +3596,25 @@ class Panel:
         }
 
     def _sketch_rc(self) -> dict:
-        """The rc overrides for the sketch attributes, empty when both are off."""
+        """The rc override for the path wobble, empty when it is off."""
 
         furniture = self.settings.get("furniture") or {}
-        rc = {}
-        if furniture.get("sketch_params") is not None:
-            rc["path.sketch"] = tuple(furniture["sketch_params"])
-        if furniture.get("sketch_halo_width") is not None:
-            rc["path.effects"] = [
-                patheffects.withStroke(
-                    linewidth=furniture["sketch_halo_width"], foreground="#FFFFFF"
-                )
-            ]
-        return rc
+        if furniture.get("sketch_params") is None:
+            return {}
+        return {"path.sketch": tuple(furniture["sketch_params"])}
+
+    def _apply_halo(self, *axes) -> None:
+        """Stroke a white halo under the line artists; text and patches stay clean."""
+
+        furniture = self.settings.get("furniture") or {}
+        width = furniture.get("sketch_halo_width")
+        if width is None:
+            return
+        halo = [patheffects.withStroke(linewidth=width, foreground="#FFFFFF")]
+        for ax in axes:
+            if ax is not None:
+                for line in ax.get_lines():
+                    line.set_path_effects(halo)
 
     def _apply_furniture(
         self, ax: plt.Axes, axes_types=("xaxis", "yaxis"), spines=True
@@ -3627,20 +3633,18 @@ class Panel:
                 for axis, spine_style in furniture["spines"].items():
                     ax.spines[axis].set(**spine_style)
             # the spines predate the render, so the rc context never saw them
-            rc = self._sketch_rc()
-            for spine in ax.spines.values():
-                if "path.sketch" in rc:
-                    spine.set_sketch_params(*rc["path.sketch"])
-                if "path.effects" in rc:
-                    spine.set_path_effects(rc["path.effects"])
+            sketch = self._sketch_rc().get("path.sketch")
+            if sketch is not None:
+                for spine in ax.spines.values():
+                    spine.set_sketch_params(*sketch)
         for axis_type in axes_types:
             getattr(ax, axis_type).set_tick_params(which="major", **furniture["ticks"])
 
     # ---------------- rendering ----------------
 
     def render(self, ax: plt.Axes) -> None:
-        # every artist created here copies the sketch attributes from the rc
-        # context at construction (ADR 0027); nothing global changes
+        # every artist created here copies the wobble from the rc context at
+        # construction (ADR 0027); nothing global changes
         with rc_context(self._sketch_rc()):
             self._render(ax)
 
@@ -3899,6 +3903,7 @@ class Panel:
         if category_index:
             self._apply_category_ticks(ax, category_index, group_layers, horizontal)
 
+        self._apply_halo(ax, ax_right)
         self._finalize(ax, ax_right, bar_layers, horizontal, group_axes)
 
     @staticmethod

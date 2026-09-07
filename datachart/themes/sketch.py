@@ -59,7 +59,7 @@ SKETCH_THEME: StyleAttrs = make_theme(
 )
 """The sketch theme: hand-drawn, xkcd-style wobble and halo, Comic Neue font.
 
-Paths wobble and carry a white halo, spines and lines are thick, the grid is
+Paths wobble, lines carry a white halo, spines and lines are thick, the grid is
 off, and text is set in Comic Neue, which ships with the package; Humor Sans
 and Comic Sans MS are the fallbacks should the bundled face fail to register.
 

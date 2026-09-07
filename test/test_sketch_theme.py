@@ -58,14 +58,23 @@ class TestSketchTheme(unittest.TestCase):
         self.assertEqual(len(line.get_path_effects()), 1)
         spine = figure.axes[0].spines["bottom"]
         self.assertEqual(spine.get_sketch_params(), SKETCH)
-        self.assertEqual(len(spine.get_path_effects()), 1)
+        self.assertFalse(spine.get_path_effects())
+
+    def test_halo_is_lines_only(self):
+        """Text and patches wobble but carry no halo; only lines do."""
+        config.set_theme(THEME.SKETCH)
+        figure = LineChart(LINE, title="Title")
+        ax = figure.axes[0]
+        self.assertFalse(ax.title.get_path_effects())
+        self.assertFalse(ax.get_xticklabels()[0].get_path_effects())
+        self.assertFalse(BarChart(BAR).axes[0].patches[0].get_path_effects())
+        self.assertEqual(len(data_lines(figure)[0].get_path_effects()), 1)
 
     def test_sketch_applies_to_bars(self):
         config.set_theme(THEME.SKETCH)
         figure = BarChart(BAR)
         patch = figure.axes[0].patches[0]
         self.assertEqual(patch.get_sketch_params(), SKETCH)
-        self.assertEqual(len(patch.get_path_effects()), 1)
 
     def test_area_floor_fill_skips_sketch(self):
         """The floor fill's off-screen edge stays unsketched; the line wobbles."""
