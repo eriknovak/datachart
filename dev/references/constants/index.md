@@ -29,6 +29,7 @@ The `constants` module provides a set of predefined constants used in the packag
 | `CONTOUR_LEVELS`    | The supported contour level rules.             |
 | `HEXBIN_REDUCE`     | The supported hexbin aggregations.             |
 | `BASELINE`          | The supported stacked area baselines.          |
+| `NETWORK_LAYOUT`    | The supported network chart layouts.           |
 | `RADIAL_TYPE`       | The supported radial chart visuals.            |
 | `SWARM_MODE`        | The supported swarm plot modes.                |
 | `DIRECTION`         | The supported angular directions.              |
@@ -229,9 +230,9 @@ Examples:
 
 ### datachart.constants.ARROW_STYLE
 
-The supported text annotation connector looks.
+The supported connector looks.
 
-Used by the `plot_text_arrow_style` style attribute of text annotations. Each value names a complete connector look — the line shape, curvature, and the gap on the text side. A curved look bows toward the side with the most open space around the chart's data; `plot_text_arrow_curve` pins the bow exactly, and the other `plot_text_arrow_*` style attributes override single properties of the chosen look. A raw matplotlib arrow style string (e.g. `"-|>"`) is also accepted.
+The one constant for every drawn connector: the `plot_text_arrow_style` style attribute of text annotations and the `plot_network_edge_style` style attribute of network charts. Each value names a complete connector look — the line shape, curvature, and the gap on the text side. For an annotation, a curved look bows toward the side with the most open space around the chart's data; `plot_text_arrow_curve` pins the bow exactly, and the other `plot_text_arrow_*` style attributes override single properties of the chosen look. A raw matplotlib arrow style string (e.g. `"-|>"`) is also accepted. A network edge takes only the two headless looks, `CURVE` and `STRAIGHT`, bowed by `plot_network_edge_curve`; its arrowhead comes from the chart's `directed` argument.
 
 Examples:
 
@@ -241,12 +242,13 @@ Examples:
 "curve"
 ```
 
-| ATTRIBUTE     | DESCRIPTION                                                                                        |
-| ------------- | -------------------------------------------------------------------------------------------------- |
-| `CURVE`       | A curved plain line with a small text-side gap. The default. Equals to "curve". **TYPE:** `str`    |
-| `CURVE_ARROW` | The same curve with an arrowhead at the target. Equals to "curve-arrow". **TYPE:** `str`           |
-| `TOUCHING`    | A straight plain line starting flush at the text box border. Equals to "touching". **TYPE:** `str` |
-| `ARROW`       | A straight line with an arrowhead at the target. Equals to "arrow". **TYPE:** `str`                |
+| ATTRIBUTE     | DESCRIPTION                                                                                                                         |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `CURVE`       | A curved plain line with a small text-side gap. The default. Text annotations and network edges. Equals to "curve". **TYPE:** `str` |
+| `CURVE_ARROW` | The same curve with an arrowhead at the target. Text annotations only. Equals to "curve-arrow". **TYPE:** `str`                     |
+| `STRAIGHT`    | A straight plain line with a small text-side gap. Text annotations and network edges. Equals to "straight". **TYPE:** `str`         |
+| `TOUCHING`    | A straight plain line starting flush at the text box border. Text annotations only. Equals to "touching". **TYPE:** `str`           |
+| `ARROW`       | A straight line with an arrowhead at the target. Text annotations only. Equals to "arrow". **TYPE:** `str`                          |
 
 ## Style Constants
 
@@ -618,6 +620,27 @@ Examples:
 | `SYM`             | The stack is centred on zero. Equals to "sym". **TYPE:** `str`                                               |
 | `WIGGLE`          | The baseline minimises the sum of squared slopes. Equals to "wiggle". **TYPE:** `str`                        |
 | `WEIGHTED_WIGGLE` | The baseline minimises the size-weighted sum of squared slopes. Equals to "weighted_wiggle". **TYPE:** `str` |
+
+### datachart.constants.NETWORK_LAYOUT
+
+The supported network chart layouts.
+
+Passed as the `layout` attribute of network charts: the rule that places the nodes in the 0–1 layout space. Layout changes what the picture means, so it is a chart attribute and not a style key.
+
+Examples:
+
+```
+>>> from datachart.constants import NETWORK_LAYOUT
+>>> NETWORK_LAYOUT.DEFAULT
+"spring"
+```
+
+| ATTRIBUTE  | DESCRIPTION                                                                                                                                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DEFAULT`  | The default layout. Same as NETWORK_LAYOUT.SPRING. **TYPE:** `str`                                                                                                                                                       |
+| `SPRING`   | A force-directed (Fruchterman–Reingold) layout: linked nodes pull together, every pair pushes apart. Seeded by the chart's seed argument, so the same data renders the same picture. Equals to "spring". **TYPE:** `str` |
+| `CIRCULAR` | The nodes evenly spaced on a circle in input order, starting at the top. Equals to "circular". **TYPE:** `str`                                                                                                           |
+| `FIXED`    | Each node at its own x/y, in the 0–1 layout space; a node without them raises. Equals to "fixed". **TYPE:** `str`                                                                                                        |
 
 ### datachart.constants.RADIAL_TYPE
 

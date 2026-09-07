@@ -525,6 +525,8 @@
       
         
       
+        
+      
     
     
     
@@ -984,6 +986,34 @@
     
   
     Parallel Coordinates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../how-to-guides/charts/networkchart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network Chart
   
 
     
@@ -2181,6 +2211,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.constants.NETWORK_LAYOUT" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;NETWORK_LAYOUT
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.constants.RADIAL_TYPE" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2759,6 +2800,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.constants.NETWORK_LAYOUT" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;NETWORK_LAYOUT
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.constants.RADIAL_TYPE" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3061,6 +3113,14 @@ These include figure size, format, style, and other figure manipulation values.<
             <td class="doc-class-details">
               <div class="doc-md-description">
                 <p>The supported stacked area baselines.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.NETWORK_LAYOUT&lt;/span&gt;" href="#datachart.constants.NETWORK_LAYOUT">NETWORK_LAYOUT</a></code></td>
+            <td class="doc-class-details">
+              <div class="doc-md-description">
+                <p>The supported network chart layouts.</p>
               </div>
             </td>
           </tr>
@@ -4564,14 +4624,19 @@ axis labels).</p>
 
 
 
-        <p>The supported text annotation connector looks.</p>
-<p>Used by the <code>plot_text_arrow_style</code> style attribute of text annotations.
-Each value names a complete connector look — the line shape, curvature,
-and the gap on the text side. A curved look bows toward the side with
-the most open space around the chart's data; <code>plot_text_arrow_curve</code>
-pins the bow exactly, and the other <code>plot_text_arrow_*</code> style attributes
-override single properties of the chosen look. A raw matplotlib arrow
-style string (e.g. <code>"-|&gt;"</code>) is also accepted.</p>
+        <p>The supported connector looks.</p>
+<p>The one constant for every drawn connector: the <code>plot_text_arrow_style</code>
+style attribute of text annotations and the <code>plot_network_edge_style</code>
+style attribute of network charts. Each value names a complete connector
+look — the line shape, curvature, and the gap on the text side. For an
+annotation, a curved look bows toward the side with the most open space
+around the chart's data; <code>plot_text_arrow_curve</code> pins the bow exactly,
+and the other <code>plot_text_arrow_*</code> style attributes override single
+properties of the chosen look. A raw matplotlib arrow style string
+(e.g. <code>"-|&gt;"</code>) is also accepted. A network edge takes only the two
+headless looks, <code>CURVE</code> and <code>STRAIGHT</code>, bowed by
+<code>plot_network_edge_curve</code>; its arrowhead comes from the chart's
+<code>directed</code> argument.</p>
 <p><img alt="ARROW_STYLE at a glance" src="../../assets/imgs/const-arrow-style.svg" width="100%" /></p>
 
 
@@ -4594,7 +4659,7 @@ style string (e.g. <code>"-|&gt;"</code>) is also accepted.</p>
             <td><code><span title="datachart.constants.ARROW_STYLE.CURVE">CURVE</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>A curved plain line with a small text-side gap. The default. Equals to <code>"curve"</code>.</p>
+                <p>A curved plain line with a small text-side gap. The default. Text annotations and network edges. Equals to <code>"curve"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
@@ -4608,7 +4673,21 @@ style string (e.g. <code>"-|&gt;"</code>) is also accepted.</p>
             <td><code><span title="datachart.constants.ARROW_STYLE.CURVE_ARROW">CURVE_ARROW</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The same curve with an arrowhead at the target. Equals to <code>"curve-arrow"</code>.</p>
+                <p>The same curve with an arrowhead at the target. Text annotations only. Equals to <code>"curve-arrow"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.ARROW_STYLE.STRAIGHT">STRAIGHT</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>A straight plain line with a small text-side gap. Text annotations and network edges. Equals to <code>"straight"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
@@ -4622,7 +4701,7 @@ style string (e.g. <code>"-|&gt;"</code>) is also accepted.</p>
             <td><code><span title="datachart.constants.ARROW_STYLE.TOUCHING">TOUCHING</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>A straight plain line starting flush at the text box border. Equals to <code>"touching"</code>.</p>
+                <p>A straight plain line starting flush at the text box border. Text annotations only. Equals to <code>"touching"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
@@ -4636,7 +4715,7 @@ style string (e.g. <code>"-|&gt;"</code>) is also accepted.</p>
             <td><code><span title="datachart.constants.ARROW_STYLE.ARROW">ARROW</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>A straight line with an arrowhead at the target. Equals to <code>"arrow"</code>.</p>
+                <p>A straight line with an arrowhead at the target. Text annotations only. Equals to <code>"arrow"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
@@ -7233,6 +7312,136 @@ first series starts, and so how the whole stack sits on the y-axis.</p>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
                 <p>The baseline minimises the size-weighted sum of squared slopes. Equals to <code>"weighted_wiggle"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="datachart.constants.NETWORK_LAYOUT" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.constants.NETWORK_LAYOUT</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>The supported network chart layouts.</p>
+<p>Passed as the <code>layout</code> attribute of network charts: the rule that places
+the nodes in the 0–1 layout space. Layout changes what the picture
+means, so it is a chart attribute and not a style key.</p>
+<p><img alt="NETWORK_LAYOUT at a glance" src="../../assets/imgs/const-network-layout.svg" width="100%" /></p>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">NETWORK_LAYOUT</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">NETWORK_LAYOUT</span><span class="o">.</span><span class="n">DEFAULT</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">"spring"</span>
+</code></pre></div>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">ATTRIBUTE</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.NETWORK_LAYOUT.DEFAULT">DEFAULT</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The default layout. Same as <code>NETWORK_LAYOUT.SPRING</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.NETWORK_LAYOUT.SPRING">SPRING</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>A force-directed (Fruchterman–Reingold) layout: linked
+nodes pull together, every pair pushes apart. Seeded by the chart's
+<code>seed</code> argument, so the same data renders the same picture.
+Equals to <code>"spring"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.NETWORK_LAYOUT.CIRCULAR">CIRCULAR</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The nodes evenly spaced on a circle in input order,
+starting at the top. Equals to <code>"circular"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.NETWORK_LAYOUT.FIXED">FIXED</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Each node at its own <code>x</code>/<code>y</code>, in the 0–1 layout space;
+a node without them raises. Equals to <code>"fixed"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">

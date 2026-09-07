@@ -5,7 +5,7 @@
 datachart is a Python data visualization package built on matplotlib.
 It provides simple chart functions (BarChart, LineChart, StackedAreaChart, ScatterChart,
 Histogram, Heatmap, ContourChart, HexbinChart, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot,
-ParallelCoords, PyramidChart, RadialChart, SankeyChart, Treemap), figure
+ParallelCoords, PyramidChart, RadialChart, SankeyChart, NetworkChart, Treemap), figure
 composition via Panel (overlaying charts on shared axes) and Grid
 (arranging charts in a grid), and a global configuration system with
 predefined themes.
@@ -73,14 +73,14 @@ save_figure(figure, "line.png")
 
 Every chart is a single function call taking plain lists of dicts, and every function accepts a list of series to overlay or a `subplots=True` flag to split them apart. The dict keys per chart are listed in each guide.
 
-| Family            | Charts                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Use for                                                                |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| **Trends**        | [LineChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/linechart/), [StackedAreaChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/stackedareachart/)                                                                                                                                                                                                                                                                                          | values over an ordered axis; area for part-of-whole over time          |
-| **Comparisons**   | [BarChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/barchart/), [PyramidChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/pyramidchart/), [RadialChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/radialchart/)                                                                                                                                                                                                     | category totals, paired populations, cyclic/periodic values            |
-| **Distributions** | [Histogram](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/histogram/), [BoxPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/boxplot/), [ViolinPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/violinplot/), [SwarmPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/swarmplot/), [RaincloudPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/raincloudplot/)                 | shape and spread of one variable, per group                            |
-| **Relationships** | [ScatterChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/scatterchart/), [Heatmap](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/heatmap/), [ContourChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/contourchart/), [HexbinChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/hexbinchart/), [ParallelCoords](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/parallelcoords/) | two-variable correlation, matrices, dense 2-D density, many dimensions |
-| **Flows**         | [SankeyChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/sankeychart/)                                                                                                                                                                                                                                                                                                                                                                                               | quantities moving between stages                                       |
-| **Proportions**   | [Treemap](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/treemap/)                                                                                                                                                                                                                                                                                                                                                                                                       | how a whole splits into parts, with one level of grouping              |
+| Family            | Charts                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Use for                                                                                       |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| **Trends**        | [LineChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/linechart/), [StackedAreaChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/stackedareachart/)                                                                                                                                                                                                                                                                                                                                                                                           | values over an ordered axis; area for part-of-whole over time                                 |
+| **Comparisons**   | [BarChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/barchart/), [PyramidChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/pyramidchart/), [RadialChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/radialchart/)                                                                                                                                                                                                                                                                                                      | category totals, paired populations, cyclic/periodic values                                   |
+| **Distributions** | [Histogram](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/histogram/), [BoxPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/boxplot/), [ViolinPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/violinplot/), [SwarmPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/swarmplot/), [RaincloudPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/raincloudplot/)                                                                                                                  | shape and spread of one variable, per group                                                   |
+| **Relationships** | [ScatterChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/scatterchart/), [Heatmap](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/heatmap/), [ContourChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/contourchart/), [HexbinChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/hexbinchart/), [ParallelCoords](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/parallelcoords/), [NetworkChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/networkchart/) | two-variable correlation, matrices, dense 2-D density, many dimensions, who is linked to whom |
+| **Flows**         | [SankeyChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/sankeychart/)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | quantities moving between stages                                                              |
+| **Proportions**   | [Treemap](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/treemap/)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | how a whole splits into parts, with one level of grouping                                     |
 
 ## Composition
 
@@ -232,6 +232,7 @@ How two or more variables relate to each other.
 | [Contour Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md)          | The showcase of the contour chart.        |
 | [Hexbin Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md)            | The showcase of the hexbin chart.         |
 | [Parallel Coordinates](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/parallelcoords/index.md) | The showcase of the parallel coordinates. |
+| [Network Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/networkchart/index.md)          | The showcase of the network chart.        |
 
 ## Flows
 
@@ -8746,6 +8747,562 @@ SankeyChart(
 ).show()
 ```
 
+# Network Chart
+
+This section showcases the network chart. It contains examples of how to create network charts using the [datachart.charts.NetworkChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.NetworkChart) function.
+
+Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-network-chart), which maps common tasks to the parameter or style attribute that does the job.
+
+As mentioned above, the network charts are created using the `NetworkChart` function found in the [datachart.charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md) module. Let's import it:
+
+```
+from datachart.charts import NetworkChart
+```
+
+## Network Chart Input Attributes
+
+The `NetworkChart` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the nodes and the edges between them. A network is a `{"nodes": [...], "edges": [...]}` dict; `nodes` may be omitted, in which case the nodes are read from the edges. A list of such dicts draws one network per subplot.
+
+```
+NetworkChart(
+    data={                                              # The network (or a list of such dicts, one network per subplot)
+        "nodes": [                                      # Optional; inferred from the edges in first-seen order when omitted
+            {
+                "id": str,                              # The node identifier the edges refer to; unique within a chart
+                "label": Optional[str],                 # The drawn label; the id by default, "" draws nothing
+                "size": Optional[Union[int, float]],    # Mapped by square root to the marker area; must be greater than 0
+                "group": Optional[str],                 # The group the node is colored by
+                "emphasis": Optional[str],              # "background" mutes the node and its edges, "highlight" strokes its border
+                "x": Optional[float],                   # The position in the 0-1 layout space; NETWORK_LAYOUT.FIXED only
+                "y": Optional[float],
+            },
+            ...
+        ],
+        "edges": [
+            {
+                "source": str,                          # The id of the node the edge leaves
+                "target": str,                          # The id of the node the edge enters
+                "weight": Optional[Union[int, float]],  # Mapped to the edge width; must be greater than 0
+            },
+            ...
+        ],
+    },
+    layout=Optional[str],                               # How the nodes are placed, a NETWORK_LAYOUT constant (SPRING by default)
+    directed=Optional[bool],                            # Whether the edges end in an arrowhead (False by default)
+    seed=Optional[int],                                 # The seed of the spring layout (0 by default)
+    show_values=Optional[bool],                         # Whether to write each edge's weight at its midpoint
+    value_format=Optional[str],                         # The format of the values, a VALUE_FORMAT constant or a format string
+    show_legend=Optional[bool],                         # Whether to list the node groups in a legend
+    style={                                             # The style of the chart (optional; a list for multiple charts)
+        "plot_network_node_color":            Optional[str],    # The node color; overrides the palette
+        "plot_network_node_alpha":            Optional[float],  # The node alpha (0.95 by default)
+        "plot_network_node_marker":           Optional[str],    # The node marker shape ("o" by default)
+        "plot_network_node_size":             Optional[float],  # The marker area of a node without size (200 by default)
+        "plot_network_node_size_min":         Optional[float],  # The marker area of the smallest sized node (80 by default)
+        "plot_network_node_size_max":         Optional[float],  # The marker area of the largest sized node (900 by default)
+        "plot_network_node_edge_color":       Optional[str],    # The node stroke color (white by default)
+        "plot_network_node_edge_width":       Optional[float],  # The node stroke width (0.8 by default)
+        "plot_network_edge_style":            Optional[str],    # The edge geometry: ARROW_STYLE.CURVE (default) or ARROW_STYLE.STRAIGHT
+        "plot_network_edge_curve":            Optional[float],  # The bow of a curved edge; the sign picks the side (0.2 by default)
+        "plot_network_edge_color":            Optional[str],    # The edge color (grey by default)
+        "plot_network_edge_alpha":            Optional[float],  # The edge alpha (0.6 by default)
+        "plot_network_edge_width_min":        Optional[float],  # The width of the lightest edge, and of an edge without weight (0.8 by default)
+        "plot_network_edge_width_max":        Optional[float],  # The width of the heaviest edge (4 by default)
+        "plot_network_highlight_edge_width":  Optional[float],  # The stroke width of a highlighted node (2 by default)
+        "plot_network_label_halo_width":      Optional[float],  # The white halo behind the labels; 0 disables it (2 by default)
+    },
+    subtitle=Optional[str],                             # The chart subtitle (or list for multiple charts)
+    title=Optional[str],                                # The chart title
+    figsize=Optional[Tuple[float, float]],              # The figure size
+    subplots=Optional[bool],                            # Whether to draw each chart in its own subplot
+    max_cols=Optional[int],                             # The maximum number of subplot columns
+    texts=Optional[Union[dict, List[dict]]],            # The text annotations
+)
+```
+
+For more details, see the [datachart.charts.NetworkChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.NetworkChart) function.
+
+## Basics
+
+The examples in this guide share one dataset: the modules of a small web service and the imports between them. Each module has a size in lines of code and belongs to a layer of the architecture; each import is an edge from the importing module to the imported one, weighted by how many names it pulls in. The numbers live in the cell below. A dependency graph is the textbook network: the question is what depends on what, and a node-link diagram shows every module and every import at once.
+
+```
+# The modules of a small web service: (layer, lines of code)
+MODULES = {
+    "app": ("interface", 620),
+    "cli": ("interface", 340),
+    "api": ("service", 910),
+    "auth": ("service", 480),
+    "jobs": ("service", 260),
+    "models": ("core", 1150),
+    "storage": ("core", 730),
+    "config": ("core", 190),
+    "utils": ("core", 410),
+}
+
+# The imports between them: (importing module, imported module, names imported)
+IMPORTS = [
+    ("app", "api", 12),
+    ("app", "auth", 4),
+    ("app", "config", 2),
+    ("cli", "api", 6),
+    ("cli", "jobs", 3),
+    ("cli", "config", 2),
+    ("api", "models", 15),
+    ("api", "auth", 5),
+    ("api", "storage", 7),
+    ("auth", "models", 6),
+    ("auth", "utils", 3),
+    ("jobs", "storage", 4),
+    ("jobs", "models", 5),
+    ("models", "utils", 8),
+    ("storage", "config", 3),
+    ("storage", "utils", 4),
+]
+
+service = {
+    "nodes": [
+        {"id": module, "group": layer, "size": lines}
+        for module, (layer, lines) in MODULES.items()
+    ],
+    "edges": [
+        {"source": importer, "target": imported, "weight": names}
+        for importer, imported, names in IMPORTS
+    ],
+}
+```
+
+The data is one dict with a `nodes` list and an `edges` list. Every node is a dict with an `id` that is unique within the chart; every edge is a dict whose `source` and `target` name two different nodes by id. Everything else is optional: a node's `label` (the id by default), its `size` and `group`, an edge's `weight`. The `nodes` list itself is optional too — without it, the nodes are read from the edges in the order they are first mentioned. A repeated id, an edge naming an unknown node or joining a node to itself, and a zero or negative `size` or `weight` raise a `ValueError`.
+
+```
+service["nodes"][:2], service["edges"][:2]
+```
+
+**Basic example.** Only the `data` argument is required to draw the network chart. The nodes are placed by a force-directed layout — linked modules pull together, every pair pushes apart — and joined by curved edges. With no `group` every node takes one color, and the sizes and weights below are mapped to marker area and edge width straight away; the sections that follow show each encoding on its own.
+
+```
+NetworkChart(
+    # add the data to the chart
+    data={"edges": service["edges"]}
+).show()
+```
+
+## Customizing the Network Chart
+
+Every customization is either a keyword argument of `NetworkChart` or a `plot_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
+
+| I want to…                                | Use                                                                       | See                                                         |
+| ----------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| add a title                               | `title`                                                                   | [Title and figure size](#title-and-figure-size)             |
+| resize the figure                         | `figsize`                                                                 | [Title and figure size](#title-and-figure-size)             |
+| place the nodes another way               | `layout`, `seed`                                                          | [Layouts](#layouts)                                         |
+| put every node where I say                | `layout=NETWORK_LAYOUT.FIXED` and `"x"`, `"y"` on the nodes               | [Layouts](#layouts)                                         |
+| show the direction of the edges           | `directed`                                                                | [Directed edges](#directed-edges)                           |
+| size the edges and the nodes by a value   | `"weight"` on the edges, `"size"` on the nodes                            | [Edge weights and node sizes](#edge-weights-and-node-sizes) |
+| color the nodes by a category             | `"group"` on the nodes, `show_legend`                                     | [Groups and the legend](#groups-and-the-legend)             |
+| mute or outline a node                    | `"emphasis"` on the node                                                  | [Emphasis](#emphasis)                                       |
+| write the weights on the edges            | `show_values`, `value_format`                                             | [Edge values](#edge-values)                                 |
+| draw straight edges, or bow them more     | `style={"plot_network_edge_style": ..., "plot_network_edge_curve": ...}`  | [Node and edge style](#node-and-edge-style)                 |
+| change the node markers or the edge color | `style={"plot_network_node_marker": ..., "plot_network_edge_color": ...}` | [Node and edge style](#node-and-edge-style)                 |
+| drop the halo behind the labels           | `style={"plot_network_label_halo_width": 0}`                              | [Node and edge style](#node-and-edge-style)                 |
+| annotate a point of the chart             | `texts`                                                                   | [Text annotations](#text-annotations)                       |
+| draw several networks side by side        | `subplots`                                                                | [Subplots](#subplots)                                       |
+| arrange a network next to other charts    | `Grid`                                                                    | [Composing network charts](#composing-network-charts)       |
+
+### Title and figure size
+
+To add the chart title, add the `title` attribute. A network chart has no axes, so there are no axis labels to set. To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains predefined figure sizes. The layout always keeps a square aspect, so a wide figure leaves room beside the drawing rather than stretching it.
+
+```
+from datachart.constants import FIG_SIZE
+```
+
+```
+NetworkChart(
+    data={"edges": service["edges"]},
+    # add the title
+    title="Imports between the modules of the service",
+    # add to determine the figure size
+    figsize=FIG_SIZE.SQUARE,
+).show()
+```
+
+### Layouts
+
+The `layout` attribute says how the nodes are placed, using the [datachart.constants.NETWORK_LAYOUT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NETWORK_LAYOUT) constants. The default, `SPRING`, is a force-directed layout: it is seeded by the `seed` attribute (`0` by default), so the same data draws the same picture every time, and another seed gives another arrangement of the same graph. `CIRCULAR` spaces the nodes evenly on a circle in input order, starting at the top — a good choice when the nodes have a natural order or the layout must be predictable. `FIXED` places every node at its own `x` and `y`, given on the node in the `0`–`1` layout space; a node without them raises a `ValueError`. An edge's weight never moves a node: it is a visual cue only.
+
+```
+from datachart.constants import NETWORK_LAYOUT
+```
+
+`layout` and `seed` apply to every network in a figure, so the comparison below draws three figures and arranges them with [datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) (see [Composing network charts](#composing-network-charts)). The two spring layouts only differ in the seed; the circular one has nothing random.
+
+```
+from datachart.utils import Grid
+
+imports = {"edges": service["edges"]}
+Grid(
+    [[
+        NetworkChart(imports, title="SPRING, seed=0"),
+        # another arrangement of the same graph
+        NetworkChart(imports, seed=3, title="SPRING, seed=3"),
+        # the nodes on a circle in input order
+        NetworkChart(imports, layout=NETWORK_LAYOUT.CIRCULAR, title="CIRCULAR"),
+    ]],
+    figsize=(12, 4),
+).show()
+```
+
+To place the nodes by hand, give each an `x` and a `y` and pick the fixed layout — here the layers of the architecture become rows, top to bottom:
+
+```
+ROW = {"interface": 0.85, "service": 0.5, "core": 0.15}
+COLUMN = {
+    "app": 0.35, "cli": 0.65,
+    "api": 0.2, "auth": 0.5, "jobs": 0.8,
+    "models": 0.15, "storage": 0.4, "config": 0.65, "utils": 0.9,
+}
+
+layered = {
+    "nodes": [
+        {"id": module, "x": COLUMN[module], "y": ROW[layer]}
+        for module, (layer, _) in MODULES.items()
+    ],
+    "edges": service["edges"],
+}
+
+NetworkChart(
+    data=layered,
+    # every node at its own x and y
+    layout=NETWORK_LAYOUT.FIXED,
+    title="The modules by layer",
+    figsize=FIG_SIZE.SQUARE,
+).show()
+```
+
+### Directed edges
+
+To show which way an edge goes, add the `directed` attribute. Each edge then ends in an arrowhead at its target, stopping at the node's edge, and an edge and its reverse draw as two separate arrows, each bowing to its own side. Without `directed` (the default), a network is undirected: an edge and its reverse draw as one line. The imports have a direction — the importing module points at the one it imports — so the dependency graph reads best directed.
+
+```
+NetworkChart(
+    data={"edges": service["edges"]},
+    # arrowheads from the importing module to the imported one
+    directed=True,
+    title="Imports between the modules of the service",
+    figsize=FIG_SIZE.SQUARE,
+).show()
+```
+
+### Edge weights and node sizes
+
+An edge's `weight` sets its width, linearly between `plot_network_edge_width_min` and `plot_network_edge_width_max` over the weights in the chart; an edge without a weight draws at the minimum. A node's `size` sets its marker area, by square root between `plot_network_node_size_min` and `plot_network_node_size_max`, so a node four times the size draws twice the marker; a node without a size draws at `plot_network_node_size`. The example carries both: the width of an import is how many names it pulls in, and a module's marker grows with its lines of code.
+
+```
+NetworkChart(
+    # the edges carry a weight, the nodes a size
+    data={"nodes": [{"id": m, "size": lines} for m, (_, lines) in MODULES.items()], "edges": service["edges"]},
+    directed=True,
+    title="Imports weighted by names, modules sized by lines of code",
+    figsize=FIG_SIZE.SQUARE,
+).show()
+```
+
+### Groups and the legend
+
+A node's `group` colors it: the groups take the palette colors in the order they are first seen, and nodes without a group share the first color. To name the groups, add the `show_legend` attribute; the legend sits beside the drawing, since the nodes fill the axes. The example colors every module by its layer of the architecture.
+
+```
+NetworkChart(
+    # the nodes carry a group
+    data=service,
+    directed=True,
+    # name the layers beside the chart
+    show_legend=True,
+    title="The modules by layer",
+    figsize=FIG_SIZE.SQUARE,
+).show()
+```
+
+### Emphasis
+
+Emphasis is set per node with the `emphasis` key, using the [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) roles. `background` mutes a node, its label, and every edge touching it into the theme's muted color; `highlight` strokes the node's border in the text color. Roles are explicit: highlighting one node does not mute the others, and the `emphasis` argument of the function itself is not supported — pass the roles on the nodes. The example highlights the module every other module ends up depending on, and mutes the command-line entry point and what only it uses.
+
+```
+from datachart.constants import EMPHASIS
+
+ROLES = {"models": EMPHASIS.HIGHLIGHT, "cli": EMPHASIS.BACKGROUND, "jobs": EMPHASIS.BACKGROUND}
+
+NetworkChart(
+    data={
+        "nodes": [
+            {"id": module, "group": layer, "size": lines, **({"emphasis": ROLES[module]} if module in ROLES else {})}
+            for module, (layer, lines) in MODULES.items()
+        ],
+        "edges": service["edges"],
+    },
+    directed=True,
+    title="What everything depends on",
+    figsize=FIG_SIZE.SQUARE,
+).show()
+```
+
+### Edge values
+
+To write each edge's weight at its midpoint, add the `show_values` attribute. The `value_format` attribute formats the values: use one of the [datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constants or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string. A value sits on the drawn edge — on the bow of a curved one — behind the same halo as the labels; an edge without a weight gets no value.
+
+```
+from datachart.constants import VALUE_FORMAT
+```
+
+```
+NetworkChart(
+    data=service,
+    directed=True,
+    # write the number of imported names on the edges
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
+    title="Names imported between the modules",
+    figsize=FIG_SIZE.SQUARE,
+).show()
+```
+
+### Node and edge style
+
+To change the node and edge style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.NetworkStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.NetworkStyleAttrs) typing. The nodes are a scatter and take the `plot_network_node_*` keys: the marker, its alpha and stroke, and the three areas the sizes map onto; `plot_network_node_color` overrides the palette for every node. The edges take `plot_network_edge_color` and `plot_network_edge_alpha`, and the width range the weights map onto.
+
+The edge geometry is `plot_network_edge_style`, one of the [datachart.constants.ARROW_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ARROW_STYLE) looks: `CURVE` (the default) bows every edge by `plot_network_edge_curve`, whose sign picks the side, and `STRAIGHT` draws straight lines. The headed looks are rejected — the arrowhead of a network edge comes from the `directed` attribute, not from the style. The example draws the graph with straight, darker edges and square markers.
+
+```
+from datachart.constants import ARROW_STYLE, LINE_MARKER
+
+NetworkChart(
+    data=service,
+    directed=True,
+    style={
+        # straight edges
+        "plot_network_edge_style": ARROW_STYLE.STRAIGHT,
+        # darker and heavier
+        "plot_network_edge_color": "#555555",
+        "plot_network_edge_width_max": 6,
+        # square markers with a dark stroke
+        "plot_network_node_marker": LINE_MARKER.SQUARE,
+        "plot_network_node_edge_color": "#333333",
+        # no halo behind the labels
+        "plot_network_label_halo_width": 0,
+    },
+    title="Straight edges, square modules",
+    figsize=FIG_SIZE.SQUARE,
+).show()
+```
+
+The default bow is `0.2`. A larger `plot_network_edge_curve` bows the edges more, which helps a dense graph keep its edges apart; a negative one bows them to the other side of the line between the nodes, and `0` is a straight edge:
+
+```
+NetworkChart(
+    data=[{"edges": service["edges"]}] * 3,
+    subtitle=["default (edge_curve=0.2)", "edge_curve=0.5", "edge_curve=-0.2"],
+    # one style per subplot; None keeps the default
+    style=[None, {"plot_network_edge_curve": 0.5}, {"plot_network_edge_curve": -0.2}],
+    directed=True,
+    max_cols=3,
+    figsize=(12, 4),
+).show()
+```
+
+### Text annotations
+
+To place text on the chart, add the `texts` attribute with the [datachart.typings.TextAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextAttrs) records. The layout spans `0`–`1` in both directions, so `x` and `y` are fractions of the drawing; the [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/utility/annotations.ipynb) guide covers the connector and box options. The example notes what the fixed, layered layout shows.
+
+```
+NetworkChart(
+    data=layered,
+    layout=NETWORK_LAYOUT.FIXED,
+    directed=True,
+    texts={
+        "x": 0.5,
+        "y": 0.98,
+        "text": "every import points down a layer",
+        "ha": "center",
+        "va": "top",
+    },
+    title="The modules by layer",
+    figsize=FIG_SIZE.SQUARE,
+).show()
+```
+
+## Multiple Network Charts
+
+### Subplots
+
+A list of networks draws each in its own subplot; there is no overlay of two networks on one axes, so `subplots` is implied. The `subtitle` becomes the subplot title and the `title` is positioned to be global for all charts. The `max_cols` attribute limits the number of columns. The example draws the imports of the service layer and of the core layer as two separate graphs.
+
+```
+def layer_imports(layer):
+    modules = {m for m, (l, _) in MODULES.items() if l == layer}
+    return {
+        "edges": [
+            {"source": s, "target": t, "weight": w}
+            for s, t, w in IMPORTS
+            if s in modules or t in modules
+        ]
+    }
+
+NetworkChart(
+    # one network per layer
+    data=[layer_imports("service"), layer_imports("core")],
+    subtitle=["Imports of the service layer", "Imports of the core layer"],
+    directed=True,
+    max_cols=2,
+    title="Imports by layer",
+    figsize=(10, 4.5),
+).show()
+```
+
+### Composing Network Charts
+
+A network chart owns its axes: there is no shared coordinate space to overlay other charts on, so [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) rejects a network figure. [datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) arranges it next to other figures as an ordinary cell, keeping the layout it was drawn with. The grid pairs the dependency graph with a [datachart.charts.BarChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.BarChart) of the module sizes.
+
+```
+from datachart.charts import BarChart
+from datachart.utils import Grid
+
+graph = NetworkChart(data=service, directed=True, show_legend=True, title="Imports")
+sizes = BarChart(
+    data=[{"label": m, "y": lines} for m, (_, lines) in MODULES.items()],
+    title="Lines of code",
+)
+Grid([[graph, sizes]], figsize=(12, 4.5)).show()
+```
+
+### Themes
+
+A theme sets the palette, the node strokes and the fonts of every chart at once; see the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery.ipynb) for the whole suite under each. Apply one with [datachart.config.Config.set_theme](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) from the [datachart.constants.THEME](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) constant, and reset the configuration afterwards so the following charts draw in the default again.
+
+```
+from datachart.config import config
+from datachart.constants import THEME
+
+config.set_theme(THEME.INK)
+figure = NetworkChart(
+    data=service,
+    directed=True,
+    show_legend=True,
+    title="Imports between the modules of the service",
+    figsize=FIG_SIZE.SQUARE,
+)
+config.reset_config()
+figure.show()
+```
+
+## Saving the Chart as an Image
+
+To save the chart as an image, use the [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.save_figure) function.
+
+```
+from datachart.utils import save_figure
+
+figure = NetworkChart(
+    data=service,
+    directed=True,
+    title="Imports between the modules of the service",
+)
+save_figure(figure, "./fig_networkchart.png", dpi=300)
+```
+
+The figure should be saved in the current working directory.
+
+## Real-World Examples
+
+The following examples put the features above to work. Each one states what it shows; any derived quantity is computed in the code, and the data is illustrative.
+
+### Example 1: Who Reviews Whose Code (Undirected, Groups, Sizes, and a Highlight)
+
+A team's code review pairs over a quarter: an edge joins two people who reviewed each other's pull requests, weighted by how many reviews they exchanged, and a person's node grows with the reviews they gave. Reviews flow both ways, so the network is undirected; the teams are the groups, and the one person reviewing across every team is highlighted.
+
+```
+REVIEWERS = {
+    "Ana": ("Backend", 41), "Bo": ("Backend", 18), "Cy": ("Backend", 12),
+    "Di": ("Frontend", 33), "Ed": ("Frontend", 15), "Flo": ("Frontend", 9),
+    "Gus": ("Data", 27), "Hal": ("Data", 11),
+}
+REVIEW_PAIRS = [
+    ("Ana", "Bo", 14), ("Ana", "Cy", 6), ("Bo", "Cy", 5),
+    ("Di", "Ed", 11), ("Di", "Flo", 7), ("Ed", "Flo", 3),
+    ("Gus", "Hal", 9),
+    ("Ana", "Di", 8), ("Ana", "Gus", 6), ("Ana", "Ed", 2), ("Di", "Gus", 3), ("Bo", "Hal", 1),
+]
+```
+
+```
+reviews = {
+    "nodes": [
+        {
+            "id": person,
+            "group": team,
+            "size": given,
+            # the reviewer every team leans on
+            **({"emphasis": EMPHASIS.HIGHLIGHT} if person == "Ana" else {}),
+        }
+        for person, (team, given) in REVIEWERS.items()
+    ],
+    "edges": [{"source": a, "target": b, "weight": n} for a, b, n in REVIEW_PAIRS],
+}
+
+NetworkChart(
+    data=reviews,
+    show_legend=True,
+    title="Code reviews exchanged this quarter",
+    figsize=FIG_SIZE.SQUARE,
+).show()
+```
+
+### Example 2: Container Traffic Between Ports (Directed, Values, and a Fixed Layout)
+
+Container shipments between six ports in a month, in thousands of units. A shipment goes one way, so the network is directed, and a port pair trading both ways shows as two arrows; the values are written on the edges. The ports keep their rough geographic positions through the fixed layout, and the two ports on the busiest lane are highlighted.
+
+```
+PORTS = {
+    "Shanghai": (0.85, 0.7), "Singapore": (0.75, 0.25), "Dubai": (0.5, 0.45),
+    "Rotterdam": (0.2, 0.8), "Los Angeles": (0.1, 0.3), "Santos": (0.35, 0.1),
+}
+SHIPMENTS = [
+    ("Shanghai", "Rotterdam", 96), ("Rotterdam", "Shanghai", 41),
+    ("Shanghai", "Los Angeles", 88), ("Los Angeles", "Shanghai", 37),
+    ("Shanghai", "Singapore", 52), ("Singapore", "Dubai", 30), ("Dubai", "Rotterdam", 27),
+    ("Singapore", "Rotterdam", 44), ("Santos", "Rotterdam", 18), ("Santos", "Shanghai", 22),
+    ("Rotterdam", "Santos", 9), ("Los Angeles", "Santos", 7),
+]
+```
+
+```
+busiest = max(SHIPMENTS, key=lambda s: s[2])
+
+traffic = {
+    "nodes": [
+        {
+            "id": port,
+            "x": x,
+            "y": y,
+            # the two ends of the busiest lane
+            **({"emphasis": EMPHASIS.HIGHLIGHT} if port in busiest[:2] else {}),
+        }
+        for port, (x, y) in PORTS.items()
+    ],
+    "edges": [{"source": s, "target": t, "weight": k} for s, t, k in SHIPMENTS],
+}
+
+NetworkChart(
+    data=traffic,
+    layout=NETWORK_LAYOUT.FIXED,
+    directed=True,
+    show_values=True,
+    value_format="{x:.0f}k",
+    title="Container shipments between ports, thousands of units",
+    figsize=FIG_SIZE.SQUARE,
+).show()
+```
+
 # Treemap
 
 This section showcases the treemap. It contains examples of how to create treemaps using the [datachart.charts.Treemap](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.Treemap) function.
@@ -10646,10 +11203,11 @@ The connector's look is set by the `plot_text_arrow_style` style key, whose valu
 
 ```
 looks = [
-    (ARROW_STYLE.CURVE, 0.03, 0.62),
-    (ARROW_STYLE.CURVE_ARROW, 0.28, 0.9),
-    (ARROW_STYLE.TOUCHING, 0.7, 0.88),
-    (ARROW_STYLE.ARROW, 0.66, 0.3),
+    (ARROW_STYLE.CURVE, 0.03, 0.62, 1),
+    (ARROW_STYLE.CURVE_ARROW, 0.28, 0.9, 4),
+    (ARROW_STYLE.TOUCHING, 0.7, 0.88, 7),
+    (ARROW_STYLE.ARROW, 0.6, 0.28, 9),
+    (ARROW_STYLE.STRAIGHT, 0.86, 0.45, 11),
 ]
 
 LineChart(
@@ -10665,10 +11223,10 @@ LineChart(
             "x": x,
             "y": y,
             "coords": "axes",
-            "target": (index * 3 + 1, TEMPERATURE[index * 3 + 1]),
+            "target": (month, TEMPERATURE[month]),
             "style": {"plot_text_arrow_style": look},
         }
-        for index, (look, x, y) in enumerate(looks)
+        for look, x, y, month in looks
     ],
 ).show()
 ```
@@ -10676,6 +11234,8 @@ LineChart(
 The connector also places itself: it leaves the box from the side facing the target, a curved look bows toward the side with the most open space — away from the chart's data — and a connector shorter than its own gaps straightens, then disappears entirely.
 
 A look is a starting point, not a straitjacket: the individual `plot_text_arrow_*` keys override single properties of it — `plot_text_arrow_curve` pins the bow (side and depth) exactly, and `plot_text_arrow_color` and `plot_text_arrow_width` restyle the stroke. A raw matplotlib arrow style string (such as `"-|>"`) is also accepted.
+
+`ARROW_STYLE` is the one constant for every drawn connector in the package. A text annotation accepts every member; the edges of a [network chart](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/charts/networkchart.ipynb) take only the two headless looks, `CURVE` and `STRAIGHT`, since their arrowhead comes from the chart's `directed` argument.
 
 ### Text and Box Style
 
@@ -11725,6 +12285,7 @@ The `charts` module contains the methods to create the plots and figures, groupe
 | `ContourChart`     | Creates the contour chart.              |
 | `HexbinChart`      | Creates the hexbin chart.               |
 | `ParallelCoords`   | Creates the parallel coordinates chart. |
+| `NetworkChart`     | Creates the network chart.              |
 | `SankeyChart`      | Creates the Sankey chart.               |
 | `Treemap`          | Creates the treemap.                    |
 
@@ -14183,6 +14744,97 @@ Examples:
 | ------------ | ----------------------------------------------------- |
 | `plt.Figure` | The figure containing the parallel coordinates chart. |
 
+### datachart.charts.NetworkChart
+
+```
+NetworkChart(
+    data: Union[
+        NetworkSingleChartAttrs,
+        List[NetworkSingleChartAttrs],
+    ],
+    *,
+    layout: Optional[Union[NETWORK_LAYOUT, str]] = None,
+    directed: Optional[bool] = None,
+    seed: Optional[int] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    show_legend: Optional[bool] = None,
+    title: Optional[str] = None,
+    subtitle: Optional[
+        Union[str, List[Optional[str]]]
+    ] = None,
+    emphasis: None = None,
+    figsize: Optional[
+        Union[FIG_SIZE, Tuple[float, float]]
+    ] = None,
+    subplots: Optional[bool] = None,
+    max_cols: Optional[int] = None,
+    style: Optional[
+        Union[
+            NetworkStyleAttrs,
+            List[Optional[NetworkStyleAttrs]],
+        ]
+    ] = None,
+    texts: Optional[
+        Union[
+            TextAttrs,
+            List[TextAttrs],
+            List[Union[TextAttrs, List[TextAttrs], None]],
+        ]
+    ] = None
+) -> plt.Figure
+```
+
+Creates the network chart.
+
+A network chart draws relational data as a node-link diagram — module dependencies, who works with whom, co-occurring terms, flows between peers. Nodes are placed by a layout and joined by edges; an edge's weight sets its width, a node's size its marker area, its group its color. Use it when the question is what is connected to what; for weighted flows through ordered stages use SankeyChart.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.charts import NetworkChart
+>>> figure = NetworkChart(
+...     data={
+...         "edges": [
+...             {"source": "core", "target": "utils"},
+...             {"source": "cli", "target": "core"},
+...             {"source": "api", "target": "core"},
+...             {"source": "web", "target": "api"},
+...         ]
+...     },
+...     directed=True,
+...     title="Module dependencies",
+... )
+```
+
+| PARAMETER      | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`         | The chart data: a {"nodes": [...], "edges": [...]} dict, or a list of such dicts drawing one network per subplot. An edge is a {"source", "target"} record naming node ids, with an optional weight above zero. A node is an {"id"} record with an optional label (defaults to the id; an empty string draws nothing), size above zero, group, and emphasis role: "background" mutes the node, its label, and its edges, "highlight" strokes its border. nodes may be omitted; the node set is then read from the edges in first-seen order. **TYPE:** `Union[NetworkSingleChartAttrs, List[NetworkSingleChartAttrs]]` |
+| `layout`       | How the nodes are placed: a NETWORK_LAYOUT constant (default NETWORK_LAYOUT.SPRING). FIXED reads each node's x/y in the 0–1 layout space. **TYPE:** `Optional[Union[NETWORK_LAYOUT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `directed`     | Whether the edges end in an arrowhead at the target. When False (the default), an edge and its reverse draw as one line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `seed`         | The seed of the spring layout (default 0); another seed gives another arrangement of the same data. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `show_values`  | Whether to write each edge's weight at its midpoint. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `value_format` | The format of the edge values: a VALUE_FORMAT constant (default VALUE_FORMAT.DEFAULT) or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `show_legend`  | Whether to list the node groups in a legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `title`        | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `subtitle`     | The subtitle(s) for individual charts. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `emphasis`     | Not supported: emphasis is set per node through its emphasis key. Passing a value raises ValueError. **TYPE:** `None` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `figsize`      | The size of the figure. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `subplots`     | Whether to show each chart in its own subplot; several charts always split into subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `max_cols`     | Maximum number of columns in subplots. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `style`        | Style configuration(s) for the chart(s). The edge geometry, plot_network_edge_style, takes ARROW_STYLE.CURVE (default) or ARROW_STYLE.STRAIGHT; the arrowhead comes from directed. **TYPE:** `Optional[Union[NetworkStyleAttrs, List[Optional[NetworkStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                               |
+| `texts`        | Text annotation(s) to draw. The layout spans 0–1 in both directions. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                        |
+
+| RETURNS      | DESCRIPTION                              |
+| ------------ | ---------------------------------------- |
+| `plt.Figure` | The figure containing the network chart. |
+
+| RAISES       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ValueError` | If emphasis is given, layout is unknown, the records are malformed (a node without an id or a repeated id, an edge naming an unknown node or joining a node to itself, a size or weight not above zero, a node without x/y under the fixed layout, an emphasis that is not a role), or plot_network_edge_style is a headed connector look. |
+
 ## Flows
 
 ### datachart.charts.SankeyChart
@@ -15324,6 +15976,7 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         "plot_bar_edge_color": "#000000",
         "plot_sankey_node_edge_color": "#000000",
         "plot_treemap_edge_color": "#000000",
+        "plot_network_node_edge_color": "#000000",
         "plot_hist_edge_color": "#000000",
         "plot_vline_color": "#5D6D7E",
         "plot_vline_style": LINE_STYLE.DASHED,
@@ -15369,6 +16022,7 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_bar_edge_color": "#0B1F44",
         "plot_sankey_node_edge_color": "#0B1F44",
         "plot_treemap_edge_color": "#0B1F44",
+        "plot_network_node_edge_color": "#0B1F44",
         "plot_hist_edge_color": "#0B1F44",
         "plot_vline_color": "#7F8C8D",
         "plot_vline_style": LINE_STYLE.DASHED,
@@ -15432,6 +16086,7 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_bar_edge_color": "#000000",
         "plot_sankey_node_edge_color": "#000000",
         "plot_treemap_edge_color": "#000000",
+        "plot_network_node_edge_color": "#000000",
         "plot_bar_edge_width": 0.8,
         "plot_bar_alpha": 1.0,
         "plot_hist_edge_color": "#000000",
@@ -15626,6 +16281,7 @@ The `constants` module provides a set of predefined constants used in the packag
 | `CONTOUR_LEVELS`    | The supported contour level rules.             |
 | `HEXBIN_REDUCE`     | The supported hexbin aggregations.             |
 | `BASELINE`          | The supported stacked area baselines.          |
+| `NETWORK_LAYOUT`    | The supported network chart layouts.           |
 | `RADIAL_TYPE`       | The supported radial chart visuals.            |
 | `SWARM_MODE`        | The supported swarm plot modes.                |
 | `DIRECTION`         | The supported angular directions.              |
@@ -15826,9 +16482,9 @@ Examples:
 
 ### datachart.constants.ARROW_STYLE
 
-The supported text annotation connector looks.
+The supported connector looks.
 
-Used by the `plot_text_arrow_style` style attribute of text annotations. Each value names a complete connector look — the line shape, curvature, and the gap on the text side. A curved look bows toward the side with the most open space around the chart's data; `plot_text_arrow_curve` pins the bow exactly, and the other `plot_text_arrow_*` style attributes override single properties of the chosen look. A raw matplotlib arrow style string (e.g. `"-|>"`) is also accepted.
+The one constant for every drawn connector: the `plot_text_arrow_style` style attribute of text annotations and the `plot_network_edge_style` style attribute of network charts. Each value names a complete connector look — the line shape, curvature, and the gap on the text side. For an annotation, a curved look bows toward the side with the most open space around the chart's data; `plot_text_arrow_curve` pins the bow exactly, and the other `plot_text_arrow_*` style attributes override single properties of the chosen look. A raw matplotlib arrow style string (e.g. `"-|>"`) is also accepted. A network edge takes only the two headless looks, `CURVE` and `STRAIGHT`, bowed by `plot_network_edge_curve`; its arrowhead comes from the chart's `directed` argument.
 
 Examples:
 
@@ -15838,12 +16494,13 @@ Examples:
 "curve"
 ```
 
-| ATTRIBUTE     | DESCRIPTION                                                                                        |
-| ------------- | -------------------------------------------------------------------------------------------------- |
-| `CURVE`       | A curved plain line with a small text-side gap. The default. Equals to "curve". **TYPE:** `str`    |
-| `CURVE_ARROW` | The same curve with an arrowhead at the target. Equals to "curve-arrow". **TYPE:** `str`           |
-| `TOUCHING`    | A straight plain line starting flush at the text box border. Equals to "touching". **TYPE:** `str` |
-| `ARROW`       | A straight line with an arrowhead at the target. Equals to "arrow". **TYPE:** `str`                |
+| ATTRIBUTE     | DESCRIPTION                                                                                                                         |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `CURVE`       | A curved plain line with a small text-side gap. The default. Text annotations and network edges. Equals to "curve". **TYPE:** `str` |
+| `CURVE_ARROW` | The same curve with an arrowhead at the target. Text annotations only. Equals to "curve-arrow". **TYPE:** `str`                     |
+| `STRAIGHT`    | A straight plain line with a small text-side gap. Text annotations and network edges. Equals to "straight". **TYPE:** `str`         |
+| `TOUCHING`    | A straight plain line starting flush at the text box border. Text annotations only. Equals to "touching". **TYPE:** `str`           |
+| `ARROW`       | A straight line with an arrowhead at the target. Text annotations only. Equals to "arrow". **TYPE:** `str`                          |
 
 ## Style Constants
 
@@ -16216,6 +16873,27 @@ Examples:
 | `WIGGLE`          | The baseline minimises the sum of squared slopes. Equals to "wiggle". **TYPE:** `str`                        |
 | `WEIGHTED_WIGGLE` | The baseline minimises the size-weighted sum of squared slopes. Equals to "weighted_wiggle". **TYPE:** `str` |
 
+### datachart.constants.NETWORK_LAYOUT
+
+The supported network chart layouts.
+
+Passed as the `layout` attribute of network charts: the rule that places the nodes in the 0–1 layout space. Layout changes what the picture means, so it is a chart attribute and not a style key.
+
+Examples:
+
+```
+>>> from datachart.constants import NETWORK_LAYOUT
+>>> NETWORK_LAYOUT.DEFAULT
+"spring"
+```
+
+| ATTRIBUTE  | DESCRIPTION                                                                                                                                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DEFAULT`  | The default layout. Same as NETWORK_LAYOUT.SPRING. **TYPE:** `str`                                                                                                                                                       |
+| `SPRING`   | A force-directed (Fruchterman–Reingold) layout: linked nodes pull together, every pair pushes apart. Seeded by the chart's seed argument, so the same data renders the same picture. Equals to "spring". **TYPE:** `str` |
+| `CIRCULAR` | The nodes evenly spaced on a circle in input order, starting at the top. Equals to "circular". **TYPE:** `str`                                                                                                           |
+| `FIXED`    | Each node at its own x/y, in the 0–1 layout space; a node without them raises. Equals to "fixed". **TYPE:** `str`                                                                                                        |
+
 ### datachart.constants.RADIAL_TYPE
 
 The supported radial chart visuals.
@@ -16405,6 +17083,9 @@ The `typings` module contains the typings for all chart components. The module i
 | `SankeyLinkAttrs`                | The link record attributes for the Sankey chart.                |
 | `TreemapSingleChartAttrs`        | The single chart attributes for the treemap.                    |
 | `TreemapRecordAttrs`             | The record attributes for the treemap.                          |
+| `NetworkSingleChartAttrs`        | The single chart attributes for the network chart.              |
+| `NetworkNodeAttrs`               | The node record attributes for the network chart.               |
+| `NetworkEdgeAttrs`               | The edge record attributes for the network chart.               |
 | `BarSingleChartAttrs`            | The single chart attributes for the bar chart.                  |
 | `BarDataPointAttrs`              | The data point attributes for the bar chart.                    |
 | `HistogramSingleChartAttrs`      | The single chart attributes for the histogram chart.            |
@@ -16441,6 +17122,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `StackedAreaStyleAttrs`          | The typing for the stacked area chart style.                    |
 | `SankeyStyleAttrs`               | The typing for the Sankey chart style.                          |
 | `TreemapStyleAttrs`              | The typing for the treemap style.                               |
+| `NetworkStyleAttrs`              | The typing for the network chart style.                         |
 | `BarStyleAttrs`                  | The typing for the bar style.                                   |
 | `HistStyleAttrs`                 | The typing for the histogram style.                             |
 | `VLineStyleAttrs`                | The typing for the vertical line style.                         |
@@ -16958,7 +17640,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `BarStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
 
 The style attributes. Combines all style typings.
 

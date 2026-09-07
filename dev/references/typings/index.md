@@ -19,6 +19,9 @@ The `typings` module contains the typings for all chart components. The module i
 | `SankeyLinkAttrs`                | The link record attributes for the Sankey chart.                |
 | `TreemapSingleChartAttrs`        | The single chart attributes for the treemap.                    |
 | `TreemapRecordAttrs`             | The record attributes for the treemap.                          |
+| `NetworkSingleChartAttrs`        | The single chart attributes for the network chart.              |
+| `NetworkNodeAttrs`               | The node record attributes for the network chart.               |
+| `NetworkEdgeAttrs`               | The edge record attributes for the network chart.               |
 | `BarSingleChartAttrs`            | The single chart attributes for the bar chart.                  |
 | `BarDataPointAttrs`              | The data point attributes for the bar chart.                    |
 | `HistogramSingleChartAttrs`      | The single chart attributes for the histogram chart.            |
@@ -55,6 +58,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `StackedAreaStyleAttrs`          | The typing for the stacked area chart style.                    |
 | `SankeyStyleAttrs`               | The typing for the Sankey chart style.                          |
 | `TreemapStyleAttrs`              | The typing for the treemap style.                               |
+| `NetworkStyleAttrs`              | The typing for the network chart style.                         |
 | `BarStyleAttrs`                  | The typing for the bar style.                                   |
 | `HistStyleAttrs`                 | The typing for the histogram style.                             |
 | `VLineStyleAttrs`                | The typing for the vertical line style.                         |
@@ -572,7 +576,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `BarStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
 
 The style attributes. Combines all style typings.
 

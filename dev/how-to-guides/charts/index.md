@@ -39,6 +39,7 @@ How two or more variables relate to each other.
 | [Contour Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md)          | The showcase of the contour chart.        |
 | [Hexbin Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md)            | The showcase of the hexbin chart.         |
 | [Parallel Coordinates](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/parallelcoords/index.md) | The showcase of the parallel coordinates. |
+| [Network Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/networkchart/index.md)          | The showcase of the network chart.        |
 
 ## Flows
 

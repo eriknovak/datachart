@@ -102,10 +102,11 @@ The connector's look is set by the `plot_text_arrow_style` style key, whose valu
 
 ```
 looks = [
-    (ARROW_STYLE.CURVE, 0.03, 0.62),
-    (ARROW_STYLE.CURVE_ARROW, 0.28, 0.9),
-    (ARROW_STYLE.TOUCHING, 0.7, 0.88),
-    (ARROW_STYLE.ARROW, 0.66, 0.3),
+    (ARROW_STYLE.CURVE, 0.03, 0.62, 1),
+    (ARROW_STYLE.CURVE_ARROW, 0.28, 0.9, 4),
+    (ARROW_STYLE.TOUCHING, 0.7, 0.88, 7),
+    (ARROW_STYLE.ARROW, 0.6, 0.28, 9),
+    (ARROW_STYLE.STRAIGHT, 0.86, 0.45, 11),
 ]
 
 LineChart(
@@ -121,10 +122,10 @@ LineChart(
             "x": x,
             "y": y,
             "coords": "axes",
-            "target": (index * 3 + 1, TEMPERATURE[index * 3 + 1]),
+            "target": (month, TEMPERATURE[month]),
             "style": {"plot_text_arrow_style": look},
         }
-        for index, (look, x, y) in enumerate(looks)
+        for look, x, y, month in looks
     ],
 ).show()
 ```
@@ -132,6 +133,8 @@ LineChart(
 The connector also places itself: it leaves the box from the side facing the target, a curved look bows toward the side with the most open space — away from the chart's data — and a connector shorter than its own gaps straightens, then disappears entirely.
 
 A look is a starting point, not a straitjacket: the individual `plot_text_arrow_*` keys override single properties of it — `plot_text_arrow_curve` pins the bow (side and depth) exactly, and `plot_text_arrow_color` and `plot_text_arrow_width` restyle the stroke. A raw matplotlib arrow style string (such as `"-|>"`) is also accepted.
+
+`ARROW_STYLE` is the one constant for every drawn connector in the package. A text annotation accepts every member; the edges of a [network chart](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/charts/networkchart.ipynb) take only the two headless looks, `CURVE` and `STRAIGHT`, since their arrowhead comes from the chart's `directed` argument.
 
 ### Text and Box Style
 
