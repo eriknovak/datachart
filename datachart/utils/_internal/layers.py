@@ -1275,6 +1275,9 @@ class HistogramLayer(Layer):
         def datum(i: int) -> dict:
             span = _range_text(ax, value_axis, edges[i], edges[i + 1])
             count = _scalar(counts[i])
+            # matplotlib bins into floats; a plain count reads as a whole number
+            if not self.show_density and float(count).is_integer():
+                count = int(count)
             if self.is_horizontal:
                 return {"label": label, "x": count, "y": span}
             return {"label": label, "x": span, "y": count}

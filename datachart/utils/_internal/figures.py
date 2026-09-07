@@ -185,12 +185,14 @@ class DatachartFigure(Figure):
         hovering a mark shows its data: in notebooks the figure is displayed
         on an `ipympl` widget canvas with the matplotlib toolbar, in scripts
         the GUI window's toolbar already provides zoom and pan. Hovering a
-        line point, scatter point, or bar annotates it with the series'
-        legend label and one `name: value` line per axis, named after the
-        axis labels when set; the annotation wears the theme's text
-        annotation style. Other chart types zoom and pan but show no hover
-        annotation. The optional dependencies come with the
-        `interactive` extra: `pip install "datachart[interactive]"`.
+        mark of any chart type annotates it with the series' legend label
+        and one `name: value` line per field of the mark: its axis
+        coordinates, named after the axis labels when set, or the summary
+        an aggregate mark stands for — a box its quartiles, a histogram bin
+        its range and count, a sankey link its endpoints and flow. The
+        annotation wears the theme's text annotation style. The optional
+        dependencies come with the `interactive` extra:
+        `pip install "datachart[interactive]"`.
 
         !!! info "Added in Unreleased"
 
