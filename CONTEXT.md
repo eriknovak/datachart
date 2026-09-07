@@ -167,6 +167,17 @@ participation) to its panel and re-rendering. Rejects grid figures — annotate
 the sources before composing.
 _Avoid_: overlay text, label function
 
+**Point label**:
+A scatter point's name, read from the data key the `label` parameter names
+(`label="name"`, off when unset) and drawn beside its marker in the text
+font. The panel places all of a coordinate space's point labels at once,
+after limits are final: each takes the spot around its marker with the least
+overlap against every marker in the panel, the labels already placed, the
+correlation box, and the axes edge. A crowded label is placed at its
+least-overlap spot, never dropped; a background layer's labels take the muted
+color.
+_Avoid_: annotation (for this), tag, name label, adjusted text
+
 **Heatmap**:
 A per-cell matrix (`Heatmap`: a 2-D `z` grid per chart with optional `x`, `y`
 labels for its columns and rows) drawn as one colored cell per value at

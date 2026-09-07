@@ -143,6 +143,26 @@ SANKEY_VALUE_POSITIONS = (0.8, 0.65, 0.5, 0.35, 0.2)
 # estimated glyph width and line height as multiples of the font size
 TEXT_WIDTH_PER_CHAR = 0.55
 TEXT_LINE_HEIGHT = 1.2
+# point labels: the gap between a marker's edge and its label, in points, and
+# the candidate spots around the marker in preference order (ha, va, dx, dy)
+POINT_LABEL_PAD = 3.0
+# an overlap below this many square pixels counts as a clear spot
+POINT_LABEL_CLEAR = 1e-6
+POINT_LABEL_SPOTS = (
+    ("left", "center", 1, 0),
+    ("right", "center", -1, 0),
+    ("center", "bottom", 0, 1),
+    ("center", "top", 0, -1),
+    ("left", "bottom", 1, 1),
+    ("right", "bottom", -1, 1),
+    ("left", "top", 1, -1),
+    ("right", "top", -1, -1),
+)
+# the widest correlation readout, for reserving its corner box
+CORRELATION_BOX_TEXT = "r = -0.000"
+# the correlation readout's corner, in axes fractions
+CORRELATION_BOX_CORNER = (0.05, 0.95)
+CORRELATION_BOX_PAD = 0.3
 SANKEY_GREY = "#9E9E9E"
 # treemap header band: its height in font heights, and the group height in
 # bands below which the group goes unlabelled (ADR 0028)
@@ -1173,6 +1193,12 @@ class ScatterLayer(Layer):
         # the correlation box wears the plot_text_* family (ADR 0018)
         self.correlation_font = get_plot_text_style({})
         self.correlation_bbox = get_plot_text_box_style({})
+        # point labels wear the text font; alignment comes from their spot
+        self.label_font = {
+            k: v for k, v in get_plot_text_style({}).items() if k not in ("ha", "va")
+        }
+        # drawn points per axes, consumed by the panel's label placement
+        self._pending_labels = {}
 
         hue_data = get_chart_data("hue", self.chart)
         self.hue_colors = None
@@ -1200,13 +1226,49 @@ class ScatterLayer(Layer):
                 "s", self.default_size
             )
 
-    def _draw_regression(self, ax, x, y, color, transpose=False):
+    def _point_labels(self, x_data) -> Optional[np.ndarray]:
+        """One label per drawn point (None where the key is absent), or None."""
+
+        x_attr = get_attr_value("x", self.chart, "x")
+        label_attr = get_attr_value("label", self.chart, "label")
+        data = self.chart.get("data")
+        if not isinstance(data, list):
+            return None
+        labels = [d.get(label_attr) for d in data if x_attr in d]
+        if len(labels) != len(x_data) or all(l is None for l in labels):
+            return None
+        return np.array([None if l is None else str(l) for l in labels], dtype=object)
+
+    def _record_points(self, ax, ctx, x, y, sizes, labels) -> None:
+        """Remember the drawn points so the panel can place their labels."""
+
+        if ctx.transpose:
+            x, y = y, x
+        font = dict(self.label_font)
+        if ctx.emphasis == EMPHASIS_BACKGROUND:
+            font["color"] = self.muted_color
+        self._pending_labels.setdefault(id(ax), []).append(
+            (
+                np.asarray(x, dtype=float),
+                np.asarray(y, dtype=float),
+                sizes,
+                labels,
+                font,
+            )
+        )
+
+    def pending_labels(self, ax) -> list:
+        """The points drawn into `ax` as (x, y, sizes, labels, font) tuples."""
+
+        return self._pending_labels.pop(id(ax), [])
+
+    def _draw_regression(self, ax, ctx, x, y, color):
         from scipy import stats as scipy_stats
 
         if len(x) == 0 or len(np.unique(x)) <= 1:
             return
 
-        plot, fill, _ = _oriented(ax, transpose)
+        plot, fill, _ = _oriented(ax, ctx.transpose)
 
         slope, intercept, _, _, _ = scipy_stats.linregress(x, y)
         x_line = np.linspace(x.min(), x.max(), 100)
@@ -1217,6 +1279,9 @@ class ScatterLayer(Layer):
             reg_style["color"] = color
         self._stroke_halo(reg_style)
         plot(x_line, y_line, **reg_style)
+        # the line's samples keep point labels off it, as markers of its width
+        width = reg_style.get("linewidth") or 1.0
+        self._record_points(ax, ctx, x_line, y_line, (2 * width) ** 2, None)
 
         if self.show_ci:
             n = len(x)
@@ -1247,7 +1312,12 @@ class ScatterLayer(Layer):
         font["ha"], font["va"] = "left", "top"
         if self.correlation_bbox is not None:
             font["bbox"] = dict(self.correlation_bbox)
-        ax.annotate(f"r = {r:.3f}", xy=(0.05, 0.95), xycoords="axes fraction", **font)
+        ax.annotate(
+            f"r = {r:.3f}",
+            xy=CORRELATION_BOX_CORNER,
+            xycoords="axes fraction",
+            **font,
+        )
 
     def draw(self, ax, ctx):
         x_data = get_chart_data("x", self.chart)
@@ -1257,6 +1327,7 @@ class ScatterLayer(Layer):
 
         if x_data is None or y_data is None:
             return
+        labels = self._point_labels(x_data)
 
         scatter_style = dict(self.scatter_style)
         if ctx.z_order is not None:
@@ -1292,13 +1363,19 @@ class ScatterLayer(Layer):
                     **group_style,
                 )
                 self._mark_legend_size(collection, size_data)
+                self._record_points(
+                    ax,
+                    ctx,
+                    x_data[mask],
+                    y_data[mask],
+                    group_sizes,
+                    labels[mask] if labels is not None else None,
+                )
 
             if self.show_correlation:
                 self._draw_correlation(ax, x_data, y_data, color=None)
             if self.show_regression:
-                self._draw_regression(
-                    ax, x_data, y_data, color=None, transpose=ctx.transpose
-                )
+                self._draw_regression(ax, ctx, x_data, y_data, color=None)
         else:
             sizes = self._sizes(size_data)
             base_style = {k: v for k, v in scatter_style.items() if k != "s"}
@@ -1311,12 +1388,11 @@ class ScatterLayer(Layer):
                 x_data, y_data, s=sizes, label=self.label(ctx), **base_style
             )
             self._mark_legend_size(collection, size_data)
+            self._record_points(ax, ctx, x_data, y_data, sizes, labels)
 
             color = base_style.get("c", base_style.get("color"))
             if self.show_regression:
-                self._draw_regression(
-                    ax, x_data, y_data, color=color, transpose=ctx.transpose
-                )
+                self._draw_regression(ax, ctx, x_data, y_data, color=color)
             if self.show_correlation:
                 self._draw_correlation(ax, x_data, y_data, color=color)
 
@@ -3009,6 +3085,56 @@ def _text_box(ax, x, y, text, fontsize, ha, pad_points=0.0):
     height = (text_h + 2 * pad_points) * per_point_y
     x0 = x - width / 2 if ha == "center" else x - width if ha == "right" else x
     return (x0, y - height / 2, x0 + width, y + height / 2)
+
+
+def _draw_point_labels(ax, entries, obstacles) -> None:
+    """Draw point labels at the spot around each marker with the least overlap.
+
+    `entries` are (owner_ax, x, y, radius_pt, text, font) in draw order;
+    `obstacles` are display-space (x0, y0, x1, y1) boxes — every marker of
+    the panel and its correlation box. Each label takes the first clear spot
+    among `POINT_LABEL_SPOTS`, or the least-overlapping one when none is
+    clear; placed labels join the obstacles, and the space outside the axes
+    counts as occupied.
+    """
+
+    px_per_pt = ax.figure.dpi / 72.0
+    frame = tuple(ax.bbox.extents)
+    occupied = list(obstacles)
+    for owner_ax, x, y, radius_pt, text, font in entries:
+        cx, cy = owner_ax.transData.transform((x, y))
+        w, h = (v * px_per_pt for v in _text_size(font["fontsize"], text))
+        gap = radius_pt + POINT_LABEL_PAD
+        best = None
+        for ha, va, dx, dy in POINT_LABEL_SPOTS:
+            # a diagonal spot keeps the same gap along the diagonal
+            step = gap / math.sqrt(2) if dx and dy else gap
+            ax0 = cx + dx * step * px_per_pt
+            ay0 = cy + dy * step * px_per_pt
+            x0 = ax0 - w / 2 if ha == "center" else ax0 - w if ha == "right" else ax0
+            y0 = ay0 - h / 2 if va == "center" else ay0 - h if va == "top" else ay0
+            box = (x0, y0, x0 + w, y0 + h)
+            outside = w * h - _overlap_area(box, frame)
+            overlap = outside + sum(_overlap_area(box, other) for other in occupied)
+            # sub-pixel residue from the transforms is not an overlap
+            overlap = 0.0 if overlap < POINT_LABEL_CLEAR else overlap
+            if best is None or overlap < best[0]:
+                best = (overlap, ha, va, dx * step, dy * step, box)
+            if overlap == 0:
+                break
+        _, ha, va, dx, dy, box = best
+        occupied.append(box)
+        ax.annotate(
+            text,
+            xy=(x, y),
+            xycoords=owner_ax.transData,
+            xytext=(dx, dy),
+            textcoords="offset points",
+            ha=ha,
+            va=va,
+            zorder=TEXT_ANNOTATION_ZORDER,
+            **font,
+        )
 
 
 def _overlap_area(a, b) -> float:
@@ -5000,6 +5126,10 @@ class Panel:
             for layer in group.layers:
                 _draw_texts(top_ax, layer.texts, owner_ax, clearance)
 
+        # point labels are placed once every marker of the panel is drawn and
+        # the limits are final, so the estimate sees the real display space
+        self._place_point_labels(top_ax, group_axes)
+
         # aspect ratio (a polar axes keeps its own; a bare layer fixed its own)
         if s.get("aspect_ratio") and not polar and not bare:
             ax.set(adjustable="box", aspect=s["aspect_ratio"])
@@ -5080,6 +5210,43 @@ class Panel:
                     text.set_fontfamily(family)
                 if legend.get_title() is not None:
                     legend.get_title().set_fontfamily(family)
+
+    def _place_point_labels(self, top_ax, group_axes) -> None:
+        """Gather every scatter layer's points and place their labels together."""
+
+        px_per_pt = top_ax.figure.dpi / 72.0
+        entries, obstacles = [], []
+        for group, owner_ax in zip(self.groups, group_axes):
+            for layer in group.layers:
+                if not isinstance(layer, ScatterLayer):
+                    continue
+                for xs, ys, sizes, labels, font in layer.pending_labels(owner_ax):
+                    centers = owner_ax.transData.transform(np.column_stack([xs, ys]))
+                    # scatter sizes are marker areas in points squared
+                    radii = np.sqrt(np.broadcast_to(sizes, len(xs))) / 2
+                    for i, ((cx, cy), r) in enumerate(zip(centers, radii)):
+                        rpx = r * px_per_pt
+                        obstacles.append((cx - rpx, cy - rpx, cx + rpx, cy + rpx))
+                        if labels is not None and labels[i] is not None:
+                            entries.append((owner_ax, xs[i], ys[i], r, labels[i], font))
+                if layer.show_correlation:
+                    obstacles.append(self._correlation_box(top_ax, layer))
+        if entries:
+            _draw_point_labels(top_ax, entries, obstacles)
+
+    @staticmethod
+    def _correlation_box(ax, layer) -> tuple:
+        """The display-space box the layer's correlation readout occupies."""
+
+        px_per_pt = ax.figure.dpi / 72.0
+        fontsize = layer.correlation_font["fontsize"]
+        w, h = (v * px_per_pt for v in _text_size(fontsize, CORRELATION_BOX_TEXT))
+        # matplotlib pads a text box by 0.3 font sizes unless the boxstyle says
+        pad = CORRELATION_BOX_PAD * fontsize * px_per_pt
+        if layer.correlation_bbox is None:
+            pad = 0.0
+        x0, y1 = ax.transAxes.transform(CORRELATION_BOX_CORNER)
+        return (x0 - pad, y1 - h - pad, x0 + w + pad, y1 + pad)
 
     def _clearance_points(self, group_axes, horizontal):
         """The panel's data in display coordinates, for connector scoring."""
