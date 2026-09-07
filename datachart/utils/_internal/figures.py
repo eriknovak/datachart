@@ -10,13 +10,17 @@ annotations over the layers' registered hover targets (ADR 0031).
 import importlib
 import io
 import itertools
+import numbers
 import warnings
 
+import numpy as np
 import matplotlib._constrained_layout as _constrained_layout
 from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.collections import PathCollection, PolyCollection
 from matplotlib.figure import Figure
 from matplotlib.layout_engine import ConstrainedLayoutEngine
 from matplotlib.lines import Line2D
+from matplotlib.patches import FancyArrowPatch, PathPatch
 
 
 def _in_notebook_kernel() -> bool:
@@ -73,33 +77,101 @@ def _hover_value(ax, which: str, value) -> str:
 
     if isinstance(value, str):
         return value
-    return getattr(ax, f"format_{which}data")(value).strip()
+    # a tick formatter may hand back the label object itself, not text
+    return str(getattr(ax, f"format_{which}data")(value)).strip()
+
+
+def _plain_value(value) -> str:
+    """A field value as plain text: whole numbers without a fraction, reals positional."""
+
+    if isinstance(value, numbers.Real) and not isinstance(value, numbers.Integral):
+        if not np.isfinite(value):
+            return str(value)
+        return np.format_float_positional(value, precision=6, trim="-")
+    return str(value)
 
 
 def _hover_text(artist, datum: dict) -> str:
-    """The annotation for a datum: legend label, then one `name: value` line per axis."""
+    """The annotation for a datum: legend label, then one `name: value` line per field.
+
+    `x` and `y` are axis coordinates, named and formatted by the axes they
+    are drawn on; every other field is shown under its own key, in the
+    datum's order (ADR 0031).
+    """
 
     ax = artist.axes if hasattr(artist, "axes") else artist[0].axes
     label = datum.get("label")
     lines = [] if label is None or str(label).startswith("_") else [str(label)]
-    for which in ("x", "y"):
-        if which in datum:
-            lines.append(
-                f"{_axis_name(ax, which)}: {_hover_value(ax, which, datum[which])}"
-            )
+    for key, value in datum.items():
+        if key == "label":
+            continue
+        if key in ("x", "y"):
+            lines.append(f"{_axis_name(ax, key)}: {_hover_value(ax, key, value)}")
+        else:
+            lines.append(f"{key}: {_plain_value(value)}")
     return "\n".join(lines)
 
 
-def _selection_index(index) -> int:
+def _selection_index(index):
     """The element index of an mplcursors selection, snapped to the nearest datum.
 
     Line segments pick a fractional index, step lines an `Index` carrying the
-    source point as `.int`.
+    source point as `.int`; collections, images, and contour sets pick a
+    tuple, whose components snap the same way.
     """
 
+    if isinstance(index, tuple):
+        return tuple(_selection_index(component) for component in index)
     if hasattr(index, "int"):
         return int(index.int)
     return int(round(float(index)))
+
+
+def _extend_pickers() -> None:
+    """Teach mplcursors the two artist kinds it has no pick for.
+
+    Registered through mplcursors' own single-dispatch seam, only where it
+    has no implementation, so an upstream one wins once it exists. A filled
+    polygon collection (a stacked band, a violin body, a hexagon) is picked
+    by matplotlib's containment test, reporting the polygon and its vertex
+    nearest the pointer at that vertex's distance; an arrow patch (a network
+    edge) is picked like any other patch, by the distance to its outline.
+    """
+
+    from mplcursors._pick_info import Selection, compute_pick, get_ann_text
+
+    fallback = compute_pick.dispatch(object)
+    if compute_pick.dispatch(FancyArrowPatch) is fallback:
+        compute_pick.register(FancyArrowPatch, compute_pick.dispatch(PathPatch))
+    if compute_pick.dispatch(PolyCollection) is not fallback:
+        return
+    # the default text is replaced by the datum's; a collection's will do
+    get_ann_text.register(PolyCollection, get_ann_text.dispatch(PathCollection))
+
+    @compute_pick.register(PolyCollection)
+    def _(artist, event):
+        contains, info = artist.contains(event)
+        if not contains:
+            return None
+        polygon = int(info["ind"][-1])
+        paths, offsets = artist.get_paths(), artist.get_offsets()
+        screen = artist.get_transform().transform_path(paths[polygon % len(paths)])
+        vertices = screen.vertices
+        if len(offsets):
+            offset = offsets[polygon % len(offsets)]
+            vertices = vertices + artist.get_offset_transform().transform(offset)
+        distances = np.hypot(*(vertices - [event.x, event.y]).T)
+        vertex = int(np.nanargmin(distances))
+        # the distance to the outline, so a point or line drawn over the
+        # polygon still wins the pick when the pointer is on it
+        return Selection(
+            artist,
+            (event.xdata, event.ydata),
+            (polygon, vertex),
+            distances[vertex],
+            None,
+            None,
+        )
 
 
 class DatachartFigure(Figure):
@@ -122,12 +194,14 @@ class DatachartFigure(Figure):
         hovering a mark shows its data: in notebooks the figure is displayed
         on an `ipympl` widget canvas with the matplotlib toolbar, in scripts
         the GUI window's toolbar already provides zoom and pan. Hovering a
-        line point, scatter point, or bar annotates it with the series'
-        legend label and one `name: value` line per axis, named after the
-        axis labels when set; the annotation wears the theme's text
-        annotation style. Other chart types zoom and pan but show no hover
-        annotation. The optional dependencies come with the
-        `interactive` extra: `pip install "datachart[interactive]"`.
+        mark of any chart type annotates it with the series' legend label
+        and one `name: value` line per field of the mark: its axis
+        coordinates, named after the axis labels when set, or the summary
+        an aggregate mark stands for — a box its quartiles, a histogram bin
+        its range and count, a sankey link its endpoints and flow. The
+        annotation wears the theme's text annotation style. The optional
+        dependencies come with the `interactive` extra:
+        `pip install "datachart[interactive]"`.
 
         !!! info "Added in Unreleased"
 
@@ -208,6 +282,7 @@ class DatachartFigure(Figure):
 
         if getattr(self, "_hover_canvas", None) is self.canvas:
             return
+        _extend_pickers()
         previous = getattr(self, "_hover_cursor", None)
         if previous is not None:
             # bound to the canvas a previous show() swapped out

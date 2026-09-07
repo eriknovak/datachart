@@ -14,9 +14,12 @@ import pytest
 import matplotlib.pyplot as plt
 from matplotlib.backend_bases import MouseEvent
 from matplotlib.backends.backend_agg import FigureCanvasAgg
-from matplotlib.collections import PathCollection
+from matplotlib.collections import PathCollection, PolyCollection
 from matplotlib.container import BarContainer
+from matplotlib.contour import ContourSet
+from matplotlib.image import AxesImage
 from matplotlib.lines import Line2D
+from matplotlib.patches import FancyArrowPatch, Polygon
 
 from datachart.charts import (
     LineChart,
@@ -25,7 +28,19 @@ from datachart.charts import (
     Histogram,
     BoxPlot,
     PyramidChart,
+    StackedAreaChart,
+    SwarmPlot,
+    HexbinChart,
+    Heatmap,
+    ContourChart,
+    ViolinPlot,
+    ParallelCoords,
+    SankeyChart,
+    Treemap,
+    NetworkChart,
+    RadialChart,
 )
+from datachart.constants import HISTOGRAM_TYPE
 from datachart.utils import Panel, Grid
 
 LINE_DATA = [
@@ -101,11 +116,11 @@ class TestHoverSeam:
         for bar_mode in ("group", "stack", "overlay"):
             targets = _targets(_bar_fig(bar_mode=bar_mode))
             assert [type(a) for a, _ in targets] == [BarContainer, BarContainer]
-            assert targets[1][1](1) == {"label": "south", "x": "B", "y": 5}
+            assert targets[1][1](1) == {"label": "south", "x": 1, "y": 5}
 
     def test_horizontal_bar_reports_value_on_the_drawn_x(self):
         targets = _targets(_bar_fig(orientation="horizontal"))
-        assert targets[0][1](2) == {"label": "north", "x": 4, "y": "C"}
+        assert targets[0][1](2) == {"label": "north", "x": 4, "y": 2}
 
     def test_pyramid_bars_report_positive_values(self):
         figure = PyramidChart(data=BAR_DATA, subtitle=["left", "right"])
@@ -115,14 +130,6 @@ class TestHoverSeam:
     def test_log_scale_bars_report_the_data_value(self):
         targets = _targets(_bar_fig(scaley="log"))
         assert targets[0][1](0)["y"] == 3
-
-    def test_other_layers_register_nothing(self):
-        hist = Histogram(
-            data=[{"x": v} for v in np.random.default_rng(0).normal(size=30)]
-        )
-        box = BoxPlot(data=[{"label": "g", "value": v} for v in range(20)])
-        assert _targets(hist) == []
-        assert _targets(box) == []
 
     def test_composed_figures_register_their_own_targets(self):
         line, bar = _line_fig(), _bar_fig()
@@ -141,6 +148,341 @@ class TestHoverSeam:
         panel = Panel([hbar, line])
         resolver = _targets(panel)[2][1]
         assert resolver(1) == {"label": None, "x": 10, "y": 1}
+
+
+GROUP_DATA = [{"label": "A", "value": v} for v in [1, 2, 3, 4, 10]] + [
+    {"label": "B", "value": v} for v in [5, 6, 7]
+]
+
+
+def _vertex_near(collection, x, transpose=False):
+    """The index of the polygon vertex closest to `x` along the band's x axis."""
+    vertices = collection.get_paths()[0].vertices[:, 1 if transpose else 0]
+    return int(np.argmin(np.abs(vertices - x)))
+
+
+class TestCartesianLayers:
+    """Point and bin layers on cartesian axes register their marks."""
+
+    def test_stacked_area_band_reports_own_value_at_nearest_x(self):
+        figure = StackedAreaChart(
+            data=[
+                [{"x": i, "y": i + 1} for i in range(4)],
+                [{"x": i, "y": 10} for i in range(4)],
+            ],
+            subtitle=["low", "high"],
+        )
+        targets = _targets(figure)
+        assert [type(a).__mro__[1] for a, _ in targets] == [PolyCollection] * 2
+        band, resolver = targets[1]
+        assert resolver((0, _vertex_near(band, 2))) == {
+            "label": "high",
+            "x": 2,
+            "y": 10,
+        }
+
+    def test_histogram_bins_report_range_and_count(self):
+        figure = Histogram(
+            data=[{"x": v} for v in [0, 1, 2, 2, 3, 3, 3, 4, 5, 10]],
+            num_bins=5,
+            subtitle="values",
+        )
+        ((bars, resolver),) = _targets(figure)
+        assert isinstance(bars, BarContainer)
+        ax = figure.axes[0]
+        edges = f"{ax.format_xdata(2.0).strip()} – {ax.format_xdata(4.0).strip()}"
+        assert resolver(1) == {"label": "values", "x": edges, "y": 5}
+
+    def test_horizontal_and_stacked_histograms_report_own_heights(self):
+        data = [[{"x": v} for v in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]] * 2
+        stacked = Histogram(
+            data=data, num_bins=5, bar_mode="stack", subtitle=["a", "b"]
+        )
+        assert [r(0)["y"] for _, r in _targets(stacked)] == [2, 2]
+        horizontal = Histogram(
+            data=data[0], num_bins=5, orientation="horizontal", subtitle="a"
+        )
+        ((_, resolver),) = _targets(horizontal)
+        assert resolver(0)["x"] == 2 and "–" in resolver(0)["y"]
+
+    def test_step_histogram_outline_names_the_bin_of_a_vertex(self):
+        figure = Histogram(
+            data=[{"x": v} for v in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
+            num_bins=5,
+            style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
+        )
+        ((outline, resolver),) = _targets(figure)
+        assert isinstance(outline, Polygon)
+        # vertex 3 sits on the second bin's top edge, at x=2..4
+        vertex_x = outline.get_xy()[3][0]
+        assert 2 <= vertex_x <= 4
+        assert resolver(3)["y"] == 2
+
+    def test_swarm_points_report_category_and_value(self):
+        figure = SwarmPlot(data=GROUP_DATA, subtitle="scores")
+        ((points, resolver),) = _targets(figure)
+        assert isinstance(points, PathCollection)
+        assert resolver(4) == {"label": "scores", "x": 1, "y": 10}
+        assert resolver(6) == {"label": "scores", "x": 2, "y": 6}
+        horizontal = SwarmPlot(data=GROUP_DATA, orientation="horizontal")
+        assert _targets(horizontal)[0][1](0) == {"label": None, "x": 1, "y": 1}
+
+    def test_hexbin_hexagons_report_center_and_count(self):
+        rng = np.random.default_rng(0)
+        figure = HexbinChart(
+            data={"x": rng.random(200), "y": rng.random(200)}, gridsize=4
+        )
+        ((tiles, resolver),) = _targets(figure)
+        assert isinstance(tiles, PolyCollection)
+        datum = resolver((3, 0))
+        cx, cy = tiles.get_offsets()[3]
+        assert datum == {
+            "label": None,
+            "x": cx,
+            "y": cy,
+            "count": int(tiles.get_array()[3]),
+        }
+
+    def test_hexbin_reduced_values_name_the_reducer(self):
+        figure = HexbinChart(
+            data={"x": [0, 0.1, 1, 1.1], "y": [0, 0.1, 1, 1.1], "c": [2, 4, 6, 8]},
+            gridsize=2,
+            reduce="mean",
+        )
+        ((tiles, resolver),) = _targets(figure)
+        assert list(resolver((0, 0))) == ["label", "x", "y", "mean"]
+
+    def test_heatmap_cells_report_labels_and_value(self):
+        figure = Heatmap(
+            data={"x": ["a", "b"], "y": ["p", "q"], "z": [[1, 2], [3, None]]},
+            subtitle="grid",
+        )
+        ((image, resolver),) = _targets(figure)
+        assert isinstance(image, AxesImage)
+        assert resolver((1, 0)) == {"label": "grid", "x": 0, "y": 1, "value": 3}
+        unlabeled = Heatmap(data={"z": [[1, 2], [3, 4]]})
+        assert _targets(unlabeled)[0][1]((0, 1)) == {
+            "label": None,
+            "x": 1,
+            "y": 0,
+            "value": 2,
+        }
+
+    def test_contour_lines_and_bands_report_their_level(self):
+        z = [[0, 1, 4], [1, 2, 5], [4, 5, 8]]
+        lines = ContourChart(data={"z": z}, levels=[1, 3, 5], subtitle="height")
+        ((contours, resolver),) = _targets(lines)
+        assert isinstance(contours, ContourSet)
+        assert resolver((1, 0.4)) == {"label": "height", "level": 3}
+        filled = ContourChart(data={"z": z}, levels=[1, 3, 5], filled=True)
+        ((bands, resolver),) = _targets(filled)
+        assert resolver((0, 2)) == {"label": None, "level": "1 – 3"}
+
+
+SUMMARY_A = {"median": 3, "q1": 2, "q3": 4, "min": 1, "max": 10}
+
+
+class TestAggregateLayers:
+    """Aggregate and structural marks report their summary."""
+
+    def test_box_reports_category_and_five_numbers(self):
+        figure = BoxPlot(data=GROUP_DATA, subtitle="scores")
+        ((boxes, resolver),) = _targets(figure)
+        assert isinstance(boxes, BarContainer) and len(boxes) == 2
+        assert resolver(0) == {"label": "scores", "x": 1, **SUMMARY_A}
+        horizontal = BoxPlot(data=GROUP_DATA, orientation="horizontal")
+        datum = _targets(horizontal)[0][1](1)
+        assert list(datum) == ["label", "y", "median", "q1", "q3", "min", "max"]
+        assert datum["y"] == 2
+
+    def test_violin_bodies_report_the_same_summary(self):
+        figure = ViolinPlot(data=GROUP_DATA, subtitle="scores")
+        targets = _targets(figure)
+        assert all(isinstance(a, PolyCollection) for a, _ in targets)
+        assert len(targets) == 2
+        assert targets[0][1]((0, 7)) == {"label": "scores", "x": 1, **SUMMARY_A}
+        assert targets[1][1]((0, 0))["median"] == 6
+
+    def test_split_violins_report_the_split_value(self):
+        data = [
+            {"label": "A", "value": v, "side": s} for v, s in zip(range(8), "LLLLRRRR")
+        ]
+        figure = ViolinPlot(data=data, split="side")
+        assert [r((0, 0))["label"] for _, r in _targets(figure)] == ["L", "R"]
+
+    def test_parallel_rows_report_the_axis_under_the_pointer(self):
+        figure = ParallelCoords(
+            data=[
+                {"a": 1, "b": 2, "c": 3, "kind": "k1"},
+                {"a": 4, "b": 5, "c": 6, "kind": "k2"},
+            ],
+            dimensions=["a", "b", "c"],
+            hue="kind",
+        )
+        targets = _targets(figure)
+        assert [type(a) for a, _ in targets] == [Line2D, Line2D]
+        assert targets[1][1](2) == {"label": "k2", "c": 6}
+        assert targets[0][1](0) == {"label": "k1", "a": 1}
+        unhued = ParallelCoords(data=[{"a": 1, "b": 2}], subtitle="rows")
+        assert _targets(unhued)[0][1](1) == {"label": "rows", "b": 2}
+
+    def test_sankey_nodes_and_links_report_flows(self):
+        figure = SankeyChart(
+            data={
+                "links": [
+                    {"source": "A", "target": "X", "value": 3},
+                    {"source": "A", "target": "Y", "value": 1},
+                    {"source": "B", "target": "Y", "value": 2},
+                ]
+            }
+        )
+        (nodes, node_resolver), (links, link_resolver) = _targets(figure)
+        assert isinstance(nodes, BarContainer) and len(nodes) == 4
+        assert node_resolver(0) == {"label": "A", "flow": 4}
+        assert node_resolver(3) == {"label": "Y", "flow": 3}
+        assert len(links) == 3
+        datums = [link_resolver(i) for i in range(3)]
+        assert {"label": None, "source": "B", "target": "Y", "flow": 2} in datums
+
+    def test_treemap_tiles_and_bands_report_values(self):
+        figure = Treemap(
+            data={
+                "data": [
+                    {
+                        "label": "Asia",
+                        "children": [
+                            {"label": "India", "value": 30},
+                            {"label": "China", "value": 20},
+                        ],
+                    },
+                    {"label": "Africa", "value": 10},
+                ]
+            }
+        )
+        ((tiles, resolver),) = _targets(figure)
+        assert isinstance(tiles, BarContainer)
+        datums = [resolver(i) for i in range(len(tiles))]
+        assert {"label": "India", "value": 30} in datums
+        assert {"label": "Africa", "value": 10} in datums
+        # the group's band stands for the group total
+        assert {"label": "Asia", "value": 50} in datums
+
+    def test_network_nodes_report_degree_and_edges_their_endpoints(self):
+        weighted = NetworkChart(
+            data={
+                "edges": [
+                    {"source": "a", "target": "b", "weight": 2},
+                    {"source": "a", "target": "c", "weight": 3},
+                ]
+            }
+        )
+        targets = _targets(weighted)
+        edges = [r for a, r in targets if isinstance(a, FancyArrowPatch)]
+        ((nodes, node_resolver),) = [
+            (a, r) for a, r in targets if isinstance(a, PathCollection)
+        ]
+        assert len(edges) == 2
+        assert edges[0](0) == {"label": None, "source": "a", "target": "b", "weight": 2}
+        assert node_resolver(0) == {"label": "a", "degree": 5}
+        assert node_resolver(1) == {"label": "b", "degree": 2}
+        directed = NetworkChart(
+            data={
+                "nodes": [
+                    {"id": "a", "group": "core", "size": 40},
+                    {"id": "b", "group": "core"},
+                    {"id": "c"},
+                ],
+                "edges": [
+                    {"source": "a", "target": "b", "weight": 2},
+                    {"source": "c", "target": "a", "weight": 3},
+                    {"source": "a", "target": "c", "weight": 1},
+                ],
+            },
+            directed=True,
+        )
+        node = [r for a, r in _targets(directed) if isinstance(a, PathCollection)][0]
+        # a directed node splits its degree; group and size ride along when given
+        assert node(0) == {"label": "a", "in": 3, "out": 3, "group": "core", "size": 40}
+        assert node(1) == {"label": "b", "in": 2, "out": 0, "group": "core"}
+        assert node(2) == {"label": "c", "in": 1, "out": 3}
+        unweighted = NetworkChart(
+            data={
+                "nodes": [{"id": "a", "label": "Alpha"}, {"id": "b"}, {"id": "c"}],
+                "edges": [
+                    {"source": "a", "target": "b"},
+                    {"source": "a", "target": "c"},
+                ],
+            }
+        )
+        targets = _targets(unweighted)
+        node = [r for a, r in targets if isinstance(a, PathCollection)][0]
+        edge = [r for a, r in targets if isinstance(a, FancyArrowPatch)][0]
+        assert node(0) == {"label": "Alpha", "degree": 2}
+        assert edge(0) == {"label": None, "source": "a", "target": "b"}
+
+
+RADIAL_DATA = [{"label": l, "y": v} for l, v in zip("NESW", [5, 10, 15, 20])]
+
+
+class TestRadialLayers:
+    """Radial marks report their angle and radius under their own keys."""
+
+    def test_radial_marks_report_angle_and_radius(self):
+        ((line, resolver),) = _targets(RadialChart(data=RADIAL_DATA, subtitle="wind"))
+        assert isinstance(line, Line2D)
+        assert resolver(1) == {"label": "wind", "angle": "E", "radius": 10}
+        # the closing point repeats the first
+        assert resolver(4) == resolver(0)
+        ((bars, resolver),) = _targets(RadialChart(data=RADIAL_DATA, type="bar"))
+        assert isinstance(bars, BarContainer)
+        assert resolver(3) == {"label": None, "angle": "W", "radius": 20}
+        ((points, resolver),) = _targets(RadialChart(data=RADIAL_DATA, type="scatter"))
+        assert isinstance(points, PathCollection)
+        assert resolver(2) == {"label": None, "angle": "S", "radius": 15}
+
+    def test_stacked_radial_bars_report_their_own_value(self):
+        figure = RadialChart(
+            data=[RADIAL_DATA, RADIAL_DATA], type="bar", bar_mode="stack"
+        )
+        assert [r(0)["radius"] for _, r in _targets(figure)] == [5, 5]
+
+    def test_radial_histogram_bins_report_degree_ranges(self):
+        figure = RadialChart(
+            data=[{"x": d} for d in [5, 10, 100, 200, 350]],
+            type="histogram",
+            num_bins=4,
+        )
+        ((bars, resolver),) = _targets(figure)
+        assert isinstance(bars, BarContainer)
+        assert resolver(0) == {"label": None, "angle": "0° – 90°", "radius": 2}
+
+
+class TestHoverText:
+    """The annotation lists the datum's fields in order; x and y are axis coordinates."""
+
+    def test_named_fields_follow_the_axes_in_insertion_order(self):
+        from datachart.utils._internal.figures import _hover_text
+
+        figure = _line_fig(xlabel="Step")
+        (line, _), *_ = _targets(figure)
+        datum = {"label": "fast", "x": 2, "median": 4.5, "y": 3, "count": 7}
+        assert _hover_text(line, datum) == "fast\nStep: 2\nmedian: 4.5\ny: 3\ncount: 7"
+
+    def test_plain_values_read_as_numbers_or_text(self):
+        from datachart.utils._internal.figures import _hover_text
+
+        (line, _), *_ = _targets(_line_fig())
+        datum = {"label": None, "level": 0.30000000000000004, "flow": 1200.0, "q": "A"}
+        assert _hover_text(line, datum) == "level: 0.3\nflow: 1200\nq: A"
+
+    def test_axis_only_datum_is_unchanged(self):
+        from datachart.utils._internal.figures import _hover_text
+
+        (line, _), *_ = _targets(_line_fig(ylabel="Loss"))
+        assert (
+            _hover_text(line, {"label": "fast", "x": 1, "y": 2})
+            == "fast\nx: 1\nLoss: 2"
+        )
 
 
 class TestShowInteractive:
@@ -273,6 +615,100 @@ class TestShowInteractive:
         event = MouseEvent("motion_notify_event", old_canvas, px, py)
         old_canvas.callbacks.process("motion_notify_event", event)
         assert first.selections == ()
+
+    def test_band_and_hexagon_hover_pick_by_containment(self):
+        area = StackedAreaChart(
+            data=[
+                [{"x": i, "y": 2} for i in range(4)],
+                [{"x": i, "y": i + 1} for i in range(4)],
+            ],
+            subtitle=["base", "growth"],
+            ylabel="Visits",
+        )
+        _show_interactive(area)
+        # inside the upper band, between x=1 and x=2 but nearer 2
+        texts = _hover(area, area.axes[0], 1.8, 3.5)
+        visits = area.axes[0].format_ydata(3).strip()
+        assert texts == [f"growth\nx: 2\nVisits: {visits}"]
+        rng = np.random.default_rng(1)
+        hexbin = HexbinChart(
+            data={"x": rng.random(300), "y": rng.random(300)}, gridsize=3
+        )
+        _show_interactive(hexbin)
+        ((tiles, _),) = _targets(hexbin)
+        cx, cy = tiles.get_offsets()[4]
+        texts = _hover(hexbin, hexbin.axes[0], cx, cy)
+        ax = hexbin.axes[0]
+        x, y = ax.format_xdata(cx).strip(), ax.format_ydata(cy).strip()
+        assert texts == [f"x: {x}\ny: {y}\ncount: {int(tiles.get_array()[4])}"]
+
+    def test_box_hover_picks_the_body_by_containment(self):
+        figure = BoxPlot(data=GROUP_DATA, subtitle="scores", xlabel="Group")
+        _show_interactive(figure)
+        # the first box sits at position 1 and spans q1..q3 = 2..4
+        assert _hover(figure, figure.axes[0], 1, 3) == [
+            "scores\nGroup: A\nmedian: 3\nq1: 2\nq3: 4\nmin: 1\nmax: 10"
+        ]
+
+    def test_network_edge_hover_picks_the_outline(self):
+        figure = NetworkChart(
+            data={
+                "nodes": [
+                    {"id": "a", "x": 0.2, "y": 0.5},
+                    {"id": "b", "x": 0.8, "y": 0.5},
+                ],
+                "edges": [{"source": "a", "target": "b", "weight": 4}],
+            },
+            layout="fixed",
+            style={"plot_network_edge_style": "straight"},
+        )
+        _show_interactive(figure)
+        assert _hover(figure, figure.axes[0], 0.5, 0.5) == [
+            "source: a\ntarget: b\nweight: 4"
+        ]
+
+    def test_radial_bar_hover_names_the_category(self):
+        figure = RadialChart(data=RADIAL_DATA, type="bar", subtitle="wind")
+        _show_interactive(figure)
+        # the "E" bar sits a quarter turn in and reaches radius 10
+        assert _hover(figure, figure.axes[0], np.pi / 2, 5) == [
+            "wind\nangle: E\nradius: 10"
+        ]
+
+    def test_line_over_a_band_wins_the_pick_on_its_point(self):
+        area = StackedAreaChart(
+            data=[{"x": i, "y": 10} for i in range(4)], subtitle="band"
+        )
+        line = LineChart(data=[{"x": i, "y": 5} for i in range(4)], subtitle="line")
+        panel = Panel([area, line])
+        _show_interactive(panel)
+        assert _hover(panel, panel.axes[0], 2, 5)[0].startswith("line\n")
+        assert _hover(panel, panel.axes[0], 2.5, 8)[0].startswith("band\n")
+
+    def test_numeric_category_labels_read_off_the_axis(self):
+        box = BoxPlot(
+            data=[
+                {"label": year, "value": v} for year in (2020, 2021) for v in range(5)
+            ],
+            xlabel="Year",
+        )
+        _show_interactive(box)
+        assert _hover(box, box.axes[0], 2, 2)[0].startswith("Year: 2021\n")
+        bar = BarChart(data=[{"label": year, "y": 3} for year in (2020, 2021)])
+        _show_interactive(bar)
+        assert _hover(bar, bar.axes[0], 0, 1)[0].startswith("x: 2020\n")
+        heatmap = Heatmap(data={"x": [10, 20], "y": [100, 200], "z": [[1, 2], [3, 4]]})
+        _show_interactive(heatmap)
+        assert _hover(heatmap, heatmap.axes[0], 1, 0) == ["x: 20\ny: 100\nvalue: 2"]
+
+    def test_heatmap_hover_reports_the_cell(self):
+        figure = Heatmap(
+            data={"x": ["a", "b"], "y": ["p", "q"], "z": [[1, 2], [3, 4]]},
+            xlabel="Col",
+            ylabel="Row",
+        )
+        _show_interactive(figure)
+        assert _hover(figure, figure.axes[0], 1, 0) == ["Col: b\nRow: p\nvalue: 2"]
 
     def test_missing_mplcursors_raises_import_error(self, monkeypatch):
         monkeypatch.setitem(sys.modules, "mplcursors", None)

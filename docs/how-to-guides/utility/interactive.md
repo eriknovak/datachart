@@ -41,16 +41,67 @@ Without them `show(interactive=True)` raises an `ImportError` naming the missing
 
 ## Hover to inspect
 
-Hovering a mark shows an annotation with the series' legend label on the first line — its `subtitle`, or the `legend_label` a `Panel` assigned — and one `name: value` line per axis. The names are the axis labels of the chart when set (`xlabel`, `ylabel`, and a `Panel`'s `ylabel_left` / `ylabel_right`), and `x` / `y` otherwise; a series on a `Panel`'s secondary value axis reports the secondary label. Values are formatted the way the axis formats its coordinates, so a point on a category axis reports the category name. The annotation wears the theme's text annotation style — the `plot_text_*` font, box, and connector — so it matches the figure it sits on.
+Hovering a mark shows an annotation with the series' legend label on the first line — its `subtitle`, or the `legend_label` a `Panel` assigned — and one `name: value` line per field of the mark. A mark that stands for a data point reports its axis coordinates: the names are the axis labels of the chart when set (`xlabel`, `ylabel`, and a `Panel`'s `ylabel_left` / `ylabel_right`), and `x` / `y` otherwise; a series on a `Panel`'s secondary value axis reports the secondary label. Values are formatted the way the axis formats its coordinates, so a point on a category axis reports the category name. A mark that stands for an aggregate reports its summary under plain names — a box its `median` and quartiles, a histogram bin its range and count, a sankey link its endpoints and `flow`. The annotation wears the theme's text annotation style — the `plot_text_*` font, box, and connector — so it matches the figure it sits on.
 
-Hover follows the marks through composition: it works on every series of a `Panel` overlay, including those on the secondary axis, and in every cell of a `Grid`.
+Hover follows the marks through composition: it works on every series of a `Panel` overlay, including those on the secondary axis, and in every cell of a `Grid`. Text annotations and reference lines decorate the chart and carry no hover.
 
-The chart types with hover support:
+Every chart type has hover support. Filled marks — bars, bands, boxes, bodies, cells, hexagons, tiles, nodes, ribbons — pick anywhere inside; lines, outlines, and network edges pick within a few points of their stroke, as do the outline of a `step` histogram and the edges of a filled contour band.
 
-| Chart                                        | Mark          | Annotation                                  |
-| :------------------------------------------- | :------------ | :------------------------------------------ |
-| [Line Chart](../charts/linechart.ipynb)      | line point    | legend label, `x`, `y`                      |
-| [Scatter Chart](../charts/scatterchart.ipynb) | scatter point | legend label (or the `hue` group), `x`, `y` |
-| [Bar Chart](../charts/barchart.ipynb)        | bar           | legend label, category, the bar's own value |
+| Chart | Mark | Annotation |
+| :---- | :--- | :--------- |
+| [Line Chart](../charts/linechart.ipynb) | line point | legend label, `x`, `y` |
+| [Stacked Area Chart](../charts/stackedareachart.ipynb) | band, at the nearest point | legend label, `x`, the series' own `y` (never the stack total) |
+| [Bar Chart](../charts/barchart.ipynb) | bar | legend label, category, the bar's own value (never the stack total) |
+| [Pyramid Chart](../charts/pyramidchart.ipynb) | bar | legend label, category, the value as passed, positive |
+| [Radial Chart](../charts/radialchart.ipynb) | point, bar, or bin | legend label, `angle` (the category, or a bin's degree range), `radius` |
+| [Histogram](../charts/histogram.ipynb) | bin | legend label, the bin's range, its count (or density) |
+| [Box Plot](../charts/boxplot.ipynb) | box | legend label, category, `median`, `q1`, `q3`, `min`, `max` |
+| [Violin Plot](../charts/violinplot.ipynb) | body | legend label (or the split value), category, `median`, `q1`, `q3`, `min`, `max` |
+| [Swarm Plot](../charts/swarmplot.ipynb) | point | legend label, category, value |
+| [Raincloud Plot](../charts/raincloudplot.ipynb) | box, body, or rain point | as the box, violin, and swarm marks |
+| [Scatter Chart](../charts/scatterchart.ipynb) | point | legend label (or the `hue` group), `x`, `y` |
+| [Heatmap](../charts/heatmap.ipynb) | cell | legend label, `x`, `y`, `value` |
+| [Contour Chart](../charts/contourchart.ipynb) | level line or filled band | legend label, `level` (a band's two levels) |
+| [Hexbin Chart](../charts/hexbinchart.ipynb) | hexagon | legend label, `x`, `y` (the cell center), `count` (or the reduced `c` under its reducer's name) |
+| [Parallel Coordinates](../charts/parallelcoords.ipynb) | row line, at the nearest axis | the `hue` value (or the legend label), the axis name and the row's value there |
+| [Network Chart](../charts/networkchart.ipynb) | node or edge | node: its label, `degree` (`in` / `out` when directed, the weight sum when weighted), its `group` and `size` when given; edge: `source`, `target`, `weight` |
+| [Sankey Chart](../charts/sankeychart.ipynb) | node or link | node: its name, `flow`; link: `source`, `target`, `flow` |
+| [Treemap](../charts/treemap.ipynb) | tile or group band | its label, `value` (a band's group total) |
 
-Grouped and stacked bars report their own value, never the stack total. Every other chart type zooms and pans but shows no hover annotation.
+The annotation on each chart, from the figure shown with `show(interactive=True)` and a mark hovered:
+
+| **Line Chart** — a hovered point | **Stacked Area Chart** — a hovered band |
+| :-- | :-- |
+| ![A line chart with a hovered point](../../assets/imgs/hover-line.png) | ![A stacked area chart with a hovered band](../../assets/imgs/hover-stackedarea.png) |
+
+| **Bar Chart** — a hovered bar | **Pyramid Chart** — a hovered bar |
+| :-- | :-- |
+| ![A grouped bar chart with a hovered bar](../../assets/imgs/hover-bar.png) | ![A pyramid chart with a hovered bar](../../assets/imgs/hover-pyramid.png) |
+
+| **Radial Chart** — a hovered bar | **Histogram** — a hovered bin |
+| :-- | :-- |
+| ![A radial bar chart with a hovered bar](../../assets/imgs/hover-radial.png) | ![A histogram with a hovered bin](../../assets/imgs/hover-histogram.png) |
+
+| **Box Plot** — a hovered box | **Violin Plot** — a hovered body |
+| :-- | :-- |
+| ![A box plot with a hovered box](../../assets/imgs/hover-box.png) | ![A violin plot with a hovered body](../../assets/imgs/hover-violin.png) |
+
+| **Swarm Plot** — a hovered point | **Raincloud Plot** — a hovered box |
+| :-- | :-- |
+| ![A swarm plot with a hovered point](../../assets/imgs/hover-swarm.png) | ![A raincloud plot with a hovered box](../../assets/imgs/hover-raincloud.png) |
+
+| **Scatter Chart** — a hovered point | **Heatmap** — a hovered cell |
+| :-- | :-- |
+| ![A scatter chart with a hovered point](../../assets/imgs/hover-scatter.png) | ![A heatmap with a hovered cell](../../assets/imgs/hover-heatmap.png) |
+
+| **Contour Chart** — a hovered level line | **Hexbin Chart** — a hovered hexagon |
+| :-- | :-- |
+| ![A contour chart with a hovered level line](../../assets/imgs/hover-contour.png) | ![A hexbin chart with a hovered hexagon](../../assets/imgs/hover-hexbin.png) |
+
+| **Parallel Coordinates** — a hovered row | **Network Chart** — a hovered node |
+| :-- | :-- |
+| ![A parallel coordinates chart with a hovered row](../../assets/imgs/hover-parallelcoords.png) | ![A network chart with a hovered node](../../assets/imgs/hover-network.png) |
+
+| **Sankey Chart** — a hovered link | **Treemap** — a hovered tile |
+| :-- | :-- |
+| ![A sankey chart with a hovered link](../../assets/imgs/hover-sankey.png) | ![A treemap with a hovered tile](../../assets/imgs/hover-treemap.png) |
