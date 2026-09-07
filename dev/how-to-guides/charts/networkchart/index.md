@@ -61,6 +61,7 @@ NetworkChart(
         "plot_network_edge_width_max":        Optional[float],  # The width of the heaviest edge (4 by default)
         "plot_network_highlight_edge_width":  Optional[float],  # The stroke width of a highlighted node (2 by default)
         "plot_network_label_halo_width":      Optional[float],  # The white halo behind the labels; 0 disables it (2 by default)
+        "plot_network_group_alpha":           Optional[float],  # The disc behind each cluster of the grouped layout; 0 disables it (0.12 by default)
     },
     subtitle=Optional[str],                             # The chart subtitle (or list for multiple charts)
     title=Optional[str],                                # The chart title
@@ -152,6 +153,7 @@ Every customization is either a keyword argument of `NetworkChart` or a `plot_*`
 | show the direction of the edges           | `directed`                                                                    | [Directed edges](#directed-edges)                           |
 | size the edges and the nodes by a value   | `"weight"` on the edges, `"size"` on the nodes                                | [Edge weights and node sizes](#edge-weights-and-node-sizes) |
 | color the nodes by a category             | `"group"` on the nodes, `show_legend`                                         | [Groups and the legend](#groups-and-the-legend)             |
+| cluster the nodes by their group          | `layout=NETWORK_LAYOUT.GROUPED`                                               | [Layouts](#layouts)                                         |
 | mute or outline a node                    | `"emphasis"` on the node                                                      | [Emphasis](#emphasis)                                       |
 | write the weights on the edges            | `show_values`, `value_format`                                                 | [Edge values](#edge-values)                                 |
 | draw straight edges, or bow them more     | `style={"plot_network_edge_style": ..., "plot_network_edge_curve": ...}`      | [Node and edge style](#node-and-edge-style)                 |
@@ -181,13 +183,13 @@ NetworkChart(
 
 ### Layouts
 
-The `layout` attribute says how the nodes are placed, using the [datachart.constants.NETWORK_LAYOUT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NETWORK_LAYOUT) constants. The default, `SPRING`, is a force-directed layout: it is seeded by the `seed` attribute (`0` by default), so the same data draws the same picture every time, and another seed gives another arrangement of the same graph. `CIRCULAR` spaces the nodes evenly on a circle in input order, starting at the top — a good choice when the nodes have a natural order or the layout must be predictable. `FIXED` places every node at its own `x` and `y`, given on the node in the `0`–`1` layout space; a node without them raises a `ValueError`. An edge's weight never moves a node: it is a visual cue only.
+The `layout` attribute says how the nodes are placed, using the [datachart.constants.NETWORK_LAYOUT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NETWORK_LAYOUT) constants. The default, `SPRING`, is a force-directed layout: linked nodes pull together and every pair pushes apart. It is seeded by the `seed` attribute (`0` by default), so the same data draws the same picture every time, and another seed gives another arrangement of the same graph. Under `SPRING` an edge's weight never moves a node: it is a visual cue only. `CIRCULAR` spaces the nodes evenly on a circle in input order, starting at the top — a good choice when the nodes have a natural order or the layout must be predictable. `FIXED` places every node at its own `x` and `y`, given on the node in the `0`–`1` layout space; a node without them raises a `ValueError`.
 
 ```
 from datachart.constants import NETWORK_LAYOUT
 ```
 
-`layout` and `seed` apply to every network in a figure, so the comparison below draws three figures and arranges them with [datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) (see [Composing network charts](#composing-network-charts)). The two spring layouts only differ in the seed; the circular one has nothing random.
+`layout` and `seed` apply to every network in a figure, so the comparisons in this section draw several figures and arrange them with [datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) (see [Composing network charts](#composing-network-charts)). The two spring layouts below only differ in the seed; the circular one has nothing random.
 
 ```
 from datachart.utils import Grid
@@ -200,6 +202,21 @@ Grid(
         NetworkChart(imports, seed=3, title="SPRING, seed=3"),
         # the nodes on a circle in input order
         NetworkChart(imports, layout=NETWORK_LAYOUT.CIRCULAR, title="CIRCULAR"),
+    ]],
+    figsize=(12, 4),
+).show()
+```
+
+Two layouts let the data shape the picture. `WEIGHTED` is the spring layout with each edge's weight setting how hard it pulls: the lightest edge pulls at a tenth of the plain pull, the heaviest at three times, the rest linearly between, so heavily imported modules draw close to their importers (the exact rule is in the [NETWORK_LAYOUT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NETWORK_LAYOUT) reference). `GROUPED` clusters the nodes by their `group`, a node without one being a group of its own: each group is laid out by the plain spring on its own edges, then the groups are laid out as a smaller network by the weighted spring, an edge between two groups weighing the sum of the edges joining them, so strongly linked layers sit close. A translucent disc in the group color marks each cluster; `plot_network_group_alpha` sets its alpha and `0` removes it. Both take the same `seed`; `GROUPED` costs about what `SPRING` costs at worst, and far less when the groups are many. It pays off most when the edges run inside the groups, as in [Example 1](#example-1-who-reviews-whose-code-undirected-groups-sizes-and-a-highlight); a layered graph like this one, whose imports run between the layers, is better served by the fixed layout above.
+
+```
+Grid(
+    [[
+        NetworkChart(service, title="SPRING"),
+        # heavy imports pull their modules close
+        NetworkChart(service, layout=NETWORK_LAYOUT.WEIGHTED, title="WEIGHTED"),
+        # one cluster per layer, arranged by the imports between the layers
+        NetworkChart(service, layout=NETWORK_LAYOUT.GROUPED, title="GROUPED"),
     ]],
     figsize=(12, 4),
 ).show()
@@ -236,12 +253,12 @@ NetworkChart(
 
 A network chart is meant for a graph a reader can follow, and the drawing cost sets a practical ceiling well before the readable one. Every edge is drawn as its own curved patch, which costs a few milliseconds to build and as many again to save, and the spring layout weighs every pair of nodes, so its cost grows with the square of the node count. Measured on a laptop, these sizes draw without a problem:
 
-| Layout              | Nodes        | Edges         | Time to draw and save |
-| ------------------- | ------------ | ------------- | --------------------- |
-| `SPRING` (default)  | up to ~1,000 | up to ~3,000  | a few seconds         |
-| `CIRCULAR`, `FIXED` | up to ~5,000 | up to ~15,000 | under a minute        |
+| Layout                                    | Nodes        | Edges         | Time to draw and save |
+| ----------------------------------------- | ------------ | ------------- | --------------------- |
+| `SPRING` (default), `WEIGHTED`, `GROUPED` | up to ~1,000 | up to ~3,000  | a few seconds         |
+| `CIRCULAR`, `FIXED`                       | up to ~5,000 | up to ~15,000 | under a minute        |
 
-Past those, the spring layout is the first to give: 2,000 nodes take about half a minute, 5,000 several minutes and over a gigabyte of memory. The circular and fixed layouts stay linear, about six milliseconds per edge, so 10,000 nodes and 30,000 edges take around two minutes. Nothing is enforced — a larger graph draws, only slowly — but a picture that dense reads as a hairball anyway. Aggregate the nodes (a group per node, an edge per group pair, its weight the count) or keep the heaviest edges before drawing, and switch to `CIRCULAR` or `FIXED` when the node count passes a thousand.
+Past those, the spring layouts are the first to give (`GROUPED` costs about the same at worst, far less when the groups are many): 2,000 nodes take about half a minute, 5,000 several minutes and over a gigabyte of memory. The circular and fixed layouts stay linear, about six milliseconds per edge, so 10,000 nodes and 30,000 edges take around two minutes. Nothing is enforced — a larger graph draws, only slowly — but a picture that dense reads as a hairball anyway. Aggregate the nodes (a group per node, an edge per group pair, its weight the count) or keep the heaviest edges before drawing, and switch to `CIRCULAR` or `FIXED` when the node count passes a thousand.
 
 The example collapses a random code base of 3,000 modules and 15,000 imports into its 120 packages — one node per package, colored by the team that owns it and sized by its imports, one edge per pair of packages with at least five imports between them — and lets the spring layout, still comfortable at this size, pull the busy packages together:
 
@@ -311,7 +328,7 @@ NetworkChart(
 
 ### Groups and the legend
 
-A node's `group` colors it: the groups take the palette colors in the order they are first seen, and nodes without a group share the first color. To name the groups, add the `show_legend` attribute; the legend sits beside the drawing, since the nodes fill the axes. The example colors every module by its layer of the architecture.
+A node's `group` colors it: the groups take the palette colors in the order they are first seen, and a node without a group draws in the edge color, so it reads as no group's member. To name the groups, add the `show_legend` attribute; the legend sits beside the drawing, since the nodes fill the axes. The example colors every module by its layer of the architecture; to also place the modules by layer, pick the `GROUPED` layout (see [Layouts](#layouts)).
 
 ```
 NetworkChart(
@@ -519,7 +536,7 @@ The following examples put the features above to work. Each one states what it s
 
 ### Example 1: Who Reviews Whose Code (Undirected, Groups, Sizes, and a Highlight)
 
-A team's code review pairs over a quarter: an edge joins two people who reviewed each other's pull requests, weighted by how many reviews they exchanged, and a person's node grows with the reviews they gave. Reviews flow both ways, so the network is undirected; the teams are the groups, and the one person reviewing across every team is highlighted.
+A team's code review pairs over a quarter: an edge joins two people who reviewed each other's pull requests, weighted by how many reviews they exchanged, and a person's node grows with the reviews they gave. Reviews flow both ways, so the network is undirected; the teams are the groups, drawn as clusters by the grouped layout, and the one person reviewing across every team is highlighted.
 
 ```
 REVIEWERS = {
@@ -552,6 +569,8 @@ reviews = {
 
 NetworkChart(
     data=reviews,
+    # one cluster per team, the teams placed by how much they review each other
+    layout=NETWORK_LAYOUT.GROUPED,
     show_legend=True,
     title="Code reviews exchanged this quarter",
     figsize=FIG_SIZE.SQUARE,

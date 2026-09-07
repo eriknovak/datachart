@@ -7377,6 +7377,13 @@ means, so it is a chart attribute and not a style key.</p>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">NETWORK_LAYOUT</span><span class="o">.</span><span class="n">DEFAULT</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">"spring"</span>
 </code></pre></div>
+        <p>Under <code>WEIGHTED</code>, and between the groups of <code>GROUPED</code>, an edge of weight
+<span class="arithmatex">\(w\)</span> pulls its nodes together at <span class="arithmatex">\(s(w)\)</span> times the <code>SPRING</code> pull:</p>
+<div class="arithmatex">\[s(w) = 0.1 + 2.9\,\frac{w - w_{\min}}{w_{\max} - w_{\min}}\]</div>
+<p>The lightest edge pulls at a tenth, the heaviest at three times, the rest
+linearly between; an edge without a weight pulls as the lightest. With no
+weights, or all equal, every edge pulls at one and the picture is the
+<code>SPRING</code> picture.</p>
 
 
 <table>
@@ -7410,6 +7417,44 @@ nodes pull together, every pair pushes apart. Seeded by the chart's
 <code>seed</code> argument, so the same data renders the same picture. Costs
 the square of the node count: fine up to about 1,000 nodes, slow
 and memory-hungry past that. Equals to <code>"spring"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.NETWORK_LAYOUT.WEIGHTED">WEIGHTED</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The spring layout with each edge's pull set by its
+weight, as above: heavy edges draw their nodes close, light ones
+let them drift. Same cost as <code>SPRING</code>. Equals to <code>"weighted"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.NETWORK_LAYOUT.GROUPED">GROUPED</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The nodes clustered by their <code>group</code>, a node without
+one being a group of its own. Each group is laid out by the
+spring on its own edges; the groups are then laid out as a
+smaller network by the weighted spring, an edge between two
+groups weighing the sum of the edges joining them, so strongly
+linked clusters sit close. A translucent disc in the group color
+marks each cluster (<code>plot_network_group_alpha</code>; 0 disables it).
+Costs about what <code>SPRING</code> costs at worst, far less when the
+groups are many. Equals to <code>"grouped"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
@@ -8603,6 +8648,10 @@ the x-unit on screen.</p>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       
     
   </body>

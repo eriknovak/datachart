@@ -15782,7 +15782,8 @@ list of such dicts drawing one network per subplot. An edge is a
 <code>{"source", "target"}</code> record naming node ids, with an optional
 <code>weight</code> above zero. A node is an <code>{"id"}</code> record with an optional
 <code>label</code> (defaults to the id; an empty string draws nothing),
-<code>size</code> above zero, <code>group</code>, and <code>emphasis</code> role: <code>"background"</code>
+<code>size</code> above zero, <code>group</code> (a node without one draws in the edge
+color beside grouped nodes), and <code>emphasis</code> role: <code>"background"</code>
 mutes the node, its label, and its edges, <code>"highlight"</code> strokes
 its border. <code>nodes</code> may be omitted; the node set is then read
 from the edges in first-seen order.</p>
@@ -15802,10 +15803,14 @@ from the edges in first-seen order.</p>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>How the nodes are placed: a <code>NETWORK_LAYOUT</code> constant
-(default <code>NETWORK_LAYOUT.SPRING</code>). <code>FIXED</code> reads each node's
-<code>x</code>/<code>y</code> in the 0–1 layout space. <code>SPRING</code> costs the square of
-the node count; past about 1,000 nodes prefer <code>CIRCULAR</code> or
-<code>FIXED</code>.</p>
+(default <code>NETWORK_LAYOUT.SPRING</code>). <code>WEIGHTED</code> lets each edge's
+weight set how hard it pulls its nodes together; <code>GROUPED</code>
+clusters the nodes by <code>group</code>, arranges the clusters by the
+summed weight of the edges between them, and marks each with a
+disc in the group color (<code>plot_network_group_alpha</code>). <code>FIXED</code> reads each
+node's <code>x</code>/<code>y</code> in the 0–1 layout space. The three spring
+layouts cost the square of the node count; past about 1,000
+nodes prefer <code>CIRCULAR</code> or <code>FIXED</code>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -15846,7 +15851,7 @@ the node count; past about 1,000 nodes prefer <code>CIRCULAR</code> or
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The seed of the spring layout (default 0); another seed gives
+                <p>The seed of the spring layouts (default 0); another seed gives
 another arrangement of the same data.</p>
               </div>
               <p>
@@ -17053,6 +17058,10 @@ group value that is not its children's sum), or a record's
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       
     
   </body>
