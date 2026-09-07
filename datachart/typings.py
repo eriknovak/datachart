@@ -1846,6 +1846,7 @@ class ScatterDataPointAttrs(TypedDict):
         y (Union[int, float]): The y-axis value.
         size (Optional[Union[int, float]]): The marker size (for bubble charts).
         hue (Optional[str]): The category for color grouping.
+        label (Optional[str]): The label drawn beside the point.
 
     """
 
@@ -1853,6 +1854,7 @@ class ScatterDataPointAttrs(TypedDict):
     y: Union[int, float]
     size: Optional[Union[int, float]]
     hue: Optional[str]
+    label: Optional[str]
 
 
 class ScatterSingleChartAttrs(TypedDict):
@@ -1877,6 +1879,7 @@ class ScatterSingleChartAttrs(TypedDict):
         y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
         size (Union[str, None]): The key name in `data` that contains the marker size value.
         hue (Union[str, None]): The key name in `data` that contains the hue/category value.
+        label (Union[str, None]): The key name in `data` that contains the point label.
 
     """
 
@@ -1901,6 +1904,7 @@ class ScatterSingleChartAttrs(TypedDict):
     y: Union[str, None]
     size: Union[str, None]
     hue: Union[str, None]
+    label: Union[str, None]
 
 
 class _ScatterChartAttrs(ChartCommonAttrs):
