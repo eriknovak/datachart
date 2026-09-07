@@ -96,6 +96,7 @@ split them apart. The dict keys per chart are listed in each guide.
 | **Distributions** | [Histogram], [BoxPlot], [ViolinPlot], [SwarmPlot], [RaincloudPlot]         | shape and spread of one variable, per group                            |
 | **Relationships** | [ScatterChart], [Heatmap], [ContourChart], [HexbinChart], [ParallelCoords] | two-variable correlation, matrices, dense 2-D density, many dimensions |
 | **Flows**         | [SankeyChart]                                                              | quantities moving between stages                                       |
+| **Proportions**   | [Treemap]                                                                  | how a whole splits into parts, with one level of grouping              |
 
 ## Composition
 
@@ -224,6 +225,7 @@ Code is formatted with `black`; the pre-commit hook runs it for you.
 [HexbinChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/hexbinchart/
 [ParallelCoords]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/parallelcoords/
 [SankeyChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/sankeychart/
+[Treemap]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/treemap/
 [panel-guide]: https://eriknovak.github.io/datachart/latest/how-to-guides/utility/panel/
 [grid-guide]: https://eriknovak.github.io/datachart/latest/how-to-guides/utility/grid/
 [themes-guide]: https://eriknovak.github.io/datachart/latest/how-to-guides/styling/themes/

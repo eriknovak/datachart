@@ -4,6 +4,7 @@ Each function raises ``ValueError`` when a value is not one the charts accept,
 so the fronts fail early with one message instead of deep inside matplotlib.
 """
 
+import math
 from collections import defaultdict
 from numbers import Real
 
@@ -176,3 +177,68 @@ def validate_sankey_nodes(nodes, links) -> None:
             "`nodes` must name exactly the nodes in `links`; "
             f"missing {sorted(missing)}, unknown {sorted(extra)}."
         )
+
+
+def _positive_number(value) -> bool:
+    return isinstance(value, Real) and not isinstance(value, bool) and value > 0
+
+
+def validate_treemap_records(records) -> None:
+    """Raise unless `records` is a non-empty list of valid treemap records.
+
+    A record is a dict with a `label` and either a `value` above zero or a
+    `children` list of such records; children nest one level only, and a
+    parent carrying a `value` must match its children's sum (ADR 0028). An
+    `emphasis` key on any record takes the emphasis roles.
+    """
+
+    if not isinstance(records, list) or not records:
+        raise ValueError("A treemap requires a non-empty `data` list of records.")
+    for i, record in enumerate(records):
+        _validate_treemap_record(record, f"Treemap record {i}", nested=False)
+    _validate_unique_labels(records, "Treemap records")
+    for record in records:
+        if record.get("children") is not None:
+            name = f"Treemap record {record['label']!r} children"
+            _validate_unique_labels(record["children"], name)
+
+
+def _validate_unique_labels(records, name: str) -> None:
+    """Siblings are keyed by label: for colors, the legend, and the reader."""
+
+    seen = set()
+    for record in records:
+        if record["label"] in seen:
+            raise ValueError(
+                f"{name} must have unique labels; {record['label']!r} repeats."
+            )
+        seen.add(record["label"])
+
+
+def _validate_treemap_record(record, name: str, nested: bool) -> None:
+    if not isinstance(record, dict) or "label" not in record:
+        raise ValueError(f"{name} must be a dict with a `label`.")
+    label = record["label"]
+    validate_emphasis(record.get("emphasis"), f"{name} ({label!r}) `emphasis`")
+    children = record.get("children")
+    if children is None:
+        if not _positive_number(record.get("value")):
+            raise ValueError(f"{name} ({label!r}) must have a `value` greater than 0.")
+        return
+    if nested:
+        raise ValueError(
+            f"{name} ({label!r}) nests deeper than one level; "
+            "a child cannot carry `children`."
+        )
+    if not isinstance(children, list) or not children:
+        raise ValueError(f"{name} ({label!r}) must have a non-empty `children` list.")
+    for j, child in enumerate(children):
+        _validate_treemap_record(child, f"{name} ({label!r}) child {j}", nested=True)
+    value = record.get("value")
+    if value is not None:
+        total = sum(child["value"] for child in children)
+        if not _positive_number(value) or not math.isclose(value, total, rel_tol=1e-9):
+            raise ValueError(
+                f"{name} ({label!r}) has `value` {value!r} but its children sum "
+                f"to {total!r}; omit the value or make it the sum."
+            )

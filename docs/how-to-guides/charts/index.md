@@ -52,6 +52,14 @@ How a quantity moves between categories: where it comes from and where it goes.
 | :-------------------------------------------- | :------------------------------------------- |
 | [Sankey Chart](sankeychart.ipynb)             | The showcase of the Sankey chart.            |
 
+## Part of a Whole
+
+How a whole splits into parts, and parts into smaller parts.
+
+| Chart                                         | Description                                  |
+| :-------------------------------------------- | :------------------------------------------- |
+| [Treemap](treemap.ipynb)                      | The showcase of the treemap.                 |
+
 ## Composition
 
 Here are some utility functions, that could help you.

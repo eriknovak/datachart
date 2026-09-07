@@ -52,6 +52,9 @@ SKETCH_THEME: StyleAttrs = make_theme(
         "plot_hist_edge_width": 1.6,
         "plot_scatter_edge_color": "#222222",
         "plot_heatmap_cmap": COLORS.Blues,
+        # a wobbled box around wobbled tiles reads as a second drawing; the
+        # band and the pad already mark the group
+        "plot_treemap_group_edge_width": 0,
         # half the amplitude of matplotlib's xkcd mode (1, 100, 2), plus a halo
         "plot_sketch_params": (0.5, 100, 2),
         "plot_sketch_halo_width": 4,
