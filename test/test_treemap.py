@@ -516,6 +516,16 @@ class TestRendering(unittest.TestCase):
             self.assertIn("India", _tiles(fig.axes[0]))
             plt.close(fig)
 
+    def test_sketch_draws_no_group_border(self):
+        config.set_theme(THEME.SKETCH)
+        fig = Treemap({"data": NESTED}, figsize=(8, 5))
+        boxes = _boxes(fig.axes[0])
+        self.assertEqual(boxes["Asia"].get_linewidth(), 0)
+        # the highlight border is a separate width, so it still shows
+        data = [rec("A", emphasis="highlight", children=[rec("a", 1)]), rec("B", 1)]
+        fig = Treemap({"data": data})
+        self.assertGreater(_boxes(fig.axes[0])["A"].get_linewidth(), 0)
+
     def test_dark_edge_themes_stroke_leaves_dark(self):
         config.set_theme(THEME.GREYSCALE)
         fig = Treemap({"data": FLAT})
