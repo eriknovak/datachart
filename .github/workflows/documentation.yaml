@@ -26,10 +26,12 @@ jobs:
         with:
           python-version: 3.12
       - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      # only the material plugin cache: the mkdocs-jupyter cache must not
+      # carry executed notebooks across builds
       - uses: actions/cache@v4
         with:
           key: mkdocs-material-${{ env.cache_id }}
-          path: .cache
+          path: .cache/plugin
           restore-keys: |
             mkdocs-material-
       - run: uv sync --group docs

@@ -28,6 +28,7 @@ from matplotlib.mlab import GaussianKDE
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
 from matplotlib.path import Path
+from matplotlib.transforms import Bbox
 import matplotlib.patheffects as patheffects
 from matplotlib.legend import Legend
 from matplotlib.legend_handler import HandlerPathCollection
@@ -244,6 +245,10 @@ LEGEND_HANDLER_MAP = {
 # fraction of the value-axis span added so bar value labels stay inside
 VALUE_HEADROOM_VERTICAL = 0.08
 VALUE_HEADROOM_HORIZONTAL = 0.12
+# a legend that would cover marks gets a clear slot at the value-axis end;
+# the marks give up at most this fraction of the axes for it, padded in points
+LEGEND_HEADROOM_MAX = 0.35
+LEGEND_HEADROOM_PAD_PT = 4.0
 # normalized cell value above which heatmap value text switches to white
 HEATMAP_TEXT_CONTRAST_THRESHOLD = 0.55
 # the low end of a sequential cmap vanishes on white: iso-lines sample from here
@@ -620,6 +625,123 @@ def _draw_legend(
 
     legend._auto_legend_data = both_axes_data
     return legend
+
+
+def _legend_obstacles(legend, axes, renderer):
+    """The marks and texts a legend must clear, in display coordinates."""
+
+    bboxes, lines, offsets = legend._auto_legend_data(renderer)
+    texts = [
+        t.get_window_extent(renderer)
+        for a in axes
+        for t in a.texts
+        if t.get_visible() and t.get_text()
+    ]
+    return list(bboxes) + texts, list(lines), np.asarray(offsets).reshape(-1, 2)
+
+
+def _legend_overlaps(box, bboxes, lines, offsets) -> bool:
+    return bool(
+        any(box.overlaps(b) for b in bboxes)
+        or any(
+            box.count_contains(l.vertices) or l.intersects_bbox(box, filled=False)
+            for l in lines
+        )
+        or box.count_contains(offsets)
+    )
+
+
+def _marks_reach(slot, dim, bboxes, lines, offsets):
+    """How far the marks under a slot extend along the value axis `dim`.
+
+    Only marks within the slot's span across the other axis count: bar boxes
+    and texts by their far edge, polylines by their vertices and by where a
+    segment crosses the span's edges, markers by their centre.
+    """
+
+    cross = 1 - dim
+    lo, hi = slot.get_points()[:, cross]
+    reach = []
+    for b in bboxes:
+        pts = b.get_points()
+        if pts[1, cross] > lo and pts[0, cross] < hi:
+            reach.append(pts[1, dim])
+    for line in lines:
+        v = line.vertices
+        if len(v) == 0:
+            continue
+        inside = (v[:, cross] >= lo) & (v[:, cross] <= hi)
+        if inside.any():
+            reach.append(v[inside, dim].max())
+        a, b = v[:-1], v[1:]
+        for edge in (lo, hi):
+            straddle = (a[:, cross] - edge) * (b[:, cross] - edge) < 0
+            if straddle.any():
+                t = (edge - a[straddle, cross]) / (
+                    b[straddle, cross] - a[straddle, cross]
+                )
+                reach.append(
+                    (a[straddle, dim] + t * (b[straddle, dim] - a[straddle, dim])).max()
+                )
+    if len(offsets):
+        inside = (offsets[:, cross] >= lo) & (offsets[:, cross] <= hi)
+        if inside.any():
+            reach.append(offsets[inside, dim].max())
+    return max(reach) if reach else None
+
+
+def _fit_legend(legend: Legend, axes: list, dim: int, renderer) -> None:
+    """Give a best-placed legend a clear slot at the end of the value axis.
+
+    matplotlib picks the least-covered slot, which still hides marks when they
+    fill the axes. The legend then moves to the slot along the value-axis end
+    (top for a vertical panel, right for a horizontal one) whose marks reach
+    least far, and every axes extends its value range so those marks end below
+    the legend. Runs at draw time, once constrained layout has sized the axes.
+    A fit that would squeeze the marks past LEGEND_HEADROOM_MAX keeps
+    matplotlib's slot; the translucent frame still shows what it covers.
+    """
+
+    if legend._loc != 0:
+        return
+    bboxes, lines, offsets = _legend_obstacles(legend, axes, renderer)
+    box = legend.get_window_extent(renderer)
+    if not _legend_overlaps(box, bboxes, lines, offsets):
+        return
+
+    pad = LEGEND_HEADROOM_PAD_PT * legend.figure.dpi / 72.0
+    size = Bbox.from_bounds(0, 0, box.width, box.height)
+    anchor = legend.get_bbox_to_anchor()
+    names = (
+        ("upper left", "upper right", "upper center")
+        if dim == 1
+        else ("upper right", "lower right", "center right")
+    )
+    a0, a1 = legend.axes.bbox.get_points()[:, dim]
+    best = None
+    for name in names:
+        code = Legend.codes[name]
+        l, b = legend._get_anchored_bbox(code, size, anchor, renderer)
+        slot = Bbox.from_bounds(l, b, box.width, box.height)
+        reach = _marks_reach(slot, dim, bboxes, lines, offsets)
+        reach = a0 if reach is None else min(reach, a1)
+        floor = slot.get_points()[0, dim] - pad
+        if floor <= a0:
+            continue
+        # scale the value range so the marks' reach maps just below the legend
+        factor = max(1.0, (reach - a0) / (floor - a0))
+        if best is None or factor < best[0]:
+            best = (factor, code)
+    if best is None or best[0] - 1 > LEGEND_HEADROOM_MAX:
+        return
+    factor, code = best
+    for a in axes:
+        axis = a.yaxis if dim == 1 else a.xaxis
+        trans = axis.get_transform()
+        lo, hi = trans.transform(a.get_ylim() if dim == 1 else a.get_xlim())
+        lo, hi = trans.inverted().transform([lo, lo + (hi - lo) * factor])
+        (a.set_ylim if dim == 1 else a.set_xlim)(lo, hi)
+    legend._set_loc(code)
 
 
 # ================================================
@@ -5544,13 +5666,21 @@ class Panel:
                 if labels:
                     _draw_legend(ax, ax_right, legend_style, handles, labels)
 
-        # the polar border circle crosses the plot area; the legend covers it
-        # fully — above the spine, with an opaque frame so nothing shows through
-        if polar:
-            legend = top_ax.get_legend()
-            if legend is not None:
-                legend.set_zorder(self._spine_zorder() + RADIAL_LEGEND_Z_OVER_SPINE)
-                legend.get_frame().set_alpha(1.0)
+        legend = top_ax.get_legend()
+        if legend is not None and polar:
+            # the polar border circle crosses the plot area; the legend sits
+            # above the spine so it is never cut by the circle
+            legend.set_zorder(self._spine_zorder() + RADIAL_LEGEND_Z_OVER_SPINE)
+        elif legend is not None and not bare:
+            # a legend over the marks gets headroom at draw time, once layout
+            # has sized the axes; explicit value-axis limits stay as set
+            value_max = s.get("xmax" if horizontal else "ymax")
+            if value_max is None and (ax_right is None or s.get("ymax_right") is None):
+                axes = [ax] + ([ax_right] if ax_right is not None else [])
+                dim = 0 if horizontal else 1
+                top_ax.figure.__dict__.setdefault("_legend_fits", []).append(
+                    lambda renderer: _fit_legend(legend, axes, dim, renderer)
+                )
 
         # tick labels and legend text cannot take the font family through
         # tick_params/legend kwargs; restyle them directly
