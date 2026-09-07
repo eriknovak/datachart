@@ -108,7 +108,8 @@ EXPECTED_CHANGES = {
     "violin_split_quartiles",
     "violin_horizontal_median",
     "violin_panel_box",
-    # new raincloud plot cases (ADR 0021)
+    # new raincloud plot cases (ADR 0021); the rain drops are too small for
+    # the theme edge and draw solid
     "raincloud_vertical",
     "raincloud_horizontal",
     "raincloud_emphasis",

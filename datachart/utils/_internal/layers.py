@@ -238,6 +238,29 @@ def _scatter_legend_handle(legend_handle, orig_handle):
         legend_handle.set_sizes([size])
 
 
+# a marker keeps its theme edge only while the stroke stays under this share of
+# the marker diameter (sqrt of the area in points): on a tiny circle a light
+# rim reads as a gap and a dark one swallows the fill
+MARKER_EDGE_MAX_SHARE = 1 / 6
+
+
+def _marker_edge_widths(width, sizes):
+    """`width` for markers of area `sizes` the stroke fits, 0 for the rest.
+
+    Scalar in, scalar out; per-marker areas give per-marker widths. A highlight
+    edge never passes through here — it is the emphasis cue, not a rim.
+    """
+
+    if not width or sizes is None:
+        return width
+    fits = width <= MARKER_EDGE_MAX_SHARE * np.sqrt(np.asarray(sizes, dtype=float))
+    if fits.all():
+        return width
+    if not fits.any():
+        return 0.0
+    return np.where(fits, width, 0.0)
+
+
 # bubble charts size markers by data; their legend entries keep the base size
 LEGEND_HANDLER_MAP = {
     PathCollection: HandlerPathCollection(update_func=_scatter_legend_handle)
@@ -1616,6 +1639,10 @@ class ScatterLayer(Layer):
                 if ctx.emphasis == EMPHASIS_BACKGROUND:
                     group_style["c"] = self.muted_color
                     label = NO_LEGEND
+                if ctx.emphasis != EMPHASIS_HIGHLIGHT:
+                    group_style["linewidths"] = _marker_edge_widths(
+                        group_style.get("linewidths"), group_sizes
+                    )
                 collection = scatter(
                     x_data[mask],
                     y_data[mask],
@@ -1648,6 +1675,10 @@ class ScatterLayer(Layer):
                 base_style["c"] = ctx.color
             if ctx.emphasis == EMPHASIS_BACKGROUND:
                 base_style["c"] = self.muted_color
+            if ctx.emphasis != EMPHASIS_HIGHLIGHT:
+                base_style["linewidths"] = _marker_edge_widths(
+                    base_style.get("linewidths"), sizes
+                )
 
             collection = scatter(
                 x_data, y_data, s=sizes, label=self.label(ctx), **base_style
@@ -2065,6 +2096,10 @@ class SwarmLayer(GroupLayer):
             self._apply_emphasis(style, role, width_key="linewidths", color_key="c")
             if role == EMPHASIS_HIGHLIGHT:
                 style["edgecolors"] = self.highlight_edge_color
+            else:
+                style["linewidths"] = _marker_edge_widths(
+                    style.get("linewidths"), style.get("s")
+                )
             label = NO_LEGEND
             if role != EMPHASIS_BACKGROUND and not legend_taken:
                 label = self.label(ctx)
@@ -3337,6 +3372,10 @@ class RadialScatterLayer(RadialLayer):
         )
         if ctx.emphasis == EMPHASIS_HIGHLIGHT:
             scatter_style["edgecolors"] = self.highlight_edge_color
+        else:
+            scatter_style["linewidths"] = _marker_edge_widths(
+                scatter_style.get("linewidths"), scatter_style.get("s")
+            )
         if scatter_style.get("c") is None:
             scatter_style["c"] = ctx.color
         if ctx.emphasis == EMPHASIS_BACKGROUND:
@@ -4608,6 +4647,9 @@ class NetworkLayer(Layer):
             self.muted_alpha if muted[k] else style["node_alpha"]
             for k in range(len(self.nodes))
         ]
+        rim_widths = np.broadcast_to(
+            _marker_edge_widths(style["linewidth"], self.areas), len(self.nodes)
+        )
         points = ax.scatter(
             pos[:, 0],
             pos[:, 1],
@@ -4619,8 +4661,8 @@ class NetworkLayer(Layer):
                 self.highlight_color if h else style["edgecolor"] for h in highlighted
             ],
             linewidths=[
-                style["highlight_linewidth"] if h else style["linewidth"]
-                for h in highlighted
+                style["highlight_linewidth"] if h else w
+                for h, w in zip(highlighted, rim_widths)
             ],
             zorder=3,
             gid="nodes",
