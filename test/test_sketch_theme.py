@@ -21,6 +21,7 @@ from datachart.utils._internal.config_helpers import _font_available
 LINE = [{"x": x, "y": y} for x, y in enumerate([1.0, 3.0, 2.0, 4.0])]
 NEGATIVE = [{"x": x, "y": y} for x, y in enumerate([-3.0, -1.0, -2.0, 0.0])]
 BAR = [{"label": label, "y": y} for label, y in zip("ABC", [3.0, 5.0, 4.0])]
+SKETCH = (0.5, 100, 2)
 
 
 def data_lines(figure):
@@ -37,7 +38,7 @@ class TestSketchTheme(unittest.TestCase):
     def test_theme_registered(self):
         config.set_theme(THEME.SKETCH)
         self.assertEqual(config.config, SKETCH_THEME)
-        self.assertEqual(SKETCH_THEME["plot_sketch_params"], (1, 100, 2))
+        self.assertEqual(SKETCH_THEME["plot_sketch_params"], SKETCH)
         self.assertEqual(SKETCH_THEME["plot_sketch_halo_width"], 4)
 
     def test_default_theme_has_no_sketch(self):
@@ -53,17 +54,17 @@ class TestSketchTheme(unittest.TestCase):
         config.set_theme(THEME.SKETCH)
         figure = LineChart(LINE)
         line = data_lines(figure)[0]
-        self.assertEqual(line.get_sketch_params(), (1, 100, 2))
+        self.assertEqual(line.get_sketch_params(), SKETCH)
         self.assertEqual(len(line.get_path_effects()), 1)
         spine = figure.axes[0].spines["bottom"]
-        self.assertEqual(spine.get_sketch_params(), (1, 100, 2))
+        self.assertEqual(spine.get_sketch_params(), SKETCH)
         self.assertEqual(len(spine.get_path_effects()), 1)
 
     def test_sketch_applies_to_bars(self):
         config.set_theme(THEME.SKETCH)
         figure = BarChart(BAR)
         patch = figure.axes[0].patches[0]
-        self.assertEqual(patch.get_sketch_params(), (1, 100, 2))
+        self.assertEqual(patch.get_sketch_params(), SKETCH)
         self.assertEqual(len(patch.get_path_effects()), 1)
 
     def test_area_floor_fill_skips_sketch(self):
@@ -72,7 +73,7 @@ class TestSketchTheme(unittest.TestCase):
         figure = LineChart(LINE, show_area=True)
         fill = figure.axes[0].collections[0]
         self.assertIsNone(fill.get_sketch_params())
-        self.assertEqual(data_lines(figure)[0].get_sketch_params(), (1, 100, 2))
+        self.assertEqual(data_lines(figure)[0].get_sketch_params(), SKETCH)
 
     def test_no_rc_leakage(self):
         before = {
@@ -93,9 +94,9 @@ class TestSketchTheme(unittest.TestCase):
         grid = Grid([[first, second]])
         lines = data_lines(grid)
         self.assertTrue(lines)
-        self.assertEqual(lines[0].get_sketch_params(), (1, 100, 2))
+        self.assertEqual(lines[0].get_sketch_params(), SKETCH)
         patches = [p for ax in grid.axes for p in ax.patches]
-        self.assertEqual(patches[0].get_sketch_params(), (1, 100, 2))
+        self.assertEqual(patches[0].get_sketch_params(), SKETCH)
 
     def test_panel_twin_axis_sketched(self):
         config.set_theme(THEME.SKETCH)
@@ -105,7 +106,7 @@ class TestSketchTheme(unittest.TestCase):
         self.assertEqual(len(panel.axes), 2)
         for ax in panel.axes:
             for spine in ax.spines.values():
-                self.assertEqual(spine.get_sketch_params(), (1, 100, 2))
+                self.assertEqual(spine.get_sketch_params(), SKETCH)
 
     def test_explicit_show_grid_wins(self):
         config.set_theme(THEME.SKETCH)

@@ -778,7 +778,7 @@ class SketchStyleAttrs(TypedDict):
     Attributes:
         plot_sketch_params (Union[Tuple[float, float, float], None]): The path
             wobble as matplotlib sketch parameters `(scale, length, randomness)`;
-            `(1, 100, 2)` is the hand-drawn look. `None` draws clean paths.
+            `plt.xkcd()` uses `(1, 100, 2)`. `None` draws clean paths.
         plot_sketch_halo_width (Union[float, None]): The width of the white halo
             stroked under every path and text. `None` draws no halo.
 
