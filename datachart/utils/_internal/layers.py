@@ -1597,6 +1597,21 @@ class GroupLayer(Layer):
             else:
                 ax.set_yscale(scaley)
 
+    def summary_datum(self, label, category, values) -> dict:
+        """A group's hover datum: its category on the drawn axis, then the five-number summary."""
+
+        values = np.asarray(values, dtype=float)
+        q1, median, q3 = np.percentile(values, [25, 50, 75])
+        return {
+            "label": label,
+            "y" if self.is_horizontal else "x": category,
+            "median": float(median),
+            "q1": float(q1),
+            "q3": float(q3),
+            "min": float(values.min()),
+            "max": float(values.max()),
+        }
+
     def _group_roles(self, labels: list, panel_role: Optional[str] = None) -> list:
         """One emphasis role per label; the panel's role, or a single value, applies to all."""
 
@@ -1711,6 +1726,12 @@ class BoxLayer(GroupLayer):
         if self.side:
             self._clip_to_side(bp, positions)
         self._apply_box_emphasis(bp, self._group_roles(labels, ctx.emphasis))
+        # a container picks its patches by containment; each box reports its group
+        label = self.label(ctx)
+        self.register_hover(
+            BarContainer(bp["boxes"]),
+            lambda i: self.summary_datum(label, labels[i], values[i]),
+        )
 
     def _clip_to_side(self, bp: dict, positions: list) -> None:
         """Keep the box, median, and caps on one side of each box center."""
@@ -2061,6 +2082,11 @@ class ViolinLayer(GroupLayer):
                 artists = [self._draw_body(ax, values, position, width, style, side)]
                 artists += self._draw_inner(ax, values, position, width, side)
                 self._apply_violin_emphasis(artists, roles[i])
+                # a split half stands for its split value, like its legend entry
+                datum = self.summary_datum(
+                    str(split_value) if self.split else self.label(ctx), label, values
+                )
+                self.register_hover(artists[0], lambda _, datum=datum: datum)
 
     def _draw_body(self, ax, values, position, width, style, side):
         parts = ax.violinplot(
@@ -2768,7 +2794,15 @@ class ParallelCoordsLayer(Layer):
             if style.get("color") is None:
                 style["color"] = line_color
             self._apply_emphasis(style, role)
-            ax.plot(x_positions, y_vals, **style)
+            (line,) = ax.plot(x_positions, y_vals, **style)
+            self.register_hover(
+                line,
+                _row_resolver(
+                    self.label(ctx) if hue_val is None else str(hue_val),
+                    dimensions,
+                    data_point,
+                ),
+            )
 
         if ctx.parallel_axes:
             self._draw_axis_furniture(ax, stats)
@@ -2867,6 +2901,16 @@ class ParallelCoordsLayer(Layer):
                         zorder=tick_zorder + 1,
                         **self.tick_label_style,
                     )
+
+
+def _row_resolver(label, dimensions: list, row: dict) -> Callable[[int], dict]:
+    """A parallel-coords row reports, under the axis nearest the pointer, its value there."""
+
+    def resolve(index: int) -> dict:
+        dim = dimensions[min(max(int(index), 0), len(dimensions) - 1)]
+        return {"label": label, dim: row.get(dim)}
+
+    return resolve
 
 
 def compute_parallel_stats(layers: List["ParallelCoordsLayer"]) -> Optional[dict]:
@@ -3385,7 +3429,7 @@ class SankeyLayer(Layer):
         self.node_colors = {name: cycle[i]["color"] for i, name in enumerate(names)}
 
     def _geometry(self) -> tuple:
-        """The (x, bottom, height) of every node and the shared height scale."""
+        """The (x, bottom, height) of every node, the shared height scale, and the node flows."""
 
         style = self.sankey_style
         node_width = style["node_width"]
@@ -3414,12 +3458,14 @@ class SankeyLayer(Layer):
                 height = size[name] * scale
                 geometry[name] = NodeBox(x, y - height, height)
                 y -= height + gap
-        return geometry, scale
+        return geometry, scale, size
 
     def draw(self, ax: plt.Axes, ctx: DrawContext) -> None:
         style = self.sankey_style
         node_width = style["node_width"]
-        geometry, scale = self._geometry()
+        geometry, scale, size = self._geometry()
+        # the (patch, datum) of every node bar and ribbon, for the hover containers
+        node_marks, link_marks = [], []
         halo = style.get("halo_width") or 0
         # the axes limits are fixed before any text so box estimates use them
         ax.set_xlim(-SANKEY_LABEL_MARGIN, 1 + SANKEY_LABEL_MARGIN)
@@ -3431,18 +3477,18 @@ class SankeyLayer(Layer):
         for ci, column in enumerate(self.columns):
             for name in column:
                 box = geometry[name]
-                ax.add_patch(
-                    Rectangle(
-                        (box.x, box.bottom),
-                        node_width,
-                        box.height,
-                        facecolor=self.node_colors[name],
-                        edgecolor=style.get("edgecolor"),
-                        linewidth=style.get("linewidth"),
-                        zorder=3,
-                        label=name,
-                    )
+                bar = Rectangle(
+                    (box.x, box.bottom),
+                    node_width,
+                    box.height,
+                    facecolor=self.node_colors[name],
+                    edgecolor=style.get("edgecolor"),
+                    linewidth=style.get("linewidth"),
+                    zorder=3,
+                    label=name,
                 )
+                ax.add_patch(bar)
+                node_marks.append((bar, {"label": name, "flow": size[name]}))
                 # labels sit left of the first column, right of every other
                 if ci == 0:
                     tx, ha = box.x - SANKEY_LABEL_PAD, "right"
@@ -3523,13 +3569,23 @@ class SankeyLayer(Layer):
                 "target": self.node_colors[target],
                 "grey": SANKEY_GREY,
             }[self.link_color]
-            ax.add_patch(
-                PathPatch(
-                    Path(verts, codes),
-                    facecolor=color,
-                    edgecolor="none",
-                    alpha=style.get("link_alpha"),
-                    zorder=2,
+            ribbon = PathPatch(
+                Path(verts, codes),
+                facecolor=color,
+                edgecolor="none",
+                alpha=style.get("link_alpha"),
+                zorder=2,
+            )
+            ax.add_patch(ribbon)
+            link_marks.append(
+                (
+                    ribbon,
+                    {
+                        "label": None,
+                        "source": source,
+                        "target": target,
+                        "flow": record["value"],
+                    },
                 )
             )
             if self.show_values:
@@ -3571,6 +3627,10 @@ class SankeyLayer(Layer):
                 **self.value_style,
             )
 
+        for marks in (node_marks, link_marks):
+            self.register_hover(
+                BarContainer([patch for patch, _ in marks]), lambda i, m=marks: m[i][1]
+            )
         ax.axis("off")
 
 
@@ -3688,6 +3748,8 @@ class TileFrame(NamedTuple):
     aspect: float
     # the halo path effects behind every label
     effects: list
+    # the (patch, datum) of every tile and band placed, for the hover container
+    marks: list
 
 
 class TreemapLayer(Layer):
@@ -3738,7 +3800,7 @@ class TreemapLayer(Layer):
         pos = ax.get_position()
         axes_pt = (fig_w * pos.width * 72, fig_h * pos.height * 72)
         frame = TileFrame(
-            axes_pt, axes_pt[0] / axes_pt[1], _halo_effects(style.get("halo_width"))
+            axes_pt, axes_pt[0] / axes_pt[1], _halo_effects(style.get("halo_width")), []
         )
         aspect = frame.aspect
         pad = style["group_pad"]
@@ -3754,10 +3816,15 @@ class TreemapLayer(Layer):
                 self._draw_tile(ax, record, box, color, role, 0, frame)
             else:
                 self._draw_group(ax, record, box, color, role, frame)
+        # a container picks its patches by containment; tiles and bands never overlap
+        marks = frame.marks
+        self.register_hover(
+            BarContainer([patch for patch, _ in marks]), lambda i: marks[i][1]
+        )
 
     def _draw_group(self, ax, record, box, color, role, frame):
         style = self.treemap_style
-        axes_pt, aspect, effects = frame
+        axes_pt, aspect, effects, marks = frame
         x, y, w, h = box
         label = record["label"]
         muted = role == EMPHASIS_BACKGROUND
@@ -3786,18 +3853,18 @@ class TreemapLayer(Layer):
             self._draw_tile(ax, child, tile, leaf_color, child_role, 1, frame)
 
         if band:
-            ax.add_patch(
-                Rectangle(
-                    (x, y + h - band),
-                    w,
-                    band,
-                    facecolor=box_color,
-                    edgecolor="none",
-                    alpha=alpha,
-                    zorder=3,
-                    gid=f"band:{label}",
-                )
+            header = Rectangle(
+                (x, y + h - band),
+                w,
+                band,
+                facecolor=box_color,
+                edgecolor="none",
+                alpha=alpha,
+                zorder=3,
+                gid=f"band:{label}",
             )
+            ax.add_patch(header)
+            marks.append((header, {"label": label, "value": _record_total(record)}))
             # a band label never wraps or shrinks; the legend names what is cut
             if (
                 _text_size(band_size, label)[0]
@@ -3839,25 +3906,25 @@ class TreemapLayer(Layer):
 
     def _draw_tile(self, ax, record, box, color, role, level, frame):
         style = self.treemap_style
-        axes_pt, _, effects = frame
+        axes_pt, _, effects, marks = frame
         x, y, w, h = box
         muted = role == EMPHASIS_BACKGROUND
         highlight = role == EMPHASIS_HIGHLIGHT
-        ax.add_patch(
-            Rectangle(
-                (x, y),
-                w,
-                h,
-                facecolor=self.muted_color if muted else color,
-                alpha=self.muted_alpha if muted else None,
-                edgecolor=self.highlight_color if highlight else style["edgecolor"],
-                linewidth=(
-                    style["highlight_linewidth"] if highlight else style["linewidth"]
-                ),
-                zorder=4 if highlight else 2,
-                gid=f"tile:{record['label']}",
-            )
+        tile = Rectangle(
+            (x, y),
+            w,
+            h,
+            facecolor=self.muted_color if muted else color,
+            alpha=self.muted_alpha if muted else None,
+            edgecolor=self.highlight_color if highlight else style["edgecolor"],
+            linewidth=(
+                style["highlight_linewidth"] if highlight else style["linewidth"]
+            ),
+            zorder=4 if highlight else 2,
+            gid=f"tile:{record['label']}",
         )
+        ax.add_patch(tile)
+        marks.append((tile, {"label": record["label"], "value": record["value"]}))
         scale = style["level_font_scale"] ** level
         value = (
             _format_value(self.value_format, record["value"])
@@ -4166,6 +4233,14 @@ class NetworkLayer(Layer):
         self.drawn_edges = drawn
         self.pairs = [(index[e["source"]], index[e["target"]]) for e in drawn]
         self.weights = [record.get("weight") for record in drawn]
+        # a node's degree: its edge count, or their weight sum once any edge
+        # carries a weight (an unweighted edge then counts one)
+        weighted = any(w is not None for w in self.weights)
+        self.degrees = [0] * len(self.nodes)
+        for (i, j), weight in zip(self.pairs, self.weights):
+            share = weight if weighted and weight is not None else 1
+            self.degrees[i] += share
+            self.degrees[j] += share
         self.groups = [node.get("group") for node in self.nodes]
         # the clusters behind the nodes: only the grouped layout has any
         self.clusters = []
@@ -4317,6 +4392,14 @@ class NetworkLayer(Layer):
                     gid=gid,
                 )
             ax.add_patch(patch)
+            datum = {
+                "label": None,
+                "source": record["source"],
+                "target": record["target"],
+            }
+            if record.get("weight") is not None:
+                datum["weight"] = record["weight"]
+            self.register_hover(patch, lambda _, datum=datum: datum)
             if self.show_values and record.get("weight") is not None:
                 # the midpoint of the arc3 quadratic Bézier, not of the chord
                 mid = (pos[i] + pos[j]) / 2
@@ -4349,7 +4432,7 @@ class NetworkLayer(Layer):
             self.muted_alpha if muted[k] else style["node_alpha"]
             for k in range(len(self.nodes))
         ]
-        ax.scatter(
+        points = ax.scatter(
             pos[:, 0],
             pos[:, 1],
             s=self.areas,
@@ -4365,6 +4448,13 @@ class NetworkLayer(Layer):
             ],
             zorder=3,
             gid="nodes",
+        )
+        names = [
+            node["id"] if not node.get("label") else node["label"]
+            for node in self.nodes
+        ]
+        self.register_hover(
+            points, lambda k: {"label": names[k], "degree": self.degrees[k]}
         )
 
         for k, node in enumerate(self.nodes):

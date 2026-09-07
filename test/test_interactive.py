@@ -19,7 +19,7 @@ from matplotlib.container import BarContainer
 from matplotlib.contour import ContourSet
 from matplotlib.image import AxesImage
 from matplotlib.lines import Line2D
-from matplotlib.patches import Polygon
+from matplotlib.patches import FancyArrowPatch, Polygon
 
 from datachart.charts import (
     LineChart,
@@ -33,6 +33,11 @@ from datachart.charts import (
     HexbinChart,
     Heatmap,
     ContourChart,
+    ViolinPlot,
+    ParallelCoords,
+    SankeyChart,
+    Treemap,
+    NetworkChart,
 )
 from datachart.constants import HISTOGRAM_TYPE
 from datachart.utils import Panel, Grid
@@ -273,6 +278,128 @@ class TestCartesianLayers:
         assert resolver((0, 2)) == {"label": None, "level": "1 – 3"}
 
 
+SUMMARY_A = {"median": 3, "q1": 2, "q3": 4, "min": 1, "max": 10}
+
+
+class TestAggregateLayers:
+    """Aggregate and structural marks report their summary."""
+
+    def test_box_reports_category_and_five_numbers(self):
+        figure = BoxPlot(data=GROUP_DATA, subtitle="scores")
+        ((boxes, resolver),) = _targets(figure)
+        assert isinstance(boxes, BarContainer) and len(boxes) == 2
+        assert resolver(0) == {"label": "scores", "x": "A", **SUMMARY_A}
+        horizontal = BoxPlot(data=GROUP_DATA, orientation="horizontal")
+        datum = _targets(horizontal)[0][1](1)
+        assert list(datum) == ["label", "y", "median", "q1", "q3", "min", "max"]
+        assert datum["y"] == "B"
+
+    def test_violin_bodies_report_the_same_summary(self):
+        figure = ViolinPlot(data=GROUP_DATA, subtitle="scores")
+        targets = _targets(figure)
+        assert all(isinstance(a, PolyCollection) for a, _ in targets)
+        assert len(targets) == 2
+        assert targets[0][1]((0, 7)) == {"label": "scores", "x": "A", **SUMMARY_A}
+        assert targets[1][1]((0, 0))["median"] == 6
+
+    def test_split_violins_report_the_split_value(self):
+        data = [
+            {"label": "A", "value": v, "side": s} for v, s in zip(range(8), "LLLLRRRR")
+        ]
+        figure = ViolinPlot(data=data, split="side")
+        assert [r((0, 0))["label"] for _, r in _targets(figure)] == ["L", "R"]
+
+    def test_parallel_rows_report_the_axis_under_the_pointer(self):
+        figure = ParallelCoords(
+            data=[
+                {"a": 1, "b": 2, "c": 3, "kind": "k1"},
+                {"a": 4, "b": 5, "c": 6, "kind": "k2"},
+            ],
+            dimensions=["a", "b", "c"],
+            hue="kind",
+        )
+        targets = _targets(figure)
+        assert [type(a) for a, _ in targets] == [Line2D, Line2D]
+        assert targets[1][1](2) == {"label": "k2", "c": 6}
+        assert targets[0][1](0) == {"label": "k1", "a": 1}
+        unhued = ParallelCoords(data=[{"a": 1, "b": 2}], subtitle="rows")
+        assert _targets(unhued)[0][1](1) == {"label": "rows", "b": 2}
+
+    def test_sankey_nodes_and_links_report_flows(self):
+        figure = SankeyChart(
+            data={
+                "links": [
+                    {"source": "A", "target": "X", "value": 3},
+                    {"source": "A", "target": "Y", "value": 1},
+                    {"source": "B", "target": "Y", "value": 2},
+                ]
+            }
+        )
+        (nodes, node_resolver), (links, link_resolver) = _targets(figure)
+        assert isinstance(nodes, BarContainer) and len(nodes) == 4
+        assert node_resolver(0) == {"label": "A", "flow": 4}
+        assert node_resolver(3) == {"label": "Y", "flow": 3}
+        assert len(links) == 3
+        datums = [link_resolver(i) for i in range(3)]
+        assert {"label": None, "source": "B", "target": "Y", "flow": 2} in datums
+
+    def test_treemap_tiles_and_bands_report_values(self):
+        figure = Treemap(
+            data={
+                "data": [
+                    {
+                        "label": "Asia",
+                        "children": [
+                            {"label": "India", "value": 30},
+                            {"label": "China", "value": 20},
+                        ],
+                    },
+                    {"label": "Africa", "value": 10},
+                ]
+            }
+        )
+        ((tiles, resolver),) = _targets(figure)
+        assert isinstance(tiles, BarContainer)
+        datums = [resolver(i) for i in range(len(tiles))]
+        assert {"label": "India", "value": 30} in datums
+        assert {"label": "Africa", "value": 10} in datums
+        # the group's band stands for the group total
+        assert {"label": "Asia", "value": 50} in datums
+
+    def test_network_nodes_report_degree_and_edges_their_endpoints(self):
+        weighted = NetworkChart(
+            data={
+                "edges": [
+                    {"source": "a", "target": "b", "weight": 2},
+                    {"source": "a", "target": "c", "weight": 3},
+                ]
+            }
+        )
+        targets = _targets(weighted)
+        edges = [r for a, r in targets if isinstance(a, FancyArrowPatch)]
+        ((nodes, node_resolver),) = [
+            (a, r) for a, r in targets if isinstance(a, PathCollection)
+        ]
+        assert len(edges) == 2
+        assert edges[0](0) == {"label": None, "source": "a", "target": "b", "weight": 2}
+        assert node_resolver(0) == {"label": "a", "degree": 5}
+        assert node_resolver(1) == {"label": "b", "degree": 2}
+        unweighted = NetworkChart(
+            data={
+                "nodes": [{"id": "a", "label": "Alpha"}, {"id": "b"}, {"id": "c"}],
+                "edges": [
+                    {"source": "a", "target": "b"},
+                    {"source": "a", "target": "c"},
+                ],
+            }
+        )
+        targets = _targets(unweighted)
+        node = [r for a, r in targets if isinstance(a, PathCollection)][0]
+        edge = [r for a, r in targets if isinstance(a, FancyArrowPatch)][0]
+        assert node(0) == {"label": "Alpha", "degree": 2}
+        assert edge(0) == {"label": None, "source": "a", "target": "b"}
+
+
 class TestHoverText:
     """The annotation lists the datum's fields in order; x and y are axis coordinates."""
 
@@ -457,6 +584,31 @@ class TestShowInteractive:
         ax = hexbin.axes[0]
         x, y = ax.format_xdata(cx).strip(), ax.format_ydata(cy).strip()
         assert texts == [f"x: {x}\ny: {y}\ncount: {int(tiles.get_array()[4])}"]
+
+    def test_box_hover_picks_the_body_by_containment(self):
+        figure = BoxPlot(data=GROUP_DATA, subtitle="scores", xlabel="Group")
+        _show_interactive(figure)
+        # the first box sits at position 1 and spans q1..q3 = 2..4
+        assert _hover(figure, figure.axes[0], 1, 3) == [
+            "scores\nGroup: A\nmedian: 3\nq1: 2\nq3: 4\nmin: 1\nmax: 10"
+        ]
+
+    def test_network_edge_hover_picks_the_outline(self):
+        figure = NetworkChart(
+            data={
+                "nodes": [
+                    {"id": "a", "x": 0.2, "y": 0.5},
+                    {"id": "b", "x": 0.8, "y": 0.5},
+                ],
+                "edges": [{"source": "a", "target": "b", "weight": 4}],
+            },
+            layout="fixed",
+            style={"plot_network_edge_style": "straight"},
+        )
+        _show_interactive(figure)
+        assert _hover(figure, figure.axes[0], 0.5, 0.5) == [
+            "source: a\ntarget: b\nweight: 4"
+        ]
 
     def test_heatmap_hover_reports_the_cell(self):
         figure = Heatmap(
