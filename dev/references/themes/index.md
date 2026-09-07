@@ -318,4 +318,4 @@ The sketch theme: hand-drawn, xkcd-style wobble and halo, Comic Neue font.
 
 Paths wobble, lines carry a white halo, spines and lines are thick, the grid is off, and text is set in Comic Neue, which ships with the package; Humor Sans and Comic Sans MS are the fallbacks should the bundled face fail to register.
 
-Added in Unreleased
+Added in v0.9.1

@@ -350,15 +350,15 @@ Examples:
 "default"
 ```
 
-| ATTRIBUTE   | DESCRIPTION                                                                                                                         |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `DEFAULT`   | The default theme. Equals to "default". **TYPE:** `str`                                                                             |
-| `GREYSCALE` | The greyscale theme. Equals to "greyscale". **TYPE:** `str`                                                                         |
-| `INK`       | The ink theme (dark-ink accents, print-ready). Equals to "ink". **TYPE:** `str`                                                     |
-| `HATCH`     | The hatch theme (hatch cycle, value labels, dotted grid). Equals to "hatch". **TYPE:** `str`                                        |
-| `MINIMAL`   | The minimal theme (accent blue, no spines, flat bars). Equals to "minimal". **TYPE:** `str`                                         |
-| `MATERIAL`  | The material theme (Google palette, light grid). Equals to "material". **TYPE:** `str`                                              |
-| `SKETCH`    | The sketch theme (hand-drawn, xkcd-style wobble and halo, Comic Neue font). Equals to "sketch". Added in Unreleased **TYPE:** `str` |
+| ATTRIBUTE   | DESCRIPTION                                                                                                     |
+| ----------- | --------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT`   | The default theme. Equals to "default". **TYPE:** `str`                                                         |
+| `GREYSCALE` | The greyscale theme. Equals to "greyscale". **TYPE:** `str`                                                     |
+| `INK`       | The ink theme (dark-ink accents, print-ready). Equals to "ink". **TYPE:** `str`                                 |
+| `HATCH`     | The hatch theme (hatch cycle, value labels, dotted grid). Equals to "hatch". **TYPE:** `str`                    |
+| `MINIMAL`   | The minimal theme (accent blue, no spines, flat bars). Equals to "minimal". **TYPE:** `str`                     |
+| `MATERIAL`  | The material theme (Google palette, light grid). Equals to "material". **TYPE:** `str`                          |
+| `SKETCH`    | The sketch theme (hand-drawn, xkcd-style wobble and halo, Comic Neue font). Equals to "sketch". **TYPE:** `str` |
 
 ### datachart.constants.EMPHASIS
 

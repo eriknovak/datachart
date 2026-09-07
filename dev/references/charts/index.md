@@ -2527,7 +2527,7 @@ Creates the network chart.
 
 A network chart draws relational data as a node-link diagram — module dependencies, who works with whom, co-occurring terms, flows between peers. Nodes are placed by a layout and joined by edges; an edge's weight sets its width, a node's size its marker area, its group its color. Use it when the question is what is connected to what; for weighted flows through ordered stages use SankeyChart.
 
-Added in Unreleased
+Added in v0.9.1
 
 Examples:
 
@@ -2704,7 +2704,7 @@ Creates the treemap.
 
 A treemap tiles part-of-whole data as rectangles whose area is the value — disk usage by folder, a budget by line, population by continent and country. A record's `children` add one level of grouping: the group is a bordered box with a header band, its tiles a lighter tint of the group color. Every level is sorted largest first and tiled so the rectangles stay near square. Use it when the question is how a whole splits; for the values alone, or for more than a handful of small parts, use BarChart.
 
-Added in Unreleased
+Added in v0.9.1
 
 Examples:
 

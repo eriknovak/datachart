@@ -961,7 +961,7 @@ Bases: `TypedDict`
 
 The typing for the sketch attributes: the theme's render-scoped rc-level look (path wobble, halo stroke). The panel snapshots both at build time and applies them inside a scoped matplotlib rc context, so no global rc setting changes; composition keeps the look of the figures it was built from.
 
-Added in Unreleased
+Added in v0.9.1
 
 | ATTRIBUTE                | DESCRIPTION                                                                                                                                                                           |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
