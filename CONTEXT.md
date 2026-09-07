@@ -208,6 +208,23 @@ are Bézier patches whose height is the value, coloured by source. One layer
 per chart, no furniture; rejected in `Panel`, a cell in `Grid`.
 _Avoid_: flow chart, alluvial (that implies time-ordered axes), network graph
 
+**Treemap**:
+Part-of-whole data tiled as rectangles whose area is the value (`Treemap`: a
+`data` list of `{label, value}` records, a record's `children` giving one
+level of nesting). Every level is sorted descending and squarified in the
+axes' pixel aspect; a group is a bordered box with a header band, its
+children share one tint a level lighter than the group. Labels wrap, then
+shrink to a minimum size, then drop. One layer per chart, no furniture;
+rejected in `Panel`, a cell in `Grid`.
+_Avoid_: tree map, tile chart, mosaic plot (that is a different encoding)
+
+**Per-record emphasis**:
+An `emphasis` key on a treemap record (group or leaf, leaf wins) carrying an
+`EMPHASIS` role. Roles stay explicit per item: `highlight` bolds the tile's
+border only, `background` mutes it, neither changes its siblings. The
+front's per-chart `emphasis` argument is rejected for treemaps.
+_Avoid_: focus, selected group
+
 **Density estimate**:
 A Gaussian kernel density (`stats.kde1d` → `{x, y}` points for `LineChart`,
 `stats.kde2d` → an `{x, y, z}` dict for `ContourChart`) on a grid that extends
