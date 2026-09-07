@@ -5,7 +5,7 @@
 datachart is a Python data visualization package built on matplotlib.
 It provides simple chart functions (BarChart, LineChart, StackedAreaChart, ScatterChart,
 Histogram, Heatmap, ContourChart, HexbinChart, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot,
-ParallelCoords, PyramidChart, RadialChart, SankeyChart), figure
+ParallelCoords, PyramidChart, RadialChart, SankeyChart, Treemap), figure
 composition via Panel (overlaying charts on shared axes) and Grid
 (arranging charts in a grid), and a global configuration system with
 predefined themes.
@@ -38,6 +38,7 @@ themes; per-chart overrides go in each chart's `style` parameter.
 - [Contour Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md): Contour chart input attributes, iso-lines and filled bands, colorbars, inline labels, level rules, emphasis, multiple surfaces, composing with Panel and Grid, and saving.
 - [Hexbin Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md): Hexbin chart input attributes, point counts and log color scales, aggregating a per-point value, grid size and minimum count, hexagon edges, subplots, composing with Panel and Grid, and saving.
 - [Sankey Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/sankeychart/index.md): Sankey chart input attributes, the links data contract, inferred and explicit node columns, node and ribbon style, text annotations, subplots, composing with Grid, and saving.
+- [Treemap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/treemap/index.md): Treemap input attributes, the records data contract with one level of children, tile values, per-record emphasis, the group legend, tile style, text annotations, subplots, composing with Grid, and saving.
 - [Parallel Coordinates](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/parallelcoords/index.md): Parallel coordinates input attributes and customization for multivariate data.
 
 ## Composition & Utilities

@@ -48,6 +48,14 @@ How a quantity moves between categories: where it comes from and where it goes.
 | --------------------------------------------------------------------------------------------------- | --------------------------------- |
 | [Sankey Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/sankeychart/index.md) | The showcase of the Sankey chart. |
 
+## Part of a Whole
+
+How a whole splits into parts, and parts into smaller parts.
+
+| Chart                                                                                      | Description                  |
+| ------------------------------------------------------------------------------------------ | ---------------------------- |
+| [Treemap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/treemap/index.md) | The showcase of the treemap. |
+
 ## Composition
 
 Here are some utility functions, that could help you.

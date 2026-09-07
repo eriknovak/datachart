@@ -32,6 +32,8 @@ The modernized default: Tableau-style palette, white bar edges, open spines, sof
 
 ### Flows
 
+### Part of a Whole
+
 ### Composition
 
 ## Greyscale
@@ -45,6 +47,8 @@ Monochrome and print-friendly, with the same open spines and muted grid treatmen
 ### Relationships
 
 ### Flows
+
+### Part of a Whole
 
 ### Composition
 
@@ -60,6 +64,8 @@ The diversified YlGnBu palette (`COLORS.PaperYlGnBu`) with navy ink edges, print
 
 ### Flows
 
+### Part of a Whole
+
 ### Composition
 
 ## Minimal
@@ -73,6 +79,8 @@ Accent blue with deep grays, no spines or tick marks, flat bars — and bar valu
 ### Relationships
 
 ### Flows
+
+### Part of a Whole
 
 ### Composition
 
@@ -88,6 +96,8 @@ The Google palette with a bottom spine only and a light solid grid; value labels
 
 ### Flows
 
+### Part of a Whole
+
 ### Composition
 
 ## Hatch
@@ -102,6 +112,8 @@ Black edges, dotted grid — and the hatch cycle (`""`, `"//"`, `".."`) applied 
 
 ### Flows
 
+### Part of a Whole
+
 ### Composition
 
 ## Sketch
@@ -115,6 +127,8 @@ Hand-drawn: wobbled paths, lines cut out by a white halo, thick spines and lines
 ### Relationships
 
 ### Flows
+
+### Part of a Whole
 
 ### Composition
 
