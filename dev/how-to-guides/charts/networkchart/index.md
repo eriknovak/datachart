@@ -142,23 +142,24 @@ NetworkChart(
 
 Every customization is either a keyword argument of `NetworkChart` or a `plot_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                                | Use                                                                       | See                                                         |
-| ----------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| add a title                               | `title`                                                                   | [Title and figure size](#title-and-figure-size)             |
-| resize the figure                         | `figsize`                                                                 | [Title and figure size](#title-and-figure-size)             |
-| place the nodes another way               | `layout`, `seed`                                                          | [Layouts](#layouts)                                         |
-| put every node where I say                | `layout=NETWORK_LAYOUT.FIXED` and `"x"`, `"y"` on the nodes               | [Layouts](#layouts)                                         |
-| show the direction of the edges           | `directed`                                                                | [Directed edges](#directed-edges)                           |
-| size the edges and the nodes by a value   | `"weight"` on the edges, `"size"` on the nodes                            | [Edge weights and node sizes](#edge-weights-and-node-sizes) |
-| color the nodes by a category             | `"group"` on the nodes, `show_legend`                                     | [Groups and the legend](#groups-and-the-legend)             |
-| mute or outline a node                    | `"emphasis"` on the node                                                  | [Emphasis](#emphasis)                                       |
-| write the weights on the edges            | `show_values`, `value_format`                                             | [Edge values](#edge-values)                                 |
-| draw straight edges, or bow them more     | `style={"plot_network_edge_style": ..., "plot_network_edge_curve": ...}`  | [Node and edge style](#node-and-edge-style)                 |
-| change the node markers or the edge color | `style={"plot_network_node_marker": ..., "plot_network_edge_color": ...}` | [Node and edge style](#node-and-edge-style)                 |
-| drop the halo behind the labels           | `style={"plot_network_label_halo_width": 0}`                              | [Node and edge style](#node-and-edge-style)                 |
-| annotate a point of the chart             | `texts`                                                                   | [Text annotations](#text-annotations)                       |
-| draw several networks side by side        | `subplots`                                                                | [Subplots](#subplots)                                       |
-| arrange a network next to other charts    | `Grid`                                                                    | [Composing network charts](#composing-network-charts)       |
+| I want to…                                | Use                                                                           | See                                                         |
+| ----------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| add a title                               | `title`                                                                       | [Title and figure size](#title-and-figure-size)             |
+| resize the figure                         | `figsize`                                                                     | [Title and figure size](#title-and-figure-size)             |
+| place the nodes another way               | `layout`, `seed`                                                              | [Layouts](#layouts)                                         |
+| put every node where I say                | `layout=NETWORK_LAYOUT.FIXED` and `"x"`, `"y"` on the nodes                   | [Layouts](#layouts)                                         |
+| draw a large network                      | aggregate or filter first; `layout=NETWORK_LAYOUT.CIRCULAR` past ~1,000 nodes | [Large networks](#large-networks)                           |
+| show the direction of the edges           | `directed`                                                                    | [Directed edges](#directed-edges)                           |
+| size the edges and the nodes by a value   | `"weight"` on the edges, `"size"` on the nodes                                | [Edge weights and node sizes](#edge-weights-and-node-sizes) |
+| color the nodes by a category             | `"group"` on the nodes, `show_legend`                                         | [Groups and the legend](#groups-and-the-legend)             |
+| mute or outline a node                    | `"emphasis"` on the node                                                      | [Emphasis](#emphasis)                                       |
+| write the weights on the edges            | `show_values`, `value_format`                                                 | [Edge values](#edge-values)                                 |
+| draw straight edges, or bow them more     | `style={"plot_network_edge_style": ..., "plot_network_edge_curve": ...}`      | [Node and edge style](#node-and-edge-style)                 |
+| change the node markers or the edge color | `style={"plot_network_node_marker": ..., "plot_network_edge_color": ...}`     | [Node and edge style](#node-and-edge-style)                 |
+| drop the halo behind the labels           | `style={"plot_network_label_halo_width": 0}`                                  | [Node and edge style](#node-and-edge-style)                 |
+| annotate a point of the chart             | `texts`                                                                       | [Text annotations](#text-annotations)                       |
+| draw several networks side by side        | `subplots`                                                                    | [Subplots](#subplots)                                       |
+| arrange a network next to other charts    | `Grid`                                                                        | [Composing network charts](#composing-network-charts)       |
 
 ### Title and figure size
 
@@ -228,6 +229,55 @@ NetworkChart(
     layout=NETWORK_LAYOUT.FIXED,
     title="The modules by layer",
     figsize=FIG_SIZE.SQUARE,
+).show()
+```
+
+### Large networks
+
+A network chart is meant for a graph a reader can follow, and the drawing cost sets a practical ceiling well before the readable one. Every edge is drawn as its own curved patch, which costs a few milliseconds to build and as many again to save, and the spring layout weighs every pair of nodes, so its cost grows with the square of the node count. Measured on a laptop, these sizes draw without a problem:
+
+| Layout              | Nodes        | Edges         | Time to draw and save |
+| ------------------- | ------------ | ------------- | --------------------- |
+| `SPRING` (default)  | up to ~1,000 | up to ~3,000  | a few seconds         |
+| `CIRCULAR`, `FIXED` | up to ~5,000 | up to ~15,000 | under a minute        |
+
+Past those, the spring layout is the first to give: 2,000 nodes take about half a minute, 5,000 several minutes and over a gigabyte of memory. The circular and fixed layouts stay linear, about six milliseconds per edge, so 10,000 nodes and 30,000 edges take around two minutes. Nothing is enforced — a larger graph draws, only slowly — but a picture that dense reads as a hairball anyway. Aggregate the nodes (a group per node, an edge per group pair, its weight the count) or keep the heaviest edges before drawing, and switch to `CIRCULAR` or `FIXED` when the node count passes a thousand.
+
+The example collapses a random code base of 3,000 modules and 15,000 imports into its 120 packages — one node per package, colored by the team that owns it and sized by its imports, one edge per pair of packages with at least five imports between them — and lets the spring layout, still comfortable at this size, pull the busy packages together:
+
+```
+import random
+from collections import Counter
+
+rng = random.Random(0)
+# 3,000 modules in 120 packages owned by six teams, and 15,000 random imports
+N_MODULES, N_PACKAGES, N_IMPORTS = 3000, 120, 15000
+package = {f"m{i}": f"pkg{i % N_PACKAGES}" for i in range(N_MODULES)}
+team = {f"pkg{p}": f"team {p // 20 + 1}" for p in range(N_PACKAGES)}
+imports = [(f"m{rng.randrange(N_MODULES)}", f"m{rng.randrange(N_MODULES)}") for _ in range(N_IMPORTS)]
+
+# one edge per pair of packages, weighted by the imports crossing between them,
+# keeping only the pairs with at least five
+crossing = Counter(
+    tuple(sorted((package[s], package[t]))) for s, t in imports if package[s] != package[t]
+)
+edges = [{"source": a, "target": b, "weight": n} for (a, b), n in crossing.items() if n >= 5]
+
+# a package's size is how many imports cross its border
+traffic = Counter()
+for edge in edges:
+    traffic[edge["source"]] += edge["weight"]
+    traffic[edge["target"]] += edge["weight"]
+# in package order, so the legend lists the teams in order
+nodes = [{"id": pkg, "label": "", "group": owner, "size": traffic[pkg]} for pkg, owner in team.items()]
+
+NetworkChart(
+    data={"nodes": nodes, "edges": edges},
+    show_legend=True,
+    title="Imports between the packages of a large code base",
+    figsize=(10, 10),
+    # smaller markers keep 120 nodes apart
+    style={"plot_network_node_size_max": 400},
 ).show()
 ```
 

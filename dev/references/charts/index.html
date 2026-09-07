@@ -15732,6 +15732,15 @@ peers. Nodes are placed by a layout and joined by edges; an edge's weight
 sets its width, a node's size its marker area, its group its color. Use
 it when the question is what is connected to what; for weighted flows
 through ordered stages use <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;datachart.charts.SankeyChart&lt;/span&gt;" href="#datachart.charts.SankeyChart"><code>SankeyChart</code></a>.</p>
+<p>Every edge is its own patch and the spring layout weighs every pair of
+nodes, so the chart is meant for networks that can be read, not for
+whole graphs. Without a problem: up to about 1,000 nodes and 3,000
+edges under the spring layout (a few seconds), up to about 5,000 nodes
+and 15,000 edges under the circular or fixed layout (under a minute).
+Beyond that the spring layout grows with the square of the node count —
+2,000 nodes take half a minute, 5,000 several minutes and gigabytes of
+memory — and every layout pays a few milliseconds per edge to draw and
+again to save. Aggregate or filter a larger graph first.</p>
 <div class="admonition info">
 <p class="admonition-title">Added in v0.9.1</p>
 </div>
@@ -15794,7 +15803,9 @@ from the edges in first-seen order.</p>
               <div class="doc-md-description">
                 <p>How the nodes are placed: a <code>NETWORK_LAYOUT</code> constant
 (default <code>NETWORK_LAYOUT.SPRING</code>). <code>FIXED</code> reads each node's
-<code>x</code>/<code>y</code> in the 0–1 layout space.</p>
+<code>x</code>/<code>y</code> in the 0–1 layout space. <code>SPRING</code> costs the square of
+the node count; past about 1,000 nodes prefer <code>CIRCULAR</code> or
+<code>FIXED</code>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">

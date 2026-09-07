@@ -635,12 +635,12 @@ Examples:
 "spring"
 ```
 
-| ATTRIBUTE  | DESCRIPTION                                                                                                                                                                                                              |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `DEFAULT`  | The default layout. Same as NETWORK_LAYOUT.SPRING. **TYPE:** `str`                                                                                                                                                       |
-| `SPRING`   | A force-directed (Fruchterman–Reingold) layout: linked nodes pull together, every pair pushes apart. Seeded by the chart's seed argument, so the same data renders the same picture. Equals to "spring". **TYPE:** `str` |
-| `CIRCULAR` | The nodes evenly spaced on a circle in input order, starting at the top. Equals to "circular". **TYPE:** `str`                                                                                                           |
-| `FIXED`    | Each node at its own x/y, in the 0–1 layout space; a node without them raises. Equals to "fixed". **TYPE:** `str`                                                                                                        |
+| ATTRIBUTE  | DESCRIPTION                                                                                                                                                                                                                                                                                                                  |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT`  | The default layout. Same as NETWORK_LAYOUT.SPRING. **TYPE:** `str`                                                                                                                                                                                                                                                           |
+| `SPRING`   | A force-directed (Fruchterman–Reingold) layout: linked nodes pull together, every pair pushes apart. Seeded by the chart's seed argument, so the same data renders the same picture. Costs the square of the node count: fine up to about 1,000 nodes, slow and memory-hungry past that. Equals to "spring". **TYPE:** `str` |
+| `CIRCULAR` | The nodes evenly spaced on a circle in input order, starting at the top. Equals to "circular". **TYPE:** `str`                                                                                                                                                                                                               |
+| `FIXED`    | Each node at its own x/y, in the 0–1 layout space; a node without them raises. Equals to "fixed". **TYPE:** `str`                                                                                                                                                                                                            |
 
 ### datachart.constants.RADIAL_TYPE
 
