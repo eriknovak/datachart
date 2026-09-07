@@ -1171,13 +1171,14 @@ class BarLayer(Layer):
             **error_range,
             **bar_style,
         )
-        # each bar reports its own value, never the stack total; a pyramid
-        # side draws negative values, so they read as passed, like the labels
+        # each bar reports its category position (the axis names it) and its
+        # own value, never the stack total; a pyramid side draws negative
+        # values, so they read as passed, like the labels
         self.register_hover(
             bars,
             _point_resolver(
                 self.label(ctx),
-                labels,
+                x,
                 np.abs(y) if self.is_pyramid else y,
                 self.is_horizontal,
             ),
@@ -1616,14 +1617,14 @@ class GroupLayer(Layer):
             else:
                 ax.set_yscale(scaley)
 
-    def summary_datum(self, label, category, values) -> dict:
-        """A group's hover datum: its category on the drawn axis, then the five-number summary."""
+    def summary_datum(self, label, position, values) -> dict:
+        """A group's hover datum: its category position on the drawn axis, then the five-number summary."""
 
         values = np.asarray(values, dtype=float)
         q1, median, q3 = np.percentile(values, [25, 50, 75])
         return {
             "label": label,
-            "y" if self.is_horizontal else "x": category,
+            "y" if self.is_horizontal else "x": position,
             "median": float(median),
             "q1": float(q1),
             "q3": float(q3),
@@ -1748,7 +1749,7 @@ class BoxLayer(GroupLayer):
         label = self.label(ctx)
         self.register_patch_hover(
             [
-                (box, self.summary_datum(label, lbl, vals))
+                (box, self.summary_datum(label, ctx.category_index[lbl], vals))
                 for box, lbl, vals in zip(bp["boxes"], labels, values)
             ]
         )
@@ -1954,17 +1955,12 @@ class SwarmLayer(GroupLayer):
             values = np.concatenate([v for _, v in groups])
             x, y = (values, centers) if self.is_horizontal else (centers, values)
             collection = ax.scatter(x, y, label=label, **style)
-            categories = np.concatenate(
-                [
-                    np.full(len(v), lbl, dtype=object)
-                    for lbl, (_, v) in zip(members, groups)
-                ]
+            positions = np.concatenate(
+                [np.full(len(v), index[lbl]) for lbl, (_, v) in zip(members, groups)]
             )
             self.register_hover(
                 collection,
-                _point_resolver(
-                    self.label(ctx), categories, values, self.is_horizontal
-                ),
+                _point_resolver(self.label(ctx), positions, values, self.is_horizontal),
             )
             # the category axis spans every group edge to edge, like a box plot
             edges = (
@@ -2104,7 +2100,9 @@ class ViolinLayer(GroupLayer):
                 self._apply_violin_emphasis(artists, roles[i])
                 # a split half stands for its split value, like its legend entry
                 datum = self.summary_datum(
-                    str(split_value) if self.split else self.label(ctx), label, values
+                    str(split_value) if self.split else self.label(ctx),
+                    ctx.category_index[label],
+                    values,
                 )
                 self.register_hover(artists[0], lambda _, datum=datum: datum)
 
@@ -2279,7 +2277,6 @@ class HeatmapLayer(Layer):
         r, g, b = heatmap_style["cmap"](1.0)[:3]
         self.contrast_values = (0.2126 * r + 0.7152 * g + 0.0722 * b) < 0.5
         x, y, self.z = self._grid()
-        self.x_labels, self.y_labels = x, y
         self._label_axes(x, y)
 
     def _grid(self) -> tuple:
@@ -2320,10 +2317,11 @@ class HeatmapLayer(Layer):
 
         def resolve(index):
             row, col = index
+            # cell indices: the axes' tick labels name them
             return {
                 "label": label,
-                "x": col if self.x_labels is None else self.x_labels[col],
-                "y": row if self.y_labels is None else self.y_labels[row],
+                "x": col,
+                "y": row,
                 "value": _scalar(data[row][col]),
             }
 

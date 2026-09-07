@@ -58,16 +58,19 @@ line per field — without knowing chart types.
   | scatter, swarm       | point               | `x`, `y`                                        |
   | bar                  | bar                 | `x`, `y` (own value, never the stack total)     |
   | histogram            | bin                 | `x` (bin range), `y` (count or density)         |
-  | box, violin          | box / body          | `x` (category), `median`, `q1`, `q3`, `min`, `max` |
+  | box, violin          | box / body          | `x` (category), `median`, `q1`, `q3`, `min`, `max` (a split violin half: labelled by its split value) |
   | heatmap              | cell                | `x`, `y`, `value`                               |
-  | contour              | level line          | `level`                                         |
-  | hexbin               | hexagon             | `x`, `y` (cell center), `count`                 |
+  | contour              | level line / filled band | `level` (a band: the `low – high` pair it lies between) |
+  | hexbin               | hexagon             | `x`, `y` (cell center), `count` (a reduced `c`: under its reducer's name) |
   | parallel coordinates | series line on axis | axis name, `value`                              |
-  | radial line/bar/scatter/histogram | point / wedge | `angle` (category label when categorical), `radius` |
+  | radial line/bar/scatter/histogram | point / wedge | `angle` (the category label; a rose bin: its degree span), `radius` |
   | sankey               | node / link         | node: `flow`; link: `source`, `target`, `flow`  |
   | treemap              | tile                | `value`                                         |
   | network              | node / edge         | node: `degree` (`in` / `out` when directed; weight sum when weighted), then `group` and `size` when given; edge: `source`, `target`, `weight` |
 
+  A category mark reports its category *position* under `x`/`y`, so the
+  axis' tick formatter names it — a numeric label never collides with a
+  tick position, and a heatmap cell reads as its tick labels.
   Text layers and reference lines decorate and register nothing. Polar axes
   carry no axis labels, so radial fields are shown under their own keys. A
   mark `mplcursors` cannot pick stays zoom/pan only and is documented as such

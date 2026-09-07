@@ -116,11 +116,11 @@ class TestHoverSeam:
         for bar_mode in ("group", "stack", "overlay"):
             targets = _targets(_bar_fig(bar_mode=bar_mode))
             assert [type(a) for a, _ in targets] == [BarContainer, BarContainer]
-            assert targets[1][1](1) == {"label": "south", "x": "B", "y": 5}
+            assert targets[1][1](1) == {"label": "south", "x": 1, "y": 5}
 
     def test_horizontal_bar_reports_value_on_the_drawn_x(self):
         targets = _targets(_bar_fig(orientation="horizontal"))
-        assert targets[0][1](2) == {"label": "north", "x": 4, "y": "C"}
+        assert targets[0][1](2) == {"label": "north", "x": 4, "y": 2}
 
     def test_pyramid_bars_report_positive_values(self):
         figure = PyramidChart(data=BAR_DATA, subtitle=["left", "right"])
@@ -222,10 +222,10 @@ class TestCartesianLayers:
         figure = SwarmPlot(data=GROUP_DATA, subtitle="scores")
         ((points, resolver),) = _targets(figure)
         assert isinstance(points, PathCollection)
-        assert resolver(4) == {"label": "scores", "x": "A", "y": 10}
-        assert resolver(6) == {"label": "scores", "x": "B", "y": 6}
+        assert resolver(4) == {"label": "scores", "x": 1, "y": 10}
+        assert resolver(6) == {"label": "scores", "x": 2, "y": 6}
         horizontal = SwarmPlot(data=GROUP_DATA, orientation="horizontal")
-        assert _targets(horizontal)[0][1](0) == {"label": None, "x": 1, "y": "A"}
+        assert _targets(horizontal)[0][1](0) == {"label": None, "x": 1, "y": 1}
 
     def test_hexbin_hexagons_report_center_and_count(self):
         rng = np.random.default_rng(0)
@@ -259,7 +259,7 @@ class TestCartesianLayers:
         )
         ((image, resolver),) = _targets(figure)
         assert isinstance(image, AxesImage)
-        assert resolver((1, 0)) == {"label": "grid", "x": "a", "y": "q", "value": 3}
+        assert resolver((1, 0)) == {"label": "grid", "x": 0, "y": 1, "value": 3}
         unlabeled = Heatmap(data={"z": [[1, 2], [3, 4]]})
         assert _targets(unlabeled)[0][1]((0, 1)) == {
             "label": None,
@@ -289,18 +289,18 @@ class TestAggregateLayers:
         figure = BoxPlot(data=GROUP_DATA, subtitle="scores")
         ((boxes, resolver),) = _targets(figure)
         assert isinstance(boxes, BarContainer) and len(boxes) == 2
-        assert resolver(0) == {"label": "scores", "x": "A", **SUMMARY_A}
+        assert resolver(0) == {"label": "scores", "x": 1, **SUMMARY_A}
         horizontal = BoxPlot(data=GROUP_DATA, orientation="horizontal")
         datum = _targets(horizontal)[0][1](1)
         assert list(datum) == ["label", "y", "median", "q1", "q3", "min", "max"]
-        assert datum["y"] == "B"
+        assert datum["y"] == 2
 
     def test_violin_bodies_report_the_same_summary(self):
         figure = ViolinPlot(data=GROUP_DATA, subtitle="scores")
         targets = _targets(figure)
         assert all(isinstance(a, PolyCollection) for a, _ in targets)
         assert len(targets) == 2
-        assert targets[0][1]((0, 7)) == {"label": "scores", "x": "A", **SUMMARY_A}
+        assert targets[0][1]((0, 7)) == {"label": "scores", "x": 1, **SUMMARY_A}
         assert targets[1][1]((0, 0))["median"] == 6
 
     def test_split_violins_report_the_split_value(self):
@@ -684,6 +684,22 @@ class TestShowInteractive:
         _show_interactive(panel)
         assert _hover(panel, panel.axes[0], 2, 5)[0].startswith("line\n")
         assert _hover(panel, panel.axes[0], 2.5, 8)[0].startswith("band\n")
+
+    def test_numeric_category_labels_read_off_the_axis(self):
+        box = BoxPlot(
+            data=[
+                {"label": year, "value": v} for year in (2020, 2021) for v in range(5)
+            ],
+            xlabel="Year",
+        )
+        _show_interactive(box)
+        assert _hover(box, box.axes[0], 2, 2)[0].startswith("Year: 2021\n")
+        bar = BarChart(data=[{"label": year, "y": 3} for year in (2020, 2021)])
+        _show_interactive(bar)
+        assert _hover(bar, bar.axes[0], 0, 1)[0].startswith("x: 2020\n")
+        heatmap = Heatmap(data={"x": [10, 20], "y": [100, 200], "z": [[1, 2], [3, 4]]})
+        _show_interactive(heatmap)
+        assert _hover(heatmap, heatmap.axes[0], 1, 0) == ["x: 20\ny: 100\nvalue: 2"]
 
     def test_heatmap_hover_reports_the_cell(self):
         figure = Heatmap(

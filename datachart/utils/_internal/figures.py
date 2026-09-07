@@ -77,7 +77,8 @@ def _hover_value(ax, which: str, value) -> str:
 
     if isinstance(value, str):
         return value
-    return getattr(ax, f"format_{which}data")(value).strip()
+    # a tick formatter may hand back the label object itself, not text
+    return str(getattr(ax, f"format_{which}data")(value)).strip()
 
 
 def _plain_value(value) -> str:
