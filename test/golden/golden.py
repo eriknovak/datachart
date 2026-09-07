@@ -369,6 +369,18 @@ def scatter_regression():
 
 
 @case
+def scatter_labels():
+    # neighbours crowd the right-hand spots, so labels must move around
+    data = [
+        {"x": i % 5 + (i // 5) * 0.35, "y": i // 5, "name": f"point {i}"}
+        for i in range(15)
+    ]
+    return ScatterChart(
+        data=data, label="name", show_regression=True, show_correlation=True
+    )
+
+
+@case
 def scatter_multi_subplots():
     return ScatterChart(data=[SCAT1, LINE1], subplots=True, max_cols=2)
 

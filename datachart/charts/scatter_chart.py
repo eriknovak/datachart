@@ -80,6 +80,7 @@ def ScatterChart(
     y: Optional[Union[str, List[Optional[str]]]] = None,
     size: Optional[Union[str, List[Optional[str]]]] = None,
     hue: Optional[Union[str, List[Optional[str]]]] = None,
+    label: Optional[Union[str, List[Optional[str]]]] = None,
     size_range: Optional[Tuple[float, float]] = None,
 ) -> plt.Figure:
     """Creates a scatter chart.
@@ -141,6 +142,15 @@ def ScatterChart(
         ...     data=[...],
         ...     show_correlation=True
         ... )
+        >>>
+        >>> # Scatter with a label beside each point
+        >>> figure = ScatterChart(
+        ...     data=[
+        ...         {"x": 1, "y": 5, "name": "A"},
+        ...         {"x": 2, "y": 10, "name": "B"}
+        ...     ],
+        ...     label="name"
+        ... )
 
     Args:
         data: The data points for the scatter chart(s). Can be a single list of data points
@@ -187,6 +197,12 @@ def ScatterChart(
         y: The key name in data for y-axis values (default: "y").
         size: The key name in data for marker size values (for bubble charts).
         hue: The key name in data for color grouping (categorical variable).
+        label: The key name in data for the point labels (default: "label"),
+            aligned like `style` for multiple charts; `None` in the list
+            leaves that chart unlabelled. Each label is drawn beside its
+            marker at the spot with the least overlap against the other
+            markers, labels, and the axes edge; points without the key stay
+            unlabelled.
         size_range: Tuple of (min_size, max_size) for bubble charts (default: (20, 200)).
 
     Returns:
@@ -212,6 +228,7 @@ def ScatterChart(
         y=y,
         size=size,
         hue=hue,
+        label=label,
     )
 
     # Figure-level settings; None values resolve to defaults downstream
