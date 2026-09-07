@@ -24,6 +24,7 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         ],
         "plot_bar_edge_width": 0.8,
         "plot_bar_edge_color": "#000000",
+        "plot_stackedarea_edge_color": "#000000",
         "plot_sankey_node_edge_color": "#000000",
         "plot_treemap_edge_color": "#000000",
         "plot_network_node_edge_color": "#000000",

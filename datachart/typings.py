@@ -317,16 +317,20 @@ class StackedAreaStyleAttrs(TypedDict):
     """The typing for the stacked area chart style.
 
     The fill takes the `plot_area_*` keys (color, hatch, zorder) and the
-    outline the `plot_line_*` keys; these two switch what is specific to a stack.
+    outline the `plot_line_*` keys; these keys switch what is specific to a stack.
 
     Attributes:
         plot_stackedarea_alpha (Union[float, None]): The alpha value of the stacked bands.
         plot_stackedarea_outline (Union[bool, None]): Whether each band draws its top edge as a line.
+        plot_stackedarea_edge_color (Union[str, None]): The stroke color between the bands.
+        plot_stackedarea_edge_width (Union[float, None]): The stroke width between the bands.
 
     """
 
     plot_stackedarea_alpha: Union[float, None]
     plot_stackedarea_outline: Union[bool, None]
+    plot_stackedarea_edge_color: Union[str, None]
+    plot_stackedarea_edge_width: Union[float, None]
 
 
 class SankeyStyleAttrs(TypedDict):
@@ -356,7 +360,7 @@ class TreemapStyleAttrs(TypedDict):
     """The typing for the treemap style.
 
     Attributes:
-        plot_treemap_edge_color (Union[str, None]): The leaf tile stroke color.
+        plot_treemap_edge_color (Union[str, None]): The stroke color of leaf tiles and group borders.
         plot_treemap_edge_width (Union[float, None]): The leaf tile stroke width.
         plot_treemap_group_edge_width (Union[float, None]): The width of the border around a group.
         plot_treemap_group_pad (Union[float, None]): The gap between groups as a fraction of the span.

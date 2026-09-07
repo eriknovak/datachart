@@ -3449,21 +3449,23 @@ class TreemapLayer(Layer):
                     path_effects=effects,
                     zorder=6,
                 )
-        # the group is a box: one border encloses the band and the leaves
+        # the group is a box: one border in the tile stroke color encloses
+        # the band and the leaves
         ax.add_patch(
             Rectangle(
                 (x, y),
                 w,
                 h,
                 facecolor="none",
-                edgecolor=self.highlight_color if highlight else box_color,
+                edgecolor=self.highlight_color if highlight else style["edgecolor"],
                 linewidth=(
                     style["highlight_linewidth"]
                     if highlight
                     else style["group_linewidth"]
                 ),
                 alpha=alpha,
-                zorder=5,
+                # under highlighted leaves, whose stroke must not be clipped
+                zorder=3,
                 gid=f"group:{label}",
             )
         )

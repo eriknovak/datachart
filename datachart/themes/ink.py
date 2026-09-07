@@ -17,6 +17,7 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_grid_color": "#DDE3E8",
         "plot_bar_edge_width": 1.0,
         "plot_bar_edge_color": "#0B1F44",
+        "plot_stackedarea_edge_color": "#0B1F44",
         "plot_sankey_node_edge_color": "#0B1F44",
         "plot_treemap_edge_color": "#0B1F44",
         "plot_network_node_edge_color": "#0B1F44",
@@ -41,7 +42,6 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_box_edgecolor": "#34495E",
         "plot_box_median_color": "#34495E",
         "plot_violin_edgecolor": "#34495E",
-        "plot_violin_inner_color": "#34495E",
     }
 )
 """The ink theme: dark-ink accents, print-ready.
