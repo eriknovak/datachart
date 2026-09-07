@@ -569,7 +569,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `BarStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `BarStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
 
 The style attributes. Combines all style typings.
 
@@ -947,3 +947,16 @@ The typing for theme-driven defaults and cycles.
 | `chart_default_show_grid`   | The theme default for show_grid, applied when a chart call leaves it unset. Never applies to heatmaps. None means the theme has no opinion. **TYPE:** `Union[SHOW_GRID, str, None]`    |
 | `chart_default_show_values` | The theme default for show_values, applied when a chart call leaves it unset. None means the theme has no opinion. **TYPE:** `Union[bool, None]`                                       |
 | `plot_hatch_cycle`          | The hatch patterns assigned per bar/histogram series, parallel to the color cycle. An explicit per-chart hatch style wins. None disables the cycle. **TYPE:** `Union[List[str], None]` |
+
+### datachart.typings.SketchStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the sketch attributes: the theme's render-scoped rc-level look (path wobble, halo stroke). The panel snapshots both at build time and applies them inside a scoped matplotlib rc context, so no global rc setting changes; composition keeps the look of the figures it was built from.
+
+Added in Unreleased
+
+| ATTRIBUTE                | DESCRIPTION                                                                                                                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_sketch_params`     | The path wobble as matplotlib sketch parameters (scale, length, randomness); plt.xkcd() uses (1, 100, 2). None draws clean paths. **TYPE:** `Union[Tuple[float, float, float], None]` |
+| `plot_sketch_halo_width` | The width of the white halo stroked under the lines, so crossing lines read as cut-outs; text and patches stay clean. None draws no halo. **TYPE:** `Union[float, None]`              |

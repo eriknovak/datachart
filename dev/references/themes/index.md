@@ -6,14 +6,15 @@ The module containing the `themes`.
 
 The `themes` module contains the predefined style themes that are used to visualize the plots. Themes are named for their visual trait, never for a use case or audience.
 
-| ATTRIBUTE         | DESCRIPTION                                                                            |
-| ----------------- | -------------------------------------------------------------------------------------- |
-| `DEFAULT_THEME`   | The default theme style. **TYPE:** `StyleAttrs`                                        |
-| `GREYSCALE_THEME` | The greyscale theme style. **TYPE:** `StyleAttrs`                                      |
-| `INK_THEME`       | The ink theme style (dark-ink accents, print-ready). **TYPE:** `StyleAttrs`            |
-| `HATCH_THEME`     | The hatch theme style (hatch cycle, value labels, dotted grid). **TYPE:** `StyleAttrs` |
-| `MINIMAL_THEME`   | The minimal theme style (accent blue, no spines, flat bars). **TYPE:** `StyleAttrs`    |
-| `MATERIAL_THEME`  | The material theme style (Google palette, light grid). **TYPE:** `StyleAttrs`          |
+| ATTRIBUTE         | DESCRIPTION                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| `DEFAULT_THEME`   | The default theme style. **TYPE:** `StyleAttrs`                                                          |
+| `GREYSCALE_THEME` | The greyscale theme style. **TYPE:** `StyleAttrs`                                                        |
+| `INK_THEME`       | The ink theme style (dark-ink accents, print-ready). **TYPE:** `StyleAttrs`                              |
+| `HATCH_THEME`     | The hatch theme style (hatch cycle, value labels, dotted grid). **TYPE:** `StyleAttrs`                   |
+| `MINIMAL_THEME`   | The minimal theme style (accent blue, no spines, flat bars). **TYPE:** `StyleAttrs`                      |
+| `MATERIAL_THEME`  | The material theme style (Google palette, light grid). **TYPE:** `StyleAttrs`                            |
+| `SKETCH_THEME`    | The sketch theme style (hand-drawn, xkcd-style wobble and halo, Comic Neue font). **TYPE:** `StyleAttrs` |
 
 ## Themes
 
@@ -266,3 +267,48 @@ MATERIAL_THEME: StyleAttrs = make_theme(
 The material theme: Google palette, light grid.
 
 Added in v0.8.0
+
+### datachart.themes.SKETCH_THEME
+
+```
+SKETCH_THEME: StyleAttrs = make_theme(
+    {
+        "color_general_singular": COLORS.Blues,
+        "color_general_multiple": [
+            "#2E86AB",
+            "#E4572E",
+            "#76B041",
+            "#F5B700",
+            "#7E5AAB",
+        ],
+        "font_general_family": "sans-serif",
+        "font_general_sansserif": [
+            "Comic Neue",
+            "Humor Sans",
+            "Comic Sans MS",
+        ],
+        "font_general_size": 11,
+        "font_general_color": "#222222",
+        "font_title_size": 15,
+        "font_title_color": "#222222",
+        "font_title_weight": FONT_WEIGHT.BOLD,
+        "axes_spines_width": 1.6,
+        "axes_ticks_length": 5,
+        "chart_default_show_grid": None,
+        "plot_line_width": 2.5,
+        "plot_bar_alpha": 1.0,
+        "plot_bar_edge_width": 1.6,
+        "plot_hist_edge_width": 1.6,
+        "plot_scatter_edge_color": "#222222",
+        "plot_heatmap_cmap": COLORS.Blues,
+        "plot_sketch_params": (0.5, 100, 2),
+        "plot_sketch_halo_width": 4,
+    }
+)
+```
+
+The sketch theme: hand-drawn, xkcd-style wobble and halo, Comic Neue font.
+
+Paths wobble, lines carry a white halo, spines and lines are thick, the grid is off, and text is set in Comic Neue, which ships with the package; Humor Sans and Comic Sans MS are the fallbacks should the bundled face fail to register.
+
+Added in Unreleased

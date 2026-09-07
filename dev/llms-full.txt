@@ -10599,9 +10599,11 @@ Furthemore, the instance is of the [datachart.config.Config](https://eriknovak.g
 
 # Themes
 
-This section showcases the themes found in the [datachart.themes](https://eriknovak.github.io/datachart/dev/references/themes/index.md) module and how to customize them. Six predefined themes are available: `DEFAULT`, `GREYSCALE`, `MINIMAL`, `MATERIAL`, `INK`, and `HATCH` — each named for its visual trait — see the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) for every theme rendered across the full range of chart types.
+This section showcases the themes found in the [datachart.themes](https://eriknovak.github.io/datachart/dev/references/themes/index.md) module and how to customize them. Seven predefined themes are available: `DEFAULT`, `GREYSCALE`, `MINIMAL`, `MATERIAL`, `INK`, `HATCH`, and `SKETCH` — each named for its visual trait — see the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) for every theme rendered across the full range of chart types.
 
-Themes may also carry defaults for chart settings ([ThemeDefaultAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ThemeDefaultAttrs)): `chart_default_show_grid` supplies the grid when a chart call leaves `show_grid` unset (every predefined theme ships a muted `"y"` grid), `chart_default_show_values` does the same for bar value labels (on in `MINIMAL`, `MATERIAL`, and `HATCH`), and `plot_hatch_cycle` assigns hatch patterns per bar/histogram series (only `HATCH` ships one). An explicit chart setting always wins over the theme default.
+Themes may also carry defaults for chart settings ([ThemeDefaultAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ThemeDefaultAttrs)): `chart_default_show_grid` supplies the grid when a chart call leaves `show_grid` unset (every predefined theme but `SKETCH` ships a muted `"y"` grid), `chart_default_show_values` does the same for bar value labels (on in `MINIMAL`, `MATERIAL`, and `HATCH`), and `plot_hatch_cycle` assigns hatch patterns per bar/histogram series (only `HATCH` ships one). An explicit chart setting always wins over the theme default.
+
+`SKETCH` is the hand-drawn look: its path wobble and white halo are sketch attributes ([SketchStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.SketchStyleAttrs)) that the panel applies at render time, so matplotlib's global settings never change. It ships the Comic Neue font, so the look is the same on every machine.
 
 Let's start by importing the necessary functions to help us work with the `datachart.themes` module.
 
@@ -10858,7 +10860,7 @@ config.reset_config()
 
 # Theme Gallery
 
-This gallery renders the same suite of example charts — the basic chart types plus research-style figures — under each of the six predefined themes, composed into one grid per chart group so the whole suite is visible at a glance. The groups follow the [charts index](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md) — trends and comparisons, distributions, relationships, composition — so each tile sits next to the guide that documents it. The available themes are:
+This gallery renders the same suite of example charts — the basic chart types plus research-style figures — under each of the seven predefined themes, composed into one grid per chart group so the whole suite is visible at a glance. The groups follow the [charts index](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md) — trends and comparisons, distributions, relationships, composition — so each tile sits next to the guide that documents it. The available themes are:
 
 | Theme             | Character                                                  |
 | ----------------- | ---------------------------------------------------------- |
@@ -10868,8 +10870,9 @@ This gallery renders the same suite of example charts — the basic chart types 
 | `THEME.MINIMAL`   | Accent blue with deep grays, no spines, flat bars.         |
 | `THEME.MATERIAL`  | Google palette, bottom spine only, light grid.             |
 | `THEME.HATCH`     | Hatch cycle, black edges, dotted grid, value labels.       |
+| `THEME.SKETCH`    | Hand-drawn wobble and halo, Comic Neue font, no grid.      |
 
-Themes also carry *defaults for chart settings*: every theme shows a muted y-grid unless a chart call sets `show_grid` itself, `MINIMAL`, `MATERIAL`, and `HATCH` label bar values by default, and `HATCH` hatches bar series via its hatch cycle — which is why the very same chart code below renders with grids, value labels, and hatches that differ per theme. An explicit setting always wins.
+Themes also carry *defaults for chart settings*: every theme but `SKETCH` shows a muted y-grid unless a chart call sets `show_grid` itself, `MINIMAL`, `MATERIAL`, and `HATCH` label bar values by default, and `HATCH` hatches bar series via its hatch cycle — which is why the very same chart code below renders with grids, value labels, and hatches that differ per theme. An explicit setting always wins.
 
 The small-multiples example is itself a `Grid`; grid figures nest inside `Grid`, so it takes one cell of each theme's composition grid.
 
@@ -10950,6 +10953,20 @@ The Google palette with a bottom spine only and a light solid grid; value labels
 ## Hatch
 
 Black edges, dotted grid — and the hatch cycle (`""`, `"//"`, `".."`) applied per bar series, so grouped bars stay distinguishable in black-and-white print.
+
+### Trends and Comparisons
+
+### Distributions
+
+### Relationships
+
+### Flows
+
+### Composition
+
+## Sketch
+
+Hand-drawn: wobbled paths, lines cut out by a white halo, thick spines and lines, no grid, and the bundled Comic Neue font, so the look is the same on every machine. The wobble and halo are theme attributes the panel applies at render time, so nothing changes in matplotlib's global settings.
 
 ### Trends and Comparisons
 
@@ -14784,14 +14801,15 @@ The module containing the `themes`.
 
 The `themes` module contains the predefined style themes that are used to visualize the plots. Themes are named for their visual trait, never for a use case or audience.
 
-| ATTRIBUTE         | DESCRIPTION                                                                            |
-| ----------------- | -------------------------------------------------------------------------------------- |
-| `DEFAULT_THEME`   | The default theme style. **TYPE:** `StyleAttrs`                                        |
-| `GREYSCALE_THEME` | The greyscale theme style. **TYPE:** `StyleAttrs`                                      |
-| `INK_THEME`       | The ink theme style (dark-ink accents, print-ready). **TYPE:** `StyleAttrs`            |
-| `HATCH_THEME`     | The hatch theme style (hatch cycle, value labels, dotted grid). **TYPE:** `StyleAttrs` |
-| `MINIMAL_THEME`   | The minimal theme style (accent blue, no spines, flat bars). **TYPE:** `StyleAttrs`    |
-| `MATERIAL_THEME`  | The material theme style (Google palette, light grid). **TYPE:** `StyleAttrs`          |
+| ATTRIBUTE         | DESCRIPTION                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| `DEFAULT_THEME`   | The default theme style. **TYPE:** `StyleAttrs`                                                          |
+| `GREYSCALE_THEME` | The greyscale theme style. **TYPE:** `StyleAttrs`                                                        |
+| `INK_THEME`       | The ink theme style (dark-ink accents, print-ready). **TYPE:** `StyleAttrs`                              |
+| `HATCH_THEME`     | The hatch theme style (hatch cycle, value labels, dotted grid). **TYPE:** `StyleAttrs`                   |
+| `MINIMAL_THEME`   | The minimal theme style (accent blue, no spines, flat bars). **TYPE:** `StyleAttrs`                      |
+| `MATERIAL_THEME`  | The material theme style (Google palette, light grid). **TYPE:** `StyleAttrs`                            |
+| `SKETCH_THEME`    | The sketch theme style (hand-drawn, xkcd-style wobble and halo, Comic Neue font). **TYPE:** `StyleAttrs` |
 
 ## Themes
 
@@ -15044,6 +15062,51 @@ MATERIAL_THEME: StyleAttrs = make_theme(
 The material theme: Google palette, light grid.
 
 Added in v0.8.0
+
+### datachart.themes.SKETCH_THEME
+
+```
+SKETCH_THEME: StyleAttrs = make_theme(
+    {
+        "color_general_singular": COLORS.Blues,
+        "color_general_multiple": [
+            "#2E86AB",
+            "#E4572E",
+            "#76B041",
+            "#F5B700",
+            "#7E5AAB",
+        ],
+        "font_general_family": "sans-serif",
+        "font_general_sansserif": [
+            "Comic Neue",
+            "Humor Sans",
+            "Comic Sans MS",
+        ],
+        "font_general_size": 11,
+        "font_general_color": "#222222",
+        "font_title_size": 15,
+        "font_title_color": "#222222",
+        "font_title_weight": FONT_WEIGHT.BOLD,
+        "axes_spines_width": 1.6,
+        "axes_ticks_length": 5,
+        "chart_default_show_grid": None,
+        "plot_line_width": 2.5,
+        "plot_bar_alpha": 1.0,
+        "plot_bar_edge_width": 1.6,
+        "plot_hist_edge_width": 1.6,
+        "plot_scatter_edge_color": "#222222",
+        "plot_heatmap_cmap": COLORS.Blues,
+        "plot_sketch_params": (0.5, 100, 2),
+        "plot_sketch_halo_width": 4,
+    }
+)
+```
+
+The sketch theme: hand-drawn, xkcd-style wobble and halo, Comic Neue font.
+
+Paths wobble, lines carry a white halo, spines and lines are thick, the grid is off, and text is set in Comic Neue, which ships with the package; Humor Sans and Comic Sans MS are the fallbacks should the bundled face fail to register.
+
+Added in Unreleased
 
 # Constants Module
 
@@ -15395,14 +15458,15 @@ Examples:
 "default"
 ```
 
-| ATTRIBUTE   | DESCRIPTION                                                                                  |
-| ----------- | -------------------------------------------------------------------------------------------- |
-| `DEFAULT`   | The default theme. Equals to "default". **TYPE:** `str`                                      |
-| `GREYSCALE` | The greyscale theme. Equals to "greyscale". **TYPE:** `str`                                  |
-| `INK`       | The ink theme (dark-ink accents, print-ready). Equals to "ink". **TYPE:** `str`              |
-| `HATCH`     | The hatch theme (hatch cycle, value labels, dotted grid). Equals to "hatch". **TYPE:** `str` |
-| `MINIMAL`   | The minimal theme (accent blue, no spines, flat bars). Equals to "minimal". **TYPE:** `str`  |
-| `MATERIAL`  | The material theme (Google palette, light grid). Equals to "material". **TYPE:** `str`       |
+| ATTRIBUTE   | DESCRIPTION                                                                                                                         |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT`   | The default theme. Equals to "default". **TYPE:** `str`                                                                             |
+| `GREYSCALE` | The greyscale theme. Equals to "greyscale". **TYPE:** `str`                                                                         |
+| `INK`       | The ink theme (dark-ink accents, print-ready). Equals to "ink". **TYPE:** `str`                                                     |
+| `HATCH`     | The hatch theme (hatch cycle, value labels, dotted grid). Equals to "hatch". **TYPE:** `str`                                        |
+| `MINIMAL`   | The minimal theme (accent blue, no spines, flat bars). Equals to "minimal". **TYPE:** `str`                                         |
+| `MATERIAL`  | The material theme (Google palette, light grid). Equals to "material". **TYPE:** `str`                                              |
+| `SKETCH`    | The sketch theme (hand-drawn, xkcd-style wobble and halo, Comic Neue font). Equals to "sketch". Added in Unreleased **TYPE:** `str` |
 
 ### datachart.constants.EMPHASIS
 
@@ -16404,7 +16468,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `BarStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `BarStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
 
 The style attributes. Combines all style typings.
 
@@ -16782,3 +16846,16 @@ The typing for theme-driven defaults and cycles.
 | `chart_default_show_grid`   | The theme default for show_grid, applied when a chart call leaves it unset. Never applies to heatmaps. None means the theme has no opinion. **TYPE:** `Union[SHOW_GRID, str, None]`    |
 | `chart_default_show_values` | The theme default for show_values, applied when a chart call leaves it unset. None means the theme has no opinion. **TYPE:** `Union[bool, None]`                                       |
 | `plot_hatch_cycle`          | The hatch patterns assigned per bar/histogram series, parallel to the color cycle. An explicit per-chart hatch style wins. None disables the cycle. **TYPE:** `Union[List[str], None]` |
+
+### datachart.typings.SketchStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the sketch attributes: the theme's render-scoped rc-level look (path wobble, halo stroke). The panel snapshots both at build time and applies them inside a scoped matplotlib rc context, so no global rc setting changes; composition keeps the look of the figures it was built from.
+
+Added in Unreleased
+
+| ATTRIBUTE                | DESCRIPTION                                                                                                                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_sketch_params`     | The path wobble as matplotlib sketch parameters (scale, length, randomness); plt.xkcd() uses (1, 100, 2). None draws clean paths. **TYPE:** `Union[Tuple[float, float, float], None]` |
+| `plot_sketch_halo_width` | The width of the white halo stroked under the lines, so crossing lines read as cut-outs; text and patches stay clean. None draws no halo. **TYPE:** `Union[float, None]`              |

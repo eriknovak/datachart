@@ -1,6 +1,6 @@
 # Theme Gallery
 
-This gallery renders the same suite of example charts — the basic chart types plus research-style figures — under each of the six predefined themes, composed into one grid per chart group so the whole suite is visible at a glance. The groups follow the [charts index](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md) — trends and comparisons, distributions, relationships, composition — so each tile sits next to the guide that documents it. The available themes are:
+This gallery renders the same suite of example charts — the basic chart types plus research-style figures — under each of the seven predefined themes, composed into one grid per chart group so the whole suite is visible at a glance. The groups follow the [charts index](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md) — trends and comparisons, distributions, relationships, composition — so each tile sits next to the guide that documents it. The available themes are:
 
 | Theme             | Character                                                  |
 | ----------------- | ---------------------------------------------------------- |
@@ -10,8 +10,9 @@ This gallery renders the same suite of example charts — the basic chart types 
 | `THEME.MINIMAL`   | Accent blue with deep grays, no spines, flat bars.         |
 | `THEME.MATERIAL`  | Google palette, bottom spine only, light grid.             |
 | `THEME.HATCH`     | Hatch cycle, black edges, dotted grid, value labels.       |
+| `THEME.SKETCH`    | Hand-drawn wobble and halo, Comic Neue font, no grid.      |
 
-Themes also carry *defaults for chart settings*: every theme shows a muted y-grid unless a chart call sets `show_grid` itself, `MINIMAL`, `MATERIAL`, and `HATCH` label bar values by default, and `HATCH` hatches bar series via its hatch cycle — which is why the very same chart code below renders with grids, value labels, and hatches that differ per theme. An explicit setting always wins.
+Themes also carry *defaults for chart settings*: every theme but `SKETCH` shows a muted y-grid unless a chart call sets `show_grid` itself, `MINIMAL`, `MATERIAL`, and `HATCH` label bar values by default, and `HATCH` hatches bar series via its hatch cycle — which is why the very same chart code below renders with grids, value labels, and hatches that differ per theme. An explicit setting always wins.
 
 The small-multiples example is itself a `Grid`; grid figures nest inside `Grid`, so it takes one cell of each theme's composition grid.
 
@@ -92,6 +93,20 @@ The Google palette with a bottom spine only and a light solid grid; value labels
 ## Hatch
 
 Black edges, dotted grid — and the hatch cycle (`""`, `"//"`, `".."`) applied per bar series, so grouped bars stay distinguishable in black-and-white print.
+
+### Trends and Comparisons
+
+### Distributions
+
+### Relationships
+
+### Flows
+
+### Composition
+
+## Sketch
+
+Hand-drawn: wobbled paths, lines cut out by a white halo, thick spines and lines, no grid, and the bundled Comic Neue font, so the look is the same on every machine. The wobble and halo are theme attributes the panel applies at render time, so nothing changes in matplotlib's global settings.
 
 ### Trends and Comparisons
 
