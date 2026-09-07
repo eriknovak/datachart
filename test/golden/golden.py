@@ -37,6 +37,7 @@ from datachart.charts import (
     StackedAreaChart,
     SankeyChart,
     Treemap,
+    NetworkChart,
 )
 from datachart.utils import Panel, Grid, Annotate
 from datachart.config import config
@@ -46,6 +47,7 @@ from datachart.constants import (
     CONTOUR_LEVELS,
     HEXBIN_REDUCE,
     BASELINE,
+    NETWORK_LAYOUT,
     NORMALIZE,
     THEME,
     VALUE_FORMAT,
@@ -172,6 +174,15 @@ EXPECTED_CHANGES = {
     "theme_sketch_line",
     "theme_sketch_bar",
     "grid_sketch_panel_twin",
+    # new network cases (ADR 0029)
+    "network_default",
+    "network_directed_values",
+    "network_grouped_legend",
+    "network_straight",
+    "network_circular_emphasis",
+    "network_grid",
+    # ARROW_STYLE.STRAIGHT annotation connector (ADR 0029)
+    "annotate_arrow_straight",
 }
 
 
@@ -1610,6 +1621,139 @@ def treemap_grid():
     left = Treemap(treemap_world(), title="population")
     right = LineChart(data=LINE1, title="line")
     return Grid([[left, right]], figsize=(10, 4))
+
+
+NETWORK_DEPS = [
+    ("core", "utils"),
+    ("cli", "core"),
+    ("api", "core"),
+    ("api", "auth"),
+    ("auth", "utils"),
+    ("web", "api"),
+    ("web", "ui"),
+    ("ui", "utils"),
+    ("tests", "core"),
+    ("tests", "api"),
+    ("docs", "cli"),
+]
+NETWORK_FLOWS = [
+    ("Alpha", "Beta", 8),
+    ("Alpha", "Gamma", 3),
+    ("Beta", "Gamma", 5),
+    ("Beta", "Delta", 2),
+    ("Gamma", "Delta", 7),
+    ("Delta", "Alpha", 1),
+    ("Gamma", "Epsilon", 4),
+    ("Epsilon", "Beta", 2),
+]
+NETWORK_PEOPLE = {
+    "Ana": ("Design", 30),
+    "Bo": ("Design", 12),
+    "Cy": ("Eng", 45),
+    "Di": ("Eng", 20),
+    "Ed": ("Eng", 8),
+    "Fay": ("Ops", 25),
+    "Gus": ("Ops", 10),
+    "Hal": ("Design", 18),
+}
+NETWORK_TIES = [
+    ("Ana", "Bo"),
+    ("Ana", "Cy"),
+    ("Cy", "Di"),
+    ("Cy", "Ed"),
+    ("Di", "Ed"),
+    ("Cy", "Fay"),
+    ("Fay", "Gus"),
+    ("Ana", "Hal"),
+    ("Hal", "Bo"),
+    ("Fay", "Di"),
+    ("Gus", "Ed"),
+]
+
+
+def network_edges(pairs):
+    return [
+        {"source": p[0], "target": p[1], **({"weight": p[2]} if len(p) > 2 else {})}
+        for p in pairs
+    ]
+
+
+def network_team(emphasis=None):
+    return {
+        "nodes": [
+            {
+                "id": k,
+                "group": g,
+                "size": s,
+                **({"emphasis": emphasis[k]} if emphasis and k in emphasis else {}),
+            }
+            for k, (g, s) in NETWORK_PEOPLE.items()
+        ],
+        "edges": network_edges(NETWORK_TIES),
+    }
+
+
+@case
+def network_default():
+    return NetworkChart(
+        {"edges": network_edges(NETWORK_DEPS)}, title="Module dependencies"
+    )
+
+
+@case
+def network_directed_values():
+    return NetworkChart(
+        {"edges": network_edges(NETWORK_FLOWS)},
+        directed=True,
+        show_values=True,
+        title="Directed flows",
+    )
+
+
+@case
+def network_grouped_legend():
+    return NetworkChart(network_team(), show_legend=True, title="Team ties")
+
+
+@case
+def network_straight():
+    return NetworkChart(
+        {"edges": network_edges(NETWORK_FLOWS)},
+        directed=True,
+        show_values=True,
+        style={"plot_network_edge_style": ARROW_STYLE.STRAIGHT},
+    )
+
+
+@case
+def network_circular_emphasis():
+    return NetworkChart(
+        network_team({"Cy": "highlight", "Gus": "background", "Bo": "background"}),
+        layout=NETWORK_LAYOUT.CIRCULAR,
+        directed=True,
+    )
+
+
+@case
+def network_grid():
+    left = NetworkChart(network_team(), show_legend=True, title="team")
+    right = LineChart(data=LINE1, title="line")
+    return Grid([[left, right]], figsize=(10, 4))
+
+
+@case
+def annotate_arrow_straight():
+    return LineChart(
+        data=LINE1,
+        texts={
+            "text": "note",
+            "x": 0.3,
+            "y": 0.8,
+            "coords": "axes",
+            "target": (6, 36),
+            "style": {"plot_text_arrow_style": ARROW_STYLE.STRAIGHT},
+        },
+    )
 
 
 @case

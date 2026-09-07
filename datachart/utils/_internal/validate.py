@@ -8,7 +8,7 @@ import math
 from collections import defaultdict
 from numbers import Real
 
-from ...constants import BANDWIDTH, BASELINE, EMPHASIS
+from ...constants import ARROW_STYLE, BANDWIDTH, BASELINE, EMPHASIS, NETWORK_LAYOUT
 
 BANDWIDTH_RULES = (BANDWIDTH.SCOTT, BANDWIDTH.SILVERMAN)
 EMPHASIS_ROLES = (EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT)
@@ -110,8 +110,8 @@ def validate_sankey_link_color(value):
     return value
 
 
-def sankey_node_order(links) -> list:
-    """The node names in first-seen input order."""
+def first_seen_nodes(links) -> list:
+    """The node names of source/target records in first-seen input order."""
 
     nodes = []
     for record in links:
@@ -133,7 +133,7 @@ def infer_sankey_columns(links) -> list:
     for record in links:
         successors[record["source"]].append(record["target"])
         predecessors[record["target"]].append(record["source"])
-    nodes = sankey_node_order(links)
+    nodes = first_seen_nodes(links)
 
     depth = {}
 
@@ -169,7 +169,7 @@ def validate_sankey_nodes(nodes, links) -> None:
     named = [node for column in nodes for node in column]
     if len(named) != len(set(named)):
         raise ValueError("`nodes` names a node more than once.")
-    linked = set(sankey_node_order(links))
+    linked = set(first_seen_nodes(links))
     missing = linked - set(named)
     extra = set(named) - linked
     if missing or extra:
@@ -242,3 +242,103 @@ def _validate_treemap_record(record, name: str, nested: bool) -> None:
                 f"{name} ({label!r}) has `value` {value!r} but its children sum "
                 f"to {total!r}; omit the value or make it the sum."
             )
+
+
+NETWORK_LAYOUTS = (NETWORK_LAYOUT.SPRING, NETWORK_LAYOUT.CIRCULAR, NETWORK_LAYOUT.FIXED)
+# the headless connector looks; directedness owns the arrowhead (ADR 0029)
+NETWORK_EDGE_STYLES = (ARROW_STYLE.CURVE, ARROW_STYLE.STRAIGHT)
+
+
+def infer_network_nodes(edges) -> list:
+    """Node records for the edges' endpoints in first-seen order (ADR 0029)."""
+
+    return [{"id": node_id} for node_id in first_seen_nodes(edges)]
+
+
+def validate_network_records(nodes, edges, layout) -> None:
+    """Raise unless the network's nodes, edges, and layout are well formed.
+
+    A node is a dict with a unique `id`; `size`, when given, is above zero,
+    `emphasis` takes the emphasis roles, and under `NETWORK_LAYOUT.FIXED`
+    every node carries `x` and `y`. An edge is a dict with a `source` and a
+    `target` naming known nodes, never the same one, and a `weight` above
+    zero when given. `nodes` is the explicit list or the inferred one; it is
+    never `None` here (ADR 0029).
+    """
+
+    if layout not in NETWORK_LAYOUTS:
+        raise ValueError(
+            f"Invalid network `layout` value {layout!r}. "
+            f"Must be one of {NETWORK_LAYOUTS}."
+        )
+    if not isinstance(edges, list):
+        raise ValueError("A network chart requires an `edges` list of records.")
+    for i, record in enumerate(edges):
+        name = f"Network edge {i}"
+        if not isinstance(record, dict) or not all(
+            key in record for key in ("source", "target")
+        ):
+            raise ValueError(f"{name} must be a dict with `source` and `target`.")
+        weight = record.get("weight")
+        if weight is not None and not _positive_number(weight):
+            raise ValueError(f"{name} must have a `weight` greater than 0.")
+        if record["source"] == record["target"]:
+            raise ValueError(
+                f"{name} joins {record['source']!r} to itself; "
+                "self-loops are not drawn."
+            )
+
+    if not isinstance(nodes, list):
+        raise ValueError("A network chart's `nodes` must be a list of records.")
+    if not nodes:
+        raise ValueError("A network chart requires at least one node.")
+
+    ids = set()
+    for i, record in enumerate(nodes):
+        name = f"Network node {i}"
+        if not isinstance(record, dict) or "id" not in record:
+            raise ValueError(f"{name} must be a dict with an `id`.")
+        node_id = record["id"]
+        if node_id in ids:
+            raise ValueError(
+                f"Network nodes must have unique ids; {node_id!r} repeats."
+            )
+        ids.add(node_id)
+        size = record.get("size")
+        if size is not None and not _positive_number(size):
+            raise ValueError(f"{name} ({node_id!r}) must have a `size` greater than 0.")
+        validate_emphasis(record.get("emphasis"), f"{name} ({node_id!r}) `emphasis`")
+        if layout == NETWORK_LAYOUT.FIXED:
+            for key in ("x", "y"):
+                if not isinstance(record.get(key), Real):
+                    raise ValueError(
+                        f"{name} ({node_id!r}) lacks `{key}`; the fixed layout "
+                        "needs `x` and `y` on every node."
+                    )
+
+    for i, record in enumerate(edges):
+        for key in ("source", "target"):
+            if record[key] not in ids:
+                raise ValueError(
+                    f"Network edge {i} names an unknown node {record[key]!r} "
+                    f"as its `{key}`."
+                )
+
+
+def validate_network_edge_style(value):
+    """Validate the `plot_network_edge_style` look; None means the curve."""
+
+    if value is None:
+        return ARROW_STYLE.CURVE
+    if value in (ARROW_STYLE.ARROW, ARROW_STYLE.CURVE_ARROW, ARROW_STYLE.TOUCHING):
+        raise ValueError(
+            f"`plot_network_edge_style` does not take {value!r}: a network edge "
+            f"is headless, pass `directed=True` for arrowheads. Must be one of "
+            f"{NETWORK_EDGE_STYLES}."
+        )
+    if value not in NETWORK_EDGE_STYLES:
+        raise ValueError(
+            f"Invalid `plot_network_edge_style` value {value!r}. "
+            f"Must be one of {NETWORK_EDGE_STYLES}."
+        )
+    return value

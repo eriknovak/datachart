@@ -390,6 +390,44 @@ def get_treemap_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Network Style
+# -------------------------------------
+
+
+def get_network_style(chart_style: dict) -> dict:
+    """Get the network chart style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The network style setting.
+
+    """
+
+    config_attrs = [
+        ("node_color", "plot_network_node_color"),
+        ("node_alpha", "plot_network_node_alpha"),
+        ("node_marker", "plot_network_node_marker"),
+        ("node_size", "plot_network_node_size"),
+        ("node_size_min", "plot_network_node_size_min"),
+        ("node_size_max", "plot_network_node_size_max"),
+        ("edgecolor", "plot_network_node_edge_color"),
+        ("linewidth", "plot_network_node_edge_width"),
+        ("edge_style", "plot_network_edge_style"),
+        ("edge_curve", "plot_network_edge_curve"),
+        ("edge_color", "plot_network_edge_color"),
+        ("edge_alpha", "plot_network_edge_alpha"),
+        ("edge_width_min", "plot_network_edge_width_min"),
+        ("edge_width_max", "plot_network_edge_width_max"),
+        ("highlight_linewidth", "plot_network_highlight_edge_width"),
+        ("halo_width", "plot_network_label_halo_width"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+# -------------------------------------
 # Grid Style
 # -------------------------------------
 
@@ -477,6 +515,7 @@ TEXT_ARROW_TEXT_GAP = 6.0
 ARROW_STYLE_PRESETS = {
     ARROW_STYLE.CURVE: ("-", 0.2, TEXT_ARROW_TEXT_GAP),
     ARROW_STYLE.CURVE_ARROW: ("->", 0.2, TEXT_ARROW_TEXT_GAP),
+    ARROW_STYLE.STRAIGHT: ("-", 0.0, TEXT_ARROW_TEXT_GAP),
     ARROW_STYLE.TOUCHING: ("-", 0.0, 0.0),
     ARROW_STYLE.ARROW: ("->", 0.0, TEXT_ARROW_TEXT_GAP),
 }

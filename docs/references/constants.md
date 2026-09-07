@@ -113,6 +113,10 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.NETWORK_LAYOUT
+    options:
+        heading_level: 3
+
 ::: datachart.constants.RADIAL_TYPE
     options:
         heading_level: 3

@@ -43,6 +43,7 @@ How two or more variables relate to each other.
 | [Contour Chart](contourchart.ipynb)           | The showcase of the contour chart.           |
 | [Hexbin Chart](hexbinchart.ipynb)             | The showcase of the hexbin chart.            |
 | [Parallel Coordinates](parallelcoords.ipynb)  | The showcase of the parallel coordinates.    |
+| [Network Chart](networkchart.ipynb)           | The showcase of the network chart.           |
 
 ## Flows
 

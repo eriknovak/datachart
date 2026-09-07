@@ -27,6 +27,7 @@ from datachart.charts import (
     HexbinChart,
     Histogram,
     LineChart,
+    NetworkChart,
     RadialChart,
     ScatterChart,
     StackedAreaChart,
@@ -53,6 +54,7 @@ from datachart.constants import (
     LINE_DRAW_STYLE,
     LINE_MARKER,
     LINE_STYLE,
+    NETWORK_LAYOUT,
     NORMALIZE,
     ORIENTATION,
     RADIAL_TYPE,
@@ -309,6 +311,7 @@ def arrow_style():
     members = [
         ("CURVE", ARROW_STYLE.CURVE),
         ("CURVE_ARROW", ARROW_STYLE.CURVE_ARROW),
+        ("STRAIGHT", ARROW_STYLE.STRAIGHT),
         ("TOUCHING", ARROW_STYLE.TOUCHING),
         ("ARROW", ARROW_STYLE.ARROW),
     ]
@@ -336,7 +339,56 @@ def arrow_style():
         3.4,
         cols=2,
         footnote="Same annotation under each look; curved looks pick their bow "
-        "side and depth against the data, TOUCHING starts flush at the box border.",
+        "side and depth against the data, TOUCHING starts flush at the box border. "
+        "Network edges take the headless CURVE and STRAIGHT only.",
+    )
+
+
+def network_layout():
+    members = [
+        ("SPRING", NETWORK_LAYOUT.SPRING),
+        ("CIRCULAR", NETWORK_LAYOUT.CIRCULAR),
+        ("FIXED", NETWORK_LAYOUT.FIXED),
+    ]
+    # a small module graph; FIXED reads the hand-placed x/y from the nodes
+    placed = {
+        "core": (0.5, 0.5),
+        "utils": (0.5, 0.12),
+        "cli": (0.15, 0.85),
+        "api": (0.85, 0.85),
+        "web": (0.88, 0.4),
+        "tests": (0.12, 0.35),
+    }
+    edges = [
+        {"source": s, "target": t}
+        for s, t in (
+            ("core", "utils"),
+            ("cli", "core"),
+            ("api", "core"),
+            ("web", "api"),
+            ("tests", "core"),
+            ("tests", "api"),
+        )
+    ]
+    figs = [
+        NetworkChart(
+            data={
+                "nodes": [{"id": k, "x": x, "y": y} for k, (x, y) in placed.items()],
+                "edges": edges,
+            },
+            layout=value,
+            directed=True,
+            title=f"NETWORK_LAYOUT.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-network-layout.svg",
+        3.0,
+        cols=3,
+        footnote="The same six modules; SPRING is seeded so it repeats, CIRCULAR "
+        "keeps the input order, FIXED reads each node's x and y.",
     )
 
 
@@ -955,6 +1007,7 @@ def main():
     line_draw_style()
     hatch_style()
     arrow_style()
+    network_layout()
     legend_align()
     legend_location()
     value_format()

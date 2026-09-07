@@ -24,7 +24,8 @@ from matplotlib.ticker import MaxNLocator
 from matplotlib.collections import LineCollection, PathCollection
 from matplotlib.colors import LinearSegmentedColormap, to_hex, to_rgb
 from matplotlib.mlab import GaussianKDE
-from matplotlib.patches import Patch, PathPatch, Rectangle
+from matplotlib.lines import Line2D
+from matplotlib.patches import FancyArrowPatch, Patch, PathPatch, Rectangle
 from matplotlib.path import Path
 import matplotlib.patheffects as patheffects
 from matplotlib.legend_handler import HandlerPathCollection
@@ -32,9 +33,11 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from .colors import create_color_cycle, create_colormap, get_colormap
 from .validate import (
+    infer_network_nodes,
     infer_sankey_columns,
     validate_baseline,
     validate_emphasis,
+    validate_network_edge_style,
     validate_sankey_link_color,
     validate_shared_x,
 )
@@ -45,6 +48,7 @@ from .config_helpers import (
     get_stackedarea_style,
     get_sankey_style,
     get_treemap_style,
+    get_network_style,
     get_grid_style,
     get_line_style,
     get_bar_style,
@@ -86,6 +90,7 @@ from .config_helpers import (
 )
 from ..stats import minimum, maximum, iqr
 from ...constants import (
+    ARROW_STYLE,
     ASPECT_RATIO,
     BASELINE,
     DIRECTION,
@@ -93,6 +98,7 @@ from ...constants import (
     HEXBIN_REDUCE,
     EMPHASIS,
     HISTOGRAM_TYPE,
+    NETWORK_LAYOUT,
     ORIENTATION,
     SWARM_MODE,
     RADIAL_TYPE,
@@ -144,6 +150,16 @@ TREEMAP_BAND_MIN_ROWS = 2.2
 TREEMAP_LABEL_PAD = 4
 # the font shrinks in these steps before a label is dropped
 TREEMAP_FONT_STEP = 0.5
+# network layouts keep this much of the 0–1 space clear on every side, room
+# for the largest marker and its label (ADR 0029)
+NETWORK_LAYOUT_MARGIN = 0.1
+# spring layout: iterations and the initial step, cooled geometrically
+NETWORK_SPRING_ITERATIONS = 300
+NETWORK_SPRING_STEP = 0.1
+NETWORK_SPRING_COOLING = 0.985
+# an arrowhead grows with its shaft, from this base in points
+NETWORK_ARROW_HEAD_BASE = 6.0
+NETWORK_ARROW_HEAD_PER_WIDTH = 1.5
 # matplotlib skips underscore-prefixed labels when assembling the legend
 NO_LEGEND = "_nolegend_"
 # radial furniture defaults: compass and calendar conventions (ADR 0015)
@@ -624,6 +640,24 @@ class Layer:
 
     def _resolve_style(self) -> None:
         """Collapse config → theme → chart style into concrete style dicts."""
+
+    def _resolve_value_labels(self) -> None:
+        """The label font, `show_values` flag, value formatter, and value font.
+
+        Shared by the bare layers, whose labels are drawn text in the general
+        font and whose values take the bar value style.
+        """
+
+        self.label_style = get_text_style("general")
+        self.show_values = bool(self.settings.get("show_values"))
+        self.value_format = _value_formatter(
+            self.settings.get("value_format") or VALUE_FORMAT.DEFAULT
+        )
+        self.value_style = {
+            "fontsize": config["plot_bar_value_fontsize"],
+            "color": config["plot_bar_value_color"],
+            "family": self.label_style.get("family"),
+        }
 
     def label(self, ctx: DrawContext) -> Optional[str]:
         return ctx.legend_label if ctx.legend_label is not None else self.subtitle
@@ -2956,18 +2990,9 @@ class SankeyLayer(Layer):
         self.link_color = validate_sankey_link_color(
             self.sankey_style.get("link_color")
         )
-        self.label_style = get_text_style("general")
+        self._resolve_value_labels()
         # column headings read as per-column subtitles
         self.column_label_style = get_text_style("subtitle")
-        self.show_values = bool(self.settings.get("show_values"))
-        self.value_format = _value_formatter(
-            self.settings.get("value_format") or VALUE_FORMAT.DEFAULT
-        )
-        self.value_style = {
-            "fontsize": config["plot_bar_value_fontsize"],
-            "color": config["plot_bar_value_color"],
-            "family": self.label_style.get("family"),
-        }
         # one color per node in column-then-row order, keyed by name
         names = [node for column in self.columns for node in column]
         cycle = create_color_cycle(config["color_general_multiple"], len(names))
@@ -3297,17 +3322,9 @@ class TreemapLayer(Layer):
 
     def _resolve_style(self) -> None:
         self.treemap_style = get_treemap_style(self.style)
-        self.label_style = get_text_style("general")
+        self._resolve_value_labels()
         # a group's header band reads as its subtitle
         self.band_style = get_text_style("subtitle")
-        self.show_values = bool(self.settings.get("show_values"))
-        self.value_format = _value_formatter(
-            self.settings.get("value_format") or VALUE_FORMAT.DEFAULT
-        )
-        self.value_style = {
-            "fontsize": config["plot_bar_value_fontsize"],
-            "color": config["plot_bar_value_color"],
-        }
         self.highlight_color = config["font_general_color"]
         # top-level records largest first; one palette color each, by label
         self.groups = sorted(self.records, key=_record_total, reverse=True)
@@ -3513,6 +3530,315 @@ class TreemapLayer(Layer):
         )
 
 
+# ================================================
+# Network Layer
+# ================================================
+
+
+def _fit_layout(pos: np.ndarray) -> np.ndarray:
+    """Positions scaled uniformly and centred inside the layout margin."""
+
+    span = (pos.max(axis=0) - pos.min(axis=0)).max()
+    inner = 1 - 2 * NETWORK_LAYOUT_MARGIN
+    if span == 0:
+        return np.full_like(pos, 0.5)
+    scaled = (pos - pos.min(axis=0)) / span * inner
+    extent = scaled.max(axis=0)
+    return scaled + NETWORK_LAYOUT_MARGIN + (inner - extent) / 2
+
+
+def spring_layout(n: int, pairs: list, seed: int) -> np.ndarray:
+    """Fruchterman–Reingold positions of `n` nodes joined by index `pairs`.
+
+    Linked nodes attract in proportion to their distance squared, every pair
+    repels in inverse proportion to its distance; the step length cools
+    geometrically. Seeded, so the same input renders the same picture. The
+    result fits the 0–1 space inside the layout margin.
+    """
+
+    rng = np.random.default_rng(seed)
+    pos = rng.random((n, 2))
+    if n < 2:
+        return _fit_layout(pos)
+    linked = np.zeros((n, n))
+    for i, j in pairs:
+        linked[i, j] = linked[j, i] = 1
+    # the ideal edge length for n nodes in a unit square
+    k = 1 / math.sqrt(n)
+    step = NETWORK_SPRING_STEP
+    for _ in range(NETWORK_SPRING_ITERATIONS):
+        delta = pos[:, None, :] - pos[None, :, :]
+        dist = np.linalg.norm(delta, axis=-1)
+        np.fill_diagonal(dist, 1)
+        dist = np.maximum(dist, 0.01)
+        force = k * k / dist**2 - linked * dist / k
+        disp = (delta * force[..., None]).sum(axis=1)
+        length = np.maximum(np.linalg.norm(disp, axis=1), 0.01)
+        pos += disp / length[:, None] * np.minimum(length, step)[:, None]
+        step *= NETWORK_SPRING_COOLING
+    return _fit_layout(pos)
+
+
+def circular_layout(n: int) -> np.ndarray:
+    """`n` nodes evenly spaced on a circle, the first at the top, clockwise."""
+
+    if n < 2:
+        return np.full((n, 2), 0.5)
+    angles = np.pi / 2 - np.linspace(0, 2 * np.pi, n, endpoint=False)
+    radius = 0.5 - NETWORK_LAYOUT_MARGIN
+    return 0.5 + radius * np.column_stack([np.cos(angles), np.sin(angles)])
+
+
+def _linear_map(values: list, low: float, high: float, missing: float) -> np.ndarray:
+    """Values mapped linearly onto [low, high]; None and a degenerate range map to `missing`."""
+
+    out = np.full(len(values), missing, dtype=float)
+    given = [i for i, v in enumerate(values) if v is not None]
+    if not given:
+        return out
+    known = np.array([values[i] for i in given], dtype=float)
+    span = known.max() - known.min()
+    if span > 0:
+        out[given] = low + (known - known.min()) / span * (high - low)
+    return out
+
+
+class NetworkLayer(Layer):
+    """One network: every node and edge of a chart as a node-link diagram (ADR 0029).
+
+    The layer owns its axes: a fixed 0–1 data space with equal aspect and the
+    axis off, so the panel applies no furniture, scales, or limits around it.
+    Positions are computed once at build time, so a redraw into another axes
+    keeps the picture.
+    """
+
+    kind = "network"
+    bare = True
+
+    def __init__(self, chart: dict, settings: dict):
+        data = chart["data"]
+        self.edges = data["edges"]
+        nodes = data.get("nodes")
+        self.nodes = infer_network_nodes(self.edges) if nodes is None else nodes
+        self.directed = bool(settings.get("directed"))
+        self.layout = settings.get("layout") or NETWORK_LAYOUT.DEFAULT
+        self.seed = 0 if settings.get("seed") is None else settings["seed"]
+        super().__init__(chart, settings)
+
+    def _resolve_style(self) -> None:
+        style = get_network_style(self.style)
+        self.network_style = style
+        self.edge_style = validate_network_edge_style(style.get("edge_style"))
+        self._resolve_value_labels()
+        self.highlight_color = config["font_general_color"]
+
+        ids = [node["id"] for node in self.nodes]
+        index = {node_id: i for i, node_id in enumerate(ids)}
+        # undirected reverse duplicates draw as one line; the first-seen wins
+        drawn, seen = [], set()
+        for record in self.edges:
+            key = (record["source"], record["target"])
+            if not self.directed:
+                key = tuple(sorted(key, key=str))
+            if key in seen:
+                continue
+            seen.add(key)
+            drawn.append(record)
+        self.drawn_edges = drawn
+        self.pairs = [(index[e["source"]], index[e["target"]]) for e in drawn]
+        self.positions = self._layout()
+
+        # encodings: sqrt(size) to marker area, weight to edge width
+        sizes = [
+            None if node.get("size") is None else math.sqrt(node["size"])
+            for node in self.nodes
+        ]
+        self.areas = _linear_map(
+            sizes, style["node_size_min"], style["node_size_max"], style["node_size"]
+        )
+        weights = [record.get("weight") for record in drawn]
+        self.widths = _linear_map(
+            weights,
+            style["edge_width_min"],
+            style["edge_width_max"],
+            style["edge_width_min"],
+        )
+
+        # colors: one singular color, or the multiple cycle keyed by group
+        groups = [node.get("group") for node in self.nodes]
+        self.group_names = list(dict.fromkeys(g for g in groups if g is not None))
+        if style.get("node_color") is not None:
+            base = style["node_color"]
+            self.group_colors = {g: base for g in self.group_names}
+        elif self.group_names:
+            cycle = create_color_cycle(
+                config["color_general_multiple"], len(self.group_names)
+            )
+            self.group_colors = {
+                g: cycle[i]["color"] for i, g in enumerate(self.group_names)
+            }
+            base = cycle[0]["color"]
+        else:
+            base = create_color_cycle(config["color_general_singular"], 1)[0]["color"]
+            self.group_colors = {}
+        self.node_colors = [self.group_colors.get(g, base) for g in groups]
+        roles = [node.get("emphasis") for node in self.nodes]
+        self.muted = [role == EMPHASIS_BACKGROUND for role in roles]
+        self.highlighted = [role == EMPHASIS_HIGHLIGHT for role in roles]
+
+    def _layout(self) -> np.ndarray:
+        if self.layout == NETWORK_LAYOUT.FIXED:
+            return np.array([[node["x"], node["y"]] for node in self.nodes], float)
+        if self.layout == NETWORK_LAYOUT.CIRCULAR:
+            return circular_layout(len(self.nodes))
+        return spring_layout(len(self.nodes), self.pairs, self.seed)
+
+    def legend_handles(self):
+        if not self.group_names:
+            return None
+        return [
+            Line2D(
+                [],
+                [],
+                marker=self.network_style["node_marker"],
+                linestyle="",
+                color=self.group_colors[g],
+                # half the default marker's diameter: a legend swatch, not a node
+                markersize=math.sqrt(self.network_style["node_size"]) / 2,
+                label=g,
+            )
+            for g in self.group_names
+        ]
+
+    def draw(self, ax: plt.Axes, ctx: DrawContext) -> None:
+        style = self.network_style
+        pos = self.positions
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
+        ax.set_aspect("equal", adjustable="box")
+        ax.axis("off")
+        effects = _halo_effects(style.get("halo_width"))
+        muted, highlighted = self.muted, self.highlighted
+        # scatter sizes are the marker's bounding-box diameter squared
+        radii = np.sqrt(self.areas) / 2
+        curve = (
+            0.0 if self.edge_style == ARROW_STYLE.STRAIGHT else style["edge_curve"]
+        ) or 0.0
+        connection = f"arc3,rad={curve}"
+
+        for record, (i, j), width in zip(self.drawn_edges, self.pairs, self.widths):
+            edge_muted = muted[i] or muted[j]
+            color = self.muted_color if edge_muted else style["edge_color"]
+            alpha = self.muted_alpha if edge_muted else style["edge_alpha"]
+            gid = f"edge:{record['source']}->{record['target']}"
+            if self.directed:
+                # one filled polygon: the shaft and the head share an outline,
+                # so the alpha never doubles where they meet
+                head = NETWORK_ARROW_HEAD_BASE + NETWORK_ARROW_HEAD_PER_WIDTH * width
+                patch = FancyArrowPatch(
+                    pos[i],
+                    pos[j],
+                    arrowstyle=(
+                        f"simple,tail_width={width},"
+                        f"head_width={head},head_length={head}"
+                    ),
+                    mutation_scale=1,
+                    connectionstyle=connection,
+                    shrinkA=radii[i],
+                    shrinkB=radii[j],
+                    facecolor=color,
+                    edgecolor="none",
+                    linewidth=0,
+                    alpha=alpha,
+                    zorder=2,
+                    gid=gid,
+                )
+            else:
+                patch = FancyArrowPatch(
+                    pos[i],
+                    pos[j],
+                    arrowstyle="-",
+                    connectionstyle=connection,
+                    color=color,
+                    linewidth=width,
+                    alpha=alpha,
+                    zorder=2,
+                    gid=gid,
+                )
+            ax.add_patch(patch)
+            if self.show_values and record.get("weight") is not None:
+                # the midpoint of the arc3 quadratic Bézier, not of the chord
+                mid = (pos[i] + pos[j]) / 2
+                dx, dy = pos[j] - pos[i]
+                mid = mid + curve / 2 * np.array([dy, -dx])
+                ax.text(
+                    mid[0],
+                    mid[1],
+                    _format_value(self.value_format, record["weight"]),
+                    ha="center",
+                    va="center",
+                    zorder=4,
+                    path_effects=effects,
+                    gid=f"value:{record['source']}->{record['target']}",
+                    **{
+                        **self.value_style,
+                        "color": (
+                            self.muted_color
+                            if edge_muted
+                            else self.value_style["color"]
+                        ),
+                    },
+                )
+
+        face = [
+            self.muted_color if muted[k] else color
+            for k, color in enumerate(self.node_colors)
+        ]
+        alpha = [
+            self.muted_alpha if muted[k] else style["node_alpha"]
+            for k in range(len(self.nodes))
+        ]
+        ax.scatter(
+            pos[:, 0],
+            pos[:, 1],
+            s=self.areas,
+            c=face,
+            alpha=alpha,
+            marker=style["node_marker"],
+            edgecolors=[
+                self.highlight_color if h else style["edgecolor"] for h in highlighted
+            ],
+            linewidths=[
+                style["highlight_linewidth"] if h else style["linewidth"]
+                for h in highlighted
+            ],
+            zorder=3,
+            gid="nodes",
+        )
+
+        for k, node in enumerate(self.nodes):
+            label = node.get("label")
+            label = node["id"] if label is None else label
+            if label == "":
+                continue
+            ax.text(
+                pos[k, 0],
+                pos[k, 1],
+                label,
+                ha="center",
+                va="center",
+                zorder=5,
+                path_effects=effects,
+                gid=f"label:{node['id']}",
+                **{
+                    **self.label_style,
+                    "color": (
+                        self.muted_color if muted[k] else self.label_style["color"]
+                    ),
+                },
+            )
+
+
 LAYER_TYPES = {
     "linechart": LineLayer,
     "barchart": BarLayer,
@@ -3529,6 +3855,7 @@ LAYER_TYPES = {
     "stackedareachart": StackedAreaLayer,
     "sankeychart": SankeyLayer,
     "treemap": TreemapLayer,
+    "networkchart": NetworkLayer,
 }
 
 RADIAL_LAYER_TYPES = {
@@ -4446,8 +4773,8 @@ class Panel:
             for layer in group.layers:
                 _draw_texts(top_ax, layer.texts, owner_ax, clearance)
 
-        # aspect ratio (a polar axes keeps its own fixed aspect)
-        if s.get("aspect_ratio") and not polar:
+        # aspect ratio (a polar axes keeps its own; a bare layer fixed its own)
+        if s.get("aspect_ratio") and not polar and not bare:
             ax.set(adjustable="box", aspect=s["aspect_ratio"])
 
         # panel-level labels (used when a panel renders into a grid cell)

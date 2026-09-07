@@ -69,4 +69,8 @@ CHART_CONFIGS = {
         "multiplot": False,
         "subplots": True,
     },
+    "networkchart": {
+        "multiplot": False,
+        "subplots": True,
+    },
 }
