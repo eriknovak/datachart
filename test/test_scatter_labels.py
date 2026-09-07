@@ -62,6 +62,11 @@ def test_missing_label_skips_the_point():
     assert [t.get_text() for t in _labels(fig.axes[0])] == ["a"]
 
 
+def test_per_chart_none_leaves_the_series_unlabelled():
+    fig = ScatterChart(data=[POINTS, POINTS], label=[None, "label"])
+    assert [t.get_text() for t in _labels(fig.axes[0])] == ["a", "b", "c"]
+
+
 def test_labels_take_the_text_font():
     fig = ScatterChart(data=POINTS)
     label = _labels(fig.axes[0])[0]

@@ -197,10 +197,12 @@ def ScatterChart(
         y: The key name in data for y-axis values (default: "y").
         size: The key name in data for marker size values (for bubble charts).
         hue: The key name in data for color grouping (categorical variable).
-        label: The key name in data for the point labels (default: "label").
-            Each label is drawn beside its marker at the spot with the least
-            overlap against the other markers, labels, and the axes edge;
-            points without the key stay unlabelled.
+        label: The key name in data for the point labels (default: "label"),
+            aligned like `style` for multiple charts; `None` in the list
+            leaves that chart unlabelled. Each label is drawn beside its
+            marker at the spot with the least overlap against the other
+            markers, labels, and the axes edge; points without the key stay
+            unlabelled.
         size_range: Tuple of (min_size, max_size) for bubble charts (default: (20, 200)).
 
     Returns:
