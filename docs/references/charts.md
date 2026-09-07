@@ -35,6 +35,7 @@ title: Charts Module
 ::: datachart.charts.ContourChart
 ::: datachart.charts.HexbinChart
 ::: datachart.charts.ParallelCoords
+::: datachart.charts.NetworkChart
 
 
 ## Flows

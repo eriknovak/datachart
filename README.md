@@ -94,7 +94,7 @@ split them apart. The dict keys per chart are listed in each guide.
 | **Trends**        | [LineChart], [StackedAreaChart]                                            | values over an ordered axis; area for part-of-whole over time          |
 | **Comparisons**   | [BarChart], [PyramidChart], [RadialChart]                                  | category totals, paired populations, cyclic/periodic values            |
 | **Distributions** | [Histogram], [BoxPlot], [ViolinPlot], [SwarmPlot], [RaincloudPlot]         | shape and spread of one variable, per group                            |
-| **Relationships** | [ScatterChart], [Heatmap], [ContourChart], [HexbinChart], [ParallelCoords] | two-variable correlation, matrices, dense 2-D density, many dimensions |
+| **Relationships** | [ScatterChart], [Heatmap], [ContourChart], [HexbinChart], [ParallelCoords], [NetworkChart] | two-variable correlation, matrices, dense 2-D density, many dimensions, who is linked to whom |
 | **Flows**         | [SankeyChart]                                                              | quantities moving between stages                                       |
 | **Proportions**   | [Treemap]                                                                  | how a whole splits into parts, with one level of grouping              |
 
@@ -224,6 +224,7 @@ Code is formatted with `black`; the pre-commit hook runs it for you.
 [ContourChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/contourchart/
 [HexbinChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/hexbinchart/
 [ParallelCoords]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/parallelcoords/
+[NetworkChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/networkchart/
 [SankeyChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/sankeychart/
 [Treemap]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/treemap/
 [panel-guide]: https://eriknovak.github.io/datachart/latest/how-to-guides/utility/panel/

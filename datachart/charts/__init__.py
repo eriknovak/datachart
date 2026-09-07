@@ -34,10 +34,10 @@ Methods:
         Creates the hexbin chart.
     ParallelCoords(attrs):
         Creates the parallel coordinates chart.
-    SankeyChart(attrs):
-        Creates the Sankey chart.
     NetworkChart(attrs):
         Creates the network chart.
+    SankeyChart(attrs):
+        Creates the Sankey chart.
     Treemap(attrs):
         Creates the treemap.
 
@@ -63,10 +63,10 @@ from .heatmap import Heatmap
 from .contour_chart import ContourChart
 from .hexbin_chart import HexbinChart
 from .parallel_coords import ParallelCoords
-
-# flows and relations
-from .sankey_chart import SankeyChart
 from .network_chart import NetworkChart
+
+# flows
+from .sankey_chart import SankeyChart
 
 # part of a whole
 from .treemap import Treemap
@@ -90,9 +90,9 @@ __all__ = [
     "ContourChart",
     "HexbinChart",
     "ParallelCoords",
-    # flows and relations
-    "SankeyChart",
     "NetworkChart",
+    # flows
+    "SankeyChart",
     # part of a whole
     "Treemap",
 ]
