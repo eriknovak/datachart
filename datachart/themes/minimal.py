@@ -30,6 +30,7 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "plot_grid_alpha": 1.0,
         "plot_bar_alpha": 1.0,
         "plot_bar_edge_width": 0,
+        "plot_stackedarea_edge_width": 0,
         "plot_bar_value_fontsize": 9,
         "plot_bar_value_color": "#1F1F1F",
         "plot_hist_edge_width": 0,

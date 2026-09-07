@@ -38,8 +38,10 @@ previous one, like matplotlib's `stackplot`.
   (color, hatch, zorder) with its own `plot_stackedarea_alpha` (0.8 — the
   0.25 of `plot_area_alpha` is tuned for a band under a line and washes out
   when stacked); the optional outline takes `plot_line_*`, switched by
-  `plot_stackedarea_outline` (`False`). Both new keys live in `BASE_THEME`
-  only; no sibling theme overrides them.
+  `plot_stackedarea_outline` (`False`). Bands are separated by a stroke
+  that mirrors the bar edge (`plot_stackedarea_edge_color` white,
+  `plot_stackedarea_edge_width` 0.6; GREYSCALE, HATCH, INK override the
+  color as for bars), so a stack reads like stacked bars do.
 - **Series order is stack order.** The first series sits at the bottom; the
   legend lists bottom→top in input order, with no reversal.
 - **`emphasis` roles apply** through the shared muting path: non-highlighted

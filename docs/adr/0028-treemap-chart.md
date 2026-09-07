@@ -31,12 +31,14 @@ space and the axes carry nothing.
   shares one tint, `plot_treemap_level_shade` (0.35; 0 gives the flat group
   color) lighter than the group; siblings never differ in hue or alpha, so
   the depth is the only thing the tint encodes.
-- **A group is a box.** Its header band sits on top and one border in the
-  group color at `plot_treemap_group_edge_width` (1.0) encloses band and
-  leaves, so their edges align. Leaves are separated by an edge stroke only
+- **A group is a box.** Its header band sits on top and one border at
+  `plot_treemap_group_edge_width` (1.0) encloses band and leaves, so their
+  edges align. Leaves are separated by an edge stroke only
   (`plot_treemap_edge_color` white, `plot_treemap_edge_width` 0.6; GRAYSCALE,
-  HATCH, INK override the color as for bars). Groups are separated by a
-  data-space pad, `plot_treemap_group_pad` (0.01 of the span).
+  HATCH, INK override the color as for bars); the group border takes the
+  same color, so every stroke in a treemap matches the theme's bar edge.
+  Groups are separated by a data-space pad, `plot_treemap_group_pad` (0.02
+  of the span).
 - **Emphasis is per record**, not per chart: an `emphasis` key on any record
   (group or leaf; a leaf's role overrides its group's) takes the `EMPHASIS`
   roles. `background` mutes the tile (`muted_color`, `muted_alpha`, muted
@@ -85,6 +87,9 @@ space and the axes carry nothing.
 - *Shading leaves by rank, largest darkest.* Rejected after the preview:
   siblings in different tints read as different categories, and the area
   already carries the rank.
+- *Group border in the group color.* Shipped first, then dropped: a colored
+  frame around a band of the same color reads as a second, heavier band
+  edge, and it is the one stroke in the chart that does not match the bars.
 - *Band over loose leaves, no group border.* Rejected after the preview:
   the band's edge and the stroked leaves' edge do not meet, so the band looks
   like it hangs over its children.

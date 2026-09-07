@@ -29,6 +29,7 @@ MATERIAL_THEME: StyleAttrs = make_theme(
         "plot_grid_linewidth": 0.8,
         "plot_bar_alpha": 1.0,
         "plot_bar_edge_width": 0,
+        "plot_stackedarea_edge_width": 0,
         "plot_hist_edge_width": 0,
         "plot_line_width": 2.0,
         "plot_text_box_edgecolor": "#757575",

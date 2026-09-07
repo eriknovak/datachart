@@ -45,6 +45,7 @@ from .config_helpers import (
     get_attr_value,
     resolve_font_family,
     get_area_style,
+    get_sketch_halo,
     get_stackedarea_style,
     get_sankey_style,
     get_treemap_style,
@@ -652,6 +653,8 @@ class Layer:
         muted_alpha = config.get("muted_alpha")
         self.muted_color = config.get("muted_color") or DEFAULT_MUTED_COLOR
         self.muted_alpha = DEFAULT_MUTED_ALPHA if muted_alpha is None else muted_alpha
+        # the sketch halo around a series line (ADR 0027); None means off
+        self.halo = get_sketch_halo(self.style)
         self._resolve_style()
 
     def _resolve_emphasis(self, value):
@@ -693,6 +696,13 @@ class Layer:
             ax.set_xscale(scalex)
         if scaley:
             ax.set_yscale(scaley)
+
+    def _stroke_halo(self, line_style: dict) -> None:
+        """Stroke the sketch halo under a series line, sized to its width."""
+
+        if self.halo is not None:
+            width = (line_style.get("linewidth") or 0) + self.halo
+            line_style["path_effects"] = _halo_effects(width)
 
     @staticmethod
     def _merge_color(color_key: str, ctx_color: Optional[str], style: dict) -> dict:
@@ -768,6 +778,7 @@ class LineLayer(Layer):
         if ctx.z_order is not None:
             line_style["zorder"] = ctx.z_order
         self._apply_emphasis(line_style, ctx.emphasis)
+        self._stroke_halo(line_style)
 
         draw_yerr = (
             self.show_yerr and isinstance(yerr, np.ndarray) and len(yerr) == len(y)
@@ -1159,6 +1170,7 @@ class ScatterLayer(Layer):
         reg_style = dict(self.regression_style)
         if color is not None:
             reg_style["color"] = color
+        self._stroke_halo(reg_style)
         plot(x_line, y_line, **reg_style)
 
         if self.show_ci:
@@ -2716,6 +2728,7 @@ class RadialLineLayer(RadialLayer):
         if ctx.z_order is not None:
             line_style["zorder"] = ctx.z_order
         self._apply_emphasis(line_style, ctx.emphasis)
+        self._stroke_halo(line_style)
 
         yerr = get_chart_data("yerr", self.chart)
         if self.show_yerr and isinstance(yerr, np.ndarray) and len(yerr) == len(y) - 1:
@@ -3449,21 +3462,23 @@ class TreemapLayer(Layer):
                     path_effects=effects,
                     zorder=6,
                 )
-        # the group is a box: one border encloses the band and the leaves
+        # the group is a box: one border in the tile stroke color encloses
+        # the band and the leaves
         ax.add_patch(
             Rectangle(
                 (x, y),
                 w,
                 h,
                 facecolor="none",
-                edgecolor=self.highlight_color if highlight else box_color,
+                edgecolor=self.highlight_color if highlight else style["edgecolor"],
                 linewidth=(
                     style["highlight_linewidth"]
                     if highlight
                     else style["group_linewidth"]
                 ),
                 alpha=alpha,
-                zorder=5,
+                # under highlighted leaves, whose stroke must not be clipped
+                zorder=3,
                 gid=f"group:{label}",
             )
         )
@@ -4477,9 +4492,8 @@ class Panel:
             },
             # tick_params cannot set a font family; applied to the labels directly
             "font_family": resolve_font_family(),
-            # render-scoped rc attributes (ADR 0027); None means off
+            # the render-scoped rc attribute (ADR 0027); None means off
             "sketch_params": config.get("plot_sketch_params"),
-            "sketch_halo_width": config.get("plot_sketch_halo_width"),
         }
 
     def _sketch_rc(self) -> dict:
@@ -4489,19 +4503,6 @@ class Panel:
         if furniture.get("sketch_params") is None:
             return {}
         return {"path.sketch": tuple(furniture["sketch_params"])}
-
-    def _apply_halo(self, *axes) -> None:
-        """Stroke a white halo under the line artists; text and patches stay clean."""
-
-        furniture = self.settings.get("furniture") or {}
-        width = furniture.get("sketch_halo_width")
-        if width is None:
-            return
-        halo = _halo_effects(width)
-        for ax in axes:
-            if ax is not None:
-                for line in ax.get_lines():
-                    line.set_path_effects(halo)
 
     def _apply_furniture(
         self, ax: plt.Axes, axes_types=("xaxis", "yaxis"), spines=True
@@ -4790,7 +4791,6 @@ class Panel:
         if category_index:
             self._apply_category_ticks(ax, category_index, group_layers, horizontal)
 
-        self._apply_halo(ax, ax_right)
         self._finalize(ax, ax_right, bar_layers, horizontal, group_axes)
 
     @staticmethod

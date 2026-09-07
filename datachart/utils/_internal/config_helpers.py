@@ -300,6 +300,26 @@ def get_area_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Sketch Halo
+# -------------------------------------
+
+
+def get_sketch_halo(chart_style: dict):
+    """The extra width of the white halo stroked around a series line.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The width in points added to the line width, or None when off.
+
+    """
+
+    halo = get_attr_value("plot_sketch_halo_width", chart_style, config)
+    return halo if halo else None
+
+
+# -------------------------------------
 # Stacked Area Style
 # -------------------------------------
 
@@ -308,7 +328,8 @@ def get_stackedarea_style(chart_style: dict) -> dict:
     """Get the stacked area chart style.
 
     The fill reuses the area color, hatch and zorder with the stack's own
-    alpha; `outline` says whether the line style draws each band's top edge.
+    alpha and edge stroke; `outline` says whether the line style draws each
+    band's top edge.
 
     Args:
         chart_style: The chart style dictionary.
@@ -323,6 +344,8 @@ def get_stackedarea_style(chart_style: dict) -> dict:
         ("color", "plot_area_color"),
         ("hatch", "plot_area_hatch"),
         ("zorder", "plot_area_zorder"),
+        ("edgecolor", "plot_stackedarea_edge_color"),
+        ("linewidth", "plot_stackedarea_edge_width"),
         ("outline", "plot_stackedarea_outline"),
     ]
 

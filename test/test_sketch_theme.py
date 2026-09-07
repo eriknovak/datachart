@@ -11,7 +11,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
 
-from datachart.charts import BarChart, LineChart
+from datachart.charts import BarChart, BoxPlot, LineChart, ScatterChart
 from datachart.config import config
 from datachart.constants import THEME
 from datachart.themes import SKETCH_THEME
@@ -39,7 +39,7 @@ class TestSketchTheme(unittest.TestCase):
         config.set_theme(THEME.SKETCH)
         self.assertEqual(config.config, SKETCH_THEME)
         self.assertEqual(SKETCH_THEME["plot_sketch_params"], SKETCH)
-        self.assertEqual(SKETCH_THEME["plot_sketch_halo_width"], 4)
+        self.assertEqual(SKETCH_THEME["plot_sketch_halo_width"], 1.5)
 
     def test_default_theme_has_no_sketch(self):
         """Existing themes keep both rc attributes off, so their output is unchanged."""
@@ -60,8 +60,8 @@ class TestSketchTheme(unittest.TestCase):
         self.assertEqual(spine.get_sketch_params(), SKETCH)
         self.assertFalse(spine.get_path_effects())
 
-    def test_halo_is_lines_only(self):
-        """Text and patches wobble but carry no halo; only lines do."""
+    def test_halo_is_series_lines_only(self):
+        """Text, patches and marks wobble but carry no halo; series lines do."""
         config.set_theme(THEME.SKETCH)
         figure = LineChart(LINE, title="Title")
         ax = figure.axes[0]
@@ -69,6 +69,24 @@ class TestSketchTheme(unittest.TestCase):
         self.assertFalse(ax.get_xticklabels()[0].get_path_effects())
         self.assertFalse(BarChart(BAR).axes[0].patches[0].get_path_effects())
         self.assertEqual(len(data_lines(figure)[0].get_path_effects()), 1)
+        box = BoxPlot([{"y": [1.0, 2.0, 3.0, 4.0, 9.0]}])
+        for line in data_lines(box):
+            self.assertFalse(line.get_path_effects())
+
+    def test_halo_width_follows_the_line(self):
+        config.set_theme(THEME.SKETCH)
+        thin = LineChart(LINE, style={"plot_line_width": 1.0})
+        (effect,) = data_lines(thin)[0].get_path_effects()
+        self.assertEqual(effect._gc["linewidth"], 2.5)
+        regression = ScatterChart(
+            [{"x": float(i), "y": float(i)} for i in range(5)], show_regression=True
+        )
+        self.assertTrue(any(line.get_path_effects() for line in data_lines(regression)))
+
+    def test_chart_style_turns_the_halo_off(self):
+        config.set_theme(THEME.SKETCH)
+        figure = LineChart(LINE, style={"plot_sketch_halo_width": 0})
+        self.assertFalse(data_lines(figure)[0].get_path_effects())
 
     def test_sketch_applies_to_bars(self):
         config.set_theme(THEME.SKETCH)

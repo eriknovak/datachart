@@ -317,16 +317,20 @@ class StackedAreaStyleAttrs(TypedDict):
     """The typing for the stacked area chart style.
 
     The fill takes the `plot_area_*` keys (color, hatch, zorder) and the
-    outline the `plot_line_*` keys; these two switch what is specific to a stack.
+    outline the `plot_line_*` keys; these keys switch what is specific to a stack.
 
     Attributes:
         plot_stackedarea_alpha (Union[float, None]): The alpha value of the stacked bands.
         plot_stackedarea_outline (Union[bool, None]): Whether each band draws its top edge as a line.
+        plot_stackedarea_edge_color (Union[str, None]): The stroke color between the bands.
+        plot_stackedarea_edge_width (Union[float, None]): The stroke width between the bands.
 
     """
 
     plot_stackedarea_alpha: Union[float, None]
     plot_stackedarea_outline: Union[bool, None]
+    plot_stackedarea_edge_color: Union[str, None]
+    plot_stackedarea_edge_width: Union[float, None]
 
 
 class SankeyStyleAttrs(TypedDict):
@@ -356,7 +360,7 @@ class TreemapStyleAttrs(TypedDict):
     """The typing for the treemap style.
 
     Attributes:
-        plot_treemap_edge_color (Union[str, None]): The leaf tile stroke color.
+        plot_treemap_edge_color (Union[str, None]): The stroke color of leaf tiles and group borders.
         plot_treemap_edge_width (Union[float, None]): The leaf tile stroke width.
         plot_treemap_group_edge_width (Union[float, None]): The width of the border around a group.
         plot_treemap_group_pad (Union[float, None]): The gap between groups as a fraction of the span.
@@ -848,9 +852,10 @@ class ThemeDefaultAttrs(TypedDict):
 
 class SketchStyleAttrs(TypedDict):
     """The typing for the sketch attributes: the theme's render-scoped rc-level
-    look (path wobble, halo stroke). The panel snapshots both at build time and
-    applies them inside a scoped matplotlib rc context, so no global rc setting
-    changes; composition keeps the look of the figures it was built from.
+    look (path wobble, halo stroke). The panel snapshots the wobble at build
+    time and applies it inside a scoped matplotlib rc context, so no global rc
+    setting changes; the halo resolves like any style key, so a chart's `style`
+    can override it. Composition keeps the look of the figures it was built from.
 
     !!! info "Added in v0.9.1"
 
@@ -858,9 +863,10 @@ class SketchStyleAttrs(TypedDict):
         plot_sketch_params (Union[Tuple[float, float, float], None]): The path
             wobble as matplotlib sketch parameters `(scale, length, randomness)`;
             `plt.xkcd()` uses `(1, 100, 2)`. `None` draws clean paths.
-        plot_sketch_halo_width (Union[float, None]): The width of the white halo
-            stroked under the lines, so crossing lines read as cut-outs; text
-            and patches stay clean. `None` draws no halo.
+        plot_sketch_halo_width (Union[float, None]): The extra width, added to
+            the line width, of the white halo stroked under series lines (line,
+            radial, regression), so crossing lines read as cut-outs; marks, text
+            and patches stay clean. `None` or `0` draws no halo.
 
     """
 

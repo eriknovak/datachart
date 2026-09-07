@@ -92,9 +92,12 @@ BASE_THEME: StyleAttrs = {
     "plot_area_linewidth": 0,
     "plot_area_hatch": None,
     "plot_area_zorder": 3,
-    # plot stackedarea style; the fill reuses the area keys (ADR 0025)
+    # plot stackedarea style; the fill reuses the area keys and the band
+    # stroke mirrors plot_bar_edge_* (ADR 0025)
     "plot_stackedarea_alpha": 0.8,
     "plot_stackedarea_outline": False,
+    "plot_stackedarea_edge_color": "#FFFFFF",
+    "plot_stackedarea_edge_width": 0.6,
     # plot sankey style; the node stroke mirrors plot_bar_edge_* (ADR 0026)
     "plot_sankey_node_width": 0.04,
     "plot_sankey_node_pad": 0.10,
@@ -107,7 +110,7 @@ BASE_THEME: StyleAttrs = {
     "plot_treemap_edge_color": "#FFFFFF",
     "plot_treemap_edge_width": 0.6,
     "plot_treemap_group_edge_width": 1.0,
-    "plot_treemap_group_pad": 0.01,
+    "plot_treemap_group_pad": 0.02,
     "plot_treemap_level_shade": 0.35,
     "plot_treemap_level_font_scale": 0.85,
     "plot_treemap_min_fontsize": 6,

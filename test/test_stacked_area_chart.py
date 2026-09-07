@@ -64,7 +64,12 @@ class TestStackedAreaStyle(unittest.TestCase):
     def test_every_theme_sets_the_stackedarea_keys(self):
         for theme in THEMES:
             config.set_theme(theme)
-            for key in ("plot_stackedarea_alpha", "plot_stackedarea_outline"):
+            for key in (
+                "plot_stackedarea_alpha",
+                "plot_stackedarea_outline",
+                "plot_stackedarea_edge_color",
+                "plot_stackedarea_edge_width",
+            ):
                 self.assertIn(key, config.config, f"{theme} lacks {key}")
 
 

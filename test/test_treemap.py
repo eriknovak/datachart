@@ -275,7 +275,8 @@ class TestRendering(unittest.TestCase):
         plt.close("all")
 
     def test_flat_tiles_are_proportional_largest_top_left(self):
-        fig = Treemap({"data": FLAT})
+        # the pad shaves every box, so the tiling is checked without it
+        fig = Treemap({"data": FLAT}, style={"plot_treemap_group_pad": 0})
         ax = fig.axes[0]
         tiles = _tiles(ax)
         self.assertEqual(set(tiles), {"A", "B", "C", "D"})
@@ -314,8 +315,12 @@ class TestRendering(unittest.TestCase):
         self.assertLessEqual(
             tiles["India"].get_y() + tiles["India"].get_height(), band.get_y() + 1e-9
         )
-        # the border is the group color; the leaves share one lighter tint
-        group_rgb = to_rgb(asia.get_edgecolor())
+        # the border is the tile stroke; the leaves share one tint lighter
+        # than the band's group color
+        self.assertEqual(
+            to_rgb(asia.get_edgecolor()), to_rgb(config["plot_treemap_edge_color"])
+        )
+        group_rgb = to_rgb(band.get_facecolor())
         leaf_rgbs = {
             to_rgb(tiles[k].get_facecolor()) for k in ("India", "China", "Japan")
         }
@@ -342,7 +347,7 @@ class TestRendering(unittest.TestCase):
         ax = fig.axes[0]
         self.assertEqual(
             to_rgb(_tiles(ax)["India"].get_facecolor()),
-            to_rgb(_boxes(ax)["Asia"].get_edgecolor()),
+            to_rgb(_bands(ax)["Asia"].get_facecolor()),
         )
 
     def test_background_mutes_only_that_record(self):
@@ -396,7 +401,11 @@ class TestRendering(unittest.TestCase):
         tiles, boxes = _tiles(ax), _boxes(ax)
         muted = to_rgb(config["muted_color"])
         self.assertEqual(to_rgb(tiles["China"].get_facecolor()), muted)
-        self.assertEqual(to_rgb(boxes["Asia"].get_edgecolor()), muted)
+        self.assertEqual(to_rgb(_bands(ax)["Asia"].get_facecolor()), muted)
+        self.assertEqual(
+            to_rgb(boxes["Asia"].get_edgecolor()),
+            to_rgb(config["plot_treemap_edge_color"]),
+        )
         self.assertNotEqual(to_rgb(tiles["India"].get_facecolor()), muted)
         self.assertEqual(
             to_rgb(tiles["India"].get_edgecolor()), to_rgb(config["font_general_color"])
@@ -561,7 +570,9 @@ class TestComposition(unittest.TestCase):
         self.assertEqual(grid.axes[0].get_title(), "world")
 
     def test_grid_cell_tiles_in_its_own_aspect(self):
-        treemap = Treemap({"data": FLAT}, figsize=(3, 6))
+        treemap = Treemap(
+            {"data": FLAT}, figsize=(3, 6), style={"plot_treemap_group_pad": 0}
+        )
         grid = Grid([[treemap, LineChart(LINE)]], figsize=(10, 4))
         ratios = _aspects(grid, grid.axes[0])
         self.assertLessEqual(ratios["A"], 2.0)
