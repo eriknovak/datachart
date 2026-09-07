@@ -22,6 +22,7 @@ from matplotlib import rc_context
 import matplotlib.ticker as mticker
 from matplotlib.ticker import MaxNLocator
 from matplotlib.collections import LineCollection, PathCollection
+from matplotlib.container import BarContainer
 from matplotlib.colors import LinearSegmentedColormap, to_hex, to_rgb
 from matplotlib.mlab import GaussianKDE
 from matplotlib.lines import Line2D
@@ -842,6 +843,30 @@ def _scalar(value):
     return value.item() if isinstance(value, np.generic) else value
 
 
+def _range_text(ax: plt.Axes, which: str, low, high) -> str:
+    """A `low – high` span formatted like the axis formats its coordinates."""
+
+    fmt = getattr(ax, f"format_{which}data")
+    return f"{fmt(low).strip()} – {fmt(high).strip()}"
+
+
+def _nearest(positions, coordinate) -> int:
+    """The index of the position closest to `coordinate`."""
+
+    return int(np.nanargmin(np.abs(np.asarray(positions, dtype=float) - coordinate)))
+
+
+def _vertex_coordinate(vertices: np.ndarray, index, axis: int) -> float:
+    """The coordinate along `axis` of a picked outline vertex.
+
+    A polygon collection picks `(polygon, vertex)`, a patch outline the
+    vertex alone; either wraps around the closing vertex.
+    """
+
+    vertex = index[-1] if isinstance(index, tuple) else index
+    return float(vertices[vertex % len(vertices)][axis])
+
+
 def _column_range(chart: dict, attr: str) -> Optional[tuple]:
     """The (min, max) of a chart's data column; None when the column is absent."""
 
@@ -957,13 +982,25 @@ class StackedAreaLayer(Layer):
         self._apply_emphasis(fill_style, ctx.emphasis)
 
         plot, fill, _ = _oriented(ax, ctx.transpose)
-        fill(
+        band = fill(
             x,
             ctx.stack_slot.bottom,
             ctx.stack_slot.top,
             **fill_style,
             label=self.label(ctx),
         )
+        # the band picks by containment and reports the point nearest the
+        # picked vertex, under its own value, never the stack total
+        y = get_chart_data("y", self.chart)
+        point = _point_resolver(self.label(ctx), x, y, ctx.transpose)
+        axis = ax.yaxis if ctx.transpose else ax.xaxis
+
+        def resolve(index):
+            vertices = band.get_paths()[index[0]].vertices
+            coordinate = _vertex_coordinate(vertices, index, 1 if ctx.transpose else 0)
+            return point(_nearest(axis.convert_units(x), coordinate))
+
+        self.register_hover(band, resolve)
 
         if self.outline:
             line_style = self._merge_color("color", ctx.color, self.line_style)
@@ -1207,7 +1244,7 @@ class HistogramLayer(Layer):
             # weighted bin centers reproduce the precomputed stack heights
             # exactly; density/cumulative are already encoded in them
             slot = ctx.hist_slot
-            ax.hist(
+            counts, edges, bars = ax.hist(
                 (slot.bins[:-1] + slot.bins[1:]) / 2,
                 bins=slot.bins,
                 weights=slot.heights,
@@ -1216,18 +1253,45 @@ class HistogramLayer(Layer):
                 orientation=self.orientation,
                 **hist_style,
             )
-            return
+        else:
+            bins = ctx.bins if ctx.bins is not None else self.num_bins
+            counts, edges, bars = ax.hist(
+                x,
+                bins=bins,
+                label=self.label(ctx),
+                density=self.show_density,
+                cumulative=self.show_cumulative,
+                orientation=self.orientation,
+                **hist_style,
+            )
+        self._register_bins(ax, ctx, bars, edges, counts)
 
-        bins = ctx.bins if ctx.bins is not None else self.num_bins
-        ax.hist(
-            x,
-            bins=bins,
-            label=self.label(ctx),
-            density=self.show_density,
-            cumulative=self.show_cumulative,
-            orientation=self.orientation,
-            **hist_style,
-        )
+    def _register_bins(self, ax, ctx, bars, edges, counts) -> None:
+        """Each bin reports its range on the value axis and its own height."""
+
+        label = self.label(ctx)
+        value_axis = "y" if self.is_horizontal else "x"
+
+        def datum(i: int) -> dict:
+            span = _range_text(ax, value_axis, edges[i], edges[i + 1])
+            count = _scalar(counts[i])
+            if self.is_horizontal:
+                return {"label": label, "x": count, "y": span}
+            return {"label": label, "x": span, "y": count}
+
+        if isinstance(bars, BarContainer):
+            self.register_hover(bars, datum)
+            return
+        # a step outline is one polygon; a picked vertex names its bin
+        (outline,) = bars
+        axis = 1 if self.is_horizontal else 0
+
+        def resolve(index):
+            coordinate = _vertex_coordinate(outline.get_xy(), index, axis)
+            i = int(np.searchsorted(edges, coordinate, side="right")) - 1
+            return datum(min(max(i, 0), len(counts) - 1))
+
+        self.register_hover(outline, resolve)
 
 
 class ScatterLayer(Layer):
@@ -1849,6 +1913,18 @@ class SwarmLayer(GroupLayer):
             values = np.concatenate([v for _, v in groups])
             x, y = (values, centers) if self.is_horizontal else (centers, values)
             collection = ax.scatter(x, y, label=label, **style)
+            categories = np.concatenate(
+                [
+                    np.full(len(v), lbl, dtype=object)
+                    for lbl, (_, v) in zip(members, groups)
+                ]
+            )
+            self.register_hover(
+                collection,
+                _point_resolver(
+                    self.label(ctx), categories, values, self.is_horizontal
+                ),
+            )
             # the category axis spans every group edge to edge, like a box plot
             edges = (
                 collection.sticky_edges.y
@@ -2157,6 +2233,7 @@ class HeatmapLayer(Layer):
         r, g, b = heatmap_style["cmap"](1.0)[:3]
         self.contrast_values = (0.2126 * r + 0.7152 * g + 0.0722 * b) < 0.5
         x, y, self.z = self._grid()
+        self.x_labels, self.y_labels = x, y
         self._label_axes(x, y)
 
     def _grid(self) -> tuple:
@@ -2193,6 +2270,18 @@ class HeatmapLayer(Layer):
             vmax=self.chart.get("vmax", None),
             **self.heatmap_style,
         )
+        label = self.label(ctx)
+
+        def resolve(index):
+            row, col = index
+            return {
+                "label": label,
+                "x": col if self.x_labels is None else self.x_labels[col],
+                "y": row if self.y_labels is None else self.y_labels[row],
+                "value": _scalar(data[row][col]),
+            }
+
+        self.register_hover(im, resolve)
 
         if self.show_heatmap_values:
             valfmt = _value_formatter(valfmt)
@@ -2357,6 +2446,7 @@ class ContourLayer(Layer):
             )
             # a legend proxy: the contour set itself carries no legend handle
             ax.fill_between([], [], [], color=self.cmap(CONTOUR_SWATCH), label=label)
+            self.register_hover(bands, self._level_resolver(bands, label))
             if self.show_colorbars:
                 _draw_colorbar(
                     ax, bands, self.chart.get("colorbar", {}), ctx.aspect_locked
@@ -2380,6 +2470,7 @@ class ContourLayer(Layer):
         lines = ax.contour(
             self.x, self.y, self.z, levels=self.levels, **palette, **style
         )
+        self.register_hover(lines, self._level_resolver(lines, label))
         ax.plot(
             [],
             [],
@@ -2396,6 +2487,20 @@ class ContourLayer(Layer):
             if ctx.emphasis == EMPHASIS_BACKGROUND:
                 label_style["colors"] = self.muted_color
             ax.clabel(lines, **label_style)
+
+    @staticmethod
+    def _level_resolver(contours, label) -> Callable:
+        """A level line reports its level; a filled band the two it lies between."""
+
+        levels = [_scalar(level) for level in contours.levels]
+
+        def resolve(index):
+            i = index[0]
+            if contours.filled:
+                return {"label": label, "level": f"{levels[i]:g} – {levels[i + 1]:g}"}
+            return {"label": label, "level": levels[i]}
+
+        return resolve
 
 
 # the `reduce` attr of a hexbin chart, as the numpy reducer of a hexagon's `c`
@@ -2425,6 +2530,7 @@ class HexbinLayer(Layer):
         self.mincnt = self.chart.get("mincnt")
         # counts need no reducer; `c` defaults to the mean
         self.reduce = None
+        self.value_name = "count"
         if self.c is not None:
             name = self.chart.get("reduce")
             if name is None:
@@ -2435,6 +2541,7 @@ class HexbinLayer(Layer):
                     f"Must be one of {sorted(HEXBIN_REDUCERS)}."
                 )
             self.reduce = HEXBIN_REDUCERS[name]
+            self.value_name = str(name)
 
     def _columns(self) -> tuple:
         """The validated (x, y, c) columns; c is None when absent."""
@@ -2478,6 +2585,19 @@ class HexbinLayer(Layer):
             vmax=self.chart.get("vmax", None),
             **style,
         )
+        label = self.label(ctx)
+
+        def resolve(index):
+            cx, cy = tiles.get_offsets()[index[0]]
+            value = _scalar(tiles.get_array()[index[0]])
+            return {
+                "label": label,
+                "x": _scalar(cx),
+                "y": _scalar(cy),
+                self.value_name: value,
+            }
+
+        self.register_hover(tiles, resolve)
         if self.show_colorbars:
             colorbar = self.chart.get("colorbar", {})
             _draw_colorbar(ax, tiles, colorbar, ctx.aspect_locked)

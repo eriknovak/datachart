@@ -14,9 +14,12 @@ import pytest
 import matplotlib.pyplot as plt
 from matplotlib.backend_bases import MouseEvent
 from matplotlib.backends.backend_agg import FigureCanvasAgg
-from matplotlib.collections import PathCollection
+from matplotlib.collections import PathCollection, PolyCollection
 from matplotlib.container import BarContainer
+from matplotlib.contour import ContourSet
+from matplotlib.image import AxesImage
 from matplotlib.lines import Line2D
+from matplotlib.patches import Polygon
 
 from datachart.charts import (
     LineChart,
@@ -25,7 +28,13 @@ from datachart.charts import (
     Histogram,
     BoxPlot,
     PyramidChart,
+    StackedAreaChart,
+    SwarmPlot,
+    HexbinChart,
+    Heatmap,
+    ContourChart,
 )
+from datachart.constants import HISTOGRAM_TYPE
 from datachart.utils import Panel, Grid
 
 LINE_DATA = [
@@ -116,14 +125,6 @@ class TestHoverSeam:
         targets = _targets(_bar_fig(scaley="log"))
         assert targets[0][1](0)["y"] == 3
 
-    def test_other_layers_register_nothing(self):
-        hist = Histogram(
-            data=[{"x": v} for v in np.random.default_rng(0).normal(size=30)]
-        )
-        box = BoxPlot(data=[{"label": "g", "value": v} for v in range(20)])
-        assert _targets(hist) == []
-        assert _targets(box) == []
-
     def test_composed_figures_register_their_own_targets(self):
         line, bar = _line_fig(), _bar_fig()
         panel = Panel([bar, line])
@@ -141,6 +142,135 @@ class TestHoverSeam:
         panel = Panel([hbar, line])
         resolver = _targets(panel)[2][1]
         assert resolver(1) == {"label": None, "x": 10, "y": 1}
+
+
+GROUP_DATA = [{"label": "A", "value": v} for v in [1, 2, 3, 4, 10]] + [
+    {"label": "B", "value": v} for v in [5, 6, 7]
+]
+
+
+def _vertex_near(collection, x, transpose=False):
+    """The index of the polygon vertex closest to `x` along the band's x axis."""
+    vertices = collection.get_paths()[0].vertices[:, 1 if transpose else 0]
+    return int(np.argmin(np.abs(vertices - x)))
+
+
+class TestCartesianLayers:
+    """Point and bin layers on cartesian axes register their marks."""
+
+    def test_stacked_area_band_reports_own_value_at_nearest_x(self):
+        figure = StackedAreaChart(
+            data=[
+                [{"x": i, "y": i + 1} for i in range(4)],
+                [{"x": i, "y": 10} for i in range(4)],
+            ],
+            subtitle=["low", "high"],
+        )
+        targets = _targets(figure)
+        assert [type(a).__mro__[1] for a, _ in targets] == [PolyCollection] * 2
+        band, resolver = targets[1]
+        assert resolver((0, _vertex_near(band, 2))) == {
+            "label": "high",
+            "x": 2,
+            "y": 10,
+        }
+
+    def test_histogram_bins_report_range_and_count(self):
+        figure = Histogram(
+            data=[{"x": v} for v in [0, 1, 2, 2, 3, 3, 3, 4, 5, 10]],
+            num_bins=5,
+            subtitle="values",
+        )
+        ((bars, resolver),) = _targets(figure)
+        assert isinstance(bars, BarContainer)
+        ax = figure.axes[0]
+        edges = f"{ax.format_xdata(2.0).strip()} – {ax.format_xdata(4.0).strip()}"
+        assert resolver(1) == {"label": "values", "x": edges, "y": 5}
+
+    def test_horizontal_and_stacked_histograms_report_own_heights(self):
+        data = [[{"x": v} for v in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]] * 2
+        stacked = Histogram(
+            data=data, num_bins=5, bar_mode="stack", subtitle=["a", "b"]
+        )
+        assert [r(0)["y"] for _, r in _targets(stacked)] == [2, 2]
+        horizontal = Histogram(
+            data=data[0], num_bins=5, orientation="horizontal", subtitle="a"
+        )
+        ((_, resolver),) = _targets(horizontal)
+        assert resolver(0)["x"] == 2 and "–" in resolver(0)["y"]
+
+    def test_step_histogram_outline_names_the_bin_of_a_vertex(self):
+        figure = Histogram(
+            data=[{"x": v} for v in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
+            num_bins=5,
+            style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
+        )
+        ((outline, resolver),) = _targets(figure)
+        assert isinstance(outline, Polygon)
+        # vertex 3 sits on the second bin's top edge, at x=2..4
+        vertex_x = outline.get_xy()[3][0]
+        assert 2 <= vertex_x <= 4
+        assert resolver(3)["y"] == 2
+
+    def test_swarm_points_report_category_and_value(self):
+        figure = SwarmPlot(data=GROUP_DATA, subtitle="scores")
+        ((points, resolver),) = _targets(figure)
+        assert isinstance(points, PathCollection)
+        assert resolver(4) == {"label": "scores", "x": "A", "y": 10}
+        assert resolver(6) == {"label": "scores", "x": "B", "y": 6}
+        horizontal = SwarmPlot(data=GROUP_DATA, orientation="horizontal")
+        assert _targets(horizontal)[0][1](0) == {"label": None, "x": 1, "y": "A"}
+
+    def test_hexbin_hexagons_report_center_and_count(self):
+        rng = np.random.default_rng(0)
+        figure = HexbinChart(
+            data={"x": rng.random(200), "y": rng.random(200)}, gridsize=4
+        )
+        ((tiles, resolver),) = _targets(figure)
+        assert isinstance(tiles, PolyCollection)
+        datum = resolver((3, 0))
+        cx, cy = tiles.get_offsets()[3]
+        assert datum == {
+            "label": None,
+            "x": cx,
+            "y": cy,
+            "count": int(tiles.get_array()[3]),
+        }
+
+    def test_hexbin_reduced_values_name_the_reducer(self):
+        figure = HexbinChart(
+            data={"x": [0, 0.1, 1, 1.1], "y": [0, 0.1, 1, 1.1], "c": [2, 4, 6, 8]},
+            gridsize=2,
+            reduce="mean",
+        )
+        ((tiles, resolver),) = _targets(figure)
+        assert list(resolver((0, 0))) == ["label", "x", "y", "mean"]
+
+    def test_heatmap_cells_report_labels_and_value(self):
+        figure = Heatmap(
+            data={"x": ["a", "b"], "y": ["p", "q"], "z": [[1, 2], [3, None]]},
+            subtitle="grid",
+        )
+        ((image, resolver),) = _targets(figure)
+        assert isinstance(image, AxesImage)
+        assert resolver((1, 0)) == {"label": "grid", "x": "a", "y": "q", "value": 3}
+        unlabeled = Heatmap(data={"z": [[1, 2], [3, 4]]})
+        assert _targets(unlabeled)[0][1]((0, 1)) == {
+            "label": None,
+            "x": 1,
+            "y": 0,
+            "value": 2,
+        }
+
+    def test_contour_lines_and_bands_report_their_level(self):
+        z = [[0, 1, 4], [1, 2, 5], [4, 5, 8]]
+        lines = ContourChart(data={"z": z}, levels=[1, 3, 5], subtitle="height")
+        ((contours, resolver),) = _targets(lines)
+        assert isinstance(contours, ContourSet)
+        assert resolver((1, 0.4)) == {"label": "height", "level": 3}
+        filled = ContourChart(data={"z": z}, levels=[1, 3, 5], filled=True)
+        ((bands, resolver),) = _targets(filled)
+        assert resolver((0, 2)) == {"label": None, "level": "1 – 3"}
 
 
 class TestHoverText:
@@ -301,6 +431,41 @@ class TestShowInteractive:
         event = MouseEvent("motion_notify_event", old_canvas, px, py)
         old_canvas.callbacks.process("motion_notify_event", event)
         assert first.selections == ()
+
+    def test_band_and_hexagon_hover_pick_by_containment(self):
+        area = StackedAreaChart(
+            data=[
+                [{"x": i, "y": 2} for i in range(4)],
+                [{"x": i, "y": i + 1} for i in range(4)],
+            ],
+            subtitle=["base", "growth"],
+            ylabel="Visits",
+        )
+        _show_interactive(area)
+        # inside the upper band, between x=1 and x=2 but nearer 2
+        texts = _hover(area, area.axes[0], 1.8, 3.5)
+        visits = area.axes[0].format_ydata(3).strip()
+        assert texts == [f"growth\nx: 2\nVisits: {visits}"]
+        rng = np.random.default_rng(1)
+        hexbin = HexbinChart(
+            data={"x": rng.random(300), "y": rng.random(300)}, gridsize=3
+        )
+        _show_interactive(hexbin)
+        ((tiles, _),) = _targets(hexbin)
+        cx, cy = tiles.get_offsets()[4]
+        texts = _hover(hexbin, hexbin.axes[0], cx, cy)
+        ax = hexbin.axes[0]
+        x, y = ax.format_xdata(cx).strip(), ax.format_ydata(cy).strip()
+        assert texts == [f"x: {x}\ny: {y}\ncount: {int(tiles.get_array()[4])}"]
+
+    def test_heatmap_hover_reports_the_cell(self):
+        figure = Heatmap(
+            data={"x": ["a", "b"], "y": ["p", "q"], "z": [[1, 2], [3, 4]]},
+            xlabel="Col",
+            ylabel="Row",
+        )
+        _show_interactive(figure)
+        assert _hover(figure, figure.axes[0], 1, 0) == ["Col: b\nRow: p\nvalue: 2"]
 
     def test_missing_mplcursors_raises_import_error(self, monkeypatch):
         monkeypatch.setitem(sys.modules, "mplcursors", None)

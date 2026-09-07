@@ -16,7 +16,7 @@ import warnings
 import numpy as np
 import matplotlib._constrained_layout as _constrained_layout
 from matplotlib.backends.backend_agg import FigureCanvasAgg
-from matplotlib.collections import PolyCollection
+from matplotlib.collections import PathCollection, PolyCollection
 from matplotlib.figure import Figure
 from matplotlib.layout_engine import ConstrainedLayoutEngine
 from matplotlib.lines import Line2D
@@ -137,13 +137,15 @@ def _extend_pickers() -> None:
     other patch, by the distance to its outline.
     """
 
-    from mplcursors._pick_info import Selection, compute_pick
+    from mplcursors._pick_info import Selection, compute_pick, get_ann_text
 
     fallback = compute_pick.dispatch(object)
     if compute_pick.dispatch(FancyArrowPatch) is fallback:
         compute_pick.register(FancyArrowPatch, compute_pick.dispatch(PathPatch))
     if compute_pick.dispatch(PolyCollection) is not fallback:
         return
+    # the default text is replaced by the datum's; a collection's will do
+    get_ann_text.register(PolyCollection, get_ann_text.dispatch(PathCollection))
 
     @compute_pick.register(PolyCollection)
     def _(artist, event):
