@@ -27,6 +27,7 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_grid_alpha": 0.8,
         "plot_bar_edge_color": "#000000",
         "plot_sankey_node_edge_color": "#000000",
+        "plot_treemap_edge_color": "#000000",
         "plot_bar_edge_width": 0.8,
         "plot_bar_alpha": 1.0,
         "plot_hist_edge_color": "#000000",

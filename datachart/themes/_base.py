@@ -103,6 +103,16 @@ BASE_THEME: StyleAttrs = {
     "plot_sankey_link_color": "source",
     "plot_sankey_link_alpha": 0.4,
     "plot_sankey_label_halo_width": 2,
+    # plot treemap style; the leaf stroke mirrors plot_bar_edge_* (ADR 0028)
+    "plot_treemap_edge_color": "#FFFFFF",
+    "plot_treemap_edge_width": 0.6,
+    "plot_treemap_group_edge_width": 1.0,
+    "plot_treemap_group_pad": 0.01,
+    "plot_treemap_level_shade": 0.35,
+    "plot_treemap_level_font_scale": 0.85,
+    "plot_treemap_min_fontsize": 6,
+    "plot_treemap_highlight_edge_width": 2.0,
+    "plot_treemap_label_halo_width": 2,
     # plot grid style
     "plot_grid_alpha": 0.5,
     "plot_grid_color": "#EAEAEA",

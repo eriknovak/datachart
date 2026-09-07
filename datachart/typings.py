@@ -13,6 +13,8 @@ Classes:
     StackedAreaSingleChartAttrs: The single chart attributes for the stacked area chart.
     SankeySingleChartAttrs: The single chart attributes for the Sankey chart.
     SankeyLinkAttrs: The link record attributes for the Sankey chart.
+    TreemapSingleChartAttrs: The single chart attributes for the treemap.
+    TreemapRecordAttrs: The record attributes for the treemap.
     BarSingleChartAttrs: The single chart attributes for the bar chart.
     BarDataPointAttrs: The data point attributes for the bar chart.
     HistogramSingleChartAttrs: The single chart attributes for the histogram chart.
@@ -49,6 +51,7 @@ Classes:
     LineStyleAttrs: The typing for the line style.
     StackedAreaStyleAttrs: The typing for the stacked area chart style.
     SankeyStyleAttrs: The typing for the Sankey chart style.
+    TreemapStyleAttrs: The typing for the treemap style.
     BarStyleAttrs: The typing for the bar style.
     HistStyleAttrs: The typing for the histogram style.
     VLineStyleAttrs: The typing for the vertical line style.
@@ -99,6 +102,7 @@ from .constants import (
     BASELINE,
     ASPECT_RATIO,
     VALUE_FORMAT,
+    EMPHASIS,
 )
 
 # ================================================
@@ -341,6 +345,33 @@ class SankeyStyleAttrs(TypedDict):
     plot_sankey_link_color: Union[str, None]
     plot_sankey_link_alpha: Union[float, None]
     plot_sankey_label_halo_width: Union[float, None]
+
+
+class TreemapStyleAttrs(TypedDict):
+    """The typing for the treemap style.
+
+    Attributes:
+        plot_treemap_edge_color (Union[str, None]): The leaf tile stroke color.
+        plot_treemap_edge_width (Union[float, None]): The leaf tile stroke width.
+        plot_treemap_group_edge_width (Union[float, None]): The width of the border around a group.
+        plot_treemap_group_pad (Union[float, None]): The gap between groups as a fraction of the span.
+        plot_treemap_level_shade (Union[float, None]): How much lighter than its group a leaf is, 0 to 1; 0 keeps the group color.
+        plot_treemap_level_font_scale (Union[float, None]): The label font scale applied per nesting level.
+        plot_treemap_min_fontsize (Union[float, None]): The smallest font size a label shrinks to before it is dropped.
+        plot_treemap_highlight_edge_width (Union[float, None]): The border width of a highlighted record.
+        plot_treemap_label_halo_width (Union[float, None]): The width of the white halo behind labels; 0 disables it.
+
+    """
+
+    plot_treemap_edge_color: Union[str, None]
+    plot_treemap_edge_width: Union[float, None]
+    plot_treemap_group_edge_width: Union[float, None]
+    plot_treemap_group_pad: Union[float, None]
+    plot_treemap_level_shade: Union[float, None]
+    plot_treemap_level_font_scale: Union[float, None]
+    plot_treemap_min_fontsize: Union[float, None]
+    plot_treemap_highlight_edge_width: Union[float, None]
+    plot_treemap_label_halo_width: Union[float, None]
 
 
 class BarStyleAttrs(TypedDict):
@@ -799,6 +830,7 @@ class StyleAttrs(
     LineStyleAttrs,
     StackedAreaStyleAttrs,
     SankeyStyleAttrs,
+    TreemapStyleAttrs,
     BarStyleAttrs,
     HistStyleAttrs,
     VLineStyleAttrs,
@@ -1146,6 +1178,60 @@ class _SankeyChartAttrs(ChartCommonAttrs):
     charts: Union[SankeySingleChartAttrs, List[SankeySingleChartAttrs]]
     nodes: Union[List[List[str]], None]
     column_labels: Union[List[str], None]
+    show_values: Union[bool, None]
+    value_format: Union[VALUE_FORMAT, str, None]
+
+
+# ================================================
+# Treemap Attributes
+# ================================================
+
+
+class TreemapRecordAttrs(TypedDict):
+    """The record attributes for the treemap.
+
+    Attributes:
+        label (str): The drawn label of the tile or group.
+        value (Union[int, float, None]): The size of the tile; must be greater than 0. A group omits it or carries its children's sum.
+        children (Union[List["TreemapRecordAttrs"], None]): The records of a group, one level only; a child cannot carry children.
+        emphasis (Union[EMPHASIS, str, None]): The emphasis role of the record; a leaf's role overrides its group's.
+
+    """
+
+    label: str
+    value: Union[int, float, None]
+    children: Union[List["TreemapRecordAttrs"], None]
+    emphasis: Union[EMPHASIS, str, None]
+
+
+class TreemapSingleChartAttrs(TypedDict):
+    """The single chart attributes for the treemap.
+
+    Attributes:
+        data (List[TreemapRecordAttrs]): The records to tile.
+        subtitle (Union[str, None]): The subtitle of the chart.
+        style (Union[TreemapStyleAttrs, None]): The style of the chart.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+
+    """
+
+    data: List[TreemapRecordAttrs]
+    subtitle: Union[str, None]
+    style: Union[TreemapStyleAttrs, None]
+    texts: Union[TextAttrs, List[TextAttrs]]
+
+
+class _TreemapChartAttrs(ChartCommonAttrs):
+    """The treemap attributes.
+
+    Attributes:
+        charts (Union[TreemapSingleChartAttrs, List[TreemapSingleChartAttrs]]): The chart definitions.
+        show_values (Union[bool, None]): Whether to write each tile's value under its label.
+        value_format (Union[VALUE_FORMAT, str, None]): The format of the tile values.
+
+    """
+
+    charts: Union[TreemapSingleChartAttrs, List[TreemapSingleChartAttrs]]
     show_values: Union[bool, None]
     value_format: Union[VALUE_FORMAT, str, None]
 

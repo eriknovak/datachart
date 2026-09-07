@@ -359,6 +359,37 @@ def get_sankey_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Treemap Style
+# -------------------------------------
+
+
+def get_treemap_style(chart_style: dict) -> dict:
+    """Get the treemap style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The treemap style setting.
+
+    """
+
+    config_attrs = [
+        ("edgecolor", "plot_treemap_edge_color"),
+        ("linewidth", "plot_treemap_edge_width"),
+        ("group_linewidth", "plot_treemap_group_edge_width"),
+        ("group_pad", "plot_treemap_group_pad"),
+        ("level_shade", "plot_treemap_level_shade"),
+        ("level_font_scale", "plot_treemap_level_font_scale"),
+        ("min_fontsize", "plot_treemap_min_fontsize"),
+        ("highlight_linewidth", "plot_treemap_highlight_edge_width"),
+        ("halo_width", "plot_treemap_label_halo_width"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+# -------------------------------------
 # Grid Style
 # -------------------------------------
 
