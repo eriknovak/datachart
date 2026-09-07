@@ -36,7 +36,7 @@ BASE_THEME: StyleAttrs = {
     "muted_alpha": 0.5,
     # general font style
     "font_general_family": "sans-serif",
-    "font_general_sansserif": ["Helvetica", "Arial"],
+    "font_general_sansserif": ["Helvetica", "Arial", "Liberation Sans"],
     "font_general_serif": None,
     "font_general_color": "#000000",
     "font_general_size": 10,

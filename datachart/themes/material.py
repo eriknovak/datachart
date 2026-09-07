@@ -19,7 +19,7 @@ MATERIAL_THEME: StyleAttrs = make_theme(
             "#4285F4",
             "#1B5FD9",
         ],
-        "font_general_sansserif": ["Roboto", "Arial", "Helvetica"],
+        "font_general_sansserif": ["Roboto", "Arial", "Helvetica", "Liberation Sans"],
         "axes_spines_top_visible": False,
         "axes_spines_right_visible": False,
         "axes_spines_left_visible": False,
