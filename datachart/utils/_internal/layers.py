@@ -4579,6 +4579,32 @@ class Panel:
         }
 
     @staticmethod
+    def snapshot_hover_style() -> dict:
+        """Capture the hover annotation look from the config at render time.
+
+        The popup wears the theme's text annotation style (ADR 0018): the
+        `plot_text_*` font, box, and connector color. Placement, and so the
+        alignment, stays with the cursor; the connector is straight because
+        the popup sits a few points from its mark.
+        """
+
+        text = get_plot_text_style({})
+        text.pop("ha", None)
+        text.pop("va", None)
+        arrow = get_plot_text_arrow_style({})
+        return {
+            **text,
+            "bbox": get_plot_text_box_style({}),
+            "arrowprops": {
+                "arrowstyle": arrow["arrowstyle"],
+                "connectionstyle": "arc3",
+                "color": arrow["color"],
+                "linewidth": arrow["linewidth"],
+                "shrinkB": 0,
+            },
+        }
+
+    @staticmethod
     def snapshot_furniture() -> dict:
         """Capture spine/tick styling from the config at build time."""
 
@@ -4835,6 +4861,7 @@ class Panel:
         figure = ax.figure
         if getattr(figure, "_hover_targets", None) is None:
             figure._hover_targets = []
+            figure._hover_style = self.snapshot_hover_style()
         hover_targets = figure._hover_targets
         group_axes = []
         for group, assignment in zip(self.groups, assignments):

@@ -124,8 +124,9 @@ class DatachartFigure(Figure):
         the GUI window's toolbar already provides zoom and pan. Hovering a
         line point, scatter point, or bar annotates it with the series'
         legend label and one `name: value` line per axis, named after the
-        axis labels when set. Other chart types zoom and pan but show no
-        hover annotation. The optional dependencies come with the
+        axis labels when set; the annotation wears the theme's text
+        annotation style. Other chart types zoom and pan but show no hover
+        annotation. The optional dependencies come with the
         `interactive` extra: `pip install "datachart[interactive]"`.
 
         !!! info "Added in Unreleased"
@@ -188,7 +189,13 @@ class DatachartFigure(Figure):
         nbagg = _import_interactive("ipympl.backend_nbagg")
         _import_interactive("mplcursors")
         if not isinstance(self.canvas, nbagg.Canvas):
-            manager = nbagg.FigureManager(nbagg.Canvas(self), next(_widget_numbers))
+            with warnings.catch_warnings():
+                # ipympl's toolbar trips a traitlets deprecation on init, on
+                # `%matplotlib widget` too (matplotlib/ipympl#488)
+                warnings.filterwarnings(
+                    "ignore", category=DeprecationWarning, module="traitlets"
+                )
+                manager = nbagg.FigureManager(nbagg.Canvas(self), next(_widget_numbers))
         else:
             manager = self.canvas.manager
         self._attach_hover()
@@ -220,7 +227,11 @@ class DatachartFigure(Figure):
             if isinstance(selection.artist, Line2D):
                 selection.annotation.xy = selection.artist.get_xydata()[index]
 
-        cursor = mplcursors.cursor([artist for artist, _ in targets], hover=True)
+        cursor = mplcursors.cursor(
+            [artist for artist, _ in targets],
+            hover=True,
+            annotation_kwargs=getattr(self, "_hover_style", None),
+        )
         cursor.connect("add", annotate)
         self._hover_cursor = cursor
         self._hover_canvas = self.canvas

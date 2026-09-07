@@ -218,6 +218,27 @@ class TestShowInteractive:
         # the grid-level ylabel names the axis the cell left unlabeled
         assert _hover(grid, bar_ax, 0, 0.5)[0].startswith("north\nRegion: A\nValue: ")
 
+    def test_hover_annotation_wears_the_theme_at_build_time(self):
+        from matplotlib.colors import to_hex
+        from datachart.config import config
+        from datachart.constants import THEME
+
+        config.set_theme(THEME.INK)
+        try:
+            ink = _line_fig()
+        finally:
+            config.set_theme(THEME.DEFAULT)
+        default = _line_fig()
+        themed = ((ink, "#000000", "#000000"), (default, "#b4bcc4", "#7f8c8d"))
+        for figure, box_edge, arrow in themed:
+            _show_interactive(figure)
+            _hover(figure, figure.axes[0], 2, 4)
+            annotation = figure._hover_cursor.selections[0].annotation
+            assert to_hex(annotation.get_bbox_patch().get_edgecolor()) == box_edge
+            assert to_hex(annotation.arrow_patch.get_edgecolor()) == arrow
+            assert annotation.get_fontsize() == config["plot_text_size"]
+            assert annotation.get_fontfamily() != ["sans-serif"]
+
     def test_step_line_hover_snaps_to_the_source_point(self):
         figure = LineChart(
             data=LINE_DATA[0],
@@ -311,6 +332,17 @@ class TestShowInteractiveNotebook:
         assert plt.get_fignums() == []
         assert _hover(figure, figure.axes[0], 2, 4) == ["fast\nx: 2\ny: 4"]
 
+    def test_widget_toolbar_deprecation_is_silenced(self, kernel, monkeypatch):
+        import ipympl.backend_nbagg
+
+        pytest.importorskip("ipympl")
+        monkeypatch.setattr(
+            ipympl.backend_nbagg.FigureManager, "show", lambda self: None
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", DeprecationWarning)
+            _line_fig().show(interactive=True)
+
     def test_interactive_show_twice_reuses_the_manager(self, kernel, fake_ipympl):
         figure = _line_fig()
         figure.show(interactive=True)
@@ -326,6 +358,7 @@ class TestShowInteractiveNotebook:
 
     def test_missing_ipympl_raises_import_error(self, kernel, monkeypatch):
         monkeypatch.setitem(sys.modules, "ipympl", None)
+        monkeypatch.setitem(sys.modules, "ipympl.backend_nbagg", None)
         with pytest.raises(ImportError, match=r"ipympl.*datachart\[interactive\]"):
             _line_fig().show(interactive=True)
         assert kernel == []

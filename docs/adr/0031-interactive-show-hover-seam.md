@@ -45,6 +45,11 @@ visible axis labels — without knowing chart types.
   figure's sup-label, else `x`/`y`) and formats values with the axis' own
   coordinate formatter. Twin-axis series therefore report the secondary
   label, and category-axis points the category name.
+- **The annotation wears the theme's text annotation style.** The panel
+  snapshots the `plot_text_*` font, box, and connector color from the config
+  when it first renders into a figure (ADR 0018), so the popup matches the
+  figure it sits on and the theme in force when the figure was built, not
+  when it is shown.
 - **Bars report their own value, never the stack total.** Pyramid sides
   report the value as passed, positive.
 - **A missing dependency raises.** `show(interactive=True)` raises
