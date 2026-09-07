@@ -6,13 +6,16 @@ pyplot's global figure manager. Displaying is explicit via
 `DatachartFigure.show`.
 """
 
+import importlib
 import io
+import itertools
 import warnings
 
 import matplotlib._constrained_layout as _constrained_layout
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
 from matplotlib.layout_engine import ConstrainedLayoutEngine
+from matplotlib.lines import Line2D
 
 
 def _in_notebook_kernel() -> bool:
@@ -27,6 +30,74 @@ def _in_notebook_kernel() -> bool:
     return shell is not None and shell.__class__.__name__ == "ZMQInteractiveShell"
 
 
+def _import_interactive(name: str):
+    """Import an `interactive` extra's package, naming the extra when it is missing."""
+
+    try:
+        return importlib.import_module(name)
+    except ImportError as error:
+        raise ImportError(
+            f"`show(interactive=True)` needs the `{name.split('.')[0]}` package; "
+            'install it with `pip install "datachart[interactive]"`.'
+        ) from error
+
+
+# numbers the widget canvases like pyplot numbers its figures
+_widget_numbers = itertools.count(1)
+
+
+def _axis_name(ax, which: str) -> str:
+    """The visible label of an axis: its own, a shared sibling's, the figure's, or `x`/`y`.
+
+    A twin axes labels only the axis it adds, so the shared one is read off
+    its siblings; a chart figure labels its single plot at the figure level.
+    """
+
+    shared = ax.get_shared_x_axes() if which == "x" else ax.get_shared_y_axes()
+    for candidate in [ax, *shared.get_siblings(ax)]:
+        label = getattr(candidate, f"get_{which}label")().strip()
+        if label:
+            return label
+    sup_label = getattr(ax.figure, f"_sup{which}label", None)
+    if sup_label is not None and sup_label.get_text().strip():
+        return sup_label.get_text().strip()
+    return which
+
+
+def _hover_value(ax, which: str, value) -> str:
+    """Format a datum value like the axis formats its coordinates; text as is."""
+
+    if isinstance(value, str):
+        return value
+    return getattr(ax, f"format_{which}data")(value).strip()
+
+
+def _hover_text(artist, datum: dict) -> str:
+    """The annotation for a datum: legend label, then one `name: value` line per axis."""
+
+    ax = artist.axes if hasattr(artist, "axes") else artist[0].axes
+    label = datum.get("label")
+    lines = [] if label is None or str(label).startswith("_") else [str(label)]
+    for which in ("x", "y"):
+        if which in datum:
+            lines.append(
+                f"{_axis_name(ax, which)}: {_hover_value(ax, which, datum[which])}"
+            )
+    return "\n".join(lines)
+
+
+def _selection_index(index) -> int:
+    """The element index of an mplcursors selection, snapped to the nearest datum.
+
+    Line segments pick a fractional index, step lines an `Index` carrying the
+    source point as `.int`.
+    """
+
+    if hasattr(index, "int"):
+        return index.int
+    return int(round(float(index)))
+
+
 class DatachartFigure(Figure):
     """A figure owned by the caller, never registered with pyplot.
 
@@ -35,7 +106,7 @@ class DatachartFigure(Figure):
     window in scripts.
     """
 
-    def show(self, warn=True):
+    def show(self, warn=True, interactive=False):
         """Display the figure.
 
         Showing is the only way a figure appears: in notebooks the figure is
@@ -43,10 +114,34 @@ class DatachartFigure(Figure):
         pyplot's figure manager and shown via `plt.show()`, so a GUI window
         opens where a backend supports one.
 
+        With `interactive=True` the figure becomes zoomable and pannable and
+        hovering a mark shows its data: in notebooks the figure is displayed
+        on an `ipympl` widget canvas with the matplotlib toolbar, in scripts
+        the GUI window's toolbar already provides zoom and pan. Hovering a
+        line point, scatter point, or bar annotates it with the series'
+        legend label and one `name: value` line per axis, named after the
+        axis labels when set. Other chart types zoom and pan but show no
+        hover annotation. The optional dependencies come with the
+        `interactive` extra: `pip install "datachart[interactive]"`.
+
+        !!! info "Added in Unreleased"
+
+            The `interactive` parameter.
+
         Args:
             warn: If True, warn when the backend cannot open a window.
+            interactive: If True, display the figure with zoom, pan, and
+                hover-to-inspect annotations.
+
+        Raises:
+            ImportError: If `interactive` is True and `ipympl` or
+                `mplcursors` is not installed.
         """
         if _in_notebook_kernel():
+            if interactive:
+                self._show_widget()
+                return
+
             from IPython.display import display
 
             # a raw payload needs no repr hook, pyplot, or IPython
@@ -59,6 +154,10 @@ class DatachartFigure(Figure):
             )
             return
 
+        if interactive:
+            # fail before any pyplot state changes
+            _import_interactive("mplcursors")
+
         import matplotlib.pyplot as plt
 
         if self.canvas is None or self.canvas.manager is None:
@@ -67,10 +166,56 @@ class DatachartFigure(Figure):
             manager = dummy.canvas.manager
             manager.canvas.figure = self
             self.set_canvas(manager.canvas)
+        if interactive:
+            self._attach_hover()
         with warnings.catch_warnings():
             if not warn:
                 warnings.simplefilter("ignore")
             plt.show()
+
+    def _show_widget(self) -> None:
+        """Display the figure on an ipympl widget canvas, with hover attached.
+
+        The canvas and manager are built directly rather than through the
+        backend's factory, so the figure stays unmanaged (ADR 0008): nothing
+        lands in pyplot's registry or in ipympl's post-cell display queue.
+        """
+
+        nbagg = _import_interactive("ipympl.backend_nbagg")
+        _import_interactive("mplcursors")
+        if not isinstance(self.canvas, nbagg.Canvas):
+            manager = nbagg.FigureManager(nbagg.Canvas(self), next(_widget_numbers))
+        else:
+            manager = self.canvas.manager
+        self._attach_hover()
+        manager.show()
+
+    def _attach_hover(self) -> None:
+        """Attach one hover cursor to the current canvas over the registered targets."""
+
+        import mplcursors
+
+        if getattr(self, "_hover_canvas", None) is self.canvas:
+            return
+        targets = getattr(self, "_hover_targets", [])
+        resolvers = {id(artist): resolver for artist, resolver in targets}
+
+        def annotate(selection):
+            resolver = resolvers.get(id(selection.artist))
+            if resolver is None:
+                return
+            index = _selection_index(selection.index)
+            selection.annotation.set_text(
+                _hover_text(selection.artist, resolver(index))
+            )
+            # a pick between two line points snaps to the one it reports
+            if isinstance(selection.artist, Line2D):
+                selection.annotation.xy = selection.artist.get_xydata()[index]
+
+        cursor = mplcursors.cursor([artist for artist, _ in targets], hover=True)
+        cursor.connect("add", annotate)
+        self._hover_cursor = cursor
+        self._hover_canvas = self.canvas
 
 
 def _propagate_nested_margins(layoutgrids) -> None:
