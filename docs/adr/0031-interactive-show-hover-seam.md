@@ -66,7 +66,7 @@ line per field — without knowing chart types.
   | radial line/bar/scatter/histogram | point / wedge | `angle` (category label when categorical), `radius` |
   | sankey               | node / link         | node: `flow`; link: `source`, `target`, `flow`  |
   | treemap              | tile                | `value`                                         |
-  | network              | node / edge         | node: `degree` (weight sum when weighted); edge: `source`, `target`, `weight` |
+  | network              | node / edge         | node: `degree` (`in` / `out` when directed; weight sum when weighted), then `group` and `size` when given; edge: `source`, `target`, `weight` |
 
   Text layers and reference lines decorate and register nothing. Polar axes
   carry no axis labels, so radial fields are shown under their own keys. A

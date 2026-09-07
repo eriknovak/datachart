@@ -4258,14 +4258,27 @@ class NetworkLayer(Layer):
         self.drawn_edges = drawn
         self.pairs = [(index[e["source"]], index[e["target"]]) for e in drawn]
         self.weights = [record.get("weight") for record in drawn]
-        # a node's degree: its edge count, or their weight sum once any edge
-        # carries a weight (an unweighted edge then counts one)
+        # a node's degree (in/out when directed) counts its edges, or sums
+        # their weights once any edge has one (an unweighted edge counts one)
         weighted = any(w is not None for w in self.weights)
-        self.degrees = [0] * len(self.nodes)
+        n = len(self.nodes)
+        incoming, outgoing = [0] * n, [0] * n
         for (i, j), weight in zip(self.pairs, self.weights):
             share = weight if weighted and weight is not None else 1
-            self.degrees[i] += share
-            self.degrees[j] += share
+            outgoing[i] += share
+            incoming[j] += share
+        # the hover datum per node; group and size ride along when given
+        self.node_datums = []
+        for k, node in enumerate(self.nodes):
+            datum = {"label": node["id"] if not node.get("label") else node["label"]}
+            if self.directed:
+                datum.update({"in": incoming[k], "out": outgoing[k]})
+            else:
+                datum["degree"] = incoming[k] + outgoing[k]
+            for key in ("group", "size"):
+                if node.get(key) is not None:
+                    datum[key] = node[key]
+            self.node_datums.append(datum)
         self.groups = [node.get("group") for node in self.nodes]
         # the clusters behind the nodes: only the grouped layout has any
         self.clusters = []
@@ -4474,13 +4487,7 @@ class NetworkLayer(Layer):
             zorder=3,
             gid="nodes",
         )
-        names = [
-            node["id"] if not node.get("label") else node["label"]
-            for node in self.nodes
-        ]
-        self.register_hover(
-            points, lambda k: {"label": names[k], "degree": self.degrees[k]}
-        )
+        self.register_hover(points, lambda k: self.node_datums[k])
 
         for k, node in enumerate(self.nodes):
             label = node.get("label")

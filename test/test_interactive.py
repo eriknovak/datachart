@@ -385,6 +385,26 @@ class TestAggregateLayers:
         assert edges[0](0) == {"label": None, "source": "a", "target": "b", "weight": 2}
         assert node_resolver(0) == {"label": "a", "degree": 5}
         assert node_resolver(1) == {"label": "b", "degree": 2}
+        directed = NetworkChart(
+            data={
+                "nodes": [
+                    {"id": "a", "group": "core", "size": 40},
+                    {"id": "b", "group": "core"},
+                    {"id": "c"},
+                ],
+                "edges": [
+                    {"source": "a", "target": "b", "weight": 2},
+                    {"source": "c", "target": "a", "weight": 3},
+                    {"source": "a", "target": "c", "weight": 1},
+                ],
+            },
+            directed=True,
+        )
+        node = [r for a, r in _targets(directed) if isinstance(a, PathCollection)][0]
+        # a directed node splits its degree; group and size ride along when given
+        assert node(0) == {"label": "a", "in": 3, "out": 3, "group": "core", "size": 40}
+        assert node(1) == {"label": "b", "in": 2, "out": 0, "group": "core"}
+        assert node(2) == {"label": "c", "in": 1, "out": 3}
         unweighted = NetworkChart(
             data={
                 "nodes": [{"id": "a", "label": "Alpha"}, {"id": "b"}, {"id": "c"}],
