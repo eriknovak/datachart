@@ -31,7 +31,7 @@ Treemap(
     value_format=Optional[str],                         # The format of the values, a VALUE_FORMAT constant or a format string
     show_legend=Optional[bool],                         # Whether to list the top-level records in a legend
     style={                                             # The style of the chart (optional; a list for multiple charts)
-        "plot_treemap_edge_color":           Optional[str],    # The stroke color between tiles
+        "plot_treemap_edge_color":           Optional[str],    # The stroke color between tiles and around groups
         "plot_treemap_edge_width":           Optional[float],  # The stroke width between tiles (0.6 by default)
         "plot_treemap_group_edge_width":     Optional[float],  # The border width around a group (1 by default)
         "plot_treemap_group_pad":            Optional[float],  # The gap between groups as a fraction of the span (0.01 by default)
@@ -198,7 +198,7 @@ Treemap(
 
 ### Tile style
 
-To change the tile style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.TreemapStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TreemapStyleAttrs) typing. `plot_treemap_group_pad` is the gap between groups as a fraction of the drawing, while tiles inside a group are separated by a stroke only, drawn in `plot_treemap_edge_color` at `plot_treemap_edge_width`; `plot_treemap_group_edge_width` draws the border around a group. `plot_treemap_level_shade` says how much lighter than the group its tiles are, from `0` (the group color) to `1` (white). Tile labels shrink by `plot_treemap_level_font_scale` per nesting level and down to `plot_treemap_min_fontsize` before they are dropped; every label sits behind a white halo of `plot_treemap_label_halo_width`, and `0` drops it.
+To change the tile style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.TreemapStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TreemapStyleAttrs) typing. `plot_treemap_group_pad` is the gap between groups as a fraction of the drawing, while tiles inside a group are separated by a stroke only, drawn in `plot_treemap_edge_color` at `plot_treemap_edge_width`; `plot_treemap_group_edge_width` draws the border around a group in the same color. `plot_treemap_level_shade` says how much lighter than the group its tiles are, from `0` (the group color) to `1` (white). Tile labels shrink by `plot_treemap_level_font_scale` per nesting level and down to `plot_treemap_min_fontsize` before they are dropped; every label sits behind a white halo of `plot_treemap_label_halo_width`, and `0` drops it.
 
 The example widens the gap between the continents, keeps the countries closer to the continent color, and drops the halo.
 

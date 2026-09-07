@@ -33,6 +33,8 @@ StackedAreaChart(
         "plot_area_zorder":         Optional[int],      # The zorder of the band
         "plot_stackedarea_alpha":   Optional[float],    # The alpha of the band (0.8 by default)
         "plot_stackedarea_outline": Optional[bool],     # Whether to draw the top edge of the band as a line (False by default)
+        "plot_stackedarea_edge_color": Optional[str],    # The stroke color between the bands
+        "plot_stackedarea_edge_width": Optional[float],  # The stroke width between the bands (0.6 by default)
         "plot_line_color":          Optional[str],      # The outline color
         "plot_line_width":          Optional[float],    # The outline width
         "plot_line_style":          Optional[str],      # The outline style
@@ -198,7 +200,7 @@ StackedAreaChart(
 
 ### Band style
 
-To change the band style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.StackedAreaStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StackedAreaStyleAttrs) typing: the fill takes the `plot_area_*` color, hatch and zorder, its alpha comes from `plot_stackedarea_alpha`, and `plot_stackedarea_outline` draws the top edge of every band as a line in the `plot_line_*` style. A single dictionary applies to every series; a list, aligned with `data`, styles each on its own. The example groups the fossil sources in warm colors and the low-carbon ones in cool colors, with outlines to separate the bands.
+To change the band style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.StackedAreaStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StackedAreaStyleAttrs) typing: the fill takes the `plot_area_*` color, hatch and zorder, its alpha comes from `plot_stackedarea_alpha`, the bands are separated by a stroke in `plot_stackedarea_edge_color` at `plot_stackedarea_edge_width`, and `plot_stackedarea_outline` draws the top edge of every band as a line in the `plot_line_*` style. A single dictionary applies to every series; a list, aligned with `data`, styles each on its own. The example groups the fossil sources in warm colors and the low-carbon ones in cool colors, with outlines to separate the bands.
 
 ```
 FOSSIL, CLEAN = "#C8553D", "#2E86AB"

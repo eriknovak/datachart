@@ -44,6 +44,7 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         ],
         "plot_bar_edge_width": 0.8,
         "plot_bar_edge_color": "#000000",
+        "plot_stackedarea_edge_color": "#000000",
         "plot_sankey_node_edge_color": "#000000",
         "plot_treemap_edge_color": "#000000",
         "plot_network_node_edge_color": "#000000",
@@ -90,6 +91,7 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_grid_color": "#DDE3E8",
         "plot_bar_edge_width": 1.0,
         "plot_bar_edge_color": "#0B1F44",
+        "plot_stackedarea_edge_color": "#0B1F44",
         "plot_sankey_node_edge_color": "#0B1F44",
         "plot_treemap_edge_color": "#0B1F44",
         "plot_network_node_edge_color": "#0B1F44",
@@ -114,7 +116,6 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_box_edgecolor": "#34495E",
         "plot_box_median_color": "#34495E",
         "plot_violin_edgecolor": "#34495E",
-        "plot_violin_inner_color": "#34495E",
     }
 )
 ```
@@ -154,6 +155,7 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_grid_linestyle": LINE_STYLE.DOTTED,
         "plot_grid_alpha": 0.8,
         "plot_bar_edge_color": "#000000",
+        "plot_stackedarea_edge_color": "#000000",
         "plot_sankey_node_edge_color": "#000000",
         "plot_treemap_edge_color": "#000000",
         "plot_network_node_edge_color": "#000000",
@@ -208,6 +210,7 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "plot_grid_alpha": 1.0,
         "plot_bar_alpha": 1.0,
         "plot_bar_edge_width": 0,
+        "plot_stackedarea_edge_width": 0,
         "plot_bar_value_fontsize": 9,
         "plot_bar_value_color": "#1F1F1F",
         "plot_hist_edge_width": 0,
@@ -260,6 +263,7 @@ MATERIAL_THEME: StyleAttrs = make_theme(
         "plot_grid_linewidth": 0.8,
         "plot_bar_alpha": 1.0,
         "plot_bar_edge_width": 0,
+        "plot_stackedarea_edge_width": 0,
         "plot_hist_edge_width": 0,
         "plot_line_width": 2.0,
         "plot_text_box_edgecolor": "#757575",
@@ -303,13 +307,13 @@ SKETCH_THEME: StyleAttrs = make_theme(
         "chart_default_show_grid": None,
         "plot_line_width": 2.5,
         "plot_bar_alpha": 1.0,
-        "plot_bar_edge_width": 1.6,
-        "plot_hist_edge_width": 1.6,
+        "plot_bar_edge_width": 1.0,
+        "plot_hist_edge_width": 1.0,
         "plot_scatter_edge_color": "#222222",
         "plot_heatmap_cmap": COLORS.Blues,
         "plot_treemap_group_edge_width": 0,
         "plot_sketch_params": (0.5, 100, 2),
-        "plot_sketch_halo_width": 4,
+        "plot_sketch_halo_width": 1.5,
     }
 )
 ```

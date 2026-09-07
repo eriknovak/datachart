@@ -12887,9 +12887,10 @@ per-chart hatch style wins. <code>None</code> disables the cycle.</p>
 
 
         <p>The typing for the sketch attributes: the theme's render-scoped rc-level
-look (path wobble, halo stroke). The panel snapshots both at build time and
-applies them inside a scoped matplotlib rc context, so no global rc setting
-changes; composition keeps the look of the figures it was built from.</p>
+look (path wobble, halo stroke). The panel snapshots the wobble at build
+time and applies it inside a scoped matplotlib rc context, so no global rc
+setting changes; the halo resolves like any style key, so a chart's <code>style</code>
+can override it. Composition keeps the look of the figures it was built from.</p>
 <div class="admonition info">
 <p class="admonition-title">Added in v0.9.1</p>
 </div>
@@ -12923,9 +12924,10 @@ wobble as matplotlib sketch parameters <code>(scale, length, randomness)</code>;
             <td><code><span title="datachart.typings.SketchStyleAttrs.plot_sketch_halo_width">plot_sketch_halo_width</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The width of the white halo
-stroked under the lines, so crossing lines read as cut-outs; text
-and patches stay clean. <code>None</code> draws no halo.</p>
+                <p>The extra width, added to
+the line width, of the white halo stroked under series lines (line,
+radial, regression), so crossing lines read as cut-outs; marks, text
+and patches stay clean. <code>None</code> or <code>0</code> draws no halo.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
