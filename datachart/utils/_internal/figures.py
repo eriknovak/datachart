@@ -133,8 +133,8 @@ def _extend_pickers() -> None:
     has no implementation, so an upstream one wins once it exists. A filled
     polygon collection (a stacked band, a violin body, a hexagon) is picked
     by matplotlib's containment test, reporting the polygon and its vertex
-    nearest the pointer; an arrow patch (a network edge) is picked like any
-    other patch, by the distance to its outline.
+    nearest the pointer at that vertex's distance; an arrow patch (a network
+    edge) is picked like any other patch, by the distance to its outline.
     """
 
     from mplcursors._pick_info import Selection, compute_pick, get_ann_text
@@ -159,9 +159,17 @@ def _extend_pickers() -> None:
         if len(offsets):
             offset = offsets[polygon % len(offsets)]
             vertices = vertices + artist.get_offset_transform().transform(offset)
-        vertex = int(np.nanargmin(np.hypot(*(vertices - [event.x, event.y]).T)))
+        distances = np.hypot(*(vertices - [event.x, event.y]).T)
+        vertex = int(np.nanargmin(distances))
+        # the distance to the outline, so a point or line drawn over the
+        # polygon still wins the pick when the pointer is on it
         return Selection(
-            artist, (event.xdata, event.ydata), (polygon, vertex), 0, None, None
+            artist,
+            (event.xdata, event.ydata),
+            (polygon, vertex),
+            distances[vertex],
+            None,
+            None,
         )
 
 

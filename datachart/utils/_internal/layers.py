@@ -767,6 +767,17 @@ class Layer:
 
         self._hover_targets.append((artist, resolver))
 
+    def register_patch_hover(self, marks: list) -> None:
+        """Make loose `(patch, datum)` pairs one hover target picked by containment.
+
+        mplcursors picks a lone patch by the distance to its outline, but a
+        container's patches by containment — what a filled mark wants.
+        """
+
+        self.register_hover(
+            BarContainer([patch for patch, _ in marks]), lambda i: marks[i][1]
+        )
+
     def take_hover_targets(self) -> list:
         """Hand over the pairs registered by the last draw and forget them."""
 
@@ -843,11 +854,16 @@ def _scalar(value):
     return value.item() if isinstance(value, np.generic) else value
 
 
-def _range_text(ax: plt.Axes, which: str, low, high) -> str:
-    """A `low – high` span formatted like the axis formats its coordinates."""
+def _span_text(low, high, fmt=lambda value: f"{value:g}") -> str:
+    """A `low – high` span, each end formatted by `fmt`."""
 
-    fmt = getattr(ax, f"format_{which}data")
     return f"{fmt(low).strip()} – {fmt(high).strip()}"
+
+
+def _axis_formatter(ax: plt.Axes, which: str) -> Callable:
+    """The formatter the axis uses for its own coordinates."""
+
+    return getattr(ax, f"format_{which}data")
 
 
 def _nearest(positions, coordinate) -> int:
@@ -1273,7 +1289,7 @@ class HistogramLayer(Layer):
         value_axis = "y" if self.is_horizontal else "x"
 
         def datum(i: int) -> dict:
-            span = _range_text(ax, value_axis, edges[i], edges[i + 1])
+            span = _span_text(edges[i], edges[i + 1], _axis_formatter(ax, value_axis))
             count = _scalar(counts[i])
             # matplotlib bins into floats; a plain count reads as a whole number
             if not self.show_density and float(count).is_integer():
@@ -1729,11 +1745,12 @@ class BoxLayer(GroupLayer):
         if self.side:
             self._clip_to_side(bp, positions)
         self._apply_box_emphasis(bp, self._group_roles(labels, ctx.emphasis))
-        # a container picks its patches by containment; each box reports its group
         label = self.label(ctx)
-        self.register_hover(
-            BarContainer(bp["boxes"]),
-            lambda i: self.summary_datum(label, labels[i], values[i]),
+        self.register_patch_hover(
+            [
+                (box, self.summary_datum(label, lbl, vals))
+                for box, lbl, vals in zip(bp["boxes"], labels, values)
+            ]
         )
 
     def _clip_to_side(self, bp: dict, positions: list) -> None:
@@ -2526,7 +2543,7 @@ class ContourLayer(Layer):
         def resolve(index):
             i = index[0]
             if contours.filled:
-                return {"label": label, "level": f"{levels[i]:g} – {levels[i + 1]:g}"}
+                return {"label": label, "level": _span_text(levels[i], levels[i + 1])}
             return {"label": label, "level": levels[i]}
 
         return resolve
@@ -3019,8 +3036,11 @@ def _radial_theta(n: int) -> np.ndarray:
 
 
 def _radial_resolver(label, angles, radii) -> Callable[[int], dict]:
-    """The hover resolver of radial marks; polar axes carry no axis labels, so
-    the fields keep their own keys. Indices wrap, for a closed line's repeat."""
+    """The hover resolver of radial marks: `angle` and `radius` under their own keys.
+
+    Polar axes carry no axis labels to name the fields off. Indices wrap, for
+    a closed line's repeated first point.
+    """
 
     def resolve(index: int) -> dict:
         i = int(index) % len(radii)
@@ -3269,7 +3289,10 @@ class RadialHistogramLayer(RadialLayer):
             label=self.label(ctx),
             **hist_style,
         )
-        spans = [f"{lo:g}° – {hi:g}°" for lo, hi in zip(edges[:-1], edges[1:])]
+        spans = [
+            _span_text(lo, hi, lambda value: f"{value:g}°")
+            for lo, hi in zip(edges[:-1], edges[1:])
+        ]
         self.register_hover(bars, _radial_resolver(self.label(ctx), spans, counts))
 
 
@@ -3489,7 +3512,7 @@ class SankeyLayer(Layer):
         style = self.sankey_style
         node_width = style["node_width"]
         geometry, scale, size = self._geometry()
-        # the (patch, datum) of every node bar and ribbon, for the hover containers
+        # the (patch, datum) of every node bar and ribbon, for the hover targets
         node_marks, link_marks = [], []
         halo = style.get("halo_width") or 0
         # the axes limits are fixed before any text so box estimates use them
@@ -3652,10 +3675,8 @@ class SankeyLayer(Layer):
                 **self.value_style,
             )
 
-        for marks in (node_marks, link_marks):
-            self.register_hover(
-                BarContainer([patch for patch, _ in marks]), lambda i, m=marks: m[i][1]
-            )
+        self.register_patch_hover(node_marks)
+        self.register_patch_hover(link_marks)
         ax.axis("off")
 
 
@@ -3841,11 +3862,8 @@ class TreemapLayer(Layer):
                 self._draw_tile(ax, record, box, color, role, 0, frame)
             else:
                 self._draw_group(ax, record, box, color, role, frame)
-        # a container picks its patches by containment; tiles and bands never overlap
-        marks = frame.marks
-        self.register_hover(
-            BarContainer([patch for patch, _ in marks]), lambda i: marks[i][1]
-        )
+        # tiles and bands never overlap, so one containment pick names one
+        self.register_patch_hover(frame.marks)
 
     def _draw_group(self, ax, record, box, color, role, frame):
         style = self.treemap_style

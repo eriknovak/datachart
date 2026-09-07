@@ -675,6 +675,16 @@ class TestShowInteractive:
             "wind\nangle: E\nradius: 10"
         ]
 
+    def test_line_over_a_band_wins_the_pick_on_its_point(self):
+        area = StackedAreaChart(
+            data=[{"x": i, "y": 10} for i in range(4)], subtitle="band"
+        )
+        line = LineChart(data=[{"x": i, "y": 5} for i in range(4)], subtitle="line")
+        panel = Panel([area, line])
+        _show_interactive(panel)
+        assert _hover(panel, panel.axes[0], 2, 5)[0].startswith("line\n")
+        assert _hover(panel, panel.axes[0], 2.5, 8)[0].startswith("band\n")
+
     def test_heatmap_hover_reports_the_cell(self):
         figure = Heatmap(
             data={"x": ["a", "b"], "y": ["p", "q"], "z": [[1, 2], [3, 4]]},
