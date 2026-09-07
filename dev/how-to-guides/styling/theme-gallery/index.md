@@ -18,11 +18,18 @@ The small-multiples example is itself a `Grid`; grid figures nest inside `Grid`,
 
 The sample data shared by every theme suite is defined in a hidden cell.
 
-The whole suite is built by one function (in a hidden cell), so every theme renders the exact same chart code — grids, value labels, and hatches come from the theme's own defaults. `pair` supplies the two accent colors used where a chart styles lines explicitly (trend/forecast/walk examples). Intermediate figures that only exist to feed a `Panel` are closed as we go, so only the group grids are displayed. The small-multiples `Grid` nests as one composition cell and rebuilds its own layout there; the nested charts on the block's edges keep their y-axes inline with the gallery column's axes.
+Each theme section opens with the one call that selects it; the whole suite is then built by one function (in a hidden cell), so every theme renders the exact same chart code — grids, value labels, and hatches come from the theme's own defaults. `pair` supplies the two accent colors used where a chart styles lines explicitly (trend/forecast/walk examples). Intermediate figures that only exist to feed a `Panel` are closed as we go, so only the group grids are displayed. The small-multiples `Grid` nests as one composition cell and rebuilds its own layout there; the nested charts on the block's edges keep their y-axes inline with the gallery column's axes.
 
 ## Default
 
 The modernized default: Tableau-style palette, white bar edges, open spines, soft y-grid from the theme default.
+
+```
+from datachart.config import config
+from datachart.constants import THEME
+
+config.set_theme(THEME.DEFAULT)
+```
 
 ### Trends and Comparisons
 
@@ -40,6 +47,13 @@ The modernized default: Tableau-style palette, white bar edges, open spines, sof
 
 Monochrome and print-friendly, with the same open spines and muted grid treatment.
 
+```
+from datachart.config import config
+from datachart.constants import THEME
+
+config.set_theme(THEME.GREYSCALE)
+```
+
 ### Trends and Comparisons
 
 ### Distributions
@@ -55,6 +69,13 @@ Monochrome and print-friendly, with the same open spines and muted grid treatmen
 ## Ink
 
 The diversified YlGnBu palette (`COLORS.PaperYlGnBu`) with navy ink edges, print-ready.
+
+```
+from datachart.config import config
+from datachart.constants import THEME
+
+config.set_theme(THEME.INK)
+```
 
 ### Trends and Comparisons
 
@@ -72,6 +93,13 @@ The diversified YlGnBu palette (`COLORS.PaperYlGnBu`) with navy ink edges, print
 
 Accent blue with deep grays, no spines or tick marks, flat bars — and bar value labels on by default.
 
+```
+from datachart.config import config
+from datachart.constants import THEME
+
+config.set_theme(THEME.MINIMAL)
+```
+
 ### Trends and Comparisons
 
 ### Distributions
@@ -87,6 +115,13 @@ Accent blue with deep grays, no spines or tick marks, flat bars — and bar valu
 ## Material
 
 The Google palette with a bottom spine only and a light solid grid; value labels default to on.
+
+```
+from datachart.config import config
+from datachart.constants import THEME
+
+config.set_theme(THEME.MATERIAL)
+```
 
 ### Trends and Comparisons
 
@@ -104,6 +139,13 @@ The Google palette with a bottom spine only and a light solid grid; value labels
 
 Black edges, dotted grid — and the hatch cycle (`""`, `"//"`, `".."`) applied per bar series, so grouped bars stay distinguishable in black-and-white print.
 
+```
+from datachart.config import config
+from datachart.constants import THEME
+
+config.set_theme(THEME.HATCH)
+```
+
 ### Trends and Comparisons
 
 ### Distributions
@@ -119,6 +161,13 @@ Black edges, dotted grid — and the hatch cycle (`""`, `"//"`, `".."`) applied 
 ## Sketch
 
 Hand-drawn: wobbled paths, lines cut out by a white halo, thick spines and lines, no grid, and the bundled Comic Neue font, so the look is the same on every machine. The wobble and halo are theme attributes the panel applies at render time, so nothing changes in matplotlib's global settings.
+
+```
+from datachart.config import config
+from datachart.constants import THEME
+
+config.set_theme(THEME.SKETCH)
+```
 
 ### Trends and Comparisons
 
