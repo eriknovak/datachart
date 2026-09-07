@@ -14,7 +14,7 @@ import warnings
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import cycle as iter_cycle
-from typing import List, NamedTuple, Optional, Union
+from typing import Callable, List, NamedTuple, Optional, Union
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -706,6 +706,8 @@ class Layer:
 
     def __init__(self, chart: dict, settings: dict):
         self.chart = chart
+        # (artist, resolver) pairs registered by the draw in progress (ADR 0031)
+        self._hover_targets = []
         self.settings = settings
         self.subtitle = chart.get("subtitle", None)
         self.style = chart.get("style", {}) or {}
@@ -752,6 +754,23 @@ class Layer:
     def draw(self, ax: plt.Axes, ctx: DrawContext) -> None:
         raise NotImplementedError
 
+    def register_hover(self, artist, resolver: Callable[[int], dict]) -> None:
+        """Make `artist` a hover target: `resolver(i)` is the datum behind its i-th element.
+
+        The datum is a dict with the series' legend `label` and one entry per
+        drawn axis (`x`, `y`), so `show(interactive=True)` can annotate it
+        without knowing the chart type. Called from `draw`; the panel
+        collects the pairs right after.
+        """
+
+        self._hover_targets.append((artist, resolver))
+
+    def take_hover_targets(self) -> list:
+        """Hand over the pairs registered by the last draw and forget them."""
+
+        targets, self._hover_targets = self._hover_targets, []
+        return targets
+
     def y_range(self) -> Optional[tuple]:
         """The (min, max) of the layer's y data, used for axis clustering."""
         return None
@@ -797,6 +816,29 @@ class Layer:
                 style[width_key] = width * MUTED_WIDTH_SCALE
         elif width is not None:
             style[width_key] = width * HIGHLIGHT_WIDTH_SCALE
+
+
+def _point_resolver(label, x, y, transpose: bool) -> Callable[[int], dict]:
+    """The hover resolver of a point series drawn from `x` and `y` arrays.
+
+    The datum names the *drawn* axes: a transposed series (horizontal panel
+    or bars) reports its `x` values under `y` and vice versa, so the axis
+    labels on the artist's axes always describe the values.
+    """
+
+    def resolve(index: int) -> dict:
+        x_val, y_val = _scalar(x[index]), _scalar(y[index])
+        if transpose:
+            x_val, y_val = y_val, x_val
+        return {"label": label, "x": x_val, "y": y_val}
+
+    return resolve
+
+
+def _scalar(value):
+    """A plain Python scalar for a numpy element; anything else as is."""
+
+    return value.item() if isinstance(value, np.generic) else value
 
 
 def _column_range(chart: dict, attr: str) -> Optional[tuple]:
@@ -854,7 +896,8 @@ class LineLayer(Layer):
         if draw_yerr:
             fill(x, y - yerr, y + yerr, **self._resolved_area_style(ctx))
 
-        plot(x, y, **line_style, label=self.label(ctx))
+        (line,) = plot(x, y, **line_style, label=self.label(ctx))
+        self.register_hover(line, _point_resolver(self.label(ctx), x, y, ctx.transpose))
 
         if self.show_area:
             drawstyle = line_style.get("drawstyle", "")
@@ -1073,6 +1116,17 @@ class BarLayer(Layer):
             label=self.label(ctx),
             **error_range,
             **bar_style,
+        )
+        # each bar reports its own value, never the stack total; a pyramid
+        # side draws negative values, so they read as passed, like the labels
+        self.register_hover(
+            bars,
+            _point_resolver(
+                self.label(ctx),
+                labels,
+                np.abs(y) if self.is_pyramid else y,
+                self.is_horizontal,
+            ),
         )
 
         if self.show_values:
@@ -1363,6 +1417,10 @@ class ScatterLayer(Layer):
                     **group_style,
                 )
                 self._mark_legend_size(collection, size_data)
+                self.register_hover(
+                    collection,
+                    _point_resolver(label, x_data[mask], y_data[mask], ctx.transpose),
+                )
                 self._record_points(
                     ax,
                     ctx,
@@ -1388,6 +1446,10 @@ class ScatterLayer(Layer):
                 x_data, y_data, s=sizes, label=self.label(ctx), **base_style
             )
             self._mark_legend_size(collection, size_data)
+            self.register_hover(
+                collection,
+                _point_resolver(self.label(ctx), x_data, y_data, ctx.transpose),
+            )
             self._record_points(ax, ctx, x_data, y_data, sizes, labels)
 
             color = base_style.get("c", base_style.get("color"))
@@ -4643,6 +4705,32 @@ class Panel:
         }
 
     @staticmethod
+    def snapshot_hover_style() -> dict:
+        """Capture the hover annotation look from the config at render time.
+
+        The popup wears the theme's text annotation style (ADR 0018): the
+        `plot_text_*` font, box, and connector color. Placement, and so the
+        alignment, stays with the cursor; the connector is straight because
+        the popup sits a few points from its mark.
+        """
+
+        text = get_plot_text_style({})
+        text.pop("ha", None)
+        text.pop("va", None)
+        arrow = get_plot_text_arrow_style({})
+        return {
+            **text,
+            "bbox": get_plot_text_box_style({}),
+            "arrowprops": {
+                "arrowstyle": arrow["arrowstyle"],
+                "connectionstyle": "arc3",
+                "color": arrow["color"],
+                "linewidth": arrow["linewidth"],
+                "shrinkB": 0,
+            },
+        }
+
+    @staticmethod
     def snapshot_furniture() -> dict:
         """Capture spine/tick styling from the config at build time."""
 
@@ -4894,6 +4982,13 @@ class Panel:
         parallel_stats = compute_parallel_stats(parallel_layers)
         parallel_axes_owner = parallel_layers[-1] if parallel_layers else None
 
+        # hover targets ride on the figure drawn into, not on the layers a
+        # source figure shares with every composition of it (ADR 0031)
+        figure = ax.figure
+        if getattr(figure, "_hover_targets", None) is None:
+            figure._hover_targets = []
+            figure._hover_style = self.snapshot_hover_style()
+        hover_targets = figure._hover_targets
         group_axes = []
         for group, assignment in zip(self.groups, assignments):
             target_ax = ax_right if assignment == "right" else ax
@@ -4958,6 +5053,7 @@ class Panel:
                     aspect_locked=aspect_locked,
                 )
                 layer.draw(target_ax, ctx)
+                hover_targets.extend(layer.take_hover_targets())
 
         if category_index:
             self._apply_category_ticks(ax, category_index, group_layers, horizontal)

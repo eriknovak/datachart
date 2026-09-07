@@ -175,6 +175,9 @@ With [uv]:
 uv add datachart
 ```
 
+For zoom, pan, and hover-to-inspect via `figure.show(interactive=True)`,
+add the `interactive` extra: `pip install "datachart[interactive]"`.
+
 ## Using with LLMs
 
 The documentation is available in LLM-friendly formats:

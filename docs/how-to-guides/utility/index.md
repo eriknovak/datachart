@@ -13,3 +13,4 @@ These include:
 - The `texts` chart parameter and the [datachart.utils.Annotate](../../references/utils/index.md#datachart.utils.Annotate) function for attaching text annotations to charts and finished figures, as illustrated in the [text annotations](annotations.ipynb) section.
 - The [datachart.utils.stats](../../references/utils/stats.md) module for statistical calculations, as illustrated in the [stats](stats.ipynb) section.
 - The [datachart.utils.save_figure](../../references/utils/index.md#datachart.utils.save_figure) function for saving figures into files, as showcased in the [charts](../charts/index.md) section.
+- The `interactive` flag of every figure's `show()` method for zooming, panning, and hovering over the marks, as described in the [interactive figures](interactive.md) section.

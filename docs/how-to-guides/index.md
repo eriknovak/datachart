@@ -9,5 +9,5 @@ The how-to guides showcase how to utilize the `datachart` package: creating char
 | Section                                          | Description                                                                            |
 | :----------------------------------------------- | :------------------------------------------------------------------------------------- |
 | [charts](charts/index.md)                        | Showcases the creation and customization of charts available in the `charts` module.   |
-| [composition & utilities](utility/index.md)      | Composing figures with `Panel` and `Grid`, plus the statistics and saving utilities.   |
+| [composition & utilities](utility/index.md)      | Composing figures with `Panel` and `Grid`, statistics, saving, and interactive figures. |
 | [styling](styling/index.md)                      | Configuring the global style, applying and creating themes, emphasis, and colormaps.   |

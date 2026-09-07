@@ -143,11 +143,12 @@ plugins:
           - how-to-guides/charts/treemap.ipynb: Treemap input attributes, the records data contract with one level of children, tile values, per-record emphasis, the group legend, tile style, text annotations, subplots, composing with Grid, and saving.
           - how-to-guides/charts/parallelcoords.ipynb: Parallel coordinates input attributes and customization for multivariate data.
         Composition & Utilities:
-          - how-to-guides/utility/index.md: Map of Panel, Grid, statistics, and figure saving.
+          - how-to-guides/utility/index.md: Map of Panel, Grid, statistics, figure saving, and interactive figures.
           - how-to-guides/utility/panel.ipynb: "Overlaying multiple charts on one plot with Panel: dual y-axes, z-order, emphasis, and nesting panels."
           - how-to-guides/utility/grid.ipynb: Arranging multiple charts in a grid layout with Grid, including nested rows and layout specs.
           - how-to-guides/utility/annotations.ipynb: "Text annotations on any chart: placement and coordinates, connector looks, text and box styling, and annotating finished figures with Annotate."
           - how-to-guides/utility/stats.ipynb: Statistical utilities for preparing chart data.
+          - how-to-guides/utility/interactive.md: "Zooming, panning, and hovering over marks with show(interactive=True): the interactive extra, notebook and script behavior, and the chart types with hover support."
         Styling:
           - how-to-guides/styling/index.md: Map of configuration, themes, emphasis, and colormaps.
           - how-to-guides/styling/config.ipynb: "Customizing the global style via the config singleton: set_theme, update_config, reset_config."
@@ -221,6 +222,7 @@ nav:
       - Grid: how-to-guides/utility/grid.ipynb
       - Text Annotations: how-to-guides/utility/annotations.ipynb
       - Statistics: how-to-guides/utility/stats.ipynb
+      - Interactive Figures: how-to-guides/utility/interactive.md
     - Styling:
       - how-to-guides/styling/index.md
       - Config: how-to-guides/styling/config.ipynb
