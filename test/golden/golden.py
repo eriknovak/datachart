@@ -181,6 +181,9 @@ EXPECTED_CHANGES = {
     "network_straight",
     "network_circular_emphasis",
     "network_grid",
+    # new network layouts (ADR 0030)
+    "network_weighted",
+    "network_grouped",
     # ARROW_STYLE.STRAIGHT annotation connector (ADR 0029)
     "annotate_arrow_straight",
 }
@@ -1713,6 +1716,29 @@ def network_directed_values():
 @case
 def network_grouped_legend():
     return NetworkChart(network_team(), show_legend=True, title="Team ties")
+
+
+@case
+def network_weighted():
+    return NetworkChart(
+        {"edges": network_edges(NETWORK_FLOWS)},
+        layout=NETWORK_LAYOUT.WEIGHTED,
+        show_values=True,
+        title="Weighted pull",
+    )
+
+
+@case
+def network_grouped():
+    team = network_team()
+    # one node without a group: its own cluster, in the edge color
+    team["nodes"].append({"id": "Ivy", "size": 15})
+    team["edges"].append({"source": "Ivy", "target": "Cy", "weight": 3})
+    for record in team["edges"][:4]:
+        record["weight"] = 6
+    return NetworkChart(
+        team, layout=NETWORK_LAYOUT.GROUPED, show_legend=True, title="Grouped"
+    )
 
 
 @case

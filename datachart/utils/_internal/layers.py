@@ -25,7 +25,7 @@ from matplotlib.collections import LineCollection, PathCollection
 from matplotlib.colors import LinearSegmentedColormap, to_hex, to_rgb
 from matplotlib.mlab import GaussianKDE
 from matplotlib.lines import Line2D
-from matplotlib.patches import FancyArrowPatch, Patch, PathPatch, Rectangle
+from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
 from matplotlib.path import Path
 import matplotlib.patheffects as patheffects
 from matplotlib.legend_handler import HandlerPathCollection
@@ -157,6 +157,25 @@ NETWORK_LAYOUT_MARGIN = 0.1
 NETWORK_SPRING_ITERATIONS = 300
 NETWORK_SPRING_STEP = 0.1
 NETWORK_SPRING_COOLING = 0.985
+# weighted pull: the lightest edge pulls at PULL_MIN times the plain spring
+# pull, the heaviest at PULL_MAX, the rest linearly between (ADR 0030)
+NETWORK_PULL_MIN = 0.1
+NETWORK_PULL_MAX = 3.0
+# grouped layout: a cluster's radius scales sqrt(n_g / n); centres are pushed
+# apart to GAP times the summed radii; a cluster fills FILL of its share of
+# the gap to its nearest neighbour (ADR 0030)
+NETWORK_CLUSTER_RADIUS = 0.3
+NETWORK_CLUSTER_GAP = 2.0
+NETWORK_CLUSTER_FILL = 0.8
+NETWORK_CLUSTER_PUSH_ITERATIONS = 100
+# the cluster halo reaches this far past the rim nodes' markers, room for
+# their labels
+NETWORK_CLUSTER_HALO_PAD = 0.03
+# the grouped solvers pull every node toward the centre in proportion to its
+# distance: a node with no link inside its network cannot drift away and
+# squeeze the linked ones together, and a chain of groups folds into a
+# compact shape instead of a line across the square
+NETWORK_CLUSTER_GRAVITY = 3.0
 # an arrowhead grows with its shaft, from this base in points
 NETWORK_ARROW_HEAD_BASE = 6.0
 NETWORK_ARROW_HEAD_PER_WIDTH = 1.5
@@ -3535,23 +3554,56 @@ class TreemapLayer(Layer):
 # ================================================
 
 
+def _fit_transform(pos: np.ndarray) -> tuple:
+    """The uniform scale and offset that centre `pos` inside the layout margin."""
+
+    low, high = pos.min(axis=0), pos.max(axis=0)
+    span = (high - low).max()
+    inner = 1 - 2 * NETWORK_LAYOUT_MARGIN
+    if span == 0:
+        return 0.0, np.full(2, 0.5)
+    scale = inner / span
+    return scale, 0.5 - (low + high) / 2 * scale
+
+
 def _fit_layout(pos: np.ndarray) -> np.ndarray:
     """Positions scaled uniformly and centred inside the layout margin."""
 
-    span = (pos.max(axis=0) - pos.min(axis=0)).max()
-    inner = 1 - 2 * NETWORK_LAYOUT_MARGIN
-    if span == 0:
-        return np.full_like(pos, 0.5)
-    scaled = (pos - pos.min(axis=0)) / span * inner
-    extent = scaled.max(axis=0)
-    return scaled + NETWORK_LAYOUT_MARGIN + (inner - extent) / 2
+    scale, offset = _fit_transform(pos)
+    return pos * scale + offset
 
 
-def spring_layout(n: int, pairs: list, seed: int) -> np.ndarray:
+def edge_strengths(weights: list) -> list:
+    """Each weight's pull under the weighted layouts (ADR 0030).
+
+    Weights map linearly from the lightest at `NETWORK_PULL_MIN` to the
+    heaviest at `NETWORK_PULL_MAX`; a missing weight pulls as the lightest.
+    Without weights, or with all equal, every edge pulls at one: the plain
+    spring picture.
+    """
+
+    given = [w for w in weights if w is not None]
+    if not given or max(given) == min(given):
+        return [1.0] * len(weights)
+    low, span = min(given), max(given) - min(given)
+    return [
+        NETWORK_PULL_MIN
+        + ((low if w is None else w) - low)
+        / span
+        * (NETWORK_PULL_MAX - NETWORK_PULL_MIN)
+        for w in weights
+    ]
+
+
+def spring_layout(
+    n: int, pairs: list, seed: int, strengths=None, gravity: float = 0.0
+) -> np.ndarray:
     """Fruchterman–Reingold positions of `n` nodes joined by index `pairs`.
 
-    Linked nodes attract in proportion to their distance squared, every pair
-    repels in inverse proportion to its distance; the step length cools
+    Linked nodes attract in proportion to their distance squared, scaled by
+    the pair's strength (one when `strengths` is None); every pair repels in
+    inverse proportion to its distance; `gravity` pulls every node toward
+    the centre in proportion to its distance; the step length cools
     geometrically. Seeded, so the same input renders the same picture. The
     result fits the 0–1 space inside the layout margin.
     """
@@ -3561,8 +3613,9 @@ def spring_layout(n: int, pairs: list, seed: int) -> np.ndarray:
     if n < 2:
         return _fit_layout(pos)
     linked = np.zeros((n, n))
-    for i, j in pairs:
-        linked[i, j] = linked[j, i] = 1
+    for (i, j), s in zip(pairs, [1.0] * len(pairs) if strengths is None else strengths):
+        # a reverse pair or a repeated edge keeps the strongest pull
+        linked[i, j] = linked[j, i] = max(linked[i, j], s)
     # the ideal edge length for n nodes in a unit square
     k = 1 / math.sqrt(n)
     step = NETWORK_SPRING_STEP
@@ -3573,10 +3626,107 @@ def spring_layout(n: int, pairs: list, seed: int) -> np.ndarray:
         dist = np.maximum(dist, 0.01)
         force = k * k / dist**2 - linked * dist / k
         disp = (delta * force[..., None]).sum(axis=1)
+        disp -= gravity * (pos - pos.mean(axis=0))
         length = np.maximum(np.linalg.norm(disp, axis=1), 0.01)
         pos += disp / length[:, None] * np.minimum(length, step)[:, None]
         step *= NETWORK_SPRING_COOLING
     return _fit_layout(pos)
+
+
+def grouped_layout(groups: list, pairs: list, weights: list, seed: int) -> tuple:
+    """Two-level spring positions: clusters by group, arranged by their links (ADR 0030).
+
+    `groups[i]` is node `i`'s group, None for none; an ungrouped node is a
+    group of one. Each group runs the plain spring on the edges inside it.
+    The groups then run the weighted spring as a smaller network, an edge
+    between two groups weighing the sum of the edges joining them (a missing
+    weight counts one). Overlapping clusters are pushed apart, each shrinks
+    to keep clear of its nearest neighbour, and the whole fits the 0–1 space.
+
+    Returns the positions and the clusters of the named groups as
+    `(group, centre, radius)` in the same space, for the halo behind each.
+    """
+
+    n = len(groups)
+    keys = [
+        ("group", g) if g is not None else ("node", i) for i, g in enumerate(groups)
+    ]
+    names = list(dict.fromkeys(keys))
+    index = {name: k for k, name in enumerate(names)}
+    group_of = [index[key] for key in keys]
+    members = [[i for i in range(n) if group_of[i] == g] for g in range(len(names))]
+
+    # level one: each group's own spring, centred on the origin
+    local = np.zeros((n, 2))
+    for g, idx in enumerate(members):
+        place = {node: k for k, node in enumerate(idx)}
+        inside = [
+            (place[i], place[j])
+            for i, j in pairs
+            if group_of[i] == g and group_of[j] == g
+        ]
+        local[idx] = (
+            spring_layout(len(idx), inside, seed, gravity=NETWORK_CLUSTER_GRAVITY) - 0.5
+        )
+
+    # level two: the groups as a weighted network
+    between = {}
+    for (i, j), w in zip(pairs, weights):
+        a, b = sorted((group_of[i], group_of[j]))
+        if a != b:
+            between[(a, b)] = between.get((a, b), 0) + (1 if w is None else w)
+    links = list(between)
+    centers = spring_layout(
+        len(names),
+        links,
+        seed,
+        edge_strengths([between[k] for k in links]),
+        gravity=NETWORK_CLUSTER_GRAVITY,
+    )
+
+    sizes = np.array([len(idx) for idx in members], float)
+    radius = NETWORK_CLUSTER_RADIUS * np.sqrt(sizes / n)
+    if len(names) > 1:
+        min_dist = (radius[:, None] + radius[None, :]) * NETWORK_CLUSTER_GAP
+        for _ in range(NETWORK_CLUSTER_PUSH_ITERATIONS):
+            delta, dist = _centre_distances(centers)
+            overlap = np.maximum(min_dist - dist, 0)
+            if not overlap.any():
+                break
+            centers = centers + (
+                delta / dist[..., None] * (overlap / 2)[..., None]
+            ).sum(axis=1)
+        _, dist = _centre_distances(centers)
+        radius_share = radius[:, None] / (radius[:, None] + radius[None, :])
+        radius = np.minimum(
+            radius, (dist * radius_share).min(axis=1) * NETWORK_CLUSTER_FILL
+        )
+
+    # a group's local picture fills a square; scale its farthest node onto the
+    # cluster radius so every node lies within the disc
+    pos = np.zeros((n, 2))
+    for g, idx in enumerate(members):
+        reach = np.linalg.norm(local[idx], axis=1).max()
+        pos[idx] = centers[g] + local[idx] / (reach or 1) * radius[g]
+    named = [g for g, name in enumerate(names) if name[0] == "group"]
+    # the fit keeps the named clusters' discs inside the margin, not only the nodes
+    rim = radius[named, None]
+    scale, offset = _fit_transform(
+        np.vstack([pos, centers[named] - rim, centers[named] + rim])
+    )
+    clusters = [
+        (names[g][1], centers[g] * scale + offset, radius[g] * scale) for g in named
+    ]
+    return pos * scale + offset, clusters
+
+
+def _centre_distances(centers: np.ndarray):
+    """Pairwise offsets and distances between cluster centres, the diagonal infinite."""
+
+    delta = centers[:, None] - centers[None]
+    dist = np.linalg.norm(delta, axis=-1)
+    np.fill_diagonal(dist, np.inf)
+    return delta, dist
 
 
 def circular_layout(n: int) -> np.ndarray:
@@ -3646,6 +3796,10 @@ class NetworkLayer(Layer):
             drawn.append(record)
         self.drawn_edges = drawn
         self.pairs = [(index[e["source"]], index[e["target"]]) for e in drawn]
+        self.weights = [record.get("weight") for record in drawn]
+        self.groups = [node.get("group") for node in self.nodes]
+        # the clusters behind the nodes: only the grouped layout has any
+        self.clusters = []
         self.positions = self._layout()
 
         # encodings: sqrt(size) to marker area, weight to edge width
@@ -3656,16 +3810,16 @@ class NetworkLayer(Layer):
         self.areas = _linear_map(
             sizes, style["node_size_min"], style["node_size_max"], style["node_size"]
         )
-        weights = [record.get("weight") for record in drawn]
         self.widths = _linear_map(
-            weights,
+            self.weights,
             style["edge_width_min"],
             style["edge_width_max"],
             style["edge_width_min"],
         )
 
-        # colors: one singular color, or the multiple cycle keyed by group
-        groups = [node.get("group") for node in self.nodes]
+        # colors: one singular color, or the multiple cycle keyed by group with
+        # an ungrouped node in the edge color so it reads as no group's member
+        groups = self.groups
         self.group_names = list(dict.fromkeys(g for g in groups if g is not None))
         if style.get("node_color") is not None:
             base = style["node_color"]
@@ -3677,7 +3831,7 @@ class NetworkLayer(Layer):
             self.group_colors = {
                 g: cycle[i]["color"] for i, g in enumerate(self.group_names)
             }
-            base = cycle[0]["color"]
+            base = style["edge_color"]
         else:
             base = create_color_cycle(config["color_general_singular"], 1)[0]["color"]
             self.group_colors = {}
@@ -3691,6 +3845,15 @@ class NetworkLayer(Layer):
             return np.array([[node["x"], node["y"]] for node in self.nodes], float)
         if self.layout == NETWORK_LAYOUT.CIRCULAR:
             return circular_layout(len(self.nodes))
+        if self.layout == NETWORK_LAYOUT.WEIGHTED:
+            return spring_layout(
+                len(self.nodes), self.pairs, self.seed, edge_strengths(self.weights)
+            )
+        if self.layout == NETWORK_LAYOUT.GROUPED:
+            pos, self.clusters = grouped_layout(
+                self.groups, self.pairs, self.weights, self.seed
+            )
+            return pos
         return spring_layout(len(self.nodes), self.pairs, self.seed)
 
     def legend_handles(self):
@@ -3725,6 +3888,25 @@ class NetworkLayer(Layer):
             0.0 if self.edge_style == ARROW_STYLE.STRAIGHT else style["edge_curve"]
         ) or 0.0
         connection = f"arc3,rad={curve}"
+
+        # a translucent disc in the group color behind each cluster, reaching
+        # past the largest marker of the group (points to 0–1 data units)
+        if style.get("group_alpha"):
+            ax.apply_aspect()
+            axis_pt = ax.get_window_extent().width * 72 / ax.figure.dpi
+            for group, centre, radius in self.clusters:
+                marker_pt = max(r for r, g in zip(radii, self.groups) if g == group)
+                ax.add_patch(
+                    Circle(
+                        centre,
+                        radius + marker_pt / axis_pt + NETWORK_CLUSTER_HALO_PAD,
+                        facecolor=self.group_colors[group],
+                        edgecolor="none",
+                        alpha=style["group_alpha"],
+                        zorder=1,
+                        gid=f"group:{group}",
+                    )
+                )
 
         for record, (i, j), width in zip(self.drawn_edges, self.pairs, self.widths):
             edge_muted = muted[i] or muted[j]

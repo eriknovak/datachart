@@ -347,33 +347,39 @@ def arrow_style():
 def network_layout():
     members = [
         ("SPRING", NETWORK_LAYOUT.SPRING),
+        ("WEIGHTED", NETWORK_LAYOUT.WEIGHTED),
+        ("GROUPED", NETWORK_LAYOUT.GROUPED),
         ("CIRCULAR", NETWORK_LAYOUT.CIRCULAR),
         ("FIXED", NETWORK_LAYOUT.FIXED),
     ]
-    # a small module graph; FIXED reads the hand-placed x/y from the nodes
+    # six modules in two packages; the weights are the imported names, FIXED
+    # reads the hand-placed x/y from the nodes
     placed = {
-        "core": (0.5, 0.5),
-        "utils": (0.5, 0.12),
-        "cli": (0.15, 0.85),
-        "api": (0.85, 0.85),
-        "web": (0.88, 0.4),
-        "tests": (0.12, 0.35),
+        "core": ("lib", 0.5, 0.5),
+        "utils": ("lib", 0.5, 0.12),
+        "tests": ("lib", 0.12, 0.35),
+        "cli": ("app", 0.15, 0.85),
+        "api": ("app", 0.85, 0.85),
+        "web": ("app", 0.88, 0.4),
     }
     edges = [
-        {"source": s, "target": t}
-        for s, t in (
-            ("core", "utils"),
-            ("cli", "core"),
-            ("api", "core"),
-            ("web", "api"),
-            ("tests", "core"),
-            ("tests", "api"),
+        {"source": s, "target": t, "weight": w}
+        for s, t, w in (
+            ("core", "utils", 9),
+            ("cli", "core", 2),
+            ("api", "core", 1),
+            ("web", "api", 8),
+            ("tests", "core", 6),
+            ("tests", "api", 1),
         )
     ]
     figs = [
         NetworkChart(
             data={
-                "nodes": [{"id": k, "x": x, "y": y} for k, (x, y) in placed.items()],
+                "nodes": [
+                    {"id": k, "group": g, "x": x, "y": y}
+                    for k, (g, x, y) in placed.items()
+                ],
                 "edges": edges,
             },
             layout=value,
@@ -385,10 +391,11 @@ def network_layout():
     chart_grid(
         figs,
         "const-network-layout.svg",
-        3.0,
+        5.0,
         cols=3,
-        footnote="The same six modules; SPRING is seeded so it repeats, CIRCULAR "
-        "keeps the input order, FIXED reads each node's x and y.",
+        footnote="The same six modules; SPRING is seeded so it repeats, WEIGHTED "
+        "pulls heavy edges short, GROUPED clusters by group, CIRCULAR keeps the "
+        "input order, FIXED reads each node's x and y.",
     )
 
 

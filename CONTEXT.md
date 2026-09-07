@@ -213,12 +213,18 @@ Relational data as a node-link diagram (`NetworkChart`: a `{nodes, edges}`
 dict, a node `{id, label?, size?, group?, emphasis?}`, an edge `{source,
 target, weight?}`; nodes may be inferred from edges). `layout` takes a
 `NETWORK_LAYOUT` constant (`SPRING`, seeded in-package Fruchterman–Reingold;
+`WEIGHTED`, the spring with each edge's pull set by its weight; `GROUPED`,
+a plain spring inside each group and a weighted one between the groups;
 `CIRCULAR`; `FIXED` from per-node `x`/`y`); `directed` adds arrowheads.
-Weight maps to edge width only, size by square root to marker area, `group`
-to the multiple color cycle. One layer per chart, no furniture; rejected in
-`Panel`, a cell in `Grid`. Scale: one patch per edge and an O(n²) spring
-layout — comfortable up to ~1k nodes / 3k edges (spring) or ~5k / 15k
-(circular, fixed); documented as the practical ceiling, not enforced.
+Weight maps to edge width, and to pull only under the two layouts named for
+it; size by square root to marker area; `group` to the multiple color cycle,
+an ungrouped node beside groups taking the edge color. A **cluster** is the
+nodes of one group as `GROUPED` places them: a compact patch arranged by the
+group's own edges, marked by a translucent disc in the group color (the
+**halo**, `plot_network_group_alpha`). One layer per chart, no furniture; rejected in `Panel`, a
+cell in `Grid`. Scale: one patch per edge and an O(n²) spring layout —
+comfortable up to ~1k nodes / 3k edges (spring, weighted, grouped) or ~5k /
+15k (circular, fixed); documented as the practical ceiling, not enforced.
 _Avoid_: graph (a synonym for chart), node-link diagram, force graph
 
 **Connector style**:

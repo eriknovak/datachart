@@ -131,6 +131,7 @@ BASE_THEME: StyleAttrs = {
     "plot_network_edge_width_max": 4.0,
     "plot_network_highlight_edge_width": 2.0,
     "plot_network_label_halo_width": 2,
+    "plot_network_group_alpha": 0.12,
     # plot grid style
     "plot_grid_alpha": 0.5,
     "plot_grid_color": "#EAEAEA",
