@@ -143,6 +143,34 @@ class TestHoverSeam:
         assert resolver(1) == {"label": None, "x": 10, "y": 1}
 
 
+class TestHoverText:
+    """The annotation lists the datum's fields in order; x and y are axis coordinates."""
+
+    def test_named_fields_follow_the_axes_in_insertion_order(self):
+        from datachart.utils._internal.figures import _hover_text
+
+        figure = _line_fig(xlabel="Step")
+        (line, _), *_ = _targets(figure)
+        datum = {"label": "fast", "x": 2, "median": 4.5, "y": 3, "count": 7}
+        assert _hover_text(line, datum) == "fast\nStep: 2\nmedian: 4.5\ny: 3\ncount: 7"
+
+    def test_plain_values_read_as_numbers_or_text(self):
+        from datachart.utils._internal.figures import _hover_text
+
+        (line, _), *_ = _targets(_line_fig())
+        datum = {"label": None, "level": 0.30000000000000004, "flow": 1200.0, "q": "A"}
+        assert _hover_text(line, datum) == "level: 0.3\nflow: 1200\nq: A"
+
+    def test_axis_only_datum_is_unchanged(self):
+        from datachart.utils._internal.figures import _hover_text
+
+        (line, _), *_ = _targets(_line_fig(ylabel="Loss"))
+        assert (
+            _hover_text(line, {"label": "fast", "x": 1, "y": 2})
+            == "fast\nx: 1\nLoss: 2"
+        )
+
+
 class TestShowInteractive:
     """show(interactive=True) attaches hover cursors and keeps the static path."""
 

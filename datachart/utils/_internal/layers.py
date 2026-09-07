@@ -757,9 +757,10 @@ class Layer:
     def register_hover(self, artist, resolver: Callable[[int], dict]) -> None:
         """Make `artist` a hover target: `resolver(i)` is the datum behind its i-th element.
 
-        The datum is a dict with the series' legend `label` and one entry per
-        drawn axis (`x`, `y`), so `show(interactive=True)` can annotate it
-        without knowing the chart type. Called from `draw`; the panel
+        The datum is an ordered dict: the series' legend `label`, then the
+        fields the mark stands for — `x`/`y` are the drawn axes' coordinates,
+        any other key is shown as is — so `show(interactive=True)` annotates
+        it without knowing the chart type. Called from `draw`; the panel
         collects the pairs right after.
         """
 
