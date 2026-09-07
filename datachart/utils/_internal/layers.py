@@ -600,6 +600,8 @@ class Layer:
     is_horizontal: Optional[bool] = None
     # the coordinate space the layer draws in; a panel property (ADR 0015)
     projection: str = "cartesian"
+    # a bare layer owns its axes: fixed limits, axis off, no panel furniture
+    bare: bool = False
 
     def __init__(self, chart: dict, settings: dict):
         self.chart = chart
@@ -2865,6 +2867,24 @@ def _ribbon_centerline(x1, y1, x2, y2, t):
     return x, y
 
 
+def _halo_effects(width) -> list:
+    """The path effects stroking a white halo of `width` points; none when 0."""
+
+    if not width or width <= 0:
+        return []
+    return [patheffects.withStroke(linewidth=width, foreground="#FFFFFF")]
+
+
+def _text_size(fontsize, text) -> tuple:
+    """A text's estimated (width, height) in points."""
+
+    lines = text.split("\n")
+    return (
+        TEXT_WIDTH_PER_CHAR * fontsize * max(len(line) for line in lines),
+        TEXT_LINE_HEIGHT * fontsize * len(lines),
+    )
+
+
 def _text_box(ax, x, y, text, fontsize, ha, pad_points=0.0):
     """A text's estimated (x0, y0, x1, y1) in data units, before any layout pass."""
 
@@ -2873,8 +2893,9 @@ def _text_box(ax, x, y, text, fontsize, ha, pad_points=0.0):
     xlim, ylim = ax.get_xlim(), ax.get_ylim()
     per_point_x = (xlim[1] - xlim[0]) / (fig_w * pos.width * 72)
     per_point_y = (ylim[1] - ylim[0]) / (fig_h * pos.height * 72)
-    width = (TEXT_WIDTH_PER_CHAR * fontsize * len(text) + 2 * pad_points) * per_point_x
-    height = (TEXT_LINE_HEIGHT * fontsize + 2 * pad_points) * per_point_y
+    text_w, text_h = _text_size(fontsize, text)
+    width = (text_w + 2 * pad_points) * per_point_x
+    height = (text_h + 2 * pad_points) * per_point_y
     x0 = x - width / 2 if ha == "center" else x - width if ha == "right" else x
     return (x0, y - height / 2, x0 + width, y + height / 2)
 
@@ -2915,6 +2936,7 @@ class SankeyLayer(Layer):
     """
 
     kind = "sankey"
+    bare = True
 
     def __init__(self, chart: dict, settings: dict):
         self.links = chart["data"]["links"]
@@ -2993,11 +3015,7 @@ class SankeyLayer(Layer):
         ax.set_ylim(0, 1 + (SANKEY_COLUMN_LABEL_HEADROOM if self.column_labels else 0))
         # every label and value placed so far, for the ribbon values to avoid
         occupied = []
-        effects = (
-            [patheffects.withStroke(linewidth=halo, foreground="#FFFFFF")]
-            if halo > 0
-            else []
-        )
+        effects = _halo_effects(halo)
 
         for ci, column in enumerate(self.columns):
             for name in column:
@@ -3206,18 +3224,10 @@ def _lighten(color, amount: float) -> str:
 
 
 def _record_total(record) -> float:
+    """A record's value, or the sum of its children's for a group."""
+
     children = record.get("children")
     return record["value"] if children is None else sum(c["value"] for c in children)
-
-
-def _text_size(fontsize, text) -> tuple:
-    """A text's estimated (width, height) in points."""
-
-    lines = text.split("\n")
-    return (
-        TEXT_WIDTH_PER_CHAR * fontsize * max(len(line) for line in lines),
-        TEXT_LINE_HEIGHT * fontsize * len(lines),
-    )
 
 
 def _wrap_label(text) -> Optional[str]:
@@ -3242,8 +3252,10 @@ def _fit_text(label, value, box, size, value_size, min_size) -> Optional[tuple]:
     width, height = box[0] - TREEMAP_LABEL_PAD, box[1] - TREEMAP_LABEL_PAD
     wrapped = _wrap_label(label)
     candidates = [label] if wrapped is None else [label, wrapped]
+    # the value shrinks in proportion to the label, never below the minimum
+    value_step = TREEMAP_FONT_STEP * value_size / size
     for with_value in (True, False) if value else (False,):
-        s, vs = size, value_size
+        s, vs = size, max(value_size, min_size)
         while s >= min_size:
             for text in candidates:
                 tw, th = _text_size(s, text)
@@ -3251,10 +3263,20 @@ def _fit_text(label, value, box, size, value_size, min_size) -> Optional[tuple]:
                     vw, vh = _text_size(vs, value)
                     tw, th = max(tw, vw), th + vh
                 if tw <= width and th <= height:
-                    return text, value if with_value else None, s, max(vs, min_size)
+                    return text, value if with_value else None, s, vs
             s -= TREEMAP_FONT_STEP
-            vs -= TREEMAP_FONT_STEP * value_size / size
+            vs = max(vs - value_step, min_size)
     return None
+
+
+class TileFrame(NamedTuple):
+    """What one treemap draw shares with every tile it places."""
+
+    # the axes size in points; tiles are squarified in this aspect
+    axes_pt: tuple
+    aspect: float
+    # the halo path effects behind every label
+    effects: list
 
 
 class TreemapLayer(Layer):
@@ -3267,6 +3289,7 @@ class TreemapLayer(Layer):
     """
 
     kind = "treemap"
+    bare = True
 
     def __init__(self, chart: dict, settings: dict):
         self.records = chart["data"]["data"]
@@ -3286,7 +3309,7 @@ class TreemapLayer(Layer):
             "color": config["plot_bar_value_color"],
         }
         self.highlight_color = config["font_general_color"]
-        # top-level records largest first; one palette color each, keyed by label
+        # top-level records largest first; one palette color each, by label
         self.groups = sorted(self.records, key=_record_total, reverse=True)
         cycle = create_color_cycle(config["color_general_multiple"], len(self.groups))
         self.group_colors = {
@@ -3308,17 +3331,13 @@ class TreemapLayer(Layer):
         engine = ax.figure.get_layout_engine()
         if engine is not None:
             engine.execute(ax.figure)
-        # the axes size in points; tiles are squarified in this aspect
         fig_w, fig_h = ax.figure.get_size_inches()
         pos = ax.get_position()
         axes_pt = (fig_w * pos.width * 72, fig_h * pos.height * 72)
-        aspect = axes_pt[0] / axes_pt[1]
-        halo = style.get("halo_width") or 0
-        effects = (
-            [patheffects.withStroke(linewidth=halo, foreground="#FFFFFF")]
-            if halo > 0
-            else []
+        frame = TileFrame(
+            axes_pt, axes_pt[0] / axes_pt[1], _halo_effects(style.get("halo_width"))
         )
+        aspect = frame.aspect
         pad = style["group_pad"]
 
         totals = [_record_total(record) for record in self.groups]
@@ -3329,12 +3348,13 @@ class TreemapLayer(Layer):
             color = self.group_colors[record["label"]]
             role = record.get("emphasis")
             if record.get("children") is None:
-                self._draw_tile(ax, record, box, color, role, 0, axes_pt, effects)
+                self._draw_tile(ax, record, box, color, role, 0, frame)
             else:
-                self._draw_group(ax, record, box, color, role, aspect, axes_pt, effects)
+                self._draw_group(ax, record, box, color, role, frame)
 
-    def _draw_group(self, ax, record, box, color, role, aspect, axes_pt, effects):
+    def _draw_group(self, ax, record, box, color, role, frame):
         style = self.treemap_style
+        axes_pt, aspect, effects = frame
         x, y, w, h = box
         label = record["label"]
         muted = role == EMPHASIS_BACKGROUND
@@ -3342,7 +3362,7 @@ class TreemapLayer(Layer):
         box_color = self.muted_color if muted else color
         alpha = self.muted_alpha if muted else None
 
-        # the band shrinks its font to the minimum before the group goes unlabelled
+        # the band font shrinks to the minimum before the group goes unlabelled
         band_size, band = self.band_style["fontsize"], 0.0
         while band_size >= style["min_fontsize"]:
             height = TREEMAP_BAND_HEIGHT * band_size / axes_pt[1]
@@ -3358,10 +3378,9 @@ class TreemapLayer(Layer):
             children, _squarify(values, x * aspect, y, w * aspect, h - band)
         ):
             tile = (cx / aspect, cy, cw / aspect, ch)
-            child_role = child.get("emphasis", role)
-            self._draw_tile(
-                ax, child, tile, leaf_color, child_role, 1, axes_pt, effects
-            )
+            # a leaf inherits its group's role unless it carries its own
+            child_role = child.get("emphasis") or role
+            self._draw_tile(ax, child, tile, leaf_color, child_role, 1, frame)
 
         if band:
             ax.add_patch(
@@ -3376,7 +3395,7 @@ class TreemapLayer(Layer):
                     gid=f"band:{label}",
                 )
             )
-            # the band label never wraps or shrinks: it fits or the legend names the group
+            # a band label never wraps or shrinks; the legend names what is cut
             if (
                 _text_size(band_size, label)[0]
                 <= w * axes_pt[0] - 2 * TREEMAP_LABEL_PAD
@@ -3413,8 +3432,9 @@ class TreemapLayer(Layer):
             )
         )
 
-    def _draw_tile(self, ax, record, box, color, role, level, axes_pt, effects):
+    def _draw_tile(self, ax, record, box, color, role, level, frame):
         style = self.treemap_style
+        axes_pt, _, effects = frame
         x, y, w, h = box
         muted = role == EMPHASIS_BACKGROUND
         highlight = role == EMPHASIS_HIGHLIGHT
@@ -3893,9 +3913,7 @@ class Panel:
         """Whether the layers own their axes: no furniture, scales, or limits."""
 
         layers = self.layers
-        return bool(layers) and all(
-            isinstance(l, (SankeyLayer, TreemapLayer)) for l in layers
-        )
+        return bool(layers) and all(l.bare for l in layers)
 
     @property
     def projection(self) -> str:
@@ -3970,7 +3988,7 @@ class Panel:
         width = furniture.get("sketch_halo_width")
         if width is None:
             return
-        halo = [patheffects.withStroke(linewidth=width, foreground="#FFFFFF")]
+        halo = _halo_effects(width)
         for ax in axes:
             if ax is not None:
                 for line in ax.get_lines():

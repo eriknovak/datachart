@@ -196,6 +196,23 @@ def validate_treemap_records(records) -> None:
         raise ValueError("A treemap requires a non-empty `data` list of records.")
     for i, record in enumerate(records):
         _validate_treemap_record(record, f"Treemap record {i}", nested=False)
+    _validate_unique_labels(records, "Treemap records")
+    for record in records:
+        if record.get("children") is not None:
+            name = f"Treemap record {record['label']!r} children"
+            _validate_unique_labels(record["children"], name)
+
+
+def _validate_unique_labels(records, name: str) -> None:
+    """Siblings are keyed by label: for colors, the legend, and the reader."""
+
+    seen = set()
+    for record in records:
+        if record["label"] in seen:
+            raise ValueError(
+                f"{name} must have unique labels; {record['label']!r} repeats."
+            )
+        seen.add(record["label"])
 
 
 def _validate_treemap_record(record, name: str, nested: bool) -> None:

@@ -45,6 +45,10 @@ from ._internal.layers import (
     TextLayer,
 )
 
+# figures whose layer owns its axes: no shared coordinate space to overlay
+# (ADR 0026, ADR 0028)
+BARE_FIGURES = {"sankeychart": "Sankey", "treemap": "treemap"}
+
 OVERLAYABLE_LAYERS = (
     LineLayer,
     BarLayer,
@@ -94,17 +98,11 @@ def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
             f"Figure at index {index} is a pyramid figure; "
             "pyramid figures cannot be overlaid"
         )
-    if metadata.get("type") == "sankeychart":
-        # a Sankey owns its axes: no shared coordinate space to overlay (ADR 0026)
+    if metadata.get("type") in BARE_FIGURES:
+        name = BARE_FIGURES[metadata["type"]]
         raise ValueError(
-            f"Figure at index {index} is a Sankey figure; "
-            "Sankey figures cannot be overlaid. Use `Grid` instead."
-        )
-    if metadata.get("type") == "treemap":
-        # a treemap owns its axes: no shared coordinate space to overlay (ADR 0028)
-        raise ValueError(
-            f"Figure at index {index} is a treemap figure; "
-            "treemap figures cannot be overlaid. Use `Grid` instead."
+            f"Figure at index {index} is a {name} figure; "
+            f"{name} figures cannot be overlaid. Use `Grid` instead."
         )
     panel = metadata.get("panel")
     if panel is None:

@@ -169,6 +169,8 @@ class TestValidation(unittest.TestCase):
             [rec("A", 5, children=[rec("a", 1), rec("b", 2)])],
             [rec("A", 1, emphasis="bold")],
             [rec("A", children=[rec("a", 1, emphasis="nope")])],
+            [rec("A", 1), rec("A", 2)],
+            [rec("A", children=[rec("a", 1), rec("a", 2)])],
         ):
             with self.subTest(records=records), self.assertRaises(ValueError):
                 validate_treemap_records(records)
@@ -184,6 +186,12 @@ class TestValidation(unittest.TestCase):
             validate_treemap_records([rec("A", 5, children=[rec("a", 1)])])
         with self.assertRaisesRegex(ValueError, "emphasis"):
             validate_treemap_records([rec("A", 1, emphasis="bold")])
+        with self.assertRaisesRegex(ValueError, "unique"):
+            validate_treemap_records([rec("A", 1), rec("A", 2)])
+        # the same label may recur across groups
+        validate_treemap_records(
+            [rec("A", children=[rec("Rest", 1)]), rec("B", children=[rec("Rest", 1)])]
+        )
 
     def test_front_rejects_emphasis_and_bad_shape(self):
         with self.assertRaisesRegex(ValueError, "emphasis"):
@@ -250,6 +258,16 @@ class TestTextLadder(unittest.TestCase):
         # then drops
         self.assertIsNone(_fit_text("Rest of Asia", None, (10, 10), 10, 8, 6))
 
+    def test_value_never_shrinks_below_the_minimum(self):
+        fit = _fit_text("Hello World", "1234567", (40, 28), 10, 8, 6)
+        self.assertIsNotNone(fit)
+        _, value, size, value_size = fit
+        self.assertEqual(value, "1234567")
+        self.assertGreaterEqual(value_size, 6)
+        # the size drawn is the size that was measured to fit
+        label_h = 1.2 * size * 2
+        self.assertLessEqual(label_h + 1.2 * value_size, 28 - 4)
+
 
 class TestRendering(unittest.TestCase):
     def tearDown(self):
@@ -296,7 +314,7 @@ class TestRendering(unittest.TestCase):
         self.assertLessEqual(
             tiles["India"].get_y() + tiles["India"].get_height(), band.get_y() + 1e-9
         )
-        # the group border takes the group color; the leaves share one lighter tint
+        # the border is the group color; the leaves share one lighter tint
         group_rgb = to_rgb(asia.get_edgecolor())
         leaf_rgbs = {
             to_rgb(tiles[k].get_facecolor()) for k in ("India", "China", "Japan")
@@ -385,6 +403,15 @@ class TestRendering(unittest.TestCase):
         )
         self.assertEqual(
             boxes["Africa"].get_linewidth(), config["plot_treemap_highlight_edge_width"]
+        )
+        # a highlighted group strokes its leaves too; a muted group mutes them
+        self.assertEqual(
+            tiles["Nigeria"].get_linewidth(),
+            config["plot_treemap_highlight_edge_width"],
+        )
+        self.assertEqual(
+            to_rgb(tiles["Nigeria"].get_edgecolor()),
+            to_rgb(config["font_general_color"]),
         )
         self.assertEqual(
             to_rgb(boxes["Africa"].get_edgecolor()),
