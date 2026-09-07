@@ -225,6 +225,55 @@ class TestPanel:
         plt.close(line1_fig)
         plt.close(line2_fig)
 
+    def test_legend_gets_headroom_when_marks_fill_the_axes(self):
+        """A legend with no clear slot moves to the top and both value axes extend."""
+        bars = BarChart(
+            data=[{"label": str(i), "y": 150 + 5 * (i % 2)} for i in range(12)],
+            subtitle="A",
+        )
+        line = LineChart(
+            data=[{"x": i, "y": 30 - abs(i - 6) * 4} for i in range(12)], subtitle="B"
+        )
+        fig = Panel(
+            [{"figure": bars, "y_axis": "left"}, {"figure": line, "y_axis": "right"}],
+            show_legend=True,
+        )
+        host, twin = fig.axes
+        before = (host.get_ylim()[1], twin.get_ylim()[1])
+        fig.canvas.draw()
+        legend = twin.get_legend()
+        renderer = fig.canvas.get_renderer()
+        box = legend.get_window_extent(renderer)
+        assert legend._loc != 0
+        assert host.get_ylim()[1] > before[0] and twin.get_ylim()[1] > before[1]
+        # nothing drawn on either axes reaches into the legend's box
+        for ax in (host, twin):
+            for artist in ax.patches + ax.lines:
+                assert not box.overlaps(artist.get_window_extent(renderer))
+        plt.close(fig)
+        plt.close(bars)
+        plt.close(line)
+
+    def test_legend_headroom_respects_explicit_limits(self):
+        """An explicit ymax is a user decision: no headroom is added over it."""
+        bars = BarChart(
+            data=[{"label": str(i), "y": 150 + 5 * (i % 2)} for i in range(12)],
+            subtitle="A",
+        )
+        line = LineChart(
+            data=[{"x": i, "y": 30 - abs(i - 6) * 4} for i in range(12)], subtitle="B"
+        )
+        fig = Panel(
+            [{"figure": bars, "y_axis": "left"}, {"figure": line, "y_axis": "right"}],
+            show_legend=True,
+            ymax=200,
+        )
+        fig.canvas.draw()
+        assert fig.axes[0].get_ylim()[1] == 200
+        plt.close(fig)
+        plt.close(bars)
+        plt.close(line)
+
     def test_scale_compatibility_detection(self):
         """Test scale compatibility detection."""
         # Create two charts with compatible scales

@@ -182,6 +182,17 @@ class DatachartFigure(Figure):
     window in scripts.
     """
 
+    def draw(self, renderer):
+        # legends fit their headroom against the laid-out axes, once per figure
+        fits = self.__dict__.pop("_legend_fits", None)
+        if fits:
+            engine = self.get_layout_engine()
+            if engine is not None:
+                engine.execute(self)
+            for fit in fits:
+                fit(renderer)
+        super().draw(renderer)
+
     def show(self, warn=True, interactive=False):
         """Display the figure.
 
