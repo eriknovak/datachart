@@ -86,6 +86,7 @@ INK_THEME: StyleAttrs = make_theme(
         "font_general_sansserif": [
             "Helvetica",
             "Arial",
+            "Liberation Sans",
             "DejaVu Sans",
         ],
         "plot_grid_color": "#DDE3E8",
@@ -147,6 +148,7 @@ HATCH_THEME: StyleAttrs = make_theme(
         "font_general_sansserif": [
             "Helvetica",
             "Arial",
+            "Liberation Sans",
             "DejaVu Sans",
         ],
         "chart_default_show_values": True,
@@ -253,6 +255,7 @@ MATERIAL_THEME: StyleAttrs = make_theme(
             "Roboto",
             "Arial",
             "Helvetica",
+            "Liberation Sans",
         ],
         "axes_spines_top_visible": False,
         "axes_spines_right_visible": False,
