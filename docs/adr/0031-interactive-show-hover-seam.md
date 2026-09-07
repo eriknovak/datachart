@@ -17,11 +17,11 @@ We extend ADR 0008 rather than add a rendering path: `show()` gains a keyword
 script figure opens in its GUI window as before; on both, `mplcursors` is
 attached in hover mode to the figure's *hover targets*. A hover target is an
 `(artist, resolver)` pair a layer registers during `draw()`, where
-`resolver(i)` returns the datum behind the artist's i-th element as a dict of
-the legend label and one value per drawn axis. The panel collects the pairs
-right after each draw onto the figure being drawn into, so `show()` builds
-the annotation — label line, then `name: value` per axis, named after the
-visible axis labels — without knowing chart types.
+`resolver(i)` returns the datum behind the artist's i-th element as an
+ordered dict: the legend label, then the fields the mark stands for. The
+panel collects the pairs right after each draw onto the figure being drawn
+into, so `show()` builds the annotation — label line, then one `name: value`
+line per field — without knowing chart types.
 
 ## Commitments
 
@@ -39,19 +39,45 @@ visible axis labels — without knowing chart types.
   They cannot stick to layers: a layer is shared by every figure it is
   redrawn into (source figure, Panel, Grid), and each figure has its own
   artists.
-- **Resolvers name the drawn axes.** A transposed series or a horizontal bar
-  reports its values under the axis they are drawn on; `show()` reads the
-  names off the artist's axes (own label, a shared sibling's for twins, the
-  figure's sup-label, else `x`/`y`) and formats values with the axis' own
-  coordinate formatter. Twin-axis series therefore report the secondary
-  label, and category-axis points the category name.
+- **A datum is an ordered dict of named fields.** The `x` and `y` fields are
+  axis coordinates: a transposed series or a horizontal bar reports its
+  values under the axis they are drawn on, and `show()` names them off the
+  artist's axes (own label, a shared sibling's for twins, the figure's
+  sup-label, else `x`/`y`) and formats them with the axis' own coordinate
+  formatter, so twin-axis series report the secondary label and
+  category-axis points the category name. Every other field is shown under
+  its own key, in insertion order, formatted as a plain value. A layer adds
+  a field by adding a key; the annotation builder never learns chart types.
+- **Every data layer registers; aggregate marks report their summary.** The
+  mark the user hovers is the mark that answers, with what an explorer wants
+  from it:
+
+  | Layer                | Mark                | Fields after the label                          |
+  | :------------------- | :------------------ | :---------------------------------------------- |
+  | line, stacked area   | point               | `x`, `y` (own value, never the stack total)     |
+  | scatter, swarm       | point               | `x`, `y`                                        |
+  | bar                  | bar                 | `x`, `y` (own value, never the stack total)     |
+  | histogram            | bin                 | `x` (bin range), `y` (count or density)         |
+  | box, violin          | box / body          | `x` (category), `median`, `q1`, `q3`, `min`, `max` |
+  | heatmap              | cell                | `x`, `y`, `value`                               |
+  | contour              | level line          | `level`                                         |
+  | hexbin               | hexagon             | `x`, `y` (cell center), `count`                 |
+  | parallel coordinates | series line on axis | axis name, `value`                              |
+  | radial line/bar/scatter/histogram | point / wedge | `angle` (category label when categorical), `radius` |
+  | sankey               | node / link         | node: `flow`; link: `source`, `target`, `flow`  |
+  | treemap              | tile                | `value`                                         |
+  | network              | node / edge         | node: `degree` (weight sum when weighted); edge: `source`, `target`, `weight` |
+
+  Text layers and reference lines decorate and register nothing. Polar axes
+  carry no axis labels, so radial fields are shown under their own keys. A
+  mark `mplcursors` cannot pick stays zoom/pan only and is documented as such
+  rather than hand-rolled.
 - **The annotation wears the theme's text annotation style.** The panel
   snapshots the `plot_text_*` font, box, and connector color from the config
   when it first renders into a figure (ADR 0018), so the popup matches the
   figure it sits on and the theme in force when the figure was built, not
   when it is shown.
-- **Bars report their own value, never the stack total.** Pyramid sides
-  report the value as passed, positive.
+- **Pyramid sides report the value as passed, positive.**
 - **A missing dependency raises.** `show(interactive=True)` raises
   `ImportError` naming the missing package and the `datachart[interactive]`
   extra; there is no silent static fallback. Each path imports only what it
@@ -74,3 +100,8 @@ bar containers, annotation placement, and the widget and GUI canvases alike.
 Storing the datum on the artist (`artist.datachart_datum`) instead of a
 resolver was rejected: a resolver keeps the per-element lookup lazy and lets
 one artist — a line, a bar container — stand for many data points.
+An explicit `fields: [(name, value), ...]` list instead of an ordered dict
+was rejected when the seam widened beyond `x`/`y`: it would have invalidated
+every existing resolver for no gain, since dict insertion order already
+carries the field order. Pre-formatted text per layer was rejected: it moves
+axis naming and value formatting into every layer.
