@@ -18,7 +18,8 @@ def _register_bundled_fonts() -> None:
     known = {entry.fname for entry in font_manager.fontManager.ttflist}
     for name in _FONT_FILES:
         path = os.path.join(_FONT_DIR, name)
-        if path not in known:
+        # a face missing from the install leaves the stack to its fallbacks
+        if path not in known and os.path.isfile(path):
             font_manager.fontManager.addfont(path)
 
 
@@ -35,7 +36,7 @@ SKETCH_THEME: StyleAttrs = make_theme(
             "#7E5AAB",
         ],
         "font_general_family": "sans-serif",
-        # Humor Sans / Comic Sans MS are picked up when installed
+        # the fallbacks only apply when the bundled face fails to register
         "font_general_sansserif": ["Comic Neue", "Humor Sans", "Comic Sans MS"],
         "font_general_size": 11,
         "font_general_color": "#222222",
@@ -59,8 +60,8 @@ SKETCH_THEME: StyleAttrs = make_theme(
 """The sketch theme: hand-drawn, xkcd-style wobble and halo, Comic Neue font.
 
 Paths wobble and carry a white halo, spines and lines are thick, the grid is
-off, and text is set in the bundled Comic Neue (xkcd Script or Humor Sans and
-Comic Sans MS are used when installed).
+off, and text is set in Comic Neue, which ships with the package; Humor Sans
+and Comic Sans MS are the fallbacks should the bundled face fail to register.
 
 !!! info "Added in Unreleased"
 """

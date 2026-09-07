@@ -111,7 +111,13 @@ class TestThemeDefaults(unittest.TestCase):
 
     def test_theme_constants_are_valid(self):
         """Every THEME constant applies without warnings."""
-        for theme in [THEME.MINIMAL, THEME.MATERIAL, THEME.INK, THEME.HATCH]:
+        for theme in [
+            THEME.MINIMAL,
+            THEME.MATERIAL,
+            THEME.INK,
+            THEME.HATCH,
+            THEME.SKETCH,
+        ]:
             config.set_theme(theme)
             self.assertEqual(config.theme, theme)
 
@@ -126,6 +132,7 @@ class TestThemeDefaults(unittest.TestCase):
             THEME.HATCH,
             THEME.MINIMAL,
             THEME.MATERIAL,
+            THEME.SKETCH,
         ]:
             config.set_theme(theme)
             for key in TextStyleAttrs.__annotations__:

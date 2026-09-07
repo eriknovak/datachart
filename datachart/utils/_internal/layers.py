@@ -3605,7 +3605,7 @@ class Panel:
         if furniture.get("sketch_halo_width") is not None:
             rc["path.effects"] = [
                 patheffects.withStroke(
-                    linewidth=furniture["sketch_halo_width"], foreground="w"
+                    linewidth=furniture["sketch_halo_width"], foreground="#FFFFFF"
                 )
             ]
         return rc

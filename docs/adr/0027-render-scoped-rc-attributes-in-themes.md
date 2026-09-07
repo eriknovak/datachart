@@ -20,9 +20,17 @@ We add **sketch attributes**: an enumerated pair of nullable theme attributes,
 tick styles, and `Panel.render()` applies them inside a scoped
 `matplotlib.rc_context` around its artist creation. Spines predate the render,
 so the furniture pass sets their sketch and halo directly. Because matplotlib
-copies both values into each artist when it is created, `Panel` and `Grid`
-composition redraws the look into new axes without any config access at draw
-time — the same compose-time snapshot rule the furniture already follows.
+copies both values into each artist when it is created, composition redraws
+the look into new axes without any config access at draw time. `Grid` renders
+each figure's stored panel, snapshot included, so a figure built under
+`SKETCH` stays sketched in a grid built under another theme; the `Panel` front
+builds one new panel and snapshots at compose time, so a composed panel wears
+the theme active at the compose call — the same rule the furniture follows.
+
+One carve-out: the `show_area` fill under a line reaches a floor far below
+the axes, and the sketch filter would split that off-screen edge into millions
+of wobble segments. The fill drops its sketch parameters; its only visible edge
+sits under the wobbled line and its halo.
 
 `THEME.SKETCH` is the first theme to set both. It also bundles Comic Neue
 Regular and Bold (SIL OFL) as package data, registered with matplotlib's font
@@ -38,9 +46,10 @@ manager on import, so its font stack resolves on every machine.
   the chart fronts, `render_chart`, or the layers.
 - **No global rc mutation.** `rcParams["path.sketch"]` and
   `rcParams["path.effects"]` are unchanged after any render.
-- **Composition inherits via the compose-time snapshot.** A figure built under
-  `SKETCH` stays sketched inside a `Grid` or `Panel` built under another theme;
-  the composed figure's own furniture follows the theme active at compose time.
+- **Composition follows the compose-time snapshot.** `Grid` keeps each
+  figure's own snapshot, so a `SKETCH` figure stays sketched in a grid built
+  under another theme; a `Panel` front snapshots when called, so the composed
+  panel wears the theme active then, exactly as its furniture does.
 
 ## Considered options
 
