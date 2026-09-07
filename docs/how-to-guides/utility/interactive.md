@@ -47,23 +47,97 @@ Hover follows the marks through composition: it works on every series of a `Pane
 
 Every chart type has hover support. Filled marks — bars, bands, boxes, bodies, cells, hexagons, tiles, nodes, ribbons — pick anywhere inside; lines, outlines, and network edges pick within a few points of their stroke, as do the outline of a `step` histogram and the edges of a filled contour band.
 
-| Chart                                         | Mark                        | Annotation                                                                 | Hovered                                                                                             |
-| :-------------------------------------------- | :-------------------------- | :------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------- |
-| [Line Chart](../charts/linechart.ipynb)       | line point                  | legend label, `x`, `y`                                                     | ![A line chart with a hovered point](../../assets/imgs/hover-line.png){ width="300" }               |
-| [Stacked Area Chart](../charts/stackedareachart.ipynb) | band, at the nearest point | legend label, `x`, the series' own `y` (never the stack total)      | ![A stacked area chart with a hovered band](../../assets/imgs/hover-stackedarea.png){ width="300" } |
-| [Bar Chart](../charts/barchart.ipynb)         | bar                         | legend label, category, the bar's own value (never the stack total)        | ![A grouped bar chart with a hovered bar](../../assets/imgs/hover-bar.png){ width="300" }           |
-| [Pyramid Chart](../charts/pyramidchart.ipynb) | bar                         | legend label, category, the value as passed, positive                      | ![A pyramid chart with a hovered bar](../../assets/imgs/hover-pyramid.png){ width="300" }           |
-| [Radial Chart](../charts/radialchart.ipynb)   | point, bar, or bin          | legend label, `angle` (the category, or a bin's degree range), `radius`    | ![A radial bar chart with a hovered bar](../../assets/imgs/hover-radial.png){ width="300" }         |
-| [Histogram](../charts/histogram.ipynb)        | bin                         | legend label, the bin's range, its count (or density)                      | ![A histogram with a hovered bin](../../assets/imgs/hover-histogram.png){ width="300" }             |
-| [Box Plot](../charts/boxplot.ipynb)           | box                         | legend label, category, `median`, `q1`, `q3`, `min`, `max`                 | ![A box plot with a hovered box](../../assets/imgs/hover-box.png){ width="300" }                    |
-| [Violin Plot](../charts/violinplot.ipynb)     | body                        | legend label (or the split value), category, `median`, `q1`, `q3`, `min`, `max` | ![A violin plot with a hovered body](../../assets/imgs/hover-violin.png){ width="300" }        |
-| [Swarm Plot](../charts/swarmplot.ipynb)       | point                       | legend label, category, value                                              | ![A swarm plot with a hovered point](../../assets/imgs/hover-swarm.png){ width="300" }              |
-| [Raincloud Plot](../charts/raincloudplot.ipynb) | box, body, or rain point  | as the box, violin, and swarm marks                                        | ![A raincloud plot with a hovered box](../../assets/imgs/hover-raincloud.png){ width="300" }        |
-| [Scatter Chart](../charts/scatterchart.ipynb) | point                       | legend label (or the `hue` group), `x`, `y`                                | ![A scatter chart with a hovered point](../../assets/imgs/hover-scatter.png){ width="300" }         |
-| [Heatmap](../charts/heatmap.ipynb)            | cell                        | legend label, `x`, `y`, `value`                                            | ![A heatmap with a hovered cell](../../assets/imgs/hover-heatmap.png){ width="300" }                |
-| [Contour Chart](../charts/contourchart.ipynb) | level line or filled band   | legend label, `level` (a band's two levels)                                | ![A contour chart with a hovered level line](../../assets/imgs/hover-contour.png){ width="300" }    |
-| [Hexbin Chart](../charts/hexbinchart.ipynb)   | hexagon                     | legend label, `x`, `y` (the cell center), `count` (or the reduced `c` under its reducer's name) | ![A hexbin chart with a hovered hexagon](../../assets/imgs/hover-hexbin.png){ width="300" } |
-| [Parallel Coordinates](../charts/parallelcoords.ipynb) | row line, at the nearest axis | the `hue` value (or the legend label), the axis name and the row's value there | ![A parallel coordinates chart with a hovered row](../../assets/imgs/hover-parallelcoords.png){ width="300" } |
-| [Network Chart](../charts/networkchart.ipynb) | node or edge                | node: its label, `degree` (`in` / `out` when directed, the weight sum when weighted), its `group` and `size` when given; edge: `source`, `target`, `weight` | ![A network chart with a hovered node](../../assets/imgs/hover-network.png){ width="300" } |
-| [Sankey Chart](../charts/sankeychart.ipynb)   | node or link                | node: its name, `flow`; link: `source`, `target`, `flow`                   | ![A sankey chart with a hovered link](../../assets/imgs/hover-sankey.png){ width="300" }            |
-| [Treemap](../charts/treemap.ipynb)            | tile or group band          | its label, `value` (a band's group total)                                  | ![A treemap with a hovered tile](../../assets/imgs/hover-treemap.png){ width="300" }                |
+| Chart | Mark | Annotation |
+| :---- | :--- | :--------- |
+| [Line Chart](../charts/linechart.ipynb) | line point | legend label, `x`, `y` |
+| [Stacked Area Chart](../charts/stackedareachart.ipynb) | band, at the nearest point | legend label, `x`, the series' own `y` (never the stack total) |
+| [Bar Chart](../charts/barchart.ipynb) | bar | legend label, category, the bar's own value (never the stack total) |
+| [Pyramid Chart](../charts/pyramidchart.ipynb) | bar | legend label, category, the value as passed, positive |
+| [Radial Chart](../charts/radialchart.ipynb) | point, bar, or bin | legend label, `angle` (the category, or a bin's degree range), `radius` |
+| [Histogram](../charts/histogram.ipynb) | bin | legend label, the bin's range, its count (or density) |
+| [Box Plot](../charts/boxplot.ipynb) | box | legend label, category, `median`, `q1`, `q3`, `min`, `max` |
+| [Violin Plot](../charts/violinplot.ipynb) | body | legend label (or the split value), category, `median`, `q1`, `q3`, `min`, `max` |
+| [Swarm Plot](../charts/swarmplot.ipynb) | point | legend label, category, value |
+| [Raincloud Plot](../charts/raincloudplot.ipynb) | box, body, or rain point | as the box, violin, and swarm marks |
+| [Scatter Chart](../charts/scatterchart.ipynb) | point | legend label (or the `hue` group), `x`, `y` |
+| [Heatmap](../charts/heatmap.ipynb) | cell | legend label, `x`, `y`, `value` |
+| [Contour Chart](../charts/contourchart.ipynb) | level line or filled band | legend label, `level` (a band's two levels) |
+| [Hexbin Chart](../charts/hexbinchart.ipynb) | hexagon | legend label, `x`, `y` (the cell center), `count` (or the reduced `c` under its reducer's name) |
+| [Parallel Coordinates](../charts/parallelcoords.ipynb) | row line, at the nearest axis | the `hue` value (or the legend label), the axis name and the row's value there |
+| [Network Chart](../charts/networkchart.ipynb) | node or edge | node: its label, `degree` (`in` / `out` when directed, the weight sum when weighted), its `group` and `size` when given; edge: `source`, `target`, `weight` |
+| [Sankey Chart](../charts/sankeychart.ipynb) | node or link | node: its name, `flow`; link: `source`, `target`, `flow` |
+| [Treemap](../charts/treemap.ipynb) | tile or group band | its label, `value` (a band's group total) |
+
+The annotation on each chart, from the figure shown with `show(interactive=True)` and a mark hovered:
+
+**Line Chart** — a hovered point
+
+![A line chart with a hovered point](../../assets/imgs/hover-line.png)
+
+**Stacked Area Chart** — a hovered band
+
+![A stacked area chart with a hovered band](../../assets/imgs/hover-stackedarea.png)
+
+**Bar Chart** — a hovered bar
+
+![A grouped bar chart with a hovered bar](../../assets/imgs/hover-bar.png)
+
+**Pyramid Chart** — a hovered bar
+
+![A pyramid chart with a hovered bar](../../assets/imgs/hover-pyramid.png)
+
+**Radial Chart** — a hovered bar
+
+![A radial bar chart with a hovered bar](../../assets/imgs/hover-radial.png)
+
+**Histogram** — a hovered bin
+
+![A histogram with a hovered bin](../../assets/imgs/hover-histogram.png)
+
+**Box Plot** — a hovered box
+
+![A box plot with a hovered box](../../assets/imgs/hover-box.png)
+
+**Violin Plot** — a hovered body
+
+![A violin plot with a hovered body](../../assets/imgs/hover-violin.png)
+
+**Swarm Plot** — a hovered point
+
+![A swarm plot with a hovered point](../../assets/imgs/hover-swarm.png)
+
+**Raincloud Plot** — a hovered box
+
+![A raincloud plot with a hovered box](../../assets/imgs/hover-raincloud.png)
+
+**Scatter Chart** — a hovered point
+
+![A scatter chart with a hovered point](../../assets/imgs/hover-scatter.png)
+
+**Heatmap** — a hovered cell
+
+![A heatmap with a hovered cell](../../assets/imgs/hover-heatmap.png)
+
+**Contour Chart** — a hovered level line
+
+![A contour chart with a hovered level line](../../assets/imgs/hover-contour.png)
+
+**Hexbin Chart** — a hovered hexagon
+
+![A hexbin chart with a hovered hexagon](../../assets/imgs/hover-hexbin.png)
+
+**Parallel Coordinates** — a hovered row
+
+![A parallel coordinates chart with a hovered row](../../assets/imgs/hover-parallelcoords.png)
+
+**Network Chart** — a hovered node
+
+![A network chart with a hovered node](../../assets/imgs/hover-network.png)
+
+**Sankey Chart** — a hovered link
+
+![A sankey chart with a hovered link](../../assets/imgs/hover-sankey.png)
+
+**Treemap** — a hovered tile
+
+![A treemap with a hovered tile](../../assets/imgs/hover-treemap.png)
