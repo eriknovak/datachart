@@ -289,6 +289,24 @@ decisions; a figure left as a cell's last expression renders only its text
 repr.
 _Avoid_: plot (for the act), display (for the method name)
 
+**Interactive figure**:
+A figure shown with `show(interactive=True)`: zoomable and pannable — on an
+`ipympl` widget canvas in notebooks, in the GUI window's toolbar in scripts —
+with hover-to-inspect annotations on its hover targets. The flag on `show()`
+is the only opt-in; chart fronts, `Panel`, `Grid`, and the config carry none,
+and the default show is unchanged. Needs the `interactive` extra (`ipympl`,
+`mplcursors`); a missing package raises, never falls back to static.
+_Avoid_: widget mode, live figure, interactive backend (for the concept)
+
+**Hover target**:
+An `(artist, resolver)` pair a layer registers while drawing — a line, a
+scatter collection, a bar container — where `resolver(i)` returns the datum
+behind the artist's i-th element as a dict of the legend label and one value
+per drawn axis. The panel collects the pairs onto the figure it draws into,
+so `show()` attaches hover cursors without knowing chart types; a layer that
+registers nothing has no hover. Line, scatter, and bar layers register today.
+_Avoid_: pickable, tooltip source, hover artist
+
 ### Styling
 
 **Theme**:
