@@ -248,7 +248,7 @@ _Avoid_: plot (for the act), display (for the method name)
 
 **Theme**:
 A complete, named set of style attributes (`DEFAULT`, `GREYSCALE`, `MINIMAL`,
-`MATERIAL`, `INK`, `HATCH`). Applying one replaces the whole global
+`MATERIAL`, `INK`, `HATCH`, `SKETCH`). Applying one replaces the whole global
 configuration. Themes are named for their visual trait, never for a use case
 or audience.
 _Avoid_: publication, academic, background (former role-based theme names)
@@ -272,6 +272,12 @@ A nullable theme attribute that supplies the default for a per-chart setting
 (grid visibility, bar value labels) when the chart call leaves it unset. An
 explicit chart setting always wins.
 _Avoid_: forced setting, theme override
+
+**Sketch attributes**:
+The theme's render-scoped rc-level look (path wobble, halo stroke),
+snapshotted by the panel and applied inside a scoped rc context; `None` means
+off. The set is exactly those two attributes; nothing global changes.
+_Avoid_: xkcd mode, rc theme
 
 **Hatch cycle**:
 A theme-defined sequence of hatch patterns the panel assigns per bar/histogram
