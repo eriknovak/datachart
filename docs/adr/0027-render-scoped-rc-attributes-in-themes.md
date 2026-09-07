@@ -16,16 +16,20 @@ composition cannot reproduce.
 We add **sketch attributes**: an enumerated pair of nullable theme attributes,
 `plot_sketch_params` (the `(scale, length, randomness)` triple) and
 `plot_sketch_halo_width` (the white stroke width). `None` in both means off.
-`Panel.snapshot_furniture()` captures them at build time beside the spine and
-tick styles. `Panel.render()` applies the wobble inside a scoped
+`Panel.snapshot_furniture()` captures the wobble at build time beside the
+spine and tick styles. `Panel.render()` applies it inside a scoped
 `matplotlib.rc_context` around its artist creation, so matplotlib copies it
 into every artist as it is made; spines predate the render, so the furniture
-pass sets their sketch directly. The halo is deliberately narrower than
-matplotlib's xkcd mode: `Panel.render()` strokes it under the line artists
-after drawing, and text and patches stay clean — a halo around glyphs
-thickens them (and vanishes on white text), and bars already carry an edge.
-Both values live on the artists, so composition redraws the look into new
-axes without any config access at draw time. `Grid` renders
+pass sets their sketch directly. The halo resolves like any style key: the
+layers that draw a series line (line, radial, regression) stroke it under
+that line at `line width + plot_sketch_halo_width`, so a thin context line
+gets a thin halo and a chart's `style` can turn it off. Marks inside a filled
+body (box whiskers, violin inner lines), parallel-coordinate polylines, text
+and patches stay clean — a halo around glyphs thickens them (and vanishes on
+white text), bars already carry an edge, and a halo on every line erases its
+neighbours wherever lines are dense. Both values live on the artists, so
+composition redraws the look into new axes without any config access at
+draw time. `Grid` renders
 each figure's stored panel, snapshot included, so a figure built under
 `SKETCH` stays sketched in a grid built under another theme; the `Panel` front
 builds one new panel and snapshots at compose time, so a composed panel wears
@@ -46,8 +50,9 @@ manager on import, so its font stack resolves on every machine.
   arbitrary rcParams; growing the set requires revisiting this ADR.
 - **`None` means off, and every existing theme keeps `None`**, so the
   mechanism alone alters no output — the golden baselines stay byte-identical.
-- **Application lives in the `Panel`**, beside the furniture: no rc handling in
-  the chart fronts, `render_chart`, or the layers.
+- **The wobble is applied by the `Panel`**, beside the furniture: no rc
+  handling in the chart fronts, `render_chart`, or the layers. The halo is a
+  resolved layer style, applied only by the series-line layers.
 - **No global rc mutation.** `rcParams["path.sketch"]` and
   `rcParams["path.effects"]` are unchanged after any render.
 - **Composition follows the compose-time snapshot.** `Grid` keeps each
@@ -66,6 +71,13 @@ manager on import, so its font stack resolves on every machine.
   Rejected: it duplicates what matplotlib already does at construction and
   has to enumerate artist containers (patches, lines, collections, texts,
   colorbars) per chart type.
+- **A post-render halo on every `Line2D` at a fixed width.** Shipped first,
+  then dropped: it stroked box whiskers and violin inner lines inside their
+  bodies, and its 4pt under 1pt parallel-coordinate lines erased the chart.
+- **Wobbling collections through a no-op path effect.** Rejected: Agg skips
+  the sketch filter for collections, and a `Normal()` effect would route
+  scatter markers, hexbin cells and contours through `draw_path`; at 0.5pt
+  amplitude the result is invisible at chart scale and costs per-path drawing.
 - **Asking users to install a handwriting font.** Rejected: the theme would
   fall back to Helvetica on most machines and lose its identity; Comic Neue is
   small and OFL-licensed. xkcd Script is CC BY-NC and is never bundled.

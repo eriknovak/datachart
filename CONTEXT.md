@@ -319,9 +319,10 @@ explicit chart setting always wins.
 _Avoid_: forced setting, theme override
 
 **Sketch attributes**:
-The theme's render-scoped rc-level look (path wobble, halo stroke),
-snapshotted by the panel and applied inside a scoped rc context; `None` means
-off. The set is exactly those two attributes; nothing global changes.
+The theme's hand-drawn look: the path wobble, snapshotted by the panel and
+applied inside a scoped rc context, and the halo, a layer style stroked under
+series lines only; `None` means off. The set is exactly those two attributes;
+nothing global changes.
 _Avoid_: xkcd mode, rc theme
 
 **Hatch cycle**:

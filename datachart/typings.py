@@ -852,9 +852,10 @@ class ThemeDefaultAttrs(TypedDict):
 
 class SketchStyleAttrs(TypedDict):
     """The typing for the sketch attributes: the theme's render-scoped rc-level
-    look (path wobble, halo stroke). The panel snapshots both at build time and
-    applies them inside a scoped matplotlib rc context, so no global rc setting
-    changes; composition keeps the look of the figures it was built from.
+    look (path wobble, halo stroke). The panel snapshots the wobble at build
+    time and applies it inside a scoped matplotlib rc context, so no global rc
+    setting changes; the halo resolves like any style key, so a chart's `style`
+    can override it. Composition keeps the look of the figures it was built from.
 
     !!! info "Added in v0.9.1"
 
@@ -862,9 +863,10 @@ class SketchStyleAttrs(TypedDict):
         plot_sketch_params (Union[Tuple[float, float, float], None]): The path
             wobble as matplotlib sketch parameters `(scale, length, randomness)`;
             `plt.xkcd()` uses `(1, 100, 2)`. `None` draws clean paths.
-        plot_sketch_halo_width (Union[float, None]): The width of the white halo
-            stroked under the lines, so crossing lines read as cut-outs; text
-            and patches stay clean. `None` draws no halo.
+        plot_sketch_halo_width (Union[float, None]): The extra width, added to
+            the line width, of the white halo stroked under series lines (line,
+            radial, regression), so crossing lines read as cut-outs; marks, text
+            and patches stay clean. `None` or `0` draws no halo.
 
     """
 

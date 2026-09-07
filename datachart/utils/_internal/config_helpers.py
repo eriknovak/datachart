@@ -300,6 +300,26 @@ def get_area_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Sketch Halo
+# -------------------------------------
+
+
+def get_sketch_halo(chart_style: dict):
+    """The extra width of the white halo stroked around a series line.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The width in points added to the line width, or None when off.
+
+    """
+
+    halo = get_attr_value("plot_sketch_halo_width", chart_style, config)
+    return halo if halo else None
+
+
+# -------------------------------------
 # Stacked Area Style
 # -------------------------------------
 
