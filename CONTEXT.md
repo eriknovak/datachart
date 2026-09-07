@@ -347,6 +347,14 @@ once, derived from the active theme's `muted_*` attributes — never a separate
 theme.
 _Avoid_: greyed-out, background style
 
+**Marker edge rule**:
+A filled marker (scatter, bubble, swarm, radial scatter, network node) keeps
+its theme edge only while the stroke stays under a sixth of the marker
+diameter; a smaller marker draws with no edge, per marker for data-sized
+ones. A highlight edge is the emphasis cue and always stays. Hollow markers
+(box outliers) are exempt — their edge is the marker.
+_Avoid_: edge threshold, min marker size
+
 **Theme-level default**:
 A nullable theme attribute that supplies the default for a per-chart setting
 (grid visibility, bar value labels) when the chart call leaves it unset. An
