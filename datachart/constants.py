@@ -961,6 +961,10 @@ class THEME:
         HATCH (str): The hatch theme (hatch cycle, value labels, dotted grid). Equals to `"hatch"`.
         MINIMAL (str): The minimal theme (accent blue, no spines, flat bars). Equals to `"minimal"`.
         MATERIAL (str): The material theme (Google palette, light grid). Equals to `"material"`.
+        SKETCH (str): The sketch theme (hand-drawn, xkcd-style wobble and halo,
+            Comic Neue font). Equals to `"sketch"`.
+
+            !!! info "Added in Unreleased"
 
     """
 
@@ -970,6 +974,7 @@ class THEME:
     HATCH = "hatch"
     MINIMAL = "minimal"
     MATERIAL = "material"
+    SKETCH = "sketch"
 
 
 class EMPHASIS:

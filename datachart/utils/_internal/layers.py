@@ -18,6 +18,7 @@ from typing import List, NamedTuple, Optional, Union
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import rc_context
 import matplotlib.ticker as mticker
 from matplotlib.ticker import MaxNLocator
 from matplotlib.collections import LineCollection, PathCollection
@@ -3586,7 +3587,25 @@ class Panel:
             },
             # tick_params cannot set a font family; applied to the labels directly
             "font_family": resolve_font_family(),
+            # render-scoped rc attributes (ADR 0027); None means off
+            "sketch_params": config.get("plot_sketch_params"),
+            "sketch_halo_width": config.get("plot_sketch_halo_width"),
         }
+
+    def _sketch_rc(self) -> dict:
+        """The rc overrides for the sketch attributes, empty when both are off."""
+
+        furniture = self.settings.get("furniture") or {}
+        rc = {}
+        if furniture.get("sketch_params") is not None:
+            rc["path.sketch"] = tuple(furniture["sketch_params"])
+        if furniture.get("sketch_halo_width") is not None:
+            rc["path.effects"] = [
+                patheffects.withStroke(
+                    linewidth=furniture["sketch_halo_width"], foreground="w"
+                )
+            ]
+        return rc
 
     def _apply_furniture(
         self, ax: plt.Axes, axes_types=("xaxis", "yaxis"), spines=True
@@ -3604,12 +3623,25 @@ class Panel:
             else:
                 for axis, spine_style in furniture["spines"].items():
                     ax.spines[axis].set(**spine_style)
+            # the spines predate the render, so the rc context never saw them
+            rc = self._sketch_rc()
+            for spine in ax.spines.values():
+                if "path.sketch" in rc:
+                    spine.set_sketch_params(*rc["path.sketch"])
+                if "path.effects" in rc:
+                    spine.set_path_effects(rc["path.effects"])
         for axis_type in axes_types:
             getattr(ax, axis_type).set_tick_params(which="major", **furniture["ticks"])
 
     # ---------------- rendering ----------------
 
     def render(self, ax: plt.Axes) -> None:
+        # every artist created here copies the sketch attributes from the rc
+        # context at construction (ADR 0027); nothing global changes
+        with rc_context(self._sketch_rc()):
+            self._render(ax)
+
+    def _render(self, ax: plt.Axes) -> None:
         s = self.settings
 
         # one dataset per kind: a violin and a box may share the positions

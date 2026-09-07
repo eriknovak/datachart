@@ -18,3 +18,4 @@ title: Themes Module
 ::: datachart.themes.HATCH_THEME
 ::: datachart.themes.MINIMAL_THEME
 ::: datachart.themes.MATERIAL_THEME
+::: datachart.themes.SKETCH_THEME

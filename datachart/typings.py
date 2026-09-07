@@ -767,6 +767,27 @@ class ThemeDefaultAttrs(TypedDict):
     plot_hatch_cycle: Union[List[str], None]
 
 
+class SketchStyleAttrs(TypedDict):
+    """The typing for the sketch attributes: the theme's render-scoped rc-level
+    look (path wobble, halo stroke). The panel snapshots both at build time and
+    applies them inside a scoped matplotlib rc context, so no global rc setting
+    changes; composition keeps the look of the figures it was built from.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        plot_sketch_params (Union[Tuple[float, float, float], None]): The path
+            wobble as matplotlib sketch parameters `(scale, length, randomness)`;
+            `(1, 100, 2)` is the hand-drawn look. `None` draws clean paths.
+        plot_sketch_halo_width (Union[float, None]): The width of the white halo
+            stroked under every path and text. `None` draws no halo.
+
+    """
+
+    plot_sketch_params: Union[Tuple[float, float, float], None]
+    plot_sketch_halo_width: Union[float, None]
+
+
 class StyleAttrs(
     ColorStyleAttrs,
     FontStyleAttrs,
@@ -792,6 +813,7 @@ class StyleAttrs(
     ViolinStyleAttrs,
     ParallelCoordsStyleAttrs,
     ThemeDefaultAttrs,
+    SketchStyleAttrs,
 ):
     """The style attributes. Combines all style typings."""
 
