@@ -683,11 +683,11 @@ class Layer:
     projection: str = "cartesian"
     # a bare layer owns its axes: fixed limits, axis off, no panel furniture
     bare: bool = False
-    # (artist, resolver) pairs registered by the draw in progress (ADR 0031)
-    _hover_targets: Optional[list] = None
 
     def __init__(self, chart: dict, settings: dict):
         self.chart = chart
+        # (artist, resolver) pairs registered by the draw in progress (ADR 0031)
+        self._hover_targets = []
         self.settings = settings
         self.subtitle = chart.get("subtitle", None)
         self.style = chart.get("style", {}) or {}
@@ -743,14 +743,12 @@ class Layer:
         collects the pairs right after.
         """
 
-        if self._hover_targets is None:
-            self._hover_targets = []
         self._hover_targets.append((artist, resolver))
 
     def take_hover_targets(self) -> list:
         """Hand over the pairs registered by the last draw and forget them."""
 
-        targets, self._hover_targets = self._hover_targets or [], None
+        targets, self._hover_targets = self._hover_targets, []
         return targets
 
     def y_range(self) -> Optional[tuple]:
@@ -4832,10 +4830,12 @@ class Panel:
         parallel_stats = compute_parallel_stats(parallel_layers)
         parallel_axes_owner = parallel_layers[-1] if parallel_layers else None
 
-        # hover targets ride on the figure being drawn into, next to the
-        # transport: layers are shared by every figure they are redrawn
-        # into, so the artists of one render must not stick to them (ADR 0031)
-        hover_targets = ax.figure.__dict__.setdefault("_hover_targets", [])
+        # hover targets ride on the figure drawn into, not on the layers a
+        # source figure shares with every composition of it (ADR 0031)
+        figure = ax.figure
+        if getattr(figure, "_hover_targets", None) is None:
+            figure._hover_targets = []
+        hover_targets = figure._hover_targets
         group_axes = []
         for group, assignment in zip(self.groups, assignments):
             target_ax = ax_right if assignment == "right" else ax

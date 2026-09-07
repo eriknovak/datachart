@@ -1,9 +1,10 @@
-"""Unmanaged figure construction.
+"""Unmanaged figure construction and display.
 
 Figures are created directly — never through pyplot — so they are owned by the
 caller and garbage-collected like any object instead of accumulating in
 pyplot's global figure manager. Displaying is explicit via
-`DatachartFigure.show`.
+`DatachartFigure.show`, which with `interactive=True` also attaches the hover
+annotations over the layers' registered hover targets (ADR 0031).
 """
 
 import importlib
@@ -50,11 +51,14 @@ def _axis_name(ax, which: str) -> str:
     """The visible label of an axis: its own, a shared sibling's, the figure's, or `x`/`y`.
 
     A twin axes labels only the axis it adds, so the shared one is read off
-    its siblings; a chart figure labels its single plot at the figure level.
+    the siblings in its slot — never a grid cell sharing the axis from another
+    slot; a chart figure labels its single plot at the figure level.
     """
 
     shared = ax.get_shared_x_axes() if which == "x" else ax.get_shared_y_axes()
-    for candidate in [ax, *shared.get_siblings(ax)]:
+    slot = ax.get_position().bounds
+    twins = [s for s in shared.get_siblings(ax) if s.get_position().bounds == slot]
+    for candidate in [ax, *twins]:
         label = getattr(candidate, f"get_{which}label")().strip()
         if label:
             return label
@@ -94,7 +98,7 @@ def _selection_index(index) -> int:
     """
 
     if hasattr(index, "int"):
-        return index.int
+        return int(index.int)
     return int(round(float(index)))
 
 
@@ -197,6 +201,10 @@ class DatachartFigure(Figure):
 
         if getattr(self, "_hover_canvas", None) is self.canvas:
             return
+        previous = getattr(self, "_hover_cursor", None)
+        if previous is not None:
+            # bound to the canvas a previous show() swapped out
+            previous.remove()
         targets = getattr(self, "_hover_targets", [])
         resolvers = {id(artist): resolver for artist, resolver in targets}
 

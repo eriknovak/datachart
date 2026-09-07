@@ -218,6 +218,41 @@ class TestShowInteractive:
         # the grid-level ylabel names the axis the cell left unlabeled
         assert _hover(grid, bar_ax, 0, 0.5)[0].startswith("north\nRegion: A\nValue: ")
 
+    def test_step_line_hover_snaps_to_the_source_point(self):
+        figure = LineChart(
+            data=LINE_DATA[0],
+            subtitle="steps",
+            style={"plot_line_drawstyle": "steps-post"},
+        )
+        _show_interactive(figure)
+        # on the riser between x=1 and x=2, which the post step draws at x=2
+        texts = _hover(figure, figure.axes[0], 2, 3)
+        assert texts == ["steps\nx: 1\ny: 2"]
+
+    def test_shared_grid_axes_keep_their_own_labels(self):
+        grid = Grid(
+            [[_line_fig(ylabel="Apples"), _line_fig()]], sharey=True, sharex=True
+        )
+        _show_interactive(grid)
+        assert _hover(grid, grid.axes[1], 2, 4) == ["fast\nx: 2\ny: 4"]
+
+    def test_interactive_after_static_show_rebinds_the_cursor(self):
+        figure = _line_fig()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            figure.show()
+        _show_interactive(figure)
+        first = figure._hover_cursor
+        old_canvas = figure.canvas
+        # a fresh canvas gets a fresh cursor; the stale one is disconnected
+        figure.set_canvas(FigureCanvasAgg(figure))
+        _show_interactive(figure)
+        assert figure._hover_cursor is not first
+        px, py = _pixel(figure.axes[0], 2, 4)
+        event = MouseEvent("motion_notify_event", old_canvas, px, py)
+        old_canvas.callbacks.process("motion_notify_event", event)
+        assert first.selections == ()
+
     def test_missing_mplcursors_raises_import_error(self, monkeypatch):
         monkeypatch.setitem(sys.modules, "mplcursors", None)
         with pytest.raises(ImportError, match=r"datachart\[interactive\]"):
