@@ -21,6 +21,7 @@ ScatterChart(
         "y":    Union[int, float],                      # The y-axis value
         "size": Optional[Union[int, float]],            # The marker size value (for bubble charts)
         "hue":  Optional[str],                          # The category for color grouping
+        "label": Optional[str],                         # The label drawn beside the point
     }],
     style={                                             # The style of the scatter markers (optional)
         "plot_scatter_color":      Optional[str],       # The color of the markers (hex color code)
@@ -71,6 +72,7 @@ ScatterChart(
     y=Optional[str],                                    # the key holding the y-axis value (default: "y")
     size=Optional[str],                                 # the key holding the marker size value (bubble charts)
     hue=Optional[str],                                  # the key holding the category for color grouping
+    label=Optional[str],                                # the key holding the point label (default: "label")
     size_range=Optional[Tuple[float, float]],           # the (min_size, max_size) range for bubble charts (default: (20, 200))
 )
 ```
@@ -113,6 +115,7 @@ Every customization is either a keyword argument of `ScatterChart` or a `plot_sc
 | outline the markers                    | `style={"plot_scatter_edge_width": ..., "plot_scatter_edge_color": ...}` | [Scatter style](#scatter-style)                               |
 | color the points by a category         | `hue`, `show_legend`                                                     | [Hue grouping](#hue-grouping)                                 |
 | scale the markers by a value           | `size`, `size_range`                                                     | [Bubble chart](#bubble-chart)                                 |
+| name each point                        | `label`                                                                  | [Point labels](#point-labels)                                 |
 | fit a regression line                  | `show_regression`, `show_ci`, `ci_level`, `show_correlation`             | [Regression line](#regression-line)                           |
 | fix the aspect ratio of the axes       | `aspect_ratio`                                                           | [Aspect ratio](#aspect-ratio)                                 |
 | highlight one series, mute the rest    | `emphasis`                                                               | [Emphasis](#emphasis)                                         |
@@ -120,7 +123,7 @@ Every customization is either a keyword argument of `ScatterChart` or a `plot_sc
 | compare several series in one chart    | `data` as a list of lists, `subtitle`, `show_legend`                     | [Multiple Scatter Charts](#multiple-scatter-charts)           |
 | draw each series in its own subplot    | `subplots`, `sharex`, `sharey`, `max_cols`                               | [Subplots](#subplots)                                         |
 | use a logarithmic axis                 | `scalex`, `scaley`                                                       | [Axis scales](#axis-scales)                                   |
-| plot data with other key names         | `x`, `y`, `size`, `hue`                                                  | [Custom data keys](#custom-data-keys)                         |
+| plot data with other key names         | `x`, `y`, `size`, `hue`, `label`                                         | [Custom data keys](#custom-data-keys)                         |
 | save the chart to a file               | `save_figure`                                                            | [Saving the Chart as an Image](#saving-the-chart-as-an-image) |
 
 The full list of style attributes is in the [datachart.typings.ScatterStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ScatterStyleAttrs) type; the full list of parameters is in the [datachart.charts.ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.ScatterChart) reference.
@@ -276,6 +279,75 @@ ScatterChart(
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.BOTH,
+    show_legend=True,
+).show()
+```
+
+### Point labels
+
+To name the points, add the `label` attribute with the name of the key that holds each point's label — here the `country` key. Each label sits beside its marker at the spot with the least overlap against the other markers, the labels already placed, the regression line and correlation box, and the axes edge, so a crowded chart stays readable without hand-placed annotations. Labels take the `plot_text_*` font of the active theme.
+
+```
+americas = [point for point in countries if point["continent"] == "Americas"]
+
+ScatterChart(
+    data=americas,
+    # name each point after its country
+    label="country",
+    title="Life expectancy vs. GDP per capita in the Americas",
+    xlabel="GDP per capita (USD)",
+    ylabel="Life expectancy (years)",
+    xticks=GDP_TICKS,
+    xticklabels=GDP_TICK_LABELS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.BOTH,
+).show()
+```
+
+**Labelling only some points.** Points without the key stay unlabelled, so a label on a handful of points singles them out among the rest. The `notable_countries` list below carries the `label` key — the default key, so `label` need not be passed — on the most populous country of every continent and the two richest ones.
+
+```
+NOTABLE = {"Nigeria", "United States", "India", "Germany", "Switzerland", "Norway"}
+
+notable_countries = [
+    {**point, "label": point["country"]} if point["country"] in NOTABLE else point
+    for point in countries
+]
+
+ScatterChart(
+    data=notable_countries,
+    hue="continent",
+    title="Life expectancy vs. GDP per capita",
+    xlabel="GDP per capita (USD)",
+    ylabel="Life expectancy (years)",
+    xticks=GDP_TICKS,
+    xticklabels=GDP_TICK_LABELS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.BOTH,
+    show_legend=True,
+).show()
+```
+
+**Labels and emphasis.** Labels combine with [emphasis](#emphasis): split the points into two series, mute the rest as `"background"` and highlight the notable ones. Like `subtitle` and `emphasis`, `label` takes one entry per series, and `None` leaves a series unlabelled — so the muted series needs no label key at all. A background series that does carry labels draws them in the muted color.
+
+```
+notable = [point for point in countries if point["country"] in NOTABLE]
+other = [point for point in countries if point["country"] not in NOTABLE]
+
+ScatterChart(
+    data=[other, notable],
+    subtitle=["other countries", "notable countries"],
+    # mute the rest, highlight the notable countries
+    emphasis=["background", "highlight"],
+    # label the notable countries only
+    label=[None, "country"],
+    title="Life expectancy vs. GDP per capita",
+    xlabel="GDP per capita (USD)",
+    ylabel="Life expectancy (years)",
+    xticks=GDP_TICKS,
+    xticklabels=GDP_TICK_LABELS,
+    figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.BOTH,
     show_legend=True,
 ).show()
@@ -548,7 +620,7 @@ for scale in [SCALE.LINEAR, SCALE.LOG]:
 
 ### Custom data keys
 
-By default, the `data` items are dictionaries with the keys `x` and `y`, and `size` and `hue` name whichever keys hold the bubble size and the category. Data that comes from elsewhere rarely calls its columns `x` and `y`, and renaming every key just to plot it is a chore. Instead, tell `ScatterChart` which keys to read with the `x` and `y` arguments. The `country_records` list below stores the same countries under their natural names.
+By default, the `data` items are dictionaries with the keys `x` and `y`, and `size`, `hue` and `label` name whichever keys hold the bubble size, the category and the point label. Data that comes from elsewhere rarely calls its columns `x` and `y`, and renaming every key just to plot it is a chore. Instead, tell `ScatterChart` which keys to read with the `x` and `y` arguments. The `country_records` list below stores the same countries under their natural names.
 
 ```
 country_records = [
@@ -678,9 +750,9 @@ ScatterChart(
 ).show()
 ```
 
-### Example 4: European Cities (Bubble Chart with an Equal Aspect Ratio)
+### Example 4: European Cities (Bubble Chart with Point Labels and an Equal Aspect Ratio)
 
-`cities` holds the longitude, latitude and metropolitan population (in millions, rounded) of 21 European cities. Plotting longitude against latitude turns the scatter chart into a map, which only keeps its shape if a degree is the same length on both axes — hence `aspect_ratio`. `size` scales each bubble by population and `size_range` is widened so that the capitals dominate the map the way they dominate the continent.
+`cities` holds the longitude, latitude and metropolitan population (in millions, rounded) of 21 European cities. Plotting longitude against latitude turns the scatter chart into a map, which only keeps its shape if a degree is the same length on both axes — hence `aspect_ratio`. `size` scales each bubble by population and `size_range` is widened so that the capitals dominate the map the way they dominate the continent; `label` names every bubble, and the names slide around their bubbles to stay clear of the neighbours.
 
 ```
 from datachart.constants import ASPECT_RATIO
@@ -692,6 +764,8 @@ ScatterChart(
     # scale the bubbles by population
     size="population",
     size_range=(30, 900),
+    # name each bubble
+    label="city",
     style={
         "plot_scatter_alpha": 0.5,
         "plot_scatter_edge_width": 0.8,

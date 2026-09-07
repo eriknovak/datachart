@@ -340,6 +340,7 @@ The single chart attributes for the scatter chart.
 | `y`           | The key name in data that contains the y-axis value. Defaults to "y". **TYPE:** `Union[str, None]`    |
 | `size`        | The key name in data that contains the marker size value. **TYPE:** `Union[str, None]`                |
 | `hue`         | The key name in data that contains the hue/category value. **TYPE:** `Union[str, None]`               |
+| `label`       | The key name in data that contains the point label. **TYPE:** `Union[str, None]`                      |
 
 #### datachart.typings.ScatterDataPointAttrs
 
@@ -353,6 +354,7 @@ The data point attributes for the scatter chart.
 | `y`       | The y-axis value. **TYPE:** `Union[int, float]`                              |
 | `size`    | The marker size (for bubble charts). **TYPE:** `Optional[Union[int, float]]` |
 | `hue`     | The category for color grouping. **TYPE:** `Optional[str]`                   |
+| `label`   | The label drawn beside the point. **TYPE:** `Optional[str]`                  |
 
 ### Box Chart (Box Plot) Typings
 
