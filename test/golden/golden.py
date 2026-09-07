@@ -36,6 +36,7 @@ from datachart.charts import (
     HexbinChart,
     StackedAreaChart,
     SankeyChart,
+    Treemap,
 )
 from datachart.utils import Panel, Grid, Annotate
 from datachart.config import config
@@ -148,6 +149,12 @@ EXPECTED_CHANGES = {
     "sankey_subplots",
     "sankey_grid",
     "sankey_values_labels",
+    # new treemap cases (ADR 0028)
+    "treemap_flat",
+    "treemap_nested",
+    "treemap_emphasis",
+    "treemap_values",
+    "treemap_grid",
     # line-only panels hug the data range like line charts (ADR 0025)
     "overlay_line_line",
     "overlay_theme_snapshot",
@@ -1499,6 +1506,108 @@ def sankey_values_labels():
 @case
 def sankey_grid():
     left = SankeyChart(sankey_links(SANKEY_FUNNEL), title="funnel")
+    right = LineChart(data=LINE1, title="line")
+    return Grid([[left, right]], figsize=(10, 4))
+
+
+TREEMAP_BUDGET = [
+    ("Salaries", 520),
+    ("Cloud", 180),
+    ("Marketing", 140),
+    ("Office", 90),
+    ("Travel", 45),
+    ("Legal", 25),
+]
+TREEMAP_WORLD = {
+    "Asia": [
+        ("India", 1429),
+        ("China", 1426),
+        ("Indonesia", 278),
+        ("Pakistan", 240),
+        ("Bangladesh", 173),
+        ("Japan", 123),
+        ("Rest of Asia", 1084),
+    ],
+    "Africa": [
+        ("Nigeria", 224),
+        ("Ethiopia", 127),
+        ("Egypt", 113),
+        ("DR Congo", 102),
+        ("Rest of Africa", 895),
+    ],
+    "Europe": [
+        ("Russia", 144),
+        ("Germany", 83),
+        ("UK", 68),
+        ("France", 65),
+        ("Rest of Europe", 382),
+    ],
+    "N. America": [("USA", 340), ("Mexico", 128), ("Rest", 132)],
+    "S. America": [("Brazil", 216), ("Rest", 220)],
+    "Oceania": [("Australia", 26), ("Rest", 19)],
+}
+
+
+def treemap_records(rows, emphasis=None):
+    emphasis = emphasis or {}
+    records = []
+    for label, value in rows:
+        record = {"label": label, "value": value}
+        if label in emphasis:
+            record["emphasis"] = emphasis[label]
+        records.append(record)
+    return records
+
+
+def treemap_world(emphasis=None):
+    emphasis = emphasis or {}
+    records = []
+    for group, rows in TREEMAP_WORLD.items():
+        record = {"label": group, "children": treemap_records(rows, emphasis)}
+        if group in emphasis:
+            record["emphasis"] = emphasis[group]
+        records.append(record)
+    return {"data": records}
+
+
+@case
+def treemap_flat():
+    return Treemap({"data": treemap_records(TREEMAP_BUDGET)}, title="Budget")
+
+
+@case
+def treemap_nested():
+    return Treemap(
+        treemap_world(),
+        title="World population by continent and country",
+        figsize=(8, 4.5),
+    )
+
+
+@case
+def treemap_emphasis():
+    return Treemap(
+        treemap_world(
+            {"Asia": "background", "India": "highlight", "Europe": "highlight"}
+        ),
+        show_legend=True,
+        figsize=(8, 4.5),
+    )
+
+
+@case
+def treemap_values():
+    return Treemap(
+        treemap_world(),
+        show_values=True,
+        value_format=VALUE_FORMAT.INTEGER,
+        figsize=(8, 4.5),
+    )
+
+
+@case
+def treemap_grid():
+    left = Treemap(treemap_world(), title="population")
     right = LineChart(data=LINE1, title="line")
     return Grid([[left, right]], figsize=(10, 4))
 
