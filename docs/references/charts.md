@@ -40,3 +40,8 @@ title: Charts Module
 ## Flows
 
 ::: datachart.charts.SankeyChart
+
+
+## Part of a Whole
+
+::: datachart.charts.Treemap
