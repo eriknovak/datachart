@@ -3015,6 +3015,21 @@ def _radial_theta(n: int) -> np.ndarray:
     return np.linspace(0, 2 * np.pi, n, endpoint=False)
 
 
+def _radial_resolver(label, angles, radii) -> Callable[[int], dict]:
+    """The hover resolver of radial marks; polar axes carry no axis labels, so
+    the fields keep their own keys. Indices wrap, for a closed line's repeat."""
+
+    def resolve(index: int) -> dict:
+        i = int(index) % len(radii)
+        return {
+            "label": label,
+            "angle": _scalar(angles[i]),
+            "radius": _scalar(radii[i]),
+        }
+
+    return resolve
+
+
 class RadialLayer(Layer):
     """A layer drawn on a polar axes; angles are degrees in, radians internally."""
 
@@ -3083,7 +3098,8 @@ class RadialLineLayer(RadialLayer):
             yerr = np.append(yerr, yerr[0])
             ax.fill_between(theta, y - yerr, y + yerr, **self._resolved_area_style(ctx))
 
-        ax.plot(theta, y, **line_style, label=self.label(ctx))
+        (line,) = ax.plot(theta, y, **line_style, label=self.label(ctx))
+        self.register_hover(line, _radial_resolver(self.label(ctx), labels, y[:-1]))
 
         if self.show_area:
             # the fill reaches the center (or the innerradius hole clips it)
@@ -3150,7 +3166,10 @@ class RadialBarLayer(RadialLayer):
             for i, (t, r, v) in enumerate(zip(theta, tops, y))
         ]
 
-        ax.bar(theta + theta_offset, y, yerr=yerr, label=self.label(ctx), **bar_style)
+        bars = ax.bar(
+            theta + theta_offset, y, yerr=yerr, label=self.label(ctx), **bar_style
+        )
+        self.register_hover(bars, _radial_resolver(self.label(ctx), labels, y))
 
 
 class RadialScatterLayer(RadialLayer):
@@ -3184,7 +3203,8 @@ class RadialScatterLayer(RadialLayer):
         self._tips = [
             (float(t), float(v), float(v), i) for i, (t, v) in enumerate(zip(theta, y))
         ]
-        ax.scatter(theta, y, label=self.label(ctx), **scatter_style)
+        points = ax.scatter(theta, y, label=self.label(ctx), **scatter_style)
+        self.register_hover(points, _radial_resolver(self.label(ctx), labels, y))
 
 
 class RadialHistogramLayer(RadialLayer):
@@ -3239,13 +3259,15 @@ class RadialHistogramLayer(RadialLayer):
         self._tips = [
             (float(c), float(n), float(n), None) for c, n in zip(centers, counts)
         ]
-        ax.bar(
+        bars = ax.bar(
             centers,
             counts,
             width=np.diff(theta_edges),
             label=self.label(ctx),
             **hist_style,
         )
+        spans = [f"{lo:g}° – {hi:g}°" for lo, hi in zip(edges[:-1], edges[1:])]
+        self.register_hover(bars, _radial_resolver(self.label(ctx), spans, counts))
 
 
 # the carrier keeps post-hoc texts on the layer seam (ADR 0018)

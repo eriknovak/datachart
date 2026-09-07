@@ -38,6 +38,7 @@ from datachart.charts import (
     SankeyChart,
     Treemap,
     NetworkChart,
+    RadialChart,
 )
 from datachart.constants import HISTOGRAM_TYPE
 from datachart.utils import Panel, Grid
@@ -400,6 +401,42 @@ class TestAggregateLayers:
         assert edge(0) == {"label": None, "source": "a", "target": "b"}
 
 
+RADIAL_DATA = [{"label": l, "y": v} for l, v in zip("NESW", [5, 10, 15, 20])]
+
+
+class TestRadialLayers:
+    """Radial marks report their angle and radius under their own keys."""
+
+    def test_radial_marks_report_angle_and_radius(self):
+        ((line, resolver),) = _targets(RadialChart(data=RADIAL_DATA, subtitle="wind"))
+        assert isinstance(line, Line2D)
+        assert resolver(1) == {"label": "wind", "angle": "E", "radius": 10}
+        # the closing point repeats the first
+        assert resolver(4) == resolver(0)
+        ((bars, resolver),) = _targets(RadialChart(data=RADIAL_DATA, type="bar"))
+        assert isinstance(bars, BarContainer)
+        assert resolver(3) == {"label": None, "angle": "W", "radius": 20}
+        ((points, resolver),) = _targets(RadialChart(data=RADIAL_DATA, type="scatter"))
+        assert isinstance(points, PathCollection)
+        assert resolver(2) == {"label": None, "angle": "S", "radius": 15}
+
+    def test_stacked_radial_bars_report_their_own_value(self):
+        figure = RadialChart(
+            data=[RADIAL_DATA, RADIAL_DATA], type="bar", bar_mode="stack"
+        )
+        assert [r(0)["radius"] for _, r in _targets(figure)] == [5, 5]
+
+    def test_radial_histogram_bins_report_degree_ranges(self):
+        figure = RadialChart(
+            data=[{"x": d} for d in [5, 10, 100, 200, 350]],
+            type="histogram",
+            num_bins=4,
+        )
+        ((bars, resolver),) = _targets(figure)
+        assert isinstance(bars, BarContainer)
+        assert resolver(0) == {"label": None, "angle": "0° – 90°", "radius": 2}
+
+
 class TestHoverText:
     """The annotation lists the datum's fields in order; x and y are axis coordinates."""
 
@@ -608,6 +645,14 @@ class TestShowInteractive:
         _show_interactive(figure)
         assert _hover(figure, figure.axes[0], 0.5, 0.5) == [
             "source: a\ntarget: b\nweight: 4"
+        ]
+
+    def test_radial_bar_hover_names_the_category(self):
+        figure = RadialChart(data=RADIAL_DATA, type="bar", subtitle="wind")
+        _show_interactive(figure)
+        # the "E" bar sits a quarter turn in and reaches radius 10
+        assert _hover(figure, figure.axes[0], np.pi / 2, 5) == [
+            "wind\nangle: E\nradius: 10"
         ]
 
     def test_heatmap_hover_reports_the_cell(self):
