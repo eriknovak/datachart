@@ -36,6 +36,8 @@ Methods:
         Creates the parallel coordinates chart.
     SankeyChart(attrs):
         Creates the Sankey chart.
+    NetworkChart(attrs):
+        Creates the network chart.
     Treemap(attrs):
         Creates the treemap.
 
@@ -62,8 +64,9 @@ from .contour_chart import ContourChart
 from .hexbin_chart import HexbinChart
 from .parallel_coords import ParallelCoords
 
-# flows
+# flows and relations
 from .sankey_chart import SankeyChart
+from .network_chart import NetworkChart
 
 # part of a whole
 from .treemap import Treemap
@@ -87,8 +90,9 @@ __all__ = [
     "ContourChart",
     "HexbinChart",
     "ParallelCoords",
-    # flows
+    # flows and relations
     "SankeyChart",
+    "NetworkChart",
     # part of a whole
     "Treemap",
 ]

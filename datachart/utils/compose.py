@@ -46,8 +46,12 @@ from ._internal.layers import (
 )
 
 # figures whose layer owns its axes: no shared coordinate space to overlay
-# (ADR 0026, ADR 0028)
-BARE_FIGURES = {"sankeychart": "Sankey", "treemap": "treemap"}
+# (ADR 0026, ADR 0028, ADR 0029)
+BARE_FIGURES = {
+    "sankeychart": "Sankey",
+    "treemap": "treemap",
+    "networkchart": "network",
+}
 
 OVERLAYABLE_LAYERS = (
     LineLayer,

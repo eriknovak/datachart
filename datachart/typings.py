@@ -15,6 +15,9 @@ Classes:
     SankeyLinkAttrs: The link record attributes for the Sankey chart.
     TreemapSingleChartAttrs: The single chart attributes for the treemap.
     TreemapRecordAttrs: The record attributes for the treemap.
+    NetworkSingleChartAttrs: The single chart attributes for the network chart.
+    NetworkNodeAttrs: The node record attributes for the network chart.
+    NetworkEdgeAttrs: The edge record attributes for the network chart.
     BarSingleChartAttrs: The single chart attributes for the bar chart.
     BarDataPointAttrs: The data point attributes for the bar chart.
     HistogramSingleChartAttrs: The single chart attributes for the histogram chart.
@@ -52,6 +55,7 @@ Classes:
     StackedAreaStyleAttrs: The typing for the stacked area chart style.
     SankeyStyleAttrs: The typing for the Sankey chart style.
     TreemapStyleAttrs: The typing for the treemap style.
+    NetworkStyleAttrs: The typing for the network chart style.
     BarStyleAttrs: The typing for the bar style.
     HistStyleAttrs: The typing for the histogram style.
     VLineStyleAttrs: The typing for the vertical line style.
@@ -76,6 +80,7 @@ from typing import TypedDict, Union, Tuple, List, Optional, Dict
 import matplotlib.colors as colors
 from .constants import (
     ARROW_STYLE,
+    NETWORK_LAYOUT,
     BAR_MODE,
     FIG_SIZE,
     FONT_STYLE,
@@ -372,6 +377,47 @@ class TreemapStyleAttrs(TypedDict):
     plot_treemap_min_fontsize: Union[float, None]
     plot_treemap_highlight_edge_width: Union[float, None]
     plot_treemap_label_halo_width: Union[float, None]
+
+
+class NetworkStyleAttrs(TypedDict):
+    """The typing for the network chart style.
+
+    Attributes:
+        plot_network_node_color (Union[str, None]): The node marker color; overrides the color cycle.
+        plot_network_node_alpha (Union[float, None]): The alpha value of the node markers.
+        plot_network_node_marker (Union[LINE_MARKER, str, None]): The node marker shape.
+        plot_network_node_size (Union[int, float, None]): The marker area of a node without `size`.
+        plot_network_node_size_min (Union[int, float, None]): The marker area of the smallest sized node.
+        plot_network_node_size_max (Union[int, float, None]): The marker area of the largest sized node.
+        plot_network_node_edge_color (Union[str, None]): The node stroke color.
+        plot_network_node_edge_width (Union[int, float, None]): The node stroke width.
+        plot_network_edge_style (Union[ARROW_STYLE, str, None]): The edge geometry: `ARROW_STYLE.CURVE` or `ARROW_STYLE.STRAIGHT`.
+        plot_network_edge_curve (Union[float, None]): The bow of a curved edge; the sign picks the side.
+        plot_network_edge_color (Union[str, None]): The edge color.
+        plot_network_edge_alpha (Union[float, None]): The edge alpha.
+        plot_network_edge_width_min (Union[int, float, None]): The width of the lightest edge, and of an edge without `weight`.
+        plot_network_edge_width_max (Union[int, float, None]): The width of the heaviest edge.
+        plot_network_highlight_edge_width (Union[float, None]): The stroke width of a highlighted node.
+        plot_network_label_halo_width (Union[float, None]): The width of the white halo behind labels; 0 disables it.
+
+    """
+
+    plot_network_node_color: Union[str, None]
+    plot_network_node_alpha: Union[float, None]
+    plot_network_node_marker: Union[LINE_MARKER, str, None]
+    plot_network_node_size: Union[int, float, None]
+    plot_network_node_size_min: Union[int, float, None]
+    plot_network_node_size_max: Union[int, float, None]
+    plot_network_node_edge_color: Union[str, None]
+    plot_network_node_edge_width: Union[int, float, None]
+    plot_network_edge_style: Union[ARROW_STYLE, str, None]
+    plot_network_edge_curve: Union[float, None]
+    plot_network_edge_color: Union[str, None]
+    plot_network_edge_alpha: Union[float, None]
+    plot_network_edge_width_min: Union[int, float, None]
+    plot_network_edge_width_max: Union[int, float, None]
+    plot_network_highlight_edge_width: Union[float, None]
+    plot_network_label_halo_width: Union[float, None]
 
 
 class BarStyleAttrs(TypedDict):
@@ -831,6 +877,7 @@ class StyleAttrs(
     StackedAreaStyleAttrs,
     SankeyStyleAttrs,
     TreemapStyleAttrs,
+    NetworkStyleAttrs,
     BarStyleAttrs,
     HistStyleAttrs,
     VLineStyleAttrs,
@@ -1234,6 +1281,91 @@ class _TreemapChartAttrs(ChartCommonAttrs):
     charts: Union[TreemapSingleChartAttrs, List[TreemapSingleChartAttrs]]
     show_values: Union[bool, None]
     value_format: Union[VALUE_FORMAT, str, None]
+
+
+# ================================================
+# Network Chart Attributes
+# ================================================
+
+
+class NetworkNodeAttrs(TypedDict):
+    """The node record attributes for the network chart.
+
+    Attributes:
+        id (str): The node identifier the edges refer to; unique within a chart.
+        label (Union[str, None]): The drawn label; defaults to `id`. An empty string draws nothing.
+        size (Union[int, float, None]): The node size, mapped by square root to marker area; must be greater than 0.
+        group (Union[str, None]): The group the node is colored by.
+        emphasis (Union[EMPHASIS, str, None]): The emphasis role of the node.
+        x (Union[float, None]): The node's horizontal position in the 0–1 layout space; `NETWORK_LAYOUT.FIXED` only.
+        y (Union[float, None]): The node's vertical position in the 0–1 layout space; `NETWORK_LAYOUT.FIXED` only.
+
+    """
+
+    id: str
+    label: Union[str, None]
+    size: Union[int, float, None]
+    group: Union[str, None]
+    emphasis: Union[EMPHASIS, str, None]
+    x: Union[float, None]
+    y: Union[float, None]
+
+
+class NetworkEdgeAttrs(TypedDict):
+    """The edge record attributes for the network chart.
+
+    Attributes:
+        source (str): The id of the node the edge leaves.
+        target (str): The id of the node the edge enters.
+        weight (Union[int, float, None]): The edge weight, mapped to its width; must be greater than 0.
+
+    """
+
+    source: str
+    target: str
+    weight: Union[int, float, None]
+
+
+class NetworkSingleChartAttrs(TypedDict):
+    """The single chart attributes for the network chart.
+
+    Attributes:
+        nodes (Union[List[NetworkNodeAttrs], None]): The nodes; inferred from the edges when omitted.
+        edges (List[NetworkEdgeAttrs]): The edges.
+        subtitle (Union[str, None]): The subtitle of the chart.
+        style (Union[NetworkStyleAttrs, None]): The style of the chart.
+        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+
+    """
+
+    nodes: Union[List[NetworkNodeAttrs], None]
+    edges: List[NetworkEdgeAttrs]
+    subtitle: Union[str, None]
+    style: Union[NetworkStyleAttrs, None]
+    texts: Union[TextAttrs, List[TextAttrs]]
+
+
+class _NetworkChartAttrs(ChartCommonAttrs):
+    """The network chart attributes.
+
+    Attributes:
+        charts (Union[NetworkSingleChartAttrs, List[NetworkSingleChartAttrs]]): The chart definitions.
+        layout (Union[NETWORK_LAYOUT, str, None]): The node placement rule.
+        directed (Union[bool, None]): Whether the edges end in arrowheads.
+        seed (Union[int, None]): The seed of the spring layout.
+        show_values (Union[bool, None]): Whether to write each edge's weight at its midpoint.
+        value_format (Union[VALUE_FORMAT, str, None]): The format of the edge values.
+        show_legend (Union[bool, None]): Whether to list the node groups in a legend.
+
+    """
+
+    charts: Union[NetworkSingleChartAttrs, List[NetworkSingleChartAttrs]]
+    layout: Union[NETWORK_LAYOUT, str, None]
+    directed: Union[bool, None]
+    seed: Union[int, None]
+    show_values: Union[bool, None]
+    value_format: Union[VALUE_FORMAT, str, None]
+    show_legend: Union[bool, None]
 
 
 # ================================================
