@@ -2114,9 +2114,9 @@
 <li><strong>Scripts.</strong> The figure opens in the GUI window it always did; the window's own toolbar provides the zoom and pan.</li>
 </ul>
 <h2 id="hover-to-inspect">Hover to inspect</h2>
-<p>Hovering a mark shows an annotation with the series' legend label on the first line — its <code>subtitle</code>, or the <code>legend_label</code> a <code>Panel</code> assigned — and one <code>name: value</code> line per axis. The names are the axis labels of the chart when set (<code>xlabel</code>, <code>ylabel</code>, and a <code>Panel</code>'s <code>ylabel_left</code> / <code>ylabel_right</code>), and <code>x</code> / <code>y</code> otherwise; a series on a <code>Panel</code>'s secondary value axis reports the secondary label. Values are formatted the way the axis formats its coordinates, so a point on a category axis reports the category name. The annotation wears the theme's text annotation style — the <code>plot_text_*</code> font, box, and connector — so it matches the figure it sits on.</p>
-<p>Hover follows the marks through composition: it works on every series of a <code>Panel</code> overlay, including those on the secondary axis, and in every cell of a <code>Grid</code>.</p>
-<p>The chart types with hover support:</p>
+<p>Hovering a mark shows an annotation with the series' legend label on the first line — its <code>subtitle</code>, or the <code>legend_label</code> a <code>Panel</code> assigned — and one <code>name: value</code> line per field of the mark. A mark that stands for a data point reports its axis coordinates: the names are the axis labels of the chart when set (<code>xlabel</code>, <code>ylabel</code>, and a <code>Panel</code>'s <code>ylabel_left</code> / <code>ylabel_right</code>), and <code>x</code> / <code>y</code> otherwise; a series on a <code>Panel</code>'s secondary value axis reports the secondary label. Values are formatted the way the axis formats its coordinates, so a point on a category axis reports the category name. A mark that stands for an aggregate reports its summary under plain names — a box its <code>median</code> and quartiles, a histogram bin its range and count, a sankey link its endpoints and <code>flow</code>. The annotation wears the theme's text annotation style — the <code>plot_text_*</code> font, box, and connector — so it matches the figure it sits on.</p>
+<p>Hover follows the marks through composition: it works on every series of a <code>Panel</code> overlay, including those on the secondary axis, and in every cell of a <code>Grid</code>. Text annotations and reference lines decorate the chart and carry no hover.</p>
+<p>Every chart type has hover support. Filled marks — bars, bands, boxes, bodies, cells, hexagons, tiles, nodes, ribbons — pick anywhere inside; lines, outlines, and network edges pick within a few points of their stroke, as do the outline of a <code>step</code> histogram and the edges of a filled contour band.</p>
 <table>
 <thead>
 <tr>
@@ -2132,18 +2132,219 @@
 <td style="text-align: left;">legend label, <code>x</code>, <code>y</code></td>
 </tr>
 <tr>
-<td style="text-align: left;"><a href="../../charts/scatterchart/">Scatter Chart</a></td>
-<td style="text-align: left;">scatter point</td>
-<td style="text-align: left;">legend label (or the <code>hue</code> group), <code>x</code>, <code>y</code></td>
+<td style="text-align: left;"><a href="../../charts/stackedareachart/">Stacked Area Chart</a></td>
+<td style="text-align: left;">band, at the nearest point</td>
+<td style="text-align: left;">legend label, <code>x</code>, the series' own <code>y</code> (never the stack total)</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="../../charts/barchart/">Bar Chart</a></td>
 <td style="text-align: left;">bar</td>
-<td style="text-align: left;">legend label, category, the bar's own value</td>
+<td style="text-align: left;">legend label, category, the bar's own value (never the stack total)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/pyramidchart/">Pyramid Chart</a></td>
+<td style="text-align: left;">bar</td>
+<td style="text-align: left;">legend label, category, the value as passed, positive</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/radialchart/">Radial Chart</a></td>
+<td style="text-align: left;">point, bar, or bin</td>
+<td style="text-align: left;">legend label, <code>angle</code> (the category, or a bin's degree range), <code>radius</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/histogram/">Histogram</a></td>
+<td style="text-align: left;">bin</td>
+<td style="text-align: left;">legend label, the bin's range, its count (or density)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/boxplot/">Box Plot</a></td>
+<td style="text-align: left;">box</td>
+<td style="text-align: left;">legend label, category, <code>median</code>, <code>q1</code>, <code>q3</code>, <code>min</code>, <code>max</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/violinplot/">Violin Plot</a></td>
+<td style="text-align: left;">body</td>
+<td style="text-align: left;">legend label (or the split value), category, <code>median</code>, <code>q1</code>, <code>q3</code>, <code>min</code>, <code>max</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/swarmplot/">Swarm Plot</a></td>
+<td style="text-align: left;">point</td>
+<td style="text-align: left;">legend label, category, value</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/raincloudplot/">Raincloud Plot</a></td>
+<td style="text-align: left;">box, body, or rain point</td>
+<td style="text-align: left;">as the box, violin, and swarm marks</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/scatterchart/">Scatter Chart</a></td>
+<td style="text-align: left;">point</td>
+<td style="text-align: left;">legend label (or the <code>hue</code> group), <code>x</code>, <code>y</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/heatmap/">Heatmap</a></td>
+<td style="text-align: left;">cell</td>
+<td style="text-align: left;">legend label, <code>x</code>, <code>y</code>, <code>value</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/contourchart/">Contour Chart</a></td>
+<td style="text-align: left;">level line or filled band</td>
+<td style="text-align: left;">legend label, <code>level</code> (a band's two levels)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/hexbinchart/">Hexbin Chart</a></td>
+<td style="text-align: left;">hexagon</td>
+<td style="text-align: left;">legend label, <code>x</code>, <code>y</code> (the cell center), <code>count</code> (or the reduced <code>c</code> under its reducer's name)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/parallelcoords/">Parallel Coordinates</a></td>
+<td style="text-align: left;">row line, at the nearest axis</td>
+<td style="text-align: left;">the <code>hue</code> value (or the legend label), the axis name and the row's value there</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/networkchart/">Network Chart</a></td>
+<td style="text-align: left;">node or edge</td>
+<td style="text-align: left;">node: its label, <code>degree</code> (<code>in</code> / <code>out</code> when directed, the weight sum when weighted), its <code>group</code> and <code>size</code> when given; edge: <code>source</code>, <code>target</code>, <code>weight</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/sankeychart/">Sankey Chart</a></td>
+<td style="text-align: left;">node or link</td>
+<td style="text-align: left;">node: its name, <code>flow</code>; link: <code>source</code>, <code>target</code>, <code>flow</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../charts/treemap/">Treemap</a></td>
+<td style="text-align: left;">tile or group band</td>
+<td style="text-align: left;">its label, <code>value</code> (a band's group total)</td>
 </tr>
 </tbody>
 </table>
-<p>Grouped and stacked bars report their own value, never the stack total. Every other chart type zooms and pans but shows no hover annotation.</p>
+<p>The annotation on each chart, from the figure shown with <code>show(interactive=True)</code> and a mark hovered:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Line Chart</strong> — a hovered point</th>
+<th style="text-align: left;"><strong>Stacked Area Chart</strong> — a hovered band</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><img alt="A line chart with a hovered point" src="../../../assets/imgs/hover-line.png" /></td>
+<td style="text-align: left;"><img alt="A stacked area chart with a hovered band" src="../../../assets/imgs/hover-stackedarea.png" /></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Bar Chart</strong> — a hovered bar</th>
+<th style="text-align: left;"><strong>Pyramid Chart</strong> — a hovered bar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><img alt="A grouped bar chart with a hovered bar" src="../../../assets/imgs/hover-bar.png" /></td>
+<td style="text-align: left;"><img alt="A pyramid chart with a hovered bar" src="../../../assets/imgs/hover-pyramid.png" /></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Radial Chart</strong> — a hovered bar</th>
+<th style="text-align: left;"><strong>Histogram</strong> — a hovered bin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><img alt="A radial bar chart with a hovered bar" src="../../../assets/imgs/hover-radial.png" /></td>
+<td style="text-align: left;"><img alt="A histogram with a hovered bin" src="../../../assets/imgs/hover-histogram.png" /></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Box Plot</strong> — a hovered box</th>
+<th style="text-align: left;"><strong>Violin Plot</strong> — a hovered body</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><img alt="A box plot with a hovered box" src="../../../assets/imgs/hover-box.png" /></td>
+<td style="text-align: left;"><img alt="A violin plot with a hovered body" src="../../../assets/imgs/hover-violin.png" /></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Swarm Plot</strong> — a hovered point</th>
+<th style="text-align: left;"><strong>Raincloud Plot</strong> — a hovered box</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><img alt="A swarm plot with a hovered point" src="../../../assets/imgs/hover-swarm.png" /></td>
+<td style="text-align: left;"><img alt="A raincloud plot with a hovered box" src="../../../assets/imgs/hover-raincloud.png" /></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Scatter Chart</strong> — a hovered point</th>
+<th style="text-align: left;"><strong>Heatmap</strong> — a hovered cell</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><img alt="A scatter chart with a hovered point" src="../../../assets/imgs/hover-scatter.png" /></td>
+<td style="text-align: left;"><img alt="A heatmap with a hovered cell" src="../../../assets/imgs/hover-heatmap.png" /></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Contour Chart</strong> — a hovered level line</th>
+<th style="text-align: left;"><strong>Hexbin Chart</strong> — a hovered hexagon</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><img alt="A contour chart with a hovered level line" src="../../../assets/imgs/hover-contour.png" /></td>
+<td style="text-align: left;"><img alt="A hexbin chart with a hovered hexagon" src="../../../assets/imgs/hover-hexbin.png" /></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Parallel Coordinates</strong> — a hovered row</th>
+<th style="text-align: left;"><strong>Network Chart</strong> — a hovered node</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><img alt="A parallel coordinates chart with a hovered row" src="../../../assets/imgs/hover-parallelcoords.png" /></td>
+<td style="text-align: left;"><img alt="A network chart with a hovered node" src="../../../assets/imgs/hover-network.png" /></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Sankey Chart</strong> — a hovered link</th>
+<th style="text-align: left;"><strong>Treemap</strong> — a hovered tile</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><img alt="A sankey chart with a hovered link" src="../../../assets/imgs/hover-sankey.png" /></td>
+<td style="text-align: left;"><img alt="A treemap with a hovered tile" src="../../../assets/imgs/hover-treemap.png" /></td>
+</tr>
+</tbody>
+</table>
 
 
 
