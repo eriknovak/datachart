@@ -1,3 +1,17 @@
+### datachart-0.9.1 (2026-09-07)
+
+**New Features**
+
+- Added `NetworkChart` with the `NETWORK_LAYOUT` constant and `ARROW_STYLE.STRAIGHT`
+- Added `Treemap` with squarified tiling and one-level nesting
+- Added the `SKETCH` theme: hand-drawn wobble, halo, and a bundled Comic Neue font
+- Restructured the README for onboarding with a charts table and rendered examples
+
+**Bug Fixes**
+
+- Clip network arrows at the true marker radius
+- Keep the area floor fill unsketched under the sketch theme
+
 ### datachart-0.9.0 (2026-08-28)
 
 **Breaking Changes**

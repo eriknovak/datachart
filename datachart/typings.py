@@ -850,7 +850,7 @@ class SketchStyleAttrs(TypedDict):
     applies them inside a scoped matplotlib rc context, so no global rc setting
     changes; composition keeps the look of the figures it was built from.
 
-    !!! info "Added in Unreleased"
+    !!! info "Added in v0.9.1"
 
     Attributes:
         plot_sketch_params (Union[Tuple[float, float, float], None]): The path

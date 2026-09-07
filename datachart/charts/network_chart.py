@@ -49,7 +49,7 @@ def NetworkChart(
     it when the question is what is connected to what; for weighted flows
     through ordered stages use [`SankeyChart`][datachart.charts.SankeyChart].
 
-    !!! info "Added in Unreleased"
+    !!! info "Added in v0.9.1"
 
     Examples:
         >>> from datachart.charts import NetworkChart

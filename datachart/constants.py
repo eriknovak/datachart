@@ -1005,8 +1005,6 @@ class THEME:
         SKETCH (str): The sketch theme (hand-drawn, xkcd-style wobble and halo,
             Comic Neue font). Equals to `"sketch"`.
 
-            !!! info "Added in Unreleased"
-
     """
 
     DEFAULT = "default"

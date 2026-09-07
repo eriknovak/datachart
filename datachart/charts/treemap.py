@@ -45,7 +45,7 @@ def Treemap(
     splits; for the values alone, or for more than a handful of small parts,
     use [`BarChart`][datachart.charts.BarChart].
 
-    !!! info "Added in Unreleased"
+    !!! info "Added in v0.9.1"
 
     Examples:
         >>> from datachart.charts import Treemap
