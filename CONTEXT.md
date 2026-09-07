@@ -208,6 +208,25 @@ are Bézier patches whose height is the value, coloured by source. One layer
 per chart, no furniture; rejected in `Panel`, a cell in `Grid`.
 _Avoid_: flow chart, alluvial (that implies time-ordered axes), network graph
 
+**Network**:
+Relational data as a node-link diagram (`NetworkChart`: a `{nodes, edges}`
+dict, a node `{id, label?, size?, group?, emphasis?}`, an edge `{source,
+target, weight?}`; nodes may be inferred from edges). `layout` takes a
+`NETWORK_LAYOUT` constant (`SPRING`, seeded in-package Fruchterman–Reingold;
+`CIRCULAR`; `FIXED` from per-node `x`/`y`); `directed` adds arrowheads.
+Weight maps to edge width only, size by square root to marker area, `group`
+to the multiple color cycle. One layer per chart, no furniture; rejected in
+`Panel`, a cell in `Grid`.
+_Avoid_: graph (a synonym for chart), node-link diagram, force graph
+
+**Connector style**:
+The one constant for every drawn connector, `ARROW_STYLE`: geometry
+(`CURVE`, `STRAIGHT`) crossed with an arrowhead (`CURVE_ARROW`, `ARROW`),
+plus `TOUCHING` (straight, flush at the text box). Text annotations accept
+every member; network edges accept only the headless two, since `directed`
+owns the arrowhead. Each chart's docs say which members it takes.
+_Avoid_: edge style (as a separate constant), line style (that is `LINE_STYLE`)
+
 **Treemap**:
 Part-of-whole data tiled as rectangles whose area is the value (`Treemap`: a
 `data` list of `{label, value}` records, a record's `children` giving one
@@ -219,10 +238,11 @@ rejected in `Panel`, a cell in `Grid`.
 _Avoid_: tree map, tile chart, mosaic plot (that is a different encoding)
 
 **Per-record emphasis**:
-An `emphasis` key on a treemap record (group or leaf, leaf wins) carrying an
-`EMPHASIS` role. Roles stay explicit per item: `highlight` bolds the tile's
-border only, `background` mutes it, neither changes its siblings. The
-front's per-chart `emphasis` argument is rejected for treemaps.
+An `emphasis` key on a treemap record (group or leaf, leaf wins) or a network
+node carrying an `EMPHASIS` role. Roles stay explicit per item: `highlight` bolds the tile's
+border only, `background` mutes it (a node's edges with it), neither changes its
+siblings. The front's per-chart `emphasis` argument is rejected for treemaps
+and networks.
 _Avoid_: focus, selected group
 
 **Density estimate**:
