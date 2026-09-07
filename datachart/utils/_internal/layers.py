@@ -28,6 +28,7 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
 from matplotlib.path import Path
 import matplotlib.patheffects as patheffects
+from matplotlib.legend import Legend
 from matplotlib.legend_handler import HandlerPathCollection
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -556,12 +557,19 @@ def _draw_ref_lines(ax: plt.Axes, vlines: List[tuple], hlines: List[tuple]) -> N
         )
 
 
-def _draw_legend(ax, ax_right, legend_style: dict, handles, labels=None):
+def _draw_legend(
+    ax: plt.Axes,
+    ax_right: Optional[plt.Axes],
+    legend_style: dict,
+    handles: list,
+    labels: Optional[list] = None,
+) -> Legend:
     """Draw the legend on the panel's topmost axes.
 
     A twin axes renders entirely above its host, so a legend on the host would
     sit under every right-axis mark. matplotlib scores ``loc="best"`` against
-    the legend's own axes only; with a twin, the scoring is widened to both.
+    the legend's own axes only; with a twin, the scoring is widened to both
+    through its private ``_auto_legend_data`` hook.
     """
 
     top_ax = ax if ax_right is None else ax_right
