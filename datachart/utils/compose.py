@@ -100,6 +100,12 @@ def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
             f"Figure at index {index} is a Sankey figure; "
             "Sankey figures cannot be overlaid. Use `Grid` instead."
         )
+    if metadata.get("type") == "treemap":
+        # a treemap owns its axes: no shared coordinate space to overlay (ADR 0028)
+        raise ValueError(
+            f"Figure at index {index} is a treemap figure; "
+            "treemap figures cannot be overlaid. Use `Grid` instead."
+        )
     panel = metadata.get("panel")
     if panel is None:
         raise ValueError("Figure has invalid metadata: missing 'panel'")

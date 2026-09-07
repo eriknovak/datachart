@@ -65,4 +65,8 @@ CHART_CONFIGS = {
         "multiplot": False,
         "subplots": True,
     },
+    "treemap": {
+        "multiplot": False,
+        "subplots": True,
+    },
 }

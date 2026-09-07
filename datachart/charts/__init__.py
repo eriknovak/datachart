@@ -36,6 +36,8 @@ Methods:
         Creates the parallel coordinates chart.
     SankeyChart(attrs):
         Creates the Sankey chart.
+    Treemap(attrs):
+        Creates the treemap.
 
 """
 
@@ -63,6 +65,9 @@ from .parallel_coords import ParallelCoords
 # flows
 from .sankey_chart import SankeyChart
 
+# part of a whole
+from .treemap import Treemap
+
 __all__ = [
     # trends and comparisons
     "LineChart",
@@ -84,4 +89,6 @@ __all__ = [
     "ParallelCoords",
     # flows
     "SankeyChart",
+    # part of a whole
+    "Treemap",
 ]
