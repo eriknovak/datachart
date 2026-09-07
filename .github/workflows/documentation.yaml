@@ -34,6 +34,9 @@ jobs:
           path: .cache/plugin
           restore-keys: |
             mkdocs-material-
+      # the themes' Helvetica/Arial stacks fall back to this metric-compatible
+      # clone when the notebooks render here
+      - run: sudo apt-get install -y --no-install-recommends fonts-liberation
       - run: uv sync --group docs
       - run: |
           git config user.name github-actions[bot]
