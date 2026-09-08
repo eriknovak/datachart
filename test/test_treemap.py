@@ -651,7 +651,7 @@ class TestDeepNesting(unittest.TestCase):
         fig = Treemap({"data": DEEP}, figsize=(8, 5))
         ax = fig.axes[0]
         boxes, bands, tiles = _boxes(ax), _bands(ax), _tiles(ax)
-        gutter = config["plot_treemap_group_pad"] / 2
+        gutter = config["plot_treemap_group_pad"]
         # the children fill the box under the band, inset by the gutter
         for group, children in (
             ("Asia", (boxes["East Asia"], boxes["South Asia"])),
@@ -678,9 +678,9 @@ class TestDeepNesting(unittest.TestCase):
             or abs(a.get_y() + a.get_height() - b.get_y()) < 1e-9
             or abs(b.get_y() + b.get_height() - a.get_y()) < 1e-9
         )
-        # the level-1 pad is unchanged
+        # the top-level records keep half the pad from the axes edge
         xs = sorted(b.get_x() for k, b in boxes.items() if k in ("Asia", "Africa"))
-        self.assertAlmostEqual(xs[0], gutter)
+        self.assertAlmostEqual(xs[0], gutter / 2)
 
     def test_inner_band_ladder_degrades_to_a_border(self):
         fig = Treemap({"data": DEEP}, figsize=(8, 5))

@@ -27,10 +27,11 @@ second rule for bands, tints, or emphasis.
 - **A group is a filled box that insets its children by the gutter.** The
   box is filled in the group's own color, so its band and the gutter around
   its children are one surface; the children sit on it one tint lighter,
-  behind their stroke. Half of `plot_treemap_group_pad` separates the
-  children from the border and the band, as it separates the top-level
-  records from the axes edge; the children then meet each other at the
-  stroke, as the tiles of a group always have. Without the gutter a nested
+  behind their stroke. `plot_treemap_group_pad` is the one gap: it
+  separates the top-level records from each other, and the children of a
+  group from its border and its band; the children then meet each other
+  at the stroke, as the tiles of a group always have. The default halves
+  to 0.01 so that the gap stays the width the gutter had. Without the gutter a nested
   box shares its edges with its parent's, and two stacked bands of one width
   read as siblings, not as a parent and its child; a white gutter reads as
   a gap between groups, the parent's color reads as containment. The gutter
@@ -68,6 +69,9 @@ second rule for bands, tints, or emphasis.
   coincident borders the nesting is illegible, which defeats the feature.
 - *A white gutter, the box unfilled.* Rejected after a preview: white
   reads as the space between groups, not as the parent.
+- *A gutter of half the pad.* Rejected after a preview: the white gap
+  between the top-level records was then twice the gutter inside them, two
+  rhythms on one page.
 - *A gap between inner siblings too, as between the top-level records.*
   Rejected: at depth the gaps take more area than the smallest leaves have,
   and their labels drop first; the gutter alone shows the containment.

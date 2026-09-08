@@ -4059,12 +4059,12 @@ class TreemapLayer(Layer):
                 break
             band_size -= TREEMAP_FONT_STEP
 
-        # children tile the area under the band, inset by the gutter that
-        # sets a group off from its box; siblings meet at the stroke
+        # children tile the area under the band, inset by the pad as the
+        # top-level records are set apart by it; siblings meet at the stroke
         children = sorted(record["children"], key=treemap_record_total, reverse=True)
         child_color = _lighten(color, style["level_shade"])
         totals = [treemap_record_total(child) for child in children]
-        gutter = style["group_pad"] / 2
+        gutter = style["group_pad"]
         inner = (x + gutter, y + gutter, w - 2 * gutter, h - band - 2 * gutter)
         for child, (cx, cy, cw, ch) in zip(
             children,

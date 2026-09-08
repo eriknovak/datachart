@@ -363,7 +363,7 @@ class TreemapStyleAttrs(TypedDict):
         plot_treemap_edge_color (Union[str, None]): The stroke color of leaf tiles and group borders.
         plot_treemap_edge_width (Union[float, None]): The leaf tile stroke width.
         plot_treemap_group_edge_width (Union[float, None]): The width of the border around a group.
-        plot_treemap_group_pad (Union[float, None]): The gap between top-level records as a fraction of the span; half of it is the gutter between a group's border and its children at every level.
+        plot_treemap_group_pad (Union[float, None]): The gap between top-level records and, at every level, the gutter between a group's border and its children, as a fraction of the span.
         plot_treemap_level_shade (Union[float, None]): How much lighter than its parent each level is, 0 to 1, applied once more per level; 0 keeps the group color.
         plot_treemap_level_font_scale (Union[float, None]): The label font scale applied once more per nesting level.
         plot_treemap_min_fontsize (Union[float, None]): The smallest font size a label shrinks to before it is dropped.
