@@ -110,7 +110,7 @@ BASE_THEME: StyleAttrs = {
     "plot_treemap_edge_color": "#FFFFFF",
     "plot_treemap_edge_width": 0.6,
     "plot_treemap_group_edge_width": 1.0,
-    "plot_treemap_group_pad": 0.02,
+    "plot_treemap_group_pad": 0.01,
     "plot_treemap_level_shade": 0.35,
     "plot_treemap_level_font_scale": 0.85,
     "plot_treemap_min_fontsize": 6,

@@ -352,20 +352,29 @@ class TestAggregateLayers:
                         "label": "Asia",
                         "children": [
                             {"label": "India", "value": 30},
-                            {"label": "China", "value": 20},
+                            {
+                                "label": "East Asia",
+                                "children": [
+                                    {"label": "China", "value": 15},
+                                    {"label": "Japan", "value": 5},
+                                ],
+                            },
                         ],
                     },
                     {"label": "Africa", "value": 10},
                 ]
-            }
+            },
+            figsize=(8, 5),
         )
         ((tiles, resolver),) = _targets(figure)
         assert isinstance(tiles, BarContainer)
         datums = [resolver(i) for i in range(len(tiles))]
         assert {"label": "India", "value": 30} in datums
+        assert {"label": "Japan", "value": 5} in datums
         assert {"label": "Africa", "value": 10} in datums
-        # the group's band stands for the group total
+        # a group's band stands for the group total, at every level
         assert {"label": "Asia", "value": 50} in datums
+        assert {"label": "East Asia", "value": 20} in datums
 
     def test_network_nodes_report_degree_and_edges_their_endpoints(self):
         weighted = NetworkChart(

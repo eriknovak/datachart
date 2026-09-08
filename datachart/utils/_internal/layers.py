@@ -38,6 +38,7 @@ from .colors import create_color_cycle, create_colormap, get_colormap
 from .validate import (
     infer_network_nodes,
     infer_sankey_columns,
+    treemap_record_total,
     validate_baseline,
     validate_emphasis,
     validate_network_edge_style,
@@ -3899,13 +3900,6 @@ def _lighten(color, amount: float) -> str:
     return to_hex(tuple(c + (1 - c) * amount for c in to_rgb(color)))
 
 
-def _record_total(record) -> float:
-    """A record's value, or the sum of its children's for a group."""
-
-    children = record.get("children")
-    return record["value"] if children is None else sum(c["value"] for c in children)
-
-
 def _wrap_label(text) -> Optional[str]:
     """The label split at the space nearest its middle; None without a space."""
 
@@ -3980,7 +3974,7 @@ class TreemapLayer(Layer):
         self.band_style = get_text_style("subtitle")
         self.highlight_color = config["font_general_color"]
         # top-level records largest first; one palette color each, by label
-        self.groups = sorted(self.records, key=_record_total, reverse=True)
+        self.groups = sorted(self.records, key=treemap_record_total, reverse=True)
         cycle = create_color_cycle(config["color_general_multiple"], len(self.groups))
         self.group_colors = {
             record["label"]: cycle[i]["color"] for i, record in enumerate(self.groups)
@@ -4010,21 +4004,27 @@ class TreemapLayer(Layer):
         aspect = frame.aspect
         pad = style["group_pad"]
 
-        totals = [_record_total(record) for record in self.groups]
+        totals = [treemap_record_total(record) for record in self.groups]
         for record, (x, y, w, h) in zip(
             self.groups, _squarify(totals, 0, 0, aspect, 1)
         ):
             box = (x / aspect + pad / 2, y + pad / 2, w / aspect - pad, h - pad)
             color = self.group_colors[record["label"]]
-            role = record.get("emphasis")
-            if record.get("children") is None:
-                self._draw_tile(ax, record, box, color, role, 0, frame)
-            else:
-                self._draw_group(ax, record, box, color, role, frame)
+            self._draw_record(ax, record, box, color, record.get("emphasis"), 0, frame)
         # tiles and bands never overlap, so one containment pick names one
         self.register_patch_hover(frame.marks)
 
-    def _draw_group(self, ax, record, box, color, role, frame):
+    def _draw_record(self, ax, record, box, color, role, level, frame):
+        """A record in its box: a group when it carries `children`, else a tile."""
+
+        if record.get("children") is None:
+            self._draw_tile(ax, record, box, color, role, level, frame)
+        else:
+            self._draw_group(ax, record, box, color, role, level, frame)
+
+    def _draw_group(self, ax, record, box, color, role, level, frame):
+        """A group at any level: band, children, and one border (ADR 0032)."""
+
         style = self.treemap_style
         axes_pt, aspect, effects, marks = frame
         x, y, w, h = box
@@ -4033,9 +4033,25 @@ class TreemapLayer(Layer):
         highlight = role == EMPHASIS_HIGHLIGHT
         box_color = self.muted_color if muted else color
         alpha = self.muted_alpha if muted else None
+        # the box is filled in the group's color: the band and the gutter
+        # around the children are one surface, under everything drawn inside
+        ax.add_patch(
+            Rectangle(
+                (x, y),
+                w,
+                h,
+                facecolor=box_color,
+                edgecolor="none",
+                alpha=alpha,
+                zorder=1,
+                gid=f"fill:{label}",
+            )
+        )
 
-        # the band font shrinks to the minimum before the group goes unlabelled
-        band_size, band = self.band_style["fontsize"], 0.0
+        # the band font scales per level, then shrinks to the minimum before
+        # the group goes unlabelled
+        band_size = self.band_style["fontsize"] * style["level_font_scale"] ** level
+        band = 0.0
         while band_size >= style["min_fontsize"]:
             height = TREEMAP_BAND_HEIGHT * band_size / axes_pt[1]
             if h > TREEMAP_BAND_MIN_ROWS * height:
@@ -4043,16 +4059,23 @@ class TreemapLayer(Layer):
                 break
             band_size -= TREEMAP_FONT_STEP
 
-        children = sorted(record["children"], key=lambda c: c["value"], reverse=True)
-        leaf_color = _lighten(color, style["level_shade"])
-        values = [child["value"] for child in children]
+        # children tile the area under the band, inset by the pad as the
+        # top-level records are set apart by it; siblings meet at the stroke
+        children = sorted(record["children"], key=treemap_record_total, reverse=True)
+        child_color = _lighten(color, style["level_shade"])
+        totals = [treemap_record_total(child) for child in children]
+        gutter = style["group_pad"]
+        inner = (x + gutter, y + gutter, w - 2 * gutter, h - band - 2 * gutter)
         for child, (cx, cy, cw, ch) in zip(
-            children, _squarify(values, x * aspect, y, w * aspect, h - band)
+            children,
+            _squarify(totals, inner[0] * aspect, inner[1], inner[2] * aspect, inner[3]),
         ):
-            tile = (cx / aspect, cy, cw / aspect, ch)
-            # a leaf inherits its group's role unless it carries its own
+            child_box = (cx / aspect, cy, cw / aspect, ch)
+            # a child inherits its group's role unless it carries its own
             child_role = child.get("emphasis") or role
-            self._draw_tile(ax, child, tile, leaf_color, child_role, 1, frame)
+            self._draw_record(
+                ax, child, child_box, child_color, child_role, level + 1, frame
+            )
 
         if band:
             header = Rectangle(
@@ -4066,7 +4089,9 @@ class TreemapLayer(Layer):
                 gid=f"band:{label}",
             )
             ax.add_patch(header)
-            marks.append((header, {"label": label, "value": _record_total(record)}))
+            marks.append(
+                (header, {"label": label, "value": treemap_record_total(record)})
+            )
             # a band label never wraps or shrinks; the legend names what is cut
             if (
                 _text_size(band_size, label)[0]
@@ -4086,7 +4111,7 @@ class TreemapLayer(Layer):
                     zorder=6,
                 )
         # the group is a box: one border in the tile stroke color encloses
-        # the band and the leaves
+        # the band and the children
         ax.add_patch(
             Rectangle(
                 (x, y),
