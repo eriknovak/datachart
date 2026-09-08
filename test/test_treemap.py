@@ -110,6 +110,15 @@ def _boxes(ax):
     }
 
 
+def _fills(ax):
+    """The group box fills keyed by group label."""
+    return {
+        p.get_gid()[len("fill:") :]: p
+        for p in ax.patches
+        if isinstance(p, Rectangle) and (p.get_gid() or "").startswith("fill:")
+    }
+
+
 def _bands(ax):
     return {
         p.get_gid()[len("band:") :]: p
@@ -364,6 +373,11 @@ class TestRendering(unittest.TestCase):
             to_rgb(asia.get_edgecolor()), to_rgb(config["plot_treemap_edge_color"])
         )
         group_rgb = to_rgb(band.get_facecolor())
+        # the box is filled in the group color, under the leaves
+        fill = _fills(ax)["Asia"]
+        self.assertEqual(to_rgb(fill.get_facecolor()), group_rgb)
+        self.assertEqual(fill.get_bbox().bounds, asia.get_bbox().bounds)
+        self.assertLess(fill.get_zorder(), tiles["India"].get_zorder())
         leaf_rgbs = {
             to_rgb(tiles[k].get_facecolor()) for k in ("India", "China", "Japan")
         }
@@ -445,6 +459,8 @@ class TestRendering(unittest.TestCase):
         muted = to_rgb(config["muted_color"])
         self.assertEqual(to_rgb(tiles["China"].get_facecolor()), muted)
         self.assertEqual(to_rgb(_bands(ax)["Asia"].get_facecolor()), muted)
+        self.assertEqual(to_rgb(_fills(ax)["Asia"].get_facecolor()), muted)
+        self.assertEqual(_fills(ax)["Asia"].get_alpha(), config["muted_alpha"])
         self.assertEqual(
             to_rgb(boxes["Asia"].get_edgecolor()),
             to_rgb(config["plot_treemap_edge_color"]),
@@ -702,8 +718,14 @@ class TestDeepNesting(unittest.TestCase):
     def test_tint_compounds_per_level(self):
         fig = Treemap({"data": DEEP}, figsize=(8, 5))
         ax = fig.axes[0]
-        bands, tiles = _bands(ax), _tiles(ax)
+        bands, fills, tiles = _bands(ax), _fills(ax), _tiles(ax)
         shade = config["plot_treemap_level_shade"]
+        # every group's fill is its band's color
+        for label in ("Asia", "East Asia", "China", "Africa"):
+            self.assertEqual(
+                to_rgb(fills[label].get_facecolor()),
+                to_rgb(bands[label].get_facecolor()),
+            )
         group = to_rgb(bands["Asia"].get_facecolor())
         # an inner band keeps its own level's color
         level2 = to_rgb(bands["East Asia"].get_facecolor())

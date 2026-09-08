@@ -24,14 +24,18 @@ second rule for bands, tints, or emphasis.
   same ladder (the band font shrinks in steps to `plot_treemap_min_fontsize`,
   and a group too short for a band draws a border only, no label), and one
   border at `plot_treemap_group_edge_width` encloses band and children.
-- **A group insets its children by the gutter.** Half of
-  `plot_treemap_group_pad` separates a group's children from its border and
-  its band, as it separates the top-level records from the axes edge; the
-  children then meet each other at the stroke, as the tiles of a group
-  always have. Without the gutter a nested box shares its edges with its
-  parent's, and two stacked bands of one width read as siblings, not as a
-  parent and its child. The gutter compounds with depth, but at four levels
-  it costs a leaf at most two pads per side.
+- **A group is a filled box that insets its children by the gutter.** The
+  box is filled in the group's own color, so its band and the gutter around
+  its children are one surface; the children sit on it one tint lighter,
+  behind their stroke. Half of `plot_treemap_group_pad` separates the
+  children from the border and the band, as it separates the top-level
+  records from the axes edge; the children then meet each other at the
+  stroke, as the tiles of a group always have. Without the gutter a nested
+  box shares its edges with its parent's, and two stacked bands of one width
+  read as siblings, not as a parent and its child; a white gutter reads as
+  a gap between groups, the parent's color reads as containment. The gutter
+  compounds with depth, but at four levels it costs a leaf at most two pads
+  per side.
 - **Tint and font compound per level.** Each level is
   `plot_treemap_level_shade` lighter than its parent, applied once more per
   level, and labels scale by `plot_treemap_level_font_scale` per level, both
@@ -62,6 +66,8 @@ second rule for bands, tints, or emphasis.
   nesting unreadable in ADR 0028's preview.
 - *No gutter inside groups, stroke only.* Rejected after a preview: with
   coincident borders the nesting is illegible, which defeats the feature.
+- *A white gutter, the box unfilled.* Rejected after a preview: white
+  reads as the space between groups, not as the parent.
 - *A gap between inner siblings too, as between the top-level records.*
   Rejected: at depth the gaps take more area than the smallest leaves have,
   and their labels drop first; the gutter alone shows the containment.

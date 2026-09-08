@@ -39,8 +39,8 @@ def Treemap(
     A treemap tiles part-of-whole data as rectangles whose area is the
     value — disk usage by folder, a budget by line, population by continent
     and country. A record's `children` group it, up to four levels deep: a
-    group is a bordered box with a header band, its children a lighter tint
-    of the group color. Every level is sorted largest first and tiled so the
+    group is a box in its color with a header band, its children inset in a
+    lighter tint. Every level is sorted largest first and tiled so the
     rectangles stay near square. Use it when the question is how a whole
     splits; for the values alone, or for more than a handful of small parts,
     use [`BarChart`][datachart.charts.BarChart].

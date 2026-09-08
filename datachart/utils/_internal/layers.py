@@ -4033,6 +4033,20 @@ class TreemapLayer(Layer):
         highlight = role == EMPHASIS_HIGHLIGHT
         box_color = self.muted_color if muted else color
         alpha = self.muted_alpha if muted else None
+        # the box is filled in the group's color: the band and the gutter
+        # around the children are one surface, under everything drawn inside
+        ax.add_patch(
+            Rectangle(
+                (x, y),
+                w,
+                h,
+                facecolor=box_color,
+                edgecolor="none",
+                alpha=alpha,
+                zorder=1,
+                gid=f"fill:{label}",
+            )
+        )
 
         # the band font scales per level, then shrinks to the minimum before
         # the group goes unlabelled
