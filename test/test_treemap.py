@@ -62,6 +62,36 @@ NESTED = [
 LINE = [{"x": 0, "y": 1}, {"x": 1, "y": 2}]
 
 
+def deep(levels):
+    """One record tree `levels` deep: A > B > C > ... with a leaf at the end."""
+    record = rec("L%d" % levels, 1)
+    for level in range(levels - 1, 0, -1):
+        record = rec("L%d" % level, children=[record])
+    return [record]
+
+
+# a four-level tree: Asia > East Asia > China > Guangdong
+DEEP = [
+    rec(
+        "Asia",
+        children=[
+            rec(
+                "East Asia",
+                children=[
+                    rec(
+                        "China", children=[rec("Guangdong", 127), rec("Shandong", 101)]
+                    ),
+                    rec("Japan", 123),
+                ],
+            ),
+            rec("South Asia", children=[rec("India", 1429), rec("Pakistan", 240)]),
+        ],
+    ),
+    rec("Africa", children=[rec("Nigeria", 224), rec("Ethiopia", 127)]),
+    rec("Oceania", 45),
+]
+
+
 def _tiles(ax):
     """The leaf tiles keyed by label."""
     return {
@@ -143,6 +173,12 @@ class TestValidation(unittest.TestCase):
     def test_valid_records_pass(self):
         validate_treemap_records(FLAT)
         validate_treemap_records(NESTED)
+        validate_treemap_records(DEEP)
+        validate_treemap_records(deep(4))
+        # an inner group may carry its children's sum too
+        validate_treemap_records(
+            [rec("A", 3, children=[rec("a", 3, children=[rec("x", 1), rec("y", 2)])])]
+        )
         # a parent may carry its children's sum
         validate_treemap_records([rec("A", 3, children=[rec("a", 1), rec("b", 2)])])
         validate_treemap_records([rec("A", 3.0, children=[rec("a", 1), rec("b", 2)])])
@@ -165,12 +201,13 @@ class TestValidation(unittest.TestCase):
             [rec("A", "x")],
             [rec("A", True)],
             [rec("A", children=[])],
-            [rec("A", children=[rec("a", children=[rec("x", 1)])])],
+            deep(5),
             [rec("A", 5, children=[rec("a", 1), rec("b", 2)])],
             [rec("A", 1, emphasis="bold")],
             [rec("A", children=[rec("a", 1, emphasis="nope")])],
             [rec("A", 1), rec("A", 2)],
             [rec("A", children=[rec("a", 1), rec("a", 2)])],
+            [rec("A", children=[rec("a", children=[rec("x", 1), rec("x", 2)])])],
         ):
             with self.subTest(records=records), self.assertRaises(ValueError):
                 validate_treemap_records(records)
@@ -178,16 +215,22 @@ class TestValidation(unittest.TestCase):
     def test_messages_name_the_rule(self):
         with self.assertRaisesRegex(ValueError, "greater than 0"):
             validate_treemap_records([rec("A", 0)])
-        with self.assertRaisesRegex(ValueError, "one level"):
-            validate_treemap_records(
-                [rec("A", children=[rec("a", children=[rec("x", 1)])])]
-            )
+        with self.assertRaisesRegex(ValueError, "four levels"):
+            validate_treemap_records(deep(5))
         with self.assertRaisesRegex(ValueError, "sum"):
             validate_treemap_records([rec("A", 5, children=[rec("a", 1)])])
         with self.assertRaisesRegex(ValueError, "emphasis"):
             validate_treemap_records([rec("A", 1, emphasis="bold")])
         with self.assertRaisesRegex(ValueError, "unique"):
             validate_treemap_records([rec("A", 1), rec("A", 2)])
+        with self.assertRaisesRegex(ValueError, "unique"):
+            validate_treemap_records(
+                [rec("A", children=[rec("a", children=[rec("x", 1), rec("x", 2)])])]
+            )
+        with self.assertRaisesRegex(ValueError, "sum"):
+            validate_treemap_records(
+                [rec("A", children=[rec("a", 5, children=[rec("x", 1)])])]
+            )
         # the same label may recur across groups
         validate_treemap_records(
             [rec("A", children=[rec("Rest", 1)]), rec("B", children=[rec("Rest", 1)])]

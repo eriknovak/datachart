@@ -38,6 +38,7 @@ from .colors import create_color_cycle, create_colormap, get_colormap
 from .validate import (
     infer_network_nodes,
     infer_sankey_columns,
+    treemap_record_total,
     validate_baseline,
     validate_emphasis,
     validate_network_edge_style,
@@ -3899,13 +3900,6 @@ def _lighten(color, amount: float) -> str:
     return to_hex(tuple(c + (1 - c) * amount for c in to_rgb(color)))
 
 
-def _record_total(record) -> float:
-    """A record's value, or the sum of its children's for a group."""
-
-    children = record.get("children")
-    return record["value"] if children is None else sum(c["value"] for c in children)
-
-
 def _wrap_label(text) -> Optional[str]:
     """The label split at the space nearest its middle; None without a space."""
 
@@ -3980,7 +3974,7 @@ class TreemapLayer(Layer):
         self.band_style = get_text_style("subtitle")
         self.highlight_color = config["font_general_color"]
         # top-level records largest first; one palette color each, by label
-        self.groups = sorted(self.records, key=_record_total, reverse=True)
+        self.groups = sorted(self.records, key=treemap_record_total, reverse=True)
         cycle = create_color_cycle(config["color_general_multiple"], len(self.groups))
         self.group_colors = {
             record["label"]: cycle[i]["color"] for i, record in enumerate(self.groups)
@@ -4010,7 +4004,7 @@ class TreemapLayer(Layer):
         aspect = frame.aspect
         pad = style["group_pad"]
 
-        totals = [_record_total(record) for record in self.groups]
+        totals = [treemap_record_total(record) for record in self.groups]
         for record, (x, y, w, h) in zip(
             self.groups, _squarify(totals, 0, 0, aspect, 1)
         ):
@@ -4066,7 +4060,9 @@ class TreemapLayer(Layer):
                 gid=f"band:{label}",
             )
             ax.add_patch(header)
-            marks.append((header, {"label": label, "value": _record_total(record)}))
+            marks.append(
+                (header, {"label": label, "value": treemap_record_total(record)})
+            )
             # a band label never wraps or shrinks; the legend names what is cut
             if (
                 _text_size(band_size, label)[0]

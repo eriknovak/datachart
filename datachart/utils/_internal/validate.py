@@ -183,24 +183,34 @@ def _positive_number(value) -> bool:
     return isinstance(value, Real) and not isinstance(value, bool) and value > 0
 
 
+# the data list is level 1; a record nests to this depth (ADR 0032)
+TREEMAP_MAX_DEPTH = 4
+
+
+def treemap_record_total(record) -> float:
+    """A record's value, or the sum of its descendants' for a group."""
+
+    children = record.get("children")
+    if children is None:
+        return record["value"]
+    return sum(treemap_record_total(child) for child in children)
+
+
 def validate_treemap_records(records) -> None:
     """Raise unless `records` is a non-empty list of valid treemap records.
 
     A record is a dict with a `label` and either a `value` above zero or a
-    `children` list of such records; children nest one level only, and a
-    parent carrying a `value` must match its children's sum (ADR 0028). An
-    `emphasis` key on any record takes the emphasis roles.
+    `children` list of such records; records nest to `TREEMAP_MAX_DEPTH`
+    levels, siblings have unique labels, and a parent carrying a `value`
+    must match its children's total (ADR 0028, ADR 0032). An `emphasis`
+    key on any record takes the emphasis roles.
     """
 
     if not isinstance(records, list) or not records:
         raise ValueError("A treemap requires a non-empty `data` list of records.")
     for i, record in enumerate(records):
-        _validate_treemap_record(record, f"Treemap record {i}", nested=False)
+        _validate_treemap_record(record, f"Treemap record {i}", depth=1)
     _validate_unique_labels(records, "Treemap records")
-    for record in records:
-        if record.get("children") is not None:
-            name = f"Treemap record {record['label']!r} children"
-            _validate_unique_labels(record["children"], name)
 
 
 def _validate_unique_labels(records, name: str) -> None:
@@ -215,7 +225,7 @@ def _validate_unique_labels(records, name: str) -> None:
         seen.add(record["label"])
 
 
-def _validate_treemap_record(record, name: str, nested: bool) -> None:
+def _validate_treemap_record(record, name: str, depth: int) -> None:
     if not isinstance(record, dict) or "label" not in record:
         raise ValueError(f"{name} must be a dict with a `label`.")
     label = record["label"]
@@ -225,18 +235,19 @@ def _validate_treemap_record(record, name: str, nested: bool) -> None:
         if not _positive_number(record.get("value")):
             raise ValueError(f"{name} ({label!r}) must have a `value` greater than 0.")
         return
-    if nested:
+    if depth >= TREEMAP_MAX_DEPTH:
         raise ValueError(
-            f"{name} ({label!r}) nests deeper than one level; "
-            "a child cannot carry `children`."
+            f"{name} ({label!r}) nests deeper than four levels; "
+            f"a record at level {TREEMAP_MAX_DEPTH} cannot carry `children`."
         )
     if not isinstance(children, list) or not children:
         raise ValueError(f"{name} ({label!r}) must have a non-empty `children` list.")
     for j, child in enumerate(children):
-        _validate_treemap_record(child, f"{name} ({label!r}) child {j}", nested=True)
+        _validate_treemap_record(child, f"{name} ({label!r}) child {j}", depth + 1)
+    _validate_unique_labels(children, f"{name} ({label!r}) children")
     value = record.get("value")
     if value is not None:
-        total = sum(child["value"] for child in children)
+        total = treemap_record_total(record)
         if not _positive_number(value) or not math.isclose(value, total, rel_tol=1e-9):
             raise ValueError(
                 f"{name} ({label!r}) has `value` {value!r} but its children sum "
