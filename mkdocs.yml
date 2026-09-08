@@ -155,6 +155,7 @@ plugins:
           - how-to-guides/utility/grid.ipynb: Arranging multiple charts in a grid layout with Grid, including nested rows and layout specs.
           - how-to-guides/utility/annotations.ipynb: "Text annotations on any chart: placement and coordinates, connector looks, text and box styling, and annotating finished figures with Annotate."
           - how-to-guides/utility/stats.ipynb: Statistical utilities for preparing chart data.
+          - how-to-guides/utility/saving.md: "Saving figures with save_figure: choosing vector or raster formats and dpi, embedding SVG or PNG in web pages, and why interactive web charts are out of scope."
           - how-to-guides/utility/interactive.md: "Zooming, panning, and hovering over marks with show(interactive=True): the interactive extra, notebook and script behavior, and the chart types with hover support."
         Styling:
           - how-to-guides/styling/index.md: Map of configuration, themes, emphasis, and colormaps.
@@ -229,6 +230,7 @@ nav:
       - Grid: how-to-guides/utility/grid.ipynb
       - Text Annotations: how-to-guides/utility/annotations.ipynb
       - Statistics: how-to-guides/utility/stats.ipynb
+      - Saving Figures: how-to-guides/utility/saving.md
       - Interactive Figures: how-to-guides/utility/interactive.md
     - Styling:
       - how-to-guides/styling/index.md
