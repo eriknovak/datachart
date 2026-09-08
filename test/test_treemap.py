@@ -631,24 +631,40 @@ class TestDeepNesting(unittest.TestCase):
             _area(tiles["Guangdong"]) / _area(tiles["Shandong"]), 127 / 101, delta=0.05
         )
 
-    def test_inner_groups_have_no_pad(self):
+    def test_every_group_insets_its_children_by_the_gutter(self):
         fig = Treemap({"data": DEEP}, figsize=(8, 5))
         ax = fig.axes[0]
-        boxes, bands = _boxes(ax), _bands(ax)
-        asia, band = boxes["Asia"], bands["Asia"]
-        inner = _area(asia) - _area(band)
-        # the children fill the parent's area under the band exactly
-        self.assertAlmostEqual(
-            _area(boxes["East Asia"]) + _area(boxes["South Asia"]), inner
-        )
-        self.assertAlmostEqual(
-            _area(boxes["China"]) + _area(_tiles(ax)["Japan"]),
-            _area(boxes["East Asia"]) - _area(bands["East Asia"]),
+        boxes, bands, tiles = _boxes(ax), _bands(ax), _tiles(ax)
+        gutter = config["plot_treemap_group_pad"] / 2
+        # the children fill the box under the band, inset by the gutter
+        for group, children in (
+            ("Asia", (boxes["East Asia"], boxes["South Asia"])),
+            ("East Asia", (boxes["China"], tiles["Japan"])),
+            ("China", (tiles["Guangdong"], tiles["Shandong"])),
+            ("Africa", (tiles["Nigeria"], tiles["Ethiopia"])),
+        ):
+            box, band = boxes[group], bands[group]
+            inner = (box.get_width() - 2 * gutter) * (
+                box.get_height() - band.get_height() - 2 * gutter
+            )
+            self.assertAlmostEqual(sum(_area(c) for c in children), inner, msg=group)
+            for child in children:
+                self.assertGreaterEqual(child.get_x() + 1e-9, box.get_x() + gutter)
+                self.assertGreaterEqual(child.get_y() + 1e-9, box.get_y() + gutter)
+                self.assertLessEqual(
+                    child.get_y() + child.get_height(), band.get_y() - gutter + 1e-9
+                )
+        # siblings meet at the stroke: the two China tiles share an edge
+        a, b = tiles["Guangdong"], tiles["Shandong"]
+        self.assertTrue(
+            abs(a.get_x() + a.get_width() - b.get_x()) < 1e-9
+            or abs(b.get_x() + b.get_width() - a.get_x()) < 1e-9
+            or abs(a.get_y() + a.get_height() - b.get_y()) < 1e-9
+            or abs(b.get_y() + b.get_height() - a.get_y()) < 1e-9
         )
         # the level-1 pad is unchanged
-        pad = config["plot_treemap_group_pad"]
         xs = sorted(b.get_x() for k, b in boxes.items() if k in ("Asia", "Africa"))
-        self.assertAlmostEqual(xs[0], pad / 2)
+        self.assertAlmostEqual(xs[0], gutter)
 
     def test_inner_band_ladder_degrades_to_a_border(self):
         fig = Treemap({"data": DEEP}, figsize=(8, 5))

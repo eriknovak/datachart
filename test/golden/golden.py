@@ -152,13 +152,13 @@ EXPECTED_CHANGES = {
     "sankey_subplots",
     "sankey_grid",
     "sankey_values_labels",
-    # new treemap cases (ADR 0028)
+    # new treemap cases (ADR 0028); groups inset their children by the
+    # gutter and records nest to four levels (ADR 0032)
     "treemap_flat",
     "treemap_nested",
     "treemap_emphasis",
     "treemap_values",
     "treemap_grid",
-    # treemap records nest to four levels (ADR 0032)
     "treemap_deep",
     # line-only panels hug the data range like line charts (ADR 0025)
     "overlay_line_line",

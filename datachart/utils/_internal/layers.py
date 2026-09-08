@@ -4045,12 +4045,16 @@ class TreemapLayer(Layer):
                 break
             band_size -= TREEMAP_FONT_STEP
 
-        # children tile the area under the band, separated by the stroke only
+        # children tile the area under the band, inset by the gutter that
+        # sets a group off from its box; siblings meet at the stroke
         children = sorted(record["children"], key=treemap_record_total, reverse=True)
         child_color = _lighten(color, style["level_shade"])
         totals = [treemap_record_total(child) for child in children]
+        gutter = style["group_pad"] / 2
+        inner = (x + gutter, y + gutter, w - 2 * gutter, h - band - 2 * gutter)
         for child, (cx, cy, cw, ch) in zip(
-            children, _squarify(totals, x * aspect, y, w * aspect, h - band)
+            children,
+            _squarify(totals, inner[0] * aspect, inner[1], inner[2] * aspect, inner[3]),
         ):
             child_box = (cx / aspect, cy, cw / aspect, ch)
             # a child inherits its group's role unless it carries its own

@@ -24,9 +24,14 @@ second rule for bands, tints, or emphasis.
   same ladder (the band font shrinks in steps to `plot_treemap_min_fontsize`,
   and a group too short for a band draws a border only, no label), and one
   border at `plot_treemap_group_edge_width` encloses band and children.
-  Groups are separated from their siblings by the stroke only; the data-space
-  pad `plot_treemap_group_pad` stays a top-level gap, since an inner pad
-  takes area from the leaves that have the least.
+- **A group insets its children by the gutter.** Half of
+  `plot_treemap_group_pad` separates a group's children from its border and
+  its band, as it separates the top-level records from the axes edge; the
+  children then meet each other at the stroke, as the tiles of a group
+  always have. Without the gutter a nested box shares its edges with its
+  parent's, and two stacked bands of one width read as siblings, not as a
+  parent and its child. The gutter compounds with depth, but at four levels
+  it costs a leaf at most two pads per side.
 - **Tint and font compound per level.** Each level is
   `plot_treemap_level_shade` lighter than its parent, applied once more per
   level, and labels scale by `plot_treemap_level_font_scale` per level, both
@@ -55,7 +60,12 @@ second rule for bands, tints, or emphasis.
   groups is a second rule for the same case.
 - *Bands at every level regardless of height.* Rejected: this is what made
   nesting unreadable in ADR 0028's preview.
-- *Group pad at every level.* Rejected: the pad exists to separate palette
-  colors; inner groups share a hue and a pad there only shrinks the leaves.
+- *No gutter inside groups, stroke only.* Rejected after a preview: with
+  coincident borders the nesting is illegible, which defeats the feature.
+- *A gap between inner siblings too, as between the top-level records.*
+  Rejected: at depth the gaps take more area than the smallest leaves have,
+  and their labels drop first; the gutter alone shows the containment.
+- *A separate inset key in points.* Rejected: a second knob for one gap, and
+  the brief admits no new style key.
 - *Legend entries for inner groups.* Rejected: same hue, no distinguishable
   swatch.

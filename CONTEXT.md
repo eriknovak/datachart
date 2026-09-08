@@ -251,9 +251,9 @@ Part-of-whole data tiled as rectangles whose area is the value (`Treemap`: a
 `data` list of `{label, value}` records, a record's `children` nesting to
 four levels). Every level is sorted descending and squarified in the axes'
 pixel aspect; a group at any level is a bordered box with a header band that
-degrades to a border alone when short, its children share one tint a level
-lighter than the group. Labels wrap, then shrink to a minimum size, then
-drop. One layer per chart, no furniture; rejected in `Panel`, a cell in
+degrades to a border alone when short, its children inset by a gutter and
+sharing one tint a level lighter than the group. Labels wrap, then shrink to
+a minimum size, then drop. One layer per chart, no furniture; rejected in `Panel`, a cell in
 `Grid`.
 _Avoid_: tree map, tile chart, mosaic plot (that is a different encoding)
 
