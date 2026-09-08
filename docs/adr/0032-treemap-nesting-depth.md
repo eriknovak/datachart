@@ -30,13 +30,15 @@ second rule for bands, tints, or emphasis.
 - **Tint and font compound per level.** Each level is
   `plot_treemap_level_shade` lighter than its parent, applied once more per
   level, and labels scale by `plot_treemap_level_font_scale` per level, both
-  as the rules already read. A group's band keeps the group's own color.
+  as the rules already read; a band's label starts from the subtitle size
+  scaled the same way before it takes the ladder. A group's band keeps the
+  group's own color.
 - **Emphasis inherits all the way down.** A record's `emphasis` applies to
   its whole subtree; a descendant's own role overrides it, at any depth.
 - **The legend stays top-level.** `show_legend` lists the level-1 records
   only: inner groups share their ancestor's hue, so a legend entry could not
-  tell them apart. An inner group too short for a band is named by hover
-  (ADR 0031) and by nothing else.
+  tell them apart. An inner group too short for a band draws its border
+  only and goes unnamed, as a top-level one does without the legend.
 - **Hover reports every level.** Bands and tiles register at every depth,
   each with its label and total, as in ADR 0028.
 

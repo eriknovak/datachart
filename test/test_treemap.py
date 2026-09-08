@@ -641,10 +641,9 @@ class TestDeepNesting(unittest.TestCase):
         self.assertAlmostEqual(
             _area(boxes["East Asia"]) + _area(boxes["South Asia"]), inner
         )
-        east = boxes["East Asia"]
         self.assertAlmostEqual(
             _area(boxes["China"]) + _area(_tiles(ax)["Japan"]),
-            _area(east) - (_area(bands["East Asia"]) if "East Asia" in bands else 0),
+            _area(boxes["East Asia"]) - _area(bands["East Asia"]),
         )
         # the level-1 pad is unchanged
         pad = config["plot_treemap_group_pad"]
@@ -716,6 +715,11 @@ class TestDeepNesting(unittest.TestCase):
         self.assertAlmostEqual(sizes["Nigeria"], general * scale)
         self.assertAlmostEqual(sizes["Japan"], general * scale**2)
         self.assertAlmostEqual(sizes["Guangdong"], general * scale**3)
+        # a band label starts from the subtitle size scaled the same way
+        subtitle = config["font_subtitle_size"]
+        self.assertAlmostEqual(sizes["Asia"], subtitle)
+        self.assertAlmostEqual(sizes["East Asia"], subtitle * scale)
+        self.assertAlmostEqual(sizes["China"], subtitle * scale**2)
         # values scale the same way
         self.assertAlmostEqual(sizes["45"], config["plot_bar_value_fontsize"])
         self.assertAlmostEqual(sizes["224"], config["plot_bar_value_fontsize"] * scale)

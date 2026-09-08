@@ -4034,8 +4034,10 @@ class TreemapLayer(Layer):
         box_color = self.muted_color if muted else color
         alpha = self.muted_alpha if muted else None
 
-        # the band font shrinks to the minimum before the group goes unlabelled
-        band_size, band = self.band_style["fontsize"], 0.0
+        # the band font scales per level, then shrinks to the minimum before
+        # the group goes unlabelled
+        band_size = self.band_style["fontsize"] * style["level_font_scale"] ** level
+        band = 0.0
         while band_size >= style["min_fontsize"]:
             height = TREEMAP_BAND_HEIGHT * band_size / axes_pt[1]
             if h > TREEMAP_BAND_MIN_ROWS * height:

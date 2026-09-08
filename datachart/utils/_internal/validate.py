@@ -238,7 +238,7 @@ def _validate_treemap_record(record, name: str, depth: int) -> None:
     if depth >= TREEMAP_MAX_DEPTH:
         raise ValueError(
             f"{name} ({label!r}) nests deeper than four levels; "
-            f"a record at level {TREEMAP_MAX_DEPTH} cannot carry `children`."
+            "a record at the fourth level cannot carry `children`."
         )
     if not isinstance(children, list) or not children:
         raise ValueError(f"{name} ({label!r}) must have a non-empty `children` list.")
