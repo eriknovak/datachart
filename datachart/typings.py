@@ -363,9 +363,9 @@ class TreemapStyleAttrs(TypedDict):
         plot_treemap_edge_color (Union[str, None]): The stroke color of leaf tiles and group borders.
         plot_treemap_edge_width (Union[float, None]): The leaf tile stroke width.
         plot_treemap_group_edge_width (Union[float, None]): The width of the border around a group.
-        plot_treemap_group_pad (Union[float, None]): The gap between groups as a fraction of the span.
-        plot_treemap_level_shade (Union[float, None]): How much lighter than its group a leaf is, 0 to 1; 0 keeps the group color.
-        plot_treemap_level_font_scale (Union[float, None]): The label font scale applied per nesting level.
+        plot_treemap_group_pad (Union[float, None]): The gap between top-level groups as a fraction of the span; nested groups are separated by the stroke only.
+        plot_treemap_level_shade (Union[float, None]): How much lighter than its parent each level is, 0 to 1, applied once more per level; 0 keeps the group color.
+        plot_treemap_level_font_scale (Union[float, None]): The label font scale applied once more per nesting level.
         plot_treemap_min_fontsize (Union[float, None]): The smallest font size a label shrinks to before it is dropped.
         plot_treemap_highlight_edge_width (Union[float, None]): The border width of a highlighted record.
         plot_treemap_label_halo_width (Union[float, None]): The width of the white halo behind labels; 0 disables it.
@@ -1248,8 +1248,8 @@ class TreemapRecordAttrs(TypedDict):
     Attributes:
         label (str): The drawn label of the tile or group.
         value (Union[int, float, None]): The size of the tile; must be greater than 0. A group omits it or carries its children's sum.
-        children (Union[List["TreemapRecordAttrs"], None]): The records of a group, one level only; a child cannot carry children.
-        emphasis (Union[EMPHASIS, str, None]): The emphasis role of the record; a leaf's role overrides its group's.
+        children (Union[List["TreemapRecordAttrs"], None]): The records of a group, nesting up to four levels deep.
+        emphasis (Union[EMPHASIS, str, None]): The emphasis role of the record and its subtree; a descendant's own role overrides it.
 
     """
 

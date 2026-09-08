@@ -96,7 +96,7 @@ split them apart. The dict keys per chart are listed in each guide.
 | **Distributions** | [Histogram], [BoxPlot], [ViolinPlot], [SwarmPlot], [RaincloudPlot]         | shape and spread of one variable, per group                            |
 | **Relationships** | [ScatterChart], [Heatmap], [ContourChart], [HexbinChart], [ParallelCoords], [NetworkChart] | two-variable correlation, matrices, dense 2-D density, many dimensions, who is linked to whom |
 | **Flows**         | [SankeyChart]                                                              | quantities moving between stages                                       |
-| **Proportions**   | [Treemap]                                                                  | how a whole splits into parts, with one level of grouping              |
+| **Proportions**   | [Treemap]                                                                  | how a whole splits into parts, grouped up to four levels deep          |
 
 ## Composition
 

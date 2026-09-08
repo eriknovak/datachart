@@ -1639,14 +1639,14 @@ TREEMAP_HOME = {
     "Projects": {
         "datachart": {"docs": 14, "src": 6, ".venv": 22, "test": 3},
         "thesis": {"figures": 18, "chapters": 4, "data": 31},
-        "scratch": 9,
+        "scratch": {"notes": 3, "tmp": 6},
     },
     "Media": {
         "Photos": {"2024": 38, "2025": 52, "raw": 61},
         "Videos": 47,
         "Music": 12,
     },
-    "Library": {"Caches": 28, "Mail": 9, "Fonts": 2},
+    "Library": {"Caches": 28, "Mail": {"Inbox": 3, "Archive": 2}, "Fonts": 2},
     "Downloads": 24,
     "Desktop": 5,
 }

@@ -38,9 +38,9 @@ def Treemap(
 
     A treemap tiles part-of-whole data as rectangles whose area is the
     value — disk usage by folder, a budget by line, population by continent
-    and country. A record's `children` add one level of grouping: the group
-    is a bordered box with a header band, its tiles a lighter tint of the
-    group color. Every level is sorted largest first and tiled so the
+    and country. A record's `children` group it, up to four levels deep: a
+    group is a bordered box with a header band, its children a lighter tint
+    of the group color. Every level is sorted largest first and tiled so the
     rectangles stay near square. Use it when the question is how a whole
     splits; for the values alone, or for more than a handful of small parts,
     use [`BarChart`][datachart.charts.BarChart].
@@ -67,10 +67,11 @@ def Treemap(
         data: The chart data: a `{"data": [...]}` dict whose records are
             `{"label", "value"}` dicts, or a list of such dicts drawing one
             treemap per subplot. A record may carry `children`, a list of
-            records of the same shape, for one level of grouping; it then
-            omits `value` or carries its children's sum. Any record may carry
-            an `emphasis` role: `"background"` mutes the tile, `"highlight"`
-            strokes its border; a child's role overrides its group's.
+            records of the same shape, nesting up to four levels deep; a
+            group then omits `value` or carries its children's sum. Any
+            record may carry an `emphasis` role: `"background"` mutes the
+            tile or group, `"highlight"` strokes its border; the role applies
+            to the whole subtree, and a descendant's own role overrides it.
         show_values: Whether to write each tile's value under its label. A
             value that does not fit is dropped before the label.
         value_format: The format of the tile values: a `VALUE_FORMAT`
@@ -95,8 +96,8 @@ def Treemap(
 
     Raises:
         ValueError: If `emphasis` is given, the records are malformed (a
-            missing label, a value not above zero, a child with children, a
-            group value that is not its children's sum), or a record's
+            missing label, a value not above zero, a record nested past four
+            levels, a group value that is not its children's sum), or a record's
             `emphasis` is not a role.
 
     """
