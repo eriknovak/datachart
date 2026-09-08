@@ -4010,15 +4010,21 @@ class TreemapLayer(Layer):
         ):
             box = (x / aspect + pad / 2, y + pad / 2, w / aspect - pad, h - pad)
             color = self.group_colors[record["label"]]
-            role = record.get("emphasis")
-            if record.get("children") is None:
-                self._draw_tile(ax, record, box, color, role, 0, frame)
-            else:
-                self._draw_group(ax, record, box, color, role, frame)
+            self._draw_record(ax, record, box, color, record.get("emphasis"), 0, frame)
         # tiles and bands never overlap, so one containment pick names one
         self.register_patch_hover(frame.marks)
 
-    def _draw_group(self, ax, record, box, color, role, frame):
+    def _draw_record(self, ax, record, box, color, role, level, frame):
+        """A record in its box: a group when it carries `children`, else a tile."""
+
+        if record.get("children") is None:
+            self._draw_tile(ax, record, box, color, role, level, frame)
+        else:
+            self._draw_group(ax, record, box, color, role, level, frame)
+
+    def _draw_group(self, ax, record, box, color, role, level, frame):
+        """A group at any level: band, children, and one border (ADR 0032)."""
+
         style = self.treemap_style
         axes_pt, aspect, effects, marks = frame
         x, y, w, h = box
@@ -4037,16 +4043,19 @@ class TreemapLayer(Layer):
                 break
             band_size -= TREEMAP_FONT_STEP
 
-        children = sorted(record["children"], key=lambda c: c["value"], reverse=True)
-        leaf_color = _lighten(color, style["level_shade"])
-        values = [child["value"] for child in children]
+        # children tile the area under the band, separated by the stroke only
+        children = sorted(record["children"], key=treemap_record_total, reverse=True)
+        child_color = _lighten(color, style["level_shade"])
+        totals = [treemap_record_total(child) for child in children]
         for child, (cx, cy, cw, ch) in zip(
-            children, _squarify(values, x * aspect, y, w * aspect, h - band)
+            children, _squarify(totals, x * aspect, y, w * aspect, h - band)
         ):
-            tile = (cx / aspect, cy, cw / aspect, ch)
-            # a leaf inherits its group's role unless it carries its own
+            child_box = (cx / aspect, cy, cw / aspect, ch)
+            # a child inherits its group's role unless it carries its own
             child_role = child.get("emphasis") or role
-            self._draw_tile(ax, child, tile, leaf_color, child_role, 1, frame)
+            self._draw_record(
+                ax, child, child_box, child_color, child_role, level + 1, frame
+            )
 
         if band:
             header = Rectangle(
@@ -4082,7 +4091,7 @@ class TreemapLayer(Layer):
                     zorder=6,
                 )
         # the group is a box: one border in the tile stroke color encloses
-        # the band and the leaves
+        # the band and the children
         ax.add_patch(
             Rectangle(
                 (x, y),

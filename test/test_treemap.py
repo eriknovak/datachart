@@ -593,6 +593,206 @@ class TestRendering(unittest.TestCase):
             self.assertLessEqual(max(ratios.values()), 3.0, figsize)
 
 
+class TestDeepNesting(unittest.TestCase):
+    """Groups below the top level follow the top-level rules (ADR 0032)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_inner_groups_are_boxes_inside_their_parent(self):
+        fig = Treemap({"data": DEEP}, figsize=(8, 5))
+        ax = fig.axes[0]
+        boxes, tiles = _boxes(ax), _tiles(ax)
+        self.assertEqual(
+            set(boxes), {"Asia", "East Asia", "China", "South Asia", "Africa"}
+        )
+        self.assertEqual(
+            set(tiles),
+            {"Guangdong", "Shandong", "Japan", "India", "Pakistan"}
+            | {"Nigeria", "Ethiopia", "Oceania"},
+        )
+        asia, east, china = boxes["Asia"], boxes["East Asia"], boxes["China"]
+        for inner, outer in ((east, asia), (china, east)):
+            self.assertGreaterEqual(inner.get_x() + 1e-9, outer.get_x())
+            self.assertGreaterEqual(inner.get_y() + 1e-9, outer.get_y())
+            self.assertLessEqual(
+                inner.get_x() + inner.get_width(),
+                outer.get_x() + outer.get_width() + 1e-9,
+            )
+            self.assertLessEqual(
+                inner.get_y() + inner.get_height(),
+                outer.get_y() + outer.get_height() + 1e-9,
+            )
+        # an inner group's area is its share of the parent's inner area
+        self.assertAlmostEqual(
+            _area(boxes["South Asia"]) / _area(east), 1669 / 351, delta=0.5
+        )
+        self.assertAlmostEqual(
+            _area(tiles["Guangdong"]) / _area(tiles["Shandong"]), 127 / 101, delta=0.05
+        )
+
+    def test_inner_groups_have_no_pad(self):
+        fig = Treemap({"data": DEEP}, figsize=(8, 5))
+        ax = fig.axes[0]
+        boxes, bands = _boxes(ax), _bands(ax)
+        asia, band = boxes["Asia"], bands["Asia"]
+        inner = _area(asia) - _area(band)
+        # the children fill the parent's area under the band exactly
+        self.assertAlmostEqual(
+            _area(boxes["East Asia"]) + _area(boxes["South Asia"]), inner
+        )
+        east = boxes["East Asia"]
+        self.assertAlmostEqual(
+            _area(boxes["China"]) + _area(_tiles(ax)["Japan"]),
+            _area(east) - (_area(bands["East Asia"]) if "East Asia" in bands else 0),
+        )
+        # the level-1 pad is unchanged
+        pad = config["plot_treemap_group_pad"]
+        xs = sorted(b.get_x() for k, b in boxes.items() if k in ("Asia", "Africa"))
+        self.assertAlmostEqual(xs[0], pad / 2)
+
+    def test_inner_band_ladder_degrades_to_a_border(self):
+        fig = Treemap({"data": DEEP}, figsize=(8, 5))
+        ax = fig.axes[0]
+        boxes, bands, texts = _boxes(ax), _bands(ax), _texts(ax)
+        # a tall inner group has a band on its top edge, with its label
+        self.assertIn("East Asia", bands)
+        self.assertIn("East Asia", texts)
+        box, band = boxes["East Asia"], bands["East Asia"]
+        self.assertAlmostEqual(
+            band.get_y() + band.get_height(), box.get_y() + box.get_height()
+        )
+        self.assertEqual(box.get_linewidth(), config["plot_treemap_group_edge_width"])
+        # a short inner group draws its border only, and no label
+        data = [
+            rec(
+                "Asia",
+                children=[
+                    rec("Big", 1000),
+                    rec("Tiny group", children=[rec("a", 1), rec("b", 1)]),
+                ],
+            ),
+            rec("Africa", 500),
+        ]
+        fig = Treemap({"data": data}, figsize=(4, 3))
+        ax = fig.axes[0]
+        self.assertIn("Tiny group", _boxes(ax))
+        self.assertNotIn("Tiny group", _bands(ax))
+        self.assertNotIn("Tiny group", _texts(ax))
+        self.assertEqual(
+            _boxes(ax)["Tiny group"].get_linewidth(),
+            config["plot_treemap_group_edge_width"],
+        )
+
+    def test_tint_compounds_per_level(self):
+        fig = Treemap({"data": DEEP}, figsize=(8, 5))
+        ax = fig.axes[0]
+        bands, tiles = _bands(ax), _tiles(ax)
+        shade = config["plot_treemap_level_shade"]
+        group = to_rgb(bands["Asia"].get_facecolor())
+        # an inner band keeps its own level's color
+        level2 = to_rgb(bands["East Asia"].get_facecolor())
+        level3 = to_rgb(tiles["Japan"].get_facecolor())
+        level4 = to_rgb(tiles["Guangdong"].get_facecolor())
+        for parent, child in ((group, level2), (level2, level3), (level3, level4)):
+            for p, c in zip(parent, child):
+                self.assertAlmostEqual(c, p + (1 - p) * shade, places=2)
+        fig = Treemap(
+            {"data": DEEP}, figsize=(8, 5), style={"plot_treemap_level_shade": 0}
+        )
+        ax = fig.axes[0]
+        bands, tiles = _bands(ax), _tiles(ax)
+        for label in ("East Asia", "China"):
+            self.assertEqual(to_rgb(bands[label].get_facecolor()), group)
+        for label in ("Guangdong", "Japan", "India"):
+            self.assertEqual(to_rgb(tiles[label].get_facecolor()), group)
+
+    def test_label_font_scales_per_level(self):
+        fig = Treemap({"data": DEEP}, figsize=(8, 5), show_values=True)
+        sizes = {t.get_text(): t.get_fontsize() for t in fig.axes[0].texts}
+        general = config["font_general_size"]
+        scale = config["plot_treemap_level_font_scale"]
+        self.assertAlmostEqual(sizes["Oceania"], general)
+        self.assertAlmostEqual(sizes["Nigeria"], general * scale)
+        self.assertAlmostEqual(sizes["Japan"], general * scale**2)
+        self.assertAlmostEqual(sizes["Guangdong"], general * scale**3)
+        # values scale the same way
+        self.assertAlmostEqual(sizes["45"], config["plot_bar_value_fontsize"])
+        self.assertAlmostEqual(sizes["224"], config["plot_bar_value_fontsize"] * scale)
+
+    def test_emphasis_inherits_down_the_subtree(self):
+        data = [
+            rec(
+                "Asia",
+                children=[
+                    rec(
+                        "East Asia",
+                        emphasis="background",
+                        children=[
+                            rec(
+                                "China",
+                                children=[
+                                    rec("Guangdong", 127, emphasis="highlight"),
+                                    rec("Shandong", 101),
+                                ],
+                            ),
+                            rec("Japan", 123),
+                        ],
+                    ),
+                    rec(
+                        "South Asia",
+                        emphasis="highlight",
+                        children=[rec("India", 1429), rec("Pakistan", 240)],
+                    ),
+                ],
+            ),
+            rec("Africa", children=[rec("Nigeria", 224)]),
+        ]
+        fig = Treemap({"data": data}, figsize=(8, 5))
+        ax = fig.axes[0]
+        boxes, bands, tiles = _boxes(ax), _bands(ax), _tiles(ax)
+        muted = to_rgb(config["muted_color"])
+        stroke = to_rgb(config["font_general_color"])
+        # background on a level-2 group mutes its band and every tile under it
+        self.assertEqual(to_rgb(bands["East Asia"].get_facecolor()), muted)
+        self.assertEqual(to_rgb(tiles["Japan"].get_facecolor()), muted)
+        self.assertEqual(to_rgb(tiles["Shandong"].get_facecolor()), muted)
+        self.assertEqual(boxes["China"].get_alpha(), config["muted_alpha"])
+        # a level-4 leaf's own role wins
+        self.assertNotEqual(to_rgb(tiles["Guangdong"].get_facecolor()), muted)
+        self.assertEqual(to_rgb(tiles["Guangdong"].get_edgecolor()), stroke)
+        # highlight on an inner group strokes its border and its leaves
+        self.assertEqual(to_rgb(boxes["South Asia"].get_edgecolor()), stroke)
+        self.assertEqual(
+            boxes["South Asia"].get_linewidth(),
+            config["plot_treemap_highlight_edge_width"],
+        )
+        self.assertEqual(to_rgb(tiles["India"].get_edgecolor()), stroke)
+        # the ancestors and the unrelated group are untouched
+        self.assertNotEqual(to_rgb(bands["Asia"].get_facecolor()), muted)
+        self.assertEqual(
+            to_rgb(boxes["Asia"].get_edgecolor()),
+            to_rgb(config["plot_treemap_edge_color"]),
+        )
+        self.assertNotEqual(to_rgb(tiles["Nigeria"].get_facecolor()), muted)
+
+    def test_legend_stays_top_level(self):
+        fig = Treemap({"data": DEEP}, show_legend=True)
+        legend = fig.axes[0].get_legend()
+        labels = [t.get_text() for t in legend.get_texts()]
+        self.assertEqual(labels, ["Asia", "Africa", "Oceania"])
+
+    def test_deep_tree_in_every_theme_and_in_a_grid(self):
+        for theme in THEMES:
+            config.set_theme(theme)
+            fig = Treemap({"data": DEEP}, show_values=True)
+            self.assertIn("Guangdong", _tiles(fig.axes[0]))
+            plt.close(fig)
+        config.set_theme(THEME.DEFAULT)
+        grid = Grid([[Treemap({"data": DEEP}), LineChart(LINE)]])
+        self.assertIn("China", _boxes(grid.axes[0]))
+
+
 class TestComposition(unittest.TestCase):
     def tearDown(self):
         plt.close("all")
