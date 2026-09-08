@@ -12,7 +12,7 @@ from datachart.charts import Treemap
 
 ## Treemap Input Attributes
 
-The `Treemap` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the records to tile. A treemap is a `{"data": [...]}` dict whose records are `{"label", "value"}` dicts; a record's `children` list adds one level of grouping. A list of such dicts draws one treemap per subplot.
+The `Treemap` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the records to tile. A treemap is a `{"data": [...]}` dict whose records are `{"label", "value"}` dicts; a record's `children` list groups it, up to four levels deep. A list of such dicts draws one treemap per subplot.
 
 ```
 Treemap(
@@ -21,7 +21,7 @@ Treemap(
             {
                 "label": str,                           # The drawn label of the tile or group
                 "value": Union[int, float],             # The size of the tile; must be greater than 0
-                "children": Optional[List[dict]],       # Records of the same shape, one level deep; a group then omits its value or carries their sum
+                "children": Optional[List[dict]],       # Records of the same shape, nesting up to four levels deep; a group then omits its value or carries their sum
                 "emphasis": Optional[str],              # "background" mutes the tile or group, "highlight" strokes its border
             },
             ...
@@ -34,7 +34,7 @@ Treemap(
         "plot_treemap_edge_color":           Optional[str],    # The stroke color between tiles and around groups
         "plot_treemap_edge_width":           Optional[float],  # The stroke width between tiles (0.6 by default)
         "plot_treemap_group_edge_width":     Optional[float],  # The border width around a group (1 by default)
-        "plot_treemap_group_pad":            Optional[float],  # The gap between groups as a fraction of the span (0.01 by default)
+        "plot_treemap_group_pad":            Optional[float],  # The gap between top-level records and the gutter inside every group, as a fraction of the span (0.01 by default)
         "plot_treemap_level_shade":          Optional[float],  # How much lighter than its group a tile is, 0 to 1 (0.35 by default)
         "plot_treemap_level_font_scale":     Optional[float],  # The label font scale applied per nesting level (0.85 by default)
         "plot_treemap_min_fontsize":         Optional[float],  # The smallest font size a label shrinks to before it is dropped (6 by default)
@@ -56,15 +56,15 @@ For more details, see the [datachart.charts.Treemap](https://eriknovak.github.io
 
 The examples in this guide share one dataset: the world's population in 2023 by continent and country, in millions, from the United Nations *World Population Prospects* estimates. Each continent lists its most populous countries and a "Rest of" bucket that makes the continent whole; the numbers live in the hidden cell below. Population is a textbook part-of-whole story: the world splits into continents, and each continent into countries — and a treemap shows both splits at once, with the area of every tile carrying its share.
 
-The data is one dict with a `data` list. Every record is a dict with a `label` and a `value` above zero; a record that carries `children` is a group, and its children are records of the same shape. Groups nest one level only, and a group either omits its `value` or carries the sum of its children — anything else raises a `ValueError`, as does a zero or negative value. The order of the records does not matter: every level is sorted largest first before it is tiled.
+The data is one dict with a `data` list. Every record is a dict with a `label` and a `value` above zero; a record that carries `children` is a group, and its children are records of the same shape. Groups nest up to four levels deep, and a group either omits its `value` or carries the sum of its children — anything else raises a `ValueError`, as does a zero or negative value. The order of the records does not matter: every level is sorted largest first before it is tiled.
 
-!!! note "One level of nesting" A treemap groups its records one level deep: a record's `children` are tiles, and a child cannot carry `children` of its own. Deeper hierarchies are not supported yet; fold the lower levels into "Rest of" buckets, or draw a subgroup as its own treemap with [subplots](#subplots).
+!!! note "Four levels of nesting" A treemap nests its records four levels deep: the `data` list is the first level, and a record at the fourth cannot carry `children` of its own. The cap is a readability limit — every level takes a header band and a lighter tint from its parent, and at the default figure sizes a fifth level has no room left for its labels. For a deeper hierarchy, fold the lowest levels into "Rest of" buckets, or draw a subtree as its own treemap with [subplots](#subplots).
 
 ```
 world["data"][0]["label"], world["data"][0]["children"][:3]
 ```
 
-**Basic example.** Only the `data` argument is required to draw the treemap. Each continent is a bordered box with a header band, its countries are tiles in a lighter tint of the continent's color, and the largest tile of every level sits top-left. The tiles are squarified in the drawn aspect of the axes, so they stay near square whatever the figure size. A label that does not fit its tile wraps, then shrinks, then is dropped; a group too short for its band goes unlabelled, and the [legend](#legend) is what names it.
+**Basic example.** Only the `data` argument is required to draw the treemap. Each continent is a box in its color with a header band, its countries are tiles in a lighter tint inset within it, and the largest tile of every level sits top-left. The tiles are squarified in the drawn aspect of the axes, so they stay near square whatever the figure size. A label that does not fit its tile wraps, then shrinks, then is dropped; a group too short for its band goes unlabelled, and the [legend](#legend) is what names it.
 
 ```
 Treemap(
@@ -82,10 +82,11 @@ Every customization is either a keyword argument of `Treemap` or a `plot_*` attr
 | add a title                             | `title`                                                                    | [Title and figure size](#title-and-figure-size) |
 | resize the figure                       | `figsize`                                                                  | [Title and figure size](#title-and-figure-size) |
 | tile one level without groups           | records without `children`                                                 | [Flat data](#flat-data)                         |
+| nest groups inside groups               | `children` on a child record, up to four levels                            | [Nested groups](#nested-groups)                 |
 | write the values on the tiles           | `show_values`, `value_format`                                              | [Tile values](#tile-values)                     |
 | mute or outline a tile or a group       | `"emphasis"` on the record                                                 | [Emphasis](#emphasis)                           |
 | name the groups in a legend             | `show_legend`                                                              | [Legend](#legend)                               |
-| widen the gap between groups            | `style={"plot_treemap_group_pad": ...}`                                    | [Tile style](#tile-style)                       |
+| widen the gap around groups             | `style={"plot_treemap_group_pad": ...}`                                    | [Tile style](#tile-style)                       |
 | change the tint of the tiles in a group | `style={"plot_treemap_level_shade": ...}`                                  | [Tile style](#tile-style)                       |
 | change the strokes or the label sizes   | `style={"plot_treemap_edge_width": ..., "plot_treemap_min_fontsize": ...}` | [Tile style](#tile-style)                       |
 | drop the halo behind the labels         | `style={"plot_treemap_label_halo_width": 0}`                               | [Tile style](#tile-style)                       |
@@ -126,6 +127,46 @@ continents = {
 Treemap(
     data=continents,
     title="World population by continent, 2023 (millions)",
+).show()
+```
+
+### Nested groups
+
+A child record may carry `children` of its own, up to four levels deep, and every level follows the same rules as the top one: a group is a box filled in its color with a header band, its children one tint lighter inset within it, and the largest sits top-left. A nested group's band shrinks its font when the box is short — scratch in the example — and a group too short even for that draws its border only, like Mail; either way the [legend](#legend) still names the top-level groups alone. Every group insets its children by `plot_treemap_group_pad`, the same gap that separates the top-level records, so a nested box sits visibly inside its parent's color; the children themselves meet at the stroke. The example is a home folder four levels deep, in gigabytes: the nested dicts are turned into records by a small recursive helper.
+
+```
+# a home folder: a dict is a folder, a number a file size in GB
+HOME = {
+    "Projects": {
+        "datachart": {"docs": 14, "src": 6, ".venv": 22, "test": 3},
+        "thesis": {"figures": 18, "chapters": 4, "data": 31},
+        "scratch": {"notes": 3, "tmp": 6},
+    },
+    "Media": {
+        "Photos": {"2024": 38, "2025": 52, "raw": 61},
+        "Videos": 47,
+        "Music": 12,
+    },
+    "Library": {"Caches": 28, "Mail": {"Inbox": 3, "Archive": 2}, "Fonts": 2},
+    "Downloads": 24,
+    "Desktop": 5,
+}
+
+
+def records(tree):
+    """A folder's records: a number is a tile, a dict a group of its own."""
+    return [
+        {"label": name, "value": size}
+        if not isinstance(size, dict)
+        else {"label": name, "children": records(size)}
+        for name, size in tree.items()
+    ]
+
+
+Treemap(
+    data={"data": records(HOME)},
+    title="Home folder by size (GB)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
@@ -198,16 +239,16 @@ Treemap(
 
 ### Tile style
 
-To change the tile style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.TreemapStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TreemapStyleAttrs) typing. `plot_treemap_group_pad` is the gap between groups as a fraction of the drawing, while tiles inside a group are separated by a stroke only, drawn in `plot_treemap_edge_color` at `plot_treemap_edge_width`; `plot_treemap_group_edge_width` draws the border around a group in the same color. `plot_treemap_level_shade` says how much lighter than the group its tiles are, from `0` (the group color) to `1` (white). Tile labels shrink by `plot_treemap_level_font_scale` per nesting level and down to `plot_treemap_min_fontsize` before they are dropped; every label sits behind a white halo of `plot_treemap_label_halo_width`, and `0` drops it.
+To change the tile style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.TreemapStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TreemapStyleAttrs) typing. `plot_treemap_group_pad` is the one gap, as a fraction of the drawing: between the top-level records, and, in the group's color, between a group's border and its children at every level; the children themselves are separated by a stroke only, drawn in `plot_treemap_edge_color` at `plot_treemap_edge_width`; `plot_treemap_group_edge_width` draws the border around a group in the same color. `plot_treemap_level_shade` says how much lighter than its parent each level is, from `0` (the group color) to `1` (white), applied once more per level. Tile labels shrink by `plot_treemap_level_font_scale` per nesting level and down to `plot_treemap_min_fontsize` before they are dropped; every label sits behind a white halo of `plot_treemap_label_halo_width`, and `0` drops it.
 
-The example widens the gap between the continents, keeps the countries closer to the continent color, and drops the halo.
+The example widens the gap around the continents and their countries, keeps the countries closer to the continent color, and drops the halo.
 
 ```
 Treemap(
     data=world,
     style={
-        # a wider gap between the continents
-        "plot_treemap_group_pad": 0.03,
+        # a wider gap around the continents
+        "plot_treemap_group_pad": 0.02,
         # the countries close to the continent color
         "plot_treemap_level_shade": 0.15,
         # no halo behind the labels

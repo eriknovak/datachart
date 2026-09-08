@@ -16707,9 +16707,9 @@ cycle, <code>nodes</code> does not name exactly the linked nodes, or
         <p>Creates the treemap.</p>
 <p>A treemap tiles part-of-whole data as rectangles whose area is the
 value — disk usage by folder, a budget by line, population by continent
-and country. A record's <code>children</code> add one level of grouping: the group
-is a bordered box with a header band, its tiles a lighter tint of the
-group color. Every level is sorted largest first and tiled so the
+and country. A record's <code>children</code> group it, up to four levels deep: a
+group is a box in its color with a header band, its children inset in a
+lighter tint. Every level is sorted largest first and tiled so the
 rectangles stay near square. Use it when the question is how a whole
 splits; for the values alone, or for more than a handful of small parts,
 use <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;datachart.charts.BarChart&lt;/span&gt;" href="#datachart.charts.BarChart"><code>BarChart</code></a>.</p>
@@ -16753,10 +16753,11 @@ use <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol
                 <p>The chart data: a <code>{"data": [...]}</code> dict whose records are
 <code>{"label", "value"}</code> dicts, or a list of such dicts drawing one
 treemap per subplot. A record may carry <code>children</code>, a list of
-records of the same shape, for one level of grouping; it then
-omits <code>value</code> or carries its children's sum. Any record may carry
-an <code>emphasis</code> role: <code>"background"</code> mutes the tile, <code>"highlight"</code>
-strokes its border; a child's role overrides its group's.</p>
+records of the same shape, nesting up to four levels deep; a
+group then omits <code>value</code> or carries its children's sum. Any
+record may carry an <code>emphasis</code> role: <code>"background"</code> mutes the
+tile or group, <code>"highlight"</code> strokes its border; the role applies
+to the whole subtree, and a descendant's own role overrides it.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -17038,8 +17039,8 @@ directions.</p>
             <td class="doc-raises-details">
               <div class="doc-md-description">
                 <p>If <code>emphasis</code> is given, the records are malformed (a
-missing label, a value not above zero, a child with children, a
-group value that is not its children's sum), or a record's
+missing label, a value not above zero, a record nested past four
+levels, a group value that is not its children's sum), or a record's
 <code>emphasis</code> is not a role.</p>
               </div>
             </td>
