@@ -10306,7 +10306,7 @@ These include:
 - The [datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) function for arranging multiple charts in a grid layout, as illustrated in the [grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) section.
 - The `texts` chart parameter and the [datachart.utils.Annotate](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Annotate) function for attaching text annotations to charts and finished figures, as illustrated in the [text annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) section.
 - The [datachart.utils.stats](https://eriknovak.github.io/datachart/dev/references/utils/stats/index.md) module for statistical calculations, as illustrated in the [stats](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md) section.
-- The [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.save_figure) function for saving figures into files, as showcased in the [charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md) section.
+- The [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.save_figure) function for saving figures into files and embedding them in web pages, as described in the [saving figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) section.
 - The `interactive` flag of every figure's `show()` method for zooming, panning, and hovering over the marks, as described in the [interactive figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/interactive/index.md) section.
 
 # Panel
@@ -11657,6 +11657,68 @@ from datachart.utils.stats import kde2d
 surface = kde2d(random_values, random_values_2, gridsize=3)
 surface
 ```
+
+# Saving Figures
+
+Every chart function returns a matplotlib figure. The [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.save_figure) function writes it to disk in the format given by its `format` argument or, when omitted, by the file extension. The theme is baked into the figure when it is created, so saving never consults the global `config`.
+
+```
+from datachart.charts import LineChart
+from datachart.utils import save_figure
+
+figure = LineChart(
+    data=[{"x": i, "y": i**2} for i in range(10)],
+    subtitle="growth",
+    xlabel="Step",
+    ylabel="Value",
+)
+save_figure(figure, "chart.png", dpi=300)
+```
+
+## Choosing a format
+
+- **Vector formats**, such as SVG and PDF. The marks are stored as shapes, so the figure stays crisp at any size and the file stays small for charts made of lines and bars. Use these for print, papers, and web pages.
+- **Raster formats**, such as PNG. The figure is stored as pixels at the resolution set by `dpi`. Use `dpi=300` or higher for anything that will be printed or zoomed; the default is `300`.
+- **`transparent=True`** drops the figure background, so the chart sits on whatever the page or slide behind it is colored.
+
+The [FIG_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_FORMAT) constant lists every supported format.
+
+## Embedding in web pages
+
+Export the figure as SVG with a transparent background:
+
+```
+save_figure(figure, "chart.svg", transparent=True)
+```
+
+SVG is the right format for the web: it renders sharp on every screen density, it scales with the layout instead of being resized as an image, and for charts drawn from lines, bars, and text the file is usually smaller than a PNG of the same size. The transparent background lets the chart match the page in both light and dark color schemes.
+
+There are two ways to put the SVG on a page:
+
+- **As an image.** Reference the file from an `<img>` tag, the same as any picture. The chart is cached and reused across pages, its markup stays out of the HTML, and the page's CSS cannot reach into it. Prefer this when the chart is a static illustration.
+
+  ```
+  <img src="chart.svg" alt="Value against step, growing quadratically" width="640">
+  ```
+
+- **Inline.** Paste the file's contents into the HTML directly. The chart becomes part of the document, so the page's CSS can restyle its strokes and fills, and text inside it is selectable and searchable. Prefer this when the chart should follow the page's styling or when there is a single chart per page. The markup is repeated on every page that shows it, so keep the number of inlined charts small.
+
+  ```
+  <figure>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400">...</svg>
+    <figcaption>Value against step.</figcaption>
+  </figure>
+  ```
+
+When the page or platform cannot use SVG, save a PNG at `dpi=300` or higher and embed it the same way as the image above. Raster images blur when scaled up, so export at the largest size the page will display.
+
+```
+save_figure(figure, "chart.png", dpi=300, transparent=True)
+```
+
+### Interactive web charts are out of scope
+
+The exported file is a static picture. `datachart` does not render figures interactively in the browser: there is no HTML export, no embed snippet, and no zoom or hover on a web page. Interactivity is available in notebooks and GUI windows through `show(interactive=True)`, as described in the [interactive figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/interactive/index.md) section. For charts that zoom and hover inside a web page, use a browser-native library such as [d3](https://d3js.org/), [Plotly](https://plotly.com/javascript/), [Vega](https://vega.github.io/vega/), or [Bokeh](https://bokeh.org/).
 
 # Interactive Figures
 

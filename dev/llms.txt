@@ -49,6 +49,7 @@ themes; per-chart overrides go in each chart's `style` parameter.
 - [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md): Arranging multiple charts in a grid layout with Grid, including nested rows and layout specs.
 - [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md): Text annotations on any chart: placement and coordinates, connector looks, text and box styling, and annotating finished figures with Annotate.
 - [Statistics](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md): Statistical utilities for preparing chart data.
+- [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md): Saving figures with save_figure: choosing vector or raster formats and dpi, embedding SVG or PNG in web pages, and why interactive web charts are out of scope.
 - [Interactive Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/interactive/index.md): Zooming, panning, and hovering over marks with show(interactive=True): the interactive extra, notebook and script behavior, and the chart types with hover support.
 
 ## Styling
