@@ -158,6 +158,8 @@ EXPECTED_CHANGES = {
     "treemap_emphasis",
     "treemap_values",
     "treemap_grid",
+    # treemap records nest to four levels (ADR 0032)
+    "treemap_deep",
     # line-only panels hug the data range like line charts (ADR 0025)
     "overlay_line_line",
     "overlay_theme_snapshot",
@@ -1629,6 +1631,47 @@ def treemap_values():
         show_values=True,
         value_format=VALUE_FORMAT.INTEGER,
         figsize=(8, 4.5),
+    )
+
+
+# a home directory four levels deep, in gigabytes
+TREEMAP_HOME = {
+    "Projects": {
+        "datachart": {"docs": 14, "src": 6, ".venv": 22, "test": 3},
+        "thesis": {"figures": 18, "chapters": 4, "data": 31},
+        "scratch": 9,
+    },
+    "Media": {
+        "Photos": {"2024": 38, "2025": 52, "raw": 61},
+        "Videos": 47,
+        "Music": 12,
+    },
+    "Library": {"Caches": 28, "Mail": 9, "Fonts": 2},
+    "Downloads": 24,
+    "Desktop": 5,
+}
+
+
+def treemap_tree(tree):
+    """Nested dicts as treemap records: a number is a leaf, a dict a group."""
+    return [
+        (
+            {"label": label, "value": value}
+            if not isinstance(value, dict)
+            else {"label": label, "children": treemap_tree(value)}
+        )
+        for label, value in tree.items()
+    ]
+
+
+@case
+def treemap_deep():
+    return Treemap(
+        {"data": treemap_tree(TREEMAP_HOME)},
+        title="Home folder, GB",
+        show_values=True,
+        value_format=VALUE_FORMAT.INTEGER,
+        figsize=(8, 5),
     )
 
 
