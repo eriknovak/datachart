@@ -30,7 +30,10 @@ second rule for bands, tints, or emphasis.
   behind their stroke. `plot_treemap_group_pad` is the one gap: it
   separates the top-level records from each other, and the children of a
   group from its border and its band; the children then meet each other
-  at the stroke, as the tiles of a group always have. The default halves
+  at the stroke, as the tiles of a group always have. The band label is
+  centred on the band plus the gutter under it, the span a reader sees as
+  the header, and on its text body rather than its descender box;
+  centred on the band alone it sat visibly high. The default halves
   to 0.01 so that the gap stays the width the gutter had. Without the gutter a nested
   box shares its edges with its parent's, and two stacked bands of one width
   read as siblings, not as a parent and its child; a white gutter reads as

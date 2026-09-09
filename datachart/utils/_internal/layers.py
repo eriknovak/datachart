@@ -4097,12 +4097,15 @@ class TreemapLayer(Layer):
                 _text_size(band_size, label)[0]
                 <= w * axes_pt[0] - 2 * TREEMAP_LABEL_PAD
             ):
+                # the label is centred on the span the reader sees as the
+                # header, band plus gutter, on its text body, not its
+                # descender box
                 ax.text(
                     x + TREEMAP_LABEL_PAD / axes_pt[0],
-                    y + h - band / 2,
+                    y + h - (band + gutter) / 2,
                     label,
                     ha="left",
-                    va="center",
+                    va="center_baseline",
                     fontsize=band_size,
                     fontweight=self.band_style["fontweight"],
                     family=self.band_style["family"],
