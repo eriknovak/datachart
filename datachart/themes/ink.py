@@ -13,7 +13,12 @@ INK_THEME: StyleAttrs = make_theme(
             "#41B6C4",
             "#225EA8",
         ],
-        "font_general_sansserif": ["Helvetica", "Arial", "Liberation Sans", "DejaVu Sans"],
+        "font_general_sansserif": [
+            "Helvetica",
+            "Arial",
+            "Liberation Sans",
+            "DejaVu Sans",
+        ],
         "plot_grid_color": "#DDE3E8",
         "plot_bar_edge_width": 1.0,
         "plot_bar_edge_color": "#0B1F44",

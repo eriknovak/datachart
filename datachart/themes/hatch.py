@@ -19,7 +19,12 @@ HATCH_THEME: StyleAttrs = make_theme(
             "#5B84C4",
             "#2E4E8F",
         ],
-        "font_general_sansserif": ["Helvetica", "Arial", "Liberation Sans", "DejaVu Sans"],
+        "font_general_sansserif": [
+            "Helvetica",
+            "Arial",
+            "Liberation Sans",
+            "DejaVu Sans",
+        ],
         "chart_default_show_values": True,
         "plot_hatch_cycle": ["", "//", ".."],
         "plot_grid_color": "#D0D0D0",

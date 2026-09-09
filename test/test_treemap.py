@@ -532,6 +532,19 @@ class TestRendering(unittest.TestCase):
         )
         self.assertEqual(len(text.get_path_effects()), 1)
 
+    def test_band_label_is_centred_on_band_and_gutter(self):
+        fig = Treemap({"data": DEEP}, figsize=(8, 5))
+        ax = fig.axes[0]
+        boxes, bands = _boxes(ax), _bands(ax)
+        gutter = config["plot_treemap_group_pad"]
+        texts = {t.get_text(): t for t in ax.texts}
+        for group in ("Asia", "East Asia", "China"):
+            box, band, text = boxes[group], bands[group], texts[group]
+            top = box.get_y() + box.get_height()
+            children_top = band.get_y() - gutter
+            self.assertAlmostEqual(text.get_position()[1], (top + children_top) / 2)
+            self.assertEqual(text.get_va(), "center_baseline")
+
     def test_no_halo_when_width_is_zero(self):
         fig = Treemap({"data": FLAT}, style={"plot_treemap_label_halo_width": 0})
         self.assertEqual(fig.axes[0].texts[0].get_path_effects(), [])
