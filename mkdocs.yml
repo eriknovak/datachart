@@ -132,23 +132,23 @@ plugins:
         Charts:
           - how-to-guides/charts/index.md: The chart functions, their common data format, and how to save figures.
           - how-to-guides/charts/linechart.ipynb: Line chart input attributes, single and multiple datasets, customization, datetime axes, and saving.
-          - how-to-guides/charts/stackedareachart.ipynb: Stacked area chart input attributes, baselines (zero, percent, sym, wiggle), band style and outlines, emphasis, subplots, composing with Panel and Grid, and saving.
-          - how-to-guides/charts/barchart.ipynb: Bar chart input attributes, single and multiple datasets, customization, and saving.
-          - how-to-guides/charts/pyramidchart.ipynb: Pyramid chart input attributes, the two-sides data contract, mirrored value axis controls, and composing pyramids with Grid.
+          - how-to-guides/charts/stackedareachart.ipynb: Stacked area chart input attributes, baselines (zero, percent, sym, wiggle), band style and outlines, emphasis, subplots, composing with Panel and Grid, datetime axes, and saving.
+          - how-to-guides/charts/barchart.ipynb: Bar chart input attributes, single and multiple datasets, customization, date labels, and saving.
+          - how-to-guides/charts/pyramidchart.ipynb: Pyramid chart input attributes, the two-sides data contract, mirrored value axis controls, date labels, and composing pyramids with Grid.
           - how-to-guides/charts/radialchart.ipynb: Radial chart input attributes, the line, bar, scatter, and histogram visuals, and polar settings (start angle, direction, inner radius).
           - how-to-guides/charts/histogram.ipynb: Histogram input attributes, single and multiple datasets, and histogram views.
-          - how-to-guides/charts/boxplot.ipynb: Box plot input attributes and customization, composing boxes with swarm and violin plots; multiple datasets require subplots.
-          - how-to-guides/charts/violinplot.ipynb: Violin plot input attributes, inner marks, bandwidth, split violins, composing violins with box and swarm plots, and subplots.
-          - how-to-guides/charts/swarmplot.ipynb: Swarm plot input attributes, swarm and strip modes, emphasis, overlaying box and violin plots with Panel, multiple datasets, and saving.
-          - how-to-guides/charts/raincloudplot.ipynb: Raincloud plot input attributes, the cloud, rain, and box parts and their styles, bandwidth, rain modes, orientation, emphasis, subplots, composing with Panel and Grid, and saving.
-          - how-to-guides/charts/scatterchart.ipynb: Scatter chart input attributes, single and multiple datasets, customization, and saving.
-          - how-to-guides/charts/heatmap.ipynb: Heatmap input attributes, single and multiple datasets, customization, and saving.
-          - how-to-guides/charts/contourchart.ipynb: Contour chart input attributes, iso-lines and filled bands, colorbars, inline labels, level rules, emphasis, multiple surfaces, composing with Panel and Grid, and saving.
-          - how-to-guides/charts/hexbinchart.ipynb: Hexbin chart input attributes, point counts and log color scales, aggregating a per-point value, grid size and minimum count, hexagon edges, subplots, composing with Panel and Grid, and saving.
+          - how-to-guides/charts/boxplot.ipynb: Box plot input attributes, customization, date labels, composing boxes with swarm and violin plots; multiple datasets require subplots.
+          - how-to-guides/charts/violinplot.ipynb: Violin plot input attributes, inner marks, bandwidth, split violins, date labels, composing violins with box and swarm plots, and subplots.
+          - how-to-guides/charts/swarmplot.ipynb: Swarm plot input attributes, swarm and strip modes, date labels, emphasis, overlaying box and violin plots with Panel, multiple datasets, and saving.
+          - how-to-guides/charts/raincloudplot.ipynb: Raincloud plot input attributes, the cloud, rain, and box parts and their styles, bandwidth, rain modes, orientation, date labels, emphasis, subplots, composing with Panel and Grid, and saving.
+          - how-to-guides/charts/scatterchart.ipynb: Scatter chart input attributes, single and multiple datasets, customization, datetime axes, and saving.
+          - how-to-guides/charts/heatmap.ipynb: Heatmap input attributes, single and multiple datasets, customization, date labels, and saving.
+          - how-to-guides/charts/contourchart.ipynb: Contour chart input attributes, iso-lines and filled bands, colorbars, inline labels, level rules, datetime axes, emphasis, multiple surfaces, composing with Panel and Grid, and saving.
+          - how-to-guides/charts/hexbinchart.ipynb: Hexbin chart input attributes, point counts and log color scales, aggregating a per-point value, grid size and minimum count, hexagon edges, datetime axes, subplots, composing with Panel and Grid, and saving.
           - how-to-guides/charts/sankeychart.ipynb: Sankey chart input attributes, the links data contract, inferred and explicit node columns, node and ribbon style, text annotations, subplots, composing with Grid, and saving.
           - how-to-guides/charts/networkchart.ipynb: Network chart input attributes, the nodes and edges data contract, spring, circular, and fixed layouts, directed edges, weight and size encodings, groups and the legend, per-node emphasis, edge values, node and edge style, text annotations, subplots, composing with Grid, and saving.
           - how-to-guides/charts/treemap.ipynb: Treemap input attributes, the records data contract with one level of children, tile values, per-record emphasis, the group legend, tile style, text annotations, subplots, composing with Grid, and saving.
-          - how-to-guides/charts/parallelcoords.ipynb: Parallel coordinates input attributes and customization for multivariate data.
+          - how-to-guides/charts/parallelcoords.ipynb: Parallel coordinates input attributes and customization for multivariate data, including date dimensions.
         Composition & Utilities:
           - how-to-guides/utility/index.md: Map of Panel, Grid, statistics, figure saving, and interactive figures.
           - how-to-guides/utility/panel.ipynb: "Overlaying multiple charts on one plot with Panel: dual y-axes, z-order, emphasis, and nesting panels."
