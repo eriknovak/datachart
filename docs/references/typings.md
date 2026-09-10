@@ -168,6 +168,8 @@ title: Typings Module
 
 ::: datachart.typings.BarStyleAttrs
 
+::: datachart.typings.ValueLabelStyleAttrs
+
 ::: datachart.typings.HistStyleAttrs
 
 ::: datachart.typings.VLineStyleAttrs

@@ -44,6 +44,7 @@ from .validate import (
     validate_network_edge_style,
     validate_sankey_link_color,
     validate_shared_x,
+    validate_value_step,
 )
 from .config_helpers import (
     get_attr_value,
@@ -88,6 +89,7 @@ from .config_helpers import (
     get_parallel_dim_label_pad,
     get_text_style,
     get_plot_text_style,
+    get_value_label_style,
     get_plot_text_box_style,
     get_plot_text_arrow_style,
     configure_axis_ticks_position,
@@ -121,7 +123,7 @@ DEFAULT_SWARM_MODE = SWARM_MODE.SWARM
 DEFAULT_SWARM_JITTER = 0.4
 # swarm offsets stay inside the category cell, clear of its neighbors
 SWARM_MAX_OFFSET = 0.4
-DEFAULT_BAR_VALUE_FORMAT = "%g"
+DEFAULT_VALUE_LABEL_FORMAT = "%g"
 # show_area fills this many data magnitudes below the line; the axes clip it,
 # so the fill meets the floor whatever limits sharey, ymin or a re-render set
 AREA_FLOOR_FACTOR = 1e6
@@ -160,6 +162,17 @@ POINT_LABEL_SPOTS = (
     ("right", "bottom", -1, 1),
     ("left", "top", 1, -1),
     ("right", "top", -1, -1),
+)
+# a line's value labels sit above or below the mark only: a side spot falls
+# on the line itself, between two points, and reads as either (ADR 0033);
+# the edge-anchored spots keep the first and last labels inside the axes
+POINT_LABEL_SPOTS_VERTICAL = (
+    ("center", "bottom", 0, 1),
+    ("center", "top", 0, -1),
+    ("left", "bottom", 0, 1),
+    ("right", "bottom", 0, 1),
+    ("left", "top", 0, -1),
+    ("right", "top", 0, -1),
 )
 # the widest correlation readout, for reserving its corner box
 CORRELATION_BOX_TEXT = "r = -0.000"
@@ -840,6 +853,15 @@ def _oriented(ax: plt.Axes, transpose: bool) -> tuple:
     )
 
 
+def _resolve_show_values(settings: dict) -> bool:
+    """`show_values` as set, else the theme default for a front that takes it (ADR 0033)."""
+
+    value = settings.get("show_values")
+    if value is None and "show_values" in settings:
+        value = config.get("chart_default_show_values")
+    return bool(value)
+
+
 class Layer:
     """One drawable unit; owns its resolved style, knows nothing about siblings."""
 
@@ -878,22 +900,68 @@ class Layer:
         """Collapse config → theme → chart style into concrete style dicts."""
 
     def _resolve_value_labels(self) -> None:
-        """The label font, `show_values` flag, value formatter, and value font.
+        """The `show_values` flag, value format, step, and label font (ADR 0033).
 
-        Shared by the bare layers, whose labels are drawn text in the general
-        font and whose values take the bar value style.
+        One resolution serves every chart that prints values; only the
+        placement differs per geometry.
         """
 
-        self.label_style = get_text_style("general")
-        self.show_values = bool(self.settings.get("show_values"))
-        self.value_format = _value_formatter(
-            self.settings.get("value_format") or VALUE_FORMAT.DEFAULT
+        self.show_values = _resolve_show_values(self.settings)
+        value_format = self.settings.get("value_format")
+        self.value_format = (
+            DEFAULT_VALUE_LABEL_FORMAT if value_format is None else value_format
         )
-        self.value_style = {
-            "fontsize": config["plot_bar_value_fontsize"],
-            "color": config["plot_bar_value_color"],
-            "family": self.label_style.get("family"),
+        self.value_step = validate_value_step(self.settings.get("value_step"))
+        style = get_value_label_style(self.style)
+        self.value_padding = style["padding"]
+        self.value_font = {
+            "fontsize": style["fontsize"],
+            "color": style["color"],
+            "family": resolve_font_family(),
         }
+
+    def _label_bars(self, ax, bars, stacked: bool, **labels) -> None:
+        """Label a bar container past each bar's edge; inside it when stacked.
+
+        A stacked segment's edge is the next segment's base, so an edge label
+        would sit on the mark above it.
+        """
+
+        ax.bar_label(
+            bars,
+            label_type="center" if stacked else "edge",
+            padding=0 if stacked else self.value_padding,
+            zorder=TEXT_ANNOTATION_ZORDER,
+            **labels,
+            **self.value_font,
+        )
+
+    def _resolve_bare_labels(self) -> None:
+        """The bare layers' label font and value labels.
+
+        Their labels are drawn text in the general font; their values print
+        as passed, so a whole number stays a whole number.
+        """
+
+        self._resolve_value_labels()
+        self.label_style = get_text_style("general")
+        if self.settings.get("value_format") is None:
+            self.value_format = VALUE_FORMAT.DEFAULT
+
+    def _value_texts(self, ax, values, along_y: bool = False) -> np.ndarray:
+        """One formatted value per mark, `None` where the step skips it.
+
+        Without a `value_step` the step keeps the widest label from meeting
+        its neighbours along the series axis, so a dense series stays legible.
+        """
+
+        texts = [_format_value(self.value_format, v) for v in values]
+        step = self.value_step or _default_value_step(
+            ax, texts, self.value_font["fontsize"], along_y
+        )
+        return np.array(
+            [t if i % step == 0 else None for i, t in enumerate(texts)], dtype=object
+        )
 
     def label(self, ctx: DrawContext) -> Optional[str]:
         return ctx.legend_label if ctx.legend_label is not None else self.subtitle
@@ -1038,14 +1106,75 @@ def _column_range(chart: dict, attr: str) -> Optional[tuple]:
     return (minimum(values), maximum(values))
 
 
-class LineLayer(Layer):
+class PointLabelMixin:
+    """Marks whose labels the panel places together, once every mark is drawn.
+
+    A layer records its drawn points; the panel's collision-avoiding placer
+    reads them back through `pending_labels` and tries `label_spots` around
+    each mark in preference order.
+    """
+
+    label_spots = POINT_LABEL_SPOTS
+
+    def _init_point_labels(self) -> None:
+        # point labels wear the text font; alignment comes from their spot
+        self.label_font = {
+            k: v for k, v in get_plot_text_style({}).items() if k not in ("ha", "va")
+        }
+        # drawn points per axes, consumed by the panel's label placement
+        self._pending_labels = {}
+
+    def _record_points(
+        self, ax, ctx, x, y, sizes, labels=None, font=None, pad=POINT_LABEL_PAD
+    ) -> None:
+        """Remember the drawn points so the panel can place their labels.
+
+        `sizes` are marker areas in points squared; `pad` is the gap between
+        a mark's edge and its label, in points.
+        """
+
+        if ctx.transpose:
+            x, y = y, x
+        font = dict(self.label_font if font is None else font)
+        if ctx.emphasis == EMPHASIS_BACKGROUND:
+            font["color"] = self.muted_color
+        self._pending_labels.setdefault(id(ax), []).append(
+            (
+                np.asarray(ax.xaxis.convert_units(x), dtype=float),
+                np.asarray(ax.yaxis.convert_units(y), dtype=float),
+                sizes,
+                labels,
+                font,
+                pad,
+            )
+        )
+
+    def pending_labels(self, ax) -> list:
+        """The points drawn into `ax` as (x, y, sizes, labels, font, pad) tuples."""
+
+        return self._pending_labels.pop(id(ax), [])
+
+
+def _mark_radius(line_style: dict) -> float:
+    """Half the marker size of a line's points, or half its stroke when unmarked."""
+
+    marker = line_style.get("marker")
+    if marker in (None, "", "None", "none", " "):
+        return (line_style.get("linewidth") or 1.0) / 2
+    return (line_style.get("markersize") or plt.rcParams["lines.markersize"]) / 2
+
+
+class LineLayer(PointLabelMixin, Layer):
     kind = "line"
+    label_spots = POINT_LABEL_SPOTS_VERTICAL
 
     def _resolve_style(self):
         self.line_style = get_line_style(self.style)
         self.area_style = get_area_style(self.style)
         self.show_yerr = self.settings.get("show_yerr")
         self.show_area = self.settings.get("show_area")
+        self._resolve_value_labels()
+        self._init_point_labels()
 
     def y_range(self):
         return _column_range(self.chart, "y")
@@ -1087,6 +1216,18 @@ class LineLayer(Layer):
         (line,) = plot(x, y, **line_style, label=self.label(ctx))
         self.register_hover(line, _point_resolver(self.label(ctx), x, y, ctx.transpose))
 
+        if self.show_values and ctx.emphasis != EMPHASIS_BACKGROUND:
+            self._record_points(
+                ax,
+                ctx,
+                x,
+                y,
+                (2 * _mark_radius(line_style)) ** 2,
+                self._value_texts(ax, y, ctx.transpose),
+                self.value_font,
+                self.value_padding,
+            )
+
         if self.show_area:
             drawstyle = line_style.get("drawstyle", "")
             step = drawstyle.split("-")[1] if "steps-" in drawstyle else None
@@ -1119,6 +1260,7 @@ class StackedAreaLayer(Layer):
         self.outline = bool(style.pop("outline", False))
         self.fill_style = style
         self.line_style = get_line_style(self.style)
+        self._resolve_value_labels()
 
     def x_values(self):
         return get_chart_data("x", self.chart)
@@ -1170,6 +1312,34 @@ class StackedAreaLayer(Layer):
             self._apply_emphasis(line_style, ctx.emphasis)
             plot(x, ctx.stack_slot.top, **line_style)
 
+        if self.show_values and ctx.emphasis != EMPHASIS_BACKGROUND:
+            self._label_band(ax, ctx, x)
+
+    def _label_band(self, ax, ctx, x) -> None:
+        """Print each value at the midpoint of its band; an empty band stays bare."""
+
+        heights = ctx.stack_slot.top - ctx.stack_slot.bottom
+        mids = (ctx.stack_slot.top + ctx.stack_slot.bottom) / 2
+        texts = self._value_texts(ax, heights, ctx.transpose)
+        last = len(x) - 1
+        for i, (xi, mid, height, text) in enumerate(zip(x, mids, heights, texts)):
+            if text is None or height == 0:
+                continue
+            # the band ends at the axes edge: the end labels hang inward
+            edge = "left" if i == 0 else "right" if i == last else "center"
+            ax.annotate(
+                text,
+                xy=(mid, xi) if ctx.transpose else (xi, mid),
+                ha="center" if ctx.transpose else edge,
+                va=(
+                    {"left": "bottom", "right": "top"}.get(edge, "center")
+                    if ctx.transpose
+                    else "center"
+                ),
+                zorder=TEXT_ANNOTATION_ZORDER,
+                **self.value_font,
+            )
+
 
 def stack_first_line(y: np.ndarray, baseline: str) -> np.ndarray:
     """Where the stack starts at each x; matplotlib's `stackplot` baselines."""
@@ -1212,26 +1382,6 @@ def _stack_slots(layers: List[StackedAreaLayer], baseline: str) -> dict:
     return slots
 
 
-def _abs_bar_value_fmt(value_format):
-    """A bar_label fmt callable that formats the absolute value.
-
-    Pyramid sides draw as signed data but display positive magnitudes
-    (ADR 0017); the resolved format applies after the sign is dropped.
-    """
-
-    def format_abs(value):
-        magnitude = abs(value)
-        if isinstance(value_format, mticker.Formatter):
-            return value_format(magnitude)
-        # printf first, {}-style on failure: mirrors bar_label's own fmt handling
-        try:
-            return value_format % (magnitude,)
-        except (TypeError, ValueError):
-            return value_format.format(magnitude)
-
-    return format_abs
-
-
 class BarLayer(Layer):
     kind = "bar"
 
@@ -1241,25 +1391,8 @@ class BarLayer(Layer):
         self.is_pyramid = bool(self.settings.get("pyramid"))
         self.bar_style = get_bar_style(self.style, self.is_horizontal)
         self.show_yerr = self.settings.get("show_yerr")
-        show_values = self.settings.get("show_values")
-        if show_values is None:
-            show_values = config.get("chart_default_show_values")
-        self.show_values = show_values
-        value_format = self.settings.get("value_format")
-        self.value_format = (
-            DEFAULT_BAR_VALUE_FORMAT if value_format is None else value_format
-        )
-        self.value_font_family = resolve_font_family()
+        self._resolve_value_labels()
         self.log_offset = 1 if self.settings.get("scaley") == "log" else 0
-        self.value_padding = self.style.get(
-            "plot_bar_value_padding", config["plot_bar_value_padding"]
-        )
-        self.value_fontsize = self.style.get(
-            "plot_bar_value_fontsize", config["plot_bar_value_fontsize"]
-        )
-        self.value_color = self.style.get(
-            "plot_bar_value_color", config["plot_bar_value_color"]
-        )
 
     def labels(self) -> Optional[np.ndarray]:
         return get_chart_data("label", self.chart)
@@ -1330,21 +1463,15 @@ class BarLayer(Layer):
             ),
         )
 
-        if self.show_values:
-            value_format = self.value_format
-            # VALUE_FORMAT strings name the value `x`, which bar_label's own
-            # {}-style formatting cannot resolve
-            if isinstance(value_format, str) and "{x" in value_format:
-                value_format = mticker.StrMethodFormatter(value_format)
-            if self.is_pyramid:
-                value_format = _abs_bar_value_fmt(value_format)
-            ax.bar_label(
+        if self.show_values and ctx.emphasis != EMPHASIS_BACKGROUND:
+            # pyramid sides draw as signed data but display positive
+            # magnitudes (ADR 0017)
+            magnitude = abs if self.is_pyramid else (lambda v: v)
+            self._label_bars(
+                ax,
                 bars,
-                fmt=value_format,
-                padding=self.value_padding,
-                fontsize=self.value_fontsize,
-                color=self.value_color,
-                family=self.value_font_family,
+                fmt=lambda v: _format_value(self.value_format, magnitude(v)),
+                stacked=slot is not None and slot.bottom is not None,
             )
 
 
@@ -1363,6 +1490,7 @@ class HistogramLayer(Layer):
         self.step_edge_color_auto = "plot_hist_edge_color" not in self.style
         self.step_edge_width_auto = "plot_hist_edge_width" not in self.style
         self.step_edge_width = config["plot_line_width"]
+        self._resolve_value_labels()
 
     def x_values(self) -> Optional[np.ndarray]:
         return get_chart_data("x", self.chart)
@@ -1428,6 +1556,29 @@ class HistogramLayer(Layer):
                 **hist_style,
             )
         self._register_bins(ax, ctx, bars, edges, counts)
+        if self.show_values and ctx.emphasis != EMPHASIS_BACKGROUND:
+            self._label_bins(ax, bars, edges, counts, ctx.hist_slot is not None)
+
+    def _label_bins(self, ax, bars, edges, counts, stacked: bool) -> None:
+        """Print each bin's height at its top; an empty bin stays bare."""
+
+        texts = [_format_value(self.value_format, c) if c else "" for c in counts]
+        if isinstance(bars, BarContainer):
+            self._label_bars(ax, bars, stacked, labels=texts)
+            return
+        # a step outline has no bars to label: the bin tops are annotated directly
+        centres = (edges[:-1] + edges[1:]) / 2
+        for centre, height, text in zip(centres, counts, texts):
+            if text:
+                _annotate_value(
+                    ax,
+                    centre,
+                    height,
+                    text,
+                    self.is_horizontal,
+                    self.value_padding,
+                    self.value_font,
+                )
 
     def _register_bins(self, ax, ctx, bars, edges, counts) -> None:
         """Each bin reports its range on the value axis and its own height."""
@@ -1460,11 +1611,16 @@ class HistogramLayer(Layer):
         self.register_hover(outline, resolve)
 
 
-class ScatterLayer(Layer):
+class ScatterLayer(PointLabelMixin, Layer):
     kind = "scatter"
 
     def _resolve_style(self):
         self.scatter_style = get_scatter_style(self.style)
+        self._resolve_value_labels()
+        self._init_point_labels()
+        # an explicit `show_values` outranks point labels found under the
+        # default key; the theme default yields to them
+        self.show_values_explicit = self.settings.get("show_values") is not None
         self.size_range = self.settings.get("size_range") or DEFAULT_SIZE_RANGE
         self.show_regression = self.settings.get("show_regression")
         self.show_ci = self.settings.get("show_ci")
@@ -1478,12 +1634,6 @@ class ScatterLayer(Layer):
         # the correlation box wears the plot_text_* family (ADR 0018)
         self.correlation_font = get_plot_text_style({})
         self.correlation_bbox = get_plot_text_box_style({})
-        # point labels wear the text font; alignment comes from their spot
-        self.label_font = {
-            k: v for k, v in get_plot_text_style({}).items() if k not in ("ha", "va")
-        }
-        # drawn points per axes, consumed by the panel's label placement
-        self._pending_labels = {}
 
         hue_data = get_chart_data("hue", self.chart)
         self.hue_colors = None
@@ -1524,28 +1674,21 @@ class ScatterLayer(Layer):
             return None
         return np.array([None if l is None else str(l) for l in labels], dtype=object)
 
-    def _record_points(self, ax, ctx, x, y, sizes, labels) -> None:
-        """Remember the drawn points so the panel can place their labels."""
+    def _mark_labels(self, ax, ctx, x_data, y_data) -> tuple:
+        """The (labels, font, pad) each point carries: its value, or its point label."""
 
-        if ctx.transpose:
-            x, y = y, x
-        font = dict(self.label_font)
-        if ctx.emphasis == EMPHASIS_BACKGROUND:
-            font["color"] = self.muted_color
-        self._pending_labels.setdefault(id(ax), []).append(
-            (
-                np.asarray(x, dtype=float),
-                np.asarray(y, dtype=float),
-                sizes,
-                labels,
-                font,
+        labels = self._point_labels(x_data)
+        if (
+            self.show_values
+            and (labels is None or self.show_values_explicit)
+            and ctx.emphasis != EMPHASIS_BACKGROUND
+        ):
+            return (
+                self._value_texts(ax, y_data, ctx.transpose),
+                self.value_font,
+                self.value_padding,
             )
-        )
-
-    def pending_labels(self, ax) -> list:
-        """The points drawn into `ax` as (x, y, sizes, labels, font) tuples."""
-
-        return self._pending_labels.pop(id(ax), [])
+        return labels, self.label_font, POINT_LABEL_PAD
 
     def _draw_regression(self, ax, ctx, x, y, color):
         from scipy import stats as scipy_stats
@@ -1612,7 +1755,7 @@ class ScatterLayer(Layer):
 
         if x_data is None or y_data is None:
             return
-        labels = self._point_labels(x_data)
+        labels, font, pad = self._mark_labels(ax, ctx, x_data, y_data)
 
         scatter_style = dict(self.scatter_style)
         if ctx.z_order is not None:
@@ -1663,6 +1806,8 @@ class ScatterLayer(Layer):
                     y_data[mask],
                     group_sizes,
                     labels[mask] if labels is not None else None,
+                    font,
+                    pad,
                 )
 
             if self.show_correlation:
@@ -1689,7 +1834,7 @@ class ScatterLayer(Layer):
                 collection,
                 _point_resolver(self.label(ctx), x_data, y_data, ctx.transpose),
             )
-            self._record_points(ax, ctx, x_data, y_data, sizes, labels)
+            self._record_points(ax, ctx, x_data, y_data, sizes, labels, font, pad)
 
             color = base_style.get("c", base_style.get("color"))
             if self.show_regression:
@@ -1786,6 +1931,20 @@ class GroupLayer(Layer):
             "max": float(values.max()),
         }
 
+    def _label_median(self, ax, position: float, values) -> None:
+        """Print a group's median beside its median line."""
+
+        median = float(np.percentile(np.asarray(values, dtype=float), 50))
+        _annotate_value(
+            ax,
+            position,
+            median,
+            _format_value(self.value_format, median),
+            self.is_horizontal,
+            self.value_padding,
+            self.value_font,
+        )
+
     def _group_roles(self, labels: list, panel_role: Optional[str] = None) -> list:
         """One emphasis role per label; the panel's role, or a single value, applies to all."""
 
@@ -1819,6 +1978,7 @@ class BoxLayer(GroupLayer):
         self.median_style = get_box_median_style(self.style)
         self.whisker_style = get_box_whisker_style(self.style)
         self.cap_style = get_box_cap_style(self.style)
+        self._resolve_value_labels()
         if self.settings.get("outline"):
             self._apply_outline()
 
@@ -1899,7 +2059,13 @@ class BoxLayer(GroupLayer):
 
         if self.side:
             self._clip_to_side(bp, positions)
-        self._apply_box_emphasis(bp, self._group_roles(labels, ctx.emphasis))
+        roles = self._group_roles(labels, ctx.emphasis)
+        self._apply_box_emphasis(bp, roles)
+        if self.show_values:
+            # the median is the number a reader takes from a box (ADR 0033)
+            for position, vals, role in zip(positions, values, roles):
+                if role != EMPHASIS_BACKGROUND:
+                    self._label_median(ax, position, vals)
         label = self.label(ctx)
         self.register_patch_hover(
             [
@@ -2179,6 +2345,7 @@ class ViolinLayer(GroupLayer):
         if width is not None and "plot_violin_width" not in self.style:
             self.violin_style["width"] = width
         self.inner_style = get_violin_inner_style(self.style)
+        self._resolve_value_labels()
         # split halves take the multiple palette; a layer receives one ctx color
         self.split_colors = (
             create_color_cycle(config["color_general_multiple"], 2)
@@ -2256,6 +2423,9 @@ class ViolinLayer(GroupLayer):
                 artists = [self._draw_body(ax, values, position, width, style, side)]
                 artists += self._draw_inner(ax, values, position, width, side)
                 self._apply_violin_emphasis(artists, roles[i])
+                if self.show_values and roles[i] != EMPHASIS_BACKGROUND:
+                    # a half body carries its label at the middle of its half
+                    self._label_median(ax, position + side * width / 4, values)
                 # a split half stands for its split value, like its legend entry
                 datum = self.summary_datum(
                     str(split_value) if self.split else self.label(ctx),
@@ -3525,10 +3695,10 @@ def _text_box(ax, x, y, text, fontsize, ha, pad_points=0.0):
 def _draw_point_labels(ax, entries, obstacles) -> None:
     """Draw point labels at the spot around each marker with the least overlap.
 
-    `entries` are (owner_ax, x, y, radius_pt, text, font) in draw order;
-    `obstacles` are display-space (x0, y0, x1, y1) boxes — every marker of
-    the panel and its correlation box. Each label takes the first clear spot
-    among `POINT_LABEL_SPOTS`, or the least-overlapping one when none is
+    `entries` are (owner_ax, x, y, radius_pt, pad_pt, text, font, spots) in
+    draw order; `obstacles` are display-space (x0, y0, x1, y1) boxes — every
+    marker of the panel and its correlation box. Each label takes the first
+    clear spot among its `spots`, or the least-overlapping one when none is
     clear; placed labels join the obstacles, and the space outside the axes
     counts as occupied.
     """
@@ -3536,12 +3706,12 @@ def _draw_point_labels(ax, entries, obstacles) -> None:
     px_per_pt = ax.figure.dpi / 72.0
     frame = tuple(ax.bbox.extents)
     occupied = list(obstacles)
-    for owner_ax, x, y, radius_pt, text, font in entries:
+    for owner_ax, x, y, radius_pt, pad_pt, text, font, spots in entries:
         cx, cy = owner_ax.transData.transform((x, y))
         w, h = (v * px_per_pt for v in _text_size(font["fontsize"], text))
-        gap = radius_pt + POINT_LABEL_PAD
+        gap = radius_pt + pad_pt
         best = None
-        for ha, va, dx, dy in POINT_LABEL_SPOTS:
+        for ha, va, dx, dy in spots:
             # a diagonal spot keeps the same gap along the diagonal
             step = gap / math.sqrt(2) if dx and dy else gap
             ax0 = cx + dx * step * px_per_pt
@@ -3579,13 +3749,45 @@ def _overlap_area(a, b) -> float:
 
 
 def _format_value(value_format, value) -> str:
-    """Render a value with a formatter, a `%` string, or a `{}` string."""
+    """Render a value with a formatter or callable, a `{x}`, `{}`, or `%` string."""
 
-    if isinstance(value_format, mticker.Formatter):
+    if callable(value_format):
         return value_format(value)
-    if "%" in value_format:
-        return value_format % (value,)
-    return value_format.format(value)
+    if "{x" in value_format:
+        return value_format.format(x=value)
+    if "{" in value_format:
+        return value_format.format(value)
+    return value_format % (value,)
+
+
+def _default_value_step(ax, texts: list, fontsize, along_y: bool = False) -> int:
+    """Every Nth mark, so the widest label fits between neighbours along the axes."""
+
+    fig_w, fig_h = ax.figure.get_size_inches()
+    pos = ax.get_position()
+    if along_y:
+        axis_pt = fig_h * pos.height * 72
+        widest = max(_text_size(fontsize, t)[1] for t in texts)
+    else:
+        axis_pt = fig_w * pos.width * 72
+        widest = max(_text_size(fontsize, t)[0] for t in texts)
+    fits = max(int(axis_pt // (widest + 2 * POINT_LABEL_PAD)), 1)
+    return max(1, math.ceil(len(texts) / fits))
+
+
+def _annotate_value(ax, position, value, text, horizontal, pad, font) -> None:
+    """Print `text` just past `value` at `position` on the category axis."""
+
+    ax.annotate(
+        text,
+        xy=(value, position) if horizontal else (position, value),
+        xytext=(pad, 0) if horizontal else (0, pad),
+        textcoords="offset points",
+        ha="left" if horizontal else "center",
+        va="center" if horizontal else "bottom",
+        zorder=TEXT_ANNOTATION_ZORDER,
+        **font,
+    )
 
 
 class NodeBox(NamedTuple):
@@ -3628,7 +3830,7 @@ class SankeyLayer(Layer):
         self.link_color = validate_sankey_link_color(
             self.sankey_style.get("link_color")
         )
-        self._resolve_value_labels()
+        self._resolve_bare_labels()
         # column headings read as per-column subtitles
         self.column_label_style = get_text_style("subtitle")
         # one color per node in column-then-row order, keyed by name
@@ -3808,7 +4010,7 @@ class SankeyLayer(Layer):
         # the widest ribbons claim their midpoints first; the rest slide along
         # their curve to the first spot clear of the labels and earlier values
         for _, line, text in sorted(values, key=lambda v: v[0], reverse=True):
-            fontsize = self.value_style["fontsize"]
+            fontsize = self.value_font["fontsize"]
             x1, y1, x2, y2 = line
             candidates = [(x2 - SANKEY_LABEL_PAD, y2, "right")] + [
                 (*_ribbon_centerline(*line, t), "center")
@@ -3832,7 +4034,7 @@ class SankeyLayer(Layer):
                 va="center",
                 zorder=4,
                 path_effects=effects,
-                **self.value_style,
+                **self.value_font,
             )
 
         self.register_patch_hover(node_marks)
@@ -3969,7 +4171,7 @@ class TreemapLayer(Layer):
 
     def _resolve_style(self) -> None:
         self.treemap_style = get_treemap_style(self.style)
-        self._resolve_value_labels()
+        self._resolve_bare_labels()
         # a group's header band reads as its subtitle
         self.band_style = get_text_style("subtitle")
         self.highlight_color = config["font_general_color"]
@@ -4164,7 +4366,7 @@ class TreemapLayer(Layer):
             value,
             (w * axes_pt[0], h * axes_pt[1]),
             self.label_style["fontsize"] * scale,
-            self.value_style["fontsize"] * scale,
+            self.value_font["fontsize"] * scale,
             style["min_fontsize"],
         )
         if fit is None:
@@ -4208,7 +4410,7 @@ class TreemapLayer(Layer):
             cy - label_h / 2 / axes_pt[1],
             value,
             fontsize=value_size,
-            color=self.muted_color if muted else self.value_style["color"],
+            color=self.muted_color if muted else self.value_font["color"],
             **common,
         )
 
@@ -4443,7 +4645,7 @@ class NetworkLayer(Layer):
         style = get_network_style(self.style)
         self.network_style = style
         self.edge_style = validate_network_edge_style(style.get("edge_style"))
-        self._resolve_value_labels()
+        self._resolve_bare_labels()
         self.highlight_color = config["font_general_color"]
 
         ids = [node["id"] for node in self.nodes]
@@ -4656,11 +4858,9 @@ class NetworkLayer(Layer):
                     path_effects=effects,
                     gid=f"value:{record['source']}->{record['target']}",
                     **{
-                        **self.value_style,
+                        **self.value_font,
                         "color": (
-                            self.muted_color
-                            if edge_muted
-                            else self.value_style["color"]
+                            self.muted_color if edge_muted else self.value_font["color"]
                         ),
                     },
                 )
@@ -5609,7 +5809,14 @@ class Panel:
                 lo, hi = ax.get_ylim()
                 ax.set_ylim(lo, hi + (hi - lo) * extra)
         else:
-            value_layers = [l for l in bar_layers if l.show_values]
+            # bars, bins and points label past the mark on the value axis;
+            # band and median labels sit inside the marks
+            value_layers = [
+                l
+                for l in layers
+                if isinstance(l, (BarLayer, HistogramLayer, LineLayer, ScatterLayer))
+                and l.show_values
+            ]
             if value_layers:
                 lo, hi = ax.get_xlim() if horizontal else ax.get_ylim()
                 pad = (hi - lo) * (
@@ -5765,15 +5972,15 @@ class Panel:
                     legend.get_title().set_fontfamily(family)
 
     def _place_point_labels(self, top_ax, group_axes) -> None:
-        """Gather every scatter layer's points and place their labels together."""
+        """Gather every labelled layer's points and place their labels together."""
 
         px_per_pt = top_ax.figure.dpi / 72.0
         entries, obstacles = [], []
         for group, owner_ax in zip(self.groups, group_axes):
             for layer in group.layers:
-                if not isinstance(layer, ScatterLayer):
+                if not isinstance(layer, PointLabelMixin):
                     continue
-                for xs, ys, sizes, labels, font in layer.pending_labels(owner_ax):
+                for xs, ys, sizes, labels, font, pad in layer.pending_labels(owner_ax):
                     centers = owner_ax.transData.transform(np.column_stack([xs, ys]))
                     # scatter sizes are marker areas in points squared
                     radii = np.sqrt(np.broadcast_to(sizes, len(xs))) / 2
@@ -5781,8 +5988,19 @@ class Panel:
                         rpx = r * px_per_pt
                         obstacles.append((cx - rpx, cy - rpx, cx + rpx, cy + rpx))
                         if labels is not None and labels[i] is not None:
-                            entries.append((owner_ax, xs[i], ys[i], r, labels[i], font))
-                if layer.show_correlation:
+                            entries.append(
+                                (
+                                    owner_ax,
+                                    xs[i],
+                                    ys[i],
+                                    r,
+                                    pad,
+                                    labels[i],
+                                    font,
+                                    layer.label_spots,
+                                )
+                            )
+                if getattr(layer, "show_correlation", False):
                     obstacles.append(self._correlation_box(top_ax, layer))
         if entries:
             _draw_point_labels(top_ax, entries, obstacles)
@@ -5992,26 +6210,14 @@ class Panel:
             return screen, "left"
 
         if show_values:
-            value_format = s.get("value_format") or DEFAULT_BAR_VALUE_FORMAT
-            # VALUE_FORMAT strings name the value `x` (see BarLayer.draw)
-            if isinstance(value_format, str) and "{x" in value_format:
-                formatter = mticker.StrMethodFormatter(value_format)
-
-                def format_value(v):
-                    return formatter(v, None)
-
-            else:
-
-                def format_value(v):
-                    return value_format % v
-
+            value_format = s.get("value_format") or DEFAULT_VALUE_LABEL_FORMAT
             value_style = s.get("tip_value_style") or {}
             for theta, r_tip, value, _ in tips:
                 rotation, ha = spoke_rotation(theta)
                 ax.text(
                     theta,
                     r_tip + RADIAL_TIP_VALUE_PAD * span,
-                    format_value(value),
+                    _format_value(value_format, value),
                     rotation=rotation,
                     rotation_mode="anchor",
                     ha=ha,
@@ -6125,12 +6331,13 @@ def build_chart_panel_settings(
         "direction": settings.get("direction"),
         "innerradius": settings.get("innerradius"),
         "show_border": settings.get("show_border"),
-        "show_values": settings.get("show_values"),
+        "show_values": _resolve_show_values(settings),
         "show_tip_labels": settings.get("show_tip_labels"),
         "value_format": settings.get("value_format"),
         "tip_value_style": {
-            "fontsize": config["plot_bar_value_fontsize"],
-            "color": config["plot_bar_value_color"],
+            k: v
+            for k, v in get_value_label_style(first_style).items()
+            if k != "padding"
         },
     }
 

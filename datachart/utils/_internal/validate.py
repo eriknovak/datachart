@@ -34,6 +34,28 @@ def validate_bandwidth(bandwidth) -> None:
         )
 
 
+def validate_point_labels(label, show_values) -> None:
+    """Raise when a scatter chart asks for point labels and value labels at once."""
+
+    if label is not None and show_values:
+        raise ValueError(
+            "`label` and `show_values` cannot be combined: a point carries "
+            "either its label or its value."
+        )
+
+
+def validate_value_step(step):
+    """Validate a value-label step: None or a positive whole number."""
+
+    if step is None:
+        return None
+    if isinstance(step, bool) or not isinstance(step, int) or step < 1:
+        raise ValueError(
+            f"Invalid `value_step` value {step!r}. Must be None or a positive integer."
+        )
+    return step
+
+
 def validate_baseline(baseline):
     """Validate a stacked area baseline; None means the zero baseline."""
 

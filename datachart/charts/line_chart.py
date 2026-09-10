@@ -11,7 +11,7 @@ from ..typings import (
     HLinePlotAttrs,
     TextAttrs,
 )
-from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID, SCALE
+from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID, SCALE, VALUE_FORMAT
 
 # ================================================
 # Main Chart Definition
@@ -35,6 +35,9 @@ def LineChart(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_yerr: Optional[bool] = None,
     show_area: Optional[bool] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    value_step: Optional[int] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -101,6 +104,10 @@ def LineChart(
         ...     ylabel="Y"
         ... )
 
+    !!! info "Added in Unreleased"
+
+        The `show_values`, `value_format` and `value_step` parameters.
+
     Args:
         data: The data points for the line chart(s). Can be a single list of data points
             for one chart, or a list of lists for multiple charts/subplots.
@@ -122,6 +129,11 @@ def LineChart(
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_yerr: Whether to show y-axis error bars.
         show_area: Whether to show the area under the line.
+        show_values: Whether to print each point's value above or below it.
+        value_format: Format string for the value labels: a `VALUE_FORMAT`
+            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
+        value_step: Label every Nth point (`1` labels all of them). Defaults
+            to the smallest step that keeps neighbouring labels apart.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             `ASPECT_RATIO`.
         scalex: The x-axis scale (e.g., "log", "linear").
@@ -187,6 +199,9 @@ def LineChart(
         "sharey": sharey,
         "show_yerr": show_yerr,
         "show_area": show_area,
+        "show_values": show_values,
+        "value_format": value_format,
+        "value_step": value_step,
         "scalex": scalex,
         "scaley": scaley,
     }

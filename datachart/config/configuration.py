@@ -8,6 +8,7 @@ from datachart.typings import StyleAttrs
 from datachart.constants import THEME
 
 # import the themes
+from ..themes._base import STYLE_ALIASES, canonical_style
 from ..themes import (
     DEFAULT_THEME,
     GREYSCALE_THEME,
@@ -108,6 +109,7 @@ class Config:
             theme: The style attributes of the theme.
 
         """
+        theme = canonical_style(theme)
         unknown = set(theme) - set(DEFAULT_THEME)
         if unknown:
             raise ValueError(f"Unknown theme attributes: {sorted(unknown)}")
@@ -148,7 +150,7 @@ class Config:
 
         """
 
-        for key, val in config.items():
+        for key, val in canonical_style(config).items():
             if key not in self.config:
                 print(f"Warning: Attribute '{key}' is not valid. Skipping attribute...")
                 continue
@@ -169,6 +171,7 @@ class Config:
             The attribute value if present. Otherwise, `None`.
 
         """
+        attr = STYLE_ALIASES.get(attr, attr)
         return self.config[attr] if attr in self.config else None
 
     def get(self, attr: str, default: Any = None) -> Any:
@@ -191,7 +194,7 @@ class Config:
             The attribute value if present. Otherwise, returns the `default` value.
 
         """
-        return self.config.get(attr, default)
+        return self.config.get(STYLE_ALIASES.get(attr, attr), default)
 
     def __repr__(self):
         """Represents the configuration as a json string."""

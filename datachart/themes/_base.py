@@ -18,6 +18,25 @@ from ..constants import (
     SHOW_GRID,
 )
 
+# the bar-specific value label keys predate the shared family; they resolve
+# to it wherever a style is read (ADR 0033)
+STYLE_ALIASES = {
+    "plot_bar_value_fontsize": "plot_value_fontsize",
+    "plot_bar_value_color": "plot_value_color",
+    "plot_bar_value_padding": "plot_value_padding",
+}
+
+
+def canonical_style(style: dict) -> dict:
+    """`style` with every alias key renamed; a canonical key already present wins."""
+
+    resolved = {k: v for k, v in style.items() if k not in STYLE_ALIASES}
+    for alias, key in STYLE_ALIASES.items():
+        if alias in style and key not in resolved:
+            resolved[key] = style[alias]
+    return resolved
+
+
 BASE_THEME: StyleAttrs = {
     # general color style
     "color_general_singular": COLORS.Blues,
@@ -158,9 +177,10 @@ BASE_THEME: StyleAttrs = {
     "plot_bar_edge_width": 0.6,
     "plot_bar_edge_color": "#FFFFFF",
     "plot_bar_error_color": "#000000",
-    "plot_bar_value_fontsize": 8,
-    "plot_bar_value_color": "#000000",
-    "plot_bar_value_padding": 3,
+    # value label style, shared by every chart that prints values (ADR 0033)
+    "plot_value_fontsize": 8,
+    "plot_value_color": "#000000",
+    "plot_value_padding": 3,
     # plot hist style
     "plot_hist_color": None,
     "plot_hist_alpha": 0.9,

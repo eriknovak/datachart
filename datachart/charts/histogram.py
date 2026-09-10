@@ -12,6 +12,7 @@ from ..typings import (
     TextAttrs,
 )
 from ..constants import (
+    VALUE_FORMAT,
     ASPECT_RATIO,
     BAR_MODE,
     EMPHASIS,
@@ -43,6 +44,8 @@ def Histogram(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_density: Optional[bool] = None,
     show_cumulative: Optional[bool] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
@@ -110,6 +113,10 @@ def Histogram(
         ...     ylabel="Y"
         ... )
 
+    !!! info "Added in Unreleased"
+
+        The `show_values` and `value_format` parameters.
+
     Args:
         data: The data points for the histogram(s). Can be a single list of data points
             for one chart, or a list of lists for multiple charts/subplots.
@@ -132,6 +139,9 @@ def Histogram(
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_density: Whether to plot the density histogram.
         show_cumulative: Whether to plot the cumulative histogram.
+        show_values: Whether to print each bin's height at its top; empty bins stay bare.
+        value_format: Format string for the value labels: a `VALUE_FORMAT`
+            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             `ASPECT_RATIO`.
         orientation: The orientation of the histogram (vertical or horizontal).
@@ -199,6 +209,8 @@ def Histogram(
         "sharey": sharey,
         "show_density": show_density,
         "show_cumulative": show_cumulative,
+        "show_values": show_values,
+        "value_format": value_format,
         "orientation": orientation,
         "bar_mode": bar_mode,
         "num_bins": num_bins,

@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.validate import validate_point_labels
 from ..typings import (
     ScatterDataPointAttrs,
     ScatterStyleAttrs,
@@ -11,7 +12,7 @@ from ..typings import (
     HLinePlotAttrs,
     TextAttrs,
 )
-from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID, SCALE
+from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID, SCALE, VALUE_FORMAT
 
 # ================================================
 # Main Chart Definition
@@ -37,6 +38,9 @@ def ScatterChart(
     show_ci: Optional[bool] = None,
     ci_level: Optional[float] = None,
     show_correlation: Optional[bool] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    value_step: Optional[int] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -152,6 +156,10 @@ def ScatterChart(
         ...     label="name"
         ... )
 
+    !!! info "Added in Unreleased"
+
+        The `show_values`, `value_format` and `value_step` parameters.
+
     Args:
         data: The data points for the scatter chart(s). Can be a single list of data points
             for one chart, or a list of lists for multiple charts/subplots.
@@ -175,6 +183,12 @@ def ScatterChart(
         show_ci: Whether to show the confidence interval around the regression line.
         ci_level: The confidence interval level (default 0.95).
         show_correlation: Whether to show the Pearson correlation coefficient (r-value) as an annotation.
+        show_values: Whether to print each point's y value beside it. Cannot be
+            combined with `label`: a point carries its label or its value.
+        value_format: Format string for the value labels: a `VALUE_FORMAT`
+            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
+        value_step: Label every Nth point (`1` labels all of them). Defaults
+            to the smallest step that keeps neighbouring labels apart.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             `ASPECT_RATIO`.
         scalex: The x-axis scale (e.g., "log", "linear").
@@ -210,6 +224,7 @@ def ScatterChart(
 
     """
     # Build the charts structure using shared utility
+    validate_point_labels(label, show_values)
     charts = build_charts_structure(
         data,
         subtitle=subtitle,
@@ -252,6 +267,9 @@ def ScatterChart(
         "show_ci": show_ci,
         "ci_level": ci_level,
         "show_correlation": show_correlation,
+        "show_values": show_values,
+        "value_format": value_format,
+        "value_step": value_step,
         "scalex": scalex,
         "scaley": scaley,
         "size_range": size_range,
