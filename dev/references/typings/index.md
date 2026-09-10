@@ -98,8 +98,8 @@ The chart attributes common to all chart types.
 | `xlabel`       | The xlabel of the charts. **TYPE:** `Union[str, None]`                                                               |
 | `ylabel`       | The ylabel of the charts. **TYPE:** `Union[str, None]`                                                               |
 | `figsize`      | The size of the figure. **TYPE:** `Union[FIG_SIZE, Tuple[float, float], None]`                                       |
-| `xmin`         | Determine the minimum x-axis value. **TYPE:** `Union[int, float, None]`                                              |
-| `xmax`         | Determine the maximum x-axis value. **TYPE:** `Union[int, float, None]`                                              |
+| `xmin`         | Determine the minimum x-axis value; a datetime on a datetime axis. **TYPE:** `Union[int, float, datetime, None]`     |
+| `xmax`         | Determine the maximum x-axis value; a datetime on a datetime axis. **TYPE:** `Union[int, float, datetime, None]`     |
 | `ymin`         | Determine the minimum y-axis value. **TYPE:** `Union[int, float, None]`                                              |
 | `ymax`         | Determine the maximum y-axis value. **TYPE:** `Union[int, float, None]`                                              |
 | `show_legend`  | Whether or not to show the legend. **TYPE:** `Union[bool, None]`                                                     |

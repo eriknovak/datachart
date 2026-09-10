@@ -332,6 +332,34 @@ ParallelCoords(
 ).show()
 ```
 
+### Date dimensions
+
+A dimension whose values are real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp` — is a categorical axis ordered by time, with each date printed as its ISO label. Date strings are not parsed; they sort as plain text.
+
+```
+from datetime import date
+
+# CPython feature releases: release date, bugfix releases shipped, and years of support
+releases = [
+    {"version": "3.8", "released": date(2019, 10, 14), "bugfix releases": 10, "years of support": 5},
+    {"version": "3.9", "released": date(2020, 10, 5), "bugfix releases": 13, "years of support": 5},
+    {"version": "3.10", "released": date(2021, 10, 4), "bugfix releases": 11, "years of support": 5},
+    {"version": "3.11", "released": date(2022, 10, 24), "bugfix releases": 9, "years of support": 5},
+    {"version": "3.12", "released": date(2023, 10, 2), "bugfix releases": 7, "years of support": 5},
+    {"version": "3.13", "released": date(2024, 10, 7), "bugfix releases": 3, "years of support": 5},
+]
+
+ParallelCoords(
+    data=releases,
+    title="CPython feature releases",
+    dimensions=["version", "released", "bugfix releases"],
+    hue="version",
+    # keep the versions in release order instead of sorting them as text
+    category_orders={"version": [release["version"] for release in releases]},
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
 ### Emphasis
 
 When the story is about some of the rows, the `emphasis` attribute tells the rest to step back. It takes one role per data point, aligned with the rows of `data` (a single string applies the same role to every row):

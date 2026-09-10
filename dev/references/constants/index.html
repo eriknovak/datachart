@@ -2326,6 +2326,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.constants.DATE_FORMAT" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;DATE_FORMAT
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.constants.SHOW_GRID" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2915,6 +2926,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.constants.DATE_FORMAT" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;DATE_FORMAT
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.constants.SHOW_GRID" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3213,6 +3235,14 @@ These include figure size, format, style, and other figure manipulation values.<
             <td class="doc-class-details">
               <div class="doc-md-description">
                 <p>The predefined value formats.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.DATE_FORMAT&lt;/span&gt;" href="#datachart.constants.DATE_FORMAT">DATE_FORMAT</a></code></td>
+            <td class="doc-class-details">
+              <div class="doc-md-description">
+                <p>The predefined date formats.</p>
               </div>
             </td>
           </tr>
@@ -8120,6 +8150,178 @@ heatmap's <code>valfmt</code> attribute (the values drawn in the cells).</p>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
                 <p>The thousands separator format. Equals to <code>"{x:,.0f}"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="datachart.constants.DATE_FORMAT" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.constants.DATE_FORMAT</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>The predefined date formats.</p>
+<p>Passed as the <code>xticks_format</code> or <code>yticks_format</code> attribute of a chart
+whose axis holds datetime values, to label its ticks. Every member but
+<code>AUTO</code> is a <code>strftime</code> pattern; any other pattern is accepted as well.
+On a time axis <code>AUTO</code> picks concise, non-repeating labels for the visible
+span; on a category axis with date labels it prints the ISO date, plus
+the time when any label carries one.</p>
+<div class="admonition info">
+<p class="admonition-title">Added in Unreleased</p>
+</div>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DATE_FORMAT</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">DATE_FORMAT</span><span class="o">.</span><span class="n">YEAR_MONTH</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">"%Y-%m"</span>
+</code></pre></div>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">ATTRIBUTE</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DATE_FORMAT.AUTO">AUTO</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Pick the labels from the visible span: concise, non-repeating. Equals to <code>"auto"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DATE_FORMAT.ISO">ISO</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The ISO 8601 date. Equals to <code>"%Y-%m-%d"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DATE_FORMAT.YEAR">YEAR</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The four-digit year. Equals to <code>"%Y"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DATE_FORMAT.YEAR_MONTH">YEAR_MONTH</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The year and month. Equals to <code>"%Y-%m"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DATE_FORMAT.MONTH_DAY">MONTH_DAY</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The month and day. Equals to <code>"%m-%d"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DATE_FORMAT.DAY">DAY</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The day of the month. Equals to <code>"%d"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DATE_FORMAT.TIME">TIME</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The hour and minute. Equals to <code>"%H:%M"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">

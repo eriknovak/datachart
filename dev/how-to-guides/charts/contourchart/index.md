@@ -520,6 +520,38 @@ ContourChart(
 ).show()
 ```
 
+### Datetime axis
+
+The `x` coordinates may be real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp` — so a surface sampled over time draws on a time axis. Points sit at their elapsed time and the ticks pick concise, non-repeating labels for the visible span; date strings are not parsed and draw as categories. `xticks_format` takes a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern, and explicit `xticks`, `xmin` / `xmax`, reference lines, and reference bands take datetimes as well. Here the surface is the temperature by month and hour of the day.
+
+```
+from datetime import date
+
+from datachart.constants import DATE_FORMAT
+
+# mean monthly temperature in °C (1991-2020 normals of Ljubljana) and the daily swing
+MONTHLY_MEAN = [0.8, 2.4, 6.8, 11.5, 16.2, 20.1, 22.0, 21.4, 16.6, 11.5, 5.9, 1.3]
+DAILY_SWING = [3.0, 3.5, 4.5, 5.0, 5.5, 5.5, 6.0, 6.0, 5.5, 4.5, 3.5, 3.0]
+
+months = [date(2024, month, 1) for month in range(1, 13)]
+hours = list(range(24))
+# the day is coldest around 05:00 and warmest around 15:00
+temperature = [
+    [mean + swing * np.sin((hour - 9) / 24 * 2 * np.pi) for mean, swing in zip(MONTHLY_MEAN, DAILY_SWING)]
+    for hour in hours
+]
+
+ContourChart(
+    data={"x": months, "y": hours, "z": temperature},
+    title="Temperature by month and hour of the day",
+    ylabel="Hour of the day",
+    filled=True,
+    show_colorbars=True,
+    xticks_format=DATE_FORMAT.YEAR_MONTH,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
 ### Reference lines
 
 A reference line marks a position on the surface. To add vertical lines, add the `vlines` attribute with the [datachart.typings.VLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLinePlotAttrs) typing, which is either a `dict` or a `List[dict]`; horizontal lines use `hlines` and the [datachart.typings.HLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLinePlotAttrs) typing. Here the lines cross at the minimum of the Himmelblau function at (3, 2).

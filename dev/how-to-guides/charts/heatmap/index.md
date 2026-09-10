@@ -150,6 +150,25 @@ Heatmap(
 ).show()
 ```
 
+### Date labels
+
+The `x` and `y` coordinates may be real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp`. The cells keep their grid positions, and the dates print into the tick labels through `xticks_format` / `yticks_format`: a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern.
+
+```
+from datetime import date
+
+from datachart.constants import DATE_FORMAT
+
+Heatmap(
+    data={"x": [date(2024, month, 1) for month in range(1, 13)], "y": CITIES, "z": TEMPERATURES},
+    title="Mean monthly temperature",
+    xlabel="Month",
+    ylabel="City",
+    xticks_format=DATE_FORMAT.YEAR_MONTH,
+    xtickrotate=45,
+).show()
+```
+
 ### Figure size and aspect ratio
 
 To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains some of the predefined figure sizes.

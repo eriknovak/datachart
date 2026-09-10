@@ -174,6 +174,37 @@ PyramidChart(
 ).show()
 ```
 
+### Date labels
+
+Category labels may be real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp`. Group labels that are real temporal objects print through `DATE_FORMAT`; the groups keep their categorical positions, and `{axis}ticks_format` picks the pattern (a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern). The station flows keyed by the clock time of each slot label the category axis with `DATE_FORMAT.TIME`; explicit `yticks` positions keep their slot's label.
+
+```
+from datetime import datetime, timedelta
+
+from datachart.constants import DATE_FORMAT
+
+SLOT_START = datetime(2024, 1, 1, 6)
+station_in_timed, station_out_timed = (
+    [
+        {"label": SLOT_START + timedelta(minutes=15 * index), "y": slot["y"]}
+        for index, slot in enumerate(side)
+    ]
+    for side in (station_in, station_out)
+)
+
+PyramidChart(
+    data=[station_in_timed, station_out_timed],
+    subtitle=["Entries", "Exits"],
+    title="Station passengers by time of day",
+    xlabel="Passengers per 15 min",
+    # one tick per hour over the 15-minute slots, labelled as clock time
+    yticks=list(range(0, 64, 4)),
+    yticks_format=DATE_FORMAT.TIME,
+    show_legend=True,
+    figsize=FIG_SIZE.FULL_TALL,
+).show()
+```
+
 ### Value labels
 
 The `show_values` attribute writes each bar's value at its end, formatted via `value_format` — a `VALUE_FORMAT` constant or any printf/format-style string. The labels show the absolute value on both sides. On a dense pyramid, shrink them with the `plot_bar_value_fontsize` style attribute so the rows stay separate.

@@ -254,6 +254,24 @@ BoxPlot(
 ).show()
 ```
 
+### Date labels
+
+Group labels may be real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp`. Group labels that are real temporal objects print through `DATE_FORMAT`; the groups keep their categorical positions, and `{axis}ticks_format` picks the pattern (a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern). Here twenty daily temperatures per month are grouped by the first day of the month (the data is drawn in a hidden cell).
+
+```
+from datachart.constants import DATE_FORMAT
+
+BoxPlot(
+    data=daily_temperatures,
+    title="Daily mean temperature in Ljubljana",
+    xlabel="Month",
+    ylabel="Temperature (°C)",
+    xticks_format=DATE_FORMAT.YEAR_MONTH,
+    xtickrotate=45,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
 ### Showing and hiding outliers
 
 By default, the values beyond the whiskers are drawn as outliers. To hide them, add the `show_outliers` attribute set to `False`. The Chinstrap penguins have two: one of 2,700 g and one of 4,800 g, far from the 3,700 g median. With the outliers hidden the whiskers stay where they are — they still end at the furthest values within 1.5 times the box height — so hiding outliers changes what is drawn, not what the boxes summarize.

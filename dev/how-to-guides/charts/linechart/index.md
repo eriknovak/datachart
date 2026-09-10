@@ -621,6 +621,49 @@ for scale in [SCALE.LINEAR, SCALE.LOG]:
     figure.show()
 ```
 
+### Datetime axis
+
+An `x` value that is a real temporal object — a `datetime`, a `date`, a `numpy.datetime64`, or a pandas `Timestamp` — puts the chart on a time axis: points sit at their elapsed time, and the ticks pick a concise, non-repeating label for the visible span (a `2024-Apr` offset carries the part every label shares). Date strings such as `"2024-03-01"` are **not** parsed; they draw as unordered categories, like any other string.
+
+```
+from datetime import date, timedelta
+
+# daily closing level of an index over one spring (illustrative)
+start = date(2024, 3, 1)
+daily_index = [
+    {"x": start + timedelta(days=i), "y": 100 + round(2.5 * i - 0.05 * i * i, 1)}
+    for i in range(60)
+]
+
+LineChart(
+    data=daily_index,
+    title="Daily Index Level",
+    xlabel="Date",
+    ylabel="Level",
+)
+```
+
+`xticks_format` labels the ticks with a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern instead of the automatic labels. Explicit `xticks`, `xmin` / `xmax`, reference lines, and reference bands take datetimes as well, and `yticks_format` takes a `VALUE_FORMAT` member or a `"{x:.1f}"` style string for the value axis.
+
+```
+from datachart.constants import DATE_FORMAT
+
+LineChart(
+    data=daily_index,
+    title="Daily Index Level",
+    xlabel="Date",
+    ylabel="Level",
+    xticks_format=DATE_FORMAT.MONTH_DAY,
+    xticks=[date(2024, 3, 1), date(2024, 3, 15), date(2024, 4, 1), date(2024, 4, 15)],
+    xmin=date(2024, 3, 1),
+    xmax=date(2024, 4, 20),
+    vlines={"x": date(2024, 3, 20), "label": "Rebalance"},
+    vspans={"xmin": date(2024, 4, 1), "xmax": date(2024, 4, 10), "label": "Earnings season"},
+    yticks_format=VALUE_FORMAT.INTEGER,
+    show_legend=True,
+)
+```
+
 ### Custom data keys
 
 By default, the `data` items are dictionaries with the keys `x`, `y` and, optionally, `yerr`. Data that comes from elsewhere rarely uses those names, and renaming every key just to plot it is a chore. Instead, tell `LineChart` which keys to read with the `x`, `y` and `yerr` arguments. The `readings` list below stores the Ljubljana temperatures under `month` and `temperature`, with the deviation under `spread`.

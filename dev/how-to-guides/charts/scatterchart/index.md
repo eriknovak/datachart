@@ -673,6 +673,41 @@ for scale in [SCALE.LINEAR, SCALE.LOG]:
     figure.show()
 ```
 
+### Datetime axis
+
+An `x` value that is a real temporal object — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp` — puts the chart on a time axis. Points sit at their elapsed time and the ticks pick concise, non-repeating labels for the visible span; date strings are not parsed and draw as categories. `xticks_format` takes a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern, and explicit `xticks`, `xmin` / `xmax`, reference lines, and reference bands take datetimes as well.
+
+```
+from datetime import date
+
+from datachart.constants import DATE_FORMAT
+
+# men's marathon world record progression: race date and finishing time in minutes
+records = [
+    {"x": date(2003, 9, 28), "y": 124.92, "label": "Tergat"},
+    {"x": date(2007, 9, 30), "y": 124.43, "label": "Gebrselassie"},
+    {"x": date(2008, 9, 28), "y": 123.98, "label": "Gebrselassie"},
+    {"x": date(2011, 9, 25), "y": 123.63, "label": "Makau"},
+    {"x": date(2013, 9, 29), "y": 123.38, "label": "Kipsang"},
+    {"x": date(2014, 9, 28), "y": 122.95, "label": "Kimetto"},
+    {"x": date(2018, 9, 16), "y": 121.65, "label": "Kipchoge"},
+    {"x": date(2022, 9, 25), "y": 121.15, "label": "Kipchoge"},
+    {"x": date(2023, 10, 8), "y": 120.58, "label": "Kiptum"},
+]
+
+ScatterChart(
+    data=records,
+    title="Marathon world record progression",
+    xlabel="Race date",
+    ylabel="Finishing time (minutes)",
+    # one tick per five years, labelled with the year only
+    xticks=[date(year, 1, 1) for year in range(2005, 2025, 5)],
+    xticks_format=DATE_FORMAT.YEAR,
+    show_regression=True,
+    figsize=FIG_SIZE.FULL_SHORT,
+).show()
+```
+
 ### Custom data keys
 
 By default, the `data` items are dictionaries with the keys `x` and `y`, and `size`, `hue` and `label` name whichever keys hold the bubble size, the category and the point label. Data that comes from elsewhere rarely calls its columns `x` and `y`, and renaming every key just to plot it is a chore. Instead, tell `ScatterChart` which keys to read with the `x` and `y` arguments. The `country_records` list below stores the same countries under their natural names.

@@ -230,10 +230,16 @@ Examples:
 ### datachart.utils.stats.minimum
 
 ```
-minimum(values: List[Union[int, float]]) -> float
+minimum(values: List[Any]) -> Any
 ```
 
 Gets the minimum of the values.
+
+Numeric values return a float; any other ordered values, such as datetimes, return their minimum unchanged.
+
+Added in Unreleased
+
+Non-numeric values pass through instead of raising.
 
 Examples:
 
@@ -243,21 +249,27 @@ Examples:
 1
 ```
 
-| PARAMETER | DESCRIPTION                                             |
-| --------- | ------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]` |
+| PARAMETER | DESCRIPTION                               |
+| --------- | ----------------------------------------- |
+| `values`  | The list of values. **TYPE:** `List[Any]` |
 
-| RETURNS | DESCRIPTION                |
-| ------- | -------------------------- |
-| `float` | The minimum of the values. |
+| RETURNS | DESCRIPTION                                                            |
+| ------- | ---------------------------------------------------------------------- |
+| `Any`   | The minimum of the values: a float for numbers, else the value itself. |
 
 ### datachart.utils.stats.maximum
 
 ```
-maximum(values: List[Union[int, float]]) -> float
+maximum(values: List[Any]) -> Any
 ```
 
 Gets the maximum of the values.
+
+Numeric values return a float; any other ordered values, such as datetimes, return their maximum unchanged.
+
+Added in Unreleased
+
+Non-numeric values pass through instead of raising.
 
 Examples:
 
@@ -267,13 +279,13 @@ Examples:
 5
 ```
 
-| PARAMETER | DESCRIPTION                                             |
-| --------- | ------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]` |
+| PARAMETER | DESCRIPTION                               |
+| --------- | ----------------------------------------- |
+| `values`  | The list of values. **TYPE:** `List[Any]` |
 
-| RETURNS | DESCRIPTION                |
-| ------- | -------------------------- |
-| `float` | The maximum of the values. |
+| RETURNS | DESCRIPTION                                                            |
+| ------- | ---------------------------------------------------------------------- |
+| `Any`   | The maximum of the values: a float for numbers, else the value itself. |
 
 ### datachart.utils.stats.correlation
 

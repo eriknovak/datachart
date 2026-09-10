@@ -233,6 +233,24 @@ SwarmPlot(
 ).show()
 ```
 
+### Date labels
+
+Group labels may be real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp`. Group labels that are real temporal objects print through `DATE_FORMAT`; the groups keep their categorical positions, and `{axis}ticks_format` picks the pattern (a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern). Here twenty daily temperatures per month are grouped by the first day of the month (the data is drawn in a hidden cell).
+
+```
+from datachart.constants import DATE_FORMAT
+
+SwarmPlot(
+    data=daily_temperatures,
+    title="Daily mean temperature in Ljubljana",
+    xlabel="Month",
+    ylabel="Temperature (°C)",
+    xticks_format=DATE_FORMAT.YEAR_MONTH,
+    xtickrotate=45,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
 ### Emphasis
 
 To draw attention to one group, add the `emphasis` attribute. The `emphasis` list aligns with the group **labels** of one call, in the order the labels first appear in the data — here Adelie, Chinstrap, Gentoo. Each entry is one of the following roles:

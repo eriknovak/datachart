@@ -401,6 +401,26 @@ HexbinChart(
 ).show()
 ```
 
+### Datetime axis
+
+An `x` column of real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp` — bins the points along a time axis. Points sit at their elapsed time and the ticks pick concise, non-repeating labels for the visible span; date strings are not parsed and draw as categories. `xticks_format` takes a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern, and explicit `xticks`, `xmin` / `xmax`, reference lines, and reference bands take datetimes as well. Here the listings are keyed by the day they were posted (a hidden cell adds the dates and a seasonal swing to the rents).
+
+```
+from datachart.constants import DATE_FORMAT
+
+HexbinChart(
+    data=listings_by_date,
+    title="Rents by the day the listing was posted",
+    xlabel="Posted",
+    ylabel="Rent (€/month)",
+    gridsize=(24, 18),
+    # one tick per quarter, labelled year-month
+    xticks=[date(2024, month, 1) for month in (1, 4, 7, 10)],
+    xticks_format=DATE_FORMAT.YEAR_MONTH,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
 ### Reference lines
 
 A reference line marks a position on the plane. To add vertical lines, add the `vlines` attribute with the [datachart.typings.VLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLinePlotAttrs) typing; for horizontal lines, add the `hlines` attribute with the [datachart.typings.HLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLinePlotAttrs) typing. The lines below mark the median floor area and rent, which split the listings into four quadrants.

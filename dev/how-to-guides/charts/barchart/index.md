@@ -150,6 +150,29 @@ BarChart(
 ).show()
 ```
 
+### Date labels
+
+Bar labels may be real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp`. Group labels that are real temporal objects print through `DATE_FORMAT`; the groups keep their categorical positions, and `{axis}ticks_format` picks the pattern (a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern).
+
+```
+from datetime import date
+
+from datachart.constants import DATE_FORMAT
+
+sales_dated = [
+    {"label": date(2025, index + 1, 1), "y": point["y"]}
+    for index, point in enumerate(sales_total)
+]
+
+BarChart(
+    data=sales_dated,
+    title="Monthly unit sales",
+    ylabel="Units",
+    xticks_format=DATE_FORMAT.YEAR_MONTH,
+    xtickrotate=45,
+).show()
+```
+
 ### Figure size and grid
 
 To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains some of the predefined figure sizes.

@@ -34,6 +34,7 @@ The `constants` module provides a set of predefined constants used in the packag
 | `SWARM_MODE`        | The supported swarm plot modes.                |
 | `DIRECTION`         | The supported angular directions.              |
 | `VALUE_FORMAT`      | The predefined value formats.                  |
+| `DATE_FORMAT`       | The predefined date formats.                   |
 | `THEME`             | The predefined themes.                         |
 | `EMPHASIS`          | The supported emphasis roles.                  |
 | `SHOW_GRID`         | The supported show grid options.               |
@@ -742,6 +743,32 @@ Examples:
 | `PERCENT_INT` | The percentage value format (no decimals). Equals to "{x:.0%}". **TYPE:** `str`      |
 | `SCIENTIFIC`  | The scientific notation format. Equals to "{x:.2e}". **TYPE:** `str`                 |
 | `THOUSANDS`   | The thousands separator format. Equals to "{x:,.0f}". **TYPE:** `str`                |
+
+### datachart.constants.DATE_FORMAT
+
+The predefined date formats.
+
+Passed as the `xticks_format` or `yticks_format` attribute of a chart whose axis holds datetime values, to label its ticks. Every member but `AUTO` is a `strftime` pattern; any other pattern is accepted as well. On a time axis `AUTO` picks concise, non-repeating labels for the visible span; on a category axis with date labels it prints the ISO date, plus the time when any label carries one.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import DATE_FORMAT
+>>> DATE_FORMAT.YEAR_MONTH
+"%Y-%m"
+```
+
+| ATTRIBUTE    | DESCRIPTION                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------ |
+| `AUTO`       | Pick the labels from the visible span: concise, non-repeating. Equals to "auto". **TYPE:** `str` |
+| `ISO`        | The ISO 8601 date. Equals to "%Y-%m-%d". **TYPE:** `str`                                         |
+| `YEAR`       | The four-digit year. Equals to "%Y". **TYPE:** `str`                                             |
+| `YEAR_MONTH` | The year and month. Equals to "%Y-%m". **TYPE:** `str`                                           |
+| `MONTH_DAY`  | The month and day. Equals to "%m-%d". **TYPE:** `str`                                            |
+| `DAY`        | The day of the month. Equals to "%d". **TYPE:** `str`                                            |
+| `TIME`       | The hour and minute. Equals to "%H:%M". **TYPE:** `str`                                          |
 
 ### datachart.constants.SHOW_GRID
 

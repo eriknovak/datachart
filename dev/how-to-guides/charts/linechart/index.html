@@ -875,6 +875,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datetime-axis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Datetime axis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#custom-data-keys" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2561,6 +2572,17 @@
     <span class="md-ellipsis">
       
         Axis scales
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datetime-axis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Datetime axis
       
     </span>
   </a>
@@ -5391,7 +5413,7 @@ LineChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="custom-data-keys">Custom data keys<a class="anchor-link" href="#custom-data-keys">¶</a></h3><p>By default, the <code>data</code> items are dictionaries with the keys <code>x</code>, <code>y</code> and, optionally, <code>yerr</code>. Data that comes from elsewhere rarely uses those names, and renaming every key just to plot it is a chore. Instead, tell <code>LineChart</code> which keys to read with the <code>x</code>, <code>y</code> and <code>yerr</code> arguments. The <code>readings</code> list below stores the Ljubljana temperatures under <code>month</code> and <code>temperature</code>, with the deviation under <code>spread</code>.</p>
+<h3 id="datetime-axis">Datetime axis<a class="anchor-link" href="#datetime-axis">¶</a></h3><p>An <code>x</code> value that is a real temporal object — a <code>datetime</code>, a <code>date</code>, a <code>numpy.datetime64</code>, or a pandas <code>Timestamp</code> — puts the chart on a time axis: points sit at their elapsed time, and the ticks pick a concise, non-repeating label for the visible span (a <code>2024-Apr</code> offset carries the part every label shares). Date strings such as <code>"2024-03-01"</code> are <strong>not</strong> parsed; they draw as unordered categories, like any other string.</p>
 </div>
 </div>
 </div>
@@ -5414,13 +5436,171 @@ LineChart(
 </div>
 </clipboard-copy>
 </div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">timedelta</span>
+
+<span class="c1"># daily closing level of an index over one spring (illustrative)</span>
+<span class="n">start</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">daily_index</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">start</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">i</span><span class="p">),</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mi">100</span> <span class="o">+</span> <span class="nb">round</span><span class="p">(</span><span class="mf">2.5</span> <span class="o">*</span> <span class="n">i</span> <span class="o">-</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="n">i</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+<span class="p">]</span>
+
+<span class="n">LineChart</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">daily_index</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Daily Index Level"</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Date"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Level"</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-23">from datetime import date, timedelta
+
+# daily closing level of an index over one spring (illustrative)
+start = date(2024, 3, 1)
+daily_index = [
+    {"x": start + timedelta(days=i), "y": 100 + round(2.5 * i - 0.05 * i * i, 1)}
+    for i in range(60)
+]
+
+LineChart(
+    data=daily_index,
+    title="Daily Index Level",
+    xlabel="Date",
+    ylabel="Level",
+)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[25]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>&lt;DatachartFigure size 640x480 with 1 Axes&gt;</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><code>xticks_format</code> labels the ticks with a <a href="../../../references/constants/#datachart.constants.DATE_FORMAT"><code>DATE_FORMAT</code></a> member or any <code>strftime</code> pattern instead of the automatic labels. Explicit <code>xticks</code>, <code>xmin</code> / <code>xmax</code>, reference lines, and reference bands take datetimes as well, and <code>yticks_format</code> takes a <code>VALUE_FORMAT</code> member or a <code>"{x:.1f}"</code> style string for the value axis.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-24">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DATE_FORMAT</span>
+
+<span class="n">LineChart</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">daily_index</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Daily Index Level"</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Date"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Level"</span><span class="p">,</span>
+    <span class="n">xticks_format</span><span class="o">=</span><span class="n">DATE_FORMAT</span><span class="o">.</span><span class="n">MONTH_DAY</span><span class="p">,</span>
+    <span class="n">xticks</span><span class="o">=</span><span class="p">[</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">15</span><span class="p">)],</span>
+    <span class="n">xmin</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">xmax</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+    <span class="n">vlines</span><span class="o">=</span><span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Rebalance"</span><span class="p">},</span>
+    <span class="n">vspans</span><span class="o">=</span><span class="p">{</span><span class="s2">"xmin"</span><span class="p">:</span> <span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">"xmax"</span><span class="p">:</span> <span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Earnings season"</span><span class="p">},</span>
+    <span class="n">yticks_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
+    <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-24">from datachart.constants import DATE_FORMAT
+
+LineChart(
+    data=daily_index,
+    title="Daily Index Level",
+    xlabel="Date",
+    ylabel="Level",
+    xticks_format=DATE_FORMAT.MONTH_DAY,
+    xticks=[date(2024, 3, 1), date(2024, 3, 15), date(2024, 4, 1), date(2024, 4, 15)],
+    xmin=date(2024, 3, 1),
+    xmax=date(2024, 4, 20),
+    vlines={"x": date(2024, 3, 20), "label": "Rebalance"},
+    vspans={"xmin": date(2024, 4, 1), "xmax": date(2024, 4, 10), "label": "Earnings season"},
+    yticks_format=VALUE_FORMAT.INTEGER,
+    show_legend=True,
+)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[26]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>&lt;DatachartFigure size 640x480 with 1 Axes&gt;</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="custom-data-keys">Custom data keys<a class="anchor-link" href="#custom-data-keys">¶</a></h3><p>By default, the <code>data</code> items are dictionaries with the keys <code>x</code>, <code>y</code> and, optionally, <code>yerr</code>. Data that comes from elsewhere rarely uses those names, and renaming every key just to plot it is a chore. Instead, tell <code>LineChart</code> which keys to read with the <code>x</code>, <code>y</code> and <code>yerr</code> arguments. The <code>readings</code> list below stores the Ljubljana temperatures under <code>month</code> and <code>temperature</code>, with the deviation under <code>spread</code>.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-25">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">readings</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span><span class="s2">"month"</span><span class="p">:</span> <span class="n">month</span><span class="p">,</span> <span class="s2">"temperature"</span><span class="p">:</span> <span class="n">temp</span><span class="p">,</span> <span class="s2">"spread"</span><span class="p">:</span> <span class="n">std</span><span class="p">}</span>
     <span class="k">for</span> <span class="n">month</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">std</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">MONTH_TICKS</span><span class="p">,</span> <span class="n">TEMPERATURE</span><span class="p">[</span><span class="s2">"Ljubljana"</span><span class="p">],</span> <span class="n">TEMPERATURE_STD</span><span class="p">[</span><span class="s2">"Ljubljana"</span><span class="p">])</span>
 <span class="p">]</span>
 <span class="n">readings</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-23">readings = [
+<div class="clipboard-copy-txt" id="cell-25">readings = [
     {"month": month, "temperature": temp, "spread": std}
     for month, temp, std in zip(MONTH_TICKS, TEMPERATURE["Ljubljana"], TEMPERATURE_STD["Ljubljana"])
 ]
@@ -5434,7 +5614,7 @@ readings[:3]</div>
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[25]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[27]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
 <pre>[{'month': 1, 'temperature': 0.3, 'spread': 2.1},
  {'month': 2, 'temperature': 1.9, 'spread': 2.4},
@@ -5450,10 +5630,10 @@ readings[:3]</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-24">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-26">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5480,7 +5660,7 @@ readings[:3]</div>
 <span class="p">)</span>
 <span class="n">figure</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-24">figure = LineChart(
+<div class="clipboard-copy-txt" id="cell-26">figure = LineChart(
     data=readings,
     # specify which keys hold the x, y and error values
     x="month",
@@ -5530,10 +5710,10 @@ figure.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-25">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-27">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5545,7 +5725,7 @@ figure.show()</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">save_figure</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-25">from datachart.utils import save_figure</div>
+<div class="clipboard-copy-txt" id="cell-27">from datachart.utils import save_figure</div>
 </div>
 </div>
 </div>
@@ -5557,10 +5737,10 @@ figure.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-26">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-28">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5572,7 +5752,7 @@ figure.show()</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"./fig_line_chart.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-26">save_figure(figure, "./fig_line_chart.png", dpi=300)</div>
+<div class="clipboard-copy-txt" id="cell-28">save_figure(figure, "./fig_line_chart.png", dpi=300)</div>
 </div>
 </div>
 </div>
@@ -5620,10 +5800,10 @@ figure.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [32]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-27">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-29">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5635,7 +5815,7 @@ figure.show()</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">ASPECT_RATIO</span><span class="p">,</span> <span class="n">HATCH_STYLE</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-27">from datachart.constants import ASPECT_RATIO, HATCH_STYLE</div>
+<div class="clipboard-copy-txt" id="cell-29">from datachart.constants import ASPECT_RATIO, HATCH_STYLE</div>
 </div>
 </div>
 </div>
@@ -5647,10 +5827,10 @@ figure.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [31]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [33]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-28">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-30">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5685,7 +5865,7 @@ figure.show()</div>
     <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">ASPECT_RATIO</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-28">LineChart(
+<div class="clipboard-copy-txt" id="cell-30">LineChart(
     data=roc_curves,
     subtitle=list(ROC_POINTS),
     # the points are stored as "fp" and "tp", instead of "x" and "y"
@@ -5746,10 +5926,10 @@ figure.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [33]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [35]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-29">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-31">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5778,7 +5958,7 @@ figure.show()</div>
     <span class="n">scaley</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-29">LineChart(
+<div class="clipboard-copy-txt" id="cell-31">LineChart(
     data=training_loss,
     subtitle=list(LOSS_CURVES),
     # the points are stored as "step", "loss" and "spread"
@@ -5833,10 +6013,10 @@ figure.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [35]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [37]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-30">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-32">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5863,7 +6043,7 @@ figure.show()</div>
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-30">LineChart(
+<div class="clipboard-copy-txt" id="cell-32">LineChart(
     data=sector_indices,
     subtitle=list(SECTOR_INDEX),
     # highlight Technology, mute the other sectors
@@ -5916,10 +6096,10 @@ figure.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [37]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [39]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-31">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-33">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5962,7 +6142,7 @@ figure.show()</div>
     <span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-31">LineChart(
+<div class="clipboard-copy-txt" id="cell-33">LineChart(
     data=weekly_visitors,
     subtitle="unique visitors",
     style={"plot_line_marker": LINE_MARKER.CIRCLE},

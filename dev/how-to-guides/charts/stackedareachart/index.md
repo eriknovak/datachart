@@ -444,6 +444,34 @@ StackedAreaChart(
 ).show()
 ```
 
+### Datetime axis
+
+The series' `x` values may be real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp` — instead of numbers; the same generation data keyed by the first day of each year draws on a time axis. Points sit at their elapsed time and the ticks pick concise, non-repeating labels for the visible span; date strings are not parsed and draw as categories. `xticks_format` takes a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern, and explicit `xticks`, `xmin` / `xmax`, reference lines, and reference bands take datetimes as well.
+
+```
+from datetime import date
+
+from datachart.constants import DATE_FORMAT
+
+generation_dated = [
+    [{"x": date(year, 1, 1), "y": twh} for year, twh in zip(YEARS, GENERATION[source])]
+    for source in SOURCES
+]
+
+StackedAreaChart(
+    data=generation_dated,
+    subtitle=SOURCES,
+    title="World electricity generation since 2010",
+    ylabel="TWh",
+    # the axis reads as time: a datetime limit and one tick per five years
+    xmin=date(2010, 1, 1),
+    xticks=[date(year, 1, 1) for year in range(2010, 2024, 5)],
+    xticks_format=DATE_FORMAT.YEAR,
+    show_legend=True,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
 ### Themes
 
 A theme sets the palette, the band alpha and the furniture of every chart at once; see the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery.ipynb) for the whole suite under each. Apply one with [datachart.config.Config.set_theme](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) from the [datachart.constants.THEME](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) constant, and reset the configuration afterwards so the following charts draw in the default again.

@@ -754,6 +754,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#date-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Date labels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#figure-size-and-grid" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2391,6 +2402,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#date-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Date labels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#figure-size-and-grid" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3881,6 +3903,86 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="date-labels">Date labels<a class="anchor-link" href="#date-labels">¶</a></h3><p>Bar labels may be real temporal objects — <code>datetime</code>, <code>date</code>, <code>numpy.datetime64</code>, or pandas <code>Timestamp</code>. Group labels that are real temporal objects print through <code>DATE_FORMAT</code>; the groups keep their categorical positions, and <code>{axis}ticks_format</code> picks the pattern (a <a href="../../../references/constants/#datachart.constants.DATE_FORMAT"><code>DATE_FORMAT</code></a> member or any <code>strftime</code> pattern).</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DATE_FORMAT</span>
+
+<span class="n">sales_dated</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="n">date</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">"y"</span><span class="p">:</span> <span class="n">point</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]}</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">point</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sales_total</span><span class="p">)</span>
+<span class="p">]</span>
+
+<span class="n">BarChart</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">sales_dated</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly unit sales"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Units"</span><span class="p">,</span>
+    <span class="n">xticks_format</span><span class="o">=</span><span class="n">DATE_FORMAT</span><span class="o">.</span><span class="n">YEAR_MONTH</span><span class="p">,</span>
+    <span class="n">xtickrotate</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-5">from datetime import date
+
+from datachart.constants import DATE_FORMAT
+
+sales_dated = [
+    {"label": date(2025, index + 1, 1), "y": point["y"]}
+    for index, point in enumerate(sales_total)
+]
+
+BarChart(
+    data=sales_dated,
+    title="Monthly unit sales",
+    ylabel="Units",
+    xticks_format=DATE_FORMAT.YEAR_MONTH,
+    xtickrotate=45,
+).show()</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
+<img alt="No description has been provided for this image" class="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAosAAAHrCAYAAACn9tfQAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjExLjEsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvctoD+AAAAAlwSFlzAAAPYQAAD2EBqD+naQAAUg5JREFUeJzt3Xd4FWX+/vE7ISRZSkCRktBRpEovCUU60ouiKKCIWBALiqjLyncXFAQWWBvYBRGUjiBSpCiIu2BBARXpUhVBITkhkARyPr8/+DFyTAYCAnNOfL+uK9fFPDMnuc9DCHeeMzMnzMxMAAAAQBbCvQ4AAACA4EVZBAAAgCvKIgAAAFxRFgEAAOCKsggAAABXlEUAAAC4oiwCAADAFWURAAAAriiLAILGhg0bNGTIEP3www/nPHbdunUaMmSItm3bdhmSXZgvv/xSQ4YM0Y4dO7yOEhLzBSA4URaBHM7n82nIkCEaMmSINm3adNZj33jjDQ0ZMkQffPDBZUoX6Ntvv9WIESO0ZcuWcx77zTffaMSIEUFRxNysW7dOI0aM0I8//uh1lJCYLwDBKcLrAAAuLZ/PpxEjRkiSDhw4oDfffDPL43799Vc98MADOnHihO677z516tTpkmd7++23Vb58eTVs2PCSfy0v3HnnnerWrZsKFCjgjOX05wwg52FlEfiLKF26tGbMmKGjR49muX/q1KnKly+f8uXLd9kyPfHEE1qzZs1l+3qXW3R0tK666irlzp3bGcvpzxlAzsPKIvAX0a5dO73yyiuaOXOm7rrrrkz7J02apDZt2uj999/P8vG7du3S0qVLdeDAAeXPn18JCQmKj48POGbdunV6//339fDDDysiIkLvv/++Dhw4oFKlSqlLly7Knz+/c9yUKVN06NAhLVmyRImJibr99tudzxMeHq7Dhw8HPL5r166uRXbZsmVatWqV+vbtq7JlywbsS01N1YgRI1ShQgX16tUry8evWbNGCxcu1L333qtSpUo540ePHtWoUaMUHx+vDh06nNdzlE6dszh//nz16dNHiYmJWT7nChUqZJkpPT1dixYt0o4dO3TixAmVKVNG7du3D/j8Z/7drFixQgcOHFDhwoXVoEEDVa1aNcvP+0c//fSTFi9erP3796tAgQJq0qSJatSo8afyAMhhDECOtnfvXpNk//73v61GjRrWoEGDTMd89dVXJsnmzZtn4eHhdt999wXsHzVqlEVERFjBggWtYcOGVqZMGZNkHTt2tNTUVOe4yZMnmyR7++23LTY21q6++mqrUKGCSbISJUrYTz/9ZGZmH330kTVs2NAkWaVKlax9+/b2xRdf2JQpU0ySjRs3zooVK2ZXX321XXvttZkeb2b2xhtvmCRbvHixrVmzxiTZoEGDMj23OXPmmCR79dVXXefoueeeM0m2evXqgPGff/7ZJNkDDzxw3s/RzOyVV14xSbZs2TLX55yVHTt2WIkSJSwyMtJq165tdevWtejoaLviiitszZo1AceOHDnScuXKZUWKFLH4+HgrVqyYhYWF2VNPPRVw3Jnzddprr71mUVFRVqhQIWvcuLHz99qnTx/LyMi4oDwAch7KIpDDnS6LI0eOtOeff94k2aZNmwKOeeCBB6xw4cKWnp5ukgLK4qpVq0yStWvXzo4ePeqMjxw50iTZsGHDnLHTZS82NtY+/fRTZ3zChAkmyUaMGOGMnS54Y8aMyfT4okWLBjz+5ZdfzvT4P5afatWqWZEiRezEiRMBz61bt26WJ08eS0pKcp2j8ymL5/MczyyLbs85K3fffbdFRUXZrl27nLGDBw9axYoVLT4+3hnbvHmz83eTnp5uZmYnTpywLl26WFhYmH3//feu8/XVV19ZeHi4derUyVJSUszMzO/32zPPPJOpXGc3D4CciXMWgb+QXr16KSoqShMnTnTG0tLS9N5776lXr14B59ad9tZbb0mSXnzxReXNm9cZf/LJJxUXF6d33nkn02N69Oihxo0bO9u33HKLJGXrKmdJuv3228/78ffee68OHjyoDz/80Bk7evSoFi5cqG7duikmJiZbXzu7/uxzPJsDBw5IkqKiopyxwoULa82aNfr000+dsaioKL366qt69tlnnb+7iIgI3XbbbTIzffPNN65f47XXXpPf79dLL72kPHnySJLCwsL0j3/8Q8WLF3f+3s8nD4CciXMWgb+QQoUKqXPnznrnnXecgjFv3jwdOXIky/MYJWnjxo0qWLCgrr766oDxsLAwVatWTUuWLFFqaqqio6OdfTVr1gw4tmDBgpJOFdPsqFWrVsD26auJz/b4Xr166YknntDEiRPVpUsXSdK8efN0/Phx9e3bN1tf93z82ed4Nv369dPixYtVtWpVdevWTS1atFDz5s1VqFChgOPK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tbxS6GUOtbxS6GUOtbxSaGY+mxxxgUuLFi3022+/6Z577tH999+vnTt3qmPHjl7HAgAACHk5YmUxLCxMK1as0IoVK+T3+/X8888rIiJHPLUAUVFR+te//hWwMhrsQi1zqOWVQi9zqOWVQi9zqOWVQi9zqOWVQi9zqOWVQjNzduSIC1wAAABwaeSIl6EBAABwaVAWAQAA4IqyCAAAAFeURQD4C/v111+9jgAgyFEW4bljx45p0aJF2rZtm9dRsm3jxo2aMWOG89aRwW737t0h937pw4YN03vvved1jGw7evSoZs+erW+//dbrKNk2fPhw1alTx+sY2Xbs2DHNmjVLa9eu9TpKth08eFA7d+70Oka2nThxQp9//rl++eUXr6PkWKmpqVqyZIl++OEHr6NkG2Uxhxk9erTGjRvndYxs+/nnn9WkSRNNnTpV119/vRYsWOB1pHN67rnn9OCDD2rq1Knq2bOn13GyZc6cObrrrrs0adIkr6Nky7Bhw7Rt2zZ1797d6yjZcvjwYbVs2VJr1qzR1q1bvY6TLcOHD9d3332nOnXqaPPmzV7HOaeDBw+qY8eO+vbbb3XLLbdo9erVXkc6p5dffllt2rRRr1691KhRI+3YscPrSGd18OBBNWzYUGPGjFGdOnX0xBNP6OTJy/f+xBeiW7du+vTTT72OkW2//fabmjZtqnfeeUctW7YMnV/iDTlK/fr1rXLlyjZ27Fivo2RLr169bMmSJWZm9uWXX1r9+vU9TnR2mzZtsuuvv94yMjLM7/db06ZNLTEx0TIyMryOdlbLly+3Bx980KpVq2YTJ070Os5ZDR061Hr06GEnT540M7PExET73//+Zz6fz+Nk7v7973/bCy+84Gx/9dVX9t1333mY6OyeeeYZ6969u508edJee+01e+6557yOdE633XabbdiwwczMJk6caBMmTLC9e/d6nMrdjz/+aAkJCc7PhnHjxtlVV11lGzdu9DiZuwceeMBmzJhhZmbJycnWtWtXa9++vaWnp3ucLGu7d++22rVrW2xsrK1atcrrONnSr18/mz17tpmZff/993bdddd5nCh7WFnMQZKSklS2bFl9/PHHmjhxYkisMG7btk3FixeXJNWpUyfgPb6D0ebNm1WmTBmFh4drzpw52rNnj5o3b66yZctq48aNXsdzVb16de3fv1/Lly/X888/r3Hjxqlfv35ex8rSwYMHlZGRobCwMK1evVrx8fF66qmnVKlSJX3zzTdex8uS3+/X0aNHZWbq0aOH/vnPf+rGG29U//79vY6WSWJion799Ve9++67ypUrl9q0aaMZM2Z4Heucvv32W0VERCglJUVTp07V6tWr1bJly6D9Pt6xY4euvPJKhYef+m+2V69eqly5sjp16hS0P+cOHTqkfPnySZLy5cun2bNnK0+ePBowYIDHybK2ceNG9enTR7Nnz9att94aEiuMZ/6fV7lyZaWnp3ucKJu8bqv48/x+v/PnxMREMzM7cOBAphXGlJSUy57NzenMixcvtl9//dUZr1ixovPnYMybnJzs/FY4dOhQ27Vrl5mZTZ482WrUqOFZvqyc+X1hZtaoUSMzM9uwYYOFhYXZ4MGDvYjl6nTejIwMu/HGG+2hhx6yxo0b28GDB83MbM6cOVa3bl0vI2ZyOvPOnTutRIkSNmPGDHv22WfNzCw1NdUaNmxo8+bN8zJigD9+T5zWvHlzW7FixWVOkz2nM8+bN88qV65s1apVs1deecXMzI4fP27x8fHOv8lgcDpvSkqKlS9f3p577jk7dOiQDRgwwObOnWuDBg2yf/7znx6nzNrChQutevXqAT97jx8/buXKlbPNmzd7mOx3x44ds99++83ZTkpKMjOz//73vwErjH6/344fP+5JxrNZvny5HThwwNk+8/+8Y8eOuf4b9RplMcSNHTvWSpcubaVKlbKxY8cGvBx6ZmGcPHmy9ezZ08Okp+zevdsaNWpkxYoVsxtuuMF++OGHgP0VKlQwM7MjR45YQkJCULxkc7Y5PtMVV1wRFC9Hu81x+/btbfPmzVa/fn1bsGBBUL0k/fzzz1uZMmWsZMmSNnr0aEtJSbFGjRrZU0895Rzj9/utWLFiHqb83Z49e+z666+3YsWKWatWrez777+3F154wWJiYmzu3LnOca+88oo9/fTTHib93R/n+Mzv1QULFliDBg2cl/6Dwb59+6xJkyYWGxtrLVq0sG+//dbMzO6//3773//+5xw3adIkGzZsmFcxA7z00kvOHI8cOdK2b99uHTp0sHLlyjm/RGzatMmaNWvmcdJT9u7da//5z38Cxu6//35r27atHTt2zBn7+9//bpMnT77c8bL0wAMPWI0aNQIWGU47XRg/+eQTu+eee+zVV1/1IGGg/fv3n/W0sGuvvdbMTi1ENGnSxNauXXu5op0XymIIW7ZsmXXu3NnS09Nt3759dsMNN1jXrl0tLS3NOebAgQNWqlQpa9asmR09etTDtKc0adLE/ve//5nf77d33nnHihYtah9//LGzv1KlSk5RPPM/Xa+ca45P/1b75ptvWu/evT1M+ju3OR48eLBdc801zg+jgwcP2qJFizxOa/bJJ59Yhw4dLD093fbv32/t2rWzTp062aFDhwLKy5tvvmn33nuvh0l/17x5c1u9erWZmb377rtWtGhRW7ZsmQ0fPtxKlSplS5cuta1bt1rjxo2d8+y85DbHZ/6saNWqlT3xxBMepgzUqlUrW7lypZmZTZ8+3YoWLWpLliyxyZMnW/369e3gwYN29OhRa9u2rVMkvbR69Wpr27atpaWl2c8//2wdOnSw9u3bW2pqasBxEydOtEceecSjlIGGDBlisbGx9n//93/OWEZGht19991Wt25d+/LLL23Pnj1Wu3btTL/YeyUhIcGefvpp18L42WefWe7cuW3QoEEepMts6NChFhsb6/pKTsWKFZ2iOHXq1MucLvsoiyFs5MiRAb+xnDhxwrp37x5QWiZPnhw0RdHMrEiRIgErGmvWrLGiRYs6P+zLly9v8fHxQVEUzc4+x+np6VatWjUrWbKk9erVK+jneNmyZfbll196mCxrY8aMsVGjRjnbJ0+etB49ejgr4TfffLOVK1fOunfvHjSnJhQtWjSgyH7++edWtGhRW79+vX3yySfWtWtXa926tS1dutTDlL871xybmf3yyy/ORS/BoFixYnbixAln+6uvvrKiRYvaunXrbNiwYVakSBGrUaOGc4Gc15577jkbPny4s33y5Em7/fbbrXv37mZmNnv2bIuLi7POnTtbcnKyVzEDtGjRwvbt22e1a9cOKIxmZtOmTbOGDRta7dq1bcGCBR4lDJSRkWH/+te/zMyyLIx+v9/uueeeoCmKZmatW7e2vXv3Wr169bIsjNWqVbOEhISgLopmlMWQtm7dOitfvnxASUlNTbWaNWva8uXLzezUfxLBUmLMzDp16uScb3TajBkznPPpRo8eHTRF0ezcc+z3+wNergkG55rjYLN+/XorV65cwNXOaWlpVrt2bVuyZImdOHHCORc3WNx444320ksvBYzNmTPH4uPjPUp0duea42B0yy23ZLpKe/78+VanTh0z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VapUsb1793qUMtDkyZOtadOm9uijj9qxY8fszTfftLx589qMGTOcY95///2geVeWP87xkSNH7LrrrrPatWsHHFe9evWgWcGdMmWKNW3a1B555BFLSUkJ+jk+cOCA3XnnndaiRQvnJa/q1atn+iWndu3aQbPy9cc5njRpkuXNmzfgFJUFCxYExVt9mp1616A+ffpY8+bNbdmyZSExx++99541a9bMHn74YTt69GjIzbHP57NatWpZ1apVA447XXa9dvq94G+++WarWbOm9evXz8zM/vGPfwSc25eWlmZlypTxKmaAQ4cOWd++fa158+b20UcfBf0cXwyUxSDz6quvWo8ePWzdunXWtWtX5wae8+fPD/hNe9iwYc6Vd15KSUmxunXr2rx58+z999+3YsWK2S+//GJ79uyxr776yjnu8OHDVqlSpaD4LevNN9+07t2727p166xbt272+OOPm9mpOT7zXKQRI0bYuHHjvIrpcJvjffv22RdffOEcl5iYaJUqVQqKCy3efvtt69atm61bt866d+9ujz76qJkF7xwfP37c6tWrZ3PnzrX58+dbsWLF7KeffrKffvop4NzQ0yfZe30lvJn7HH/wwQcBczx69OigeJk0NTXV6tevb7Nnz7YFCxZYsWLFbN++fUE9x1OnTrUbb7zR1q1bZz169HDurRpqc3zgwAFbs2aNc1xycrJVrlzZ8yvhzU794n76Z/Dx48etbNmyAedS7ty507Zs2WJ33HGHvfjii17FdKSlpVl8fLzNnDnTFi5caMWKFbPdu3cH9RxfDJTFIFO1alXn3SoOHTpktWrVcvYdPXrU+vfvb71797YOHToERfGaN2+ePfjgg872gAEDAlZAp02bZo8++qjVqlUraN767My3iDp8+LBVq1bN2ZeSkmL9+/e3O++809q2bRsUxetcczxz5kx75JFHrFatWrZ48WIvImZSp04dO3DggJmd+s+/SpUqzr5gnOMPP/zQWdEwO3URy5kroLNnz7ZHHnnEateu7bwbh9fONsfHjh2zBx54wO666y674YYbguIq4iVLltjdd9/tbD/55JMBq3PBOMfx8fG2b98+Mzv1n3+lSpWcfaE4x++//7498sgjVqdOHZs/f74XETMZOnRoQNHu2bNnwAWSjz/+uCUkJATNBUTLly+3O++809l+6qmnAu6YEYxzfDFEeH2f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PS8xx48ftxUrVtju3buzNceff/65R0l/d+YcDx8+3Dp16hQwxz/++KOVKlUqaOY4NTXVVqxYYbt27bLDhw9byZIl7bPPPgs45t5777WXX37Z/H5/UMzx9u3bsz3H33//vedF8cw5TkxMtFKlStmqVasCjunfv7+9+OKLQTHHqamp9uijj9q1115rAwYMsNTUVGvevLk99thjAccNGDAgaApXamqqffzxx/bjjz9ma47/+NarORFl8TIbNWqUxcfHW926da19+/aWlpZmLVq0sLvvvjvgvl1ly5YNilsx7N+/3+rUqWNdu3a1okWL2ooVK2zJkiUWFxcXcB/FSZMmZVpx9MrYsWOtXr16Vq9ePWvTpo2lp6db69atrU+fPgG3G7rmmmuC4h5YWc3xsmXLLC4uLuAH/ZQpUzKthnnlueees3r16ll8fLy1bNnS0tLSgnqOf/75Z6tbt64zx6ffLSKU5jg9Pd3atWtnd9xxR8DthipWrOh5gTEz++WXX6xevXrOHC9evNg++eQTi42NDSjl06ZNy7Ti6JWXXnrJ6tatawkJCdasWbOQnONPP/3UYmNjA0r5rFmzMq2GeeXuu++2cePG2Z49e+yGG26wF1980RITEy0+Pt7uvPNOS0xMtJMnT1qbNm3sv//9r9dx7dChQxYfH+/M8YIFC4J+ji8HyuJltHHjRmvevLn5/X7z+/3WqFEj++9//2spKSnWuXNna9y4sX3wwQc2YsQI69atm9dxzcyse/futnz5cjMz++STT6xZs2ZmZrZo0SKLi4uzESNG2OLFi6127dr29ddfexnVzMw2bdpkTZo0cea4adOmtmrVKjt27JjdeOON1rBhQ5s/f76NGjXKunTp4nVcM3Of49Ol/JlnnrElS5ZYnTp1Au4/5pUtW7ZY48aNndWXli1b2ooVK4J6jnv27GlLliwxM7PVq1db48aNzSz05vj48eN28803W0JCgs2bN8/GjBljHTp08DjtKb1793buj/i///3PEhISzMycUj5s2DBbsmSJ1atXL9OKrhe2b99uDRo0cOa4TZs29tFHH4XkHH/88cdWvHhx+9e//mUfffSR1a9fP9OKrhf8fr+VKlXK2V63bp3zPsrHjx+3xx57zGJjY61s2bI2fPhwr2IG6Nu3r82bN8/MzL744gurV6+emQXvHF8uXA19GW3evFllypRRWFiYwsLC1K5dO23fvl158uTRvHnzNGDAAM2ZM0d+v19TpkzxOq4k6YcffnDuFdW0aVP99NNPkqS2bdvqyy+/VEpKimbOnKmXXnpJNWvW9DKqpFNzXLp06Uxz/Le//U1z5szRY489pvfff19paWl67733vI4ryX2Ob7jhBn311VdKTU3V9OnT9dxzz6lOnTpeRpUkbdmyRSVLlnRuORRqc9yoUSMdPHhQUujNcXR0tGbOnKknn3xS8+bN09GjRzVjxgyP055y5hwnJCTo8OHDkqSWLVtq3bp1OnHihKZNm6YxY8YoPj7ey6iSpK1bt6pEiRI5Yo6bNWumdevWye/367333tOoUaPUsGFDL6NKksLCwlSmTBnnPoSFCxfWsWPHJEnR0dEaO3as9uzZo82bN2d5RbQXzpzjunXrKikpSVLwzvHlkkOv8Q5OrVu3Dripq9/vD7iRa4cOHXTTTTd5Ec3VsGHDAm7BceY9CQsVKqQRI0Z4EctVy5YtdeLECWf7j3Pcrl07de3a1Ytors42x1deeaWGDx/uRSxXzZs3V0pKirMdCnP8z3/+U1dccYWzHepz3KZNG3Xu3NmLaK6GDBmiQoUKOdtnzvEVV1yhZ555xotYrpo0aaLExERn2+/3O7cfkkJvjgsWLKinn37ai1hntXLlSuf/vdP3UJRO3bNy5MiRGjBggPLmzetlxACDBw9W4cKFne1QmOPLgZXFy6hAgQLq1q2bs+3z+Zx7+k2aNEkPPvigV9FcdenSxfnhdOLECeceUomJiWrWrJm2bNniZbxM8ufPr1tuucXZPnOO33nnHd1///1eRXMVanOcN29e3Xrrrc72mXP87rvv6p577vEqmqvOnTvrqquuknSqFJz+zyspKUktWrTQpk2bvIyXSSjOcceOHQPeMMD+//0Jk5OT1apVK3377bdeRctSnjx5dNtttznbZ87xjBkzgvLGyqE2x5ICFkhO39fW/v8Nt48cORJURVE6tWhz5psy+P1+SaduuH3DDTdo/fr1HiXzFiuLHjq9WjBp0iS99957mj9/vteRzup03tM3g3788cdVoUIFr2Od1enM77zzjt5++20tWLDA60hnFcpz/O677+qNN97Qhx9+6HWkszIzhYeHOzfcfuSRR1S5cmWvY51VqM2xdGpF5vTNoB944AFdd911Xkc6q9NzPGPGDE2YMEELFy70OtI5hdoc58+fXwcPHnRuuD1mzBivI51TeHi4c8Pte+65RzVq1PA6kicoix4qXbq0Ro0apejoaM2fPz8o3onjbKKiopSUlOSUmGB7qTErpUuX1pgxYxQZGakFCxYE3W+xfxSqc/yf//xHuXPn1ocffuj5uwydS65cuXTs2DG1a9dOjz76aMBqf7AKtTmWTr2tW9u2bfXQQw8FvJ1bsCpdurRefPFF5cqVSwsXLvT8nZyyI9TmuEKFCtqwYYOqVasWEkVROvVLRNu2bdWvXz/17NnT6zieoSx6qHPnzlq5cqXeeeedoC+Kp/Xs2VO1atUKiRIjnXrZZunSpZoyZUrQF8XTQm2O27dvr4ULF2rKlCkhUWIk6Y477lCVKlVCoihKoTnHvXv3Vvny5UOixEinzrWdN2+epkyZEhJFUQq9OQ4LC9Nnn32ma665xuso2da7d2+VKlXqL10UJSnM7A/vQA8AAAD8f1zgAgAAAFeURQAAALiiLAIAAMAVZREAAACuKIsAAABwRVkEAACAK8oiAAAAXFEWAQAA4IqyCAAAAFeURQAAALiiLAIAAMDV/wN34I9Aky2HfQAAAABJRU5ErkJggg=="/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="figure-size-and-grid">Figure size and grid<a class="anchor-link" href="#figure-size-and-grid">¶</a></h3><p>To change the figure size, add the <code>figsize</code> attribute. The <code>figsize</code> attribute can be a tuple (width, height), values are in inches. The <code>datachart</code> package provides a <a href="../../../references/constants/#datachart.constants.FIG_SIZE">datachart.constants.FIG_SIZE</a> constant, which contains some of the predefined figure sizes.</p>
 <p>To add the grid, add the <code>show_grid</code> attribute. The possible options are:</p>
 <table>
@@ -3916,10 +4018,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -3931,7 +4033,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">FIG_SIZE</span><span class="p">,</span> <span class="n">SHOW_GRID</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">from datachart.constants import FIG_SIZE, SHOW_GRID</div>
+<div class="clipboard-copy-txt" id="cell-6">from datachart.constants import FIG_SIZE, SHOW_GRID</div>
 </div>
 </div>
 </div>
@@ -3943,10 +4045,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -3967,7 +4069,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">BarChart(
+<div class="clipboard-copy-txt" id="cell-7">BarChart(
     data=sales_total,
     title="Monthly unit sales (2025)",
     xlabel="Month",
@@ -4081,10 +4183,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4096,7 +4198,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">HATCH_STYLE</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">from datachart.constants import HATCH_STYLE</div>
+<div class="clipboard-copy-txt" id="cell-8">from datachart.constants import HATCH_STYLE</div>
 </div>
 </div>
 </div>
@@ -4108,10 +4210,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-9">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4139,7 +4241,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">BarChart(
+<div class="clipboard-copy-txt" id="cell-9">BarChart(
     data=sales_total,
     # define the style of the bars
     style={
@@ -4224,10 +4326,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-9">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-10">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4239,7 +4341,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">ORIENTATION</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-9">from datachart.constants import ORIENTATION</div>
+<div class="clipboard-copy-txt" id="cell-10">from datachart.constants import ORIENTATION</div>
 </div>
 </div>
 </div>
@@ -4251,10 +4353,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-10">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-11">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4277,7 +4379,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">orientation</span><span class="o">=</span><span class="n">ORIENTATION</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-10">BarChart(
+<div class="clipboard-copy-txt" id="cell-11">BarChart(
     data=sales_total,
     title="Monthly unit sales (2025)",
     # swap the axis labels to match the orientation
@@ -4324,10 +4426,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-11">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-12">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4350,7 +4452,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-11">BarChart(
+<div class="clipboard-copy-txt" id="cell-12">BarChart(
     data=sales_by_region,
     subtitle=REGIONS,
     # highlight one region, mute the rest
@@ -4412,10 +4514,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-12">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-13">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4427,7 +4529,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">LINE_STYLE</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-12">from datachart.constants import LINE_STYLE</div>
+<div class="clipboard-copy-txt" id="cell-13">from datachart.constants import LINE_STYLE</div>
 </div>
 </div>
 </div>
@@ -4439,10 +4541,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-13">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-14">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4482,7 +4584,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-13">BarChart(
+<div class="clipboard-copy-txt" id="cell-14">BarChart(
     data=sales_total,
     # add a horizontal line at the sales goal
     hlines={
@@ -4562,10 +4664,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-14">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-15">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4594,7 +4696,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-14">BarChart(
+<div class="clipboard-copy-txt" id="cell-15">BarChart(
     data=sales_total,
     # shade the tolerance around the monthly goal
     hspans={
@@ -4653,10 +4755,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-15">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-16">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4676,7 +4778,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-15">BarChart(
+<div class="clipboard-copy-txt" id="cell-16">BarChart(
     # use a list of lists to define multiple bar charts
     data=sales_by_region,
     title="Monthly unit sales by region (2025)",
@@ -4719,10 +4821,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-16">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-17">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4745,7 +4847,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-16">BarChart(
+<div class="clipboard-copy-txt" id="cell-17">BarChart(
     data=sales_by_region,
     # add a subtitle to each chart
     subtitle=REGIONS,
@@ -4815,10 +4917,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-17">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-18">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4830,7 +4932,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">BAR_MODE</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-17">from datachart.constants import BAR_MODE</div>
+<div class="clipboard-copy-txt" id="cell-18">from datachart.constants import BAR_MODE</div>
 </div>
 </div>
 </div>
@@ -4842,10 +4944,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-18">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-19">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4868,7 +4970,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-18">BarChart(
+<div class="clipboard-copy-txt" id="cell-19">BarChart(
     data=sales_by_region,
     subtitle=REGIONS,
     # stack the series
@@ -4914,10 +5016,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-19">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-20">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4941,7 +5043,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">max_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-19">BarChart(
+<div class="clipboard-copy-txt" id="cell-20">BarChart(
     data=sales_by_region,
     subtitle=REGIONS,
     title="Monthly unit sales by region (2025)",
@@ -4988,10 +5090,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-20">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-21">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5017,7 +5119,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-20">BarChart(
+<div class="clipboard-copy-txt" id="cell-21">BarChart(
     data=sales_by_region,
     subtitle=REGIONS,
     title="Monthly unit sales by region (2025)",
@@ -5066,10 +5168,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-21">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-22">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5096,7 +5198,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">orientation</span><span class="o">=</span><span class="n">ORIENTATION</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-21">BarChart(
+<div class="clipboard-copy-txt" id="cell-22">BarChart(
     data=sales_by_region,
     subtitle=REGIONS,
     title="Monthly unit sales by region (2025)",
@@ -5157,10 +5259,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-22">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-23">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5190,7 +5292,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-22">BarChart(
+<div class="clipboard-copy-txt" id="cell-23">BarChart(
     data=sales_by_region,
     subtitle=REGIONS,
     # set the error bar color (a single style applies to every chart)
@@ -5285,10 +5387,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-23">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-24">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5300,7 +5402,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">VALUE_FORMAT</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-23">from datachart.constants import VALUE_FORMAT</div>
+<div class="clipboard-copy-txt" id="cell-24">from datachart.constants import VALUE_FORMAT</div>
 </div>
 </div>
 </div>
@@ -5312,10 +5414,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-24">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-25">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5340,7 +5442,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">THOUSANDS</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-24">BarChart(
+<div class="clipboard-copy-txt" id="cell-25">BarChart(
     data=sales_total,
     title="Monthly unit sales (2025)",
     xlabel="Month",
@@ -5388,10 +5490,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-25">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-26">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5422,7 +5524,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-25">BarChart(
+<div class="clipboard-copy-txt" id="cell-26">BarChart(
     data=sales_total,
     style={
         "plot_value_fontsize": 9,
@@ -5521,10 +5623,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-26">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-27">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5536,7 +5638,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCALE</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-26">from datachart.constants import SCALE</div>
+<div class="clipboard-copy-txt" id="cell-27">from datachart.constants import SCALE</div>
 </div>
 </div>
 </div>
@@ -5559,10 +5661,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-27">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-28">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5585,7 +5687,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="p">)</span>
     <span class="n">figure</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-27">for scale in [SCALE.LINEAR, SCALE.LOG]:
+<div class="clipboard-copy-txt" id="cell-28">for scale in [SCALE.LINEAR, SCALE.LOG]:
     figure = BarChart(
         data=populations,
         title=f"Population on the '{scale}' scale",
@@ -5637,33 +5739,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-28">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">save_figure</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-28">from datachart.utils import save_figure</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In [31]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
@@ -5677,9 +5752,36 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">save_figure</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-29">from datachart.utils import save_figure</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [32]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-30">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"./fig_bar_chart.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-29">save_figure(figure, "./fig_bar_chart.png", dpi=300)</div>
+<div class="clipboard-copy-txt" id="cell-30">save_figure(figure, "./fig_bar_chart.png", dpi=300)</div>
 </div>
 </div>
 </div>
@@ -5727,10 +5829,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [33]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [34]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-30">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-31">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5757,7 +5859,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-30">BarChart(
+<div class="clipboard-copy-txt" id="cell-31">BarChart(
     data=medals,
     subtitle=["Gold", "Silver", "Bronze"],
     style=[
@@ -5810,10 +5912,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [35]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [36]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-31">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-32">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5837,7 +5939,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-31">BarChart(
+<div class="clipboard-copy-txt" id="cell-32">BarChart(
     data=revenue,
     subtitle=list(REVENUE),
     # highlight Asia-Pacific, mute the other regions
@@ -5887,10 +5989,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [37]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [38]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-32">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-33">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5918,7 +6020,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">value_format</span><span class="o">=</span><span class="s2">"</span><span class="si">{:.1f}</span><span class="s2">%"</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-32">BarChart(
+<div class="clipboard-copy-txt" id="cell-33">BarChart(
     data=languages,
     style={
         "plot_bar_color": "#f48024",
@@ -5972,10 +6074,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [39]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [40]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-33">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-34">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6009,7 +6111,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">xtickrotate</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-33">BarChart(
+<div class="clipboard-copy-txt" id="cell-34">BarChart(
     data=trade_balance,
     style=[
         {"plot_bar_color": "#2a9d8f"},  # surplus
