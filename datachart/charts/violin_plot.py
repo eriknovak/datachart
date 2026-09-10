@@ -13,6 +13,7 @@ from ..typings import (
     TextAttrs,
 )
 from ..constants import (
+    VALUE_FORMAT,
     ASPECT_RATIO,
     EMPHASIS,
     FIG_SIZE,
@@ -45,6 +46,8 @@ def ViolinPlot(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -116,6 +119,10 @@ def ViolinPlot(
         ...     ylabel="Value"
         ... )
 
+    !!! info "Added in Unreleased"
+
+        The `show_values` and `value_format` parameters.
+
     Args:
         data: The data points for the violin plot(s). Can be a single list of data points
             for one chart, or a list of lists for multiple charts/subplots.
@@ -135,6 +142,9 @@ def ViolinPlot(
         ymax: The maximum y-axis value.
         show_legend: Whether to show the legend.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_values: Whether to print each group's median beside its median line.
+        value_format: Format string for the value labels: a `VALUE_FORMAT`
+            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             `ASPECT_RATIO`.
         orientation: The orientation of the violins (vertical or horizontal).
@@ -205,6 +215,8 @@ def ViolinPlot(
         "ymax": ymax,
         "show_legend": show_legend,
         "show_grid": show_grid,
+        "show_values": show_values,
+        "value_format": value_format,
         "aspect_ratio": aspect_ratio,
         "subplots": subplots,
         "max_cols": max_cols,

@@ -12,6 +12,7 @@ from ..typings import (
     TextAttrs,
 )
 from ..constants import (
+    VALUE_FORMAT,
     ASPECT_RATIO,
     BASELINE,
     EMPHASIS,
@@ -41,6 +42,9 @@ def StackedAreaChart(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    value_step: Optional[int] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -111,6 +115,10 @@ def StackedAreaChart(
         ...     ylabel="Visits",
         ... )
 
+    !!! info "Added in Unreleased"
+
+        The `show_values`, `value_format` and `value_step` parameters.
+
     Args:
         data: The data points for the stacked series. A single list of points
             draws one band; a list of lists draws one band per series, the
@@ -134,6 +142,11 @@ def StackedAreaChart(
         ymax: The maximum y-axis value.
         show_legend: Whether to show the legend.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_values: Whether to print each value at the midpoint of its band.
+        value_format: Format string for the value labels: a `VALUE_FORMAT`
+            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
+        value_step: Label every Nth x position (`1` labels all of them). Defaults
+            to the smallest step that keeps neighbouring labels apart.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             `ASPECT_RATIO`.
         scalex: The x-axis scale (e.g., "log", "linear").
@@ -193,6 +206,9 @@ def StackedAreaChart(
         "ymax": ymax,
         "show_legend": show_legend,
         "show_grid": show_grid,
+        "show_values": show_values,
+        "value_format": value_format,
+        "value_step": value_step,
         "aspect_ratio": aspect_ratio,
         "subplots": subplots,
         "max_cols": max_cols,

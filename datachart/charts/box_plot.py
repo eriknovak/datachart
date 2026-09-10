@@ -11,7 +11,15 @@ from ..typings import (
     HLinePlotAttrs,
     TextAttrs,
 )
-from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID, ORIENTATION, SCALE
+from ..constants import (
+    ASPECT_RATIO,
+    EMPHASIS,
+    FIG_SIZE,
+    SHOW_GRID,
+    ORIENTATION,
+    SCALE,
+    VALUE_FORMAT,
+)
 
 # ================================================
 # Main Chart Definition
@@ -35,6 +43,8 @@ def BoxPlot(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_outliers: Optional[bool] = None,
     show_notch: Optional[bool] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -103,6 +113,10 @@ def BoxPlot(
         ...     ylabel="Value"
         ... )
 
+    !!! info "Added in Unreleased"
+
+        The `show_values` and `value_format` parameters.
+
     Args:
         data: The data points for the box plot(s). Can be a single list of data points
             for one chart, or a list of lists for multiple charts/subplots.
@@ -125,6 +139,9 @@ def BoxPlot(
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_outliers: Whether to show outliers. Defaults to True.
         show_notch: Whether to show notched boxes for median confidence interval.
+        show_values: Whether to print each group's median beside its median line.
+        value_format: Format string for the value labels: a `VALUE_FORMAT`
+            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             `ASPECT_RATIO`.
         orientation: The orientation of the boxes (vertical or horizontal).
@@ -188,6 +205,8 @@ def BoxPlot(
         "sharey": sharey,
         "show_outliers": show_outliers,
         "show_notch": show_notch,
+        "show_values": show_values,
+        "value_format": value_format,
         "orientation": orientation,
         "scaley": scaley,
     }

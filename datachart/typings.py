@@ -438,9 +438,9 @@ class BarStyleAttrs(TypedDict):
         plot_bar_edge_width (Union[int, float, None]): The edge width of the bar.
         plot_bar_edge_color (Union[str, None]): The edge color of the bar.
         plot_bar_error_color (Union[str, None]): The color of the error line of the bar.
-        plot_bar_value_fontsize (Union[int, float, None]): The font size of the bar value labels.
-        plot_bar_value_color (Union[str, None]): The color of the bar value labels.
-        plot_bar_value_padding (Union[int, float, None]): The padding between bar edge and value label.
+        plot_bar_value_fontsize (Union[int, float, None]): Alias of `plot_value_fontsize`.
+        plot_bar_value_color (Union[str, None]): Alias of `plot_value_color`.
+        plot_bar_value_padding (Union[int, float, None]): Alias of `plot_value_padding`.
         plot_xticks_label_rotate (Union[int, float, None]): The label rotation of the xticks in the bar chart.
         plot_yticks_label_rotate (Union[int, float, None]): The label rotation of the yticks in the bar chart.
 
@@ -459,6 +459,27 @@ class BarStyleAttrs(TypedDict):
     plot_bar_value_padding: Union[int, float, None]
     plot_xticks_label_rotate: Union[int, float, None]
     plot_yticks_label_rotate: Union[int, float, None]
+
+
+class ValueLabelStyleAttrs(TypedDict):
+    """The typing for the value labels: the numbers a chart prints beside its
+    marks when `show_values` is on. One style serves every chart that takes
+    `show_values`; the `plot_bar_value_*` keys of `BarStyleAttrs` are aliases.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        plot_value_fontsize (Union[int, float, None]): The font size of the value labels.
+        plot_value_color (Union[str, None]): The color of the value labels.
+        plot_value_padding (Union[int, float, None]): The gap between a mark and its value label, in points.
+        plot_value_halo_width (Union[int, float, None]): The width, in points, of the white halo stroked around the value labels so they stay legible over marks and lines. `None` or `0` draws no halo.
+
+    """
+
+    plot_value_fontsize: Union[int, float, None]
+    plot_value_color: Union[str, None]
+    plot_value_padding: Union[int, float, None]
+    plot_value_halo_width: Union[int, float, None]
 
 
 class HistStyleAttrs(TypedDict):
@@ -837,8 +858,8 @@ class ThemeDefaultAttrs(TypedDict):
             for `show_grid`, applied when a chart call leaves it unset. Never
             applies to heatmaps. `None` means the theme has no opinion.
         chart_default_show_values (Union[bool, None]): The theme default for
-            `show_values`, applied when a chart call leaves it unset. `None`
-            means the theme has no opinion.
+            `show_values`, applied to every chart that takes it when the chart
+            call leaves it unset. `None` means the theme has no opinion.
         plot_hatch_cycle (Union[List[str], None]): The hatch patterns assigned
             per bar/histogram series, parallel to the color cycle. An explicit
             per-chart hatch style wins. `None` disables the cycle.
@@ -887,6 +908,7 @@ class StyleAttrs(
     TreemapStyleAttrs,
     NetworkStyleAttrs,
     BarStyleAttrs,
+    ValueLabelStyleAttrs,
     HistStyleAttrs,
     VLineStyleAttrs,
     HLineStyleAttrs,
@@ -1101,6 +1123,9 @@ class _LineChartAttrs(ChartCommonAttrs):
         charts (Union[LineSingleChartAttrs, List[LineSingleChartAttrs]]): The line chart definitions.
         show_yerr (Union[bool, None]): Whether or not to show the y-axis errors.
         show_area (Union[bool, None]): Whether or not to show the area under the lines.
+        show_values (Union[bool, None]): Whether or not to show the value labels.
+        value_format (Union[str, None]): Format string for the value labels (e.g., "{x:.1f}").
+        value_step (Union[int, None]): Label every Nth point; None picks a readable step.
         scalex (Union[SCALE, str, None]): The scale of the x-axis.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
 
@@ -1109,6 +1134,9 @@ class _LineChartAttrs(ChartCommonAttrs):
     charts: Union[LineSingleChartAttrs, List[LineSingleChartAttrs]]
     show_yerr: Union[bool, None]
     show_area: Union[bool, None]
+    show_values: Union[bool, None]
+    value_format: Union[str, None]
+    value_step: Union[int, None]
     scalex: Union[SCALE, str, None]
     scaley: Union[SCALE, str, None]
 
@@ -1168,6 +1196,9 @@ class _StackedAreaChartAttrs(ChartCommonAttrs):
     Attributes:
         charts (Union[StackedAreaSingleChartAttrs, List[StackedAreaSingleChartAttrs]]): The series definitions.
         baseline (Union[BASELINE, str, None]): Where the first series starts.
+        show_values (Union[bool, None]): Whether or not to show the value labels.
+        value_format (Union[str, None]): Format string for the value labels (e.g., "{x:.1f}").
+        value_step (Union[int, None]): Label every Nth point; None picks a readable step.
         aspect_ratio (Union[ASPECT_RATIO, str, None]): The aspect ratio of the axes.
         scalex (Union[SCALE, str, None]): The scale of the x-axis.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
@@ -1176,6 +1207,9 @@ class _StackedAreaChartAttrs(ChartCommonAttrs):
 
     charts: Union[StackedAreaSingleChartAttrs, List[StackedAreaSingleChartAttrs]]
     baseline: Union[BASELINE, str, None]
+    show_values: Union[bool, None]
+    value_format: Union[str, None]
+    value_step: Union[int, None]
     aspect_ratio: Union[ASPECT_RATIO, str, None]
     scalex: Union[SCALE, str, None]
     scaley: Union[SCALE, str, None]
@@ -1533,6 +1567,8 @@ class _HistogramChartAttrs(ChartCommonAttrs):
         num_bins (Union[int, None]): The number of bins the data points are split in to create the histogram.
         show_density (Union[bool, None]): Whether or not to plot the density histogram.
         show_cumulative (Union[bool, None]): Whether or not to plot the cumulative histogram.
+        show_values (Union[bool, None]): Whether or not to show the value labels.
+        value_format (Union[str, None]): Format string for the value labels (e.g., "{x:.1f}").
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
 
     """
@@ -1543,6 +1579,8 @@ class _HistogramChartAttrs(ChartCommonAttrs):
     num_bins: Union[int, None]
     show_density: Union[bool, None]
     show_cumulative: Union[bool, None]
+    show_values: Union[bool, None]
+    value_format: Union[str, None]
     scaley: Union[SCALE, str, None]
 
 
@@ -1916,6 +1954,9 @@ class _ScatterChartAttrs(ChartCommonAttrs):
         show_ci (Union[bool, None]): Whether or not to show the confidence interval around the regression.
         ci_level (Union[float, None]): The confidence interval level (default 0.95).
         show_correlation (Union[bool, None]): Whether or not to show the Pearson correlation coefficient as an annotation.
+        show_values (Union[bool, None]): Whether or not to show the value labels.
+        value_format (Union[str, None]): Format string for the value labels (e.g., "{x:.1f}").
+        value_step (Union[int, None]): Label every Nth point; None picks a readable step.
         scalex (Union[SCALE, str, None]): The scale of the x-axis.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
         size_range (Union[Tuple[float, float], None]): The min/max marker sizes for bubble charts.
@@ -1927,6 +1968,9 @@ class _ScatterChartAttrs(ChartCommonAttrs):
     show_ci: Union[bool, None]
     ci_level: Union[float, None]
     show_correlation: Union[bool, None]
+    show_values: Union[bool, None]
+    value_format: Union[str, None]
+    value_step: Union[int, None]
     scalex: Union[SCALE, str, None]
     scaley: Union[SCALE, str, None]
     size_range: Union[Tuple[float, float], None]
@@ -2001,6 +2045,8 @@ class _BoxChartAttrs(ChartCommonAttrs):
         charts (Union[BoxSingleChartAttrs, List[BoxSingleChartAttrs]]): The box plot definitions.
         show_outliers (Union[bool, None]): Whether or not to show outliers.
         show_notch (Union[bool, None]): Whether or not to show notched boxes for median CI.
+        show_values (Union[bool, None]): Whether or not to show the value labels.
+        value_format (Union[str, None]): Format string for the value labels (e.g., "{x:.1f}").
         orientation (Union[ORIENTATION, str, None]): The orientation of the box plots.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
 
@@ -2009,6 +2055,8 @@ class _BoxChartAttrs(ChartCommonAttrs):
     charts: Union[BoxSingleChartAttrs, List[BoxSingleChartAttrs]]
     show_outliers: Union[bool, None]
     show_notch: Union[bool, None]
+    show_values: Union[bool, None]
+    value_format: Union[str, None]
     orientation: Union[ORIENTATION, str, None]
     scaley: Union[SCALE, str, None]
 
@@ -2161,6 +2209,8 @@ class _ViolinPlotAttrs(ChartCommonAttrs):
         inner (Union[VIOLIN_INNER, str, None]): The inner marks drawn inside each body.
         bandwidth (Union[BANDWIDTH, str, float, None]): The KDE bandwidth rule or scalar factor.
         split (Union[str, None]): The key name in `data` whose two values split each violin.
+        show_values (Union[bool, None]): Whether or not to show the value labels.
+        value_format (Union[str, None]): Format string for the value labels (e.g., "{x:.1f}").
         orientation (Union[ORIENTATION, str, None]): The orientation of the violins.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
 
@@ -2170,6 +2220,8 @@ class _ViolinPlotAttrs(ChartCommonAttrs):
     inner: Union[VIOLIN_INNER, str, None]
     bandwidth: Union[BANDWIDTH, str, float, None]
     split: Union[str, None]
+    show_values: Union[bool, None]
+    value_format: Union[str, None]
     orientation: Union[ORIENTATION, str, None]
     scaley: Union[SCALE, str, None]
 
