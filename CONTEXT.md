@@ -167,6 +167,16 @@ participation) to its panel and re-rendering. Rejects grid figures — annotate
 the sources before composing.
 _Avoid_: overlay text, label function
 
+**Band**:
+A shaded region behind the data marking an interval — a confidence range, a
+recession period, an acceptable range. Declared with the chart (`vspans=` for
+a band bounded on the x axis, `hspans=` for one bounded on the y axis) like
+reference lines, stored on the layer, drawn by the panel over the grid and
+under the marks — so it survives composition. An omitted bound runs to the
+axis limit. On a polar axes a `vspan` is a wedge bounded in degrees and an
+`hspan` an annulus bounded in radius.
+_Avoid_: span (for the concept), region, shading, highlight
+
 **Point label**:
 A scatter point's name, read from the data key the `label` parameter names
 (`label="name"`, off when unset) and drawn beside its marker in the text

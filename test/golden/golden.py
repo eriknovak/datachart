@@ -214,6 +214,16 @@ EXPECTED_CHANGES = {
     "colorbar_top_locked",
     "colorbar_right_ticks",
     "colorbar_grid_label",
+    # new reference band cases (ADR 0036)
+    "band_line_vspans_hspans",
+    "band_bar_vspans_hspans",
+    "band_labelled",
+    "band_hatched",
+    "band_half_open",
+    "band_theme_ink",
+    "band_radial_wedge",
+    "band_radial_annulus",
+    "band_grid_composed",
 }
 
 
@@ -2065,6 +2075,132 @@ def colorbar_grid_label():
     )
     line = LineChart(data=LINE1, title="line")
     return Grid([[heatmap, line]], figsize=(10, 4))
+
+
+# ----- reference bands (ADR 0036) -----
+
+
+@case
+def band_line_vspans_hspans():
+    return LineChart(
+        data=[LINE1, LINE2],
+        subtitle=["sq", "lin"],
+        vspans={"xmin": 3, "xmax": 5},
+        hspans={"ymin": 20, "ymax": 40},
+        show_grid="both",
+        show_legend=True,
+        title="Bands over the grid, under the marks",
+    )
+
+
+@case
+def band_bar_vspans_hspans():
+    return BarChart(
+        data=BAR1,
+        vspans={"xmin": 1.5, "xmax": 3.5},
+        hspans={"ymin": 15, "ymax": 25, "style": {"plot_hspan_color": "#2A9D8F"}},
+        show_grid="y",
+        title="Bar bands",
+    )
+
+
+@case
+def band_labelled():
+    return LineChart(
+        data=LINE1,
+        subtitle="sq",
+        vspans={"xmin": 2, "xmax": 4, "label": "recession"},
+        hspans={
+            "ymin": 10,
+            "ymax": 30,
+            "label": "target",
+            "style": {"plot_hspan_color": "#E76F51"},
+        },
+        show_legend=True,
+        title="Labelled bands",
+    )
+
+
+@case
+def band_hatched():
+    return LineChart(
+        data=LINE1,
+        hspans={
+            "ymin": 40,
+            "ymax": 60,
+            "style": {
+                "plot_hspan_hatch": "//",
+                "plot_hspan_edge_color": "#264653",
+                "plot_hspan_color": "#FFFFFF",
+            },
+        },
+        vspans={
+            "xmin": 6,
+            "xmax": 8,
+            "style": {"plot_vspan_hatch": "..", "plot_vspan_edge_color": "#E76F51"},
+        },
+        show_grid="both",
+        title="Hatched bands",
+    )
+
+
+@case
+def band_half_open():
+    return LineChart(
+        data=LINE1,
+        vspans={"xmin": 7},
+        hspans={"ymax": 10},
+        show_grid="both",
+        title="Half-open bands run to the axis limits",
+    )
+
+
+@case
+def band_theme_ink():
+    config.set_theme(THEME.INK)
+    return LineChart(
+        data=[LINE1, LINE2],
+        subtitle=["sq", "lin"],
+        vspans={"xmin": 3, "xmax": 5, "label": "band"},
+        hlines={"y": 40, "label": "line"},
+        show_grid="both",
+        show_legend=True,
+        title="Ink band",
+    )
+
+
+@case
+def band_radial_wedge():
+    return RadialChart(
+        data=RAD1,
+        vspans={"xmin": 0, "xmax": 90, "label": "NE quadrant"},
+        show_legend=True,
+        title="Wedge",
+    )
+
+
+@case
+def band_radial_annulus():
+    return RadialChart(
+        data=RAD1,
+        type="bar",
+        hspans={"ymin": 3, "ymax": 5, "style": {"plot_hspan_color": "#E76F51"}},
+        vspans={"xmin": 300, "xmax": 30},
+        innerradius=0.2,
+        title="Annulus and a wrapped wedge",
+    )
+
+
+@case
+def band_grid_composed():
+    banded_line = LineChart(
+        data=LINE1, subtitle="sq", vspans={"xmin": 2, "xmax": 4, "label": "band"}
+    )
+    other_line = LineChart(data=LINE2, subtitle="lin")
+    panel = Panel([banded_line, other_line], title="Panel", show_legend=True)
+    bar = BarChart(data=BAR1, hspans={"ymin": 15, "ymax": 25}, title="Bar")
+    wedge = RadialChart(data=RAD1, vspans={"xmin": 180, "xmax": 270}, title="Wedge")
+    return Grid([[panel, bar], [wedge]], figsize=(12, 8))
 
 
 # ----- runner -----

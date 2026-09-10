@@ -10,6 +10,8 @@ from ..typings import (
     BarStyleAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
+    VSpanPlotAttrs,
+    HSpanPlotAttrs,
     TextAttrs,
 )
 from ..constants import (
@@ -81,6 +83,20 @@ def BarChart(
             List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]],
         ]
     ] = None,
+    vspans: Optional[
+        Union[
+            VSpanPlotAttrs,
+            List[VSpanPlotAttrs],
+            List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]],
+        ]
+    ] = None,
+    hspans: Optional[
+        Union[
+            HSpanPlotAttrs,
+            List[HSpanPlotAttrs],
+            List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]],
+        ]
+    ] = None,
     texts: Optional[
         Union[
             TextAttrs,
@@ -104,6 +120,7 @@ def BarChart(
     !!! info "Added in Unreleased"
 
         The `legend` parameter.
+        The `vspans` and `hspans` reference bands.
 
     Examples:
         >>> from datachart.charts import BarChart
@@ -169,6 +186,8 @@ def BarChart(
         ytickrotate: Rotation angle for y-axis tick labels.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
+        vspans: Vertical reference band(s) to shade, between two x positions.
+        hspans: Horizontal reference band(s) to shade, between two y positions.
         texts: Text annotation(s) to draw.
         label: The key name in data for label values (default: "label").
         y: The key name in data for y-axis values (default: "y").
@@ -192,6 +211,8 @@ def BarChart(
         ytickrotate=ytickrotate,
         vlines=vlines,
         hlines=hlines,
+        vspans=vspans,
+        hspans=hspans,
         texts=texts,
         label=label,
         y=y,

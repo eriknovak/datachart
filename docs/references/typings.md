@@ -27,6 +27,14 @@ title: Typings Module
     options:
         heading_level: 4
 
+::: datachart.typings.VSpanPlotAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.HSpanPlotAttrs
+    options:
+        heading_level: 4
+
 ::: datachart.typings.TextAttrs
     options:
         heading_level: 4
@@ -179,6 +187,10 @@ title: Typings Module
 ::: datachart.typings.VLineStyleAttrs
 
 ::: datachart.typings.HLineStyleAttrs
+
+::: datachart.typings.VSpanStyleAttrs
+
+::: datachart.typings.HSpanStyleAttrs
 
 ::: datachart.typings.TextStyleAttrs
 
