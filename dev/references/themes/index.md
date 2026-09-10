@@ -319,7 +319,7 @@ SKETCH_THEME: StyleAttrs = make_theme(
         "plot_scatter_edge_color": "#222222",
         "plot_heatmap_cmap": COLORS.Blues,
         "plot_treemap_group_edge_width": 0,
-        "plot_sketch_params": (0.5, 100, 2),
+        "plot_sketch_params": [0.5, 100, 2],
         "plot_sketch_halo_width": 1.5,
     }
 )

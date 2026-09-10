@@ -13112,17 +13112,17 @@ The annotation on each chart, from the figure shown with `show(interactive=True)
 
 The styling guides cover everything that controls how charts look: the global configuration, the predefined themes and how to create your own, emphasis for highlighting data, and the available colormaps.
 
-| Guide                                                                                                   | Description                                                             |
-| ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| [config](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/config/index.md)               | Showcases the use of the `config` module to customize the global style. |
-| [themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md)               | How to apply the predefined themes and create your own.                 |
-| [theme gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) | Showcases the themes across basic charts and research-style figures.    |
-| [highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md)   | Emphasizing and muting data series with the `emphasis` option.          |
-| [colormaps](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/colormaps/index.md)         | Showcases the existing colormaps available via the `COLORS` constant.   |
+| Guide                                                                                                   | Description                                                                    |
+| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| [config](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/config/index.md)               | Customizing the global style: themes, attributes, scoped changes, theme files. |
+| [themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md)               | How to apply the predefined themes and create your own.                        |
+| [theme gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) | Showcases the themes across basic charts and research-style figures.           |
+| [highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md)   | Emphasizing and muting data series with the `emphasis` option.                 |
+| [colormaps](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/colormaps/index.md)         | Showcases the existing colormaps available via the `COLORS` constant.          |
 
 # Config
 
-This section showcases how to use the [datachart.config](https://eriknovak.github.io/datachart/dev/references/config/index.md) module to customize the global style of the `datachart` package.
+This section showcases how to use the [datachart.config](https://eriknovak.github.io/datachart/dev/references/config/index.md) module to customize the global style of the `datachart` package: applying a theme, changing single attributes, scoping a change to one block, and saving a look to a file so it can be shared or reloaded.
 
 Let's start by importing the necessary functions to help us work with the `datachart.config` module.
 
@@ -13130,9 +13130,159 @@ Let's start by importing the necessary functions to help us work with the `datac
 from datachart.config import config
 ```
 
+```
+from datachart.charts import BarChart
+from datachart.constants import FIG_SIZE, THEME
+```
+
 The `config` instance is a global configuration that the users can interact with. It allows them to customize the global style of the `datachart` package.
 
-Furthemore, the instance is of the [datachart.config.Config](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config) class.
+Furthermore, the instance is of the [datachart.config.Config](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config) class.
+
+## The Configuration Instance
+
+The instance holds one style attribute per key of [StyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs) and the name of the active theme. Read an attribute with `config.get` or by indexing:
+
+```
+config.get("font_general_size"), config["color_general_multiple"]
+```
+
+```
+config.theme
+```
+
+The attribute names are the keys of the live configuration; the reference page documents each one:
+
+```
+len(config.config), list(config.config)[:5]
+```
+
+Charts read the configuration when they are built, so every change below applies to the charts created after it. The examples use the heights of the five tallest mountains:
+
+```
+MOUNTAINS = [
+    {"label": "Everest", "y": 8849},
+    {"label": "K2", "y": 8611},
+    {"label": "Kangchenjunga", "y": 8586},
+    {"label": "Lhotse", "y": 8516},
+    {"label": "Makalu", "y": 8485},
+]
+
+
+def mountains(title):
+    return BarChart(
+        data=MOUNTAINS,
+        title=title,
+        ylabel="Height [m]",
+        ymin=8000,
+        figsize=FIG_SIZE.FULL_SHORT,
+    )
+```
+
+## Customizing the Configuration
+
+| Task                                    | Method                     | Section                                     |
+| --------------------------------------- | -------------------------- | ------------------------------------------- |
+| Switch the look of every chart          | `set_theme`, `list_themes` | [Applying a Theme](#applying-a-theme)       |
+| Change single attributes                | `update_config`            | [Updating Attributes](#updating-attributes) |
+| Change the style for one block only     | `override`, `using_theme`  | [Scoping a Change](#scoping-a-change)       |
+| Share a look as a file and load it back | `save_theme`, `load_theme` | [Theme Files](#theme-files)                 |
+| Return to the default theme             | `reset_config`             | [Resetting](#resetting)                     |
+
+### Applying a Theme
+
+`list_themes` returns every name `set_theme` accepts: the predefined themes from [THEME](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) plus any theme registered with `register_theme` or `load_theme`.
+
+```
+config.list_themes()
+```
+
+Applying a theme replaces the whole configuration and updates the active theme name; see the [themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) for the predefined themes and for registering your own.
+
+```
+config.set_theme(THEME.MINIMAL)
+config.theme
+```
+
+```
+mountains("The minimal theme").show()
+```
+
+### Updating Attributes
+
+`update_config` changes individual attributes on top of the active theme. The change persists until the next `set_theme` or `reset_config`; unknown attribute names are skipped with a warning.
+
+```
+config.update_config({"font_title_size": 16, "color_general_singular": "#B5651D"})
+mountains("Larger title, copper bars").show()
+```
+
+### Scoping a Change
+
+A scope is a temporary style change that lasts for one `with` block: the configuration that entered the block is restored when it ends, also when the block raises. Any `set_theme` or `update_config` performed inside the block is discarded at exit.
+
+`override` scopes attribute overrides, taking keyword arguments or a dictionary:
+
+```
+with config.override(font_title_size=10, color_general_singular="#4E79A7"):
+    mountains("Inside the override scope").show()
+
+mountains("After the override scope").show()
+```
+
+`using_theme` scopes a whole theme and restores the active theme name as well:
+
+```
+with config.using_theme(THEME.INK):
+    print("inside:", config.theme)
+    mountains("Inside the theme scope").show()
+
+print("after:", config.theme)
+```
+
+The two nest in either order, each level restoring its own state. The scopes are plain save-and-restore on the global configuration, so they are neither thread-safe nor async-safe.
+
+### Theme Files
+
+`save_theme` writes a theme file: a JSON document carrying a name, a format version, and only the attributes that differ from the default theme, so the file stays short and reviewable. With no name it saves the live configuration, which lets a look assembled with `update_config` leave the process:
+
+```
+import tempfile
+from pathlib import Path
+
+folder = Path(tempfile.mkdtemp())
+config.save_theme(folder / "house.json")
+print((folder / "house.json").read_text())
+```
+
+A registered theme is saved by name:
+
+```
+config.save_theme(folder / "ink.json", name=THEME.INK)
+```
+
+`load_theme` registers the theme in a file and returns the name it registered under: the `name` argument, else the name in the file, else the file's stem. Loading only registers; apply the theme with `set_theme` or `using_theme`.
+
+```
+name = config.load_theme(folder / "house.json", name="house-v2")
+config.set_theme(name)
+config.theme, config["font_title_size"]
+```
+
+```
+config.list_themes()
+```
+
+A file is validated the way `register_theme` validates a dictionary: missing attributes are filled from the default theme and an unknown attribute raises `ValueError`, so a hand-edited file cannot register a broken theme.
+
+### Resetting
+
+`reset_config` restores the default theme and resets the active theme name, discarding every override:
+
+```
+config.reset_config()
+config.theme
+```
 
 # Themes
 
@@ -18427,14 +18577,20 @@ The class representing the configuration options.
 | ATTRIBUTE | DESCRIPTION                                     |
 | --------- | ----------------------------------------------- |
 | `config`  | The style configuration. **TYPE:** `StyleAttrs` |
+| `theme`   | The name of the active theme. **TYPE:** `str`   |
 
-| METHOD           | DESCRIPTION                                      |
-| ---------------- | ------------------------------------------------ |
-| `set_theme`      | Set the global configuration to match the theme. |
-| `reset_config`   | Resets the global configuration.                 |
-| `update_config`  | Updates the global configuration.                |
-| `register_theme` | Registers a custom theme for use with set_theme. |
-| `get`            | Gets the associated configuration attribute.     |
+| METHOD           | DESCRIPTION                                                   |
+| ---------------- | ------------------------------------------------------------- |
+| `set_theme`      | Set the global configuration to match the theme.              |
+| `reset_config`   | Resets the global configuration.                              |
+| `update_config`  | Updates the global configuration.                             |
+| `override`       | Applies attribute overrides for the duration of a with block. |
+| `using_theme`    | Applies a theme for the duration of a with block.             |
+| `register_theme` | Registers a custom theme for use with set_theme.              |
+| `list_themes`    | Lists the names set_theme accepts.                            |
+| `save_theme`     | Writes a theme file.                                          |
+| `load_theme`     | Registers the theme in a theme file.                          |
+| `get`            | Gets the associated configuration attribute.                  |
 
 #### __init__
 
@@ -18506,7 +18662,7 @@ reset_config() -> None
 
 Resets the global configuration.
 
-Restores the default theme, discarding the current theme and every `update_config` override. Use it to return to a known state, for example at the start of a notebook section or between tests.
+Restores the default theme, discarding the current theme and every `update_config` override, and resets the active theme name to match. Use it to return to a known state, for example at the start of a notebook section or between tests.
 
 Examples:
 
@@ -18539,6 +18695,156 @@ Examples:
 | PARAMETER | DESCRIPTION                                                        |
 | --------- | ------------------------------------------------------------------ |
 | `config`  | The configuration attributes to be updated. **TYPE:** `StyleAttrs` |
+
+#### override
+
+```
+override(
+    config: Optional[StyleAttrs] = None, **attrs: Any
+) -> Iterator[None]
+```
+
+Applies style overrides for the duration of a `with` block.
+
+On entry the attributes are applied the way `update_config` applies them; on exit the configuration that entered the block is restored, also when the block raises. Any `set_theme` or `update_config` performed inside the block is discarded at exit. Use it for a one-off figure that needs a different font or palette without touching the global state. The scope is plain save-and-restore on the global configuration: it is neither thread-safe nor async-safe.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.config import config
+>>> with config.override(font_general_size=14):
+...     config.get("font_general_size")
+14
+>>> config.get("font_general_size")
+10
+```
+
+| PARAMETER | DESCRIPTION                                                                                       |
+| --------- | ------------------------------------------------------------------------------------------------- |
+| `config`  | The attributes to override, as a dictionary. **TYPE:** `Optional[StyleAttrs]` **DEFAULT:** `None` |
+| `**attrs` | The attributes to override, as keyword arguments. **TYPE:** `Any` **DEFAULT:** `{}`               |
+
+#### using_theme
+
+```
+using_theme(theme: THEME) -> Iterator[None]
+```
+
+Applies a theme for the duration of a `with` block.
+
+On entry the theme is applied the way `set_theme` applies it; on exit both the configuration and the active theme name that entered the block are restored, also when the block raises. Any `set_theme` or `update_config` performed inside the block is discarded at exit. The scope is plain save-and-restore on the global configuration: it is neither thread-safe nor async-safe.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import THEME
+>>> from datachart.config import config
+>>> with config.using_theme(THEME.INK):
+...     config.theme
+'ink'
+>>> config.theme
+'default'
+```
+
+| PARAMETER | DESCRIPTION                                                                            |
+| --------- | -------------------------------------------------------------------------------------- |
+| `theme`   | The theme to apply: one of the THEME constants or a registered name. **TYPE:** `THEME` |
+
+#### list_themes
+
+```
+list_themes() -> List[str]
+```
+
+Lists the theme names `set_theme` accepts.
+
+Returns the predefined themes in declaration order, followed by every name added with `register_theme` or `load_theme` in registration order.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.config import config
+>>> "default" in config.list_themes()
+True
+```
+
+| RETURNS     | DESCRIPTION      |
+| ----------- | ---------------- |
+| `List[str]` | The theme names. |
+
+#### save_theme
+
+```
+save_theme(
+    path: Union[str, Path], name: Optional[str] = None
+) -> None
+```
+
+Writes a theme file.
+
+With no name the live configuration is saved, so a look assembled with `update_config` can be shared or committed directly; the file is named after its stem. With a name that registered theme is saved instead. The file is JSON and carries only the attributes that differ from the default theme, so it stays short and reviewable; load it back with `load_theme`. The parent directory must exist.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.config import config
+>>> config.update_config({"font_general_size": 14})
+>>> config.save_theme("house.json")
+>>> config.save_theme("ink.json", name="ink")
+```
+
+| PARAMETER | DESCRIPTION                                                                                                     |
+| --------- | --------------------------------------------------------------------------------------------------------------- |
+| `path`    | The file to write. **TYPE:** `Union[str, Path]`                                                                 |
+| `name`    | The registered theme to save. Defaults to the live configuration. **TYPE:** `Optional[str]` **DEFAULT:** `None` |
+
+| RAISES       | DESCRIPTION                        |
+| ------------ | ---------------------------------- |
+| `ValueError` | If name is not a registered theme. |
+
+#### load_theme
+
+```
+load_theme(
+    path: Union[str, Path], name: Optional[str] = None
+) -> str
+```
+
+Registers the theme held in a theme file and returns its name.
+
+The file is read as written by `save_theme` and registered through `register_theme`, so missing attributes are filled from the default theme, alias keys resolve to their canonical name, and unknown keys are rejected. The name is, in order of precedence, the `name` argument, the name in the file, or the file's stem; an existing theme of that name is replaced. Loading only registers: apply the theme with `set_theme` or `using_theme`.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.config import config
+>>> config.set_theme(config.load_theme("house.json"))
+>>> config.theme
+'house'
+```
+
+| PARAMETER | DESCRIPTION                                                                                                                                    |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `path`    | The theme file to read. **TYPE:** `Union[str, Path]`                                                                                           |
+| `name`    | The name to register the theme under. Defaults to the name in the file, then to the file's stem. **TYPE:** `Optional[str]` **DEFAULT:** `None` |
+
+| RETURNS | DESCRIPTION                              |
+| ------- | ---------------------------------------- |
+| `str`   | The name the theme was registered under. |
+
+| RAISES       | DESCRIPTION                                                                                    |
+| ------------ | ---------------------------------------------------------------------------------------------- |
+| `ValueError` | If the file is not a theme file, states another format version, or holds an unknown attribute. |
 
 #### __getitem__
 
@@ -18920,7 +19226,7 @@ SKETCH_THEME: StyleAttrs = make_theme(
         "plot_scatter_edge_color": "#222222",
         "plot_heatmap_cmap": COLORS.Blues,
         "plot_treemap_group_edge_width": 0,
-        "plot_sketch_params": (0.5, 100, 2),
+        "plot_sketch_params": [0.5, 100, 2],
         "plot_sketch_halo_width": 1.5,
     }
 )
@@ -20898,5 +21204,5 @@ Added in v0.9.1
 
 | ATTRIBUTE                | DESCRIPTION                                                                                                                                                                                                                                        |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plot_sketch_params`     | The path wobble as matplotlib sketch parameters (scale, length, randomness); plt.xkcd() uses (1, 100, 2). None draws clean paths. **TYPE:** `Union[Tuple[float, float, float], None]`                                                              |
+| `plot_sketch_params`     | The path wobble as matplotlib sketch parameters [scale, length, randomness]; plt.xkcd() uses [1, 100, 2]. None draws clean paths. **TYPE:** `Union[List[float], None]`                                                                             |
 | `plot_sketch_halo_width` | The extra width, added to the line width, of the white halo stroked under series lines (line, radial, regression), so crossing lines read as cut-outs; marks, text and patches stay clean. None or 0 draws no halo. **TYPE:** `Union[float, None]` |

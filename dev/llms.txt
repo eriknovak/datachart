@@ -55,7 +55,7 @@ themes; per-chart overrides go in each chart's `style` parameter.
 ## Styling
 
 - [Styling](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/index.md): Map of configuration, themes, emphasis, and colormaps.
-- [Config](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/config/index.md): Customizing the global style via the config singleton: set_theme, update_config, reset_config.
+- [Config](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/config/index.md): Customizing the global style via the config singleton: applying and listing themes, updating attributes, scoping a change with override and using_theme, saving and loading JSON theme files, resetting.
 - [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md): Applying the predefined themes and creating custom ones.
 - [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md): Every predefined theme rendered across the chart types.
 - [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md): Emphasizing and muting data series with the emphasis option.
