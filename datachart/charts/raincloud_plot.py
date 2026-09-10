@@ -6,6 +6,7 @@ from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..utils._internal.validate import validate_bandwidth
 from ..typings import (
+    LegendSettingAttrs,
     RaincloudDataPointAttrs,
     RaincloudStyleAttrs,
     VLinePlotAttrs,
@@ -42,6 +43,7 @@ def RaincloudPlot(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_outliers: Optional[bool] = True,
     mode: Union[SWARM_MODE, str] = SWARM_MODE.SWARM,
@@ -119,6 +121,10 @@ def RaincloudPlot(
         ...     ylabel="Value"
         ... )
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Args:
         data: The data points for the raincloud plot(s). Can be a single list of
             data points for one chart, or a list of lists for multiple charts
@@ -138,6 +144,9 @@ def RaincloudPlot(
         ymin: The minimum y-axis value.
         ymax: The maximum y-axis value.
         show_legend: Whether to show the legend; one entry per group.
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. See
+            `LegendSettingAttrs`.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_outliers: Whether the box shows outliers.
         mode: How the rain spreads across its width. See `SWARM_MODE`:
@@ -205,6 +214,7 @@ def RaincloudPlot(
         "ymin": ymin,
         "ymax": ymax,
         "show_legend": show_legend,
+        "legend": legend,
         "show_grid": show_grid,
         "show_outliers": show_outliers,
         "aspect_ratio": aspect_ratio,

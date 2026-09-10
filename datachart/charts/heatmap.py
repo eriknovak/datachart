@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    LegendSettingAttrs,
     HeatmapDataAttrs,
     HeatmapStyleAttrs,
     HeatmapColorbarAttrs,
@@ -31,6 +32,7 @@ def Heatmap(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_colorbars: Optional[bool] = None,
     show_heatmap_values: Optional[bool] = None,
@@ -92,6 +94,10 @@ def Heatmap(
         ...     ylabel="Y"
         ... )
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Args:
         data: The labelled grid(s) for the heatmap(s): one `{x, y, z}` dict,
             or a list of them for multiple heatmaps/subplots. `z` is the 2-D
@@ -112,6 +118,9 @@ def Heatmap(
         ymin: The minimum y-axis value.
         ymax: The maximum y-axis value.
         show_legend: Whether to show the legend (not typical for heatmaps).
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. See
+            `LegendSettingAttrs`.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_colorbars: Whether to show the colorbar(s).
         show_heatmap_values: Whether to show values on the heatmap cells.
@@ -184,6 +193,7 @@ def Heatmap(
         "ymin": ymin,
         "ymax": ymax,
         "show_legend": show_legend,
+        "legend": legend,
         "show_grid": show_grid,
         "aspect_ratio": aspect_ratio,
         "subplots": subplots,

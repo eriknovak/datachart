@@ -8,7 +8,12 @@ from ..utils._internal.validate import (
     infer_network_nodes,
     validate_network_records,
 )
-from ..typings import NetworkSingleChartAttrs, NetworkStyleAttrs, TextAttrs
+from ..typings import (
+    NetworkSingleChartAttrs,
+    NetworkStyleAttrs,
+    TextAttrs,
+    LegendSettingAttrs,
+)
 from ..constants import FIG_SIZE, NETWORK_LAYOUT, VALUE_FORMAT
 
 # ================================================
@@ -25,6 +30,7 @@ def NetworkChart(
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     title: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: None = None,
@@ -76,6 +82,10 @@ def NetworkChart(
         ...     title="Module dependencies",
         ... )
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Args:
         data: The chart data: a `{"nodes": [...], "edges": [...]}` dict, or a
             list of such dicts drawing one network per subplot. An edge is a
@@ -105,6 +115,9 @@ def NetworkChart(
             constant (default `VALUE_FORMAT.DEFAULT`) or any `"{x:.1f}"`,
             `"{:.1f}%"`, or `"%g"` style string.
         show_legend: Whether to list the node groups in a legend.
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. See
+            `LegendSettingAttrs`.
         title: The title of the chart.
         subtitle: The subtitle(s) for individual charts.
         emphasis: Not supported: emphasis is set per node through its
@@ -170,6 +183,7 @@ def NetworkChart(
         "show_values": show_values,
         "value_format": value_format,
         "show_legend": show_legend,
+        "legend": legend,
     }
 
     return render_chart("networkchart", charts, settings)

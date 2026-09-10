@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure, _get_indexed_value
 from ..typings import (
+    LegendSettingAttrs,
     BarDataPointAttrs,
     BarStyleAttrs,
     VLinePlotAttrs,
@@ -34,6 +35,7 @@ def PyramidChart(
     xmin: Optional[Union[int, float]] = None,
     xmax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_yerr: Optional[bool] = None,
     show_values: Optional[bool] = None,
@@ -87,6 +89,10 @@ def PyramidChart(
         ...     show_legend=True,
         ... )
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Args:
         data: Exactly two lists of data points — the first is the left side,
             the second the right. Values are positive for both sides; the
@@ -100,6 +106,9 @@ def PyramidChart(
             Raises when passed.
         xmax: The maximum per-side value; the value axis spans (-xmax, xmax).
         show_legend: Whether to show the legend.
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. See
+            `LegendSettingAttrs`.
         show_grid: Which grid lines to show ("both", "x", "y"). See `SHOW_GRID`.
         show_yerr: Whether to show error bars on the bars.
         show_values: Whether to show bar value labels at the edge of each bar.
@@ -178,6 +187,7 @@ def PyramidChart(
         "figsize": figsize,
         "xmax": xmax,
         "show_legend": show_legend,
+        "legend": legend,
         "show_grid": show_grid,
         "show_yerr": show_yerr,
         "show_values": show_values,

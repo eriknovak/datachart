@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    LegendSettingAttrs,
     BoxDataPointAttrs,
     BoxStyleAttrs,
     VLinePlotAttrs,
@@ -40,6 +41,7 @@ def BoxPlot(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_outliers: Optional[bool] = None,
     show_notch: Optional[bool] = None,
@@ -115,7 +117,7 @@ def BoxPlot(
 
     !!! info "Added in Unreleased"
 
-        The `show_values` and `value_format` parameters.
+        The `show_values`, `value_format` and `legend` parameters.
 
     Args:
         data: The data points for the box plot(s). Can be a single list of data points
@@ -136,6 +138,9 @@ def BoxPlot(
         ymin: The minimum y-axis value.
         ymax: The maximum y-axis value.
         show_legend: Whether to show the legend.
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. See
+            `LegendSettingAttrs`.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_outliers: Whether to show outliers. Defaults to True.
         show_notch: Whether to show notched boxes for median confidence interval.
@@ -197,6 +202,7 @@ def BoxPlot(
         "ymin": ymin,
         "ymax": ymax,
         "show_legend": show_legend,
+        "legend": legend,
         "show_grid": show_grid,
         "aspect_ratio": aspect_ratio,
         "subplots": subplots,

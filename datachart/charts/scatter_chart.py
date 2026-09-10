@@ -6,6 +6,7 @@ from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..utils._internal.validate import validate_point_labels
 from ..typings import (
+    LegendSettingAttrs,
     ScatterDataPointAttrs,
     ScatterStyleAttrs,
     VLinePlotAttrs,
@@ -33,6 +34,7 @@ def ScatterChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_regression: Optional[bool] = None,
     show_ci: Optional[bool] = None,
@@ -158,7 +160,7 @@ def ScatterChart(
 
     !!! info "Added in Unreleased"
 
-        The `show_values`, `value_format` and `value_step` parameters.
+        The `show_values`, `value_format`, `value_step` and `legend` parameters.
 
     Args:
         data: The data points for the scatter chart(s). Can be a single list of data points
@@ -178,6 +180,9 @@ def ScatterChart(
         ymin: The minimum y-axis value.
         ymax: The maximum y-axis value.
         show_legend: Whether to show the legend.
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. See
+            `LegendSettingAttrs`.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_regression: Whether to show the regression line.
         show_ci: Whether to show the confidence interval around the regression line.
@@ -257,6 +262,7 @@ def ScatterChart(
         "ymin": ymin,
         "ymax": ymax,
         "show_legend": show_legend,
+        "legend": legend,
         "show_grid": show_grid,
         "aspect_ratio": aspect_ratio,
         "subplots": subplots,

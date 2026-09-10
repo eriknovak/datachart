@@ -5,7 +5,12 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..utils._internal.validate import validate_treemap_records
-from ..typings import TreemapSingleChartAttrs, TreemapStyleAttrs, TextAttrs
+from ..typings import (
+    TreemapSingleChartAttrs,
+    TreemapStyleAttrs,
+    TextAttrs,
+    LegendSettingAttrs,
+)
 from ..constants import FIG_SIZE, VALUE_FORMAT
 
 # ================================================
@@ -19,6 +24,7 @@ def Treemap(
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     title: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: None = None,
@@ -63,6 +69,10 @@ def Treemap(
         ...     title="Population, millions",
         ... )
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Args:
         data: The chart data: a `{"data": [...]}` dict whose records are
             `{"label", "value"}` dicts, or a list of such dicts drawing one
@@ -79,6 +89,9 @@ def Treemap(
             `"{:.1f}%"`, or `"%g"` style string.
         show_legend: Whether to list the top-level records in a legend; it
             names the groups too short for a header band.
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. See
+            `LegendSettingAttrs`.
         title: The title of the chart.
         subtitle: The subtitle(s) for individual charts.
         emphasis: Not supported: emphasis is set per record through its
@@ -133,6 +146,7 @@ def Treemap(
         "show_values": show_values,
         "value_format": value_format,
         "show_legend": show_legend,
+        "legend": legend,
     }
 
     return render_chart("treemap", charts, settings)

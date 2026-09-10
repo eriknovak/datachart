@@ -49,6 +49,7 @@ Classes:
     FontStyleAttrs: The typing for the font style.
     AxesStyleAttrs: The typing for the axes style.
     LegendStyleAttrs: The typing for the legend style.
+    LegendSettingAttrs: The per-figure legend setting.
     AreaStyleAttrs: The typing for the area style.
     GridStyleAttrs: The typing for the grid style.
     LineStyleAttrs: The typing for the line style.
@@ -236,6 +237,12 @@ class LegendStyleAttrs(TypedDict):
         plot_legend_font_size (Union[int, float, str, None]): The font size within the legend.
         plot_legend_title_size (Union[int, float, str, None]): The title size of the legend.
         plot_legend_label_color (Union[str, None]): The label color of the legend.
+        plot_legend_title (Union[str, None]): The legend title; an empty string draws none.
+        plot_legend_ncols (Union[int, None]): The number of legend columns.
+
+    !!! info "Added in Unreleased"
+
+        The `plot_legend_title` and `plot_legend_ncols` attributes.
 
     """
 
@@ -246,6 +253,8 @@ class LegendStyleAttrs(TypedDict):
     plot_legend_font_size: Union[int, float, str, None]
     plot_legend_title_size: Union[int, float, str, None]
     plot_legend_label_color: Union[str, None]
+    plot_legend_title: Union[str, None]
+    plot_legend_ncols: Union[int, None]
 
 
 class AreaStyleAttrs(TypedDict):
@@ -1023,6 +1032,29 @@ class HLinePlotAttrs(TypedDict):
 # ================================================
 # Text Annotation Attributes
 # ================================================
+
+
+class LegendSettingAttrs(TypedDict):
+    """The per-figure legend setting, passed to a chart front as `legend`.
+
+    Every field is optional; a `None` field falls back to the theme's
+    `plot_legend_*` attribute of the same name (ADR 0003).
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        title (Union[str, None]): The legend title; an empty string draws none.
+        location (Union[LEGEND_LOCATION, str, None]): The legend location. An
+            outside member places the legend beside the axes.
+        ncols (Union[int, None]): The number of legend columns.
+        alignment (Union[LEGEND_ALIGN, str, None]): The legend alignment.
+
+    """
+
+    title: Union[str, None]
+    location: Union[LEGEND_LOCATION, str, None]
+    ncols: Union[int, None]
+    alignment: Union[LEGEND_ALIGN, str, None]
 
 
 class TextAttrs(TypedDict):

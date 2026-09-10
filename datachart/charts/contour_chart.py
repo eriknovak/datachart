@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    LegendSettingAttrs,
     ContourDataAttrs,
     ContourStyleAttrs,
     HeatmapColorbarAttrs,
@@ -41,6 +42,7 @@ def ContourChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     filled: Optional[bool] = None,
     levels: Optional[Union[CONTOUR_LEVELS, str, int, List[float]]] = None,
@@ -123,6 +125,10 @@ def ContourChart(
         ...     ylabel="Y"
         ... )
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Args:
         data: The gridded surface(s): a dictionary with the 2-D `z` grid and
             the optional `x` and `y` axis values (one per column and per row
@@ -144,6 +150,9 @@ def ContourChart(
         ymin: The minimum y-axis value.
         ymax: The maximum y-axis value.
         show_legend: Whether to show the legend.
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. See
+            `LegendSettingAttrs`.
         show_grid: Which grid lines to show (e.g., "both", "x", "y"). Off by
             default for filled contours.
         filled: Whether to fill the bands between the levels (colored by the
@@ -224,6 +233,7 @@ def ContourChart(
         "ymin": ymin,
         "ymax": ymax,
         "show_legend": show_legend,
+        "legend": legend,
         "show_grid": show_grid,
         "aspect_ratio": aspect_ratio,
         "subplots": subplots,

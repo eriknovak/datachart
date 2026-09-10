@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    LegendSettingAttrs,
     RadialDataPointAttrs,
     LineStyleAttrs,
     BarStyleAttrs,
@@ -53,6 +54,7 @@ def RadialChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_yerr: Optional[bool] = None,
     show_area: Optional[bool] = None,
@@ -108,6 +110,10 @@ def RadialChart(
         ...     title="Basic Radial Chart"
         ... )
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Args:
         data: The data points for the radial chart(s). Can be a single list of data
             points for one chart, or a list of lists for multiple charts/subplots.
@@ -127,6 +133,9 @@ def RadialChart(
         ymin: The minimum radial-axis value.
         ymax: The maximum radial-axis value.
         show_legend: Whether to show the legend.
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. See
+            `LegendSettingAttrs`.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_yerr: Whether to show the radial error band (line visual).
         show_area: Whether to fill the area inside the line (line visual).
@@ -225,6 +234,7 @@ def RadialChart(
         "ymin": ymin,
         "ymax": ymax,
         "show_legend": show_legend,
+        "legend": legend,
         "show_grid": show_grid,
         "show_yerr": show_yerr,
         "show_area": show_area,

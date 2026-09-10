@@ -110,6 +110,8 @@ BASE_THEME: StyleAttrs = {
     "plot_legend_font_size": 8,
     "plot_legend_title_size": 9,
     "plot_legend_label_color": "#000000",
+    "plot_legend_title": "Legend",
+    "plot_legend_ncols": 1,
     # plot area style
     "plot_area_alpha": 0.25,
     "plot_area_color": None,

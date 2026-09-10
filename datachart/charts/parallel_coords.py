@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    LegendSettingAttrs,
     ParallelCoordsDataPointAttrs,
     ParallelCoordsStyleAttrs,
     TextAttrs,
@@ -28,6 +29,7 @@ def ParallelCoords(
     emphasis: Optional[Union[EMPHASIS, str, List[Optional[str]]]] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     style: Optional[
@@ -68,6 +70,10 @@ def ParallelCoords(
         ...     show_legend=True
         ... )
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Args:
         data: The data points for the chart. Each data point is a dictionary where
             keys are dimension names and values are numeric or string values. Can
@@ -83,6 +89,9 @@ def ParallelCoords(
             among the data rows, None leaves it unchanged.
         figsize: The size of the figure.
         show_legend: Whether to show the legend (for hue categories).
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. See
+            `LegendSettingAttrs`.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             `ASPECT_RATIO`.
@@ -121,6 +130,7 @@ def ParallelCoords(
         "ylabel": ylabel,
         "figsize": figsize,
         "show_legend": show_legend,
+        "legend": legend,
         "show_grid": show_grid,
         "aspect_ratio": aspect_ratio,
     }

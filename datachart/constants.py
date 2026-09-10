@@ -416,8 +416,10 @@ class LEGEND_ALIGN:
 class LEGEND_LOCATION:
     """The supported legend locations.
 
-    Used by the `plot_legend_location` style attribute; places the legend
-    within the chart.
+    Used by the `plot_legend_location` style attribute and the `location`
+    field of a chart's `legend` setting. The in-axes members place the legend
+    within the chart; the `OUTSIDE_*` members place it beside the axes, on the
+    named edge, with nothing clipped.
 
     ![LEGEND_LOCATION at a glance](../assets/imgs/const-legend-location.svg){ width="100%" }
 
@@ -438,6 +440,14 @@ class LEGEND_LOCATION:
         LOWER_CENTER (str): Lower center. Equals to `"lower center"`.
         UPPER_CENTER (str): Upper center. Equals to `"upper center"`.
         CENTER (str): Center. Equals to `"center"`.
+        OUTSIDE_RIGHT (str): Beside the right edge, top-aligned. Equals to `"outside right"`.
+        OUTSIDE_LEFT (str): Beside the left edge, top-aligned. Equals to `"outside left"`.
+        OUTSIDE_TOP (str): Above the axes, centered. Equals to `"outside top"`.
+        OUTSIDE_BOTTOM (str): Below the axes, centered. Equals to `"outside bottom"`.
+
+    !!! info "Added in Unreleased"
+
+        The four `OUTSIDE_*` members.
 
     """
 
@@ -452,6 +462,10 @@ class LEGEND_LOCATION:
     LOWER_CENTER = "lower center"
     UPPER_CENTER = "upper center"
     CENTER = "center"
+    OUTSIDE_RIGHT = "outside right"
+    OUTSIDE_LEFT = "outside left"
+    OUTSIDE_TOP = "outside top"
+    OUTSIDE_BOTTOM = "outside bottom"
 
 
 class HISTOGRAM_TYPE:
