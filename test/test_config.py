@@ -211,6 +211,12 @@ class TestThemeFiles(unittest.TestCase):
         with self.assertRaises(ValueError):
             config.load_theme(path)
 
+    def test_load_other_format_version_raises(self):
+        path = self.dir / "future.json"
+        path.write_text(json.dumps({"format_version": 2, "attributes": {}}))
+        with self.assertRaises(ValueError):
+            config.load_theme(path)
+
     def test_load_malformed_file_raises(self):
         path = self.dir / "malformed.json"
         path.write_text(json.dumps({"font_general_size": 8}))

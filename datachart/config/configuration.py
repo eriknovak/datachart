@@ -3,14 +3,14 @@ import json
 import warnings
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Iterator, Optional, Union
+from typing import Any, Iterator, List, Optional, Union
 
 # import the schemas
 from datachart.typings import StyleAttrs
 from datachart.constants import THEME
 
 # import the themes
-from ..themes._base import BASE_THEME, STYLE_ALIASES, canonical_style
+from ..themes._base import STYLE_ALIASES, canonical_style
 from ..themes import (
     DEFAULT_THEME,
     GREYSCALE_THEME,
@@ -40,6 +40,7 @@ class Config:
 
     Attributes:
         config (StyleAttrs): The style configuration.
+        theme (str): The name of the active theme.
 
     Methods:
         set_theme(theme):
@@ -173,9 +174,10 @@ class Config:
                 continue
             self.config[key] = val
 
+    # both scopes restore wholesale, exceptions included (ADR 0040)
     @contextmanager
     def _scope(self) -> Iterator[None]:
-        """Restores the style dict and the active theme name on exit (ADR 0040)."""
+        """Restores the style dict and the active theme name on exit."""
 
         saved_config, saved_theme = self.config, self.theme
         self.config = copy.deepcopy(saved_config)
@@ -250,7 +252,7 @@ class Config:
             self.set_theme(theme)
             yield
 
-    def list_themes(self) -> list:
+    def list_themes(self) -> List[str]:
         """Lists the theme names `set_theme` accepts.
 
         Returns the predefined themes in declaration order, followed by every
@@ -298,20 +300,22 @@ class Config:
         """
         path = Path(path)
         if name is None:
-            style, name = self.config, path.stem
+            style, file_name = self.config, path.stem
         elif name in THEMES:
-            style = THEMES[name]
+            style, file_name = THEMES[name], name
         else:
             raise ValueError(
                 f"Unknown theme: {name!r}. Must be one of {self.list_themes()}"
             )
+        # diffed against what register_theme fills missing keys from, so a
+        # file loads back to exactly the style it was saved from
         attributes = {
             key: val
             for key, val in canonical_style(style).items()
-            if val != BASE_THEME.get(key)
+            if val != DEFAULT_THEME.get(key)
         }
         data = {
-            "name": name,
+            "name": file_name,
             "format_version": THEME_FILE_VERSION,
             "attributes": attributes,
         }
@@ -345,8 +349,8 @@ class Config:
             The name the theme was registered under.
 
         Raises:
-            ValueError: If the file is not a theme file, was written by a
-                newer format, or holds an unknown attribute.
+            ValueError: If the file is not a theme file, states another
+                format version, or holds an unknown attribute.
 
         """
         path = Path(path)
@@ -357,8 +361,8 @@ class Config:
             )
         if data.get("format_version") != THEME_FILE_VERSION:
             raise ValueError(
-                f"{path} has theme file format {data.get('format_version')!r}; "
-                f"this version of datachart reads format {THEME_FILE_VERSION}"
+                f"{path} states theme file format {data.get('format_version')!r}; "
+                f"expected {THEME_FILE_VERSION}"
             )
         name = name or data.get("name") or path.stem
         self.register_theme(name, data["attributes"])
