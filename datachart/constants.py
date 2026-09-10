@@ -30,6 +30,7 @@ Classes:
     SWARM_MODE:         The supported swarm plot modes.
     DIRECTION:          The supported angular directions.
     VALUE_FORMAT:       The predefined value formats.
+    DATE_FORMAT:        The predefined date formats.
     THEME:              The predefined themes.
     EMPHASIS:           The supported emphasis roles.
     SHOW_GRID:          The supported show grid options.
@@ -1020,6 +1021,40 @@ class VALUE_FORMAT:
     PERCENT_INT = "{x:.0%}"
     SCIENTIFIC = "{x:.2e}"
     THOUSANDS = "{x:,.0f}"
+
+
+class DATE_FORMAT:
+    """The predefined date formats.
+
+    Passed as the `xticks_format` or `yticks_format` attribute of a chart
+    whose axis holds datetime values, to label its ticks. Every member but
+    `AUTO` is a `strftime` pattern; any other pattern is accepted as well.
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> from datachart.constants import DATE_FORMAT
+        >>> DATE_FORMAT.YEAR_MONTH
+        "%Y-%m"
+
+    Attributes:
+        AUTO (str): Pick the labels from the visible span: concise, non-repeating. Equals to `"auto"`.
+        ISO (str): The ISO 8601 date. Equals to `"%Y-%m-%d"`.
+        YEAR (str): The four-digit year. Equals to `"%Y"`.
+        YEAR_MONTH (str): The year and month. Equals to `"%Y-%m"`.
+        MONTH_DAY (str): The month and day. Equals to `"%m-%d"`.
+        DAY (str): The day of the month. Equals to `"%d"`.
+        TIME (str): The hour and minute. Equals to `"%H:%M"`.
+
+    """
+
+    AUTO = "auto"
+    ISO = "%Y-%m-%d"
+    YEAR = "%Y"
+    YEAR_MONTH = "%Y-%m"
+    MONTH_DAY = "%m-%d"
+    DAY = "%d"
+    TIME = "%H:%M"
 
 
 class THEME:

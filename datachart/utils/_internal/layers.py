@@ -12,6 +12,7 @@ import json
 import math
 import warnings
 from collections import defaultdict
+from datetime import date, datetime, tzinfo
 from dataclasses import dataclass
 from itertools import cycle as iter_cycle
 from typing import Callable, List, NamedTuple, Optional, Union
@@ -358,6 +359,11 @@ class NumpyEncoder(json.JSONEncoder):
             return obj.tolist()
         if isinstance(obj, (np.integer, np.floating)):
             return obj.item()
+        # a datetime is a date; pandas Timestamps are datetimes
+        if isinstance(obj, date):
+            return obj.isoformat()
+        if isinstance(obj, np.datetime64):
+            return str(obj)
         return super().default(obj)
 
 

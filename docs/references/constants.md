@@ -133,6 +133,10 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.DATE_FORMAT
+    options:
+        heading_level: 3
+
 ::: datachart.constants.SHOW_GRID
     options:
         heading_level: 3
