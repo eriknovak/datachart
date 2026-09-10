@@ -6210,8 +6210,21 @@ class Panel:
                 else:
                     ax.set_xticklabels(cat_labels)
 
-        # user-provided tick positions
+        # user-provided tick positions; on a date-labelled category axis a
+        # position names its category, so the tick keeps that label
         if not bare:
+            for axis_name in self.date_axes - {self.temporal_axis}:
+                axis = getattr(ax, f"{axis_name}axis")
+                # the strings, not the tick texts: a later layer's ticks reuse them
+                texts = {
+                    loc: label.get_text()
+                    for loc, label in zip(
+                        axis.get_majorticklocs(), axis.get_majorticklabels()
+                    )
+                }
+                tick_labelers[f"{axis_name}axis"] = lambda ticks, texts=texts: [
+                    texts.get(t, str(t)) for t in ticks
+                ]
             for layer in layers:
                 configure_axis_ticks_position(ax, layer.chart, tick_labelers)
 

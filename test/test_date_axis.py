@@ -231,6 +231,21 @@ class TestGroupLabels(unittest.TestCase):
             ["2024-01-01 08:00", "2024-01-01 12:00", "2024-01-01 16:00"],
         )
 
+    def test_explicit_positions_keep_date_labels(self):
+        ax = BarChart(
+            data=BAR_MONTHS, xticks=[0, 2], xticks_format=DATE_FORMAT.YEAR_MONTH
+        ).axes[0]
+        self.assertEqual(tick_labels(ax.xaxis), ["2024-01", "2024-03"])
+        # two sides share the axis; the second side's ticks read the same labels
+        slots = [datetime(2024, 1, 1, 6) + timedelta(minutes=15 * i) for i in range(20)]
+        side = [{"label": s, "y": 1} for s in slots]
+        ax = PyramidChart(
+            data=[side, side], yticks=[0, 4, 8, 12, 16], yticks_format=DATE_FORMAT.TIME
+        ).axes[0]
+        self.assertEqual(
+            tick_labels(ax.yaxis), ["06:00", "07:00", "08:00", "09:00", "10:00"]
+        )
+
     def test_pyramid_and_parallel_coords(self):
         left = [{"label": m, "y": v} for m, v in zip(MONTHS, [1, 2, 3, 4])]
         right = [{"label": m, "y": v} for m, v in zip(MONTHS, [2, 3, 4, 5])]
