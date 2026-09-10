@@ -59,6 +59,8 @@ StackedAreaChart(
     scaley=Optional[str],                               # The y-axis scale
     vlines=Optional[Union[dict, List[dict]]],           # The vertical reference lines
     hlines=Optional[Union[dict, List[dict]]],           # The horizontal reference lines
+    vspans=Optional[Union[dict, List[dict]]],           # The vertical reference bands
+    hspans=Optional[Union[dict, List[dict]]],           # The horizontal reference bands
     texts=Optional[Union[dict, List[dict]]],            # The text annotations
     x=Optional[str],                                    # The key holding the x-axis value (default: "x")
     y=Optional[str],                                    # The key holding the y-axis value (default: "y")
@@ -103,6 +105,7 @@ Every customization is either a keyword argument of `StackedAreaChart` or a `plo
 | print the values on the bands               | `show_values`, `value_format`, `value_step`                     | [Value labels](#value-labels)                       |
 | highlight one series, mute the rest         | `emphasis`                                                      | [Emphasis](#emphasis)                               |
 | mark a year or a level                      | `vlines`, `hlines`                                              | [Reference lines](#reference-lines)                 |
+| shade a period or a level range             | `hspans`, `vspans`                                              | [Reference bands](#reference-bands)                 |
 | annotate a point of the chart               | `texts`                                                         | [Text annotations](#text-annotations)               |
 | draw every series on its own                | `subplots`                                                      | [Subplots](#subplots)                               |
 | overlay the total or arrange several stacks | `Panel`, `Grid`                                                 | [Composing stacked areas](#composing-stacked-areas) |
@@ -295,6 +298,26 @@ StackedAreaChart(
     + [None] * (len(SOURCES) - 1),
     hlines=[{"y": sum(values[0] for values in GENERATION.values()), "label": "2000 total"}]
     + [None] * (len(SOURCES) - 1),
+    title="World electricity generation",
+    xlabel="Year",
+    ylabel="Generation (TWh)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Reference bands
+
+A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
+
+A single band applies to the whole stack and draws once; a list aligned with `data` attaches bands to individual series instead. The example shades the 2008–2009 financial crisis, the one period before 2020 in which generation dipped.
+
+```
+StackedAreaChart(
+    data=generation,
+    subtitle=SOURCES,
+    show_legend=True,
+    # shade the financial crisis; one band applies to the whole stack
+    vspans={"xmin": 2008, "xmax": 2009, "label": "financial crisis"},
     title="World electricity generation",
     xlabel="Year",
     ylabel="Generation (TWh)",

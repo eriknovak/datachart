@@ -66,6 +66,8 @@ ContourChart(
     ytickrotate: Optional[int],                         # The rotation of the y-axis tick labels
     vlines: Optional[Union[dict, List[dict]]],          # The vertical reference lines
     hlines: Optional[Union[dict, List[dict]]],          # The horizontal reference lines
+    vspans: Optional[Union[dict, List[dict]]],          # The vertical reference bands
+    hspans: Optional[Union[dict, List[dict]]],          # The horizontal reference bands
     colorbar: Optional[Union[dict, List[dict]]],        # The colorbar configuration(s) ({"orientation": ...})
     texts: Optional[Union[dict, List[dict]]],           # The text annotations
 )
@@ -125,6 +127,7 @@ Every customization is either a keyword argument of `ContourChart` or a `plot_co
 | draw the contours over a scatter chart   | `Panel`                                                             | [Composing contours](#composing-contours)                     |
 | keep one unit equal on both axes         | `aspect_ratio`                                                      | [Aspect ratio](#aspect-ratio)                                 |
 | mark a position with a reference line    | `vlines`, `hlines`                                                  | [Reference lines](#reference-lines)                           |
+| shade a region of the plane              | `hspans`, `vspans`                                                  | [Reference bands](#reference-bands)                           |
 | estimate the density of scattered points | `stats.kde2d`, `bandwidth`                                          | [Density of scattered points](#density-of-scattered-points)   |
 
 ### Title and axis labels
@@ -532,6 +535,27 @@ ContourChart(
     xlabel="x",
     ylabel="y",
     figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Reference bands
+
+A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
+
+The bands below cross in a window around the minimum at (3, 2); where they overlap the tint doubles.
+
+```
+ContourChart(
+    data=chart_data,
+    # a search window around the minimum at (3, 2)
+    vspans={"xmin": 2.5, "xmax": 3.5, "label": "search window"},
+    hspans={"ymin": 1.5, "ymax": 2.5},
+    levels=[2, 10, 30, 60, 100, 150, 250, 400, 600],
+    title="Himmelblau function",
+    xlabel="x",
+    ylabel="y",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_legend=True,
 ).show()
 ```
 

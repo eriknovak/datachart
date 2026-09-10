@@ -67,6 +67,8 @@ Histogram(
 
     vlines=Optional[Union[dict, List[dict]]],           # the vertical lines
     hlines=Optional[Union[dict, List[dict]]],           # the horizontal lines
+    vspans=Optional[Union[dict, List[dict]]],           # the vertical reference bands
+    hspans=Optional[Union[dict, List[dict]]],           # the horizontal reference bands
 
     x=Optional[str],                                    # the key holding the value to bin (default: "x")
 )
@@ -113,6 +115,7 @@ Every customization is either a keyword argument of `Histogram` or a `plot_hist_
 | print the count at the top of each bin  | `show_values`, `value_format`                                                              | [Value labels](#value-labels)                                 |
 | highlight one series, mute the rest     | `emphasis`                                                                                 | [Emphasis](#emphasis)                                         |
 | mark a threshold or a reference value   | `vlines`, `hlines`                                                                         | [Reference lines](#reference-lines)                           |
+| shade a range of values                 | `hspans`, `vspans`                                                                         | [Reference bands](#reference-bands)                           |
 | compare several series in one chart     | `data` as a list of lists, `subtitle`, `show_legend`                                       | [Multiple Histograms](#multiple-histograms)                   |
 | stack or overlay the series             | `bar_mode`                                                                                 | [Multiple Histograms](#multiple-histograms)                   |
 | draw each series in its own subplot     | `subplots`, `sharex`, `sharey`, `max_cols`                                                 | [Subplots](#subplots)                                         |
@@ -389,6 +392,46 @@ Histogram(
             },
         },
     ],
+    title="Flipper length of Palmer penguins",
+    xlabel="Flipper length (mm)",
+    ylabel="Number of penguins",
+    xticks=FLIPPER_TICKS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+).show()
+```
+
+### Reference bands
+
+A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
+
+On a histogram a vertical band marks a range of the binned value and a horizontal band a range of counts. The example shades one standard deviation around the mean flipper length and keeps the mean itself as a line; the bins to the right of the band are the long-flippered Gentoo penguins.
+
+```
+flippers = [penguin["x"] for penguin in penguins]
+mean_flipper = sum(flippers) / len(flippers)
+std_flipper = (sum((f - mean_flipper) ** 2 for f in flippers) / len(flippers)) ** 0.5
+
+Histogram(
+    data=penguins,
+    subtitle="all species",
+    # shade one standard deviation around the mean flipper length
+    vspans={
+        "xmin": mean_flipper - std_flipper,
+        "xmax": mean_flipper + std_flipper,
+        "label": "mean ± 1 SD",
+    },
+    # keep the mean itself as a line
+    vlines={
+        "x": mean_flipper,
+        "label": "mean",
+        "style": {
+            "plot_vline_color": "#1d3557",
+            "plot_vline_style": LINE_STYLE.DASHED,
+            "plot_vline_width": 1.5,
+        },
+    },
     title="Flipper length of Palmer penguins",
     xlabel="Flipper length (mm)",
     ylabel="Number of penguins",

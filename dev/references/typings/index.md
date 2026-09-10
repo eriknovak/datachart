@@ -11,6 +11,8 @@ The `typings` module contains the typings for all chart components. The module i
 | `ChartCommonAttrs`               | The chart attributes common to all chart types.                 |
 | `VLinePlotAttrs`                 | The vertical line plot attributes.                              |
 | `HLinePlotAttrs`                 | The horizontal line plot attributes.                            |
+| `VSpanPlotAttrs`                 | The vertical reference band plot attributes.                    |
+| `HSpanPlotAttrs`                 | The horizontal reference band plot attributes.                  |
 | `TextAttrs`                      | The text annotation attributes.                                 |
 | `LineSingleChartAttrs`           | The single chart attributes for the line chart.                 |
 | `LineDataPointAttrs`             | The data point attributes for the line chart.                   |
@@ -65,6 +67,8 @@ The `typings` module contains the typings for all chart components. The module i
 | `HistStyleAttrs`                 | The typing for the histogram style.                             |
 | `VLineStyleAttrs`                | The typing for the vertical line style.                         |
 | `HLineStyleAttrs`                | The typing for the horizontal line style.                       |
+| `VSpanStyleAttrs`                | The typing for the vertical reference band style.               |
+| `HSpanStyleAttrs`                | The typing for the horizontal reference band style.             |
 | `TextStyleAttrs`                 | The typing for the text annotation style.                       |
 | `HeatmapStyleAttrs`              | The typing for the heatmap style.                               |
 | `ContourStyleAttrs`              | The typing for the contour chart style.                         |
@@ -134,6 +138,40 @@ The horizontal line plot attributes.
 | `style`   | The horizontal line style attributes. **TYPE:** `Union[HLineStyleAttrs, None]` |
 | `label`   | The label of the horizontal line. **TYPE:** `Union[str, None]`                 |
 
+#### datachart.typings.VSpanPlotAttrs
+
+Bases: `TypedDict`
+
+The vertical reference band plot attributes.
+
+A vertical band shades the region between two x-axis positions over the full height of the axes. On a radial chart the bounds are angles in degrees and the band is a wedge over the full radius.
+
+Added in Unreleased
+
+| ATTRIBUTE | DESCRIPTION                                                                               |
+| --------- | ----------------------------------------------------------------------------------------- |
+| `xmin`    | The lower x-axis bound. Defaults to the axis minimum. **TYPE:** `Union[int, float, None]` |
+| `xmax`    | The upper x-axis bound. Defaults to the axis maximum. **TYPE:** `Union[int, float, None]` |
+| `style`   | The vertical band style attributes. **TYPE:** `Union[VSpanStyleAttrs, None]`              |
+| `label`   | The label of the band (shown in the legend). **TYPE:** `Union[str, None]`                 |
+
+#### datachart.typings.HSpanPlotAttrs
+
+Bases: `TypedDict`
+
+The horizontal reference band plot attributes.
+
+A horizontal band shades the region between two y-axis positions over the full width of the axes. On a radial chart the bounds are radii and the band is an annulus over the full circle.
+
+Added in Unreleased
+
+| ATTRIBUTE | DESCRIPTION                                                                               |
+| --------- | ----------------------------------------------------------------------------------------- |
+| `ymin`    | The lower y-axis bound. Defaults to the axis minimum. **TYPE:** `Union[int, float, None]` |
+| `ymax`    | The upper y-axis bound. Defaults to the axis maximum. **TYPE:** `Union[int, float, None]` |
+| `style`   | The horizontal band style attributes. **TYPE:** `Union[HSpanStyleAttrs, None]`            |
+| `label`   | The label of the band (shown in the legend). **TYPE:** `Union[str, None]`                 |
+
 #### datachart.typings.TextAttrs
 
 Bases: `TypedDict`
@@ -189,6 +227,8 @@ The single chart attributes for the line chart.
 | `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                      |
 | `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLinePlotAttrs, List[VLinePlotAttrs], None]`                |
 | `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLinePlotAttrs, List[HLinePlotAttrs], None]`              |
+| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]`      |
+| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]`    |
 | `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                       |
 | `x`           | The key name in data that contains the x-axis value. Defaults to "x". **TYPE:** `Union[str, None]`          |
 | `y`           | The key name in data that contains the y-axis value. Defaults to "y". **TYPE:** `Union[str, None]`          |
@@ -229,6 +269,8 @@ The single chart attributes for the bar chart.
 | `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                      |
 | `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLinePlotAttrs, List[VLinePlotAttrs], None]`                |
 | `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLinePlotAttrs, List[HLinePlotAttrs], None]`              |
+| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]`      |
+| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]`    |
 | `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                       |
 | `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]`       |
 | `y`           | The key name in data that contains the y-axis value. Defaults to "y". **TYPE:** `Union[str, None]`          |
@@ -254,23 +296,25 @@ Bases: `TypedDict`
 
 The single chart attributes for the histogram chart.
 
-| ATTRIBUTE     | DESCRIPTION                                                                                             |
-| ------------- | ------------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the histogram chart. **TYPE:** `List[HistDataPointAttrs]`              |
-| `subtitle`    | The subtitle of the histogram chart. Also used as the label in the legend. **TYPE:** `Union[str, None]` |
-| `xlabel`      | The xlabel of the histogram chart. **TYPE:** `Union[str, None]`                                         |
-| `ylabel`      | The ylabel of the histogram chart. **TYPE:** `Union[str, None]`                                         |
-| `style`       | The style of the histogram chart. **TYPE:** `Union[HistStyleAttrs, None]`                               |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                           |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                    |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                  |
-| `yticks`      | the ytick position list. **TYPE:** `Union[int, float, None]`                                            |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                    |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                  |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLinePlotAttrs, List[VLinePlotAttrs], None]`            |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLinePlotAttrs, List[HLinePlotAttrs], None]`          |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                   |
-| `x`           | The key name in data that contains the x-axis value. Defaults to "x". **TYPE:** `Union[str, None]`      |
+| ATTRIBUTE     | DESCRIPTION                                                                                              |
+| ------------- | -------------------------------------------------------------------------------------------------------- |
+| `data`        | The list of data points defining the histogram chart. **TYPE:** `List[HistDataPointAttrs]`               |
+| `subtitle`    | The subtitle of the histogram chart. Also used as the label in the legend. **TYPE:** `Union[str, None]`  |
+| `xlabel`      | The xlabel of the histogram chart. **TYPE:** `Union[str, None]`                                          |
+| `ylabel`      | The ylabel of the histogram chart. **TYPE:** `Union[str, None]`                                          |
+| `style`       | The style of the histogram chart. **TYPE:** `Union[HistStyleAttrs, None]`                                |
+| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                            |
+| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                     |
+| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                   |
+| `yticks`      | the ytick position list. **TYPE:** `Union[int, float, None]`                                             |
+| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                     |
+| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                   |
+| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLinePlotAttrs, List[VLinePlotAttrs], None]`             |
+| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLinePlotAttrs, List[HLinePlotAttrs], None]`           |
+| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]`   |
+| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]` |
+| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                    |
+| `x`           | The key name in data that contains the x-axis value. Defaults to "x". **TYPE:** `Union[str, None]`       |
 
 #### datachart.typings.HistDataPointAttrs
 
@@ -349,27 +393,29 @@ Bases: `TypedDict`
 
 The single chart attributes for the scatter chart.
 
-| ATTRIBUTE     | DESCRIPTION                                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the scatter chart. **TYPE:** `List[ScatterDataPointAttrs]`           |
-| `subtitle`    | The subtitle of the scatter chart. Also used as the label in the legend. **TYPE:** `Union[str, None]` |
-| `xlabel`      | The xlabel of the scatter chart. **TYPE:** `Union[str, None]`                                         |
-| `ylabel`      | The ylabel of the scatter chart. **TYPE:** `Union[str, None]`                                         |
-| `style`       | The style of the scatter chart. **TYPE:** `Union[ScatterStyleAttrs, None]`                            |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                         |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                  |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                |
-| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                          |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                  |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLinePlotAttrs, List[VLinePlotAttrs], None]`          |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLinePlotAttrs, List[HLinePlotAttrs], None]`        |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                 |
-| `x`           | The key name in data that contains the x-axis value. Defaults to "x". **TYPE:** `Union[str, None]`    |
-| `y`           | The key name in data that contains the y-axis value. Defaults to "y". **TYPE:** `Union[str, None]`    |
-| `size`        | The key name in data that contains the marker size value. **TYPE:** `Union[str, None]`                |
-| `hue`         | The key name in data that contains the hue/category value. **TYPE:** `Union[str, None]`               |
-| `label`       | The key name in data that contains the point label. **TYPE:** `Union[str, None]`                      |
+| ATTRIBUTE     | DESCRIPTION                                                                                              |
+| ------------- | -------------------------------------------------------------------------------------------------------- |
+| `data`        | The list of data points defining the scatter chart. **TYPE:** `List[ScatterDataPointAttrs]`              |
+| `subtitle`    | The subtitle of the scatter chart. Also used as the label in the legend. **TYPE:** `Union[str, None]`    |
+| `xlabel`      | The xlabel of the scatter chart. **TYPE:** `Union[str, None]`                                            |
+| `ylabel`      | The ylabel of the scatter chart. **TYPE:** `Union[str, None]`                                            |
+| `style`       | The style of the scatter chart. **TYPE:** `Union[ScatterStyleAttrs, None]`                               |
+| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                            |
+| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                     |
+| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                   |
+| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                             |
+| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                     |
+| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                   |
+| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLinePlotAttrs, List[VLinePlotAttrs], None]`             |
+| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLinePlotAttrs, List[HLinePlotAttrs], None]`           |
+| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]`   |
+| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]` |
+| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                    |
+| `x`           | The key name in data that contains the x-axis value. Defaults to "x". **TYPE:** `Union[str, None]`       |
+| `y`           | The key name in data that contains the y-axis value. Defaults to "y". **TYPE:** `Union[str, None]`       |
+| `size`        | The key name in data that contains the marker size value. **TYPE:** `Union[str, None]`                   |
+| `hue`         | The key name in data that contains the hue/category value. **TYPE:** `Union[str, None]`                  |
+| `label`       | The key name in data that contains the point label. **TYPE:** `Union[str, None]`                         |
 
 #### datachart.typings.ScatterDataPointAttrs
 
@@ -393,24 +439,26 @@ Bases: `TypedDict`
 
 The single chart attributes for the box plot.
 
-| ATTRIBUTE     | DESCRIPTION                                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the box plot. **TYPE:** `List[BoxDataPointAttrs]`                    |
-| `subtitle`    | The subtitle of the box plot. Also used as the label in the legend. **TYPE:** `Union[str, None]`      |
-| `xlabel`      | The xlabel of the box plot. **TYPE:** `Union[str, None]`                                              |
-| `ylabel`      | The ylabel of the box plot. **TYPE:** `Union[str, None]`                                              |
-| `style`       | The style of the box plot. **TYPE:** `Union[BoxStyleAttrs, None]`                                     |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                         |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                  |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                |
-| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                          |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                  |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLinePlotAttrs, List[VLinePlotAttrs], None]`          |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLinePlotAttrs, List[HLinePlotAttrs], None]`        |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                 |
-| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]` |
-| `value`       | The key name in data that contains the value. Defaults to "value". **TYPE:** `Union[str, None]`       |
+| ATTRIBUTE     | DESCRIPTION                                                                                              |
+| ------------- | -------------------------------------------------------------------------------------------------------- |
+| `data`        | The list of data points defining the box plot. **TYPE:** `List[BoxDataPointAttrs]`                       |
+| `subtitle`    | The subtitle of the box plot. Also used as the label in the legend. **TYPE:** `Union[str, None]`         |
+| `xlabel`      | The xlabel of the box plot. **TYPE:** `Union[str, None]`                                                 |
+| `ylabel`      | The ylabel of the box plot. **TYPE:** `Union[str, None]`                                                 |
+| `style`       | The style of the box plot. **TYPE:** `Union[BoxStyleAttrs, None]`                                        |
+| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                            |
+| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                     |
+| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                   |
+| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                             |
+| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                     |
+| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                   |
+| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLinePlotAttrs, List[VLinePlotAttrs], None]`             |
+| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLinePlotAttrs, List[HLinePlotAttrs], None]`           |
+| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]`   |
+| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]` |
+| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                    |
+| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]`    |
+| `value`       | The key name in data that contains the value. Defaults to "value". **TYPE:** `Union[str, None]`          |
 
 #### datachart.typings.BoxDataPointAttrs
 
@@ -431,24 +479,26 @@ Bases: `TypedDict`
 
 The single chart attributes for the swarm plot.
 
-| ATTRIBUTE     | DESCRIPTION                                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the swarm plot. **TYPE:** `List[SwarmDataPointAttrs]`                |
-| `subtitle`    | The subtitle of the swarm plot. Also used as the label in the legend. **TYPE:** `Union[str, None]`    |
-| `xlabel`      | The xlabel of the swarm plot. **TYPE:** `Union[str, None]`                                            |
-| `ylabel`      | The ylabel of the swarm plot. **TYPE:** `Union[str, None]`                                            |
-| `style`       | The style of the swarm plot. **TYPE:** `Union[SwarmStyleAttrs, None]`                                 |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                         |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                  |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                |
-| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                          |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                  |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLinePlotAttrs, List[VLinePlotAttrs], None]`          |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLinePlotAttrs, List[HLinePlotAttrs], None]`        |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                 |
-| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]` |
-| `value`       | The key name in data that contains the value. Defaults to "value". **TYPE:** `Union[str, None]`       |
+| ATTRIBUTE     | DESCRIPTION                                                                                              |
+| ------------- | -------------------------------------------------------------------------------------------------------- |
+| `data`        | The list of data points defining the swarm plot. **TYPE:** `List[SwarmDataPointAttrs]`                   |
+| `subtitle`    | The subtitle of the swarm plot. Also used as the label in the legend. **TYPE:** `Union[str, None]`       |
+| `xlabel`      | The xlabel of the swarm plot. **TYPE:** `Union[str, None]`                                               |
+| `ylabel`      | The ylabel of the swarm plot. **TYPE:** `Union[str, None]`                                               |
+| `style`       | The style of the swarm plot. **TYPE:** `Union[SwarmStyleAttrs, None]`                                    |
+| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                            |
+| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                     |
+| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                   |
+| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                             |
+| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                     |
+| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                   |
+| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLinePlotAttrs, List[VLinePlotAttrs], None]`             |
+| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLinePlotAttrs, List[HLinePlotAttrs], None]`           |
+| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]`   |
+| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]` |
+| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                    |
+| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]`    |
+| `value`       | The key name in data that contains the value. Defaults to "value". **TYPE:** `Union[str, None]`          |
 
 ### datachart.typings.SwarmDataPointAttrs
 
@@ -469,24 +519,26 @@ Bases: `TypedDict`
 
 The single chart attributes for the violin plot.
 
-| ATTRIBUTE     | DESCRIPTION                                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the violin plot. **TYPE:** `List[ViolinDataPointAttrs]`              |
-| `subtitle`    | The subtitle of the violin plot. Also used as the label in the legend. **TYPE:** `Union[str, None]`   |
-| `xlabel`      | The xlabel of the violin plot. **TYPE:** `Union[str, None]`                                           |
-| `ylabel`      | The ylabel of the violin plot. **TYPE:** `Union[str, None]`                                           |
-| `style`       | The style of the violin plot. **TYPE:** `Union[ViolinStyleAttrs, None]`                               |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                         |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                  |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                |
-| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                          |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                  |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLinePlotAttrs, List[VLinePlotAttrs], None]`          |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLinePlotAttrs, List[HLinePlotAttrs], None]`        |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                 |
-| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]` |
-| `value`       | The key name in data that contains the value. Defaults to "value". **TYPE:** `Union[str, None]`       |
+| ATTRIBUTE     | DESCRIPTION                                                                                              |
+| ------------- | -------------------------------------------------------------------------------------------------------- |
+| `data`        | The list of data points defining the violin plot. **TYPE:** `List[ViolinDataPointAttrs]`                 |
+| `subtitle`    | The subtitle of the violin plot. Also used as the label in the legend. **TYPE:** `Union[str, None]`      |
+| `xlabel`      | The xlabel of the violin plot. **TYPE:** `Union[str, None]`                                              |
+| `ylabel`      | The ylabel of the violin plot. **TYPE:** `Union[str, None]`                                              |
+| `style`       | The style of the violin plot. **TYPE:** `Union[ViolinStyleAttrs, None]`                                  |
+| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                            |
+| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                     |
+| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                   |
+| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                             |
+| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                     |
+| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                   |
+| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLinePlotAttrs, List[VLinePlotAttrs], None]`             |
+| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLinePlotAttrs, List[HLinePlotAttrs], None]`           |
+| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]`   |
+| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]` |
+| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                    |
+| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]`    |
+| `value`       | The key name in data that contains the value. Defaults to "value". **TYPE:** `Union[str, None]`          |
 
 #### datachart.typings.ViolinDataPointAttrs
 
@@ -507,24 +559,26 @@ Bases: `TypedDict`
 
 The single chart attributes for the raincloud plot.
 
-| ATTRIBUTE     | DESCRIPTION                                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the raincloud plot. **TYPE:** `List[RaincloudDataPointAttrs]`        |
-| `subtitle`    | The subtitle of the raincloud plot. **TYPE:** `Union[str, None]`                                      |
-| `xlabel`      | The xlabel of the raincloud plot. **TYPE:** `Union[str, None]`                                        |
-| `ylabel`      | The ylabel of the raincloud plot. **TYPE:** `Union[str, None]`                                        |
-| `style`       | The style of the raincloud plot. **TYPE:** `Union[RaincloudStyleAttrs, None]`                         |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                         |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                  |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                |
-| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                          |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                  |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLinePlotAttrs, List[VLinePlotAttrs], None]`          |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLinePlotAttrs, List[HLinePlotAttrs], None]`        |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                 |
-| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]` |
-| `value`       | The key name in data that contains the value. Defaults to "value". **TYPE:** `Union[str, None]`       |
+| ATTRIBUTE     | DESCRIPTION                                                                                              |
+| ------------- | -------------------------------------------------------------------------------------------------------- |
+| `data`        | The list of data points defining the raincloud plot. **TYPE:** `List[RaincloudDataPointAttrs]`           |
+| `subtitle`    | The subtitle of the raincloud plot. **TYPE:** `Union[str, None]`                                         |
+| `xlabel`      | The xlabel of the raincloud plot. **TYPE:** `Union[str, None]`                                           |
+| `ylabel`      | The ylabel of the raincloud plot. **TYPE:** `Union[str, None]`                                           |
+| `style`       | The style of the raincloud plot. **TYPE:** `Union[RaincloudStyleAttrs, None]`                            |
+| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                            |
+| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                     |
+| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                   |
+| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                             |
+| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                     |
+| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                   |
+| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLinePlotAttrs, List[VLinePlotAttrs], None]`             |
+| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLinePlotAttrs, List[HLinePlotAttrs], None]`           |
+| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]`   |
+| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]` |
+| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                    |
+| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]`    |
+| `value`       | The key name in data that contains the value. Defaults to "value". **TYPE:** `Union[str, None]`          |
 
 #### datachart.typings.RaincloudDataPointAttrs
 
@@ -583,6 +637,8 @@ The single chart attributes for the radial chart.
 | `subtitle` | The subtitle of the radial chart. Also used as the label in the legend. **TYPE:** `Union[str, None]`                                          |
 | `style`    | The style of the radial chart, matching its visual. **TYPE:** `Union[LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs, None]` |
 | `texts`    | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                                                         |
+| `vspans`   | The angular wedges to be plot, bounded in degrees. **TYPE:** `Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]`                              |
+| `hspans`   | The annuli to be plot, bounded in radius. **TYPE:** `Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]`                                       |
 | `label`    | The key name in data that contains the category label. Defaults to "label". **TYPE:** `Union[str, None]`                                      |
 | `x`        | The key name in data that contains the angular observation. Defaults to "x". **TYPE:** `Union[str, None]`                                     |
 | `y`        | The key name in data that contains the radial value. Defaults to "y". **TYPE:** `Union[str, None]`                                            |
@@ -607,7 +663,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
 
 The style attributes. Combines all style typings.
 
@@ -825,6 +881,40 @@ The typing for the horizontal line style.
 | `plot_hline_style` | The style of the horizontal line. **TYPE:** `Union[LINE_STYLE, str, None]` |
 | `plot_hline_width` | The width of the horizontal line. **TYPE:** `Union[int, float, None]`      |
 | `plot_hline_alpha` | The alpha value of the horizontal line. **TYPE:** `Union[float, None]`     |
+
+### datachart.typings.VSpanStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the vertical reference band style.
+
+Added in Unreleased
+
+| ATTRIBUTE               | DESCRIPTION                                                                                                    |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `plot_vspan_color`      | The fill color of the band. Defaults to the theme's muted color. **TYPE:** `Union[str, None]`                  |
+| `plot_vspan_alpha`      | The alpha value of the band. **TYPE:** `Union[float, None]`                                                    |
+| `plot_vspan_hatch`      | The hatch pattern of the band. **TYPE:** `Union[HATCH_STYLE, str, None]`                                       |
+| `plot_vspan_edge_color` | The edge color of the band; the hatch draws in it. **TYPE:** `Union[str, None]`                                |
+| `plot_vspan_edge_width` | The edge line width of the band. **TYPE:** `Union[int, float, None]`                                           |
+| `plot_vspan_zorder`     | The zorder of the band. Defaults to sit over the grid and under the marks. **TYPE:** `Union[int, float, None]` |
+
+### datachart.typings.HSpanStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the horizontal reference band style.
+
+Added in Unreleased
+
+| ATTRIBUTE               | DESCRIPTION                                                                                                    |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `plot_hspan_color`      | The fill color of the band. Defaults to the theme's muted color. **TYPE:** `Union[str, None]`                  |
+| `plot_hspan_alpha`      | The alpha value of the band. **TYPE:** `Union[float, None]`                                                    |
+| `plot_hspan_hatch`      | The hatch pattern of the band. **TYPE:** `Union[HATCH_STYLE, str, None]`                                       |
+| `plot_hspan_edge_color` | The edge color of the band; the hatch draws in it. **TYPE:** `Union[str, None]`                                |
+| `plot_hspan_edge_width` | The edge line width of the band. **TYPE:** `Union[int, float, None]`                                           |
+| `plot_hspan_zorder`     | The zorder of the band. Defaults to sit over the grid and under the marks. **TYPE:** `Union[int, float, None]` |
 
 ### datachart.typings.TextStyleAttrs
 

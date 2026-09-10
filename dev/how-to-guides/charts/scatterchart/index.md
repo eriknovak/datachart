@@ -67,6 +67,8 @@ ScatterChart(
 
     vlines=Optional[Union[dict, List[dict]]],           # the vertical lines
     hlines=Optional[Union[dict, List[dict]]],           # the horizontal lines
+    vspans=Optional[Union[dict, List[dict]]],           # the vertical reference bands
+    hspans=Optional[Union[dict, List[dict]]],           # the horizontal reference bands
 
     x=Optional[str],                                    # the key holding the x-axis value (default: "x")
     y=Optional[str],                                    # the key holding the y-axis value (default: "y")
@@ -121,6 +123,7 @@ Every customization is either a keyword argument of `ScatterChart` or a `plot_sc
 | fix the aspect ratio of the axes       | `aspect_ratio`                                                           | [Aspect ratio](#aspect-ratio)                                 |
 | highlight one series, mute the rest    | `emphasis`                                                               | [Emphasis](#emphasis)                                         |
 | mark a threshold or a reference value  | `hlines`, `vlines`                                                       | [Reference lines](#reference-lines)                           |
+| shade a range of values                | `hspans`, `vspans`                                                       | [Reference bands](#reference-bands)                           |
 | compare several series in one chart    | `data` as a list of lists, `subtitle`, `show_legend`                     | [Multiple Scatter Charts](#multiple-scatter-charts)           |
 | draw each series in its own subplot    | `subplots`, `sharex`, `sharey`, `max_cols`                               | [Subplots](#subplots)                                         |
 | use a logarithmic axis                 | `scalex`, `scaley`                                                       | [Axis scales](#axis-scales)                                   |
@@ -489,6 +492,35 @@ ScatterChart(
             "plot_vline_style": LINE_STYLE.DOTTED,
             "plot_vline_width": 1.5,
         },
+    },
+    title="Life expectancy vs. GDP per capita",
+    xlabel="GDP per capita (USD)",
+    ylabel="Life expectancy (years)",
+    xticks=GDP_TICKS,
+    xticklabels=GDP_TICK_LABELS,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.BOTH,
+    show_legend=True,
+).show()
+```
+
+### Reference bands
+
+A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
+
+The example uses two half-open bands: the countries with a life expectancy above 80 years, and those with a GDP per capita below $5,000. Each omits one bound, so the bands run to the top and the left edge.
+
+```
+ScatterChart(
+    data=countries,
+    hue="continent",
+    # life expectancy above 80: no upper bound, so the band runs to the top edge
+    hspans={"ymin": 80, "label": "life expectancy above 80"},
+    # GDP per capita below $5,000: no lower bound, so the band runs to the left edge
+    vspans={
+        "xmax": 5_000,
+        "label": "GDP per capita below $5k",
+        "style": {"plot_vspan_color": "#e9a03b"},
     },
     title="Life expectancy vs. GDP per capita",
     xlabel="GDP per capita (USD)",

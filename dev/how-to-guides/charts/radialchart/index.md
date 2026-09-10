@@ -61,6 +61,9 @@ RadialChart(
     ymin=Optional[Union[int, float]],                   # The radial-axis range
     ymax=Optional[Union[int, float]],
 
+    vspans=Optional[Union[dict, List[dict]]],           # the angular wedges to shade (bounds in degrees)
+    hspans=Optional[Union[dict, List[dict]]],           # the annuli to shade (bounds in radial values)
+
     label=Optional[str],                                # the key holding the category label (default: "label")
     x=Optional[str],                                    # the key holding the angular observation (default: "x")
     y=Optional[str],                                    # the key holding the radial value (default: "y")
@@ -111,6 +114,7 @@ Every customization is either a keyword argument of `RadialChart` or a style att
 | write values or labels at the mark tips | `show_values`, `show_tip_labels`              | [Values and labels at the tips](#values-and-labels-at-the-tips) |
 | hide the outer border circle            | `show_border`                                 | [Values and labels at the tips](#values-and-labels-at-the-tips) |
 | use a log radial axis                   | `scaley`                                      | [Radial axis scale](#radial-axis-scale)                         |
+| shade a wedge or an annulus             | `vspans`, `hspans`                            | [Reference bands](#reference-bands)                             |
 
 ### Title and axis labels
 
@@ -369,7 +373,7 @@ RadialChart(
 
 ### Radial axis scale
 
-The radial (value) axis can change scale with `scaley`, exactly like a cartesian y-axis. The angular axis has no scale to change — passing `scalex` raises a `ValueError`, as do `vlines` and `hlines`, which have no geometric meaning on a polar plot.
+The radial (value) axis can change scale with `scaley`, exactly like a cartesian y-axis. The angular axis has no scale to change — passing `scalex` raises a `ValueError`, as do `vlines` and `hlines`, which have no geometric meaning on a polar plot. Shaded [reference bands](#reference-bands) do have one, and are supported.
 
 ```
 from datachart.constants import SCALE
@@ -380,6 +384,29 @@ RadialChart(
     # spread values spanning two orders of magnitude
     scaley=SCALE.LOG,
     title="Particle counts by direction",
+).show()
+```
+
+### Reference bands
+
+A straight reference line has no meaning on a polar plot, but a shaded band does. The `vspans` argument draws an angular **wedge** over the full radius, bounded by `xmin` and `xmax` in degrees measured from the start angle in the chart's direction; the `hspans` argument draws an **annulus** over the full circle, bounded by `ymin` and `ymax` in radial values. Both use the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) and [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typings of the cartesian charts: a `label` puts the band in the legend, `style` takes the `plot_vspan_*` / `plot_hspan_*` attributes, and an omitted bound runs to the edge (0° or 360° for a wedge, the radial minimum or maximum for an annulus).
+
+The example shades the south-westerly quadrant, where the wind is strongest, and the 10–15 km/h speed range.
+
+```
+RadialChart(
+    data=wind_by_direction,
+    # a wedge from south (180°) to west (270°), measured from the start angle
+    vspans={"xmin": 180, "xmax": 270, "label": "SW quadrant"},
+    # an annulus between 10 and 15 km/h
+    hspans={
+        "ymin": 10,
+        "ymax": 15,
+        "label": "10–15 km/h",
+        "style": {"plot_hspan_color": "#e9a03b"},
+    },
+    title="Average wind speed by direction",
+    show_legend=True,
 ).show()
 ```
 

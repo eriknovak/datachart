@@ -19,7 +19,7 @@ Every chart function takes a `texts` parameter: a single text annotation or a li
 }
 ```
 
-With multiple charts drawn as subplots, a list of lists assigns the annotations per chart, exactly as `vlines` and `hlines` do. For the full definitions, see the [datachart.typings.TextAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextAttrs) and [datachart.typings.TextStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs) typings.
+With multiple charts drawn as subplots, a list of lists assigns the annotations per chart, exactly as `vlines`, `hlines`, `vspans` and `hspans` do. For the full definitions, see the [datachart.typings.TextAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextAttrs) and [datachart.typings.TextStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs) typings.
 
 ```
 from datachart.charts import BarChart, LineChart

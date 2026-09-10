@@ -51,6 +51,8 @@ RaincloudPlot(
     sharey: Union[bool, None],                          # Whether the subplots share the y-axis (optional)
     hlines: Union[dict, List[dict], None],              # The horizontal reference lines (optional)
     vlines: Union[dict, List[dict], None],              # The vertical reference lines (optional)
+    vspans: Union[dict, List[dict], None],              # The vertical reference bands (optional)
+    hspans: Union[dict, List[dict], None],              # The horizontal reference bands (optional)
     label: Union[str, None],                            # The key name in `data` holding the label (optional)
     value: Union[str, None],                            # The key name in `data` holding the value (optional)
 )
@@ -94,6 +96,7 @@ Every customization is either a keyword argument of `RaincloudPlot` or an attrib
 | draw the rainclouds horizontally        | `orientation`                                                                         | [Raincloud orientation](#raincloud-orientation)               |
 | highlight one group, mute the rest      | `emphasis`                                                                            | [Emphasis](#emphasis)                                         |
 | draw a threshold or reference line      | `hlines`, `vlines`                                                                    | [Reference lines](#reference-lines)                           |
+| shade a range next to the rainclouds    | `hspans`, `vspans`                                                                    | [Reference bands](#reference-bands)                           |
 | draw each dataset in its own subplot    | `data` as a list of lists, `subplots`, `sharex`, `sharey`                             | [Multiple Raincloud Plots](#multiple-raincloud-plots)         |
 | compose the raincloud with other charts | `Panel`, `Grid`                                                                       | [Composing rainclouds](#composing-rainclouds)                 |
 | use a logarithmic value axis            | `scaley`                                                                              | [Logarithmic scale](#logarithmic-scale)                       |
@@ -328,6 +331,41 @@ RaincloudPlot(
     ylabel="Body mass (g)",
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
+).show()
+```
+
+### Reference bands
+
+A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
+
+The example shades one standard deviation around the mean body mass of all penguins and keeps the mean itself as a line: the Adelie and Chinstrap rainclouds sit inside the band, the Gentoo raincloud above it.
+
+```
+masses = [penguin["value"] for penguin in chart_data]
+mean_mass = sum(masses) / len(masses)
+std_mass = (sum((mass - mean_mass) ** 2 for mass in masses) / len(masses)) ** 0.5
+
+RaincloudPlot(
+    data=chart_data,
+    # shade one standard deviation around the mean body mass of all penguins
+    hspans={
+        "ymin": mean_mass - std_mass,
+        "ymax": mean_mass + std_mass,
+        "label": "mean ± 1 SD",
+        "style": {"plot_hspan_color": "#d62728"},
+    },
+    # keep the mean itself as a line
+    hlines={
+        "y": mean_mass,
+        "label": "mean",
+        "style": {"plot_hline_color": "#d62728", "plot_hline_style": LINE_STYLE.DASHED},
+    },
+    title="Body mass of Palmer penguins",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
 ).show()
 ```
 

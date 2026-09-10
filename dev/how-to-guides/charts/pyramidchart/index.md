@@ -50,6 +50,8 @@ PyramidChart(
 
     vlines=Optional[VLinePlotAttrs],                # The vertical lines to draw
     hlines=Optional[HLinePlotAttrs],                # The horizontal lines to draw
+    vspans=Optional[VSpanPlotAttrs],                # The vertical bands to shade
+    hspans=Optional[HSpanPlotAttrs],                # The horizontal bands to shade
 
     label=Optional[str],                            # The data key for the labels (default: "label")
     y=Optional[str],                                # The data key for the bar values (default: "y")
@@ -84,16 +86,18 @@ Both sides extend from the shared zero line at full bar width, the category labe
 
 Every customization is either a keyword argument of `PyramidChart` or a style attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                         | Use                           | See                                             |
-| ---------------------------------- | ----------------------------- | ----------------------------------------------- |
-| add a title and axis labels        | `title`, `xlabel`, `ylabel`   | [Title and axis labels](#title-and-axis-labels) |
-| name the two sides                 | `subtitle`, `show_legend`     | [Naming the sides](#naming-the-sides)           |
-| resize the figure or show the grid | `figsize`, `show_grid`        | [Figure size and grid](#figure-size-and-grid)   |
-| fix the value range or place ticks | `xmax`, `xticks`, `yticks`    | [Axis limits and ticks](#axis-limits-and-ticks) |
-| write each bar's value at its end  | `show_values`, `value_format` | [Value labels](#value-labels)                   |
-| show the error bars                | `show_yerr`                   | [Error bars](#error-bars)                       |
-| style the bars, per side           | `style`                       | [Bar style](#bar-style)                         |
-| use my own data keys               | `label`, `y`, `yerr`          | [Custom data keys](#custom-data-keys)           |
+| I want to…                                | Use                           | See                                             |
+| ----------------------------------------- | ----------------------------- | ----------------------------------------------- |
+| add a title and axis labels               | `title`, `xlabel`, `ylabel`   | [Title and axis labels](#title-and-axis-labels) |
+| name the two sides                        | `subtitle`, `show_legend`     | [Naming the sides](#naming-the-sides)           |
+| resize the figure or show the grid        | `figsize`, `show_grid`        | [Figure size and grid](#figure-size-and-grid)   |
+| fix the value range or place ticks        | `xmax`, `xticks`, `yticks`    | [Axis limits and ticks](#axis-limits-and-ticks) |
+| write each bar's value at its end         | `show_values`, `value_format` | [Value labels](#value-labels)                   |
+| show the error bars                       | `show_yerr`                   | [Error bars](#error-bars)                       |
+| style the bars, per side                  | `style`                       | [Bar style](#bar-style)                         |
+| mark a value or an age band               | `vlines`, `hlines`            | [Reference lines](#reference-lines)             |
+| shade a value range or a run of age bands | `vspans`, `hspans`            | [Reference bands](#reference-bands)             |
+| use my own data keys                      | `label`, `y`, `yerr`          | [Custom data keys](#custom-data-keys)           |
 
 ### Title and axis labels
 
@@ -214,6 +218,52 @@ PyramidChart(
         {"plot_bar_color": "#2a6f97"},
         {"plot_bar_color": "#61a5c2", "plot_bar_hatch": "///"},
     ],
+).show()
+```
+
+### Reference lines
+
+A reference line marks a value or an age band. Vertical lines on the value axis use the `vlines` attribute with the [datachart.typings.VLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLinePlotAttrs) typing, which is either a `dict` or a `List[dict]`; horizontal lines across the category axis use `hlines` and the [datachart.typings.HLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLinePlotAttrs) typing. The value axis is mirrored, so a value on the left side is negative; the category axis counts the age bands from the bottom (`0`, `1`, `2`, …), so a line *between* two bands sits at a half-integer position. A single line applies to both sides and draws twice, so the example attaches its lines to the first side only, with a list aligned with `data`. The [Box Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/boxplot/#reference-lines) guide lists every attribute of a line.
+
+The example marks 1,000 residents on both sides and the boundary between the 64-65 and 66-67 bands, above which the residents are of retirement age.
+
+```
+from datachart.constants import LINE_STYLE
+
+PyramidChart(
+    data=[riverside_bands, hillcrest_bands],
+    subtitle=["Riverside", "Hillcrest"],
+    show_legend=True,
+    # mark 1,000 residents on both sides, attached to the first side only
+    vlines=[
+        [
+            {"x": -1000, "label": "1,000 residents", "style": {"plot_vline_style": LINE_STYLE.DASHED}},
+            {"x": 1000, "style": {"plot_vline_style": LINE_STYLE.DASHED}},
+        ],
+        None,
+    ],
+    # mark the retirement age, between the 64-65 and 66-67 bands
+    hlines=[{"y": 32.5, "label": "retirement age"}, None],
+    title="Residents by age band",
+    figsize=FIG_SIZE.FULL_TALL,
+).show()
+```
+
+### Reference bands
+
+A reference band shades a range of values or a run of age bands, over the grid lines and under the bars. Vertical bands on the value axis use the `vspans` attribute with the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing; horizontal bands across the category axis use `hspans` and the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing. Each is a `dict` or a `List[dict]` with the bounds (`xmin` / `xmax`, or `ymin` / `ymax`), an optional `label` for the legend and an optional `style` with the `plot_vspan_*` / `plot_hspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. A single band applies to both sides and draws once. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
+
+The example shades the working-age bands, from 18-19 up to 64-65.
+
+```
+PyramidChart(
+    data=[riverside_bands, hillcrest_bands],
+    subtitle=["Riverside", "Hillcrest"],
+    show_legend=True,
+    # shade the working-age bands, 18-19 up to 64-65: indices 9 to 32
+    hspans={"ymin": 8.5, "ymax": 32.5, "label": "working age"},
+    title="Residents by age band",
+    figsize=FIG_SIZE.FULL_TALL,
 ).show()
 ```
 

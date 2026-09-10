@@ -67,6 +67,8 @@ BoxPlot(
 
     vlines=Optional[Union[dict, List[dict]]],           # the vertical lines
     hlines=Optional[Union[dict, List[dict]]],           # the horizontal lines
+    vspans=Optional[Union[dict, List[dict]]],           # the vertical reference bands
+    hspans=Optional[Union[dict, List[dict]]],           # the horizontal reference bands
 
     label=Optional[str],                                # The key in data holding the category label (default: "label")
     value=Optional[str],                                # The key in data holding the numeric value (default: "value")
@@ -112,6 +114,7 @@ Every customization is either a keyword argument of `BoxPlot` or a `plot_box_*` 
 | print the median of each box                     | `show_values`, `value_format`                                                     | [Value labels](#value-labels)                                   |
 | highlight one box, mute the rest                 | `emphasis`                                                                        | [Emphasis](#emphasis)                                           |
 | draw a threshold or reference line               | `hlines`, `vlines`                                                                | [Reference lines](#reference-lines)                             |
+| shade a range next to the boxes                  | `hspans`, `vspans`                                                                | [Reference bands](#reference-bands)                             |
 | draw the observations or a violin with the boxes | `Panel`                                                                           | [Boxes with swarms and violins](#boxes-with-swarms-and-violins) |
 | compare several datasets side by side            | `data` as a list of lists, `subtitle`, `subplots`                                 | [Multiple Box Plots](#multiple-box-plots)                       |
 | arrange the subplots                             | `max_cols`, `sharex`, `sharey`                                                    | [Shared axes across subplots](#shared-axes-across-subplots)     |
@@ -380,6 +383,41 @@ BoxPlot(
     ylabel="Body mass (g)",
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
+).show()
+```
+
+### Reference bands
+
+A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
+
+The example shades one standard deviation around the mean body mass of all penguins and keeps the mean itself as a line: the Adelie and Chinstrap boxes sit inside the band, the Gentoo box above it.
+
+```
+masses = [penguin["value"] for penguin in chart_data]
+mean_mass = sum(masses) / len(masses)
+std_mass = (sum((mass - mean_mass) ** 2 for mass in masses) / len(masses)) ** 0.5
+
+BoxPlot(
+    data=chart_data,
+    # shade one standard deviation around the mean body mass of all penguins
+    hspans={
+        "ymin": mean_mass - std_mass,
+        "ymax": mean_mass + std_mass,
+        "label": "mean ± 1 SD",
+        "style": {"plot_hspan_color": "#d62728"},
+    },
+    # keep the mean itself as a line
+    hlines={
+        "y": mean_mass,
+        "label": "mean",
+        "style": {"plot_hline_color": "#d62728", "plot_hline_style": LINE_STYLE.DASHED},
+    },
+    title="Body mass of Palmer penguins",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
 ).show()
 ```
 

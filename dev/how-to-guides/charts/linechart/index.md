@@ -66,6 +66,8 @@ LineChart(
 
     vlines=Optional[Union[dict, List[dict]]],           # the vertical lines
     hlines=Optional[Union[dict, List[dict]]],           # the horizontal lines
+    vspans=Optional[Union[dict, List[dict]]],           # the vertical reference bands
+    hspans=Optional[Union[dict, List[dict]]],           # the horizontal reference bands
 
     x=Optional[str],                                    # the key holding the x-axis value (default: "x")
     y=Optional[str],                                    # the key holding the y-axis value (default: "y")
@@ -116,6 +118,7 @@ Every customization is either a keyword argument of `LineChart` or a `plot_line_
 | print the value beside each point     | `show_values`, `value_format`, `value_step`                           | [Value labels](#value-labels)                                 |
 | highlight one series, mute the rest   | `emphasis`                                                            | [Emphasis](#emphasis)                                         |
 | mark a threshold or an event          | `hlines`, `vlines`                                                    | [Reference lines](#reference-lines)                           |
+| shade a period or a range             | `hspans`, `vspans`                                                    | [Reference bands](#reference-bands)                           |
 | compare several series in one chart   | `data` as a list of lists, `subtitle`, `show_legend`                  | [Multiple Line Charts](#multiple-line-charts)                 |
 | draw each series in its own subplot   | `subplots`, `sharex`, `sharey`, `max_cols`                            | [Subplots](#subplots)                                         |
 | draw a confidence interval            | `yerr` in `data`, `show_yerr`                                         | [Confidence interval](#confidence-interval)                   |
@@ -372,6 +375,56 @@ LineChart(
             "plot_vline_width": 1.5,
         },
     },
+    title="Average monthly temperature in Ljubljana",
+    xlabel="Month",
+    ylabel="Temperature (°C)",
+    xticks=MONTH_TICKS,
+    xticklabels=MONTHS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.BOTH,
+    show_legend=True,
+).show()
+```
+
+### Reference bands
+
+Reference bands shade a region of the chart — a period, an acceptable range, a confidence interval. A band sits over the grid lines and under the lines, so the data stays readable through it.
+
+**Horizontal bands.** Use the `hspans` argument with the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
+
+```
+{
+  "ymin": Optional[Union[int, float]],            # The lower y-axis bound (default: the axis minimum)
+  "ymax": Optional[Union[int, float]],            # The upper y-axis bound (default: the axis maximum)
+  "style": {                                      # The style of the band (optional)
+    "plot_hspan_color":      Optional[str],       # The fill color (default: the theme's muted color)
+    "plot_hspan_alpha":      Optional[float],     # The alpha of the band (how visible the band is)
+    "plot_hspan_hatch":      Optional[HATCH_STYLE], # The hatch pattern of the band
+    "plot_hspan_edge_color": Optional[str],       # The edge color; the hatch draws in it
+    "plot_hspan_edge_width": Optional[float],     # The edge line width
+    "plot_hspan_zorder":     Optional[float],     # The zorder (default: over the grid, under the marks)
+  },
+  "label": Optional[str],                         # The label of the band (shown in the legend)
+}
+```
+
+**Vertical bands.** Use the `vspans` argument with the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing, which has the same shape with `xmin`, `xmax` and `plot_vspan_*` style attributes. At least one bound is required; an omitted bound runs to the axis edge, so `{"xmin": 9}` shades everything from September to the right edge of the chart.
+
+The example shades the comfortable temperature range with a horizontal band and the meteorological summer (June to August) with a vertical band. The band labels appear in the legend.
+
+```
+LineChart(
+    data=temperature_ljubljana,
+    subtitle="Ljubljana",
+    # shade the comfortable temperature range
+    hspans={
+        "ymin": 15,
+        "ymax": 25,
+        "label": "comfortable range",
+        "style": {"plot_hspan_color": "#e9a03b"},
+    },
+    # shade the meteorological summer (June to August)
+    vspans={"xmin": 5.5, "xmax": 8.5, "label": "summer"},
     title="Average monthly temperature in Ljubljana",
     xlabel="Month",
     ylabel="Temperature (°C)",

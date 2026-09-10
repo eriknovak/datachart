@@ -61,6 +61,8 @@ HexbinChart(
     ytickrotate: Optional[int],                         # The rotation of the y-axis tick labels
     vlines: Optional[Union[dict, List[dict]]],          # The vertical reference lines
     hlines: Optional[Union[dict, List[dict]]],          # The horizontal reference lines
+    vspans: Optional[Union[dict, List[dict]]],          # The vertical reference bands
+    hspans: Optional[Union[dict, List[dict]]],          # The horizontal reference bands
     colorbar: Optional[Union[dict, List[dict]]],        # The colorbar configuration(s) ({"orientation": ...})
     texts: Optional[Union[dict, List[dict]]],           # The text annotations
 )
@@ -106,6 +108,7 @@ Every customization is either a keyword argument of `HexbinChart` or a `plot_hex
 | draw points or lines over the hexagons     | `Panel`                                                          | [Composing hexbins](#composing-hexbins)           |
 | keep one unit equal on both axes           | `aspect_ratio`                                                   | [Aspect ratio](#aspect-ratio)                     |
 | mark a position with a reference line      | `vlines`, `hlines`                                               | [Reference lines](#reference-lines)               |
+| shade a region of the plane                | `hspans`, `vspans`                                               | [Reference bands](#reference-bands)               |
 | render the chart in another theme          | `config.set_theme`                                               | [Themes](#themes)                                 |
 
 ### Title and axis labels
@@ -420,6 +423,29 @@ HexbinChart(
         "label": "Median rent",
         "style": {"plot_hline_style": LINE_STYLE.DASHED},
     },
+    mincnt=1,
+    title="Apartment listings",
+    xlabel="Floor area (m²)",
+    ylabel="Rent (€/month)",
+    figsize=FIG_SIZE.FULL_SHORT,
+).show()
+```
+
+### Reference bands
+
+A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
+
+The bands below shade the interquartile rent range and the apartments under 40 m²; the second band has no lower bound, so it runs to the left edge.
+
+```
+rent_low, rent_high = np.percentile(listings["y"], [25, 75])
+
+HexbinChart(
+    data=points,
+    # the interquartile rent range
+    hspans={"ymin": float(rent_low), "ymax": float(rent_high)},
+    # the apartments under 40 m²: no lower bound, so the band runs to the left edge
+    vspans={"xmax": 40},
     mincnt=1,
     title="Apartment listings",
     xlabel="Floor area (m²)",

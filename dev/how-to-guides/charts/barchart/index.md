@@ -71,6 +71,8 @@ BarChart(
 
     vlines=Optional[Union[dict, List[dict]]],           # the vertical lines
     hlines=Optional[Union[dict, List[dict]]],           # the horizontal lines
+    vspans=Optional[Union[dict, List[dict]]],           # the vertical reference bands
+    hspans=Optional[Union[dict, List[dict]]],           # the horizontal reference bands
 )
 ```
 
@@ -115,6 +117,7 @@ Every customization is either a keyword argument of `BarChart` or a `plot_bar_*`
 | draw horizontal bars                | `orientation`                                                                                        | [Bar orientation](#bar-orientation)                           |
 | highlight one series, mute the rest | `emphasis`                                                                                           | [Emphasis](#emphasis)                                         |
 | mark a goal, threshold or event     | `hlines`, `vlines`                                                                                   | [Reference lines](#reference-lines)                           |
+| shade a period or a range           | `hspans`, `vspans`                                                                                   | [Reference bands](#reference-bands)                           |
 | compare several series side by side | `data` as a list of lists, `subtitle`, `show_legend`                                                 | [Multiple Bar Charts](#multiple-bar-charts)                   |
 | stack or overlay the series         | `bar_mode`                                                                                           | [Bar mode](#bar-mode)                                         |
 | draw each series in its own subplot | `subplots`, `sharex`, `sharey`, `max_cols`                                                           | [Subplots](#subplots)                                         |
@@ -339,6 +342,53 @@ BarChart(
             "plot_vline_width": 1.5,
         },
     },
+    title="Monthly unit sales (2025)",
+    xlabel="Month",
+    ylabel="Units sold",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+).show()
+```
+
+### Reference bands
+
+Reference bands shade a region of the chart — a period, an acceptable range, a tolerance around a goal. A band sits over the grid lines and under the bars.
+
+**Horizontal bands.** Use the `hspans` argument with the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
+
+```
+{
+  "ymin": Optional[Union[int, float]],            # The lower y-axis bound (default: the axis minimum)
+  "ymax": Optional[Union[int, float]],            # The upper y-axis bound (default: the axis maximum)
+  "style": {                                      # The style of the band (optional)
+    "plot_hspan_color":      Optional[str],       # The fill color (default: the theme's muted color)
+    "plot_hspan_alpha":      Optional[float],     # The alpha of the band (how visible the band is)
+    "plot_hspan_hatch":      Optional[HATCH_STYLE], # The hatch pattern of the band
+    "plot_hspan_edge_color": Optional[str],       # The edge color; the hatch draws in it
+    "plot_hspan_edge_width": Optional[float],     # The edge line width
+    "plot_hspan_zorder":     Optional[float],     # The zorder (default: over the grid, under the marks)
+  },
+  "label": Optional[str],                         # The label of the band (shown in the legend)
+}
+```
+
+**Vertical bands.** Use the `vspans` argument with the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing, which has the same shape with `xmin`, `xmax` and `plot_vspan_*` style attributes. The bounds are bar indices (`0`, `1`, `2`, …), so a band that starts *between* two bars starts at a half-integer position. At least one bound is required; an omitted bound runs to the axis edge.
+
+The example shades a tolerance around the monthly goal with a horizontal band and the fourth quarter with a vertical band that starts between September and October and, with no `xmax`, runs to the right edge. The band labels appear in the legend.
+
+```
+BarChart(
+    data=sales_total,
+    # shade the tolerance around the monthly goal
+    hspans={
+        "ymin": SALES_GOAL - 100,
+        "ymax": SALES_GOAL + 100,
+        "label": "goal ± 100",
+        "style": {"plot_hspan_color": "#c1121f"},
+    },
+    # shade the fourth quarter: from between September and October to the edge
+    vspans={"xmin": 8.5, "label": "Q4"},
     title="Monthly unit sales (2025)",
     xlabel="Month",
     ylabel="Units sold",
