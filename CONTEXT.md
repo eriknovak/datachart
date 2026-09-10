@@ -356,9 +356,16 @@ ones. A highlight edge is the emphasis cue and always stays. Hollow markers
 (box outliers) are exempt — their edge is the marker.
 _Avoid_: edge threshold, min marker size
 
+**Value label**:
+The number a chart prints beside a mark it has already drawn, turned on with
+`show_values` and rendered through `value_format`. It is derived from the
+data, unlike a text annotation, which the caller writes and positions. A
+distribution chart's value label is its median.
+_Avoid_: data label, annotation, callout
+
 **Theme-level default**:
 A nullable theme attribute that supplies the default for a per-chart setting
-(grid visibility, bar value labels) when the chart call leaves it unset. An
+(grid visibility, value labels) when the chart call leaves it unset. An
 explicit chart setting always wins.
 _Avoid_: forced setting, theme override
 
