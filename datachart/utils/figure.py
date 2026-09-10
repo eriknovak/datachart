@@ -4,12 +4,13 @@ The `figure` module provides a set of utilities for manipulating the images.
 
 Methods:
     save_figure(figure, path, dpi, format, transparent):
-        Saves the figure into a file using the provided format parameters.
+        Saves the figure into one file per provided format.
 
 """
 
 import math
-from typing import List, Optional, Tuple, Dict, Any
+import os
+from typing import List, Optional, Set, Tuple, Union, Dict, Any
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec, SubplotSpec
@@ -21,6 +22,25 @@ from ._internal.figures import new_figure
 # =====================================
 # Helper functions
 # =====================================
+
+
+def _format_extensions() -> Set[str]:
+    """Every file extension `FIG_FORMAT` names, lower-cased."""
+    return {
+        value.lower()
+        for name, value in vars(FIG_FORMAT).items()
+        if not name.startswith("_") and isinstance(value, str)
+    }
+
+
+def _figure_stem(path: str) -> str:
+    """The path without its trailing format extension (ADR 0039).
+
+    Only a suffix naming a supported format is stripped, so a dotted file
+    name like `fig.v2` keeps every part of itself.
+    """
+    stem, extension = os.path.splitext(path)
+    return stem if extension[1:].lower() in _format_extensions() else path
 
 
 def _cell_content(figure: plt.Figure, idx: int) -> Dict[str, Any]:
@@ -432,10 +452,10 @@ def save_figure(
     figure: plt.Figure,
     path: str,
     dpi: int = 300,
-    format: FIG_FORMAT = None,
+    format: Union[FIG_FORMAT, List[FIG_FORMAT]] = None,
     transparent: bool = False,
-) -> None:
-    """Save the figure to a file.
+) -> List[str]:
+    """Save the figure to one or more files.
 
     Writes the rendered figure to disk in the format given by `format` or,
     when omitted, by the file extension. Use a vector format (PDF, SVG) for
@@ -443,6 +463,11 @@ def save_figure(
     `transparent=True` to drop the figure background for slides and web
     pages. The theme is already baked into the figure, so saving never
     consults the global config.
+
+    Pass a list of formats to write the same figure several times in one
+    call. `path` is then a stem: its extension is dropped when it names a
+    supported format, and one file per format is written next to it.
+    `dpi` and `transparent` apply to every file.
 
     Examples:
         >>> # 1. create the figure
@@ -455,16 +480,37 @@ def save_figure(
         >>> path = "/path/to/save/chart.png"
         >>> save_figure(figure, path, dpi=300, format=FIG_FORMAT.PNG, transparent=True)
 
+        >>> # 3. save the same figure as a PDF and a PNG
+        >>> save_figure(figure, "/path/to/save/chart", format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
+        ["/path/to/save/chart.pdf", "/path/to/save/chart.png"]
+
     Args:
         figure: The figure to save.
-        path: The path where the figure is saved.
+        path: The path where the figure is saved. A stem when `format` is a list.
         dpi: The DPI of the figure.
-        format: The format of the figure. If `None`, the format will be determined from the file extension.
+        format: The format of the figure, or a list of formats to write. If `None`, the format will be determined from the file extension.
         transparent: Whether to make the background transparent.
+
+    Returns:
+        The paths written, in the order the formats were given.
+
+    Raises:
+        ValueError: If `format` is an empty list.
     """
 
-    # save the figure to a file
-    figure.savefig(path, dpi=dpi, format=format, transparent=transparent)
+    if isinstance(format, (list, tuple)):
+        if not format:
+            raise ValueError("The `format` list is empty: name at least one format")
+        formats = list(format)
+        stem = _figure_stem(path)
+        paths = [f"{stem}.{fmt}" for fmt in formats]
+    else:
+        formats, paths = [format], [path]
+
+    # save the figure to one file per format
+    for out_path, out_format in zip(paths, formats):
+        figure.savefig(out_path, dpi=dpi, format=out_format, transparent=transparent)
+    return paths
 
 
 def _grid_from_dicts(

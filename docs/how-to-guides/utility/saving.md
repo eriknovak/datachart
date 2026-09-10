@@ -27,6 +27,23 @@ save_figure(figure, "chart.png", dpi=300)
 
 The [FIG_FORMAT](../../references/constants.md#datachart.constants.FIG_FORMAT) constant lists every supported format.
 
+## Writing several formats at once
+
+A figure is often needed more than once: a PDF for the manuscript, a PNG for the preview, an SVG for the slides. Pass a list of formats and the same figure is written once per format.
+
+```python
+from datachart.constants import FIG_FORMAT
+
+paths = save_figure(figure, "figures/growth", format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
+# ["figures/growth.pdf", "figures/growth.png"]
+```
+
+With a list, the path is a stem rather than a file name, and each format is appended to it. An extension on the stem is dropped when it names a supported format, so `figures/growth.png` and `figures/growth` behave the same; a dotted name such as `figures/growth.v2` keeps every part of itself and yields `figures/growth.v2.pdf`. A name that already exists is overwritten, and the parent directory must exist.
+
+`save_figure` returns the paths it wrote, in the order the formats were given. It returns a list for a single format too, so the return value never changes shape.
+
+`dpi` and `transparent` apply to every file in the call. Vector formats ignore `dpi`, so one call can carry a raster resolution alongside them without affecting the vector output. For different settings per format, make separate calls.
+
 ## Embedding in web pages
 
 Export the figure as SVG with a transparent background:
