@@ -209,6 +209,20 @@ BASE_THEME: StyleAttrs = {
     "plot_hline_style": LINE_STYLE.SOLID,
     "plot_hline_width": 1,
     "plot_hline_alpha": 0.7,
+    # plot vspan (vertical reference band) style; None color: the muted color
+    "plot_vspan_color": None,
+    "plot_vspan_alpha": 0.25,
+    "plot_vspan_hatch": None,
+    "plot_vspan_edge_color": None,
+    "plot_vspan_edge_width": 0.8,
+    "plot_vspan_zorder": 1.75,
+    # plot hspan (horizontal reference band) style
+    "plot_hspan_color": None,
+    "plot_hspan_alpha": 0.25,
+    "plot_hspan_hatch": None,
+    "plot_hspan_edge_color": None,
+    "plot_hspan_edge_width": 0.8,
+    "plot_hspan_zorder": 1.75,
     # plot text (annotation) style
     "plot_text_color": None,
     "plot_text_size": 9.5,

@@ -10,6 +10,8 @@ from ..typings import (
     StackedAreaStyleAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
+    VSpanPlotAttrs,
+    HSpanPlotAttrs,
     TextAttrs,
 )
 from ..constants import (
@@ -81,6 +83,20 @@ def StackedAreaChart(
             List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]],
         ]
     ] = None,
+    vspans: Optional[
+        Union[
+            VSpanPlotAttrs,
+            List[VSpanPlotAttrs],
+            List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]],
+        ]
+    ] = None,
+    hspans: Optional[
+        Union[
+            HSpanPlotAttrs,
+            List[HSpanPlotAttrs],
+            List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]],
+        ]
+    ] = None,
     texts: Optional[
         Union[
             TextAttrs,
@@ -120,6 +136,7 @@ def StackedAreaChart(
     !!! info "Added in Unreleased"
 
         The `show_values`, `value_format`, `value_step` and `legend` parameters.
+        The `vspans` and `hspans` reference bands.
 
     Args:
         data: The data points for the stacked series. A single list of points
@@ -169,6 +186,8 @@ def StackedAreaChart(
         ytickrotate: Rotation angle for y-axis tick labels.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
+        vspans: Vertical reference band(s) to shade, between two x positions.
+        hspans: Horizontal reference band(s) to shade, between two y positions.
         texts: Text annotation(s) to draw.
         x: The key name in data for x-axis values (default: "x").
         y: The key name in data for y-axis values (default: "y").
@@ -194,6 +213,8 @@ def StackedAreaChart(
         ytickrotate=ytickrotate,
         vlines=vlines,
         hlines=hlines,
+        vspans=vspans,
+        hspans=hspans,
         texts=texts,
         x=x,
         y=y,

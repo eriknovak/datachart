@@ -34,6 +34,15 @@ def validate_bandwidth(bandwidth) -> None:
         )
 
 
+def validate_span_bounds(span: dict, lo: str, hi: str) -> None:
+    """Raise unless a reference band sets at least one of its two bounds."""
+
+    if not isinstance(span, dict) or (span.get(lo) is None and span.get(hi) is None):
+        raise ValueError(
+            f"A reference band needs at least one bound: set `{lo}`, `{hi}`, or both."
+        )
+
+
 def validate_point_labels(label, show_values) -> None:
     """Raise when a scatter chart asks for point labels and value labels at once."""
 

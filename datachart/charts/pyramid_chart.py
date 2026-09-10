@@ -10,6 +10,8 @@ from ..typings import (
     BarStyleAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
+    VSpanPlotAttrs,
+    HSpanPlotAttrs,
     TextAttrs,
 )
 from ..constants import (
@@ -49,6 +51,8 @@ def PyramidChart(
     ytickrotate: Optional[int] = None,
     vlines: Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs]]] = None,
     hlines: Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs]]] = None,
+    vspans: Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]] = None,
+    hspans: Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]] = None,
     texts: Optional[Union[TextAttrs, List[TextAttrs]]] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
     y: Optional[Union[str, List[Optional[str]]]] = None,
@@ -72,6 +76,7 @@ def PyramidChart(
     !!! info "Added in Unreleased"
 
         The `legend` parameter.
+        The `vspans` and `hspans` reference bands.
 
     Examples:
         >>> from datachart.charts import PyramidChart
@@ -125,6 +130,8 @@ def PyramidChart(
         ytickrotate: Rotation angle for category-axis tick labels.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
+        vspans: Vertical reference band(s) to shade, between two x positions.
+        hspans: Horizontal reference band(s) to shade, between two y positions.
         texts: Text annotation(s) to draw.
         label: The key name in data for label values (default: "label").
         y: The key name in data for the bar values (default: "y").
@@ -170,6 +177,8 @@ def PyramidChart(
         ytickrotate=ytickrotate,
         vlines=vlines,
         hlines=hlines,
+        vspans=vspans,
+        hspans=hspans,
         texts=texts,
         label=label,
         y=y,

@@ -559,6 +559,62 @@ def get_hline_style(hline_style: dict) -> dict:
 
 
 # -------------------------------------
+# Vertical Band Style
+# -------------------------------------
+
+
+def get_vspan_style(vspan_style: dict) -> dict:
+    """Get the vertical reference band style.
+
+    Args:
+        vspan_style: The vertical band style dictionary.
+
+    Returns:
+        The vertical band style setting.
+
+    """
+
+    config_attrs = [
+        ("facecolor", "plot_vspan_color"),
+        ("alpha", "plot_vspan_alpha"),
+        ("hatch", "plot_vspan_hatch"),
+        ("edgecolor", "plot_vspan_edge_color"),
+        ("linewidth", "plot_vspan_edge_width"),
+        ("zorder", "plot_vspan_zorder"),
+    ]
+
+    return create_config_dict(vspan_style, config_attrs)
+
+
+# -------------------------------------
+# Horizontal Band Style
+# -------------------------------------
+
+
+def get_hspan_style(hspan_style: dict) -> dict:
+    """Get the horizontal reference band style.
+
+    Args:
+        hspan_style: The horizontal band style dictionary.
+
+    Returns:
+        The horizontal band style setting.
+
+    """
+
+    config_attrs = [
+        ("facecolor", "plot_hspan_color"),
+        ("alpha", "plot_hspan_alpha"),
+        ("hatch", "plot_hspan_hatch"),
+        ("edgecolor", "plot_hspan_edge_color"),
+        ("linewidth", "plot_hspan_edge_width"),
+        ("zorder", "plot_hspan_zorder"),
+    ]
+
+    return create_config_dict(hspan_style, config_attrs)
+
+
+# -------------------------------------
 # Text Annotation Style
 # -------------------------------------
 

@@ -45,6 +45,7 @@ from .validate import (
     validate_network_edge_style,
     validate_sankey_link_color,
     validate_shared_x,
+    validate_span_bounds,
     validate_value_step,
 )
 from .config_helpers import (
@@ -64,6 +65,8 @@ from .config_helpers import (
     expand_legend_location,
     get_vline_style,
     get_hline_style,
+    get_vspan_style,
+    get_hspan_style,
     get_heatmap_style,
     get_heatmap_font_style,
     get_heatmap_edge_style,
@@ -385,6 +388,28 @@ def _resolve_ref_lines(chart: dict, key: str) -> List[tuple]:
     return [(line, get_style(line.get("style", {}))) for line in lines]
 
 
+# a band's bounds per side: (lower key, upper key), the same on polar in degrees
+SPAN_BOUNDS = {"vspans": ("xmin", "xmax"), "hspans": ("ymin", "ymax")}
+
+
+def _resolve_ref_spans(chart: dict, key: str, muted_color: str) -> List[tuple]:
+    """Resolve v/h reference-band styles at build time (ADR 0036)."""
+
+    spans = chart.get(key)
+    if spans is None:
+        return []
+    spans = spans if isinstance(spans, list) else [spans]
+    get_style = get_vspan_style if key == "vspans" else get_hspan_style
+    resolved = []
+    for span in spans:
+        validate_span_bounds(span, *SPAN_BOUNDS[key])
+        style = get_style(span.get("style") or {})
+        # an unset color sits behind the data without competing with the cycle
+        style.setdefault("facecolor", muted_color)
+        resolved.append((span, style))
+    return resolved
+
+
 TEXT_COORDS = ("data", "axes")
 # annotations sit above the data marks (zorder 3), below the panel furniture
 TEXT_ANNOTATION_ZORDER = 5
@@ -623,6 +648,75 @@ def _draw_ref_lines(ax: plt.Axes, vlines: List[tuple], hlines: List[tuple]) -> N
             label=hline.get("label", ""),
             **style,
         )
+
+
+def _draw_ref_spans(
+    ax: plt.Axes, vspans: List[tuple], hspans: List[tuple], polar: bool
+) -> None:
+    """Draw the pre-resolved reference bands on the host axes (ADR 0036).
+
+    Cartesian bands are `axvspan` / `axhspan`; on a polar axes a vertical
+    band is a wedge over the full radius and a horizontal one an annulus over
+    the full circle, both via `fill_between` because the span helpers measure
+    their perpendicular extent in axes fractions. An omitted bound falls back
+    to the axis limit, and the limit is then pinned so the band meets the
+    axes edge instead of growing the view by the autoscale margin.
+    """
+
+    if not (vspans or hspans):
+        return
+
+    if polar:
+        rmin, rmax = ax.get_ylim()
+        for vspan, style in vspans:
+            lo = vspan.get("xmin")
+            hi = vspan.get("xmax")
+            lo = 0.0 if lo is None else float(lo)
+            hi = 360.0 if hi is None else float(hi)
+            if hi < lo:
+                # a wedge through the start angle wraps the long way round
+                hi += 360.0
+            theta = np.deg2rad(np.linspace(lo, hi, max(2, int(2 * (hi - lo)) + 1)))
+            ax.fill_between(theta, rmin, rmax, label=vspan.get("label", ""), **style)
+        theta = np.linspace(0, 2 * np.pi, 721)
+        for hspan, style in hspans:
+            lo = hspan.get("ymin")
+            hi = hspan.get("ymax")
+            ax.fill_between(
+                theta,
+                rmin if lo is None else lo,
+                rmax if hi is None else hi,
+                label=hspan.get("label", ""),
+                **style,
+            )
+        ax.set_ylim(rmin, rmax)
+        return
+
+    xlim = ax.get_xlim()
+    for vspan, style in vspans:
+        lo = vspan.get("xmin")
+        hi = vspan.get("xmax")
+        ax.axvspan(
+            xlim[0] if lo is None else lo,
+            xlim[1] if hi is None else hi,
+            label=vspan.get("label", ""),
+            **style,
+        )
+    if any(v.get("xmin") is None or v.get("xmax") is None for v, _ in vspans):
+        ax.set_xlim(xlim)
+
+    ylim = ax.get_ylim()
+    for hspan, style in hspans:
+        lo = hspan.get("ymin")
+        hi = hspan.get("ymax")
+        ax.axhspan(
+            ylim[0] if lo is None else lo,
+            ylim[1] if hi is None else hi,
+            label=hspan.get("label", ""),
+            **style,
+        )
+    if any(h.get("ymin") is None or h.get("ymax") is None for h, _ in hspans):
+        ax.set_ylim(ylim)
 
 
 def _draw_legend(
@@ -943,6 +1037,8 @@ class Layer:
         # snapshot at build so muting harmonizes with the layer's own theme
         muted_alpha = config.get("muted_alpha")
         self.muted_color = config.get("muted_color") or DEFAULT_MUTED_COLOR
+        self.vspans = _resolve_ref_spans(chart, "vspans", self.muted_color)
+        self.hspans = _resolve_ref_spans(chart, "hspans", self.muted_color)
         self.muted_alpha = DEFAULT_MUTED_ALPHA if muted_alpha is None else muted_alpha
         # the sketch halo around a series line (ADR 0027); None means off
         self.halo = get_sketch_halo(self.style)
@@ -5978,9 +6074,11 @@ class Panel:
                 if isinstance(layer, SwarmLayer):
                     layer.pack(owner_ax)
 
-        # reference lines and text annotations, after scales and limits
+        # reference lines and bands, after scales and limits; the host axes
+        # sits under a twin, so a band there lies beneath both axes' marks
         for layer, target_ax in zip(layers, [ax] * len(layers)):
             _draw_ref_lines(target_ax, layer.vlines, layer.hlines)
+            _draw_ref_spans(target_ax, layer.vspans, layer.hspans, polar)
 
         # a twin axes renders entirely above its host, so texts live on the
         # topmost axes while data coordinates read the owning layer's axes

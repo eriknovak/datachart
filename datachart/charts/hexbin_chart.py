@@ -10,6 +10,8 @@ from ..typings import (
     ColorbarSettingAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
+    VSpanPlotAttrs,
+    HSpanPlotAttrs,
     TextAttrs,
 )
 from ..constants import (
@@ -80,6 +82,20 @@ def HexbinChart(
             List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]],
         ]
     ] = None,
+    vspans: Optional[
+        Union[
+            VSpanPlotAttrs,
+            List[VSpanPlotAttrs],
+            List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]],
+        ]
+    ] = None,
+    hspans: Optional[
+        Union[
+            HSpanPlotAttrs,
+            List[HSpanPlotAttrs],
+            List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]],
+        ]
+    ] = None,
     colorbar: Optional[
         Union[ColorbarSettingAttrs, List[Optional[ColorbarSettingAttrs]]]
     ] = None,
@@ -108,6 +124,7 @@ def HexbinChart(
 
         The `label`, `location`, `format`, and `ticks` fields of the
         `colorbar` setting.
+        The `vspans` and `hspans` reference bands.
 
     Examples:
         >>> from datachart.charts import HexbinChart
@@ -171,6 +188,8 @@ def HexbinChart(
         ytickrotate: Rotation angle for y-axis tick labels.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
+        vspans: Vertical reference band(s) to shade, between two x positions.
+        hspans: Horizontal reference band(s) to shade, between two y positions.
         colorbar: The colorbar setting(s): label, location, tick format,
             and tick positions. See `ColorbarSettingAttrs`.
         texts: Text annotation(s) to draw.
@@ -198,6 +217,8 @@ def HexbinChart(
         ytickrotate=ytickrotate,
         vlines=vlines,
         hlines=hlines,
+        vspans=vspans,
+        hspans=hspans,
         texts=texts,
         is_2d_data=True,
         gridsize=gridsize,

@@ -11,6 +11,8 @@ from ..typings import (
     ScatterStyleAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
+    VSpanPlotAttrs,
+    HSpanPlotAttrs,
     TextAttrs,
 )
 from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID, SCALE, VALUE_FORMAT
@@ -73,6 +75,20 @@ def ScatterChart(
             HLinePlotAttrs,
             List[HLinePlotAttrs],
             List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]],
+        ]
+    ] = None,
+    vspans: Optional[
+        Union[
+            VSpanPlotAttrs,
+            List[VSpanPlotAttrs],
+            List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]],
+        ]
+    ] = None,
+    hspans: Optional[
+        Union[
+            HSpanPlotAttrs,
+            List[HSpanPlotAttrs],
+            List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]],
         ]
     ] = None,
     texts: Optional[
@@ -161,6 +177,7 @@ def ScatterChart(
     !!! info "Added in Unreleased"
 
         The `show_values`, `value_format`, `value_step` and `legend` parameters.
+        The `vspans` and `hspans` reference bands.
 
     Args:
         data: The data points for the scatter chart(s). Can be a single list of data points
@@ -211,6 +228,8 @@ def ScatterChart(
         ytickrotate: Rotation angle for y-axis tick labels.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
+        vspans: Vertical reference band(s) to shade, between two x positions.
+        hspans: Horizontal reference band(s) to shade, between two y positions.
         texts: Text annotation(s) to draw.
         x: The key name in data for x-axis values (default: "x").
         y: The key name in data for y-axis values (default: "y").
@@ -243,6 +262,8 @@ def ScatterChart(
         ytickrotate=ytickrotate,
         vlines=vlines,
         hlines=hlines,
+        vspans=vspans,
+        hspans=hspans,
         texts=texts,
         x=x,
         y=y,

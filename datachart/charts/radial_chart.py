@@ -12,6 +12,8 @@ from ..typings import (
     HistStyleAttrs,
     ScatterStyleAttrs,
     TextAttrs,
+    VSpanPlotAttrs,
+    HSpanPlotAttrs,
 )
 from ..constants import (
     BAR_MODE,
@@ -83,6 +85,20 @@ def RadialChart(
     ] = None,
     vlines: Optional[dict] = None,
     hlines: Optional[dict] = None,
+    vspans: Optional[
+        Union[
+            VSpanPlotAttrs,
+            List[VSpanPlotAttrs],
+            List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]],
+        ]
+    ] = None,
+    hspans: Optional[
+        Union[
+            HSpanPlotAttrs,
+            List[HSpanPlotAttrs],
+            List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]],
+        ]
+    ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
     x: Optional[Union[str, List[Optional[str]]]] = None,
     y: Optional[Union[str, List[Optional[str]]]] = None,
@@ -101,6 +117,7 @@ def RadialChart(
     !!! info "Added in Unreleased"
 
         The `legend` parameter.
+        The `vspans` and `hspans` reference bands.
 
     Examples:
         >>> from datachart.charts import RadialChart
@@ -172,6 +189,12 @@ def RadialChart(
             coordinates (`"coords": "axes"`) are often easier.
         vlines: Not supported on a polar axes. Raises when passed.
         hlines: Not supported on a polar axes. Raises when passed.
+        vspans: Angular wedge(s) to shade over the full radius; `xmin` and
+            `xmax` are angles in degrees from the start angle, an omitted
+            bound running to 0 or 360.
+        hspans: Annulus (annuli) to shade over the full circle; `ymin` and
+            `ymax` are radial values, an omitted bound running to the radial
+            limit.
         label: The key name in data for the category labels (default: "label").
         x: The key name in data for the histogram observations (default: "x").
         y: The key name in data for radial values (default: "y").
@@ -218,6 +241,8 @@ def RadialChart(
         emphasis=emphasis,
         style=style,
         texts=texts,
+        vspans=vspans,
+        hspans=hspans,
         label=label,
         x=x,
         y=y,
