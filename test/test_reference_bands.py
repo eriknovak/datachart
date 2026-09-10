@@ -250,6 +250,18 @@ class TestFronts(unittest.TestCase):
             ax = figure.axes[0]
             self.assertEqual(len(band_patches(ax)) >= 2, True, front.__name__)
 
+    def test_shared_band_draws_once_per_panel(self):
+        figure = LineChart(
+            data=[LINE, LINE],
+            vspans={"xmin": 1, "xmax": 2, "label": "band"},
+            show_legend=True,
+        )
+        ax = figure.axes[0]
+        self.assertEqual(len(band_patches(ax)), 1)
+        self.assertEqual(
+            [t.get_text() for t in ax.get_legend().get_texts()].count("band"), 1
+        )
+
     def test_subplots_take_per_chart_bands(self):
         figure = LineChart(
             data=[LINE, LINE],

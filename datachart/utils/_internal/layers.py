@@ -6074,11 +6074,17 @@ class Panel:
                 if isinstance(layer, SwarmLayer):
                     layer.pack(owner_ax)
 
-        # reference lines and bands, after scales and limits; the host axes
-        # sits under a twin, so a band there lies beneath both axes' marks
+        # reference lines and bands, after scales and limits
         for layer, target_ax in zip(layers, [ax] * len(layers)):
             _draw_ref_lines(target_ax, layer.vlines, layer.hlines)
-            _draw_ref_spans(target_ax, layer.vspans, layer.hspans, polar)
+        # one band declared for every chart of a figure draws once, so its
+        # tint does not stack with the series count; the host axes sits under
+        # a twin, so the band lies beneath both axes' marks
+        vspans, hspans = [], []
+        for layer in layers:
+            vspans.extend(span for span in layer.vspans if span not in vspans)
+            hspans.extend(span for span in layer.hspans if span not in hspans)
+        _draw_ref_spans(ax, vspans, hspans, polar)
 
         # a twin axes renders entirely above its host, so texts live on the
         # topmost axes while data coordinates read the owning layer's axes
