@@ -28,11 +28,16 @@ STYLE_ALIASES = {
 
 
 def canonical_style(style: dict) -> dict:
-    """`style` with every alias key renamed; a canonical key already present wins."""
+    """`style` with every alias key renamed.
+
+    An alias present in `style` wins over the canonical key: the alias was
+    written by hand, while the canonical key usually arrives by spreading a
+    predefined theme underneath it.
+    """
 
     resolved = {k: v for k, v in style.items() if k not in STYLE_ALIASES}
     for alias, key in STYLE_ALIASES.items():
-        if alias in style and key not in resolved:
+        if alias in style:
             resolved[key] = style[alias]
     return resolved
 

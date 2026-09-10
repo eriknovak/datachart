@@ -79,6 +79,13 @@ class TestStyleFamily(ValueLabelCase):
         figure = BarChart(BAR, show_values=True)
         self.assertEqual(labels(figure.axes[0])[0].get_color(), "#123456")
 
+    def test_theme_spread_with_alias_override(self):
+        config.register_theme(
+            "spread", {**DEFAULT_THEME, "plot_bar_value_fontsize": 12}
+        )
+        config.set_theme("spread")
+        self.assertEqual(config["plot_value_fontsize"], 12)
+
     def test_chart_style_accepts_both_names(self):
         old = BarChart(BAR, show_values=True, style={"plot_bar_value_fontsize": 15})
         new = LineChart(LINE, show_values=True, style={"plot_value_fontsize": 15})

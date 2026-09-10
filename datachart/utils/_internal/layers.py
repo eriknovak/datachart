@@ -872,6 +872,8 @@ class Layer:
     projection: str = "cartesian"
     # a bare layer owns its axes: fixed limits, axis off, no panel furniture
     bare: bool = False
+    # value labels sit past the mark on the value axis and need headroom there
+    labels_past_mark: bool = False
 
     def __init__(self, chart: dict, settings: dict):
         self.chart = chart
@@ -920,11 +922,12 @@ class Layer:
             "family": resolve_font_family(),
         }
 
-    def _label_bars(self, ax, bars, stacked: bool, **labels) -> None:
+    def _label_bars(self, ax, bars, stacked: bool, **bar_label_kwargs) -> None:
         """Label a bar container past each bar's edge; inside it when stacked.
 
         A stacked segment's edge is the next segment's base, so an edge label
-        would sit on the mark above it.
+        would sit on the mark above it. `bar_label_kwargs` name the texts:
+        `fmt` or `labels`, as `ax.bar_label` takes them.
         """
 
         ax.bar_label(
@@ -932,7 +935,7 @@ class Layer:
             label_type="center" if stacked else "edge",
             padding=0 if stacked else self.value_padding,
             zorder=TEXT_ANNOTATION_ZORDER,
-            **labels,
+            **bar_label_kwargs,
             **self.value_font,
         )
 
@@ -1115,6 +1118,9 @@ class PointLabelMixin:
     """
 
     label_spots = POINT_LABEL_SPOTS
+    labels_past_mark = True
+    # only the scatter layer reserves a correlation box among the obstacles
+    show_correlation = False
 
     def _init_point_labels(self) -> None:
         # point labels wear the text font; alignment comes from their spot
@@ -1321,10 +1327,10 @@ class StackedAreaLayer(Layer):
         heights = ctx.stack_slot.top - ctx.stack_slot.bottom
         mids = (ctx.stack_slot.top + ctx.stack_slot.bottom) / 2
         texts = self._value_texts(ax, heights, ctx.transpose)
-        # a band thinner than its label cannot hold it; the view limits are
-        # read first so the display transform sees the autoscaled axes
+        # a band thinner than its label cannot hold it; the axes autoscale
+        # first so the display transform sees the final limits
         axis = 0 if ctx.transpose else 1
-        (ax.get_xlim if ctx.transpose else ax.get_ylim)()
+        ax.autoscale_view()
         per_unit = abs(
             ax.transData.transform([[1, 1]])[0][axis]
             - ax.transData.transform([[0, 0]])[0][axis]
@@ -1393,6 +1399,7 @@ def _stack_slots(layers: List[StackedAreaLayer], baseline: str) -> dict:
 
 class BarLayer(Layer):
     kind = "bar"
+    labels_past_mark = True
 
     def _resolve_style(self):
         orientation = self.settings.get("orientation") or DEFAULT_ORIENTATION
@@ -1486,6 +1493,7 @@ class BarLayer(Layer):
 
 class HistogramLayer(Layer):
     kind = "histogram"
+    labels_past_mark = True
 
     def _resolve_style(self):
         self.hist_style = get_hist_style(self.style)
@@ -5818,14 +5826,8 @@ class Panel:
                 lo, hi = ax.get_ylim()
                 ax.set_ylim(lo, hi + (hi - lo) * extra)
         else:
-            # bars, bins and points label past the mark on the value axis;
-            # band and median labels sit inside the marks
-            value_layers = [
-                l
-                for l in layers
-                if isinstance(l, (BarLayer, HistogramLayer, LineLayer, ScatterLayer))
-                and l.show_values
-            ]
+            # band and median labels sit inside the marks and need no room
+            value_layers = [l for l in layers if l.labels_past_mark and l.show_values]
             if value_layers:
                 lo, hi = ax.get_xlim() if horizontal else ax.get_ylim()
                 pad = (hi - lo) * (
@@ -6009,7 +6011,7 @@ class Panel:
                                     layer.label_spots,
                                 )
                             )
-                if getattr(layer, "show_correlation", False):
+                if layer.show_correlation:
                     obstacles.append(self._correlation_box(top_ax, layer))
         if entries:
             _draw_point_labels(top_ax, entries, obstacles)
