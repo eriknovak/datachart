@@ -38,6 +38,13 @@ WIND = [{"label": d, "y": v} for d, v in zip(["N", "E", "S", "W"], [3, 5, 4, 6])
 SPAN_KEYS = ("color", "alpha", "hatch", "edge_color", "edge_width", "zorder")
 
 
+def hatch_color(patch):
+    """The resolved hatch color; matplotlib < 3.10 has no public accessor."""
+
+    getter = getattr(patch, "get_hatchcolor", None)
+    return getter() if getter else patch._hatch_color
+
+
 def band_patches(ax):
     """The band patches of an axes: spans ride the blended axis transforms."""
 
@@ -187,9 +194,7 @@ class TestStacking(unittest.TestCase):
         )
         (band,) = band_patches(figure.axes[0])
         self.assertEqual(band.get_hatch(), "//")
-        self.assertEqual(
-            band.get_hatchcolor(), matplotlib.colors.to_rgba("#123456", 0.25)
-        )
+        self.assertEqual(hatch_color(band), matplotlib.colors.to_rgba("#123456", 0.25))
 
     def test_hatch_without_edge_draws_in_fill_color(self):
         figure = LineChart(
@@ -197,7 +202,7 @@ class TestStacking(unittest.TestCase):
             vspans={"xmin": 1, "xmax": 3, "style": {"plot_vspan_hatch": "//"}},
         )
         (band,) = band_patches(figure.axes[0])
-        self.assertEqual(band.get_hatchcolor(), band.get_facecolor())
+        self.assertEqual(hatch_color(band), band.get_facecolor())
 
 
 class TestLegend(unittest.TestCase):
