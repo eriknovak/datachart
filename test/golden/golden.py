@@ -189,6 +189,16 @@ EXPECTED_CHANGES = {
     "network_grouped",
     # ARROW_STYLE.STRAIGHT annotation connector (ADR 0029)
     "annotate_arrow_straight",
+    # new value label cases (ADR 0033); the labelling themes now label lines
+    "values_line",
+    "values_scatter_hue",
+    "values_hist_stacked",
+    "values_stackedarea",
+    "values_box_horizontal",
+    "values_violin_split",
+    "values_panel_line_scatter",
+    "values_theme_minimal_grid",
+    "emphasis_line_walks_material",
 }
 
 
@@ -747,6 +757,98 @@ def emphasis_panel_cross_type():
         title="Trend over observations",
         show_legend=True,
     )
+
+
+# ----- value labels (ADR 0033) -----
+
+
+@case
+def values_line():
+    return LineChart(
+        data=[LINE1, LINE2],
+        subtitle=["square", "linear"],
+        show_values=True,
+        value_format=VALUE_FORMAT.INTEGER,
+        show_legend=True,
+    )
+
+
+@case
+def values_scatter_hue():
+    data = [
+        {"x": p["x"], "y": p["y"], "hue": "even" if i % 2 == 0 else "odd"}
+        for i, p in enumerate(SCAT1)
+    ]
+    return ScatterChart(data=data, hue="hue", show_values=True, value_step=2)
+
+
+@case
+def values_hist_stacked():
+    return Histogram(
+        data=[hist_data(), hist_data(mu=2.0)],
+        subtitle=["a", "b"],
+        num_bins=12,
+        show_values=True,
+        show_legend=True,
+    )
+
+
+@case
+def values_stackedarea():
+    return StackedAreaChart(
+        data=stack_series(),
+        subtitle=["a", "b", "c"],
+        show_values=True,
+        value_format=VALUE_FORMAT.DECIMAL,
+        show_legend=True,
+    )
+
+
+@case
+def values_box_horizontal():
+    rng = np.random.RandomState(3)
+    data = [
+        {"label": lab, "value": float(v)}
+        for lab in ["A", "B", "C"]
+        for v in rng.randn(30) * 10 + {"A": 40, "B": 60, "C": 50}[lab]
+    ]
+    return BoxPlot(
+        data=data,
+        orientation="horizontal",
+        show_values=True,
+        value_format=VALUE_FORMAT.DECIMAL,
+    )
+
+
+@case
+def values_violin_split():
+    return ViolinPlot(
+        data=violin_data(split=True),
+        split="sex",
+        show_values=True,
+        value_format=VALUE_FORMAT.DECIMAL_2,
+        show_legend=True,
+    )
+
+
+@case
+def values_panel_line_scatter():
+    line = LineChart(data=LINE2, show_values=True, value_format=VALUE_FORMAT.INTEGER)
+    scatter = ScatterChart(data=SCAT1, show_values=True, value_step=3)
+    return Panel([line, scatter], title="composed value labels")
+
+
+@case
+def values_theme_minimal_grid():
+    config.set_theme(THEME.MINIMAL)
+    line = LineChart(data=LINE2, title="line")
+    hist = Histogram(data=hist_data(), num_bins=10, title="histogram")
+    box = BoxPlot(
+        data=[{"label": lab, "value": v} for lab in "AB" for v in range(1, 8)],
+        title="box",
+    )
+    area = StackedAreaChart(data=stack_series(), title="area")
+    return Grid([[line, hist], [box, area]], figsize=(10, 7))
 
 
 # ----- overlays -----
