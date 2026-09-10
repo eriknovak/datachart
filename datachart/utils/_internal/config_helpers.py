@@ -1308,6 +1308,19 @@ def get_legend_style(legend: Optional[dict] = None) -> dict:
     return style
 
 
+def get_legend_panel_settings(legend: Optional[dict] = None) -> dict:
+    """The panel settings a per-figure legend setting resolves to.
+
+    The resolved style, plus whether the caller named a location: on a bare
+    panel that beats the built-in outside pin (ADR 0034).
+    """
+
+    return {
+        "legend_style": get_legend_style(legend),
+        "legend_loc_explicit": (legend or {}).get("location") is not None,
+    }
+
+
 # ================================================
 # Chart Configurations
 # ================================================

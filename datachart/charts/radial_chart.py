@@ -98,6 +98,10 @@ def RadialChart(
 
     !!! info "Added in v0.8.0"
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Examples:
         >>> from datachart.charts import RadialChart
         >>> figure = RadialChart(
@@ -109,10 +113,6 @@ def RadialChart(
         ...     ],
         ...     title="Basic Radial Chart"
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `legend` parameter.
 
     Args:
         data: The data points for the radial chart(s). Can be a single list of data

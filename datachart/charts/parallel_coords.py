@@ -56,6 +56,10 @@ def ParallelCoords(
 
     !!! info "Added in v0.7.0"
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Examples:
         >>> from datachart.charts import ParallelCoords
         >>> figure = ParallelCoords(
@@ -69,10 +73,6 @@ def ParallelCoords(
         ...     dimensions=["sepal_length", "sepal_width", "petal_length", "petal_width"],
         ...     show_legend=True
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `legend` parameter.
 
     Args:
         data: The data points for the chart. Each data point is a dictionary where

@@ -59,7 +59,7 @@ from .config_helpers import (
     get_line_style,
     get_bar_style,
     get_hist_style,
-    get_legend_style,
+    get_legend_panel_settings,
     expand_legend_location,
     get_vline_style,
     get_hline_style,
@@ -748,7 +748,7 @@ def _fit_legend(legend: Legend, axes: list, dim: int, renderer) -> None:
     if not _legend_overlaps(box, bboxes, lines, offsets):
         return
 
-    pad = LEGEND_HEADROOM_PAD_PT * legend.figure.dpi / 72.0
+    pad = _legend_pad_px(legend.figure)
     size = Bbox.from_bounds(0, 0, box.width, box.height)
     anchor = legend.get_bbox_to_anchor()
     names = (
@@ -794,27 +794,24 @@ def _fit_outside_legend(legend: Legend, axes: list, renderer) -> None:
 
     box = legend.get_window_extent(renderer)
     ax_box = legend.axes.bbox
-    # (legend lies on this side, the furniture overhang there, shift direction)
-    sides = [
-        (box.x0 >= ax_box.x1, lambda f: f.x1 - ax_box.x1, (1, 0)),
-        (box.x1 <= ax_box.x0, lambda f: ax_box.x0 - f.x0, (-1, 0)),
-        (box.y0 >= ax_box.y1, lambda f: f.y1 - ax_box.y1, (0, 1)),
-        (box.y1 <= ax_box.y0, lambda f: ax_box.y0 - f.y0, (0, -1)),
-    ]
-    side = next((entry for entry in sides if entry[0]), None)
-    if side is None:
-        return
-    _, overhang, direction = side
     legend.set_in_layout(False)
     try:
         furniture = Bbox.union([ax.get_tightbbox(renderer) for ax in axes])
     finally:
         legend.set_in_layout(True)
-    shift = overhang(furniture)
+    if box.x0 >= ax_box.x1:
+        shift, direction = furniture.x1 - ax_box.x1, (1, 0)
+    elif box.x1 <= ax_box.x0:
+        shift, direction = ax_box.x0 - furniture.x0, (-1, 0)
+    elif box.y0 >= ax_box.y1:
+        shift, direction = furniture.y1 - ax_box.y1, (0, 1)
+    elif box.y1 <= ax_box.y0:
+        shift, direction = ax_box.y0 - furniture.y0, (0, -1)
+    else:
+        return
     if shift <= 0:
         return
-    pad = LEGEND_HEADROOM_PAD_PT * legend.figure.dpi / 72.0
-    inches = (shift + pad) / legend.figure.dpi
+    inches = (shift + _legend_pad_px(legend.figure)) / legend.figure.dpi
     offset = ScaledTranslation(
         direction[0] * inches, direction[1] * inches, legend.figure.dpi_scale_trans
     )
@@ -822,6 +819,16 @@ def _fit_outside_legend(legend: Legend, axes: list, renderer) -> None:
     # axes-fraction position so the re-layout keeps the gap
     anchor = legend.axes.transAxes.inverted().transform(legend.get_bbox_to_anchor().p0)
     legend.set_bbox_to_anchor(tuple(anchor), transform=legend.axes.transAxes + offset)
+
+
+def _legend_pad_px(figure) -> float:
+    return LEGEND_HEADROOM_PAD_PT * figure.dpi / 72.0
+
+
+def _defer_legend_fit(ax: plt.Axes, fit) -> None:
+    """Queue a legend fit for the figure's first draw, once layout has run."""
+
+    ax.figure.__dict__.setdefault("_legend_fits", []).append(fit)
 
 
 # ================================================
@@ -6005,13 +6012,15 @@ class Panel:
                 if labels:
                     _draw_legend(ax, ax_right, legend_style, handles, labels)
 
+            legend = top_ax.get_legend()
+            if legend is not None and not bare and "bbox_to_anchor" in legend_style:
+                # an outside legend clears the axis furniture at draw time
+                axes = [ax] + ([ax_right] if ax_right is not None else [])
+                _defer_legend_fit(
+                    top_ax, lambda renderer: _fit_outside_legend(legend, axes, renderer)
+                )
+
         legend = top_ax.get_legend()
-        if legend is not None and not bare and legend._bbox_to_anchor is not None:
-            # an outside legend clears the axis furniture at draw time
-            axes = [ax] + ([ax_right] if ax_right is not None else [])
-            top_ax.figure.__dict__.setdefault("_legend_fits", []).append(
-                lambda renderer: _fit_outside_legend(legend, axes, renderer)
-            )
         if legend is not None and polar:
             # the polar border circle crosses the plot area; the legend sits
             # above the spine so it is never cut by the circle
@@ -6023,8 +6032,8 @@ class Panel:
             if value_max is None and (ax_right is None or s.get("ymax_right") is None):
                 axes = [ax] + ([ax_right] if ax_right is not None else [])
                 dim = 0 if horizontal else 1
-                top_ax.figure.__dict__.setdefault("_legend_fits", []).append(
-                    lambda renderer: _fit_legend(legend, axes, dim, renderer)
+                _defer_legend_fit(
+                    top_ax, lambda renderer: _fit_legend(legend, axes, dim, renderer)
                 )
 
         # tick labels and legend text cannot take the font family through
@@ -6389,10 +6398,7 @@ def build_chart_panel_settings(
             if settings.get("aspect_ratio") is None
             else settings["aspect_ratio"]
         ),
-        "legend_style": get_legend_style(settings.get("legend")),
-        # a caller-named location beats the bare-panel pin (ADR 0034)
-        "legend_loc_explicit": (settings.get("legend") or {}).get("location")
-        is not None,
+        **get_legend_panel_settings(settings.get("legend")),
         # histograms stack by default; bars group (ADR 0014)
         "bar_mode": settings.get("bar_mode")
         or ("stack" if chart_type == "histogram" else "group"),

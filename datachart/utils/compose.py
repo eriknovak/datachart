@@ -25,7 +25,11 @@ from ..config import config
 from ..constants import BAR_MODE, FIG_SIZE
 from ..typings import LegendSettingAttrs, TextAttrs
 from .figure import _grid_from_dicts, _figure_grid_layout_impl
-from ._internal.config_helpers import get_grid_style, get_legend_style, get_text_style
+from ._internal.config_helpers import (
+    get_grid_style,
+    get_legend_panel_settings,
+    get_text_style,
+)
 from ._internal.figures import new_figure
 from ._internal.layers import (
     Panel as _PanelSeam,
@@ -343,8 +347,7 @@ def Panel(
         "hatch_cycle": config.get("plot_hatch_cycle"),
         "show_legend": show_legend,
         "legend_mode": "combined",
-        "legend_style": get_legend_style(legend),
-        "legend_loc_explicit": (legend or {}).get("location") is not None,
+        **get_legend_panel_settings(legend),
         "title": title,
         "xlabel": xlabel,
         "ylabel": ylabel_left,

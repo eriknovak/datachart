@@ -69,6 +69,10 @@ def PyramidChart(
 
     !!! info "Added in v0.8.0"
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Examples:
         >>> from datachart.charts import PyramidChart
         >>> figure = PyramidChart(
@@ -88,10 +92,6 @@ def PyramidChart(
         ...     title="Basic Pyramid Chart",
         ...     show_legend=True,
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `legend` parameter.
 
     Args:
         data: Exactly two lists of data points — the first is the left side,

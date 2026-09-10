@@ -77,6 +77,10 @@ def Heatmap(
 
     !!! info "Added in v0.4.0"
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Examples:
         >>> from datachart.charts import Heatmap
         >>> figure = Heatmap(
@@ -93,10 +97,6 @@ def Heatmap(
         ...     xlabel="X",
         ...     ylabel="Y"
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `legend` parameter.
 
     Args:
         data: The labelled grid(s) for the heatmap(s): one `{x, y, z}` dict,

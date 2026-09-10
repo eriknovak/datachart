@@ -101,6 +101,10 @@ def BarChart(
     [`LineChart`][datachart.charts.LineChart], for distributions for
     [`Histogram`][datachart.charts.Histogram].
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Examples:
         >>> from datachart.charts import BarChart
         >>> figure = BarChart(
@@ -115,10 +119,6 @@ def BarChart(
         ...     xlabel="LABEL",
         ...     ylabel="Y"
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `legend` parameter.
 
     Args:
         data: The data points for the bar chart(s). Can be a single list of data points

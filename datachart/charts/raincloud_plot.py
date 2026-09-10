@@ -105,6 +105,10 @@ def RaincloudPlot(
 
     !!! info "Added in 0.9.0"
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Examples:
         >>> from datachart.charts import RaincloudPlot
         >>> figure = RaincloudPlot(
@@ -120,10 +124,6 @@ def RaincloudPlot(
         ...     xlabel="Group",
         ...     ylabel="Value"
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `legend` parameter.
 
     Args:
         data: The data points for the raincloud plot(s). Can be a single list of

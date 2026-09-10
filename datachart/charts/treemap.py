@@ -53,6 +53,10 @@ def Treemap(
 
     !!! info "Added in v0.9.1"
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Examples:
         >>> from datachart.charts import Treemap
         >>> figure = Treemap(
@@ -68,10 +72,6 @@ def Treemap(
         ...     },
         ...     title="Population, millions",
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `legend` parameter.
 
     Args:
         data: The chart data: a `{"data": [...]}` dict whose records are

@@ -1038,7 +1038,7 @@ class LegendSettingAttrs(TypedDict):
     """The per-figure legend setting, passed to a chart front as `legend`.
 
     Every field is optional; a `None` field falls back to the theme's
-    `plot_legend_*` attribute of the same name (ADR 0003).
+    `plot_legend_*` attribute of the same name.
 
     !!! info "Added in Unreleased"
 

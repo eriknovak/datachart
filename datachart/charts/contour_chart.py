@@ -108,6 +108,10 @@ def ContourChart(
 
     !!! info "Added in 0.9.0"
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Examples:
         >>> from datachart.charts import ContourChart
         >>> figure = ContourChart(
@@ -124,10 +128,6 @@ def ContourChart(
         ...     xlabel="X",
         ...     ylabel="Y"
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `legend` parameter.
 
     Args:
         data: The gridded surface(s): a dictionary with the 2-D `z` grid and

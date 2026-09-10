@@ -67,6 +67,10 @@ def NetworkChart(
 
     !!! info "Added in v0.9.1"
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Examples:
         >>> from datachart.charts import NetworkChart
         >>> figure = NetworkChart(
@@ -81,10 +85,6 @@ def NetworkChart(
         ...     directed=True,
         ...     title="Module dependencies",
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `legend` parameter.
 
     Args:
         data: The chart data: a `{"nodes": [...], "edges": [...]}` dict, or a

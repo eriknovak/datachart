@@ -35,8 +35,12 @@ matplotlib location string passed straight through.
   anchor to the top edge rather than centering, which is both the common case
   and what bare panels already do.
 - **The expansion happens once, where legend style is resolved**, so a theme
-  key and a per-chart setting produce identical results and neither the fronts
-  nor the panel learn about anchors.
+  key and a per-chart setting produce identical results and the fronts never
+  learn about anchors. The anchor sits on the axes edge, where the tick labels
+  and axis labels live, so the panel finishes the placement at draw time: once
+  layout has sized the axes it moves the legend outward by the furniture's
+  overhang on that side, as a fixed offset so the re-layout that makes room
+  keeps the gap. Bare panels have no such furniture and keep the plain pin.
 - **A user-supplied location wins over the bare-panel pin.** Charts whose marks
   fill the axes — treemap, sankey, network — currently force the legend beside
   the plot. That stays the default and stops being unconditional; a caller who

@@ -99,6 +99,10 @@ def SwarmPlot(
 
     !!! info "Added in 0.9.0"
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Examples:
         >>> from datachart.charts import SwarmPlot
         >>> figure = SwarmPlot(
@@ -114,10 +118,6 @@ def SwarmPlot(
         ...     xlabel="Group",
         ...     ylabel="Value"
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `legend` parameter.
 
     Args:
         data: The data points for the swarm plot(s). Can be a single list of data
