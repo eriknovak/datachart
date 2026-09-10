@@ -159,7 +159,7 @@ plugins:
           - how-to-guides/utility/interactive.md: "Zooming, panning, and hovering over marks with show(interactive=True): the interactive extra, notebook and script behavior, and the chart types with hover support."
         Styling:
           - how-to-guides/styling/index.md: Map of configuration, themes, emphasis, and colormaps.
-          - how-to-guides/styling/config.ipynb: "Customizing the global style via the config singleton: set_theme, update_config, reset_config."
+          - how-to-guides/styling/config.ipynb: "Customizing the global style via the config singleton: applying and listing themes, updating attributes, scoping a change with override and using_theme, saving and loading JSON theme files, resetting."
           - how-to-guides/styling/themes.ipynb: Applying the predefined themes and creating custom ones.
           - how-to-guides/styling/theme-gallery.ipynb: Every predefined theme rendered across the chart types.
           - how-to-guides/styling/highlighting.ipynb: Emphasizing and muting data series with the emphasis option.
