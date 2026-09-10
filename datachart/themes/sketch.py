@@ -58,7 +58,7 @@ SKETCH_THEME: StyleAttrs = make_theme(
         "plot_treemap_group_edge_width": 0,
         # half the amplitude of matplotlib's xkcd mode (1, 100, 2), plus a
         # halo of 0.75pt each side of every series line
-        "plot_sketch_params": (0.5, 100, 2),
+        "plot_sketch_params": [0.5, 100, 2],
         "plot_sketch_halo_width": 1.5,
     }
 )

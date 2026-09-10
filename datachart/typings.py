@@ -944,9 +944,9 @@ class SketchStyleAttrs(TypedDict):
     !!! info "Added in v0.9.1"
 
     Attributes:
-        plot_sketch_params (Union[Tuple[float, float, float], None]): The path
-            wobble as matplotlib sketch parameters `(scale, length, randomness)`;
-            `plt.xkcd()` uses `(1, 100, 2)`. `None` draws clean paths.
+        plot_sketch_params (Union[List[float], None]): The path wobble as
+            matplotlib sketch parameters `[scale, length, randomness]`;
+            `plt.xkcd()` uses `[1, 100, 2]`. `None` draws clean paths.
         plot_sketch_halo_width (Union[float, None]): The extra width, added to
             the line width, of the white halo stroked under series lines (line,
             radial, regression), so crossing lines read as cut-outs; marks, text
@@ -954,7 +954,7 @@ class SketchStyleAttrs(TypedDict):
 
     """
 
-    plot_sketch_params: Union[Tuple[float, float, float], None]
+    plot_sketch_params: Union[List[float], None]
     plot_sketch_halo_width: Union[float, None]
 
 

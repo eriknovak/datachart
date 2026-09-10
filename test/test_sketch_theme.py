@@ -38,7 +38,7 @@ class TestSketchTheme(unittest.TestCase):
     def test_theme_registered(self):
         config.set_theme(THEME.SKETCH)
         self.assertEqual(config.config, SKETCH_THEME)
-        self.assertEqual(SKETCH_THEME["plot_sketch_params"], SKETCH)
+        self.assertEqual(SKETCH_THEME["plot_sketch_params"], list(SKETCH))
         self.assertEqual(SKETCH_THEME["plot_sketch_halo_width"], 1.5)
 
     def test_default_theme_has_no_sketch(self):
