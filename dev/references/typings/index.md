@@ -28,7 +28,8 @@ The `typings` module contains the typings for all chart components. The module i
 | `HistDataPointAttrs`             | The data point attributes for the histogram chart.              |
 | `HeatmapSingleChartAttrs`        | The single chart attributes for the heatmap chart.              |
 | `HeatmapDataAttrs`               | The data attributes for the heatmap chart.                      |
-| `HeatmapColorbarAttrs`           | The heatmap colorbar attributes.                                |
+| `ColorbarSettingAttrs`           | The per-figure colorbar setting.                                |
+| `HeatmapColorbarAttrs`           | Deprecated alias of ColorbarSettingAttrs.                       |
 | `ContourSingleChartAttrs`        | The single chart attributes for the contour chart.              |
 | `ContourDataAttrs`               | The data attributes for the contour chart.                      |
 | `HexbinSingleChartAttrs`         | The single chart attributes for the hexbin chart.               |
@@ -305,7 +306,7 @@ The single chart attributes for the heatmap chart.
 | `yticks`      | the ytick position list. **TYPE:** `Union[int, float, None]`                                          |
 | `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                  |
 | `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                |
-| `colorbar`    | The heatmap colorbar attributes. **TYPE:** `Union[HeatmapColorbarAttrs, None]`                        |
+| `colorbar`    | The colorbar setting of the heatmap. **TYPE:** `Union[ColorbarSettingAttrs, None]`                    |
 | `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextAttrs, List[TextAttrs], None]`                 |
 
 #### datachart.typings.HeatmapDataAttrs
@@ -320,15 +321,25 @@ The data attributes for the heatmap chart.
 | `y`       | The row labels, one per row of z. Defaults to the row indices. **TYPE:** `Union[List[Union[str, int, float]], None]`          |
 | `z`       | The 2-D grid of cell values, one row per y and one column per x. **TYPE:** `List[List[Union[int, float, None]]]`              |
 
-#### datachart.typings.HeatmapColorbarAttrs
+#### datachart.typings.ColorbarSettingAttrs
 
 Bases: `TypedDict`
 
-The heatmap colorbar attributes.
+The per-figure colorbar setting, passed to a chart front as `colorbar`.
 
-| ATTRIBUTE     | DESCRIPTION                                                |
-| ------------- | ---------------------------------------------------------- |
-| `orientation` | The orientation. **TYPE:** `Union[ORIENTATION, str, None]` |
+Every field is optional. `location` is the control: it places the bar on any edge of the chart. With no `location`, `orientation` derives the edge: vertical means right, horizontal means top. When both are given `location` wins.
+
+Added in Unreleased
+
+The `label`, `location`, `format`, and `ticks` fields, and the name `ColorbarSettingAttrs`.
+
+| ATTRIBUTE     | DESCRIPTION                                                                                                                                                                          |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `label`       | The caption beside the bar, reading along it; drawn in the font_ylabel\_\* theme font. **TYPE:** `Union[str, None]`                                                                  |
+| `location`    | The chart edge the bar sits on. **TYPE:** `Union[COLORBAR_LOCATION, str, None]`                                                                                                      |
+| `format`      | The format of the bar's tick labels, with the value named x (e.g. "{x:.0f}"). On a hexbin chart, valfmt still applies when this is unset. **TYPE:** `Union[VALUE_FORMAT, str, None]` |
+| `ticks`       | Explicit tick positions on the bar. **TYPE:** `Union[List[Union[int, float]], None]`                                                                                                 |
+| `orientation` | The orientation; derives the edge when location is unset. **TYPE:** `Union[ORIENTATION, str, None]`                                                                                  |
 
 ### Scatter Chart Typings
 

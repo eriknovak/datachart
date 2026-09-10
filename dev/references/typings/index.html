@@ -2184,10 +2184,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#datachart.typings.HeatmapColorbarAttrs" class="md-nav__link">
+  <a href="#datachart.typings.ColorbarSettingAttrs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;HeatmapColorbarAttrs
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ColorbarSettingAttrs
       
     </span>
   </a>
@@ -3101,10 +3101,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#datachart.typings.HeatmapColorbarAttrs" class="md-nav__link">
+  <a href="#datachart.typings.ColorbarSettingAttrs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;HeatmapColorbarAttrs
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ColorbarSettingAttrs
       
     </span>
   </a>
@@ -3881,10 +3881,18 @@ is intended to contain the typings for easier input value format checkup.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HeatmapColorbarAttrs&lt;/span&gt;" href="#datachart.typings.HeatmapColorbarAttrs">HeatmapColorbarAttrs</a></code></td>
+            <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ColorbarSettingAttrs&lt;/span&gt;" href="#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a></code></td>
             <td class="doc-class-details">
               <div class="doc-md-description">
-                <p>The heatmap colorbar attributes.</p>
+                <p>The per-figure colorbar setting.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.HeatmapColorbarAttrs">HeatmapColorbarAttrs</span></code></td>
+            <td class="doc-class-details">
+              <div class="doc-md-description">
+                <p>Deprecated alias of <code>ColorbarSettingAttrs</code>.</p>
               </div>
             </td>
           </tr>
@@ -6472,12 +6480,12 @@ outside member places the legend beside the axes.</p>
             <td><code><span title="datachart.typings.HeatmapSingleChartAttrs.colorbar">colorbar</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The heatmap colorbar attributes.</p>
+                <p>The colorbar setting of the heatmap.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
                     <b>TYPE:</b>
-                      <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HeatmapColorbarAttrs&lt;/span&gt;" href="#datachart.typings.HeatmapColorbarAttrs">HeatmapColorbarAttrs</a>, None]</code>
+                      <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ColorbarSettingAttrs&lt;/span&gt;" href="#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a>, None]</code>
                   </span>
               </p>
             </td>
@@ -6634,8 +6642,8 @@ outside member places the legend beside the axes.</p>
 
 
 
-<h4 id="datachart.typings.HeatmapColorbarAttrs" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.typings.HeatmapColorbarAttrs</span>
+<h4 id="datachart.typings.ColorbarSettingAttrs" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.typings.ColorbarSettingAttrs</span>
 
 
 </h4>
@@ -6647,7 +6655,16 @@ outside member places the legend beside the axes.</p>
 
 
 
-        <p>The heatmap colorbar attributes.</p>
+        <p>The per-figure colorbar setting, passed to a chart front as <code>colorbar</code>.</p>
+<p>Every field is optional. <code>location</code> is the control: it places the bar on
+any edge of the chart. With no <code>location</code>, <code>orientation</code> derives the edge:
+vertical means right, horizontal means top. When both are given <code>location</code>
+wins.</p>
+<div class="admonition info">
+<p class="admonition-title">Added in Unreleased</p>
+<p>The <code>label</code>, <code>location</code>, <code>format</code>, and <code>ticks</code> fields, and the name
+<code>ColorbarSettingAttrs</code>.</p>
+</div>
 
 
 <table>
@@ -6659,10 +6676,72 @@ outside member places the legend beside the axes.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="datachart.typings.HeatmapColorbarAttrs.orientation">orientation</span></code></td>
+            <td><code><span title="datachart.typings.ColorbarSettingAttrs.label">label</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The orientation.</p>
+                <p>The caption beside the bar, reading along
+it; drawn in the <code>font_ylabel_*</code> theme font.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="str">str</span>, None]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.ColorbarSettingAttrs.location">location</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The chart edge the
+bar sits on.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.COLORBAR_LOCATION&lt;/span&gt;" href="../constants/#datachart.constants.COLORBAR_LOCATION">COLORBAR_LOCATION</a>, <span title="str">str</span>, None]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.ColorbarSettingAttrs.format">format</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The format of the bar's tick
+labels, with the value named <code>x</code> (e.g. <code>"{x:.0f}"</code>). On a hexbin
+chart, <code>valfmt</code> still applies when this is unset.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.VALUE_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.VALUE_FORMAT">VALUE_FORMAT</a>, <span title="str">str</span>, None]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.ColorbarSettingAttrs.ticks">ticks</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Explicit tick positions
+on the bar.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<span title="int">int</span>, <span title="float">float</span>]], None]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.ColorbarSettingAttrs.orientation">orientation</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The orientation; derives
+the edge when <code>location</code> is unset.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">

@@ -811,6 +811,8 @@ Examples:
 
 The supported colorbar locations.
 
+Used by the `location` field of a chart's `colorbar` setting (`ColorbarSettingAttrs`): the chart edge the bar sits on.
+
 Examples:
 
 ```

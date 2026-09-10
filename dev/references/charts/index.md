@@ -2045,8 +2045,8 @@ Heatmap(
     ] = None,
     colorbar: Optional[
         Union[
-            HeatmapColorbarAttrs,
-            List[Optional[HeatmapColorbarAttrs]],
+            ColorbarSettingAttrs,
+            List[Optional[ColorbarSettingAttrs]],
         ]
     ] = None,
     texts: Optional[
@@ -2067,7 +2067,7 @@ Added in v0.4.0
 
 Added in Unreleased
 
-The `legend` parameter.
+The `legend` parameter, and the `label`, `location`, `format`, and `ticks` fields of the `colorbar` setting.
 
 Examples:
 
@@ -2123,7 +2123,7 @@ Examples:
 | `yticks`              | Custom y-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float]], List[List[Union[int, float]]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                     |
 | `yticklabels`         | Custom y-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                    |
 | `ytickrotate`         | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                          |
-| `colorbar`            | Colorbar configuration(s). **TYPE:** `Optional[Union[HeatmapColorbarAttrs, List[Optional[HeatmapColorbarAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                    |
+| `colorbar`            | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** `Optional[Union[ColorbarSettingAttrs, List[Optional[ColorbarSettingAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                          |
 | `texts`               | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                    |
 
 | RETURNS      | DESCRIPTION                        |
@@ -2236,8 +2236,8 @@ ContourChart(
     ] = None,
     colorbar: Optional[
         Union[
-            HeatmapColorbarAttrs,
-            List[Optional[HeatmapColorbarAttrs]],
+            ColorbarSettingAttrs,
+            List[Optional[ColorbarSettingAttrs]],
         ]
     ] = None,
     texts: Optional[
@@ -2258,7 +2258,7 @@ Added in 0.9.0
 
 Added in Unreleased
 
-The `legend` parameter.
+The `legend` parameter, and the `label`, `location`, `format`, and `ticks` fields of the `colorbar` setting.
 
 Examples:
 
@@ -2320,7 +2320,7 @@ Examples:
 | `ytickrotate`    | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                |
 | `vlines`         | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                        |
 | `hlines`         | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                      |
-| `colorbar`       | Colorbar configuration(s). **TYPE:** `Optional[Union[HeatmapColorbarAttrs, List[Optional[HeatmapColorbarAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                          |
+| `colorbar`       | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** `Optional[Union[ColorbarSettingAttrs, List[Optional[ColorbarSettingAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                |
 | `texts`          | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                          |
 
 | RETURNS      | DESCRIPTION                              |
@@ -2433,8 +2433,8 @@ HexbinChart(
     ] = None,
     colorbar: Optional[
         Union[
-            HeatmapColorbarAttrs,
-            List[Optional[HeatmapColorbarAttrs]],
+            ColorbarSettingAttrs,
+            List[Optional[ColorbarSettingAttrs]],
         ]
     ] = None,
     texts: Optional[
@@ -2453,6 +2453,10 @@ A hexbin chart tiles the plane with hexagons and colors each by the number of po
 
 Added in 0.9.0
 
+Added in Unreleased
+
+The `label`, `location`, `format`, and `ticks` fields of the `colorbar` setting.
+
 Examples:
 
 ```
@@ -2468,46 +2472,46 @@ Examples:
 ... )
 ```
 
-| PARAMETER        | DESCRIPTION                                                                                                                                                                                                                                               |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`           | The points to bin: a dictionary with the x and y columns and an optional c column of per-point values, or a list of them for multiple charts/subplots. **TYPE:** `Union[HexbinDataAttrs, List[HexbinDataAttrs]]`                                          |
-| `title`          | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                     |
-| `xlabel`         | The x-axis label. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                           |
-| `ylabel`         | The y-axis label. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                           |
-| `subtitle`       | The subtitle(s) for individual charts. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                          |
-| `emphasis`       | Not supported: a hexbin chart is a single colormapped layer with no series to mute or highlight. Passing a value raises ValueError. **TYPE:** `None` **DEFAULT:** `None`                                                                                  |
-| `figsize`        | The size of the figure. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                                                                                    |
-| `xmin`           | The minimum x-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                     |
-| `xmax`           | The maximum x-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                     |
-| `ymin`           | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                     |
-| `ymax`           | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                     |
-| `show_grid`      | Which grid lines to show (e.g., "both", "x", "y"). Off by default: the hexagons cover it. **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                 |
-| `show_colorbars` | Whether to show the colorbar(s). **TYPE:** `bool` **DEFAULT:** `True`                                                                                                                                                                                     |
-| `aspect_ratio`   | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                    |
-| `scalex`         | The x-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                     |
-| `scaley`         | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                     |
-| `subplots`       | Whether to create separate subplots for each chart. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                        |
-| `max_cols`       | Maximum number of columns in subplots (when subplots=True). **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                 |
-| `sharex`         | Whether to share the x-axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                   |
-| `sharey`         | Whether to share the y-axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                   |
-| `style`          | Style configuration(s) for the hexbin chart(s). **TYPE:** `Optional[Union[HexbinStyleAttrs, List[Optional[HexbinStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                       |
-| `gridsize`       | The number of hexagons across the x-axis; the plot_hexbin_gridsize config value by default. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                     |
-| `reduce`         | How the c values in a hexagon collapse into its color, one of HEXBIN_REDUCE (the mean by default). Ignored without c, where every hexagon shows its point count. **TYPE:** `Optional[Union[HEXBIN_REDUCE, str, List[Optional[str]]]]` **DEFAULT:** `None` |
-| `mincnt`         | The point count below which a hexagon stays blank; every hexagon is drawn by default. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                           |
-| `norm`           | Value normalization method(s) of the colormap; "log" spreads heavy-tailed counts. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                               |
-| `vmin`           | Minimum value(s) for normalization. **TYPE:** `Optional[Union[float, List[Optional[float]]]]` **DEFAULT:** `None`                                                                                                                                         |
-| `vmax`           | Maximum value(s) for normalization. **TYPE:** `Optional[Union[float, List[Optional[float]]]]` **DEFAULT:** `None`                                                                                                                                         |
-| `valfmt`         | Format string(s) for the colorbar tick labels, with the value named x (e.g., "{x:.0f}"). See VALUE_FORMAT. **TYPE:** `Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]]` **DEFAULT:** `None`                                                        |
-| `xticks`         | Custom x-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float]], List[List[Union[int, float]]]]]` **DEFAULT:** `None`                                                                                                                     |
-| `xticklabels`    | Custom x-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                                                    |
-| `xtickrotate`    | Rotation angle for x-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                          |
-| `yticks`         | Custom y-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float]], List[List[Union[int, float]]]]]` **DEFAULT:** `None`                                                                                                                     |
-| `yticklabels`    | Custom y-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                                                    |
-| `ytickrotate`    | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                          |
-| `vlines`         | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                  |
-| `hlines`         | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                |
-| `colorbar`       | Colorbar configuration(s). **TYPE:** `Optional[Union[HeatmapColorbarAttrs, List[Optional[HeatmapColorbarAttrs]]]]` **DEFAULT:** `None`                                                                                                                    |
-| `texts`          | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                    |
+| PARAMETER        | DESCRIPTION                                                                                                                                                                                                                                                |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`           | The points to bin: a dictionary with the x and y columns and an optional c column of per-point values, or a list of them for multiple charts/subplots. **TYPE:** `Union[HexbinDataAttrs, List[HexbinDataAttrs]]`                                           |
+| `title`          | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                      |
+| `xlabel`         | The x-axis label. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                            |
+| `ylabel`         | The y-axis label. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                            |
+| `subtitle`       | The subtitle(s) for individual charts. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                           |
+| `emphasis`       | Not supported: a hexbin chart is a single colormapped layer with no series to mute or highlight. Passing a value raises ValueError. **TYPE:** `None` **DEFAULT:** `None`                                                                                   |
+| `figsize`        | The size of the figure. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                                                                                     |
+| `xmin`           | The minimum x-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                      |
+| `xmax`           | The maximum x-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                      |
+| `ymin`           | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                      |
+| `ymax`           | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                      |
+| `show_grid`      | Which grid lines to show (e.g., "both", "x", "y"). Off by default: the hexagons cover it. **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                  |
+| `show_colorbars` | Whether to show the colorbar(s). **TYPE:** `bool` **DEFAULT:** `True`                                                                                                                                                                                      |
+| `aspect_ratio`   | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                     |
+| `scalex`         | The x-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                      |
+| `scaley`         | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                      |
+| `subplots`       | Whether to create separate subplots for each chart. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                         |
+| `max_cols`       | Maximum number of columns in subplots (when subplots=True). **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                  |
+| `sharex`         | Whether to share the x-axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                    |
+| `sharey`         | Whether to share the y-axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                    |
+| `style`          | Style configuration(s) for the hexbin chart(s). **TYPE:** `Optional[Union[HexbinStyleAttrs, List[Optional[HexbinStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                        |
+| `gridsize`       | The number of hexagons across the x-axis; the plot_hexbin_gridsize config value by default. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                      |
+| `reduce`         | How the c values in a hexagon collapse into its color, one of HEXBIN_REDUCE (the mean by default). Ignored without c, where every hexagon shows its point count. **TYPE:** `Optional[Union[HEXBIN_REDUCE, str, List[Optional[str]]]]` **DEFAULT:** `None`  |
+| `mincnt`         | The point count below which a hexagon stays blank; every hexagon is drawn by default. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                            |
+| `norm`           | Value normalization method(s) of the colormap; "log" spreads heavy-tailed counts. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                |
+| `vmin`           | Minimum value(s) for normalization. **TYPE:** `Optional[Union[float, List[Optional[float]]]]` **DEFAULT:** `None`                                                                                                                                          |
+| `vmax`           | Maximum value(s) for normalization. **TYPE:** `Optional[Union[float, List[Optional[float]]]]` **DEFAULT:** `None`                                                                                                                                          |
+| `valfmt`         | Format string(s) for the colorbar tick labels, with the value named x (e.g., "{x:.0f}"). See VALUE_FORMAT. The format field of the colorbar setting wins when set. **TYPE:** `Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]]` **DEFAULT:** `None` |
+| `xticks`         | Custom x-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float]], List[List[Union[int, float]]]]]` **DEFAULT:** `None`                                                                                                                      |
+| `xticklabels`    | Custom x-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                                                     |
+| `xtickrotate`    | Rotation angle for x-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                           |
+| `yticks`         | Custom y-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float]], List[List[Union[int, float]]]]]` **DEFAULT:** `None`                                                                                                                      |
+| `yticklabels`    | Custom y-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                                                     |
+| `ytickrotate`    | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                           |
+| `vlines`         | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                   |
+| `hlines`         | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                 |
+| `colorbar`       | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** `Optional[Union[ColorbarSettingAttrs, List[Optional[ColorbarSettingAttrs]]]]` **DEFAULT:** `None`                                           |
+| `texts`          | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                     |
 
 | RETURNS      | DESCRIPTION                             |
 | ------------ | --------------------------------------- |

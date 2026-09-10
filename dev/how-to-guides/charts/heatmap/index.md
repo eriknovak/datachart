@@ -184,7 +184,7 @@ Heatmap(
 
 A heatmap on its own shows which cells are higher and which are lower, not by how much. Two attributes add the numbers back: `show_colorbars` draws the colorbar that maps the colors to values, and `show_heatmap_values` writes every value into its cell. On dark cells the value is written in white automatically, so it stays legible across the whole colormap.
 
-The colorbar is vertical and sits to the right of the heatmap; to draw it horizontally, add the `colorbar` attribute with the [datachart.typings.HeatmapColorbarAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HeatmapColorbarAttrs) typing, whose `orientation` takes a [datachart.constants.ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) value.
+The colorbar is vertical and sits to the right of the heatmap; to caption it or move it, add the `colorbar` attribute with the [datachart.typings.ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs) typing: `label` names the quantity, `location` takes a [datachart.constants.COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) value, and `orientation` alone still takes an [datachart.constants.ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) value.
 
 To format the values written into the cells, add the `valfmt` attribute, which is a `string` depicting how to format the values. Examples of such formats are:
 

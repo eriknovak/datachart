@@ -13266,8 +13266,8 @@ unlabelled.</p>
 <a id="__codelineno-0-67" name="__codelineno-0-67" href="#__codelineno-0-67"></a>    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68" href="#__codelineno-0-68"></a>    <span class="n">colorbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
 <a id="__codelineno-0-69" name="__codelineno-0-69" href="#__codelineno-0-69"></a>        <span class="n">Union</span><span class="p">[</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70" href="#__codelineno-0-70"></a>            <span class="n">HeatmapColorbarAttrs</span><span class="p">,</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71" href="#__codelineno-0-71"></a>            <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">HeatmapColorbarAttrs</span><span class="p">]],</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70" href="#__codelineno-0-70"></a>            <span class="n">ColorbarSettingAttrs</span><span class="p">,</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71" href="#__codelineno-0-71"></a>            <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ColorbarSettingAttrs</span><span class="p">]],</span>
 <a id="__codelineno-0-72" name="__codelineno-0-72" href="#__codelineno-0-72"></a>        <span class="p">]</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73" href="#__codelineno-0-73"></a>    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74" href="#__codelineno-0-74"></a>    <span class="n">texts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
@@ -13293,7 +13293,8 @@ are all configurable.</p>
 </div>
 <div class="admonition info">
 <p class="admonition-title">Added in Unreleased</p>
-<p>The <code>legend</code> parameter.</p>
+<p>The <code>legend</code> parameter, and the <code>label</code>, <code>location</code>, <code>format</code>, and
+<code>ticks</code> fields of the <code>colorbar</code> setting.</p>
 </div>
 
 
@@ -13977,12 +13978,13 @@ and alignment; each field falls back to the theme. See
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>Colorbar configuration(s).</p>
+                <p>The colorbar setting(s): label, location, tick format,
+and tick positions. See <code>ColorbarSettingAttrs</code>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HeatmapColorbarAttrs&lt;/span&gt;" href="../typings/#datachart.typings.HeatmapColorbarAttrs">HeatmapColorbarAttrs</a>, <span title="typing.List">List</span>[<span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HeatmapColorbarAttrs&lt;/span&gt;" href="../typings/#datachart.typings.HeatmapColorbarAttrs">HeatmapColorbarAttrs</a>]]]]</code>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ColorbarSettingAttrs&lt;/span&gt;" href="../typings/#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a>, <span title="typing.List">List</span>[<span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ColorbarSettingAttrs&lt;/span&gt;" href="../typings/#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a>]]]]</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
@@ -14154,8 +14156,8 @@ and alignment; each field falls back to the theme. See
 <a id="__codelineno-0-101" name="__codelineno-0-101" href="#__codelineno-0-101"></a>    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102" href="#__codelineno-0-102"></a>    <span class="n">colorbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103" href="#__codelineno-0-103"></a>        <span class="n">Union</span><span class="p">[</span>
-<a id="__codelineno-0-104" name="__codelineno-0-104" href="#__codelineno-0-104"></a>            <span class="n">HeatmapColorbarAttrs</span><span class="p">,</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105" href="#__codelineno-0-105"></a>            <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">HeatmapColorbarAttrs</span><span class="p">]],</span>
+<a id="__codelineno-0-104" name="__codelineno-0-104" href="#__codelineno-0-104"></a>            <span class="n">ColorbarSettingAttrs</span><span class="p">,</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105" href="#__codelineno-0-105"></a>            <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ColorbarSettingAttrs</span><span class="p">]],</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106" href="#__codelineno-0-106"></a>        <span class="p">]</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107" href="#__codelineno-0-107"></a>    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108" href="#__codelineno-0-108"></a>    <span class="n">texts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
@@ -14184,7 +14186,8 @@ use <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol
 </div>
 <div class="admonition info">
 <p class="admonition-title">Added in Unreleased</p>
-<p>The <code>legend</code> parameter.</p>
+<p>The <code>legend</code> parameter, and the <code>label</code>, <code>location</code>, <code>format</code>, and
+<code>ticks</code> fields of the <code>colorbar</code> setting.</p>
 </div>
 
 
@@ -14993,12 +14996,13 @@ named <code>x</code> (e.g., <code>"{x:.1f}"</code>). See <code>VALUE_FORMAT</cod
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>Colorbar configuration(s).</p>
+                <p>The colorbar setting(s): label, location, tick format,
+and tick positions. See <code>ColorbarSettingAttrs</code>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HeatmapColorbarAttrs&lt;/span&gt;" href="../typings/#datachart.typings.HeatmapColorbarAttrs">HeatmapColorbarAttrs</a>, <span title="typing.List">List</span>[<span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HeatmapColorbarAttrs&lt;/span&gt;" href="../typings/#datachart.typings.HeatmapColorbarAttrs">HeatmapColorbarAttrs</a>]]]]</code>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ColorbarSettingAttrs&lt;/span&gt;" href="../typings/#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a>, <span title="typing.List">List</span>[<span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ColorbarSettingAttrs&lt;/span&gt;" href="../typings/#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a>]]]]</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
@@ -15170,8 +15174,8 @@ named <code>x</code> (e.g., <code>"{x:.1f}"</code>). See <code>VALUE_FORMAT</cod
 <a id="__codelineno-0-101" name="__codelineno-0-101" href="#__codelineno-0-101"></a>    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102" href="#__codelineno-0-102"></a>    <span class="n">colorbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103" href="#__codelineno-0-103"></a>        <span class="n">Union</span><span class="p">[</span>
-<a id="__codelineno-0-104" name="__codelineno-0-104" href="#__codelineno-0-104"></a>            <span class="n">HeatmapColorbarAttrs</span><span class="p">,</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105" href="#__codelineno-0-105"></a>            <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">HeatmapColorbarAttrs</span><span class="p">]],</span>
+<a id="__codelineno-0-104" name="__codelineno-0-104" href="#__codelineno-0-104"></a>            <span class="n">ColorbarSettingAttrs</span><span class="p">,</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105" href="#__codelineno-0-105"></a>            <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ColorbarSettingAttrs</span><span class="p">]],</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106" href="#__codelineno-0-106"></a>        <span class="p">]</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107" href="#__codelineno-0-107"></a>    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108" href="#__codelineno-0-108"></a>    <span class="n">texts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
@@ -15197,6 +15201,11 @@ estimate use <a class="autorefs autorefs-internal" title="&lt;code class=&quot;d
 <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;datachart.utils.stats.kde2d&lt;/span&gt;" href="../utils/stats/#datachart.utils.stats.kde2d"><code>stats.kde2d</code></a>.</p>
 <div class="admonition info">
 <p class="admonition-title">Added in 0.9.0</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Added in Unreleased</p>
+<p>The <code>label</code>, <code>location</code>, <code>format</code>, and <code>ticks</code> fields of the
+<code>colorbar</code> setting.</p>
 </div>
 
 
@@ -15776,7 +15785,8 @@ heavy-tailed counts.</p>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>Format string(s) for the colorbar tick labels, with the value
-named <code>x</code> (e.g., <code>"{x:.0f}"</code>). See <code>VALUE_FORMAT</code>.</p>
+named <code>x</code> (e.g., <code>"{x:.0f}"</code>). See <code>VALUE_FORMAT</code>. The <code>format</code>
+field of the <code>colorbar</code> setting wins when set.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -15956,12 +15966,13 @@ named <code>x</code> (e.g., <code>"{x:.0f}"</code>). See <code>VALUE_FORMAT</cod
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>Colorbar configuration(s).</p>
+                <p>The colorbar setting(s): label, location, tick format,
+and tick positions. See <code>ColorbarSettingAttrs</code>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HeatmapColorbarAttrs&lt;/span&gt;" href="../typings/#datachart.typings.HeatmapColorbarAttrs">HeatmapColorbarAttrs</a>, <span title="typing.List">List</span>[<span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HeatmapColorbarAttrs&lt;/span&gt;" href="../typings/#datachart.typings.HeatmapColorbarAttrs">HeatmapColorbarAttrs</a>]]]]</code>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ColorbarSettingAttrs&lt;/span&gt;" href="../typings/#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a>, <span title="typing.List">List</span>[<span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ColorbarSettingAttrs&lt;/span&gt;" href="../typings/#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a>]]]]</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
