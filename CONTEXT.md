@@ -360,6 +360,26 @@ configuration. Themes are named for their visual trait, never for a use case
 or audience.
 _Avoid_: publication, academic, background (former role-based theme names)
 
+**Active theme**:
+The name of the theme last applied, held on the configuration as `theme` and
+kept in step with the style dictionary — `set_theme`, `reset_config`, and a
+theme scope all move the two together.
+_Avoid_: current theme, selected theme
+
+**Theme file**:
+A JSON document carrying a theme's name, a format version, and only the style
+attributes that differ from the base theme (ADR 0040). It is a portable theme,
+not a dump of the live configuration, and loading one registers it without
+applying it.
+_Avoid_: config file, theme export, style sheet
+
+**Scope**:
+A context-managed temporary style change — `override` for attributes,
+`using_theme` for a whole theme — that restores the state that entered it when
+the block ends, exceptions included. Changes made inside the block are
+discarded at exit (ADR 0040).
+_Avoid_: temporary config, config stack, style context
+
 **Emphasis**:
 A per-chart (and, in `Panel`, per-figure) role — `"background"`, `"highlight"`,
 or unset — deciding how a layer reads relative to its siblings: background
