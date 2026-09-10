@@ -52,6 +52,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `FontStyleAttrs`                 | The typing for the font style.                                  |
 | `AxesStyleAttrs`                 | The typing for the axes style.                                  |
 | `LegendStyleAttrs`               | The typing for the legend style.                                |
+| `LegendSettingAttrs`             | The per-figure legend setting.                                  |
 | `AreaStyleAttrs`                 | The typing for the area style.                                  |
 | `GridStyleAttrs`                 | The typing for the grid style.                                  |
 | `LineStyleAttrs`                 | The typing for the line style.                                  |
@@ -146,6 +147,23 @@ The text annotation attributes.
 | `coords`  | The coordinate system of the text position: "data" (default) or "axes" (axes fraction, 0–1). **TYPE:** `Union[str, None]`                                                                                |
 | `target`  | The data point the connector points to, always in data coordinates. When present, a connector is drawn from the text to the target. **TYPE:** `Union[Tuple[Union[int, float], Union[int, float]], None]` |
 | `style`   | The per-text style attributes. **TYPE:** `Union[TextStyleAttrs, None]`                                                                                                                                   |
+
+#### datachart.typings.LegendSettingAttrs
+
+Bases: `TypedDict`
+
+The per-figure legend setting, passed to a chart front as `legend`.
+
+Every field is optional; a `None` field falls back to the theme's `plot_legend_*` attribute of the same name.
+
+Added in Unreleased
+
+| ATTRIBUTE   | DESCRIPTION                                                                                                             |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `title`     | The legend title; an empty string draws none. **TYPE:** `Union[str, None]`                                              |
+| `location`  | The legend location. An outside member places the legend beside the axes. **TYPE:** `Union[LEGEND_LOCATION, str, None]` |
+| `ncols`     | The number of legend columns. **TYPE:** `Union[int, None]`                                                              |
+| `alignment` | The legend alignment. **TYPE:** `Union[LEGEND_ALIGN, str, None]`                                                        |
 
 ### Line Chart Typings
 
@@ -652,15 +670,21 @@ Bases: `TypedDict`
 
 The typing for the legend style.
 
-| ATTRIBUTE                 | DESCRIPTION                                                               |
-| ------------------------- | ------------------------------------------------------------------------- |
-| `plot_legend_shadow`      | Show the legends shadow. **TYPE:** `Union[bool, None]`                    |
-| `plot_legend_frameon`     | Show the legends frame. **TYPE:** `Union[bool, None]`                     |
-| `plot_legend_alignment`   | The legend alignment. **TYPE:** `Union[LEGEND_ALIGN, str, None]`          |
-| `plot_legend_location`    | The legend location. **TYPE:** `Union[LEGEND_LOCATION, str, None]`        |
-| `plot_legend_font_size`   | The font size within the legend. **TYPE:** `Union[int, float, str, None]` |
-| `plot_legend_title_size`  | The title size of the legend. **TYPE:** `Union[int, float, str, None]`    |
-| `plot_legend_label_color` | The label color of the legend. **TYPE:** `Union[str, None]`               |
+| ATTRIBUTE                 | DESCRIPTION                                                                |
+| ------------------------- | -------------------------------------------------------------------------- |
+| `plot_legend_shadow`      | Show the legends shadow. **TYPE:** `Union[bool, None]`                     |
+| `plot_legend_frameon`     | Show the legends frame. **TYPE:** `Union[bool, None]`                      |
+| `plot_legend_alignment`   | The legend alignment. **TYPE:** `Union[LEGEND_ALIGN, str, None]`           |
+| `plot_legend_location`    | The legend location. **TYPE:** `Union[LEGEND_LOCATION, str, None]`         |
+| `plot_legend_font_size`   | The font size within the legend. **TYPE:** `Union[int, float, str, None]`  |
+| `plot_legend_title_size`  | The title size of the legend. **TYPE:** `Union[int, float, str, None]`     |
+| `plot_legend_label_color` | The label color of the legend. **TYPE:** `Union[str, None]`                |
+| `plot_legend_title`       | The legend title; an empty string draws none. **TYPE:** `Union[str, None]` |
+| `plot_legend_ncols`       | The number of legend columns. **TYPE:** `Union[int, None]`                 |
+
+Added in Unreleased
+
+The `plot_legend_title` and `plot_legend_ncols` attributes.
 
 ### datachart.typings.AreaStyleAttrs
 

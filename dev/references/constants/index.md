@@ -406,7 +406,7 @@ Examples:
 
 The supported legend locations.
 
-Used by the `plot_legend_location` style attribute; places the legend within the chart.
+Used by the `plot_legend_location` style attribute and the `location` field of a chart's `legend` setting. The in-axes members place the legend within the chart; the `OUTSIDE_*` members place it beside the axes, on the named edge, with nothing clipped.
 
 Examples:
 
@@ -416,19 +416,27 @@ Examples:
 "best"
 ```
 
-| ATTRIBUTE      | DESCRIPTION                                                  |
-| -------------- | ------------------------------------------------------------ |
-| `BEST`         | Automatic best location. Equals to "best". **TYPE:** `str`   |
-| `UPPER_RIGHT`  | Upper right corner. Equals to "upper right". **TYPE:** `str` |
-| `UPPER_LEFT`   | Upper left corner. Equals to "upper left". **TYPE:** `str`   |
-| `LOWER_LEFT`   | Lower left corner. Equals to "lower left". **TYPE:** `str`   |
-| `LOWER_RIGHT`  | Lower right corner. Equals to "lower right". **TYPE:** `str` |
-| `RIGHT`        | Center right. Equals to "right". **TYPE:** `str`             |
-| `CENTER_LEFT`  | Center left. Equals to "center left". **TYPE:** `str`        |
-| `CENTER_RIGHT` | Center right. Equals to "center right". **TYPE:** `str`      |
-| `LOWER_CENTER` | Lower center. Equals to "lower center". **TYPE:** `str`      |
-| `UPPER_CENTER` | Upper center. Equals to "upper center". **TYPE:** `str`      |
-| `CENTER`       | Center. Equals to "center". **TYPE:** `str`                  |
+| ATTRIBUTE        | DESCRIPTION                                                                    |
+| ---------------- | ------------------------------------------------------------------------------ |
+| `BEST`           | Automatic best location. Equals to "best". **TYPE:** `str`                     |
+| `UPPER_RIGHT`    | Upper right corner. Equals to "upper right". **TYPE:** `str`                   |
+| `UPPER_LEFT`     | Upper left corner. Equals to "upper left". **TYPE:** `str`                     |
+| `LOWER_LEFT`     | Lower left corner. Equals to "lower left". **TYPE:** `str`                     |
+| `LOWER_RIGHT`    | Lower right corner. Equals to "lower right". **TYPE:** `str`                   |
+| `RIGHT`          | Center right. Equals to "right". **TYPE:** `str`                               |
+| `CENTER_LEFT`    | Center left. Equals to "center left". **TYPE:** `str`                          |
+| `CENTER_RIGHT`   | Center right. Equals to "center right". **TYPE:** `str`                        |
+| `LOWER_CENTER`   | Lower center. Equals to "lower center". **TYPE:** `str`                        |
+| `UPPER_CENTER`   | Upper center. Equals to "upper center". **TYPE:** `str`                        |
+| `CENTER`         | Center. Equals to "center". **TYPE:** `str`                                    |
+| `OUTSIDE_RIGHT`  | Beside the right edge, top-aligned. Equals to "outside right". **TYPE:** `str` |
+| `OUTSIDE_LEFT`   | Beside the left edge, top-aligned. Equals to "outside left". **TYPE:** `str`   |
+| `OUTSIDE_TOP`    | Above the axes, centered. Equals to "outside top". **TYPE:** `str`             |
+| `OUTSIDE_BOTTOM` | Below the axes, centered. Equals to "outside bottom". **TYPE:** `str`          |
+
+Added in Unreleased
+
+The four `OUTSIDE_*` members.
 
 ## Chart Constants
 

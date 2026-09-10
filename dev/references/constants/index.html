@@ -6065,8 +6065,10 @@ title and entries against each other.</p>
 
 
         <p>The supported legend locations.</p>
-<p>Used by the <code>plot_legend_location</code> style attribute; places the legend
-within the chart.</p>
+<p>Used by the <code>plot_legend_location</code> style attribute and the <code>location</code>
+field of a chart's <code>legend</code> setting. The in-axes members place the legend
+within the chart; the <code>OUTSIDE_*</code> members place it beside the axes, on the
+named edge, with nothing clipped.</p>
 <p><img alt="LEGEND_LOCATION at a glance" src="../../assets/imgs/const-legend-location.svg" width="100%" /></p>
 
 
@@ -6239,8 +6241,68 @@ within the chart.</p>
               </p>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.LEGEND_LOCATION.OUTSIDE_RIGHT">OUTSIDE_RIGHT</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Beside the right edge, top-aligned. Equals to <code>"outside right"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.LEGEND_LOCATION.OUTSIDE_LEFT">OUTSIDE_LEFT</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Beside the left edge, top-aligned. Equals to <code>"outside left"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.LEGEND_LOCATION.OUTSIDE_TOP">OUTSIDE_TOP</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Above the axes, centered. Equals to <code>"outside top"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.LEGEND_LOCATION.OUTSIDE_BOTTOM">OUTSIDE_BOTTOM</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Below the axes, centered. Equals to <code>"outside bottom"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
       </tbody>
     </table>
+        <div class="admonition info">
+<p class="admonition-title">Added in Unreleased</p>
+<p>The four <code>OUTSIDE_*</code> members.</p>
+</div>
 
 
 

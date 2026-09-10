@@ -55,6 +55,7 @@ LineChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_yerr: Optional[bool] = None,
     show_area: Optional[bool] = None,
@@ -160,7 +161,7 @@ Examples:
 
 Added in Unreleased
 
-The `show_values`, `value_format` and `value_step` parameters.
+The `show_values`, `value_format`, `value_step` and `legend` parameters.
 
 | PARAMETER      | DESCRIPTION                                                                                                                                                                                                                                                                                                                                     |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -176,6 +177,7 @@ The `show_values`, `value_format` and `value_step` parameters.
 | `ymin`         | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                           |
 | `ymax`         | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                           |
 | `show_legend`  | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                      |
+| `legend`       | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                            |
 | `show_grid`    | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                              |
 | `show_yerr`    | Whether to show y-axis error bars. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                               |
 | `show_area`    | Whether to show the area under the line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                         |
@@ -234,6 +236,7 @@ StackedAreaChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
@@ -337,7 +340,7 @@ Examples:
 
 Added in Unreleased
 
-The `show_values`, `value_format` and `value_step` parameters.
+The `show_values`, `value_format`, `value_step` and `legend` parameters.
 
 | PARAMETER      | DESCRIPTION                                                                                                                                                                                                                                                                                      |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -354,6 +357,7 @@ The `show_values`, `value_format` and `value_step` parameters.
 | `ymin`         | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                            |
 | `ymax`         | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                            |
 | `show_legend`  | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                       |
+| `legend`       | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                             |
 | `show_grid`    | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                               |
 | `show_values`  | Whether to print each value at the midpoint of its band. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                          |
 | `value_format` | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                |
@@ -412,6 +416,7 @@ BarChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_yerr: Optional[bool] = None,
     show_values: Optional[bool] = None,
@@ -497,6 +502,10 @@ Creates the bar chart.
 
 Bars compare a numeric value across discrete categories: each label gets a bar whose length encodes its value. Use it when the categories are few and unordered (or ordinal) and the question is "which is bigger, and by how much"; several series can be grouped, stacked, or overlaid via `bar_mode`. For a continuous x-axis reach for LineChart, for distributions for Histogram.
 
+Added in Unreleased
+
+The `legend` parameter.
+
 Examples:
 
 ```
@@ -529,6 +538,7 @@ Examples:
 | `ymin`         | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                  |
 | `ymax`         | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                  |
 | `show_legend`  | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                             |
+| `legend`       | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                                   |
 | `show_grid`    | Which grid lines to show ("both", "x", "y"). See SHOW_GRID. **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                            |
 | `show_yerr`    | Whether to show y-axis error bars. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                      |
 | `show_values`  | Whether to show bar value labels at the edge of each bar. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                               |
@@ -578,6 +588,7 @@ PyramidChart(
     xmin: Optional[Union[int, float]] = None,
     xmax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_yerr: Optional[bool] = None,
     show_values: Optional[bool] = None,
@@ -614,6 +625,10 @@ Both series are supplied as positive values; value ticks and labels show absolut
 
 Added in v0.8.0
 
+Added in Unreleased
+
+The `legend` parameter.
+
 Examples:
 
 ```
@@ -648,6 +663,7 @@ Examples:
 | `xmin`         | Not supported; the value axis is always symmetric around zero. Raises when passed. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                             |
 | `xmax`         | The maximum per-side value; the value axis spans (-xmax, xmax). **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                |
 | `show_legend`  | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                 |
+| `legend`       | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`       |
 | `show_grid`    | Which grid lines to show ("both", "x", "y"). See SHOW_GRID. **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                |
 | `show_yerr`    | Whether to show error bars on the bars. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                     |
 | `show_values`  | Whether to show bar value labels at the edge of each bar. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                   |
@@ -695,6 +711,7 @@ RadialChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_yerr: Optional[bool] = None,
     show_area: Optional[bool] = None,
@@ -741,6 +758,10 @@ A radial chart plots series on polar axes: as a line (radar) profile, an area, b
 
 Added in v0.8.0
 
+Added in Unreleased
+
+The `legend` parameter.
+
 Examples:
 
 ```
@@ -769,6 +790,7 @@ Examples:
 | `ymin`            | The minimum radial-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                 |
 | `ymax`            | The maximum radial-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                 |
 | `show_legend`     | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                 |
+| `legend`          | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                                                                                                       |
 | `show_grid`       | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                         |
 | `show_yerr`       | Whether to show the radial error band (line visual). **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                        |
 | `show_area`       | Whether to fill the area inside the line (line visual). **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                     |
@@ -828,6 +850,7 @@ Histogram(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_density: Optional[bool] = None,
     show_cumulative: Optional[bool] = None,
@@ -935,7 +958,7 @@ Examples:
 
 Added in Unreleased
 
-The `show_values` and `value_format` parameters.
+The `show_values`, `value_format` and `legend` parameters.
 
 | PARAMETER         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -951,6 +974,7 @@ The `show_values` and `value_format` parameters.
 | `ymin`            | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                          |
 | `ymax`            | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                          |
 | `show_legend`     | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                     |
+| `legend`          | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                                                                                                           |
 | `show_grid`       | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                             |
 | `show_density`    | Whether to plot the density histogram. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                          |
 | `show_cumulative` | Whether to plot the cumulative histogram. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                       |
@@ -1008,6 +1032,7 @@ BoxPlot(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_outliers: Optional[bool] = None,
     show_notch: Optional[bool] = None,
@@ -1114,7 +1139,7 @@ Examples:
 
 Added in Unreleased
 
-The `show_values` and `value_format` parameters.
+The `show_values`, `value_format` and `legend` parameters.
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                           |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1130,6 +1155,7 @@ The `show_values` and `value_format` parameters.
 | `ymin`          | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                 |
 | `ymax`          | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                 |
 | `show_legend`   | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                            |
+| `legend`        | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                  |
 | `show_grid`     | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                    |
 | `show_outliers` | Whether to show outliers. Defaults to True. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                            |
 | `show_notch`    | Whether to show notched boxes for median confidence interval. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                          |
@@ -1185,6 +1211,7 @@ ViolinPlot(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
@@ -1299,7 +1326,7 @@ Examples:
 
 Added in Unreleased
 
-The `show_values` and `value_format` parameters.
+The `show_values`, `value_format` and `legend` parameters.
 
 | PARAMETER      | DESCRIPTION                                                                                                                                                                                                                                                                                                     |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1315,6 +1342,7 @@ The `show_values` and `value_format` parameters.
 | `ymin`         | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                           |
 | `ymax`         | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                           |
 | `show_legend`  | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                      |
+| `legend`       | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                            |
 | `show_grid`    | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                              |
 | `show_values`  | Whether to print each group's median beside its median line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                     |
 | `value_format` | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                               |
@@ -1371,6 +1399,7 @@ SwarmPlot(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     mode: Union[SWARM_MODE, str] = SWARM_MODE.SWARM,
     jitter: float = 0.4,
@@ -1456,6 +1485,10 @@ A swarm plot draws every observation as a point at its group's category position
 
 Added in 0.9.0
 
+Added in Unreleased
+
+The `legend` parameter.
+
 Examples:
 
 ```
@@ -1489,6 +1522,7 @@ Examples:
 | `ymin`         | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                   |
 | `ymax`         | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                   |
 | `show_legend`  | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                              |
+| `legend`       | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                    |
 | `show_grid`    | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                      |
 | `mode`         | How the points spread across the category width. See SWARM_MODE: "swarm" packs the points so none overlap, from the marker size at draw time (axis limits changed afterwards can shift the spacing); "strip" jitters them uniformly. **TYPE:** `Union[SWARM_MODE, str]` **DEFAULT:** `SWARM_MODE.SWARM` |
 | `jitter`       | The strip jitter width, as a fraction of the category width. Only used with mode="strip". **TYPE:** `float` **DEFAULT:** `0.4`                                                                                                                                                                          |
@@ -1542,6 +1576,7 @@ RaincloudPlot(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_outliers: Optional[bool] = True,
     mode: Union[SWARM_MODE, str] = SWARM_MODE.SWARM,
@@ -1632,6 +1667,10 @@ A raincloud plot draws each group as a cloud (a half violin of its density), its
 
 Added in 0.9.0
 
+Added in Unreleased
+
+The `legend` parameter.
+
 Examples:
 
 ```
@@ -1665,6 +1704,7 @@ Examples:
 | `ymin`          | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                               |
 | `ymax`          | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                               |
 | `show_legend`   | Whether to show the legend; one entry per group. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                     |
+| `legend`        | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                |
 | `show_grid`     | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                  |
 | `show_outliers` | Whether the box shows outliers. **TYPE:** `Optional[bool]` **DEFAULT:** `True`                                                                                                                                                                                                                                      |
 | `mode`          | How the rain spreads across its width. See SWARM_MODE: "swarm" packs the points so none overlap; "strip" jitters them uniformly. **TYPE:** `Union[SWARM_MODE, str]` **DEFAULT:** `SWARM_MODE.SWARM`                                                                                                                 |
@@ -1722,6 +1762,7 @@ ScatterChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_regression: Optional[bool] = None,
     show_ci: Optional[bool] = None,
@@ -1879,7 +1920,7 @@ Examples:
 
 Added in Unreleased
 
-The `show_values`, `value_format` and `value_step` parameters.
+The `show_values`, `value_format`, `value_step` and `legend` parameters.
 
 | PARAMETER          | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                           |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1895,6 +1936,7 @@ The `show_values`, `value_format` and `value_step` parameters.
 | `ymin`             | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                 |
 | `ymax`             | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                 |
 | `show_legend`      | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                            |
+| `legend`           | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                                                                                  |
 | `show_grid`        | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                    |
 | `show_regression`  | Whether to show the regression line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                   |
 | `show_ci`          | Whether to show the confidence interval around the regression line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                    |
@@ -1952,6 +1994,7 @@ Heatmap(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_colorbars: Optional[bool] = None,
     show_heatmap_values: Optional[bool] = None,
@@ -2022,6 +2065,10 @@ A heatmap maps every cell of a 2-D matrix to a color, so structure in a grid of 
 
 Added in v0.4.0
 
+Added in Unreleased
+
+The `legend` parameter.
+
 Examples:
 
 ```
@@ -2056,6 +2103,7 @@ Examples:
 | `ymin`                | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                     |
 | `ymax`                | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                     |
 | `show_legend`         | Whether to show the legend (not typical for heatmaps). **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                     |
+| `legend`              | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                                                                                                                      |
 | `show_grid`           | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                        |
 | `show_colorbars`      | Whether to show the colorbar(s). **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                           |
 | `show_heatmap_values` | Whether to show values on the heatmap cells. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                               |
@@ -2105,6 +2153,7 @@ ContourChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     filled: Optional[bool] = None,
     levels: Optional[
@@ -2207,6 +2256,10 @@ A contour chart draws a surface sampled on a grid — a loss landscape, a 2-D de
 
 Added in 0.9.0
 
+Added in Unreleased
+
+The `legend` parameter.
+
 Examples:
 
 ```
@@ -2241,6 +2294,7 @@ Examples:
 | `ymin`           | The minimum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                           |
 | `ymax`           | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                           |
 | `show_legend`    | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                      |
+| `legend`         | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                                                                                                            |
 | `show_grid`      | Which grid lines to show (e.g., "both", "x", "y"). Off by default for filled contours. **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                          |
 | `filled`         | Whether to fill the bands between the levels (colored by the colormap) instead of drawing iso-lines (in the chart's color). **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                      |
 | `levels`         | Which levels cut the surface: a rule of CONTOUR_LEVELS ("auto", the default, leaves the choice to matplotlib), a target level count, or an explicit list of level values. **TYPE:** `Optional[Union[CONTOUR_LEVELS, str, int, List[float]]]` **DEFAULT:** `None`                                                                                                                                                                |
@@ -2481,6 +2535,7 @@ ParallelCoords(
         Union[FIG_SIZE, Tuple[float, float]]
     ] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     style: Optional[
@@ -2507,6 +2562,10 @@ Creates the parallel coordinates chart.
 Parallel coordinates draw each record as a polyline across one vertical axis per dimension. Use it to explore multivariate data: clusters show as bundles of similar lines, and correlations between neighboring dimensions show as parallel or crossing segments. Works best with a handful of dimensions; color the records by group with `hue` to compare groups.
 
 Added in v0.7.0
+
+Added in Unreleased
+
+The `legend` parameter.
 
 Examples:
 
@@ -2535,6 +2594,7 @@ Examples:
 | `emphasis`        | The emphasis role(s), aligned with the data rows (a single value applies to every row): "background" mutes a row (theme muted color, lowered alpha, thinner line, behind the others, no hue legend entry), "highlight" bolds it and brings it to the front among the data rows, None leaves it unchanged. **TYPE:** `Optional[Union[EMPHASIS, str, List[Optional[str]]]]` **DEFAULT:** `None` |
 | `figsize`         | The size of the figure. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                        |
 | `show_legend`     | Whether to show the legend (for hue categories). **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                               |
+| `legend`          | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                                                                          |
 | `show_grid`       | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                            |
 | `aspect_ratio`    | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                        |
 | `style`           | Style configuration(s) for the lines. **TYPE:** `Optional[Union[ParallelCoordsStyleAttrs, List[Optional[ParallelCoordsStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                     |
@@ -2562,6 +2622,7 @@ NetworkChart(
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     title: Optional[str] = None,
     subtitle: Optional[
         Union[str, List[Optional[str]]]
@@ -2596,6 +2657,10 @@ Every edge is its own patch and the spring layout weighs every pair of nodes, so
 
 Added in v0.9.1
 
+Added in Unreleased
+
+The `legend` parameter.
+
 Examples:
 
 ```
@@ -2623,6 +2688,7 @@ Examples:
 | `show_values`  | Whether to write each edge's weight at its midpoint. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `value_format` | The format of the edge values: a VALUE_FORMAT constant (default VALUE_FORMAT.DEFAULT) or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `show_legend`  | Whether to list the node groups in a legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `legend`       | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `title`        | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `subtitle`     | The subtitle(s) for individual charts. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | `emphasis`     | Not supported: emphasis is set per node through its emphasis key. Passing a value raises ValueError. **TYPE:** `None` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
@@ -2741,6 +2807,7 @@ Treemap(
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     title: Optional[str] = None,
     subtitle: Optional[
         Union[str, List[Optional[str]]]
@@ -2773,6 +2840,10 @@ A treemap tiles part-of-whole data as rectangles whose area is the value — dis
 
 Added in v0.9.1
 
+Added in Unreleased
+
+The `legend` parameter.
+
 Examples:
 
 ```
@@ -2798,6 +2869,7 @@ Examples:
 | `show_values`  | Whether to write each tile's value under its label. A value that does not fit is dropped before the label. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `value_format` | The format of the tile values: a VALUE_FORMAT constant (default VALUE_FORMAT.DEFAULT) or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                   |
 | `show_legend`  | Whether to list the top-level records in a legend; it names the groups too short for a header band. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `legend`       | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                          |
 | `title`        | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | `subtitle`     | The subtitle(s) for individual charts. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `emphasis`     | Not supported: emphasis is set per record through its emphasis key. Passing a value raises ValueError. **TYPE:** `None` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                   |
