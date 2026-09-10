@@ -22,5 +22,15 @@ title: Stats Module
 ::: datachart.utils.stats.minimum
 ::: datachart.utils.stats.maximum
 ::: datachart.utils.stats.correlation
+::: datachart.utils.stats.spearman
+::: datachart.utils.stats.mode
+::: datachart.utils.stats.skewness
+::: datachart.utils.stats.kurtosis
+::: datachart.utils.stats.linear_fit
+::: datachart.utils.stats.bootstrap_ci
+::: datachart.utils.stats.histogram
+::: datachart.utils.stats.rolling_mean
+::: datachart.utils.stats.ewma
+::: datachart.utils.stats.loess
 ::: datachart.utils.stats.kde1d
 ::: datachart.utils.stats.kde2d

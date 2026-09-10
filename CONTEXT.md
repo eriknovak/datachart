@@ -282,6 +282,22 @@ A Gaussian kernel density (`stats.kde1d` → `{x, y}` points for `LineChart`,
 clipped. `bandwidth` takes a `BANDWIDTH` rule or a scalar factor, as violins do.
 _Avoid_: KDE plot, density chart (as a chart type)
 
+**Smoother**:
+A stats helper that turns a noisy series into a readable one — `rolling_mean`
+and `ewma` return a `List[float]` aligned to the input index (`nan` until the
+window fills), `loess` returns `{x, y}` points sorted by `x` for `LineChart`,
+as `kde1d` does. Shapes follow each function's arity, not the chart that draws
+them (ADR 0038).
+_Avoid_: trend line (that is the drawn mark), moving average (for the group)
+
+**Bin rule**:
+A named rule that picks histogram bin edges from the data — `stats.histogram`
+passes `bins` straight to `numpy.histogram_bin_edges`, so `"auto"`, `"fd"`,
+`"rice"`, an integer, and an explicit edge list all work. Unrelated to the
+`CONTOUR_LEVELS` rules of the same name, which count contour levels from grid
+resolution; and the `Histogram` front still takes an integer `num_bins`.
+_Avoid_: binning strategy, bin count (for the rule)
+
 **Level**:
 One `z` value at which a contour line is drawn or a band boundary falls.
 Defaults to matplotlib's auto count; a `CONTOUR_LEVELS` rule (`AUTO`, `RICE`,
