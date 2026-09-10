@@ -1365,6 +1365,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#writing-several-formats-at-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing several formats at once
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#embedding-in-web-pages" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2086,6 +2097,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#writing-several-formats-at-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing several formats at once
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#embedding-in-web-pages" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2150,29 +2172,39 @@
 <li><strong><code>transparent=True</code></strong> drops the figure background, so the chart sits on whatever the page or slide behind it is colored.</li>
 </ul>
 <p>The <a href="../../../references/constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a> constant lists every supported format.</p>
+<h2 id="writing-several-formats-at-once">Writing several formats at once</h2>
+<p>A figure is often needed more than once: a PDF for the manuscript, a PNG for the preview, an SVG for the slides. Pass a list of formats and the same figure is written once per format.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">FIG_FORMAT</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"figures/growth"</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="p">[</span><span class="n">FIG_FORMAT</span><span class="o">.</span><span class="n">PDF</span><span class="p">,</span> <span class="n">FIG_FORMAT</span><span class="o">.</span><span class="n">PNG</span><span class="p">])</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># ["figures/growth.pdf", "figures/growth.png"]</span>
+</code></pre></div>
+<p>With a list, the path is a stem rather than a file name, and each format is appended to it. An extension on the stem is dropped when it names a supported format, so <code>figures/growth.png</code> and <code>figures/growth</code> behave the same; a dotted name such as <code>figures/growth.v2</code> keeps every part of itself and yields <code>figures/growth.v2.pdf</code>. A name that already exists is overwritten, and the parent directory must exist.</p>
+<p><code>save_figure</code> returns the paths it wrote, in the order the formats were given. It returns a list for a single format too, so the return value never changes shape.</p>
+<p><code>dpi</code> and <code>transparent</code> apply to every file in the call. Vector formats ignore <code>dpi</code>, so one call can carry a raster resolution alongside them without affecting the vector output. For different settings per format, make separate calls.</p>
 <h2 id="embedding-in-web-pages">Embedding in web pages</h2>
 <p>Export the figure as SVG with a transparent background:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"chart.svg"</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"chart.svg"</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 <p>SVG is the right format for the web: it renders sharp on every screen density, it scales with the layout instead of being resized as an image, and for charts drawn from lines, bars, and text the file is usually smaller than a PNG of the same size. The transparent background lets the chart match the page in both light and dark color schemes.</p>
 <p>There are two ways to put the SVG on a page:</p>
 <ul>
 <li>
 <p><strong>As an image.</strong> Reference the file from an <code>&lt;img&gt;</code> tag, the same as any picture. The chart is cached and reused across pages, its markup stays out of the HTML, and the page's CSS cannot reach into it. Prefer this when the chart is a static illustration.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">"chart.svg"</span> <span class="na">alt</span><span class="o">=</span><span class="s">"Value against step, growing quadratically"</span> <span class="na">width</span><span class="o">=</span><span class="s">"640"</span><span class="p">&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">"chart.svg"</span> <span class="na">alt</span><span class="o">=</span><span class="s">"Value against step, growing quadratically"</span> <span class="na">width</span><span class="o">=</span><span class="s">"640"</span><span class="p">&gt;</span>
 </code></pre></div>
 </li>
 <li>
 <p><strong>Inline.</strong> Paste the file's contents into the HTML directly. The chart becomes part of the document, so the page's CSS can restyle its strokes and fills, and text inside it is selectable and searchable. Prefer this when the chart should follow the page's styling or when there is a single chart per page. The markup is repeated on every page that shows it, so keep the number of inlined charts small.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">&lt;</span><span class="nt">figure</span><span class="p">&gt;</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  <span class="p">&lt;</span><span class="nt">svg</span> <span class="na">xmlns</span><span class="o">=</span><span class="s">"http://www.w3.org/2000/svg"</span> <span class="na">viewBox</span><span class="o">=</span><span class="s">"0 0 640 400"</span><span class="p">&gt;</span>...<span class="p">&lt;/</span><span class="nt">svg</span><span class="p">&gt;</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  <span class="p">&lt;</span><span class="nt">figcaption</span><span class="p">&gt;</span>Value against step.<span class="p">&lt;/</span><span class="nt">figcaption</span><span class="p">&gt;</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">&lt;/</span><span class="nt">figure</span><span class="p">&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">&lt;</span><span class="nt">figure</span><span class="p">&gt;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  <span class="p">&lt;</span><span class="nt">svg</span> <span class="na">xmlns</span><span class="o">=</span><span class="s">"http://www.w3.org/2000/svg"</span> <span class="na">viewBox</span><span class="o">=</span><span class="s">"0 0 640 400"</span><span class="p">&gt;</span>...<span class="p">&lt;/</span><span class="nt">svg</span><span class="p">&gt;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  <span class="p">&lt;</span><span class="nt">figcaption</span><span class="p">&gt;</span>Value against step.<span class="p">&lt;/</span><span class="nt">figcaption</span><span class="p">&gt;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">&lt;/</span><span class="nt">figure</span><span class="p">&gt;</span>
 </code></pre></div>
 </li>
 </ul>
 <p>When the page or platform cannot use SVG, save a PNG at <code>dpi=300</code> or higher and embed it the same way as the image above. Raster images blur when scaled up, so export at the largest size the page will display.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"chart.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"chart.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="interactive-web-charts-are-out-of-scope">Interactive web charts are out of scope</h3>
 <p>The exported file is a static picture. <code>datachart</code> does not render figures interactively in the browser: there is no HTML export, no embed snippet, and no zoom or hover on a web page. Interactivity is available in notebooks and GUI windows through <code>show(interactive=True)</code>, as described in the <a href="../interactive/">interactive figures</a> section. For charts that zoom and hover inside a web page, use a browser-native library such as <a href="https://d3js.org/">d3</a>, <a href="https://plotly.com/javascript/">Plotly</a>, <a href="https://vega.github.io/vega/">Vega</a>, or <a href="https://bokeh.org/">Bokeh</a>.</p>

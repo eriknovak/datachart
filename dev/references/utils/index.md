@@ -28,14 +28,18 @@ save_figure(
     figure: plt.Figure,
     path: str,
     dpi: int = 300,
-    format: FIG_FORMAT = None,
+    format: Optional[
+        Union[FIG_FORMAT, List[FIG_FORMAT]]
+    ] = None,
     transparent: bool = False,
-) -> None
+) -> List[str]
 ```
 
-Save the figure to a file.
+Save the figure to one or more files.
 
 Writes the rendered figure to disk in the format given by `format` or, when omitted, by the file extension. Use a vector format (PDF, SVG) for print and papers, PNG with `dpi` >= 300 for raster deliverables, and `transparent=True` to drop the figure background for slides and web pages. The theme is already baked into the figure, so saving never consults the global config.
+
+Pass a list of formats to write the same figure several times in one call. `path` is then a stem: its extension is dropped when it names a supported format, and one file per format is written next to it. `dpi` and `transparent` apply to every file.
 
 Examples:
 
@@ -53,13 +57,31 @@ Examples:
 >>> save_figure(figure, path, dpi=300, format=FIG_FORMAT.PNG, transparent=True)
 ```
 
-| PARAMETER     | DESCRIPTION                                                                                                                          |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `figure`      | The figure to save. **TYPE:** `plt.Figure`                                                                                           |
-| `path`        | The path where the figure is saved. **TYPE:** `str`                                                                                  |
-| `dpi`         | The DPI of the figure. **TYPE:** `int` **DEFAULT:** `300`                                                                            |
-| `format`      | The format of the figure. If None, the format will be determined from the file extension. **TYPE:** `FIG_FORMAT` **DEFAULT:** `None` |
-| `transparent` | Whether to make the background transparent. **TYPE:** `bool` **DEFAULT:** `False`                                                    |
+```
+>>> # 3. save the same figure as a PDF and a PNG
+>>> save_figure(figure, "/path/to/save/chart", format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
+['/path/to/save/chart.pdf', '/path/to/save/chart.png']
+```
+
+Added in Unreleased
+
+The list form of `format`, and the returned paths.
+
+| PARAMETER     | DESCRIPTION                                                                                                                                                                                            |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `figure`      | The figure to save. **TYPE:** `plt.Figure`                                                                                                                                                             |
+| `path`        | The path where the figure is saved. A stem when format is a list. **TYPE:** `str`                                                                                                                      |
+| `dpi`         | The DPI of the figure. **TYPE:** `int` **DEFAULT:** `300`                                                                                                                                              |
+| `format`      | The format of the figure, or a list of formats to write. If None, the format will be determined from the file extension. **TYPE:** `Optional[Union[FIG_FORMAT, List[FIG_FORMAT]]]` **DEFAULT:** `None` |
+| `transparent` | Whether to make the background transparent. **TYPE:** `bool` **DEFAULT:** `False`                                                                                                                      |
+
+| RETURNS     | DESCRIPTION                                             |
+| ----------- | ------------------------------------------------------- |
+| `List[str]` | The paths written, in the order the formats were given. |
+
+| RAISES       | DESCRIPTION                 |
+| ------------ | --------------------------- |
+| `ValueError` | If format is an empty list. |
 
 ### datachart.utils.Panel
 
