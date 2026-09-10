@@ -11,7 +11,7 @@ from ..typings import (
     ColorbarSettingAttrs,
     TextAttrs,
 )
-from ..constants import ASPECT_RATIO, FIG_SIZE, SHOW_GRID, VALUE_FORMAT
+from ..constants import ASPECT_RATIO, FIG_SIZE, SHOW_GRID, VALUE_FORMAT, DATE_FORMAT
 
 # ================================================
 # Main Chart Definition
@@ -56,6 +56,8 @@ def Heatmap(
     ] = None,
     yticklabels: Optional[Union[List[str], List[List[str]]]] = None,
     ytickrotate: Optional[Union[int, List[Optional[int]]]] = None,
+    xticks_format: Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]] = None,
+    yticks_format: Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]] = None,
     colorbar: Optional[
         Union[ColorbarSettingAttrs, List[Optional[ColorbarSettingAttrs]]]
     ] = None,
@@ -79,6 +81,7 @@ def Heatmap(
 
     !!! info "Added in Unreleased"
 
+        The `xticks_format` and `yticks_format` tick formats.
         The `legend` parameter, and the `label`, `location`, `format`, and
         `ticks` fields of the `colorbar` setting.
 
@@ -143,6 +146,10 @@ def Heatmap(
         yticks: Custom y-axis tick positions.
         yticklabels: Custom y-axis tick labels.
         ytickrotate: Rotation angle for y-axis tick labels.
+        xticks_format: The x-axis tick label format: a `DATE_FORMAT` member
+            or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT`
+            member or `"{x:.1f}"` style string.
+        yticks_format: The y-axis tick label format, as `xticks_format`.
         colorbar: The colorbar setting(s): label, location, tick format,
             and tick positions. See `ColorbarSettingAttrs`.
         texts: Text annotation(s) to draw.
@@ -204,6 +211,8 @@ def Heatmap(
         "sharey": sharey,
         "show_colorbars": show_colorbars,
         "show_heatmap_values": show_heatmap_values,
+        "xticks_format": xticks_format,
+        "yticks_format": yticks_format,
     }
 
     return render_chart("heatmap", charts, settings)

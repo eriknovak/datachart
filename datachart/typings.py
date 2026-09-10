@@ -81,6 +81,7 @@ Classes:
 
 """
 
+from datetime import datetime
 from typing import TypedDict, Union, Tuple, List, Optional, Dict
 
 import matplotlib.colors as colors
@@ -114,6 +115,7 @@ from .constants import (
     BASELINE,
     ASPECT_RATIO,
     VALUE_FORMAT,
+    DATE_FORMAT,
     EMPHASIS,
 )
 
@@ -1006,8 +1008,8 @@ class ChartCommonAttrs(TypedDict):
         xlabel (Union[str, None]): The xlabel of the charts.
         ylabel (Union[str, None]): The ylabel of the charts.
         figsize (Union[FIG_SIZE, Tuple[float, float], None]): The size of the figure.
-        xmin (Union[int, float, None]): Determine the minimum x-axis value.
-        xmax (Union[int, float, None]): Determine the maximum x-axis value.
+        xmin (Union[int, float, datetime, None]): Determine the minimum x-axis value; a datetime on a datetime axis.
+        xmax (Union[int, float, datetime, None]): Determine the maximum x-axis value; a datetime on a datetime axis.
         ymin (Union[int, float, None]): Determine the minimum y-axis value.
         ymax (Union[int, float, None]): Determine the maximum y-axis value.
         show_legend (Union[bool, None]): Whether or not to show the legend.
@@ -1025,8 +1027,8 @@ class ChartCommonAttrs(TypedDict):
     xlabel: Union[str, None]
     ylabel: Union[str, None]
     figsize: Union[FIG_SIZE, Tuple[float, float], None]
-    xmin: Union[int, float, None]
-    xmax: Union[int, float, None]
+    xmin: Union[int, float, datetime, None]
+    xmax: Union[int, float, datetime, None]
     ymin: Union[int, float, None]
     ymax: Union[int, float, None]
     # visibility attributes
@@ -1269,6 +1271,8 @@ class _LineChartAttrs(ChartCommonAttrs):
         value_step (Union[int, None]): Label every Nth point; None picks a readable step.
         scalex (Union[SCALE, str, None]): The scale of the x-axis.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
+        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
+        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
 
     """
 
@@ -1280,6 +1284,8 @@ class _LineChartAttrs(ChartCommonAttrs):
     value_step: Union[int, None]
     scalex: Union[SCALE, str, None]
     scaley: Union[SCALE, str, None]
+    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
+    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
 
 
 # ================================================
@@ -1347,6 +1353,8 @@ class _StackedAreaChartAttrs(ChartCommonAttrs):
         aspect_ratio (Union[ASPECT_RATIO, str, None]): The aspect ratio of the axes.
         scalex (Union[SCALE, str, None]): The scale of the x-axis.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
+        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
+        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
 
     """
 
@@ -1358,6 +1366,8 @@ class _StackedAreaChartAttrs(ChartCommonAttrs):
     aspect_ratio: Union[ASPECT_RATIO, str, None]
     scalex: Union[SCALE, str, None]
     scaley: Union[SCALE, str, None]
+    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
+    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
 
 
 # ================================================
@@ -1636,6 +1646,8 @@ class _BarChartAttrs(ChartCommonAttrs):
         value_format (Union[str, None]): Format string for bar value labels (e.g., "{:.1f}%").
         orientation (Union[ORIENTATION, str, None]): The orientation of the bar charts.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
+        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
+        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
 
     """
 
@@ -1645,6 +1657,8 @@ class _BarChartAttrs(ChartCommonAttrs):
     value_format: Union[str, None]
     orientation: Union[ORIENTATION, str, None]
     scaley: Union[SCALE, str, None]
+    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
+    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
 
 
 # ================================================
@@ -1850,12 +1864,16 @@ class _HeatmapChartAttrs(ChartCommonAttrs):
         charts (Union[HeatmapSingleChartAttrs, List[HeatmapSingleChartAttrs]]): The heatmap chart definitions.
         show_colorbars (Union[bool, None]): Whether or not to plot the colorbars.
         show_heatmap_values (Union[bool, None]): Whether or not to plot the heatmap values.
+        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
+        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
 
     """
 
     charts: Union[HeatmapSingleChartAttrs, List[HeatmapSingleChartAttrs]]
     show_colorbars: Union[bool, None]
     show_heatmap_values: Union[bool, None]
+    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
+    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
 
 
 # ================================================
@@ -1946,6 +1964,8 @@ class _ContourChartAttrs(ChartCommonAttrs):
         show_colorbars (Union[bool, None]): Whether or not to plot the colorbars of filled contours.
         scalex (Union[SCALE, str, None]): The scale of the x-axis.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
+        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
+        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
 
     """
 
@@ -1956,6 +1976,8 @@ class _ContourChartAttrs(ChartCommonAttrs):
     show_colorbars: Union[bool, None]
     scalex: Union[SCALE, str, None]
     scaley: Union[SCALE, str, None]
+    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
+    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
 
 
 # ================================================
@@ -2050,6 +2072,8 @@ class _HexbinChartAttrs(ChartCommonAttrs):
         aspect_ratio (Union[ASPECT_RATIO, str, None]): The aspect ratio of the axes.
         scalex (Union[SCALE, str, None]): The scale of the x-axis.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
+        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
+        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
 
     """
 
@@ -2058,6 +2082,8 @@ class _HexbinChartAttrs(ChartCommonAttrs):
     aspect_ratio: Union[ASPECT_RATIO, str, None]
     scalex: Union[SCALE, str, None]
     scaley: Union[SCALE, str, None]
+    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
+    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
 
 
 # ================================================
@@ -2153,6 +2179,8 @@ class _ScatterChartAttrs(ChartCommonAttrs):
         scalex (Union[SCALE, str, None]): The scale of the x-axis.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
         size_range (Union[Tuple[float, float], None]): The min/max marker sizes for bubble charts.
+        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
+        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
 
     """
 
@@ -2167,6 +2195,8 @@ class _ScatterChartAttrs(ChartCommonAttrs):
     scalex: Union[SCALE, str, None]
     scaley: Union[SCALE, str, None]
     size_range: Union[Tuple[float, float], None]
+    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
+    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
 
 
 # ================================================
@@ -2246,6 +2276,8 @@ class _BoxChartAttrs(ChartCommonAttrs):
         value_format (Union[str, None]): Format string for the value labels (e.g., "{x:.1f}").
         orientation (Union[ORIENTATION, str, None]): The orientation of the box plots.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
+        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
+        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
 
     """
 
@@ -2256,6 +2288,8 @@ class _BoxChartAttrs(ChartCommonAttrs):
     value_format: Union[str, None]
     orientation: Union[ORIENTATION, str, None]
     scaley: Union[SCALE, str, None]
+    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
+    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
 
 
 # ================================================
@@ -2333,12 +2367,16 @@ class _SwarmPlotAttrs(ChartCommonAttrs):
         jitter (Union[float, None]): The strip jitter width as a fraction of the category width.
         orientation (Union[ORIENTATION, str, None]): The orientation of the swarms.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
+        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
+        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
 
     """
 
     charts: Union[SwarmSingleChartAttrs, List[SwarmSingleChartAttrs]]
     mode: Union[SWARM_MODE, str, None]
     jitter: Union[float, None]
+    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
+    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
 
 
 # Violin Plot Attributes
@@ -2418,6 +2456,8 @@ class _ViolinPlotAttrs(ChartCommonAttrs):
         value_format (Union[str, None]): Format string for the value labels (e.g., "{x:.1f}").
         orientation (Union[ORIENTATION, str, None]): The orientation of the violins.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
+        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
+        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
 
     """
 
@@ -2429,6 +2469,8 @@ class _ViolinPlotAttrs(ChartCommonAttrs):
     value_format: Union[str, None]
     orientation: Union[ORIENTATION, str, None]
     scaley: Union[SCALE, str, None]
+    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
+    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
 
 
 # ================================================
@@ -2508,6 +2550,8 @@ class _RaincloudPlotAttrs(ChartCommonAttrs):
         show_outliers (Union[bool, None]): Whether or not the box shows outliers.
         orientation (Union[ORIENTATION, str, None]): The orientation of the rainclouds.
         scaley (Union[SCALE, str, None]): The scale of the y-axis.
+        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
+        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
 
     """
 
@@ -2518,6 +2562,8 @@ class _RaincloudPlotAttrs(ChartCommonAttrs):
     show_outliers: Union[bool, None]
     orientation: Union[ORIENTATION, str, None]
     scaley: Union[SCALE, str, None]
+    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
+    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
 
 
 # ================================================

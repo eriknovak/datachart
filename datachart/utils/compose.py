@@ -366,6 +366,11 @@ def Panel(
     ]
     # the x-axis hugs the data only when every source figure hugs it too
     panel_settings["tighten_xlim"] = all(s.get("tighten_xlim") for s in source_settings)
+    # the first source figure that formats an axis' ticks formats the panel's
+    for key in ("xticks_format", "yticks_format"):
+        panel_settings[key] = next(
+            (s.get(key) for s in source_settings if s.get(key) is not None), None
+        )
     # the first stacked source figure's baseline wins, like bar_mode (ADR 0025)
     panel_settings["baseline"] = next(
         (

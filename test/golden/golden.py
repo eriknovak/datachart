@@ -9,6 +9,7 @@ import sys
 import os
 import hashlib
 import warnings
+from datetime import date, datetime, timedelta
 
 import numpy as np
 import matplotlib
@@ -47,6 +48,7 @@ from datachart.constants import (
     COLORBAR_LOCATION,
     COLORS,
     CONTOUR_LEVELS,
+    DATE_FORMAT,
     HEXBIN_REDUCE,
     BASELINE,
     NETWORK_LAYOUT,
@@ -118,6 +120,9 @@ EXPECTED_CHANGES = {
     "raincloud_emphasis",
     # colorbars are placed by the layout engine instead of an inset (ADR 0022)
     "heatmap_basic",
+    # new temporal axis cases (ADR 0037)
+    "date_axis_daily_monthly_yearly",
+    "date_axis_labels_and_references",
     # new heatmap label case (ADR 0023)
     "heatmap_labels",
     # new contour cases (ADR 0022)
@@ -2201,6 +2206,64 @@ def band_grid_composed():
     bar = BarChart(data=BAR1, hspans={"ymin": 15, "ymax": 25}, title="Bar")
     wedge = RadialChart(data=RAD1, vspans={"xmin": 180, "xmax": 270}, title="Wedge")
     return Grid([[panel, bar], [wedge]], figsize=(12, 8))
+
+
+# ----- temporal axis (ADR 0037) -----
+
+
+def _walk(n, seed):
+    return np.cumsum(np.random.RandomState(seed).randn(n)).round(3).tolist()
+
+
+DAILY = [
+    {"x": datetime(2024, 3, 1) + timedelta(days=i), "y": v}
+    for i, v in enumerate(_walk(45, 21))
+]
+MONTHLY = [
+    {"x": date(2022 + m // 12, m % 12 + 1, 1), "y": v}
+    for m, v in enumerate(_walk(30, 22))
+]
+YEARLY = [
+    {"x": np.datetime64(f"{year}-01-01"), "y": v}
+    for year, v in zip(range(1990, 2025), _walk(35, 23))
+]
+BAR_MONTHS = [
+    {"label": date(2024, m, 1), "y": v} for m, v in zip(range(1, 7), [3, 5, 4, 6, 2, 7])
+]
+
+
+@case
+def date_axis_daily_monthly_yearly():
+    daily = LineChart(data=DAILY, title="Daily", show_area=True)
+    monthly = LineChart(
+        data=MONTHLY, title="Monthly", xticks_format=DATE_FORMAT.YEAR_MONTH
+    )
+    yearly = ScatterChart(data=YEARLY, title="Yearly", show_regression=True)
+    return Grid([[daily, monthly], [yearly]], figsize=(12, 8))
+
+
+@case
+def date_axis_labels_and_references():
+    line = LineChart(
+        data=DAILY,
+        title="Ticks, limits, references",
+        xticks=[datetime(2024, 3, 10), datetime(2024, 3, 25), datetime(2024, 4, 5)],
+        xmin=datetime(2024, 3, 5),
+        xmax=datetime(2024, 4, 10),
+        vlines={"x": datetime(2024, 3, 20)},
+        vspans={"xmin": datetime(2024, 4, 1), "xmax": datetime(2024, 4, 8)},
+        yticks_format=VALUE_FORMAT.DECIMAL,
+    )
+    bars = BarChart(
+        data=BAR_MONTHS, title="Date labels", xticks_format=DATE_FORMAT.YEAR_MONTH
+    )
+    box = BoxPlot(
+        data=[{"label": d["label"], "value": v} for d in BAR_MONTHS for v in (1, 2, 4)],
+        title="Horizontal date labels",
+        orientation="horizontal",
+        yticks_format=DATE_FORMAT.MONTH_DAY,
+    )
+    return Grid([[line], [bars, box]], figsize=(12, 8))
 
 
 # ----- runner -----

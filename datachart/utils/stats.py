@@ -31,7 +31,8 @@ Methods:
         Estimates the density of the (x, y) points as a gridded surface.
 """
 
-from typing import Dict, List, Optional, Tuple, Union
+from numbers import Real
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from matplotlib.mlab import GaussianKDE
@@ -221,8 +222,21 @@ def iqr(values: List[Union[int, float]]) -> float:
     return float(np.percentile(values, 75) - np.percentile(values, 25))
 
 
-def minimum(values: List[Union[int, float]]) -> float:
+def _as_float(value: Any) -> Any:
+    """A float for a numeric scalar; anything else (e.g. a datetime) as is."""
+
+    return float(value) if isinstance(value, (Real, np.number)) else value
+
+
+def minimum(values: List[Any]) -> Any:
     """Gets the minimum of the values.
+
+    Numeric values return a float; any other ordered values, such as
+    datetimes, return their minimum unchanged.
+
+    !!! info "Added in Unreleased"
+
+        Non-numeric values pass through instead of raising.
 
     Examples:
         >>> from datachart.utils.stats import minimum
@@ -233,18 +247,25 @@ def minimum(values: List[Union[int, float]]) -> float:
         values: The list of values.
 
     Returns:
-        The minimum of the values.
+        The minimum of the values: a float for numbers, else the value itself.
 
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
     if len(values) == 0:
         return np.nan
-    return float(np.min(values))
+    return _as_float(np.min(values))
 
 
-def maximum(values: List[Union[int, float]]) -> float:
+def maximum(values: List[Any]) -> Any:
     """Gets the maximum of the values.
+
+    Numeric values return a float; any other ordered values, such as
+    datetimes, return their maximum unchanged.
+
+    !!! info "Added in Unreleased"
+
+        Non-numeric values pass through instead of raising.
 
     Examples:
         >>> from datachart.utils.stats import maximum
@@ -255,14 +276,14 @@ def maximum(values: List[Union[int, float]]) -> float:
         values: The list of values.
 
     Returns:
-        The maximum of the values.
+        The maximum of the values: a float for numbers, else the value itself.
 
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
     if len(values) == 0:
         return np.nan
-    return float(np.max(values))
+    return _as_float(np.max(values))
 
 
 def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
