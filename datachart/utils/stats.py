@@ -345,6 +345,18 @@ def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float
     return float(np.corrcoef(x, y)[0, 1])
 
 
+def _paired(x: Any, y: Any) -> Tuple[np.ndarray, np.ndarray]:
+    """The (x, y) inputs as float arrays, checked for type and equal length."""
+
+    if not isinstance(x, (list, np.ndarray)):
+        raise TypeError("The x variable must be a list or numpy array.")
+    if not isinstance(y, (list, np.ndarray)):
+        raise TypeError("The y variable must be a list or numpy array.")
+    if len(x) != len(y):
+        raise ValueError("x and y must have the same length.")
+    return np.asarray(x, dtype=float), np.asarray(y, dtype=float)
+
+
 def spearman(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
     """Calculates the Spearman rank correlation between two lists.
 
@@ -400,6 +412,9 @@ def mode(values: List[Union[int, float]]) -> float:
 
     Returns:
         The smallest most frequent value; `nan` for an empty list.
+
+    Raises:
+        TypeError: If values is not a list or numpy array.
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
@@ -408,6 +423,18 @@ def mode(values: List[Union[int, float]]) -> float:
     from scipy import stats as scipy_stats
 
     return float(scipy_stats.mode(np.asarray(values), keepdims=False).mode)
+
+
+def _shape(name: str, values: Any) -> float:
+    """The scipy shape statistic `name` of the values; nan when it is undefined."""
+
+    if not isinstance(values, (list, np.ndarray)):
+        raise TypeError("The values variable must be a list or numpy array.")
+    if len(values) < 2 or np.ptp(values) == 0:
+        return np.nan
+    from scipy import stats as scipy_stats
+
+    return float(getattr(scipy_stats, name)(np.asarray(values, dtype=float)))
 
 
 def skewness(values: List[Union[int, float]]) -> float:
@@ -432,14 +459,11 @@ def skewness(values: List[Union[int, float]]) -> float:
     Returns:
         The skewness of the values; `nan` for fewer than two values or a
         constant list.
-    """
-    if not isinstance(values, (list, np.ndarray)):
-        raise TypeError("The values variable must be a list or numpy array.")
-    if len(values) < 2 or np.ptp(values) == 0:
-        return np.nan
-    from scipy import stats as scipy_stats
 
-    return float(scipy_stats.skew(np.asarray(values, dtype=float)))
+    Raises:
+        TypeError: If values is not a list or numpy array.
+    """
+    return _shape("skew", values)
 
 
 def kurtosis(values: List[Union[int, float]]) -> float:
@@ -462,14 +486,11 @@ def kurtosis(values: List[Union[int, float]]) -> float:
     Returns:
         The excess kurtosis of the values; `nan` for fewer than two values or
         a constant list.
-    """
-    if not isinstance(values, (list, np.ndarray)):
-        raise TypeError("The values variable must be a list or numpy array.")
-    if len(values) < 2 or np.ptp(values) == 0:
-        return np.nan
-    from scipy import stats as scipy_stats
 
-    return float(scipy_stats.kurtosis(np.asarray(values, dtype=float)))
+    Raises:
+        TypeError: If values is not a list or numpy array.
+    """
+    return _shape("kurtosis", values)
 
 
 def linear_fit(
@@ -495,7 +516,8 @@ def linear_fit(
 
     Returns:
         The `(slope, intercept, r2)` of the fitted line; all `nan` for fewer
-        than two points or a constant `x`.
+        than two points or a constant `x`, and `r2` alone `nan` for a
+        constant `y`, which leaves no variation to explain.
 
     Raises:
         TypeError: If x or y is not a list or numpy array.
@@ -647,11 +669,14 @@ def rolling_mean(values: List[Union[int, float]], window: int) -> List[float]:
         The smoothed values, one per input value.
 
     Raises:
-        TypeError: If values is not a list or numpy array.
+        TypeError: If values is not a list or numpy array, or the window is
+            not an integer.
         ValueError: If the window is not positive.
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    if not isinstance(window, (int, np.integer)):
+        raise TypeError("The `window` must be an integer.")
     if window < 1:
         raise ValueError("The `window` must be a positive integer.")
     series = np.asarray(values, dtype=float)
@@ -742,37 +767,25 @@ def loess(
     k = max(2, int(np.ceil(frac * n)))
     smoothed = []
     for xi in xs:
-        distance = np.abs(xs - xi)
+        # centre x on the fit point so the normal equations stay well scaled
+        dx = xs - xi
+        distance = np.abs(dx)
         span = np.sort(distance)[k - 1]
         if span > 0:
             weight = np.clip(1 - (distance / span) ** 3, 0, None) ** 3
         else:
             # duplicate x collapse the span: average the points sitting on it
             weight = (distance == 0).astype(float)
-        sw = weight.sum()
-        sx, sy = (weight * xs).sum(), (weight * ys).sum()
-        sxx, sxy = (weight * xs * xs).sum(), (weight * xs * ys).sum()
+        sw, sx, sy = weight.sum(), (weight * dx).sum(), (weight * ys).sum()
+        sxx, sxy = (weight * dx * dx).sum(), (weight * dx * ys).sum()
         denominator = sw * sxx - sx * sx
         # a singular fit (all weighted x equal) falls back to the local mean
         if denominator <= 1e-12 * sw * sxx:
             smoothed.append(sy / sw)
             continue
         slope = (sw * sxy - sx * sy) / denominator
-        intercept = (sy - slope * sx) / sw
-        smoothed.append(slope * xi + intercept)
+        smoothed.append((sy - slope * sx) / sw)
     return [{"x": float(xi), "y": float(yi)} for xi, yi in zip(xs, smoothed)]
-
-
-def _paired(x: Any, y: Any) -> Tuple[np.ndarray, np.ndarray]:
-    """The (x, y) inputs as float arrays, checked for type and equal length."""
-
-    if not isinstance(x, (list, np.ndarray)):
-        raise TypeError("The x variable must be a list or numpy array.")
-    if not isinstance(y, (list, np.ndarray)):
-        raise TypeError("The y variable must be a list or numpy array.")
-    if len(x) != len(y):
-        raise ValueError("x and y must have the same length.")
-    return np.asarray(x, dtype=float), np.asarray(y, dtype=float)
 
 
 # ================================================

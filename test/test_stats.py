@@ -229,6 +229,11 @@ class TestStats(unittest.TestCase):
         self.assertGreater(r2, 0)
         self.assertLess(r2, 1)
 
+    def test_linear_fit_constant_y(self):
+        slope, intercept, r2 = linear_fit([1, 2, 3], [5, 5, 5])
+        self.assertEqual((slope, intercept), (0.0, 5.0))
+        self.assertTrue(np.isnan(r2))
+
     def test_linear_fit_degenerate_is_nan(self):
         for x, y in ([], []), ([1], [2]), ([2, 2, 2], [1, 2, 3]):
             self.assertTrue(all(np.isnan(v) for v in linear_fit(x, y)))
@@ -326,6 +331,8 @@ class TestStats(unittest.TestCase):
         with self.assertRaises(ValueError):
             rolling_mean([1, 2, 3], 0)
         with self.assertRaises(TypeError):
+            rolling_mean([1, 2, 3], 1.5)
+        with self.assertRaises(TypeError):
             rolling_mean("abc", 2)
 
     def test_ewma_recursion(self):
@@ -349,6 +356,13 @@ class TestStats(unittest.TestCase):
         curve = loess(x, y, frac=0.6)
         self.assertEqual([p["x"] for p in curve], [1.0, 2.0, 3.0, 4.0, 5.0])
         np.testing.assert_allclose([p["y"] for p in curve], [3, 5, 7, 9, 11])
+
+    def test_loess_large_magnitude_x(self):
+        # epoch-second sized x must not collapse the local fit to a mean
+        x = [1e9 + i for i in range(10)]
+        y = [2 * xi + 1 for xi in x]
+        curve = loess(x, y, frac=0.5)
+        np.testing.assert_allclose([p["y"] for p in curve], y, rtol=1e-9)
 
     def test_loess_smooths_noise(self):
         rng = np.random.RandomState(0)

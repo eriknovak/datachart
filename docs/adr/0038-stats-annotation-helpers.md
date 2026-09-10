@@ -15,8 +15,10 @@ forced three conventions that were previously implicit and contradictory.
 - **Degenerate data returns `nan`; malformed input raises.** A helper feeds
   an annotation on a chart that is already being drawn, so failing on a
   short or constant series would abort a figure over a value nobody plots.
-  Fewer than two points, zero variance, and an empty list yield `nan`, a
-  `(nan, nan)` interval, or a `nan`-filled series. Mismatched `x`/`y`
+  Fewer than two points, an empty list, and zero variance where the
+  statistic is undefined yield `nan`, a `(nan, nan)` interval, or a
+  `nan`-filled series; a value that is still defined on constant data,
+  such as a bootstrap interval of `(c, c)`, is returned as is. Mismatched `x`/`y`
   lengths, a non-list argument, an unknown bin rule, a non-positive window,
   and an `alpha` or `frac` out of range still raise, because those are
   caller mistakes rather than thin data. This settles the split between
