@@ -529,7 +529,9 @@ def linear_fit(
     from scipy import stats as scipy_stats
 
     fit = scipy_stats.linregress(xs, ys)
-    return (float(fit.slope), float(fit.intercept), float(fit.rvalue**2))
+    # constant y: r is 0 or nan depending on the scipy version, so decide here
+    r2 = np.nan if np.ptp(ys) == 0 else float(fit.rvalue**2)
+    return (float(fit.slope), float(fit.intercept), r2)
 
 
 def bootstrap_ci(
