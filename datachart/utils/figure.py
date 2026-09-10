@@ -10,7 +10,7 @@ Methods:
 
 import math
 import os
-from typing import List, Optional, Set, Tuple, Union, Dict, Any
+from typing import FrozenSet, List, Optional, Tuple, Union, Dict, Any
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec, SubplotSpec
@@ -24,13 +24,11 @@ from ._internal.figures import new_figure
 # =====================================
 
 
-def _format_extensions() -> Set[str]:
-    """Every file extension `FIG_FORMAT` names, lower-cased."""
-    return {
-        value.lower()
-        for name, value in vars(FIG_FORMAT).items()
-        if not name.startswith("_") and isinstance(value, str)
-    }
+_FORMAT_EXTENSIONS: FrozenSet[str] = frozenset(
+    value.lower()
+    for name, value in vars(FIG_FORMAT).items()
+    if not name.startswith("_") and isinstance(value, str)
+)
 
 
 def _figure_stem(path: str) -> str:
@@ -40,7 +38,7 @@ def _figure_stem(path: str) -> str:
     name like `fig.v2` keeps every part of itself.
     """
     stem, extension = os.path.splitext(path)
-    return stem if extension[1:].lower() in _format_extensions() else path
+    return stem if extension[1:].lower() in _FORMAT_EXTENSIONS else path
 
 
 def _cell_content(figure: plt.Figure, idx: int) -> Dict[str, Any]:
@@ -452,7 +450,7 @@ def save_figure(
     figure: plt.Figure,
     path: str,
     dpi: int = 300,
-    format: Union[FIG_FORMAT, List[FIG_FORMAT]] = None,
+    format: Optional[Union[FIG_FORMAT, List[FIG_FORMAT]]] = None,
     transparent: bool = False,
 ) -> List[str]:
     """Save the figure to one or more files.
@@ -482,7 +480,11 @@ def save_figure(
 
         >>> # 3. save the same figure as a PDF and a PNG
         >>> save_figure(figure, "/path/to/save/chart", format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
-        ["/path/to/save/chart.pdf", "/path/to/save/chart.png"]
+        ['/path/to/save/chart.pdf', '/path/to/save/chart.png']
+
+    !!! info "Added in Unreleased"
+
+        The list form of `format`, and the returned paths.
 
     Args:
         figure: The figure to save.
@@ -498,10 +500,10 @@ def save_figure(
         ValueError: If `format` is an empty list.
     """
 
-    if isinstance(format, (list, tuple)):
+    if isinstance(format, list):
         if not format:
             raise ValueError("The `format` list is empty: name at least one format")
-        formats = list(format)
+        formats = format
         stem = _figure_stem(path)
         paths = [f"{stem}.{fmt}" for fmt in formats]
     else:

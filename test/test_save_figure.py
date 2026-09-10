@@ -8,6 +8,8 @@ import matplotlib
 
 matplotlib.use("Agg", force=True)
 
+import matplotlib.pyplot as plt
+
 from datachart.charts import LineChart
 from datachart.constants import FIG_FORMAT
 from datachart.utils import save_figure
@@ -18,6 +20,7 @@ class TestSaveFigure(unittest.TestCase):
         self.figure = LineChart(data=[{"x": i, "y": i * 2} for i in range(5)])
         self.tmpdir = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmpdir.cleanup)
+        self.addCleanup(plt.close, "all")
 
     def path(self, name: str) -> str:
         return os.path.join(self.tmpdir.name, name)
