@@ -33,6 +33,7 @@ import matplotlib.patheffects as patheffects
 from matplotlib.legend import Legend
 from matplotlib.legend_handler import HandlerPathCollection
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from mpl_toolkits.axes_grid1.axes_size import Fixed as FixedPad
 
 from .colors import create_color_cycle, create_colormap, get_colormap
 from .validate import (
@@ -69,6 +70,7 @@ from .config_helpers import (
     get_contour_style,
     get_contour_label_style,
     get_hexbin_style,
+    get_colorbar_setting,
     get_scatter_style,
     get_regression_style,
     get_box_style,
@@ -101,6 +103,7 @@ from ...constants import (
     ARROW_STYLE,
     ASPECT_RATIO,
     BASELINE,
+    COLORBAR_LOCATION,
     DIRECTION,
     CONTOUR_LEVELS,
     HEXBIN_REDUCE,
@@ -2607,39 +2610,82 @@ COLORBAR_DIVIDER_PAD = 0.1
 
 
 def _draw_colorbar(
-    ax: plt.Axes, mappable, colorbar: dict, aspect_locked: bool = False
+    ax: plt.Axes, mappable, setting: dict, aspect_locked: bool = False
 ) -> None:
-    """Draw a colorbar beside (or above) the axes.
+    """Draw a colorbar on the edge the resolved setting names (ADR 0035)."""
+
+    colorbar = _place_colorbar(ax, mappable, setting, aspect_locked)
+    fmt = _value_formatter(setting["format"])
+    if fmt is not None:
+        colorbar.formatter = fmt
+        colorbar.update_ticks()
+    if setting["ticks"] is not None:
+        colorbar.set_ticks(setting["ticks"])
+    if setting["label"]:
+        colorbar.set_label(setting["label"], **setting["label_style"])
+
+
+def _place_colorbar(ax: plt.Axes, mappable, setting: dict, aspect_locked: bool):
+    """Place the bar on its edge and size it against the axes.
 
     The layout engine places it clear of titles and neighbouring axes; an
     aspect-locked axes instead carves it from its own box, which the engine
     would size to the grid cell rather than the box.
     """
 
-    orientation = colorbar.get("orientation", DEFAULT_ORIENTATION)
-    location = "right" if orientation == ORIENTATION.VERTICAL else "top"
-    if aspect_locked:
-        cax = make_axes_locatable(ax).append_axes(
-            location, size=f"{COLORBAR_FRACTION:.0%}", pad=COLORBAR_DIVIDER_PAD
+    location, orientation = setting["location"], setting["orientation"]
+    if not aspect_locked:
+        # the layout engine keeps a colorbar at its own aspect (20:1 by
+        # default), which shortens it beside a narrow axes: size it to the
+        # axes slot instead
+        bbox = ax.get_position()
+        width, height = ax.figure.get_size_inches()
+        along, across = bbox.height * height, bbox.width * width
+        if orientation == ORIENTATION.HORIZONTAL:
+            along, across = across, along
+        return ax.figure.colorbar(
+            mappable,
+            ax=ax,
+            location=location,
+            fraction=COLORBAR_FRACTION,
+            pad=COLORBAR_PAD,
+            aspect=along / (across * COLORBAR_FRACTION),
         )
-        ax.figure.colorbar(mappable, cax=cax, orientation=orientation)
-        return
-    # the layout engine keeps a colorbar at its own aspect (20:1 by default),
-    # which shortens it beside a narrow axes: size it to the axes slot instead
-    bbox = ax.get_position()
-    width, height = ax.figure.get_size_inches()
-    if location == "right":
-        aspect = (bbox.height * height) / (bbox.width * width * COLORBAR_FRACTION)
-    else:
-        aspect = (bbox.width * width) / (bbox.height * height * COLORBAR_FRACTION)
-    ax.figure.colorbar(
-        mappable,
-        ax=ax,
-        location=location,
-        fraction=COLORBAR_FRACTION,
-        pad=COLORBAR_PAD,
-        aspect=aspect,
+    # a left or bottom bar crosses the chart's tick labels: pad past them
+    crosses_ticks = location in (COLORBAR_LOCATION.LEFT, COLORBAR_LOCATION.BOTTOM)
+    pad = COLORBAR_DIVIDER_PAD
+    if crosses_ticks:
+        pad = _AxisClearance(ax, location, pad)
+    cax = make_axes_locatable(ax).append_axes(
+        location, size=f"{COLORBAR_FRACTION:.0%}", pad=pad
     )
+    if crosses_ticks or setting["label"]:
+        # the layout engine reserves room for a child axes, not a divider axes
+        ax.figure.delaxes(cax)
+        ax.add_child_axes(cax)
+    kwargs = {"orientation": orientation}
+    if location == COLORBAR_LOCATION.LEFT:
+        # a left bar reads outward; the other edges keep matplotlib's tick side
+        kwargs["ticklocation"] = location
+    return ax.figure.colorbar(mappable, cax=cax, **kwargs)
+
+
+class _AxisClearance(FixedPad):
+    """A divider pad that clears the chart axis' tick labels on one edge."""
+
+    def __init__(self, ax: plt.Axes, location: str, pad: float):
+        super().__init__(pad)
+        self._ax, self._location = ax, location
+
+    def get_size(self, renderer):
+        ax = self._ax
+        if self._location == COLORBAR_LOCATION.LEFT:
+            bbox = ax.yaxis.get_tightbbox(renderer)
+            extent = ax.bbox.x0 - bbox.x0 if bbox else 0.0
+        else:
+            bbox = ax.xaxis.get_tightbbox(renderer)
+            extent = ax.bbox.y0 - bbox.y0 if bbox else 0.0
+        return 0.0, self.fixed_size + max(extent, 0.0) / ax.figure.dpi
 
 
 def _value_formatter(valfmt):
@@ -2656,6 +2702,7 @@ class HeatmapLayer(Layer):
     def _resolve_style(self):
         self.show_heatmap_values = self.settings.get("show_heatmap_values")
         self.show_colorbars = self.settings.get("show_colorbars")
+        self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
         heatmap_style = get_heatmap_style(self.style)
         heatmap_style["cmap"] = get_colormap(heatmap_style["cmap"])
         self.heatmap_style = heatmap_style
@@ -2694,7 +2741,6 @@ class HeatmapLayer(Layer):
     def draw(self, ax, ctx):
         data = self.z
         valfmt = self.chart.get("valfmt", DEFAULT_VALUE_FORMAT)
-        colorbar = self.chart.get("colorbar", {})
 
         # the panel owns the aspect; imshow's own "equal" would size the
         # colorbar to a box the panel then stretches
@@ -2745,7 +2791,7 @@ class HeatmapLayer(Layer):
             self._draw_cell_borders(ax, len(data), len(data[0]))
 
         if self.show_colorbars:
-            _draw_colorbar(ax, im, colorbar, ctx.aspect_locked)
+            _draw_colorbar(ax, im, self.colorbar, ctx.aspect_locked)
 
         # heatmaps always draw a full frame, regardless of theme spine visibility
         for spine in ax.spines.values():
@@ -2829,6 +2875,7 @@ class ContourLayer(Layer):
         self.filled = bool(self.settings.get("filled"))
         self.show_labels = self.settings.get("show_labels")
         self.show_colorbars = self.settings.get("show_colorbars")
+        self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
         style = get_contour_style(self.style)
         self.cmap = get_colormap(style.pop("cmap"))
         # lines take a pinned contour cmap only, past its washed-out low end
@@ -2885,9 +2932,7 @@ class ContourLayer(Layer):
             ax.fill_between([], [], [], color=self.cmap(CONTOUR_SWATCH), label=label)
             self.register_hover(bands, self._level_resolver(bands, label))
             if self.show_colorbars:
-                _draw_colorbar(
-                    ax, bands, self.chart.get("colorbar", {}), ctx.aspect_locked
-                )
+                _draw_colorbar(ax, bands, self.colorbar, ctx.aspect_locked)
             return
 
         # a pinned line color beats the cmap; a muted background beats both
@@ -2957,6 +3002,10 @@ class HexbinLayer(Layer):
 
     def _resolve_style(self):
         self.show_colorbars = self.settings.get("show_colorbars")
+        # valfmt is the tick format the colorbar setting falls back on
+        self.colorbar = get_colorbar_setting(
+            self.chart.get("colorbar"), self.chart.get("valfmt")
+        )
         style = get_hexbin_style(self.style)
         style["cmap"] = get_colormap(style["cmap"])
         self.hexbin_style = style
@@ -3036,12 +3085,7 @@ class HexbinLayer(Layer):
 
         self.register_hover(tiles, resolve)
         if self.show_colorbars:
-            colorbar = self.chart.get("colorbar", {})
-            _draw_colorbar(ax, tiles, colorbar, ctx.aspect_locked)
-            fmt = _value_formatter(self.chart.get("valfmt"))
-            if fmt is not None:
-                tiles.colorbar.formatter = fmt
-                tiles.colorbar.update_ticks()
+            _draw_colorbar(ax, tiles, self.colorbar, ctx.aspect_locked)
 
 
 class ParallelCoordsLayer(Layer):

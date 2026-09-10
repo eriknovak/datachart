@@ -399,6 +399,14 @@ it expands, once, into a location plus an anchor that no public surface names
 (ADR 0034).
 _Avoid_: legend style (that is the theme-key family), bbox anchor
 
+**Colorbar setting**:
+The per-figure colorbar controls — label, location, tick format, tick
+positions — passed to a front as `colorbar` on Heatmap, filled Contour, and
+Hexbin. `location` is a `COLORBAR_LOCATION` edge and is what the bar follows;
+`orientation` stays accepted and derives the edge when no location is given
+(ADR 0035).
+_Avoid_: color legend, colorbar style, scale bar
+
 **Style resolution**:
 Collapsing `global config → theme → chart-specific style` into one concrete style,
 performed once when a layer is built — never at draw time.

@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 from ...config import config, Config
 from ...config.charts import CHART_CONFIGS
-from ...constants import ARROW_STYLE, LEGEND_LOCATION
+from ...constants import ARROW_STYLE, COLORBAR_LOCATION, LEGEND_LOCATION, ORIENTATION
 from ...themes._base import canonical_style
 
 # ================================================
@@ -1238,6 +1238,69 @@ def get_parallel_dim_label_pad(chart_style: dict) -> float:
     return chart_style.get(
         "plot_parallel_dim_label_pad", config["plot_parallel_dim_label_pad"]
     )
+
+
+# -------------------------------------
+# Colorbar Setting
+# -------------------------------------
+
+
+# the edge each orientation derives when the setting names no location
+COLORBAR_DERIVED_LOCATIONS = {
+    ORIENTATION.VERTICAL: COLORBAR_LOCATION.RIGHT,
+    ORIENTATION.HORIZONTAL: COLORBAR_LOCATION.TOP,
+}
+COLORBAR_ORIENTATIONS = {
+    COLORBAR_LOCATION.RIGHT: ORIENTATION.VERTICAL,
+    COLORBAR_LOCATION.LEFT: ORIENTATION.VERTICAL,
+    COLORBAR_LOCATION.TOP: ORIENTATION.HORIZONTAL,
+    COLORBAR_LOCATION.BOTTOM: ORIENTATION.HORIZONTAL,
+}
+
+
+def get_colorbar_setting(
+    colorbar: Optional[dict], valfmt: Optional[str] = None
+) -> dict:
+    """Resolve the per-figure colorbar setting (ADR 0035).
+
+    `location` is the control and `orientation` follows it; with no location
+    the orientation derives the edge (vertical: right, horizontal: top). The
+    label wears the `font_ylabel_*` theme font.
+
+    Args:
+        colorbar: The colorbar setting; `None` fields take the defaults.
+        valfmt: The tick format to fall back on when `format` is unset.
+
+    Returns:
+        The resolved setting: `location`, `orientation`, `label`, `format`,
+        `ticks`, and the `label_style`.
+
+    """
+
+    colorbar = colorbar or {}
+    location = colorbar.get("location")
+    if location is None:
+        orientation = colorbar.get("orientation") or ORIENTATION.VERTICAL
+        if orientation not in COLORBAR_DERIVED_LOCATIONS:
+            raise ValueError(
+                f"Invalid colorbar `orientation` value {orientation!r}. "
+                f"Must be one of {tuple(COLORBAR_DERIVED_LOCATIONS)}."
+            )
+        location = COLORBAR_DERIVED_LOCATIONS[orientation]
+    if location not in COLORBAR_ORIENTATIONS:
+        raise ValueError(
+            f"Invalid colorbar `location` value {location!r}. "
+            f"Must be one of {tuple(COLORBAR_ORIENTATIONS)}."
+        )
+    fmt = colorbar.get("format")
+    return {
+        "location": location,
+        "orientation": COLORBAR_ORIENTATIONS[location],
+        "label": colorbar.get("label"),
+        "format": valfmt if fmt is None else fmt,
+        "ticks": colorbar.get("ticks"),
+        "label_style": get_text_style("ylabel"),
+    }
 
 
 # -------------------------------------
