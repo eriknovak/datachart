@@ -28,7 +28,6 @@ from datachart.charts import (
     ViolinPlot,
 )
 from datachart.config import config
-from datachart.constants import THEME
 from datachart import themes
 from datachart.utils import Grid, Panel
 from datachart.utils._internal.config_helpers import get_hspan_style, get_vspan_style
@@ -192,6 +191,14 @@ class TestStacking(unittest.TestCase):
             band.get_hatchcolor(), matplotlib.colors.to_rgba("#123456", 0.25)
         )
 
+    def test_hatch_without_edge_draws_in_fill_color(self):
+        figure = LineChart(
+            data=LINE,
+            vspans={"xmin": 1, "xmax": 3, "style": {"plot_vspan_hatch": "//"}},
+        )
+        (band,) = band_patches(figure.axes[0])
+        self.assertEqual(band.get_hatchcolor(), band.get_facecolor())
+
 
 class TestLegend(unittest.TestCase):
     def tearDown(self):
@@ -248,7 +255,7 @@ class TestFronts(unittest.TestCase):
         for front, data in calls:
             figure = front(data=data, **span)
             ax = figure.axes[0]
-            self.assertEqual(len(band_patches(ax)) >= 2, True, front.__name__)
+            self.assertGreaterEqual(len(band_patches(ax)), 2, front.__name__)
 
     def test_shared_band_draws_once_per_panel(self):
         figure = LineChart(

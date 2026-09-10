@@ -173,8 +173,8 @@ recession period, an acceptable range. Declared with the chart (`vspans=` for
 a band bounded on the x axis, `hspans=` for one bounded on the y axis) like
 reference lines, stored on the layer, drawn by the panel over the grid and
 under the marks — so it survives composition. An omitted bound runs to the
-axis limit. On a polar axes a `vspan` is a wedge and an `hspan` an annulus,
-both bounded in degrees.
+axis limit. On a polar axes a `vspan` is a wedge bounded in degrees and an
+`hspan` an annulus bounded in radius.
 _Avoid_: span (for the concept), region, shading, highlight
 
 **Point label**:

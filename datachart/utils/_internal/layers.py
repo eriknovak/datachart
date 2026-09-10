@@ -388,8 +388,14 @@ def _resolve_ref_lines(chart: dict, key: str) -> List[tuple]:
     return [(line, get_style(line.get("style", {}))) for line in lines]
 
 
-# a band's bounds per side: (lower key, upper key), the same on polar in degrees
-SPAN_BOUNDS = {"vspans": ("xmin", "xmax"), "hspans": ("ymin", "ymax")}
+# per side: the bound keys and the style resolver; on polar a vspan is
+# bounded in degrees, an hspan in radius
+SPAN_SIDES = {
+    "vspans": ("xmin", "xmax", get_vspan_style),
+    "hspans": ("ymin", "ymax", get_hspan_style),
+}
+# polar wedge outline samples per degree: enough for the chord error to vanish
+SPAN_SAMPLES_PER_DEGREE = 2
 
 
 def _resolve_ref_spans(chart: dict, key: str, muted_color: str) -> List[tuple]:
@@ -399,15 +405,27 @@ def _resolve_ref_spans(chart: dict, key: str, muted_color: str) -> List[tuple]:
     if spans is None:
         return []
     spans = spans if isinstance(spans, list) else [spans]
-    get_style = get_vspan_style if key == "vspans" else get_hspan_style
+    lo_key, hi_key, get_style = SPAN_SIDES[key]
     resolved = []
     for span in spans:
-        validate_span_bounds(span, *SPAN_BOUNDS[key])
+        validate_span_bounds(span, lo_key, hi_key)
         style = get_style(span.get("style") or {})
         # an unset color sits behind the data without competing with the cycle
         style.setdefault("facecolor", muted_color)
+        if style.get("hatch") and "edgecolor" not in style:
+            # a hatch draws in the edge color, and an unset edge is transparent
+            style["edgecolor"] = style["facecolor"]
         resolved.append((span, style))
     return resolved
+
+
+def _span_bounds(span: dict, key: str, limits: tuple) -> tuple:
+    """A band's (lower, upper) bounds, an omitted one falling back to the limit."""
+
+    lo_key, hi_key, _ = SPAN_SIDES[key]
+    lo = span.get(lo_key)
+    hi = span.get(hi_key)
+    return (limits[0] if lo is None else lo, limits[1] if hi is None else hi)
 
 
 TEXT_COORDS = ("data", "axes")
@@ -659,62 +677,43 @@ def _draw_ref_spans(
     band is a wedge over the full radius and a horizontal one an annulus over
     the full circle, both via `fill_between` because the span helpers measure
     their perpendicular extent in axes fractions. An omitted bound falls back
-    to the axis limit, and the limit is then pinned so the band meets the
-    axes edge instead of growing the view by the autoscale margin.
+    to the axis limit, and that limit is then pinned so the band meets the
+    axes edge instead of the autoscale margin pushing the edge away from it.
+    The polar r limits are always pinned: the radial furniture already read
+    them, so a band never moves the ring the donut hole was cut from.
     """
 
     if not (vspans or hspans):
         return
 
     if polar:
-        rmin, rmax = ax.get_ylim()
+        rlim = ax.get_ylim()
         for vspan, style in vspans:
-            lo = vspan.get("xmin")
-            hi = vspan.get("xmax")
-            lo = 0.0 if lo is None else float(lo)
-            hi = 360.0 if hi is None else float(hi)
+            lo, hi = _span_bounds(vspan, "vspans", (0.0, 360.0))
             if hi < lo:
                 # a wedge through the start angle wraps the long way round
                 hi += 360.0
-            theta = np.deg2rad(np.linspace(lo, hi, max(2, int(2 * (hi - lo)) + 1)))
-            ax.fill_between(theta, rmin, rmax, label=vspan.get("label", ""), **style)
-        theta = np.linspace(0, 2 * np.pi, 721)
+            samples = max(2, int(SPAN_SAMPLES_PER_DEGREE * (hi - lo)) + 1)
+            theta = np.deg2rad(np.linspace(lo, hi, samples))
+            ax.fill_between(theta, *rlim, label=vspan.get("label", ""), **style)
+        theta = np.linspace(0, 2 * np.pi, SPAN_SAMPLES_PER_DEGREE * 360 + 1)
         for hspan, style in hspans:
-            lo = hspan.get("ymin")
-            hi = hspan.get("ymax")
-            ax.fill_between(
-                theta,
-                rmin if lo is None else lo,
-                rmax if hi is None else hi,
-                label=hspan.get("label", ""),
-                **style,
-            )
-        ax.set_ylim(rmin, rmax)
+            lo, hi = _span_bounds(hspan, "hspans", rlim)
+            ax.fill_between(theta, lo, hi, label=hspan.get("label", ""), **style)
+        ax.set_ylim(rlim)
         return
 
     xlim = ax.get_xlim()
     for vspan, style in vspans:
-        lo = vspan.get("xmin")
-        hi = vspan.get("xmax")
-        ax.axvspan(
-            xlim[0] if lo is None else lo,
-            xlim[1] if hi is None else hi,
-            label=vspan.get("label", ""),
-            **style,
-        )
+        lo, hi = _span_bounds(vspan, "vspans", xlim)
+        ax.axvspan(lo, hi, label=vspan.get("label", ""), **style)
     if any(v.get("xmin") is None or v.get("xmax") is None for v, _ in vspans):
         ax.set_xlim(xlim)
 
     ylim = ax.get_ylim()
     for hspan, style in hspans:
-        lo = hspan.get("ymin")
-        hi = hspan.get("ymax")
-        ax.axhspan(
-            ylim[0] if lo is None else lo,
-            ylim[1] if hi is None else hi,
-            label=hspan.get("label", ""),
-            **style,
-        )
+        lo, hi = _span_bounds(hspan, "hspans", ylim)
+        ax.axhspan(lo, hi, label=hspan.get("label", ""), **style)
     if any(h.get("ymin") is None or h.get("ymax") is None for h, _ in hspans):
         ax.set_ylim(ylim)
 
@@ -6082,8 +6081,10 @@ class Panel:
         # a twin, so the band lies beneath both axes' marks
         vspans, hspans = [], []
         for layer in layers:
-            vspans.extend(span for span in layer.vspans if span not in vspans)
-            hspans.extend(span for span in layer.hspans if span not in hspans)
+            for pool, spans in ((vspans, layer.vspans), (hspans, layer.hspans)):
+                for span in spans:
+                    if span not in pool:
+                        pool.append(span)
         _draw_ref_spans(ax, vspans, hspans, polar)
 
         # a twin axes renders entirely above its host, so texts live on the
