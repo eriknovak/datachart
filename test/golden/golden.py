@@ -43,6 +43,8 @@ from datachart.utils import Panel, Grid, Annotate
 from datachart.config import config
 from datachart.constants import (
     ARROW_STYLE,
+    ASPECT_RATIO,
+    COLORBAR_LOCATION,
     COLORS,
     CONTOUR_LEVELS,
     HEXBIN_REDUCE,
@@ -206,6 +208,12 @@ EXPECTED_CHANGES = {
     "legend_title",
     "legend_outside_right",
     "legend_multi_column",
+    # new per-figure colorbar cases (ADR 0035)
+    "colorbar_left_label",
+    "colorbar_bottom_format",
+    "colorbar_top_locked",
+    "colorbar_right_ticks",
+    "colorbar_grid_label",
 }
 
 
@@ -1997,6 +2005,66 @@ def hist_kde1d():
         ],
         show_legend=True,
     )
+
+
+# ----- per-figure colorbar settings (ADR 0035) -----
+
+
+@case
+def colorbar_left_label():
+    data = {"z": [[(i * j) % 7 for j in range(6)] for i in range(5)]}
+    return Heatmap(
+        data=data,
+        show_colorbars=True,
+        colorbar={"label": "Residual", "location": COLORBAR_LOCATION.LEFT},
+    )
+
+
+@case
+def colorbar_bottom_format():
+    return ContourChart(
+        data=contour_grid_data(peaks, -3, 3),
+        filled=True,
+        show_colorbars=True,
+        colorbar={
+            "label": "Height",
+            "location": COLORBAR_LOCATION.BOTTOM,
+            "format": "{x:.1f}",
+        },
+    )
+
+
+@case
+def colorbar_top_locked():
+    return HexbinChart(
+        data=hexbin_points(),
+        aspect_ratio=ASPECT_RATIO.EQUAL,
+        colorbar={"label": "Points", "location": COLORBAR_LOCATION.TOP},
+    )
+
+
+@case
+def colorbar_right_ticks():
+    data = {"z": [[(i * j) % 7 for j in range(6)] for i in range(5)]}
+    return Heatmap(
+        data=data,
+        show_colorbars=True,
+        aspect_ratio=ASPECT_RATIO.EQUAL,
+        colorbar={"label": "Residual", "ticks": [0, 3, 6], "format": "{x:.0f}"},
+    )
+
+
+@case
+def colorbar_grid_label():
+    data = {"z": [[(i * j) % 7 for j in range(6)] for i in range(5)]}
+    heatmap = Heatmap(
+        data=data,
+        show_colorbars=True,
+        title="labelled",
+        colorbar={"label": "Residual", "location": COLORBAR_LOCATION.BOTTOM},
+    )
+    line = LineChart(data=LINE1, title="line")
+    return Grid([[heatmap, line]], figsize=(10, 4))
 
 
 # ----- runner -----
