@@ -110,6 +110,7 @@ Every customization is either a keyword argument of `Histogram` or a `plot_hist_
 | draw the histogram as a step outline    | `style={"plot_hist_type": ...}`                                                            | [Histogram style](#histogram-style)                           |
 | hatch or outline the bars               | `style={"plot_hist_hatch": ..., "plot_hist_edge_width": ..., "plot_hist_edge_color": ...}` | [Histogram style](#histogram-style)                           |
 | draw the bars horizontally              | `orientation`                                                                              | [Orientation](#orientation)                                   |
+| print the count at the top of each bin  | `show_values`, `value_format`                                                              | [Value labels](#value-labels)                                 |
 | highlight one series, mute the rest     | `emphasis`                                                                                 | [Emphasis](#emphasis)                                         |
 | mark a threshold or a reference value   | `vlines`, `hlines`                                                                         | [Reference lines](#reference-lines)                           |
 | compare several series in one chart     | `data` as a list of lists, `subtitle`, `show_legend`                                       | [Multiple Histograms](#multiple-histograms)                   |
@@ -286,6 +287,26 @@ Histogram(
     show_grid=SHOW_GRID.X,
     # change the orientation of the bars
     orientation=ORIENTATION.HORIZONTAL,
+).show()
+```
+
+### Value labels
+
+To print the number of values in each bin at its top, add the `show_values` attribute; `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)). Empty bins stay bare. When several series are stacked, every segment prints its own count at its centre.
+
+```
+from datachart.constants import VALUE_FORMAT
+
+Histogram(
+    data=penguins,
+    title="Flipper length of Palmer penguins",
+    xlabel="Flipper length (mm)",
+    ylabel="Number of penguins",
+    xticks=FLIPPER_TICKS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    # print the count of every bin
+    show_values=True,
 ).show()
 ```
 

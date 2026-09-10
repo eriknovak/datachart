@@ -58,6 +58,9 @@ LineChart(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_yerr: Optional[bool] = None,
     show_area: Optional[bool] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    value_step: Optional[int] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -155,6 +158,10 @@ Examples:
 ... )
 ```
 
+Added in Unreleased
+
+The `show_values`, `value_format` and `value_step` parameters.
+
 | PARAMETER      | DESCRIPTION                                                                                                                                                                                                                                                                                                                                     |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `data`         | The data points for the line chart(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** `Union[List[LineDataPointAttrs], List[List[LineDataPointAttrs]]]`                                                                                                                          |
@@ -172,6 +179,9 @@ Examples:
 | `show_grid`    | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                              |
 | `show_yerr`    | Whether to show y-axis error bars. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                               |
 | `show_area`    | Whether to show the area under the line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                         |
+| `show_values`  | Whether to print each point's value above or below it. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                           |
+| `value_format` | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                               |
+| `value_step`   | Label every Nth point (1 labels all of them). Defaults to the smallest step that keeps neighbouring labels apart. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                 |
 | `aspect_ratio` | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                                                          |
 | `scalex`       | The x-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                           |
 | `scaley`       | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                           |
@@ -225,6 +235,9 @@ StackedAreaChart(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    value_step: Optional[int] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -322,6 +335,10 @@ Examples:
 ... )
 ```
 
+Added in Unreleased
+
+The `show_values`, `value_format` and `value_step` parameters.
+
 | PARAMETER      | DESCRIPTION                                                                                                                                                                                                                                                                                      |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `data`         | The data points for the stacked series. A single list of points draws one band; a list of lists draws one band per series, the first at the bottom. Every series must hold the same x values in the same order. **TYPE:** `Union[List[LineDataPointAttrs], List[List[LineDataPointAttrs]]]`      |
@@ -338,6 +355,9 @@ Examples:
 | `ymax`         | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                            |
 | `show_legend`  | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                       |
 | `show_grid`    | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                               |
+| `show_values`  | Whether to print each value at the midpoint of its band. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                          |
+| `value_format` | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                |
+| `value_step`   | Label every Nth x position (1 labels all of them). Defaults to the smallest step that keeps neighbouring labels apart. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                             |
 | `aspect_ratio` | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                           |
 | `scalex`       | The x-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                            |
 | `scaley`       | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                            |
@@ -811,6 +831,8 @@ Histogram(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_density: Optional[bool] = None,
     show_cumulative: Optional[bool] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[
         Union[ORIENTATION, str]
@@ -911,6 +933,10 @@ Examples:
 ... )
 ```
 
+Added in Unreleased
+
+The `show_values` and `value_format` parameters.
+
 | PARAMETER         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `data`            | The data points for the histogram(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** `Union[List[HistDataPointAttrs], List[List[HistDataPointAttrs]]]`                                                                                                                                                                                                          |
@@ -928,6 +954,8 @@ Examples:
 | `show_grid`       | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                             |
 | `show_density`    | Whether to plot the density histogram. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                          |
 | `show_cumulative` | Whether to plot the cumulative histogram. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                       |
+| `show_values`     | Whether to print each bin's height at its top; empty bins stay bare. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                            |
+| `value_format`    | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                              |
 | `aspect_ratio`    | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                         |
 | `orientation`     | The orientation of the histogram (vertical or horizontal). **TYPE:** `Optional[Union[ORIENTATION, str]]` **DEFAULT:** `ORIENTATION.VERTICAL`                                                                                                                                                                                                                                                                                   |
 | `bar_mode`        | How multiple histogram series share the axis: "stack" (stacked on shared bins, the default) or "overlay" (each series drawn individually over the others). "group" has no histogram meaning and behaves like "overlay". See BAR_MODE. **TYPE:** `Optional[Union[BAR_MODE, str]]` **DEFAULT:** `None`                                                                                                                           |
@@ -983,6 +1011,8 @@ BoxPlot(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_outliers: Optional[bool] = None,
     show_notch: Optional[bool] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[
         Union[ORIENTATION, str]
@@ -1082,6 +1112,10 @@ Examples:
 ... )
 ```
 
+Added in Unreleased
+
+The `show_values` and `value_format` parameters.
+
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                           |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `data`          | The data points for the box plot(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. Each data point should have a label (category) and value (numeric). **TYPE:** `Union[List[BoxDataPointAttrs], List[List[BoxDataPointAttrs]]]`                                                |
@@ -1099,6 +1133,8 @@ Examples:
 | `show_grid`     | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                    |
 | `show_outliers` | Whether to show outliers. Defaults to True. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                            |
 | `show_notch`    | Whether to show notched boxes for median confidence interval. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                          |
+| `show_values`   | Whether to print each group's median beside its median line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                           |
+| `value_format`  | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                     |
 | `aspect_ratio`  | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                                                |
 | `orientation`   | The orientation of the boxes (vertical or horizontal). **TYPE:** `Optional[Union[ORIENTATION, str]]` **DEFAULT:** `ORIENTATION.VERTICAL`                                                                                                                                                                                              |
 | `scaley`        | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                 |
@@ -1150,6 +1186,8 @@ ViolinPlot(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[
         Union[ORIENTATION, str]
@@ -1259,6 +1297,10 @@ Examples:
 ... )
 ```
 
+Added in Unreleased
+
+The `show_values` and `value_format` parameters.
+
 | PARAMETER      | DESCRIPTION                                                                                                                                                                                                                                                                                                     |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `data`         | The data points for the violin plot(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. Each data point should have a label (category) and value (numeric). **TYPE:** `Union[List[ViolinDataPointAttrs], List[List[ViolinDataPointAttrs]]]`                 |
@@ -1274,6 +1316,8 @@ Examples:
 | `ymax`         | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                           |
 | `show_legend`  | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                      |
 | `show_grid`    | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                              |
+| `show_values`  | Whether to print each group's median beside its median line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                     |
+| `value_format` | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                               |
 | `aspect_ratio` | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                          |
 | `orientation`  | The orientation of the violins (vertical or horizontal). **TYPE:** `Optional[Union[ORIENTATION, str]]` **DEFAULT:** `ORIENTATION.VERTICAL`                                                                                                                                                                      |
 | `scaley`       | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                           |
@@ -1683,6 +1727,9 @@ ScatterChart(
     show_ci: Optional[bool] = None,
     ci_level: Optional[float] = None,
     show_correlation: Optional[bool] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    value_step: Optional[int] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -1830,6 +1877,10 @@ Examples:
 ... )
 ```
 
+Added in Unreleased
+
+The `show_values`, `value_format` and `value_step` parameters.
+
 | PARAMETER          | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                           |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `data`             | The data points for the scatter chart(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** `Union[List[ScatterDataPointAttrs], List[List[ScatterDataPointAttrs]]]`                                                                                                                                                                       |
@@ -1849,6 +1900,9 @@ Examples:
 | `show_ci`          | Whether to show the confidence interval around the regression line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                    |
 | `ci_level`         | The confidence interval level (default 0.95). **TYPE:** `Optional[float]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                         |
 | `show_correlation` | Whether to show the Pearson correlation coefficient (r-value) as an annotation. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                        |
+| `show_values`      | Whether to print each point's y value beside it. Cannot be combined with label: a point carries its label or its value. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                |
+| `value_format`     | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                     |
+| `value_step`       | Label every Nth point (1 labels all of them). Defaults to the smallest step that keeps neighbouring labels apart. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                       |
 | `aspect_ratio`     | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                |
 | `scalex`           | The x-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                 |
 | `scaley`           | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                 |

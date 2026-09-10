@@ -109,6 +109,7 @@ Every customization is either a keyword argument of `BoxPlot` or a `plot_box_*` 
 | draw the boxes horizontally                      | `orientation`                                                                     | [Box orientation](#box-orientation)                             |
 | hide the outliers                                | `show_outliers`                                                                   | [Showing and hiding outliers](#showing-and-hiding-outliers)     |
 | show the confidence interval of the median       | `show_notch`                                                                      | [Notched box plots](#notched-box-plots)                         |
+| print the median of each box                     | `show_values`, `value_format`                                                     | [Value labels](#value-labels)                                   |
 | highlight one box, mute the rest                 | `emphasis`                                                                        | [Emphasis](#emphasis)                                           |
 | draw a threshold or reference line               | `hlines`, `vlines`                                                                | [Reference lines](#reference-lines)                             |
 | draw the observations or a violin with the boxes | `Panel`                                                                           | [Boxes with swarms and violins](#boxes-with-swarms-and-violins) |
@@ -277,6 +278,26 @@ BoxPlot(
     data=chart_data,
     # draw the confidence interval of the median as a notch
     show_notch=True,
+    title="Body mass of Palmer penguins",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+).show()
+```
+
+### Value labels
+
+To print the median of each group beside its median line, add the `show_values` attribute; `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)). The median is the number readers take from a box, so it is the one value printed.
+
+```
+from datachart.constants import VALUE_FORMAT
+
+BoxPlot(
+    data=chart_data,
+    # print the median of every box
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
     title="Body mass of Palmer penguins",
     xlabel="Species",
     ylabel="Body mass (g)",

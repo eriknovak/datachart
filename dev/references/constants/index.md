@@ -713,7 +713,7 @@ Examples:
 
 The predefined value formats.
 
-Passed as the heatmap's `valfmt` attribute (the values drawn in the cells) or the bar chart's `value_format` attribute (the bar value labels).
+Passed as the `value_format` attribute of every chart that takes `show_values` (the value labels printed beside its marks) or as the heatmap's `valfmt` attribute (the values drawn in the cells).
 
 Examples:
 

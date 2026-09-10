@@ -578,7 +578,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
 
 The style attributes. Combines all style typings.
 
@@ -724,11 +724,26 @@ The typing for the bar chart style.
 | `plot_bar_edge_width`      | The edge width of the bar. **TYPE:** `Union[int, float, None]`                         |
 | `plot_bar_edge_color`      | The edge color of the bar. **TYPE:** `Union[str, None]`                                |
 | `plot_bar_error_color`     | The color of the error line of the bar. **TYPE:** `Union[str, None]`                   |
-| `plot_bar_value_fontsize`  | The font size of the bar value labels. **TYPE:** `Union[int, float, None]`             |
-| `plot_bar_value_color`     | The color of the bar value labels. **TYPE:** `Union[str, None]`                        |
-| `plot_bar_value_padding`   | The padding between bar edge and value label. **TYPE:** `Union[int, float, None]`      |
+| `plot_bar_value_fontsize`  | Alias of plot_value_fontsize. **TYPE:** `Union[int, float, None]`                      |
+| `plot_bar_value_color`     | Alias of plot_value_color. **TYPE:** `Union[str, None]`                                |
+| `plot_bar_value_padding`   | Alias of plot_value_padding. **TYPE:** `Union[int, float, None]`                       |
 | `plot_xticks_label_rotate` | The label rotation of the xticks in the bar chart. **TYPE:** `Union[int, float, None]` |
 | `plot_yticks_label_rotate` | The label rotation of the yticks in the bar chart. **TYPE:** `Union[int, float, None]` |
+
+### datachart.typings.ValueLabelStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the value labels: the numbers a chart prints beside its marks when `show_values` is on. One style serves every chart that takes `show_values`; the `plot_bar_value_*` keys of `BarStyleAttrs` are aliases.
+
+Added in Unreleased
+
+| ATTRIBUTE               | DESCRIPTION                                                                                                                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_value_fontsize`   | The font size of the value labels. **TYPE:** `Union[int, float, None]`                                                                                                          |
+| `plot_value_color`      | The color of the value labels. **TYPE:** `Union[str, None]`                                                                                                                     |
+| `plot_value_padding`    | The gap between a mark and its value label, in points. **TYPE:** `Union[int, float, None]`                                                                                      |
+| `plot_value_halo_width` | The width, in points, of the white halo stroked around the value labels so they stay legible over marks and lines. None or 0 draws no halo. **TYPE:** `Union[int, float, None]` |
 
 ### datachart.typings.HistStyleAttrs
 
@@ -954,7 +969,7 @@ The typing for theme-driven defaults and cycles.
 | ATTRIBUTE                   | DESCRIPTION                                                                                                                                                                            |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `chart_default_show_grid`   | The theme default for show_grid, applied when a chart call leaves it unset. Never applies to heatmaps. None means the theme has no opinion. **TYPE:** `Union[SHOW_GRID, str, None]`    |
-| `chart_default_show_values` | The theme default for show_values, applied when a chart call leaves it unset. None means the theme has no opinion. **TYPE:** `Union[bool, None]`                                       |
+| `chart_default_show_values` | The theme default for show_values, applied to every chart that takes it when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** `Union[bool, None]`        |
 | `plot_hatch_cycle`          | The hatch patterns assigned per bar/histogram series, parallel to the color cycle. An explicit per-chart hatch style wins. None disables the cycle. **TYPE:** `Union[List[str], None]` |
 
 ### datachart.typings.SketchStyleAttrs

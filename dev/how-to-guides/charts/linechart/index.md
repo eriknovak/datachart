@@ -113,6 +113,7 @@ Every customization is either a keyword argument of `LineChart` or a `plot_line_
 | draw the line as steps                | `style={"plot_line_drawstyle": ...}`                                  | [Line style](#line-style)                                     |
 | change the line width or transparency | `style={"plot_line_width": ..., "plot_line_alpha": ...}`              | [Line style](#line-style)                                     |
 | fill the area under the line          | `show_area`, `style={"plot_area_color": ..., "plot_area_alpha": ...}` | [Area under the line](#area-under-the-line)                   |
+| print the value beside each point     | `show_values`, `value_format`, `value_step`                           | [Value labels](#value-labels)                                 |
 | highlight one series, mute the rest   | `emphasis`                                                            | [Emphasis](#emphasis)                                         |
 | mark a threshold or an event          | `hlines`, `vlines`                                                    | [Reference lines](#reference-lines)                           |
 | compare several series in one chart   | `data` as a list of lists, `subtitle`, `show_legend`                  | [Multiple Line Charts](#multiple-line-charts)                 |
@@ -273,6 +274,29 @@ LineChart(
     show_grid=SHOW_GRID.BOTH,
     # fill the area under the line
     show_area=True,
+).show()
+```
+
+### Value labels
+
+To print the value beside each point, add the `show_values` attribute. `value_format` controls how the values are formatted — a [datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant or any `"{x:.1f}"`, `"{:.1f}%"` or `"%g"` style string — and `value_step` labels every Nth point when a series is too dense to label them all (by default the step is chosen so that neighbouring labels stay apart). Each label sits directly above or below its point, wherever it overlaps least with the other lines and labels, and takes the `plot_value_*` style of the active theme ([datachart.typings.ValueLabelStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)).
+
+```
+from datachart.constants import VALUE_FORMAT
+
+LineChart(
+    data=temperature_ljubljana,
+    title="Average monthly temperature in Ljubljana",
+    xlabel="Month",
+    ylabel="Temperature (°C)",
+    xticks=MONTH_TICKS,
+    xticklabels=MONTHS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    # print the value of every point
+    show_values=True,
+    # with one decimal place
+    value_format=VALUE_FORMAT.DECIMAL,
 ).show()
 ```
 

@@ -104,6 +104,7 @@ Every customization is either a keyword argument of `ViolinPlot` or a `plot_viol
 | change the body fill, edge or transparency             | `style={"plot_violin_color": ..., "plot_violin_edgecolor": ..., "plot_violin_alpha": ...}` | [Violin style](#violin-style)                                   |
 | style the inner marks and the median dot               | `style={"plot_violin_inner_color": ..., "plot_violin_median_color": ..., ...}`             | [Violin style](#violin-style)                                   |
 | change what is drawn inside the body                   | `inner`                                                                                    | [Inner marks](#inner-marks)                                     |
+| print the median of each violin                        | `show_values`, `value_format`                                                              | [Value labels](#value-labels)                                   |
 | smooth or sharpen the body                             | `bandwidth`                                                                                | [Bandwidth](#bandwidth)                                         |
 | compare two groups within each category                | `split`, `show_legend`                                                                     | [Split violins](#split-violins)                                 |
 | draw the violins horizontally                          | `orientation`                                                                              | [Violin orientation](#violin-orientation)                       |
@@ -220,6 +221,26 @@ for inner in [VIOLIN_INNER.BOX, VIOLIN_INNER.QUARTILES, VIOLIN_INNER.MEDIAN, Non
         figsize=FIG_SIZE.FULL_SHORT,
         show_grid=SHOW_GRID.Y,
     ).show()
+```
+
+### Value labels
+
+To print the median of each body beside its median mark, add the `show_values` attribute; `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)). With `split`, each half prints its own median.
+
+```
+from datachart.constants import VALUE_FORMAT
+
+ViolinPlot(
+    data=chart_data,
+    # print the median of every violin
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
+    title="Body mass of Palmer penguins",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+).show()
 ```
 
 ### Bandwidth

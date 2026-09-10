@@ -376,6 +376,7 @@ Every customization is either a keyword argument of `LineChart` or a `plot_line_
 | draw the line as steps                | `style={"plot_line_drawstyle": ...}`                                  | [Line style](#line-style)                                     |
 | change the line width or transparency | `style={"plot_line_width": ..., "plot_line_alpha": ...}`              | [Line style](#line-style)                                     |
 | fill the area under the line          | `show_area`, `style={"plot_area_color": ..., "plot_area_alpha": ...}` | [Area under the line](#area-under-the-line)                   |
+| print the value beside each point     | `show_values`, `value_format`, `value_step`                           | [Value labels](#value-labels)                                 |
 | highlight one series, mute the rest   | `emphasis`                                                            | [Emphasis](#emphasis)                                         |
 | mark a threshold or an event          | `hlines`, `vlines`                                                    | [Reference lines](#reference-lines)                           |
 | compare several series in one chart   | `data` as a list of lists, `subtitle`, `show_legend`                  | [Multiple Line Charts](#multiple-line-charts)                 |
@@ -536,6 +537,29 @@ LineChart(
     show_grid=SHOW_GRID.BOTH,
     # fill the area under the line
     show_area=True,
+).show()
+```
+
+### Value labels
+
+To print the value beside each point, add the `show_values` attribute. `value_format` controls how the values are formatted — a [datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant or any `"{x:.1f}"`, `"{:.1f}%"` or `"%g"` style string — and `value_step` labels every Nth point when a series is too dense to label them all (by default the step is chosen so that neighbouring labels stay apart). Each label sits directly above or below its point, wherever it overlaps least with the other lines and labels, and takes the `plot_value_*` style of the active theme ([datachart.typings.ValueLabelStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)).
+
+```
+from datachart.constants import VALUE_FORMAT
+
+LineChart(
+    data=temperature_ljubljana,
+    title="Average monthly temperature in Ljubljana",
+    xlabel="Month",
+    ylabel="Temperature (°C)",
+    xticks=MONTH_TICKS,
+    xticklabels=MONTHS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    # print the value of every point
+    show_values=True,
+    # with one decimal place
+    value_format=VALUE_FORMAT.DECIMAL,
 ).show()
 ```
 
@@ -1080,6 +1104,7 @@ Every customization is either a keyword argument of `StackedAreaChart` or a `plo
 | centre the stack or draw a streamgraph      | `baseline="sym"`, `"wiggle"`, `"weighted_wiggle"`               | [Baseline](#baseline)                               |
 | change the band colors, alpha, or hatch     | `style={"plot_area_color": ..., "plot_stackedarea_alpha": ...}` | [Band style](#band-style)                           |
 | outline the top of every band               | `style={"plot_stackedarea_outline": True}`                      | [Band style](#band-style)                           |
+| print the values on the bands               | `show_values`, `value_format`, `value_step`                     | [Value labels](#value-labels)                       |
 | highlight one series, mute the rest         | `emphasis`                                                      | [Emphasis](#emphasis)                               |
 | mark a year or a level                      | `vlines`, `hlines`                                              | [Reference lines](#reference-lines)                 |
 | annotate a point of the chart               | `texts`                                                         | [Text annotations](#text-annotations)               |
@@ -1196,6 +1221,29 @@ StackedAreaChart(
     title="World electricity generation",
     xlabel="Year",
     ylabel="Generation (TWh)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Value labels
+
+To print each series' value at the midpoint of its band, add the `show_values` attribute. `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)) and `value_step` labels every Nth x position when the bands are too dense to label every point (by default the step keeps neighbouring labels apart). With the percent baseline the labels print the shares. The example labels the mix every fourth year.
+
+```
+from datachart.constants import VALUE_FORMAT
+
+StackedAreaChart(
+    data=generation,
+    baseline=BASELINE.PERCENT,
+    subtitle=SOURCES,
+    show_legend=True,
+    # print the share of every source every fourth year
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
+    value_step=4,
+    title="World electricity mix",
+    xlabel="Year",
+    ylabel="Share of generation (%)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
@@ -2025,15 +2073,15 @@ BarChart(
 ).show()
 ```
 
-Bar value labels also work with horizontal bar charts. You can customize the label appearance using style attributes like `plot_bar_value_fontsize`, `plot_bar_value_color`, and `plot_bar_value_padding`.
+Bar value labels also work with horizontal bar charts. You can customize the label appearance using the `plot_value_fontsize`, `plot_value_color`, and `plot_value_padding` style attributes, shared by every chart that prints values (the `plot_bar_value_*` names still work as aliases).
 
 ```
 BarChart(
     data=sales_total,
     style={
-        "plot_bar_value_fontsize": 9,
-        "plot_bar_value_color": "#333333",
-        "plot_bar_value_padding": 5,
+        "plot_value_fontsize": 9,
+        "plot_value_color": "#333333",
+        "plot_value_padding": 5,
     },
     title="Monthly unit sales (2025)",
     xlabel="Units sold",
@@ -2160,8 +2208,8 @@ BarChart(
     data=languages,
     style={
         "plot_bar_color": "#f48024",
-        "plot_bar_value_fontsize": 9,
-        "plot_bar_value_padding": 4,
+        "plot_value_fontsize": 9,
+        "plot_value_padding": 4,
     },
     title="Most used programming languages, 2024",
     xlabel="Share of respondents",
@@ -3116,6 +3164,7 @@ Every customization is either a keyword argument of `Histogram` or a `plot_hist_
 | draw the histogram as a step outline    | `style={"plot_hist_type": ...}`                                                            | [Histogram style](#histogram-style)                           |
 | hatch or outline the bars               | `style={"plot_hist_hatch": ..., "plot_hist_edge_width": ..., "plot_hist_edge_color": ...}` | [Histogram style](#histogram-style)                           |
 | draw the bars horizontally              | `orientation`                                                                              | [Orientation](#orientation)                                   |
+| print the count at the top of each bin  | `show_values`, `value_format`                                                              | [Value labels](#value-labels)                                 |
 | highlight one series, mute the rest     | `emphasis`                                                                                 | [Emphasis](#emphasis)                                         |
 | mark a threshold or a reference value   | `vlines`, `hlines`                                                                         | [Reference lines](#reference-lines)                           |
 | compare several series in one chart     | `data` as a list of lists, `subtitle`, `show_legend`                                       | [Multiple Histograms](#multiple-histograms)                   |
@@ -3292,6 +3341,26 @@ Histogram(
     show_grid=SHOW_GRID.X,
     # change the orientation of the bars
     orientation=ORIENTATION.HORIZONTAL,
+).show()
+```
+
+### Value labels
+
+To print the number of values in each bin at its top, add the `show_values` attribute; `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)). Empty bins stay bare. When several series are stacked, every segment prints its own count at its centre.
+
+```
+from datachart.constants import VALUE_FORMAT
+
+Histogram(
+    data=penguins,
+    title="Flipper length of Palmer penguins",
+    xlabel="Flipper length (mm)",
+    ylabel="Number of penguins",
+    xticks=FLIPPER_TICKS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    # print the count of every bin
+    show_values=True,
 ).show()
 ```
 
@@ -3899,6 +3968,7 @@ Every customization is either a keyword argument of `BoxPlot` or a `plot_box_*` 
 | draw the boxes horizontally                      | `orientation`                                                                     | [Box orientation](#box-orientation)                             |
 | hide the outliers                                | `show_outliers`                                                                   | [Showing and hiding outliers](#showing-and-hiding-outliers)     |
 | show the confidence interval of the median       | `show_notch`                                                                      | [Notched box plots](#notched-box-plots)                         |
+| print the median of each box                     | `show_values`, `value_format`                                                     | [Value labels](#value-labels)                                   |
 | highlight one box, mute the rest                 | `emphasis`                                                                        | [Emphasis](#emphasis)                                           |
 | draw a threshold or reference line               | `hlines`, `vlines`                                                                | [Reference lines](#reference-lines)                             |
 | draw the observations or a violin with the boxes | `Panel`                                                                           | [Boxes with swarms and violins](#boxes-with-swarms-and-violins) |
@@ -4067,6 +4137,26 @@ BoxPlot(
     data=chart_data,
     # draw the confidence interval of the median as a notch
     show_notch=True,
+    title="Body mass of Palmer penguins",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+).show()
+```
+
+### Value labels
+
+To print the median of each group beside its median line, add the `show_values` attribute; `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)). The median is the number readers take from a box, so it is the one value printed.
+
+```
+from datachart.constants import VALUE_FORMAT
+
+BoxPlot(
+    data=chart_data,
+    # print the median of every box
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
     title="Body mass of Palmer penguins",
     xlabel="Species",
     ylabel="Body mass (g)",
@@ -4484,6 +4574,7 @@ Every customization is either a keyword argument of `ViolinPlot` or a `plot_viol
 | change the body fill, edge or transparency             | `style={"plot_violin_color": ..., "plot_violin_edgecolor": ..., "plot_violin_alpha": ...}` | [Violin style](#violin-style)                                   |
 | style the inner marks and the median dot               | `style={"plot_violin_inner_color": ..., "plot_violin_median_color": ..., ...}`             | [Violin style](#violin-style)                                   |
 | change what is drawn inside the body                   | `inner`                                                                                    | [Inner marks](#inner-marks)                                     |
+| print the median of each violin                        | `show_values`, `value_format`                                                              | [Value labels](#value-labels)                                   |
 | smooth or sharpen the body                             | `bandwidth`                                                                                | [Bandwidth](#bandwidth)                                         |
 | compare two groups within each category                | `split`, `show_legend`                                                                     | [Split violins](#split-violins)                                 |
 | draw the violins horizontally                          | `orientation`                                                                              | [Violin orientation](#violin-orientation)                       |
@@ -4600,6 +4691,26 @@ for inner in [VIOLIN_INNER.BOX, VIOLIN_INNER.QUARTILES, VIOLIN_INNER.MEDIAN, Non
         figsize=FIG_SIZE.FULL_SHORT,
         show_grid=SHOW_GRID.Y,
     ).show()
+```
+
+### Value labels
+
+To print the median of each body beside its median mark, add the `show_values` attribute; `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)). With `split`, each half prints its own median.
+
+```
+from datachart.constants import VALUE_FORMAT
+
+ViolinPlot(
+    data=chart_data,
+    # print the median of every violin
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
+    title="Body mass of Palmer penguins",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+).show()
 ```
 
 ### Bandwidth
@@ -6126,6 +6237,7 @@ Every customization is either a keyword argument of `ScatterChart` or a `plot_sc
 | color the points by a category         | `hue`, `show_legend`                                                     | [Hue grouping](#hue-grouping)                                 |
 | scale the markers by a value           | `size`, `size_range`                                                     | [Bubble chart](#bubble-chart)                                 |
 | name each point                        | `label`                                                                  | [Point labels](#point-labels)                                 |
+| print the value beside each point      | `show_values`, `value_format`, `value_step`                              | [Value labels](#value-labels)                                 |
 | fit a regression line                  | `show_regression`, `show_ci`, `ci_level`, `show_correlation`             | [Regression line](#regression-line)                           |
 | fix the aspect ratio of the axes       | `aspect_ratio`                                                           | [Aspect ratio](#aspect-ratio)                                 |
 | highlight one series, mute the rest    | `emphasis`                                                               | [Emphasis](#emphasis)                                         |
@@ -6360,6 +6472,28 @@ ScatterChart(
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.BOTH,
     show_legend=True,
+).show()
+```
+
+### Value labels
+
+To print each point's y value beside it instead of a name, add the `show_values` attribute. `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)) and `value_step` labels every Nth point when the chart is crowded (by default the step keeps neighbouring labels apart). Value labels are placed like point labels, at the least overlapping spot around the marker. A point carries either its label or its value: combining `label` with `show_values` raises a `ValueError`.
+
+```
+from datachart.constants import VALUE_FORMAT
+
+ScatterChart(
+    data=americas,
+    # print the life expectancy beside each point
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
+    title="Life expectancy vs. GDP per capita in the Americas",
+    xlabel="GDP per capita (USD)",
+    ylabel="Life expectancy (years)",
+    xticks=GDP_TICKS,
+    xticklabels=GDP_TICK_LABELS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.BOTH,
 ).show()
 ```
 
@@ -11894,7 +12028,7 @@ Furthemore, the instance is of the [datachart.config.Config](https://eriknovak.g
 
 This section showcases the themes found in the [datachart.themes](https://eriknovak.github.io/datachart/dev/references/themes/index.md) module and how to customize them. Seven predefined themes are available: `DEFAULT`, `GREYSCALE`, `MINIMAL`, `MATERIAL`, `INK`, `HATCH`, and `SKETCH` — each named for its visual trait — see the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) for every theme rendered across the full range of chart types.
 
-Themes may also carry defaults for chart settings ([ThemeDefaultAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ThemeDefaultAttrs)): `chart_default_show_grid` supplies the grid when a chart call leaves `show_grid` unset (every predefined theme but `SKETCH` ships a muted `"y"` grid), `chart_default_show_values` does the same for bar value labels (on in `MINIMAL`, `MATERIAL`, and `HATCH`), and `plot_hatch_cycle` assigns hatch patterns per bar/histogram series (only `HATCH` ships one). An explicit chart setting always wins over the theme default.
+Themes may also carry defaults for chart settings ([ThemeDefaultAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ThemeDefaultAttrs)): `chart_default_show_grid` supplies the grid when a chart call leaves `show_grid` unset (every predefined theme but `SKETCH` ships a muted `"y"` grid), `chart_default_show_values` does the same for the value labels of every chart that takes `show_values` (on in `MINIMAL`, `MATERIAL`, and `HATCH`), and `plot_hatch_cycle` assigns hatch patterns per bar/histogram series (only `HATCH` ships one). An explicit chart setting always wins over the theme default.
 
 `SKETCH` is the hand-drawn look: its path wobble and white halo are sketch attributes ([SketchStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.SketchStyleAttrs)) applied at render time without touching matplotlib's global settings: the panel wobbles every path, and the line, radial and regression layers stroke the halo under their series lines. It ships the Comic Neue font, so the look is the same on every machine.
 
@@ -12736,6 +12870,9 @@ LineChart(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_yerr: Optional[bool] = None,
     show_area: Optional[bool] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    value_step: Optional[int] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -12833,6 +12970,10 @@ Examples:
 ... )
 ```
 
+Added in Unreleased
+
+The `show_values`, `value_format` and `value_step` parameters.
+
 | PARAMETER      | DESCRIPTION                                                                                                                                                                                                                                                                                                                                     |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `data`         | The data points for the line chart(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** `Union[List[LineDataPointAttrs], List[List[LineDataPointAttrs]]]`                                                                                                                          |
@@ -12850,6 +12991,9 @@ Examples:
 | `show_grid`    | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                              |
 | `show_yerr`    | Whether to show y-axis error bars. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                               |
 | `show_area`    | Whether to show the area under the line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                         |
+| `show_values`  | Whether to print each point's value above or below it. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                           |
+| `value_format` | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                               |
+| `value_step`   | Label every Nth point (1 labels all of them). Defaults to the smallest step that keeps neighbouring labels apart. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                 |
 | `aspect_ratio` | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                                                          |
 | `scalex`       | The x-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                           |
 | `scaley`       | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                           |
@@ -12903,6 +13047,9 @@ StackedAreaChart(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    value_step: Optional[int] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -13000,6 +13147,10 @@ Examples:
 ... )
 ```
 
+Added in Unreleased
+
+The `show_values`, `value_format` and `value_step` parameters.
+
 | PARAMETER      | DESCRIPTION                                                                                                                                                                                                                                                                                      |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `data`         | The data points for the stacked series. A single list of points draws one band; a list of lists draws one band per series, the first at the bottom. Every series must hold the same x values in the same order. **TYPE:** `Union[List[LineDataPointAttrs], List[List[LineDataPointAttrs]]]`      |
@@ -13016,6 +13167,9 @@ Examples:
 | `ymax`         | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                            |
 | `show_legend`  | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                       |
 | `show_grid`    | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                               |
+| `show_values`  | Whether to print each value at the midpoint of its band. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                          |
+| `value_format` | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                |
+| `value_step`   | Label every Nth x position (1 labels all of them). Defaults to the smallest step that keeps neighbouring labels apart. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                             |
 | `aspect_ratio` | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                           |
 | `scalex`       | The x-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                            |
 | `scaley`       | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                            |
@@ -13489,6 +13643,8 @@ Histogram(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_density: Optional[bool] = None,
     show_cumulative: Optional[bool] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[
         Union[ORIENTATION, str]
@@ -13589,6 +13745,10 @@ Examples:
 ... )
 ```
 
+Added in Unreleased
+
+The `show_values` and `value_format` parameters.
+
 | PARAMETER         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `data`            | The data points for the histogram(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** `Union[List[HistDataPointAttrs], List[List[HistDataPointAttrs]]]`                                                                                                                                                                                                          |
@@ -13606,6 +13766,8 @@ Examples:
 | `show_grid`       | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                             |
 | `show_density`    | Whether to plot the density histogram. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                          |
 | `show_cumulative` | Whether to plot the cumulative histogram. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                       |
+| `show_values`     | Whether to print each bin's height at its top; empty bins stay bare. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                            |
+| `value_format`    | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                              |
 | `aspect_ratio`    | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                         |
 | `orientation`     | The orientation of the histogram (vertical or horizontal). **TYPE:** `Optional[Union[ORIENTATION, str]]` **DEFAULT:** `ORIENTATION.VERTICAL`                                                                                                                                                                                                                                                                                   |
 | `bar_mode`        | How multiple histogram series share the axis: "stack" (stacked on shared bins, the default) or "overlay" (each series drawn individually over the others). "group" has no histogram meaning and behaves like "overlay". See BAR_MODE. **TYPE:** `Optional[Union[BAR_MODE, str]]` **DEFAULT:** `None`                                                                                                                           |
@@ -13661,6 +13823,8 @@ BoxPlot(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_outliers: Optional[bool] = None,
     show_notch: Optional[bool] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[
         Union[ORIENTATION, str]
@@ -13760,6 +13924,10 @@ Examples:
 ... )
 ```
 
+Added in Unreleased
+
+The `show_values` and `value_format` parameters.
+
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                           |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `data`          | The data points for the box plot(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. Each data point should have a label (category) and value (numeric). **TYPE:** `Union[List[BoxDataPointAttrs], List[List[BoxDataPointAttrs]]]`                                                |
@@ -13777,6 +13945,8 @@ Examples:
 | `show_grid`     | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                    |
 | `show_outliers` | Whether to show outliers. Defaults to True. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                            |
 | `show_notch`    | Whether to show notched boxes for median confidence interval. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                          |
+| `show_values`   | Whether to print each group's median beside its median line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                           |
+| `value_format`  | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                     |
 | `aspect_ratio`  | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                                                |
 | `orientation`   | The orientation of the boxes (vertical or horizontal). **TYPE:** `Optional[Union[ORIENTATION, str]]` **DEFAULT:** `ORIENTATION.VERTICAL`                                                                                                                                                                                              |
 | `scaley`        | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                 |
@@ -13828,6 +13998,8 @@ ViolinPlot(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[
         Union[ORIENTATION, str]
@@ -13937,6 +14109,10 @@ Examples:
 ... )
 ```
 
+Added in Unreleased
+
+The `show_values` and `value_format` parameters.
+
 | PARAMETER      | DESCRIPTION                                                                                                                                                                                                                                                                                                     |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `data`         | The data points for the violin plot(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. Each data point should have a label (category) and value (numeric). **TYPE:** `Union[List[ViolinDataPointAttrs], List[List[ViolinDataPointAttrs]]]`                 |
@@ -13952,6 +14128,8 @@ Examples:
 | `ymax`         | The maximum y-axis value. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                           |
 | `show_legend`  | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                      |
 | `show_grid`    | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                              |
+| `show_values`  | Whether to print each group's median beside its median line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                     |
+| `value_format` | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                               |
 | `aspect_ratio` | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                          |
 | `orientation`  | The orientation of the violins (vertical or horizontal). **TYPE:** `Optional[Union[ORIENTATION, str]]` **DEFAULT:** `ORIENTATION.VERTICAL`                                                                                                                                                                      |
 | `scaley`       | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                           |
@@ -14361,6 +14539,9 @@ ScatterChart(
     show_ci: Optional[bool] = None,
     ci_level: Optional[float] = None,
     show_correlation: Optional[bool] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    value_step: Optional[int] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -14508,6 +14689,10 @@ Examples:
 ... )
 ```
 
+Added in Unreleased
+
+The `show_values`, `value_format` and `value_step` parameters.
+
 | PARAMETER          | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                           |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `data`             | The data points for the scatter chart(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** `Union[List[ScatterDataPointAttrs], List[List[ScatterDataPointAttrs]]]`                                                                                                                                                                       |
@@ -14527,6 +14712,9 @@ Examples:
 | `show_ci`          | Whether to show the confidence interval around the regression line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                    |
 | `ci_level`         | The confidence interval level (default 0.95). **TYPE:** `Optional[float]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                         |
 | `show_correlation` | Whether to show the Pearson correlation coefficient (r-value) as an annotation. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                        |
+| `show_values`      | Whether to print each point's y value beside it. Cannot be combined with label: a point carries its label or its value. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                |
+| `value_format`     | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                     |
+| `value_step`       | Label every Nth point (1 labels all of them). Defaults to the smallest step that keeps neighbouring labels apart. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                       |
 | `aspect_ratio`     | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                |
 | `scalex`           | The x-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                 |
 | `scaley`           | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                 |
@@ -16572,8 +16760,8 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "plot_bar_alpha": 1.0,
         "plot_bar_edge_width": 0,
         "plot_stackedarea_edge_width": 0,
-        "plot_bar_value_fontsize": 9,
-        "plot_bar_value_color": "#1F1F1F",
+        "plot_value_fontsize": 9,
+        "plot_value_color": "#1F1F1F",
         "plot_hist_edge_width": 0,
         "plot_line_width": 2.0,
         "plot_scatter_edge_color": "#FFFFFF",
@@ -17401,7 +17589,7 @@ Examples:
 
 The predefined value formats.
 
-Passed as the heatmap's `valfmt` attribute (the values drawn in the cells) or the bar chart's `value_format` attribute (the bar value labels).
+Passed as the `value_format` attribute of every chart that takes `show_values` (the value labels printed beside its marks) or as the heatmap's `valfmt` attribute (the values drawn in the cells).
 
 Examples:
 
@@ -18086,7 +18274,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
 
 The style attributes. Combines all style typings.
 
@@ -18232,11 +18420,26 @@ The typing for the bar chart style.
 | `plot_bar_edge_width`      | The edge width of the bar. **TYPE:** `Union[int, float, None]`                         |
 | `plot_bar_edge_color`      | The edge color of the bar. **TYPE:** `Union[str, None]`                                |
 | `plot_bar_error_color`     | The color of the error line of the bar. **TYPE:** `Union[str, None]`                   |
-| `plot_bar_value_fontsize`  | The font size of the bar value labels. **TYPE:** `Union[int, float, None]`             |
-| `plot_bar_value_color`     | The color of the bar value labels. **TYPE:** `Union[str, None]`                        |
-| `plot_bar_value_padding`   | The padding between bar edge and value label. **TYPE:** `Union[int, float, None]`      |
+| `plot_bar_value_fontsize`  | Alias of plot_value_fontsize. **TYPE:** `Union[int, float, None]`                      |
+| `plot_bar_value_color`     | Alias of plot_value_color. **TYPE:** `Union[str, None]`                                |
+| `plot_bar_value_padding`   | Alias of plot_value_padding. **TYPE:** `Union[int, float, None]`                       |
 | `plot_xticks_label_rotate` | The label rotation of the xticks in the bar chart. **TYPE:** `Union[int, float, None]` |
 | `plot_yticks_label_rotate` | The label rotation of the yticks in the bar chart. **TYPE:** `Union[int, float, None]` |
+
+### datachart.typings.ValueLabelStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the value labels: the numbers a chart prints beside its marks when `show_values` is on. One style serves every chart that takes `show_values`; the `plot_bar_value_*` keys of `BarStyleAttrs` are aliases.
+
+Added in Unreleased
+
+| ATTRIBUTE               | DESCRIPTION                                                                                                                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_value_fontsize`   | The font size of the value labels. **TYPE:** `Union[int, float, None]`                                                                                                          |
+| `plot_value_color`      | The color of the value labels. **TYPE:** `Union[str, None]`                                                                                                                     |
+| `plot_value_padding`    | The gap between a mark and its value label, in points. **TYPE:** `Union[int, float, None]`                                                                                      |
+| `plot_value_halo_width` | The width, in points, of the white halo stroked around the value labels so they stay legible over marks and lines. None or 0 draws no halo. **TYPE:** `Union[int, float, None]` |
 
 ### datachart.typings.HistStyleAttrs
 
@@ -18462,7 +18665,7 @@ The typing for theme-driven defaults and cycles.
 | ATTRIBUTE                   | DESCRIPTION                                                                                                                                                                            |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `chart_default_show_grid`   | The theme default for show_grid, applied when a chart call leaves it unset. Never applies to heatmaps. None means the theme has no opinion. **TYPE:** `Union[SHOW_GRID, str, None]`    |
-| `chart_default_show_values` | The theme default for show_values, applied when a chart call leaves it unset. None means the theme has no opinion. **TYPE:** `Union[bool, None]`                                       |
+| `chart_default_show_values` | The theme default for show_values, applied to every chart that takes it when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** `Union[bool, None]`        |
 | `plot_hatch_cycle`          | The hatch patterns assigned per bar/histogram series, parallel to the color cycle. An explicit per-chart hatch style wins. None disables the cycle. **TYPE:** `Union[List[str], None]` |
 
 ### datachart.typings.SketchStyleAttrs

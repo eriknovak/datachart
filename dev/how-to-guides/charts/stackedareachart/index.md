@@ -100,6 +100,7 @@ Every customization is either a keyword argument of `StackedAreaChart` or a `plo
 | centre the stack or draw a streamgraph      | `baseline="sym"`, `"wiggle"`, `"weighted_wiggle"`               | [Baseline](#baseline)                               |
 | change the band colors, alpha, or hatch     | `style={"plot_area_color": ..., "plot_stackedarea_alpha": ...}` | [Band style](#band-style)                           |
 | outline the top of every band               | `style={"plot_stackedarea_outline": True}`                      | [Band style](#band-style)                           |
+| print the values on the bands               | `show_values`, `value_format`, `value_step`                     | [Value labels](#value-labels)                       |
 | highlight one series, mute the rest         | `emphasis`                                                      | [Emphasis](#emphasis)                               |
 | mark a year or a level                      | `vlines`, `hlines`                                              | [Reference lines](#reference-lines)                 |
 | annotate a point of the chart               | `texts`                                                         | [Text annotations](#text-annotations)               |
@@ -216,6 +217,29 @@ StackedAreaChart(
     title="World electricity generation",
     xlabel="Year",
     ylabel="Generation (TWh)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Value labels
+
+To print each series' value at the midpoint of its band, add the `show_values` attribute. `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)) and `value_step` labels every Nth x position when the bands are too dense to label every point (by default the step keeps neighbouring labels apart). With the percent baseline the labels print the shares. The example labels the mix every fourth year.
+
+```
+from datachart.constants import VALUE_FORMAT
+
+StackedAreaChart(
+    data=generation,
+    baseline=BASELINE.PERCENT,
+    subtitle=SOURCES,
+    show_legend=True,
+    # print the share of every source every fourth year
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
+    value_step=4,
+    title="World electricity mix",
+    xlabel="Year",
+    ylabel="Share of generation (%)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```

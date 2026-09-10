@@ -551,15 +551,15 @@ BarChart(
 ).show()
 ```
 
-Bar value labels also work with horizontal bar charts. You can customize the label appearance using style attributes like `plot_bar_value_fontsize`, `plot_bar_value_color`, and `plot_bar_value_padding`.
+Bar value labels also work with horizontal bar charts. You can customize the label appearance using the `plot_value_fontsize`, `plot_value_color`, and `plot_value_padding` style attributes, shared by every chart that prints values (the `plot_bar_value_*` names still work as aliases).
 
 ```
 BarChart(
     data=sales_total,
     style={
-        "plot_bar_value_fontsize": 9,
-        "plot_bar_value_color": "#333333",
-        "plot_bar_value_padding": 5,
+        "plot_value_fontsize": 9,
+        "plot_value_color": "#333333",
+        "plot_value_padding": 5,
     },
     title="Monthly unit sales (2025)",
     xlabel="Units sold",
@@ -686,8 +686,8 @@ BarChart(
     data=languages,
     style={
         "plot_bar_color": "#f48024",
-        "plot_bar_value_fontsize": 9,
-        "plot_bar_value_padding": 4,
+        "plot_value_fontsize": 9,
+        "plot_value_padding": 4,
     },
     title="Most used programming languages, 2024",
     xlabel="Share of respondents",

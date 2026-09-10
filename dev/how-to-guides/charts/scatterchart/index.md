@@ -116,6 +116,7 @@ Every customization is either a keyword argument of `ScatterChart` or a `plot_sc
 | color the points by a category         | `hue`, `show_legend`                                                     | [Hue grouping](#hue-grouping)                                 |
 | scale the markers by a value           | `size`, `size_range`                                                     | [Bubble chart](#bubble-chart)                                 |
 | name each point                        | `label`                                                                  | [Point labels](#point-labels)                                 |
+| print the value beside each point      | `show_values`, `value_format`, `value_step`                              | [Value labels](#value-labels)                                 |
 | fit a regression line                  | `show_regression`, `show_ci`, `ci_level`, `show_correlation`             | [Regression line](#regression-line)                           |
 | fix the aspect ratio of the axes       | `aspect_ratio`                                                           | [Aspect ratio](#aspect-ratio)                                 |
 | highlight one series, mute the rest    | `emphasis`                                                               | [Emphasis](#emphasis)                                         |
@@ -350,6 +351,28 @@ ScatterChart(
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.BOTH,
     show_legend=True,
+).show()
+```
+
+### Value labels
+
+To print each point's y value beside it instead of a name, add the `show_values` attribute. `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)) and `value_step` labels every Nth point when the chart is crowded (by default the step keeps neighbouring labels apart). Value labels are placed like point labels, at the least overlapping spot around the marker. A point carries either its label or its value: combining `label` with `show_values` raises a `ValueError`.
+
+```
+from datachart.constants import VALUE_FORMAT
+
+ScatterChart(
+    data=americas,
+    # print the life expectancy beside each point
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
+    title="Life expectancy vs. GDP per capita in the Americas",
+    xlabel="GDP per capita (USD)",
+    ylabel="Life expectancy (years)",
+    xticks=GDP_TICKS,
+    xticklabels=GDP_TICK_LABELS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.BOTH,
 ).show()
 ```
 
