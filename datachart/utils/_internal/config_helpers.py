@@ -1258,7 +1258,9 @@ COLORBAR_ORIENTATIONS = {
 }
 
 
-def get_colorbar_setting(colorbar: Optional[dict], valfmt=None) -> dict:
+def get_colorbar_setting(
+    colorbar: Optional[dict], valfmt: Optional[str] = None
+) -> dict:
     """Resolve the per-figure colorbar setting (ADR 0035).
 
     `location` is the control and `orientation` follows it; with no location
@@ -1279,7 +1281,12 @@ def get_colorbar_setting(colorbar: Optional[dict], valfmt=None) -> dict:
     location = colorbar.get("location")
     if location is None:
         orientation = colorbar.get("orientation") or ORIENTATION.VERTICAL
-        location = COLORBAR_DERIVED_LOCATIONS.get(orientation, COLORBAR_LOCATION.TOP)
+        if orientation not in COLORBAR_DERIVED_LOCATIONS:
+            raise ValueError(
+                f"Invalid colorbar `orientation` value {orientation!r}. "
+                f"Must be one of {tuple(COLORBAR_DERIVED_LOCATIONS)}."
+            )
+        location = COLORBAR_DERIVED_LOCATIONS[orientation]
     if location not in COLORBAR_ORIENTATIONS:
         raise ValueError(
             f"Invalid colorbar `location` value {location!r}. "

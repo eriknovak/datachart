@@ -120,6 +120,9 @@ class TestColorbarSetting(unittest.TestCase):
         with self.assertRaises(ValueError) as cm:
             get_colorbar_setting({"location": "middle"})
         self.assertIn("location", str(cm.exception))
+        with self.assertRaises(ValueError) as cm:
+            get_colorbar_setting({"orientation": "diagonal"})
+        self.assertIn("orientation", str(cm.exception))
 
     def test_label_style_is_the_ylabel_font(self):
         config.update_config({"font_ylabel_size": 17})

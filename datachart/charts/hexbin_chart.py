@@ -104,6 +104,11 @@ def HexbinChart(
 
     !!! info "Added in 0.9.0"
 
+    !!! info "Added in Unreleased"
+
+        The `label`, `location`, `format`, and `ticks` fields of the
+        `colorbar` setting.
+
     Examples:
         >>> from datachart.charts import HexbinChart
         >>> figure = HexbinChart(
@@ -115,11 +120,6 @@ def HexbinChart(
         ...     xlabel="X",
         ...     ylabel="Y"
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `label`, `location`, `format`, and `ticks` fields of the
-        `colorbar` setting.
 
     Args:
         data: The points to bin: a dictionary with the `x` and `y` columns and

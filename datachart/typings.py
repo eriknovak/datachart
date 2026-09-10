@@ -1627,9 +1627,9 @@ class ColorbarSettingAttrs(TypedDict):
     """The per-figure colorbar setting, passed to a chart front as `colorbar`.
 
     Every field is optional. `location` is the control: it places the bar on
-    any edge of the chart. With no `location`, `orientation` derives the edge
-    as before — vertical means right, horizontal means top — and when both are
-    given `location` wins.
+    any edge of the chart. With no `location`, `orientation` derives the edge:
+    vertical means right, horizontal means top. When both are given `location`
+    wins.
 
     !!! info "Added in Unreleased"
 

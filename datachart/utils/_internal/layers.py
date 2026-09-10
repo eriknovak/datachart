@@ -33,7 +33,7 @@ import matplotlib.patheffects as patheffects
 from matplotlib.legend import Legend
 from matplotlib.legend_handler import HandlerPathCollection
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from mpl_toolkits.axes_grid1.axes_size import _Base as DividerSize
+from mpl_toolkits.axes_grid1.axes_size import Fixed as FixedPad
 
 from .colors import create_color_cycle, create_colormap, get_colormap
 from .validate import (
@@ -2612,51 +2612,9 @@ COLORBAR_DIVIDER_PAD = 0.1
 def _draw_colorbar(
     ax: plt.Axes, mappable, setting: dict, aspect_locked: bool = False
 ) -> None:
-    """Draw a colorbar on the edge the resolved setting names (ADR 0035).
+    """Draw a colorbar on the edge the resolved setting names (ADR 0035)."""
 
-    The layout engine places it clear of titles and neighbouring axes; an
-    aspect-locked axes instead carves it from its own box, which the engine
-    would size to the grid cell rather than the box.
-    """
-
-    location, orientation = setting["location"], setting["orientation"]
-    if aspect_locked:
-        outward = location in (COLORBAR_LOCATION.LEFT, COLORBAR_LOCATION.BOTTOM)
-        pad = COLORBAR_DIVIDER_PAD
-        if outward:
-            # the bar sits past the tick labels the divider would otherwise cover
-            pad = _AxisClearance(ax, location, pad)
-        cax = make_axes_locatable(ax).append_axes(
-            location, size=f"{COLORBAR_FRACTION:.0%}", pad=pad
-        )
-        if outward or setting["label"]:
-            # the layout engine ignores a divider axes; as a child of the chart
-            # axes its extent counts toward the margins. A bare right or top
-            # bar stays a figure axes, which the golden baselines pin.
-            ax.figure.delaxes(cax)
-            ax.add_child_axes(cax)
-        # a left bar reads outward; the other edges keep matplotlib's tick side
-        kwargs = {"orientation": orientation}
-        if location == COLORBAR_LOCATION.LEFT:
-            kwargs["ticklocation"] = location
-        colorbar = ax.figure.colorbar(mappable, cax=cax, **kwargs)
-    else:
-        # the layout engine keeps a colorbar at its own aspect (20:1 by
-        # default), which shortens it beside a narrow axes: size it to the
-        # axes slot instead
-        bbox = ax.get_position()
-        width, height = ax.figure.get_size_inches()
-        along, across = bbox.height * height, bbox.width * width
-        if orientation == ORIENTATION.HORIZONTAL:
-            along, across = across, along
-        colorbar = ax.figure.colorbar(
-            mappable,
-            ax=ax,
-            location=location,
-            fraction=COLORBAR_FRACTION,
-            pad=COLORBAR_PAD,
-            aspect=along / (across * COLORBAR_FRACTION),
-        )
+    colorbar = _place_colorbar(ax, mappable, setting, aspect_locked)
     fmt = _value_formatter(setting["format"])
     if fmt is not None:
         colorbar.formatter = fmt
@@ -2667,11 +2625,57 @@ def _draw_colorbar(
         colorbar.set_label(setting["label"], **setting["label_style"])
 
 
-class _AxisClearance(DividerSize):
+def _place_colorbar(ax: plt.Axes, mappable, setting: dict, aspect_locked: bool):
+    """Place the bar on its edge and size it against the axes.
+
+    The layout engine places it clear of titles and neighbouring axes; an
+    aspect-locked axes instead carves it from its own box, which the engine
+    would size to the grid cell rather than the box.
+    """
+
+    location, orientation = setting["location"], setting["orientation"]
+    if not aspect_locked:
+        # the layout engine keeps a colorbar at its own aspect (20:1 by
+        # default), which shortens it beside a narrow axes: size it to the
+        # axes slot instead
+        bbox = ax.get_position()
+        width, height = ax.figure.get_size_inches()
+        along, across = bbox.height * height, bbox.width * width
+        if orientation == ORIENTATION.HORIZONTAL:
+            along, across = across, along
+        return ax.figure.colorbar(
+            mappable,
+            ax=ax,
+            location=location,
+            fraction=COLORBAR_FRACTION,
+            pad=COLORBAR_PAD,
+            aspect=along / (across * COLORBAR_FRACTION),
+        )
+    # a left or bottom bar crosses the chart's tick labels: pad past them
+    crosses_ticks = location in (COLORBAR_LOCATION.LEFT, COLORBAR_LOCATION.BOTTOM)
+    pad = COLORBAR_DIVIDER_PAD
+    if crosses_ticks:
+        pad = _AxisClearance(ax, location, pad)
+    cax = make_axes_locatable(ax).append_axes(
+        location, size=f"{COLORBAR_FRACTION:.0%}", pad=pad
+    )
+    if crosses_ticks or setting["label"]:
+        # the layout engine reserves room for a child axes, not a divider axes
+        ax.figure.delaxes(cax)
+        ax.add_child_axes(cax)
+    kwargs = {"orientation": orientation}
+    if location == COLORBAR_LOCATION.LEFT:
+        # a left bar reads outward; the other edges keep matplotlib's tick side
+        kwargs["ticklocation"] = location
+    return ax.figure.colorbar(mappable, cax=cax, **kwargs)
+
+
+class _AxisClearance(FixedPad):
     """A divider pad that clears the chart axis' tick labels on one edge."""
 
     def __init__(self, ax: plt.Axes, location: str, pad: float):
-        self._ax, self._location, self._pad = ax, location, pad
+        super().__init__(pad)
+        self._ax, self._location = ax, location
 
     def get_size(self, renderer):
         ax = self._ax
@@ -2681,7 +2685,7 @@ class _AxisClearance(DividerSize):
         else:
             bbox = ax.xaxis.get_tightbbox(renderer)
             extent = ax.bbox.y0 - bbox.y0 if bbox else 0.0
-        return 0.0, self._pad + max(extent, 0.0) / ax.figure.dpi
+        return 0.0, self.fixed_size + max(extent, 0.0) / ax.figure.dpi
 
 
 def _value_formatter(valfmt):
