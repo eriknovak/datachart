@@ -234,8 +234,9 @@ RADIAL_YLABEL_PAD = 30
 # tip texts sit just past the mark along its spoke, as fractions of the r span
 RADIAL_TIP_VALUE_PAD = 0.03
 RADIAL_TIP_LABEL_PAD = 0.06
-# a soft halo keeps polar text legible over marks, grid spokes, and the border
-RADIAL_TEXT_HALO = {
+# a soft halo keeps text legible over marks, grid lines, and the border: polar
+# tip texts, and the value labels placed among points
+TEXT_HALO = {
     "boxstyle": "round,pad=0.15",
     "facecolor": "#FFFFFF",
     "edgecolor": "none",
@@ -1230,7 +1231,7 @@ class LineLayer(PointLabelMixin, Layer):
                 y,
                 (2 * _mark_radius(line_style)) ** 2,
                 self._value_texts(ax, y, ctx.transpose),
-                self.value_font,
+                {**self.value_font, "bbox": TEXT_HALO},
                 self.value_padding,
             )
 
@@ -1702,7 +1703,7 @@ class ScatterLayer(PointLabelMixin, Layer):
         ):
             return (
                 self._value_texts(ax, y_data, ctx.transpose),
-                self.value_font,
+                {**self.value_font, "bbox": TEXT_HALO},
                 self.value_padding,
             )
         return labels, self.label_font, POINT_LABEL_PAD
@@ -6181,7 +6182,7 @@ class Panel:
                 fontfamily=furniture.get("font_family"),
                 color="#000000",
                 zorder=self._spine_zorder() + RADIAL_LABEL_Z_OVER_SPINE,
-                bbox=RADIAL_TEXT_HALO,
+                bbox=TEXT_HALO,
             )
 
     def _draw_radial_tip_texts(self, ax) -> None:
@@ -6235,7 +6236,7 @@ class Panel:
                     va="center",
                     zorder=z_order,
                     fontfamily=family,
-                    bbox=RADIAL_TEXT_HALO,
+                    bbox=TEXT_HALO,
                     **value_style,
                 )
 
@@ -6274,7 +6275,7 @@ class Panel:
                     fontsize=tick_style.get("labelsize"),
                     color=tick_style.get("labelcolor"),
                     fontfamily=family,
-                    bbox=RADIAL_TEXT_HALO,
+                    bbox=TEXT_HALO,
                 )
 
     @staticmethod
