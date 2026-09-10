@@ -49,6 +49,7 @@ from datachart.constants import (
     BASELINE,
     NETWORK_LAYOUT,
     NORMALIZE,
+    LEGEND_LOCATION,
     THEME,
     VALUE_FORMAT,
 )
@@ -201,6 +202,10 @@ EXPECTED_CHANGES = {
     "emphasis_line_walks_material",
     # every value label now wears the plot_value_halo_width stroke
     "bar_values",
+    # new per-figure legend cases (ADR 0034)
+    "legend_title",
+    "legend_outside_right",
+    "legend_multi_column",
 }
 
 
@@ -227,6 +232,46 @@ CASES = {}
 def case(fn):
     CASES[fn.__name__] = fn
     return fn
+
+
+# ----- per-figure legend settings (ADR 0034) -----
+
+
+@case
+def legend_title():
+    return LineChart(
+        data=[LINE1, LINE2],
+        subtitle=["sq", "lin"],
+        show_legend=True,
+        title="Legend title",
+        legend={"title": "Series"},
+    )
+
+
+@case
+def legend_outside_right():
+    return BarChart(
+        data=[BAR1, BAR2],
+        subtitle=["a", "b"],
+        show_legend=True,
+        xlabel="x",
+        ylabel="y",
+        title="Legend outside right",
+        legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT, "title": ""},
+    )
+
+
+@case
+def legend_multi_column():
+    return LineChart(
+        data=[LINE1, LINE2, SCAT1, [{"x": i, "y": 40 - 3 * i} for i in range(10)]],
+        subtitle=["sq", "lin", "saw", "fall"],
+        show_legend=True,
+        xlabel="x",
+        ylabel="y",
+        title="Legend multi-column",
+        legend={"location": LEGEND_LOCATION.OUTSIDE_BOTTOM, "ncols": 4},
+    )
 
 
 # ----- single charts -----
