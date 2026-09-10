@@ -39,6 +39,8 @@ was no tick-format setting and no date-format constant.
   labels of index positions, so it sits in this tier. Hexbin and contour
   draw floats, so a temporal column converts to matplotlib date numbers at
   build and the panel's locator and formatter make the axis read as time.
+  On the group tier `AUTO` has no locator to lean on, so it prints the ISO
+  date, plus the time when any label carries one.
 - **`xticks_format` / `yticks_format` are panel settings** that resolve by
   the axis they land on: a `strftime` pattern on a dated axis, a
   `VALUE_FORMAT` or `{x}` / `%` string elsewhere, applied like the heatmap's
@@ -50,7 +52,10 @@ was no tick-format setting and no date-format constant.
   `xmin` / `xmax`, reference lines, and bands take datetimes because the
   axes convert them; the panel sets its locator and formatter before the
   limits so unit updates never reset them. Timezone-aware input keeps its
-  zone: the locator and formatter read it back from the axis.
+  zone: the locator and formatter read it back from the axis, or from the
+  layer when it drew date numbers. A value format on a dated axis, like a
+  date pattern on a numeric one, is rejected at build with one message
+  rather than printing date numbers.
 - **The public `minimum` / `maximum` pass non-numeric values through**
   rather than the column-range helper bypassing them. Only one internal
   caller exists; the change is to the published contract, recorded with an

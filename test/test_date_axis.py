@@ -173,6 +173,12 @@ class TestTemporalAxis(unittest.TestCase):
             ax.get_xlim()[0], mdates.date2num(DAYS[0].replace(tzinfo=tz)), places=6
         )
 
+    def test_timezone_survives_date_numbers(self):
+        tz = timezone(timedelta(hours=5))
+        aware = [d.replace(tzinfo=tz) for d in DAYS]
+        fig = HexbinChart(data={"x": aware, "y": list(range(10))})
+        self.assertEqual(fig.axes[0].xaxis.get_major_locator().tz, tz)
+
     def test_mixed_temporal_and_numeric_raises(self):
         with self.assertRaisesRegex(ValueError, "temporal"):
             LineChart(data=[LINE_DAYS, LINE_NUMS])
@@ -266,6 +272,10 @@ class TestTicksFormat(unittest.TestCase):
     def test_bad_format_raises(self):
         with self.assertRaisesRegex(ValueError, "ticks_format"):
             LineChart(data=LINE_NUMS, xticks_format="%Y")
+        with self.assertRaisesRegex(ValueError, "holds dates"):
+            LineChart(data=LINE_DAYS, xticks_format=VALUE_FORMAT.DECIMAL)
+        with self.assertRaisesRegex(ValueError, "holds dates"):
+            BarChart(data=BAR_MONTHS, xticks_format=VALUE_FORMAT.DECIMAL)
 
 
 class TestExplicitPositions(unittest.TestCase):

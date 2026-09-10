@@ -39,6 +39,9 @@ from mpl_toolkits.axes_grid1.axes_size import Fixed as FixedPad
 
 from .colors import create_color_cycle, create_colormap, get_colormap
 from .validate import (
+    AXIS_CATEGORICAL,
+    AXIS_NUMERIC,
+    AXIS_TEMPORAL,
     infer_network_nodes,
     infer_sankey_columns,
     treemap_record_total,
@@ -363,11 +366,8 @@ class NumpyEncoder(json.JSONEncoder):
             return obj.tolist()
         if isinstance(obj, (np.integer, np.floating)):
             return obj.item()
-        # a datetime is a date; pandas Timestamps are datetimes
-        if isinstance(obj, date):
-            return obj.isoformat()
-        if isinstance(obj, np.datetime64):
-            return str(obj)
+        if is_temporal(obj):
+            return obj.isoformat() if isinstance(obj, date) else str(obj)
         return super().default(obj)
 
 
@@ -377,10 +377,6 @@ def get_chart_hash(chart: dict) -> int:
     return hash(json.dumps(chart, sort_keys=True, cls=NumpyEncoder))
 
 
-# the kinds of axis a data column asks for (ADR 0037)
-AXIS_TEMPORAL = "temporal"
-AXIS_NUMERIC = "numeric"
-AXIS_CATEGORICAL = "categorical"
 # an AUTO date label carries the time only when one of the labels has one
 DATE_LABEL_WITH_TIME = "%Y-%m-%d %H:%M"
 
@@ -416,11 +412,23 @@ def _as_datetime(value):
     return value
 
 
+def _auto_format(fmt) -> bool:
+    """Whether a tick format leaves the labels to the axis."""
+
+    return fmt in (None, DATE_FORMAT.AUTO)
+
+
+def _column_tz(values) -> Optional[tzinfo]:
+    """The zone of the first zone-aware value in a temporal column, else None."""
+
+    return next((v.tzinfo for v in values if getattr(v, "tzinfo", None)), None)
+
+
 def date_labels(values, fmt=None) -> List[str]:
     """Temporal values as tick text; AUTO prints the date, plus the time when any has one."""
 
     values = [_as_datetime(v) for v in values]
-    if fmt in (None, DATE_FORMAT.AUTO):
+    if _auto_format(fmt):
         has_time = any(
             isinstance(v, datetime) and (v.hour or v.minute or v.second) for v in values
         )
@@ -438,18 +446,16 @@ def _tick_formatter(fmt, temporal: bool, locator=None, tz=None):
     """The major formatter a tick format resolves to; None keeps the axis default.
 
     On a temporal axis the format is a `strftime` pattern, AUTO the concise
-    formatter over `locator`. Elsewhere a `{x}` string is applied like the
-    heatmap's `valfmt`; any other value-label style string formats each tick.
+    formatter over `locator`. Elsewhere any value-label style string (`{x}`,
+    `{}`, or `%`) formats each tick, like the heatmap's `valfmt`.
     """
 
     if temporal:
-        if fmt in (None, DATE_FORMAT.AUTO):
+        if _auto_format(fmt):
             return mdates.ConciseDateFormatter(locator, tz=tz)
         return mdates.DateFormatter(fmt, tz=tz)
-    if fmt in (None, DATE_FORMAT.AUTO):
+    if _auto_format(fmt):
         return None
-    if "{x" in fmt:
-        return mticker.StrMethodFormatter(fmt)
     return mticker.FuncFormatter(lambda value, _pos: _format_value(fmt, value))
 
 
@@ -1106,6 +1112,8 @@ class Layer:
     bare: bool = False
     # value labels sit past the mark on the value axis and need headroom there
     labels_past_mark: bool = False
+    # the zone of a temporal x column a layer draws as date numbers
+    x_tz: Optional[tzinfo] = None
 
     def __init__(self, chart: dict, settings: dict):
         self.chart = chart
@@ -1241,13 +1249,26 @@ class Layer:
         """The layer's x data column; None when it has none."""
         return None
 
+    def labels(self):
+        """The layer's category labels; None for a layer without groups."""
+        return None
+
     def x_kind(self) -> Optional[str]:
-        """The kind of axis the layer's x data asks for (ADR 0037); None without x."""
+        """The kind of axis the layer's x data asks for (ADR 0037); None without x.
+
+        Labelled groups sit on category positions whatever their labels hold.
+        """
+
+        if self.labels() is not None:
+            return AXIS_CATEGORICAL
         return axis_kind(self.x_values())
 
     def date_label_axes(self) -> set:
         """The drawn axes ("x", "y") whose category labels are dates."""
-        return set()
+
+        if axis_kind(self.labels()) != AXIS_TEMPORAL:
+            return set()
+        return {"y" if self.is_horizontal else "x"}
 
     def apply_scales(self, ax: plt.Axes, scalex, scaley) -> None:
         if scalex:
@@ -1666,15 +1687,6 @@ class BarLayer(Layer):
 
     def labels(self) -> Optional[np.ndarray]:
         return get_chart_data("label", self.chart)
-
-    def x_kind(self):
-        # bars sit on category positions whatever their labels hold
-        return AXIS_CATEGORICAL
-
-    def date_label_axes(self):
-        if axis_kind(self.labels()) != AXIS_TEMPORAL:
-            return set()
-        return {"y" if self.is_horizontal else "x"}
 
     def y_values(self) -> Optional[np.ndarray]:
         return get_chart_data("y", self.chart)
@@ -2187,15 +2199,6 @@ class GroupLayer(Layer):
 
     def labels(self) -> list:
         return list(self.grouped_values().keys())
-
-    def x_kind(self):
-        # groups sit on category positions whatever their labels hold
-        return AXIS_CATEGORICAL
-
-    def date_label_axes(self):
-        if axis_kind(self.labels()) != AXIS_TEMPORAL:
-            return set()
-        return {"y" if self.is_horizontal else "x"}
 
     def y_range(self):
         values = [v for vals in self.grouped_values().values() for v in vals]
@@ -2971,10 +2974,6 @@ class HeatmapLayer(Layer):
             )
         self.chart = chart
 
-    def x_kind(self):
-        # cells sit on index positions whatever the coordinates hold
-        return AXIS_CATEGORICAL
-
     def date_label_axes(self):
         return self.date_axes
 
@@ -3140,6 +3139,7 @@ class ContourLayer(Layer):
         if x is None:
             x = np.arange(n_cols)
         elif self._x_kind == AXIS_TEMPORAL:
+            self.x_tz = _column_tz(x)
             x = to_date_numbers(x)
         else:
             x = x.astype(float)
@@ -3289,6 +3289,7 @@ class HexbinLayer(Layer):
             )
         self._x_kind = axis_kind(x)
         if self._x_kind == AXIS_TEMPORAL:
+            self.x_tz = _column_tz(x)
             x = to_date_numbers(x)
         else:
             x = np.asarray(x, dtype=float)
@@ -5677,9 +5678,10 @@ class Panel:
     def __init__(self, groups: List[LayerGroup], settings: Optional[dict] = None):
         self.groups = groups
         self.settings = settings or {}
-        # the kind of the layers' shared x axis, resolved once at build so
-        # composition inherits it with the layers (ADR 0037)
+        # the axis kind is snapshotted at build, like the furniture (ADR 0037)
         self.x_kind = validate_axis_kinds([l.x_kind() for l in self.layers])
+        self.temporal_axis = self._temporal_axis()
+        self.date_axes = self._date_axes()
         for axis in ("x", "y"):
             validate_ticks_format(
                 self.settings.get(f"{axis}ticks_format"), axis, axis in self.date_axes
@@ -5689,16 +5691,14 @@ class Panel:
     def layers(self) -> List[Layer]:
         return [layer for group in self.groups for layer in group.layers]
 
-    @property
-    def temporal_axis(self) -> Optional[str]:
+    def _temporal_axis(self) -> Optional[str]:
         """The drawn axis ("x" or "y") that holds time; None when neither does."""
 
         if self.x_kind != AXIS_TEMPORAL:
             return None
         return "y" if self.horizontal else "x"
 
-    @property
-    def date_axes(self) -> set:
+    def _date_axes(self) -> set:
         """The drawn axes whose ticks read as dates, by position or by label."""
 
         axes = set().union(*(l.date_label_axes() for l in self.layers))
@@ -6159,8 +6159,7 @@ class Panel:
         if layers and not bare and (s.get("scalex") or s.get("scaley")):
             layers[0].apply_scales(ax, s.get("scalex"), s.get("scaley"))
 
-        # the time axis' locator and formatter, and the tick formats; explicit
-        # ticks and category labels override them below
+        # tick formats go first: explicit ticks and category labels override
         tick_labelers = {}
         if not bare and not polar:
             tick_labelers = self._apply_tick_formats(ax)
@@ -6488,9 +6487,12 @@ class Panel:
                 continue
             locator = tz = None
             if temporal:
-                # plotted datetimes leave their zone on the axis; keep it
+                # plotted datetimes leave their zone on the axis; a layer
+                # drawing date numbers keeps it itself
                 units = axis.get_units()
                 tz = units if isinstance(units, tzinfo) else None
+                if tz is None:
+                    tz = next((l.x_tz for l in self.layers if l.x_tz), None)
                 locator = mdates.AutoDateLocator(tz=tz)
                 axis.set_major_locator(locator)
             formatter = _tick_formatter(fmt, temporal, locator, tz)
@@ -6525,7 +6527,7 @@ class Panel:
         fmt = s.get("xticks_format")
         magnitude = (
             (lambda value: f"{abs(value):g}")
-            if fmt in (None, DATE_FORMAT.AUTO)
+            if _auto_format(fmt)
             else (lambda value: _format_value(fmt, abs(value)))
         )
         ax.xaxis.set_major_formatter(

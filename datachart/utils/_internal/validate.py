@@ -8,6 +8,8 @@ import math
 from collections import defaultdict
 from numbers import Real
 
+from typing import Optional
+
 from ...constants import (
     ARROW_STYLE,
     BANDWIDTH,
@@ -18,6 +20,10 @@ from ...constants import (
 )
 
 BANDWIDTH_RULES = (BANDWIDTH.SCOTT, BANDWIDTH.SILVERMAN)
+# the kinds of axis a data column asks for (ADR 0037)
+AXIS_TEMPORAL = "temporal"
+AXIS_NUMERIC = "numeric"
+AXIS_CATEGORICAL = "categorical"
 EMPHASIS_ROLES = (EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT)
 STACK_BASELINES = (
     BASELINE.ZERO,
@@ -99,39 +105,44 @@ def validate_shared_x(columns) -> None:
             )
 
 
-def validate_axis_kinds(kinds) -> "str | None":
+def validate_axis_kinds(kinds) -> Optional[str]:
     """The one axis kind the layers' x columns ask for; a temporal/numeric mix raises.
 
-    Kinds are `"temporal"`, `"numeric"`, `"categorical"`, or None for a layer
-    without x. Time wins over category positions, which sit on their own index.
+    Kinds are the `AXIS_*` values, or None for a layer without x. Time wins
+    over category positions, which sit on their own index.
     """
 
     present = {kind for kind in kinds if kind is not None}
-    if {"temporal", "numeric"} <= present:
+    if {AXIS_TEMPORAL, AXIS_NUMERIC} <= present:
         raise ValueError(
             "Cannot mix temporal and numeric `x` values in one panel. "
             "Every chart sharing an axis must give datetimes or numbers, not both."
         )
-    for kind in ("temporal", "numeric", "categorical"):
+    for kind in (AXIS_TEMPORAL, AXIS_NUMERIC, AXIS_CATEGORICAL):
         if kind in present:
             return kind
     return None
 
 
-def validate_ticks_format(value, axis: str, temporal: bool):
+def validate_ticks_format(value, axis: str, dated: bool) -> None:
     """Raise unless a tick format can label the axis it is set on.
 
-    A temporal axis takes a `strftime` pattern; any other axis a value format,
+    A dated axis takes a `strftime` pattern; any other axis a value format,
     i.e. a `{x}`, `{}`, or `%` string that formats a number.
     """
 
     if value is None or value == DATE_FORMAT.AUTO:
-        return value
+        return
     name = f"`{axis}ticks_format`"
     if not isinstance(value, str):
         raise ValueError(f"{name} must be a format string, got {value!r}.")
-    if temporal:
-        return value
+    if dated:
+        if "{" in value or "%" not in value:
+            raise ValueError(
+                f"{name} {value!r} is a value format, but the {axis} axis holds "
+                "dates. Pass a DATE_FORMAT member or a `strftime` pattern."
+            )
+        return
     try:
         if "{x" in value:
             value.format(x=1.0)
@@ -145,7 +156,6 @@ def validate_ticks_format(value, axis: str, temporal: bool):
             "axis pass a VALUE_FORMAT member or a `{x:.1f}`, `{:.1f}`, or "
             "`%.1f` style string; DATE_FORMAT patterns apply to datetime axes."
         ) from None
-    return value
 
 
 def validate_emphasis(value, context: str = "emphasis"):

@@ -1029,6 +1029,9 @@ class DATE_FORMAT:
     Passed as the `xticks_format` or `yticks_format` attribute of a chart
     whose axis holds datetime values, to label its ticks. Every member but
     `AUTO` is a `strftime` pattern; any other pattern is accepted as well.
+    On a time axis `AUTO` picks concise, non-repeating labels for the visible
+    span; on a category axis with date labels it prints the ISO date, plus
+    the time when any label carries one.
 
     !!! info "Added in Unreleased"
 
