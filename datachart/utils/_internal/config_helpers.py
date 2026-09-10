@@ -1445,14 +1445,20 @@ def get_legend_panel_settings(legend: Optional[dict] = None) -> dict:
 # ================================================
 
 
-def configure_axis_ticks_position(ax: plt.Axes, chart: dict):
+def configure_axis_ticks_position(
+    ax: plt.Axes, chart: dict, labelers: Optional[dict] = None
+):
     """Configure axis ticks position.
 
     Args:
         ax: The axes.
         chart: The chart style.
+        labelers: Per axis (`"xaxis"`, `"yaxis"`), a callable turning tick
+            positions into their labels when the chart gives none.
 
     """
+
+    labelers = labelers or {}
 
     tick_attrs = [
         ("xticks", "xticklabels", "xtickrotate", "xaxis"),
@@ -1471,6 +1477,7 @@ def configure_axis_ticks_position(ax: plt.Axes, chart: dict):
             va = "center"
 
         set_ticks = getattr(ax, attrs[3]).set_ticks
+        labeler = labelers.get(attrs[3], list)
 
         if ticks is None and labels is None:
             continue
@@ -1482,7 +1489,7 @@ def configure_axis_ticks_position(ax: plt.Axes, chart: dict):
         elif ticks is not None and labels is None:
             set_ticks(
                 ticks,
-                labels=ticks,
+                labels=labeler(ticks),
                 rotation=rotation,
                 rotation_mode="anchor",
                 ha=ha,
@@ -1497,7 +1504,7 @@ def configure_axis_ticks_position(ax: plt.Axes, chart: dict):
                 # draw only the ticks
                 set_ticks(
                     ticks,
-                    labels=ticks,
+                    labels=labeler(ticks),
                     rotation=rotation,
                     rotation_mode="anchor",
                     ha=ha,

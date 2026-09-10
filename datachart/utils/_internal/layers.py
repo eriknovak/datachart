@@ -19,6 +19,7 @@ from typing import Callable, List, NamedTuple, Optional, Union
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 from matplotlib import rc_context
 import matplotlib.ticker as mticker
 from matplotlib.ticker import MaxNLocator
@@ -45,8 +46,10 @@ from .validate import (
     validate_emphasis,
     validate_network_edge_style,
     validate_sankey_link_color,
+    validate_axis_kinds,
     validate_shared_x,
     validate_span_bounds,
+    validate_ticks_format,
     validate_value_step,
 )
 from .config_helpers import (
@@ -108,6 +111,7 @@ from ...constants import (
     ASPECT_RATIO,
     BASELINE,
     COLORBAR_LOCATION,
+    DATE_FORMAT,
     DIRECTION,
     CONTOUR_LEVELS,
     HEXBIN_REDUCE,
@@ -371,6 +375,82 @@ def get_chart_hash(chart: dict) -> int:
     """Stable hash of a chart dictionary, used to key color assignment."""
 
     return hash(json.dumps(chart, sort_keys=True, cls=NumpyEncoder))
+
+
+# the kinds of axis a data column asks for (ADR 0037)
+AXIS_TEMPORAL = "temporal"
+AXIS_NUMERIC = "numeric"
+AXIS_CATEGORICAL = "categorical"
+# an AUTO date label carries the time only when one of the labels has one
+DATE_LABEL_WITH_TIME = "%Y-%m-%d %H:%M"
+
+
+def is_temporal(value) -> bool:
+    """Whether `value` is a real temporal object; date strings never are (ADR 0037)."""
+
+    # a datetime is a date; pandas Timestamps are datetimes
+    return isinstance(value, (date, np.datetime64))
+
+
+def axis_kind(values) -> Optional[str]:
+    """The kind of axis a data column asks for; None when it holds nothing."""
+
+    if values is None:
+        return None
+    if isinstance(values, np.ndarray) and values.dtype.kind == "M":
+        return AXIS_TEMPORAL
+    for value in values:
+        if value is None:
+            continue
+        if is_temporal(value):
+            return AXIS_TEMPORAL
+        return AXIS_CATEGORICAL if isinstance(value, str) else AXIS_NUMERIC
+    return None
+
+
+def _as_datetime(value):
+    """A value with `strftime`; numpy scalars convert at microsecond precision."""
+
+    if isinstance(value, np.datetime64):
+        return value.astype("datetime64[us]").item()
+    return value
+
+
+def date_labels(values, fmt=None) -> List[str]:
+    """Temporal values as tick text; AUTO prints the date, plus the time when any has one."""
+
+    values = [_as_datetime(v) for v in values]
+    if fmt in (None, DATE_FORMAT.AUTO):
+        has_time = any(
+            isinstance(v, datetime) and (v.hour or v.minute or v.second) for v in values
+        )
+        fmt = DATE_LABEL_WITH_TIME if has_time else DATE_FORMAT.ISO
+    return [v.strftime(fmt) for v in values]
+
+
+def to_date_numbers(values) -> np.ndarray:
+    """Temporal values as matplotlib date numbers, for layers that draw floats."""
+
+    return np.asarray(mdates.date2num(list(values)), dtype=float)
+
+
+def _tick_formatter(fmt, temporal: bool, locator=None, tz=None):
+    """The major formatter a tick format resolves to; None keeps the axis default.
+
+    On a temporal axis the format is a `strftime` pattern, AUTO the concise
+    formatter over `locator`. Elsewhere a `{x}` string is applied like the
+    heatmap's `valfmt`; any other value-label style string formats each tick.
+    """
+
+    if temporal:
+        if fmt in (None, DATE_FORMAT.AUTO):
+            return mdates.ConciseDateFormatter(locator, tz=tz)
+        return mdates.DateFormatter(fmt, tz=tz)
+    if fmt in (None, DATE_FORMAT.AUTO):
+        return None
+    if "{x" in fmt:
+        return mticker.StrMethodFormatter(fmt)
+    return mticker.FuncFormatter(lambda value, _pos: _format_value(fmt, value))
 
 
 def _normalize_sizes(sizes: np.ndarray, size_range: tuple) -> np.ndarray:
@@ -1157,6 +1237,18 @@ class Layer:
         """The (min, max) of the layer's y data, used for axis clustering."""
         return None
 
+    def x_values(self):
+        """The layer's x data column; None when it has none."""
+        return None
+
+    def x_kind(self) -> Optional[str]:
+        """The kind of axis the layer's x data asks for (ADR 0037); None without x."""
+        return axis_kind(self.x_values())
+
+    def date_label_axes(self) -> set:
+        """The drawn axes ("x", "y") whose category labels are dates."""
+        return set()
+
     def apply_scales(self, ax: plt.Axes, scalex, scaley) -> None:
         if scalex:
             ax.set_xscale(scalex)
@@ -1198,6 +1290,13 @@ class Layer:
                 style[width_key] = width * MUTED_WIDTH_SCALE
         elif width is not None:
             style[width_key] = width * HIGHLIGHT_WIDTH_SCALE
+
+
+def _axis_numbers(ax, transpose: bool, x) -> np.ndarray:
+    """The drawn x data in axis units, so fits run on numbers when x is temporal."""
+
+    axis = ax.yaxis if transpose else ax.xaxis
+    return np.asarray(axis.convert_units(x), dtype=float)
 
 
 def _point_resolver(label, x, y, transpose: bool) -> Callable[[int], dict]:
@@ -1256,7 +1355,7 @@ def _column_range(chart: dict, attr: str) -> Optional[tuple]:
     """The (min, max) of a chart's data column; None when the column is absent."""
 
     values = get_chart_data(attr, chart)
-    if values is None or len(values) == 0:
+    if values is None or len(values) == 0 or axis_kind(values) == AXIS_CATEGORICAL:
         return None
     return (minimum(values), maximum(values))
 
@@ -1339,6 +1438,9 @@ class LineLayer(PointLabelMixin, Layer):
 
     def x_range(self):
         return _column_range(self.chart, "x")
+
+    def x_values(self):
+        return get_chart_data("x", self.chart)
 
     def _resolved_area_style(self, ctx):
         area_style = self._merge_color("color", ctx.color, self.area_style)
@@ -1564,6 +1666,15 @@ class BarLayer(Layer):
 
     def labels(self) -> Optional[np.ndarray]:
         return get_chart_data("label", self.chart)
+
+    def x_kind(self):
+        # bars sit on category positions whatever their labels hold
+        return AXIS_CATEGORICAL
+
+    def date_label_axes(self):
+        if axis_kind(self.labels()) != AXIS_TEMPORAL:
+            return set()
+        return {"y" if self.is_horizontal else "x"}
 
     def y_values(self) -> Optional[np.ndarray]:
         return get_chart_data("y", self.chart)
@@ -1819,6 +1930,9 @@ class ScatterLayer(PointLabelMixin, Layer):
             return None
         return (float(np.min(y)), float(np.max(y)))
 
+    def x_values(self):
+        return get_chart_data("x", self.chart)
+
     def _sizes(self, size_data):
         if size_data is not None:
             return _normalize_sizes(size_data, self.size_range)
@@ -1979,10 +2093,11 @@ class ScatterLayer(PointLabelMixin, Layer):
                     pad,
                 )
 
+            x_fit = _axis_numbers(ax, ctx.transpose, x_data)
             if self.show_correlation:
-                self._draw_correlation(ax, x_data, y_data, color=None)
+                self._draw_correlation(ax, x_fit, y_data, color=None)
             if self.show_regression:
-                self._draw_regression(ax, ctx, x_data, y_data, color=None)
+                self._draw_regression(ax, ctx, x_fit, y_data, color=None)
         else:
             sizes = self._sizes(size_data)
             base_style = {k: v for k, v in scatter_style.items() if k != "s"}
@@ -2006,8 +2121,9 @@ class ScatterLayer(PointLabelMixin, Layer):
             self._record_points(ax, ctx, x_data, y_data, sizes, labels, font, pad)
 
             color = base_style.get("c", base_style.get("color"))
+            x_fit = _axis_numbers(ax, ctx.transpose, x_data)
             if self.show_regression:
-                self._draw_regression(ax, ctx, x_data, y_data, color=color)
+                self._draw_regression(ax, ctx, x_fit, y_data, color=color)
             if self.show_correlation:
                 self._draw_correlation(ax, x_data, y_data, color=color)
 
@@ -2071,6 +2187,15 @@ class GroupLayer(Layer):
 
     def labels(self) -> list:
         return list(self.grouped_values().keys())
+
+    def x_kind(self):
+        # groups sit on category positions whatever their labels hold
+        return AXIS_CATEGORICAL
+
+    def date_label_axes(self):
+        if axis_kind(self.labels()) != AXIS_TEMPORAL:
+            return set()
+        return {"y" if self.is_horizontal else "x"}
 
     def y_range(self):
         values = [v for vals in self.grouped_values().values() for v in vals]
@@ -2818,6 +2943,11 @@ class HeatmapLayer(Layer):
         r, g, b = heatmap_style["cmap"](1.0)[:3]
         self.contrast_values = (0.2126 * r + 0.7152 * g + 0.0722 * b) < 0.5
         x, y, self.z = self._grid()
+        self.date_axes = {
+            axis
+            for axis, labels in (("x", x), ("y", y))
+            if axis_kind(labels) == AXIS_TEMPORAL
+        }
         self._label_axes(x, y)
 
     def _grid(self) -> tuple:
@@ -2834,10 +2964,19 @@ class HeatmapLayer(Layer):
             if labels is None or chart.get(f"{axis}ticks") is not None:
                 continue
             chart[f"{axis}ticks"] = list(range(len(labels)))
-            chart[f"{axis}ticklabels"] = chart.get(f"{axis}ticklabels") or [
-                str(label) for label in labels
-            ]
+            chart[f"{axis}ticklabels"] = chart.get(f"{axis}ticklabels") or (
+                date_labels(labels, self.settings.get(f"{axis}ticks_format"))
+                if axis_kind(labels) == AXIS_TEMPORAL
+                else [str(label) for label in labels]
+            )
         self.chart = chart
+
+    def x_kind(self):
+        # cells sit on index positions whatever the coordinates hold
+        return AXIS_CATEGORICAL
+
+    def date_label_axes(self):
+        return self.date_axes
 
     def draw(self, ax, ctx):
         data = self.z
@@ -2997,9 +3136,18 @@ class ContourLayer(Layer):
 
         x, y, z = get_chart_grid(self.chart, "contour")
         n_rows, n_cols = z.shape
-        x = np.arange(n_cols) if x is None else x.astype(float)
+        self._x_kind = axis_kind(x)
+        if x is None:
+            x = np.arange(n_cols)
+        elif self._x_kind == AXIS_TEMPORAL:
+            x = to_date_numbers(x)
+        else:
+            x = x.astype(float)
         y = np.arange(n_rows) if y is None else y.astype(float)
         return x, y, z
+
+    def x_kind(self):
+        return self._x_kind
 
     def y_range(self):
         return (float(self.y.min()), float(self.y.max()))
@@ -3139,7 +3287,11 @@ class HexbinLayer(Layer):
             raise ValueError(
                 "A hexbin chart requires the `x` and `y` columns in `data`."
             )
-        x = np.asarray(x, dtype=float)
+        self._x_kind = axis_kind(x)
+        if self._x_kind == AXIS_TEMPORAL:
+            x = to_date_numbers(x)
+        else:
+            x = np.asarray(x, dtype=float)
         y = np.asarray(y, dtype=float)
         c = get_chart_data("c", self.chart)
         c = None if c is None else np.asarray(c, dtype=float)
@@ -3150,6 +3302,9 @@ class HexbinLayer(Layer):
                     f"({len(x)}), got {len(column)}."
                 )
         return x, y, c
+
+    def x_kind(self):
+        return self._x_kind
 
     def y_range(self):
         if len(self.y) == 0:
@@ -3415,7 +3570,13 @@ class ParallelCoordsLayer(Layer):
             tick_zorder = self.axis_style.get("zorder", 2) + 1
 
             if dim_is_categorical[dim]:
-                for cat in dim_categories[dim]:
+                categories = dim_categories[dim]
+                texts = (
+                    date_labels(categories)
+                    if axis_kind(categories) == AXIS_TEMPORAL
+                    else [str(cat) for cat in categories]
+                )
+                for cat, text in zip(categories, texts):
                     tick_pos = dim_category_map[dim][cat]
                     ax.plot(
                         [tick_start, tick_end],
@@ -3426,7 +3587,7 @@ class ParallelCoordsLayer(Layer):
                     ax.text(
                         i + label_x_offset,
                         tick_pos,
-                        str(cat),
+                        text,
                         ha=label_ha,
                         va="center",
                         bbox=self.tick_label_bbox,
@@ -3516,7 +3677,9 @@ def compute_parallel_stats(layers: List["ParallelCoordsLayer"]) -> Optional[dict
     for dim in dimensions:
         values = dim_values_raw[dim]
         non_none = [v for v in values if v is not None]
-        if len(non_none) > 0 and isinstance(non_none[0], str):
+        if len(non_none) > 0 and (
+            isinstance(non_none[0], str) or is_temporal(non_none[0])
+        ):
             dim_is_categorical[dim] = True
             unique_cats = set(v for v in values if v is not None)
             if dim in category_orders:
@@ -5514,10 +5677,34 @@ class Panel:
     def __init__(self, groups: List[LayerGroup], settings: Optional[dict] = None):
         self.groups = groups
         self.settings = settings or {}
+        # the kind of the layers' shared x axis, resolved once at build so
+        # composition inherits it with the layers (ADR 0037)
+        self.x_kind = validate_axis_kinds([l.x_kind() for l in self.layers])
+        for axis in ("x", "y"):
+            validate_ticks_format(
+                self.settings.get(f"{axis}ticks_format"), axis, axis in self.date_axes
+            )
 
     @property
     def layers(self) -> List[Layer]:
         return [layer for group in self.groups for layer in group.layers]
+
+    @property
+    def temporal_axis(self) -> Optional[str]:
+        """The drawn axis ("x" or "y") that holds time; None when neither does."""
+
+        if self.x_kind != AXIS_TEMPORAL:
+            return None
+        return "y" if self.horizontal else "x"
+
+    @property
+    def date_axes(self) -> set:
+        """The drawn axes whose ticks read as dates, by position or by label."""
+
+        axes = set().union(*(l.date_label_axes() for l in self.layers))
+        if self.temporal_axis is not None:
+            axes.add(self.temporal_axis)
+        return axes
 
     @property
     def horizontal(self) -> bool:
@@ -5941,11 +6128,18 @@ class Panel:
                     index.setdefault(label, len(index) + 1)
         return index or None
 
-    @staticmethod
-    def _apply_category_ticks(ax, index, group_layers, horizontal) -> None:
+    def _category_labels(self, labels, axis: str) -> list:
+        """Category labels as tick text; dates print through the axis' format."""
+
+        labels = list(labels)
+        if axis_kind(labels) != AXIS_TEMPORAL:
+            return labels
+        return date_labels(labels, self.settings.get(f"{axis}ticks_format"))
+
+    def _apply_category_ticks(self, ax, index, group_layers, horizontal) -> None:
         # the first group layer's rotation applies; user ticks override later
         chart = group_layers[0].chart
-        labels = list(index.keys())
+        labels = self._category_labels(index.keys(), "y" if horizontal else "x")
         if horizontal:
             ax.set_yticks(list(index.values()))
             ax.set_yticklabels(labels, rotation=chart.get("ytickrotate", 0))
@@ -5964,6 +6158,12 @@ class Panel:
         # scales (a layer may remap them, e.g. horizontal box plots)
         if layers and not bare and (s.get("scalex") or s.get("scaley")):
             layers[0].apply_scales(ax, s.get("scalex"), s.get("scaley"))
+
+        # the time axis' locator and formatter, and the tick formats; explicit
+        # ticks and category labels override them below
+        tick_labelers = {}
+        if not bare and not polar:
+            tick_labelers = self._apply_tick_formats(ax)
 
         # grid; the marks sit above it whatever z-order the panel gave them
         # (overlay defaults start at 1, below matplotlib's 2.5 gridlines)
@@ -6014,7 +6214,7 @@ class Panel:
         # user-provided tick positions
         if not bare:
             for layer in layers:
-                configure_axis_ticks_position(ax, layer.chart)
+                configure_axis_ticks_position(ax, layer.chart, tick_labelers)
 
         # value-label headroom: expand the value axis so bar labels stay
         # inside; diverging bars get padding on both ends
@@ -6270,6 +6470,42 @@ class Panel:
                     points.append(owner_ax.transData.transform(xy))
         return np.vstack(points) if points else None
 
+    def _apply_tick_formats(self, ax) -> dict:
+        """Apply the temporal locator and the tick formats (ADR 0037).
+
+        Returns one labeler per formatted axis, keyed like `ax.xaxis`, that
+        turns explicit tick positions into text in the same format.
+        """
+
+        s = self.settings
+        labelers = {}
+        for axis_name in ("x", "y"):
+            axis = getattr(ax, f"{axis_name}axis")
+            fmt = s.get(f"{axis_name}ticks_format")
+            temporal = self.temporal_axis == axis_name
+            if not temporal and axis_name in self.date_axes:
+                # dated category labels carry the format in their text
+                continue
+            locator = tz = None
+            if temporal:
+                # plotted datetimes leave their zone on the axis; keep it
+                units = axis.get_units()
+                tz = units if isinstance(units, tzinfo) else None
+                locator = mdates.AutoDateLocator(tz=tz)
+                axis.set_major_locator(locator)
+            formatter = _tick_formatter(fmt, temporal, locator, tz)
+            if formatter is not None:
+                axis.set_major_formatter(formatter)
+            if temporal:
+                labelers[f"{axis_name}axis"] = lambda ticks, fmt=fmt: date_labels(
+                    ticks, fmt
+                )
+            elif formatter is not None:
+                labelers[f"{axis_name}axis"] = lambda ticks, f=formatter: [
+                    f(tick) for tick in ticks
+                ]
+        return labelers
+
     def _apply_pyramid_mirror(self, ax) -> None:
         """The pyramid's mirror furniture (ADR 0017).
 
@@ -6286,8 +6522,14 @@ class Panel:
             limit = max(abs(lo), abs(hi))
         ax.set_xlim(-limit, limit)
 
+        fmt = s.get("xticks_format")
+        magnitude = (
+            (lambda value: f"{abs(value):g}")
+            if fmt in (None, DATE_FORMAT.AUTO)
+            else (lambda value: _format_value(fmt, abs(value)))
+        )
         ax.xaxis.set_major_formatter(
-            mticker.FuncFormatter(lambda value, _pos: f"{abs(value):g}")
+            mticker.FuncFormatter(lambda value, _pos: magnitude(value))
         )
 
         ticks = s.get("pyramid_xticks")
@@ -6319,11 +6561,12 @@ class Panel:
         labels = layer.labels()
         # ticks sit on the category positions; slotted groups center on them
         ticks_loc = np.arange(labels.shape[0])
+        labels = self._category_labels(labels, "y" if layer.is_horizontal else "x")
 
         if bar_ticks == "group":
             rotation_default = 0
         else:  # one bar layer per subplot
-            n_labels = labels.shape[0]
+            n_labels = len(labels)
             rotation_default = 90 if n_labels >= 7 else (45 if n_labels >= 4 else 0)
 
         if layer.is_horizontal:
@@ -6548,6 +6791,8 @@ def build_chart_panel_settings(
         "xmax": settings.get("xmax"),
         "ymin": settings.get("ymin"),
         "ymax": settings.get("ymax"),
+        "xticks_format": settings.get("xticks_format"),
+        "yticks_format": settings.get("yticks_format"),
         "aspect_ratio": (
             ASPECT_RATIO.AUTO
             if settings.get("aspect_ratio") is None

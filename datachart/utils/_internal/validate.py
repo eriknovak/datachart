@@ -8,7 +8,14 @@ import math
 from collections import defaultdict
 from numbers import Real
 
-from ...constants import ARROW_STYLE, BANDWIDTH, BASELINE, EMPHASIS, NETWORK_LAYOUT
+from ...constants import (
+    ARROW_STYLE,
+    BANDWIDTH,
+    BASELINE,
+    DATE_FORMAT,
+    EMPHASIS,
+    NETWORK_LAYOUT,
+)
 
 BANDWIDTH_RULES = (BANDWIDTH.SCOTT, BANDWIDTH.SILVERMAN)
 EMPHASIS_ROLES = (EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT)
@@ -90,6 +97,55 @@ def validate_shared_x(columns) -> None:
                 "Every stacked area series must share the same `x` values in the "
                 f"same order; series {i} differs from series 0."
             )
+
+
+def validate_axis_kinds(kinds) -> "str | None":
+    """The one axis kind the layers' x columns ask for; a temporal/numeric mix raises.
+
+    Kinds are `"temporal"`, `"numeric"`, `"categorical"`, or None for a layer
+    without x. Time wins over category positions, which sit on their own index.
+    """
+
+    present = {kind for kind in kinds if kind is not None}
+    if {"temporal", "numeric"} <= present:
+        raise ValueError(
+            "Cannot mix temporal and numeric `x` values in one panel. "
+            "Every chart sharing an axis must give datetimes or numbers, not both."
+        )
+    for kind in ("temporal", "numeric", "categorical"):
+        if kind in present:
+            return kind
+    return None
+
+
+def validate_ticks_format(value, axis: str, temporal: bool):
+    """Raise unless a tick format can label the axis it is set on.
+
+    A temporal axis takes a `strftime` pattern; any other axis a value format,
+    i.e. a `{x}`, `{}`, or `%` string that formats a number.
+    """
+
+    if value is None or value == DATE_FORMAT.AUTO:
+        return value
+    name = f"`{axis}ticks_format`"
+    if not isinstance(value, str):
+        raise ValueError(f"{name} must be a format string, got {value!r}.")
+    if temporal:
+        return value
+    try:
+        if "{x" in value:
+            value.format(x=1.0)
+        elif "{" in value:
+            value.format(1.0)
+        else:
+            value % (1.0,)
+    except (ValueError, TypeError, KeyError, IndexError) as error:
+        raise ValueError(
+            f"{name} {value!r} cannot format a number ({error}). On a numeric "
+            "axis pass a VALUE_FORMAT member or a `{x:.1f}`, `{:.1f}`, or "
+            "`%.1f` style string; DATE_FORMAT patterns apply to datetime axes."
+        ) from None
+    return value
 
 
 def validate_emphasis(value, context: str = "emphasis"):

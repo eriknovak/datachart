@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
@@ -16,6 +17,7 @@ from ..typings import (
     TextAttrs,
 )
 from ..constants import (
+    DATE_FORMAT,
     ASPECT_RATIO,
     CONTOUR_LEVELS,
     EMPHASIS,
@@ -39,8 +41,8 @@ def ContourChart(
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: Optional[Union[EMPHASIS, str, List[Optional[str]]]] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
-    xmin: Optional[Union[int, float]] = None,
-    xmax: Optional[Union[int, float]] = None,
+    xmin: Optional[Union[int, float, datetime]] = None,
+    xmax: Optional[Union[int, float, datetime]] = None,
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
@@ -63,7 +65,10 @@ def ContourChart(
     vmax: Optional[Union[float, List[Optional[float]]]] = None,
     valfmt: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
     xticks: Optional[
-        Union[List[Union[int, float]], List[List[Union[int, float]]]]
+        Union[
+            List[Union[int, float, datetime]],
+            List[List[Union[int, float, datetime]]],
+        ]
     ] = None,
     xticklabels: Optional[Union[List[str], List[List[str]]]] = None,
     xtickrotate: Optional[Union[int, List[Optional[int]]]] = None,
@@ -72,6 +77,8 @@ def ContourChart(
     ] = None,
     yticklabels: Optional[Union[List[str], List[List[str]]]] = None,
     ytickrotate: Optional[Union[int, List[Optional[int]]]] = None,
+    xticks_format: Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]] = None,
+    yticks_format: Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]] = None,
     vlines: Optional[
         Union[
             VLinePlotAttrs,
@@ -126,6 +133,7 @@ def ContourChart(
 
     !!! info "Added in Unreleased"
 
+        The `xticks_format` and `yticks_format` tick formats.
         The `legend` parameter, and the `label`, `location`, `format`, and
         `ticks` fields of the `colorbar` setting.
         The `vspans` and `hspans` reference bands.
@@ -200,6 +208,10 @@ def ContourChart(
         yticks: Custom y-axis tick positions.
         yticklabels: Custom y-axis tick labels.
         ytickrotate: Rotation angle for y-axis tick labels.
+        xticks_format: The x-axis tick label format: a `DATE_FORMAT` member
+            or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT`
+            member or `"{x:.1f}"` style string.
+        yticks_format: The y-axis tick label format, as `xticks_format`.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
         vspans: Vertical reference band(s) to shade, between two x positions.
@@ -269,6 +281,8 @@ def ContourChart(
         "show_colorbars": show_colorbars,
         "scalex": scalex,
         "scaley": scaley,
+        "xticks_format": xticks_format,
+        "yticks_format": yticks_format,
     }
 
     return render_chart("contourchart", charts, settings)

@@ -16,6 +16,8 @@ from ..typings import (
     TextAttrs,
 )
 from ..constants import (
+    VALUE_FORMAT,
+    DATE_FORMAT,
     ASPECT_RATIO,
     BANDWIDTH,
     EMPHASIS,
@@ -71,6 +73,8 @@ def RaincloudPlot(
     ] = None,
     yticklabels: Optional[Union[List[str], List[List[str]]]] = None,
     ytickrotate: Optional[Union[int, List[Optional[int]]]] = None,
+    xticks_format: Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]] = None,
+    yticks_format: Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]] = None,
     vlines: Optional[
         Union[
             VLinePlotAttrs,
@@ -123,6 +127,7 @@ def RaincloudPlot(
 
     !!! info "Added in Unreleased"
 
+        The `xticks_format` and `yticks_format` tick formats.
         The `legend` parameter.
         The `vspans` and `hspans` reference bands.
 
@@ -190,6 +195,10 @@ def RaincloudPlot(
         yticks: Custom y-axis tick positions.
         yticklabels: Custom y-axis tick labels.
         ytickrotate: Rotation angle for y-axis tick labels.
+        xticks_format: The x-axis tick label format: a `DATE_FORMAT` member
+            or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT`
+            member or `"{x:.1f}"` style string.
+        yticks_format: The y-axis tick label format, as `xticks_format`.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
         vspans: Vertical reference band(s) to shade, between two x positions.
@@ -248,6 +257,8 @@ def RaincloudPlot(
         "bandwidth": bandwidth,
         "orientation": orientation,
         "scaley": scaley,
+        "xticks_format": xticks_format,
+        "yticks_format": yticks_format,
     }
 
     return render_chart("raincloudplot", charts, settings)
