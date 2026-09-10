@@ -24,7 +24,8 @@ Classes:
     HistDataPointAttrs: The data point attributes for the histogram chart.
     HeatmapSingleChartAttrs: The single chart attributes for the heatmap chart.
     HeatmapDataAttrs: The data attributes for the heatmap chart.
-    HeatmapColorbarAttrs: The heatmap colorbar attributes.
+    ColorbarSettingAttrs: The per-figure colorbar setting.
+    HeatmapColorbarAttrs: Deprecated alias of `ColorbarSettingAttrs`.
     ContourSingleChartAttrs: The single chart attributes for the contour chart.
     ContourDataAttrs: The data attributes for the contour chart.
     HexbinSingleChartAttrs: The single chart attributes for the hexbin chart.
@@ -93,6 +94,7 @@ from .constants import (
     HISTOGRAM_TYPE,
     LEGEND_ALIGN,
     LEGEND_LOCATION,
+    COLORBAR_LOCATION,
     ORIENTATION,
     BAR_MODE,
     DIRECTION,
@@ -1621,15 +1623,43 @@ class _HistogramChartAttrs(ChartCommonAttrs):
 # ================================================
 
 
-class HeatmapColorbarAttrs(TypedDict):
-    """The heatmap colorbar attributes.
+class ColorbarSettingAttrs(TypedDict):
+    """The per-figure colorbar setting, passed to a chart front as `colorbar`.
+
+    Every field is optional. `location` is the control: it places the bar on
+    any edge of the chart. With no `location`, `orientation` derives the edge
+    as before — vertical means right, horizontal means top — and when both are
+    given `location` wins.
+
+    !!! info "Added in Unreleased"
+
+        The `label`, `location`, `format`, and `ticks` fields, and the name
+        `ColorbarSettingAttrs`.
 
     Attributes:
-        orientation (Union[ORIENTATION, str, None]): The orientation.
+        label (Union[str, None]): The caption beside the bar, reading along
+            it; drawn in the `font_ylabel_*` theme font.
+        location (Union[COLORBAR_LOCATION, str, None]): The chart edge the
+            bar sits on.
+        format (Union[VALUE_FORMAT, str, None]): The format of the bar's tick
+            labels, with the value named `x` (e.g. `"{x:.0f}"`). On a hexbin
+            chart, `valfmt` still applies when this is unset.
+        ticks (Union[List[Union[int, float]], None]): Explicit tick positions
+            on the bar.
+        orientation (Union[ORIENTATION, str, None]): The orientation; derives
+            the edge when `location` is unset.
 
     """
 
+    label: Union[str, None]
+    location: Union[COLORBAR_LOCATION, str, None]
+    format: Union[VALUE_FORMAT, str, None]
+    ticks: Union[List[Union[int, float]], None]
     orientation: Union[ORIENTATION, str, None]
+
+
+# deprecated alias: the setting is shared by Heatmap, ContourChart, and HexbinChart
+HeatmapColorbarAttrs = ColorbarSettingAttrs
 
 
 class HeatmapDataAttrs(TypedDict):
@@ -1668,7 +1698,7 @@ class HeatmapSingleChartAttrs(TypedDict):
         yticklabels (Union[List[str], None]): The ytick labels.
         ytickrotate (Union[int, None]): The ytick rotation value.
 
-        colorbar (Union[HeatmapColorbarAttrs, None]): The heatmap colorbar attributes.
+        colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting of the heatmap.
         texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
 
     """
@@ -1690,7 +1720,7 @@ class HeatmapSingleChartAttrs(TypedDict):
     yticklabels: Union[List[str], None]
     ytickrotate: Union[int, None]
 
-    colorbar: Union[HeatmapColorbarAttrs, None]
+    colorbar: Union[ColorbarSettingAttrs, None]
     texts: Union[TextAttrs, List[TextAttrs]]
 
 
@@ -1753,7 +1783,7 @@ class ContourSingleChartAttrs(TypedDict):
 
         vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
-        colorbar (Union[HeatmapColorbarAttrs, None]): The colorbar attributes of a filled contour.
+        colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting of a filled contour.
         texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
 
     """
@@ -1778,7 +1808,7 @@ class ContourSingleChartAttrs(TypedDict):
 
     vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
     hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
-    colorbar: Union[HeatmapColorbarAttrs, None]
+    colorbar: Union[ColorbarSettingAttrs, None]
     texts: Union[TextAttrs, List[TextAttrs]]
 
 
@@ -1841,7 +1871,7 @@ class HexbinSingleChartAttrs(TypedDict):
         norm (Union[NORMALIZE, str, None]): The value normalization of the hexagon colors.
         vmin (Union[float, None]): The minimum value to normalize the hexagon values.
         vmax (Union[float, None]): The maximum value to normalize the hexagon values.
-        valfmt (Union[VALUE_FORMAT, str, None]): The format of the colorbar tick labels.
+        valfmt (Union[VALUE_FORMAT, str, None]): The format of the colorbar tick labels when the colorbar setting names none.
 
         xticks (Union[int, float, None]): The xtick positions list.
         xticklabels (Union[List[str], None]): The xtick labels.
@@ -1852,7 +1882,7 @@ class HexbinSingleChartAttrs(TypedDict):
 
         vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
-        colorbar (Union[HeatmapColorbarAttrs, None]): The colorbar attributes.
+        colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting.
         texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
 
     """
@@ -1880,7 +1910,7 @@ class HexbinSingleChartAttrs(TypedDict):
 
     vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
     hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
-    colorbar: Union[HeatmapColorbarAttrs, None]
+    colorbar: Union[ColorbarSettingAttrs, None]
     texts: Union[TextAttrs, List[TextAttrs]]
 
 

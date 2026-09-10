@@ -8,7 +8,7 @@ from ..typings import (
     LegendSettingAttrs,
     ContourDataAttrs,
     ContourStyleAttrs,
-    HeatmapColorbarAttrs,
+    ColorbarSettingAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
     TextAttrs,
@@ -85,7 +85,7 @@ def ContourChart(
         ]
     ] = None,
     colorbar: Optional[
-        Union[HeatmapColorbarAttrs, List[Optional[HeatmapColorbarAttrs]]]
+        Union[ColorbarSettingAttrs, List[Optional[ColorbarSettingAttrs]]]
     ] = None,
     texts: Optional[
         Union[
@@ -110,7 +110,8 @@ def ContourChart(
 
     !!! info "Added in Unreleased"
 
-        The `legend` parameter.
+        The `legend` parameter, and the `label`, `location`, `format`, and
+        `ticks` fields of the `colorbar` setting.
 
     Examples:
         >>> from datachart.charts import ContourChart
@@ -184,7 +185,8 @@ def ContourChart(
         ytickrotate: Rotation angle for y-axis tick labels.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
-        colorbar: Colorbar configuration(s).
+        colorbar: The colorbar setting(s): label, location, tick format,
+            and tick positions. See `ColorbarSettingAttrs`.
         texts: Text annotation(s) to draw.
 
     Returns:

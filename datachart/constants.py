@@ -1169,6 +1169,9 @@ class ASPECT_RATIO:
 class COLORBAR_LOCATION:
     """The supported colorbar locations.
 
+    Used by the `location` field of a chart's `colorbar` setting
+    (`ColorbarSettingAttrs`): the chart edge the bar sits on.
+
     ![COLORBAR_LOCATION at a glance](../assets/imgs/const-colorbar-location.svg){ width="100%" }
 
     Examples:

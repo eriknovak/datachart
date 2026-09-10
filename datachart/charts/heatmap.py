@@ -8,7 +8,7 @@ from ..typings import (
     LegendSettingAttrs,
     HeatmapDataAttrs,
     HeatmapStyleAttrs,
-    HeatmapColorbarAttrs,
+    ColorbarSettingAttrs,
     TextAttrs,
 )
 from ..constants import ASPECT_RATIO, FIG_SIZE, SHOW_GRID, VALUE_FORMAT
@@ -57,7 +57,7 @@ def Heatmap(
     yticklabels: Optional[Union[List[str], List[List[str]]]] = None,
     ytickrotate: Optional[Union[int, List[Optional[int]]]] = None,
     colorbar: Optional[
-        Union[HeatmapColorbarAttrs, List[Optional[HeatmapColorbarAttrs]]]
+        Union[ColorbarSettingAttrs, List[Optional[ColorbarSettingAttrs]]]
     ] = None,
     texts: Optional[
         Union[
@@ -79,7 +79,8 @@ def Heatmap(
 
     !!! info "Added in Unreleased"
 
-        The `legend` parameter.
+        The `legend` parameter, and the `label`, `location`, `format`, and
+        `ticks` fields of the `colorbar` setting.
 
     Examples:
         >>> from datachart.charts import Heatmap
@@ -142,7 +143,8 @@ def Heatmap(
         yticks: Custom y-axis tick positions.
         yticklabels: Custom y-axis tick labels.
         ytickrotate: Rotation angle for y-axis tick labels.
-        colorbar: Colorbar configuration(s).
+        colorbar: The colorbar setting(s): label, location, tick format,
+            and tick positions. See `ColorbarSettingAttrs`.
         texts: Text annotation(s) to draw.
 
     Returns:

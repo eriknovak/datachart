@@ -7,7 +7,7 @@ from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
     HexbinDataAttrs,
     HexbinStyleAttrs,
-    HeatmapColorbarAttrs,
+    ColorbarSettingAttrs,
     VLinePlotAttrs,
     HLinePlotAttrs,
     TextAttrs,
@@ -81,7 +81,7 @@ def HexbinChart(
         ]
     ] = None,
     colorbar: Optional[
-        Union[HeatmapColorbarAttrs, List[Optional[HeatmapColorbarAttrs]]]
+        Union[ColorbarSettingAttrs, List[Optional[ColorbarSettingAttrs]]]
     ] = None,
     texts: Optional[
         Union[
@@ -115,6 +115,11 @@ def HexbinChart(
         ...     xlabel="X",
         ...     ylabel="Y"
         ... )
+
+    !!! info "Added in Unreleased"
+
+        The `label`, `location`, `format`, and `ticks` fields of the
+        `colorbar` setting.
 
     Args:
         data: The points to bin: a dictionary with the `x` and `y` columns and
@@ -156,7 +161,8 @@ def HexbinChart(
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
         valfmt: Format string(s) for the colorbar tick labels, with the value
-            named `x` (e.g., `"{x:.0f}"`). See `VALUE_FORMAT`.
+            named `x` (e.g., `"{x:.0f}"`). See `VALUE_FORMAT`. The `format`
+            field of the `colorbar` setting wins when set.
         xticks: Custom x-axis tick positions.
         xticklabels: Custom x-axis tick labels.
         xtickrotate: Rotation angle for x-axis tick labels.
@@ -165,7 +171,8 @@ def HexbinChart(
         ytickrotate: Rotation angle for y-axis tick labels.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
-        colorbar: Colorbar configuration(s).
+        colorbar: The colorbar setting(s): label, location, tick format,
+            and tick positions. See `ColorbarSettingAttrs`.
         texts: Text annotation(s) to draw.
 
     Returns:
