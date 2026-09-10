@@ -86,6 +86,17 @@ class TestStyleFamily(ValueLabelCase):
         config.set_theme("spread")
         self.assertEqual(config["plot_value_fontsize"], 12)
 
+    def test_every_value_label_wears_the_halo(self):
+        for figure in (
+            LineChart(LINE, show_values=True),
+            BarChart(BAR, show_values=True),
+            StackedAreaChart(STACK, show_values=True),
+            BoxPlot(GROUPS, show_values=True),
+        ):
+            self.assertTrue(labels(figure.axes[0])[0].get_path_effects())
+        bare = LineChart(LINE, show_values=True, style={"plot_value_halo_width": 0})
+        self.assertEqual(labels(bare.axes[0])[0].get_path_effects(), [])
+
     def test_chart_style_accepts_both_names(self):
         old = BarChart(BAR, show_values=True, style={"plot_bar_value_fontsize": 15})
         new = LineChart(LINE, show_values=True, style={"plot_value_fontsize": 15})

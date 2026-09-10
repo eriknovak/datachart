@@ -472,12 +472,14 @@ class ValueLabelStyleAttrs(TypedDict):
         plot_value_fontsize (Union[int, float, None]): The font size of the value labels.
         plot_value_color (Union[str, None]): The color of the value labels.
         plot_value_padding (Union[int, float, None]): The gap between a mark and its value label, in points.
+        plot_value_halo_width (Union[int, float, None]): The width, in points, of the white halo stroked around the value labels so they stay legible over marks and lines. `None` or `0` draws no halo.
 
     """
 
     plot_value_fontsize: Union[int, float, None]
     plot_value_color: Union[str, None]
     plot_value_padding: Union[int, float, None]
+    plot_value_halo_width: Union[int, float, None]
 
 
 class HistStyleAttrs(TypedDict):

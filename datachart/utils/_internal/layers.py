@@ -234,8 +234,7 @@ RADIAL_YLABEL_PAD = 30
 # tip texts sit just past the mark along its spoke, as fractions of the r span
 RADIAL_TIP_VALUE_PAD = 0.03
 RADIAL_TIP_LABEL_PAD = 0.06
-# a soft halo keeps text legible over marks, grid lines, and the border: polar
-# tip texts, and the value labels placed among points
+# a soft box keeps polar tip texts legible over the grid spokes and the border
 TEXT_HALO = {
     "boxstyle": "round,pad=0.15",
     "facecolor": "#FFFFFF",
@@ -917,11 +916,7 @@ class Layer:
         self.value_step = validate_value_step(self.settings.get("value_step"))
         style = get_value_label_style(self.style)
         self.value_padding = style["padding"]
-        self.value_font = {
-            "fontsize": style["fontsize"],
-            "color": style["color"],
-            "family": resolve_font_family(),
-        }
+        self.value_font = _value_label_font(style)
 
     def _label_bars(self, ax, bars, stacked: bool, **bar_label_kwargs) -> None:
         """Label a bar container past each bar's edge; inside it when stacked.
@@ -951,6 +946,8 @@ class Layer:
         self.label_style = get_text_style("general")
         if self.settings.get("value_format") is None:
             self.value_format = VALUE_FORMAT.DEFAULT
+        # a bare layer strokes its values with its own label halo
+        self.value_font.pop("path_effects")
 
     def _value_texts(self, ax, values, along_y: bool = False) -> np.ndarray:
         """One formatted value per mark, `None` where the step skips it.
@@ -1231,7 +1228,7 @@ class LineLayer(PointLabelMixin, Layer):
                 y,
                 (2 * _mark_radius(line_style)) ** 2,
                 self._value_texts(ax, y, ctx.transpose),
-                {**self.value_font, "bbox": TEXT_HALO},
+                self.value_font,
                 self.value_padding,
             )
 
@@ -1703,7 +1700,7 @@ class ScatterLayer(PointLabelMixin, Layer):
         ):
             return (
                 self._value_texts(ax, y_data, ctx.transpose),
-                {**self.value_font, "bbox": TEXT_HALO},
+                self.value_font,
                 self.value_padding,
             )
         return labels, self.label_font, POINT_LABEL_PAD
@@ -3683,6 +3680,17 @@ def _halo_effects(width) -> list:
     if not width or width <= 0:
         return []
     return [patheffects.withStroke(linewidth=width, foreground="#FFFFFF")]
+
+
+def _value_label_font(style: dict) -> dict:
+    """The text kwargs of a value label from its resolved `plot_value_*` style."""
+
+    return {
+        "fontsize": style["fontsize"],
+        "color": style["color"],
+        "family": resolve_font_family(),
+        "path_effects": _halo_effects(style.get("halo_width")),
+    }
 
 
 def _text_size(fontsize, text) -> tuple:
@@ -6346,10 +6354,11 @@ def build_chart_panel_settings(
         "show_values": _resolve_show_values(settings),
         "show_tip_labels": settings.get("show_tip_labels"),
         "value_format": settings.get("value_format"),
+        # the tip texts set their own family, rotated along the spoke
         "tip_value_style": {
             k: v
-            for k, v in get_value_label_style(first_style).items()
-            if k != "padding"
+            for k, v in _value_label_font(get_value_label_style(first_style)).items()
+            if k != "family"
         },
     }
 

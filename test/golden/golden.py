@@ -199,6 +199,8 @@ EXPECTED_CHANGES = {
     "values_panel_line_scatter",
     "values_theme_minimal_grid",
     "emphasis_line_walks_material",
+    # every value label now wears the plot_value_halo_width stroke
+    "bar_values",
 }
 
 

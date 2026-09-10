@@ -186,6 +186,7 @@ BASE_THEME: StyleAttrs = {
     "plot_value_fontsize": 8,
     "plot_value_color": "#000000",
     "plot_value_padding": 3,
+    "plot_value_halo_width": 2,
     # plot hist style
     "plot_hist_color": None,
     "plot_hist_alpha": 0.9,

@@ -255,7 +255,8 @@ def get_value_label_style(chart_style: dict) -> dict:
             resolve as aliases of the `plot_value_*` family.
 
     Returns:
-        The value label style setting: `fontsize`, `color`, and `padding`.
+        The value label style setting: `fontsize`, `color`, `padding`, and
+        `halo_width`.
 
     """
 
@@ -263,6 +264,7 @@ def get_value_label_style(chart_style: dict) -> dict:
         ("fontsize", "plot_value_fontsize"),
         ("color", "plot_value_color"),
         ("padding", "plot_value_padding"),
+        ("halo_width", "plot_value_halo_width"),
     ]
 
     return create_config_dict(canonical_style(chart_style), config_attrs)
