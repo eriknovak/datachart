@@ -439,9 +439,14 @@ def legend_location():
         "LOWER_LEFT": (0.04, 0.07, "left", "bottom"),
         "LOWER_CENTER": (0.5, 0.07, "center", "bottom"),
         "LOWER_RIGHT": (0.96, 0.07, "right", "bottom"),
+        # beside the axes: the side placements hang from the top edge
+        "OUTSIDE_RIGHT": (1.02, 1.0, "left", "top"),
+        "OUTSIDE_LEFT": (-0.02, 1.0, "right", "top"),
+        "OUTSIDE_TOP": (0.5, 1.03, "center", "bottom"),
+        "OUTSIDE_BOTTOM": (0.5, -0.03, "center", "top"),
     }
     fig, ax = plt.subplots(figsize=(7, 4.2))
-    fig.subplots_adjust(left=0.002, right=0.998, top=0.995, bottom=0.12)
+    fig.subplots_adjust(left=0.2, right=0.8, top=0.88, bottom=0.24)
     for label, (x, y, ha, va) in spots.items():
         ax.text(
             x,
@@ -452,16 +457,19 @@ def legend_location():
             fontsize=FS_LABEL,
             color=INK,
             family="monospace",
+            transform=ax.transAxes,
             bbox=dict(boxstyle="round,pad=0.35", facecolor=FACE, edgecolor=DARK, lw=1),
         )
     ax.text(
         0.5,
-        -0.08,
-        "BEST picks the least-crowded spot automatically; RIGHT is an alias of CENTER_RIGHT",
+        -0.2,
+        "BEST picks the least-crowded spot automatically; RIGHT is an alias of "
+        "CENTER_RIGHT;\nOUTSIDE_* sits beside the axes, clear of the tick labels",
         ha="center",
         va="top",
         fontsize=FS_NOTE,
         color=INK,
+        transform=ax.transAxes,
     )
     for spine in ax.spines.values():
         spine.set_color(INK)

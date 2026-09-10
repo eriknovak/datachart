@@ -1,14 +1,14 @@
 import math
 import warnings
 from functools import lru_cache
-from typing import Union, Tuple, Dict, List
+from typing import Union, Tuple, Dict, List, Optional
 
 import matplotlib.font_manager as font_manager
 import matplotlib.pyplot as plt
 
 from ...config import config, Config
 from ...config.charts import CHART_CONFIGS
-from ...constants import ARROW_STYLE
+from ...constants import ARROW_STYLE, LEGEND_LOCATION
 from ...themes._base import canonical_style
 
 # ================================================
@@ -1245,8 +1245,43 @@ def get_parallel_dim_label_pad(chart_style: dict) -> float:
 # -------------------------------------
 
 
-def get_legend_style() -> dict:
+# an outside member is a matplotlib location plus an anchor (ADR 0034); the
+# side placements hang from the top edge, like the bare-panel pin
+OUTSIDE_LEGEND_LOCATIONS = {
+    LEGEND_LOCATION.OUTSIDE_RIGHT: ("upper left", (1.0, 1.0)),
+    LEGEND_LOCATION.OUTSIDE_LEFT: ("upper right", (0.0, 1.0)),
+    LEGEND_LOCATION.OUTSIDE_TOP: ("lower center", (0.5, 1.0)),
+    LEGEND_LOCATION.OUTSIDE_BOTTOM: ("upper center", (0.5, 0.0)),
+}
+
+# legend setting field -> matplotlib legend keyword
+LEGEND_SETTING_KEYS = [
+    ("title", "title"),
+    ("loc", "location"),
+    ("ncols", "ncols"),
+    ("alignment", "alignment"),
+]
+
+
+def expand_legend_location(location: str) -> dict:
+    """The matplotlib legend keywords for a `LEGEND_LOCATION` member.
+
+    In-axes members pass through as `loc`; outside members expand into a
+    `loc` and a `bbox_to_anchor`.
+    """
+
+    if location in OUTSIDE_LEGEND_LOCATIONS:
+        loc, anchor = OUTSIDE_LEGEND_LOCATIONS[location]
+        return {"loc": loc, "bbox_to_anchor": anchor}
+    return {"loc": location}
+
+
+def get_legend_style(legend: Optional[dict] = None) -> dict:
     """Get the legend style.
+
+    Args:
+        legend: The per-figure legend setting; each non-None field overrides
+            the theme's matching `plot_legend_*` attribute.
 
     Returns:
         The legend style setting.
@@ -1261,8 +1296,29 @@ def get_legend_style() -> dict:
         ("loc", "plot_legend_location"),
         ("title_fontsize", "plot_legend_title_size"),
         ("labelcolor", "plot_legend_label_color"),
+        ("title", "plot_legend_title"),
+        ("ncols", "plot_legend_ncols"),
     ]
-    return create_config_dict({}, config_attrs)
+    style = create_config_dict({}, config_attrs)
+    for key, field in LEGEND_SETTING_KEYS:
+        if (legend or {}).get(field) is not None:
+            style[key] = legend[field]
+    if "loc" in style:
+        style.update(expand_legend_location(style.pop("loc")))
+    return style
+
+
+def get_legend_panel_settings(legend: Optional[dict] = None) -> dict:
+    """The panel settings a per-figure legend setting resolves to.
+
+    The resolved style, plus whether the caller named a location: on a bare
+    panel that beats the built-in outside pin (ADR 0034).
+    """
+
+    return {
+        "legend_style": get_legend_style(legend),
+        "legend_loc_explicit": (legend or {}).get("location") is not None,
+    }
 
 
 # ================================================

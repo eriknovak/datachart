@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    LegendSettingAttrs,
     BarDataPointAttrs,
     BarStyleAttrs,
     VLinePlotAttrs,
@@ -41,6 +42,7 @@ def BarChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_yerr: Optional[bool] = None,
     show_values: Optional[bool] = None,
@@ -99,6 +101,10 @@ def BarChart(
     [`LineChart`][datachart.charts.LineChart], for distributions for
     [`Histogram`][datachart.charts.Histogram].
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Examples:
         >>> from datachart.charts import BarChart
         >>> figure = BarChart(
@@ -132,6 +138,9 @@ def BarChart(
         ymin: The minimum y-axis value.
         ymax: The maximum y-axis value.
         show_legend: Whether to show the legend.
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. See
+            `LegendSettingAttrs`.
         show_grid: Which grid lines to show ("both", "x", "y"). See `SHOW_GRID`.
         show_yerr: Whether to show y-axis error bars.
         show_values: Whether to show bar value labels at the edge of each bar.
@@ -200,6 +209,7 @@ def BarChart(
         "ymin": ymin,
         "ymax": ymax,
         "show_legend": show_legend,
+        "legend": legend,
         "show_grid": show_grid,
         "aspect_ratio": aspect_ratio,
         "subplots": subplots,

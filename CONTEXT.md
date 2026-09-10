@@ -391,6 +391,14 @@ free-standing square, and slide frames (`SLIDE_*` PowerPoint-scale,
 `BEAMER_*` LaTeX-scale). Height words describe heights; width words widths.
 _Avoid_: narrow/regular/wide (former height suffixes), Letter sizes
 
+**Legend setting**:
+The per-figure legend controls — title, location, column count, alignment —
+passed to a front as `legend` and falling back to the theme's `plot_legend_*`
+attributes field by field. An outside location is not a matplotlib location:
+it expands, once, into a location plus an anchor that no public surface names
+(ADR 0034).
+_Avoid_: legend style (that is the theme-key family), bbox anchor
+
 **Style resolution**:
 Collapsing `global config → theme → chart-specific style` into one concrete style,
 performed once when a layer is built — never at draw time.

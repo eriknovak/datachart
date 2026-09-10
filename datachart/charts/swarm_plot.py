@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    LegendSettingAttrs,
     SwarmDataPointAttrs,
     SwarmStyleAttrs,
     VLinePlotAttrs,
@@ -40,6 +41,7 @@ def SwarmPlot(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     mode: Union[SWARM_MODE, str] = SWARM_MODE.SWARM,
     jitter: float = 0.4,
@@ -97,6 +99,10 @@ def SwarmPlot(
 
     !!! info "Added in 0.9.0"
 
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
+
     Examples:
         >>> from datachart.charts import SwarmPlot
         >>> figure = SwarmPlot(
@@ -131,6 +137,9 @@ def SwarmPlot(
         ymin: The minimum y-axis value.
         ymax: The maximum y-axis value.
         show_legend: Whether to show the legend.
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. See
+            `LegendSettingAttrs`.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         mode: How the points spread across the category width. See
             `SWARM_MODE`: "swarm" packs the points so none overlap, from the
@@ -192,6 +201,7 @@ def SwarmPlot(
         "ymin": ymin,
         "ymax": ymax,
         "show_legend": show_legend,
+        "legend": legend,
         "show_grid": show_grid,
         "aspect_ratio": aspect_ratio,
         "subplots": subplots,

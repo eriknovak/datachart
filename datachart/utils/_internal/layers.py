@@ -28,7 +28,7 @@ from matplotlib.mlab import GaussianKDE
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
 from matplotlib.path import Path
-from matplotlib.transforms import Bbox
+from matplotlib.transforms import Bbox, ScaledTranslation
 import matplotlib.patheffects as patheffects
 from matplotlib.legend import Legend
 from matplotlib.legend_handler import HandlerPathCollection
@@ -59,7 +59,8 @@ from .config_helpers import (
     get_line_style,
     get_bar_style,
     get_hist_style,
-    get_legend_style,
+    get_legend_panel_settings,
+    expand_legend_location,
     get_vline_style,
     get_hline_style,
     get_heatmap_style,
@@ -105,6 +106,7 @@ from ...constants import (
     HEXBIN_REDUCE,
     EMPHASIS,
     HISTOGRAM_TYPE,
+    LEGEND_LOCATION,
     NETWORK_LAYOUT,
     ORIENTATION,
     SWARM_MODE,
@@ -641,7 +643,7 @@ def _draw_legend(
         if labels is None
         else {"handles": handles, "labels": labels}
     )
-    legend = top_ax.legend(title="Legend", **entries, **legend_style)
+    legend = top_ax.legend(**entries, **legend_style)
     if ax_right is None:
         return legend
 
@@ -746,7 +748,7 @@ def _fit_legend(legend: Legend, axes: list, dim: int, renderer) -> None:
     if not _legend_overlaps(box, bboxes, lines, offsets):
         return
 
-    pad = LEGEND_HEADROOM_PAD_PT * legend.figure.dpi / 72.0
+    pad = _legend_pad_px(legend.figure)
     size = Bbox.from_bounds(0, 0, box.width, box.height)
     anchor = legend.get_bbox_to_anchor()
     names = (
@@ -779,6 +781,54 @@ def _fit_legend(legend: Legend, axes: list, dim: int, renderer) -> None:
         lo, hi = trans.inverted().transform([lo, lo + (hi - lo) * factor])
         (a.set_ylim if dim == 1 else a.set_xlim)(lo, hi)
     legend._set_loc(code)
+
+
+def _fit_outside_legend(legend: Legend, axes: list, renderer) -> None:
+    """Move an outside legend past the tick labels and axis labels on its side.
+
+    An outside location anchors to the axes edge, where the axis furniture
+    lives. Once layout has sized the axes, the legend shifts outward by the
+    furniture's overhang on that side, as a fixed offset in inches so the
+    re-layout that makes room for it keeps the gap.
+    """
+
+    box = legend.get_window_extent(renderer)
+    ax_box = legend.axes.bbox
+    legend.set_in_layout(False)
+    try:
+        furniture = Bbox.union([ax.get_tightbbox(renderer) for ax in axes])
+    finally:
+        legend.set_in_layout(True)
+    if box.x0 >= ax_box.x1:
+        shift, direction = furniture.x1 - ax_box.x1, (1, 0)
+    elif box.x1 <= ax_box.x0:
+        shift, direction = ax_box.x0 - furniture.x0, (-1, 0)
+    elif box.y0 >= ax_box.y1:
+        shift, direction = furniture.y1 - ax_box.y1, (0, 1)
+    elif box.y1 <= ax_box.y0:
+        shift, direction = ax_box.y0 - furniture.y0, (0, -1)
+    else:
+        return
+    if shift <= 0:
+        return
+    inches = (shift + _legend_pad_px(legend.figure)) / legend.figure.dpi
+    offset = ScaledTranslation(
+        direction[0] * inches, direction[1] * inches, legend.figure.dpi_scale_trans
+    )
+    # the anchor reads back in display space; the offset hangs off its
+    # axes-fraction position so the re-layout keeps the gap
+    anchor = legend.axes.transAxes.inverted().transform(legend.get_bbox_to_anchor().p0)
+    legend.set_bbox_to_anchor(tuple(anchor), transform=legend.axes.transAxes + offset)
+
+
+def _legend_pad_px(figure) -> float:
+    return LEGEND_HEADROOM_PAD_PT * figure.dpi / 72.0
+
+
+def _defer_legend_fit(ax: plt.Axes, fit) -> None:
+    """Queue a legend fit for the figure's first draw, once layout has run."""
+
+    ax.figure.__dict__.setdefault("_legend_fits", []).append(fit)
 
 
 # ================================================
@@ -5943,10 +5993,11 @@ class Panel:
                     if handles:
                         custom_handles = (custom_handles or []) + handles
             if custom_handles is not None:
-                if bare:
+                if bare and not s.get("legend_loc_explicit"):
                     # the marks fill the axes: the legend sits beside them
-                    legend_style["loc"] = "upper left"
-                    legend_style["bbox_to_anchor"] = (1.0, 1.0)
+                    legend_style.update(
+                        expand_legend_location(LEGEND_LOCATION.OUTSIDE_RIGHT)
+                    )
                 _draw_legend(ax, ax_right, legend_style, custom_handles)
             elif s.get("legend_mode") == "combined":
                 handles, labels = self._combined_legend_entries(
@@ -5961,6 +6012,14 @@ class Panel:
                 if labels:
                     _draw_legend(ax, ax_right, legend_style, handles, labels)
 
+            legend = top_ax.get_legend()
+            if legend is not None and not bare and "bbox_to_anchor" in legend_style:
+                # an outside legend clears the axis furniture at draw time
+                axes = [ax] + ([ax_right] if ax_right is not None else [])
+                _defer_legend_fit(
+                    top_ax, lambda renderer: _fit_outside_legend(legend, axes, renderer)
+                )
+
         legend = top_ax.get_legend()
         if legend is not None and polar:
             # the polar border circle crosses the plot area; the legend sits
@@ -5973,8 +6032,8 @@ class Panel:
             if value_max is None and (ax_right is None or s.get("ymax_right") is None):
                 axes = [ax] + ([ax_right] if ax_right is not None else [])
                 dim = 0 if horizontal else 1
-                top_ax.figure.__dict__.setdefault("_legend_fits", []).append(
-                    lambda renderer: _fit_legend(legend, axes, dim, renderer)
+                _defer_legend_fit(
+                    top_ax, lambda renderer: _fit_legend(legend, axes, dim, renderer)
                 )
 
         # tick labels and legend text cannot take the font family through
@@ -6339,7 +6398,7 @@ def build_chart_panel_settings(
             if settings.get("aspect_ratio") is None
             else settings["aspect_ratio"]
         ),
-        "legend_style": get_legend_style(),
+        **get_legend_panel_settings(settings.get("legend")),
         # histograms stack by default; bars group (ADR 0014)
         "bar_mode": settings.get("bar_mode")
         or ("stack" if chart_type == "histogram" else "group"),

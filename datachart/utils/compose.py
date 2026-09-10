@@ -6,7 +6,7 @@ figures into one coordinate space, `Grid` arranges them in rows and columns.
 seam, so they survive both compositions.
 
 Methods:
-    Panel(charts, title, xlabel, ylabel_left, ylabel_right, figsize, show_legend, ...):
+    Panel(charts, title, xlabel, ylabel_left, ylabel_right, figsize, show_legend, legend, ...):
         Overlays rendered chart figures on a single plot with optional dual y-axes.
     Grid(charts, title, xlabel, ylabel, max_cols, figsize, sharex, sharey):
         Arranges rendered chart figures in a grid; nested rows define the layout.
@@ -23,9 +23,13 @@ import matplotlib.pyplot as plt
 
 from ..config import config
 from ..constants import BAR_MODE, FIG_SIZE
-from ..typings import TextAttrs
+from ..typings import LegendSettingAttrs, TextAttrs
 from .figure import _grid_from_dicts, _figure_grid_layout_impl
-from ._internal.config_helpers import get_grid_style, get_legend_style, get_text_style
+from ._internal.config_helpers import (
+    get_grid_style,
+    get_legend_panel_settings,
+    get_text_style,
+)
 from ._internal.figures import new_figure
 from ._internal.layers import (
     Panel as _PanelSeam,
@@ -145,6 +149,7 @@ def Panel(
     ylabel_right: Optional[str] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     show_legend: Optional[bool] = False,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[str] = None,
     auto_secondary_axis: Optional[float] = None,
     xmin: Optional[float] = None,
@@ -184,6 +189,10 @@ def Panel(
     explicitly given.
 
     !!! info "Added in v0.8.0"
+
+    !!! info "Added in Unreleased"
+
+        The `legend` parameter.
 
     Examples:
         >>> from datachart.charts import LineChart, BarChart
@@ -244,6 +253,9 @@ def Panel(
         ylabel_right: Label for the secondary value axis (if using dual axes).
         figsize: Size of the figure (width, height) in inches.
         show_legend: Whether to show the legend.
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. See
+            `LegendSettingAttrs`.
         show_grid: Which grid lines to show ("x", "y", "both", or None); these
             name the matplotlib axes literally.
         auto_secondary_axis: Threshold ratio for automatic secondary axis creation.
@@ -335,7 +347,7 @@ def Panel(
         "hatch_cycle": config.get("plot_hatch_cycle"),
         "show_legend": show_legend,
         "legend_mode": "combined",
-        "legend_style": get_legend_style(),
+        **get_legend_panel_settings(legend),
         "title": title,
         "xlabel": xlabel,
         "ylabel": ylabel_left,
