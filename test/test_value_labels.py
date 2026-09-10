@@ -147,6 +147,11 @@ class TestFronts(ValueLabelCase):
         # the second band spans 1-5 at x=0: its label sits at the midpoint
         self.assertEqual(tuple(labels(ax)[3].xy), (0.0, 3.0))
 
+    def test_thin_band_stays_bare(self):
+        thin = [{"x": i, "y": 0.001} for i in range(3)]
+        figure = StackedAreaChart([STACK[0], thin, STACK[1]], show_values=True)
+        self.assertEqual(texts(figure.axes[0]), ["1", "2", "3", "4", "5", "6"])
+
     def test_box_labels_the_median(self):
         figure = BoxPlot(GROUPS, show_values=True)
         ax = figure.axes[0]

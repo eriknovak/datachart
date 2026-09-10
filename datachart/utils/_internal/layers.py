@@ -1316,14 +1316,23 @@ class StackedAreaLayer(Layer):
             self._label_band(ax, ctx, x)
 
     def _label_band(self, ax, ctx, x) -> None:
-        """Print each value at the midpoint of its band; an empty band stays bare."""
+        """Print each value at the midpoint of its band; a thin band stays bare."""
 
         heights = ctx.stack_slot.top - ctx.stack_slot.bottom
         mids = (ctx.stack_slot.top + ctx.stack_slot.bottom) / 2
         texts = self._value_texts(ax, heights, ctx.transpose)
+        # a band thinner than its label cannot hold it; the view limits are
+        # read first so the display transform sees the autoscaled axes
+        axis = 0 if ctx.transpose else 1
+        (ax.get_xlim if ctx.transpose else ax.get_ylim)()
+        per_unit = abs(
+            ax.transData.transform([[1, 1]])[0][axis]
+            - ax.transData.transform([[0, 0]])[0][axis]
+        )
+        text_px = TEXT_LINE_HEIGHT * self.value_font["fontsize"] * ax.figure.dpi / 72
         last = len(x) - 1
         for i, (xi, mid, height, text) in enumerate(zip(x, mids, heights, texts)):
-            if text is None or height == 0:
+            if text is None or height * per_unit < text_px:
                 continue
             # the band ends at the axes edge: the end labels hang inward
             edge = "left" if i == 0 else "right" if i == last else "center"
