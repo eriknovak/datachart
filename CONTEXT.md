@@ -21,6 +21,11 @@ limits, grid, ticks, legend assembly, and twin-axis assignment. Also the public 
 (`datachart.utils.Panel`) that overlays rendered figures into one panel.
 Panel figures nest: a nested panel flattens into the outer one, keeping its
 per-figure prefs while the outermost call supplies all panel-level furniture.
+Axis scale is the one exception: it is stamped onto each layer group as a
+pref rather than held as furniture, so it survives nesting and follows its
+group to whichever axis twin assignment sends it to. A dropped scale renders
+a clean but misleading chart where a dropped label or limit is visible
+(ADR 0041).
 A panel has an orientation, inferred from its orientable layers (horizontal
 only when all of them are); its value axis follows it.
 _Avoid_: overlay (for the concept), subplot, axes group
@@ -30,8 +35,10 @@ The two axes of a panel named by role, not by letter: the value axis carries
 the quantities (y in a vertical panel, x in a horizontal one), the category
 axis the positions or labels. The secondary axis is always a second value axis
 (`twinx` vertical, `twiny` horizontal); the `y_axis`, `ylabel_*`, `ymin*`/`ymax*`
-parameters address the value axis in either orientation, `xlabel`/`xmin`/`xmax`
-the category axis.
+and `scaley`/`scaley_right` parameters address the value axis in either
+orientation, `xlabel`/`xmin`/`xmax`/`scalex` the category axis. The two value
+axes scale independently; the category axis has no twin, so it has no
+`scalex_right`.
 _Avoid_: left/right axis (for the concept — those are the vertical spellings)
 
 **Grid**:
