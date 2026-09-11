@@ -90,8 +90,10 @@ mountains("The minimal theme").show()
 
 `update_config` changes individual attributes on top of the active theme. The change persists until the next `set_theme` or `reset_config`; unknown attribute names are skipped with a warning.
 
+Attributes that take a palette also accept a single color, used for every series that asks for one. The color below applies to charts whose datasets share one coordinate space, which is what every chart does unless `subplots` is on; see [ColorStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorStyleAttrs) for the attribute that covers the subplot case.
+
 ```
-config.update_config({"font_title_size": 16, "color_general_singular": "#B5651D"})
+config.update_config({"font_title_size": 16, "color_general_multiple": "#B5651D"})
 mountains("Larger title, copper bars").show()
 ```
 
@@ -102,7 +104,7 @@ A scope is a temporary style change that lasts for one `with` block: the configu
 `override` scopes attribute overrides, taking keyword arguments or a dictionary:
 
 ```
-with config.override(font_title_size=10, color_general_singular="#4E79A7"):
+with config.override(font_title_size=10, color_general_multiple="#4E79A7"):
     mountains("Inside the override scope").show()
 
 mountains("After the override scope").show()

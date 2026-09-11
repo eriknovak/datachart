@@ -673,14 +673,14 @@ Bases: `TypedDict`
 
 The typing for the general color style.
 
-| ATTRIBUTE                       | DESCRIPTION                                                                                                                                       |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `color_general_singular`        | The general color for the singular-typed charts. **TYPE:** `Union[COLORS, str, None]`                                                             |
-| `color_general_multiple`        | The general color for the multiple-typed charts (palette name or list of hex colors). **TYPE:** `Union[COLORS, str, List[str], None]`             |
-| `color_parallel_hue`            | The color palette for parallel coords hue categories (palette name or list of hex colors). **TYPE:** `Union[COLORS, str, List[str], None]`        |
-| `color_parallel_hue_continuous` | The sequential ramp for parallel coords numeric hue columns (palette name or list of hex colors). **TYPE:** `Union[COLORS, str, List[str], None]` |
-| `muted_color`                   | The color applied to background-emphasis layers. **TYPE:** `Union[str, None]`                                                                     |
-| `muted_alpha`                   | The alpha applied to background-emphasis layers. **TYPE:** `Union[float, None]`                                                                   |
+| ATTRIBUTE                       | DESCRIPTION                                                                                                                                                                                             |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `color_general_singular`        | The colors used when each dataset gets its own subplot, i.e. subplots=True (palette name, single color, or list of hex colors). **TYPE:** `Union[COLORS, str, List[str], None]`                         |
+| `color_general_multiple`        | The colors used when the datasets share one coordinate space, which is the default for every chart (palette name, single color, or list of hex colors). **TYPE:** `Union[COLORS, str, List[str], None]` |
+| `color_parallel_hue`            | The color palette for parallel coords hue categories (palette name, single color, or list of hex colors). **TYPE:** `Union[COLORS, str, List[str], None]`                                               |
+| `color_parallel_hue_continuous` | The sequential ramp for parallel coords numeric hue columns (palette name, single color, or list of hex colors). **TYPE:** `Union[COLORS, str, List[str], None]`                                        |
+| `muted_color`                   | The color applied to background-emphasis layers. **TYPE:** `Union[str, None]`                                                                                                                           |
+| `muted_alpha`                   | The alpha applied to background-emphasis layers. **TYPE:** `Union[float, None]`                                                                                                                         |
 
 ### datachart.typings.FontStyleAttrs
 
@@ -947,17 +947,17 @@ Bases: `TypedDict`
 
 The typing for the heatmap chart style.
 
-| ATTRIBUTE                  | DESCRIPTION                                                                                                                                           |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plot_heatmap_cmap`        | The color map of the heatmap (palette name, list of hex colors, or colormap). **TYPE:** `Union[str, List[str], colors.LinearSegmentedColormap, None]` |
-| `plot_heatmap_alpha`       | The alpha value of the heatmap. **TYPE:** `Union[float, None]`                                                                                        |
-| `plot_heatmap_font_size`   | The font size of the heatmap. **TYPE:** `Union[int, float, str, None]`                                                                                |
-| `plot_heatmap_font_color`  | The font color of the heatmap. **TYPE:** `Union[str, None]`                                                                                           |
-| `plot_heatmap_font_style`  | The font style of the heatmap. **TYPE:** `Union[FONT_STYLE, str, None]`                                                                               |
-| `plot_heatmap_font_weight` | The font weight of the heatmap. **TYPE:** `Union[FONT_WEIGHT, str, None]`                                                                             |
-| `plot_heatmap_frame_color` | The color of the frame always drawn around heatmap axes. **TYPE:** `Union[str, None]`                                                                 |
-| `plot_heatmap_edge_width`  | The width of the borders drawn between the cells (0 draws none). **TYPE:** `Union[int, float, None]`                                                  |
-| `plot_heatmap_edge_color`  | The color of the borders drawn between the cells. **TYPE:** `Union[str, None]`                                                                        |
+| ATTRIBUTE                  | DESCRIPTION                                                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_heatmap_cmap`        | The color map of the heatmap (palette name, single color, list of hex colors, or colormap). **TYPE:** `Union[str, List[str], colors.LinearSegmentedColormap, None]` |
+| `plot_heatmap_alpha`       | The alpha value of the heatmap. **TYPE:** `Union[float, None]`                                                                                                      |
+| `plot_heatmap_font_size`   | The font size of the heatmap. **TYPE:** `Union[int, float, str, None]`                                                                                              |
+| `plot_heatmap_font_color`  | The font color of the heatmap. **TYPE:** `Union[str, None]`                                                                                                         |
+| `plot_heatmap_font_style`  | The font style of the heatmap. **TYPE:** `Union[FONT_STYLE, str, None]`                                                                                             |
+| `plot_heatmap_font_weight` | The font weight of the heatmap. **TYPE:** `Union[FONT_WEIGHT, str, None]`                                                                                           |
+| `plot_heatmap_frame_color` | The color of the frame always drawn around heatmap axes. **TYPE:** `Union[str, None]`                                                                               |
+| `plot_heatmap_edge_width`  | The width of the borders drawn between the cells (0 draws none). **TYPE:** `Union[int, float, None]`                                                                |
+| `plot_heatmap_edge_color`  | The color of the borders drawn between the cells. **TYPE:** `Union[str, None]`                                                                                      |
 
 ### datachart.typings.ScatterStyleAttrs
 

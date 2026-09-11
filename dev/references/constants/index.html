@@ -5078,6 +5078,10 @@ Accepted anywhere a palette is: the <code>color_general_singular</code> and
 <code>color_general_multiple</code> config attributes, and the heatmap and parallel
 coords color settings. All predefined palettes are rendered in the
 <a href="../../how-to-guides/styling/colormaps/">Colormaps guide</a>.</p>
+<p>A single matplotlib color (<code>"#B5651D"</code>, <code>"tab:blue"</code>, <code>"rebeccapurple"</code>) is
+accepted in the same places and is used as a palette of one, repeated for
+every series that asks for a color. A name that is both a palette and a
+color, such as <code>"Red"</code> or <code>"pink"</code>, is read as the palette.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>

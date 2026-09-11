@@ -9984,12 +9984,12 @@ are placed evenly around the circle; the histogram visual takes numeric
             <td><code><span title="datachart.typings.ColorStyleAttrs.color_general_singular">color_general_singular</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The general color for the singular-typed charts.</p>
+                <p>The colors used when each dataset gets its own subplot, i.e. <code>subplots=True</code> (palette name, single color, or list of hex colors).</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
                     <b>TYPE:</b>
-                      <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.COLORS&lt;/span&gt;" href="../constants/#datachart.constants.COLORS">COLORS</a>, <span title="str">str</span>, None]</code>
+                      <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.COLORS&lt;/span&gt;" href="../constants/#datachart.constants.COLORS">COLORS</a>, <span title="str">str</span>, <span title="typing.List">List</span>[<span title="str">str</span>], None]</code>
                   </span>
               </p>
             </td>
@@ -9998,7 +9998,7 @@ are placed evenly around the circle; the histogram visual takes numeric
             <td><code><span title="datachart.typings.ColorStyleAttrs.color_general_multiple">color_general_multiple</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The general color for the multiple-typed charts (palette name or list of hex colors).</p>
+                <p>The colors used when the datasets share one coordinate space, which is the default for every chart (palette name, single color, or list of hex colors).</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
@@ -10012,7 +10012,7 @@ are placed evenly around the circle; the histogram visual takes numeric
             <td><code><span title="datachart.typings.ColorStyleAttrs.color_parallel_hue">color_parallel_hue</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The color palette for parallel coords hue categories (palette name or list of hex colors).</p>
+                <p>The color palette for parallel coords hue categories (palette name, single color, or list of hex colors).</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
@@ -10026,7 +10026,7 @@ are placed evenly around the circle; the histogram visual takes numeric
             <td><code><span title="datachart.typings.ColorStyleAttrs.color_parallel_hue_continuous">color_parallel_hue_continuous</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The sequential ramp for parallel coords numeric hue columns (palette name or list of hex colors).</p>
+                <p>The sequential ramp for parallel coords numeric hue columns (palette name, single color, or list of hex colors).</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
@@ -12705,7 +12705,7 @@ marks when <code>show_values</code> is on. One style serves every chart that tak
             <td><code><span title="datachart.typings.HeatmapStyleAttrs.plot_heatmap_cmap">plot_heatmap_cmap</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The color map of the heatmap (palette name, list of hex colors, or colormap).</p>
+                <p>The color map of the heatmap (palette name, single color, list of hex colors, or colormap).</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">

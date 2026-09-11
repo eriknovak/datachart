@@ -286,6 +286,8 @@ The predefined colors using [pypalettes](https://y-sunflower.github.io/pypalette
 
 All palette names are valid pypalettes identifiers. You can use any of the 2500+ palettes available in pypalettes by passing the palette name as a string. Accepted anywhere a palette is: the `color_general_singular` and `color_general_multiple` config attributes, and the heatmap and parallel coords color settings. All predefined palettes are rendered in the [Colormaps guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/colormaps/index.md).
 
+A single matplotlib color (`"#B5651D"`, `"tab:blue"`, `"rebeccapurple"`) is accepted in the same places and is used as a palette of one, repeated for every series that asks for a color. A name that is both a palette and a color, such as `"Red"` or `"pink"`, is read as the palette.
+
 Examples:
 
 ```
