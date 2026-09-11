@@ -85,6 +85,10 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.SORT
+    options:
+        heading_level: 3
+
 ::: datachart.constants.NORMALIZE
     options:
         heading_level: 3
