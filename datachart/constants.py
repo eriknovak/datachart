@@ -536,6 +536,11 @@ class COLORS:
     coords color settings. All predefined palettes are rendered in the
     [Colormaps guide](../../how-to-guides/styling/colormaps/).
 
+    A single matplotlib color (`"#B5651D"`, `"tab:blue"`, `"rebeccapurple"`) is
+    accepted in the same places and is used as a palette of one, repeated for
+    every series that asks for a color. A name that is both a palette and a
+    color, such as `"Red"` or `"pink"`, is read as the palette.
+
     Examples:
         >>> from datachart.constants import COLORS
         >>> COLORS.Blues

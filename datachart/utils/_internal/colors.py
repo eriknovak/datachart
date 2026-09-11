@@ -50,6 +50,34 @@ CUSTOM_PALETTES: Dict[str, List[str]] = {
 }
 
 # ===============================================
+# Helper Functions
+# ===============================================
+
+
+def is_plain_color(name: str) -> bool:
+    """Whether a name is a plain color rather than a palette.
+
+    Args:
+        name: The name to inspect.
+
+    Returns:
+        `True` for a color that names no palette, `False` otherwise.
+
+    """
+
+    if not isinstance(name, str) or name in CUSTOM_PALETTES:
+        return False
+    if not colors.is_color_like(name):
+        return False
+    # palettes win the ambiguous names ("Red", "Gold", "pink", "grey", ...)
+    try:
+        load_palette(name)
+    except Exception:
+        return True
+    return False
+
+
+# ===============================================
 # Main Function
 # ===============================================
 
@@ -58,7 +86,8 @@ def get_color_scale(name: str = DEFAULT_COLOR) -> List[str]:
     """Get a color scale by name using pypalettes.
 
     Args:
-        name: The name of the color scale (any valid pypalettes palette name).
+        name: The name of the color scale (any valid pypalettes palette name),
+            or a single color, which is a color scale of one.
 
     Returns:
         The color scale corresponding to the given name.
@@ -70,6 +99,9 @@ def get_color_scale(name: str = DEFAULT_COLOR) -> List[str]:
 
     if name in CUSTOM_PALETTES:
         return list(CUSTOM_PALETTES[name])
+
+    if is_plain_color(name):
+        return [name]
 
     try:
         palette = load_palette(name)
@@ -116,7 +148,8 @@ def get_colormap(
     """Get a color map by name using pypalettes.
 
     Args:
-        name: The name of the color map (any valid pypalettes palette name).
+        name: The name of the color map (any valid pypalettes palette name),
+            or a single color, which is a color map of one.
         cmap_type: The type of colormap ("continuous" or "discrete").
 
     Returns:
@@ -129,6 +162,9 @@ def get_colormap(
 
     if isinstance(name, str) and name in CUSTOM_PALETTES:
         return create_colormap(CUSTOM_PALETTES[name], name)
+
+    if is_plain_color(name):
+        return create_colormap([name], name)
 
     try:
         return load_cmap(name, cmap_type=cmap_type)
@@ -143,7 +179,8 @@ def get_discrete_colors(
     """Get a list of discrete colors.
 
     Args:
-        name: The name of the color scale (any valid pypalettes palette name) or a list of hex color strings.
+        name: The name of the color scale (any valid pypalettes palette name), a single
+            color, or a list of hex color strings.
         max_colors: The maximum number of colors.
 
     Returns:
@@ -158,9 +195,11 @@ def get_discrete_colors(
     if max_colors <= 0:
         raise ValueError("The max_colors must be greater than 0.")
 
-    # custom palettes cycle like explicit color lists instead of interpolating
+    # custom palettes and single colors cycle instead of interpolating
     if isinstance(name, str) and name in CUSTOM_PALETTES:
         name = list(CUSTOM_PALETTES[name])
+    elif is_plain_color(name):
+        name = [name]
 
     # If name is a list of colors, use them directly
     if isinstance(name, list):

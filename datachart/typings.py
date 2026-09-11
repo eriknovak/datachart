@@ -128,10 +128,10 @@ class ColorStyleAttrs(TypedDict):
     """The typing for the general color style.
 
     Attributes:
-        color_general_singular (Union[COLORS, str, None]): The general color for the singular-typed charts.
-        color_general_multiple (Union[COLORS, str, List[str], None]): The general color for the multiple-typed charts (palette name or list of hex colors).
-        color_parallel_hue (Union[COLORS, str, List[str], None]): The color palette for parallel coords hue categories (palette name or list of hex colors).
-        color_parallel_hue_continuous (Union[COLORS, str, List[str], None]): The sequential ramp for parallel coords numeric hue columns (palette name or list of hex colors).
+        color_general_singular (Union[COLORS, str, List[str], None]): The colors used when each dataset gets its own subplot, i.e. `subplots=True` (palette name, single color, or list of hex colors).
+        color_general_multiple (Union[COLORS, str, List[str], None]): The colors used when the datasets share one coordinate space, which is the default for every chart (palette name, single color, or list of hex colors).
+        color_parallel_hue (Union[COLORS, str, List[str], None]): The color palette for parallel coords hue categories (palette name, single color, or list of hex colors).
+        color_parallel_hue_continuous (Union[COLORS, str, List[str], None]): The sequential ramp for parallel coords numeric hue columns (palette name, single color, or list of hex colors).
         muted_color (Union[str, None]): The color applied to background-emphasis layers.
         muted_alpha (Union[float, None]): The alpha applied to background-emphasis layers.
 

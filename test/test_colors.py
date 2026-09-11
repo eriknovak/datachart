@@ -104,6 +104,30 @@ class TestColors(unittest.TestCase):
         cmap = get_colormap(COLORS.PaperYlGnBu)
         self.assertTrue(callable(cmap), "Custom palette colormap is not callable.")
 
+    def test_plain_color_is_a_one_color_palette(self):
+        """Test that a plain color resolves to itself, not to the fallback."""
+        for color in ["#B5651D", "tab:blue", "rebeccapurple"]:
+            self.assertEqual(get_color_scale(color), [color])
+            self.assertEqual(get_discrete_colors(color, 1), [color])
+
+    def test_plain_color_cycles_not_interpolates(self):
+        """Test that a plain color repeats when more colors are asked for."""
+        self.assertEqual(get_discrete_colors("#B5651D", 3), ["#B5651D"] * 3)
+
+    def test_plain_color_colormap(self):
+        """Test that a plain color produces a usable colormap."""
+        cmap = get_colormap("#B5651D")
+        self.assertTrue(callable(cmap), "Plain color colormap is not callable.")
+
+    def test_palette_name_wins_over_color_name(self):
+        """Test that names that are both a palette and a color stay palettes."""
+        for name in ["Red", "Gold", "pink", "chocolate", "grey"]:
+            self.assertGreater(
+                len(get_color_scale(name)),
+                1,
+                f"'{name}' resolved as a plain color instead of a palette.",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
