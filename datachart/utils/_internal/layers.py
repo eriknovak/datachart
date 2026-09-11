@@ -33,7 +33,7 @@ from matplotlib.path import Path
 from matplotlib.transforms import Bbox, ScaledTranslation
 import matplotlib.patheffects as patheffects
 from matplotlib.legend import Legend
-from matplotlib.legend_handler import HandlerPathCollection
+from matplotlib.legend_handler import HandlerPatch, HandlerPathCollection
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1.axes_size import Fixed as FixedPad
 
@@ -296,9 +296,26 @@ def _marker_edge_widths(width, sizes):
     return np.where(fits, width, 0.0)
 
 
+class HandlerBarSeries(HandlerPatch):
+    """Draws a bar series' legend swatch from a representative bar.
+
+    A container's swatch is its first bar, which per-record emphasis may have
+    muted (ADR 0042); the series then reads as grey in the legend. The layer
+    names an unmuted bar to stand for it, and without one nothing changes.
+    """
+
+    def create_artists(self, legend, orig_handle, *args, **kwargs):
+        representative = getattr(orig_handle, "legend_patch", None)
+        if representative is None:
+            patches = getattr(orig_handle, "patches", None)
+            representative = patches[0] if patches else orig_handle
+        return super().create_artists(legend, representative, *args, **kwargs)
+
+
 # bubble charts size markers by data; their legend entries keep the base size
 LEGEND_HANDLER_MAP = {
-    PathCollection: HandlerPathCollection(update_func=_scatter_legend_handle)
+    PathCollection: HandlerPathCollection(update_func=_scatter_legend_handle),
+    BarContainer: HandlerBarSeries(),
 }
 # fraction of the value-axis span added so bar value labels stay inside
 VALUE_HEADROOM_VERTICAL = 0.08
@@ -1329,6 +1346,17 @@ class Layer:
             return [None] * n
         return self.record_roles
 
+    @staticmethod
+    def _name_legend_patch(bars, roles: list) -> None:
+        """Let the series' first unmuted bar stand for it in the legend."""
+
+        unmuted = next(
+            (p for p, role in zip(bars.patches, roles) if role != EMPHASIS_BACKGROUND),
+            None,
+        )
+        if unmuted is not None:
+            bars.legend_patch = unmuted
+
     def _apply_patch_emphasis(self, patches, roles: list) -> None:
         """Apply per-record roles to drawn patches (ADR 0042).
 
@@ -1805,6 +1833,7 @@ class BarLayer(Layer):
         )
         roles = self._record_roles(ctx.emphasis, len(bars))
         self._apply_patch_emphasis(bars.patches, roles)
+        self._name_legend_patch(bars, roles)
         # each bar reports its category position (the axis names it) and its
         # own value, never the stack total; a pyramid side draws negative
         # values, so they read as passed, like the labels
@@ -3965,6 +3994,7 @@ class RadialBarLayer(RadialLayer):
             theta + theta_offset, y, yerr=yerr, label=self.label(ctx), **bar_style
         )
         self._apply_patch_emphasis(bars.patches, roles)
+        self._name_legend_patch(bars, roles)
         self.register_hover(bars, _radial_resolver(self.label(ctx), labels, y))
 
 

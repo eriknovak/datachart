@@ -32,6 +32,15 @@ def heights(container):
     return [patch.get_height() for patch in container]
 
 
+def swatches(figure):
+    """The (label, facecolor) of each legend entry."""
+    legend = figure.axes[0].get_legend()
+    return [
+        (text.get_text(), matplotlib.colors.to_hex(handle.get_facecolor()))
+        for handle, text in zip(legend.legend_handles, legend.get_texts())
+    ]
+
+
 def muted(container):
     return [patch.get_alpha() == config["muted_alpha"] for patch in container]
 
@@ -294,6 +303,25 @@ class TestEmphasisRuleBars:
         )
         legend = fig.axes[0].get_legend()
         assert [t.get_text() for t in legend.get_texts()] == ["s1"]
+
+    def test_legend_swatch_keeps_the_series_color(self):
+        # the rule mutes the first bar of each series; the swatch must not follow it
+        fig = BarChart(
+            data=[BAR1, BAR2],
+            subtitle=["s1", "s2"],
+            show_legend=True,
+            emphasis_rule={"top": 2},
+        )
+        plain = BarChart(data=[BAR1, BAR2], subtitle=["s1", "s2"], show_legend=True)
+        assert swatches(fig) == swatches(plain)
+
+    def test_all_muted_series_shows_a_muted_swatch(self):
+        fig = BarChart(
+            data=BAR1, subtitle="s1", show_legend=True, emphasis_rule={"above": 99.0}
+        )
+        assert swatches(fig) == [
+            ("s1", matplotlib.colors.to_hex(config["muted_color"]))
+        ]
 
     def test_only_muted_bars_lose_value_labels(self):
         ax = BarChart(data=BAR1, emphasis_rule={"top": 2}, show_values=True).axes[0]
