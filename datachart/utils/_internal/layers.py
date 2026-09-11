@@ -47,6 +47,8 @@ from .validate import (
     treemap_record_total,
     validate_baseline,
     validate_emphasis,
+    validate_emphasis_rule,
+    validate_sort,
     validate_network_edge_style,
     validate_sankey_link_color,
     validate_axis_kinds,
@@ -126,6 +128,7 @@ from ...constants import (
     SWARM_MODE,
     RADIAL_TYPE,
     SCALE,
+    SORT,
     VALUE_FORMAT,
     VIOLIN_INNER,
 )
@@ -1313,6 +1316,51 @@ class Layer:
         elif width is not None:
             style[width_key] = width * HIGHLIGHT_WIDTH_SCALE
 
+    def _record_roles(self, panel_role: Optional[str]) -> list:
+        """One role per drawn record; a layer-level role covers them all instead."""
+
+        if panel_role is not None:
+            return [None] * len(self.record_roles)
+        return self.record_roles
+
+    def _apply_patch_emphasis(self, patches, roles: list) -> None:
+        """Apply per-record roles to drawn patches (ADR 0042).
+
+        The patches were drawn in the layer's style; a muted one takes the
+        muted color, alpha, and stroke, a highlighted one the bolder stroke,
+        and both step in z like a whole layer would.
+        """
+
+        for patch, role in zip(patches, roles):
+            if role is None:
+                continue
+            patch.set_zorder(patch.get_zorder() + EMPHASIS_Z_OFFSET[role])
+            if role == EMPHASIS_BACKGROUND:
+                patch.set_facecolor(self.muted_color)
+                patch.set_alpha(self.muted_alpha)
+                patch.set_linewidth(patch.get_linewidth() * MUTED_WIDTH_SCALE)
+            else:
+                patch.set_linewidth(patch.get_linewidth() * HIGHLIGHT_WIDTH_SCALE)
+
+
+def _bar_records(chart: dict) -> list:
+    """The chart's drawn bar records: the data dicts carrying the `y` column."""
+
+    y_key = get_attr_value("y", chart, "y")
+    data = chart.get("data")
+    if not isinstance(data, list):
+        return []
+    return [record for record in data if isinstance(record, dict) and y_key in record]
+
+
+def _record_emphasis(chart: dict) -> list:
+    """The validated per-record emphasis roles of a bar chart, one per drawn bar."""
+
+    return [
+        validate_emphasis(record.get("emphasis"), f"bar record {i} `emphasis`")
+        for i, record in enumerate(_bar_records(chart))
+    ]
+
 
 def _axis_numbers(ax, transpose: bool, x) -> np.ndarray:
     """The drawn x data in axis units, so fits run on numbers when x is temporal."""
@@ -1683,6 +1731,7 @@ class BarLayer(Layer):
         self.is_pyramid = bool(self.settings.get("pyramid"))
         self.bar_style = get_bar_style(self.style, self.is_horizontal)
         self.show_yerr = self.settings.get("show_yerr")
+        self.record_roles = _record_emphasis(self.chart)
         self._resolve_value_labels()
         self.log_offset = 1 if self.settings.get("scaley") == "log" else 0
 
@@ -1742,6 +1791,8 @@ class BarLayer(Layer):
             **error_range,
             **bar_style,
         )
+        roles = self._record_roles(ctx.emphasis)
+        self._apply_patch_emphasis(bars.patches, roles)
         # each bar reports its category position (the axis names it) and its
         # own value, never the stack total; a pyramid side draws negative
         # values, so they read as passed, like the labels
@@ -1757,12 +1808,19 @@ class BarLayer(Layer):
 
         if self.show_values and ctx.emphasis != EMPHASIS_BACKGROUND:
             # pyramid sides draw as signed data but display positive
-            # magnitudes (ADR 0017)
+            # magnitudes (ADR 0017); a muted bar prints no value
             magnitude = abs if self.is_pyramid else (lambda v: v)
             self._label_bars(
                 ax,
                 bars,
-                fmt=lambda v: _format_value(self.value_format, magnitude(v)),
+                labels=[
+                    (
+                        ""
+                        if role == EMPHASIS_BACKGROUND
+                        else _format_value(self.value_format, magnitude(v))
+                    )
+                    for v, role in zip(y + self.log_offset, roles)
+                ],
                 stacked=slot is not None and slot.bottom is not None,
             )
 
@@ -3830,6 +3888,7 @@ class RadialBarLayer(RadialLayer):
     def _resolve_style(self):
         self.bar_style = get_bar_style(self.style)
         self.show_yerr = self.settings.get("show_yerr")
+        self.record_roles = _record_emphasis(self.chart)
 
     def labels(self) -> Optional[np.ndarray]:
         return get_chart_data("label", self.chart)
@@ -3878,14 +3937,22 @@ class RadialBarLayer(RadialLayer):
 
         bottoms = bar_style.get("bottom")
         tops = np.asarray(y, dtype=float) + (0.0 if bottoms is None else bottoms)
+        # a muted bar keeps its tip (the category label hugs it) but no value
+        roles = self._record_roles(ctx.emphasis)
         self._tips = [
-            (float(t + theta_offset), float(r), float(v), i)
-            for i, (t, r, v) in enumerate(zip(theta, tops, y))
+            (
+                float(t + theta_offset),
+                float(r),
+                None if role == EMPHASIS_BACKGROUND else float(v),
+                i,
+            )
+            for i, (t, r, v, role) in enumerate(zip(theta, tops, y, roles))
         ]
 
         bars = ax.bar(
             theta + theta_offset, y, yerr=yerr, label=self.label(ctx), **bar_style
         )
+        self._apply_patch_emphasis(bars.patches, roles)
         self.register_hover(bars, _radial_resolver(self.label(ctx), labels, y))
 
 
@@ -5324,11 +5391,160 @@ RADIAL_LAYER_TYPES = {
 }
 
 
+def emphasis_rule_roles(rule: tuple, values: list) -> list:
+    """The emphasis role of each value under a validated rule (ADR 0042).
+
+    A matching value is highlighted, every other one muted. `above`/`below`
+    are strict, `between` inclusive; `top`/`bottom` clamp to the value count
+    and break ties by input order.
+    """
+
+    key, bound = rule
+    if key == "above":
+        matches = [v > bound for v in values]
+    elif key == "below":
+        matches = [v < bound for v in values]
+    elif key == "between":
+        matches = [bound[0] <= v <= bound[1] for v in values]
+    else:
+        order = sorted(
+            range(len(values)),
+            key=(lambda i: -values[i]) if key == "top" else (lambda i: values[i]),
+        )
+        picked = set(order[:bound])
+        matches = [i in picked for i in range(len(values))]
+    return [EMPHASIS_HIGHLIGHT if m else EMPHASIS_BACKGROUND for m in matches]
+
+
+def _bar_record_values(charts: List[dict], magnitude: bool) -> list:
+    """`(label, value)` per drawn record of each chart; magnitudes when asked."""
+
+    columns = []
+    for chart in charts:
+        label_key = get_attr_value("label", chart, "label")
+        y_key = get_attr_value("y", chart, "y")
+        columns.append(
+            [
+                (
+                    record.get(label_key),
+                    abs(record[y_key]) if magnitude else record[y_key],
+                )
+                for record in _bar_records(chart)
+            ]
+        )
+    return columns
+
+
+def sort_bar_charts(charts: List[dict], sort, sort_by, magnitude: bool) -> List[dict]:
+    """The charts with their records in category order (ADR 0042).
+
+    One order serves every chart: categories sort by their total across the
+    charts, or by the value in the one chart `sort_by` names by subtitle;
+    categories that chart lacks sort last. Ties keep input order.
+    """
+
+    if sort_by is not None:
+        if sort is None:
+            raise ValueError(
+                "`sort_by` names the series to sort by; pass `sort` as well."
+            )
+        subtitles = [chart.get("subtitle") for chart in charts]
+        if sort_by not in subtitles:
+            raise ValueError(
+                f"`sort_by` {sort_by!r} names no series; the series subtitles "
+                f"are {subtitles!r}."
+            )
+    if sort is None:
+        return charts
+
+    columns = _bar_record_values(charts, magnitude)
+    keyed = [
+        column
+        for chart, column in zip(charts, columns)
+        if sort_by is None or chart.get("subtitle") == sort_by
+    ]
+    totals = defaultdict(float)
+    for column in keyed:
+        for label, value in column:
+            totals[label] += value
+    categories = []
+    for column in columns:
+        for label, _ in column:
+            if label not in categories:
+                categories.append(label)
+    sign = -1 if sort == SORT.DESCENDING else 1
+    ordered = sorted(
+        categories, key=lambda c: (c not in totals, sign * totals.get(c, 0))
+    )
+    rank = {label: i for i, label in enumerate(ordered)}
+
+    sorted_charts = []
+    for chart in charts:
+        label_key = get_attr_value("label", chart, "label")
+        data = sorted(
+            chart["data"],
+            key=lambda r: rank.get(
+                r.get(label_key) if isinstance(r, dict) else None, len(rank)
+            ),
+        )
+        sorted_charts.append({**chart, "data": data})
+    return sorted_charts
+
+
+def apply_emphasis_rule(charts: List[dict], rule: tuple, magnitude: bool) -> List[dict]:
+    """The charts with the rule's role written on each record that set none.
+
+    The rule reads every drawn record of the charts as one pool, so a count
+    picks records across the series; an explicit per-record role wins.
+    """
+
+    columns = _bar_record_values(charts, magnitude)
+    values = [value for column in columns for _, value in column]
+    roles = iter(emphasis_rule_roles(rule, values))
+    filled = []
+    for chart in charts:
+        y_key = get_attr_value("y", chart, "y")
+        data = []
+        for record in chart["data"]:
+            if isinstance(record, dict) and y_key in record:
+                role = next(roles)
+                if record.get("emphasis") is None:
+                    record = {**record, "emphasis": role}
+            data.append(record)
+        filled.append({**chart, "data": data})
+    return filled
+
+
+def resolve_bar_records(charts: List[dict], settings: dict) -> List[dict]:
+    """Sort the bar charts' categories, then fill in the emphasis rule (ADR 0042).
+
+    Neither setting reads the other: the rule sees the same records whatever
+    the order, and a pyramid's negated left side reads as magnitudes for both.
+    """
+
+    sort = validate_sort(settings.get("sort"))
+    rule = validate_emphasis_rule(settings.get("emphasis_rule"))
+    magnitude = bool(settings.get("pyramid"))
+    charts = sort_bar_charts(charts, sort, settings.get("sort_by"), magnitude)
+    if rule is not None:
+        charts = apply_emphasis_rule(charts, rule, magnitude)
+    return charts
+
+
+# the fronts whose records carry a value per category and sort by it
+BAR_RECORD_CHARTS = ("barchart", "pyramidchart")
+
+
 def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[Layer]:
     """Build the layers for a chart front; style resolution happens here."""
 
     if chart_type == "parallelcoords":
         return [ParallelCoordsLayer(list(charts), settings)]
+
+    if chart_type in BAR_RECORD_CHARTS or (
+        chart_type == "radialchart" and settings.get("radial_type") == RADIAL_TYPE.BAR
+    ):
+        charts = resolve_bar_records(charts, settings)
 
     if chart_type == "radialchart":
         visual = settings.get("radial_type") or RADIAL_TYPE.LINE
@@ -6796,6 +7012,8 @@ class Panel:
             value_format = s.get("value_format") or DEFAULT_VALUE_LABEL_FORMAT
             value_style = s.get("tip_value_style") or {}
             for theta, r_tip, value, _ in tips:
+                if value is None:
+                    continue
                 rotation, ha = spoke_rotation(theta)
                 ax.text(
                     theta,

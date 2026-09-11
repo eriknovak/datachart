@@ -1577,6 +1577,8 @@ class BarDataPointAttrs(TypedDict):
         label (str): The label.
         y (Union[int, float]): The y-axis value.
         yerr (Optional[Union[int, float]]): The y-axis error value.
+        emphasis (Optional[Union[EMPHASIS, str]]): The bar's own emphasis role
+            ("background" or "highlight"); wins over the chart's `emphasis_rule`.
 
     """
 
@@ -1584,6 +1586,7 @@ class BarDataPointAttrs(TypedDict):
     label: str
     y: Union[int, float]
     yerr: Optional[Union[int, float]]
+    emphasis: Optional[Union[EMPHASIS, str]]
 
 
 class BarSingleChartAttrs(TypedDict):
@@ -2640,6 +2643,9 @@ class RadialDataPointAttrs(TypedDict):
         y (Union[int, float]): The radial value (line, bar, and scatter visuals).
         yerr (Optional[Union[int, float]]): The radial error value.
         x (Optional[Union[int, float]]): The angular observation in degrees (histogram visual).
+        emphasis (Optional[Union[EMPHASIS, str]]): The bar's own emphasis role
+            ("background" or "highlight"); wins over the chart's `emphasis_rule`
+            (bar visual).
 
     """
 

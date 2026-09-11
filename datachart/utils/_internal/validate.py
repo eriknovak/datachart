@@ -17,6 +17,7 @@ from ...constants import (
     DATE_FORMAT,
     EMPHASIS,
     NETWORK_LAYOUT,
+    SORT,
 )
 
 BANDWIDTH_RULES = (BANDWIDTH.SCOTT, BANDWIDTH.SILVERMAN)
@@ -167,6 +168,83 @@ def validate_emphasis(value, context: str = "emphasis"):
             f"Must be '{EMPHASIS.BACKGROUND}', '{EMPHASIS.HIGHLIGHT}', or None."
         )
     return value
+
+
+SORT_ORDERS = (SORT.ASCENDING, SORT.DESCENDING)
+
+
+def validate_sort(value):
+    """Validate a category sort order; None (`SORT.NONE`) means input order."""
+
+    if value is None:
+        return None
+    if value not in SORT_ORDERS:
+        raise ValueError(
+            f"Invalid `sort` value {value!r}. Must be one of {SORT_ORDERS} or None."
+        )
+    return value
+
+
+# the value each rule reads against: a count of records or a threshold
+EMPHASIS_RULE_COUNTS = ("top", "bottom")
+EMPHASIS_RULE_THRESHOLDS = ("above", "below", "between")
+
+
+def validate_emphasis_rule(rule):
+    """Validate an emphasis rule; None means no rule (ADR 0042).
+
+    A rule is a one-key dict: `above`/`below` a number (strict), `between`
+    a `(lo, hi)` pair (inclusive), `top`/`bottom` a positive integer.
+
+    Returns:
+        The `(key, value)` pair of the rule, or None.
+    """
+
+    if rule is None:
+        return None
+    if not isinstance(rule, dict):
+        raise ValueError(
+            f"Invalid `emphasis_rule` value {rule!r}. Must be a one-key dict: "
+            f"one of {EMPHASIS_RULE_THRESHOLDS + EMPHASIS_RULE_COUNTS} to a value."
+        )
+    if len(rule) != 1:
+        raise ValueError(
+            f"`emphasis_rule` takes exactly one key, got {sorted(rule)!r}. "
+            "Tag the records' `emphasis` directly to combine conditions."
+        )
+    ((key, value),) = rule.items()
+    if key in EMPHASIS_RULE_COUNTS:
+        if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+            raise ValueError(
+                f"`emphasis_rule` `{key}` must be a positive integer, got {value!r}."
+            )
+    elif key == "between":
+        bounds = value if isinstance(value, (tuple, list)) else ()
+        if len(bounds) != 2 or not all(_is_number(bound) for bound in bounds):
+            raise ValueError(
+                f"`emphasis_rule` `between` takes a `(lo, hi)` pair of numbers, "
+                f"got {value!r}."
+            )
+        if bounds[0] > bounds[1]:
+            raise ValueError(
+                f"`emphasis_rule` `between` bounds are reversed: lo {bounds[0]!r} "
+                f"is above hi {bounds[1]!r}."
+            )
+    elif key in EMPHASIS_RULE_THRESHOLDS:
+        if not _is_number(value):
+            raise ValueError(
+                f"`emphasis_rule` `{key}` must be a number, got {value!r}."
+            )
+    else:
+        raise ValueError(
+            f"Unknown `emphasis_rule` key `{key}`. "
+            f"Must be one of {EMPHASIS_RULE_THRESHOLDS + EMPHASIS_RULE_COUNTS}."
+        )
+    return key, value
+
+
+def _is_number(value) -> bool:
+    return isinstance(value, Real) and not isinstance(value, bool)
 
 
 SANKEY_LINK_COLORS = ("source", "target", "grey")

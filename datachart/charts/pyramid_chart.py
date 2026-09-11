@@ -19,6 +19,7 @@ from ..constants import (
     FIG_SIZE,
     ORIENTATION,
     SHOW_GRID,
+    SORT,
     VALUE_FORMAT,
 )
 
@@ -43,6 +44,9 @@ def PyramidChart(
     show_yerr: Optional[bool] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    sort: Optional[Union[SORT, str]] = None,
+    sort_by: Optional[str] = None,
+    emphasis_rule: Optional[dict] = None,
     style: Optional[Union[BarStyleAttrs, List[Optional[BarStyleAttrs]]]] = None,
     xticks: Optional[List[Union[int, float]]] = None,
     xticklabels: Optional[List[str]] = None,
@@ -81,6 +85,8 @@ def PyramidChart(
         The `xticks_format` and `yticks_format` tick formats.
         The `legend` parameter.
         The `vspans` and `hspans` reference bands.
+        The `sort` and `sort_by` category order, the `emphasis_rule`, and
+        the per-record `emphasis` key.
 
     Examples:
         >>> from datachart.charts import PyramidChart
@@ -123,6 +129,17 @@ def PyramidChart(
         show_values: Whether to show bar value labels at the edge of each bar.
         value_format: Format string for bar value labels: a `VALUE_FORMAT`
             constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
+        sort: The order the categories are drawn in: None (input order),
+            "ascending", or "descending" by value. One order serves both
+            sides, keyed by the total of the two; ties keep input order.
+            See `SORT`.
+        sort_by: The subtitle of the one side whose values key the sort
+            instead of the total. A category that side lacks sorts last.
+        emphasis_rule: A one-key dict that highlights the bars matching it
+            and mutes the rest: `{"above": v}` or `{"below": v}` (strict),
+            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
+            `{"bottom": n}`. Reads each bar's positive value; a record's own
+            `emphasis` key wins over the rule.
         style: Style configuration(s) for the bars, per side.
         xticks: Custom value-axis tick positions, as positive values; each is
             mirrored to both halves.
@@ -209,6 +226,9 @@ def PyramidChart(
         "show_yerr": show_yerr,
         "show_values": show_values,
         "value_format": value_format,
+        "sort": sort,
+        "sort_by": sort_by,
+        "emphasis_rule": emphasis_rule,
         "orientation": ORIENTATION.HORIZONTAL,
         "xticks": xticks,
         "xticklabels": xticklabels,
