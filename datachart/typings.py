@@ -128,10 +128,10 @@ class ColorStyleAttrs(TypedDict):
     """The typing for the general color style.
 
     Attributes:
-        color_general_singular (Union[COLORS, str, None]): The general color for the singular-typed charts.
-        color_general_multiple (Union[COLORS, str, List[str], None]): The general color for the multiple-typed charts (palette name or list of hex colors).
-        color_parallel_hue (Union[COLORS, str, List[str], None]): The color palette for parallel coords hue categories (palette name or list of hex colors).
-        color_parallel_hue_continuous (Union[COLORS, str, List[str], None]): The sequential ramp for parallel coords numeric hue columns (palette name or list of hex colors).
+        color_general_singular (Union[COLORS, str, List[str], None]): The colors used when each dataset gets its own subplot, i.e. `subplots=True` (palette name, single color, or list of hex colors).
+        color_general_multiple (Union[COLORS, str, List[str], None]): The colors used when the datasets share one coordinate space, which is the default for every chart (palette name, single color, or list of hex colors).
+        color_parallel_hue (Union[COLORS, str, List[str], None]): The color palette for parallel coords hue categories (palette name, single color, or list of hex colors).
+        color_parallel_hue_continuous (Union[COLORS, str, List[str], None]): The sequential ramp for parallel coords numeric hue columns (palette name, single color, or list of hex colors).
         muted_color (Union[str, None]): The color applied to background-emphasis layers.
         muted_alpha (Union[float, None]): The alpha applied to background-emphasis layers.
 
@@ -655,7 +655,7 @@ class HeatmapStyleAttrs(TypedDict):
     """The typing for the heatmap chart style.
 
     Attributes:
-        plot_heatmap_cmap (Union[str, List[str], colors.LinearSegmentedColormap, None]): The color map of the heatmap (palette name, list of hex colors, or colormap).
+        plot_heatmap_cmap (Union[str, List[str], colors.LinearSegmentedColormap, None]): The color map of the heatmap (palette name, single color, list of hex colors, or colormap).
         plot_heatmap_alpha (Union[float, None]): The alpha value of the heatmap.
         plot_heatmap_font_size (Union[int, float, str, None]): The font size of the heatmap.
         plot_heatmap_font_color (Union[str, None]): The font color of the heatmap.
@@ -683,7 +683,7 @@ class ContourStyleAttrs(TypedDict):
 
     Attributes:
         plot_contour_color (Union[str, None]): The color of the iso-lines; `None` takes the panel's color cycle.
-        plot_contour_cmap (Union[str, List[str], colors.LinearSegmentedColormap, None]): The colormap of the filled bands (palette name, list of hex colors, or colormap); `None` takes the heatmap colormap. Iso-lines use it only when set.
+        plot_contour_cmap (Union[str, List[str], colors.LinearSegmentedColormap, None]): The colormap of the filled bands (palette name, single color, list of hex colors, or colormap); `None` takes the heatmap colormap. Iso-lines use it only when set.
         plot_contour_line_width (Union[int, float, None]): The width of the iso-lines; `None` takes the line chart width.
         plot_contour_line_style (Union[LINE_STYLE, str, None]): The style of the iso-lines.
         plot_contour_alpha (Union[float, None]): The alpha value of the contour.
@@ -707,7 +707,7 @@ class HexbinStyleAttrs(TypedDict):
     """The typing for the hexbin chart style.
 
     Attributes:
-        plot_hexbin_cmap (Union[str, List[str], colors.LinearSegmentedColormap, None]): The colormap of the hexagons (palette name, list of hex colors, or colormap); `None` takes the heatmap colormap.
+        plot_hexbin_cmap (Union[str, List[str], colors.LinearSegmentedColormap, None]): The colormap of the hexagons (palette name, single color, list of hex colors, or colormap); `None` takes the heatmap colormap.
         plot_hexbin_alpha (Union[float, None]): The alpha value of the hexagons.
         plot_hexbin_edge_width (Union[int, float, None]): The width of the hexagon edges; `0` draws none.
         plot_hexbin_edge_color (Union[str, None]): The color of the hexagon edges.

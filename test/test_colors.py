@@ -1,5 +1,7 @@
 import unittest
 
+from matplotlib.colors import to_hex
+
 from datachart.utils._internal.colors import (
     get_color_scale,
     get_discrete_colors,
@@ -103,6 +105,36 @@ class TestColors(unittest.TestCase):
         """Test that custom palettes produce a usable colormap."""
         cmap = get_colormap(COLORS.PaperYlGnBu)
         self.assertTrue(callable(cmap), "Custom palette colormap is not callable.")
+
+    def test_plain_color_is_a_one_color_palette(self):
+        """Test that a plain color resolves to itself, not to the fallback."""
+        for color in ["#B5651D", "tab:blue", "rebeccapurple"]:
+            self.assertEqual(get_color_scale(color), [color])
+            self.assertEqual(get_discrete_colors(color, 1), [color])
+
+    def test_plain_color_cycles_not_interpolates(self):
+        """Test that a plain color repeats when more colors are asked for."""
+        self.assertEqual(get_discrete_colors("#B5651D", 3), ["#B5651D"] * 3)
+
+    def test_plain_color_colormap(self):
+        """Test that a plain color maps to itself at both ends of the ramp."""
+        cmap = get_colormap("#B5651D")
+        for position in (0.0, 0.5, 1.0):
+            self.assertEqual(to_hex(cmap(position)), "#b5651d")
+
+    def test_single_color_list_colormap(self):
+        """Test that a one-color list produces a usable colormap."""
+        cmap = create_colormap(["#B5651D"])
+        self.assertEqual(to_hex(cmap(0.0)), "#b5651d")
+
+    def test_palette_name_wins_over_color_name(self):
+        """Test that names that are both a palette and a color stay palettes."""
+        for name in ["Red", "Gold", "pink", "chocolate", "grey"]:
+            self.assertGreater(
+                len(get_color_scale(name)),
+                1,
+                f"'{name}' resolved as a plain color instead of a palette.",
+            )
 
 
 if __name__ == "__main__":
