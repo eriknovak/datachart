@@ -12889,9 +12889,37 @@ LineChart(
 ).show()
 ```
 
+When the raw series is context rather than the message, mute it instead of giving it an equal color: `emphasis` (see the [emphasis guide](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/styling/highlighting)) greys the raw line and drops it from the legend, and [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) draws the smoothed series over it in the palette color.
+
+```
+from datachart.constants import EMPHASIS
+
+Panel(
+    [
+        LineChart(
+            data=[{"x": day, "y": value} for day, value in enumerate(daily_sales)],
+            emphasis=EMPHASIS.BACKGROUND,
+        ),
+        LineChart(
+            data=[
+                {"x": day, "y": value}
+                for day, value in enumerate(rolling_mean(daily_sales, window=7))
+            ],
+            subtitle="rolling mean (7 days)",
+        ),
+    ],
+    title="Daily sales behind its 7-day mean",
+    xlabel="Day",
+    ylabel_left="Units",
+    show_legend=True,
+    show_grid=SHOW_GRID.Y,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
 ### LOESS
 
-The `loess` function smooths `(x, y)` points with a locally weighted linear fit: at each `x` a line is fitted to the nearest `frac` share of the points, weighted so closer points count more. It returns `{x, y}` points sorted by `x`, ready to draw as a [datachart.charts.LineChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.LineChart) over the raw points.
+The `loess` function smooths `(x, y)` points with a locally weighted linear fit: at each `x` a line is fitted to the nearest `frac` share of the points, weighted so closer points count more. It returns `{x, y}` points sorted by `x`, ready to draw as a [datachart.charts.LineChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.LineChart) over the raw points. The fit runs on numbers, so a datetime `x` goes through `matplotlib.dates.date2num` on the way in and `num2date` on the way back.
 
 ```
 from datachart.utils.stats import loess
