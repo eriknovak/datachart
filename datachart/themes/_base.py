@@ -346,6 +346,7 @@ BASE_THEME: StyleAttrs = {
     "overlay_bar_mode": "group",
     "overlay_warn_thin_bars": True,
     "overlay_warn_scale_groups": True,
+    "overlay_warn_scale_conflict": True,
 }
 
 

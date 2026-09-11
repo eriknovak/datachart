@@ -125,6 +125,7 @@ from ...constants import (
     ORIENTATION,
     SWARM_MODE,
     RADIAL_TYPE,
+    SCALE,
     VALUE_FORMAT,
     VIOLIN_INNER,
 )
@@ -2205,13 +2206,6 @@ class GroupLayer(Layer):
         if not values:
             return None
         return (float(np.min(values)), float(np.max(values)))
-
-    def apply_scales(self, ax, scalex, scaley):
-        if scaley:
-            if self.is_horizontal:
-                ax.set_xscale(scaley)
-            else:
-                ax.set_yscale(scaley)
 
     def summary_datum(self, label, position, values) -> dict:
         """A group's hover datum: its category position on the drawn axis, then the five-number summary."""
@@ -5442,6 +5436,8 @@ class LayerGroup:
         z_order: Optional[float] = None,
         legend_label: Optional[str] = None,
         emphasis: Optional[str] = None,
+        value_scale: Optional[str] = None,
+        category_scale: Optional[str] = None,
     ):
         self.layers = layers
         self.palette = (
@@ -5453,9 +5449,19 @@ class LayerGroup:
         self.z_order = z_order
         self.legend_label = legend_label
         self.emphasis = validate_emphasis(emphasis)
+        # the source figure's scales, by role: they follow the group (ADR 0041)
+        self.value_scale = value_scale
+        self.category_scale = category_scale
 
     def with_prefs(
-        self, *, y_axis, z_order, legend_label, emphasis=None
+        self,
+        *,
+        y_axis,
+        z_order,
+        legend_label,
+        emphasis=None,
+        value_scale=None,
+        category_scale=None,
     ) -> "LayerGroup":
         return LayerGroup(
             self.layers,
@@ -5468,6 +5474,10 @@ class LayerGroup:
                 legend_label if legend_label is not None else self.legend_label
             ),
             emphasis=emphasis if emphasis is not None else self.emphasis,
+            value_scale=value_scale if value_scale is not None else self.value_scale,
+            category_scale=(
+                category_scale if category_scale is not None else self.category_scale
+            ),
         )
 
     def layer_role(self, layer: Layer) -> Optional[str]:
@@ -6147,6 +6157,83 @@ class Panel:
             ax.set_xticks(list(index.values()))
             ax.set_xticklabels(labels, rotation=chart.get("xtickrotate", 0))
 
+    def _resolve_scales(self, ax_right, group_axes) -> tuple:
+        """The literal x, y and twin value-axis scales (ADR 0041).
+
+        Per axis, an explicit setting wins; otherwise the first group on that
+        axis supplies its stamped scale, and a group built on another one
+        warns. A group that set no scale was built linear.
+        """
+
+        s = self.settings
+        horizontal = self.horizontal
+        polar = self.projection == "polar"
+        warn = s.get("warn_scale_conflict", True)
+        if group_axes is None:
+            group_axes = [None] * len(self.groups)
+        # text carrier groups hold no data: they were built on no scale at all
+        groups = [
+            (group, ax_right is not None and axes is ax_right)
+            for group, axes in zip(self.groups, group_axes)
+            if any(l.kind != "text" for l in group.layers)
+        ]
+
+        def pick(explicit, stamps, message):
+            if explicit:
+                return explicit
+            if not stamps:
+                return None
+            built = [scale or SCALE.LINEAR for scale in stamps]
+            losers = sorted(set(built[1:]) - {built[0]})
+            if losers and warn:
+                warnings.warn(message(built[0], losers))
+            return stamps[0]
+
+        def value_conflict(winner, losers):
+            return (
+                f"Figures sharing one value axis were built with different "
+                f"scales: '{winner}' (first in panel order) wins over "
+                f"{losers}. Give each scale its own axis with the per-figure "
+                '"y_axis" option and `scaley_right`, or set `scaley` '
+                "explicitly."
+            )
+
+        def category_conflict(winner, losers):
+            return (
+                f"Figures were built with different category-axis scales: "
+                f"'{winner}' (first in panel order) wins over {losers}. Set "
+                "`scalex` explicitly to choose one."
+            )
+
+        category = pick(
+            s.get("scaley" if horizontal else "scalex"),
+            [g.category_scale for g, _ in groups],
+            category_conflict,
+        )
+        value = pick(
+            s.get("scalex" if horizontal else "scaley"),
+            [g.value_scale for g, twin in groups if not twin],
+            value_conflict,
+        )
+        if ax_right is None:
+            # a polar panel has no twin, so the secondary scale is inert there
+            if s.get("scaley_right") and warn and not polar:
+                warnings.warn(
+                    "`scaley_right` is set but the panel has no secondary value "
+                    "axis: every figure landed on the primary axis. Assign a "
+                    'figure with "y_axis": "right" to create it.'
+                )
+            value_right = None
+        else:
+            value_right = pick(
+                s.get("scaley_right"),
+                [g.value_scale for g, twin in groups if twin],
+                value_conflict,
+            )
+        if horizontal:
+            return value, category, value_right
+        return category, value, value_right
+
     def _finalize(self, ax, ax_right, bar_layers, horizontal, group_axes=None) -> None:
         """Apply the furniture; x/y keys are literal, `*_right` keys hit the twin."""
 
@@ -6155,9 +6242,13 @@ class Panel:
         polar = self.projection == "polar"
         bare = self.bare
 
-        # scales (a layer may remap them, e.g. horizontal box plots)
-        if layers and not bare and (s.get("scalex") or s.get("scaley")):
-            layers[0].apply_scales(ax, s.get("scalex"), s.get("scaley"))
+        # scales, per axis: an explicit setting beats the groups' stamps
+        scalex, scaley, scale_right = self._resolve_scales(ax_right, group_axes)
+        value_scale = scalex if horizontal else scaley
+        if layers and not bare and (scalex or scaley):
+            layers[0].apply_scales(ax, scalex, scaley)
+        if ax_right is not None and scale_right:
+            (ax_right.set_xscale if horizontal else ax_right.set_yscale)(scale_right)
 
         # tick formats go first: explicit ticks and category labels override
         tick_labelers = {}
@@ -6263,7 +6354,7 @@ class Panel:
             any(isinstance(l, StackedAreaLayer) for l in layers)
             and validate_baseline(s.get("baseline"))
             in (BASELINE.ZERO, BASELINE.PERCENT)
-            and s.get("scalex" if horizontal else "scaley") != "log"
+            and value_scale != "log"
         ):
             (ax.set_xlim if horizontal else ax.set_ylim)(0, None)
 
@@ -6778,6 +6869,9 @@ class Panel:
 # ================================================
 
 
+GROUP_CHART_TYPES = ("boxplot", "violinplot", "swarmplot", "raincloudplot")
+
+
 def build_chart_panel_settings(
     chart_type: str, settings: dict, mode: str, first_style: dict
 ) -> dict:
@@ -6795,10 +6889,18 @@ def build_chart_panel_settings(
     if show_grid is None and not raster:
         show_grid = config.get("chart_default_show_grid")
 
+    # the seam's scale keys are literal; group fronts mean the value axis
+    scalex, scaley = settings.get("scalex"), settings.get("scaley")
+    if (
+        chart_type in GROUP_CHART_TYPES
+        and settings.get("orientation") == ORIENTATION.HORIZONTAL
+    ):
+        scalex, scaley = scaley, scalex
+
     panel_settings = {
         "furniture": Panel.snapshot_furniture(),
-        "scalex": settings.get("scalex"),
-        "scaley": settings.get("scaley"),
+        "scalex": scalex,
+        "scaley": scaley,
         "show_grid": show_grid,
         "grid_style": get_grid_style(first_style),
         "hatch_cycle": config.get("plot_hatch_cycle"),

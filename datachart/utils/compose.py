@@ -22,7 +22,7 @@ from typing import List, Dict, Optional, Tuple, Union, Any
 import matplotlib.pyplot as plt
 
 from ..config import config
-from ..constants import BAR_MODE, FIG_SIZE
+from ..constants import BAR_MODE, FIG_SIZE, SCALE
 from ..typings import LegendSettingAttrs, TextAttrs
 from .figure import _grid_from_dicts, _figure_grid_layout_impl
 from ._internal.config_helpers import (
@@ -74,7 +74,7 @@ OVERLAYABLE_LAYERS = (
 )
 
 
-def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
+def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
     """Pull the layer groups out of a figure's metadata transport.
 
     Args:
@@ -82,7 +82,7 @@ def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
         index: The figure's position in the `charts` argument, for error messages.
 
     Returns:
-        The figure's layer groups.
+        The figure's panel and its overlayable layer groups.
 
     Raises:
         ValueError: If the figure is missing or has invalid chart metadata.
@@ -135,9 +135,30 @@ def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
                     z_order=group.z_order,
                     legend_label=group.legend_label,
                     emphasis=group.emphasis,
+                    value_scale=group.value_scale,
+                    category_scale=group.category_scale,
                 )
             )
-    return groups
+    return panel, groups
+
+
+def _source_scales(source: _PanelSeam, group: LayerGroup) -> Dict[str, Any]:
+    """The scales a source figure's panel stamps on one of its groups, by role.
+
+    A source panel's scale keys are literal, so its own orientation maps them
+    back to roles; a nested panel's explicit ``scaley_right`` reaches only the
+    groups it pinned to the secondary axis (ADR 0041).
+    """
+
+    s = source.settings
+    horizontal = source.horizontal
+    value_key = "scalex" if horizontal else "scaley"
+    return {
+        "category_scale": s.get("scaley" if horizontal else "scalex"),
+        "value_scale": (
+            s.get("scaley_right") if group.y_axis == "right" else s.get(value_key)
+        ),
+    }
 
 
 def Panel(
@@ -158,6 +179,9 @@ def Panel(
     ymax: Optional[float] = None,
     ymin_right: Optional[float] = None,
     ymax_right: Optional[float] = None,
+    scalex: Optional[Union[SCALE, str]] = None,
+    scaley: Optional[Union[SCALE, str]] = None,
+    scaley_right: Optional[Union[SCALE, str]] = None,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
 ) -> plt.Figure:
     """Overlay rendered chart figures in one coordinate space.
@@ -172,27 +196,36 @@ def Panel(
     Mixing the two orientations raises ``ValueError``. The *value axis* carries
     the quantities — y in a vertical panel, x in a horizontal one — and the
     *category axis* is the other. The parameters keep their spelling but
-    address the axis by role: ``ylabel_left``/``ylabel_right``, ``ymin``/``ymax``
-    and ``ymin_right``/``ymax_right`` set the primary/secondary value axis,
-    ``xlabel`` and ``xmin``/``xmax`` the category axis. In a horizontal panel
+    address the axis by role: ``ylabel_left``/``ylabel_right``, ``ymin``/``ymax``,
+    ``ymin_right``/``ymax_right`` and ``scaley``/``scaley_right`` set the
+    primary/secondary value axis, ``xlabel``, ``xmin``/``xmax`` and ``scalex``
+    the category axis. In a horizontal panel
     the secondary value axis sits at the top, so ``"y_axis": "left"`` means the
     bottom axis and ``"right"`` the top one, and the legend suffixes become
     ``(B)``/``(T)``. Line and scatter figures follow the panel: in a horizontal
     panel their ``x`` runs along the category axis and their ``y`` along the
     value axis, so the same ``LineChart`` overlays vertical and horizontal bars.
 
+    Each axis keeps the scale its figures were built with: a figure drawn
+    with ``scaley="log"`` stays log in the panel, on whichever value axis it
+    lands. The panel's own ``scalex``, ``scaley`` and ``scaley_right`` override
+    that per axis; where the figures on one axis disagree, the first one wins
+    and the panel warns (``overlay_warn_scale_conflict`` in the config). The
+    two value axes scale independently, so linear bars on the primary axis
+    against a log line on the secondary one is one panel.
+
     Panel figures nest: ``Panel([Panel([f1, f2]), f3])`` is equivalent to
     ``Panel([f1, f2, f3])``, to any depth. A nested panel contributes its
-    figures with their per-figure options intact, while panel-level settings
-    (title, labels, limits, ...) always come from the outermost call. Dict
-    options on a nested panel override its per-figure options only when
-    explicitly given.
+    figures with their per-figure options and axis scales intact, while the
+    other panel-level settings (title, labels, limits, ...) always come from
+    the outermost call. Dict options on a nested panel override its
+    per-figure options only when explicitly given.
 
     !!! info "Added in v0.8.0"
 
     !!! info "Added in Unreleased"
 
-        The `legend` parameter.
+        The `legend`, `scalex`, `scaley` and `scaley_right` parameters.
 
     Examples:
         >>> from datachart.charts import LineChart, BarChart
@@ -216,6 +249,15 @@ def Panel(
         ...     ylabel_left="Count",
         ...     ylabel_right="Average",
         ...     show_legend=True,
+        ... )
+        >>>
+        >>> # Each value axis scales on its own: linear bars, a log line
+        >>> combined = Panel(
+        ...     [
+        ...         {"figure": bar_fig, "y_axis": "left"},
+        ...         {"figure": line_fig, "y_axis": "right"},
+        ...     ],
+        ...     scaley_right="log",
         ... )
         >>>
         >>> # Horizontal bars make a horizontal panel: the line runs along the
@@ -266,6 +308,13 @@ def Panel(
         ymax: Maximum value for the primary value-axis limits.
         ymin_right: Minimum value for the secondary value-axis limits.
         ymax_right: Maximum value for the secondary value-axis limits.
+        scalex: The category-axis scale ("linear", "log", "symlog", "asinh").
+            Default: the scale the first figure was built with. See `SCALE`.
+        scaley: The primary value-axis scale. Default: the scale the first
+            figure on that axis was built with.
+        scaley_right: The secondary value-axis scale. Default: the scale the
+            first figure on that axis was built with. Inert on a polar panel,
+            which has no secondary axis.
         bar_mode: How bar and histogram series share the axis: "group"
             (side-by-side bars; histograms overlay), "stack" (stacked), or
             "overlay" (overlapping). Default is taken from config
@@ -305,7 +354,8 @@ def Panel(
     # collect the layer groups from every source figure, tagged with prefs
     groups = []
     for i, chart_config in enumerate(items):
-        for group in _extract_groups(chart_config["figure"], i):
+        source, extracted = _extract_groups(chart_config["figure"], i)
+        for group in extracted:
             # None leaves the group's own pref (from a nested panel) in place
             groups.append(
                 group.with_prefs(
@@ -313,6 +363,7 @@ def Panel(
                     z_order=chart_config.get("z_order", None),
                     legend_label=chart_config.get("legend_label", None),
                     emphasis=chart_config.get("emphasis", None),
+                    **_source_scales(source, group),
                 )
             )
 
@@ -323,6 +374,7 @@ def Panel(
     if probe.horizontal:
         xlabel, ylabel_left = ylabel_left, xlabel
         xmin, xmax, ymin, ymax = ymin, ymax, xmin, xmax
+        scalex, scaley = scaley, scalex
 
     # panel-level settings are resolved against the config here, at build time
     panel_settings = {
@@ -331,6 +383,7 @@ def Panel(
         "auto_threshold": auto_secondary_axis,
         "warn_scale_groups": config.get("overlay_warn_scale_groups", True),
         "warn_thin_bars": config.get("overlay_warn_thin_bars", True),
+        "warn_scale_conflict": config.get("overlay_warn_scale_conflict", True),
         "bar_mode": bar_mode,
         "bar_ticks": "group",
         "bar_width": config.get("plot_bar_width", 0.8),
@@ -359,6 +412,9 @@ def Panel(
         "ymax": ymax,
         "ymin_right": ymin_right,
         "ymax_right": ymax_right,
+        "scalex": scalex,
+        "scaley": scaley,
+        "scaley_right": scaley_right,
     }
 
     source_settings = [
