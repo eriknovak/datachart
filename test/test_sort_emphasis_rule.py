@@ -305,6 +305,32 @@ class TestEmphasisRuleBars:
         assert tick_labels(ax) == list("DACB")
         assert muted(ax.containers[0]) == [True, True, True, False]
 
+    def test_sort_does_not_change_which_records_top_picks(self):
+        # the tie between A.X and A.Y breaks on input order, not the sorted order
+        a = [{"label": "X", "y": 5.0}, {"label": "Y", "y": 5.0}]
+        b = [{"label": "X", "y": 1.0}, {"label": "Y", "y": 9.0}]
+        rule = {"top": 2}
+        unsorted = BarChart(data=[a, b], emphasis_rule=rule).axes[0]
+        sorted_ = BarChart(data=[a, b], emphasis_rule=rule, sort="descending").axes[0]
+        assert muted(unsorted.containers[0]) == [False, True]
+        assert muted(unsorted.containers[1]) == [True, False]
+        # sorted order is Y, X: A.X (second now) stays the highlighted one
+        assert muted(sorted_.containers[0]) == [True, False]
+        assert muted(sorted_.containers[1]) == [False, True]
+
+    def test_columnar_data_rejected_with_a_clear_message(self):
+        columns = {"label": list("ABC"), "y": [1.0, 2.0, 3.0]}
+        with pytest.raises(ValueError, match="list of"):
+            BarChart(data=columns, sort="ascending")
+        with pytest.raises(ValueError, match="list of"):
+            BarChart(data=columns, emphasis_rule={"top": 1})
+
+    def test_columnar_radial_data_keeps_its_tip_values(self):
+        columns = {"label": list("ABC"), "y": [1.0, 2.0, 3.0]}
+        ax = RadialChart(data=columns, type=RADIAL_TYPE.BAR, show_values=True).axes[0]
+        tips = sorted(t.get_text() for t in ax.texts if t.get_text() in "123")
+        assert tips == ["1", "2", "3"]
+
     def test_rule_reads_own_value_under_stack(self):
         ax = BarChart(
             data=[BAR1, BAR2], bar_mode="stack", emphasis_rule={"above": 4.5}

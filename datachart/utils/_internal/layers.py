@@ -49,6 +49,7 @@ from .validate import (
     validate_emphasis,
     validate_emphasis_rule,
     validate_sort,
+    validate_sort_by,
     validate_network_edge_style,
     validate_sankey_link_color,
     validate_axis_kinds,
@@ -1116,6 +1117,8 @@ class Layer:
     bare: bool = False
     # value labels sit past the mark on the value axis and need headroom there
     labels_past_mark: bool = False
+    # one emphasis role per drawn record, on the layers whose records carry one
+    record_roles: list = ()
     # the zone of a temporal x column a layer draws as date numbers
     x_tz: Optional[tzinfo] = None
 
@@ -1316,11 +1319,14 @@ class Layer:
         elif width is not None:
             style[width_key] = width * HIGHLIGHT_WIDTH_SCALE
 
-    def _record_roles(self, panel_role: Optional[str]) -> list:
-        """One role per drawn record; a layer-level role covers them all instead."""
+    def _record_roles(self, panel_role: Optional[str], n: int) -> list:
+        """One role per drawn record; a layer-level role covers them all instead.
 
-        if panel_role is not None:
-            return [None] * len(self.record_roles)
+        Columnar data carries no records, so it draws `n` unset roles.
+        """
+
+        if panel_role is not None or len(self.record_roles) != n:
+            return [None] * n
         return self.record_roles
 
     def _apply_patch_emphasis(self, patches, roles: list) -> None:
@@ -1343,14 +1349,20 @@ class Layer:
                 patch.set_linewidth(patch.get_linewidth() * HIGHLIGHT_WIDTH_SCALE)
 
 
+def _is_bar_record(record, y_key: str) -> bool:
+    """Whether a data entry draws a bar: a dict carrying the `y` column."""
+
+    return isinstance(record, dict) and y_key in record
+
+
 def _bar_records(chart: dict) -> list:
-    """The chart's drawn bar records: the data dicts carrying the `y` column."""
+    """The chart's drawn bar records; empty for columnar data."""
 
     y_key = get_attr_value("y", chart, "y")
     data = chart.get("data")
     if not isinstance(data, list):
         return []
-    return [record for record in data if isinstance(record, dict) and y_key in record]
+    return [record for record in data if _is_bar_record(record, y_key)]
 
 
 def _record_emphasis(chart: dict) -> list:
@@ -1791,7 +1803,7 @@ class BarLayer(Layer):
             **error_range,
             **bar_style,
         )
-        roles = self._record_roles(ctx.emphasis)
+        roles = self._record_roles(ctx.emphasis, len(bars))
         self._apply_patch_emphasis(bars.patches, roles)
         # each bar reports its category position (the axis names it) and its
         # own value, never the stack total; a pyramid side draws negative
@@ -3938,7 +3950,7 @@ class RadialBarLayer(RadialLayer):
         bottoms = bar_style.get("bottom")
         tops = np.asarray(y, dtype=float) + (0.0 if bottoms is None else bottoms)
         # a muted bar keeps its tip (the category label hugs it) but no value
-        roles = self._record_roles(ctx.emphasis)
+        roles = self._record_roles(ctx.emphasis, len(y))
         self._tips = [
             (
                 float(t + theta_offset),
@@ -5421,6 +5433,11 @@ def _bar_record_values(charts: List[dict], magnitude: bool) -> list:
 
     columns = []
     for chart in charts:
+        if not isinstance(chart.get("data"), list):
+            raise ValueError(
+                "`sort` and `emphasis_rule` read bar records; pass `data` as a "
+                "list of `{label, y}` dicts, not columns."
+            )
         label_key = get_attr_value("label", chart, "label")
         y_key = get_attr_value("y", chart, "y")
         columns.append(
@@ -5435,7 +5452,7 @@ def _bar_record_values(charts: List[dict], magnitude: bool) -> list:
     return columns
 
 
-def sort_bar_charts(charts: List[dict], sort, sort_by, magnitude: bool) -> List[dict]:
+def _sort_bar_charts(charts: List[dict], sort, sort_by, magnitude: bool) -> List[dict]:
     """The charts with their records in category order (ADR 0042).
 
     One order serves every chart: categories sort by their total across the
@@ -5443,17 +5460,7 @@ def sort_bar_charts(charts: List[dict], sort, sort_by, magnitude: bool) -> List[
     categories that chart lacks sort last. Ties keep input order.
     """
 
-    if sort_by is not None:
-        if sort is None:
-            raise ValueError(
-                "`sort_by` names the series to sort by; pass `sort` as well."
-            )
-        subtitles = [chart.get("subtitle") for chart in charts]
-        if sort_by not in subtitles:
-            raise ValueError(
-                f"`sort_by` {sort_by!r} names no series; the series subtitles "
-                f"are {subtitles!r}."
-            )
+    validate_sort_by(sort, sort_by, [chart.get("subtitle") for chart in charts])
     if sort is None:
         return charts
 
@@ -5491,7 +5498,9 @@ def sort_bar_charts(charts: List[dict], sort, sort_by, magnitude: bool) -> List[
     return sorted_charts
 
 
-def apply_emphasis_rule(charts: List[dict], rule: tuple, magnitude: bool) -> List[dict]:
+def _apply_emphasis_rule(
+    charts: List[dict], rule: tuple, magnitude: bool
+) -> List[dict]:
     """The charts with the rule's role written on each record that set none.
 
     The rule reads every drawn record of the charts as one pool, so a count
@@ -5506,7 +5515,7 @@ def apply_emphasis_rule(charts: List[dict], rule: tuple, magnitude: bool) -> Lis
         y_key = get_attr_value("y", chart, "y")
         data = []
         for record in chart["data"]:
-            if isinstance(record, dict) and y_key in record:
+            if _is_bar_record(record, y_key):
                 role = next(roles)
                 if record.get("emphasis") is None:
                     record = {**record, "emphasis": role}
@@ -5515,20 +5524,20 @@ def apply_emphasis_rule(charts: List[dict], rule: tuple, magnitude: bool) -> Lis
     return filled
 
 
-def resolve_bar_records(charts: List[dict], settings: dict) -> List[dict]:
-    """Sort the bar charts' categories, then fill in the emphasis rule (ADR 0042).
+def _resolve_bar_records(charts: List[dict], settings: dict) -> List[dict]:
+    """Fill in the emphasis rule, then sort the bar charts' categories (ADR 0042).
 
-    Neither setting reads the other: the rule sees the same records whatever
-    the order, and a pyramid's negated left side reads as magnitudes for both.
+    Neither setting reads the other: the rule breaks its ties on input order,
+    so it runs on the unsorted records, and a pyramid's negated left side
+    reads as magnitudes for both.
     """
 
     sort = validate_sort(settings.get("sort"))
     rule = validate_emphasis_rule(settings.get("emphasis_rule"))
     magnitude = bool(settings.get("pyramid"))
-    charts = sort_bar_charts(charts, sort, settings.get("sort_by"), magnitude)
     if rule is not None:
-        charts = apply_emphasis_rule(charts, rule, magnitude)
-    return charts
+        charts = _apply_emphasis_rule(charts, rule, magnitude)
+    return _sort_bar_charts(charts, sort, settings.get("sort_by"), magnitude)
 
 
 # the fronts whose records carry a value per category and sort by it
@@ -5541,13 +5550,13 @@ def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[La
     if chart_type == "parallelcoords":
         return [ParallelCoordsLayer(list(charts), settings)]
 
+    visual = settings.get("radial_type") or RADIAL_TYPE.LINE
     if chart_type in BAR_RECORD_CHARTS or (
-        chart_type == "radialchart" and settings.get("radial_type") == RADIAL_TYPE.BAR
+        chart_type == "radialchart" and visual == RADIAL_TYPE.BAR
     ):
-        charts = resolve_bar_records(charts, settings)
+        charts = _resolve_bar_records(charts, settings)
 
     if chart_type == "radialchart":
-        visual = settings.get("radial_type") or RADIAL_TYPE.LINE
         if visual not in RADIAL_LAYER_TYPES:
             raise ValueError(
                 f"Invalid radial `type` value {visual!r}. "

@@ -185,6 +185,20 @@ def validate_sort(value):
     return value
 
 
+def validate_sort_by(sort, sort_by, subtitles: list) -> None:
+    """Raise unless `sort_by` names one of the series subtitles under a `sort`."""
+
+    if sort_by is None:
+        return
+    if sort is None:
+        raise ValueError("`sort_by` names the series to sort by; pass `sort` as well.")
+    if sort_by not in subtitles:
+        raise ValueError(
+            f"`sort_by` {sort_by!r} names no series; the series subtitles "
+            f"are {subtitles!r}."
+        )
+
+
 # the value each rule reads against: a count of records or a threshold
 EMPHASIS_RULE_COUNTS = ("top", "bottom")
 EMPHASIS_RULE_THRESHOLDS = ("above", "below", "between")
@@ -355,7 +369,7 @@ def validate_sankey_nodes(nodes, links) -> None:
 
 
 def _positive_number(value) -> bool:
-    return isinstance(value, Real) and not isinstance(value, bool) and value > 0
+    return _is_number(value) and value > 0
 
 
 # the data list is level 1; a record nests to this depth (ADR 0032)
