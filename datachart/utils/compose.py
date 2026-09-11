@@ -74,7 +74,7 @@ OVERLAYABLE_LAYERS = (
 )
 
 
-def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
+def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
     """Pull the layer groups out of a figure's metadata transport.
 
     Args:
@@ -82,7 +82,7 @@ def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
         index: The figure's position in the `charts` argument, for error messages.
 
     Returns:
-        The figure's layer groups.
+        The figure's panel and its overlayable layer groups.
 
     Raises:
         ValueError: If the figure is missing or has invalid chart metadata.
@@ -139,7 +139,7 @@ def _extract_groups(figure: plt.Figure, index: int) -> List[LayerGroup]:
                     category_scale=group.category_scale,
                 )
             )
-    return groups
+    return panel, groups
 
 
 def _source_scales(source: _PanelSeam, group: LayerGroup) -> Dict[str, Any]:
@@ -354,8 +354,7 @@ def Panel(
     # collect the layer groups from every source figure, tagged with prefs
     groups = []
     for i, chart_config in enumerate(items):
-        extracted = _extract_groups(chart_config["figure"], i)
-        source = chart_config["figure"]._chart_metadata["panel"]
+        source, extracted = _extract_groups(chart_config["figure"], i)
         for group in extracted:
             # None leaves the group's own pref (from a nested panel) in place
             groups.append(

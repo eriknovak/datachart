@@ -5449,8 +5449,7 @@ class LayerGroup:
         self.z_order = z_order
         self.legend_label = legend_label
         self.emphasis = validate_emphasis(emphasis)
-        # the source figure's axis scales, by role; they ride the group so a
-        # scale follows it to whichever axis twin assignment picks (ADR 0041)
+        # the source figure's scales, by role: they follow the group (ADR 0041)
         self.value_scale = value_scale
         self.category_scale = category_scale
 
@@ -6890,9 +6889,7 @@ def build_chart_panel_settings(
     if show_grid is None and not raster:
         show_grid = config.get("chart_default_show_grid")
 
-    # the panel's scale keys are literal; the group fronts (box, violin,
-    # swarm, raincloud) take `scaley` as the value axis, so a horizontal
-    # one's scale lands on x
+    # the seam's scale keys are literal; group fronts mean the value axis
     scalex, scaley = settings.get("scalex"), settings.get("scaley")
     if (
         chart_type in GROUP_CHART_TYPES
