@@ -526,6 +526,36 @@ class BAR_MODE:
     OVERLAY = "overlay"
 
 
+class SORT:
+    """The supported category sort orders.
+
+    Passed as the `sort` setting of the bar-type fronts (`BarChart`,
+    `PyramidChart`, and the `RadialChart` bar visual): the order the
+    categories are drawn in, by value. One order serves every series in the
+    chart, keyed by the total across them or by the series `sort_by` names;
+    ties keep input order.
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> from datachart.constants import SORT
+        >>> SORT.DEFAULT
+        None
+
+    Attributes:
+        DEFAULT (None): The default sort. Same as `SORT.NONE`.
+        NONE (None): Input order. Equals to `None`.
+        ASCENDING (str): Smallest value first. Equals to `"ascending"`.
+        DESCENDING (str): Largest value first. Equals to `"descending"`.
+
+    """
+
+    DEFAULT = None
+    NONE = None
+    ASCENDING = "ascending"
+    DESCENDING = "descending"
+
+
 class COLORS:
     """The predefined colors using [pypalettes](https://y-sunflower.github.io/pypalettes/).
 

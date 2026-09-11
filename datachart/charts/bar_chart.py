@@ -23,6 +23,7 @@ from ..constants import (
     SHOW_GRID,
     ORIENTATION,
     SCALE,
+    SORT,
     VALUE_FORMAT,
 )
 
@@ -53,6 +54,9 @@ def BarChart(
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
+    sort: Optional[Union[SORT, str]] = None,
+    sort_by: Optional[str] = None,
+    emphasis_rule: Optional[dict] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
@@ -125,6 +129,8 @@ def BarChart(
         The `xticks_format` and `yticks_format` tick formats.
         The `legend` parameter.
         The `vspans` and `hspans` reference bands.
+        The `sort` and `sort_by` category order, the `emphasis_rule`, and
+        the per-record `emphasis` key.
 
     Examples:
         >>> from datachart.charts import BarChart
@@ -171,6 +177,17 @@ def BarChart(
             `ASPECT_RATIO`.
         bar_mode: How multiple bar series share the axis: "group" (side-by-side),
             "stack" (stacked), or "overlay" (overlapping). See `BAR_MODE`.
+        sort: The order the categories are drawn in: None (input order),
+            "ascending", or "descending" by value. One order serves every
+            series, keyed by the total across them; ties keep input order.
+            See `SORT`.
+        sort_by: The subtitle of the one series whose values key the sort
+            instead of the total. A category that series lacks sorts last.
+        emphasis_rule: A one-key dict that highlights the bars matching it
+            and mutes the rest: `{"above": v}` or `{"below": v}` (strict),
+            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
+            `{"bottom": n}`. Reads each bar's own value; a record's own
+            `emphasis` key wins over the rule.
         orientation: The orientation of the bars ("vertical" or "horizontal").
             See `ORIENTATION`.
         scalex: The x-axis scale ("linear", "log", "symlog", "asinh"). Useful
@@ -250,6 +267,9 @@ def BarChart(
         "value_format": value_format,
         "orientation": orientation,
         "bar_mode": bar_mode,
+        "sort": sort,
+        "sort_by": sort_by,
+        "emphasis_rule": emphasis_rule,
         "scalex": scalex,
         "scaley": scaley,
         "xticks_format": xticks_format,

@@ -23,6 +23,7 @@ from ..constants import (
     RADIAL_TYPE,
     SCALE,
     SHOW_GRID,
+    SORT,
 )
 
 _RADIAL_TYPES = (
@@ -65,6 +66,9 @@ def RadialChart(
     show_border: Optional[bool] = None,
     value_format: Optional[str] = None,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
+    sort: Optional[Union[SORT, str]] = None,
+    sort_by: Optional[str] = None,
+    emphasis_rule: Optional[dict] = None,
     num_bins: Optional[int] = None,
     startangle: Optional[Union[str, int, float]] = None,
     direction: Optional[Union[DIRECTION, str]] = None,
@@ -118,6 +122,8 @@ def RadialChart(
 
         The `legend` parameter.
         The `vspans` and `hspans` reference bands.
+        The `sort` and `sort_by` category order, the `emphasis_rule`, and
+        the per-record `emphasis` key (bar visual).
 
     Examples:
         >>> from datachart.charts import RadialChart
@@ -167,6 +173,18 @@ def RadialChart(
             `VALUE_FORMAT`.
         bar_mode: How multiple bar series share the circle: "group",
             "stack", or "overlay" (bar visual). See `BAR_MODE`.
+        sort: The order the categories are drawn in around the circle: None
+            (input order), "ascending", or "descending" by value (bar
+            visual). One order serves every series, keyed by the total
+            across them; ties keep input order. See `SORT`.
+        sort_by: The subtitle of the one series whose values key the sort
+            instead of the total (bar visual). A category that series lacks
+            sorts last.
+        emphasis_rule: A one-key dict that highlights the bars matching it
+            and mutes the rest (bar visual): `{"above": v}` or
+            `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive),
+            `{"top": n}` or `{"bottom": n}`. Reads each bar's own value; a
+            record's own `emphasis` key wins over the rule.
         num_bins: The number of angular bins over [0, 360) (histogram visual).
         startangle: Where the first point sits: a compass location ("N", "NE",
             "E", "SE", "S", "SW", "W", "NW") or a numeric compass bearing in
@@ -233,6 +251,13 @@ def RadialChart(
             f"Invalid `startangle` value {startangle!r}. Must be a compass "
             f"location {_COMPASS} or a numeric bearing in degrees."
         )
+    if radial_type != RADIAL_TYPE.BAR and not (
+        sort is None and sort_by is None and emphasis_rule is None
+    ):
+        raise ValueError(
+            "RadialChart takes `sort`, `sort_by`, and `emphasis_rule` on the "
+            f"bar visual only; the {radial_type!r} visual has no bars to order."
+        )
 
     # Build the charts structure using shared utility
     charts = build_charts_structure(
@@ -268,6 +293,9 @@ def RadialChart(
         "show_border": show_border,
         "value_format": value_format,
         "bar_mode": bar_mode,
+        "sort": sort,
+        "sort_by": sort_by,
+        "emphasis_rule": emphasis_rule,
         "num_bins": num_bins,
         "startangle": startangle,
         "direction": direction,
