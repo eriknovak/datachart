@@ -54,6 +54,7 @@ from datachart.constants import (
     NETWORK_LAYOUT,
     NORMALIZE,
     SCALE,
+    SORT,
     LEGEND_LOCATION,
     THEME,
     VALUE_FORMAT,
@@ -232,6 +233,9 @@ EXPECTED_CHANGES = {
     "band_radial_wedge",
     "band_radial_annulus",
     "band_grid_composed",
+    # new category sort and emphasis rule cases (ADR 0042)
+    "bar_sorted_grouped",
+    "bar_rule_top3",
 }
 
 
@@ -393,6 +397,29 @@ def bar_horizontal():
 @case
 def bar_values():
     return BarChart(data=BAR1, show_values=True, value_format="{:.0f}")
+
+
+@case
+def bar_sorted_grouped():
+    return BarChart(
+        data=[BAR1, BAR2],
+        subtitle=["s1", "s2"],
+        sort=SORT.DESCENDING,
+        sort_by="s2",
+        show_legend=True,
+        title="Sorted by s2",
+    )
+
+
+@case
+def bar_rule_top3():
+    return BarChart(
+        data=BAR1,
+        emphasis_rule={"top": 3},
+        show_values=True,
+        value_format="{:.0f}",
+        title="Top 3",
+    )
 
 
 @case
