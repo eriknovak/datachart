@@ -53,6 +53,7 @@ from datachart.constants import (
     BASELINE,
     NETWORK_LAYOUT,
     NORMALIZE,
+    SCALE,
     LEGEND_LOCATION,
     THEME,
     VALUE_FORMAT,
@@ -74,6 +75,8 @@ EXPECTED_CHANGES = {
     "emphasis_panel_cross_type",
     # show_area now fills down to the axis floor instead of y=0
     "line_area_styled",
+    # new panel axis-scale case (ADR 0041)
+    "overlay_bar_linear_line_log",
     # new horizontal panel cases (ADR 0012)
     "overlay_horizontal_bar_line_dual",
     "overlay_horizontal_bar_bar_line",
@@ -948,6 +951,26 @@ def overlay_line_bar_dual():
         xlabel="cat",
         ylabel_left="count",
         ylabel_right="value",
+        show_legend=True,
+    )
+
+
+@case
+def overlay_bar_linear_line_log():
+    fb = BarChart(
+        data=[{"label": c, "y": v} for c, v in zip("ABCD", [12, 30, 21, 26])],
+        subtitle="count",
+    )
+    fl = LineChart(
+        data=[{"x": i, "y": v} for i, v in enumerate([2, 40, 900, 15000])],
+        subtitle="growth",
+    )
+    return Panel(
+        charts=[{"figure": fb, "y_axis": "left"}, {"figure": fl, "y_axis": "right"}],
+        scaley_right=SCALE.LOG,
+        title="Linear bars, log line",
+        ylabel_left="count",
+        ylabel_right="growth (log)",
         show_legend=True,
     )
 
