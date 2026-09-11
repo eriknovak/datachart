@@ -6,12 +6,13 @@ When a figure carries many series, the story is usually about one of them: one m
 - `"highlight"` bolds a series and brings it to the front of the data layers (never above axes or reference lines). It keeps its theme-assigned color and legend entry.
 - Leaving it unset (`None`) draws the series exactly as before.
 
-`emphasis` is accepted by `LineChart`, `BarChart`, `ScatterChart`, `Histogram`, `ParallelCoords` (per data row), and `BoxPlot` (per box label), and as a per-figure `"emphasis"` option in `Panel`. Because muting derives from the theme's `muted_color`/`muted_alpha` attributes, background series harmonize with whatever theme is active. The role strings are also available as constants: `datachart.constants.EMPHASIS.BACKGROUND` and `EMPHASIS.HIGHLIGHT`.
+`emphasis` is accepted by `LineChart`, `BarChart`, `ScatterChart`, `Histogram`, `ParallelCoords` (per data row), and `BoxPlot` (per box label), and as a per-figure `"emphasis"` option in `Panel`. Bar records — in `BarChart`, `PyramidChart`, and the `RadialChart` bar visual — also carry their own `"emphasis"` key, and those fronts' `emphasis_rule` fills it in from the values. Because muting derives from the theme's `muted_color`/`muted_alpha` attributes, background series harmonize with whatever theme is active. The role strings are also available as constants: `datachart.constants.EMPHASIS.BACKGROUND` and `EMPHASIS.HIGHLIGHT`.
 
 ```
 import numpy as np
 
 from datachart.charts import (
+    BarChart,
     BoxPlot,
     Histogram,
     LineChart,
@@ -20,7 +21,7 @@ from datachart.charts import (
 )
 from datachart.utils import Panel
 from datachart.config import config
-from datachart.constants import THEME
+from datachart.constants import SORT, THEME
 ```
 
 ## One Walk Among Many
@@ -149,6 +150,31 @@ figure = BoxPlot(
     data=data,
     emphasis=["background", None, "highlight", "background"],
     title="One group under scrutiny",
+)
+figure.show()
+```
+
+## Bars Picked by a Rule
+
+A bar chart's emphasis can come from the data instead of a hand-written list. `emphasis_rule` is a one-key dict — `{"above": v}`, `{"below": v}`, `{"between": (lo, hi)}`, `{"top": n}`, or `{"bottom": n}` — that highlights every bar matching it and mutes the rest; the contrast is the point, so the rule commits to both ends. Each bar record may also carry its own `"emphasis"` key, and an explicit record role always wins over the rule, which is how "the top three, and also this one" is said. `sort` orders the categories by value so the ranking reads left to right; it never changes which bars the rule picks.
+
+```
+rng = np.random.RandomState(13)
+teams = [
+    {"label": f"team {chr(65 + i)}", "y": float(round(rng.rand() * 80 + 10))}
+    for i in range(10)
+]
+# the team under review is highlighted whatever its score
+teams[7]["emphasis"] = "highlight"
+
+figure = BarChart(
+    data=teams,
+    title="Top three by score, plus the team under review",
+    ylabel="Score",
+    sort=SORT.DESCENDING,
+    emphasis_rule={"top": 3},
+    show_values=True,
+    value_format="{:.0f}",
 )
 figure.show()
 ```

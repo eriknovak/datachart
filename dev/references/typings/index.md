@@ -282,11 +282,12 @@ Bases: `TypedDict`
 
 The data point attributes for the bar chart.
 
-| ATTRIBUTE | DESCRIPTION                                                     |
-| --------- | --------------------------------------------------------------- |
-| `label`   | The label. **TYPE:** `str`                                      |
-| `y`       | The y-axis value. **TYPE:** `Union[int, float]`                 |
-| `yerr`    | The y-axis error value. **TYPE:** `Optional[Union[int, float]]` |
+| ATTRIBUTE  | DESCRIPTION                                                                                                                                |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `label`    | The label. **TYPE:** `str`                                                                                                                 |
+| `y`        | The y-axis value. **TYPE:** `Union[int, float]`                                                                                            |
+| `yerr`     | The y-axis error value. **TYPE:** `Optional[Union[int, float]]`                                                                            |
+| `emphasis` | The bar's own emphasis role ("background" or "highlight"); wins over the chart's emphasis_rule. **TYPE:** `Optional[Union[EMPHASIS, str]]` |
 
 ### Histogram Typings
 
@@ -652,12 +653,13 @@ The data point attributes for the radial chart.
 
 The line, bar, and scatter visuals take `label`/`y` points whose labels are placed evenly around the circle; the histogram visual takes numeric `x` observations in degrees.
 
-| ATTRIBUTE | DESCRIPTION                                                                                    |
-| --------- | ---------------------------------------------------------------------------------------------- |
-| `label`   | The category label (line, bar, and scatter visuals). **TYPE:** `str`                           |
-| `y`       | The radial value (line, bar, and scatter visuals). **TYPE:** `Union[int, float]`               |
-| `yerr`    | The radial error value. **TYPE:** `Optional[Union[int, float]]`                                |
-| `x`       | The angular observation in degrees (histogram visual). **TYPE:** `Optional[Union[int, float]]` |
+| ATTRIBUTE  | DESCRIPTION                                                                                                                                             |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`    | The category label (line, bar, and scatter visuals). **TYPE:** `str`                                                                                    |
+| `y`        | The radial value (line, bar, and scatter visuals). **TYPE:** `Union[int, float]`                                                                        |
+| `yerr`     | The radial error value. **TYPE:** `Optional[Union[int, float]]`                                                                                         |
+| `x`        | The angular observation in degrees (histogram visual). **TYPE:** `Optional[Union[int, float]]`                                                          |
+| `emphasis` | The bar's own emphasis role ("background" or "highlight"); wins over the chart's emphasis_rule (bar visual). **TYPE:** `Optional[Union[EMPHASIS, str]]` |
 
 ## Style Typings
 

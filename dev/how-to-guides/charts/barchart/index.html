@@ -809,6 +809,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#sorting-and-emphasis-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sorting and emphasis rules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#reference-lines" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2457,6 +2468,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#sorting-and-emphasis-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sorting and emphasis rules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#reference-lines" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3487,7 +3509,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">data</span><span class="o">=</span><span class="p">[{</span>                                             <span class="c1"># A list of bar data points (or list of lists for multiple charts)</span>
         <span class="s2">"label"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                                   <span class="c1"># The x-axis value</span>
         <span class="s2">"y"</span><span class="p">:</span>     <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>                     <span class="c1"># The y-axis value</span>
-        <span class="s2">"yerr"</span><span class="p">:</span>  <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>            <span class="c1"># The y-axis error value</span>
+        <span class="s2">"yerr"</span><span class="p">:</span>  <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>           <span class="c1"># The y-axis error value</span>
+        <span class="s2">"emphasis"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                      <span class="c1"># The bar's own role: "highlight" or "background"</span>
     <span class="p">}],</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span>                                             <span class="c1"># The style of the bar (optional)</span>
         <span class="s2">"plot_bar_color"</span><span class="p">:</span>       <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>       <span class="c1"># The color of the bar</span>
@@ -3514,6 +3537,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">show_legend</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span>                         <span class="c1"># Whether to show the legend</span>
     <span class="n">orientation</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                          <span class="c1"># "vertical" (default) or "horizontal"</span>
     <span class="n">bar_mode</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                             <span class="c1"># How multiple series share the axis ("group", "stack", "overlay")</span>
+    <span class="n">sort</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                                 <span class="c1"># Category order by value: None (input), "ascending", "descending"</span>
+    <span class="n">sort_by</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                              <span class="c1"># The subtitle of the series whose values key the sort</span>
+    <span class="n">emphasis_rule</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>                       <span class="c1"># One-key rule: {"above": v}, {"below": v}, {"between": (lo, hi)}, {"top": n}, {"bottom": n}</span>
 
     <span class="n">show_yerr</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span>                           <span class="c1"># Whether to show the error bars</span>
     <span class="n">show_values</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span>                         <span class="c1"># Whether to show bar value labels</span>
@@ -3760,6 +3786,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <td style="text-align:left">highlight one series, mute the rest</td>
 <td style="text-align:left"><code>emphasis</code></td>
 <td style="text-align:left"><a href="#emphasis">Emphasis</a></td>
+</tr>
+<tr>
+<td style="text-align:left">order the bars by value</td>
+<td style="text-align:left"><code>sort</code>, <code>sort_by</code></td>
+<td style="text-align:left"><a href="#sorting-and-emphasis-rules">Sorting and emphasis rules</a></td>
+</tr>
+<tr>
+<td style="text-align:left">highlight the bars above a value or the top n</td>
+<td style="text-align:left"><code>emphasis_rule</code>, a per-bar <code>emphasis</code> key</td>
+<td style="text-align:left"><a href="#sorting-and-emphasis-rules">Sorting and emphasis rules</a></td>
 </tr>
 <tr>
 <td style="text-align:left">mark a goal, threshold or event</td>
@@ -4488,6 +4524,151 @@ BarChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="sorting-and-emphasis-rules">Sorting and emphasis rules<a class="anchor-link" href="#sorting-and-emphasis-rules">¶</a></h3><p>A comparison reads best when the bars are in order and the ones that matter stand out. <code>sort</code> orders the categories by value — <code>"ascending"</code>, <code>"descending"</code>, or <code>None</code> for input order — and one order serves every series in the chart, keyed by the total across them; <code>sort_by</code> names a series (by subtitle) to key the order instead, and ties keep input order. The orders are also available as the <a href="../../../references/constants/#datachart.constants.SORT">datachart.constants.SORT</a> constants.</p>
+<p><code>emphasis_rule</code> highlights the bars that match a one-key rule and mutes the rest: <code>{"above": v}</code> or <code>{"below": v}</code> (strict), <code>{"between": (lo, hi)}</code> (inclusive), <code>{"top": n}</code> or <code>{"bottom": n}</code>. The rule reads each bar's own value, so it means the same thing under every <code>bar_mode</code>. A bar can also carry its own <code>"emphasis"</code> key, which wins over the rule — the way to say "the top three, and also this one".</p>
+<p>The first example ranks the months and highlights the ones that beat the sales goal; the second orders the grouped chart by the Asia-Pacific series.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-13">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SORT</span>
+
+<span class="n">BarChart</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">sales_total</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly unit sales (2025), months above goal"</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Units sold"</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_SHORT</span><span class="p">,</span>
+    <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
+    <span class="c1"># largest month first</span>
+    <span class="n">sort</span><span class="o">=</span><span class="n">SORT</span><span class="o">.</span><span class="n">DESCENDING</span><span class="p">,</span>
+    <span class="c1"># highlight the months that beat the goal, mute the rest</span>
+    <span class="n">emphasis_rule</span><span class="o">=</span><span class="p">{</span><span class="s2">"above"</span><span class="p">:</span> <span class="n">SALES_GOAL</span><span class="p">},</span>
+    <span class="n">hlines</span><span class="o">=</span><span class="p">{</span><span class="s2">"y"</span><span class="p">:</span> <span class="n">SALES_GOAL</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Goal"</span><span class="p">},</span>
+    <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-13">from datachart.constants import SORT
+
+BarChart(
+    data=sales_total,
+    title="Monthly unit sales (2025), months above goal",
+    xlabel="Month",
+    ylabel="Units sold",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    # largest month first
+    sort=SORT.DESCENDING,
+    # highlight the months that beat the goal, mute the rest
+    emphasis_rule={"above": SALES_GOAL},
+    hlines={"y": SALES_GOAL, "label": "Goal"},
+    show_legend=True,
+).show()</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
+<img alt="No description has been provided for this image" class="" src="data:image/png;base64,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KuHu7i5NU1Q7ERERERVWKYtAANDT05Me+fJPbm5uJWonIiIiIlWV8ppAIiIiItIsFoFEREREOohFIBEREZEOYhFIREREpINYBBIRERHpIBaBRERERDqIRSARERGRDmIRSERERKSDWAQSERER6SAWgUREREQ6iEUgERERkQ5iEUhERESkg1gEEhEREekgFoFEREREOohFIBEREZEOYhFIREREpINYBBIRERHpIBaBRERERDqIRSARERGRDmIRSERERKSDWAQSERER6SAWgUREREQ6iEUgERERkQ5iEUhERESkg1gEEhEREekgFoFEREREOohFIBEREZEOYhFIREREpINYBBIRERHpIBaBRERERDqIRSARERGRDmIRSERERKSDWAQSERER6SAWgUREREQ6iEUgERERkQ7S13aA8qJQKBAcHIyUlBR07doVpqam2o5EREREVGm9ET2Bubm56Nq1K/bv34+LFy+ibdu2UCgU2o5FREREVGm9ET2Bx48fh729PVasWAEAiI+Px759+/Dxxx9rORkRERFR5fRG9ARev34dnp6e0uvWrVvj6tWrWkxEREREVLm9ET2BL168QK1ataTXlpaWiI+PVzuuQqGQThUnJycDAFJSUjQfUoOM5Ln4d993tLbs120/5nv1sl+XLzMzE6mpqRWUSJVcLkdOTk6Rw7WZDWC+sqrM+SpzNoD5yqoy53tdtqrE3NwcMpmsyOFvRBFoYWGBjIwM6XVaWhqsrKzUjrtgwQLMnTtXpc3JyUmT8YiIiIgqXHJyMiwsLIoc/kYUgQ0aNMDZs2el13/++ScaNGigdtxvvvkGU6dOBQAolUokJCTA1tb2lZXymywlJQVOTk6Iiop65Y6iLcxXepU5G8B8ZVWZ81XmbADzlRXzVR3m5uavHP5GFIEDBgzAd999h4CAAOjr6+PAgQOFevsKGBkZwcjISHpdVI+hrrGwsKjUBwvzlV5lzgYwX1lV5nyVORvAfGXFfFXfG1EEmpiY4NixY/D19YVSqcSxY8dY3BERERG9whtRBAKAm5sblixZou0YVY6RkRH++9//qvSOVibMV3qVORvAfGVVmfNV5mwA85UV8705ZEIIoe0QRERERFSx3ojnBBIRERFRybAIJCIiItJBb8w1gaTe8ePHkZOTA7lcjho1auCdd96BgYGBtmMBAFJTU3H27Fl07dpV5dqNEydOoFu3blpMVlhwcDDs7OxQr149bUcp0tOnT3Hz5k0AQOfOnVGtWrUixz137hxatGgBExMTjee6c+cOIiMjYWJiAi8vL40vryQyMzNx+/ZtpKenw83NDbVr19Z2JABAUFAQnJycCu1vgYGBePvtt+Hq6qqlZIVFRkbiwYMHsLS0RLNmzaCvX7k+VhITExEcHIwePXpUmmx37txBamoq3nvvPZX227dvIyMjA23atNFSsv/Jy8vDsWPHAAANGzaEi4uLlhPlUygUCAwMLNTeunVr2NnZqZ0mPj4e4eHhaNmypabjVTnsCXzDeXt7IzAwEKdOncL3338PV1dX6cDWtoiICPTv3x+LFy9WaR86dKiWEqmXlJSEIUOGYPz48dqO8kqxsbE4c+YMvL29ERsb+8pxP/vsM8TExFRIrgcPHmDv3r0YM2ZMhSyvuK5fv453330XO3bswKlTp9C3b1/MnDlT27EAAKNHj8bnn3+u0vbo0SP07t0be/bs0VIqVdnZ2fjkk0/QvXt37NmzBz/88APq1q2Lc+fOvXbaiIgIxMXFVUBKYM2aNRg9ejR+//33CllecaxYsQI9e/Ys9G1BQ4YMwTfffKOlVKry8vJw5swZzJo1CwcOHNB2HEliYiIGDx6MM2fOqPwkJCQUOc2tW7eKfGyczhP0RrO0tBRxcXHS6ytXrghLS0sRGRkptYWEhIgzZ86IhIQElWlv3bolLly4IHJzczWS7c8//xSdOnUSHh4eKnlsbW2l3xUKhbh8+bL4448/RFZWlhBCiCNHjoi8vDxpnKtXr4qYmBiNZBRCiNWrV4tp06YJDw8P8fjxYyGEEJmZmeLUqVPSOH/99Ze4f/++lDk4OFjcv39fREdHi5CQEI1lU8fe3l6Eh4cLIYQ4ffq0yMjIEEIIkZKSIs6fPy+EEKJhw4YiLCyswjLdv39f1KlTRwghRFZWlggKCpKGhYeHi3v37ons7Gxx5swZkZWVJYKDg8WDBw80mmn06NFiw4YN0uvU1FQxbdo0aX+PiYkRp06dkralEEKcOXNGpKWliQsXLogbN25oLJujo6Po0KGDiI6Oltrmzp0r2rRpIxYsWCCEECI9PV2cP39enDp1SiQmJgoh8o/vv//+W5omMjJS3Lp1SyMZFy5cKPr06SMUCoXUFhQUJOzs7ERycrLUFhUVJU6fPi29v0RHR4v+/fuLuXPniqdPn2okWwGlUinc3NyEn5+f+PDDD6X2kJAQERUVJe7evSvOnz8vMjMzhRBC3Lt3T0RFRYmLFy+KlJQUjeUaO3asaNeundi4caPUdvnyZdGmTRvRsWNHIYQQeXl54saNG+LEiRMq++CFCxdEYmKiOH36tMbyvWzChAli2bJl0utHjx6JEydOqOz/Dx48EBERESI6OlqcPn1apKamaizP33//rfIZ8U+5ubni+vXr4sKFCyI9PV0IIURgYKDo06ePSEhIEGfPnhXPnz/XWL6qhj2BOqZly5bo27ev1JswZswYrF69Gn/88Qe6dOmCy5cvA8j/j3Tp0qUICAhA586dkZubq5E8enp6mDdvnvQtLi9LSUmBp6cn9uzZg99++w2tW7dGSkoKfvjhB1y4cAFA/re+DBgwAHl5eRrJBwB+fn746KOP8NFHH8Hf3x9A/umFcePGSeMcOHAA/v7+EEKgS5cu8Pf3x4YNGzBu3Dhs3LhRY9leZ+LEiVKvYEREBL744gutZSmQmJio0it4+PBh+Pn5ISsrC5988gkmTJiA48ePo2fPnjh69KjGcjg6OmLPnj2IjIwEAJiZmWHRokXQ09PDzp07MWbMGFy/fh2fffaZ1Fs9efJkjBgxAocOHcJ//vMfTJ8+XSPZhBDo06cPduzYIbXt27cPXbp0kYZPnz4dQUFBuHTpEtq3b4+//voLp0+fxo8//ihNM2/ePFy7dk0jGf39/TF79mwYGhpKbV5eXmjSpAmOHDkCANi2bRu8vb1x5swZtG3bFqGhocjIyMCTJ08QHx+PzMxMjWQrcObMGdSqVQvDhw9HcHCw9J3yGzduxNChQ7Fq1Sps2rQJ7du3h1KpxObNmzFy5EgsXboUL1680Gi2fv36Ydu2bdLrHTt2oG/fvtJrf39/+Pv74/bt2xg1ahS2b98OAJg+fTpGjRqFrVu3ajSfOteuXcP8+fNx584dLF++HGPHjgUABAQEYNy4cVi4cCF27dqF1q1bQ6lUVni+nJwc9OrVC7t370ZQUBDatm2L6OhoAPk96RMnTsTx48fRvHlzPHjwoMLzVUaV4wIJqlD16tVDdHQ0bt26hWvXruGHH34AAPTo0QPLli3D9OnTERYWJn14fPnllwgPD4ebm1u5ZxFCYODAgfD19cWpU6dUrhnz9/eHp6en9AGcmJiI7du345NPPsGvv/6KDh064Pz583B3d4ejo2O5ZwPyTyOkpqaiRYsWMDc3R7du3TBnzpwix7969SoyMjKwfv16APmntnX1KwlLSiaTISYmBosXL4adnR3s7e1x8uRJ9OrVSyPLmzlzJnx8fNC+fXsYGRmhe/fu+OKLL+Dq6opp06Zh6dKlqFatGlxcXDB27Fh8/fXXkMlkGDx4MLy9vZGQkIDatWtjwYIFkMvL///pIUOGoF+/fvj6669x/fp1uLm5wcLCArm5uZDJZFixYgXu3buHmJgY3LhxA4cPH8bIkSPRokUL6Zg5ceKExp6f+tdff6l9T3B3d0dERAQA4Ntvv0VwcDAcHR1Rv3593LhxA0OHDoWzszN69eql8Wsb/fz8MHToUBgYGKBv377Yvn07pkyZAplMBnd3d6xZswZA/j/HFy9ehL6+PmrVqlUhBVaDBg2we/duREdHo2bNmggKCsKWLVtw/PhxAPn/oEdFReHx48fIzc2V3vv09fXRs2dPTJgwQeMZ/6lFixZYtmwZ7t+/Dw8PDwwaNAi//PILZDIZatSogZUrVwL432eMpq6xzcnJweHDh1XaOnXqhEOHDkFPTw/t2rUDADx+/Bi//PIL2rVrh7S0NOzcuRNyuRwymQxbtmyBj4+PRvJVJewJ1EGJiYmwsbHBw4cPoaenh0ePHuHRo0ews7PDwIEDERYWpvLmvGTJEo0UgC9bvnw5pk6dqtLjGBYWhvr160uv3dzc8Ndff2Hw4ME4dOgQhBAICAjA8OHDNZbLz88PHh4eOHz4MMLCwpCTk4NTp04VOX5kZKTKtmvWrJnGsr2JrK2tpYu7TUxMkJGRobFlGRsbY/78+YiIiMCxY8dgZ2eHNm3aIDo6GrGxsXj69CkePXqEqKgozJkzB9nZ2QDyL5IHABsbGxgaGr7yWqSycHBwgJ2dHe7cuYMdO3Zg2LBh0rCsrCy0adMGa9aswePHj6FQKJCRkQF7e3s0a9YMgYGBOHPmDNq1a6exr80yNTVV21uWkJAAS0tLKBQKPHv2TPoH7eOPP67Q632TkpKwd+9eGBkZ4fDhw3BwcMCmTZuk4QV/RwBwcXGReoxebte0oUOHStektm/fXuWmvWnTpmHs2LEICQlBcnKyyrFQkRlfduDAAXTo0AGXLl3C06dPkZ2dLZ2FefkmJk0fuzk5OYWuCczIyMDDhw+Rl5cnfaa9++67UkFYv3596Z+1t99+G0+fPtVYvqqEPYE6RqFQYN++fdi1axdSUlJgYmIinSKMj4+Hnp4erl69isTERGmaO3fuoFatWqhevbrGcnl4eOD999/HypUrpTv4rK2tkZSUJI2TnJwMGxsb2NraomHDhrh48SKOHTuGRYsWaSSTQqHAzp07MWHCBKlXtH379ti0aRN++uknldMdqampAPLf/NLT06X258+fayTby5KSkhAdHY1GjRpJuc3MzADkn24vyFmQsaIUnGatXbt2kZn+masie0337t2Lvn37wsDAAK6urvjuu+9w8OBBREREQE9PDyNHjoS1tTWEEHj8+LF02jM5ORlAfi92Zmbma7+gvSyGDx+OXbt2ISgoCAsXLsTDhw8BAOfPn4ehoSFWr14NIP+0Z4GxY8di+/btMDMzw6hRozSWrVOnTti9e7fKzTRpaWk4deoU5s6dCyMjI+jr6yM9PR2mpqZ49uwZEhMT0aBBA41letmOHTvQuHFjhIeHIzw8HHp6enjx4oV0B33B37Egd0GxXJF3EA8ZMgT9+/fHw4cPVS6RyMvLw8qVKxEXFwczMzP4+/vj0qVL0nBNZlQqlbh8+TI8PT0hk8lUjt01a9bAx8cH/fr1Q3R0tMo/7RV57JqYmOCnn34q1G5tbQ1HR0fpMy06Ohq2trYIDg5GWlqaNN7Lf29dx55AHRAVFYUnT57g3Llz6N27N7p06YLWrVujXbt2iIyMxIEDB5CQkIBRo0bhwIEDeO+99/DgwQMEBQXh/v37GDhwoMoBpClz587F2rVrpf8sBwwYgB07diA8PBxhYWHYs2cP+vXrBwD45JNPMHv2bHh6emrsQ3jv3r1o1qwZfHx8MGfOHMyZMwe+vr44duwYDA0NkZycjCtXruD+/fs4ePAggPzTSlevXkVISAgePnxYIXfV/f3333j//fcRHByMDRs2wNHRUSrYnZ2dceTIEcTExMDPz0/jWV52/PhxDB48GH/++SdWr16NTp06AQBsbW2Rnp6OP/74A6Ghodi/f3+F5iqwZcsWTJo0CXfv3sWTJ0/g5+eHxMRENGnSBIMGDcLcuXORmJiIZcuWYcaMGdJ0mzdvRkJCAjZv3oyWLVtq9KupPvjgA+zcuRNt27ZV6SWysbFBVFQUXrx4gf379+PmzZvS3ba9evXC1atXcfnyZXTu3Flj2RYsWIA1a9bgxx9/xJ07dxAUFIRevXphzJgxUq/QgAEDsGjRIjx9+hSTJ0+WilUjIyP89ddfKv8wlTc/Pz/Mnz9fOnbnzJmD8ePHS72Bhw4dwpMnTxASEoIbN26gbdu2GstSFAcHB9ja2uLPP/9UWb6enh7Mzc0REhKCBw8eYMuWLUhISKiQ6+zkcjnGjRuH5cuX448//kBgYCDat28PIH+/u3v3LuLj4zFnzhyYmZlV2F3exdGvXz8cOXIEly9fRkxMDPr27SsV/SEhITh9+jTi4uKwa9cu6fpaXceewDdcjx49MHv2bMhkMtjY2OBf//oXvL29AQDVqlXDuXPnsGzZMmzfvh0DBgyQeg5OnDiBn3/+GampqdiwYQOcnZ3LPZuFhQU8PT2l15aWlvDx8cHOnTsB5J9KXbVqFebOnQu5XI5ffvlFOg3Sv39/7Nq1C59++mm55yrw5MkTfP311ypt1tbW+OKLL3D37l1s3rwZS5cuhaurK7799lskJCTAzs4Omzdvxg8//AAnJyeMHDkSWVlZGssI5F9btHXrVqxevRpWVlYq18osXboUCxcuxL179zBq1Cjs3r0bANCxY0eYmppqNNe//vUvZGZmYv78+WjQoIF0E4VcLsfWrVuxfPlyuLi44Ntvv0VsbCz09fXRvXt3aXonJyeNnlLatWsXfvnlFyxYsADZ2dmoX78+zp07B3Nzc6xfvx7Lli3DhAkT4ObmpnJzT48ePfDNN99AJpOp3LhRnrp06QK5XA5TU1OMHTtWui7S1dUVeXl5aN68Ob744gtMmDAB7733Hg4ePIjvvvsON27cQLNmzdC5c2dYWVlp5FrFAvXq1cPly5exbt06zJ8/HxYWFpg2bRr69OkjjbNhwwb8+OOPmDp1Ktq1a4eJEycCAD7//HMsX74c9erV08iHcWxsLNzd3dG1a1eV9jFjxmDmzJmws7PDoEGDsHbtWsTExGD37t2wsrJC/fr1NX5cAMA777wDe3t7APnbouBUtIWFhfSMwF27duHnn3+Gg4MDdu7cidmzZ8Pf3x9t2rSBtbW1RvMdOnQIixcvxtWrV/HLL7/A3d0dALBw4ULMmzcPX375Jf7zn/+gcePGWLhwYaECukOHDlLvYXkzNjZWeZ94WZ06dXD48GGsX78eaWlpmD9/Ptq2bYsbN25g5syZuHPnDjZs2IARI0ZIHQq6jt8dTFSOcnNzMWPGDIwaNQq2trb4+OOPMWvWrEIfRlQ1NW3aFLt27VK5VrUyUSgUuH//Pj7++GOcOXMGDg4O2o5UKX311VdwdnbGv//9b21HIdIq9gQSlSN9fX107doVixYtQl5eHiZOnMgC8A2iyR6O8hAUFIRdu3Zhx44dLABfwcPDQ+qJI9Jl7AkkIiIi0kG8MYSIiIhIB7EIJCIiItJBLAKJiIiIdBCLQCIiIiIdxCKQiIiISAexCCQiIiLSQSwCiYiIiHQQi0AiqpISExMxatQobNmypdCw9PR0jB49Gps3by7XZd67dw9fffVVuc6TiEhbWAQSUZWUnp6OnTt3wsfHp9Cww4cPIyAgAJcuXSrzcmbPni39HhMTg19//bXM8yQiqgxYBBJRlWVgYABra2tcv35dpX3Pnj1o1apVmeefm5uLFStWlHk+RESVEYtAIqqy8vLy0KtXL+zevVtqy8jIwIULF9C2bVuVcePj47Fo0SJMmjQJS5YsQXJyMgDgzp07mDdvHkJDQ/Hll19i6tSpuHnzJgBg5MiRSEtLw6hRoxAWFgYA0NPTw4MHD/DVV1+pjEtEVNWwCCSiKksIgY8++gh79uyR2o4cOQIvLy8YGhpKbcnJyXjnnXeQlpaGDz74AJGRkWjVqhWys7MRGxuL9evXw8fHB15eXjAwMECXLl2QkZGBvn37Ql9fH//+979Rs2ZNAPmnoefNm4cOHToAgDQuEVFVIxNCCG2HICIqqejoaNStWxdZWVlo3Lgx/Pz80KpVKwwePBhDhw7FrVu38OzZM/j6+mLFihXYtWsXLl68CCC/eHz77bexePFiWFlZoVevXoiLi4OlpSWUSiWqVauGq1evQqlUwtPTE1lZWQCAkydPFhrXxMQEV65cQZMmTbS5OYiISow9gURU5Xl7e2P37t3IzMzE+fPn0aNHD5XhYWFh8PDwkF7LZDK4u7vj8ePHAAAHBwdYWloCAORyOapVq1Zk717NmjVVxjU2NmZPIBFVSfraDkBEVFbe3t7o3r072rZtCy8vLxgbG6sMNzIyQlJSkkqbQqFAtWrVAOQXc8Ulk8nKnJeIqDJgTyARVXlubm6wtLTEqlWr8NFHHxUa3rJlS1y6dAlKpRJA/s0jt27dQrNmzV45X5lMJk1DRPSmYRFIRG8Eb29vXLt2rdCpYAAYNGgQ6tatCy8vL8yaNQvt27fHhx9+iHbt2r1yno6OjpDJZBg+fHihx9AQEVV1PB1MRFWSjY0NNmzYIL0eM2YMmjZtKp0KHjBgADIzMwHkP9bl2LFjuHLlCiIjI/HRRx/hnXfeAQA0bNgQP/30k8q816xZA1dXV9ja2uLKlSt49OgRateujVq1ahU5LhFRVcO7g4mIiIh0EE8HExEREekgFoFEREREOohFIBEREZEOYhFIREREpINYBBIRERHpIBaBRERERDqIRSARERGRDmIRSERERKSDWAQSERER6SAWgUREREQ6iEUgERERkQ76P1ClvS6BheCuAAAAAElFTkSuQmCC"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-14">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">BarChart</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">sales_by_region</span><span class="p">,</span>
+    <span class="n">subtitle</span><span class="o">=</span><span class="n">REGIONS</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly unit sales by region (2025), ordered by Asia-Pacific"</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Units sold"</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_SHORT</span><span class="p">,</span>
+    <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
+    <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="c1"># one order for every series, keyed by one of them</span>
+    <span class="n">sort</span><span class="o">=</span><span class="n">SORT</span><span class="o">.</span><span class="n">ASCENDING</span><span class="p">,</span>
+    <span class="n">sort_by</span><span class="o">=</span><span class="s2">"Asia-Pacific"</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-14">BarChart(
+    data=sales_by_region,
+    subtitle=REGIONS,
+    title="Monthly unit sales by region (2025), ordered by Asia-Pacific",
+    xlabel="Month",
+    ylabel="Units sold",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+    # one order for every series, keyed by one of them
+    sort=SORT.ASCENDING,
+    sort_by="Asia-Pacific",
+).show()</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
+<img alt="No description has been provided for this image" class="" src="data:image/png;base64,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"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="reference-lines">Reference lines<a class="anchor-link" href="#reference-lines">¶</a></h3><p>Reference lines mark a threshold or an event on the chart.</p>
 <p><strong>Horizontal lines.</strong> Use the <code>hlines</code> argument with the <a href="../../../references/typings/#datachart.typings.HLinePlotAttrs">datachart.typings.HLinePlotAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code> where each dictionary contains some of the following attributes:</p>
 <div class="highlight"><pre><span></span><span class="p">{</span>
@@ -4514,10 +4695,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-13">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-15">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4529,7 +4710,7 @@ BarChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">LINE_STYLE</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-13">from datachart.constants import LINE_STYLE</div>
+<div class="clipboard-copy-txt" id="cell-15">from datachart.constants import LINE_STYLE</div>
 </div>
 </div>
 </div>
@@ -4541,10 +4722,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-14">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-16">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4584,7 +4765,7 @@ BarChart(
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-14">BarChart(
+<div class="clipboard-copy-txt" id="cell-16">BarChart(
     data=sales_total,
     # add a horizontal line at the sales goal
     hlines={
@@ -4664,10 +4845,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-15">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-17">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4696,7 +4877,7 @@ BarChart(
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-15">BarChart(
+<div class="clipboard-copy-txt" id="cell-17">BarChart(
     data=sales_total,
     # shade the tolerance around the monthly goal
     hspans={
@@ -4755,10 +4936,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-16">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-18">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4778,7 +4959,7 @@ BarChart(
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-16">BarChart(
+<div class="clipboard-copy-txt" id="cell-18">BarChart(
     # use a list of lists to define multiple bar charts
     data=sales_by_region,
     title="Monthly unit sales by region (2025)",
@@ -4821,10 +5002,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-17">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-19">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4847,7 +5028,7 @@ BarChart(
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-17">BarChart(
+<div class="clipboard-copy-txt" id="cell-19">BarChart(
     data=sales_by_region,
     # add a subtitle to each chart
     subtitle=REGIONS,
@@ -4917,10 +5098,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-18">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-20">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4932,7 +5113,7 @@ BarChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">BAR_MODE</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-18">from datachart.constants import BAR_MODE</div>
+<div class="clipboard-copy-txt" id="cell-20">from datachart.constants import BAR_MODE</div>
 </div>
 </div>
 </div>
@@ -4944,10 +5125,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-19">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-21">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4970,7 +5151,7 @@ BarChart(
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-19">BarChart(
+<div class="clipboard-copy-txt" id="cell-21">BarChart(
     data=sales_by_region,
     subtitle=REGIONS,
     # stack the series
@@ -5016,10 +5197,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-20">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-22">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5043,7 +5224,7 @@ BarChart(
     <span class="n">max_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-20">BarChart(
+<div class="clipboard-copy-txt" id="cell-22">BarChart(
     data=sales_by_region,
     subtitle=REGIONS,
     title="Monthly unit sales by region (2025)",
@@ -5090,10 +5271,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-21">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-23">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5119,7 +5300,7 @@ BarChart(
     <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-21">BarChart(
+<div class="clipboard-copy-txt" id="cell-23">BarChart(
     data=sales_by_region,
     subtitle=REGIONS,
     title="Monthly unit sales by region (2025)",
@@ -5168,10 +5349,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-22">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-24">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5198,7 +5379,7 @@ BarChart(
     <span class="n">orientation</span><span class="o">=</span><span class="n">ORIENTATION</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-22">BarChart(
+<div class="clipboard-copy-txt" id="cell-24">BarChart(
     data=sales_by_region,
     subtitle=REGIONS,
     title="Monthly unit sales by region (2025)",
@@ -5259,10 +5440,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-23">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-25">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5292,7 +5473,7 @@ BarChart(
     <span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-23">BarChart(
+<div class="clipboard-copy-txt" id="cell-25">BarChart(
     data=sales_by_region,
     subtitle=REGIONS,
     # set the error bar color (a single style applies to every chart)
@@ -5387,10 +5568,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-24">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-26">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5402,7 +5583,7 @@ BarChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">VALUE_FORMAT</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-24">from datachart.constants import VALUE_FORMAT</div>
+<div class="clipboard-copy-txt" id="cell-26">from datachart.constants import VALUE_FORMAT</div>
 </div>
 </div>
 </div>
@@ -5414,10 +5595,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-25">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-27">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5442,7 +5623,7 @@ BarChart(
     <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">THOUSANDS</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-25">BarChart(
+<div class="clipboard-copy-txt" id="cell-27">BarChart(
     data=sales_total,
     title="Monthly unit sales (2025)",
     xlabel="Month",
@@ -5490,10 +5671,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-26">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-28">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5524,7 +5705,7 @@ BarChart(
     <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-26">BarChart(
+<div class="clipboard-copy-txt" id="cell-28">BarChart(
     data=sales_total,
     style={
         "plot_value_fontsize": 9,
@@ -5623,10 +5804,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [31]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-27">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-29">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5638,7 +5819,7 @@ BarChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCALE</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-27">from datachart.constants import SCALE</div>
+<div class="clipboard-copy-txt" id="cell-29">from datachart.constants import SCALE</div>
 </div>
 </div>
 </div>
@@ -5661,10 +5842,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [32]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-28">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-30">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5687,7 +5868,7 @@ BarChart(
     <span class="p">)</span>
     <span class="n">figure</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-28">for scale in [SCALE.LINEAR, SCALE.LOG]:
+<div class="clipboard-copy-txt" id="cell-30">for scale in [SCALE.LINEAR, SCALE.LOG]:
     figure = BarChart(
         data=populations,
         title=f"Population on the '{scale}' scale",
@@ -5739,10 +5920,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [31]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [33]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-29">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-31">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5754,7 +5935,7 @@ BarChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">save_figure</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-29">from datachart.utils import save_figure</div>
+<div class="clipboard-copy-txt" id="cell-31">from datachart.utils import save_figure</div>
 </div>
 </div>
 </div>
@@ -5766,10 +5947,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [32]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [34]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-30">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-32">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5781,7 +5962,7 @@ BarChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"./fig_bar_chart.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-30">save_figure(figure, "./fig_bar_chart.png", dpi=300)</div>
+<div class="clipboard-copy-txt" id="cell-32">save_figure(figure, "./fig_bar_chart.png", dpi=300)</div>
 </div>
 </div>
 </div>
@@ -5791,7 +5972,7 @@ BarChart(
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[32]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[34]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
 <pre>['./fig_bar_chart.png']</pre>
 </div>
@@ -5841,10 +6022,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [34]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [36]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-31">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-33">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5871,7 +6052,7 @@ BarChart(
     <span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-31">BarChart(
+<div class="clipboard-copy-txt" id="cell-33">BarChart(
     data=medals,
     subtitle=["Gold", "Silver", "Bronze"],
     style=[
@@ -5924,10 +6105,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [36]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [38]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-32">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-34">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -5951,7 +6132,7 @@ BarChart(
     <span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-32">BarChart(
+<div class="clipboard-copy-txt" id="cell-34">BarChart(
     data=revenue,
     subtitle=list(REVENUE),
     # highlight Asia-Pacific, mute the other regions
@@ -6001,10 +6182,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [38]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [40]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-33">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-35">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6032,7 +6213,7 @@ BarChart(
     <span class="n">value_format</span><span class="o">=</span><span class="s2">"</span><span class="si">{:.1f}</span><span class="s2">%"</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-33">BarChart(
+<div class="clipboard-copy-txt" id="cell-35">BarChart(
     data=languages,
     style={
         "plot_bar_color": "#f48024",
@@ -6086,10 +6267,10 @@ BarChart(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [40]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [42]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-34">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-36">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6123,7 +6304,7 @@ BarChart(
     <span class="n">xtickrotate</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-34">BarChart(
+<div class="clipboard-copy-txt" id="cell-36">BarChart(
     data=trade_balance,
     style=[
         {"plot_bar_color": "#2a9d8f"},  # surplus

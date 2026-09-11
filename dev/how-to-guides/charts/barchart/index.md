@@ -19,7 +19,8 @@ BarChart(
     data=[{                                             # A list of bar data points (or list of lists for multiple charts)
         "label": str,                                   # The x-axis value
         "y":     Union[int, float],                     # The y-axis value
-        "yerr":  Optional[Union[int, float]]            # The y-axis error value
+        "yerr":  Optional[Union[int, float]],           # The y-axis error value
+        "emphasis": Optional[str],                      # The bar's own role: "highlight" or "background"
     }],
     style={                                             # The style of the bar (optional)
         "plot_bar_color":       Union[str, None],       # The color of the bar
@@ -46,6 +47,9 @@ BarChart(
     show_legend=Optional[bool],                         # Whether to show the legend
     orientation=Optional[str],                          # "vertical" (default) or "horizontal"
     bar_mode=Optional[str],                             # How multiple series share the axis ("group", "stack", "overlay")
+    sort=Optional[str],                                 # Category order by value: None (input), "ascending", "descending"
+    sort_by=Optional[str],                              # The subtitle of the series whose values key the sort
+    emphasis_rule=Optional[dict],                       # One-key rule: {"above": v}, {"below": v}, {"between": (lo, hi)}, {"top": n}, {"bottom": n}
 
     show_yerr=Optional[bool],                           # Whether to show the error bars
     show_values=Optional[bool],                         # Whether to show bar value labels
@@ -101,32 +105,34 @@ BarChart(
 
 Every customization is either a keyword argument of `BarChart` or a `plot_bar_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                          | Use                                                                                                  | See                                                           |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| add a title and axis labels         | `title`, `xlabel`, `ylabel`                                                                          | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| rotate the tick labels              | `xtickrotate`, `ytickrotate`                                                                         | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| fix the axis range                  | `xmin`, `xmax`, `ymin`, `ymax`                                                                       | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| resize the figure                   | `figsize`                                                                                            | [Figure size and grid](#figure-size-and-grid)                 |
-| show grid lines                     | `show_grid`                                                                                          | [Figure size and grid](#figure-size-and-grid)                 |
-| fix the aspect ratio of the axes    | `aspect_ratio`                                                                                       | [Figure size and grid](#figure-size-and-grid)                 |
-| change the bar color                | `style={"plot_bar_color": ...}`                                                                      | [Bar style](#bar-style)                                       |
-| change the bar width                | `style={"plot_bar_width": ...}`                                                                      | [Bar style](#bar-style)                                       |
-| make the bars (semi-)transparent    | `style={"plot_bar_alpha": ...}`                                                                      | [Bar style](#bar-style)                                       |
-| add a hatch pattern                 | `style={"plot_bar_hatch": ...}`                                                                      | [Bar style](#bar-style)                                       |
-| outline the bars                    | `style={"plot_bar_edge_color": ..., "plot_bar_edge_width": ...}`                                     | [Bar style](#bar-style)                                       |
-| draw horizontal bars                | `orientation`                                                                                        | [Bar orientation](#bar-orientation)                           |
-| highlight one series, mute the rest | `emphasis`                                                                                           | [Emphasis](#emphasis)                                         |
-| mark a goal, threshold or event     | `hlines`, `vlines`                                                                                   | [Reference lines](#reference-lines)                           |
-| shade a period or a range           | `hspans`, `vspans`                                                                                   | [Reference bands](#reference-bands)                           |
-| compare several series side by side | `data` as a list of lists, `subtitle`, `show_legend`                                                 | [Multiple Bar Charts](#multiple-bar-charts)                   |
-| stack or overlay the series         | `bar_mode`                                                                                           | [Bar mode](#bar-mode)                                         |
-| draw each series in its own subplot | `subplots`, `sharex`, `sharey`, `max_cols`                                                           | [Subplots](#subplots)                                         |
-| add error bars                      | `yerr` in `data`, `show_yerr`, `style={"plot_bar_error_color": ...}`                                 | [Error bars](#error-bars)                                     |
-| print the value on each bar         | `show_values`                                                                                        | [Bar value labels](#bar-value-labels)                         |
-| format the printed values           | `value_format` (a `VALUE_FORMAT` constant or a format string)                                        | [Bar value labels](#bar-value-labels)                         |
-| style the value labels              | `style={"plot_bar_value_fontsize": ..., "plot_bar_value_color": ..., "plot_bar_value_padding": ...}` | [Bar value labels](#bar-value-labels)                         |
-| use a logarithmic axis              | `scaley`, `scalex`                                                                                   | [Axis scales](#axis-scales)                                   |
-| save the chart to a file            | `save_figure`                                                                                        | [Saving the Chart as an Image](#saving-the-chart-as-an-image) |
+| I want to…                                    | Use                                                                                                  | See                                                           |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| add a title and axis labels                   | `title`, `xlabel`, `ylabel`                                                                          | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
+| rotate the tick labels                        | `xtickrotate`, `ytickrotate`                                                                         | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
+| fix the axis range                            | `xmin`, `xmax`, `ymin`, `ymax`                                                                       | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
+| resize the figure                             | `figsize`                                                                                            | [Figure size and grid](#figure-size-and-grid)                 |
+| show grid lines                               | `show_grid`                                                                                          | [Figure size and grid](#figure-size-and-grid)                 |
+| fix the aspect ratio of the axes              | `aspect_ratio`                                                                                       | [Figure size and grid](#figure-size-and-grid)                 |
+| change the bar color                          | `style={"plot_bar_color": ...}`                                                                      | [Bar style](#bar-style)                                       |
+| change the bar width                          | `style={"plot_bar_width": ...}`                                                                      | [Bar style](#bar-style)                                       |
+| make the bars (semi-)transparent              | `style={"plot_bar_alpha": ...}`                                                                      | [Bar style](#bar-style)                                       |
+| add a hatch pattern                           | `style={"plot_bar_hatch": ...}`                                                                      | [Bar style](#bar-style)                                       |
+| outline the bars                              | `style={"plot_bar_edge_color": ..., "plot_bar_edge_width": ...}`                                     | [Bar style](#bar-style)                                       |
+| draw horizontal bars                          | `orientation`                                                                                        | [Bar orientation](#bar-orientation)                           |
+| highlight one series, mute the rest           | `emphasis`                                                                                           | [Emphasis](#emphasis)                                         |
+| order the bars by value                       | `sort`, `sort_by`                                                                                    | [Sorting and emphasis rules](#sorting-and-emphasis-rules)     |
+| highlight the bars above a value or the top n | `emphasis_rule`, a per-bar `emphasis` key                                                            | [Sorting and emphasis rules](#sorting-and-emphasis-rules)     |
+| mark a goal, threshold or event               | `hlines`, `vlines`                                                                                   | [Reference lines](#reference-lines)                           |
+| shade a period or a range                     | `hspans`, `vspans`                                                                                   | [Reference bands](#reference-bands)                           |
+| compare several series side by side           | `data` as a list of lists, `subtitle`, `show_legend`                                                 | [Multiple Bar Charts](#multiple-bar-charts)                   |
+| stack or overlay the series                   | `bar_mode`                                                                                           | [Bar mode](#bar-mode)                                         |
+| draw each series in its own subplot           | `subplots`, `sharex`, `sharey`, `max_cols`                                                           | [Subplots](#subplots)                                         |
+| add error bars                                | `yerr` in `data`, `show_yerr`, `style={"plot_bar_error_color": ...}`                                 | [Error bars](#error-bars)                                     |
+| print the value on each bar                   | `show_values`                                                                                        | [Bar value labels](#bar-value-labels)                         |
+| format the printed values                     | `value_format` (a `VALUE_FORMAT` constant or a format string)                                        | [Bar value labels](#bar-value-labels)                         |
+| style the value labels                        | `style={"plot_bar_value_fontsize": ..., "plot_bar_value_color": ..., "plot_bar_value_padding": ...}` | [Bar value labels](#bar-value-labels)                         |
+| use a logarithmic axis                        | `scaley`, `scalex`                                                                                   | [Axis scales](#axis-scales)                                   |
+| save the chart to a file                      | `save_figure`                                                                                        | [Saving the Chart as an Image](#saving-the-chart-as-an-image) |
 
 The full list of style attributes is in the [datachart.typings.BarStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BarStyleAttrs) type; the full list of parameters is in the [datachart.charts.BarChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.BarChart) reference.
 
@@ -310,6 +316,49 @@ BarChart(
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
+).show()
+```
+
+### Sorting and emphasis rules
+
+A comparison reads best when the bars are in order and the ones that matter stand out. `sort` orders the categories by value — `"ascending"`, `"descending"`, or `None` for input order — and one order serves every series in the chart, keyed by the total across them; `sort_by` names a series (by subtitle) to key the order instead, and ties keep input order. The orders are also available as the [datachart.constants.SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT) constants.
+
+`emphasis_rule` highlights the bars that match a one-key rule and mutes the rest: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}`. The rule reads each bar's own value, so it means the same thing under every `bar_mode`. A bar can also carry its own `"emphasis"` key, which wins over the rule — the way to say "the top three, and also this one".
+
+The first example ranks the months and highlights the ones that beat the sales goal; the second orders the grouped chart by the Asia-Pacific series.
+
+```
+from datachart.constants import SORT
+
+BarChart(
+    data=sales_total,
+    title="Monthly unit sales (2025), months above goal",
+    xlabel="Month",
+    ylabel="Units sold",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    # largest month first
+    sort=SORT.DESCENDING,
+    # highlight the months that beat the goal, mute the rest
+    emphasis_rule={"above": SALES_GOAL},
+    hlines={"y": SALES_GOAL, "label": "Goal"},
+    show_legend=True,
+).show()
+```
+
+```
+BarChart(
+    data=sales_by_region,
+    subtitle=REGIONS,
+    title="Monthly unit sales by region (2025), ordered by Asia-Pacific",
+    xlabel="Month",
+    ylabel="Units sold",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+    # one order for every series, keyed by one of them
+    sort=SORT.ASCENDING,
+    sort_by="Asia-Pacific",
 ).show()
 ```
 

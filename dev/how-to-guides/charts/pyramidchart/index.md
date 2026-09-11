@@ -221,6 +221,28 @@ PyramidChart(
 ).show()
 ```
 
+### Sorting and emphasis rules
+
+Age bands have a natural order, but a pyramid can also rank its categories: `sort` orders them by value — `"ascending"`, `"descending"`, or `None` for input order — with one order for both sides, keyed by the total of the two (or by the side `sort_by` names by subtitle). The orders are the [datachart.constants.SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT) constants.
+
+`emphasis_rule` highlights the bars that match a one-key rule and mutes the rest: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}`. It reads each bar's positive value, on both sides. A data point can also carry its own `"emphasis"` key, which wins over the rule. The example ranks the bands by their combined population and picks out the five largest bars.
+
+```
+from datachart.constants import SORT
+
+PyramidChart(
+    data=[riverside_bands, hillcrest_bands],
+    subtitle=["Riverside", "Hillcrest"],
+    title="Age bands ranked by combined population",
+    figsize=FIG_SIZE.FULL_TALL,
+    show_legend=True,
+    # largest bands at the top of the pyramid
+    sort=SORT.ASCENDING,
+    # the five largest bars, either side
+    emphasis_rule={"top": 5},
+).show()
+```
+
 ### Error bars
 
 The `show_yerr` attribute draws the `yerr` values as error bars at the bar ends — on a pyramid they extend along the value axis, symmetrically on both sides of the bar end.

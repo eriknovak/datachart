@@ -258,6 +258,24 @@ RadialChart(
 ).show()
 ```
 
+On the bar visual, emphasis can also come from the values. `sort` orders the sectors around the circle by value (`"ascending"` or `"descending"`; the [datachart.constants.SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT) constants), one order for every series, and `emphasis_rule` highlights the bars matching a one-key rule — `{"above": v}`, `{"below": v}`, `{"between": (lo, hi)}`, `{"top": n}`, or `{"bottom": n}` — and mutes the rest. A data point's own `"emphasis"` key wins over the rule. The example orders the directions by speed and picks out the ones averaging above 15 km/h.
+
+```
+from datachart.constants import SORT
+
+RadialChart(
+    data=wind_by_direction,
+    type=RADIAL_TYPE.BAR,
+    title="Directions averaging above 15 km/h",
+    # sectors in order of speed, clockwise from the start angle
+    sort=SORT.ASCENDING,
+    # highlight the strong directions, mute the rest
+    emphasis_rule={"above": 15},
+    show_values=True,
+    value_format="%.1f",
+).show()
+```
+
 ## Multiple Radial Charts
 
 To plot multiple radial charts in the same figure, pass a list of lists as `data`. All series share the figure's one `type`; to mix visuals in one polar plot, compose rendered figures with [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.Panel).

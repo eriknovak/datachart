@@ -1688,7 +1688,8 @@ BarChart(
     data=[{                                             # A list of bar data points (or list of lists for multiple charts)
         "label": str,                                   # The x-axis value
         "y":     Union[int, float],                     # The y-axis value
-        "yerr":  Optional[Union[int, float]]            # The y-axis error value
+        "yerr":  Optional[Union[int, float]],           # The y-axis error value
+        "emphasis": Optional[str],                      # The bar's own role: "highlight" or "background"
     }],
     style={                                             # The style of the bar (optional)
         "plot_bar_color":       Union[str, None],       # The color of the bar
@@ -1715,6 +1716,9 @@ BarChart(
     show_legend=Optional[bool],                         # Whether to show the legend
     orientation=Optional[str],                          # "vertical" (default) or "horizontal"
     bar_mode=Optional[str],                             # How multiple series share the axis ("group", "stack", "overlay")
+    sort=Optional[str],                                 # Category order by value: None (input), "ascending", "descending"
+    sort_by=Optional[str],                              # The subtitle of the series whose values key the sort
+    emphasis_rule=Optional[dict],                       # One-key rule: {"above": v}, {"below": v}, {"between": (lo, hi)}, {"top": n}, {"bottom": n}
 
     show_yerr=Optional[bool],                           # Whether to show the error bars
     show_values=Optional[bool],                         # Whether to show bar value labels
@@ -1770,32 +1774,34 @@ BarChart(
 
 Every customization is either a keyword argument of `BarChart` or a `plot_bar_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                          | Use                                                                                                  | See                                                           |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| add a title and axis labels         | `title`, `xlabel`, `ylabel`                                                                          | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| rotate the tick labels              | `xtickrotate`, `ytickrotate`                                                                         | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| fix the axis range                  | `xmin`, `xmax`, `ymin`, `ymax`                                                                       | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| resize the figure                   | `figsize`                                                                                            | [Figure size and grid](#figure-size-and-grid)                 |
-| show grid lines                     | `show_grid`                                                                                          | [Figure size and grid](#figure-size-and-grid)                 |
-| fix the aspect ratio of the axes    | `aspect_ratio`                                                                                       | [Figure size and grid](#figure-size-and-grid)                 |
-| change the bar color                | `style={"plot_bar_color": ...}`                                                                      | [Bar style](#bar-style)                                       |
-| change the bar width                | `style={"plot_bar_width": ...}`                                                                      | [Bar style](#bar-style)                                       |
-| make the bars (semi-)transparent    | `style={"plot_bar_alpha": ...}`                                                                      | [Bar style](#bar-style)                                       |
-| add a hatch pattern                 | `style={"plot_bar_hatch": ...}`                                                                      | [Bar style](#bar-style)                                       |
-| outline the bars                    | `style={"plot_bar_edge_color": ..., "plot_bar_edge_width": ...}`                                     | [Bar style](#bar-style)                                       |
-| draw horizontal bars                | `orientation`                                                                                        | [Bar orientation](#bar-orientation)                           |
-| highlight one series, mute the rest | `emphasis`                                                                                           | [Emphasis](#emphasis)                                         |
-| mark a goal, threshold or event     | `hlines`, `vlines`                                                                                   | [Reference lines](#reference-lines)                           |
-| shade a period or a range           | `hspans`, `vspans`                                                                                   | [Reference bands](#reference-bands)                           |
-| compare several series side by side | `data` as a list of lists, `subtitle`, `show_legend`                                                 | [Multiple Bar Charts](#multiple-bar-charts)                   |
-| stack or overlay the series         | `bar_mode`                                                                                           | [Bar mode](#bar-mode)                                         |
-| draw each series in its own subplot | `subplots`, `sharex`, `sharey`, `max_cols`                                                           | [Subplots](#subplots)                                         |
-| add error bars                      | `yerr` in `data`, `show_yerr`, `style={"plot_bar_error_color": ...}`                                 | [Error bars](#error-bars)                                     |
-| print the value on each bar         | `show_values`                                                                                        | [Bar value labels](#bar-value-labels)                         |
-| format the printed values           | `value_format` (a `VALUE_FORMAT` constant or a format string)                                        | [Bar value labels](#bar-value-labels)                         |
-| style the value labels              | `style={"plot_bar_value_fontsize": ..., "plot_bar_value_color": ..., "plot_bar_value_padding": ...}` | [Bar value labels](#bar-value-labels)                         |
-| use a logarithmic axis              | `scaley`, `scalex`                                                                                   | [Axis scales](#axis-scales)                                   |
-| save the chart to a file            | `save_figure`                                                                                        | [Saving the Chart as an Image](#saving-the-chart-as-an-image) |
+| I want to…                                    | Use                                                                                                  | See                                                           |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| add a title and axis labels                   | `title`, `xlabel`, `ylabel`                                                                          | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
+| rotate the tick labels                        | `xtickrotate`, `ytickrotate`                                                                         | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
+| fix the axis range                            | `xmin`, `xmax`, `ymin`, `ymax`                                                                       | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
+| resize the figure                             | `figsize`                                                                                            | [Figure size and grid](#figure-size-and-grid)                 |
+| show grid lines                               | `show_grid`                                                                                          | [Figure size and grid](#figure-size-and-grid)                 |
+| fix the aspect ratio of the axes              | `aspect_ratio`                                                                                       | [Figure size and grid](#figure-size-and-grid)                 |
+| change the bar color                          | `style={"plot_bar_color": ...}`                                                                      | [Bar style](#bar-style)                                       |
+| change the bar width                          | `style={"plot_bar_width": ...}`                                                                      | [Bar style](#bar-style)                                       |
+| make the bars (semi-)transparent              | `style={"plot_bar_alpha": ...}`                                                                      | [Bar style](#bar-style)                                       |
+| add a hatch pattern                           | `style={"plot_bar_hatch": ...}`                                                                      | [Bar style](#bar-style)                                       |
+| outline the bars                              | `style={"plot_bar_edge_color": ..., "plot_bar_edge_width": ...}`                                     | [Bar style](#bar-style)                                       |
+| draw horizontal bars                          | `orientation`                                                                                        | [Bar orientation](#bar-orientation)                           |
+| highlight one series, mute the rest           | `emphasis`                                                                                           | [Emphasis](#emphasis)                                         |
+| order the bars by value                       | `sort`, `sort_by`                                                                                    | [Sorting and emphasis rules](#sorting-and-emphasis-rules)     |
+| highlight the bars above a value or the top n | `emphasis_rule`, a per-bar `emphasis` key                                                            | [Sorting and emphasis rules](#sorting-and-emphasis-rules)     |
+| mark a goal, threshold or event               | `hlines`, `vlines`                                                                                   | [Reference lines](#reference-lines)                           |
+| shade a period or a range                     | `hspans`, `vspans`                                                                                   | [Reference bands](#reference-bands)                           |
+| compare several series side by side           | `data` as a list of lists, `subtitle`, `show_legend`                                                 | [Multiple Bar Charts](#multiple-bar-charts)                   |
+| stack or overlay the series                   | `bar_mode`                                                                                           | [Bar mode](#bar-mode)                                         |
+| draw each series in its own subplot           | `subplots`, `sharex`, `sharey`, `max_cols`                                                           | [Subplots](#subplots)                                         |
+| add error bars                                | `yerr` in `data`, `show_yerr`, `style={"plot_bar_error_color": ...}`                                 | [Error bars](#error-bars)                                     |
+| print the value on each bar                   | `show_values`                                                                                        | [Bar value labels](#bar-value-labels)                         |
+| format the printed values                     | `value_format` (a `VALUE_FORMAT` constant or a format string)                                        | [Bar value labels](#bar-value-labels)                         |
+| style the value labels                        | `style={"plot_bar_value_fontsize": ..., "plot_bar_value_color": ..., "plot_bar_value_padding": ...}` | [Bar value labels](#bar-value-labels)                         |
+| use a logarithmic axis                        | `scaley`, `scalex`                                                                                   | [Axis scales](#axis-scales)                                   |
+| save the chart to a file                      | `save_figure`                                                                                        | [Saving the Chart as an Image](#saving-the-chart-as-an-image) |
 
 The full list of style attributes is in the [datachart.typings.BarStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BarStyleAttrs) type; the full list of parameters is in the [datachart.charts.BarChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.BarChart) reference.
 
@@ -1979,6 +1985,49 @@ BarChart(
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
+).show()
+```
+
+### Sorting and emphasis rules
+
+A comparison reads best when the bars are in order and the ones that matter stand out. `sort` orders the categories by value — `"ascending"`, `"descending"`, or `None` for input order — and one order serves every series in the chart, keyed by the total across them; `sort_by` names a series (by subtitle) to key the order instead, and ties keep input order. The orders are also available as the [datachart.constants.SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT) constants.
+
+`emphasis_rule` highlights the bars that match a one-key rule and mutes the rest: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}`. The rule reads each bar's own value, so it means the same thing under every `bar_mode`. A bar can also carry its own `"emphasis"` key, which wins over the rule — the way to say "the top three, and also this one".
+
+The first example ranks the months and highlights the ones that beat the sales goal; the second orders the grouped chart by the Asia-Pacific series.
+
+```
+from datachart.constants import SORT
+
+BarChart(
+    data=sales_total,
+    title="Monthly unit sales (2025), months above goal",
+    xlabel="Month",
+    ylabel="Units sold",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    # largest month first
+    sort=SORT.DESCENDING,
+    # highlight the months that beat the goal, mute the rest
+    emphasis_rule={"above": SALES_GOAL},
+    hlines={"y": SALES_GOAL, "label": "Goal"},
+    show_legend=True,
+).show()
+```
+
+```
+BarChart(
+    data=sales_by_region,
+    subtitle=REGIONS,
+    title="Monthly unit sales by region (2025), ordered by Asia-Pacific",
+    xlabel="Month",
+    ylabel="Units sold",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+    # one order for every series, keyed by one of them
+    sort=SORT.ASCENDING,
+    sort_by="Asia-Pacific",
 ).show()
 ```
 
@@ -2700,6 +2749,28 @@ PyramidChart(
 ).show()
 ```
 
+### Sorting and emphasis rules
+
+Age bands have a natural order, but a pyramid can also rank its categories: `sort` orders them by value — `"ascending"`, `"descending"`, or `None` for input order — with one order for both sides, keyed by the total of the two (or by the side `sort_by` names by subtitle). The orders are the [datachart.constants.SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT) constants.
+
+`emphasis_rule` highlights the bars that match a one-key rule and mutes the rest: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}`. It reads each bar's positive value, on both sides. A data point can also carry its own `"emphasis"` key, which wins over the rule. The example ranks the bands by their combined population and picks out the five largest bars.
+
+```
+from datachart.constants import SORT
+
+PyramidChart(
+    data=[riverside_bands, hillcrest_bands],
+    subtitle=["Riverside", "Hillcrest"],
+    title="Age bands ranked by combined population",
+    figsize=FIG_SIZE.FULL_TALL,
+    show_legend=True,
+    # largest bands at the top of the pyramid
+    sort=SORT.ASCENDING,
+    # the five largest bars, either side
+    emphasis_rule={"top": 5},
+).show()
+```
+
 ### Error bars
 
 The `show_yerr` attribute draws the `yerr` values as error bars at the bar ends — on a pyramid they extend along the value axis, symmetrically on both sides of the bar end.
@@ -3143,6 +3214,24 @@ RadialChart(
     emphasis=["background", "highlight"],
     title="Average wind speed by direction",
     show_legend=True,
+).show()
+```
+
+On the bar visual, emphasis can also come from the values. `sort` orders the sectors around the circle by value (`"ascending"` or `"descending"`; the [datachart.constants.SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT) constants), one order for every series, and `emphasis_rule` highlights the bars matching a one-key rule — `{"above": v}`, `{"below": v}`, `{"between": (lo, hi)}`, `{"top": n}`, or `{"bottom": n}` — and mutes the rest. A data point's own `"emphasis"` key wins over the rule. The example orders the directions by speed and picks out the ones averaging above 15 km/h.
+
+```
+from datachart.constants import SORT
+
+RadialChart(
+    data=wind_by_direction,
+    type=RADIAL_TYPE.BAR,
+    title="Directions averaging above 15 km/h",
+    # sectors in order of speed, clockwise from the start angle
+    sort=SORT.ASCENDING,
+    # highlight the strong directions, mute the rest
+    emphasis_rule={"above": 15},
+    show_values=True,
+    value_format="%.1f",
 ).show()
 ```
 
@@ -13822,12 +13911,13 @@ When a figure carries many series, the story is usually about one of them: one m
 - `"highlight"` bolds a series and brings it to the front of the data layers (never above axes or reference lines). It keeps its theme-assigned color and legend entry.
 - Leaving it unset (`None`) draws the series exactly as before.
 
-`emphasis` is accepted by `LineChart`, `BarChart`, `ScatterChart`, `Histogram`, `ParallelCoords` (per data row), and `BoxPlot` (per box label), and as a per-figure `"emphasis"` option in `Panel`. Because muting derives from the theme's `muted_color`/`muted_alpha` attributes, background series harmonize with whatever theme is active. The role strings are also available as constants: `datachart.constants.EMPHASIS.BACKGROUND` and `EMPHASIS.HIGHLIGHT`.
+`emphasis` is accepted by `LineChart`, `BarChart`, `ScatterChart`, `Histogram`, `ParallelCoords` (per data row), and `BoxPlot` (per box label), and as a per-figure `"emphasis"` option in `Panel`. Bar records — in `BarChart`, `PyramidChart`, and the `RadialChart` bar visual — also carry their own `"emphasis"` key, and those fronts' `emphasis_rule` fills it in from the values. Because muting derives from the theme's `muted_color`/`muted_alpha` attributes, background series harmonize with whatever theme is active. The role strings are also available as constants: `datachart.constants.EMPHASIS.BACKGROUND` and `EMPHASIS.HIGHLIGHT`.
 
 ```
 import numpy as np
 
 from datachart.charts import (
+    BarChart,
     BoxPlot,
     Histogram,
     LineChart,
@@ -13836,7 +13926,7 @@ from datachart.charts import (
 )
 from datachart.utils import Panel
 from datachart.config import config
-from datachart.constants import THEME
+from datachart.constants import SORT, THEME
 ```
 
 ## One Walk Among Many
@@ -13965,6 +14055,31 @@ figure = BoxPlot(
     data=data,
     emphasis=["background", None, "highlight", "background"],
     title="One group under scrutiny",
+)
+figure.show()
+```
+
+## Bars Picked by a Rule
+
+A bar chart's emphasis can come from the data instead of a hand-written list. `emphasis_rule` is a one-key dict — `{"above": v}`, `{"below": v}`, `{"between": (lo, hi)}`, `{"top": n}`, or `{"bottom": n}` — that highlights every bar matching it and mutes the rest; the contrast is the point, so the rule commits to both ends. Each bar record may also carry its own `"emphasis"` key, and an explicit record role always wins over the rule, which is how "the top three, and also this one" is said. `sort` orders the categories by value so the ranking reads left to right; it never changes which bars the rule picks.
+
+```
+rng = np.random.RandomState(13)
+teams = [
+    {"label": f"team {chr(65 + i)}", "y": float(round(rng.rand() * 80 + 10))}
+    for i in range(10)
+]
+# the team under review is highlighted whatever its score
+teams[7]["emphasis"] = "highlight"
+
+figure = BarChart(
+    data=teams,
+    title="Top three by score, plus the team under review",
+    ylabel="Score",
+    sort=SORT.DESCENDING,
+    emphasis_rule={"top": 3},
+    show_values=True,
+    value_format="{:.0f}",
 )
 figure.show()
 ```
@@ -14634,6 +14749,9 @@ BarChart(
         Union[ORIENTATION, str]
     ] = ORIENTATION.VERTICAL,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
+    sort: Optional[Union[SORT, str]] = None,
+    sort_by: Optional[str] = None,
+    emphasis_rule: Optional[dict] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
@@ -14744,7 +14862,7 @@ Bars compare a numeric value across discrete categories: each label gets a bar w
 
 Added in Unreleased
 
-The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands.
+The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands. The `sort` and `sort_by` category order, the `emphasis_rule`, and the per-record `emphasis` key.
 
 Examples:
 
@@ -14785,6 +14903,9 @@ Examples:
 | `value_format`  | Format string for bar value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                      |
 | `aspect_ratio`  | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                 |
 | `bar_mode`      | How multiple bar series share the axis: "group" (side-by-side), "stack" (stacked), or "overlay" (overlapping). See BAR_MODE. **TYPE:** `Optional[Union[BAR_MODE, str]]` **DEFAULT:** `None`                                                                                                                                                            |
+| `sort`          | The order the categories are drawn in: None (input order), "ascending", or "descending" by value. One order serves every series, keyed by the total across them; ties keep input order. See SORT. **TYPE:** `Optional[Union[SORT, str]]` **DEFAULT:** `None`                                                                                           |
+| `sort_by`       | The subtitle of the one series whose values key the sort instead of the total. A category that series lacks sorts last. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                  |
+| `emphasis_rule` | A one-key dict that highlights the bars matching it and mutes the rest: {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}. Reads each bar's own value; a record's own emphasis key wins over the rule. **TYPE:** `Optional[dict]` **DEFAULT:** `None`                                              |
 | `orientation`   | The orientation of the bars ("vertical" or "horizontal"). See ORIENTATION. **TYPE:** `Optional[Union[ORIENTATION, str]]` **DEFAULT:** `ORIENTATION.VERTICAL`                                                                                                                                                                                           |
 | `scalex`        | The x-axis scale ("linear", "log", "symlog", "asinh"). Useful for horizontal bars. See SCALE. **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                              |
 | `scaley`        | The y-axis scale ("linear", "log", "symlog", "asinh"). Useful for vertical bars. See SCALE. **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                |
@@ -14837,6 +14958,9 @@ PyramidChart(
     show_yerr: Optional[bool] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    sort: Optional[Union[SORT, str]] = None,
+    sort_by: Optional[str] = None,
+    emphasis_rule: Optional[dict] = None,
     style: Optional[
         Union[BarStyleAttrs, List[Optional[BarStyleAttrs]]]
     ] = None,
@@ -14883,7 +15007,7 @@ Added in v0.8.0
 
 Added in Unreleased
 
-The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands.
+The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands. The `sort` and `sort_by` category order, the `emphasis_rule`, and the per-record `emphasis` key.
 
 Examples:
 
@@ -14908,39 +15032,42 @@ Examples:
 ... )
 ```
 
-| PARAMETER       | DESCRIPTION                                                                                                                                                                                                                      |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`          | Exactly two lists of data points — the first is the left side, the second the right. Values are positive for both sides; the chart mirrors the left side itself. **TYPE:** `List[List[BarDataPointAttrs]]`                       |
-| `title`         | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                            |
-| `xlabel`        | The label of the horizontal value axis. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                            |
-| `ylabel`        | The label of the vertical category axis. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                           |
-| `subtitle`      | The names of the two sides. Used as legend labels. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                     |
-| `figsize`       | The size of the figure as (width, height) in inches. See FIG_SIZE. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                |
-| `xmin`          | Not supported; the value axis is always symmetric around zero. Raises when passed. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                   |
-| `xmax`          | The maximum per-side value; the value axis spans (-xmax, xmax). **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                      |
-| `show_legend`   | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                       |
-| `legend`        | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                             |
-| `show_grid`     | Which grid lines to show ("both", "x", "y"). See SHOW_GRID. **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                      |
-| `show_yerr`     | Whether to show error bars on the bars. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                           |
-| `show_values`   | Whether to show bar value labels at the edge of each bar. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                         |
-| `value_format`  | Format string for bar value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                |
-| `style`         | Style configuration(s) for the bars, per side. **TYPE:** `Optional[Union[BarStyleAttrs, List[Optional[BarStyleAttrs]]]]` **DEFAULT:** `None`                                                                                     |
-| `xticks`        | Custom value-axis tick positions, as positive values; each is mirrored to both halves. **TYPE:** `Optional[List[Union[int, float]]]` **DEFAULT:** `None`                                                                         |
-| `xticklabels`   | Custom value-axis tick labels (same length as xticks), applied to both mirrored halves. **TYPE:** `Optional[List[str]]` **DEFAULT:** `None`                                                                                      |
-| `xtickrotate`   | Rotation angle for value-axis tick labels. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                         |
-| `yticks`        | Custom category-axis tick positions. **TYPE:** `Optional[List[Union[int, float]]]` **DEFAULT:** `None`                                                                                                                           |
-| `yticklabels`   | Custom category-axis tick labels. **TYPE:** `Optional[List[str]]` **DEFAULT:** `None`                                                                                                                                            |
-| `ytickrotate`   | Rotation angle for category-axis tick labels. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                      |
-| `xticks_format` | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None` |
-| `yticks_format` | The y-axis tick label format, as xticks_format. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                  |
-| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs]]]` **DEFAULT:** `None`                                                                                                                  |
-| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs]]]` **DEFAULT:** `None`                                                                                                                |
-| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]]` **DEFAULT:** `None`                                                                              |
-| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]]` **DEFAULT:** `None`                                                                            |
-| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs]]]` **DEFAULT:** `None`                                                                                                                          |
-| `label`         | The key name in data for label values (default: "label"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                              |
-| `y`             | The key name in data for the bar values (default: "y"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                |
-| `yerr`          | The key name in data for the bar error values (default: "yerr"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                       |
+| PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                    |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`          | Exactly two lists of data points — the first is the left side, the second the right. Values are positive for both sides; the chart mirrors the left side itself. **TYPE:** `List[List[BarDataPointAttrs]]`                                                                                                     |
+| `title`         | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                          |
+| `xlabel`        | The label of the horizontal value axis. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                          |
+| `ylabel`        | The label of the vertical category axis. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                         |
+| `subtitle`      | The names of the two sides. Used as legend labels. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                   |
+| `figsize`       | The size of the figure as (width, height) in inches. See FIG_SIZE. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                                                                                              |
+| `xmin`          | Not supported; the value axis is always symmetric around zero. Raises when passed. **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                 |
+| `xmax`          | The maximum per-side value; the value axis spans (-xmax, xmax). **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                    |
+| `show_legend`   | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                     |
+| `legend`        | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                           |
+| `show_grid`     | Which grid lines to show ("both", "x", "y"). See SHOW_GRID. **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                    |
+| `show_yerr`     | Whether to show error bars on the bars. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                         |
+| `show_values`   | Whether to show bar value labels at the edge of each bar. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                       |
+| `value_format`  | Format string for bar value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                              |
+| `sort`          | The order the categories are drawn in: None (input order), "ascending", or "descending" by value. One order serves both sides, keyed by the total of the two; ties keep input order. See SORT. **TYPE:** `Optional[Union[SORT, str]]` **DEFAULT:** `None`                                                      |
+| `sort_by`       | The subtitle of the one side whose values key the sort instead of the total. A category that side lacks sorts last. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                              |
+| `emphasis_rule` | A one-key dict that highlights the bars matching it and mutes the rest: {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}. Reads each bar's positive value; a record's own emphasis key wins over the rule. **TYPE:** `Optional[dict]` **DEFAULT:** `None` |
+| `style`         | Style configuration(s) for the bars, per side. **TYPE:** `Optional[Union[BarStyleAttrs, List[Optional[BarStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                   |
+| `xticks`        | Custom value-axis tick positions, as positive values; each is mirrored to both halves. **TYPE:** `Optional[List[Union[int, float]]]` **DEFAULT:** `None`                                                                                                                                                       |
+| `xticklabels`   | Custom value-axis tick labels (same length as xticks), applied to both mirrored halves. **TYPE:** `Optional[List[str]]` **DEFAULT:** `None`                                                                                                                                                                    |
+| `xtickrotate`   | Rotation angle for value-axis tick labels. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                       |
+| `yticks`        | Custom category-axis tick positions. **TYPE:** `Optional[List[Union[int, float]]]` **DEFAULT:** `None`                                                                                                                                                                                                         |
+| `yticklabels`   | Custom category-axis tick labels. **TYPE:** `Optional[List[str]]` **DEFAULT:** `None`                                                                                                                                                                                                                          |
+| `ytickrotate`   | Rotation angle for category-axis tick labels. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                    |
+| `xticks_format` | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                               |
+| `yticks_format` | The y-axis tick label format, as xticks_format. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                |
+| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                                |
+| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                              |
+| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]]` **DEFAULT:** `None`                                                                                                                                                            |
+| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]]` **DEFAULT:** `None`                                                                                                                                                          |
+| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                                        |
+| `label`         | The key name in data for label values (default: "label"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                            |
+| `y`             | The key name in data for the bar values (default: "y"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                              |
+| `yerr`          | The key name in data for the bar error values (default: "yerr"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                     |
 
 | RETURNS      | DESCRIPTION                              |
 | ------------ | ---------------------------------------- |
@@ -14980,6 +15107,9 @@ RadialChart(
     show_border: Optional[bool] = None,
     value_format: Optional[str] = None,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
+    sort: Optional[Union[SORT, str]] = None,
+    sort_by: Optional[str] = None,
+    emphasis_rule: Optional[dict] = None,
     num_bins: Optional[int] = None,
     startangle: Optional[Union[str, int, float]] = None,
     direction: Optional[Union[DIRECTION, str]] = None,
@@ -15046,7 +15176,7 @@ Added in v0.8.0
 
 Added in Unreleased
 
-The `legend` parameter. The `vspans` and `hspans` reference bands.
+The `legend` parameter. The `vspans` and `hspans` reference bands. The `sort` and `sort_by` category order, the `emphasis_rule`, and the per-record `emphasis` key (bar visual).
 
 Examples:
 
@@ -15085,6 +15215,9 @@ Examples:
 | `show_border`     | Whether to draw the outer border circle. Defaults to the theme's spine visibility; False hides it. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                          |
 | `value_format`    | Format for the values written by show_values — a printf format (e.g. "%.1f") or a {x}-style string. See VALUE_FORMAT. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                        |
 | `bar_mode`        | How multiple bar series share the circle: "group", "stack", or "overlay" (bar visual). See BAR_MODE. **TYPE:** `Optional[Union[BAR_MODE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                        |
+| `sort`            | The order the categories are drawn in around the circle: None (input order), "ascending", or "descending" by value (bar visual). One order serves every series, keyed by the total across them; ties keep input order. See SORT. **TYPE:** `Optional[Union[SORT, str]]` **DEFAULT:** `None`                                                                                                                                |
+| `sort_by`         | The subtitle of the one series whose values key the sort instead of the total (bar visual). A category that series lacks sorts last. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                         |
+| `emphasis_rule`   | A one-key dict that highlights the bars matching it and mutes the rest (bar visual): {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}. Reads each bar's own value; a record's own emphasis key wins over the rule. **TYPE:** `Optional[dict]` **DEFAULT:** `None`                                                                                                     |
 | `num_bins`        | The number of angular bins over \[0, 360) (histogram visual). **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                |
 | `startangle`      | Where the first point sits: a compass location ("N", "NE", "E", "SE", "S", "SW", "W", "NW") or a numeric compass bearing in degrees clockwise from north. Defaults to "N". **TYPE:** `Optional[Union[str, int, float]]` **DEFAULT:** `None`                                                                                                                                                                                |
 | `direction`       | Which way the angles increase: "clockwise" (default) or "counterclockwise". See DIRECTION. **TYPE:** `Optional[Union[DIRECTION, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                 |
@@ -19805,6 +19938,29 @@ Examples:
 | `STACK`   | The series are stacked on top of each other. Equals to "stack". **TYPE:** `str`                 |
 | `OVERLAY` | The series are drawn over each other at the same position. Equals to "overlay". **TYPE:** `str` |
 
+### datachart.constants.SORT
+
+The supported category sort orders.
+
+Passed as the `sort` setting of the bar-type fronts (`BarChart`, `PyramidChart`, and the `RadialChart` bar visual): the order the categories are drawn in, by value. One order serves every series in the chart, keyed by the total across them or by the series `sort_by` names; ties keep input order.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import SORT
+>>> SORT.DEFAULT
+None
+```
+
+| ATTRIBUTE    | DESCRIPTION                                                  |
+| ------------ | ------------------------------------------------------------ |
+| `DEFAULT`    | The default sort. Same as SORT.NONE. **TYPE:** `None`        |
+| `NONE`       | Input order. Equals to None. **TYPE:** `None`                |
+| `ASCENDING`  | Smallest value first. Equals to "ascending". **TYPE:** `str` |
+| `DESCENDING` | Largest value first. Equals to "descending". **TYPE:** `str` |
+
 ### datachart.constants.NORMALIZE
 
 The supported normalization options.
@@ -20462,11 +20618,12 @@ Bases: `TypedDict`
 
 The data point attributes for the bar chart.
 
-| ATTRIBUTE | DESCRIPTION                                                     |
-| --------- | --------------------------------------------------------------- |
-| `label`   | The label. **TYPE:** `str`                                      |
-| `y`       | The y-axis value. **TYPE:** `Union[int, float]`                 |
-| `yerr`    | The y-axis error value. **TYPE:** `Optional[Union[int, float]]` |
+| ATTRIBUTE  | DESCRIPTION                                                                                                                                |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `label`    | The label. **TYPE:** `str`                                                                                                                 |
+| `y`        | The y-axis value. **TYPE:** `Union[int, float]`                                                                                            |
+| `yerr`     | The y-axis error value. **TYPE:** `Optional[Union[int, float]]`                                                                            |
+| `emphasis` | The bar's own emphasis role ("background" or "highlight"); wins over the chart's emphasis_rule. **TYPE:** `Optional[Union[EMPHASIS, str]]` |
 
 ### Histogram Typings
 
@@ -20832,12 +20989,13 @@ The data point attributes for the radial chart.
 
 The line, bar, and scatter visuals take `label`/`y` points whose labels are placed evenly around the circle; the histogram visual takes numeric `x` observations in degrees.
 
-| ATTRIBUTE | DESCRIPTION                                                                                    |
-| --------- | ---------------------------------------------------------------------------------------------- |
-| `label`   | The category label (line, bar, and scatter visuals). **TYPE:** `str`                           |
-| `y`       | The radial value (line, bar, and scatter visuals). **TYPE:** `Union[int, float]`               |
-| `yerr`    | The radial error value. **TYPE:** `Optional[Union[int, float]]`                                |
-| `x`       | The angular observation in degrees (histogram visual). **TYPE:** `Optional[Union[int, float]]` |
+| ATTRIBUTE  | DESCRIPTION                                                                                                                                             |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`    | The category label (line, bar, and scatter visuals). **TYPE:** `str`                                                                                    |
+| `y`        | The radial value (line, bar, and scatter visuals). **TYPE:** `Union[int, float]`                                                                        |
+| `yerr`     | The radial error value. **TYPE:** `Optional[Union[int, float]]`                                                                                         |
+| `x`        | The angular observation in degrees (histogram visual). **TYPE:** `Optional[Union[int, float]]`                                                          |
+| `emphasis` | The bar's own emphasis role ("background" or "highlight"); wins over the chart's emphasis_rule (bar visual). **TYPE:** `Optional[Union[EMPHASIS, str]]` |
 
 ## Style Typings
 

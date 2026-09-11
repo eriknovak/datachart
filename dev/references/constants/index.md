@@ -484,6 +484,29 @@ Examples:
 | `STACK`   | The series are stacked on top of each other. Equals to "stack". **TYPE:** `str`                 |
 | `OVERLAY` | The series are drawn over each other at the same position. Equals to "overlay". **TYPE:** `str` |
 
+### datachart.constants.SORT
+
+The supported category sort orders.
+
+Passed as the `sort` setting of the bar-type fronts (`BarChart`, `PyramidChart`, and the `RadialChart` bar visual): the order the categories are drawn in, by value. One order serves every series in the chart, keyed by the total across them or by the series `sort_by` names; ties keep input order.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import SORT
+>>> SORT.DEFAULT
+None
+```
+
+| ATTRIBUTE    | DESCRIPTION                                                  |
+| ------------ | ------------------------------------------------------------ |
+| `DEFAULT`    | The default sort. Same as SORT.NONE. **TYPE:** `None`        |
+| `NONE`       | Input order. Equals to None. **TYPE:** `None`                |
+| `ASCENDING`  | Smallest value first. Equals to "ascending". **TYPE:** `str` |
+| `DESCENDING` | Largest value first. Equals to "descending". **TYPE:** `str` |
+
 ### datachart.constants.NORMALIZE
 
 The supported normalization options.
