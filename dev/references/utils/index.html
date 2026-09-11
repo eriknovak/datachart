@@ -2430,8 +2430,11 @@ supported format, and one file per format is written next to it.
 <a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">ymax</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="n">ymin_right</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="n">ymax_right</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>    <span class="n">bar_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">BAR_MODE</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>    <span class="n">scalex</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">SCALE</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>    <span class="n">scaley</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">SCALE</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>    <span class="n">scaley_right</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">SCALE</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>    <span class="n">bar_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">BAR_MODE</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -2446,26 +2449,34 @@ when every bar chart and histogram in it is horizontal, vertical otherwise.
 Mixing the two orientations raises <code>ValueError</code>. The <em>value axis</em> carries
 the quantities — y in a vertical panel, x in a horizontal one — and the
 <em>category axis</em> is the other. The parameters keep their spelling but
-address the axis by role: <code>ylabel_left</code>/<code>ylabel_right</code>, <code>ymin</code>/<code>ymax</code>
-and <code>ymin_right</code>/<code>ymax_right</code> set the primary/secondary value axis,
-<code>xlabel</code> and <code>xmin</code>/<code>xmax</code> the category axis. In a horizontal panel
+address the axis by role: <code>ylabel_left</code>/<code>ylabel_right</code>, <code>ymin</code>/<code>ymax</code>,
+<code>ymin_right</code>/<code>ymax_right</code> and <code>scaley</code>/<code>scaley_right</code> set the
+primary/secondary value axis, <code>xlabel</code>, <code>xmin</code>/<code>xmax</code> and <code>scalex</code>
+the category axis. In a horizontal panel
 the secondary value axis sits at the top, so <code>"y_axis": "left"</code> means the
 bottom axis and <code>"right"</code> the top one, and the legend suffixes become
 <code>(B)</code>/<code>(T)</code>. Line and scatter figures follow the panel: in a horizontal
 panel their <code>x</code> runs along the category axis and their <code>y</code> along the
 value axis, so the same <code>LineChart</code> overlays vertical and horizontal bars.</p>
+<p>Each axis keeps the scale its figures were built with: a figure drawn
+with <code>scaley="log"</code> stays log in the panel, on whichever value axis it
+lands. The panel's own <code>scalex</code>, <code>scaley</code> and <code>scaley_right</code> override
+that per axis; where the figures on one axis disagree, the first one wins
+and the panel warns (<code>overlay_warn_scale_conflict</code> in the config). The
+two value axes scale independently, so linear bars on the primary axis
+against a log line on the secondary one is one panel.</p>
 <p>Panel figures nest: <code>Panel([Panel([f1, f2]), f3])</code> is equivalent to
 <code>Panel([f1, f2, f3])</code>, to any depth. A nested panel contributes its
-figures with their per-figure options intact, while panel-level settings
-(title, labels, limits, ...) always come from the outermost call. Dict
-options on a nested panel override its per-figure options only when
-explicitly given.</p>
+figures with their per-figure options and axis scales intact, while the
+other panel-level settings (title, labels, limits, ...) always come from
+the outermost call. Dict options on a nested panel override its
+per-figure options only when explicitly given.</p>
 <div class="admonition info">
 <p class="admonition-title">Added in v0.8.0</p>
 </div>
 <div class="admonition info">
 <p class="admonition-title">Added in Unreleased</p>
-<p>The <code>legend</code> parameter.</p>
+<p>The <code>legend</code>, <code>scalex</code>, <code>scaley</code> and <code>scaley_right</code> parameters.</p>
 </div>
 
 
@@ -2493,18 +2504,27 @@ explicitly given.</p>
 <a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="gp">... </span>    <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="gp">... </span><span class="p">)</span>
 <a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="gp">&gt;&gt;&gt;</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Horizontal bars make a horizontal panel: the line runs along the</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># categories and "right" is the top value axis</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">hbar_fig</span> <span class="o">=</span> <span class="n">BarChart</span><span class="p">(</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="gp">... </span>    <span class="n">data</span><span class="o">=</span><span class="p">[{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mi">100</span><span class="p">},</span> <span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mi">200</span><span class="p">}],</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="gp">... </span>    <span class="n">orientation</span><span class="o">=</span><span class="s2">"horizontal"</span><span class="p">,</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="gp">... </span><span class="p">)</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">combined</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="gp">... </span>    <span class="p">[</span><span class="n">hbar_fig</span><span class="p">,</span> <span class="p">{</span><span class="s2">"figure"</span><span class="p">:</span> <span class="n">line_fig</span><span class="p">,</span> <span class="s2">"y_axis"</span><span class="p">:</span> <span class="s2">"right"</span><span class="p">}],</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="gp">... </span>    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Category"</span><span class="p">,</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="gp">... </span>    <span class="n">ylabel_left</span><span class="o">=</span><span class="s2">"Count"</span><span class="p">,</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="gp">... </span>    <span class="n">ylabel_right</span><span class="o">=</span><span class="s2">"Average"</span><span class="p">,</span>
-<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="gp">... </span><span class="p">)</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Each value axis scales on its own: linear bars, a log line</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">combined</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="gp">... </span>    <span class="p">[</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="gp">... </span>        <span class="p">{</span><span class="s2">"figure"</span><span class="p">:</span> <span class="n">bar_fig</span><span class="p">,</span> <span class="s2">"y_axis"</span><span class="p">:</span> <span class="s2">"left"</span><span class="p">},</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="gp">... </span>        <span class="p">{</span><span class="s2">"figure"</span><span class="p">:</span> <span class="n">line_fig</span><span class="p">,</span> <span class="s2">"y_axis"</span><span class="p">:</span> <span class="s2">"right"</span><span class="p">},</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="gp">... </span>    <span class="p">],</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="gp">... </span>    <span class="n">scaley_right</span><span class="o">=</span><span class="s2">"log"</span><span class="p">,</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="gp">... </span><span class="p">)</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="gp">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Horizontal bars make a horizontal panel: the line runs along the</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># categories and "right" is the top value axis</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">hbar_fig</span> <span class="o">=</span> <span class="n">BarChart</span><span class="p">(</span>
+<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a><span class="gp">... </span>    <span class="n">data</span><span class="o">=</span><span class="p">[{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mi">100</span><span class="p">},</span> <span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mi">200</span><span class="p">}],</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a><span class="gp">... </span>    <span class="n">orientation</span><span class="o">=</span><span class="s2">"horizontal"</span><span class="p">,</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a><span class="gp">... </span><span class="p">)</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">combined</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+<a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a><span class="gp">... </span>    <span class="p">[</span><span class="n">hbar_fig</span><span class="p">,</span> <span class="p">{</span><span class="s2">"figure"</span><span class="p">:</span> <span class="n">line_fig</span><span class="p">,</span> <span class="s2">"y_axis"</span><span class="p">:</span> <span class="s2">"right"</span><span class="p">}],</span>
+<a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a><span class="gp">... </span>    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Category"</span><span class="p">,</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a><span class="gp">... </span>    <span class="n">ylabel_left</span><span class="o">=</span><span class="s2">"Count"</span><span class="p">,</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a><span class="gp">... </span>    <span class="n">ylabel_right</span><span class="o">=</span><span class="s2">"Average"</span><span class="p">,</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a><span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -2842,6 +2862,70 @@ Default is taken from config (overlay_auto_threshold, default 3.0).</p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
                       <code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scalex</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The category-axis scale ("linear", "log", "symlog", "asinh").
+Default: the scale the first figure was built with. See <code>SCALE</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SCALE&lt;/span&gt;" href="../constants/#datachart.constants.SCALE">SCALE</a>, <span title="str">str</span>]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scaley</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The primary value-axis scale. Default: the scale the first
+figure on that axis was built with.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SCALE&lt;/span&gt;" href="../constants/#datachart.constants.SCALE">SCALE</a>, <span title="str">str</span>]]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scaley_right</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The secondary value-axis scale. Default: the scale the
+first figure on that axis was built with. Inert on a polar panel,
+which has no secondary axis.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SCALE&lt;/span&gt;" href="../constants/#datachart.constants.SCALE">SCALE</a>, <span title="str">str</span>]]</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>

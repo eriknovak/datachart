@@ -82,6 +82,7 @@ Every customization is either a keyword argument of `Panel` or a per-figure opti
 | bring a figure to the front         | per-figure `"z_order"`                                             | [Drawing order](#drawing-order)                               |
 | highlight one figure, mute the rest | per-figure `"emphasis"`                                            | [Emphasis](#emphasis)                                         |
 | limit the axes                      | `xmin`, `xmax`, `ymin`, `ymax`, `ymin_right`, `ymax_right`         | [Axis limits](#axis-limits)                                   |
+| scale an axis (linear, log, …)      | `scalex`, `scaley`, `scaley_right`, or the charts' own `scaley`    | [Axis scales](#axis-scales)                                   |
 | overlay several bar charts          | `bar_mode`                                                         | [Bar mode](#bar-mode)                                         |
 | add a figure to an existing panel   | nest `Panel` figures                                               | [Nesting panels](#nesting-panels)                             |
 | overlay horizontal bars             | `orientation` on the bar charts, the same `Panel` parameters       | [Horizontal panels](#horizontal-panels)                       |
@@ -287,6 +288,39 @@ Panel(
 ).show()
 ```
 
+### Axis scales
+
+To set the scale of an axis, add the `scalex`, `scaley` and `scaley_right` attributes with one of the [datachart.constants.SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) values; `scaley` applies to the left y-axis and `scaley_right` to the right one, so the two y-axes scale independently. Unlike the limits, a scale set on an individual chart is carried over: a chart drawn with `scaley=SCALE.LOG` stays log in the panel, on whichever y-axis it lands, and the panel attributes override it per axis. When the figures sharing one axis were built with different scales, the first one wins and the panel warns; the `overlay_warn_scale_conflict` setting of the [panel configuration](#panel-configuration) switches the warning off.
+
+`pollen` holds an illustrative monthly mean pollen concentration (in grains/m³), which spans three orders of magnitude between winter and spring. Against the precipitation bars on a linear left axis, a log right axis is what keeps the winter months readable:
+
+```
+from datachart.constants import SCALE
+
+# an illustrative monthly mean pollen concentration in grains/m³
+POLLEN = [4, 12, 180, 1400, 2100, 650, 210, 90, 40, 15, 6, 3]
+pollen = LineChart(
+    data=[{"x": i, "y": value} for i, value in enumerate(POLLEN)],
+    subtitle="Pollen (grains/m³)",
+)
+
+Panel(
+    [
+        {"figure": precipitation, "y_axis": "left"},
+        {"figure": pollen, "y_axis": "right"},
+    ],
+    # a log scale on the right y-axis only; the left one stays linear
+    scaley_right=SCALE.LOG,
+    title="Climate of Ljubljana",
+    xlabel="Month",
+    ylabel_left="Precipitation (mm)",
+    ylabel_right="Pollen (grains/m³)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+).show()
+```
+
 ### Bar mode
 
 When several bar charts are overlaid, the `bar_mode` attribute decides how their bars share each category, with the following values:
@@ -344,7 +378,7 @@ Panel(
 
 ### Nesting panels
 
-Panel figures nest: `Panel([Panel([f1, f2]), f3])` is equivalent to `Panel([f1, f2, f3])`, to any depth. A nested panel contributes its figures with their per-figure options intact, while the panel-level settings — title, labels, limits — always come from the outermost call. This makes it easy to add a figure to a panel you have already built, such as the stacked precipitation above extended with the temperature:
+Panel figures nest: `Panel([Panel([f1, f2]), f3])` is equivalent to `Panel([f1, f2, f3])`, to any depth. A nested panel contributes its figures with their per-figure options intact, while the panel-level settings — title, labels, limits — always come from the outermost call (the axis scales travel with the figures, as above). This makes it easy to add a figure to a panel you have already built, such as the stacked precipitation above extended with the temperature:
 
 ```
 # an existing panel...
@@ -376,7 +410,7 @@ Panel(
 
 A panel takes its orientation from the figures it holds: it is horizontal when every bar chart (and histogram) in it is horizontal, vertical otherwise, and mixing the two raises a `ValueError`. Line and scatter figures have no orientation of their own and follow the panel — in a horizontal panel their `x` runs along the categories and their `y` along the values, so the same temperature line overlays vertical and horizontal bars.
 
-The parameters keep their names but address the axes by role. The *value axis* carries the quantities (x in a horizontal panel) and the *category axis* the labels (y): `ylabel_left`, `ylabel_right`, `ymin`, `ymax`, `ymin_right` and `ymax_right` refer to the value axes, `xlabel`, `xmin` and `xmax` to the category axis. The secondary value axis sits at the top, so `"y_axis": "right"` places a figure on the top axis and the legend marks the two with `(B)` and `(T)`. Only `show_grid` keeps its literal meaning — it names the gridlines you see.
+The parameters keep their names but address the axes by role. The *value axis* carries the quantities (x in a horizontal panel) and the *category axis* the labels (y): `ylabel_left`, `ylabel_right`, `ymin`, `ymax`, `ymin_right`, `ymax_right`, `scaley` and `scaley_right` refer to the value axes, `xlabel`, `xmin`, `xmax` and `scalex` to the category axis. The secondary value axis sits at the top, so `"y_axis": "right"` places a figure on the top axis and the legend marks the two with `(B)` and `(T)`. Only `show_grid` keeps its literal meaning — it names the gridlines you see.
 
 ```
 from datachart.constants import ORIENTATION
