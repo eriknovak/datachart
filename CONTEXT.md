@@ -312,6 +312,14 @@ Defaults to matplotlib's auto count; a `CONTOUR_LEVELS` rule (`AUTO`, `RICE`,
 per-axis grid resolution, never on the raw cell count.
 _Avoid_: iso value, threshold, bin (for contours)
 
+**Category sort**:
+The order the categories of a bar-type front are drawn in — input order by
+default, ascending or descending by value under `sort`. One order serves every
+series in the chart, keyed by the total across them or by the one series
+`sort_by` names; a category that series does not carry sorts last, and ties
+keep input order (ADR 0042). Never a sort by label.
+_Avoid_: ordering, rank, bar order
+
 **Metadata transport**:
 The chart spec riding on a rendered figure (`figure._chart_metadata`) so composition
 functions (`Panel`, `Grid`) can rebuild it. Carries layers and panel settings, not
@@ -388,11 +396,20 @@ discarded at exit (ADR 0040).
 _Avoid_: temporary config, config stack, style context
 
 **Emphasis**:
-A per-chart (and, in `Panel`, per-figure) role — `"background"`, `"highlight"`,
-or unset — deciding how a layer reads relative to its siblings: background
-layers are muted and dropped from the legend, highlight layers are nudged
-forward (front z-order, slightly bolder). Styling, not data.
+A role — `"background"`, `"highlight"`, or unset — deciding how something
+reads relative to its siblings: background is muted and dropped from the
+legend, highlight is nudged forward (front z-order, slightly bolder). Styling,
+not data. Set per chart, per figure in `Panel`, per group label on the group
+fronts, or per record on the fronts whose records carry an `emphasis` key
+(treemap, network, bar).
 _Avoid_: background theme, de-emphasis flag
+
+**Emphasis rule**:
+A one-key dict on a bar-type front — `above`, `below`, `between`, `top`, or
+`bottom` — that reads each record's value and assigns it `"highlight"` when it
+matches and `"background"` when it does not. Sugar over the per-record
+`emphasis` key, which wins wherever a record sets one (ADR 0042).
+_Avoid_: threshold, emphasis filter, highlight rule
 
 **Muted**:
 The style transform emphasis applies to a background layer: theme's muted color,
