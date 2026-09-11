@@ -14,6 +14,8 @@ Methods:
         Get a list of discrete colors.
     create_color_cycle(name, max_colors):
         Create a color cycle.
+    is_plain_color(name):
+        Tell a plain color apart from a palette name.
 
 """
 
@@ -57,6 +59,8 @@ CUSTOM_PALETTES: Dict[str, List[str]] = {
 def is_plain_color(name: str) -> bool:
     """Whether a name is a plain color rather than a palette.
 
+    Callers resolve `CUSTOM_PALETTES` before asking.
+
     Args:
         name: The name to inspect.
 
@@ -65,8 +69,6 @@ def is_plain_color(name: str) -> bool:
 
     """
 
-    if not isinstance(name, str) or name in CUSTOM_PALETTES:
-        return False
     if not colors.is_color_like(name):
         return False
     # palettes win the ambiguous names ("Red", "Gold", "pink", "grey", ...)
@@ -139,6 +141,10 @@ def create_colormap(
     if not all(isinstance(c, str) for c in color_list):
         raise TypeError("The color_list items are not strings.")
 
+    # a ramp needs both ends; one color ramps from itself to itself
+    if len(color_list) == 1:
+        color_list = color_list * 2
+
     return colors.LinearSegmentedColormap.from_list(name, color_list)
 
 
@@ -163,7 +169,7 @@ def get_colormap(
     if isinstance(name, str) and name in CUSTOM_PALETTES:
         return create_colormap(CUSTOM_PALETTES[name], name)
 
-    if is_plain_color(name):
+    if isinstance(name, str) and is_plain_color(name):
         return create_colormap([name], name)
 
     try:
@@ -196,10 +202,11 @@ def get_discrete_colors(
         raise ValueError("The max_colors must be greater than 0.")
 
     # custom palettes and single colors cycle instead of interpolating
-    if isinstance(name, str) and name in CUSTOM_PALETTES:
-        name = list(CUSTOM_PALETTES[name])
-    elif is_plain_color(name):
-        name = [name]
+    if isinstance(name, str):
+        if name in CUSTOM_PALETTES:
+            name = list(CUSTOM_PALETTES[name])
+        elif is_plain_color(name):
+            name = [name]
 
     # If name is a list of colors, use them directly
     if isinstance(name, list):
@@ -229,7 +236,8 @@ def create_color_cycle(
     """Create a color cycle.
 
     Args:
-        name: The name of the color scale (any valid pypalettes palette name) or a list of hex color strings.
+        name: The name of the color scale (any valid pypalettes palette name), a single
+            color, or a list of hex color strings.
         max_colors: The maximum number of colors.
 
     Returns:

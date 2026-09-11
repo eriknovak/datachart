@@ -1,5 +1,7 @@
 import unittest
 
+from matplotlib.colors import to_hex
+
 from datachart.utils._internal.colors import (
     get_color_scale,
     get_discrete_colors,
@@ -115,9 +117,15 @@ class TestColors(unittest.TestCase):
         self.assertEqual(get_discrete_colors("#B5651D", 3), ["#B5651D"] * 3)
 
     def test_plain_color_colormap(self):
-        """Test that a plain color produces a usable colormap."""
+        """Test that a plain color maps to itself at both ends of the ramp."""
         cmap = get_colormap("#B5651D")
-        self.assertTrue(callable(cmap), "Plain color colormap is not callable.")
+        for position in (0.0, 0.5, 1.0):
+            self.assertEqual(to_hex(cmap(position)), "#b5651d")
+
+    def test_single_color_list_colormap(self):
+        """Test that a one-color list produces a usable colormap."""
+        cmap = create_colormap(["#B5651D"])
+        self.assertEqual(to_hex(cmap(0.0)), "#b5651d")
 
     def test_palette_name_wins_over_color_name(self):
         """Test that names that are both a palette and a color stay palettes."""
