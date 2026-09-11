@@ -22,21 +22,36 @@ so `Panel([LineChart(..., scaley="log")])` rendered linear.
   the primary axis and leaves the secondary to inherit, exactly as `ymin`
   does not touch `ymin_right`. A polar panel has no twin, so `scaley_right`
   is inert there, as `ymin_right` already is.
-- **A value-axis scale is a per-group pref, not panel furniture.** The
-  composition front stamps each layer group with the scale of the figure it
-  came from, and the group carries it to whichever axis twin assignment
-  sends it to. Inheritance cannot live in the front: twin assignment runs at
-  render time inside the seam, so at the moment the front builds its
-  settings, no figure's axis is known yet. Baking an inherited scale into
-  the panel's primary axis would put a log scale on the bars while the line
-  that needed it drew linear.
+- **A scale is a per-group pref, not panel furniture.** The composition
+  front stamps each layer group with the scale of the figure it came from,
+  and the group carries it to whichever axis twin assignment sends it to.
+  Inheritance cannot live in the front: twin assignment runs at render time
+  inside the seam, so at the moment the front builds its settings, no
+  figure's axis is known yet. Baking an inherited scale into the panel's
+  primary axis would put a log scale on the bars while the line that needed
+  it drew linear.
+- **Both axes ride the group**, as `value_scale` and `category_scale`, so
+  the seam resolves and warns for every axis in one place. Only the value
+  axis strictly needs to travel per group, since the category axis has no
+  twin to follow, but splitting the two across different mechanisms would
+  put two resolution paths in the seam for one concept.
 - **A stamped scale survives nesting**, under the None-means-keep rule that
   already governs `y_axis`, `z_order`, `legend_label` and `emphasis`. A
   nested panel's explicit `scaley` reaches its own groups, so
-  `Panel([Panel([f1, f2], scaley="log"), f3])` keeps the inner log.
+  `Panel([Panel([f1, f2], scaley="log"), f3])` keeps the inner log. Its
+  `scaley_right` reaches only the groups it pinned with `"y_axis": "right"`,
+  and its `scaley` reaches the rest: the inner call's own twin assignment
+  does not survive flattening, so the pin is the only record of which
+  figures it meant by "right".
 - **An explicit setting beats a stamped one**, per axis. Among the groups on
   one axis, the first in panel order wins — first-one-wins, as the tick
   formats and the stacked baseline already do, narrowed to that axis.
+- **A figure that set no scale was built linear**, so it takes part in
+  first-one-wins and in the conflict warning as `"linear"` rather than
+  abstaining. A linear bar chart listed before a log line on the same axis
+  keeps that axis linear and warns. Treating an unset scale as "no opinion"
+  would let one log figure anywhere in the list silently drag every
+  unscaled figure on its axis onto log.
 - **The category axis has no twin**, so `scalex` collapses to a single
   first-one-wins across every group, and there is no `scalex_right`.
 - **Conflicts warn, under `overlay_warn_scale_conflict`.** The loser is
@@ -54,6 +69,14 @@ so `Panel([LineChart(..., scaley="log")])` rendered linear.
   the same key. Asking for a secondary-axis scale states an expectation that
   a secondary axis exists; silence there is the failure this feature exists
   to remove. The polar case is exempt and documented as inert.
+- **The horizontal swap belongs to the chart-front settings builder.** The
+  group fronts — box, violin, swarm, raincloud — name the value axis
+  `scaley` whatever their orientation, so the builder swaps the keys for a
+  horizontal one and the seam's `scalex`/`scaley` are literal for every
+  front. A layer-level remap cannot survive composition: the panel front
+  swaps role-addressed arguments once on the way in, and a layer swapping
+  again at draw time would undo it for a horizontal panel holding a box
+  plot.
 - **No validation of a scale against the data.** A log panel over
   non-positive values behaves exactly as a log `LineChart` over the same
   values behaves today. That rule belongs to every front, not to panels
@@ -100,6 +123,13 @@ labels stay panel furniture.
   case to prevent the misleading one.
 - *Reuse `overlay_warn_scale_groups`.* Rejected: see above — one word, two
   meanings, and silencing one warning should not silence the other.
+- *Keeping the swap in the layer's `apply_scales`.* Rejected: it swaps at
+  draw time, after the panel front has already swapped, so a horizontal
+  panel holding a box plot swaps twice and lands the scale on the category
+  axis.
+- *Letting an unset scale abstain from first-one-wins.* Rejected: it sounds
+  permissive and behaves aggressively, since a single log figure would then
+  set the axis for every figure that never asked for one.
 - *A `scalex_right`.* Rejected: the secondary axis is always a second value
   axis (`twinx` vertical, `twiny` horizontal), so there is no second
   category axis for it to name.
