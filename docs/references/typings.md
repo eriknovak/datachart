@@ -15,10 +15,6 @@ title: Typings Module
 
 ### Common Chart Typings
 
-::: datachart.typings.ChartCommonAttrs
-    options:
-        heading_level: 4
-
 ::: datachart.typings.VLineSettingAttrs
     options:
         heading_level: 4

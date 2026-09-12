@@ -77,8 +77,8 @@ Release checklist: bump `__version__`, write the CHANGELOG section, and
 replace every `"Added in Unreleased"` docstring tag with the new version
 (`grep -rn "Added in Unreleased" datachart`). Remove any
 `_DEPRECATED_ALIASES` entry in `datachart/typings.py` that already shipped in
-a release. Publishing the GitHub release
-then triggers PyPI and the versioned docs.
+a release, and the private `_<name>` type behind a `None` entry. Publishing
+the GitHub release then triggers PyPI and the versioned docs.
 
 ## Architecture
 

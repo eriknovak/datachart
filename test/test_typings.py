@@ -30,6 +30,20 @@ class TestDeprecatedSettingNames(unittest.TestCase):
             with self.subTest(old=old):
                 self.assertFalse(hasattr(typings, old))
 
+    def test_common_attrs_warns_without_a_replacement(self):
+        with self.assertWarns(DeprecationWarning) as cm:
+            common = typings.ChartCommonAttrs
+        self.assertIn("title", common.__annotations__)
+        self.assertIn("no replacement", str(cm.warning))
+
+    def test_retired_chart_attrs_are_gone(self):
+        leftovers = [
+            name
+            for name in vars(typings)
+            if name.startswith("_") and name.endswith(("ChartAttrs", "PlotAttrs"))
+        ]
+        self.assertEqual(leftovers, [])
+
     def test_unknown_name_raises(self):
         with self.assertRaises(AttributeError):
             typings.NoSuchAttrs
