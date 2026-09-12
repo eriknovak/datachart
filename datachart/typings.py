@@ -4,7 +4,6 @@ The `typings` module contains the typings for all chart components. The module
 is intended to contain the typings for easier input value format checkup.
 
 Classes:
-    ChartCommonAttrs: The chart attributes common to all chart types.
     VLineSettingAttrs: The per-figure vertical reference line setting.
     HLineSettingAttrs: The per-figure horizontal reference line setting.
     VSpanSettingAttrs: The per-figure vertical reference band setting.
@@ -102,20 +101,11 @@ from .constants import (
     COLORBAR_LOCATION,
     ORIENTATION,
     BAR_MODE,
-    DIRECTION,
-    RADIAL_TYPE,
-    SWARM_MODE,
     COLORS,
     SHOW_GRID,
-    SCALE,
-    VIOLIN_INNER,
-    BANDWIDTH,
-    CONTOUR_LEVELS,
     HEXBIN_REDUCE,
-    BASELINE,
     ASPECT_RATIO,
     VALUE_FORMAT,
-    DATE_FORMAT,
     EMPHASIS,
 )
 
@@ -1000,7 +990,7 @@ class StyleAttrs(
 # ================================================
 
 
-class ChartCommonAttrs(TypedDict):
+class _ChartCommonAttrs(TypedDict):
     """The chart attributes common to all chart types.
 
     Attributes:
@@ -1271,35 +1261,6 @@ class LineSingleChartAttrs(TypedDict):
     yerr: Union[str, None]  # the name of the yerr attribute in data (default: "yerr")
 
 
-class _LineChartAttrs(ChartCommonAttrs):
-    """The line chart attributes.
-
-    Attributes:
-        charts (Union[LineSingleChartAttrs, List[LineSingleChartAttrs]]): The line chart definitions.
-        show_yerr (Union[bool, None]): Whether or not to show the y-axis errors.
-        show_area (Union[bool, None]): Whether or not to show the area under the lines.
-        show_values (Union[bool, None]): Whether or not to show the value labels.
-        value_format (Union[str, None]): Format string for the value labels (e.g., "{x:.1f}").
-        value_step (Union[int, None]): Label every Nth point; None picks a readable step.
-        scalex (Union[SCALE, str, None]): The scale of the x-axis.
-        scaley (Union[SCALE, str, None]): The scale of the y-axis.
-        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
-        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
-
-    """
-
-    charts: Union[LineSingleChartAttrs, List[LineSingleChartAttrs]]
-    show_yerr: Union[bool, None]
-    show_area: Union[bool, None]
-    show_values: Union[bool, None]
-    value_format: Union[str, None]
-    value_step: Union[int, None]
-    scalex: Union[SCALE, str, None]
-    scaley: Union[SCALE, str, None]
-    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-
-
 # ================================================
 # Stacked Area Chart Attributes
 # ================================================
@@ -1353,35 +1314,6 @@ class StackedAreaSingleChartAttrs(TypedDict):
     y: Union[str, None]
 
 
-class _StackedAreaChartAttrs(ChartCommonAttrs):
-    """The stacked area chart attributes.
-
-    Attributes:
-        charts (Union[StackedAreaSingleChartAttrs, List[StackedAreaSingleChartAttrs]]): The series definitions.
-        baseline (Union[BASELINE, str, None]): Where the first series starts.
-        show_values (Union[bool, None]): Whether or not to show the value labels.
-        value_format (Union[str, None]): Format string for the value labels (e.g., "{x:.1f}").
-        value_step (Union[int, None]): Label every Nth point; None picks a readable step.
-        aspect_ratio (Union[ASPECT_RATIO, str, None]): The aspect ratio of the axes.
-        scalex (Union[SCALE, str, None]): The scale of the x-axis.
-        scaley (Union[SCALE, str, None]): The scale of the y-axis.
-        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
-        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
-
-    """
-
-    charts: Union[StackedAreaSingleChartAttrs, List[StackedAreaSingleChartAttrs]]
-    baseline: Union[BASELINE, str, None]
-    show_values: Union[bool, None]
-    value_format: Union[str, None]
-    value_step: Union[int, None]
-    aspect_ratio: Union[ASPECT_RATIO, str, None]
-    scalex: Union[SCALE, str, None]
-    scaley: Union[SCALE, str, None]
-    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-
-
 # ================================================
 # Sankey Chart Attributes
 # ================================================
@@ -1417,25 +1349,6 @@ class SankeySingleChartAttrs(TypedDict):
     subtitle: Union[str, None]
     style: Union[SankeyStyleAttrs, None]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
-
-
-class _SankeyChartAttrs(ChartCommonAttrs):
-    """The Sankey chart attributes.
-
-    Attributes:
-        charts (Union[SankeySingleChartAttrs, List[SankeySingleChartAttrs]]): The chart definitions.
-        nodes (Union[List[List[str]], None]): The node columns, overriding the inferred layout.
-        column_labels (Union[List[str], None]): One heading per column.
-        show_values (Union[bool, None]): Whether to write each flow's value on its ribbon.
-        value_format (Union[VALUE_FORMAT, str, None]): The format of the ribbon values.
-
-    """
-
-    charts: Union[SankeySingleChartAttrs, List[SankeySingleChartAttrs]]
-    nodes: Union[List[List[str]], None]
-    column_labels: Union[List[str], None]
-    show_values: Union[bool, None]
-    value_format: Union[VALUE_FORMAT, str, None]
 
 
 # ================================================
@@ -1475,21 +1388,6 @@ class TreemapSingleChartAttrs(TypedDict):
     subtitle: Union[str, None]
     style: Union[TreemapStyleAttrs, None]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
-
-
-class _TreemapChartAttrs(ChartCommonAttrs):
-    """The treemap attributes.
-
-    Attributes:
-        charts (Union[TreemapSingleChartAttrs, List[TreemapSingleChartAttrs]]): The chart definitions.
-        show_values (Union[bool, None]): Whether to write each tile's value under its label.
-        value_format (Union[VALUE_FORMAT, str, None]): The format of the tile values.
-
-    """
-
-    charts: Union[TreemapSingleChartAttrs, List[TreemapSingleChartAttrs]]
-    show_values: Union[bool, None]
-    value_format: Union[VALUE_FORMAT, str, None]
 
 
 # ================================================
@@ -1552,29 +1450,6 @@ class NetworkSingleChartAttrs(TypedDict):
     subtitle: Union[str, None]
     style: Union[NetworkStyleAttrs, None]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
-
-
-class _NetworkChartAttrs(ChartCommonAttrs):
-    """The network chart attributes.
-
-    Attributes:
-        charts (Union[NetworkSingleChartAttrs, List[NetworkSingleChartAttrs]]): The chart definitions.
-        layout (Union[NETWORK_LAYOUT, str, None]): The node placement rule.
-        directed (Union[bool, None]): Whether the edges end in arrowheads.
-        seed (Union[int, None]): The seed of the spring layouts.
-        show_values (Union[bool, None]): Whether to write each edge's weight at its midpoint.
-        value_format (Union[VALUE_FORMAT, str, None]): The format of the edge values.
-        show_legend (Union[bool, None]): Whether to list the node groups in a legend.
-
-    """
-
-    charts: Union[NetworkSingleChartAttrs, List[NetworkSingleChartAttrs]]
-    layout: Union[NETWORK_LAYOUT, str, None]
-    directed: Union[bool, None]
-    seed: Union[int, None]
-    show_values: Union[bool, None]
-    value_format: Union[VALUE_FORMAT, str, None]
-    show_legend: Union[bool, None]
 
 
 # ================================================
@@ -1651,31 +1526,6 @@ class BarSingleChartAttrs(TypedDict):
     yerr: Union[str, None]  # the name of the yerr attribute in data
 
 
-class _BarChartAttrs(ChartCommonAttrs):
-    """The bar chart attributes.
-
-    Attributes:
-        charts (Union[BarSingleChartAttrs, List[BarSingleChartAttrs]]): The bar chart definitions.
-        show_yerr (Union[bool, None]): Whether or not to show the y-axis errors.
-        show_values (Union[bool, None]): Whether or not to show bar value labels at the edge of each bar.
-        value_format (Union[str, None]): Format string for bar value labels (e.g., "{:.1f}%").
-        orientation (Union[ORIENTATION, str, None]): The orientation of the bar charts.
-        scaley (Union[SCALE, str, None]): The scale of the y-axis.
-        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
-        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
-
-    """
-
-    charts: Union[BarSingleChartAttrs, List[BarSingleChartAttrs]]
-    show_yerr: Union[bool, None]
-    show_values: Union[bool, None]
-    value_format: Union[str, None]
-    orientation: Union[ORIENTATION, str, None]
-    scaley: Union[SCALE, str, None]
-    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-
-
 # ================================================
 # Hist Chart Attributes
 # ================================================
@@ -1737,33 +1587,6 @@ class HistogramSingleChartAttrs(TypedDict):
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
     x: Union[str, None]  # the name of the x attribute in data
-
-
-class _HistogramChartAttrs(ChartCommonAttrs):
-    """The histogram chart attributes.
-
-    Attributes:
-        charts (Union[HistogramSingleChartAttrs, List[HistogramSingleChartAttrs]]): The histogram chart definitions.
-        orientation (Union[ORIENTATION, str, None]): The orientation of the histogram charts.
-        bar_mode (Union[BAR_MODE, str, None]): How multiple histogram series share the axis.
-        num_bins (Union[int, None]): The number of bins the data points are split in to create the histogram.
-        show_density (Union[bool, None]): Whether or not to plot the density histogram.
-        show_cumulative (Union[bool, None]): Whether or not to plot the cumulative histogram.
-        show_values (Union[bool, None]): Whether or not to show the value labels.
-        value_format (Union[str, None]): Format string for the value labels (e.g., "{x:.1f}").
-        scaley (Union[SCALE, str, None]): The scale of the y-axis.
-
-    """
-
-    charts: Union[HistogramSingleChartAttrs, List[HistogramSingleChartAttrs]]
-    orientation: Union[ORIENTATION, str, None]
-    bar_mode: Union[BAR_MODE, str, None]
-    num_bins: Union[int, None]
-    show_density: Union[bool, None]
-    show_cumulative: Union[bool, None]
-    show_values: Union[bool, None]
-    value_format: Union[str, None]
-    scaley: Union[SCALE, str, None]
 
 
 # ================================================
@@ -1868,25 +1691,6 @@ class HeatmapSingleChartAttrs(TypedDict):
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
 
-class _HeatmapChartAttrs(ChartCommonAttrs):
-    """The heatmap chart attributes.
-
-    Attributes:
-        charts (Union[HeatmapSingleChartAttrs, List[HeatmapSingleChartAttrs]]): The heatmap chart definitions.
-        show_colorbars (Union[bool, None]): Whether or not to plot the colorbars.
-        show_heatmap_values (Union[bool, None]): Whether or not to plot the heatmap values.
-        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
-        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
-
-    """
-
-    charts: Union[HeatmapSingleChartAttrs, List[HeatmapSingleChartAttrs]]
-    show_colorbars: Union[bool, None]
-    show_heatmap_values: Union[bool, None]
-    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-
-
 # ================================================
 # Contour Chart Attributes
 # ================================================
@@ -1962,33 +1766,6 @@ class ContourSingleChartAttrs(TypedDict):
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     colorbar: Union[ColorbarSettingAttrs, None]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
-
-
-class _ContourChartAttrs(ChartCommonAttrs):
-    """The contour chart attributes.
-
-    Attributes:
-        charts (Union[ContourSingleChartAttrs, List[ContourSingleChartAttrs]]): The contour chart definitions.
-        filled (Union[bool, None]): Whether to fill the bands between the levels instead of drawing iso-lines.
-        levels (Union[CONTOUR_LEVELS, str, int, List[float], None]): The level rule, target count, or explicit level values.
-        show_labels (Union[bool, None]): Whether or not to write the level values along the iso-lines.
-        show_colorbars (Union[bool, None]): Whether or not to plot the colorbars of filled contours.
-        scalex (Union[SCALE, str, None]): The scale of the x-axis.
-        scaley (Union[SCALE, str, None]): The scale of the y-axis.
-        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
-        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
-
-    """
-
-    charts: Union[ContourSingleChartAttrs, List[ContourSingleChartAttrs]]
-    filled: Union[bool, None]
-    levels: Union[CONTOUR_LEVELS, str, int, List[float], None]
-    show_labels: Union[bool, None]
-    show_colorbars: Union[bool, None]
-    scalex: Union[SCALE, str, None]
-    scaley: Union[SCALE, str, None]
-    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
 
 
 # ================================================
@@ -2074,29 +1851,6 @@ class HexbinSingleChartAttrs(TypedDict):
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
 
-class _HexbinChartAttrs(ChartCommonAttrs):
-    """The hexbin chart attributes.
-
-    Attributes:
-        charts (Union[HexbinSingleChartAttrs, List[HexbinSingleChartAttrs]]): The hexbin chart definitions.
-        show_colorbars (Union[bool, None]): Whether or not to plot the colorbars.
-        aspect_ratio (Union[ASPECT_RATIO, str, None]): The aspect ratio of the axes.
-        scalex (Union[SCALE, str, None]): The scale of the x-axis.
-        scaley (Union[SCALE, str, None]): The scale of the y-axis.
-        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
-        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
-
-    """
-
-    charts: Union[HexbinSingleChartAttrs, List[HexbinSingleChartAttrs]]
-    show_colorbars: Union[bool, None]
-    aspect_ratio: Union[ASPECT_RATIO, str, None]
-    scalex: Union[SCALE, str, None]
-    scaley: Union[SCALE, str, None]
-    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-
-
 # ================================================
 # Scatter Chart Attributes
 # ================================================
@@ -2175,41 +1929,6 @@ class ScatterSingleChartAttrs(TypedDict):
     label: Union[str, None]
 
 
-class _ScatterChartAttrs(ChartCommonAttrs):
-    """The scatter chart attributes.
-
-    Attributes:
-        charts (Union[ScatterSingleChartAttrs, List[ScatterSingleChartAttrs]]): The scatter chart definitions.
-        show_regression (Union[bool, None]): Whether or not to show the regression line.
-        show_ci (Union[bool, None]): Whether or not to show the confidence interval around the regression.
-        ci_level (Union[float, None]): The confidence interval level (default 0.95).
-        show_correlation (Union[bool, None]): Whether or not to show the Pearson correlation coefficient as an annotation.
-        show_values (Union[bool, None]): Whether or not to show the value labels.
-        value_format (Union[str, None]): Format string for the value labels (e.g., "{x:.1f}").
-        value_step (Union[int, None]): Label every Nth point; None picks a readable step.
-        scalex (Union[SCALE, str, None]): The scale of the x-axis.
-        scaley (Union[SCALE, str, None]): The scale of the y-axis.
-        size_range (Union[Tuple[float, float], None]): The min/max marker sizes for bubble charts.
-        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
-        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
-
-    """
-
-    charts: Union[ScatterSingleChartAttrs, List[ScatterSingleChartAttrs]]
-    show_regression: Union[bool, None]
-    show_ci: Union[bool, None]
-    ci_level: Union[float, None]
-    show_correlation: Union[bool, None]
-    show_values: Union[bool, None]
-    value_format: Union[str, None]
-    value_step: Union[int, None]
-    scalex: Union[SCALE, str, None]
-    scaley: Union[SCALE, str, None]
-    size_range: Union[Tuple[float, float], None]
-    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-
-
 # ================================================
 # Box Plot Attributes
 # ================================================
@@ -2274,33 +1993,6 @@ class BoxSingleChartAttrs(TypedDict):
 
     label: Union[str, None]  # the name of the label attribute in data
     value: Union[str, None]  # the name of the value attribute in data
-
-
-class _BoxChartAttrs(ChartCommonAttrs):
-    """The box plot chart attributes.
-
-    Attributes:
-        charts (Union[BoxSingleChartAttrs, List[BoxSingleChartAttrs]]): The box plot definitions.
-        show_outliers (Union[bool, None]): Whether or not to show outliers.
-        show_notch (Union[bool, None]): Whether or not to show notched boxes for median CI.
-        show_values (Union[bool, None]): Whether or not to show the value labels.
-        value_format (Union[str, None]): Format string for the value labels (e.g., "{x:.1f}").
-        orientation (Union[ORIENTATION, str, None]): The orientation of the box plots.
-        scaley (Union[SCALE, str, None]): The scale of the y-axis.
-        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
-        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
-
-    """
-
-    charts: Union[BoxSingleChartAttrs, List[BoxSingleChartAttrs]]
-    show_outliers: Union[bool, None]
-    show_notch: Union[bool, None]
-    show_values: Union[bool, None]
-    value_format: Union[str, None]
-    orientation: Union[ORIENTATION, str, None]
-    scaley: Union[SCALE, str, None]
-    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
 
 
 # ================================================
@@ -2369,27 +2061,6 @@ class SwarmSingleChartAttrs(TypedDict):
     value: Union[str, None]  # the name of the value attribute in data
 
 
-class _SwarmPlotAttrs(ChartCommonAttrs):
-    """The swarm plot attributes.
-
-    Attributes:
-        charts (Union[SwarmSingleChartAttrs, List[SwarmSingleChartAttrs]]): The swarm plot definitions.
-        mode (Union[SWARM_MODE, str, None]): The point spread mode: beeswarm or strip.
-        jitter (Union[float, None]): The strip jitter width as a fraction of the category width.
-        orientation (Union[ORIENTATION, str, None]): The orientation of the swarms.
-        scaley (Union[SCALE, str, None]): The scale of the y-axis.
-        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
-        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
-
-    """
-
-    charts: Union[SwarmSingleChartAttrs, List[SwarmSingleChartAttrs]]
-    mode: Union[SWARM_MODE, str, None]
-    jitter: Union[float, None]
-    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-
-
 # Violin Plot Attributes
 # ================================================
 
@@ -2453,35 +2124,6 @@ class ViolinSingleChartAttrs(TypedDict):
 
     label: Union[str, None]  # the name of the label attribute in data
     value: Union[str, None]  # the name of the value attribute in data
-
-
-class _ViolinPlotAttrs(ChartCommonAttrs):
-    """The violin plot attributes.
-
-    Attributes:
-        charts (Union[ViolinSingleChartAttrs, List[ViolinSingleChartAttrs]]): The violin plot definitions.
-        inner (Union[VIOLIN_INNER, str, None]): The inner marks drawn inside each body.
-        bandwidth (Union[BANDWIDTH, str, float, None]): The KDE bandwidth rule or scalar factor.
-        split (Union[str, None]): The key name in `data` whose two values split each violin.
-        show_values (Union[bool, None]): Whether or not to show the value labels.
-        value_format (Union[str, None]): Format string for the value labels (e.g., "{x:.1f}").
-        orientation (Union[ORIENTATION, str, None]): The orientation of the violins.
-        scaley (Union[SCALE, str, None]): The scale of the y-axis.
-        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
-        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
-
-    """
-
-    charts: Union[ViolinSingleChartAttrs, List[ViolinSingleChartAttrs]]
-    inner: Union[VIOLIN_INNER, str, None]
-    bandwidth: Union[BANDWIDTH, str, float, None]
-    split: Union[str, None]
-    show_values: Union[bool, None]
-    value_format: Union[str, None]
-    orientation: Union[ORIENTATION, str, None]
-    scaley: Union[SCALE, str, None]
-    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
 
 
 # ================================================
@@ -2550,33 +2192,6 @@ class RaincloudSingleChartAttrs(TypedDict):
     value: Union[str, None]  # the name of the value attribute in data
 
 
-class _RaincloudPlotAttrs(ChartCommonAttrs):
-    """The raincloud plot attributes.
-
-    Attributes:
-        charts (Union[RaincloudSingleChartAttrs, List[RaincloudSingleChartAttrs]]): The raincloud plot definitions.
-        mode (Union[SWARM_MODE, str, None]): The rain spread mode: beeswarm or strip.
-        jitter (Union[float, None]): The strip jitter width as a fraction of the category width, scaled to the rain.
-        bandwidth (Union[BANDWIDTH, str, float, None]): The cloud KDE bandwidth rule or scalar factor.
-        show_outliers (Union[bool, None]): Whether or not the box shows outliers.
-        orientation (Union[ORIENTATION, str, None]): The orientation of the rainclouds.
-        scaley (Union[SCALE, str, None]): The scale of the y-axis.
-        xticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The x-axis tick label format: a `DATE_FORMAT` member or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT` member or `"{x:.1f}"` style string.
-        yticks_format (Union[VALUE_FORMAT, DATE_FORMAT, str, None]): The y-axis tick label format, as `xticks_format`.
-
-    """
-
-    charts: Union[RaincloudSingleChartAttrs, List[RaincloudSingleChartAttrs]]
-    mode: Union[SWARM_MODE, str, None]
-    jitter: Union[float, None]
-    bandwidth: Union[BANDWIDTH, str, float, None]
-    show_outliers: Union[bool, None]
-    orientation: Union[ORIENTATION, str, None]
-    scaley: Union[SCALE, str, None]
-    xticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-    yticks_format: Union[VALUE_FORMAT, DATE_FORMAT, str, None]
-
-
 # ================================================
 # Parallel Coordinates Chart Attributes
 # ================================================
@@ -2621,17 +2236,6 @@ class ParallelCoordsSingleChartAttrs(TypedDict):
     hue: Union[str, None]
     category_orders: Union[Dict[str, List[str]], None]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
-
-
-class _ParallelCoordsChartAttrs(ChartCommonAttrs):
-    """The parallel coordinates chart attributes.
-
-    Attributes:
-        charts (Union[ParallelCoordsSingleChartAttrs, List[ParallelCoordsSingleChartAttrs]]): The chart definitions.
-
-    """
-
-    charts: Union[ParallelCoordsSingleChartAttrs, List[ParallelCoordsSingleChartAttrs]]
 
 
 # ================================================
@@ -2693,64 +2297,30 @@ class RadialSingleChartAttrs(TypedDict):
     yerr: Union[str, None]
 
 
-class _RadialChartAttrs(ChartCommonAttrs):
-    """The radial chart attributes.
-
-    Attributes:
-        charts (Union[RadialSingleChartAttrs, List[RadialSingleChartAttrs]]): The radial chart definitions.
-        type (Union[RADIAL_TYPE, str, None]): The visual the whole figure draws.
-        show_yerr (Union[bool, None]): Whether or not to show the radial error band (line visual).
-        show_area (Union[bool, None]): Whether or not to fill the area inside the lines (line visual).
-        show_values (Union[bool, None]): Whether or not to write each mark's value at its tip.
-        show_tip_labels (Union[bool, None]): Whether or not to write the category labels at the mark tips instead of around the circle.
-        show_border (Union[bool, None]): Whether or not to draw the outer border circle.
-        value_format (Union[str, None]): The format of the values written by `show_values`.
-        bar_mode (Union[BAR_MODE, str, None]): How multiple bar series share the circle (bar visual).
-        num_bins (Union[int, None]): The number of angular bins over [0, 360) (histogram visual).
-        startangle (Union[str, int, float, None]): The compass location or bearing where the first point sits.
-        direction (Union[DIRECTION, str, None]): Which way the angles increase.
-        innerradius (Union[float, None]): The donut hole, as a fraction of the radial extent.
-        scaley (Union[SCALE, str, None]): The scale of the radial axis.
-
-    """
-
-    charts: Union[RadialSingleChartAttrs, List[RadialSingleChartAttrs]]
-    type: Union[RADIAL_TYPE, str, None]
-    show_yerr: Union[bool, None]
-    show_area: Union[bool, None]
-    show_values: Union[bool, None]
-    show_tip_labels: Union[bool, None]
-    show_border: Union[bool, None]
-    value_format: Union[str, None]
-    bar_mode: Union[BAR_MODE, str, None]
-    num_bins: Union[int, None]
-    startangle: Union[str, int, float, None]
-    direction: Union[DIRECTION, str, None]
-    innerradius: Union[float, None]
-    scaley: Union[SCALE, str, None]
-
-
 # ================================================
 # Deprecated Names
 # ================================================
 
 # old name -> new name; removed one release after it ships (ADR 0043)
+# None: no public replacement; the type is kept privately as `_<old name>`
 _DEPRECATED_ALIASES = {
     "VLinePlotAttrs": "VLineSettingAttrs",
     "HLinePlotAttrs": "HLineSettingAttrs",
     "TextAttrs": "TextSettingAttrs",
     "HeatmapColorbarAttrs": "ColorbarSettingAttrs",
+    "ChartCommonAttrs": None,
 }
 
 
 def __getattr__(name):
     if name in _DEPRECATED_ALIASES:
         new_name = _DEPRECATED_ALIASES[name]
+        hint = f"use `{new_name}` instead" if new_name else "it has no replacement"
         warnings.warn(
             f"`{name}` is deprecated and will be removed in the next release; "
-            f"use `{new_name}` instead.",
+            f"{hint}.",
             DeprecationWarning,
             stacklevel=2,
         )
-        return globals()[new_name]
+        return globals()[new_name or f"_{name}"]
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
