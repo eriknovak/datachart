@@ -100,6 +100,13 @@ input and hands the engine an explicit charts structure and settings dict; it do
 not draw, and its signature is the allowlist of what the chart supports.
 _Avoid_: chart class, chart type (for the function), attrs dict
 
+**Setting payload**:
+A dict a caller passes to a chart front to configure one per-figure element —
+a reference line, band, text, legend, or colorbar — as opposed to the chart
+dicts (data) or the theme's `plot_*` keys (style). Typed by a
+`*SettingAttrs` TypedDict.
+_Avoid_: plot attrs, style (for this)
+
 **Pyramid**:
 A back-to-back horizontal bar figure (`PyramidChart`): exactly two sides sharing
 one category axis, drawn in opposite horizontal directions from a common zero

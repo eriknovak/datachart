@@ -9,11 +9,11 @@ from ..typings import (
     HexbinDataAttrs,
     HexbinStyleAttrs,
     ColorbarSettingAttrs,
-    VLinePlotAttrs,
-    HLinePlotAttrs,
-    VSpanPlotAttrs,
-    HSpanPlotAttrs,
-    TextAttrs,
+    VLineSettingAttrs,
+    HLineSettingAttrs,
+    VSpanSettingAttrs,
+    HSpanSettingAttrs,
+    TextSettingAttrs,
 )
 from ..constants import (
     DATE_FORMAT,
@@ -77,30 +77,30 @@ def HexbinChart(
     yticks_format: Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]] = None,
     vlines: Optional[
         Union[
-            VLinePlotAttrs,
-            List[VLinePlotAttrs],
-            List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]],
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
+            List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]],
         ]
     ] = None,
     hlines: Optional[
         Union[
-            HLinePlotAttrs,
-            List[HLinePlotAttrs],
-            List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]],
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
+            List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]],
         ]
     ] = None,
     vspans: Optional[
         Union[
-            VSpanPlotAttrs,
-            List[VSpanPlotAttrs],
-            List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]],
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
+            List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]],
         ]
     ] = None,
     hspans: Optional[
         Union[
-            HSpanPlotAttrs,
-            List[HSpanPlotAttrs],
-            List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]],
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
+            List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]],
         ]
     ] = None,
     colorbar: Optional[
@@ -108,9 +108,9 @@ def HexbinChart(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
 ) -> plt.Figure:

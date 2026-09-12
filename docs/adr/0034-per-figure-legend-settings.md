@@ -56,7 +56,7 @@ matplotlib location string passed straight through.
   attributes, the text annotation attributes, and the heatmap colorbar
   attributes — keep their names here. Renaming public types needs a
   deprecation window and touches the reference docs, which is its own change,
-  not a rider on this one.
+  not a rider on this one. ADR 0043 is that change.
 
 ## Considered options
 

@@ -5,11 +5,11 @@ is intended to contain the typings for easier input value format checkup.
 
 Classes:
     ChartCommonAttrs: The chart attributes common to all chart types.
-    VLinePlotAttrs: The vertical line plot attributes.
-    HLinePlotAttrs: The horizontal line plot attributes.
-    VSpanPlotAttrs: The vertical reference band plot attributes.
-    HSpanPlotAttrs: The horizontal reference band plot attributes.
-    TextAttrs: The text annotation attributes.
+    VLineSettingAttrs: The per-figure vertical reference line setting.
+    HLineSettingAttrs: The per-figure horizontal reference line setting.
+    VSpanSettingAttrs: The per-figure vertical reference band setting.
+    HSpanSettingAttrs: The per-figure horizontal reference band setting.
+    TextSettingAttrs: The per-figure text annotation setting.
     LineSingleChartAttrs: The single chart attributes for the line chart.
     LineDataPointAttrs: The data point attributes for the line chart.
     StackedAreaSingleChartAttrs: The single chart attributes for the stacked area chart.
@@ -27,7 +27,6 @@ Classes:
     HeatmapSingleChartAttrs: The single chart attributes for the heatmap chart.
     HeatmapDataAttrs: The data attributes for the heatmap chart.
     ColorbarSettingAttrs: The per-figure colorbar setting.
-    HeatmapColorbarAttrs: Deprecated alias of `ColorbarSettingAttrs`.
     ContourSingleChartAttrs: The single chart attributes for the contour chart.
     ContourDataAttrs: The data attributes for the contour chart.
     HexbinSingleChartAttrs: The single chart attributes for the hexbin chart.
@@ -81,6 +80,7 @@ Classes:
 
 """
 
+import warnings
 from datetime import datetime
 from typing import TypedDict, Union, Tuple, List, Optional, Dict
 
@@ -1047,8 +1047,12 @@ class ChartCommonAttrs(TypedDict):
 # ================================================
 
 
-class VLinePlotAttrs(TypedDict):
-    """The vertical line plot attributes.
+class VLineSettingAttrs(TypedDict):
+    """The vertical reference line setting, passed to a chart front as `vlines`.
+
+    !!! info "Added in Unreleased"
+
+        The name `VLineSettingAttrs`; `VLinePlotAttrs` is deprecated.
 
     Attributes:
         x (Union[int, float]): The x-axis position of the line.
@@ -1066,8 +1070,12 @@ class VLinePlotAttrs(TypedDict):
     label: Union[str, None]
 
 
-class HLinePlotAttrs(TypedDict):
-    """The horizontal line plot attributes.
+class HLineSettingAttrs(TypedDict):
+    """The horizontal reference line setting, passed to a chart front as `hlines`.
+
+    !!! info "Added in Unreleased"
+
+        The name `HLineSettingAttrs`; `HLinePlotAttrs` is deprecated.
 
     Attributes:
         y (Union[int, float]): The x-axis position of the line.
@@ -1090,8 +1098,8 @@ class HLinePlotAttrs(TypedDict):
 # ================================================
 
 
-class VSpanPlotAttrs(TypedDict):
-    """The vertical reference band plot attributes.
+class VSpanSettingAttrs(TypedDict):
+    """The vertical reference band setting, passed to a chart front as `vspans`.
 
     A vertical band shades the region between two x-axis positions over the
     full height of the axes. On a radial chart the bounds are angles in
@@ -1113,8 +1121,8 @@ class VSpanPlotAttrs(TypedDict):
     label: Union[str, None]
 
 
-class HSpanPlotAttrs(TypedDict):
-    """The horizontal reference band plot attributes.
+class HSpanSettingAttrs(TypedDict):
+    """The horizontal reference band setting, passed to a chart front as `hspans`.
 
     A horizontal band shades the region between two y-axis positions over the
     full width of the axes. On a radial chart the bounds are radii and the
@@ -1164,8 +1172,12 @@ class LegendSettingAttrs(TypedDict):
     alignment: Union[LEGEND_ALIGN, str, None]
 
 
-class TextAttrs(TypedDict):
-    """The text annotation attributes.
+class TextSettingAttrs(TypedDict):
+    """The text annotation setting, passed to a chart front as `texts`.
+
+    !!! info "Added in Unreleased"
+
+        The name `TextSettingAttrs`; `TextAttrs` is deprecated.
 
     Attributes:
         text (str): The annotation text.
@@ -1224,11 +1236,11 @@ class LineSingleChartAttrs(TypedDict):
         yticks (Union[int, float, None]): the ytick position list.
         yticklabels (Union[List[str], None]): The ytick labels.
         ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
-        vspans (Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
         x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
         y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
         yerr (Union[str, None]): The key name in `data` that contains the y-axis error value. Defaults to `"yerr"`.
@@ -1248,11 +1260,11 @@ class LineSingleChartAttrs(TypedDict):
     yticklabels: Union[List[str], None]
     ytickrotate: Union[int, None]
 
-    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
-    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
-    vspans: Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]
-    hspans: Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
     x: Union[str, None]  # the name of the x attribute in data (default: "x")
     y: Union[str, None]  # the name of the y attribute in data (default: "y")
@@ -1308,11 +1320,11 @@ class StackedAreaSingleChartAttrs(TypedDict):
         yticks (Union[int, float, None]): the ytick position list.
         yticklabels (Union[List[str], None]): The ytick labels.
         ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
-        vspans (Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
         x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
         y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
 
@@ -1331,11 +1343,11 @@ class StackedAreaSingleChartAttrs(TypedDict):
     yticklabels: Union[List[str], None]
     ytickrotate: Union[int, None]
 
-    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
-    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
-    vspans: Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]
-    hspans: Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
     x: Union[str, None]
     y: Union[str, None]
@@ -1397,14 +1409,14 @@ class SankeySingleChartAttrs(TypedDict):
         links (List[SankeyLinkAttrs]): The flows; a node is the string that names it.
         subtitle (Union[str, None]): The subtitle of the chart.
         style (Union[SankeyStyleAttrs, None]): The style of the chart.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
 
     """
 
     links: List[SankeyLinkAttrs]
     subtitle: Union[str, None]
     style: Union[SankeyStyleAttrs, None]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
 
 class _SankeyChartAttrs(ChartCommonAttrs):
@@ -1455,14 +1467,14 @@ class TreemapSingleChartAttrs(TypedDict):
         data (List[TreemapRecordAttrs]): The records to tile.
         subtitle (Union[str, None]): The subtitle of the chart.
         style (Union[TreemapStyleAttrs, None]): The style of the chart.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
 
     """
 
     data: List[TreemapRecordAttrs]
     subtitle: Union[str, None]
     style: Union[TreemapStyleAttrs, None]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
 
 class _TreemapChartAttrs(ChartCommonAttrs):
@@ -1531,7 +1543,7 @@ class NetworkSingleChartAttrs(TypedDict):
         edges (List[NetworkEdgeAttrs]): The edges.
         subtitle (Union[str, None]): The subtitle of the chart.
         style (Union[NetworkStyleAttrs, None]): The style of the chart.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
 
     """
 
@@ -1539,7 +1551,7 @@ class NetworkSingleChartAttrs(TypedDict):
     edges: List[NetworkEdgeAttrs]
     subtitle: Union[str, None]
     style: Union[NetworkStyleAttrs, None]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
 
 class _NetworkChartAttrs(ChartCommonAttrs):
@@ -1604,11 +1616,11 @@ class BarSingleChartAttrs(TypedDict):
         yticks (Union[int, float, None]): the ytick position list.
         yticklabels (Union[List[str], None]): The ytick labels.
         ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
-        vspans (Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
         label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
         y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
         yerr (Union[str, None]): The key name in `data` that contains the y-axis error value. Defaults to `"yerr"`.
@@ -1628,11 +1640,11 @@ class BarSingleChartAttrs(TypedDict):
     yticklabels: Union[List[str], None]
     ytickrotate: Union[int, None]
 
-    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
-    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
-    vspans: Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]
-    hspans: Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
     label: Union[str, None]  # the name of the label attribute in data
     y: Union[str, None]  # the name of the y attribute in data
@@ -1696,11 +1708,11 @@ class HistogramSingleChartAttrs(TypedDict):
         yticks (Union[int, float, None]): the ytick position list.
         yticklabels (Union[List[str], None]): The ytick labels.
         ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
-        vspans (Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
         x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
 
     """
@@ -1718,11 +1730,11 @@ class HistogramSingleChartAttrs(TypedDict):
     yticklabels: Union[List[str], None]
     ytickrotate: Union[int, None]
 
-    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
-    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
-    vspans: Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]
-    hspans: Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
     x: Union[str, None]  # the name of the x attribute in data
 
@@ -1794,10 +1806,6 @@ class ColorbarSettingAttrs(TypedDict):
     orientation: Union[ORIENTATION, str, None]
 
 
-# deprecated alias: the setting is shared by Heatmap, ContourChart, and HexbinChart
-HeatmapColorbarAttrs = ColorbarSettingAttrs
-
-
 class HeatmapDataAttrs(TypedDict):
     """The data attributes for the heatmap chart.
 
@@ -1835,7 +1843,7 @@ class HeatmapSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
 
         colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting of the heatmap.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
 
     """
 
@@ -1857,7 +1865,7 @@ class HeatmapSingleChartAttrs(TypedDict):
     ytickrotate: Union[int, None]
 
     colorbar: Union[ColorbarSettingAttrs, None]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
 
 class _HeatmapChartAttrs(ChartCommonAttrs):
@@ -1921,12 +1929,12 @@ class ContourSingleChartAttrs(TypedDict):
         yticklabels (Union[List[str], None]): The ytick labels.
         ytickrotate (Union[int, None]): The ytick rotation value.
 
-        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
-        vspans (Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]): The horizontal reference bands to be plot.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting of a filled contour.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
 
     """
 
@@ -1948,12 +1956,12 @@ class ContourSingleChartAttrs(TypedDict):
     yticklabels: Union[List[str], None]
     ytickrotate: Union[int, None]
 
-    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
-    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
-    vspans: Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]
-    hspans: Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     colorbar: Union[ColorbarSettingAttrs, None]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
 
 class _ContourChartAttrs(ChartCommonAttrs):
@@ -2028,12 +2036,12 @@ class HexbinSingleChartAttrs(TypedDict):
         yticklabels (Union[List[str], None]): The ytick labels.
         ytickrotate (Union[int, None]): The ytick rotation value.
 
-        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
-        vspans (Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]): The horizontal reference bands to be plot.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
 
     """
 
@@ -2058,12 +2066,12 @@ class HexbinSingleChartAttrs(TypedDict):
     yticklabels: Union[List[str], None]
     ytickrotate: Union[int, None]
 
-    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
-    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
-    vspans: Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]
-    hspans: Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     colorbar: Union[ColorbarSettingAttrs, None]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
 
 class _HexbinChartAttrs(ChartCommonAttrs):
@@ -2128,11 +2136,11 @@ class ScatterSingleChartAttrs(TypedDict):
         yticks (Union[int, float, None]): The ytick position list.
         yticklabels (Union[List[str], None]): The ytick labels.
         ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
-        vspans (Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
         x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
         y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
         size (Union[str, None]): The key name in `data` that contains the marker size value.
@@ -2154,11 +2162,11 @@ class ScatterSingleChartAttrs(TypedDict):
     yticklabels: Union[List[str], None]
     ytickrotate: Union[int, None]
 
-    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
-    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
-    vspans: Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]
-    hspans: Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
     x: Union[str, None]
     y: Union[str, None]
@@ -2235,11 +2243,11 @@ class BoxSingleChartAttrs(TypedDict):
         yticks (Union[int, float, None]): The ytick position list.
         yticklabels (Union[List[str], None]): The ytick labels.
         ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
-        vspans (Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
         label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
         value (Union[str, None]): The key name in `data` that contains the value. Defaults to `"value"`.
 
@@ -2258,11 +2266,11 @@ class BoxSingleChartAttrs(TypedDict):
     yticklabels: Union[List[str], None]
     ytickrotate: Union[int, None]
 
-    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
-    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
-    vspans: Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]
-    hspans: Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
     label: Union[str, None]  # the name of the label attribute in data
     value: Union[str, None]  # the name of the value attribute in data
@@ -2328,11 +2336,11 @@ class SwarmSingleChartAttrs(TypedDict):
         yticks (Union[int, float, None]): The ytick position list.
         yticklabels (Union[List[str], None]): The ytick labels.
         ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
-        vspans (Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
         label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
         value (Union[str, None]): The key name in `data` that contains the value. Defaults to `"value"`.
 
@@ -2351,11 +2359,11 @@ class SwarmSingleChartAttrs(TypedDict):
     yticklabels: Union[List[str], None]
     ytickrotate: Union[int, None]
 
-    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
-    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
-    vspans: Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]
-    hspans: Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
     label: Union[str, None]  # the name of the label attribute in data
     value: Union[str, None]  # the name of the value attribute in data
@@ -2414,11 +2422,11 @@ class ViolinSingleChartAttrs(TypedDict):
         yticks (Union[int, float, None]): The ytick position list.
         yticklabels (Union[List[str], None]): The ytick labels.
         ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
-        vspans (Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
         label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
         value (Union[str, None]): The key name in `data` that contains the value. Defaults to `"value"`.
 
@@ -2437,11 +2445,11 @@ class ViolinSingleChartAttrs(TypedDict):
     yticklabels: Union[List[str], None]
     ytickrotate: Union[int, None]
 
-    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
-    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
-    vspans: Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]
-    hspans: Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
     label: Union[str, None]  # the name of the label attribute in data
     value: Union[str, None]  # the name of the value attribute in data
@@ -2509,11 +2517,11 @@ class RaincloudSingleChartAttrs(TypedDict):
         yticks (Union[int, float, None]): The ytick position list.
         yticklabels (Union[List[str], None]): The ytick labels.
         ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLinePlotAttrs, List[VLinePlotAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLinePlotAttrs, List[HLinePlotAttrs], None]): The horizontal lines to be plot.
-        vspans (Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
         label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
         value (Union[str, None]): The key name in `data` that contains the value. Defaults to `"value"`.
 
@@ -2532,11 +2540,11 @@ class RaincloudSingleChartAttrs(TypedDict):
     yticklabels: Union[List[str], None]
     ytickrotate: Union[int, None]
 
-    vlines: Union[VLinePlotAttrs, List[VLinePlotAttrs]]
-    hlines: Union[HLinePlotAttrs, List[HLinePlotAttrs]]
-    vspans: Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]
-    hspans: Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
     label: Union[str, None]  # the name of the label attribute in data
     value: Union[str, None]  # the name of the value attribute in data
@@ -2600,7 +2608,7 @@ class ParallelCoordsSingleChartAttrs(TypedDict):
         dimensions (Union[List[str], None]): The dimensions to include and their order.
         hue (Union[str, None]): The key name in `data` for categorical coloring.
         category_orders (Union[Dict[str, List[str]], None]): Custom order for categorical dimensions.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
 
     """
 
@@ -2612,7 +2620,7 @@ class ParallelCoordsSingleChartAttrs(TypedDict):
     dimensions: Union[List[str], None]
     hue: Union[str, None]
     category_orders: Union[Dict[str, List[str]], None]
-    texts: Union[TextAttrs, List[TextAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
 
 class _ParallelCoordsChartAttrs(ChartCommonAttrs):
@@ -2662,9 +2670,9 @@ class RadialSingleChartAttrs(TypedDict):
         data (List[RadialDataPointAttrs]): The list of data points defining the radial chart.
         subtitle (Union[str, None]): The subtitle of the radial chart. Also used as the label in the legend.
         style (Union[LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs, None]): The style of the radial chart, matching its visual.
-        texts (Union[TextAttrs, List[TextAttrs], None]): The text annotations to be drawn.
-        vspans (Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]): The angular wedges to be plot, bounded in degrees.
-        hspans (Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]): The annuli to be plot, bounded in radius.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The angular wedges to be plot, bounded in degrees.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The annuli to be plot, bounded in radius.
         label (Union[str, None]): The key name in `data` that contains the category label. Defaults to `"label"`.
         x (Union[str, None]): The key name in `data` that contains the angular observation. Defaults to `"x"`.
         y (Union[str, None]): The key name in `data` that contains the radial value. Defaults to `"y"`.
@@ -2675,9 +2683,9 @@ class RadialSingleChartAttrs(TypedDict):
     data: List[RadialDataPointAttrs]
     subtitle: Union[str, None]
     style: Union[LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs, None]
-    texts: Union[TextAttrs, List[TextAttrs]]
-    vspans: Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]
-    hspans: Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
 
     label: Union[str, None]
     x: Union[str, None]
@@ -2720,3 +2728,29 @@ class _RadialChartAttrs(ChartCommonAttrs):
     direction: Union[DIRECTION, str, None]
     innerradius: Union[float, None]
     scaley: Union[SCALE, str, None]
+
+
+# ================================================
+# Deprecated Names
+# ================================================
+
+# old name -> new name; removed one release after it ships (ADR 0043)
+_DEPRECATED_ALIASES = {
+    "VLinePlotAttrs": "VLineSettingAttrs",
+    "HLinePlotAttrs": "HLineSettingAttrs",
+    "TextAttrs": "TextSettingAttrs",
+    "HeatmapColorbarAttrs": "ColorbarSettingAttrs",
+}
+
+
+def __getattr__(name):
+    if name in _DEPRECATED_ALIASES:
+        new_name = _DEPRECATED_ALIASES[name]
+        warnings.warn(
+            f"`{name}` is deprecated and will be removed in the next release; "
+            f"use `{new_name}` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return globals()[new_name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

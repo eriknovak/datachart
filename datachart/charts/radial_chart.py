@@ -11,9 +11,9 @@ from ..typings import (
     BarStyleAttrs,
     HistStyleAttrs,
     ScatterStyleAttrs,
-    TextAttrs,
-    VSpanPlotAttrs,
-    HSpanPlotAttrs,
+    TextSettingAttrs,
+    VSpanSettingAttrs,
+    HSpanSettingAttrs,
 )
 from ..constants import (
     BAR_MODE,
@@ -82,25 +82,25 @@ def RadialChart(
     style: Optional[Union[_RadialStyleAttrs, List[Optional[_RadialStyleAttrs]]]] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
     vlines: Optional[dict] = None,
     hlines: Optional[dict] = None,
     vspans: Optional[
         Union[
-            VSpanPlotAttrs,
-            List[VSpanPlotAttrs],
-            List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]],
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
+            List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]],
         ]
     ] = None,
     hspans: Optional[
         Union[
-            HSpanPlotAttrs,
-            List[HSpanPlotAttrs],
-            List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]],
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
+            List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]],
         ]
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..utils._internal.validate import validate_sankey_links, validate_sankey_nodes
-from ..typings import SankeySingleChartAttrs, SankeyStyleAttrs, TextAttrs
+from ..typings import SankeySingleChartAttrs, SankeyStyleAttrs, TextSettingAttrs
 from ..constants import FIG_SIZE, VALUE_FORMAT
 
 # ================================================
@@ -29,9 +29,9 @@ def SankeyChart(
     style: Optional[Union[SankeyStyleAttrs, List[Optional[SankeyStyleAttrs]]]] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
 ) -> plt.Figure:

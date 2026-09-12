@@ -19,23 +19,23 @@ title: Typings Module
     options:
         heading_level: 4
 
-::: datachart.typings.VLinePlotAttrs
+::: datachart.typings.VLineSettingAttrs
     options:
         heading_level: 4
 
-::: datachart.typings.HLinePlotAttrs
+::: datachart.typings.HLineSettingAttrs
     options:
         heading_level: 4
 
-::: datachart.typings.VSpanPlotAttrs
+::: datachart.typings.VSpanSettingAttrs
     options:
         heading_level: 4
 
-::: datachart.typings.HSpanPlotAttrs
+::: datachart.typings.HSpanSettingAttrs
     options:
         heading_level: 4
 
-::: datachart.typings.TextAttrs
+::: datachart.typings.TextSettingAttrs
     options:
         heading_level: 4
 

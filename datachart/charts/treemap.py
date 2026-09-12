@@ -8,7 +8,7 @@ from ..utils._internal.validate import validate_treemap_records
 from ..typings import (
     TreemapSingleChartAttrs,
     TreemapStyleAttrs,
-    TextAttrs,
+    TextSettingAttrs,
     LegendSettingAttrs,
 )
 from ..constants import FIG_SIZE, VALUE_FORMAT
@@ -34,9 +34,9 @@ def Treemap(
     style: Optional[Union[TreemapStyleAttrs, List[Optional[TreemapStyleAttrs]]]] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
 ) -> plt.Figure:
