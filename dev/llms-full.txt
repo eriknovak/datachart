@@ -20446,7 +20446,6 @@ The `typings` module contains the typings for all chart components. The module i
 
 | CLASS                            | DESCRIPTION                                                     |
 | -------------------------------- | --------------------------------------------------------------- |
-| `ChartCommonAttrs`               | The chart attributes common to all chart types.                 |
 | `VLineSettingAttrs`              | The per-figure vertical reference line setting.                 |
 | `HLineSettingAttrs`              | The per-figure horizontal reference line setting.               |
 | `VSpanSettingAttrs`              | The per-figure vertical reference band setting.                 |
@@ -20522,30 +20521,6 @@ The `typings` module contains the typings for all chart components. The module i
 ## Chart Typings
 
 ### Common Chart Typings
-
-#### datachart.typings.ChartCommonAttrs
-
-Bases: `TypedDict`
-
-The chart attributes common to all chart types.
-
-| ATTRIBUTE      | DESCRIPTION                                                                                                          |
-| -------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `title`        | The title of the charts. **TYPE:** `Union[str, None]`                                                                |
-| `xlabel`       | The xlabel of the charts. **TYPE:** `Union[str, None]`                                                               |
-| `ylabel`       | The ylabel of the charts. **TYPE:** `Union[str, None]`                                                               |
-| `figsize`      | The size of the figure. **TYPE:** `Union[FIG_SIZE, Tuple[float, float], None]`                                       |
-| `xmin`         | Determine the minimum x-axis value; a datetime on a datetime axis. **TYPE:** `Union[int, float, datetime, None]`     |
-| `xmax`         | Determine the maximum x-axis value; a datetime on a datetime axis. **TYPE:** `Union[int, float, datetime, None]`     |
-| `ymin`         | Determine the minimum y-axis value. **TYPE:** `Union[int, float, None]`                                              |
-| `ymax`         | Determine the maximum y-axis value. **TYPE:** `Union[int, float, None]`                                              |
-| `show_legend`  | Whether or not to show the legend. **TYPE:** `Union[bool, None]`                                                     |
-| `show_grid`    | Determine which grid lines to show. **TYPE:** `Union[SHOW_GRID, str, None]`                                          |
-| `aspect_ratio` | The aspect ratio of the charts. **TYPE:** `Union[ASPECT_RATIO, str, None]`                                           |
-| `subplots`     | Whether or not to create a separate subplot for each chart. **TYPE:** `Union[bool, None]`                            |
-| `max_cols`     | The maximum number of columns in the subplots. Active only when subplots is True. **TYPE:** `Union[int, None]`       |
-| `sharex`       | Whether or not to share the x-axis in the subplots. Active only when subplots is True. **TYPE:** `Union[bool, None]` |
-| `sharey`       | Whether or not to share the y-axis in the subplots. Active only when subplots is True. **TYPE:** `Union[bool, None]` |
 
 #### datachart.typings.VLineSettingAttrs
 
