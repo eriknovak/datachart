@@ -169,7 +169,7 @@ SankeyChart(
 
 ### Text annotations
 
-To place text on the chart, add the `texts` attribute with the [datachart.typings.TextAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextAttrs) typing. Each annotation sets its `text` and position; the Sankey spans `0`–`1` on both axes, with the columns spread across the horizontal span and the tallest column filling the vertical one, so axes fractions (`"coords": "axes"`) and data coordinates are nearly the same thing. The annotation below states the overall survival rate.
+To place text on the chart, add the `texts` attribute with the [datachart.typings.TextSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextSettingAttrs) typing. Each annotation sets its `text` and position; the Sankey spans `0`–`1` on both axes, with the columns spread across the horizontal span and the tallest column filling the vertical one, so axes fractions (`"coords": "axes"`) and data coordinates are nearly the same thing. The annotation below states the overall survival rate.
 
 ```
 survived = sum(o["Survived"] for o in TITANIC.values())

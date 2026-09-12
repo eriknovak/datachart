@@ -48,10 +48,10 @@ PyramidChart(
     yticklabels=Optional[List[str]],                # Custom category-axis tick labels
     ytickrotate=Optional[int],                      # Rotation angle of the category-axis tick labels
 
-    vlines=Optional[VLinePlotAttrs],                # The vertical lines to draw
-    hlines=Optional[HLinePlotAttrs],                # The horizontal lines to draw
-    vspans=Optional[VSpanPlotAttrs],                # The vertical bands to shade
-    hspans=Optional[HSpanPlotAttrs],                # The horizontal bands to shade
+    vlines=Optional[VLineSettingAttrs],             # The vertical lines to draw
+    hlines=Optional[HLineSettingAttrs],             # The horizontal lines to draw
+    vspans=Optional[VSpanSettingAttrs],             # The vertical bands to shade
+    hspans=Optional[HSpanSettingAttrs],             # The horizontal bands to shade
 
     label=Optional[str],                            # The data key for the labels (default: "label")
     y=Optional[str],                                # The data key for the bar values (default: "y")
@@ -276,7 +276,7 @@ PyramidChart(
 
 ### Reference lines
 
-A reference line marks a value or an age band. Vertical lines on the value axis use the `vlines` attribute with the [datachart.typings.VLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLinePlotAttrs) typing, which is either a `dict` or a `List[dict]`; horizontal lines across the category axis use `hlines` and the [datachart.typings.HLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLinePlotAttrs) typing. The value axis is mirrored, so a value on the left side is negative; the category axis counts the age bands from the bottom (`0`, `1`, `2`, …), so a line *between* two bands sits at a half-integer position. A single line applies to both sides and draws twice, so the example attaches its lines to the first side only, with a list aligned with `data`. The [Box Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/boxplot/#reference-lines) guide lists every attribute of a line.
+A reference line marks a value or an age band. Vertical lines on the value axis use the `vlines` attribute with the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) typing, which is either a `dict` or a `List[dict]`; horizontal lines across the category axis use `hlines` and the [datachart.typings.HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) typing. The value axis is mirrored, so a value on the left side is negative; the category axis counts the age bands from the bottom (`0`, `1`, `2`, …), so a line *between* two bands sits at a half-integer position. A single line applies to both sides and draws twice, so the example attaches its lines to the first side only, with a list aligned with `data`. The [Box Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/boxplot/#reference-lines) guide lists every attribute of a line.
 
 The example marks 1,000 residents on both sides and the boundary between the 64-65 and 66-67 bands, above which the residents are of retirement age.
 
@@ -304,7 +304,7 @@ PyramidChart(
 
 ### Reference bands
 
-A reference band shades a range of values or a run of age bands, over the grid lines and under the bars. Vertical bands on the value axis use the `vspans` attribute with the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing; horizontal bands across the category axis use `hspans` and the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing. Each is a `dict` or a `List[dict]` with the bounds (`xmin` / `xmax`, or `ymin` / `ymax`), an optional `label` for the legend and an optional `style` with the `plot_vspan_*` / `plot_hspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. A single band applies to both sides and draws once. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
+A reference band shades a range of values or a run of age bands, over the grid lines and under the bars. Vertical bands on the value axis use the `vspans` attribute with the [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) typing; horizontal bands across the category axis use `hspans` and the [datachart.typings.HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) typing. Each is a `dict` or a `List[dict]` with the bounds (`xmin` / `xmax`, or `ymin` / `ymax`), an optional `label` for the legend and an optional `style` with the `plot_vspan_*` / `plot_hspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. A single band applies to both sides and draws once. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
 
 The example shades the working-age bands, from 18-19 up to 64-65.
 

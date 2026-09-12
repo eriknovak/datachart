@@ -4670,7 +4670,7 @@ BarChart(
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="reference-lines">Reference lines<a class="anchor-link" href="#reference-lines">¶</a></h3><p>Reference lines mark a threshold or an event on the chart.</p>
-<p><strong>Horizontal lines.</strong> Use the <code>hlines</code> argument with the <a href="../../../references/typings/#datachart.typings.HLinePlotAttrs">datachart.typings.HLinePlotAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code> where each dictionary contains some of the following attributes:</p>
+<p><strong>Horizontal lines.</strong> Use the <code>hlines</code> argument with the <a href="../../../references/typings/#datachart.typings.HLineSettingAttrs">datachart.typings.HLineSettingAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code> where each dictionary contains some of the following attributes:</p>
 <div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">"y"</span><span class="p">:</span>    <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>                 <span class="c1"># The y-axis value</span>
   <span class="s2">"xmin"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>       <span class="c1"># The minimum x-axis value  (values are bar indices, e.g. 0, 1, 2, etc.)</span>
@@ -4684,7 +4684,7 @@ BarChart(
   <span class="s2">"label"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                    <span class="c1"># The label of the line (shown in the legend)</span>
 <span class="p">}</span>
 </pre></div>
-<p><strong>Vertical lines.</strong> Use the <code>vlines</code> argument with the <a href="../../../references/typings/#datachart.typings.VLinePlotAttrs">datachart.typings.VLinePlotAttrs</a> typing, which has the same shape with <code>x</code>, <code>ymin</code>, <code>ymax</code> and <code>plot_vline_*</code> style attributes. The <code>x</code> value is a bar index (<code>0</code>, <code>1</code>, <code>2</code>, …), so a line <em>between</em> two bars sits at a half-integer position.</p>
+<p><strong>Vertical lines.</strong> Use the <code>vlines</code> argument with the <a href="../../../references/typings/#datachart.typings.VLineSettingAttrs">datachart.typings.VLineSettingAttrs</a> typing, which has the same shape with <code>x</code>, <code>ymin</code>, <code>ymax</code> and <code>plot_vline_*</code> style attributes. The <code>x</code> value is a bar index (<code>0</code>, <code>1</code>, <code>2</code>, …), so a line <em>between</em> two bars sits at a half-integer position.</p>
 <p>The example marks the monthly sales goal with a dashed horizontal line and the July price cut with a vertical line between June and July. The line labels appear in the legend.</p>
 </div>
 </div>
@@ -4819,7 +4819,7 @@ BarChart(
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="reference-bands">Reference bands<a class="anchor-link" href="#reference-bands">¶</a></h3><p>Reference bands shade a region of the chart — a period, an acceptable range, a tolerance around a goal. A band sits over the grid lines and under the bars.</p>
-<p><strong>Horizontal bands.</strong> Use the <code>hspans</code> argument with the <a href="../../../references/typings/#datachart.typings.HSpanPlotAttrs">datachart.typings.HSpanPlotAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code> where each dictionary contains some of the following attributes:</p>
+<p><strong>Horizontal bands.</strong> Use the <code>hspans</code> argument with the <a href="../../../references/typings/#datachart.typings.HSpanSettingAttrs">datachart.typings.HSpanSettingAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code> where each dictionary contains some of the following attributes:</p>
 <div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">"ymin"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>            <span class="c1"># The lower y-axis bound (default: the axis minimum)</span>
   <span class="s2">"ymax"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>            <span class="c1"># The upper y-axis bound (default: the axis maximum)</span>
@@ -4834,7 +4834,7 @@ BarChart(
   <span class="s2">"label"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                         <span class="c1"># The label of the band (shown in the legend)</span>
 <span class="p">}</span>
 </pre></div>
-<p><strong>Vertical bands.</strong> Use the <code>vspans</code> argument with the <a href="../../../references/typings/#datachart.typings.VSpanPlotAttrs">datachart.typings.VSpanPlotAttrs</a> typing, which has the same shape with <code>xmin</code>, <code>xmax</code> and <code>plot_vspan_*</code> style attributes. The bounds are bar indices (<code>0</code>, <code>1</code>, <code>2</code>, …), so a band that starts <em>between</em> two bars starts at a half-integer position. At least one bound is required; an omitted bound runs to the axis edge.</p>
+<p><strong>Vertical bands.</strong> Use the <code>vspans</code> argument with the <a href="../../../references/typings/#datachart.typings.VSpanSettingAttrs">datachart.typings.VSpanSettingAttrs</a> typing, which has the same shape with <code>xmin</code>, <code>xmax</code> and <code>plot_vspan_*</code> style attributes. The bounds are bar indices (<code>0</code>, <code>1</code>, <code>2</code>, …), so a band that starts <em>between</em> two bars starts at a half-integer position. At least one bound is required; an omitted bound runs to the axis edge.</p>
 <p>The example shades a tolerance around the monthly goal with a horizontal band and the fourth quarter with a vertical band that starts between September and October and, with no <code>xmax</code>, runs to the right edge. The band labels appear in the legend.</p>
 </div>
 </div>

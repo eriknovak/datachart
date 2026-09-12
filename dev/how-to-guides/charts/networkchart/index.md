@@ -430,7 +430,7 @@ NetworkChart(
 
 ### Text annotations
 
-To place text on the chart, add the `texts` attribute with the [datachart.typings.TextAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextAttrs) records. The layout spans `0`–`1` in both directions, so `x` and `y` are fractions of the drawing; the [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/utility/annotations.ipynb) guide covers the connector and box options. The example notes what the fixed, layered layout shows.
+To place text on the chart, add the `texts` attribute with the [datachart.typings.TextSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextSettingAttrs) records. The layout spans `0`–`1` in both directions, so `x` and `y` are fractions of the drawing; the [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/utility/annotations.ipynb) guide covers the connector and box options. The example notes what the fixed, layered layout shows.
 
 ```
 NetworkChart(

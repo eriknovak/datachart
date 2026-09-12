@@ -330,7 +330,7 @@ LineChart(
 
 Reference lines mark a threshold or an event on the chart.
 
-**Horizontal lines.** Use the `hlines` argument with the [datachart.typings.HLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLinePlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
+**Horizontal lines.** Use the `hlines` argument with the [datachart.typings.HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
 
 ```
 {
@@ -347,7 +347,7 @@ Reference lines mark a threshold or an event on the chart.
 }
 ```
 
-**Vertical lines.** Use the `vlines` argument with the [datachart.typings.VLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLinePlotAttrs) typing, which has the same shape with `x`, `ymin`, `ymax` and `plot_vline_*` style attributes. The `x` value is in data coordinates, so a line can sit anywhere along the axis — here between two months.
+**Vertical lines.** Use the `vlines` argument with the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) typing, which has the same shape with `x`, `ymin`, `ymax` and `plot_vline_*` style attributes. The `x` value is in data coordinates, so a line can sit anywhere along the axis — here between two months.
 
 The example marks the freezing point with a dashed horizontal line and the summer solstice (21 June) with a vertical line. The line labels appear in the legend.
 
@@ -390,7 +390,7 @@ LineChart(
 
 Reference bands shade a region of the chart — a period, an acceptable range, a confidence interval. A band sits over the grid lines and under the lines, so the data stays readable through it.
 
-**Horizontal bands.** Use the `hspans` argument with the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
+**Horizontal bands.** Use the `hspans` argument with the [datachart.typings.HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
 
 ```
 {
@@ -408,7 +408,7 @@ Reference bands shade a region of the chart — a period, an acceptable range, a
 }
 ```
 
-**Vertical bands.** Use the `vspans` argument with the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing, which has the same shape with `xmin`, `xmax` and `plot_vspan_*` style attributes. At least one bound is required; an omitted bound runs to the axis edge, so `{"xmin": 9}` shades everything from September to the right edge of the chart.
+**Vertical bands.** Use the `vspans` argument with the [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) typing, which has the same shape with `xmin`, `xmax` and `plot_vspan_*` style attributes. At least one bound is required; an omitted bound runs to the axis edge, so `{"xmin": 9}` shades everything from September to the right edge of the chart.
 
 The example shades the comfortable temperature range with a horizontal band and the meteorological summer (June to August) with a vertical band. The band labels appear in the legend.
 

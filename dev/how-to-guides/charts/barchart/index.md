@@ -366,7 +366,7 @@ BarChart(
 
 Reference lines mark a threshold or an event on the chart.
 
-**Horizontal lines.** Use the `hlines` argument with the [datachart.typings.HLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLinePlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
+**Horizontal lines.** Use the `hlines` argument with the [datachart.typings.HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
 
 ```
 {
@@ -383,7 +383,7 @@ Reference lines mark a threshold or an event on the chart.
 }
 ```
 
-**Vertical lines.** Use the `vlines` argument with the [datachart.typings.VLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLinePlotAttrs) typing, which has the same shape with `x`, `ymin`, `ymax` and `plot_vline_*` style attributes. The `x` value is a bar index (`0`, `1`, `2`, …), so a line *between* two bars sits at a half-integer position.
+**Vertical lines.** Use the `vlines` argument with the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) typing, which has the same shape with `x`, `ymin`, `ymax` and `plot_vline_*` style attributes. The `x` value is a bar index (`0`, `1`, `2`, …), so a line *between* two bars sits at a half-integer position.
 
 The example marks the monthly sales goal with a dashed horizontal line and the July price cut with a vertical line between June and July. The line labels appear in the legend.
 
@@ -427,7 +427,7 @@ BarChart(
 
 Reference bands shade a region of the chart — a period, an acceptable range, a tolerance around a goal. A band sits over the grid lines and under the bars.
 
-**Horizontal bands.** Use the `hspans` argument with the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
+**Horizontal bands.** Use the `hspans` argument with the [datachart.typings.HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
 
 ```
 {
@@ -445,7 +445,7 @@ Reference bands shade a region of the chart — a period, an acceptable range, a
 }
 ```
 
-**Vertical bands.** Use the `vspans` argument with the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing, which has the same shape with `xmin`, `xmax` and `plot_vspan_*` style attributes. The bounds are bar indices (`0`, `1`, `2`, …), so a band that starts *between* two bars starts at a half-integer position. At least one bound is required; an omitted bound runs to the axis edge.
+**Vertical bands.** Use the `vspans` argument with the [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) typing, which has the same shape with `xmin`, `xmax` and `plot_vspan_*` style attributes. The bounds are bar indices (`0`, `1`, `2`, …), so a band that starts *between* two bars starts at a half-integer position. At least one bound is required; an omitted bound runs to the axis edge.
 
 The example shades a tolerance around the monthly goal with a horizontal band and the fourth quarter with a vertical band that starts between September and October and, with no `xmax`, runs to the right edge. The band labels appear in the legend.
 

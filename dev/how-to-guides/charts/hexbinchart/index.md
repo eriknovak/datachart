@@ -423,7 +423,7 @@ HexbinChart(
 
 ### Reference lines
 
-A reference line marks a position on the plane. To add vertical lines, add the `vlines` attribute with the [datachart.typings.VLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLinePlotAttrs) typing; for horizontal lines, add the `hlines` attribute with the [datachart.typings.HLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLinePlotAttrs) typing. The lines below mark the median floor area and rent, which split the listings into four quadrants.
+A reference line marks a position on the plane. To add vertical lines, add the `vlines` attribute with the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) typing; for horizontal lines, add the `hlines` attribute with the [datachart.typings.HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) typing. The lines below mark the median floor area and rent, which split the listings into four quadrants.
 
 ```
 from datachart.constants import LINE_STYLE
@@ -453,7 +453,7 @@ HexbinChart(
 
 ### Reference bands
 
-A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
+A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
 
 The bands below shade the interquartile rent range and the apartments under 40 m²; the second band has no lower bound, so it runs to the left edge.
 

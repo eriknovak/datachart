@@ -261,7 +261,7 @@ Treemap(
 
 ### Text annotations
 
-To place text on the chart, add the `texts` attribute with the [datachart.typings.TextAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextAttrs) records. The tiling spans `0`–`1` in both directions, so `x` and `y` are fractions of the drawing; the [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/utility/annotations.ipynb) guide covers the connector and box options. The example points out how much of the world lives in Asia.
+To place text on the chart, add the `texts` attribute with the [datachart.typings.TextSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextSettingAttrs) records. The tiling spans `0`–`1` in both directions, so `x` and `y` are fractions of the drawing; the [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/utility/annotations.ipynb) guide covers the connector and box options. The example points out how much of the world lives in Asia.
 
 ```
 asia = sum(n for _, n in WORLD["Asia"])

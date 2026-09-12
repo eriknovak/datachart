@@ -4210,7 +4210,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8fea7910">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b43740ce">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4221,10 +4221,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input" id="cell-id=81546b64">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input" id="cell-id=e38cec41">
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6d9fa582">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=208532ac">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4625,7 +4625,7 @@ BoxPlot(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="reference-lines">Reference lines<a class="anchor-link" href="#reference-lines">¶</a></h3><p>A reference line puts a threshold or a summary value next to the boxes. To add horizontal lines, add the <code>hlines</code> attribute with the <a href="../../../references/typings/#datachart.typings.HLinePlotAttrs">datachart.typings.HLinePlotAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code> where each dictionary contains some of the following attributes:</p>
+<h3 id="reference-lines">Reference lines<a class="anchor-link" href="#reference-lines">¶</a></h3><p>A reference line puts a threshold or a summary value next to the boxes. To add horizontal lines, add the <code>hlines</code> attribute with the <a href="../../../references/typings/#datachart.typings.HLineSettingAttrs">datachart.typings.HLineSettingAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code> where each dictionary contains some of the following attributes:</p>
 <div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">"y"</span><span class="p">:</span>    <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>                 <span class="c1"># The y-axis value</span>
   <span class="s2">"xmin"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>       <span class="c1"># The minimum x-axis value</span>
@@ -4639,7 +4639,7 @@ BoxPlot(
   <span class="s2">"label"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                    <span class="c1"># The label of the line</span>
 <span class="p">}</span>
 </pre></div>
-<p>Vertical lines work the same way through the <code>vlines</code> attribute and the <a href="../../../references/typings/#datachart.typings.VLinePlotAttrs">datachart.typings.VLinePlotAttrs</a> typing, with <code>x</code>, <code>ymin</code>, <code>ymax</code> and <code>plot_vline_*</code> style attributes in place of their horizontal counterparts. The line style takes a <a href="../../../references/constants/#datachart.constants.LINE_STYLE">datachart.constants.LINE_STYLE</a> value. The example marks the mean body mass of all 342 penguins, which shows at a glance that the whole Gentoo box sits above it.</p>
+<p>Vertical lines work the same way through the <code>vlines</code> attribute and the <a href="../../../references/typings/#datachart.typings.VLineSettingAttrs">datachart.typings.VLineSettingAttrs</a> typing, with <code>x</code>, <code>ymin</code>, <code>ymax</code> and <code>plot_vline_*</code> style attributes in place of their horizontal counterparts. The line style takes a <a href="../../../references/constants/#datachart.constants.LINE_STYLE">datachart.constants.LINE_STYLE</a> value. The example marks the mean body mass of all 342 penguins, which shows at a glance that the whole Gentoo box sits above it.</p>
 </div>
 </div>
 </div>
@@ -4748,19 +4748,19 @@ BoxPlot(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fd06d573">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ff021662">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="reference-bands">Reference bands<a class="anchor-link" href="#reference-bands">¶</a></h3><p>A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the <code>hspans</code> attribute with the <a href="../../../references/typings/#datachart.typings.HSpanPlotAttrs">datachart.typings.HSpanPlotAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code> where each dictionary sets <code>ymin</code> and/or <code>ymax</code>, an optional <code>label</code> for the legend, and an optional <code>style</code> with the <code>plot_hspan_*</code> attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the <code>vspans</code> attribute and the <a href="../../../references/typings/#datachart.typings.VSpanPlotAttrs">datachart.typings.VSpanPlotAttrs</a> typing, with <code>xmin</code>, <code>xmax</code> and <code>plot_vspan_*</code> attributes. At least one bound is required; an omitted bound runs to the axis edge. The <a href="../linechart/#reference-bands">Line Chart</a> guide lists every attribute of a band.</p>
+<h3 id="reference-bands">Reference bands<a class="anchor-link" href="#reference-bands">¶</a></h3><p>A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the <code>hspans</code> attribute with the <a href="../../../references/typings/#datachart.typings.HSpanSettingAttrs">datachart.typings.HSpanSettingAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code> where each dictionary sets <code>ymin</code> and/or <code>ymax</code>, an optional <code>label</code> for the legend, and an optional <code>style</code> with the <code>plot_hspan_*</code> attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the <code>vspans</code> attribute and the <a href="../../../references/typings/#datachart.typings.VSpanSettingAttrs">datachart.typings.VSpanSettingAttrs</a> typing, with <code>xmin</code>, <code>xmax</code> and <code>plot_vspan_*</code> attributes. At least one bound is required; an omitted bound runs to the axis edge. The <a href="../linechart/#reference-bands">Line Chart</a> guide lists every attribute of a band.</p>
 <p>The example shades one standard deviation around the mean body mass of all penguins and keeps the mean itself as a line: the Adelie and Chinstrap boxes sit inside the band, the Gentoo box above it.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b0b3644c">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3b2ac0c3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

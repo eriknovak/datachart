@@ -4527,7 +4527,7 @@ ViolinPlot(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a580b2ca">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ce8d4790">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4538,10 +4538,10 @@ ViolinPlot(
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input" id="cell-id=52753270">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input" id="cell-id=bd23755b">
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8a77ff34">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7bdf1f4c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4724,7 +4724,7 @@ ViolinPlot(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="reference-lines">Reference lines<a class="anchor-link" href="#reference-lines">¶</a></h3><p>A reference line puts a threshold or a summary value next to the violins. To add horizontal lines, add the <code>hlines</code> attribute with the <a href="../../../references/typings/#datachart.typings.HLinePlotAttrs">datachart.typings.HLinePlotAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code>; vertical lines work the same way through the <code>vlines</code> attribute and the <a href="../../../references/typings/#datachart.typings.VLinePlotAttrs">datachart.typings.VLinePlotAttrs</a> typing. The <a href="../boxplot/#reference-lines">Box Plot</a> guide lists every attribute of a line. The example marks the mean body mass of all penguins.</p>
+<h3 id="reference-lines">Reference lines<a class="anchor-link" href="#reference-lines">¶</a></h3><p>A reference line puts a threshold or a summary value next to the violins. To add horizontal lines, add the <code>hlines</code> attribute with the <a href="../../../references/typings/#datachart.typings.HLineSettingAttrs">datachart.typings.HLineSettingAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code>; vertical lines work the same way through the <code>vlines</code> attribute and the <a href="../../../references/typings/#datachart.typings.VLineSettingAttrs">datachart.typings.VLineSettingAttrs</a> typing. The <a href="../boxplot/#reference-lines">Box Plot</a> guide lists every attribute of a line. The example marks the mean body mass of all penguins.</p>
 </div>
 </div>
 </div>
@@ -4833,19 +4833,19 @@ ViolinPlot(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=82779175">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=60f71050">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="reference-bands">Reference bands<a class="anchor-link" href="#reference-bands">¶</a></h3><p>A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the <code>hspans</code> attribute with the <a href="../../../references/typings/#datachart.typings.HSpanPlotAttrs">datachart.typings.HSpanPlotAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code> where each dictionary sets <code>ymin</code> and/or <code>ymax</code>, an optional <code>label</code> for the legend, and an optional <code>style</code> with the <code>plot_hspan_*</code> attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the <code>vspans</code> attribute and the <a href="../../../references/typings/#datachart.typings.VSpanPlotAttrs">datachart.typings.VSpanPlotAttrs</a> typing, with <code>xmin</code>, <code>xmax</code> and <code>plot_vspan_*</code> attributes. At least one bound is required; an omitted bound runs to the axis edge. The <a href="../linechart/#reference-bands">Line Chart</a> guide lists every attribute of a band.</p>
+<h3 id="reference-bands">Reference bands<a class="anchor-link" href="#reference-bands">¶</a></h3><p>A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the <code>hspans</code> attribute with the <a href="../../../references/typings/#datachart.typings.HSpanSettingAttrs">datachart.typings.HSpanSettingAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code> where each dictionary sets <code>ymin</code> and/or <code>ymax</code>, an optional <code>label</code> for the legend, and an optional <code>style</code> with the <code>plot_hspan_*</code> attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the <code>vspans</code> attribute and the <a href="../../../references/typings/#datachart.typings.VSpanSettingAttrs">datachart.typings.VSpanSettingAttrs</a> typing, with <code>xmin</code>, <code>xmax</code> and <code>plot_vspan_*</code> attributes. At least one bound is required; an omitted bound runs to the axis edge. The <a href="../linechart/#reference-bands">Line Chart</a> guide lists every attribute of a band.</p>
 <p>The example shades one standard deviation around the mean body mass of all penguins and keeps the mean itself as a line: the Adelie and Chinstrap violins sit inside the band, the Gentoo violin above it.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ebb4681e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b0cf7731">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

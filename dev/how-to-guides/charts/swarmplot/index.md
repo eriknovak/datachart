@@ -282,7 +282,7 @@ SwarmPlot(
 
 ### Reference lines
 
-A reference line puts a threshold or a summary value next to the swarms. To add horizontal lines, add the `hlines` attribute with the [datachart.typings.HLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLinePlotAttrs) typing, which is either a `dict` or a `List[dict]`; vertical lines use `vlines` and the [datachart.typings.VLinePlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLinePlotAttrs) typing.
+A reference line puts a threshold or a summary value next to the swarms. To add horizontal lines, add the `hlines` attribute with the [datachart.typings.HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) typing, which is either a `dict` or a `List[dict]`; vertical lines use `vlines` and the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) typing.
 
 ```
 from datachart.constants import LINE_STYLE
@@ -313,7 +313,7 @@ SwarmPlot(
 
 ### Reference bands
 
-A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanPlotAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanPlotAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanPlotAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
+A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
 
 The example shades one standard deviation around the mean body mass of all penguins and keeps the mean itself as a line: the Adelie and Chinstrap swarms sit inside the band, the Gentoo swarm above it.
 

@@ -106,12 +106,12 @@ LineChart(
     ] = None,
     vlines: Optional[
         Union[
-            VLinePlotAttrs,
-            List[VLinePlotAttrs],
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
             List[
                 Union[
-                    VLinePlotAttrs,
-                    List[VLinePlotAttrs],
+                    VLineSettingAttrs,
+                    List[VLineSettingAttrs],
                     None,
                 ]
             ],
@@ -119,12 +119,12 @@ LineChart(
     ] = None,
     hlines: Optional[
         Union[
-            HLinePlotAttrs,
-            List[HLinePlotAttrs],
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
             List[
                 Union[
-                    HLinePlotAttrs,
-                    List[HLinePlotAttrs],
+                    HLineSettingAttrs,
+                    List[HLineSettingAttrs],
                     None,
                 ]
             ],
@@ -132,12 +132,12 @@ LineChart(
     ] = None,
     vspans: Optional[
         Union[
-            VSpanPlotAttrs,
-            List[VSpanPlotAttrs],
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
             List[
                 Union[
-                    VSpanPlotAttrs,
-                    List[VSpanPlotAttrs],
+                    VSpanSettingAttrs,
+                    List[VSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -145,12 +145,12 @@ LineChart(
     ] = None,
     hspans: Optional[
         Union[
-            HSpanPlotAttrs,
-            List[HSpanPlotAttrs],
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
             List[
                 Union[
-                    HSpanPlotAttrs,
-                    List[HSpanPlotAttrs],
+                    HSpanSettingAttrs,
+                    List[HSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -158,9 +158,15 @@ LineChart(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None,
     x: Optional[Union[str, List[Optional[str]]]] = None,
@@ -232,11 +238,11 @@ The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_
 | `ytickrotate`   | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                |
 | `xticks_format` | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                |
 | `yticks_format` | The y-axis tick label format, as xticks_format. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                 |
-| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                        |
-| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                      |
-| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                    |
-| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                  |
-| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                          |
+| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs], List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                            |
+| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs], List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                          |
+| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                        |
+| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                      |
+| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                              |
 | `x`             | The key name in data for x-axis values (default: "x"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                |
 | `y`             | The key name in data for y-axis values (default: "y"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                |
 | `yerr`          | The key name in data for y-axis error values (default: "yerr"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                       |
@@ -322,12 +328,12 @@ StackedAreaChart(
     ] = None,
     vlines: Optional[
         Union[
-            VLinePlotAttrs,
-            List[VLinePlotAttrs],
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
             List[
                 Union[
-                    VLinePlotAttrs,
-                    List[VLinePlotAttrs],
+                    VLineSettingAttrs,
+                    List[VLineSettingAttrs],
                     None,
                 ]
             ],
@@ -335,12 +341,12 @@ StackedAreaChart(
     ] = None,
     hlines: Optional[
         Union[
-            HLinePlotAttrs,
-            List[HLinePlotAttrs],
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
             List[
                 Union[
-                    HLinePlotAttrs,
-                    List[HLinePlotAttrs],
+                    HLineSettingAttrs,
+                    List[HLineSettingAttrs],
                     None,
                 ]
             ],
@@ -348,12 +354,12 @@ StackedAreaChart(
     ] = None,
     vspans: Optional[
         Union[
-            VSpanPlotAttrs,
-            List[VSpanPlotAttrs],
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
             List[
                 Union[
-                    VSpanPlotAttrs,
-                    List[VSpanPlotAttrs],
+                    VSpanSettingAttrs,
+                    List[VSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -361,12 +367,12 @@ StackedAreaChart(
     ] = None,
     hspans: Optional[
         Union[
-            HSpanPlotAttrs,
-            List[HSpanPlotAttrs],
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
             List[
                 Union[
-                    HSpanPlotAttrs,
-                    List[HSpanPlotAttrs],
+                    HSpanSettingAttrs,
+                    List[HSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -374,9 +380,15 @@ StackedAreaChart(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None,
     x: Optional[Union[str, List[Optional[str]]]] = None,
@@ -446,11 +458,11 @@ The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_
 | `ytickrotate`   | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                 |
 | `xticks_format` | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                 |
 | `yticks_format` | The y-axis tick label format, as xticks_format. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                  |
-| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                         |
-| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                       |
-| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                     |
-| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                   |
-| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                           |
+| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs], List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                             |
+| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs], List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                           |
+| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                         |
+| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                       |
+| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                               |
 | `x`             | The key name in data for x-axis values (default: "x"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                 |
 | `y`             | The key name in data for y-axis values (default: "y"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                 |
 
@@ -542,12 +554,12 @@ BarChart(
     ] = None,
     vlines: Optional[
         Union[
-            VLinePlotAttrs,
-            List[VLinePlotAttrs],
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
             List[
                 Union[
-                    VLinePlotAttrs,
-                    List[VLinePlotAttrs],
+                    VLineSettingAttrs,
+                    List[VLineSettingAttrs],
                     None,
                 ]
             ],
@@ -555,12 +567,12 @@ BarChart(
     ] = None,
     hlines: Optional[
         Union[
-            HLinePlotAttrs,
-            List[HLinePlotAttrs],
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
             List[
                 Union[
-                    HLinePlotAttrs,
-                    List[HLinePlotAttrs],
+                    HLineSettingAttrs,
+                    List[HLineSettingAttrs],
                     None,
                 ]
             ],
@@ -568,12 +580,12 @@ BarChart(
     ] = None,
     vspans: Optional[
         Union[
-            VSpanPlotAttrs,
-            List[VSpanPlotAttrs],
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
             List[
                 Union[
-                    VSpanPlotAttrs,
-                    List[VSpanPlotAttrs],
+                    VSpanSettingAttrs,
+                    List[VSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -581,12 +593,12 @@ BarChart(
     ] = None,
     hspans: Optional[
         Union[
-            HSpanPlotAttrs,
-            List[HSpanPlotAttrs],
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
             List[
                 Union[
-                    HSpanPlotAttrs,
-                    List[HSpanPlotAttrs],
+                    HSpanSettingAttrs,
+                    List[HSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -594,9 +606,15 @@ BarChart(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
@@ -671,11 +689,11 @@ Examples:
 | `ytickrotate`   | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                       |
 | `xticks_format` | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                       |
 | `yticks_format` | The y-axis tick label format, as xticks_format. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                        |
-| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                               |
-| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                             |
-| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                           |
-| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                         |
-| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                 |
+| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs], List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                   |
+| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs], List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                 |
+| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                               |
+| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                             |
+| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                     |
 | `label`         | The key name in data for label values (default: "label"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                    |
 | `y`             | The key name in data for y-axis values (default: "y"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                       |
 | `yerr`          | The key name in data for y-axis error values (default: "yerr"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                              |
@@ -726,19 +744,19 @@ PyramidChart(
         Union[VALUE_FORMAT, DATE_FORMAT, str]
     ] = None,
     vlines: Optional[
-        Union[VLinePlotAttrs, List[VLinePlotAttrs]]
+        Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     ] = None,
     hlines: Optional[
-        Union[HLinePlotAttrs, List[HLinePlotAttrs]]
+        Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     ] = None,
     vspans: Optional[
-        Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]
+        Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     ] = None,
     hspans: Optional[
-        Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]
+        Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     ] = None,
     texts: Optional[
-        Union[TextAttrs, List[TextAttrs]]
+        Union[TextSettingAttrs, List[TextSettingAttrs]]
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
     y: Optional[Union[str, List[Optional[str]]]] = None,
@@ -809,11 +827,11 @@ Examples:
 | `ytickrotate`   | Rotation angle for category-axis tick labels. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                    |
 | `xticks_format` | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                               |
 | `yticks_format` | The y-axis tick label format, as xticks_format. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                |
-| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                                |
-| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                              |
-| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs]]]` **DEFAULT:** `None`                                                                                                                                                            |
-| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs]]]` **DEFAULT:** `None`                                                                                                                                                          |
-| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                                        |
+| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                          |
+| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                        |
+| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]` **DEFAULT:** `None`                                                                                                                                                      |
+| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]` **DEFAULT:** `None`                                                                                                                                                    |
+| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                          |
 | `label`         | The key name in data for label values (default: "label"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                            |
 | `y`             | The key name in data for the bar values (default: "y"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                              |
 | `yerr`          | The key name in data for the bar error values (default: "yerr"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                     |
@@ -877,21 +895,27 @@ RadialChart(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None,
     vlines: Optional[dict] = None,
     hlines: Optional[dict] = None,
     vspans: Optional[
         Union[
-            VSpanPlotAttrs,
-            List[VSpanPlotAttrs],
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
             List[
                 Union[
-                    VSpanPlotAttrs,
-                    List[VSpanPlotAttrs],
+                    VSpanSettingAttrs,
+                    List[VSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -899,12 +923,12 @@ RadialChart(
     ] = None,
     hspans: Optional[
         Union[
-            HSpanPlotAttrs,
-            List[HSpanPlotAttrs],
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
             List[
                 Union[
-                    HSpanPlotAttrs,
-                    List[HSpanPlotAttrs],
+                    HSpanSettingAttrs,
+                    List[HSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -978,11 +1002,11 @@ Examples:
 | `sharex`          | Whether to share the angular axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                              |
 | `sharey`          | Whether to share the radial axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                               |
 | `style`           | Style configuration(s) for the chart(s); radial visuals obey the matching cartesian style family (plot_line\_\*, plot_bar\_\*, plot_hist\_\*, plot_scatter\_\*). **TYPE:** `Optional[Union[_RadialStyleAttrs, List[Optional[_RadialStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                     |
-| `texts`           | Text annotation(s) to draw. On the polar axes, data coordinates are (angle in radians, radius); axes-fraction coordinates ("coords": "axes") are often easier. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                  |
+| `texts`           | Text annotation(s) to draw. On the polar axes, data coordinates are (angle in radians, radius); axes-fraction coordinates ("coords": "axes") are often easier. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                      |
 | `vlines`          | Not supported on a polar axes. Raises when passed. **TYPE:** `Optional[dict]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                          |
 | `hlines`          | Not supported on a polar axes. Raises when passed. **TYPE:** `Optional[dict]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                          |
-| `vspans`          | Angular wedge(s) to shade over the full radius; xmin and xmax are angles in degrees from the start angle, an omitted bound running to 0 or 360. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                             |
-| `hspans`          | Annulus (annuli) to shade over the full circle; ymin and ymax are radial values, an omitted bound running to the radial limit. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                              |
+| `vspans`          | Angular wedge(s) to shade over the full radius; xmin and xmax are angles in degrees from the start angle, an omitted bound running to 0 or 360. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                 |
+| `hspans`          | Annulus (annuli) to shade over the full circle; ymin and ymax are radial values, an omitted bound running to the radial limit. **TYPE:** `Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                  |
 | `label`           | The key name in data for the category labels (default: "label"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                 |
 | `x`               | The key name in data for the histogram observations (default: "x"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                              |
 | `y`               | The key name in data for radial values (default: "y"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                           |
@@ -1069,12 +1093,12 @@ Histogram(
     ] = None,
     vlines: Optional[
         Union[
-            VLinePlotAttrs,
-            List[VLinePlotAttrs],
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
             List[
                 Union[
-                    VLinePlotAttrs,
-                    List[VLinePlotAttrs],
+                    VLineSettingAttrs,
+                    List[VLineSettingAttrs],
                     None,
                 ]
             ],
@@ -1082,12 +1106,12 @@ Histogram(
     ] = None,
     hlines: Optional[
         Union[
-            HLinePlotAttrs,
-            List[HLinePlotAttrs],
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
             List[
                 Union[
-                    HLinePlotAttrs,
-                    List[HLinePlotAttrs],
+                    HLineSettingAttrs,
+                    List[HLineSettingAttrs],
                     None,
                 ]
             ],
@@ -1095,12 +1119,12 @@ Histogram(
     ] = None,
     vspans: Optional[
         Union[
-            VSpanPlotAttrs,
-            List[VSpanPlotAttrs],
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
             List[
                 Union[
-                    VSpanPlotAttrs,
-                    List[VSpanPlotAttrs],
+                    VSpanSettingAttrs,
+                    List[VSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -1108,12 +1132,12 @@ Histogram(
     ] = None,
     hspans: Optional[
         Union[
-            HSpanPlotAttrs,
-            List[HSpanPlotAttrs],
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
             List[
                 Union[
-                    HSpanPlotAttrs,
-                    List[HSpanPlotAttrs],
+                    HSpanSettingAttrs,
+                    List[HSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -1121,9 +1145,15 @@ Histogram(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None,
     x: Optional[Union[str, List[Optional[str]]]] = None
@@ -1193,11 +1223,11 @@ The `show_values`, `value_format` and `legend` parameters. The `vspans` and `hsp
 | `yticks`          | Custom y-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float]], List[List[Union[int, float]]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                          |
 | `yticklabels`     | Custom y-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                         |
 | `ytickrotate`     | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                               |
-| `vlines`          | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                       |
-| `hlines`          | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                     |
-| `vspans`          | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                   |
-| `hspans`          | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                 |
-| `texts`           | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                         |
+| `vlines`          | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs], List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                           |
+| `hlines`          | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs], List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                         |
+| `vspans`          | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                       |
+| `hspans`          | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                     |
+| `texts`           | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                             |
 | `x`               | The key name in data for x-axis values (default: "x"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                               |
 
 | RETURNS      | DESCRIPTION                          |
@@ -1280,12 +1310,12 @@ BoxPlot(
     ] = None,
     vlines: Optional[
         Union[
-            VLinePlotAttrs,
-            List[VLinePlotAttrs],
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
             List[
                 Union[
-                    VLinePlotAttrs,
-                    List[VLinePlotAttrs],
+                    VLineSettingAttrs,
+                    List[VLineSettingAttrs],
                     None,
                 ]
             ],
@@ -1293,12 +1323,12 @@ BoxPlot(
     ] = None,
     hlines: Optional[
         Union[
-            HLinePlotAttrs,
-            List[HLinePlotAttrs],
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
             List[
                 Union[
-                    HLinePlotAttrs,
-                    List[HLinePlotAttrs],
+                    HLineSettingAttrs,
+                    List[HLineSettingAttrs],
                     None,
                 ]
             ],
@@ -1306,12 +1336,12 @@ BoxPlot(
     ] = None,
     vspans: Optional[
         Union[
-            VSpanPlotAttrs,
-            List[VSpanPlotAttrs],
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
             List[
                 Union[
-                    VSpanPlotAttrs,
-                    List[VSpanPlotAttrs],
+                    VSpanSettingAttrs,
+                    List[VSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -1319,12 +1349,12 @@ BoxPlot(
     ] = None,
     hspans: Optional[
         Union[
-            HSpanPlotAttrs,
-            List[HSpanPlotAttrs],
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
             List[
                 Union[
-                    HSpanPlotAttrs,
-                    List[HSpanPlotAttrs],
+                    HSpanSettingAttrs,
+                    List[HSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -1332,9 +1362,15 @@ BoxPlot(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
@@ -1407,11 +1443,11 @@ The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_
 | `ytickrotate`   | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                      |
 | `xticks_format` | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                      |
 | `yticks_format` | The y-axis tick label format, as xticks_format. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                       |
-| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                              |
-| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                            |
-| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                          |
-| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                        |
-| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                |
+| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs], List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                  |
+| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs], List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                |
+| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                              |
+| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                            |
+| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                    |
 | `label`         | The key name in data for label/category values (default: "label"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                          |
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                 |
 
@@ -1496,12 +1532,12 @@ ViolinPlot(
     ] = None,
     vlines: Optional[
         Union[
-            VLinePlotAttrs,
-            List[VLinePlotAttrs],
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
             List[
                 Union[
-                    VLinePlotAttrs,
-                    List[VLinePlotAttrs],
+                    VLineSettingAttrs,
+                    List[VLineSettingAttrs],
                     None,
                 ]
             ],
@@ -1509,12 +1545,12 @@ ViolinPlot(
     ] = None,
     hlines: Optional[
         Union[
-            HLinePlotAttrs,
-            List[HLinePlotAttrs],
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
             List[
                 Union[
-                    HLinePlotAttrs,
-                    List[HLinePlotAttrs],
+                    HLineSettingAttrs,
+                    List[HLineSettingAttrs],
                     None,
                 ]
             ],
@@ -1522,12 +1558,12 @@ ViolinPlot(
     ] = None,
     vspans: Optional[
         Union[
-            VSpanPlotAttrs,
-            List[VSpanPlotAttrs],
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
             List[
                 Union[
-                    VSpanPlotAttrs,
-                    List[VSpanPlotAttrs],
+                    VSpanSettingAttrs,
+                    List[VSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -1535,12 +1571,12 @@ ViolinPlot(
     ] = None,
     hspans: Optional[
         Union[
-            HSpanPlotAttrs,
-            List[HSpanPlotAttrs],
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
             List[
                 Union[
-                    HSpanPlotAttrs,
-                    List[HSpanPlotAttrs],
+                    HSpanSettingAttrs,
+                    List[HSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -1548,9 +1584,15 @@ ViolinPlot(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
@@ -1628,11 +1670,11 @@ The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_
 | `ytickrotate`   | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                |
 | `xticks_format` | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                |
 | `yticks_format` | The y-axis tick label format, as xticks_format. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                 |
-| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                        |
-| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                      |
-| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                    |
-| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                  |
-| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                          |
+| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs], List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                            |
+| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs], List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                          |
+| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                        |
+| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                      |
+| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                              |
 | `label`         | The key name in data for label/category values (default: "label"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                    |
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                           |
 | `inner`         | The marks drawn inside each body: "box" (quartile bar, 1.5·IQR whisker, median dot), "quartiles" (dashed median, dotted Q1/Q3), "median" (one line), or None (body only). See VIOLIN_INNER. **TYPE:** `Optional[Union[VIOLIN_INNER, str]]` **DEFAULT:** `VIOLIN_INNER.BOX`                                      |
@@ -1719,12 +1761,12 @@ SwarmPlot(
     ] = None,
     vlines: Optional[
         Union[
-            VLinePlotAttrs,
-            List[VLinePlotAttrs],
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
             List[
                 Union[
-                    VLinePlotAttrs,
-                    List[VLinePlotAttrs],
+                    VLineSettingAttrs,
+                    List[VLineSettingAttrs],
                     None,
                 ]
             ],
@@ -1732,12 +1774,12 @@ SwarmPlot(
     ] = None,
     hlines: Optional[
         Union[
-            HLinePlotAttrs,
-            List[HLinePlotAttrs],
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
             List[
                 Union[
-                    HLinePlotAttrs,
-                    List[HLinePlotAttrs],
+                    HLineSettingAttrs,
+                    List[HLineSettingAttrs],
                     None,
                 ]
             ],
@@ -1745,12 +1787,12 @@ SwarmPlot(
     ] = None,
     vspans: Optional[
         Union[
-            VSpanPlotAttrs,
-            List[VSpanPlotAttrs],
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
             List[
                 Union[
-                    VSpanPlotAttrs,
-                    List[VSpanPlotAttrs],
+                    VSpanSettingAttrs,
+                    List[VSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -1758,12 +1800,12 @@ SwarmPlot(
     ] = None,
     hspans: Optional[
         Union[
-            HSpanPlotAttrs,
-            List[HSpanPlotAttrs],
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
             List[
                 Union[
-                    HSpanPlotAttrs,
-                    List[HSpanPlotAttrs],
+                    HSpanSettingAttrs,
+                    List[HSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -1771,9 +1813,15 @@ SwarmPlot(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
@@ -1844,11 +1892,11 @@ Examples:
 | `ytickrotate`   | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                        |
 | `xticks_format` | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                        |
 | `yticks_format` | The y-axis tick label format, as xticks_format. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                         |
-| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                |
-| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                              |
-| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                            |
-| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                          |
-| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                  |
+| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs], List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                    |
+| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs], List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                  |
+| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                |
+| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                              |
+| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                      |
 | `label`         | The key name in data for label/category values (default: "label"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                            |
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                   |
 
@@ -1937,12 +1985,12 @@ RaincloudPlot(
     ] = None,
     vlines: Optional[
         Union[
-            VLinePlotAttrs,
-            List[VLinePlotAttrs],
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
             List[
                 Union[
-                    VLinePlotAttrs,
-                    List[VLinePlotAttrs],
+                    VLineSettingAttrs,
+                    List[VLineSettingAttrs],
                     None,
                 ]
             ],
@@ -1950,12 +1998,12 @@ RaincloudPlot(
     ] = None,
     hlines: Optional[
         Union[
-            HLinePlotAttrs,
-            List[HLinePlotAttrs],
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
             List[
                 Union[
-                    HLinePlotAttrs,
-                    List[HLinePlotAttrs],
+                    HLineSettingAttrs,
+                    List[HLineSettingAttrs],
                     None,
                 ]
             ],
@@ -1963,12 +2011,12 @@ RaincloudPlot(
     ] = None,
     vspans: Optional[
         Union[
-            VSpanPlotAttrs,
-            List[VSpanPlotAttrs],
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
             List[
                 Union[
-                    VSpanPlotAttrs,
-                    List[VSpanPlotAttrs],
+                    VSpanSettingAttrs,
+                    List[VSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -1976,12 +2024,12 @@ RaincloudPlot(
     ] = None,
     hspans: Optional[
         Union[
-            HSpanPlotAttrs,
-            List[HSpanPlotAttrs],
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
             List[
                 Union[
-                    HSpanPlotAttrs,
-                    List[HSpanPlotAttrs],
+                    HSpanSettingAttrs,
+                    List[HSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -1989,9 +2037,15 @@ RaincloudPlot(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
@@ -2064,11 +2118,11 @@ Examples:
 | `ytickrotate`   | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                    |
 | `xticks_format` | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                    |
 | `yticks_format` | The y-axis tick label format, as xticks_format. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                     |
-| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                            |
-| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                          |
-| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                        |
-| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                      |
-| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                              |
+| `vlines`        | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs], List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                |
+| `hlines`        | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs], List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                              |
+| `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                            |
+| `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                          |
+| `texts`         | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                  |
 | `label`         | The key name in data for label/category values (default: "label"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                        |
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                               |
 
@@ -2158,12 +2212,12 @@ ScatterChart(
     ] = None,
     vlines: Optional[
         Union[
-            VLinePlotAttrs,
-            List[VLinePlotAttrs],
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
             List[
                 Union[
-                    VLinePlotAttrs,
-                    List[VLinePlotAttrs],
+                    VLineSettingAttrs,
+                    List[VLineSettingAttrs],
                     None,
                 ]
             ],
@@ -2171,12 +2225,12 @@ ScatterChart(
     ] = None,
     hlines: Optional[
         Union[
-            HLinePlotAttrs,
-            List[HLinePlotAttrs],
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
             List[
                 Union[
-                    HLinePlotAttrs,
-                    List[HLinePlotAttrs],
+                    HLineSettingAttrs,
+                    List[HLineSettingAttrs],
                     None,
                 ]
             ],
@@ -2184,12 +2238,12 @@ ScatterChart(
     ] = None,
     vspans: Optional[
         Union[
-            VSpanPlotAttrs,
-            List[VSpanPlotAttrs],
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
             List[
                 Union[
-                    VSpanPlotAttrs,
-                    List[VSpanPlotAttrs],
+                    VSpanSettingAttrs,
+                    List[VSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -2197,12 +2251,12 @@ ScatterChart(
     ] = None,
     hspans: Optional[
         Union[
-            HSpanPlotAttrs,
-            List[HSpanPlotAttrs],
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
             List[
                 Union[
-                    HSpanPlotAttrs,
-                    List[HSpanPlotAttrs],
+                    HSpanSettingAttrs,
+                    List[HSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -2210,9 +2264,15 @@ ScatterChart(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None,
     x: Optional[Union[str, List[Optional[str]]]] = None,
@@ -2335,11 +2395,11 @@ The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_
 | `ytickrotate`      | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                      |
 | `xticks_format`    | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                      |
 | `yticks_format`    | The y-axis tick label format, as xticks_format. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                       |
-| `vlines`           | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                              |
-| `hlines`           | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                            |
-| `vspans`           | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                          |
-| `hspans`           | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                        |
-| `texts`            | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                |
+| `vlines`           | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs], List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                  |
+| `hlines`           | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs], List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                |
+| `vspans`           | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                              |
+| `hspans`           | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                            |
+| `texts`            | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                    |
 | `x`                | The key name in data for x-axis values (default: "x"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                      |
 | `y`                | The key name in data for y-axis values (default: "y"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                      |
 | `size`             | The key name in data for marker size values (for bubble charts). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                            |
@@ -2435,9 +2495,15 @@ Heatmap(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None
 ) -> plt.Figure
@@ -2510,7 +2576,7 @@ Examples:
 | `xticks_format`       | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                          |
 | `yticks_format`       | The y-axis tick label format, as xticks_format. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                           |
 | `colorbar`            | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** `Optional[Union[ColorbarSettingAttrs, List[Optional[ColorbarSettingAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                          |
-| `texts`               | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                    |
+| `texts`               | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                        |
 
 | RETURNS      | DESCRIPTION                        |
 | ------------ | ---------------------------------- |
@@ -2602,12 +2668,12 @@ ContourChart(
     ] = None,
     vlines: Optional[
         Union[
-            VLinePlotAttrs,
-            List[VLinePlotAttrs],
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
             List[
                 Union[
-                    VLinePlotAttrs,
-                    List[VLinePlotAttrs],
+                    VLineSettingAttrs,
+                    List[VLineSettingAttrs],
                     None,
                 ]
             ],
@@ -2615,12 +2681,12 @@ ContourChart(
     ] = None,
     hlines: Optional[
         Union[
-            HLinePlotAttrs,
-            List[HLinePlotAttrs],
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
             List[
                 Union[
-                    HLinePlotAttrs,
-                    List[HLinePlotAttrs],
+                    HLineSettingAttrs,
+                    List[HLineSettingAttrs],
                     None,
                 ]
             ],
@@ -2628,12 +2694,12 @@ ContourChart(
     ] = None,
     vspans: Optional[
         Union[
-            VSpanPlotAttrs,
-            List[VSpanPlotAttrs],
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
             List[
                 Union[
-                    VSpanPlotAttrs,
-                    List[VSpanPlotAttrs],
+                    VSpanSettingAttrs,
+                    List[VSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -2641,12 +2707,12 @@ ContourChart(
     ] = None,
     hspans: Optional[
         Union[
-            HSpanPlotAttrs,
-            List[HSpanPlotAttrs],
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
             List[
                 Union[
-                    HSpanPlotAttrs,
-                    List[HSpanPlotAttrs],
+                    HSpanSettingAttrs,
+                    List[HSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -2660,9 +2726,15 @@ ContourChart(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None
 ) -> plt.Figure
@@ -2738,12 +2810,12 @@ Examples:
 | `ytickrotate`    | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                |
 | `xticks_format`  | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                |
 | `yticks_format`  | The y-axis tick label format, as xticks_format. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                 |
-| `vlines`         | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                        |
-| `hlines`         | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                      |
-| `vspans`         | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                    |
-| `hspans`         | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                  |
+| `vlines`         | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs], List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                            |
+| `hlines`         | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs], List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                          |
+| `vspans`         | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                        |
+| `hspans`         | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                      |
 | `colorbar`       | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** `Optional[Union[ColorbarSettingAttrs, List[Optional[ColorbarSettingAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                |
-| `texts`          | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                          |
+| `texts`          | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                              |
 
 | RETURNS      | DESCRIPTION                              |
 | ------------ | ---------------------------------------- |
@@ -2835,12 +2907,12 @@ HexbinChart(
     ] = None,
     vlines: Optional[
         Union[
-            VLinePlotAttrs,
-            List[VLinePlotAttrs],
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
             List[
                 Union[
-                    VLinePlotAttrs,
-                    List[VLinePlotAttrs],
+                    VLineSettingAttrs,
+                    List[VLineSettingAttrs],
                     None,
                 ]
             ],
@@ -2848,12 +2920,12 @@ HexbinChart(
     ] = None,
     hlines: Optional[
         Union[
-            HLinePlotAttrs,
-            List[HLinePlotAttrs],
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
             List[
                 Union[
-                    HLinePlotAttrs,
-                    List[HLinePlotAttrs],
+                    HLineSettingAttrs,
+                    List[HLineSettingAttrs],
                     None,
                 ]
             ],
@@ -2861,12 +2933,12 @@ HexbinChart(
     ] = None,
     vspans: Optional[
         Union[
-            VSpanPlotAttrs,
-            List[VSpanPlotAttrs],
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
             List[
                 Union[
-                    VSpanPlotAttrs,
-                    List[VSpanPlotAttrs],
+                    VSpanSettingAttrs,
+                    List[VSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -2874,12 +2946,12 @@ HexbinChart(
     ] = None,
     hspans: Optional[
         Union[
-            HSpanPlotAttrs,
-            List[HSpanPlotAttrs],
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
             List[
                 Union[
-                    HSpanPlotAttrs,
-                    List[HSpanPlotAttrs],
+                    HSpanSettingAttrs,
+                    List[HSpanSettingAttrs],
                     None,
                 ]
             ],
@@ -2893,9 +2965,15 @@ HexbinChart(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None
 ) -> plt.Figure
@@ -2964,12 +3042,12 @@ Examples:
 | `ytickrotate`    | Rotation angle for y-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                           |
 | `xticks_format`  | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                           |
 | `yticks_format`  | The y-axis tick label format, as xticks_format. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                            |
-| `vlines`         | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLinePlotAttrs, List[VLinePlotAttrs], List[Union[VLinePlotAttrs, List[VLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                   |
-| `hlines`         | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLinePlotAttrs, List[HLinePlotAttrs], List[Union[HLinePlotAttrs, List[HLinePlotAttrs], None]]]]` **DEFAULT:** `None`                                                                                 |
-| `vspans`         | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], List[Union[VSpanPlotAttrs, List[VSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                               |
-| `hspans`         | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], List[Union[HSpanPlotAttrs, List[HSpanPlotAttrs], None]]]]` **DEFAULT:** `None`                                             |
+| `vlines`         | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs], List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                       |
+| `hlines`         | Horizontal line(s) to plot. **TYPE:** `Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs], List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                     |
+| `vspans`         | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                   |
+| `hspans`         | Horizontal reference band(s) to shade, between two y positions. **TYPE:** `Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                 |
 | `colorbar`       | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** `Optional[Union[ColorbarSettingAttrs, List[Optional[ColorbarSettingAttrs]]]]` **DEFAULT:** `None`                                           |
-| `texts`          | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                     |
+| `texts`          | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                         |
 
 | RETURNS      | DESCRIPTION                             |
 | ------------ | --------------------------------------- |
@@ -3011,9 +3089,15 @@ ParallelCoords(
     category_orders: Optional[Dict[str, List[str]]] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None
 ) -> plt.Figure
@@ -3063,7 +3147,7 @@ Examples:
 | `dimensions`      | List of dimension names to include and their order. If None, all columns (except hue) are auto-detected. **TYPE:** `Optional[List[str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                  |
 | `hue`             | The key name in data for line coloring. String values color categorically: data points with the same hue value get the same color from color_parallel_hue. Numeric values color continuously along the theme's color_parallel_hue_continuous ramp. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                  |
 | `category_orders` | Dictionary mapping dimension names to lists of category values in the desired order. Example: {"rating": ["Low", "Medium", "High"]}. Categories not in the list will be appended at the end (sorted). **TYPE:** `Optional[Dict[str, List[str]]]` **DEFAULT:** `None`                                                                                                                          |
-| `texts`           | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                        |
+| `texts`           | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                            |
 
 | RETURNS      | DESCRIPTION                                           |
 | ------------ | ----------------------------------------------------- |
@@ -3103,9 +3187,15 @@ NetworkChart(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None
 ) -> plt.Figure
@@ -3158,7 +3248,7 @@ Examples:
 | `subplots`     | Whether to show each chart in its own subplot; several charts always split into subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `max_cols`     | Maximum number of columns in subplots. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `style`        | Style configuration(s) for the chart(s). The edge geometry, plot_network_edge_style, takes ARROW_STYLE.CURVE (default) or ARROW_STYLE.STRAIGHT; the arrowhead comes from directed. **TYPE:** `Optional[Union[NetworkStyleAttrs, List[Optional[NetworkStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `texts`        | Text annotation(s) to draw. The layout spans 0–1 in both directions. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `texts`        | Text annotation(s) to draw. The layout spans 0–1 in both directions. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 | RETURNS      | DESCRIPTION                              |
 | ------------ | ---------------------------------------- |
@@ -3200,9 +3290,15 @@ SankeyChart(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None
 ) -> plt.Figure
@@ -3245,7 +3341,7 @@ Examples:
 | `subplots`      | Whether to show each chart in its own subplot; several charts always split into subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                     |
 | `max_cols`      | Maximum number of columns in subplots. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                         |
 | `style`         | Style configuration(s) for the chart(s). **TYPE:** `Optional[Union[SankeyStyleAttrs, List[Optional[SankeyStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                 |
-| `texts`         | Text annotation(s) to draw. The columns span 0–1 horizontally and the tallest column 0–1 vertically. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                              |
+| `texts`         | Text annotation(s) to draw. The columns span 0–1 horizontally and the tallest column 0–1 vertically. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                  |
 
 | RETURNS      | DESCRIPTION                             |
 | ------------ | --------------------------------------- |
@@ -3288,9 +3384,15 @@ Treemap(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
         ]
     ] = None
 ) -> plt.Figure
@@ -3339,7 +3441,7 @@ Examples:
 | `subplots`     | Whether to show each chart in its own subplot; several charts always split into subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `max_cols`     | Maximum number of columns in subplots. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | `style`        | Style configuration(s) for the chart(s). **TYPE:** `Optional[Union[TreemapStyleAttrs, List[Optional[TreemapStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `texts`        | Text annotation(s) to draw. The tiling spans 0–1 in both directions. **TYPE:** `Optional[Union[TextAttrs, List[TextAttrs], List[Union[TextAttrs, List[TextAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                               |
+| `texts`        | Text annotation(s) to draw. The tiling spans 0–1 in both directions. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                   |
 
 | RETURNS      | DESCRIPTION                        |
 | ------------ | ---------------------------------- |

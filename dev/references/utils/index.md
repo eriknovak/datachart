@@ -296,7 +296,7 @@ Examples:
 ```
 Annotate(
     figure: plt.Figure,
-    texts: Union[TextAttrs, List[TextAttrs]],
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]],
 ) -> plt.Figure
 ```
 
@@ -326,10 +326,10 @@ Examples:
 ... )
 ```
 
-| PARAMETER | DESCRIPTION                                                                                                                                                                                                                                                                        |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `figure`  | A figure created by a datachart chart function or Panel. **TYPE:** `plt.Figure`                                                                                                                                                                                                    |
-| `texts`   | The text annotation(s) to add. Each annotation places text at (x, y) — data coordinates by default, axes fractions with "coords": "axes" — draws a connector to the optional target data point, and takes a per-text style override. **TYPE:** `Union[TextAttrs, List[TextAttrs]]` |
+| PARAMETER | DESCRIPTION                                                                                                                                                                                                                                                                                      |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `figure`  | A figure created by a datachart chart function or Panel. **TYPE:** `plt.Figure`                                                                                                                                                                                                                  |
+| `texts`   | The text annotation(s) to add. Each annotation places text at (x, y) — data coordinates by default, axes fractions with "coords": "axes" — draws a connector to the optional target data point, and takes a per-text style override. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs]]` |
 
 | RETURNS      | DESCRIPTION                                         |
 | ------------ | --------------------------------------------------- |

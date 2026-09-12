@@ -4251,7 +4251,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9e229531">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=674dcc47">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4262,10 +4262,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input" id="cell-id=cb1153a9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input" id="cell-id=4ad454dc">
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e5695dbd">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=52fc7947">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4448,7 +4448,7 @@ RaincloudPlot(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="reference-lines">Reference lines<a class="anchor-link" href="#reference-lines">¶</a></h3><p>A reference line puts a threshold or a summary value next to the rainclouds. To add horizontal lines, add the <code>hlines</code> attribute with the <a href="../../../references/typings/#datachart.typings.HLinePlotAttrs">datachart.typings.HLinePlotAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code>; vertical lines use <code>vlines</code> and the <a href="../../../references/typings/#datachart.typings.VLinePlotAttrs">datachart.typings.VLinePlotAttrs</a> typing.</p>
+<h3 id="reference-lines">Reference lines<a class="anchor-link" href="#reference-lines">¶</a></h3><p>A reference line puts a threshold or a summary value next to the rainclouds. To add horizontal lines, add the <code>hlines</code> attribute with the <a href="../../../references/typings/#datachart.typings.HLineSettingAttrs">datachart.typings.HLineSettingAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code>; vertical lines use <code>vlines</code> and the <a href="../../../references/typings/#datachart.typings.VLineSettingAttrs">datachart.typings.VLineSettingAttrs</a> typing.</p>
 </div>
 </div>
 </div>
@@ -4557,19 +4557,19 @@ RaincloudPlot(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=789e65f3">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=baf3bdce">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="reference-bands">Reference bands<a class="anchor-link" href="#reference-bands">¶</a></h3><p>A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the <code>hspans</code> attribute with the <a href="../../../references/typings/#datachart.typings.HSpanPlotAttrs">datachart.typings.HSpanPlotAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code> where each dictionary sets <code>ymin</code> and/or <code>ymax</code>, an optional <code>label</code> for the legend, and an optional <code>style</code> with the <code>plot_hspan_*</code> attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the <code>vspans</code> attribute and the <a href="../../../references/typings/#datachart.typings.VSpanPlotAttrs">datachart.typings.VSpanPlotAttrs</a> typing, with <code>xmin</code>, <code>xmax</code> and <code>plot_vspan_*</code> attributes. At least one bound is required; an omitted bound runs to the axis edge. The <a href="../linechart/#reference-bands">Line Chart</a> guide lists every attribute of a band.</p>
+<h3 id="reference-bands">Reference bands<a class="anchor-link" href="#reference-bands">¶</a></h3><p>A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the <code>hspans</code> attribute with the <a href="../../../references/typings/#datachart.typings.HSpanSettingAttrs">datachart.typings.HSpanSettingAttrs</a> typing, which is either a <code>dict</code> or a <code>List[dict]</code> where each dictionary sets <code>ymin</code> and/or <code>ymax</code>, an optional <code>label</code> for the legend, and an optional <code>style</code> with the <code>plot_hspan_*</code> attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the <code>vspans</code> attribute and the <a href="../../../references/typings/#datachart.typings.VSpanSettingAttrs">datachart.typings.VSpanSettingAttrs</a> typing, with <code>xmin</code>, <code>xmax</code> and <code>plot_vspan_*</code> attributes. At least one bound is required; an omitted bound runs to the axis edge. The <a href="../linechart/#reference-bands">Line Chart</a> guide lists every attribute of a band.</p>
 <p>The example shades one standard deviation around the mean body mass of all penguins and keeps the mean itself as a line: the Adelie and Chinstrap rainclouds sit inside the band, the Gentoo raincloud above it.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=79ef1d5a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2ba0f719">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
