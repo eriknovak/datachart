@@ -11,7 +11,7 @@ from ..utils._internal.validate import (
 from ..typings import (
     NetworkSingleChartAttrs,
     NetworkStyleAttrs,
-    TextAttrs,
+    TextSettingAttrs,
     LegendSettingAttrs,
 )
 from ..constants import FIG_SIZE, NETWORK_LAYOUT, VALUE_FORMAT
@@ -40,9 +40,9 @@ def NetworkChart(
     style: Optional[Union[NetworkStyleAttrs, List[Optional[NetworkStyleAttrs]]]] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
 ) -> plt.Figure:

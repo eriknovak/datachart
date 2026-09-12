@@ -12,7 +12,7 @@ import numpy as np
 from datachart.charts import ContourChart, Heatmap, HexbinChart
 from datachart.config import config
 from datachart.constants import COLORBAR_LOCATION, ORIENTATION, THEME
-from datachart.typings import ColorbarSettingAttrs, HeatmapColorbarAttrs
+from datachart.typings import ColorbarSettingAttrs
 from datachart.utils import Grid
 from datachart.utils._internal.config_helpers import (
     get_colorbar_setting,
@@ -129,9 +129,6 @@ class TestColorbarSetting(unittest.TestCase):
         setting = get_colorbar_setting({"label": "count"})
         self.assertEqual(setting["label_style"], get_text_style("ylabel"))
         self.assertEqual(setting["label_style"]["fontsize"], 17)
-
-    def test_alias_still_resolves(self):
-        self.assertIs(HeatmapColorbarAttrs, ColorbarSettingAttrs)
 
 
 class TestColorbarRendering(unittest.TestCase):

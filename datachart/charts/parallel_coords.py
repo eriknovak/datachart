@@ -8,7 +8,7 @@ from ..typings import (
     LegendSettingAttrs,
     ParallelCoordsDataPointAttrs,
     ParallelCoordsStyleAttrs,
-    TextAttrs,
+    TextSettingAttrs,
 )
 from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID
 
@@ -40,9 +40,9 @@ def ParallelCoords(
     category_orders: Optional[Dict[str, List[str]]] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
 ) -> plt.Figure:

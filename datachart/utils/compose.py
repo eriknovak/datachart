@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 
 from ..config import config
 from ..constants import BAR_MODE, FIG_SIZE, SCALE
-from ..typings import LegendSettingAttrs, TextAttrs
+from ..typings import LegendSettingAttrs, TextSettingAttrs
 from .figure import _grid_from_dicts, _figure_grid_layout_impl
 from ._internal.config_helpers import (
     get_grid_style,
@@ -477,7 +477,7 @@ def Panel(
 
 def Annotate(
     figure: plt.Figure,
-    texts: Union[TextAttrs, List[TextAttrs]],
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]],
 ) -> plt.Figure:
     """Add text annotations to an already rendered figure.
 

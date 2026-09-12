@@ -9,7 +9,7 @@ from ..typings import (
     HeatmapDataAttrs,
     HeatmapStyleAttrs,
     ColorbarSettingAttrs,
-    TextAttrs,
+    TextSettingAttrs,
 )
 from ..constants import ASPECT_RATIO, FIG_SIZE, SHOW_GRID, VALUE_FORMAT, DATE_FORMAT
 
@@ -63,9 +63,9 @@ def Heatmap(
     ] = None,
     texts: Optional[
         Union[
-            TextAttrs,
-            List[TextAttrs],
-            List[Union[TextAttrs, List[TextAttrs], None]],
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
 ) -> plt.Figure:
