@@ -353,9 +353,15 @@ class TestAnnotateSubplots(unittest.TestCase):
             Annotate(self.figure, [{**NOTE, "subplot": 0}, NOTE])
 
     def test_out_of_range_subplot_raises(self):
-        for index in (-1, 3, 1.5, True):
+        for index in (-1, 3):
             with self.subTest(index=index):
-                with self.assertRaisesRegex(ValueError, "subplot"):
+                with self.assertRaisesRegex(ValueError, "out of range"):
+                    Annotate(self.figure, {**NOTE, "subplot": index})
+
+    def test_non_integer_subplot_raises(self):
+        for index in (1.5, True, "2"):
+            with self.subTest(index=index):
+                with self.assertRaisesRegex(ValueError, "integer index"):
                     Annotate(self.figure, {**NOTE, "subplot": index})
 
 

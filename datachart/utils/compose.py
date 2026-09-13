@@ -20,13 +20,18 @@ import warnings
 from typing import List, Dict, Optional, Tuple, Union, Any
 
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 from ..config import config
 from ..constants import BAR_MODE, FIG_SIZE, SCALE
 from ..typings import LegendSettingAttrs, TextSettingAttrs
-from .figure import _grid_from_dicts, _figure_grid_layout_impl, _render_cell
+from .figure import (
+    _grid_from_dicts,
+    _figure_grid_layout_impl,
+    _render_subplot_panels,
+    _apply_figure_labels,
+)
 from ._internal.config_helpers import (
-    configure_labels,
     get_grid_style,
     get_legend_panel_settings,
     get_text_style,
@@ -490,10 +495,11 @@ def Annotate(
     Works on chart figures (including polar ones), `Panel` output, and
     multi-subplot figures (`subplots=True`). On a multi-subplot figure every
     text names its target with a 0-based `subplot` index in render order; the
-    figure is redrawn with the same subplot layout, and the texts ride the
-    per-subplot panels only, so they show in `Grid` cells but not in a
-    `Panel` overlay of the figure. Grid figures are rejected — annotate the
-    sources before composing.
+    figure is redrawn with the same subplot layout — as in a `Grid` cell,
+    each subplot scales on its own, without the source's `sharex`/`sharey` —
+    and the texts ride the per-subplot panels only, so they show in `Grid`
+    cells but not in a `Panel` overlay of the figure. Grid figures are
+    rejected — annotate the sources before composing.
 
     !!! info "Added in v0.8.0"
 
@@ -556,8 +562,7 @@ def Annotate(
         raise ValueError("Figure has invalid metadata: missing 'panel'")
 
     texts = texts if isinstance(texts, list) else [texts]
-    subplot_panels = metadata.get("panels")
-    if subplot_panels is not None:
+    if metadata.get("panels") is not None:
         return _annotate_subplots(figure, metadata, texts)
 
     for i, text in enumerate(texts):
@@ -619,13 +624,14 @@ def _annotate_subplots(
                 "figure every text must name the 0-based index of the subplot "
                 "it lands in."
             )
-        if (
-            isinstance(index, bool)
-            or not isinstance(index, int)
-            or not (0 <= index < count)
-        ):
+        if isinstance(index, bool) or not isinstance(index, int):
             raise ValueError(
-                f"Text at index {i} has `subplot` {index!r}, out of range for "
+                f"Text at index {i} has `subplot` {index!r}; it must be an "
+                "integer index."
+            )
+        if not 0 <= index < count:
+            raise ValueError(
+                f"Text at index {i} has `subplot` {index}, out of range for "
                 f"a figure with {count} subplots (0 to {count - 1})."
             )
         by_subplot.setdefault(index, []).append(text)
@@ -634,23 +640,12 @@ def _annotate_subplots(
         _with_text_carrier(p, by_subplot[i]) if i in by_subplot else p
         for i, p in enumerate(subplot_panels)
     ]
-    shape = metadata.get("shape", (1, count))
+    shape = metadata["shape"]
 
-    # the cell renderer rebuilds the subplot arrangement in the whole figure
     fig = new_figure(figsize=tuple(figure.get_size_inches()))
-    _render_cell(fig, {"panels": new_panels, "shape": shape}, fig.subplots())
-    figure_labels = {
-        "title": figure.get_suptitle(),
-        "xlabel": figure.get_supxlabel(),
-        "ylabel": figure.get_supylabel(),
-    }
-    configure_labels(
-        {k: v for k, v in figure_labels.items() if v},
-        [
-            ("title", fig.suptitle),
-            ("xlabel", fig.supxlabel),
-            ("ylabel", fig.supylabel),
-        ],
+    _render_subplot_panels(fig, new_panels, shape, GridSpec(1, 1, figure=fig)[0])
+    _apply_figure_labels(
+        fig, figure.get_suptitle(), figure.get_supxlabel(), figure.get_supylabel()
     )
 
     fig._chart_metadata = {
