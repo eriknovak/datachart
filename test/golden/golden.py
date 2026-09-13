@@ -105,6 +105,8 @@ EXPECTED_CHANGES = {
     # new text annotation cases (ADR 0018)
     "line_texts_annotated",
     "overlay_annotated",
+    # new subplot-targeted Annotate case (#125)
+    "subplots_annotated",
     # the scatter correlation box now wears the plot_text_* family (ADR 0018)
     "scatter_regression",
     # new swarm plot cases (ADR 0020)
@@ -698,6 +700,25 @@ def overlay_annotated():
     return Annotate(
         panel,
         {"text": "peak", "x": 0.75, "y": 0.85, "coords": "axes", "target": (3, 30)},
+    )
+
+
+@case
+def subplots_annotated():
+    figure = LineChart(
+        data=[LINE1, LINE2, SCAT1],
+        subtitle=["sq", "lin", "saw"],
+        subplots=True,
+        title="Annotated subplots",
+        xlabel="x",
+        ylabel="y",
+    )
+    return Annotate(
+        figure,
+        [
+            {"text": "third only", "x": 0.05, "y": 0.9, "coords": "axes", "subplot": 2},
+            {"text": "steep", "x": 1, "y": 60, "target": (8, 64), "subplot": 0},
+        ],
     )
 
 

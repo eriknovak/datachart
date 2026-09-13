@@ -85,18 +85,10 @@ def _render_cell(owner: plt.Figure, cell: Dict[str, Any], target_ax: plt.Axes) -
         return
 
     # a multi-subplot figure rebuilds its subplot arrangement in the cell
-    panels = cell.get("panels")
-    if panels:
-        nrows_sub, ncols_sub = cell["shape"]
-        sub_gs = target_ax.get_subplotspec().subgridspec(nrows_sub, ncols_sub)
+    if cell.get("panels"):
+        subplot_spec = target_ax.get_subplotspec()
         target_ax.remove()
-        for p_idx, subplot_panel in enumerate(panels):
-            sub_ax = owner.add_subplot(
-                sub_gs[p_idx // ncols_sub, p_idx % ncols_sub],
-                projection=("polar" if subplot_panel.projection == "polar" else None),
-            )
-            sub_ax.axis("off")
-            subplot_panel.render(sub_ax)
+        _render_subplot_panels(owner, cell["panels"], cell["shape"], subplot_spec)
         return
 
     # each cell's axes carries its panel's projection; polar cells swap
@@ -109,6 +101,47 @@ def _render_cell(owner: plt.Figure, cell: Dict[str, Any], target_ax: plt.Axes) -
     target_ax.axis("off")
     if cell["panel"].layers:
         cell["panel"].render(target_ax)
+
+
+def _render_subplot_panels(
+    owner: plt.Figure,
+    panels: List[Any],
+    shape: Tuple[int, int],
+    subplot_spec: SubplotSpec,
+) -> None:
+    """Draw a multi-subplot figure's per-subplot panels into `subplot_spec`.
+
+    The panels fill a `shape` subgrid of the spec in render order, each on
+    its own axes with its own projection; `Grid` cells and `Annotate` both
+    rebuild a subplot figure this way.
+    """
+    nrows, ncols = shape
+    sub_gs = subplot_spec.subgridspec(nrows, ncols)
+    for idx, panel in enumerate(panels):
+        ax = owner.add_subplot(
+            sub_gs[idx // ncols, idx % ncols],
+            projection=("polar" if panel.projection == "polar" else None),
+        )
+        ax.axis("off")
+        panel.render(ax)
+
+
+def _apply_figure_labels(
+    figure: plt.Figure,
+    title: Optional[str],
+    xlabel: Optional[str],
+    ylabel: Optional[str],
+) -> None:
+    """Set the figure-level title and axis labels that are given, themed."""
+    labels = {"title": title, "xlabel": xlabel, "ylabel": ylabel}
+    configure_labels(
+        {key: text for key, text in labels.items() if text},
+        [
+            ("title", figure.suptitle),
+            ("xlabel", figure.supxlabel),
+            ("ylabel", figure.supylabel),
+        ],
+    )
 
 
 def _render_grid_node(
@@ -414,15 +447,7 @@ def _figure_grid_layout_impl(
             axes[idx].axis("off")
 
     # global title and axis labels, one per figure
-    labels = {"title": title, "xlabel": xlabel, "ylabel": ylabel}
-    configure_labels(
-        {key: text for key, text in labels.items() if text},
-        [
-            ("title", combined_fig.suptitle),
-            ("xlabel", combined_fig.supxlabel),
-            ("ylabel", combined_fig.supylabel),
-        ],
-    )
+    _apply_figure_labels(combined_fig, title, xlabel, ylabel)
 
     _align_axes_columns(combined_fig)
 

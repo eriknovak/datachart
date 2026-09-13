@@ -31,6 +31,17 @@ attribute on the reference-line seam.
   figure, including `Panel` output, and rejects grid figures: annotate the
   sources before composing. It never mutates an existing layer, preserving
   the chart-hash → color invariant.
+- **Multi-subplot figures are annotated per subplot.** A figure drawn with
+  `subplots=True` is accepted when every text names its `subplot` — a
+  0-based index in render order; a missing or out-of-range index, or a
+  `subplot` on a single-panel figure, is a `ValueError`. The texts ride the
+  per-subplot panels only, one carrier per targeted panel, and the figure is
+  redrawn through the grid's cell renderer with the source's shape and
+  figure labels — so the texts survive `Grid`. The combined panel that
+  `Panel` consumes never carries them: a subplot index has no meaning once
+  the subplots collapse into one coordinate space. The `subplot` key is read
+  by `Annotate` alone; chart fronts keep list-of-lists `texts` as the one
+  per-subplot mechanism.
 - **One text-styling vocabulary.** A `plot_text_*` family (font, box face and
   edge, arrow color/width/style) joins every theme, with box and arrow each
   hideable. The half-implemented `plot_text_color` and

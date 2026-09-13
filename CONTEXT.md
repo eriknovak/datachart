@@ -177,9 +177,12 @@ _Avoid_: annotation (for the API name), callout, note
 **Annotate**:
 The post-hoc front (`datachart.utils.Annotate`) that adds texts to an already
 rendered figure by appending a carrier text layer (no data, no legend or color
-participation) to its panel and re-rendering. Rejects grid figures — annotate
-the sources before composing.
-_Avoid_: overlay text, label function
+participation) to its panel and re-rendering. On a multi-subplot figure each
+text names its target with a `subplot` index (0-based, render order) and the
+carrier rides that per-subplot panel only, never the combined panel; the
+figure is rebuilt the way a grid cell rebuilds it. Rejects grid figures —
+annotate the sources before composing.
+_Avoid_: overlay text, label function, axes index (for `subplot`)
 
 **Band**:
 A shaded region behind the data marking an interval — a confidence range, a

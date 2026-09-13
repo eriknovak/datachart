@@ -20,11 +20,17 @@ import warnings
 from typing import List, Dict, Optional, Tuple, Union, Any
 
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 from ..config import config
 from ..constants import BAR_MODE, FIG_SIZE, SCALE
 from ..typings import LegendSettingAttrs, TextSettingAttrs
-from .figure import _grid_from_dicts, _figure_grid_layout_impl
+from .figure import (
+    _grid_from_dicts,
+    _figure_grid_layout_impl,
+    _render_subplot_panels,
+    _apply_figure_labels,
+)
 from ._internal.config_helpers import (
     get_grid_style,
     get_legend_panel_settings,
@@ -486,12 +492,20 @@ def Annotate(
     themes and survive `Panel` and `Grid` composition. The source figure and
     its charts are never modified.
 
-    Works on any figure whose charts share one coordinate space: chart
-    figures (including polar ones) and `Panel` output. Grid figures and
-    multi-subplot figures (`subplots=True`) are rejected — annotate the
-    sources before composing.
+    Works on chart figures (including polar ones), `Panel` output, and
+    multi-subplot figures (`subplots=True`). On a multi-subplot figure every
+    text names its target with a 0-based `subplot` index in render order; the
+    figure is redrawn with the same subplot layout — as in a `Grid` cell,
+    each subplot scales on its own, without the source's `sharex`/`sharey` —
+    and the texts ride the per-subplot panels only, so they show in `Grid`
+    cells but not in a `Panel` overlay of the figure. Grid figures are
+    rejected — annotate the sources before composing.
 
     !!! info "Added in v0.8.0"
+
+    !!! info "Added in Unreleased"
+
+        Multi-subplot figures, targeted per text with the `subplot` index.
 
     Examples:
         >>> from datachart.charts import LineChart
@@ -507,20 +521,30 @@ def Annotate(
         ...         "target": (7, 49),
         ...     },
         ... )
+        >>>
+        >>> # a multi-subplot figure: each text names its subplot
+        >>> series = [[{"x": i, "y": k * i} for i in range(10)] for k in (1, 2, 3)]
+        >>> annotated = Annotate(
+        ...     LineChart(data=series, subplots=True),
+        ...     texts={"text": "steepest", "x": 2, "y": 20, "subplot": 2},
+        ... )
 
     Args:
         figure: A figure created by a datachart chart function or `Panel`.
         texts: The text annotation(s) to add. Each annotation places `text`
             at (`x`, `y`) — data coordinates by default, axes fractions with
             `"coords": "axes"` — draws a connector to the optional `target`
-            data point, and takes a per-text `style` override.
+            data point, and takes a per-text `style` override. On a
+            multi-subplot figure each one also names its `subplot` index.
 
     Returns:
         A new matplotlib Figure with the annotations added.
 
     Raises:
-        ValueError: If the figure has no chart metadata, is a Grid figure,
-            or is a multi-subplot figure.
+        ValueError: If the figure has no chart metadata or is a Grid figure;
+            if a text names a `subplot` on a single-panel figure; if, on a
+            multi-subplot figure, a text names no `subplot` or one out of
+            range.
     """
     metadata = getattr(figure, "_chart_metadata", None)
     if metadata is None or metadata.get("type") is None:
@@ -533,20 +557,25 @@ def Annotate(
             "Grid figures cannot be annotated; annotate the source figures "
             "before composing them with Grid."
         )
-    if metadata.get("panels") is not None:
-        raise ValueError(
-            "Multi-subplot figures cannot be annotated: the texts have no "
-            "single coordinate space to land in. Annotate single-chart "
-            "figures before composing them."
-        )
     panel = metadata.get("panel")
     if panel is None:
         raise ValueError("Figure has invalid metadata: missing 'panel'")
 
+    texts = texts if isinstance(texts, list) else [texts]
+    if metadata.get("panels") is not None:
+        return _annotate_subplots(figure, metadata, texts)
+
+    for i, text in enumerate(texts):
+        if text.get("subplot") is not None:
+            raise ValueError(
+                f"Text at index {i} names a `subplot`, but the figure has a "
+                "single coordinate space; `subplot` targets the subplots of a "
+                "figure drawn with `subplots=True`."
+            )
+
     # existing groups are shared, never mutated: the chart-hash -> color
     # invariant holds, and the carrier claims no color-cycle slot (ADR 0018)
-    carrier = LayerGroup([TextLayer(texts)], max_colors=0)
-    new_panel = _PanelSeam(panel.groups + [carrier], panel.settings)
+    new_panel = _with_text_carrier(panel, texts)
 
     fig = new_figure(figsize=tuple(figure.get_size_inches()))
     ax = fig.subplots(
@@ -567,6 +596,64 @@ def Annotate(
         "panel": new_panel,
     }
 
+    return fig
+
+
+def _with_text_carrier(panel: _PanelSeam, texts: List[TextSettingAttrs]) -> _PanelSeam:
+    """A new panel: `panel`'s groups plus one carrier group holding `texts`."""
+    carrier = LayerGroup([TextLayer(texts)], max_colors=0)
+    return _PanelSeam(panel.groups + [carrier], panel.settings)
+
+
+def _annotate_subplots(
+    figure: plt.Figure, metadata: Dict[str, Any], texts: List[TextSettingAttrs]
+) -> plt.Figure:
+    """Redraw a multi-subplot figure with each text on its `subplot` panel.
+
+    Only the targeted per-subplot panels gain a carrier; the combined
+    composition panel that `Panel` consumes stays as it is (#125).
+    """
+    subplot_panels = metadata["panels"]
+    count = len(subplot_panels)
+    by_subplot: Dict[int, List[TextSettingAttrs]] = {}
+    for i, text in enumerate(texts):
+        index = text.get("subplot")
+        if index is None:
+            raise ValueError(
+                f"Text at index {i} names no `subplot`: on a multi-subplot "
+                "figure every text must name the 0-based index of the subplot "
+                "it lands in."
+            )
+        if isinstance(index, bool) or not isinstance(index, int):
+            raise ValueError(
+                f"Text at index {i} has `subplot` {index!r}; it must be an "
+                "integer index."
+            )
+        if not 0 <= index < count:
+            raise ValueError(
+                f"Text at index {i} has `subplot` {index}, out of range for "
+                f"a figure with {count} subplots (0 to {count - 1})."
+            )
+        by_subplot.setdefault(index, []).append(text)
+
+    new_panels = [
+        _with_text_carrier(p, by_subplot[i]) if i in by_subplot else p
+        for i, p in enumerate(subplot_panels)
+    ]
+    shape = metadata["shape"]
+
+    fig = new_figure(figsize=tuple(figure.get_size_inches()))
+    _render_subplot_panels(fig, new_panels, shape, GridSpec(1, 1, figure=fig)[0])
+    _apply_figure_labels(
+        fig, figure.get_suptitle(), figure.get_supxlabel(), figure.get_supylabel()
+    )
+
+    fig._chart_metadata = {
+        "type": metadata["type"],
+        "panel": metadata["panel"],
+        "panels": new_panels,
+        "shape": shape,
+    }
     return fig
 
 
