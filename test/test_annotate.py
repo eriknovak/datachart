@@ -15,6 +15,7 @@ from datachart.utils._internal.chart_builder import build_charts_structure
 
 LINE1 = [{"x": i, "y": i**2} for i in range(10)]
 LINE2 = [{"x": i, "y": 3 * i} for i in range(10)]
+LINE3 = [{"x": i, "y": 50 - 2 * i} for i in range(10)]
 BAR1 = [{"label": c, "y": v} for c, v in zip("ABC", [3.0, 5.0, 4.0])]
 NOTE = {"text": "note", "x": 2, "y": 40, "target": (5, 25)}
 
@@ -255,15 +256,107 @@ class TestAnnotate(unittest.TestCase):
         with self.assertRaises(ValueError):
             Annotate(grid, NOTE)
 
-    def test_annotate_rejects_subplot_figures(self):
-        figure = LineChart([LINE1, LINE2], subplots=True)
+    def test_annotate_rejects_subplot_key_on_single_panel_figure(self):
         with self.assertRaises(ValueError):
-            Annotate(figure, NOTE)
+            Annotate(LineChart(LINE1), {**NOTE, "subplot": 0})
 
     def test_annotate_rejects_foreign_figures(self):
         figure = plt.figure()
         with self.assertRaises(ValueError):
             Annotate(figure, NOTE)
+
+
+class TestAnnotateSubplots(unittest.TestCase):
+    """`Annotate` on a multi-subplot figure targets subplots by index (#125)."""
+
+    def setUp(self):
+        self.figure = LineChart(
+            [LINE1, LINE2, LINE3],
+            subplots=True,
+            title="Three",
+            xlabel="x",
+            ylabel="y",
+        )
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_text_lands_in_the_targeted_subplot_only(self):
+        annotated = Annotate(self.figure, {**NOTE, "subplot": 2})
+        self.assertEqual(len(annotated.axes), 3)
+        per_axes = [len(annotation_texts_on(ax, "note")) for ax in annotated.axes]
+        self.assertEqual(per_axes, [0, 0, 1])
+
+    def test_texts_group_by_subplot(self):
+        annotated = Annotate(
+            self.figure,
+            [
+                {**NOTE, "subplot": 0},
+                {**NOTE, "text": "other", "subplot": 2},
+                {**NOTE, "text": "second", "subplot": 2},
+            ],
+        )
+        first, _, third = annotated.axes
+        self.assertEqual(len(annotation_texts_on(first, "note")), 1)
+        self.assertEqual(len(annotation_texts_on(third, "other")), 1)
+        self.assertEqual(len(annotation_texts_on(third, "second")), 1)
+
+    def test_layout_and_figure_labels_follow_the_source(self):
+        annotated = Annotate(self.figure, {**NOTE, "subplot": 1})
+        self.assertEqual(annotated.get_suptitle(), "Three")
+        self.assertEqual(annotated.get_supxlabel(), "x")
+        self.assertEqual(annotated.get_supylabel(), "y")
+        self.assertEqual(
+            annotated._chart_metadata["shape"], self.figure._chart_metadata["shape"]
+        )
+        self.assertEqual(
+            [ax.get_subplotspec().get_geometry()[:2] for ax in annotated.axes],
+            [ax.get_subplotspec().get_geometry()[:2] for ax in self.figure.axes],
+        )
+
+    def test_combined_panel_carries_no_subplot_texts(self):
+        annotated = Annotate(self.figure, {**NOTE, "subplot": 2})
+        metadata = annotated._chart_metadata
+        self.assertEqual(metadata["type"], "linechart")
+        self.assertFalse(
+            any(layer.kind == "text" for layer in metadata["panel"].layers)
+        )
+        text_layers = [
+            [layer for layer in panel.layers if layer.kind == "text"]
+            for panel in metadata["panels"]
+        ]
+        self.assertEqual([len(t) for t in text_layers], [0, 0, 1])
+
+    def test_source_is_untouched(self):
+        panels_before = [list(p.layers) for p in self.figure._chart_metadata["panels"]]
+        Annotate(self.figure, {**NOTE, "subplot": 2})
+        self.assertEqual(
+            [list(p.layers) for p in self.figure._chart_metadata["panels"]],
+            panels_before,
+        )
+        self.assertEqual(annotation_texts(self.figure, "note"), [])
+
+    def test_annotated_subplots_survive_grid(self):
+        annotated = Annotate(self.figure, {**NOTE, "subplot": 2})
+        grid = Grid([annotated, LineChart(LINE2)])
+        # the cell rebuilds the three sub-axes plus one for the plain figure
+        self.assertEqual(len(grid.axes), 4)
+        (host,) = [ax for ax in grid.axes if annotation_texts_on(ax, "note")]
+        # the third sub-axes of the 1x3 subgrid
+        self.assertEqual(host.get_subplotspec().get_geometry(), (1, 3, 2, 2))
+
+    def test_missing_subplot_raises(self):
+        with self.assertRaisesRegex(ValueError, "subplot"):
+            Annotate(self.figure, NOTE)
+        with self.assertRaisesRegex(ValueError, "subplot"):
+            Annotate(self.figure, [{**NOTE, "subplot": 0}, NOTE])
+
+    def test_out_of_range_subplot_raises(self):
+        for index in (-1, 3, 1.5, True):
+            with self.subTest(index=index):
+                with self.assertRaisesRegex(ValueError, "subplot"):
+                    Annotate(self.figure, {**NOTE, "subplot": index})
 
 
 if __name__ == "__main__":

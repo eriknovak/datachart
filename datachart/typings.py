@@ -1179,6 +1179,14 @@ class TextSettingAttrs(TypedDict):
             data point the connector points to, always in data coordinates.
             When present, a connector is drawn from the text to the target.
         style (Union[TextStyleAttrs, None]): The per-text style attributes.
+        subplot (Union[int, None]): The 0-based index, in render order, of the
+            subplot the text lands in. Read only by `Annotate` on a
+            multi-subplot figure, where every text must name one; chart fronts
+            target subplots with a list of lists instead.
+
+    !!! info "Added in Unreleased"
+
+        The `subplot` attribute.
 
     """
 
@@ -1188,6 +1196,7 @@ class TextSettingAttrs(TypedDict):
     coords: Union[str, None]
     target: Union[Tuple[Union[int, float], Union[int, float]], None]
     style: Union[TextStyleAttrs, None]
+    subplot: Union[int, None]
 
 
 # ================================================
