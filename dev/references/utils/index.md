@@ -304,9 +304,13 @@ Add text annotations to an already rendered figure.
 
 Returns a new figure with the annotations riding the figure's chart metadata, styled by the current theme at call time — so they follow themes and survive `Panel` and `Grid` composition. The source figure and its charts are never modified.
 
-Works on any figure whose charts share one coordinate space: chart figures (including polar ones) and `Panel` output. Grid figures and multi-subplot figures (`subplots=True`) are rejected — annotate the sources before composing.
+Works on chart figures (including polar ones), `Panel` output, and multi-subplot figures (`subplots=True`). On a multi-subplot figure every text names its target with a 0-based `subplot` index in render order; the figure is redrawn with the same subplot layout — as in a `Grid` cell, each subplot scales on its own, without the source's `sharex`/`sharey` — and the texts ride the per-subplot panels only, so they show in `Grid` cells but not in a `Panel` overlay of the figure. Grid figures are rejected — annotate the sources before composing.
 
 Added in v0.8.0
+
+Added in Unreleased
+
+Multi-subplot figures, targeted per text with the `subplot` index.
 
 Examples:
 
@@ -324,17 +328,24 @@ Examples:
 ...         "target": (7, 49),
 ...     },
 ... )
+>>>
+>>> # a multi-subplot figure: each text names its subplot
+>>> series = [[{"x": i, "y": k * i} for i in range(10)] for k in (1, 2, 3)]
+>>> annotated = Annotate(
+...     LineChart(data=series, subplots=True),
+...     texts={"text": "steepest", "x": 2, "y": 20, "subplot": 2},
+... )
 ```
 
-| PARAMETER | DESCRIPTION                                                                                                                                                                                                                                                                                      |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `figure`  | A figure created by a datachart chart function or Panel. **TYPE:** `plt.Figure`                                                                                                                                                                                                                  |
-| `texts`   | The text annotation(s) to add. Each annotation places text at (x, y) — data coordinates by default, axes fractions with "coords": "axes" — draws a connector to the optional target data point, and takes a per-text style override. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs]]` |
+| PARAMETER | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                       |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `figure`  | A figure created by a datachart chart function or Panel. **TYPE:** `plt.Figure`                                                                                                                                                                                                                                                                                   |
+| `texts`   | The text annotation(s) to add. Each annotation places text at (x, y) — data coordinates by default, axes fractions with "coords": "axes" — draws a connector to the optional target data point, and takes a per-text style override. On a multi-subplot figure each one also names its subplot index. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs]]` |
 
 | RETURNS      | DESCRIPTION                                         |
 | ------------ | --------------------------------------------------- |
 | `plt.Figure` | A new matplotlib Figure with the annotations added. |
 
-| RAISES       | DESCRIPTION                                                                          |
-| ------------ | ------------------------------------------------------------------------------------ |
-| `ValueError` | If the figure has no chart metadata, is a Grid figure, or is a multi-subplot figure. |
+| RAISES       | DESCRIPTION                                                                                                                                                                              |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If the figure has no chart metadata or is a Grid figure; if a text names a subplot on a single-panel figure; if, on a multi-subplot figure, a text names no subplot or one out of range. |

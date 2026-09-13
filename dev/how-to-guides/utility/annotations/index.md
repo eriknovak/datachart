@@ -16,6 +16,7 @@ Every chart function takes a `texts` parameter: a single text annotation or a li
     "coords": Optional[str],        # The coordinate system of the position: "data" (default) or "axes"
     "target": Optional[tuple],      # The (x, y) data point the connector points to; no target, no connector
     "style": Optional[dict],        # Per-text style overrides (the plot_text_* style attributes)
+    "subplot": Optional[int],       # Annotate only: the 0-based index of the subplot the text lands in
 }
 ```
 
@@ -29,7 +30,7 @@ from datachart.constants import ARROW_STYLE, FIG_SIZE
 
 ## Basics
 
-The examples in this guide share one dataset: the monthly climate normals of Ljubljana's weather station — the mean temperature (in °C) and the total precipitation (in mm) of each month, rounded from the published values. The data lives in a hidden cell.
+The examples in this guide share one dataset: the monthly climate normals of Ljubljana's weather station — the mean temperature (in °C) and the total precipitation (in mm) of each month, plus the mean temperature of two contrasting stations, coastal Portorož and mountain Kredarica. The values are rounded from the published normals. The data lives in a hidden cell.
 
 A text annotation is declared with the chart. By default its position is in data coordinates, and giving it a `target` draws a connector from the text to that data point:
 
@@ -177,7 +178,7 @@ LineChart(
 
 ## Annotating Finished Figures
 
-A figure that is already rendered — by a chart function or by [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) — is annotated post hoc with the [datachart.utils.Annotate](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Annotate) function. It returns a **new** figure with the texts added, leaving the source figure untouched; the annotations become part of the new figure's chart declaration, so they compose onward like any other. Grid figures and multi-subplot figures are rejected: annotate the sources before composing them.
+A figure that is already rendered — by a chart function or by [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) — is annotated post hoc with the [datachart.utils.Annotate](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Annotate) function. It returns a **new** figure with the texts added, leaving the source figure untouched; the annotations become part of the new figure's chart declaration, so they compose onward like any other. Grid figures are rejected: annotate the sources before composing them.
 
 ```
 precipitation = BarChart(data=precipitation_data, subtitle="Precipitation (mm)")
@@ -201,6 +202,36 @@ Annotate(
         "y": 0.91,
         "coords": "axes",
         "target": (8, 147),
+    },
+).show()
+```
+
+### Annotating Subplots
+
+A figure drawn with `subplots=True` has one coordinate space per subplot, so each text names the subplot it lands in with a `subplot` index — 0-based, in the order the subplots are drawn. The annotated figure keeps the subplot layout and composes onward with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md); in a [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md), where the subplots collapse into one coordinate space, the subplot texts do not apply. Here the third subplot, the mountain station, gets the note:
+
+```
+stations = LineChart(
+    data=[
+        [{"x": i, "y": value} for i, value in enumerate(values)]
+        for values in STATION_TEMPERATURES.values()
+    ],
+    subtitle=list(STATION_TEMPERATURES),
+    subplots=True,
+    title="Mean monthly temperature",
+    ylabel="Temperature (°C)",
+    figsize=FIG_SIZE.FULL_SHORT,
+)
+
+Annotate(
+    stations,
+    texts={
+        "text": "below 0 °C\nuntil April",
+        "x": 0.05,
+        "y": 0.88,
+        "coords": "axes",
+        "target": (3, -2.0),
+        "subplot": 2,
     },
 ).show()
 ```

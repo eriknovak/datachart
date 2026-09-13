@@ -164,14 +164,19 @@ Added in Unreleased
 
 The name `TextSettingAttrs`; `TextAttrs` is deprecated.
 
-| ATTRIBUTE | DESCRIPTION                                                                                                                                                                                              |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `text`    | The annotation text. **TYPE:** `str`                                                                                                                                                                     |
-| `x`       | The x-axis position of the text. **TYPE:** `Union[int, float]`                                                                                                                                           |
-| `y`       | The y-axis position of the text. **TYPE:** `Union[int, float]`                                                                                                                                           |
-| `coords`  | The coordinate system of the text position: "data" (default) or "axes" (axes fraction, 0–1). **TYPE:** `Union[str, None]`                                                                                |
-| `target`  | The data point the connector points to, always in data coordinates. When present, a connector is drawn from the text to the target. **TYPE:** `Union[Tuple[Union[int, float], Union[int, float]], None]` |
-| `style`   | The per-text style attributes. **TYPE:** `Union[TextStyleAttrs, None]`                                                                                                                                   |
+| ATTRIBUTE | DESCRIPTION                                                                                                                                                                                                                                    |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `text`    | The annotation text. **TYPE:** `str`                                                                                                                                                                                                           |
+| `x`       | The x-axis position of the text. **TYPE:** `Union[int, float]`                                                                                                                                                                                 |
+| `y`       | The y-axis position of the text. **TYPE:** `Union[int, float]`                                                                                                                                                                                 |
+| `coords`  | The coordinate system of the text position: "data" (default) or "axes" (axes fraction, 0–1). **TYPE:** `Union[str, None]`                                                                                                                      |
+| `target`  | The data point the connector points to, always in data coordinates. When present, a connector is drawn from the text to the target. **TYPE:** `Union[Tuple[Union[int, float], Union[int, float]], None]`                                       |
+| `style`   | The per-text style attributes. **TYPE:** `Union[TextStyleAttrs, None]`                                                                                                                                                                         |
+| `subplot` | The 0-based index, in render order, of the subplot the text lands in. Read only by Annotate on a multi-subplot figure, where every text must name one; chart fronts target subplots with a list of lists instead. **TYPE:** `Union[int, None]` |
+
+Added in Unreleased
+
+The `subplot` attribute.
 
 #### datachart.typings.LegendSettingAttrs
 

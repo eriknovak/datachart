@@ -3342,12 +3342,20 @@ is invalid, or a figure cannot be composed (missing metadata).</p>
 metadata, styled by the current theme at call time — so they follow
 themes and survive <code>Panel</code> and <code>Grid</code> composition. The source figure and
 its charts are never modified.</p>
-<p>Works on any figure whose charts share one coordinate space: chart
-figures (including polar ones) and <code>Panel</code> output. Grid figures and
-multi-subplot figures (<code>subplots=True</code>) are rejected — annotate the
-sources before composing.</p>
+<p>Works on chart figures (including polar ones), <code>Panel</code> output, and
+multi-subplot figures (<code>subplots=True</code>). On a multi-subplot figure every
+text names its target with a 0-based <code>subplot</code> index in render order; the
+figure is redrawn with the same subplot layout — as in a <code>Grid</code> cell,
+each subplot scales on its own, without the source's <code>sharex</code>/<code>sharey</code> —
+and the texts ride the per-subplot panels only, so they show in <code>Grid</code>
+cells but not in a <code>Panel</code> overlay of the figure. Grid figures are
+rejected — annotate the sources before composing.</p>
 <div class="admonition info">
 <p class="admonition-title">Added in v0.8.0</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Added in Unreleased</p>
+<p>Multi-subplot figures, targeted per text with the <code>subplot</code> index.</p>
 </div>
 
 
@@ -3365,6 +3373,13 @@ sources before composing.</p>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="gp">... </span>        <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">49</span><span class="p">),</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="gp">... </span>    <span class="p">},</span>
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="gp">... </span><span class="p">)</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="gp">&gt;&gt;&gt;</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># a multi-subplot figure: each text names its subplot</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">series</span> <span class="o">=</span> <span class="p">[[{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="n">k</span> <span class="o">*</span> <span class="n">i</span><span class="p">}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">annotated</span> <span class="o">=</span> <span class="n">Annotate</span><span class="p">(</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="gp">... </span>    <span class="n">LineChart</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">series</span><span class="p">,</span> <span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="gp">... </span>    <span class="n">texts</span><span class="o">=</span><span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="s2">"steepest"</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"subplot"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -3401,7 +3416,8 @@ sources before composing.</p>
                 <p>The text annotation(s) to add. Each annotation places <code>text</code>
 at (<code>x</code>, <code>y</code>) — data coordinates by default, axes fractions with
 <code>"coords": "axes"</code> — draws a connector to the optional <code>target</code>
-data point, and takes a per-text <code>style</code> override.</p>
+data point, and takes a per-text <code>style</code> override. On a
+multi-subplot figure each one also names its <code>subplot</code> index.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -3455,8 +3471,10 @@ data point, and takes a per-text <code>style</code> override.</p>
             </td>
             <td class="doc-raises-details">
               <div class="doc-md-description">
-                <p>If the figure has no chart metadata, is a Grid figure,
-or is a multi-subplot figure.</p>
+                <p>If the figure has no chart metadata or is a Grid figure;
+if a text names a <code>subplot</code> on a single-panel figure; if, on a
+multi-subplot figure, a text names no <code>subplot</code> or one out of
+range.</p>
               </div>
             </td>
           </tr>

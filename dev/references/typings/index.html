@@ -5018,8 +5018,29 @@ When present, a connector is drawn from the text to the target.</p>
               </p>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.TextSettingAttrs.subplot">subplot</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The 0-based index, in render order, of the
+subplot the text lands in. Read only by <code>Annotate</code> on a
+multi-subplot figure, where every text must name one; chart fronts
+target subplots with a list of lists instead.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="int">int</span>, None]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
       </tbody>
     </table>
+        <div class="admonition info">
+<p class="admonition-title">Added in Unreleased</p>
+<p>The <code>subplot</code> attribute.</p>
+</div>
 
 
 
