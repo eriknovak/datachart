@@ -6,9 +6,12 @@ so the fronts fail early with one message instead of deep inside matplotlib.
 
 import math
 from collections import defaultdict
+from datetime import date, datetime
 from numbers import Real
 
-from typing import Optional
+from typing import List, Optional
+
+import numpy as np
 
 from ...constants import (
     ARROW_STYLE,
@@ -18,6 +21,7 @@ from ...constants import (
     EMPHASIS,
     NETWORK_LAYOUT,
     SORT,
+    WEEKDAY,
 )
 
 BANDWIDTH_RULES = (BANDWIDTH.SCOTT, BANDWIDTH.SILVERMAN)
@@ -546,5 +550,64 @@ def validate_network_edge_style(value):
         raise ValueError(
             f"Invalid `plot_network_edge_style` value {value!r}. "
             f"Must be one of {NETWORK_EDGE_STYLES}."
+        )
+    return value
+
+
+# the temporal types a calendar date may be (ADR 0037); strings never parse
+CALENDAR_DATE_TYPES = "`date`, `datetime`, `numpy.datetime64`, or pandas `Timestamp`"
+WEEK_STARTS = (WEEKDAY.MONDAY, WEEKDAY.SUNDAY)
+
+
+def validate_calendar_dates(dates) -> List[date]:
+    """The calendar dates as `date` objects; a value that is not temporal raises."""
+
+    normalized = []
+    for value in dates:
+        if isinstance(value, np.datetime64):
+            value = value.astype("datetime64[us]").item()
+        if isinstance(value, datetime):
+            value = value.date()
+        if not isinstance(value, date):
+            raise ValueError(
+                f"Invalid calendar date {value!r}. Dates must be "
+                f"{CALENDAR_DATE_TYPES} objects; date strings are never parsed."
+            )
+        normalized.append(value)
+    return normalized
+
+
+def validate_unique_dates(dates: List[date]) -> None:
+    """Raise when a calendar date appears twice, naming the first duplicate."""
+
+    seen = set()
+    for value in dates:
+        if value in seen:
+            raise ValueError(
+                f"Duplicate calendar date {value.isoformat()}. Every date holds "
+                "one value; aggregate the duplicates before charting."
+            )
+        seen.add(value)
+
+
+def validate_calendar_year(year, years) -> None:
+    """Raise unless `year` is None or one of the years the dates span."""
+
+    if year is None:
+        return
+    if isinstance(year, bool) or not isinstance(year, int):
+        raise ValueError(f"Invalid `year` value {year!r}. Must be an integer or None.")
+    if year not in years:
+        raise ValueError(
+            f"No dates in year {year}; the data spans {min(years)}-{max(years)}."
+        )
+
+
+def validate_week_start(value):
+    """Validate a calendar week start; None means the theme default."""
+
+    if value is not None and value not in WEEK_STARTS:
+        raise ValueError(
+            f"Invalid `week_start` value {value!r}. Must be one of {WEEK_STARTS} or None."
         )
     return value

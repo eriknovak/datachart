@@ -732,6 +732,32 @@ class ORIENTATION:
     VERTICAL = "vertical"
 
 
+class WEEKDAY:
+    """The supported week start days.
+
+    Passed as the `week_start` setting of the calendar heatmap: the weekday
+    drawn in the top row of every week column. The theme's
+    `plot_calendar_heatmap_week_start` supplies the default.
+
+    ![WEEKDAY at a glance](../assets/imgs/const-weekday.svg){ width="100%" }
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> from datachart.constants import WEEKDAY
+        >>> WEEKDAY.MONDAY
+        "monday"
+
+    Attributes:
+        MONDAY (str): Weeks run from Monday to Sunday. Equals to `"monday"`.
+        SUNDAY (str): Weeks run from Sunday to Saturday. Equals to `"sunday"`.
+
+    """
+
+    MONDAY = "monday"
+    SUNDAY = "sunday"
+
+
 class SWARM_MODE:
     """The supported swarm plot modes.
 
