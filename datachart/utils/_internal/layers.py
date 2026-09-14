@@ -199,6 +199,9 @@ POINT_LABEL_SPOTS_VERTICAL = (
     ("left", "top", 0, -1),
     ("right", "top", 0, -1),
 )
+# a raincloud's extremes sit past their points along the value axis, clear of
+# the box whiskers beside the rain (ADR 0033)
+POINT_LABEL_SPOTS_HORIZONTAL = POINT_LABEL_SPOTS[:2]
 # the widest correlation readout, for reserving its corner box
 CORRELATION_BOX_TEXT = "r = -0.000"
 # the correlation readout's corner, in axes fractions
@@ -2562,11 +2565,21 @@ def strip_offsets(n: int, jitter: float) -> np.ndarray:
     return np.random.default_rng(0).uniform(-jitter / 2, jitter / 2, n)
 
 
-class SwarmLayer(GroupLayer):
+class SwarmLayer(PointLabelMixin, GroupLayer):
     kind = "swarm"
 
     def _resolve_style(self):
         super()._resolve_style()
+        self._resolve_value_labels()
+        self._init_point_labels()
+        # a raincloud's box prints the median, so its rain labels the extremes
+        self.label_median = self.settings.get("label_median", True)
+        if not self.label_median:
+            self.label_spots = (
+                POINT_LABEL_SPOTS_HORIZONTAL
+                if self.is_horizontal
+                else POINT_LABEL_SPOTS_VERTICAL
+            )
         self.mode = self.settings.get("mode") or DEFAULT_SWARM_MODE
         if self.mode not in (SWARM_MODE.SWARM, SWARM_MODE.STRIP):
             raise ValueError(
@@ -2693,18 +2706,60 @@ class SwarmLayer(GroupLayer):
                 else collection.sticky_edges.x
             )
             edges[:] = [lo, hi]
-            self._pending.setdefault(id(ax), []).append((collection, groups))
+            self._pending.setdefault(id(ax), []).append((collection, groups, role))
         interval = ax.dataLim.intervaly if self.is_horizontal else ax.dataLim.intervalx
         interval[:] = (min(interval[0], lo), max(interval[1], hi))
 
     def pack(self, ax) -> None:
         """Spread the points drawn into `ax`; the panel calls this once its view is final."""
 
-        for collection, groups in self._pending.pop(id(ax), []):
+        for collection, groups, role in self._pending.pop(id(ax), []):
             offsets = np.concatenate([self._offsets(ax, pos, v) for pos, v in groups])
             xy = np.asarray(collection.get_offsets()).copy()
             xy[:, 1 if self.is_horizontal else 0] += offsets
             collection.set_offsets(xy)
+            # labels read the packed positions; every point is an obstacle
+            texts = None
+            if self.show_values and role != EMPHASIS_BACKGROUND:
+                texts = np.concatenate([self._group_value_texts(v) for _, v in groups])
+            self._pending_labels.setdefault(id(ax), []).append(
+                (
+                    xy[:, 0],
+                    xy[:, 1],
+                    collection.get_sizes(),
+                    texts,
+                    self.value_font,
+                    self.value_padding,
+                )
+            )
+
+    def _group_value_texts(self, values: np.ndarray) -> np.ndarray:
+        """One group's min, median, and max texts, `None` on every other point.
+
+        The median labels the point nearest it; when that point is also the
+        min or max, the extreme keeps it, so no point prints twice (ADR 0033).
+        """
+
+        labelled = np.full(len(values), None, dtype=object)
+        if len(values) == 0:
+            return labelled
+        lowest, highest = int(np.argmin(values)), int(np.argmax(values))
+        marks = [(lowest, values[lowest]), (highest, values[highest])]
+        if self.label_median:
+            median = float(np.median(values))
+            marks.insert(0, (int(np.argmin(np.abs(values - median))), median))
+        for index, value in marks:
+            labelled[index] = _format_value(self.value_format, value)
+        return labelled
+        order = np.argsort(values, kind="stable")
+        along = 0 if self.is_horizontal else 1
+        ends = np.zeros((2, 2))
+        ends[:, along] = values[order[[0, -1]]]
+        span_px = np.ptp(ax.transData.transform(ends)[:, along])
+        labelled[order] = self._value_texts(
+            ax, values[order], not self.is_horizontal, span_px * 72.0 / ax.figure.dpi
+        )
+        return labelled
 
 
 # keeps the two inner boxes of a split violin off the shared seam
@@ -6166,6 +6221,8 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
         chart,
         {
             **settings,
+            # the box prints the median and the rain the extremes (ADR 0033)
+            "show_values": False,
             "inner": None,
             "split": None,
             "side": 1,
@@ -6178,6 +6235,7 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
         chart,
         {
             **settings,
+            "label_median": False,
             "offset": -RAINCLOUD_RAIN_OFFSET,
             "spread": RAINCLOUD_RAIN_SPREAD,
             "side": -1,

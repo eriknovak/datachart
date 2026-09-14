@@ -254,6 +254,11 @@ EXPECTED_CHANGES = {
     "parallel_rule_hue",
     "heatmap_rule_above",
     "hexbin_rule_top",
+    # new swarm and raincloud value label cases (#136)
+    "values_swarm_vertical",
+    "values_swarm_horizontal_strip",
+    "values_raincloud",
+    "values_theme_minimal_swarm_raincloud",
 }
 
 
@@ -992,6 +997,39 @@ def values_theme_minimal_grid():
     )
     area = StackedAreaChart(data=stack_series(), title="area")
     return Grid([[line, hist], [box, area]], figsize=(10, 7))
+
+
+@case
+def values_swarm_vertical():
+    return SwarmPlot(
+        data=swarm_data(), show_values=True, value_format=VALUE_FORMAT.DECIMAL
+    )
+
+
+@case
+def values_swarm_horizontal_strip():
+    return SwarmPlot(
+        data=swarm_data(seed=6),
+        mode="strip",
+        orientation="horizontal",
+        show_values=True,
+        value_format=VALUE_FORMAT.DECIMAL,
+    )
+
+
+@case
+def values_raincloud():
+    return RaincloudPlot(
+        data=swarm_data(), show_values=True, value_format=VALUE_FORMAT.DECIMAL
+    )
+
+
+@case
+def values_theme_minimal_swarm_raincloud():
+    config.set_theme(THEME.MINIMAL)
+    swarm = SwarmPlot(data=swarm_data(), title="swarm")
+    rain = RaincloudPlot(data=swarm_data(), title="raincloud")
+    return Grid([[swarm, rain]], figsize=(10, 4))
 
 
 # ----- overlays -----
