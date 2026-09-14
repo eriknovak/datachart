@@ -10,6 +10,7 @@ Run from the repo root: python docs/assets/scripts/generate_constant_viz.py
 
 import pathlib
 import sys
+from datetime import date, timedelta
 
 import matplotlib
 
@@ -22,6 +23,7 @@ from matplotlib.patches import FancyBboxPatch, Rectangle
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
 from datachart.charts import (
     BarChart,
+    CalendarHeatmap,
     ContourChart,
     Heatmap,
     HexbinChart,
@@ -63,6 +65,7 @@ from datachart.constants import (
     VALUE_FORMAT,
     SWARM_MODE,
     VIOLIN_INNER,
+    WEEKDAY,
 )
 from datachart.themes import DEFAULT_THEME
 from datachart.utils import Grid
@@ -696,6 +699,26 @@ def orientation():
     chart_grid(figs, "const-orientation.svg", 2.6)
 
 
+def weekday():
+    members = [("MONDAY", WEEKDAY.MONDAY), ("SUNDAY", WEEKDAY.SUNDAY)]
+    days = [date(2024, 1, 1) + timedelta(days=i) for i in range(91)]
+    values = [(i % 7) * (i % 5) for i in range(len(days))]
+    figs = [
+        CalendarHeatmap(
+            data={"date": days, "value": values},
+            week_start=value,
+            title=f"WEEKDAY.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-weekday.svg",
+        2.0,
+        footnote="The first quarter of 2024; the week start is the top row.",
+    )
+
+
 def _violin_data():
     rng = np.random.default_rng(7)
     return [
@@ -1031,6 +1054,7 @@ def main():
     baseline()
     histogram_type()
     orientation()
+    weekday()
     violin_inner()
     bandwidth()
     contour_levels()

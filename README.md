@@ -92,7 +92,7 @@ split them apart. The dict keys per chart are listed in each guide.
 | Family            | Charts                                                                     | Use for                                                                |
 | ----------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | **Trends**        | [LineChart], [StackedAreaChart]                                            | values over an ordered axis; area for part-of-whole over time          |
-| **Comparisons**   | [BarChart], [PyramidChart], [RadialChart]                                  | category totals, paired populations, cyclic/periodic values            |
+| **Comparisons**   | [BarChart], [PyramidChart], [RadialChart], [CalendarHeatmap]               | category totals, paired populations, cyclic/periodic values, daily rhythm |
 | **Distributions** | [Histogram], [BoxPlot], [ViolinPlot], [SwarmPlot], [RaincloudPlot]         | shape and spread of one variable, per group                            |
 | **Relationships** | [ScatterChart], [Heatmap], [ContourChart], [HexbinChart], [ParallelCoords], [NetworkChart] | two-variable correlation, matrices, dense 2-D density, many dimensions, who is linked to whom |
 | **Flows**         | [SankeyChart]                                                              | quantities moving between stages                                       |
@@ -217,6 +217,7 @@ Code is formatted with `black`; the pre-commit hook runs it for you.
 [BarChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/barchart/
 [PyramidChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/pyramidchart/
 [RadialChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/radialchart/
+[CalendarHeatmap]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/calendarheatmap/
 [Histogram]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/histogram/
 [BoxPlot]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/boxplot/
 [ViolinPlot]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/violinplot/
