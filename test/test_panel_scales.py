@@ -1,14 +1,30 @@
 """Tests for Panel axis scales (ADR 0041)."""
 
 import warnings
+from datetime import datetime
 
+import numpy as np
 import pytest
 import matplotlib.pyplot as plt
 
-from datachart.charts import LineChart, BarChart, BoxPlot, RadialChart
+from datachart.charts import (
+    BarChart,
+    BoxPlot,
+    ContourChart,
+    HexbinChart,
+    Histogram,
+    LineChart,
+    RadialChart,
+    RaincloudPlot,
+    ScatterChart,
+    StackedAreaChart,
+    SwarmPlot,
+    ViolinPlot,
+)
 from datachart.config import config
 from datachart.constants import ORIENTATION, SCALE
 from datachart.utils import Panel, Grid, Annotate
+from datachart.utils._internal.validate import validate_log_values
 
 BARS = [{"label": c, "y": v} for c, v in zip("ABCD", [10, 20, 30, 20])]
 LINE = [{"x": i, "y": v} for i, v in enumerate([1, 10, 100, 1000], 1)]
@@ -295,3 +311,202 @@ class TestWarnings:
         with warnings.catch_warnings():
             warnings.simplefilter("error")
             Panel([LineChart(data=LINE)], scaley_right="log")
+
+
+class TestLogValidator:
+    @pytest.mark.parametrize("scale", [None, "linear", "symlog", "asinh"])
+    def test_other_scales_accept_any_value(self, scale):
+        validate_log_values("scaley", "value", scale, [-1, 0, 5])
+
+    def test_log_accepts_positive_values(self):
+        validate_log_values("scaley", "value", SCALE.LOG, [0.1, 1, 1000])
+
+    def test_nan_and_missing_are_ignored(self):
+        validate_log_values("scaley", "value", SCALE.LOG, [1, None, np.nan, 3])
+
+    @pytest.mark.parametrize("bad", [0, -2.5])
+    def test_non_positive_raises_with_parameter_scale_and_value(self, bad):
+        with pytest.raises(ValueError) as error:
+            validate_log_values("scalex", "category", SCALE.LOG, [1, bad, 3])
+        message = str(error.value)
+        assert "`scalex` 'log'" in message
+        assert f"value {bad:g} on the category axis" in message
+        assert "'symlog' or 'asinh'" in message
+
+    def test_hint_is_appended(self):
+        with pytest.raises(ValueError, match=r"zero\. Move it\.$"):
+            validate_log_values("scaley", "value", SCALE.LOG, [0], hint="Move it.")
+
+
+ZERO_LINE = [{"x": 1, "y": 0}, {"x": 2, "y": 100}]
+ZERO_GROUPS = [{"label": c, "value": v} for c in "AB" for v in [0, 10, 100]]
+POS_GROUPS = [{"label": c, "value": v} for c in "AB" for v in [1, 10, 100]]
+
+
+class TestLogScaleRejectsNonPositive:
+    @pytest.mark.parametrize(
+        "front, kwargs",
+        [
+            (LineChart, {"data": ZERO_LINE}),
+            (ScatterChart, {"data": ZERO_LINE}),
+            (BarChart, {"data": [{"label": "A", "y": 0}, {"label": "B", "y": 3}]}),
+            (BoxPlot, {"data": ZERO_GROUPS}),
+            (ViolinPlot, {"data": ZERO_GROUPS}),
+            (SwarmPlot, {"data": ZERO_GROUPS}),
+            (RaincloudPlot, {"data": ZERO_GROUPS}),
+            (RadialChart, {"data": [{"label": "A", "y": 0}, {"label": "B", "y": 3}]}),
+            (HexbinChart, {"data": {"x": [1, 2, 3], "y": [0, 1, 2]}}),
+            (ContourChart, {"data": {"z": [[1, 2], [3, 4]]}}),
+        ],
+    )
+    def test_front_scaley_raises(self, front, kwargs):
+        with pytest.raises(ValueError, match=r"`scaley` 'log' cannot show the value"):
+            front(**kwargs, scaley="log")
+
+    @pytest.mark.parametrize(
+        "front, data",
+        [
+            (LineChart, [{"x": 0, "y": 1}, {"x": 2, "y": 100}]),
+            (ScatterChart, [{"x": -1, "y": 1}, {"x": 2, "y": 100}]),
+            (StackedAreaChart, [{"x": 0, "y": 1}, {"x": 2, "y": 100}]),
+            (Histogram, [{"x": 0}, {"x": 2}, {"x": 3}]),
+            (HexbinChart, {"x": [0, 2, 3], "y": [1, 1, 2]}),
+            (ContourChart, {"z": [[1, 2], [3, 4]]}),
+        ],
+    )
+    def test_front_scalex_raises(self, front, data):
+        with pytest.raises(ValueError, match=r"`scalex` 'log' .* category axis"):
+            front(data=data, scalex="log")
+
+    def test_positive_data_renders(self):
+        render(LineChart(data=LINE, scalex="log", scaley="log"))
+        render(BoxPlot(data=POS_GROUPS, scaley="log"))
+
+    def test_categorical_and_temporal_axes_are_not_checked(self):
+        render(BarChart(data=BARS, scalex="log"))
+        days = [{"x": datetime(2024, 1, d), "y": d} for d in (1, 2, 3)]
+        render(LineChart(data=days, scalex="log"))
+
+    def test_histogram_empty_bins_on_a_log_count_axis_render(self):
+        data = [{"x": v} for v in [1, 1, 1, 50, 100]]
+        render(Histogram(data=data, num_bins=20, scaley="log"))
+
+    def test_violin_kde_below_zero_is_not_checked(self):
+        render(ViolinPlot(data=POS_GROUPS, scaley="log"))
+
+    def test_stacked_area_tops_are_not_checked(self):
+        first = [{"x": 1, "y": 5}, {"x": 2, "y": 6}]
+        second = [{"x": 1, "y": 0}, {"x": 2, "y": 3}]
+        render(StackedAreaChart(data=[first, second], scaley="log"))
+
+    def test_horizontal_group_chart_names_scaley_on_the_value_axis(self):
+        with pytest.raises(ValueError) as error:
+            BoxPlot(data=ZERO_GROUPS, orientation=ORIENTATION.HORIZONTAL, scaley="log")
+        assert "`scaley` 'log' cannot show the value 0 on the value axis" in str(
+            error.value
+        )
+
+    def test_horizontal_bar_names_the_literal_key_it_takes(self):
+        bars = [{"label": "A", "y": 0}, {"label": "B", "y": 3}]
+        with pytest.raises(ValueError, match=r"`scalex` .* on the value axis"):
+            BarChart(data=bars, orientation=ORIENTATION.HORIZONTAL, scalex="log")
+
+    def test_horizontal_panel_names_scaley_on_the_value_axis(self):
+        bars = [{"label": "A", "y": 0}, {"label": "B", "y": 3}]
+        with pytest.raises(ValueError, match=r"`scaley` .* on the value axis"):
+            Panel(
+                [BarChart(data=bars, orientation=ORIENTATION.HORIZONTAL)], scaley="log"
+            )
+
+    def test_horizontal_histogram_names_scaley_on_the_category_axis(self):
+        with pytest.raises(ValueError, match=r"`scaley` .* category axis"):
+            Histogram(
+                data=[{"x": 0}, {"x": 2}],
+                orientation=ORIENTATION.HORIZONTAL,
+                scaley="log",
+            )
+
+    def test_nan_values_are_ignored(self):
+        data = [{"x": 1, "y": float("nan")}, {"x": 2, "y": 100}, {"x": 3, "y": 10}]
+        render(LineChart(data=data, scaley="log"))
+
+    def test_panel_explicit_log_raises(self):
+        with pytest.raises(ValueError, match=r"`scaley` 'log'") as error:
+            Panel([LineChart(data=ZERO_LINE)], scaley="log")
+        assert "y_axis" not in str(error.value)
+
+    def test_panel_explicit_scalex_raises(self):
+        line = [{"x": 0, "y": 1}, {"x": 2, "y": 100}]
+        with pytest.raises(ValueError, match=r"`scalex` 'log' .* category axis"):
+            Panel([LineChart(data=line)], scalex="log")
+
+    def test_inherited_log_over_a_linear_figure_raises_with_the_hint(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            with pytest.raises(ValueError) as error:
+                Panel(
+                    [
+                        {
+                            "figure": LineChart(data=LINE, scaley="log"),
+                            "y_axis": "left",
+                        },
+                        {"figure": LineChart(data=ZERO_LINE), "y_axis": "left"},
+                    ]
+                )
+        message = str(error.value)
+        assert "`scaley` 'log' cannot show the value 0 on the value axis" in message
+        assert '"y_axis": "right"' in message
+        assert "scaley_right" in message
+
+    def test_inherited_log_on_the_secondary_axis_hints_the_primary(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            with pytest.raises(ValueError) as error:
+                Panel(
+                    [
+                        {"figure": BarChart(data=BARS), "y_axis": "left"},
+                        {
+                            "figure": LineChart(data=LINE, scaley="log"),
+                            "y_axis": "right",
+                        },
+                        {"figure": LineChart(data=ZERO_LINE), "y_axis": "right"},
+                    ]
+                )
+        message = str(error.value)
+        assert "`scaley_right` 'log'" in message
+        assert '"y_axis": "left"' in message
+
+    def test_scaley_right_checks_only_the_secondary_axis(self):
+        zero_bars = [{"label": "A", "y": 0}, {"label": "B", "y": 3}]
+        render(
+            Panel(
+                [
+                    {"figure": BarChart(data=zero_bars), "y_axis": "left"},
+                    {"figure": LineChart(data=LINE), "y_axis": "right"},
+                ],
+                scaley_right="log",
+            )
+        )
+        with pytest.raises(ValueError, match=r"`scaley_right` 'log' .* secondary"):
+            Panel(
+                [
+                    {"figure": BarChart(data=BARS), "y_axis": "left"},
+                    {"figure": LineChart(data=ZERO_LINE), "y_axis": "right"},
+                ],
+                scaley_right="log",
+            )
+
+    def test_primary_log_ignores_the_secondary_axis(self):
+        render(
+            Panel(
+                [
+                    {"figure": LineChart(data=LINE), "y_axis": "left"},
+                    {"figure": LineChart(data=ZERO_LINE), "y_axis": "right"},
+                ],
+                scaley="log",
+            )
+        )
+
+    def test_grid_of_a_bad_figure_raises(self):
+        with pytest.raises(ValueError, match=r"`scaley` 'log'"):
+            Grid([LineChart(data=LINE), LineChart(data=ZERO_LINE, scaley="log")])

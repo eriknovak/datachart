@@ -77,10 +77,14 @@ so `Panel([LineChart(..., scaley="log")])` rendered linear.
   swaps role-addressed arguments once on the way in, and a layer swapping
   again at draw time would undo it for a horizontal panel holding a box
   plot.
-- **No validation of a scale against the data.** A log panel over
-  non-positive values behaves exactly as a log `LineChart` over the same
-  values behaves today. That rule belongs to every front, not to panels
-  (issue #147).
+- **Panels validate a resolved log scale against the data on its axis.**
+  After twin assignment and before drawing, each axis whose resolved scale is
+  `log` checks the raw values of the groups drawn on it and raises on a value
+  at or below zero; derived values (histogram counts, KDE bodies, stacked
+  tops) and categorical or temporal axes are never checked. Scale resolution
+  lives here, so one check covers every front, `Panel` and `Grid`. A figure
+  that inherited `log` from the first figure on its axis gets the remedy of
+  its own axis in the message (issue #147).
 
 ## Why a new config key
 

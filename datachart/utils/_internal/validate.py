@@ -20,6 +20,7 @@ from ...constants import (
     DATE_FORMAT,
     EMPHASIS,
     NETWORK_LAYOUT,
+    SCALE,
     SORT,
     WEEKDAY,
 )
@@ -127,6 +128,28 @@ def validate_axis_kinds(kinds) -> Optional[str]:
         if kind in present:
             return kind
     return None
+
+
+def validate_log_values(parameter: str, role: str, scale, values, hint=None) -> None:
+    """Reject a value a `log` scale cannot show: zero or below.
+
+    `parameter` is the scale setting as the user spells it, `role` the axis it
+    addresses ("value", "category", "secondary value"). NaN and missing values
+    are skipped; every other scale accepts any value.
+    """
+
+    if scale != SCALE.LOG or values is None:
+        return
+    values = np.asarray(values, dtype=float).ravel()
+    offending = values[np.isfinite(values) & (values <= 0)]
+    if offending.size == 0:
+        return
+    message = (
+        f"`{parameter}` 'log' cannot show the value {offending[0]:g} on the "
+        f"{role} axis: a log scale needs values above zero. Use 'symlog' or "
+        "'asinh' for data at or below zero."
+    )
+    raise ValueError(f"{message} {hint}" if hint else message)
 
 
 def validate_ticks_format(value, axis: str, dated: bool) -> None:
