@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    EmphasisRuleAttrs,
     LegendSettingAttrs,
     ParallelCoordsDataPointAttrs,
     ParallelCoordsStyleAttrs,
@@ -27,6 +28,7 @@ def ParallelCoords(
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: Optional[Union[EMPHASIS, str, List[Optional[str]]]] = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
@@ -59,6 +61,7 @@ def ParallelCoords(
     !!! info "Added in Unreleased"
 
         The `legend` parameter.
+        The `emphasis_rule` parameter.
 
     Examples:
         >>> from datachart.charts import ParallelCoords
@@ -87,6 +90,13 @@ def ParallelCoords(
             color, lowered alpha, thinner line, behind the others, no hue
             legend entry), "highlight" bolds it and brings it to the front
             among the data rows, None leaves it unchanged.
+        emphasis_rule: A rule that highlights the data rows matching it and
+            mutes the rest: `{"above": v}` or `{"below": v}` (strict),
+            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
+            `{"bottom": n}`, read against each row's numeric `hue` value; no
+            `hue`, or a non-numeric one, raises. An explicit `emphasis` role
+            wins, and a count ranks across the rows of every chart. The rule
+            takes no `by`. See `EmphasisRuleAttrs`.
         figsize: The size of the figure.
         show_legend: Whether to show the legend (for hue categories).
         legend: The per-figure legend setting: title, location, column count
@@ -125,6 +135,7 @@ def ParallelCoords(
 
     # Figure-level settings; None values resolve to defaults downstream
     settings = {
+        "emphasis_rule": emphasis_rule,
         "title": title,
         "xlabel": xlabel,
         "ylabel": ylabel,

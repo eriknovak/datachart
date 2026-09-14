@@ -421,15 +421,17 @@ A role — `"background"`, `"highlight"`, or unset — deciding how something
 reads relative to its siblings: background is muted and dropped from the
 legend, highlight is nudged forward (front z-order, slightly bolder). Styling,
 not data. Set per chart, per figure in `Panel`, per group label on the group
-fronts, or per record on the fronts whose records carry an `emphasis` key
-(treemap, network, bar).
+fronts, per record on the fronts whose records carry an `emphasis` key
+(treemap, network, bar), or per cell on a heatmap.
 _Avoid_: background theme, de-emphasis flag
 
 **Emphasis rule**:
-A one-key dict on a bar-type front — `above`, `below`, `between`, `top`, or
-`bottom` — that reads each record's value and assigns it `"highlight"` when it
-matches and `"background"` when it does not. Sugar over the per-record
-`emphasis` key, which wins wherever a record sets one (ADR 0042).
+A dict with one comparison — `above`, `below`, `between`, `top`, or `bottom` —
+that reads a value for each emphasis unit of a front (record, cell, group
+label, or series) and assigns it `"highlight"` when it matches and
+`"background"` when it does not. Groups and series are reduced to one value by
+a summary, chosen with an optional `by`. Sugar over the explicit roles, which
+win wherever one is set (ADR 0042, ADR 0045).
 _Avoid_: threshold, emphasis filter, highlight rule
 
 **Muted**:

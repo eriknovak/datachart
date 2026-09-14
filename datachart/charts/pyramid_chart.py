@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure, _get_indexed_value
 from ..typings import (
+    EmphasisRuleAttrs,
     LegendSettingAttrs,
     BarDataPointAttrs,
     BarStyleAttrs,
@@ -46,7 +47,7 @@ def PyramidChart(
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     sort: Optional[Union[SORT, str]] = None,
     sort_by: Optional[str] = None,
-    emphasis_rule: Optional[dict] = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     style: Optional[Union[BarStyleAttrs, List[Optional[BarStyleAttrs]]]] = None,
     xticks: Optional[List[Union[int, float]]] = None,
     xticklabels: Optional[List[str]] = None,

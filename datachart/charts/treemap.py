@@ -6,6 +6,7 @@ from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..utils._internal.validate import validate_treemap_records
 from ..typings import (
+    EmphasisRuleAttrs,
     TreemapSingleChartAttrs,
     TreemapStyleAttrs,
     TextSettingAttrs,
@@ -28,6 +29,7 @@ def Treemap(
     title: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: None = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
@@ -56,6 +58,7 @@ def Treemap(
     !!! info "Added in Unreleased"
 
         The `legend` parameter.
+        The `emphasis_rule` parameter.
 
     Examples:
         >>> from datachart.charts import Treemap
@@ -96,6 +99,12 @@ def Treemap(
         subtitle: The subtitle(s) for individual charts.
         emphasis: Not supported: emphasis is set per record through its
             `emphasis` key. Passing a value raises `ValueError`.
+        emphasis_rule: A rule that highlights the leaf records matching it and
+            mutes the rest: `{"above": v}` or `{"below": v}` (strict),
+            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
+            `{"bottom": n}`, read against each leaf's `value`. A record's own
+            `emphasis` key wins, and so does a group's, over its whole subtree.
+            The rule takes no `by`. See `EmphasisRuleAttrs`.
         figsize: The size of the figure.
         subplots: Whether to show each chart in its own subplot; several
             charts always split into subplots.
@@ -139,6 +148,7 @@ def Treemap(
 
     # Figure-level settings; None values resolve to defaults downstream
     settings = {
+        "emphasis_rule": emphasis_rule,
         "title": title,
         "figsize": figsize,
         "subplots": subplots,

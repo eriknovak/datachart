@@ -247,6 +247,13 @@ EXPECTED_CHANGES = {
     "calendar_multi_year",
     "calendar_sunday_start",
     "calendar_grid",
+    # new emphasis rule cases on every front (ADR 0045)
+    "line_rule_by_max",
+    "box_rule_median",
+    "treemap_rule_top",
+    "parallel_rule_hue",
+    "heatmap_rule_above",
+    "hexbin_rule_top",
 }
 
 
@@ -2485,6 +2492,82 @@ def main():
         for n, t in changed:
             print(f"  ! {n}: {t}")
         sys.exit(1 if changed or errors else 0)
+
+
+# ----- emphasis rules on every front (ADR 0045) -----
+
+
+@case
+def line_rule_by_max():
+    rng = np.random.RandomState(8)
+    walks = [
+        [{"x": i, "y": float(v)} for i, v in enumerate(np.cumsum(rng.randn(30)))]
+        for _ in range(6)
+    ]
+    return LineChart(
+        data=walks,
+        subtitle=[f"w{i}" for i in range(6)],
+        emphasis_rule={"top": 2, "by": "max"},
+        show_legend=True,
+        title="Two highest peaks",
+    )
+
+
+@case
+def box_rule_median():
+    rng = np.random.RandomState(3)
+    data = [
+        {"label": lab, "value": float(v)}
+        for lab, off in [("A", 0), ("B", 2), ("C", 1), ("D", 3)]
+        for v in rng.randn(30) + off
+    ]
+    return BoxPlot(data=data, emphasis_rule={"above": 1.5}, title="Median above 1.5")
+
+
+@case
+def treemap_rule_top():
+    return Treemap(
+        treemap_world(), emphasis_rule={"top": 3}, title="Three largest leaves"
+    )
+
+
+@case
+def parallel_rule_hue():
+    rng = np.random.RandomState(5)
+    data = [
+        {
+            "alpha": float(rng.rand() * 10),
+            "beta": float(rng.rand() * 100),
+            "gamma": float(rng.rand()),
+            "score": float(i),
+        }
+        for i in range(20)
+    ]
+    return ParallelCoords(
+        data=data,
+        dimensions=["alpha", "beta", "gamma"],
+        hue="score",
+        emphasis_rule={"top": 4},
+    )
+
+
+@case
+def heatmap_rule_above():
+    data = {"z": [[(i * j) % 7 for j in range(5)] for i in range(4)]}
+    data["z"][1][2] = None
+    return Heatmap(
+        data=data,
+        emphasis_rule={"above": 4},
+        show_heatmap_values=True,
+        show_colorbars=True,
+    )
+
+
+@case
+def hexbin_rule_top():
+    return HexbinChart(
+        data=hexbin_points(), emphasis_rule={"top": 5}, title="Five densest bins"
+    )
 
 
 if __name__ == "__main__":

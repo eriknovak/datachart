@@ -53,6 +53,7 @@ Classes:
     AxesStyleAttrs: The typing for the axes style.
     LegendStyleAttrs: The typing for the legend style.
     LegendSettingAttrs: The per-figure legend setting.
+    EmphasisRuleAttrs: The emphasis rule setting.
     AreaStyleAttrs: The typing for the area style.
     GridStyleAttrs: The typing for the grid style.
     LineStyleAttrs: The typing for the line style.
@@ -84,7 +85,7 @@ Classes:
 
 import warnings
 from datetime import date, datetime
-from typing import TypedDict, Union, Tuple, List, Optional, Dict
+from typing import TypedDict, Union, Tuple, List, Optional, Dict, Literal
 
 import matplotlib.colors as colors
 from .constants import (
@@ -1202,6 +1203,37 @@ class LegendSettingAttrs(TypedDict):
     alignment: Union[LEGEND_ALIGN, str, None]
 
 
+class EmphasisRuleAttrs(TypedDict):
+    """The emphasis rule setting, passed to a chart front as `emphasis_rule`.
+
+    Exactly one comparison key: a unit matching it is highlighted and every
+    other unit muted. Each front selects its own unit — a bar, leaf, node,
+    row, cell or bin reads its one value; a group or series reads a summary
+    of its values, chosen by `by`. A unit's explicit `emphasis` role wins.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        above (Union[int, float]): Highlight values strictly above this.
+        below (Union[int, float]): Highlight values strictly below this.
+        between (Tuple[Union[int, float], Union[int, float]]): Highlight
+            values within `(lo, hi)`, both bounds inclusive.
+        top (int): Highlight the `n` largest values; ties keep input order.
+        bottom (int): Highlight the `n` smallest values; ties keep input order.
+        by (Literal["mean", "median", "min", "max", "sum"]): The summary a
+            group or series is read by. Groups default to `"median"`, series
+            to `"mean"`; a front reading one value per unit rejects it.
+
+    """
+
+    above: Union[int, float]
+    below: Union[int, float]
+    between: Tuple[Union[int, float], Union[int, float]]
+    top: int
+    bottom: int
+    by: Literal["mean", "median", "min", "max", "sum"]
+
+
 class TextSettingAttrs(TypedDict):
     """The text annotation setting, passed to a chart front as `texts`.
 
@@ -1685,12 +1717,14 @@ class HeatmapDataAttrs(TypedDict):
         x (Union[List[Union[str, int, float]], None]): The column labels, one per column of `z`. Defaults to the column indices.
         y (Union[List[Union[str, int, float]], None]): The row labels, one per row of `z`. Defaults to the row indices.
         z (List[List[Union[int, float, None]]]): The 2-D grid of cell values, one row per `y` and one column per `x`.
+        emphasis (Union[List[List[Union[EMPHASIS, str, None]]], None]): The per-cell emphasis roles, aligned with `z` ("background" or "highlight"); wins over the chart's `emphasis_rule`.
 
     """
 
     x: Union[List[Union[str, int, float]], None]
     y: Union[List[Union[str, int, float]], None]
     z: List[List[Union[int, float, None]]]
+    emphasis: Union[List[List[Union[EMPHASIS, str, None]]], None]
 
 
 class HeatmapSingleChartAttrs(TypedDict):

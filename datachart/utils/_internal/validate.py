@@ -206,16 +206,24 @@ def validate_sort_by(sort, sort_by, subtitles: list) -> None:
 # the value each rule reads against: a count of records or a threshold
 EMPHASIS_RULE_COUNTS = ("top", "bottom")
 EMPHASIS_RULE_THRESHOLDS = ("above", "below", "between")
+# how a group or series rule summarises its values into one (ADR 0045)
+EMPHASIS_RULE_SUMMARIES = ("mean", "median", "min", "max", "sum")
 
 
-def validate_emphasis_rule(rule):
-    """Validate an emphasis rule; None means no rule (ADR 0042).
+def validate_emphasis_rule(rule, by: Optional[str] = None):
+    """Validate an emphasis rule; None means no rule (ADR 0042, ADR 0045).
 
     A rule is a one-key dict: `above`/`below` a number (strict), `between`
-    a `(lo, hi)` pair (inclusive), `top`/`bottom` a positive integer.
+    a `(lo, hi)` pair (inclusive), `top`/`bottom` a positive integer. On
+    group and series fronts it may also carry a `by` summary.
+
+    Args:
+        rule: The rule to validate.
+        by: The front's default summary; None when the front reads one value
+            per unit and so rejects a `by` key.
 
     Returns:
-        The `(key, value)` pair of the rule, or None.
+        The `(key, value, by)` triple of the rule, or None.
     """
 
     if rule is None:
@@ -225,6 +233,19 @@ def validate_emphasis_rule(rule):
             f"Invalid `emphasis_rule` value {rule!r}. Must be a one-key dict: "
             f"one of {EMPHASIS_RULE_THRESHOLDS + EMPHASIS_RULE_COUNTS} to a value."
         )
+    if "by" in rule:
+        if by is None:
+            raise ValueError(
+                "`emphasis_rule` `by` summarises a group or series; this chart "
+                "reads one value per record or cell, so it takes no `by`."
+            )
+        if rule["by"] not in EMPHASIS_RULE_SUMMARIES:
+            raise ValueError(
+                f"Invalid `emphasis_rule` `by` value {rule['by']!r}. "
+                f"Must be one of {EMPHASIS_RULE_SUMMARIES}."
+            )
+        by = rule["by"]
+        rule = {key: value for key, value in rule.items() if key != "by"}
     if len(rule) != 1:
         raise ValueError(
             f"`emphasis_rule` takes exactly one key, got {sorted(rule)!r}. "
@@ -258,7 +279,7 @@ def validate_emphasis_rule(rule):
             f"Unknown `emphasis_rule` key `{key}`. "
             f"Must be one of {EMPHASIS_RULE_THRESHOLDS + EMPHASIS_RULE_COUNTS}."
         )
-    return key, value
+    return key, value, by
 
 
 def _is_number(value) -> bool:

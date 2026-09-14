@@ -13,6 +13,7 @@ import math
 import warnings
 from collections import defaultdict
 from datetime import date, datetime, timedelta, tzinfo
+from numbers import Real
 from dataclasses import dataclass
 from itertools import cycle as iter_cycle
 from typing import Callable, List, NamedTuple, Optional, Union
@@ -23,7 +24,7 @@ import matplotlib.dates as mdates
 from matplotlib import rc_context
 import matplotlib.ticker as mticker
 from matplotlib.ticker import MaxNLocator
-from matplotlib.collections import LineCollection, PathCollection
+from matplotlib.collections import LineCollection, PathCollection, PolyCollection
 from matplotlib.container import BarContainer
 from matplotlib.colors import LinearSegmentedColormap, to_hex, to_rgb
 from matplotlib.mlab import GaussianKDE
@@ -2243,6 +2244,21 @@ class ScatterLayer(PointLabelMixin, Layer):
                 self._draw_correlation(ax, x_data, y_data, color=color)
 
 
+def grouped_values(chart: dict) -> dict:
+    """A group chart's values keyed by label, in first-seen label order."""
+
+    label_attr = get_attr_value("label", chart, "label")
+    value_attr = get_attr_value("value", chart, "value")
+    grouped = {}
+    data = chart.get("data", [])
+    if isinstance(data, list):
+        for d in data:
+            lbl, val = d.get(label_attr), d.get(value_attr)
+            if lbl is not None and val is not None:
+                grouped.setdefault(lbl, []).append(val)
+    return grouped
+
+
 class GroupLayer(Layer):
     """A layer of labeled groups placed on the panel's category index."""
 
@@ -2289,16 +2305,7 @@ class GroupLayer(Layer):
     def grouped_values(self) -> dict:
         """The layer's values keyed by label, in first-seen label order."""
 
-        label_attr = get_attr_value("label", self.chart, "label")
-        value_attr = get_attr_value("value", self.chart, "value")
-        grouped = {}
-        data = self.chart.get("data", [])
-        if isinstance(data, list):
-            for d in data:
-                lbl, val = d.get(label_attr), d.get(value_attr)
-                if lbl is not None and val is not None:
-                    grouped.setdefault(lbl, []).append(val)
-        return grouped
+        return grouped_values(self.chart)
 
     def labels(self) -> list:
         return list(self.grouped_values().keys())
@@ -3021,6 +3028,34 @@ def _value_formatter(valfmt):
     return valfmt
 
 
+def heatmap_cell_roles(chart: dict, z: list) -> list:
+    """A copy of the heatmap's per-cell `emphasis` grid, aligned to `z`.
+
+    Absent roles read as a grid of None; a grid of another shape, or a cell
+    role that is not one, raises.
+    """
+
+    roles = chart["data"].get("emphasis") if isinstance(chart["data"], dict) else None
+    if roles is None:
+        return [[None] * len(row) for row in z]
+    shape = [len(row) for row in z]
+    if (
+        not isinstance(roles, list)
+        or [len(row) if isinstance(row, list) else -1 for row in roles] != shape
+    ):
+        raise ValueError(
+            "The heatmap `emphasis` grid must hold one role per cell of `z` "
+            f"({len(z)} rows of {shape[0] if shape else 0})."
+        )
+    return [
+        [
+            validate_emphasis(role, f"heatmap cell ({i}, {j}) `emphasis`")
+            for j, role in enumerate(row)
+        ]
+        for i, row in enumerate(roles)
+    ]
+
+
 class HeatmapLayer(Layer):
     kind = "heatmap"
     # the theme keys the cells, values, and borders read
@@ -3044,6 +3079,8 @@ class HeatmapLayer(Layer):
         self.frame_width = config.get("axes_spines_width") or 0.8
         self._resolve_cell_values()
         x, y, self.z = self._grid()
+        self.cell_roles = heatmap_cell_roles(self.chart, self.z)
+        self.highlight_color = config["font_general_color"]
         self.date_axes = {
             axis
             for axis, labels in (("x", x), ("y", y))
@@ -3093,10 +3130,11 @@ class HeatmapLayer(Layer):
             norm=self.chart.get("norm", None),
             vmin=self.chart.get("vmin", None),
             vmax=self.chart.get("vmax", None),
-            **self.heatmap_style,
+            **self._cell_style(),
         )
         label = self.label(ctx)
         self.register_hover(im, lambda index: self._cell_datum(label, *index))
+        self._draw_cell_emphasis(ax)
 
         if self.show_cell_values:
             self._draw_cell_values(ax, im)
@@ -3127,13 +3165,61 @@ class HeatmapLayer(Layer):
                 if np.isnan(value):
                     continue
                 font_style = dict(self.font_style)
+                # a faded cell is light whatever its value
                 if (
                     self.contrast_values
                     and float(im.norm(value)) > HEATMAP_TEXT_CONTRAST_THRESHOLD
+                    and self.cell_roles[i][j] != EMPHASIS_BACKGROUND
                 ):
                     font_style["color"] = "#FFFFFF"
                 ax.text(
                     j, i, self.cell_text(value), ha="center", va="center", **font_style
+                )
+
+    def _cell_style(self) -> dict:
+        """The image style; background cells fade to the muted alpha (ADR 0045).
+
+        A fade rather than the muted color keeps a muted cell on the colormap
+        and leaves the areas around the picked cells clean.
+        """
+
+        style = self.heatmap_style
+        roles = self.cell_roles
+        if not any(role == EMPHASIS_BACKGROUND for row in roles for role in row):
+            return style
+        alpha = 1.0 if style.get("alpha") is None else style["alpha"]
+        faded = alpha * self.muted_alpha
+        return {
+            **style,
+            "alpha": np.array(
+                [
+                    [faded if role == EMPHASIS_BACKGROUND else alpha for role in row]
+                    for row in roles
+                ]
+            ),
+        }
+
+    def _draw_cell_emphasis(self, ax) -> None:
+        """Outline the highlighted cells in the bolder highlight stroke."""
+
+        width = HIGHLIGHT_WIDTH_SCALE * max(
+            self.edge_style.get("linewidth") or 0, self.frame_width
+        )
+        for i, row in enumerate(self.cell_roles):
+            for j, role in enumerate(row):
+                if role != EMPHASIS_HIGHLIGHT:
+                    continue
+                ax.add_patch(
+                    Rectangle(
+                        (j - 0.5, i - 0.5),
+                        1,
+                        1,
+                        facecolor="none",
+                        edgecolor=self.highlight_color,
+                        linewidth=width,
+                        # over the cell borders, under the cell values
+                        zorder=2,
+                    )
                 )
 
     def _draw_frame(self, ax) -> None:
@@ -3549,6 +3635,10 @@ class HexbinLayer(Layer):
         if self.gridsize is None:
             self.gridsize = get_attr_value("plot_hexbin_gridsize", self.style, config)
         self.mincnt = self.chart.get("mincnt")
+        # bins exist only once drawn, so the rule resolves in draw (ADR 0045)
+        self.emphasis_rule = validate_emphasis_rule(self.settings.get("emphasis_rule"))
+        self.highlight_color = config["font_general_color"]
+        self.frame_width = config.get("axes_spines_width") or 0.8
         # counts need no reducer; `c` defaults to the mean
         self.reduce = None
         self.value_name = "count"
@@ -3615,10 +3705,13 @@ class HexbinLayer(Layer):
             **style,
         )
         label = self.label(ctx)
+        values = tiles.get_array()
+        if self.emphasis_rule is not None:
+            self._apply_bin_emphasis(ax, tiles, values)
 
         def resolve(index):
             cx, cy = tiles.get_offsets()[index[0]]
-            value = _scalar(tiles.get_array()[index[0]])
+            value = _scalar(values[index[0]])
             return {
                 "label": label,
                 "x": _scalar(cx),
@@ -3629,6 +3722,46 @@ class HexbinLayer(Layer):
         self.register_hover(tiles, resolve)
         if self.show_colorbars:
             _draw_colorbar(ax, tiles, self.colorbar, ctx.aspect_locked)
+
+    def _apply_bin_emphasis(self, ax, tiles, values) -> None:
+        """Fade the bins the rule rejects and outline the ones it picks.
+
+        The bin colors are fixed from the colormap first so the fade holds, as
+        a heatmap's muted cells fade; the outlines draw as their own
+        collection so no neighbour covers them.
+        """
+
+        values = np.asarray(values, dtype=float)
+        # an empty count bin holds no points to rank, so it never matches
+        ranked = np.where(values == 0, np.nan, values) if self.c is None else values
+        roles = emphasis_rule_roles(self.emphasis_rule, ranked)
+        background = np.array([role == EMPHASIS_BACKGROUND for role in roles])
+        tiles.autoscale_None()
+        faces = tiles.to_rgba(values)
+        alpha = tiles.get_alpha()
+        faces[:, 3] = 1.0 if alpha is None else alpha
+        faces[background, 3] *= self.muted_alpha
+        tiles.set_array(None)
+        tiles.set_alpha(None)
+        tiles.set_facecolor(faces)
+
+        picked = ~background
+        if not picked.any():
+            return
+        width = HIGHLIGHT_WIDTH_SCALE * max(
+            float(np.max(tiles.get_linewidth())), self.frame_width
+        )
+        outline = PolyCollection(
+            [tiles.get_paths()[0].vertices],
+            offsets=tiles.get_offsets()[picked],
+            offset_transform=tiles.get_offset_transform(),
+            facecolors="none",
+            edgecolors=self.highlight_color,
+            linewidths=width,
+            zorder=tiles.get_zorder() + EMPHASIS_Z_OFFSET[EMPHASIS_HIGHLIGHT],
+        )
+        outline.set_transform(tiles.get_transform())
+        ax.add_collection(outline, autolim=False)
 
 
 class ParallelCoordsLayer(Layer):
@@ -5632,10 +5765,11 @@ def emphasis_rule_roles(rule: tuple, values: list) -> list:
 
     A matching value is highlighted, every other one muted. `above`/`below`
     are strict, `between` inclusive; `top`/`bottom` clamp to the value count
-    and break ties by input order.
+    and break ties by input order. A missing (NaN) value never matches.
     """
 
-    key, bound = rule
+    key, bound, _ = rule
+    values = [float(v) for v in values]
     if key == "above":
         matches = [v > bound for v in values]
     elif key == "below":
@@ -5643,11 +5777,9 @@ def emphasis_rule_roles(rule: tuple, values: list) -> list:
     elif key == "between":
         matches = [bound[0] <= v <= bound[1] for v in values]
     else:
-        order = sorted(
-            range(len(values)),
-            key=(lambda i: -values[i]) if key == "top" else (lambda i: values[i]),
-        )
-        picked = set(order[:bound])
+        sign = -1 if key == "top" else 1
+        present = [i for i, v in enumerate(values) if not math.isnan(v)]
+        picked = set(sorted(present, key=lambda i: sign * values[i])[:bound])
         matches = [i in picked for i in range(len(values))]
     return [EMPHASIS_HIGHLIGHT if m else EMPHASIS_BACKGROUND for m in matches]
 
@@ -5722,46 +5854,246 @@ def _sort_bar_charts(charts: List[dict], sort, sort_by, magnitude: bool) -> List
     return sorted_charts
 
 
-def _apply_emphasis_rule(
-    charts: List[dict], rule: tuple, magnitude: bool
-) -> List[dict]:
-    """The charts with the rule's role written on each record that set none.
+# how a group or series rule summarises its values (ADR 0045)
+EMPHASIS_RULE_SUMMARY_FUNCTIONS = {
+    "mean": np.mean,
+    "median": np.median,
+    "min": np.min,
+    "max": np.max,
+    "sum": np.sum,
+}
 
-    The rule reads every drawn record of the charts as one pool, so a count
-    picks records across the series; an explicit per-record role wins.
+
+def _rule_summary(values, by: str, name: str) -> float:
+    """One number for a unit's values; NaN when it has none to read."""
+
+    if values is None:
+        return math.nan
+    try:
+        values = np.asarray(values, dtype=float).ravel()
+    except (TypeError, ValueError):
+        raise ValueError(
+            f"`emphasis_rule` reads numeric `{name}` values to summarise by "
+            f"`{by}`; got non-numeric ones."
+        ) from None
+    values = values[~np.isnan(values)]
+    if values.size == 0:
+        return math.nan
+    return float(EMPHASIS_RULE_SUMMARY_FUNCTIONS[by](values))
+
+
+def _fill_role(target, key) -> Callable[[str], None]:
+    """A setter writing a rule's role into `target[key]` unless one is set."""
+
+    def fill(role):
+        if target[key] is None:
+            target[key] = role
+
+    return fill
+
+
+def _keep_role(role) -> None:
+    """The setter of a unit whose explicit role wins over the rule."""
+
+
+def _aligned_roles(chart: dict, n: int) -> Optional[list]:
+    """A fillable copy of a chart's `emphasis` list aligned to `n` units.
+
+    None when the chart's role is one string for all of them, or a list the
+    layer will reject for its length; the rule then fills nothing there.
     """
 
-    columns = _bar_record_values(charts, magnitude)
-    values = [value for column in columns for _, value in column]
-    roles = iter(emphasis_rule_roles(rule, values))
-    filled = []
-    for chart in charts:
+    roles = chart.get("emphasis")
+    if roles is None:
+        roles = [None] * n
+    if not isinstance(roles, list) or len(roles) != n:
+        return None
+    chart["emphasis"] = roles = list(roles)
+    return roles
+
+
+def _bar_units(charts: List[dict], settings: dict, by) -> tuple:
+    """One unit per drawn bar record, reading its own `y` (ADR 0042).
+
+    A pyramid's negated left side reads as magnitudes.
+    """
+
+    columns = _bar_record_values(charts, bool(settings.get("pyramid")))
+    filled, units = [], []
+    for chart, column in zip(charts, columns):
         y_key = get_attr_value("y", chart, "y")
-        data = []
-        for record in chart["data"]:
-            if _is_bar_record(record, y_key):
-                role = next(roles)
-                if record.get("emphasis") is None:
-                    record = {**record, "emphasis": role}
-            data.append(record)
+        data = [
+            {"emphasis": None, **r} if _is_bar_record(r, y_key) else r
+            for r in chart["data"]
+        ]
+        records = [r for r in data if _is_bar_record(r, y_key)]
+        units += [
+            (value, _fill_role(record, "emphasis"))
+            for record, (_, value) in zip(records, column)
+        ]
         filled.append({**chart, "data": data})
-    return filled
+    return filled, units
 
 
-def _resolve_bar_records(charts: List[dict], settings: dict) -> List[dict]:
-    """Fill in the emphasis rule, then sort the bar charts' categories (ADR 0042).
+def _series_units(column: str) -> Callable:
+    """The unit builder of a per-series front: each chart, by its `column`."""
 
-    Neither setting reads the other: the rule breaks its ties on input order,
-    so it runs on the unsorted records, and a pyramid's negated left side
-    reads as magnitudes for both.
+    def units(charts: List[dict], settings: dict, by) -> tuple:
+        filled = [{"emphasis": None, **chart} for chart in charts]
+        return filled, [
+            (
+                _rule_summary(get_chart_data(column, chart), by, column),
+                _fill_role(chart, "emphasis"),
+            )
+            for chart in filled
+        ]
+
+    return units
+
+
+def _group_units(charts: List[dict], settings: dict, by) -> tuple:
+    """One unit per group label of each chart, by a summary of its values."""
+
+    filled, units = [dict(chart) for chart in charts], []
+    for chart in filled:
+        grouped = grouped_values(chart)
+        roles = _aligned_roles(chart, len(grouped))
+        for i, values in enumerate(grouped.values()):
+            fill = _keep_role if roles is None else _fill_role(roles, i)
+            units.append((_rule_summary(values, by, "value"), fill))
+    return filled, units
+
+
+def _treemap_record_units(record: dict, inherited, units: list) -> dict:
+    """A copy of a treemap record whose leaves register as rule units.
+
+    A group's explicit role covers its subtree, so its leaves keep it.
     """
 
-    sort = validate_sort(settings.get("sort"))
-    rule = validate_emphasis_rule(settings.get("emphasis_rule"))
-    magnitude = bool(settings.get("pyramid"))
-    if rule is not None:
-        charts = _apply_emphasis_rule(charts, rule, magnitude)
-    return _sort_bar_charts(charts, sort, settings.get("sort_by"), magnitude)
+    record = {"emphasis": None, **record}
+    role = record["emphasis"] or inherited
+    if record.get("children") is None:
+        fill = _fill_role(record, "emphasis") if role is None else _keep_role
+        units.append((record["value"], fill))
+    else:
+        record["children"] = [
+            _treemap_record_units(child, role, units) for child in record["children"]
+        ]
+    return record
+
+
+def _treemap_units(charts: List[dict], settings: dict, by) -> tuple:
+    """One unit per leaf record, by its `value`; groups keep explicit roles."""
+
+    filled, units = [], []
+    for chart in charts:
+        data = chart["data"]
+        records = [_treemap_record_units(r, None, units) for r in data["data"]]
+        filled.append({**chart, "data": {**data, "data": records}})
+    return filled, units
+
+
+def _network_units(charts: List[dict], settings: dict, by) -> tuple:
+    """One unit per node, by its `size`; a node without one raises."""
+
+    filled, units = [], []
+    for chart in charts:
+        data = chart["data"]
+        nodes = data.get("nodes")
+        if nodes is None:
+            nodes = infer_network_nodes(data["edges"])
+        nodes = [{"emphasis": None, **node} for node in nodes]
+        for node in nodes:
+            if node.get("size") is None:
+                raise ValueError(
+                    "`emphasis_rule` reads each node's `size`; node "
+                    f"{node['id']!r} has none."
+                )
+            units.append((node["size"], _fill_role(node, "emphasis")))
+        filled.append({**chart, "data": {**data, "nodes": nodes}})
+    return filled, units
+
+
+def _parallel_units(charts: List[dict], settings: dict, by) -> tuple:
+    """One unit per data row, by its numeric `hue` value."""
+
+    filled, units = [dict(chart) for chart in charts], []
+    for chart in filled:
+        hue = chart.get("hue")
+        if hue is None:
+            raise ValueError(
+                "`emphasis_rule` reads each row's `hue` value; pass `hue` "
+                "naming a numeric column."
+            )
+        rows = chart.get("data") or []
+        roles = _aligned_roles(chart, len(rows))
+        for i, row in enumerate(rows):
+            value = row.get(hue)
+            if not isinstance(value, Real) or isinstance(value, bool):
+                raise ValueError(
+                    f"`emphasis_rule` reads each row's `{hue}` value as a "
+                    f"number; row {i} has {value!r}."
+                )
+            fill = _keep_role if roles is None else _fill_role(roles, i)
+            units.append((value, fill))
+    return filled, units
+
+
+def _heatmap_units(charts: List[dict], settings: dict, by) -> tuple:
+    """One unit per cell, by its value; a blank cell never matches."""
+
+    filled, units = [], []
+    for chart in charts:
+        z = get_chart_grid(chart, "heatmap", dtype=object)[2]
+        roles = heatmap_cell_roles(chart, z)
+        for i, row in enumerate(z):
+            for j, value in enumerate(row):
+                # a blank cell draws nothing to mute
+                if value is None or math.isnan(value):
+                    units.append((math.nan, _keep_role))
+                else:
+                    units.append((value, _fill_role(roles[i], j)))
+        filled.append({**chart, "data": {**chart["data"], "emphasis": roles}})
+    return filled, units
+
+
+# per front: a rule's unit builder and default `by` (ADR 0045)
+EMPHASIS_RULE_UNITS = {
+    "barchart": (_bar_units, None),
+    "pyramidchart": (_bar_units, None),
+    "radialchart": (_bar_units, None),
+    "treemap": (_treemap_units, None),
+    "networkchart": (_network_units, None),
+    "parallelcoords": (_parallel_units, None),
+    "heatmap": (_heatmap_units, None),
+    "boxplot": (_group_units, "median"),
+    "violinplot": (_group_units, "median"),
+    "swarmplot": (_group_units, "median"),
+    "raincloudplot": (_group_units, "median"),
+    "linechart": (_series_units("y"), "mean"),
+    "scatterchart": (_series_units("y"), "mean"),
+    "stackedareachart": (_series_units("y"), "mean"),
+    "histogram": (_series_units("x"), "mean"),
+    "contourchart": (_series_units("z"), "mean"),
+}
+
+
+def apply_emphasis_rule(chart_type: str, charts: List[dict], settings: dict) -> list:
+    """The charts with the rule's role written on each unit that set none.
+
+    The rule reads every unit of the charts as one pool, so a count picks
+    units across the series and subplots; an explicit role wins.
+    """
+
+    units_of, by = EMPHASIS_RULE_UNITS[chart_type]
+    rule = validate_emphasis_rule(settings.get("emphasis_rule"), by)
+    if rule is None:
+        return charts
+    charts, units = units_of(charts, settings, rule[2])
+    roles = emphasis_rule_roles(rule, [value for value, _ in units])
+    for (_, fill), role in zip(units, roles):
+        fill(role)
+    return charts
 
 
 # the fronts whose records carry a value per category and sort by it
@@ -5771,14 +6103,25 @@ BAR_RECORD_CHARTS = ("barchart", "pyramidchart")
 def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[Layer]:
     """Build the layers for a chart front; style resolution happens here."""
 
+    visual = settings.get("radial_type") or RADIAL_TYPE.LINE
+    bar_records = chart_type in BAR_RECORD_CHARTS or (
+        chart_type == "radialchart" and visual == RADIAL_TYPE.BAR
+    )
+    if chart_type in EMPHASIS_RULE_UNITS and (
+        chart_type != "radialchart" or bar_records
+    ):
+        # the rule breaks ties on input order, so it runs before the sort
+        charts = apply_emphasis_rule(chart_type, charts, settings)
+    if bar_records:
+        charts = _sort_bar_charts(
+            charts,
+            validate_sort(settings.get("sort")),
+            settings.get("sort_by"),
+            bool(settings.get("pyramid")),
+        )
+
     if chart_type == "parallelcoords":
         return [ParallelCoordsLayer(list(charts), settings)]
-
-    visual = settings.get("radial_type") or RADIAL_TYPE.LINE
-    if chart_type in BAR_RECORD_CHARTS or (
-        chart_type == "radialchart" and visual == RADIAL_TYPE.BAR
-    ):
-        charts = _resolve_bar_records(charts, settings)
 
     if chart_type == "radialchart":
         if visual not in RADIAL_LAYER_TYPES:

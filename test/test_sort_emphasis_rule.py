@@ -69,7 +69,27 @@ class TestValidateEmphasisRule:
     )
     def test_valid_shapes(self, rule):
         key, value = next(iter(rule.items()))
-        assert validate_emphasis_rule(rule) == (key, value)
+        assert validate_emphasis_rule(rule) == (key, value, None)
+
+    def test_by_defaults_on_summary_fronts(self):
+        assert validate_emphasis_rule({"top": 1}, by="median") == ("top", 1, "median")
+
+    @pytest.mark.parametrize("by", ["mean", "median", "min", "max", "sum"])
+    def test_by_overrides_the_default(self, by):
+        rule = {"above": 2, "by": by}
+        assert validate_emphasis_rule(rule, by="mean") == ("above", 2, by)
+
+    def test_by_on_a_record_front_raises(self):
+        with pytest.raises(ValueError, match="`by`"):
+            validate_emphasis_rule({"top": 1, "by": "max"})
+
+    def test_unknown_by_raises(self):
+        with pytest.raises(ValueError, match="`by`"):
+            validate_emphasis_rule({"top": 1, "by": "mode"}, by="mean")
+
+    def test_by_alone_is_no_rule(self):
+        with pytest.raises(ValueError, match="one key"):
+            validate_emphasis_rule({"by": "max"}, by="mean")
 
     def test_not_a_dict(self):
         with pytest.raises(ValueError, match="one-key dict"):
@@ -103,6 +123,27 @@ class TestValidateEmphasisRule:
     def test_between_needs_two_bounds(self):
         with pytest.raises(ValueError, match="between"):
             validate_emphasis_rule({"between": (1,)})
+
+
+class TestRuleRolesMissingValues:
+    def test_nan_never_matches_a_threshold(self):
+        rule = validate_emphasis_rule({"below": 10})
+        assert emphasis_rule_roles(rule, [1.0, float("nan")]) == [
+            "highlight",
+            "background",
+        ]
+
+    def test_nan_ranks_last(self):
+        rule = validate_emphasis_rule({"bottom": 1})
+        assert emphasis_rule_roles(rule, [float("nan"), 3.0]) == [
+            "background",
+            "highlight",
+        ]
+        rule = validate_emphasis_rule({"top": 1})
+        assert emphasis_rule_roles(rule, [float("nan"), 3.0]) == [
+            "background",
+            "highlight",
+        ]
 
 
 class TestRuleRoles:

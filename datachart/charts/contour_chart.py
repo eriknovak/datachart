@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    EmphasisRuleAttrs,
     LegendSettingAttrs,
     ContourDataAttrs,
     ContourStyleAttrs,
@@ -40,6 +41,7 @@ def ContourChart(
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: Optional[Union[EMPHASIS, str, List[Optional[str]]]] = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     xmin: Optional[Union[int, float, datetime]] = None,
     xmax: Optional[Union[int, float, datetime]] = None,
@@ -137,6 +139,7 @@ def ContourChart(
         The `legend` parameter, and the `label`, `location`, `format`, and
         `ticks` fields of the `colorbar` setting.
         The `vspans` and `hspans` reference bands.
+        The `emphasis_rule` parameter.
 
     Examples:
         >>> from datachart.charts import ContourChart
@@ -170,6 +173,13 @@ def ContourChart(
             bolds it and brings it to the front, None leaves it unchanged.
             Not supported for filled contours: passing a value with
             `filled=True` raises `ValueError`.
+        emphasis_rule: A rule that highlights the line contours matching it and
+            mutes the rest: `{"above": v}` or `{"below": v}` (strict),
+            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
+            `{"bottom": n}`, read against a summary of each contour's own `z`
+            values, chosen by `by`: `"mean"` (default), `"median"`, `"min"`,
+            `"max"`, or `"sum"`. An explicit `emphasis` role wins, and a count
+            ranks across every contour. See `EmphasisRuleAttrs`.
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -224,6 +234,12 @@ def ContourChart(
         The figure containing the contour chart.
 
     """
+    if filled and emphasis_rule is not None:
+        raise ValueError(
+            "ContourChart does not support `emphasis_rule` when `filled=True`: "
+            "filled bands take the colormap, not a series color to mute or "
+            "highlight. Use line contours instead."
+        )
     roles = emphasis if isinstance(emphasis, list) else [emphasis]
     if filled and any(role is not None for role in roles):
         raise ValueError(
@@ -259,6 +275,7 @@ def ContourChart(
 
     # Figure-level settings; None values resolve to defaults downstream
     settings = {
+        "emphasis_rule": emphasis_rule,
         "title": title,
         "xlabel": xlabel,
         "ylabel": ylabel,

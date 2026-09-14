@@ -9,6 +9,7 @@ from ..utils._internal.validate import (
     validate_network_records,
 )
 from ..typings import (
+    EmphasisRuleAttrs,
     NetworkSingleChartAttrs,
     NetworkStyleAttrs,
     TextSettingAttrs,
@@ -34,6 +35,7 @@ def NetworkChart(
     title: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: None = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
@@ -70,6 +72,7 @@ def NetworkChart(
     !!! info "Added in Unreleased"
 
         The `legend` parameter.
+        The `emphasis_rule` parameter.
 
     Examples:
         >>> from datachart.charts import NetworkChart
@@ -122,6 +125,12 @@ def NetworkChart(
         subtitle: The subtitle(s) for individual charts.
         emphasis: Not supported: emphasis is set per node through its
             `emphasis` key. Passing a value raises `ValueError`.
+        emphasis_rule: A rule that highlights the nodes matching it and mutes
+            the rest: `{"above": v}` or `{"below": v}` (strict),
+            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
+            `{"bottom": n}`, read against each node's `size`; a node without one
+            raises. A node's own `emphasis` key wins. The rule takes no `by`.
+            See `EmphasisRuleAttrs`.
         figsize: The size of the figure.
         subplots: Whether to show each chart in its own subplot; several
             charts always split into subplots.
@@ -173,6 +182,7 @@ def NetworkChart(
 
     # Figure-level settings; None values resolve to defaults downstream
     settings = {
+        "emphasis_rule": emphasis_rule,
         "title": title,
         "figsize": figsize,
         "subplots": subplots,
