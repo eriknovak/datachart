@@ -14,10 +14,15 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
 from matplotlib.colors import to_hex
+from matplotlib.legend import Legend
 
 from datachart.charts import (
     BarChart,
     BoxPlot,
+    CalendarHeatmap,
+    ContourChart,
+    Heatmap,
+    HexbinChart,
     RidgelinePlot,
     ViolinPlot,
     Histogram,
@@ -375,6 +380,96 @@ class TestQuillTheme(unittest.TestCase):
             config.set_theme(config.load_theme(path))
         loaded = png(LineChart([LINE, LINE_2])) + png(BarChart(bars))
         self.assertEqual(native, loaded)
+
+
+VALUE_ETCH = {
+    "washes": ["#F3E7CB", "#E2D1A6", "#D3BF90", "#C1A874", "#A88C52"],
+    "hatches": ["", ".", "..", "//", "xx"],
+}
+GRID = {"z": [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]]}
+
+
+def step_collections(ax):
+    return [c for c in ax.collections if c.get_gid() == "value-step"]
+
+
+class TestValueEtch(unittest.TestCase):
+    def setUp(self):
+        config.update_config({"plot_etch": ETCH, "plot_value_etch": VALUE_ETCH})
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_off_by_default(self):
+        config.set_theme(THEME.DEFAULT)
+        self.assertIsNone(config["plot_value_etch"])
+        figure = Heatmap(GRID, show_colorbars=True)
+        self.assertFalse(step_collections(figure.axes[0]))
+        self.assertEqual(len(figure.axes), 2)
+
+    def test_needs_the_etch(self):
+        config.update_config({"plot_etch": None})
+        figure = Heatmap(GRID, show_colorbars=True)
+        self.assertFalse(step_collections(figure.axes[0]))
+
+    def test_heatmap_cells_draw_as_steps_with_a_step_legend(self):
+        figure = Heatmap(GRID, show_colorbars=True, colorbar={"label": "Score"})
+        ax = figure.axes[0]
+        self.assertEqual(len(figure.axes), 1)
+        steps = step_collections(ax)
+        self.assertEqual(len(steps), 5)
+        self.assertEqual(sum(len(c.get_paths()) for c in steps), 9)
+        self.assertEqual([c.get_hatch() for c in steps], [None, ".", "..", "//", "xx"])
+        legends = [a for a in ax.artists if isinstance(a, Legend)]
+        (legend,) = legends
+        self.assertEqual(legend.get_title().get_text(), "Score")
+        self.assertEqual(len(legend.get_texts()), 5)
+        self.assertEqual(legend.get_texts()[0].get_text(), "0 – 1.6")
+        png(figure)
+
+    def test_no_legend_without_colorbars(self):
+        figure = Heatmap(GRID, show_colorbars=False)
+        self.assertTrue(step_collections(figure.axes[0]))
+        self.assertFalse([a for a in figure.axes[0].artists if isinstance(a, Legend)])
+
+    def test_cell_values_sit_on_a_cartouche(self):
+        figure = Heatmap(GRID, show_heatmap_values=True)
+        text = figure.axes[0].texts[-1]
+        self.assertIsNotNone(text.get_bbox_patch())
+
+    def test_calendar_and_hexbin_draw_steps(self):
+        from datetime import date, timedelta
+
+        days = [date(2024, 1, 1) + timedelta(days=i) for i in range(40)]
+        calendar = CalendarHeatmap(
+            {"date": days, "value": list(range(40))},
+            show_colorbars=True,
+        )
+        self.assertTrue(step_collections(calendar.axes[0]))
+        rng = np.random.default_rng(1)
+        hexbin = HexbinChart(
+            {"x": list(rng.normal(size=300)), "y": list(rng.normal(size=300))},
+            show_colorbars=True,
+        )
+        self.assertTrue(step_collections(hexbin.axes[0]))
+        self.assertEqual(len(hexbin.axes), 1)
+        png(calendar)
+        png(hexbin)
+
+    def test_filled_contour_is_a_relief_map(self):
+        x = np.linspace(-2, 2, 30)
+        z = [[float(np.exp(-(a * a + b * b))) for a in x] for b in x]
+        figure = ContourChart(
+            {"x": list(x), "y": list(x), "z": z}, filled=True, show_colorbars=True
+        )
+        ax = figure.axes[0]
+        self.assertTrue(step_collections(ax))
+        self.assertEqual(len(figure.axes), 1)
+        self.assertTrue(ax.texts, "level labels")
+        (legend,) = [a for a in ax.artists if isinstance(a, Legend)]
+        self.assertLessEqual(len(legend.get_texts()), 5)
+        png(figure)
 
 
 class _RecordingRenderer:

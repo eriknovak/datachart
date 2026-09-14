@@ -86,6 +86,8 @@ from .config_helpers import (
     get_bump_style,
     get_etch,
     get_ink_stroke,
+    get_legend_style,
+    get_value_etch,
     get_sketch_halo,
     get_stackedarea_style,
     get_sankey_style,
@@ -390,6 +392,10 @@ HEATMAP_TEXT_CONTRAST_THRESHOLD = 0.55
 CONTOUR_LINE_CMAP_START = 0.3
 # the cmap sample that stands in for a cmap-colored contour in the legend
 CONTOUR_SWATCH = 0.7
+# value steps (ADR 0048): the legend swatch outline, and the clear box a cell
+# value sits on over the etching
+STEP_LEGEND_EDGE_WIDTH = 0.8
+STEP_VALUE_CARTOUCHE = {"boxstyle": "round,pad=0.15", "edgecolor": "none", "alpha": 0.85}
 
 
 # ================================================
@@ -1226,6 +1232,9 @@ class Layer:
         self.ink_stroke = get_ink_stroke(self.style)
         self.etch = get_etch(self.style)
         self.ground = config.get("axes_facecolor") or "#FFFFFF"
+        # a value scale drawn in etched steps; only with the etch on
+        self.value_steps = get_value_etch(self.style) if self.etch else None
+        self.legend_family = resolve_font_family()
         self._resolve_style()
 
     def _resolve_emphasis(self, value):
@@ -1420,13 +1429,70 @@ class Layer:
 
         if self.etch is None:
             return
-        options = {**self.etch, "ground": self.ground}
-        if not wash:
-            options["wash"] = None
-        effect = Etch(**options)
+        effect = self._etch_effect(self.etch.get("wash") if wash else None)
         for artist in artists:
             if artist is not None:
                 artist.set_path_effects([effect])
+
+    def _etch_effect(self, wash: Optional[float]) -> "Etch":
+        return Etch(**{**self.etch, "wash": wash, "ground": self.ground})
+
+    def _draw_value_steps(
+        self, ax, steps: np.ndarray, collection_for: Callable, zorder: float
+    ) -> None:
+        """One etched collection per value step, built for the marks at `steps == k`."""
+
+        effect = self._etch_effect(1.0)
+        for k, (wash, hatch) in enumerate(self.value_steps):
+            mask = steps == k
+            if not mask.any():
+                continue
+            collection = collection_for(mask)
+            collection.set(
+                facecolor=wash,
+                edgecolor="none",
+                linewidth=0,
+                hatch=hatch or None,
+                zorder=zorder,
+                gid="value-step",
+                path_effects=[effect],
+            )
+            ax.add_collection(collection, autolim=False)
+
+    def _draw_step_legend(self, ax, entries: list, title: Optional[str]) -> None:
+        """A legend of `(step, label)` entries beside the axes, in place of a colorbar.
+
+        Added as an artist, so a panel legend on the same axes keeps it.
+        """
+
+        effect = self._etch_effect(1.0)
+        handles = [
+            Patch(
+                facecolor=self.value_steps[k][0],
+                edgecolor=self.etch["color"],
+                linewidth=STEP_LEGEND_EDGE_WIDTH,
+                hatch=self.value_steps[k][1] or None,
+                path_effects=[effect],
+            )
+            for k, _ in entries
+        ]
+        style = get_legend_style({"location": LEGEND_LOCATION.OUTSIDE_RIGHT})
+        style["title"] = title or None
+        legend = Legend(ax, handles, [label for _, label in entries], **style)
+        for text in legend.get_texts() + [legend.get_title()]:
+            text.set_fontfamily(self.legend_family)
+        ax.add_artist(legend)
+        _defer_legend_fit(
+            ax, lambda renderer: _fit_outside_legend(legend, [ax], renderer)
+        )
+
+    def _draw_even_step_legend(self, ax, norm, title: Optional[str]) -> None:
+        """The step legend of a normalized value scale: one entry per even step."""
+
+        n = len(self.value_steps)
+        edges = norm.inverse(np.linspace(0, 1, n + 1))
+        entries = [(k, _step_label(edges[k], edges[k + 1])) for k in range(n)]
+        self._draw_step_legend(ax, entries, title)
 
     @staticmethod
     def _merge_color(color_key: str, ctx_color: Optional[str], style: dict) -> dict:
@@ -3805,6 +3871,8 @@ class HeatmapLayer(Layer):
         )
         label = self.label(ctx)
         self.register_hover(im, lambda index: self._cell_datum(label, *index))
+        if self.value_steps:
+            self._draw_cell_steps(ax, im)
         self._draw_cell_emphasis(ax)
 
         if self.show_cell_values:
@@ -3813,10 +3881,28 @@ class HeatmapLayer(Layer):
         if self.edge_style.get("linewidth"):
             self._draw_cell_borders(ax, len(data), len(data[0]))
 
-        if self.show_colorbars:
+        if self.show_colorbars and self.value_steps:
+            self._draw_even_step_legend(ax, im.norm, self.colorbar["label"])
+        elif self.show_colorbars:
             _draw_colorbar(ax, im, self.colorbar, ctx.aspect_locked)
 
         self._draw_frame(ax)
+
+    def _draw_cell_steps(self, ax, im) -> None:
+        """The cells as etched value steps over the image, left clear for hover."""
+
+        im.autoscale_None()
+        values = np.asarray(self.z, dtype=float)
+        steps = value_steps(im.norm(np.ma.masked_invalid(values)), len(self.value_steps))
+        rows, cols = np.indices(values.shape)
+        squares = np.array([[-0.5, -0.5], [0.5, -0.5], [0.5, 0.5], [-0.5, 0.5]])
+
+        def cells(mask):
+            centres = np.column_stack([cols[mask], rows[mask]])
+            return PolyCollection([squares + centre for centre in centres])
+
+        self._draw_value_steps(ax, steps, cells, im.get_zorder())
+        im.set_alpha(0)
 
     def _cell_datum(self, label, row, col) -> dict:
         """The hover datum of a cell: the indices the tick labels name."""
@@ -3843,6 +3929,10 @@ class HeatmapLayer(Layer):
                     and self.cell_roles[i][j] != EMPHASIS_BACKGROUND
                 ):
                     font_style["color"] = "#FFFFFF"
+                if self.value_steps:
+                    # a value sits on a clear cartouche, never fighting the etching
+                    font_style["color"] = self.font_style.get("color")
+                    font_style["bbox"] = {**STEP_VALUE_CARTOUCHE, "facecolor": self.ground}
                 ax.text(
                     j, i, self.cell_text(value), ha="center", va="center", **font_style
                 )
@@ -4229,10 +4319,61 @@ class ContourLayer(Layer):
             # a legend proxy: the contour set itself carries no legend handle
             ax.fill_between([], [], [], color=self.cmap(CONTOUR_SWATCH), label=label)
             self.register_hover(bands, self._level_resolver(bands, label))
-            if self.show_colorbars:
+            if self.value_steps:
+                self._draw_relief(ax, ctx, bands)
+            elif self.show_colorbars:
                 _draw_colorbar(ax, bands, self.colorbar, ctx.aspect_locked)
             return
+        self._draw_lines(ax, ctx, self.show_labels, legend_proxy=True)
 
+    def _draw_relief(self, ax, ctx, bands) -> None:
+        """Filled bands as a relief map: etched steps, then labelled level lines.
+
+        A band takes the step of its middle value on the level range; the
+        legend merges consecutive bands that share a step.
+        """
+
+        levels = np.asarray(bands.levels, dtype=float)
+        span = (levels[-1] - levels[0]) or 1.0
+        middles = (levels[:-1] + levels[1:]) / 2
+        n = len(self.value_steps)
+        steps = value_steps((middles - levels[0]) / span, n)
+        paths = bands.get_paths()
+
+        def band_paths(mask):
+            return PathCollection(
+                [paths[i] for i in np.flatnonzero(mask)], transform=bands.get_transform()
+            )
+
+        self._draw_value_steps(ax, steps, band_paths, bands.get_zorder())
+        bands.set_alpha(0)
+        self._draw_lines(ax, ctx, True, legend_proxy=False)
+        if not self.show_colorbars:
+            return
+        entries = []
+        for k, low, high in zip(steps, levels[:-1], levels[1:]):
+            if entries and entries[-1][0] == k:
+                entries[-1][2] = high
+            else:
+                entries.append([k, low, high])
+        self._draw_step_legend(
+            ax,
+            [(k, _step_label(low, high)) for k, low, high in entries],
+            self.colorbar["label"],
+        )
+
+    def _draw_lines(self, ax, ctx, show_labels, legend_proxy: bool) -> None:
+        """The level lines, optionally labelled, with a legend proxy."""
+
+        style = dict(self.contour_style)
+        if ctx.z_order is not None:
+            style["zorder"] = ctx.z_order
+        scaling = {
+            "norm": self.chart.get("norm", None),
+            "vmin": self.chart.get("vmin", None),
+            "vmax": self.chart.get("vmax", None),
+        }
+        label = self.label(ctx)
         # a pinned line color beats the cmap; a muted background beats both
         by_level = (
             self.line_cmap is not None
@@ -4251,15 +4392,16 @@ class ContourLayer(Layer):
             self.x, self.y, self.z, levels=self.levels, **palette, **style
         )
         self.register_hover(lines, self._level_resolver(lines, label))
-        ax.plot(
-            [],
-            [],
-            color=color,
-            linewidth=style["linewidths"],
-            linestyle=style["linestyles"],
-            label=label,
-        )
-        if self.show_labels:
+        if legend_proxy:
+            ax.plot(
+                [],
+                [],
+                color=color,
+                linewidth=style["linewidths"],
+                linestyle=style["linestyles"],
+                label=label,
+            )
+        if show_labels:
             label_style = dict(self.label_style)
             fmt = _value_formatter(self.chart.get("valfmt"))
             if fmt is not None:
@@ -4391,6 +4533,8 @@ class HexbinLayer(Layer):
         values = tiles.get_array()
         if self.emphasis_rule is not None:
             self._apply_bin_emphasis(ax, tiles, values)
+        if self.value_steps:
+            self._draw_bin_steps(ax, tiles, values)
 
         def resolve(index):
             cx, cy = tiles.get_offsets()[index[0]]
@@ -4403,8 +4547,31 @@ class HexbinLayer(Layer):
             }
 
         self.register_hover(tiles, resolve)
-        if self.show_colorbars:
+        if self.show_colorbars and self.value_steps:
+            self._draw_even_step_legend(ax, tiles.norm, self.colorbar["label"])
+        elif self.show_colorbars:
             _draw_colorbar(ax, tiles, self.colorbar, ctx.aspect_locked)
+
+    def _draw_bin_steps(self, ax, tiles, values) -> None:
+        """The bins as etched value steps under their outlines."""
+
+        tiles.autoscale_None()
+        steps = value_steps(tiles.norm(values), len(self.value_steps))
+        hexagon = tiles.get_paths()[0].vertices
+        offsets = tiles.get_offsets()
+
+        def bins(mask):
+            collection = PolyCollection(
+                [hexagon],
+                offsets=offsets[mask],
+                offset_transform=tiles.get_offset_transform(),
+            )
+            collection.set_transform(tiles.get_transform())
+            return collection
+
+        self._draw_value_steps(ax, steps, bins, tiles.get_zorder() - 0.01)
+        tiles.set_array(None)
+        tiles.set_facecolor("none")
 
     def _apply_bin_emphasis(self, ax, tiles, values) -> None:
         """Fade the bins the rule rejects and outline the ones it picks.
@@ -5379,10 +5546,8 @@ class Etch(patheffects.AbstractPathEffect):
     repeated character is denser), but each line is drawn on its own with a
     small jitter in spacing and angle, so the renderer's sketch wobble reaches
     it; `.` stipples. Under the lines lies a `wash` of the face color over
-    the `ground` (`None`: no fill). A path without a hatch draws as it is.
-
-    `steps` switches to the value mode: the face's darkness picks one of the
-    `(wash, hatch)` steps, so a colormap reads as wash and etch density.
+    the `ground` (`None`: no fill; 1: the face itself). A path without a
+    hatch draws as it is.
     """
 
     def __init__(
@@ -5394,8 +5559,6 @@ class Etch(patheffects.AbstractPathEffect):
         wash: Optional[float] = 0.1,
         color: str = "#000000",
         ground: str = "#FFFFFF",
-        steps: Optional[list] = None,
-        hatch: Optional[str] = None,
     ):
         super().__init__()
         self.spacing = spacing
@@ -5405,9 +5568,6 @@ class Etch(patheffects.AbstractPathEffect):
         self.wash = wash
         self.color = to_rgb(color)
         self.ground = np.asarray(to_rgb(ground))
-        self.steps = steps
-        # a fixed pattern for the paths whose gc carries no hatch
-        self.hatch = hatch
 
     def _stipples(self, bbox, char, count, rng, spacing_px) -> tuple:
         spacing = max(spacing_px * ETCH_STIPPLE_SPREAD / count, ETCH_MIN_STIPPLE)
@@ -5459,11 +5619,7 @@ class Etch(patheffects.AbstractPathEffect):
     def _pattern(self, gc, face) -> tuple:
         """The `(hatch, wash color)` of a path; the hatch is empty when unetched."""
 
-        if self.steps is not None:
-            level = value_step(face, len(self.steps))
-            wash, hatch = self.steps[level]
-            return hatch, np.asarray(to_rgb(wash))
-        hatch = self.hatch or gc.get_hatch()
+        hatch = gc.get_hatch()
         if not hatch or self.wash is None:
             return hatch, None
         return hatch, (1 - self.wash) * self.ground + self.wash * face
@@ -5516,11 +5672,18 @@ class Etch(patheffects.AbstractPathEffect):
             outline.restore()
 
 
-def value_step(face, n: int) -> int:
-    """The step, 0 (lightest) to `n - 1`, a face color's darkness falls in."""
+def value_steps(normed, n: int) -> np.ndarray:
+    """The step, 0 to `n - 1`, of each value normalized to [0, 1]; -1 where missing."""
 
-    luminance = float(np.dot(np.asarray(to_rgb(face))[:3], (0.2126, 0.7152, 0.0722)))
-    return int(np.clip((1 - luminance) * (n - 1e-3), 0, n - 1))
+    normed = np.ma.masked_invalid(np.ma.asarray(normed, dtype=float))
+    steps = np.clip(np.floor(normed.filled(0.0) * n), 0, n - 1).astype(int)
+    return np.where(np.ma.getmaskarray(normed), -1, steps)
+
+
+def _step_label(low, high) -> str:
+    """A value step's range, each end to three significant digits."""
+
+    return " – ".join(f"{float(f'{value:.3g}'):g}" for value in (low, high))
 
 
 def _value_label_font(style: dict) -> dict:

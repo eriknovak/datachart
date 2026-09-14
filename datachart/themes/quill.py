@@ -73,6 +73,11 @@ QUILL_THEME: StyleAttrs = make_theme(
             "wash": 0.1,
             "color": INK,
         },
+        # a value scale reads as wash darkness plus etch density
+        "plot_value_etch": {
+            "washes": [PARCHMENT, "#E2D1A6", "#D3BF90", "#C1A874", "#A88C52"],
+            "hatches": ["", ".", "..", "//", "xx"],
+        },
         "plot_legend_label_color": INK,
         "plot_legend_font_size": 9,
         "plot_legend_title_size": 10,

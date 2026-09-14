@@ -378,6 +378,23 @@ def get_etch(chart_style: dict) -> Optional[dict]:
     return dict(etch) if etch else None
 
 
+def get_value_etch(chart_style: dict) -> Optional[list]:
+    """The `(wash, hatch)` steps a value scale draws in (ADR 0048).
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The steps, lightest first, or None when off.
+
+    """
+
+    steps = get_attr_value("plot_value_etch", chart_style, config)
+    if not steps:
+        return None
+    return list(zip(steps["washes"], steps["hatches"]))
+
+
 # -------------------------------------
 # Stacked Area Style
 # -------------------------------------

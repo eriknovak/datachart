@@ -1113,11 +1113,19 @@ class InkStyleAttrs(TypedDict):
             of the face color laid over the axes face under the lines; fills
             under lines take none), `color` (the etch ink). `None` keeps
             matplotlib's hatch.
+        plot_value_etch (Union[Dict[str, List[str]], None]): The steps a value
+            scale draws in when `plot_etch` is on: `washes` (one fill color per
+            step, lightest first) and `hatches` (one pattern per step, sparsest
+            first). Heatmap, calendar heatmap and hexbin cells and filled
+            contour bands take the step their value falls in, a filled contour
+            draws its level lines and labels over the bands, and a legend of
+            the steps replaces the colorbar. `None` keeps the colormap.
 
     """
 
     plot_ink_stroke: Union[Dict[str, float], None]
     plot_etch: Union[Dict[str, Union[float, str, None]], None]
+    plot_value_etch: Union[Dict[str, List[str]], None]
 
 
 class StyleAttrs(
