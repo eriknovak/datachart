@@ -25,7 +25,6 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "axes_spines_left_visible": False,
         "axes_spines_bottom_visible": False,
         "axes_ticks_length": 0,
-        "chart_default_show_values": True,
         "plot_grid_color": "#EFEFEF",
         "plot_grid_alpha": 1.0,
         "plot_bar_alpha": 1.0,

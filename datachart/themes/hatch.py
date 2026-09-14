@@ -25,7 +25,6 @@ HATCH_THEME: StyleAttrs = make_theme(
             "Liberation Sans",
             "DejaVu Sans",
         ],
-        "chart_default_show_values": True,
         "plot_hatch_cycle": ["", "//", ".."],
         "plot_grid_color": "#D0D0D0",
         "plot_grid_linestyle": LINE_STYLE.DOTTED,
@@ -49,7 +48,7 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_violin_edgecolor": "#000000",
     }
 )
-"""The hatch theme: hatch cycle, value labels, dotted grid.
+"""The hatch theme: hatch cycle, black edges, dotted grid.
 
 !!! info "Added in v0.8.0"
 """
