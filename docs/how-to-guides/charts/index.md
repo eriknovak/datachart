@@ -33,6 +33,7 @@ The spread of the values within each group, from a binned summary to every obser
 | [Violin Plot](violinplot.ipynb)               | The showcase of the violin plot.             |
 | [Swarm Plot](swarmplot.ipynb)                 | The showcase of the swarm plot.              |
 | [Raincloud Plot](raincloudplot.ipynb)         | The showcase of the raincloud plot.          |
+| [Ridgeline Plot](ridgelineplot.ipynb)         | The showcase of the ridgeline plot.          |
 
 ## Relationships
 

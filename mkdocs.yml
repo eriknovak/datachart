@@ -117,6 +117,7 @@ plugins:
         datachart is a Python data visualization package built on matplotlib.
         It provides simple chart functions (BarChart, LineChart, StackedAreaChart, BumpChart, ScatterChart,
         Histogram, Heatmap, ContourChart, HexbinChart, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot,
+        RidgelinePlot,
         ParallelCoords, PyramidChart, RadialChart, CalendarHeatmap, SankeyChart, NetworkChart,
         Treemap), figure
         composition via Panel (overlaying charts on shared axes) and Grid
@@ -144,6 +145,7 @@ plugins:
           - how-to-guides/charts/violinplot.ipynb: Violin plot input attributes, inner marks, bandwidth, split violins, date labels, composing violins with box and swarm plots, and subplots.
           - how-to-guides/charts/swarmplot.ipynb: Swarm plot input attributes, swarm and strip modes, date labels, emphasis, overlaying box and violin plots with Panel, multiple datasets, and saving.
           - how-to-guides/charts/raincloudplot.ipynb: Raincloud plot input attributes, the cloud, rain, and box parts and their styles, bandwidth, rain modes, orientation, date labels, emphasis, subplots, composing with Panel and Grid, and saving.
+          - how-to-guides/charts/ridgelineplot.ipynb: Ridgeline plot input attributes, ridge style, row overlap, per-row and common density scales, inner median and quartile marks, fill and outline, sorting rows by median, bandwidth, the shared value range, orientation, emphasis, reference lines, subplots, composing with Panel and Grid, and saving.
           - how-to-guides/charts/scatterchart.ipynb: Scatter chart input attributes, single and multiple datasets, customization, datetime axes, and saving.
           - how-to-guides/charts/heatmap.ipynb: Heatmap input attributes, single and multiple datasets, customization, date labels, and saving.
           - how-to-guides/charts/contourchart.ipynb: Contour chart input attributes, iso-lines and filled bands, colorbars, inline labels, level rules, datetime axes, emphasis, multiple surfaces, composing with Panel and Grid, and saving.
@@ -218,6 +220,7 @@ nav:
       - Violin Plot: how-to-guides/charts/violinplot.ipynb
       - Swarm Plot: how-to-guides/charts/swarmplot.ipynb
       - Raincloud Plot: how-to-guides/charts/raincloudplot.ipynb
+      - Ridgeline Plot: how-to-guides/charts/ridgelineplot.ipynb
       # relationships
       - Scatter Chart: how-to-guides/charts/scatterchart.ipynb
       - Heatmap: how-to-guides/charts/heatmap.ipynb
