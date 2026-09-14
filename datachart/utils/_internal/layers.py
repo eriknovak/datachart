@@ -199,6 +199,9 @@ POINT_LABEL_SPOTS_VERTICAL = (
     ("left", "top", 0, -1),
     ("right", "top", 0, -1),
 )
+# a raincloud's extremes sit past their points along the value axis, clear of
+# the box whiskers beside the rain (ADR 0033)
+POINT_LABEL_SPOTS_HORIZONTAL = POINT_LABEL_SPOTS[:2]
 # the widest correlation readout, for reserving its corner box
 CORRELATION_BOX_TEXT = "r = -0.000"
 # the correlation readout's corner, in axes fractions
@@ -2569,6 +2572,14 @@ class SwarmLayer(PointLabelMixin, GroupLayer):
         super()._resolve_style()
         self._resolve_value_labels()
         self._init_point_labels()
+        # a raincloud's box prints the median, so its rain labels the extremes
+        self.label_median = self.settings.get("label_median", True)
+        if not self.label_median:
+            self.label_spots = (
+                POINT_LABEL_SPOTS_HORIZONTAL
+                if self.is_horizontal
+                else POINT_LABEL_SPOTS_VERTICAL
+            )
         self.mode = self.settings.get("mode") or DEFAULT_SWARM_MODE
         if self.mode not in (SWARM_MODE.SWARM, SWARM_MODE.STRIP):
             raise ValueError(
@@ -2732,14 +2743,12 @@ class SwarmLayer(PointLabelMixin, GroupLayer):
         labelled = np.full(len(values), None, dtype=object)
         if len(values) == 0:
             return labelled
-        median = float(np.median(values))
         lowest, highest = int(np.argmin(values)), int(np.argmax(values))
-        nearest = int(np.argmin(np.abs(values - median)))
-        for index, value in (
-            (nearest, median),
-            (lowest, values[lowest]),
-            (highest, values[highest]),
-        ):
+        marks = [(lowest, values[lowest]), (highest, values[highest])]
+        if self.label_median:
+            median = float(np.median(values))
+            marks.insert(0, (int(np.argmin(np.abs(values - median))), median))
+        for index, value in marks:
             labelled[index] = _format_value(self.value_format, value)
         return labelled
         order = np.argsort(values, kind="stable")
@@ -6212,7 +6221,7 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
         chart,
         {
             **settings,
-            # a raincloud prints its box median only (ADR 0033)
+            # the box prints the median and the rain the extremes (ADR 0033)
             "show_values": False,
             "inner": None,
             "split": None,
@@ -6226,7 +6235,7 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
         chart,
         {
             **settings,
-            "show_values": False,
+            "label_median": False,
             "offset": -RAINCLOUD_RAIN_OFFSET,
             "spread": RAINCLOUD_RAIN_SPREAD,
             "side": -1,

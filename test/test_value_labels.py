@@ -275,11 +275,22 @@ class TestSwarm(ValueLabelCase):
 
 
 class TestRaincloud(ValueLabelCase):
-    def test_labels_only_the_box_median(self):
+    def test_box_labels_the_median(self):
         figure = RaincloudPlot(GROUPS, show_values=True)
         ax = figure.axes[0]
-        self.assertEqual(texts(ax), ["3", "20"])
-        self.assertEqual(tuple(labels(ax)[1].xy), (2.0, 20.0))
+        medians = [t for t in labels(ax) if t.get_text() in ("3", "20")]
+        self.assertEqual([tuple(t.xy) for t in medians], [(1.0, 3.0), (2.0, 20.0)])
+
+    def test_rain_labels_min_and_max_only(self):
+        figure = RaincloudPlot(GROUPS, show_values=True)
+        ax = figure.axes[0]
+        self.assertEqual(
+            sorted(texts(ax), key=float), ["1", "3", "5", "10", "20", "30"]
+        )
+        points = packed_points(ax)
+        for label in labels(ax):
+            if label.get_text() not in ("3", "20"):
+                self.assertIn(tuple(label.xy), points)
 
     def test_horizontal_and_format(self):
         figure = RaincloudPlot(
@@ -289,8 +300,11 @@ class TestRaincloud(ValueLabelCase):
             orientation=ORIENTATION.HORIZONTAL,
         )
         ax = figure.axes[0]
-        self.assertEqual(texts(ax), ["3.0", "20.0"])
-        self.assertEqual(tuple(labels(ax)[1].xy), (20.0, 2.0))
+        self.assertEqual(
+            sorted(texts(ax), key=float), ["1.0", "3.0", "5.0", "10.0", "20.0", "30.0"]
+        )
+        median = next(t for t in labels(ax) if t.get_text() == "20.0")
+        self.assertEqual(tuple(median.xy), (20.0, 2.0))
 
 
 class TestThemeDefault(ValueLabelCase):
@@ -315,9 +329,9 @@ class TestThemeDefault(ValueLabelCase):
         for front in self.FRONTS:
             self.assertFalse(labels(front().axes[0]))
 
-    def test_labelling_theme_labels_a_raincloud_median_only(self):
+    def test_labelling_theme_labels_a_raincloud_range(self):
         config.set_theme(THEME.MINIMAL)
-        self.assertEqual(texts(RaincloudPlot(GROUPS).axes[0]), ["3", "20"])
+        self.assertEqual(len(texts(RaincloudPlot(GROUPS).axes[0])), 6)
 
     def test_point_labels_win_over_the_theme_default(self):
         config.set_theme(THEME.MINIMAL)
@@ -348,7 +362,7 @@ class TestComposition(ValueLabelCase):
         rain = RaincloudPlot(GROUPS, show_values=True)
         figure = Grid([[swarm, rain]])
         self.assertEqual(len(labels(figure.axes[0])), 6)
-        self.assertEqual(texts(figure.axes[1]), ["3", "20"])
+        self.assertEqual(len(texts(figure.axes[1])), 6)
 
 
 if __name__ == "__main__":

@@ -184,8 +184,8 @@ def RaincloudPlot(
             `LegendSettingAttrs`.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_outliers: Whether the box shows outliers.
-        show_values: Whether to print each group's median beside its box; the
-            cloud and the rain carry no values.
+        show_values: Whether to print each group's median beside its box, and
+            its minimum and maximum beside the rain points holding them.
         value_format: Format string for the value labels: a `VALUE_FORMAT`
             constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
         mode: How the rain spreads across its width. See `SWARM_MODE`:
