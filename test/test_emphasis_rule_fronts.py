@@ -10,10 +10,13 @@ from datachart.charts import (
     BoxPlot,
     RaincloudPlot,
     SwarmPlot,
+    Treemap,
     ViolinPlot,
     ContourChart,
     Histogram,
     LineChart,
+    NetworkChart,
+    ParallelCoords,
     ScatterChart,
     StackedAreaChart,
 )
@@ -163,3 +166,117 @@ class TestGroupFronts:
         boxes = [p for p in ax.patches if hasattr(p, "get_path")]
         muted = config["muted_alpha"]
         assert [box.get_alpha() == muted for box in boxes] == [True, True, False]
+
+
+TREE = {
+    "data": [
+        {"label": "a", "value": 5.0},
+        {
+            "label": "g",
+            "children": [
+                {"label": "b", "value": 9.0},
+                {"label": "c", "value": 1.0},
+            ],
+        },
+        {
+            "label": "h",
+            "emphasis": BG,
+            "children": [{"label": "d", "value": 20.0}],
+        },
+    ]
+}
+
+
+def leaf_roles(records):
+    roles = {}
+    for record in records:
+        if record.get("children") is None:
+            roles[record["label"]] = record.get("emphasis")
+        else:
+            roles.update(leaf_roles(record["children"]))
+    return roles
+
+
+class TestRecordFronts:
+    def test_treemap_reads_leaf_values(self):
+        figure = Treemap(TREE, emphasis_rule={"top": 2})
+        records = layers(figure)[0].records
+        # d ranks first but keeps its group's explicit role
+        assert leaf_roles(records) == {"a": BG, "b": HL, "c": BG, "d": None}
+
+    def test_treemap_groups_keep_their_roles(self):
+        records = layers(Treemap(TREE, emphasis_rule={"top": 2}))[0].records
+        assert [r.get("emphasis") for r in records] == [BG, None, BG]
+
+    def test_treemap_explicit_leaf_role_wins(self):
+        tree = {
+            "data": [
+                {"label": "a", "value": 1.0, "emphasis": HL},
+                {"label": "b", "value": 2.0},
+            ]
+        }
+        records = layers(Treemap(tree, emphasis_rule={"top": 1}))[0].records
+        assert leaf_roles(records) == {"a": HL, "b": HL}
+
+    def test_treemap_rejects_by(self):
+        with pytest.raises(ValueError, match="`by`"):
+            Treemap(TREE, emphasis_rule={"top": 1, "by": "sum"})
+
+    def test_treemap_input_is_not_mutated(self):
+        tree = {"data": [{"label": "a", "value": 1.0}]}
+        Treemap(tree, emphasis_rule={"top": 1})
+        assert tree == {"data": [{"label": "a", "value": 1.0}]}
+
+    def test_network_reads_node_size(self):
+        network = {
+            "nodes": [
+                {"id": "a", "size": 1.0},
+                {"id": "b", "size": 9.0},
+                {"id": "c", "size": 4.0},
+            ],
+            "edges": [{"source": "a", "target": "b"}, {"source": "b", "target": "c"}],
+        }
+        layer = layers(NetworkChart(network, emphasis_rule={"above": 2}))[0]
+        assert [node["emphasis"] for node in layer.nodes] == [BG, HL, HL]
+        assert layer.muted == [True, False, False]
+
+    def test_network_node_without_size_raises(self):
+        network = {
+            "nodes": [{"id": "a", "size": 1.0}, {"id": "b"}],
+            "edges": [{"source": "a", "target": "b"}],
+        }
+        with pytest.raises(ValueError, match="size"):
+            NetworkChart(network, emphasis_rule={"top": 1})
+
+    def test_network_inferred_nodes_raise(self):
+        network = {"edges": [{"source": "a", "target": "b"}]}
+        with pytest.raises(ValueError, match="size"):
+            NetworkChart(network, emphasis_rule={"top": 1})
+
+    ROWS = [
+        {"p": 1.0, "q": 2.0, "score": 3.0},
+        {"p": 2.0, "q": 1.0, "score": 7.0},
+        {"p": 3.0, "q": 3.0, "score": 5.0},
+    ]
+
+    def test_parallel_reads_hue(self):
+        figure = ParallelCoords(self.ROWS, hue="score", emphasis_rule={"top": 2})
+        assert layers(figure)[0].row_emphasis == [BG, HL, HL]
+
+    def test_parallel_explicit_row_role_wins(self):
+        figure = ParallelCoords(
+            self.ROWS,
+            hue="score",
+            emphasis=[HL, None, None],
+            emphasis_rule={"top": 1},
+        )
+        assert layers(figure)[0].row_emphasis == [HL, HL, BG]
+
+    def test_parallel_without_hue_raises(self):
+        with pytest.raises(ValueError, match="hue"):
+            ParallelCoords(self.ROWS, emphasis_rule={"top": 1})
+
+    def test_parallel_non_numeric_hue_raises(self):
+        rows = [dict(row, kind="x") for row in self.ROWS]
+        with pytest.raises(ValueError, match="number"):
+            ParallelCoords(rows, hue="kind", emphasis_rule={"top": 1})

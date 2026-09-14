@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    EmphasisRuleAttrs,
     LegendSettingAttrs,
     BarDataPointAttrs,
     BarStyleAttrs,
@@ -56,7 +57,7 @@ def BarChart(
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
     sort: Optional[Union[SORT, str]] = None,
     sort_by: Optional[str] = None,
-    emphasis_rule: Optional[dict] = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
@@ -187,7 +188,7 @@ def BarChart(
             and mutes the rest: `{"above": v}` or `{"below": v}` (strict),
             `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
             `{"bottom": n}`. Reads each bar's own value; a record's own
-            `emphasis` key wins over the rule.
+            `emphasis` key wins over the rule. See `EmphasisRuleAttrs`.
         orientation: The orientation of the bars ("vertical" or "horizontal").
             See `ORIENTATION`.
         scalex: The x-axis scale ("linear", "log", "symlog", "asinh"). Useful

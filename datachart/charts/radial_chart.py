@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    EmphasisRuleAttrs,
     LegendSettingAttrs,
     RadialDataPointAttrs,
     LineStyleAttrs,
@@ -68,7 +69,7 @@ def RadialChart(
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
     sort: Optional[Union[SORT, str]] = None,
     sort_by: Optional[str] = None,
-    emphasis_rule: Optional[dict] = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     num_bins: Optional[int] = None,
     startangle: Optional[Union[str, int, float]] = None,
     direction: Optional[Union[DIRECTION, str]] = None,
