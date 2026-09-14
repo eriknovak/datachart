@@ -21,7 +21,7 @@ from datachart.charts import (
     ViolinPlot,
 )
 from datachart.config import config
-from datachart.constants import ORIENTATION, SWARM_MODE, THEME, VALUE_FORMAT
+from datachart.constants import ORIENTATION, SWARM_MODE, VALUE_FORMAT
 from datachart.themes import DEFAULT_THEME
 from datachart.utils import Grid, Panel
 
@@ -320,7 +320,7 @@ class TestThemeDefault(ValueLabelCase):
     )
 
     def test_labelling_theme_labels_every_front(self):
-        config.set_theme(THEME.MINIMAL)
+        config.update_config({"chart_default_show_values": True})
         for front in self.FRONTS:
             self.assertTrue(labels(front().axes[0]))
             self.assertFalse(labels(front(show_values=False).axes[0]))
@@ -330,11 +330,11 @@ class TestThemeDefault(ValueLabelCase):
             self.assertFalse(labels(front().axes[0]))
 
     def test_labelling_theme_labels_a_raincloud_range(self):
-        config.set_theme(THEME.MINIMAL)
+        config.update_config({"chart_default_show_values": True})
         self.assertEqual(len(texts(RaincloudPlot(GROUPS).axes[0])), 6)
 
     def test_point_labels_win_over_the_theme_default(self):
-        config.set_theme(THEME.MINIMAL)
+        config.update_config({"chart_default_show_values": True})
         figure = ScatterChart(NAMED, label="name")
         self.assertEqual(texts(figure.axes[0]), ["p0", "p1", "p2"])
 

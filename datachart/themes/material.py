@@ -23,7 +23,6 @@ MATERIAL_THEME: StyleAttrs = make_theme(
         "axes_spines_top_visible": False,
         "axes_spines_right_visible": False,
         "axes_spines_left_visible": False,
-        "chart_default_show_values": True,
         "plot_grid_color": "#E0E0E0",
         "plot_grid_alpha": 1.0,
         "plot_grid_linewidth": 0.8,

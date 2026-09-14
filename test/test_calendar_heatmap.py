@@ -308,7 +308,7 @@ class TestCalendarFront(unittest.TestCase):
         self.assertEqual([t.get_text() for t in fmt.axes[0].texts], ["1.0", "2.0"])
 
     def test_theme_value_default_applies(self):
-        config.set_theme(THEME.MINIMAL)
+        config.update_config({"chart_default_show_values": True})
         figure = calendar(date(2024, 1, 1), 2)
         self.assertEqual(len(figure.axes[0].texts), 2)
 

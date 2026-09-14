@@ -50,16 +50,31 @@ class TestThemeDefaults(unittest.TestCase):
         figure = Heatmap(HEAT)
         self.assertFalse(grid_visible(figure.axes[0], "y"))
 
+    def test_predefined_themes_leave_values_off(self):
+        """No predefined theme turns value labels on by default."""
+        for theme in [
+            THEME.DEFAULT,
+            THEME.GREYSCALE,
+            THEME.INK,
+            THEME.HATCH,
+            THEME.MINIMAL,
+            THEME.MATERIAL,
+            THEME.SKETCH,
+        ]:
+            config.set_theme(theme)
+            figure = BarChart(BAR)
+            self.assertEqual(list(figure.axes[0].texts), [], theme)
+
     def test_theme_show_values_default_applies(self):
-        """Themes shipping `chart_default_show_values` label bars by default."""
-        config.set_theme(THEME.MINIMAL)
+        """A theme shipping `chart_default_show_values` labels bars by default."""
+        config.update_config({"chart_default_show_values": True})
         figure = BarChart(BAR)
         labels = [text.get_text() for text in figure.axes[0].texts]
         self.assertEqual(labels, ["3", "5", "4"])
 
     def test_explicit_show_values_wins(self):
         """`show_values=False` beats the theme's on-by-default."""
-        config.set_theme(THEME.MINIMAL)
+        config.update_config({"chart_default_show_values": True})
         figure = BarChart(BAR, show_values=False)
         self.assertEqual(list(figure.axes[0].texts), [])
 

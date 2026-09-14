@@ -8,7 +8,7 @@ Attributes:
     DEFAULT_THEME (datachart.typings.StyleAttrs): The default theme style.
     GREYSCALE_THEME (datachart.typings.StyleAttrs): The greyscale theme style.
     INK_THEME (datachart.typings.StyleAttrs): The ink theme style (dark-ink accents, print-ready).
-    HATCH_THEME (datachart.typings.StyleAttrs): The hatch theme style (hatch cycle, value labels, dotted grid).
+    HATCH_THEME (datachart.typings.StyleAttrs): The hatch theme style (hatch cycle, black edges, dotted grid).
     MINIMAL_THEME (datachart.typings.StyleAttrs): The minimal theme style (accent blue, no spines, flat bars).
     MATERIAL_THEME (datachart.typings.StyleAttrs): The material theme style (Google palette, light grid).
     SKETCH_THEME (datachart.typings.StyleAttrs): The sketch theme style (hand-drawn, xkcd-style wobble and halo, Comic Neue font).
