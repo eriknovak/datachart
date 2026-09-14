@@ -11,7 +11,7 @@ The `themes` module contains the predefined style themes that are used to visual
 | `DEFAULT_THEME`   | The default theme style. **TYPE:** `StyleAttrs`                                                          |
 | `GREYSCALE_THEME` | The greyscale theme style. **TYPE:** `StyleAttrs`                                                        |
 | `INK_THEME`       | The ink theme style (dark-ink accents, print-ready). **TYPE:** `StyleAttrs`                              |
-| `HATCH_THEME`     | The hatch theme style (hatch cycle, value labels, dotted grid). **TYPE:** `StyleAttrs`                   |
+| `HATCH_THEME`     | The hatch theme style (hatch cycle, black edges, dotted grid). **TYPE:** `StyleAttrs`                    |
 | `MINIMAL_THEME`   | The minimal theme style (accent blue, no spines, flat bars). **TYPE:** `StyleAttrs`                      |
 | `MATERIAL_THEME`  | The material theme style (Google palette, light grid). **TYPE:** `StyleAttrs`                            |
 | `SKETCH_THEME`    | The sketch theme style (hand-drawn, xkcd-style wobble and halo, Comic Neue font). **TYPE:** `StyleAttrs` |
@@ -155,7 +155,6 @@ HATCH_THEME: StyleAttrs = make_theme(
             "Liberation Sans",
             "DejaVu Sans",
         ],
-        "chart_default_show_values": True,
         "plot_hatch_cycle": ["", "//", ".."],
         "plot_grid_color": "#D0D0D0",
         "plot_grid_linestyle": LINE_STYLE.DOTTED,
@@ -181,7 +180,7 @@ HATCH_THEME: StyleAttrs = make_theme(
 )
 ```
 
-The hatch theme: hatch cycle, value labels, dotted grid.
+The hatch theme: hatch cycle, black edges, dotted grid.
 
 Added in v0.8.0
 
@@ -211,7 +210,6 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "axes_spines_left_visible": False,
         "axes_spines_bottom_visible": False,
         "axes_ticks_length": 0,
-        "chart_default_show_values": True,
         "plot_grid_color": "#EFEFEF",
         "plot_grid_alpha": 1.0,
         "plot_bar_alpha": 1.0,
@@ -264,7 +262,6 @@ MATERIAL_THEME: StyleAttrs = make_theme(
         "axes_spines_top_visible": False,
         "axes_spines_right_visible": False,
         "axes_spines_left_visible": False,
-        "chart_default_show_values": True,
         "plot_grid_color": "#E0E0E0",
         "plot_grid_alpha": 1.0,
         "plot_grid_linewidth": 0.8,

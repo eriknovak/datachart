@@ -9,16 +9,16 @@ This gallery renders the same suite of example charts — the basic chart types 
 | [`THEME.INK`](#ink)             | Diversified YlGnBu palette with navy ink accents.          |
 | [`THEME.MINIMAL`](#minimal)     | Accent blue with deep grays, no spines, flat bars.         |
 | [`THEME.MATERIAL`](#material)   | Google palette, bottom spine only, light grid.             |
-| [`THEME.HATCH`](#hatch)         | Hatch cycle, black edges, dotted grid, value labels.       |
+| [`THEME.HATCH`](#hatch)         | Hatch cycle, black edges, dotted grid.                     |
 | [`THEME.SKETCH`](#sketch)       | Hand-drawn wobble and halo, Comic Neue font, no grid.      |
 
-Themes also carry *defaults for chart settings*: every theme but `SKETCH` shows a muted y-grid unless a chart call sets `show_grid` itself, `MINIMAL`, `MATERIAL`, and `HATCH` label bar values by default, and `HATCH` hatches bar series via its hatch cycle — which is why the very same chart code below renders with grids, value labels, and hatches that differ per theme. An explicit setting always wins.
+Themes also carry *defaults for chart settings*: every theme but `SKETCH` shows a muted y-grid unless a chart call sets `show_grid` itself, and `HATCH` hatches bar series via its hatch cycle — which is why the very same chart code below renders with grids and hatches that differ per theme. No predefined theme turns value labels on; the tiles that print values ask for them with `show_values`. An explicit setting always wins.
 
-The small-multiples example is itself a `Grid`; grid figures nest inside `Grid`, so it takes one cell of each theme's composition grid.
+The small-multiples example is itself a `Grid`; grid figures nest inside `Grid`, so it takes one cell of each theme's composition grid. The calendar heatmap is wide by nature, so it spans two columns of its group's grid.
 
 The sample data shared by every theme suite is defined in a hidden cell.
 
-Each theme section opens with the one call that selects it; the whole suite is then built by one function (in a hidden cell), so every theme renders the exact same chart code — grids, value labels, and hatches come from the theme's own defaults. `pair` supplies the two accent colors used where a chart styles lines explicitly (trend/forecast/walk examples). Intermediate figures that only exist to feed a `Panel` are closed as we go, so only the group grids are displayed. The small-multiples `Grid` nests as one composition cell and rebuilds its own layout there; the nested charts on the block's edges keep their y-axes inline with the gallery column's axes.
+Each theme section opens with the one call that selects it; the whole suite is then built by one function (in a hidden cell), so every theme renders the exact same chart code — grids and hatches come from the theme's own defaults. `pair` supplies the two accent colors used where a chart styles lines explicitly (trend/forecast/walk examples). Intermediate figures that only exist to feed a `Panel` are closed as we go, so only the group grids are displayed. The small-multiples `Grid` nests as one composition cell and rebuilds its own layout there; the nested charts on the block's edges keep their y-axes inline with the gallery column's axes.
 
 ## Default
 
@@ -97,7 +97,7 @@ config.set_theme(THEME.INK)
 
 ## Minimal
 
-Accent blue with deep grays, no spines or tick marks, flat bars — and bar value labels on by default.
+Accent blue with deep grays, no spines or tick marks, flat bars.
 
 Selected with [`THEME.MINIMAL`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MINIMAL_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MINIMAL_THEME).
 
@@ -122,7 +122,7 @@ config.set_theme(THEME.MINIMAL)
 
 ## Material
 
-The Google palette with a bottom spine only and a light solid grid; value labels default to on.
+The Google palette with a bottom spine only and a light solid grid.
 
 Selected with [`THEME.MATERIAL`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MATERIAL_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MATERIAL_THEME).
 
