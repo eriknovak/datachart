@@ -1219,16 +1219,19 @@ class Layer:
         # a bare layer strokes its values with its own label halo
         self.value_font.pop("path_effects")
 
-    def _value_texts(self, ax, values, along_y: bool = False) -> np.ndarray:
+    def _value_texts(
+        self, ax, values, along_y: bool = False, span_pt=None
+    ) -> np.ndarray:
         """One formatted value per mark, `None` where the step skips it.
 
         Without a `value_step` the step keeps the widest label from meeting
-        its neighbours along the series axis, so a dense series stays legible.
+        its neighbours along the series axis (or `span_pt` of it), so a dense
+        series stays legible.
         """
 
         texts = [_format_value(self.value_format, v) for v in values]
         step = self.value_step or _default_value_step(
-            ax, texts, self.value_font["fontsize"], along_y
+            ax, texts, self.value_font["fontsize"], along_y, span_pt
         )
         return np.array(
             [t if i % step == 0 else None for i, t in enumerate(texts)], dtype=object
@@ -2736,22 +2739,13 @@ class SwarmLayer(PointLabelMixin, GroupLayer):
         if len(values) == 0:
             return labelled
         order = np.argsort(values, kind="stable")
-        texts = [_format_value(self.value_format, v) for v in values[order]]
-        step = self.value_step
-        if step is None:
-            # a vertical label stack takes the text height, a horizontal one its width
-            along = 0 if self.is_horizontal else 1
-            ends = np.zeros((2, 2))
-            ends[:, along] = values[order[[0, -1]]]
-            span_px = np.ptp(ax.transData.transform(ends)[:, along])
-            span_pt = span_px * 72.0 / ax.figure.dpi
-            fontsize = self.value_font["fontsize"]
-            extent = max(_text_size(fontsize, t)[along] for t in texts)
-            fits = int(span_pt // (extent + 2 * POINT_LABEL_PAD)) + 1
-            step = math.ceil(len(texts) / fits)
-        for rank, i in enumerate(order):
-            if rank % step == 0:
-                labelled[i] = texts[rank]
+        along = 0 if self.is_horizontal else 1
+        ends = np.zeros((2, 2))
+        ends[:, along] = values[order[[0, -1]]]
+        span_px = np.ptp(ax.transData.transform(ends)[:, along])
+        labelled[order] = self._value_texts(
+            ax, values[order], not self.is_horizontal, span_px * 72.0 / ax.figure.dpi
+        )
         return labelled
 
 
@@ -4622,8 +4616,13 @@ def _format_value(value_format, value) -> str:
     return value_format % (value,)
 
 
-def _default_value_step(ax, texts: list, fontsize, along_y: bool = False) -> int:
-    """Every Nth mark, so the widest label fits between neighbours along the axes."""
+def _default_value_step(
+    ax, texts: list, fontsize, along_y: bool = False, span_pt=None
+) -> int:
+    """Every Nth mark, so the widest label fits between neighbours along the axes.
+
+    `span_pt` narrows the stretch the labels share from the whole axes.
+    """
 
     fig_w, fig_h = ax.figure.get_size_inches()
     pos = ax.get_position()
@@ -4633,6 +4632,8 @@ def _default_value_step(ax, texts: list, fontsize, along_y: bool = False) -> int
     else:
         axis_pt = fig_w * pos.width * 72
         widest = max(_text_size(fontsize, t)[0] for t in texts)
+    if span_pt is not None:
+        axis_pt = span_pt
     fits = max(int(axis_pt // (widest + 2 * POINT_LABEL_PAD)), 1)
     return max(1, math.ceil(len(texts) / fits))
 
@@ -6210,16 +6211,12 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
     falls on the low side.
     """
 
-    # a raincloud prints its box median only (ADR 0033)
-    unlabelled = {
-        k: v
-        for k, v in settings.items()
-        if k not in ("show_values", "value_format", "value_step")
-    }
     cloud = ViolinLayer(
         chart,
         {
-            **unlabelled,
+            **settings,
+            # a raincloud prints its box median only (ADR 0033)
+            "show_values": False,
             "inner": None,
             "split": None,
             "side": 1,
@@ -6231,7 +6228,8 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
     rain = SwarmLayer(
         chart,
         {
-            **unlabelled,
+            **settings,
+            "show_values": False,
             "offset": -RAINCLOUD_RAIN_OFFSET,
             "spread": RAINCLOUD_RAIN_SPREAD,
             "side": -1,
