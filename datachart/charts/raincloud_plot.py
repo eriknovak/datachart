@@ -52,6 +52,8 @@ def RaincloudPlot(
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_outliers: Optional[bool] = True,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     mode: Union[SWARM_MODE, str] = SWARM_MODE.SWARM,
     jitter: float = 0.4,
     bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
@@ -133,6 +135,7 @@ def RaincloudPlot(
         The `legend` parameter.
         The `vspans` and `hspans` reference bands.
         The `emphasis_rule` parameter.
+        The `show_values` and `value_format` parameters.
 
     Examples:
         >>> from datachart.charts import RaincloudPlot
@@ -181,6 +184,10 @@ def RaincloudPlot(
             `LegendSettingAttrs`.
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_outliers: Whether the box shows outliers.
+        show_values: Whether to print each group's median beside its box; the
+            cloud and the rain carry no values.
+        value_format: Format string for the value labels: a `VALUE_FORMAT`
+            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
         mode: How the rain spreads across its width. See `SWARM_MODE`:
             "swarm" packs the points so none overlap; "strip" jitters them
             uniformly.
@@ -258,6 +265,8 @@ def RaincloudPlot(
         "legend": legend,
         "show_grid": show_grid,
         "show_outliers": show_outliers,
+        "show_values": show_values,
+        "value_format": value_format,
         "aspect_ratio": aspect_ratio,
         "subplots": subplots,
         "max_cols": max_cols,

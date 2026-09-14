@@ -14,12 +14,14 @@ from datachart.charts import (
     BoxPlot,
     Histogram,
     LineChart,
+    RaincloudPlot,
     ScatterChart,
     StackedAreaChart,
+    SwarmPlot,
     ViolinPlot,
 )
 from datachart.config import config
-from datachart.constants import ORIENTATION, THEME, VALUE_FORMAT
+from datachart.constants import ORIENTATION, SWARM_MODE, THEME, VALUE_FORMAT
 from datachart.themes import DEFAULT_THEME
 from datachart.utils import Grid, Panel
 
@@ -38,6 +40,11 @@ GROUPS = [
     {"label": lab, "value": float(v)}
     for lab, values in {"A": [1, 2, 3, 4, 5], "B": [10, 20, 30]}.items()
     for v in values
+]
+# 200 normal draws in one group: too many to label every point
+DENSE = [
+    {"label": "A", "value": float(v)}
+    for v in np.random.default_rng(0).normal(10, 2, 200)
 ]
 
 
@@ -196,6 +203,100 @@ class TestFronts(ValueLabelCase):
         self.assertEqual(len(labels(figure.axes[0])), len(LINE))
 
 
+def packed_points(ax):
+    """Every swarm point's final (x, y), from the drawn collections."""
+
+    return {tuple(xy) for c in ax.collections for xy in np.asarray(c.get_offsets())}
+
+
+class TestSwarm(ValueLabelCase):
+    def test_labels_each_point_at_its_packed_position(self):
+        figure = SwarmPlot(GROUPS, show_values=True, value_step=1)
+        ax = figure.axes[0]
+        self.assertEqual(
+            sorted(texts(ax)), sorted(["1", "2", "3", "4", "5", "10", "20", "30"])
+        )
+        points = packed_points(ax)
+        for label in labels(ax):
+            self.assertIn(tuple(label.xy), points)
+
+    def test_labels_follow_the_packing(self):
+        tied = [{"label": "A", "value": 5.0}] * 3 + [{"label": "A", "value": 50.0}]
+        figure = SwarmPlot(tied, show_values=True, value_step=1)
+        xs = [label.xy[0] for label in labels(figure.axes[0])]
+        # tied values spread off the category center; so do their labels
+        self.assertGreater(len(set(np.round(xs, 6))), 1)
+
+    def test_default_step_labels_a_subset_of_a_dense_group(self):
+        figure = SwarmPlot(DENSE, show_values=True)
+        count = len(labels(figure.axes[0]))
+        self.assertGreater(count, 5)
+        self.assertLess(count, 60)
+
+    def test_default_step_is_per_group(self):
+        sparse = [{"label": "B", "value": v} for v in (0.0, 20.0)]
+        figure = SwarmPlot(DENSE + sparse, show_values=True)
+        self.assertEqual(texts(figure.axes[0])[-2:], ["0", "20"])
+
+    def test_value_step_steps_along_the_value_axis(self):
+        figure = SwarmPlot(DENSE, show_values=True, value_step=50)
+        values = sorted(p["value"] for p in DENSE)
+        self.assertEqual(
+            sorted(texts(figure.axes[0]), key=float),
+            [f"{values[i]:g}" for i in (0, 50, 100, 150)],
+        )
+
+    def test_value_format_applies(self):
+        figure = SwarmPlot(GROUPS, show_values=True, value_format=VALUE_FORMAT.DECIMAL)
+        self.assertIn("1.0", texts(figure.axes[0]))
+
+    def test_strip_and_horizontal(self):
+        for kwargs in (
+            {"mode": SWARM_MODE.STRIP},
+            {"orientation": ORIENTATION.HORIZONTAL},
+            {"mode": SWARM_MODE.STRIP, "orientation": ORIENTATION.HORIZONTAL},
+        ):
+            figure = SwarmPlot(GROUPS, show_values=True, value_step=1, **kwargs)
+            ax = figure.axes[0]
+            self.assertEqual(len(labels(ax)), len(GROUPS), kwargs)
+            points = packed_points(ax)
+            for label in labels(ax):
+                self.assertIn(tuple(label.xy), points)
+
+    def test_horizontal_labels_carry_the_value_on_x(self):
+        figure = SwarmPlot(GROUPS, show_values=True, orientation=ORIENTATION.HORIZONTAL)
+        for label in labels(figure.axes[0]):
+            self.assertEqual(f"{label.xy[0]:g}", label.get_text())
+
+    def test_headroom_keeps_labels_inside(self):
+        bare = SwarmPlot(GROUPS).axes[0].get_ylim()[1]
+        labelled = SwarmPlot(GROUPS, show_values=True).axes[0].get_ylim()[1]
+        self.assertGreater(labelled, bare)
+
+    def test_background_group_carries_no_labels(self):
+        figure = SwarmPlot(GROUPS, show_values=True, emphasis=["background", None])
+        self.assertEqual(sorted(texts(figure.axes[0])), ["10", "20", "30"])
+
+
+class TestRaincloud(ValueLabelCase):
+    def test_labels_only_the_box_median(self):
+        figure = RaincloudPlot(GROUPS, show_values=True)
+        ax = figure.axes[0]
+        self.assertEqual(texts(ax), ["3", "20"])
+        self.assertEqual(tuple(labels(ax)[1].xy), (2.0, 20.0))
+
+    def test_horizontal_and_format(self):
+        figure = RaincloudPlot(
+            GROUPS,
+            show_values=True,
+            value_format=VALUE_FORMAT.DECIMAL,
+            orientation=ORIENTATION.HORIZONTAL,
+        )
+        ax = figure.axes[0]
+        self.assertEqual(texts(ax), ["3.0", "20.0"])
+        self.assertEqual(tuple(labels(ax)[1].xy), (20.0, 2.0))
+
+
 class TestThemeDefault(ValueLabelCase):
     FRONTS = (
         lambda **kw: LineChart(LINE, **kw),
@@ -204,6 +305,8 @@ class TestThemeDefault(ValueLabelCase):
         lambda **kw: StackedAreaChart(STACK, **kw),
         lambda **kw: BoxPlot(GROUPS, **kw),
         lambda **kw: ViolinPlot(GROUPS, **kw),
+        lambda **kw: SwarmPlot(GROUPS, **kw),
+        lambda **kw: RaincloudPlot(GROUPS, **kw),
     )
 
     def test_labelling_theme_labels_every_front(self):
@@ -215,6 +318,10 @@ class TestThemeDefault(ValueLabelCase):
     def test_none_theme_default_leaves_labels_off(self):
         for front in self.FRONTS:
             self.assertFalse(labels(front().axes[0]))
+
+    def test_labelling_theme_labels_a_raincloud_median_only(self):
+        config.set_theme(THEME.MINIMAL)
+        self.assertEqual(texts(RaincloudPlot(GROUPS).axes[0]), ["3", "20"])
 
     def test_point_labels_win_over_the_theme_default(self):
         config.set_theme(THEME.MINIMAL)
@@ -237,6 +344,15 @@ class TestComposition(ValueLabelCase):
         figure = Grid([[box, stack]])
         self.assertEqual(texts(figure.axes[0]), ["3", "20"])
         self.assertEqual(len(labels(figure.axes[1])), 6)
+
+    def test_swarm_and_raincloud_labels_survive_composition(self):
+        swarm = SwarmPlot(GROUPS, show_values=True, value_step=1)
+        box = BoxPlot(GROUPS)
+        self.assertEqual(len(labels(Panel([box, swarm]).axes[0])), len(GROUPS))
+        rain = RaincloudPlot(GROUPS, show_values=True)
+        figure = Grid([[swarm, rain]])
+        self.assertEqual(len(labels(figure.axes[0])), len(GROUPS))
+        self.assertEqual(texts(figure.axes[1]), ["3", "20"])
 
 
 if __name__ == "__main__":

@@ -51,6 +51,9 @@ def SwarmPlot(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     mode: Union[SWARM_MODE, str] = SWARM_MODE.SWARM,
     jitter: float = 0.4,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    value_step: Optional[int] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -127,6 +130,7 @@ def SwarmPlot(
         The `legend` parameter.
         The `vspans` and `hspans` reference bands.
         The `emphasis_rule` parameter.
+        The `show_values`, `value_format` and `value_step` parameters.
 
     Examples:
         >>> from datachart.charts import SwarmPlot
@@ -179,6 +183,12 @@ def SwarmPlot(
             shift the spacing); "strip" jitters them uniformly.
         jitter: The strip jitter width, as a fraction of the category width.
             Only used with `mode="strip"`.
+        show_values: Whether to print each point's value beside it.
+        value_format: Format string for the value labels: a `VALUE_FORMAT`
+            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
+        value_step: Label every Nth point of a group, in value order (`1`
+            labels all of them). Defaults to the smallest step that keeps a
+            group's labels apart along the value axis.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             `ASPECT_RATIO`.
         orientation: The orientation of the swarms (vertical or horizontal).
@@ -251,6 +261,9 @@ def SwarmPlot(
         "sharey": sharey,
         "mode": mode,
         "jitter": jitter,
+        "show_values": show_values,
+        "value_format": value_format,
+        "value_step": value_step,
         "orientation": orientation,
         "scaley": scaley,
         "xticks_format": xticks_format,

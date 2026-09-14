@@ -2562,11 +2562,13 @@ def strip_offsets(n: int, jitter: float) -> np.ndarray:
     return np.random.default_rng(0).uniform(-jitter / 2, jitter / 2, n)
 
 
-class SwarmLayer(GroupLayer):
+class SwarmLayer(PointLabelMixin, GroupLayer):
     kind = "swarm"
 
     def _resolve_style(self):
         super()._resolve_style()
+        self._resolve_value_labels()
+        self._init_point_labels()
         self.mode = self.settings.get("mode") or DEFAULT_SWARM_MODE
         if self.mode not in (SWARM_MODE.SWARM, SWARM_MODE.STRIP):
             raise ValueError(
@@ -2693,18 +2695,64 @@ class SwarmLayer(GroupLayer):
                 else collection.sticky_edges.x
             )
             edges[:] = [lo, hi]
-            self._pending.setdefault(id(ax), []).append((collection, groups))
+            self._pending.setdefault(id(ax), []).append((collection, groups, role))
         interval = ax.dataLim.intervaly if self.is_horizontal else ax.dataLim.intervalx
         interval[:] = (min(interval[0], lo), max(interval[1], hi))
 
     def pack(self, ax) -> None:
         """Spread the points drawn into `ax`; the panel calls this once its view is final."""
 
-        for collection, groups in self._pending.pop(id(ax), []):
+        for collection, groups, role in self._pending.pop(id(ax), []):
             offsets = np.concatenate([self._offsets(ax, pos, v) for pos, v in groups])
             xy = np.asarray(collection.get_offsets()).copy()
             xy[:, 1 if self.is_horizontal else 0] += offsets
             collection.set_offsets(xy)
+            # labels read the packed positions; every point is an obstacle
+            texts = None
+            if self.show_values and role != EMPHASIS_BACKGROUND:
+                texts = np.concatenate(
+                    [self._group_value_texts(ax, v) for _, v in groups]
+                )
+            self._pending_labels.setdefault(id(ax), []).append(
+                (
+                    xy[:, 0],
+                    xy[:, 1],
+                    collection.get_sizes(),
+                    texts,
+                    self.value_font,
+                    self.value_padding,
+                )
+            )
+
+    def _group_value_texts(self, ax, values: np.ndarray) -> np.ndarray:
+        """One group's value texts, `None` where the step skips a point.
+
+        The step walks the group in value order, so the labels spread along
+        the value axis. Without a `value_step` it lets the labels stack apart
+        over the stretch of the value axis the group spans (ADR 0033).
+        """
+
+        labelled = np.full(len(values), None, dtype=object)
+        if len(values) == 0:
+            return labelled
+        order = np.argsort(values, kind="stable")
+        texts = [_format_value(self.value_format, v) for v in values[order]]
+        step = self.value_step
+        if step is None:
+            # a vertical label stack takes the text height, a horizontal one its width
+            along = 0 if self.is_horizontal else 1
+            ends = np.zeros((2, 2))
+            ends[:, along] = values[order[[0, -1]]]
+            span_px = np.ptp(ax.transData.transform(ends)[:, along])
+            span_pt = span_px * 72.0 / ax.figure.dpi
+            fontsize = self.value_font["fontsize"]
+            extent = max(_text_size(fontsize, t)[along] for t in texts)
+            fits = int(span_pt // (extent + 2 * POINT_LABEL_PAD)) + 1
+            step = math.ceil(len(texts) / fits)
+        for rank, i in enumerate(order):
+            if rank % step == 0:
+                labelled[i] = texts[rank]
+        return labelled
 
 
 # keeps the two inner boxes of a split violin off the shared seam
@@ -6162,10 +6210,16 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
     falls on the low side.
     """
 
+    # a raincloud prints its box median only (ADR 0033)
+    unlabelled = {
+        k: v
+        for k, v in settings.items()
+        if k not in ("show_values", "value_format", "value_step")
+    }
     cloud = ViolinLayer(
         chart,
         {
-            **settings,
+            **unlabelled,
             "inner": None,
             "split": None,
             "side": 1,
@@ -6177,7 +6231,7 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
     rain = SwarmLayer(
         chart,
         {
-            **settings,
+            **unlabelled,
             "offset": -RAINCLOUD_RAIN_OFFSET,
             "spread": RAINCLOUD_RAIN_SPREAD,
             "side": -1,
