@@ -4,6 +4,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 import pytest
 
 from datachart.charts import (
@@ -287,13 +288,12 @@ class TestRecordFronts:
 GRID = {"z": [[1.0, 5.0, None], [7.0, 2.0, 9.0]]}
 
 
-def cell_patches(figure):
-    """The (background, highlight) emphasis patches drawn over the cells."""
-    patches = [p for p in figure.axes[0].patches if p.get_zorder() in (1, 2)]
-    return (
-        sum(p.get_zorder() == 1 for p in patches),
-        sum(p.get_zorder() == 2 for p in patches),
-    )
+def cell_emphasis(figure):
+    """The faded cell count of the image and the highlight outline count."""
+    ax = figure.axes[0]
+    alpha = ax.images[0].get_alpha()
+    faded = 0 if alpha is None or np.ndim(alpha) == 0 else int((alpha < 0.9).sum())
+    return faded, len(ax.patches)
 
 
 class TestCellFronts:
@@ -312,10 +312,10 @@ class TestCellFronts:
 
     def test_heatmap_cell_roles_without_rule(self):
         grid = dict(GRID, emphasis=[[BG, None, None], [None, HL, None]])
-        assert cell_patches(Heatmap(grid)) == (1, 1)
+        assert cell_emphasis(Heatmap(grid)) == (1, 1)
 
     def test_heatmap_draws_veils_and_outlines(self):
-        assert cell_patches(Heatmap(GRID, emphasis_rule={"top": 2})) == (3, 2)
+        assert cell_emphasis(Heatmap(GRID, emphasis_rule={"top": 2})) == (3, 2)
 
     def test_heatmap_role_grid_shape_mismatch_raises(self):
         grid = dict(GRID, emphasis=[[BG, None]])
@@ -349,6 +349,8 @@ class TestCellFronts:
         assert len(tiles.get_offsets()) == 3
         assert len(outline.get_offsets()) == 1
         assert tiles.get_array() is None
+        alphas = sorted(tiles.get_facecolor()[:, 3])
+        assert alphas == [config["muted_alpha"]] * 2 + [1.0]
 
     def test_hexbin_hover_keeps_bin_values(self):
         figure = HexbinChart(

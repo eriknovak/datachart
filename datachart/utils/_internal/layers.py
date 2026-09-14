@@ -26,7 +26,7 @@ import matplotlib.ticker as mticker
 from matplotlib.ticker import MaxNLocator
 from matplotlib.collections import LineCollection, PathCollection, PolyCollection
 from matplotlib.container import BarContainer
-from matplotlib.colors import LinearSegmentedColormap, to_hex, to_rgb, to_rgba
+from matplotlib.colors import LinearSegmentedColormap, to_hex, to_rgb
 from matplotlib.mlab import GaussianKDE
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
@@ -3130,7 +3130,7 @@ class HeatmapLayer(Layer):
             norm=self.chart.get("norm", None),
             vmin=self.chart.get("vmin", None),
             vmax=self.chart.get("vmax", None),
-            **self.heatmap_style,
+            **self._cell_style(),
         )
         label = self.label(ctx)
         self.register_hover(im, lambda index: self._cell_datum(label, *index))
@@ -3165,42 +3165,60 @@ class HeatmapLayer(Layer):
                 if np.isnan(value):
                     continue
                 font_style = dict(self.font_style)
+                # a faded cell is light whatever its value
                 if (
                     self.contrast_values
                     and float(im.norm(value)) > HEATMAP_TEXT_CONTRAST_THRESHOLD
+                    and self.cell_roles[i][j] != EMPHASIS_BACKGROUND
                 ):
                     font_style["color"] = "#FFFFFF"
                 ax.text(
                     j, i, self.cell_text(value), ha="center", va="center", **font_style
                 )
 
-    def _draw_cell_emphasis(self, ax) -> None:
-        """Veil the background cells and outline the highlighted ones (ADR 0045).
+    def _cell_style(self) -> dict:
+        """The image style; background cells fade to the muted alpha (ADR 0045).
 
-        The veil lets the cell's own color through at the muted alpha, so a
-        muted cell still reads on the colormap; the outline takes the bolder
-        stroke a highlighted mark gets.
+        A fade rather than the muted color keeps a muted cell on the colormap
+        and leaves the areas around the picked cells clean.
         """
+
+        style = self.heatmap_style
+        roles = self.cell_roles
+        if not any(role == EMPHASIS_BACKGROUND for row in roles for role in row):
+            return style
+        alpha = 1.0 if style.get("alpha") is None else style["alpha"]
+        faded = alpha * self.muted_alpha
+        return {
+            **style,
+            "alpha": np.array(
+                [
+                    [faded if role == EMPHASIS_BACKGROUND else alpha for role in row]
+                    for row in roles
+                ]
+            ),
+        }
+
+    def _draw_cell_emphasis(self, ax) -> None:
+        """Outline the highlighted cells in the bolder highlight stroke."""
 
         width = HIGHLIGHT_WIDTH_SCALE * max(
             self.edge_style.get("linewidth") or 0, self.frame_width
         )
         for i, row in enumerate(self.cell_roles):
             for j, role in enumerate(row):
-                if role is None:
+                if role != EMPHASIS_HIGHLIGHT:
                     continue
-                background = role == EMPHASIS_BACKGROUND
                 ax.add_patch(
                     Rectangle(
                         (j - 0.5, i - 0.5),
                         1,
                         1,
-                        facecolor=self.muted_color if background else "none",
-                        alpha=1 - self.muted_alpha if background else None,
-                        edgecolor="none" if background else self.highlight_color,
-                        linewidth=0 if background else width,
-                        # outlines sit over the veils and borders, under values
-                        zorder=1 if background else 2,
+                        facecolor="none",
+                        edgecolor=self.highlight_color,
+                        linewidth=width,
+                        # over the cell borders, under the cell values
+                        zorder=2,
                     )
                 )
 
@@ -3705,21 +3723,22 @@ class HexbinLayer(Layer):
             _draw_colorbar(ax, tiles, self.colorbar, ctx.aspect_locked)
 
     def _apply_bin_emphasis(self, ax, tiles, values) -> None:
-        """Veil the bins the rule rejects and outline the ones it picks.
+        """Fade the bins the rule rejects and outline the ones it picks.
 
-        The bin colors are fixed from the colormap first so the veil holds;
-        the outlines draw as their own collection so no neighbour covers them.
+        The bin colors are fixed from the colormap first so the fade holds, as
+        a heatmap's muted cells fade; the outlines draw as their own
+        collection so no neighbour covers them.
         """
 
         roles = emphasis_rule_roles(self.emphasis_rule, values)
-        tiles.autoscale_None()
         background = np.array([role == EMPHASIS_BACKGROUND for role in roles])
+        tiles.autoscale_None()
         faces = tiles.to_rgba(np.asarray(values))
-        muted = np.asarray(to_rgba(self.muted_color))
-        faces[background] = faces[background] * self.muted_alpha + muted * (
-            1 - self.muted_alpha
-        )
+        alpha = tiles.get_alpha()
+        faces[:, 3] = 1.0 if alpha is None else alpha
+        faces[background, 3] *= self.muted_alpha
         tiles.set_array(None)
+        tiles.set_alpha(None)
         tiles.set_facecolor(faces)
 
         picked = ~background
