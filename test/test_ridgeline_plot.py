@@ -222,6 +222,13 @@ class TestRidgelineMarks(unittest.TestCase):
         figure = RidgelinePlot([ridge_data(), ridge_data()])
         self.assertEqual(len(figure.axes), 2)
 
+    def test_subplots_share_one_value_range(self):
+        cold = ridge_data(centres=(-5, -3, -1))
+        warm = ridge_data(centres=(10, 12, 14), labels="DEF")
+        figure = RidgelinePlot([cold, warm], subplots=True, inner=None)
+        first, second = (ax.lines[0].get_xdata() for ax in figure.axes[:2])
+        np.testing.assert_array_equal(first, second)
+
     def test_single_value_row_raises(self):
         with self.assertRaises(ValueError):
             RidgelinePlot([{"label": "A", "value": 1.0}])

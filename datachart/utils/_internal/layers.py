@@ -3328,6 +3328,8 @@ class RidgelineLayer(GroupLayer):
             self.ridge_style["overlap"] if overlap is None else overlap
         )
         self.show_values = False
+        # subplots share one value range, set once every layer is built
+        self.shared_range = None
 
     def grouped_values(self) -> dict:
         """The values per label, in row order: input order or by median."""
@@ -3340,22 +3342,28 @@ class RidgelineLayer(GroupLayer):
         order = sorted(grouped, key=lambda label: sign * np.median(grouped[label]))
         return {label: grouped[label] for label in order}
 
-    def _grid_bounds(self, grouped: dict) -> tuple:
-        """The union of the rows' padded ranges; the value-axis limits win."""
+    def padded_range(self) -> Optional[tuple]:
+        """The union of the rows' padded density ranges; None without a density."""
 
         ends = [
             (curve[0]["x"], curve[-1]["x"])
             for curve in (
                 kde1d(values, bandwidth=self.bandwidth, gridsize=2)
-                for values in grouped.values()
+                for values in self.grouped_values().values()
+                if len(values) > 1
             )
         ]
+        if not ends:
+            return None
+        return min(e[0] for e in ends), max(e[1] for e in ends)
+
+    def _grid_bounds(self) -> tuple:
+        """The shared or own padded range; the value-axis limits win."""
+
+        lo, hi = self.shared_range or self.padded_range()
         axis = "x" if self.is_horizontal else "y"
-        lo, hi = self.settings.get(f"{axis}min"), self.settings.get(f"{axis}max")
-        return (
-            min(e[0] for e in ends) if lo is None else lo,
-            max(e[1] for e in ends) if hi is None else hi,
-        )
+        low, high = self.settings.get(f"{axis}min"), self.settings.get(f"{axis}max")
+        return (lo if low is None else low, hi if high is None else high)
 
     def draw(self, ax, ctx):
         grouped = self.grouped_values()
@@ -3372,7 +3380,7 @@ class RidgelineLayer(GroupLayer):
         input_labels = list(super().grouped_values())
         roles = dict(zip(input_labels, self._group_roles(input_labels, ctx.emphasis)))
 
-        lo, hi = self._grid_bounds(grouped)
+        lo, hi = self._grid_bounds()
         curves = [
             kde1d(
                 values, bandwidth=self.bandwidth, gridsize=RIDGE_GRIDSIZE, xlim=(lo, hi)
@@ -6714,6 +6722,14 @@ def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[La
 
     layer_cls = LAYER_TYPES[chart_type]
     layers = [layer_cls(chart, settings) for chart in charts]
+
+    if chart_type == "ridgelineplot" and len(layers) > 1:
+        # one grid range for every subplot, like the histogram's shared bins
+        ranges = [r for r in (layer.padded_range() for layer in layers) if r]
+        if ranges:
+            shared = (min(r[0] for r in ranges), max(r[1] for r in ranges))
+            for layer in layers:
+                layer.shared_range = shared
 
     if (
         chart_type == "linechart"

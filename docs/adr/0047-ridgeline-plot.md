@@ -23,7 +23,8 @@ the side, with the rows allowed to overlap.
   the stats function directly (`ViolinLayer` draws through matplotlib's
   `violinplot` and has no density code to share). Every ridge of a panel is
   evaluated on one grid spanning the union of the rows' padded ranges, or
-  `xmin`/`xmax` when given, so curves align point for point.
+  `xmin`/`xmax` when given, so curves align point for point. The subplots
+  of one figure share that range, as histogram subplots share their bins.
 - **Rows live on the category index; the first row is at the top.** Each
   label takes one slot of the panel category index (ADR 0020), so a
   `SwarmPlot` or `BoxPlot` over the same labels lines up in `Panel`. A
