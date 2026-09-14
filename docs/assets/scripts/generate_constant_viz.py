@@ -711,10 +711,12 @@ def weekday():
         )
         for label, value in members
     ]
+    # stacked: side by side the cells are too small to read
     chart_grid(
         figs,
         "const-weekday.svg",
-        2.0,
+        3.6,
+        cols=1,
         footnote="The first quarter of 2024; the week start is the top row.",
     )
 
