@@ -26,10 +26,12 @@ the side, with the rows allowed to overlap.
   `xmin`/`xmax` when given, so curves align point for point.
 - **Rows live on the category index; the first row is at the top.** Each
   label takes one slot of the panel category index (ADR 0020), so a
-  `SwarmPlot` or `BoxPlot` over the same labels lines up in `Panel`. The
-  panel inverts the category axis when it holds a ridge layer, so input
-  order reads top to bottom as a joy plot does; overlaid group layers follow
-  the same axis. Later rows draw above earlier ones so overlap reads as
+  `SwarmPlot` or `BoxPlot` over the same labels lines up in `Panel`. A
+  ridge's baseline is the edge of its slot (position ± 0.5), so an overlaid
+  swarm centred on the position sits under its own ridge. The panel inverts
+  the category axis when it holds a horizontal ridge layer, so input order
+  reads top to bottom as a joy plot does; overlaid group layers follow the
+  same axis. A ridge draws above the row it rises into, so overlap reads as
   depth.
 - **`overlap` is a float in `[0, 1]`, a front parameter with a theme
   default.** A ridge's peak rises `1 + overlap` slots above its baseline:
@@ -52,9 +54,10 @@ the side, with the rows allowed to overlap.
 - **`fill` and `show_outline` are independent bools, both default `True`.**
   Both `False` raises `ValueError`: nothing would be drawn.
 - **`orientation` defaults to `HORIZONTAL`.** The value axis is x and rows
-  stack along y, the joy-plot form; `VERTICAL` transposes. A `Panel` mix
-  with a sibling group figure needs the same orientation on both, as
-  everywhere.
+  stack along y, the joy-plot form, ridges rising toward the top. `VERTICAL`
+  keeps the category axis uninverted: the first row is at the left and the
+  ridges rise rightward. A `Panel` mix with a sibling group figure needs
+  the same orientation on both, as everywhere.
 - **Style keys under `plot_ridgeline_*`.** `color`, `alpha`, `linewidth`,
   `edgecolor`, `overlap`, `inner_color`, `inner_linewidth`. Fill defaults to
   the palette cycle color, edge to the fill, inner marks to the theme font

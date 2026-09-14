@@ -51,10 +51,12 @@ def fills(ax):
 
 
 def rise(fill, position, horizontal=True):
-    """How far a ridge fill reaches from its baseline, in category slots."""
+    """How far a ridge fill reaches from its row edge, in category slots."""
 
     vertices = fill.get_paths()[0].vertices[:, 1 if horizontal else 0]
-    return position - vertices.min()
+    if horizontal:
+        return position + 0.5 - vertices.min()
+    return vertices.max() - (position - 0.5)
 
 
 class TestRidgelineLayout(unittest.TestCase):
@@ -133,9 +135,12 @@ class TestRidgelineLayout(unittest.TestCase):
     def test_vertical_transposes(self):
         ax = RidgelinePlot(ridge_data(), orientation="vertical").axes[0]
         self.assertEqual([t.get_text() for t in ax.get_xticklabels()], list("ABC"))
-        self.assertTrue(ax.xaxis_inverted())
+        self.assertFalse(ax.xaxis_inverted())
         self.assertFalse(ax.yaxis_inverted())
         self.assertAlmostEqual(rise(fills(ax)[0], 1, horizontal=False), 1.5, places=6)
+        # rows rise rightward, so earlier rows draw over the later ones they reach
+        zorders = [f.get_zorder() for f in fills(ax)]
+        self.assertEqual(zorders, sorted(zorders, reverse=True))
 
 
 class TestRidgelineMarks(unittest.TestCase):
@@ -156,7 +161,7 @@ class TestRidgelineMarks(unittest.TestCase):
         self.assertEqual(len(ax.lines), 3)
         for position, (fill, mark) in enumerate(zip(fills(ax), ax.lines), start=1):
             ys = mark.get_ydata()
-            self.assertAlmostEqual(max(ys), position)
+            self.assertAlmostEqual(max(ys), position + 0.5)
             self.assertGreater(min(ys), position - rise(fill, position) - 1e-9)
         quartiles = RidgelinePlot(
             ridge_data(), inner="quartiles", show_outline=False
@@ -264,6 +269,10 @@ class TestRidgelineComposition(unittest.TestCase):
         swarms = [c for c in ax.collections if isinstance(c, PathCollection)]
         rows = np.concatenate([c.get_offsets()[:, 1] for c in swarms])
         self.assertEqual(sorted(set(np.round(rows).astype(int))), [1, 2, 3])
+        # every row's points sit inside the row its ridge rises from
+        for position, fill in enumerate(fills(ax), start=1):
+            base = fill.get_paths()[0].vertices[:, 1].max()
+            self.assertAlmostEqual(base, position + 0.5)
 
     def test_panel_without_ridges_keeps_its_axis(self):
         data = ridge_data()

@@ -3371,6 +3371,9 @@ class RidgelineLayer(GroupLayer):
         peak = 1 + self.overlap
         common_max = max(float(d.max()) for d in densities)
         step = RIDGE_ZORDER_SPAN / len(grouped)
+        # a row spans its position ±0.5; horizontal ridges rise toward the
+        # first row (the top, on the inverted axis), vertical ones rightward
+        rise = -1 if self.is_horizontal else 1
 
         style = self.ridge_style
         facecolor = style.get("facecolor")
@@ -3389,9 +3392,11 @@ class RidgelineLayer(GroupLayer):
             )
             heights = density / (float(scale) or 1.0) * peak
             position = ctx.category_index[label]
-            # the category axis is inverted, so a ridge rises toward lower positions
-            tops = position - heights
-            zorder = RIDGE_ZORDER + i * step
+            baseline = position - rise * 0.5
+            tops = baseline + rise * heights
+            # a ridge draws over the row it rises into, so overlap reads as depth
+            depth = i if self.is_horizontal else len(grouped) - 1 - i
+            zorder = RIDGE_ZORDER + depth * step
             artists = []
             if self.fill:
                 fill_between = (
@@ -3399,7 +3404,7 @@ class RidgelineLayer(GroupLayer):
                 )
                 body = fill_between(
                     grid,
-                    position,
+                    baseline,
                     tops,
                     facecolor=facecolor,
                     edgecolor="none",
@@ -3411,7 +3416,7 @@ class RidgelineLayer(GroupLayer):
             artists += [
                 ("mark", mark)
                 for mark in self._draw_inner(
-                    ax, values, grid, heights, position, zorder + step / 3
+                    ax, values, grid, baseline, tops, zorder + step / 3
                 )
             ]
             if self.show_outline:
@@ -3427,15 +3432,15 @@ class RidgelineLayer(GroupLayer):
             datum = self.summary_datum(self.label(ctx), position, values)
             self.register_hover(artists[0][1], lambda _, datum=datum: datum)
 
-    def _draw_inner(self, ax, values, grid, heights, position, zorder) -> list:
+    def _draw_inner(self, ax, values, grid, baseline, tops, zorder) -> list:
         """The median or quartile marks, from the baseline up to the ridge."""
 
         if self.inner is None:
             return []
         lines = []
         for value, linestyle in inner_line_marks(self.inner, values):
-            top = position - float(np.interp(value, grid, heights))
-            xs, ys = [value, value], [position, top]
+            top = float(np.interp(value, grid, tops))
+            xs, ys = [value, value], [baseline, top]
             lines.append(
                 ax.plot(
                     *((xs, ys) if self.is_horizontal else (ys, xs)),
@@ -7816,10 +7821,9 @@ class Panel:
         if rank_axis and not ax.yaxis_inverted():
             ax.invert_yaxis()
         # the first ridge row reads at the top; overlaid groups follow (ADR 0047)
-        if not bare and any(isinstance(l, RidgelineLayer) for l in layers):
-            category_axis = ax.yaxis if horizontal else ax.xaxis
-            if not category_axis.get_inverted():
-                category_axis.set_inverted(True)
+        ridges = any(isinstance(l, RidgelineLayer) for l in layers)
+        if ridges and horizontal and not bare and not ax.yaxis_inverted():
+            ax.invert_yaxis()
         if ax_right is not None and (
             s.get("ymin_right") is not None or s.get("ymax_right") is not None
         ):
