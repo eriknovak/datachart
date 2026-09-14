@@ -687,7 +687,7 @@ class CalendarHeatmapStyleAttrs(TypedDict):
         plot_calendar_heatmap_edge_width (Union[int, float, None]): The width of the borders drawn between the day cells (0 draws none).
         plot_calendar_heatmap_edge_color (Union[str, None]): The color of the borders drawn between the day cells.
         plot_calendar_heatmap_month_line_width (Union[int, float, None]): The width of the separators drawn between months (0 draws none).
-        plot_calendar_heatmap_month_line_color (Union[str, None]): The color of the separators drawn between months.
+        plot_calendar_heatmap_month_line_color (Union[str, None]): The color of the separators drawn between months; `None` takes the heatmap frame color.
         plot_calendar_heatmap_week_start (Union[WEEKDAY, str, None]): The weekday in the top row of every week, the default of `week_start`.
 
     """

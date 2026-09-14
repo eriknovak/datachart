@@ -240,6 +240,8 @@ EXPECTED_CHANGES = {
     # new category sort and emphasis rule cases (ADR 0042)
     "bar_sorted_grouped",
     "bar_rule_top3",
+    # a blank heatmap cell no longer prints "nan" as its value (ADR 0044)
+    "heatmap_blank_cells",
     # new calendar heatmap cases (ADR 0044)
     "calendar_single_year",
     "calendar_multi_year",
@@ -528,6 +530,12 @@ def heatmap_labels():
         "z": [[(i * j) % 7 for j in range(5)] for i in range(4)],
     }
     return Heatmap(data=data, show_heatmap_values=True, xtickrotate=45)
+
+
+@case
+def heatmap_blank_cells():
+    data = {"z": [[1, None, 3], [None, 5, 6]]}
+    return Heatmap(data=data, show_heatmap_values=True, show_colorbars=True)
 
 
 @case

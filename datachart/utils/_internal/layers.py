@@ -3037,6 +3037,11 @@ class HeatmapLayer(Layer):
         # white value text only helps when the cmap's high end is actually dark
         r, g, b = heatmap_style["cmap"](1.0)[:3]
         self.contrast_values = (0.2126 * r + 0.7152 * g + 0.0722 * b) < 0.5
+        self.frame_color = self.style.get(
+            "plot_heatmap_frame_color",
+            config.get("plot_heatmap_frame_color") or "#000000",
+        )
+        self.frame_width = config.get("axes_spines_width") or 0.8
         self._resolve_cell_values()
         x, y, self.z = self._grid()
         self.date_axes = {
@@ -3052,11 +3057,6 @@ class HeatmapLayer(Layer):
         self.show_cell_values = bool(self.settings.get("show_heatmap_values"))
         formatter = _value_formatter(self.chart.get("valfmt", DEFAULT_VALUE_FORMAT))
         self.cell_text = lambda value: formatter(value, None)
-        self.frame_color = self.style.get(
-            "plot_heatmap_frame_color",
-            config.get("plot_heatmap_frame_color") or "#000000",
-        )
-        self.frame_width = config.get("axes_spines_width") or 0.8
 
     def _grid(self) -> tuple:
         """The validated (x, y, z); x and y are None when not given, z lists."""
@@ -3184,7 +3184,7 @@ def week_row(day: date, week_start: str) -> int:
 
 
 def calendar_layout(
-    year: int, week_start: str, first_month: int = 1, last_month: int = 12
+    year: int, week_start: str, first_month: int, last_month: int
 ) -> tuple:
     """The cell of every day of the months drawn: `(cells, n_weeks)`, cells as `(row, col)`.
 
@@ -3202,6 +3202,13 @@ def calendar_layout(
     return cells, (first_row + n_days + 6) // 7
 
 
+def _resolve_flag(settings: dict, key: str, default: bool = True) -> bool:
+    """A boolean setting; None takes the default."""
+
+    value = settings.get(key)
+    return default if value is None else bool(value)
+
+
 class CalendarHeatmapLayer(HeatmapLayer):
     """One year of dated values as a weeks-by-weekdays grid of cells (ADR 0044).
 
@@ -3214,13 +3221,15 @@ class CalendarHeatmapLayer(HeatmapLayer):
     style_prefix = "plot_calendar_heatmap"
 
     def _resolve_style(self):
-        self.week_start = validate_week_start(self.settings.get("week_start")) or (
-            get_attr_value("plot_calendar_heatmap_week_start", self.style, config)
-            or WEEKDAY.MONDAY
-        )
+        week_start = self.settings.get("week_start")
+        if week_start is None:
+            week_start = get_attr_value(
+                "plot_calendar_heatmap_week_start", self.style, config
+            )
+        self.week_start = validate_week_start(week_start) or WEEKDAY.MONDAY
         self.month_line_style = get_calendar_month_line_style(self.style)
-        self.show_month_labels = self.settings.get("show_month_labels") is not False
-        self.show_weekday_labels = self.settings.get("show_weekday_labels") is not False
+        self.show_month_labels = _resolve_flag(self.settings, "show_month_labels")
+        self.show_weekday_labels = _resolve_flag(self.settings, "show_weekday_labels")
         super()._resolve_style()
 
     def _resolve_cell_values(self) -> None:

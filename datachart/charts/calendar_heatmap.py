@@ -9,7 +9,6 @@ from ..utils._internal.validate import (
     validate_calendar_dates,
     validate_calendar_year,
     validate_unique_dates,
-    validate_week_start,
 )
 from ..typings import (
     CalendarHeatmapDataAttrs,
@@ -96,9 +95,10 @@ def CalendarHeatmap(
             subtitle when one is given.
         emphasis: Not supported: a calendar is a single raster layer with no
             series to mute or highlight. Passing a value raises `ValueError`.
-        year: The one year to draw. Without it every year the dates span is
-            drawn, one calendar per year in year order, sharing one value
-            range so the colors compare across years.
+        year: The one year to draw, colored over its own values. Without it
+            every year the dates span is drawn, one calendar per year in
+            year order, sharing one value range so the colors compare
+            across years.
         week_start: The weekday of the top row: `WEEKDAY.MONDAY` or
             `WEEKDAY.SUNDAY`. Defaults to the theme's
             `plot_calendar_heatmap_week_start`.
@@ -124,9 +124,10 @@ def CalendarHeatmap(
         vmax: Maximum value(s) for normalization.
         colorbar: The colorbar setting(s): label, location, tick format,
             and tick positions. See `ColorbarSettingAttrs`.
-        texts: Text annotation(s) to draw. The cells sit at integer
-            positions: the week column along x, the weekday row along y,
-            counted from zero at the top-left cell of the drawn range.
+        texts: Text annotation(s) to draw, on every calendar of their
+            dataset. The cells sit at integer positions: the week column
+            along x, the weekday row along y, counted from zero at the
+            top-left cell of the drawn range.
 
     Returns:
         The figure containing the calendar heatmap(s).
@@ -143,7 +144,6 @@ def CalendarHeatmap(
             "CalendarHeatmap does not support `emphasis`: a calendar is a single "
             "raster layer with no series to mute or highlight."
         )
-    validate_week_start(week_start)
 
     datasets = data if isinstance(data, list) else [data]
     if not all(isinstance(d, dict) and "date" in d and "value" in d for d in datasets):
@@ -217,7 +217,7 @@ def _year_charts(chart: dict, year: Optional[int]) -> List[dict]:
             by_year[day.year][0].append(day)
             by_year[day.year][1].append(value)
 
-    numbers = [v for v in values if v is not None and v == v]
+    shared = _shared_range(values, chart.get("norm"))
     charts = []
     for y, (year_dates, year_values) in by_year.items():
         panel = dict(chart)
@@ -226,9 +226,25 @@ def _year_charts(chart: dict, year: Optional[int]) -> List[dict]:
         if len(by_year) > 1:
             subtitle = chart.get("subtitle")
             panel["subtitle"] = str(y) if subtitle is None else f"{subtitle} {y}"
-            if panel.get("vmin") is None and numbers:
-                panel["vmin"] = min(numbers)
-            if panel.get("vmax") is None and numbers:
-                panel["vmax"] = max(numbers)
+            for key, bound in zip(("vmin", "vmax"), shared or ()):
+                if panel.get(key) is None:
+                    panel[key] = bound
         charts.append(panel)
     return charts
+
+
+def _shared_range(values: list, norm) -> Optional[Tuple[float, float]]:
+    """The (min, max) of the values a normalization can show; None without any.
+
+    A log norm shows the positive values, a logit norm those inside (0, 1);
+    the range skips what the norm would mask, as its own autoscale does.
+    """
+
+    numbers = [v for v in values if v is not None and not math.isnan(v)]
+    if norm == "log":
+        numbers = [v for v in numbers if v > 0]
+    elif norm == "logit":
+        numbers = [v for v in numbers if 0 < v < 1]
+    if not numbers:
+        return None
+    return min(numbers), max(numbers)

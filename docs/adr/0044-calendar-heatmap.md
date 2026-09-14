@@ -25,9 +25,10 @@ temporal detection (ADR 0037), the heatmap's cells, value labels (ADR
   in the front into one chart per year and draws through the existing
   subplot layout (`CHART_CONFIGS`: `multiplot: False, subplots: True`), so
   `Grid` rebuilds the arrangement in a cell for free. `year=` keeps one
-  year; a year without data raises. The years of one dataset share its
-  value range unless `vmin`/`vmax` pin one, so a value takes the same color
-  on every calendar. Each year panel is subtitled by its year, after the
+  year, colored over its own values; a year without data raises. The years
+  of one dataset share its value range unless `vmin`/`vmax` pin one, so a
+  value takes the same color on every calendar; the range spans the values
+  the norm can show, as a log norm's own autoscale does. Each year panel is subtitled by its year, after the
   dataset's subtitle when one is given; `max_cols` defaults to 1 so the
   years stack.
 - **One layer, the heatmap's seam.** `CalendarHeatmapLayer` subclasses
@@ -51,10 +52,12 @@ temporal detection (ADR 0037), the heatmap's cells, value labels (ADR
   `ASPECT_RATIO.EQUAL` and the default figure is wide and short, one row of
   height per row of calendars. The layer hides the spines and tick marks:
   the separators and cell borders are its only lines.
-- **The colormap derives from the heatmap's.** `plot_calendar_heatmap_cmap`
-  is `None` in the base theme and falls back to `plot_heatmap_cmap`, as the
-  contour and hexbin colormaps do (ADR 0022, ADR 0024), so a theme that
-  recolors its heatmap recolors its calendars without a second key.
+- **The colormap and the month line color derive from the heatmap's.**
+  `plot_calendar_heatmap_cmap` and `plot_calendar_heatmap_month_line_color`
+  are `None` in the base theme and fall back to `plot_heatmap_cmap` and
+  `plot_heatmap_frame_color`, as the contour and hexbin colormaps do (ADR
+  0022, ADR 0024), so a theme that recolors its heatmap recolors its
+  calendars without a second key.
 - **A bare figure.** `Panel` rejects it with the "use `Grid`" message the
   other bare charts give (ADR 0026); `Grid` accepts it. The metadata
   transport carries the per-year panels only.

@@ -6,14 +6,17 @@ from datetime import date, datetime, timedelta
 import matplotlib
 
 matplotlib.use("Agg")
+import matplotlib.colors
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.collections import LineCollection
 
 from datachart.charts import CalendarHeatmap, LineChart
 from datachart.config import config
 from datachart.constants import COLORBAR_LOCATION, THEME, VALUE_FORMAT, WEEKDAY
 from datachart.themes import _base
 from datachart.utils import Grid, Panel
+from datachart.utils._internal.layers import DrawContext
 from datachart.utils._internal.validate import (
     validate_calendar_dates,
     validate_calendar_year,
@@ -66,8 +69,6 @@ def _all_axes(figure):
 
 
 def _month_lines(ax):
-    from matplotlib.collections import LineCollection
-
     return [
         c
         for c in ax.collections
@@ -353,7 +354,7 @@ class TestCalendarFront(unittest.TestCase):
         panel = figure._chart_metadata["panel"]
         (layer,) = panel.layers
         fig, ax = plt.subplots()
-        layer.draw(ax, panel_ctx())
+        layer.draw(ax, DrawContext())
         ((image, resolver),) = layer.take_hover_targets()
         self.assertEqual(
             resolver((1, 0)), {"label": "steps", "date": "2024-01-02", "value": 2}
@@ -365,6 +366,7 @@ class TestCalendarFront(unittest.TestCase):
 
 class TestYearPanels(unittest.TestCase):
     def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
         plt.close("all")
 
     def test_multi_year_draws_one_panel_per_year_in_order(self):
@@ -395,6 +397,23 @@ class TestYearPanels(unittest.TestCase):
         pinned = CalendarHeatmap({"date": dates, "value": [1, 9]}, vmin=0, vmax=10)
         norms = [ax.images[0].norm for ax in pinned.axes]
         self.assertEqual([(n.vmin, n.vmax) for n in norms], [(0, 10), (0, 10)])
+
+    def test_log_norm_shares_the_positive_range(self):
+        dates = days(date(2023, 12, 30), 6)
+        figure = CalendarHeatmap(
+            {"date": dates, "value": [0, 1, 0, 5, 2, 0]}, norm="log"
+        )
+        figure.canvas.draw()
+        norms = [ax.images[0].norm for ax in figure.axes]
+        self.assertEqual([(n.vmin, n.vmax) for n in norms], [(1, 5), (1, 5)])
+
+    def test_month_line_color_follows_the_theme_frame(self):
+        config.set_theme(THEME.INK)
+        (lines,) = _month_lines(year_calendar(2024).axes[0])
+        self.assertEqual(
+            lines.get_edgecolor()[0].tolist(),
+            list(matplotlib.colors.to_rgba(config["plot_heatmap_frame_color"])),
+        )
 
     def test_year_filter_keeps_one_panel(self):
         dates = days(date(2023, 12, 30), 4)
@@ -450,12 +469,6 @@ class TestComposition(unittest.TestCase):
         titles = sorted(ax.get_title() for ax in grid.axes[2:])
         self.assertEqual(titles, ["2023", "2024"])
         self.assertFalse(any(s.get_visible() for s in grid.axes[0].spines.values()))
-
-
-def panel_ctx():
-    from datachart.utils._internal.layers import DrawContext
-
-    return DrawContext()
 
 
 if __name__ == "__main__":

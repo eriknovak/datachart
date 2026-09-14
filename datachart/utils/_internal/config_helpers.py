@@ -802,6 +802,8 @@ def get_heatmap_edge_style(heatmap_style: dict, prefix: str = "plot_heatmap") ->
 def get_calendar_month_line_style(calendar_style: dict) -> dict:
     """Get the style of the separators drawn between the months of a calendar heatmap.
 
+    A `None` color derives from the heatmap frame color (ADR 0044).
+
     Args:
         calendar_style: The calendar heatmap style dictionary.
 
@@ -815,7 +817,12 @@ def get_calendar_month_line_style(calendar_style: dict) -> dict:
         ("color", "plot_calendar_heatmap_month_line_color"),
     ]
 
-    return create_config_dict(calendar_style, config_attrs)
+    style = create_config_dict(calendar_style, config_attrs)
+    # the theme's heatmap frame color is its line color for rasters
+    style.setdefault(
+        "color", get_attr_value("plot_heatmap_frame_color", calendar_style, config)
+    )
+    return style
 
 
 # -------------------------------------

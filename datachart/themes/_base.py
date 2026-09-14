@@ -251,7 +251,8 @@ BASE_THEME: StyleAttrs = {
     "plot_heatmap_frame_color": "#333333",
     "plot_heatmap_edge_width": 0,
     "plot_heatmap_edge_color": "#FFFFFF",
-    # plot calendar heatmap style; None cmap derives from the heatmap cmap (ADR 0044)
+    # plot calendar heatmap style (ADR 0044); a None cmap derives from the
+    # heatmap cmap, a None month line color from the heatmap frame color
     "plot_calendar_heatmap_cmap": None,
     "plot_calendar_heatmap_alpha": 0.95,
     "plot_calendar_heatmap_font_size": 6,
@@ -261,7 +262,7 @@ BASE_THEME: StyleAttrs = {
     "plot_calendar_heatmap_edge_width": 1.0,
     "plot_calendar_heatmap_edge_color": "#FFFFFF",
     "plot_calendar_heatmap_month_line_width": 1.0,
-    "plot_calendar_heatmap_month_line_color": "#333333",
+    "plot_calendar_heatmap_month_line_color": None,
     "plot_calendar_heatmap_week_start": WEEKDAY.MONDAY,
     # plot contour style; None derives from the line/heatmap/font keys (ADR 0022)
     "plot_contour_color": None,
