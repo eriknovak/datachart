@@ -211,9 +211,8 @@ def RidgelinePlot(
         bandwidth: The KDE bandwidth: None or "scott" (Scott's rule),
             "silverman", or a scalar factor. See `BANDWIDTH`.
         overlap: How far a ridge's peak rises into the row above, in `[0, 1]`:
-            a ridge's peak stands `1 + overlap` rows above its baseline (the
-            row's lower edge, or its tick when vertical), so 0 makes rows
-            touch. None takes the theme's `plot_ridgeline_overlap`.
+            a ridge rises from its tick and its peak stands `1 + overlap`
+            rows above it, so 0 makes rows touch. None takes the theme's `plot_ridgeline_overlap`.
         normalize: "per_row" scales every ridge to the same peak so shapes
             compare; "common" keeps one density scale so heights compare. See
             `RIDGELINE_SCALE`.

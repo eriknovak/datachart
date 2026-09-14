@@ -55,7 +55,7 @@ def rise(fill, position, horizontal=True):
 
     vertices = fill.get_paths()[0].vertices[:, 1 if horizontal else 0]
     if horizontal:
-        return position + 0.5 - vertices.min()
+        return position - vertices.min()
     return vertices.max() - position
 
 
@@ -164,7 +164,7 @@ class TestRidgelineMarks(unittest.TestCase):
         self.assertEqual(len(ax.lines), 3)
         for position, (fill, mark) in enumerate(zip(fills(ax), ax.lines), start=1):
             ys = mark.get_ydata()
-            self.assertAlmostEqual(max(ys), position + 0.5)
+            self.assertAlmostEqual(max(ys), position)
             self.assertGreater(min(ys), position - rise(fill, position) - 1e-9)
         quartiles = RidgelinePlot(
             ridge_data(), inner="quartiles", show_outline=False
@@ -271,11 +271,19 @@ class TestRidgelineComposition(unittest.TestCase):
         self.assertTrue(ax.yaxis_inverted())
         swarms = [c for c in ax.collections if isinstance(c, PathCollection)]
         rows = np.concatenate([c.get_offsets()[:, 1] for c in swarms])
-        self.assertEqual(sorted(set(np.round(rows).astype(int))), [1, 2, 3])
-        # every row's points sit inside the row its ridge rises from
+        # ridges rise from their tick and the points pack upward, inside them
         for position, fill in enumerate(fills(ax), start=1):
             base = fill.get_paths()[0].vertices[:, 1].max()
-            self.assertAlmostEqual(base, position + 0.5)
+            self.assertAlmostEqual(base, position)
+        offsets = rows - np.round(rows + 0.2)
+        self.assertTrue(np.all((offsets <= 1e-9) & (offsets >= -0.4 - 1e-9)))
+        self.assertLess(offsets.min(), -0.05)
+
+    def test_swarm_without_ridges_packs_both_sides(self):
+        ax = SwarmPlot(ridge_data(), orientation="horizontal").axes[0]
+        rows = np.concatenate([c.get_offsets()[:, 1] for c in ax.collections])
+        self.assertTrue(np.any(rows > np.round(rows) + 1e-6))
+        self.assertTrue(np.any(rows < np.round(rows) - 1e-6))
 
     def test_panel_without_ridges_keeps_its_axis(self):
         data = ridge_data()

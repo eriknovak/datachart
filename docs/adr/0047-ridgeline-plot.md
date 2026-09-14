@@ -27,9 +27,9 @@ the side, with the rows allowed to overlap.
 - **Rows live on the category index; the first row is at the top.** Each
   label takes one slot of the panel category index (ADR 0020), so a
   `SwarmPlot` or `BoxPlot` over the same labels lines up in `Panel`. A
-  horizontal ridge's baseline is the lower edge of its slot (position +
-  0.5), so an overlaid swarm centred on the position sits under its own
-  ridge; a vertical ridge rises from its tick. The panel inverts
+  ridge's baseline is its tick; over ridges the panel packs a swarm on the
+  side the ridges rise to, so the points sit inside their own ridge. The
+  panel inverts
   the category axis when it holds a horizontal ridge layer, so input order
   reads top to bottom as a joy plot does; overlaid group layers follow the
   same axis. A ridge draws above the row it rises into, so overlap reads as

@@ -2893,15 +2893,21 @@ class SwarmLayer(PointLabelMixin, GroupLayer):
         # collections drawn per axes, packed by the panel after limits settle
         self._pending = {}
 
-    def _offsets(self, ax, position: float, values: np.ndarray) -> np.ndarray:
-        """Per-point offsets from the category center, in data units."""
+    def _offsets(
+        self, ax, position: float, values: np.ndarray, side: int
+    ) -> np.ndarray:
+        """Per-point offsets from the category center, in data units.
+
+        A nonzero `side` packs the points on one side only: -1 toward lower
+        category positions, +1 toward higher ones.
+        """
 
         if self.mode == SWARM_MODE.STRIP:
             # the jitter width scales with the cell the points may spread over
             offsets = strip_offsets(
                 len(values), self.jitter * self.max_offset / SWARM_MAX_OFFSET
             )
-            return offsets if not self.side else (np.abs(offsets) * 2) * self.side
+            return offsets if not side else (np.abs(offsets) * 2) * side
 
         size = self.swarm_style.get("s")
         if size is None:
@@ -2915,13 +2921,14 @@ class SwarmLayer(PointLabelMixin, GroupLayer):
         )
         px = ax.transData.transform(points)
         value_px = px[:, 0] if self.is_horizontal else px[:, 1]
-        offsets_px = beeswarm_offsets(value_px, diameter_px, bool(self.side))
-        # pixels per data unit along the category axis
+        offsets_px = beeswarm_offsets(value_px, diameter_px, bool(side))
+        # pixels per data unit along the category axis; unsigned, so a side
+        # stays in data units on an inverted axis
         unit = ax.transData.transform([[0, 1]] if self.is_horizontal else [[1, 0]])
         origin = ax.transData.transform([[0, 0]])
-        scale = (unit - origin)[0][1 if self.is_horizontal else 0]
+        scale = abs((unit - origin)[0][1 if self.is_horizontal else 0])
         offsets = np.clip(offsets_px / scale, -self.max_offset, self.max_offset)
-        return offsets if not self.side else offsets * self.side
+        return offsets if not side else offsets * side
 
     def draw(self, ax, ctx):
         grouped = self.grouped_values()
@@ -2998,11 +3005,17 @@ class SwarmLayer(PointLabelMixin, GroupLayer):
         interval = ax.dataLim.intervaly if self.is_horizontal else ax.dataLim.intervalx
         interval[:] = (min(interval[0], lo), max(interval[1], hi))
 
-    def pack(self, ax) -> None:
-        """Spread the points drawn into `ax`; the panel calls this once its view is final."""
+    def pack(self, ax, side: int = 0) -> None:
+        """Spread the points drawn into `ax`; the panel calls this once its view is final.
 
+        The layer's own side wins; otherwise the panel's `side` applies.
+        """
+
+        side = self.side or side
         for collection, groups, role in self._pending.pop(id(ax), []):
-            offsets = np.concatenate([self._offsets(ax, pos, v) for pos, v in groups])
+            offsets = np.concatenate(
+                [self._offsets(ax, pos, v, side) for pos, v in groups]
+            )
             xy = np.asarray(collection.get_offsets()).copy()
             xy[:, 1 if self.is_horizontal else 0] += offsets
             collection.set_offsets(xy)
@@ -3371,11 +3384,9 @@ class RidgelineLayer(GroupLayer):
         peak = 1 + self.overlap
         common_max = max(float(d.max()) for d in densities)
         step = RIDGE_ZORDER_SPAN / len(grouped)
-        # horizontal ridges rise toward the first row (the top, on the inverted
-        # axis) from the row's lower edge, so an overlaid swarm sits inside;
-        # vertical ridges rise rightward from their tick
+        # ridges rise from their tick: toward the first row (the top, on the
+        # inverted axis) when horizontal, rightward when vertical
         rise = -1 if self.is_horizontal else 1
-        offset = 0.5 if self.is_horizontal else 0.0
 
         style = self.ridge_style
         facecolor = style.get("facecolor")
@@ -3394,7 +3405,7 @@ class RidgelineLayer(GroupLayer):
             )
             heights = density / (float(scale) or 1.0) * peak
             position = ctx.category_index[label]
-            baseline = position + offset
+            baseline = position
             tops = baseline + rise * heights
             # a ridge draws over the row it rises into, so overlap reads as depth
             depth = i if self.is_horizontal else len(grouped) - 1 - i
@@ -7838,11 +7849,13 @@ class Panel:
             self._apply_radial_furniture(ax)
 
         # beeswarm packing reads the display transform, so it runs once the
-        # scales and limits are final (ADR 0020)
+        # scales and limits are final (ADR 0020); over ridges the points pack
+        # on the side the ridges rise to, inside them (ADR 0047)
+        swarm_side = (-1 if horizontal else 1) if ridges else 0
         for group, owner_ax in zip(self.groups, group_axes):
             for layer in group.layers:
                 if isinstance(layer, SwarmLayer):
-                    layer.pack(owner_ax)
+                    layer.pack(owner_ax, swarm_side)
 
         # reference lines and bands, after scales and limits
         for layer, target_ax in zip(layers, [ax] * len(layers)):
