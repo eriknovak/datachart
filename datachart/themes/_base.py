@@ -105,6 +105,8 @@ BASE_THEME: StyleAttrs = {
     "chart_default_show_grid": SHOW_GRID.Y,
     "chart_default_show_values": None,
     "plot_hatch_cycle": None,
+    "plot_linestyle_cycle": None,
+    "plot_marker_cycle": None,
     # render-scoped rc attributes (ADR 0027); None means off
     "plot_sketch_params": None,
     "plot_sketch_halo_width": None,

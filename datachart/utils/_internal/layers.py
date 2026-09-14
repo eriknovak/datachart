@@ -329,6 +329,24 @@ def _marker_edge_widths(width, sizes):
     return np.where(fits, width, 0.0)
 
 
+# a hollow marker's outline is the mark: never thinner than this, in points
+HOLLOW_MARKER_EDGE_WIDTH = 1.2
+
+
+def _hollow_marker(style: dict) -> dict:
+    """A scatter style whose cycle marker is hollow: the color strokes the outline."""
+
+    if not style.pop("hollow", False):
+        return style
+    color = style.pop("c", None)
+    style["facecolors"] = "none"
+    if color is not None:
+        style["edgecolors"] = color
+    width = np.max(style.get("linewidths") or 0)
+    style["linewidths"] = max(float(width), HOLLOW_MARKER_EDGE_WIDTH)
+    return style
+
+
 class HandlerBarSeries(HandlerPatch):
     """Draws a bar series' legend swatch from a representative bar.
 
@@ -1128,6 +1146,9 @@ class DrawContext:
     stack_slot: Optional[StackSlot] = None
     bins: Optional[np.ndarray] = None
     hatch: Optional[str] = None
+    linestyle: Optional[Union[str, tuple]] = None
+    # (marker, hollow) from the panel's marker cycle
+    marker: Optional[tuple] = None
     emphasis: Optional[str] = None
     parallel_stats: Optional[dict] = None
     parallel_axes: bool = True
@@ -1371,6 +1392,25 @@ class Layer:
                 for effect in line_style.get("path_effects", [])
             ]
             line_style["path_effects"] = halo + [InkStroke(**self.ink_stroke)]
+
+    def _apply_cycle_linestyle(self, line_style: dict, ctx: DrawContext) -> None:
+        """Take the panel's cycle line style unless the chart style sets one."""
+
+        if ctx.linestyle is not None and "plot_line_style" not in self.style:
+            line_style["linestyle"] = ctx.linestyle
+
+    def _apply_cycle_marker(self, scatter_style: dict, ctx: DrawContext) -> None:
+        """Take the panel's cycle marker unless the chart style sets one.
+
+        A hollow entry is drawn as an outline by `_hollow_marker`.
+        """
+
+        if ctx.marker is None or "plot_scatter_marker" in self.style:
+            return
+        marker, hollow = ctx.marker
+        scatter_style["marker"] = marker
+        if hollow:
+            scatter_style["hollow"] = True
 
     def _etch(self, artists, wash: bool = True) -> None:
         """Etch the hatched fills among `artists` (ADR 0048); nothing when off.
@@ -1663,6 +1703,7 @@ class LineLayer(PointLabelMixin, Layer):
         line_style = self._merge_color("color", ctx.color, self.line_style)
         if ctx.z_order is not None:
             line_style["zorder"] = ctx.z_order
+        self._apply_cycle_linestyle(line_style, ctx)
         self._apply_emphasis(line_style, ctx.emphasis)
         self._stroke_halo(line_style)
 
@@ -1886,6 +1927,7 @@ class BumpLayer(LineLayer):
         line_style = self._merge_color("color", ctx.color, self.line_style)
         if ctx.z_order is not None:
             line_style["zorder"] = ctx.z_order
+        self._apply_cycle_linestyle(line_style, ctx)
         self._apply_emphasis(line_style, ctx.emphasis)
         self._stroke_halo(line_style)
 
@@ -2516,6 +2558,7 @@ class ScatterLayer(PointLabelMixin, Layer):
         scatter_style = dict(self.scatter_style)
         if ctx.z_order is not None:
             scatter_style["zorder"] = ctx.z_order
+        self._apply_cycle_marker(scatter_style, ctx)
         self._apply_emphasis(
             scatter_style, ctx.emphasis, width_key="linewidths", color_key=None
         )
@@ -2548,7 +2591,7 @@ class ScatterLayer(PointLabelMixin, Layer):
                     y_data[mask],
                     s=group_sizes,
                     label=label,
-                    **group_style,
+                    **_hollow_marker(group_style),
                 )
                 self._mark_legend_size(collection, size_data)
                 self.register_hover(
@@ -2583,8 +2626,9 @@ class ScatterLayer(PointLabelMixin, Layer):
                     base_style.get("linewidths"), sizes
                 )
 
+            color = base_style.get("c", base_style.get("color"))
             collection = scatter(
-                x_data, y_data, s=sizes, label=self.label(ctx), **base_style
+                x_data, y_data, s=sizes, label=self.label(ctx), **_hollow_marker(base_style)
             )
             self._mark_legend_size(collection, size_data)
             self.register_hover(
@@ -2593,7 +2637,6 @@ class ScatterLayer(PointLabelMixin, Layer):
             )
             self._record_points(ax, ctx, x_data, y_data, sizes, labels, font, pad)
 
-            color = base_style.get("c", base_style.get("color"))
             x_fit = _axis_numbers(ax, ctx.transpose, x_data)
             if self.show_regression:
                 self._draw_regression(ax, ctx, x_fit, y_data, color=color)
@@ -4870,6 +4913,7 @@ class RadialLineLayer(RadialLayer):
         line_style = self._merge_color("color", ctx.color, self.line_style)
         if ctx.z_order is not None:
             line_style["zorder"] = ctx.z_order
+        self._apply_cycle_linestyle(line_style, ctx)
         self._apply_emphasis(line_style, ctx.emphasis)
         self._stroke_halo(line_style)
 
@@ -4984,6 +5028,7 @@ class RadialScatterLayer(RadialLayer):
         scatter_style = dict(self.scatter_style)
         if ctx.z_order is not None:
             scatter_style["zorder"] = ctx.z_order
+        self._apply_cycle_marker(scatter_style, ctx)
         self._apply_emphasis(
             scatter_style, ctx.emphasis, width_key="linewidths", color_key=None
         )
@@ -5002,7 +5047,9 @@ class RadialScatterLayer(RadialLayer):
         self._tips = [
             (float(t), float(v), float(v), i) for i, (t, v) in enumerate(zip(theta, y))
         ]
-        points = ax.scatter(theta, y, label=self.label(ctx), **scatter_style)
+        points = ax.scatter(
+            theta, y, label=self.label(ctx), **_hollow_marker(scatter_style)
+        )
         self.register_hover(points, _radial_resolver(self.label(ctx), labels, y))
 
 
@@ -7517,6 +7564,23 @@ class ScaledAxis(NamedTuple):
     remedy: str  # the fix for a figure that only inherited the scale
 
 
+def _style_assignments(entries: Optional[list]) -> Optional[defaultdict]:
+    """Chart hash -> the next cycle entry, first come first served; None without."""
+
+    if not entries:
+        return None
+    entry_iter = iter_cycle(entries)
+    return defaultdict(lambda: next(entry_iter))
+
+
+def _marker_entry(entry) -> tuple:
+    """A marker cycle entry as `(marker, hollow)`."""
+
+    if isinstance(entry, dict):
+        return entry["marker"], bool(entry.get("hollow"))
+    return entry, False
+
+
 def _takes_hatch(layer: Layer) -> bool:
     """Whether the panel's hatch cycle reaches the layer's fills.
 
@@ -7895,12 +7959,13 @@ class Panel:
         group_layers = [l for l in self.layers if isinstance(l, GroupLayer)]
         category_index = self.category_index(group_layers)
 
-        # hatch cycle: per bar/histogram series, parallel to the color cycle
-        hatch_patterns = s.get("hatch_cycle")
-        hatch_assignments = None
-        if hatch_patterns:
-            hatch_iter = iter_cycle(hatch_patterns)
-            hatch_assignments = defaultdict(lambda: next(hatch_iter))
+        # hatch, line-style and marker cycles: per series, parallel to the
+        # color cycle (ADR 0004, ADR 0048)
+        hatch_assignments = _style_assignments(s.get("hatch_cycle"))
+        linestyle_assignments = _style_assignments(s.get("linestyle_cycle"))
+        marker_assignments = _style_assignments(
+            [_marker_entry(entry) for entry in s.get("marker_cycle") or []]
+        )
 
         # draw the layers group by group, in order
         # one color cycle per palette, pooled across the panel's groups, so
@@ -7984,6 +8049,18 @@ class Panel:
                     hatch=(
                         hatch_assignments[layer.chart_hash]
                         if hatch_assignments is not None and _takes_hatch(layer)
+                        else None
+                    ),
+                    linestyle=(
+                        linestyle_assignments[layer.chart_hash]
+                        if linestyle_assignments is not None
+                        and isinstance(layer, (LineLayer, RadialLineLayer))
+                        else None
+                    ),
+                    marker=(
+                        marker_assignments[layer.chart_hash]
+                        if marker_assignments is not None
+                        and isinstance(layer, (ScatterLayer, RadialScatterLayer))
                         else None
                     ),
                     emphasis=role,
@@ -8880,6 +8957,8 @@ def build_chart_panel_settings(
         "show_grid": show_grid,
         "grid_style": get_grid_style(first_style),
         "hatch_cycle": config.get("plot_hatch_cycle"),
+        "linestyle_cycle": config.get("plot_linestyle_cycle"),
+        "marker_cycle": config.get("plot_marker_cycle"),
         "xmin": settings.get("xmin"),
         "xmax": settings.get("xmax"),
         "ymin": settings.get("ymin"),

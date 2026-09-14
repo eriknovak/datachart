@@ -1042,12 +1042,27 @@ class ThemeDefaultAttrs(TypedDict):
         plot_hatch_cycle (Union[List[str], None]): The hatch patterns assigned
             per bar/histogram series, parallel to the color cycle. An explicit
             per-chart hatch style wins. `None` disables the cycle.
+        plot_linestyle_cycle (Union[List[Union[LINE_STYLE, str]], None]): The
+            line styles assigned per line, bump and radial line series, parallel
+            to the color cycle. An explicit per-chart line style wins. `None`
+            disables the cycle.
+        plot_marker_cycle (Union[List[Union[LINE_MARKER, str, Dict[str, Union[str, bool]]]], None]):
+            The markers assigned per scatter and radial scatter series,
+            parallel to the color cycle: a marker, or `{"marker": ..., "hollow":
+            True}` to draw it as an outline. An explicit per-chart marker wins.
+            `None` disables the cycle.
+
+    !!! info "Added in Unreleased"
+
+        The `plot_linestyle_cycle` and `plot_marker_cycle` attributes.
 
     """
 
     chart_default_show_grid: Union[SHOW_GRID, str, None]
     chart_default_show_values: Union[bool, None]
     plot_hatch_cycle: Union[List[str], None]
+    plot_linestyle_cycle: Union[List[Union[LINE_STYLE, str]], None]
+    plot_marker_cycle: Union[List[Union[LINE_MARKER, str, Dict[str, Union[str, bool]]]], None]
 
 
 class SketchStyleAttrs(TypedDict):

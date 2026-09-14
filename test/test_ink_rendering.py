@@ -5,6 +5,7 @@ import io
 import unittest
 
 import matplotlib
+import numpy as np
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -282,6 +283,48 @@ class TestAreaAndBodyEtching(unittest.TestCase):
         ridge = RidgelinePlot(points).axes[0].collections[0]
         self.assertEqual(ridge.get_hatch(), "/")
         self.assertTrue(etch_effects(ridge))
+
+
+class TestStyleCycles(unittest.TestCase):
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_off_by_default(self):
+        self.assertIsNone(config["plot_linestyle_cycle"])
+        self.assertIsNone(config["plot_marker_cycle"])
+
+    def test_line_styles_cycle_per_series(self):
+        config.update_config({"plot_linestyle_cycle": ["-", "--", ":"]})
+        figure = LineChart([LINE, LINE_2])
+        styles = [line.get_linestyle() for line in data_lines(figure)]
+        self.assertEqual(styles, ["-", "--"])
+
+    def test_chart_line_style_wins(self):
+        config.update_config({"plot_linestyle_cycle": ["--"]})
+        figure = LineChart(LINE, style={"plot_line_style": ":"})
+        self.assertEqual(data_lines(figure)[0].get_linestyle(), ":")
+
+    def test_markers_cycle_filled_and_hollow(self):
+        config.update_config(
+            {"plot_marker_cycle": ["o", {"marker": "s", "hollow": True}]}
+        )
+        points = [{"x": float(i), "y": float(i)} for i in range(4)]
+        shifted = [{"x": float(i), "y": float(i) + 1} for i in range(4)]
+        figure = ScatterChart([points, shifted])
+        filled, hollow = figure.axes[0].collections
+        self.assertEqual(filled.get_facecolor()[0][3], 0.75)
+        self.assertEqual(len(hollow.get_facecolor()), 0)
+        self.assertGreater(hollow.get_linewidths()[0], 0)
+        self.assertFalse(
+            np.array_equal(filled.get_paths()[0].vertices, hollow.get_paths()[0].vertices)
+        )
+
+    def test_chart_marker_wins(self):
+        config.update_config({"plot_marker_cycle": [{"marker": "s", "hollow": True}]})
+        points = [{"x": float(i), "y": float(i)} for i in range(4)]
+        figure = ScatterChart(points, style={"plot_scatter_marker": "^"})
+        self.assertEqual(len(figure.axes[0].collections[0].get_facecolor()), 1)
 
 
 class _RecordingRenderer:
