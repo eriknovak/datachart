@@ -25,6 +25,7 @@ The `constants` module provides a set of predefined constants used in the packag
 | `NORMALIZE`         | The supported normalization options.           |
 | `ORIENTATION`       | The supported orientations.                    |
 | `VIOLIN_INNER`      | The supported violin inner marks.              |
+| `RIDGELINE_SCALE`   | The supported ridgeline density scales.        |
 | `BANDWIDTH`         | The supported kernel density bandwidth rules.  |
 | `CONTOUR_LEVELS`    | The supported contour level rules.             |
 | `HEXBIN_REDUCE`     | The supported hexbin aggregations.             |
@@ -590,6 +591,28 @@ Examples:
 | `BOX`       | A thin quartile bar, a 1.5·IQR whisker line, and a median dot. Equals to "box". **TYPE:** `str`                             |
 | `QUARTILES` | A dashed median line and dotted first and third quartile lines, clipped to the body. Equals to "quartiles". **TYPE:** `str` |
 | `MEDIAN`    | A single solid median line clipped to the body. Equals to "median". **TYPE:** `str`                                         |
+
+### datachart.constants.RIDGELINE_SCALE
+
+The supported ridgeline density scales.
+
+Passed as the `normalize` setting of ridgeline plots: whether every ridge is scaled to the same peak height, so their shapes compare, or all ridges share one density scale, so their heights compare.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import RIDGELINE_SCALE
+>>> RIDGELINE_SCALE.DEFAULT
+"per_row"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                                                                                         |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT` | The default scale. Same as RIDGELINE_SCALE.PER_ROW. **TYPE:** `str`                                                                 |
+| `PER_ROW` | Every ridge reaches the same peak height. Equals to "per_row". **TYPE:** `str`                                                      |
+| `COMMON`  | One density scale: the tallest ridge reaches the peak height and the others stay in proportion. Equals to "common". **TYPE:** `str` |
 
 ### datachart.constants.BANDWIDTH
 

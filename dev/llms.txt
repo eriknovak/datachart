@@ -5,6 +5,7 @@
 datachart is a Python data visualization package built on matplotlib.
 It provides simple chart functions (BarChart, LineChart, StackedAreaChart, BumpChart, ScatterChart,
 Histogram, Heatmap, ContourChart, HexbinChart, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot,
+RidgelinePlot,
 ParallelCoords, PyramidChart, RadialChart, CalendarHeatmap, SankeyChart, NetworkChart,
 Treemap), figure
 composition via Panel (overlaying charts on shared axes) and Grid
@@ -36,6 +37,7 @@ themes; per-chart overrides go in each chart's `style` parameter.
 - [Violin Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/violinplot/index.md): Violin plot input attributes, inner marks, bandwidth, split violins, date labels, composing violins with box and swarm plots, and subplots.
 - [Swarm Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/swarmplot/index.md): Swarm plot input attributes, swarm and strip modes, date labels, emphasis, overlaying box and violin plots with Panel, multiple datasets, and saving.
 - [Raincloud Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/raincloudplot/index.md): Raincloud plot input attributes, the cloud, rain, and box parts and their styles, bandwidth, rain modes, orientation, date labels, emphasis, subplots, composing with Panel and Grid, and saving.
+- [Ridgeline Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/ridgelineplot/index.md): Ridgeline plot input attributes, ridge style, row overlap, per-row and common density scales, inner median and quartile marks, fill and outline, sorting rows by median, bandwidth, the shared value range, orientation, emphasis, reference lines, subplots, composing with Panel and Grid, and saving.
 - [Scatter Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md): Scatter chart input attributes, single and multiple datasets, customization, datetime axes, and saving.
 - [Heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md): Heatmap input attributes, single and multiple datasets, customization, date labels, and saving.
 - [Contour Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md): Contour chart input attributes, iso-lines and filled bands, colorbars, inline labels, level rules, datetime axes, emphasis, multiple surfaces, composing with Panel and Grid, and saving.

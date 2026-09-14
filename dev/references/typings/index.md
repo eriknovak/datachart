@@ -47,6 +47,8 @@ The `typings` module contains the typings for all chart components. The module i
 | `ViolinDataPointAttrs`            | The data point attributes for the violin plot.                  |
 | `RaincloudSingleChartAttrs`       | The single chart attributes for the raincloud plot.             |
 | `RaincloudDataPointAttrs`         | The data point attributes for the raincloud plot.               |
+| `RidgelineSingleChartAttrs`       | The single chart attributes for the ridgeline plot.             |
+| `RidgelineDataPointAttrs`         | The data point attributes for the ridgeline plot.               |
 | `ParallelCoordsSingleChartAttrs`  | The single chart attributes for the parallel coordinates chart. |
 | `ParallelCoordsDataPointAttrs`    | The data point attributes for the parallel coordinates chart.   |
 | `RadialSingleChartAttrs`          | The single chart attributes for the radial chart.               |
@@ -83,6 +85,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `SwarmStyleAttrs`                 | The typing for the swarm plot style.                            |
 | `ViolinStyleAttrs`                | The typing for the violin plot style.                           |
 | `RaincloudStyleAttrs`             | The typing for the raincloud plot style.                        |
+| `RidgelineStyleAttrs`             | The typing for the ridgeline plot style.                        |
 | `ParallelCoordsStyleAttrs`        | The typing for the parallel coordinates chart style.            |
 | `ThemeDefaultAttrs`               | The typing for theme-driven defaults and cycles.                |
 
@@ -669,6 +672,46 @@ The data point attributes for the raincloud plot.
 | `label`   | The category label. **TYPE:** `str`              |
 | `value`   | The numeric value. **TYPE:** `Union[int, float]` |
 
+### Ridgeline Plot Typings
+
+#### datachart.typings.RidgelineSingleChartAttrs
+
+Bases: `TypedDict`
+
+The single chart attributes for the ridgeline plot.
+
+| ATTRIBUTE     | DESCRIPTION                                                                                                    |
+| ------------- | -------------------------------------------------------------------------------------------------------------- |
+| `data`        | The list of data points defining the ridgeline plot. **TYPE:** `List[RidgelineDataPointAttrs]`                 |
+| `subtitle`    | The subtitle of the ridgeline plot. **TYPE:** `Union[str, None]`                                               |
+| `xlabel`      | The xlabel of the ridgeline plot. **TYPE:** `Union[str, None]`                                                 |
+| `ylabel`      | The ylabel of the ridgeline plot. **TYPE:** `Union[str, None]`                                                 |
+| `style`       | The style of the ridgeline plot. **TYPE:** `Union[RidgelineStyleAttrs, None]`                                  |
+| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                                  |
+| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                           |
+| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                         |
+| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                                   |
+| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                           |
+| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                         |
+| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`             |
+| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLineSettingAttrs, List[HLineSettingAttrs], None]`           |
+| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`   |
+| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]` |
+| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`            |
+| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]`          |
+| `value`       | The key name in data that contains the value. Defaults to "value". **TYPE:** `Union[str, None]`                |
+
+#### datachart.typings.RidgelineDataPointAttrs
+
+Bases: `TypedDict`
+
+The data point attributes for the ridgeline plot.
+
+| ATTRIBUTE | DESCRIPTION                                              |
+| --------- | -------------------------------------------------------- |
+| `label`   | The category label; one ridge per label. **TYPE:** `str` |
+| `value`   | The numeric value. **TYPE:** `Union[int, float]`         |
+
 ### Parallel Coordinates Plot Typings
 
 #### datachart.typings.ParallelCoordsSingleChartAttrs
@@ -742,7 +785,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
 
 The style attributes. Combines all style typings.
 
@@ -1171,6 +1214,22 @@ Bases: `ViolinStyleAttrs`, `SwarmStyleAttrs`, `BoxStyleAttrs`
 The typing for the raincloud plot style.
 
 The union of the violin (cloud), swarm (rain), and box style keys; each key styles its own part of the raincloud.
+
+### datachart.typings.RidgelineStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the ridgeline plot style.
+
+| ATTRIBUTE                        | DESCRIPTION                                                                            |
+| -------------------------------- | -------------------------------------------------------------------------------------- |
+| `plot_ridgeline_color`           | The ridge fill color; defaults to the palette color. **TYPE:** `Union[str, None]`      |
+| `plot_ridgeline_alpha`           | The alpha value of the ridge fill. **TYPE:** `Union[float, None]`                      |
+| `plot_ridgeline_linewidth`       | The line width of the ridge outline. **TYPE:** `Union[int, float, None]`               |
+| `plot_ridgeline_edgecolor`       | The color of the ridge outline; defaults to the fill. **TYPE:** `Union[str, None]`     |
+| `plot_ridgeline_overlap`         | How far a peak rises into the row above, in [0, 1]. **TYPE:** `Union[float, None]`     |
+| `plot_ridgeline_inner_color`     | The color of the inner marks; defaults to the font color. **TYPE:** `Union[str, None]` |
+| `plot_ridgeline_inner_linewidth` | The line width of the inner marks. **TYPE:** `Union[int, float, None]`                 |
 
 ### datachart.typings.ParallelCoordsStyleAttrs
 

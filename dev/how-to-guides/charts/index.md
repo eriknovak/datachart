@@ -29,6 +29,7 @@ The spread of the values within each group, from a binned summary to every obser
 | [Violin Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/violinplot/index.md)       | The showcase of the violin plot.    |
 | [Swarm Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/swarmplot/index.md)         | The showcase of the swarm plot.     |
 | [Raincloud Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/raincloudplot/index.md) | The showcase of the raincloud plot. |
+| [Ridgeline Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/ridgelineplot/index.md) | The showcase of the ridgeline plot. |
 
 ## Relationships
 
