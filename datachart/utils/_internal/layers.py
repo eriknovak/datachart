@@ -3371,9 +3371,11 @@ class RidgelineLayer(GroupLayer):
         peak = 1 + self.overlap
         common_max = max(float(d.max()) for d in densities)
         step = RIDGE_ZORDER_SPAN / len(grouped)
-        # a row spans its position ±0.5; horizontal ridges rise toward the
-        # first row (the top, on the inverted axis), vertical ones rightward
+        # horizontal ridges rise toward the first row (the top, on the inverted
+        # axis) from the row's lower edge, so an overlaid swarm sits inside;
+        # vertical ridges rise rightward from their tick
         rise = -1 if self.is_horizontal else 1
+        offset = 0.5 if self.is_horizontal else 0.0
 
         style = self.ridge_style
         facecolor = style.get("facecolor")
@@ -3392,7 +3394,7 @@ class RidgelineLayer(GroupLayer):
             )
             heights = density / (float(scale) or 1.0) * peak
             position = ctx.category_index[label]
-            baseline = position - rise * 0.5
+            baseline = position + offset
             tops = baseline + rise * heights
             # a ridge draws over the row it rises into, so overlap reads as depth
             depth = i if self.is_horizontal else len(grouped) - 1 - i

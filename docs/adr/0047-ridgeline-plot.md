@@ -27,8 +27,9 @@ the side, with the rows allowed to overlap.
 - **Rows live on the category index; the first row is at the top.** Each
   label takes one slot of the panel category index (ADR 0020), so a
   `SwarmPlot` or `BoxPlot` over the same labels lines up in `Panel`. A
-  ridge's baseline is the edge of its slot (position ± 0.5), so an overlaid
-  swarm centred on the position sits under its own ridge. The panel inverts
+  horizontal ridge's baseline is the lower edge of its slot (position +
+  0.5), so an overlaid swarm centred on the position sits under its own
+  ridge; a vertical ridge rises from its tick. The panel inverts
   the category axis when it holds a horizontal ridge layer, so input order
   reads top to bottom as a joy plot does; overlaid group layers follow the
   same axis. A ridge draws above the row it rises into, so overlap reads as
@@ -55,8 +56,8 @@ the side, with the rows allowed to overlap.
   Both `False` raises `ValueError`: nothing would be drawn.
 - **`orientation` defaults to `HORIZONTAL`.** The value axis is x and rows
   stack along y, the joy-plot form, ridges rising toward the top. `VERTICAL`
-  keeps the category axis uninverted: the first row is at the left and the
-  ridges rise rightward. A `Panel` mix with a sibling group figure needs
+  keeps the category axis uninverted: the first row is at the left and each
+  ridge rises rightward from its tick. A `Panel` mix with a sibling group figure needs
   the same orientation on both, as everywhere.
 - **Style keys under `plot_ridgeline_*`.** `color`, `alpha`, `linewidth`,
   `edgecolor`, `overlap`, `inner_color`, `inner_linewidth`. Fill defaults to

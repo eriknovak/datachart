@@ -182,7 +182,8 @@ def RidgelinePlot(
             `ASPECT_RATIO`.
         orientation: "horizontal" (default) runs the value axis along x and
             stacks the rows along y, first row at the top; "vertical" runs
-            the rows along x, first row at the left, ridges rising rightward.
+            the rows along x, first row at the left, each ridge rising
+            rightward from its tick.
             See `ORIENTATION`.
         scaley: The value-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each chart.
@@ -210,8 +211,9 @@ def RidgelinePlot(
         bandwidth: The KDE bandwidth: None or "scott" (Scott's rule),
             "silverman", or a scalar factor. See `BANDWIDTH`.
         overlap: How far a ridge's peak rises into the row above, in `[0, 1]`:
-            each ridge rises from the edge of its row and its peak stands
-            `1 + overlap` rows above it, so 0 makes rows touch. None takes the theme's `plot_ridgeline_overlap`.
+            a ridge's peak stands `1 + overlap` rows above its baseline (the
+            row's lower edge, or its tick when vertical), so 0 makes rows
+            touch. None takes the theme's `plot_ridgeline_overlap`.
         normalize: "per_row" scales every ridge to the same peak so shapes
             compare; "common" keeps one density scale so heights compare. See
             `RIDGELINE_SCALE`.

@@ -56,7 +56,7 @@ def rise(fill, position, horizontal=True):
     vertices = fill.get_paths()[0].vertices[:, 1 if horizontal else 0]
     if horizontal:
         return position + 0.5 - vertices.min()
-    return vertices.max() - (position - 0.5)
+    return vertices.max() - position
 
 
 class TestRidgelineLayout(unittest.TestCase):
@@ -138,6 +138,9 @@ class TestRidgelineLayout(unittest.TestCase):
         self.assertFalse(ax.xaxis_inverted())
         self.assertFalse(ax.yaxis_inverted())
         self.assertAlmostEqual(rise(fills(ax)[0], 1, horizontal=False), 1.5, places=6)
+        # each vertical ridge rises from its own tick
+        for position, fill in enumerate(fills(ax), start=1):
+            self.assertAlmostEqual(fill.get_paths()[0].vertices[:, 0].min(), position)
         # rows rise rightward, so earlier rows draw over the later ones they reach
         zorders = [f.get_zorder() for f in fills(ax)]
         self.assertEqual(zorders, sorted(zorders, reverse=True))
