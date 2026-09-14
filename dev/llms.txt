@@ -5,7 +5,8 @@
 datachart is a Python data visualization package built on matplotlib.
 It provides simple chart functions (BarChart, LineChart, StackedAreaChart, ScatterChart,
 Histogram, Heatmap, ContourChart, HexbinChart, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot,
-ParallelCoords, PyramidChart, RadialChart, SankeyChart, NetworkChart, Treemap), figure
+ParallelCoords, PyramidChart, RadialChart, CalendarHeatmap, SankeyChart, NetworkChart,
+Treemap), figure
 composition via Panel (overlaying charts on shared axes) and Grid
 (arranging charts in a grid), and a global configuration system with
 predefined themes.
@@ -28,6 +29,7 @@ themes; per-chart overrides go in each chart's `style` parameter.
 - [Bar Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md): Bar chart input attributes, single and multiple datasets, customization, date labels, and saving.
 - [Pyramid Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/pyramidchart/index.md): Pyramid chart input attributes, the two-sides data contract, mirrored value axis controls, date labels, and composing pyramids with Grid.
 - [Radial Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/radialchart/index.md): Radial chart input attributes, the line, bar, scatter, and histogram visuals, and polar settings (start angle, direction, inner radius).
+- [Calendar Heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/calendarheatmap/index.md): Calendar heatmap input attributes, the dated values data contract, week start, month and weekday labels, colorbar and cell values, calendar style, normalization, one calendar per year and the year filter, composing with Grid, and saving.
 - [Histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md): Histogram input attributes, single and multiple datasets, and histogram views.
 - [Box Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/boxplot/index.md): Box plot input attributes, customization, date labels, composing boxes with swarm and violin plots; multiple datasets require subplots.
 - [Violin Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/violinplot/index.md): Violin plot input attributes, inner marks, bandwidth, split violins, date labels, composing violins with box and swarm plots, and subplots.

@@ -527,6 +527,8 @@
       
         
       
+        
+      
     
     
     
@@ -706,6 +708,34 @@
     
   
     Radial Chart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../how-to-guides/charts/calendarheatmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calendar Heatmap
   
 
     
@@ -2227,6 +2257,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.constants.WEEKDAY" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;WEEKDAY
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.constants.VIOLIN_INNER" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2831,6 +2872,17 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ORIENTATION
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.constants.WEEKDAY" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;WEEKDAY
       
     </span>
   </a>
@@ -6952,6 +7004,106 @@ plots, and violin plots.</p>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
                 <p>The vertical orientation. Equals to <code>"vertical"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="datachart.constants.WEEKDAY" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.constants.WEEKDAY</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>The supported week start days.</p>
+<p>Passed as the <code>week_start</code> setting of the calendar heatmap: the weekday
+drawn in the top row of every week column. The theme's
+<code>plot_calendar_heatmap_week_start</code> supplies the default.</p>
+<p><img alt="WEEKDAY at a glance" src="../../assets/imgs/const-weekday.svg" width="100%" /></p>
+<div class="admonition info">
+<p class="admonition-title">Added in Unreleased</p>
+</div>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">WEEKDAY</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">WEEKDAY</span><span class="o">.</span><span class="n">MONDAY</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">"monday"</span>
+</code></pre></div>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">ATTRIBUTE</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.WEEKDAY.MONDAY">MONDAY</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Weeks run from Monday to Sunday. Equals to <code>"monday"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.WEEKDAY.SUNDAY">SUNDAY</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Weeks run from Sunday to Saturday. Equals to <code>"sunday"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">

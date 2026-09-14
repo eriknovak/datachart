@@ -534,6 +534,8 @@
       
         
       
+        
+      
     
     
     
@@ -713,6 +715,34 @@
     
   
     Radial Chart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../calendarheatmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calendar Heatmap
   
 
     
@@ -3729,7 +3759,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6c1dd814">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=231b790e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -3740,7 +3770,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=dea5bb4e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f7e52673">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4924,6 +4954,8 @@ figure.show()</div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="example-3-contributions-calendar-blank-cells-sparse-ticks-and-skewed-counts">Example 3: Contributions Calendar (Blank Cells, Sparse Ticks and Skewed Counts)<a class="anchor-link" href="#example-3-contributions-calendar-blank-cells-sparse-ticks-and-skewed-counts">¶</a></h3><p><code>contributions</code> holds the number of commits on each day of 2025 by one illustrative developer, drawn from a seeded generator: most weekdays see a few commits, weekends rarely any, and two release weeks in March and September see a burst of them. The matrix is laid out like the GitHub contributions graph — one row per weekday from Monday to Sunday, one column per week of the year — and the days before January 1 and after December 31 in the first and last week are <code>None</code>, so they are left blank. The calendar only makes sense with square cells (<code>ASPECT_RATIO.EQUAL</code>) and a wide, short figure; <code>yticks</code> label every other weekday, <code>xticks</code> mark the week each month starts in (<code>month_weeks</code>, computed in the hidden cell), the colormap is GitHub's green scale passed as a list of hex colors, and white cell borders (<code>plot_heatmap_edge_width</code> and <code>plot_heatmap_edge_color</code>) stand in for the gaps between GitHub's squares. The release weeks would drown the everyday commits on a linear colormap, so <code>NORMALIZE.ASINH</code> spreads the low counts over the greens. There is no colorbar: the calendar is read by pattern, not by value.</p>
+<p>!!! tip "The calendar heatmap does this for you"
+<a href="calendarheatmap.ipynb">datachart.charts.CalendarHeatmap</a> takes the dates and values directly and lays out the weeks, month separators, and labels itself; this example shows what the layout is made of.</p>
 </div>
 </div>
 </div>

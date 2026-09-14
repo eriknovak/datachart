@@ -6,79 +6,82 @@ Module containing the `typings`.
 
 The `typings` module contains the typings for all chart components. The module is intended to contain the typings for easier input value format checkup.
 
-| CLASS                            | DESCRIPTION                                                     |
-| -------------------------------- | --------------------------------------------------------------- |
-| `VLineSettingAttrs`              | The per-figure vertical reference line setting.                 |
-| `HLineSettingAttrs`              | The per-figure horizontal reference line setting.               |
-| `VSpanSettingAttrs`              | The per-figure vertical reference band setting.                 |
-| `HSpanSettingAttrs`              | The per-figure horizontal reference band setting.               |
-| `TextSettingAttrs`               | The per-figure text annotation setting.                         |
-| `LineSingleChartAttrs`           | The single chart attributes for the line chart.                 |
-| `LineDataPointAttrs`             | The data point attributes for the line chart.                   |
-| `StackedAreaSingleChartAttrs`    | The single chart attributes for the stacked area chart.         |
-| `SankeySingleChartAttrs`         | The single chart attributes for the Sankey chart.               |
-| `SankeyLinkAttrs`                | The link record attributes for the Sankey chart.                |
-| `TreemapSingleChartAttrs`        | The single chart attributes for the treemap.                    |
-| `TreemapRecordAttrs`             | The record attributes for the treemap.                          |
-| `NetworkSingleChartAttrs`        | The single chart attributes for the network chart.              |
-| `NetworkNodeAttrs`               | The node record attributes for the network chart.               |
-| `NetworkEdgeAttrs`               | The edge record attributes for the network chart.               |
-| `BarSingleChartAttrs`            | The single chart attributes for the bar chart.                  |
-| `BarDataPointAttrs`              | The data point attributes for the bar chart.                    |
-| `HistogramSingleChartAttrs`      | The single chart attributes for the histogram chart.            |
-| `HistDataPointAttrs`             | The data point attributes for the histogram chart.              |
-| `HeatmapSingleChartAttrs`        | The single chart attributes for the heatmap chart.              |
-| `HeatmapDataAttrs`               | The data attributes for the heatmap chart.                      |
-| `ColorbarSettingAttrs`           | The per-figure colorbar setting.                                |
-| `ContourSingleChartAttrs`        | The single chart attributes for the contour chart.              |
-| `ContourDataAttrs`               | The data attributes for the contour chart.                      |
-| `HexbinSingleChartAttrs`         | The single chart attributes for the hexbin chart.               |
-| `HexbinDataAttrs`                | The data attributes for the hexbin chart.                       |
-| `ScatterSingleChartAttrs`        | The single chart attributes for the scatter chart.              |
-| `ScatterDataPointAttrs`          | The data point attributes for the scatter chart.                |
-| `BoxSingleChartAttrs`            | The single chart attributes for the box plot.                   |
-| `BoxDataPointAttrs`              | The data point attributes for the box plot.                     |
-| `SwarmSingleChartAttrs`          | The single chart attributes for the swarm plot.                 |
-| `SwarmDataPointAttrs`            | The data point attributes for the swarm plot.                   |
-| `ViolinSingleChartAttrs`         | The single chart attributes for the violin plot.                |
-| `ViolinDataPointAttrs`           | The data point attributes for the violin plot.                  |
-| `RaincloudSingleChartAttrs`      | The single chart attributes for the raincloud plot.             |
-| `RaincloudDataPointAttrs`        | The data point attributes for the raincloud plot.               |
-| `ParallelCoordsSingleChartAttrs` | The single chart attributes for the parallel coordinates chart. |
-| `ParallelCoordsDataPointAttrs`   | The data point attributes for the parallel coordinates chart.   |
-| `RadialSingleChartAttrs`         | The single chart attributes for the radial chart.               |
-| `RadialDataPointAttrs`           | The data point attributes for the radial chart.                 |
-| `StyleAttrs`                     | The style typing.                                               |
-| `ColorStyleAttrs`                | The typing for the general color style.                         |
-| `FontStyleAttrs`                 | The typing for the font style.                                  |
-| `AxesStyleAttrs`                 | The typing for the axes style.                                  |
-| `LegendStyleAttrs`               | The typing for the legend style.                                |
-| `LegendSettingAttrs`             | The per-figure legend setting.                                  |
-| `AreaStyleAttrs`                 | The typing for the area style.                                  |
-| `GridStyleAttrs`                 | The typing for the grid style.                                  |
-| `LineStyleAttrs`                 | The typing for the line style.                                  |
-| `StackedAreaStyleAttrs`          | The typing for the stacked area chart style.                    |
-| `SankeyStyleAttrs`               | The typing for the Sankey chart style.                          |
-| `TreemapStyleAttrs`              | The typing for the treemap style.                               |
-| `NetworkStyleAttrs`              | The typing for the network chart style.                         |
-| `BarStyleAttrs`                  | The typing for the bar style.                                   |
-| `HistStyleAttrs`                 | The typing for the histogram style.                             |
-| `VLineStyleAttrs`                | The typing for the vertical line style.                         |
-| `HLineStyleAttrs`                | The typing for the horizontal line style.                       |
-| `VSpanStyleAttrs`                | The typing for the vertical reference band style.               |
-| `HSpanStyleAttrs`                | The typing for the horizontal reference band style.             |
-| `TextStyleAttrs`                 | The typing for the text annotation style.                       |
-| `HeatmapStyleAttrs`              | The typing for the heatmap style.                               |
-| `ContourStyleAttrs`              | The typing for the contour chart style.                         |
-| `HexbinStyleAttrs`               | The typing for the hexbin chart style.                          |
-| `ScatterStyleAttrs`              | The typing for the scatter chart style.                         |
-| `RegressionStyleAttrs`           | The typing for the regression line style.                       |
-| `BoxStyleAttrs`                  | The typing for the box plot style.                              |
-| `SwarmStyleAttrs`                | The typing for the swarm plot style.                            |
-| `ViolinStyleAttrs`               | The typing for the violin plot style.                           |
-| `RaincloudStyleAttrs`            | The typing for the raincloud plot style.                        |
-| `ParallelCoordsStyleAttrs`       | The typing for the parallel coordinates chart style.            |
-| `ThemeDefaultAttrs`              | The typing for theme-driven defaults and cycles.                |
+| CLASS                             | DESCRIPTION                                                     |
+| --------------------------------- | --------------------------------------------------------------- |
+| `VLineSettingAttrs`               | The per-figure vertical reference line setting.                 |
+| `HLineSettingAttrs`               | The per-figure horizontal reference line setting.               |
+| `VSpanSettingAttrs`               | The per-figure vertical reference band setting.                 |
+| `HSpanSettingAttrs`               | The per-figure horizontal reference band setting.               |
+| `TextSettingAttrs`                | The per-figure text annotation setting.                         |
+| `LineSingleChartAttrs`            | The single chart attributes for the line chart.                 |
+| `LineDataPointAttrs`              | The data point attributes for the line chart.                   |
+| `StackedAreaSingleChartAttrs`     | The single chart attributes for the stacked area chart.         |
+| `SankeySingleChartAttrs`          | The single chart attributes for the Sankey chart.               |
+| `SankeyLinkAttrs`                 | The link record attributes for the Sankey chart.                |
+| `TreemapSingleChartAttrs`         | The single chart attributes for the treemap.                    |
+| `TreemapRecordAttrs`              | The record attributes for the treemap.                          |
+| `NetworkSingleChartAttrs`         | The single chart attributes for the network chart.              |
+| `NetworkNodeAttrs`                | The node record attributes for the network chart.               |
+| `NetworkEdgeAttrs`                | The edge record attributes for the network chart.               |
+| `BarSingleChartAttrs`             | The single chart attributes for the bar chart.                  |
+| `BarDataPointAttrs`               | The data point attributes for the bar chart.                    |
+| `HistogramSingleChartAttrs`       | The single chart attributes for the histogram chart.            |
+| `HistDataPointAttrs`              | The data point attributes for the histogram chart.              |
+| `HeatmapSingleChartAttrs`         | The single chart attributes for the heatmap chart.              |
+| `HeatmapDataAttrs`                | The data attributes for the heatmap chart.                      |
+| `ColorbarSettingAttrs`            | The per-figure colorbar setting.                                |
+| `CalendarHeatmapSingleChartAttrs` | The single chart attributes for the calendar heatmap.           |
+| `CalendarHeatmapDataAttrs`        | The data attributes for the calendar heatmap.                   |
+| `ContourSingleChartAttrs`         | The single chart attributes for the contour chart.              |
+| `ContourDataAttrs`                | The data attributes for the contour chart.                      |
+| `HexbinSingleChartAttrs`          | The single chart attributes for the hexbin chart.               |
+| `HexbinDataAttrs`                 | The data attributes for the hexbin chart.                       |
+| `ScatterSingleChartAttrs`         | The single chart attributes for the scatter chart.              |
+| `ScatterDataPointAttrs`           | The data point attributes for the scatter chart.                |
+| `BoxSingleChartAttrs`             | The single chart attributes for the box plot.                   |
+| `BoxDataPointAttrs`               | The data point attributes for the box plot.                     |
+| `SwarmSingleChartAttrs`           | The single chart attributes for the swarm plot.                 |
+| `SwarmDataPointAttrs`             | The data point attributes for the swarm plot.                   |
+| `ViolinSingleChartAttrs`          | The single chart attributes for the violin plot.                |
+| `ViolinDataPointAttrs`            | The data point attributes for the violin plot.                  |
+| `RaincloudSingleChartAttrs`       | The single chart attributes for the raincloud plot.             |
+| `RaincloudDataPointAttrs`         | The data point attributes for the raincloud plot.               |
+| `ParallelCoordsSingleChartAttrs`  | The single chart attributes for the parallel coordinates chart. |
+| `ParallelCoordsDataPointAttrs`    | The data point attributes for the parallel coordinates chart.   |
+| `RadialSingleChartAttrs`          | The single chart attributes for the radial chart.               |
+| `RadialDataPointAttrs`            | The data point attributes for the radial chart.                 |
+| `StyleAttrs`                      | The style typing.                                               |
+| `ColorStyleAttrs`                 | The typing for the general color style.                         |
+| `FontStyleAttrs`                  | The typing for the font style.                                  |
+| `AxesStyleAttrs`                  | The typing for the axes style.                                  |
+| `LegendStyleAttrs`                | The typing for the legend style.                                |
+| `LegendSettingAttrs`              | The per-figure legend setting.                                  |
+| `AreaStyleAttrs`                  | The typing for the area style.                                  |
+| `GridStyleAttrs`                  | The typing for the grid style.                                  |
+| `LineStyleAttrs`                  | The typing for the line style.                                  |
+| `StackedAreaStyleAttrs`           | The typing for the stacked area chart style.                    |
+| `SankeyStyleAttrs`                | The typing for the Sankey chart style.                          |
+| `TreemapStyleAttrs`               | The typing for the treemap style.                               |
+| `NetworkStyleAttrs`               | The typing for the network chart style.                         |
+| `BarStyleAttrs`                   | The typing for the bar style.                                   |
+| `HistStyleAttrs`                  | The typing for the histogram style.                             |
+| `VLineStyleAttrs`                 | The typing for the vertical line style.                         |
+| `HLineStyleAttrs`                 | The typing for the horizontal line style.                       |
+| `VSpanStyleAttrs`                 | The typing for the vertical reference band style.               |
+| `HSpanStyleAttrs`                 | The typing for the horizontal reference band style.             |
+| `TextStyleAttrs`                  | The typing for the text annotation style.                       |
+| `HeatmapStyleAttrs`               | The typing for the heatmap style.                               |
+| `CalendarHeatmapStyleAttrs`       | The typing for the calendar heatmap style.                      |
+| `ContourStyleAttrs`               | The typing for the contour chart style.                         |
+| `HexbinStyleAttrs`                | The typing for the hexbin chart style.                          |
+| `ScatterStyleAttrs`               | The typing for the scatter chart style.                         |
+| `RegressionStyleAttrs`            | The typing for the regression line style.                       |
+| `BoxStyleAttrs`                   | The typing for the box plot style.                              |
+| `SwarmStyleAttrs`                 | The typing for the swarm plot style.                            |
+| `ViolinStyleAttrs`                | The typing for the violin plot style.                           |
+| `RaincloudStyleAttrs`             | The typing for the raincloud plot style.                        |
+| `ParallelCoordsStyleAttrs`        | The typing for the parallel coordinates chart style.            |
+| `ThemeDefaultAttrs`               | The typing for theme-driven defaults and cycles.                |
 
 ## Chart Typings
 
@@ -377,6 +380,40 @@ The `label`, `location`, `format`, and `ticks` fields, and the name `ColorbarSet
 | `ticks`       | Explicit tick positions on the bar. **TYPE:** `Union[List[Union[int, float]], None]`                                                                                                 |
 | `orientation` | The orientation; derives the edge when location is unset. **TYPE:** `Union[ORIENTATION, str, None]`                                                                                  |
 
+### Calendar Heatmap Typings
+
+#### datachart.typings.CalendarHeatmapSingleChartAttrs
+
+Bases: `TypedDict`
+
+The single chart attributes for the calendar heatmap.
+
+Added in Unreleased
+
+| ATTRIBUTE  | DESCRIPTION                                                                                              |
+| ---------- | -------------------------------------------------------------------------------------------------------- |
+| `data`     | The dated values defining the calendar. **TYPE:** `CalendarHeatmapDataAttrs`                             |
+| `subtitle` | The subtitle of the calendar; a multi-year calendar appends the year to it. **TYPE:** `Union[str, None]` |
+| `style`    | The style of the calendar. **TYPE:** `Union[CalendarHeatmapStyleAttrs, None]`                            |
+| `norm`     | The value normalization. **TYPE:** `Union[NORMALIZE, str, None]`                                         |
+| `vmin`     | The minimum value to normalize the data points. **TYPE:** `Union[float, None]`                           |
+| `vmax`     | The maximum value to normalize the data points. **TYPE:** `Union[float, None]`                           |
+| `colorbar` | The colorbar setting of the calendar. **TYPE:** `Union[ColorbarSettingAttrs, None]`                      |
+| `texts`    | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`      |
+
+#### datachart.typings.CalendarHeatmapDataAttrs
+
+Bases: `TypedDict`
+
+The data attributes for the calendar heatmap.
+
+Added in Unreleased
+
+| ATTRIBUTE | DESCRIPTION                                                                                                                                                                               |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `date`    | One temporal object per day: a date, datetime, numpy.datetime64, or pandas Timestamp. Date strings are never parsed, and every date appears once. **TYPE:** `List[Union[date, datetime]]` |
+| `value`   | The value of each day, one per date; None leaves the day blank. **TYPE:** `List[Union[int, float, None]]`                                                                                 |
+
 ### Scatter Chart Typings
 
 #### datachart.typings.ScatterSingleChartAttrs
@@ -656,7 +693,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
 
 The style attributes. Combines all style typings.
 
@@ -951,6 +988,28 @@ The typing for the heatmap chart style.
 | `plot_heatmap_frame_color` | The color of the frame always drawn around heatmap axes. **TYPE:** `Union[str, None]`                                                                               |
 | `plot_heatmap_edge_width`  | The width of the borders drawn between the cells (0 draws none). **TYPE:** `Union[int, float, None]`                                                                |
 | `plot_heatmap_edge_color`  | The color of the borders drawn between the cells. **TYPE:** `Union[str, None]`                                                                                      |
+
+### datachart.typings.CalendarHeatmapStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the calendar heatmap style.
+
+Added in Unreleased
+
+| ATTRIBUTE                                | DESCRIPTION                                                                                                                                                                                           |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_calendar_heatmap_cmap`             | The colormap of the day cells (palette name, single color, list of hex colors, or colormap); None takes the heatmap colormap. **TYPE:** `Union[str, List[str], colors.LinearSegmentedColormap, None]` |
+| `plot_calendar_heatmap_alpha`            | The alpha value of the day cells. **TYPE:** `Union[float, None]`                                                                                                                                      |
+| `plot_calendar_heatmap_font_size`        | The font size of the cell values. **TYPE:** `Union[int, float, str, None]`                                                                                                                            |
+| `plot_calendar_heatmap_font_color`       | The font color of the cell values. **TYPE:** `Union[str, None]`                                                                                                                                       |
+| `plot_calendar_heatmap_font_style`       | The font style of the cell values. **TYPE:** `Union[FONT_STYLE, str, None]`                                                                                                                           |
+| `plot_calendar_heatmap_font_weight`      | The font weight of the cell values. **TYPE:** `Union[FONT_WEIGHT, str, None]`                                                                                                                         |
+| `plot_calendar_heatmap_edge_width`       | The width of the borders drawn between the day cells (0 draws none). **TYPE:** `Union[int, float, None]`                                                                                              |
+| `plot_calendar_heatmap_edge_color`       | The color of the borders drawn between the day cells. **TYPE:** `Union[str, None]`                                                                                                                    |
+| `plot_calendar_heatmap_month_line_width` | The width of the separators drawn between months (0 draws none). **TYPE:** `Union[int, float, None]`                                                                                                  |
+| `plot_calendar_heatmap_month_line_color` | The color of the separators drawn between months; None takes the heatmap frame color. **TYPE:** `Union[str, None]`                                                                                    |
+| `plot_calendar_heatmap_week_start`       | The weekday in the top row of every week, the default of week_start. **TYPE:** `Union[WEEKDAY, str, None]`                                                                                            |
 
 ### datachart.typings.ScatterStyleAttrs
 

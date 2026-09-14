@@ -548,6 +548,27 @@ Examples:
 | `HORIZONTAL` | The horizontal orientation. Equals to "horizontal". **TYPE:** `str` |
 | `VERTICAL`   | The vertical orientation. Equals to "vertical". **TYPE:** `str`     |
 
+### datachart.constants.WEEKDAY
+
+The supported week start days.
+
+Passed as the `week_start` setting of the calendar heatmap: the weekday drawn in the top row of every week column. The theme's `plot_calendar_heatmap_week_start` supplies the default.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import WEEKDAY
+>>> WEEKDAY.MONDAY
+"monday"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                            |
+| --------- | ---------------------------------------------------------------------- |
+| `MONDAY`  | Weeks run from Monday to Sunday. Equals to "monday". **TYPE:** `str`   |
+| `SUNDAY`  | Weeks run from Sunday to Saturday. Equals to "sunday". **TYPE:** `str` |
+
 ### datachart.constants.VIOLIN_INNER
 
 The supported violin inner marks.
