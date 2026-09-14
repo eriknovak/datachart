@@ -22,8 +22,10 @@ from ...constants import (
     LABEL_POSITION,
     NETWORK_LAYOUT,
     RANK,
+    RIDGELINE_SCALE,
     SCALE,
     SORT,
+    VIOLIN_INNER,
     WEEKDAY,
 )
 
@@ -54,6 +56,55 @@ def validate_bandwidth(bandwidth) -> None:
         raise ValueError(
             f"Invalid `bandwidth` value {bandwidth!r}. "
             f"Must be None, one of {BANDWIDTH_RULES}, or a number."
+        )
+
+
+RIDGELINE_SCALES = (RIDGELINE_SCALE.PER_ROW, RIDGELINE_SCALE.COMMON)
+RIDGELINE_INNERS = (VIOLIN_INNER.MEDIAN, VIOLIN_INNER.QUARTILES)
+
+
+def validate_overlap(overlap) -> float:
+    """Validate a ridgeline row overlap: a number in `[0, 1]` (ADR 0047)."""
+
+    if (
+        not isinstance(overlap, Real)
+        or isinstance(overlap, bool)
+        or not 0 <= overlap <= 1
+    ):
+        raise ValueError(f"Invalid `overlap` value {overlap!r}. Must be in [0, 1].")
+    return float(overlap)
+
+
+def validate_ridgeline_scale(normalize):
+    """Validate a ridgeline density scale; None means `PER_ROW`."""
+
+    if normalize is None:
+        return RIDGELINE_SCALE.DEFAULT
+    if normalize not in RIDGELINE_SCALES:
+        raise ValueError(
+            f"Invalid `normalize` value {normalize!r}. "
+            f"Must be one of {RIDGELINE_SCALES} or None."
+        )
+    return normalize
+
+
+def validate_ridgeline_inner(inner):
+    """Validate the ridgeline inner marks: the violin's marks without the box."""
+
+    if inner is not None and inner not in RIDGELINE_INNERS:
+        raise ValueError(
+            f"Invalid `inner` value {inner!r}. "
+            f"Must be one of {RIDGELINE_INNERS} or None."
+        )
+    return inner
+
+
+def validate_ridge_marks(fill: bool, show_outline: bool) -> None:
+    """Raise when a ridgeline would draw neither the fill nor the outline."""
+
+    if not fill and not show_outline:
+        raise ValueError(
+            "`fill` and `show_outline` cannot both be False: no ridge would be drawn."
         )
 
 

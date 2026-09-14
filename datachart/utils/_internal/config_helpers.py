@@ -1185,6 +1185,39 @@ def get_violin_inner_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Ridgeline Plot Style
+# -------------------------------------
+
+
+def get_ridgeline_style(chart_style: dict) -> dict:
+    """Get the ridgeline style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The ridge and inner marks style setting; `inner_color` falls back to
+        the font color.
+
+    """
+
+    config_attrs = [
+        ("facecolor", "plot_ridgeline_color"),
+        ("alpha", "plot_ridgeline_alpha"),
+        ("linewidth", "plot_ridgeline_linewidth"),
+        ("edgecolor", "plot_ridgeline_edgecolor"),
+        ("overlap", "plot_ridgeline_overlap"),
+        ("inner_color", "plot_ridgeline_inner_color"),
+        ("inner_linewidth", "plot_ridgeline_inner_linewidth"),
+    ]
+
+    style = create_config_dict(chart_style, config_attrs)
+    if style.get("inner_color") is None:
+        style["inner_color"] = get_attr_value("font_general_color", chart_style, config)
+    return style
+
+
+# -------------------------------------
 # Parallel Coordinates Style
 # -------------------------------------
 

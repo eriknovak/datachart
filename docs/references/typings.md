@@ -153,6 +153,16 @@ title: Typings Module
     options:
         heading_level: 4
 
+### Ridgeline Plot Typings
+
+::: datachart.typings.RidgelineSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.RidgelineDataPointAttrs
+    options:
+        heading_level: 4
+
 
 ### Parallel Coordinates Plot Typings
 
@@ -225,6 +235,7 @@ title: Typings Module
 ::: datachart.typings.SwarmStyleAttrs
 ::: datachart.typings.ViolinStyleAttrs
 ::: datachart.typings.RaincloudStyleAttrs
+::: datachart.typings.RidgelineStyleAttrs
 
 ::: datachart.typings.ParallelCoordsStyleAttrs
 ::: datachart.typings.ThemeDefaultAttrs

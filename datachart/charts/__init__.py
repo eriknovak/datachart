@@ -28,6 +28,8 @@ Methods:
         Creates the swarm plot.
     RaincloudPlot(attrs):
         Creates the raincloud plot.
+    RidgelinePlot(attrs):
+        Creates the ridgeline plot.
     ScatterChart(attrs):
         Creates the scatter chart.
     Heatmap(attrs):
@@ -62,6 +64,7 @@ from .box_plot import BoxPlot
 from .violin_plot import ViolinPlot
 from .swarm_plot import SwarmPlot
 from .raincloud_plot import RaincloudPlot
+from .ridgeline_plot import RidgelinePlot
 
 # relationships
 from .scatter_chart import ScatterChart
@@ -92,6 +95,7 @@ __all__ = [
     "ViolinPlot",
     "SwarmPlot",
     "RaincloudPlot",
+    "RidgelinePlot",
     # relationships
     "ScatterChart",
     "Heatmap",

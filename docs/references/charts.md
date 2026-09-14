@@ -28,6 +28,7 @@ title: Charts Module
 ::: datachart.charts.ViolinPlot
 ::: datachart.charts.SwarmPlot
 ::: datachart.charts.RaincloudPlot
+::: datachart.charts.RidgelinePlot
 
 
 ## Relationships

@@ -105,6 +105,10 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.RIDGELINE_SCALE
+    options:
+        heading_level: 3
+
 ::: datachart.constants.BANDWIDTH
     options:
         heading_level: 3

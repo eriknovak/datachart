@@ -54,6 +54,10 @@ from .validate import (
     validate_rank_by,
     validate_emphasis_rule,
     validate_log_values,
+    validate_overlap,
+    validate_ridge_marks,
+    validate_ridgeline_inner,
+    validate_ridgeline_scale,
     validate_sort,
     validate_sort_by,
     validate_network_edge_style,
@@ -103,6 +107,7 @@ from .config_helpers import (
     get_swarm_style,
     get_violin_style,
     get_violin_inner_style,
+    get_ridgeline_style,
     get_parallel_coords_style,
     get_parallel_axis_style,
     get_parallel_tick_style,
@@ -120,7 +125,7 @@ from .config_helpers import (
     configure_axis_ticks_position,
     configure_axis_limits,
 )
-from ..stats import minimum, maximum, iqr
+from ..stats import minimum, maximum, iqr, kde1d
 from ...constants import (
     ARROW_STYLE,
     ASPECT_RATIO,
@@ -137,6 +142,7 @@ from ...constants import (
     NETWORK_LAYOUT,
     ORIENTATION,
     RANK,
+    RIDGELINE_SCALE,
     SWARM_MODE,
     RADIAL_TYPE,
     SCALE,
@@ -2887,15 +2893,21 @@ class SwarmLayer(PointLabelMixin, GroupLayer):
         # collections drawn per axes, packed by the panel after limits settle
         self._pending = {}
 
-    def _offsets(self, ax, position: float, values: np.ndarray) -> np.ndarray:
-        """Per-point offsets from the category center, in data units."""
+    def _offsets(
+        self, ax, position: float, values: np.ndarray, side: int
+    ) -> np.ndarray:
+        """Per-point offsets from the category center, in data units.
+
+        A nonzero `side` packs the points on one side only: -1 toward lower
+        category positions, +1 toward higher ones.
+        """
 
         if self.mode == SWARM_MODE.STRIP:
             # the jitter width scales with the cell the points may spread over
             offsets = strip_offsets(
                 len(values), self.jitter * self.max_offset / SWARM_MAX_OFFSET
             )
-            return offsets if not self.side else (np.abs(offsets) * 2) * self.side
+            return offsets if not side else (np.abs(offsets) * 2) * side
 
         size = self.swarm_style.get("s")
         if size is None:
@@ -2909,13 +2921,14 @@ class SwarmLayer(PointLabelMixin, GroupLayer):
         )
         px = ax.transData.transform(points)
         value_px = px[:, 0] if self.is_horizontal else px[:, 1]
-        offsets_px = beeswarm_offsets(value_px, diameter_px, bool(self.side))
-        # pixels per data unit along the category axis
+        offsets_px = beeswarm_offsets(value_px, diameter_px, bool(side))
+        # pixels per data unit along the category axis; unsigned, so a side
+        # stays in data units on an inverted axis
         unit = ax.transData.transform([[0, 1]] if self.is_horizontal else [[1, 0]])
         origin = ax.transData.transform([[0, 0]])
-        scale = (unit - origin)[0][1 if self.is_horizontal else 0]
+        scale = abs((unit - origin)[0][1 if self.is_horizontal else 0])
         offsets = np.clip(offsets_px / scale, -self.max_offset, self.max_offset)
-        return offsets if not self.side else offsets * self.side
+        return offsets if not side else offsets * side
 
     def draw(self, ax, ctx):
         grouped = self.grouped_values()
@@ -2992,11 +3005,17 @@ class SwarmLayer(PointLabelMixin, GroupLayer):
         interval = ax.dataLim.intervaly if self.is_horizontal else ax.dataLim.intervalx
         interval[:] = (min(interval[0], lo), max(interval[1], hi))
 
-    def pack(self, ax) -> None:
-        """Spread the points drawn into `ax`; the panel calls this once its view is final."""
+    def pack(self, ax, side: int = 0) -> None:
+        """Spread the points drawn into `ax`; the panel calls this once its view is final.
 
+        The layer's own side wins; otherwise the panel's `side` applies.
+        """
+
+        side = self.side or side
         for collection, groups, role in self._pending.pop(id(ax), []):
-            offsets = np.concatenate([self._offsets(ax, pos, v) for pos, v in groups])
+            offsets = np.concatenate(
+                [self._offsets(ax, pos, v, side) for pos, v in groups]
+            )
             xy = np.asarray(collection.get_offsets()).copy()
             xy[:, 1 if self.is_horizontal else 0] += offsets
             collection.set_offsets(xy)
@@ -3060,6 +3079,15 @@ RAINCLOUD_RAIN_SIZE = 6
 # outliers are hollow rings, small enough not to outweigh the rain
 RAINCLOUD_OUTLIER_SIZE = 4
 INNER_QUARTILE_WIDTH_SCALE = 5.0
+
+
+def inner_line_marks(inner: str, values) -> list:
+    """The `(value, linestyle)` line marks of a median or quartiles inner."""
+
+    q1, median, q3 = np.percentile(np.asarray(values, dtype=float), [25, 50, 75])
+    if inner == VIOLIN_INNER.MEDIAN:
+        return [(median, "-")]
+    return [(q1, ":"), (median, "--"), (q3, ":")]
 
 
 class ViolinLayer(GroupLayer):
@@ -3250,9 +3278,7 @@ class ViolinLayer(GroupLayer):
                 lo_c, value, hi_c, value, linewidth=linewidth, linestyle=linestyle
             )
 
-        if self.inner == VIOLIN_INNER.MEDIAN:
-            return [span(median, "-")]
-        return [span(q1, ":"), span(median, "--"), span(q3, ":")]
+        return [span(v, style) for v, style in inner_line_marks(self.inner, values)]
 
     def _apply_violin_emphasis(self, artists: list, role: Optional[str]) -> None:
         if role is None:
@@ -3270,6 +3296,197 @@ class ViolinLayer(GroupLayer):
                 mark.set_linewidth(mark.get_linewidth() * MUTED_WIDTH_SCALE)
         else:
             body.set_linewidth(body.get_linewidth()[0] * HIGHLIGHT_WIDTH_SCALE)
+
+
+# the points each ridge's density is evaluated on
+RIDGE_GRIDSIZE = 200
+# rows stack in z from the violin body's level, below an overlaid swarm
+RIDGE_ZORDER = 2
+RIDGE_ZORDER_SPAN = 0.9
+
+
+class RidgelineLayer(GroupLayer):
+    """Per-label density ridges stacked on the category index (ADR 0047)."""
+
+    kind = "ridge"
+
+    def _resolve_style(self):
+        self.sort = validate_sort(self.settings.get("sort"))
+        super()._resolve_style()
+        if self.settings.get("orientation") is None:
+            self.orientation = ORIENTATION.HORIZONTAL
+            self.is_horizontal = True
+        self.bandwidth = self.settings.get("bandwidth")
+        self.inner = validate_ridgeline_inner(self.settings.get("inner"))
+        self.normalize = validate_ridgeline_scale(self.settings.get("normalize"))
+        self.fill = self.settings.get("fill") is not False
+        self.show_outline = self.settings.get("show_outline") is not False
+        validate_ridge_marks(self.fill, self.show_outline)
+        self.ridge_style = get_ridgeline_style(self.style)
+        overlap = self.settings.get("overlap")
+        self.overlap = validate_overlap(
+            self.ridge_style["overlap"] if overlap is None else overlap
+        )
+        self.show_values = False
+        # subplots share one value range, set once every layer is built
+        self.shared_range = None
+
+    def grouped_values(self) -> dict:
+        """The values per label, in row order: input order or by median."""
+
+        grouped = super().grouped_values()
+        if self.sort is None:
+            return grouped
+        sign = -1 if self.sort == SORT.DESCENDING else 1
+        # a stable sort: ties keep input order
+        order = sorted(grouped, key=lambda label: sign * np.median(grouped[label]))
+        return {label: grouped[label] for label in order}
+
+    def padded_range(self) -> Optional[tuple]:
+        """The union of the rows' padded density ranges; None without a density."""
+
+        ends = [
+            (curve[0]["x"], curve[-1]["x"])
+            for curve in (
+                kde1d(values, bandwidth=self.bandwidth, gridsize=2)
+                for values in self.grouped_values().values()
+                if len(values) > 1
+            )
+        ]
+        if not ends:
+            return None
+        return min(e[0] for e in ends), max(e[1] for e in ends)
+
+    def _grid_bounds(self) -> tuple:
+        """The shared or own padded range; the value-axis limits win."""
+
+        lo, hi = self.shared_range or self.padded_range()
+        axis = "x" if self.is_horizontal else "y"
+        low, high = self.settings.get(f"{axis}min"), self.settings.get(f"{axis}max")
+        return (lo if low is None else low, hi if high is None else high)
+
+    def draw(self, ax, ctx):
+        grouped = self.grouped_values()
+        if not grouped:
+            warnings.warn("No data points found for ridgeline plot.")
+            return
+        for label, values in grouped.items():
+            if len(values) < 2:
+                raise ValueError(
+                    f"Ridge {label!r} needs at least two values to estimate a density."
+                )
+
+        # emphasis aligns with the labels in input order, whatever the sort
+        input_labels = list(super().grouped_values())
+        roles = dict(zip(input_labels, self._group_roles(input_labels, ctx.emphasis)))
+
+        lo, hi = self._grid_bounds()
+        curves = [
+            kde1d(
+                values, bandwidth=self.bandwidth, gridsize=RIDGE_GRIDSIZE, xlim=(lo, hi)
+            )
+            for values in grouped.values()
+        ]
+        grid = np.array([point["x"] for point in curves[0]])
+        densities = [np.array([point["y"] for point in curve]) for curve in curves]
+        peak = 1 + self.overlap
+        common_max = max(float(d.max()) for d in densities)
+        step = RIDGE_ZORDER_SPAN / len(grouped)
+        # ridges rise from their tick: toward the first row (the top, on the
+        # inverted axis) when horizontal, rightward when vertical
+        rise = -1 if self.is_horizontal else 1
+
+        style = self.ridge_style
+        facecolor = style.get("facecolor")
+        if facecolor is None:
+            facecolor = ctx.color
+        edgecolor = style.get("edgecolor")
+        if edgecolor is None:
+            edgecolor = facecolor
+
+        for i, (label, values) in enumerate(grouped.items()):
+            density = densities[i]
+            scale = (
+                common_max
+                if self.normalize == RIDGELINE_SCALE.COMMON
+                else density.max()
+            )
+            heights = density / (float(scale) or 1.0) * peak
+            position = ctx.category_index[label]
+            baseline = position
+            tops = baseline + rise * heights
+            # a ridge draws over the row it rises into, so overlap reads as depth
+            depth = i if self.is_horizontal else len(grouped) - 1 - i
+            zorder = RIDGE_ZORDER + depth * step
+            artists = []
+            if self.fill:
+                fill_between = (
+                    ax.fill_between if self.is_horizontal else ax.fill_betweenx
+                )
+                body = fill_between(
+                    grid,
+                    baseline,
+                    tops,
+                    facecolor=facecolor,
+                    edgecolor="none",
+                    linewidth=0,
+                    alpha=style.get("alpha"),
+                    zorder=zorder,
+                )
+                artists.append(("fill", body))
+            artists += [
+                ("mark", mark)
+                for mark in self._draw_inner(
+                    ax, values, grid, baseline, tops, zorder + step / 3
+                )
+            ]
+            if self.show_outline:
+                xy = (grid, tops) if self.is_horizontal else (tops, grid)
+                outline = ax.plot(
+                    *xy,
+                    color=edgecolor,
+                    linewidth=style.get("linewidth"),
+                    zorder=zorder + 2 * step / 3,
+                )[0]
+                artists.append(("outline", outline))
+            self._apply_ridge_emphasis(artists, roles[label])
+            datum = self.summary_datum(self.label(ctx), position, values)
+            self.register_hover(artists[0][1], lambda _, datum=datum: datum)
+
+    def _draw_inner(self, ax, values, grid, baseline, tops, zorder) -> list:
+        """The median or quartile marks, from the baseline up to the ridge."""
+
+        if self.inner is None:
+            return []
+        lines = []
+        for value, linestyle in inner_line_marks(self.inner, values):
+            top = float(np.interp(value, grid, tops))
+            xs, ys = [value, value], [baseline, top]
+            lines.append(
+                ax.plot(
+                    *((xs, ys) if self.is_horizontal else (ys, xs)),
+                    color=self.ridge_style["inner_color"],
+                    linewidth=self.ridge_style["inner_linewidth"],
+                    linestyle=linestyle,
+                    zorder=zorder,
+                )[0]
+            )
+        return lines
+
+    def _apply_ridge_emphasis(self, artists: list, role: Optional[str]) -> None:
+        if role is None:
+            return
+        for part, artist in artists:
+            if role == EMPHASIS_HIGHLIGHT:
+                if part == "outline":
+                    artist.set_linewidth(artist.get_linewidth() * HIGHLIGHT_WIDTH_SCALE)
+                continue
+            artist.set_alpha(self.muted_alpha)
+            if part == "fill":
+                artist.set_facecolor(self.muted_color)
+            else:
+                artist.set_color(self.muted_color)
+                artist.set_linewidth(artist.get_linewidth() * MUTED_WIDTH_SCALE)
 
 
 # the axes fraction a colorbar takes, and its gap from the axes
@@ -6096,6 +6313,7 @@ LAYER_TYPES = {
     "boxplot": BoxLayer,
     "swarmplot": SwarmLayer,
     "violinplot": ViolinLayer,
+    "ridgelineplot": RidgelineLayer,
     "heatmap": HeatmapLayer,
     "contourchart": ContourLayer,
     "hexbinchart": HexbinLayer,
@@ -6425,6 +6643,7 @@ EMPHASIS_RULE_UNITS = {
     "violinplot": (_group_units, "median"),
     "swarmplot": (_group_units, "median"),
     "raincloudplot": (_group_units, "median"),
+    "ridgelineplot": (_group_units, "median"),
     "linechart": (_series_units("y"), "mean"),
     "scatterchart": (_series_units("y"), "mean"),
     "stackedareachart": (_series_units("y"), "mean"),
@@ -6503,6 +6722,14 @@ def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[La
 
     layer_cls = LAYER_TYPES[chart_type]
     layers = [layer_cls(chart, settings) for chart in charts]
+
+    if chart_type == "ridgelineplot" and len(layers) > 1:
+        # one grid range for every subplot, like the histogram's shared bins
+        ranges = [r for r in (layer.padded_range() for layer in layers) if r]
+        if ranges:
+            shared = (min(r[0] for r in ranges), max(r[1] for r in ranges))
+            for layer in layers:
+                layer.shared_range = shared
 
     if (
         chart_type == "linechart"
@@ -7034,7 +7261,11 @@ class Panel:
         s = self.settings
 
         # one dataset per kind: a violin and a box may share the positions
-        for kind, name in (("box", "box plot"), ("violin", "violin plot")):
+        for kind, name in (
+            ("box", "box plot"),
+            ("violin", "violin plot"),
+            ("ridge", "ridgeline plot"),
+        ):
             if sum(1 for l in self.layers if l.kind == kind) > 1:
                 raise ValueError(
                     f"Multiple {name} datasets require `subplots=True`. "
@@ -7618,6 +7849,10 @@ class Panel:
         # rank 1 sits at the top, inverted after any user limits apply
         if rank_axis and not ax.yaxis_inverted():
             ax.invert_yaxis()
+        # the first ridge row reads at the top; overlaid groups follow (ADR 0047)
+        ridges = any(isinstance(l, RidgelineLayer) for l in layers)
+        if ridges and horizontal and not bare and not ax.yaxis_inverted():
+            ax.invert_yaxis()
         if ax_right is not None and (
             s.get("ymin_right") is not None or s.get("ymax_right") is not None
         ):
@@ -7630,11 +7865,13 @@ class Panel:
             self._apply_radial_furniture(ax)
 
         # beeswarm packing reads the display transform, so it runs once the
-        # scales and limits are final (ADR 0020)
+        # scales and limits are final (ADR 0020); over ridges the points pack
+        # on the side the ridges rise to, inside them (ADR 0047)
+        swarm_side = (-1 if horizontal else 1) if ridges else 0
         for group, owner_ax in zip(self.groups, group_axes):
             for layer in group.layers:
                 if isinstance(layer, SwarmLayer):
-                    layer.pack(owner_ax)
+                    layer.pack(owner_ax, swarm_side)
 
         # reference lines and bands, after scales and limits
         for layer, target_ax in zip(layers, [ax] * len(layers)):
@@ -8125,7 +8362,13 @@ class Panel:
 # ================================================
 
 
-GROUP_CHART_TYPES = ("boxplot", "violinplot", "swarmplot", "raincloudplot")
+GROUP_CHART_TYPES = (
+    "boxplot",
+    "violinplot",
+    "swarmplot",
+    "raincloudplot",
+    "ridgelineplot",
+)
 
 
 def build_chart_panel_settings(

@@ -43,6 +43,8 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         "plot_box_median_color": "#000000",
         "plot_violin_edgecolor": "#000000",
         "plot_violin_inner_color": "#000000",
+        "plot_ridgeline_edgecolor": "#000000",
+        "plot_ridgeline_inner_color": "#000000",
     }
 )
 """The greyscale theme: shades of grey for print or colorblind-safe output.

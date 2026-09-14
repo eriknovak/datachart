@@ -352,6 +352,14 @@ BASE_THEME: StyleAttrs = {
     "plot_violin_inner_linewidth": 1.0,
     "plot_violin_median_color": "#FFFFFF",
     "plot_violin_median_size": 4,
+    # plot ridgeline style; the fill alpha lets overlapped rows show through
+    "plot_ridgeline_color": None,
+    "plot_ridgeline_alpha": 0.8,
+    "plot_ridgeline_linewidth": 1.0,
+    "plot_ridgeline_edgecolor": None,
+    "plot_ridgeline_overlap": 0.5,
+    "plot_ridgeline_inner_color": None,
+    "plot_ridgeline_inner_linewidth": 1.0,
     "plot_xticks_label_rotate": None,
     "plot_yticks_label_rotate": None,
     # overlay chart style

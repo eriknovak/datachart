@@ -33,6 +33,7 @@ from datachart.charts import (
     PyramidChart,
     RadialChart,
     RaincloudPlot,
+    RidgelinePlot,
     ViolinPlot,
     ContourChart,
     HexbinChart,
@@ -129,6 +130,12 @@ EXPECTED_CHANGES = {
     "raincloud_vertical",
     "raincloud_horizontal",
     "raincloud_emphasis",
+    # new ridgeline plot cases (ADR 0047)
+    "ridgeline_basic",
+    "ridgeline_sorted_overlap",
+    "ridgeline_common",
+    "ridgeline_vertical",
+    "ridgeline_panel_swarm",
     # colorbars are placed by the layout engine instead of an inset (ADR 0022)
     "heatmap_basic",
     # new temporal axis cases (ADR 0037)
@@ -614,6 +621,57 @@ def violin_panel_box():
     return Panel(
         [ViolinPlot(data=data, inner=None), BoxPlot(data=data, show_outliers=False)],
         title="Violin + box",
+    )
+
+
+def ridgeline_data(seed=5):
+    rng = np.random.RandomState(seed)
+    return [
+        {"label": month, "value": float(v)}
+        for i, month in enumerate(["Jan", "Feb", "Mar", "Apr", "May", "Jun"])
+        for v in rng.randn(60) * (1.5 + i % 3) + 8 * np.sin(i / 2)
+    ]
+
+
+@case
+def ridgeline_basic():
+    return RidgelinePlot(data=ridgeline_data(), inner="median", title="Ridges")
+
+
+@case
+def ridgeline_sorted_overlap():
+    return RidgelinePlot(
+        data=ridgeline_data(seed=6),
+        sort=SORT.DESCENDING,
+        overlap=1.0,
+        inner="quartiles",
+        emphasis=["background", None, None, "highlight", None, None],
+    )
+
+
+@case
+def ridgeline_common():
+    return RidgelinePlot(
+        data=ridgeline_data(seed=7),
+        normalize="common",
+        fill=False,
+        bandwidth=0.3,
+    )
+
+
+@case
+def ridgeline_vertical():
+    return RidgelinePlot(
+        data=ridgeline_data(seed=8), orientation="vertical", show_outline=False
+    )
+
+
+@case
+def ridgeline_panel_swarm():
+    data = ridgeline_data(seed=9)
+    return Panel(
+        [RidgelinePlot(data=data), SwarmPlot(data=data, orientation="horizontal")],
+        title="Ridges + swarm",
     )
 
 
