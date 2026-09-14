@@ -29,6 +29,8 @@ The `constants` module provides a set of predefined constants used in the packag
 | `CONTOUR_LEVELS`    | The supported contour level rules.             |
 | `HEXBIN_REDUCE`     | The supported hexbin aggregations.             |
 | `BASELINE`          | The supported stacked area baselines.          |
+| `RANK`              | The supported bump chart ranking rules.        |
+| `LABEL_POSITION`    | The supported end label positions.             |
 | `NETWORK_LAYOUT`    | The supported network chart layouts.           |
 | `RADIAL_TYPE`       | The supported radial chart visuals.            |
 | `SWARM_MODE`        | The supported swarm plot modes.                |
@@ -675,6 +677,52 @@ Examples:
 | `SYM`             | The stack is centred on zero. Equals to "sym". **TYPE:** `str`                                               |
 | `WIGGLE`          | The baseline minimises the sum of squared slopes. Equals to "wiggle". **TYPE:** `str`                        |
 | `WEIGHTED_WIGGLE` | The baseline minimises the size-weighted sum of squared slopes. Equals to "weighted_wiggle". **TYPE:** `str` |
+
+### datachart.constants.RANK
+
+The supported bump chart ranking rules.
+
+Passed as the `rank_by` setting of the bump chart: whether each series' `y` is already a rank or a value ranked per period, over the series present there. Ties keep input order.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import RANK
+>>> RANK.DEFAULT
+"value_descending"
+```
+
+| ATTRIBUTE          | DESCRIPTION                                                                  |
+| ------------------ | ---------------------------------------------------------------------------- |
+| `DEFAULT`          | The default ranking. Same as RANK.VALUE_DESCENDING. **TYPE:** `str`          |
+| `VALUE_DESCENDING` | The highest value ranks first. Equals to "value_descending". **TYPE:** `str` |
+| `VALUE_ASCENDING`  | The lowest value ranks first. Equals to "value_ascending". **TYPE:** `str`   |
+| `GIVEN`            | y is the rank, a positive integer. Equals to "given". **TYPE:** `str`        |
+
+### datachart.constants.LABEL_POSITION
+
+The supported end label positions.
+
+Passed as the `label_position` setting of the bump chart: beside which end of each line its series label prints.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import LABEL_POSITION
+>>> LABEL_POSITION.DEFAULT
+"end"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                            |
+| --------- | ---------------------------------------------------------------------- |
+| `DEFAULT` | The default position. Same as LABEL_POSITION.END. **TYPE:** `str`      |
+| `START`   | Beside the first point. Equals to "start". **TYPE:** `str`             |
+| `END`     | Beside the last point. Equals to "end". **TYPE:** `str`                |
+| `BOTH`    | Beside the first and the last point. Equals to "both". **TYPE:** `str` |
 
 ### datachart.constants.NETWORK_LAYOUT
 

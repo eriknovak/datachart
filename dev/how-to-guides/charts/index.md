@@ -12,6 +12,7 @@ Values along an axis or across categories: how a quantity moves and how the cate
 | -------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
 | [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md)                | The showcase of the line chart.         |
 | [Stacked Area Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/stackedareachart/index.md) | The showcase of the stacked area chart. |
+| [Bump Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/bumpchart/index.md)                | The showcase of the bump chart.         |
 | [Bar Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md)                  | The showcase of the bar chart.          |
 | [Pyramid Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/pyramidchart/index.md)          | The showcase of the pyramid chart.      |
 | [Radial Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/radialchart/index.md)            | The showcase of the radial chart.       |

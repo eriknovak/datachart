@@ -10,6 +10,7 @@ The `charts` module contains the methods to create the plots and figures, groupe
 | ------------------ | --------------------------------------- |
 | `LineChart`        | Creates the line chart.                 |
 | `StackedAreaChart` | Creates the stacked area chart.         |
+| `BumpChart`        | Creates the bump chart.                 |
 | `BarChart`         | Creates the bar chart.                  |
 | `PyramidChart`     | Creates the pyramid chart.              |
 | `RadialChart`      | Creates the radial chart.               |
@@ -478,6 +479,212 @@ The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_
 | RAISES       | DESCRIPTION                                                                        |
 | ------------ | ---------------------------------------------------------------------------------- |
 | `ValueError` | If the series do not share the same x values, or baseline is not a BASELINE value. |
+
+### datachart.charts.BumpChart
+
+```
+BumpChart(
+    data: Union[
+        List[LineDataPointAttrs],
+        List[List[LineDataPointAttrs]],
+    ],
+    *,
+    rank_by: Optional[Union[RANK, str]] = None,
+    title: Optional[str] = None,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
+    subtitle: Optional[
+        Union[str, List[Optional[str]]]
+    ] = None,
+    emphasis: Optional[
+        Union[EMPHASIS, str, List[Optional[str]]]
+    ] = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
+    figsize: Optional[
+        Union[FIG_SIZE, Tuple[float, float]]
+    ] = None,
+    xmin: Optional[Union[int, float, datetime]] = None,
+    xmax: Optional[Union[int, float, datetime]] = None,
+    ymin: Optional[Union[int, float]] = None,
+    ymax: Optional[Union[int, float]] = None,
+    show_labels: Optional[bool] = None,
+    label_position: Optional[
+        Union[LABEL_POSITION, str]
+    ] = None,
+    show_markers: Optional[bool] = None,
+    line_curve: Optional[float] = None,
+    show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
+    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    value_step: Optional[int] = None,
+    aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
+    scalex: Optional[Union[SCALE, str]] = None,
+    subplots: Optional[bool] = None,
+    max_cols: Optional[int] = None,
+    sharex: Optional[bool] = None,
+    sharey: Optional[bool] = None,
+    style: Optional[
+        Union[
+            BumpStyleAttrs, List[Optional[BumpStyleAttrs]]
+        ]
+    ] = None,
+    xticks: Optional[
+        Union[
+            List[Union[int, float, datetime]],
+            List[List[Union[int, float, datetime]]],
+        ]
+    ] = None,
+    xticklabels: Optional[
+        Union[List[str], List[List[str]]]
+    ] = None,
+    xtickrotate: Optional[
+        Union[int, List[Optional[int]]]
+    ] = None,
+    xticks_format: Optional[
+        Union[VALUE_FORMAT, DATE_FORMAT, str]
+    ] = None,
+    vlines: Optional[
+        Union[
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
+            List[
+                Union[
+                    VLineSettingAttrs,
+                    List[VLineSettingAttrs],
+                    None,
+                ]
+            ],
+        ]
+    ] = None,
+    hlines: Optional[
+        Union[
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
+            List[
+                Union[
+                    HLineSettingAttrs,
+                    List[HLineSettingAttrs],
+                    None,
+                ]
+            ],
+        ]
+    ] = None,
+    vspans: Optional[
+        Union[
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
+            List[
+                Union[
+                    VSpanSettingAttrs,
+                    List[VSpanSettingAttrs],
+                    None,
+                ]
+            ],
+        ]
+    ] = None,
+    hspans: Optional[
+        Union[
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
+            List[
+                Union[
+                    HSpanSettingAttrs,
+                    List[HSpanSettingAttrs],
+                    None,
+                ]
+            ],
+        ]
+    ] = None,
+    texts: Optional[
+        Union[
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[
+                Union[
+                    TextSettingAttrs,
+                    List[TextSettingAttrs],
+                    None,
+                ]
+            ],
+        ]
+    ] = None,
+    x: Optional[Union[str, List[Optional[str]]]] = None,
+    y: Optional[Union[str, List[Optional[str]]]] = None
+) -> plt.Figure
+```
+
+Creates the bump chart.
+
+A bump chart shows rank over time: one line per series, rank 1 at the top, a marker at every period, and the series named at the line's end in place of a y-axis. Use it for league tables, popularity, or market-share rankings, where the order matters more than the gaps between values. For the values themselves use LineChart; for a single period's order use BarChart with `sort`.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.charts import BumpChart
+>>> figure = BumpChart(
+...     data=[
+...         [{"x": 2022, "y": 71}, {"x": 2023, "y": 64}, {"x": 2024, "y": 80}],
+...         [{"x": 2022, "y": 68}, {"x": 2023, "y": 75}, {"x": 2024, "y": 77}],
+...         [{"x": 2022, "y": 59}, {"x": 2023, "y": 70}, {"x": 2024, "y": 62}],
+...     ],
+...     subtitle=["Ljubljana", "Maribor", "Celje"],
+...     title="League Table",
+...     xlabel="Season",
+...     ylabel="Rank",
+... )
+```
+
+| PARAMETER        | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `data`           | The data points of the series. Can be a single list of data points for one series, or a list of lists for several. **TYPE:** `Union[List[LineDataPointAttrs], List[List[LineDataPointAttrs]]]`                                                                                                                                                                                                                                 |
+| `rank_by`        | How y becomes a rank, a RANK member: VALUE_DESCENDING (default) ranks the highest value first at each period, VALUE_ASCENDING the lowest, and GIVEN reads y as the rank (a positive integer). Ranking reads the series present at a period; a series without a point there leaves a gap. Ties keep input order. **TYPE:** `Optional[Union[RANK, str]]` **DEFAULT:** `None`                                                     |
+| `title`          | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                          |
+| `xlabel`         | The x-axis label. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                |
+| `ylabel`         | The y-axis label. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                |
+| `subtitle`       | The subtitle(s) of the series. Used as end labels and legend labels. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                 |
+| `emphasis`       | The emphasis role(s) for individual series, aligned like style: "background" mutes a series, "highlight" bolds it and brings it to the front, None leaves it unchanged. **TYPE:** `Optional[Union[EMPHASIS, str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                    |
+| `emphasis_rule`  | A rule that highlights the series matching it and mutes the rest, read against a summary of each series' ranks, chosen by by ("mean" by default): {"top": n} picks the n best-ranked series, {"bottom": n} the worst, and {"above": v}, {"below": v}, {"between": (lo, hi)} compare the rank number itself. An explicit emphasis role wins. See EmphasisRuleAttrs. **TYPE:** `Optional[EmphasisRuleAttrs]` **DEFAULT:** `None` |
+| `figsize`        | The size of the figure. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                         |
+| `xmin`           | The minimum x-axis value. **TYPE:** `Optional[Union[int, float, datetime]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                |
+| `xmax`           | The maximum x-axis value. **TYPE:** `Optional[Union[int, float, datetime]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                |
+| `ymin`           | The minimum rank shown (the top of the axis). **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                      |
+| `ymax`           | The maximum rank shown (the bottom of the axis). **TYPE:** `Optional[Union[int, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                   |
+| `show_labels`    | Whether to print each series' subtitle beside its line end, in the series color. Defaults to True. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                              |
+| `label_position` | Which line end carries the label, a LABEL_POSITION member: START, END (default), or BOTH. **TYPE:** `Optional[Union[LABEL_POSITION, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                 |
+| `show_markers`   | Whether to draw a marker at every period. Defaults to True. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                     |
+| `line_curve`     | How far each segment eases between two periods, in \[0, 1\]: 0 (default) draws straight segments, 1 a full sigmoid. The points never move. **TYPE:** `Optional[float]` **DEFAULT:** `None`                                                                                                                                                                                                                                     |
+| `show_legend`    | Whether to show the legend. Defaults to on only when show_labels is off. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                        |
+| `legend`         | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                                                                                                           |
+| `show_grid`      | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                             |
+| `show_values`    | Whether to print each point's original y value beside it. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                       |
+| `value_format`   | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                              |
+| `value_step`     | Label every Nth point (1 labels all of them). Defaults to the smallest step that keeps neighbouring labels apart. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                |
+| `aspect_ratio`   | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                         |
+| `scalex`         | The x-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                          |
+| `subplots`       | Whether to create separate subplots for each series; the ranks still read every series. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                         |
+| `max_cols`       | Maximum number of columns in subplots (when subplots=True). **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                      |
+| `sharex`         | Whether to share the x-axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                        |
+| `sharey`         | Whether to share the y-axis in subplots. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                        |
+| `style`          | Style configuration(s) for the series. See BumpStyleAttrs. **TYPE:** `Optional[Union[BumpStyleAttrs, List[Optional[BumpStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                     |
+| `xticks`         | Custom x-axis tick positions. **TYPE:** `Optional[Union[List[Union[int, float, datetime]], List[List[Union[int, float, datetime]]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                      |
+| `xticklabels`    | Custom x-axis tick labels. **TYPE:** `Optional[Union[List[str], List[List[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                         |
+| `xtickrotate`    | Rotation angle for x-axis tick labels. **TYPE:** `Optional[Union[int, List[Optional[int]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                               |
+| `xticks_format`  | The x-axis tick label format: a DATE_FORMAT member or strftime pattern on a datetime axis, else a VALUE_FORMAT member or "{x:.1f}" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                               |
+| `vlines`         | Vertical line(s) to plot. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs], List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                           |
+| `hlines`         | Horizontal line(s) to plot, at rank positions. **TYPE:** `Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs], List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                      |
+| `vspans`         | Vertical reference band(s) to shade, between two x positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                       |
+| `hspans`         | Horizontal reference band(s) to shade, between two ranks. **TYPE:** `Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                           |
+| `texts`          | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs], List[Union[TextSettingAttrs, List[TextSettingAttrs], None]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                             |
+| `x`              | The key name in data for x-axis values (default: "x"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                               |
+| `y`              | The key name in data for the ranked values (default: "y"). **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                           |
+
+| RETURNS      | DESCRIPTION                           |
+| ------------ | ------------------------------------- |
+| `plt.Figure` | The figure containing the bump chart. |
 
 ### datachart.charts.BarChart
 

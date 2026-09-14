@@ -16,6 +16,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `LineSingleChartAttrs`            | The single chart attributes for the line chart.                 |
 | `LineDataPointAttrs`              | The data point attributes for the line chart.                   |
 | `StackedAreaSingleChartAttrs`     | The single chart attributes for the stacked area chart.         |
+| `BumpSingleChartAttrs`            | The single chart attributes for the bump chart.                 |
 | `SankeySingleChartAttrs`          | The single chart attributes for the Sankey chart.               |
 | `SankeyLinkAttrs`                 | The link record attributes for the Sankey chart.                |
 | `TreemapSingleChartAttrs`         | The single chart attributes for the treemap.                    |
@@ -61,6 +62,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `GridStyleAttrs`                  | The typing for the grid style.                                  |
 | `LineStyleAttrs`                  | The typing for the line style.                                  |
 | `StackedAreaStyleAttrs`           | The typing for the stacked area chart style.                    |
+| `BumpStyleAttrs`                  | The typing for the bump chart style.                            |
 | `SankeyStyleAttrs`                | The typing for the Sankey chart style.                          |
 | `TreemapStyleAttrs`               | The typing for the treemap style.                               |
 | `NetworkStyleAttrs`               | The typing for the network chart style.                         |
@@ -259,6 +261,32 @@ The data point attributes for the line chart.
 | `x`       | The x-axis value. **TYPE:** `Union[int, float]`                 |
 | `y`       | The y-axis value. **TYPE:** `Union[int, float]`                 |
 | `yerr`    | The y-axis error value. **TYPE:** `Optional[Union[int, float]]` |
+
+### Bump Chart Typings
+
+#### datachart.typings.BumpSingleChartAttrs
+
+Bases: `TypedDict`
+
+The single chart attributes for the bump chart.
+
+| ATTRIBUTE     | DESCRIPTION                                                                                                                           |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`        | The list of data points defining one series; y is a value ranked per period, or the rank itself. **TYPE:** `List[LineDataPointAttrs]` |
+| `subtitle`    | The subtitle of the series. Also used as its end label and legend label. **TYPE:** `Union[str, None]`                                 |
+| `xlabel`      | The xlabel of the chart. **TYPE:** `Union[str, None]`                                                                                 |
+| `ylabel`      | The ylabel of the chart. **TYPE:** `Union[str, None]`                                                                                 |
+| `style`       | The style of the series. **TYPE:** `Union[BumpStyleAttrs, None]`                                                                      |
+| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                                                         |
+| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                                                  |
+| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                                                |
+| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`                                    |
+| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLineSettingAttrs, List[HLineSettingAttrs], None]`                                  |
+| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`                          |
+| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]`                        |
+| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`                                   |
+| `x`           | The key name in data that contains the x-axis value. Defaults to "x". **TYPE:** `Union[str, None]`                                    |
+| `y`           | The key name in data that contains the y-axis value. Defaults to "y". **TYPE:** `Union[str, None]`                                    |
 
 ### Bar Chart Typings
 
@@ -714,7 +742,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
 
 The style attributes. Combines all style typings.
 
@@ -849,6 +877,21 @@ The typing for the line chart style.
 | `plot_line_zorder`         | The zorder of the line. **TYPE:** `Union[int, float, None]`                             |
 | `plot_xticks_label_rotate` | The label rotation of the xticks in the line chart. **TYPE:** `Union[int, float, None]` |
 | `plot_yticks_label_rotate` | The label rotation of the yticks in the line chart. **TYPE:** `Union[int, float, None]` |
+
+### datachart.typings.BumpStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the bump chart style.
+
+The line takes the `plot_line_*` keys (color, alpha, style, zorder); these keys set what is specific to a bump chart.
+
+| ATTRIBUTE                 | DESCRIPTION                                                                                  |
+| ------------------------- | -------------------------------------------------------------------------------------------- |
+| `plot_bump_line_width`    | The line width. **TYPE:** `Union[int, float, None]`                                          |
+| `plot_bump_marker`        | The marker at every period. **TYPE:** `Union[LINE_MARKER, str, None]`                        |
+| `plot_bump_marker_size`   | The marker size. **TYPE:** `Union[int, float, None]`                                         |
+| `plot_bump_label_padding` | The gap between a line end and its end label, in points. **TYPE:** `Union[int, float, None]` |
 
 ### datachart.typings.BarStyleAttrs
 
