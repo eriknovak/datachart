@@ -14,6 +14,7 @@ title: Charts Module
 
 ::: datachart.charts.LineChart
 ::: datachart.charts.StackedAreaChart
+::: datachart.charts.BumpChart
 ::: datachart.charts.BarChart
 ::: datachart.charts.PyramidChart
 ::: datachart.charts.RadialChart

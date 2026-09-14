@@ -51,6 +51,7 @@ Every chart type has hover support. Filled marks — bars, bands, boxes, bodies,
 | :---- | :--- | :--------- |
 | [Line Chart](../charts/linechart.ipynb) | line point | legend label, `x`, `y` |
 | [Stacked Area Chart](../charts/stackedareachart.ipynb) | band, at the nearest point | legend label, `x`, the series' own `y` (never the stack total) |
+| [Bump Chart](../charts/bumpchart.ipynb) | line, at the nearest period | legend label, `x`, the rank as `y`, the original `value` |
 | [Bar Chart](../charts/barchart.ipynb) | bar | legend label, category, the bar's own value (never the stack total) |
 | [Pyramid Chart](../charts/pyramidchart.ipynb) | bar | legend label, category, the value as passed, positive |
 | [Radial Chart](../charts/radialchart.ipynb) | point, bar, or bin | legend label, `angle` (the category, or a bin's degree range), `radius` |
