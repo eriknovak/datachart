@@ -49,6 +49,7 @@ from .validate import (
     validate_baseline,
     validate_emphasis,
     validate_emphasis_rule,
+    validate_log_values,
     validate_sort,
     validate_sort_by,
     validate_network_edge_style,
@@ -1280,6 +1281,18 @@ class Layer:
         """The layer's x data column; None when it has none."""
         return None
 
+    def value_data(self):
+        """The raw values the layer plots on the value axis (issue #147).
+
+        None when the layer plots none, or only derived ones (counts,
+        densities, stacked tops), which a log scale never rejects.
+        """
+        return None
+
+    def category_data(self):
+        """The raw values the layer plots on the category axis; None without."""
+        return self.x_values()
+
     def labels(self):
         """The layer's category labels; None for a layer without groups."""
         return None
@@ -1559,6 +1572,9 @@ class LineLayer(PointLabelMixin, Layer):
     def x_values(self):
         return get_chart_data("x", self.chart)
 
+    def value_data(self):
+        return get_chart_data("y", self.chart)
+
     def _resolved_area_style(self, ctx):
         area_style = self._merge_color("color", ctx.color, self.area_style)
         if ctx.z_order is not None:
@@ -1787,6 +1803,9 @@ class BarLayer(Layer):
 
     def y_values(self) -> Optional[np.ndarray]:
         return get_chart_data("y", self.chart)
+
+    def value_data(self):
+        return self.y_values()
 
     def y_range(self):
         y = self.y_values()
@@ -2052,6 +2071,9 @@ class ScatterLayer(PointLabelMixin, Layer):
     def x_values(self):
         return get_chart_data("x", self.chart)
 
+    def value_data(self):
+        return get_chart_data("y", self.chart)
+
     def _sizes(self, size_data):
         if size_data is not None:
             return _normalize_sizes(size_data, self.size_range)
@@ -2313,8 +2335,11 @@ class GroupLayer(Layer):
     def labels(self) -> list:
         return list(self.grouped_values().keys())
 
+    def value_data(self):
+        return [v for vals in self.grouped_values().values() for v in vals]
+
     def y_range(self):
-        values = [v for vals in self.grouped_values().values() for v in vals]
+        values = self.value_data()
         if not values:
             return None
         return (float(np.min(values)), float(np.max(values)))
@@ -3575,6 +3600,12 @@ class ContourLayer(Layer):
     def x_kind(self):
         return self._x_kind
 
+    def value_data(self):
+        return self.y
+
+    def category_data(self):
+        return None if self._x_kind == AXIS_TEMPORAL else self.x
+
     def y_range(self):
         return (float(self.y.min()), float(self.y.max()))
 
@@ -3736,6 +3767,12 @@ class HexbinLayer(Layer):
 
     def x_kind(self):
         return self._x_kind
+
+    def value_data(self):
+        return self.y
+
+    def category_data(self):
+        return None if self._x_kind == AXIS_TEMPORAL else self.x
 
     def y_range(self):
         if len(self.y) == 0:
@@ -4239,6 +4276,9 @@ class RadialLayer(Layer):
     def labels(self) -> Optional[np.ndarray]:
         return get_chart_data("label", self.chart)
 
+    def value_data(self):
+        return get_chart_data("y", self.chart)
+
     def y_range(self):
         y = get_chart_data("y", self.chart)
         if y is None or len(y) == 0:
@@ -4431,6 +4471,9 @@ class RadialHistogramLayer(RadialLayer):
 
     def x_values(self) -> Optional[np.ndarray]:
         return get_chart_data("x", self.chart)
+
+    def value_data(self):
+        return None
 
     def _counts(self) -> Optional[tuple]:
         x = self.x_values()
@@ -6531,6 +6574,17 @@ def determine_axis_assignment(
 # ================================================
 
 
+class ScaledAxis(NamedTuple):
+    """One panel axis as the log-scale check sees it."""
+
+    key: str  # the literal settings key
+    parameter: str  # the key as the user typed it
+    role: str
+    scale: Optional[str]
+    twin: Optional[bool]  # the side whose groups it holds; None for both
+    remedy: str  # the fix for a figure that only inherited the scale
+
+
 class Panel:
     """A group of layers sharing one coordinate space; owns all cross-layer concerns."""
 
@@ -6905,11 +6959,11 @@ class Panel:
             figure._hover_targets = []
             figure._hover_style = self.snapshot_hover_style()
         hover_targets = figure._hover_targets
-        group_axes = []
-        for group, assignment in zip(self.groups, assignments):
-            target_ax = ax_right if assignment == "right" else ax
-            group_axes.append(target_ax)
-
+        group_axes = [ax_right if a == "right" else ax for a in assignments]
+        # scales resolve before drawing: a log axis rejects its data up front
+        scales = self._resolve_scales(ax_right, group_axes)
+        self._validate_log_scales(scales, group_axes, ax_right)
+        for group, target_ax in zip(self.groups, group_axes):
             cycle = cycles[palette_key(group)]
             bins = s.get("hist_bins_override")
             if bins is None:
@@ -6974,7 +7028,7 @@ class Panel:
         if category_index:
             self._apply_category_ticks(ax, category_index, group_layers, horizontal)
 
-        self._finalize(ax, ax_right, bar_layers, horizontal, group_axes)
+        self._finalize(ax, ax_right, bar_layers, horizontal, scales, group_axes)
 
     @staticmethod
     def category_index(layers: List[Layer]) -> Optional[dict]:
@@ -7083,7 +7137,75 @@ class Panel:
             return value, category, value_right
         return category, value, value_right
 
-    def _finalize(self, ax, ax_right, bar_layers, horizontal, group_axes=None) -> None:
+    def _validate_log_scales(self, scales, group_axes, ax_right) -> None:
+        """Reject raw data a resolved log scale cannot show (issue #147).
+
+        Each axis checks only the groups drawn on it. The error names the
+        setting as the user typed it: role keys, except the literal ones
+        horizontal bar and histogram fronts take.
+        """
+
+        if self.bare:
+            return
+        s = self.settings
+        horizontal = self.horizontal
+        literal = horizontal and s.get("literal_scale_keys")
+        scalex, scaley, scale_right = scales
+        axes = [
+            ScaledAxis(
+                key="scalex" if horizontal else "scaley",
+                parameter="scalex" if literal else "scaley",
+                role="value",
+                scale=scalex if horizontal else scaley,
+                twin=False,
+                remedy='Give it the secondary axis with "y_axis": "right" and '
+                "`scaley_right`, or set `scaley` explicitly.",
+            ),
+            ScaledAxis(
+                key="scaley_right",
+                parameter="scaley_right",
+                role="secondary value",
+                scale=scale_right,
+                twin=True,
+                remedy='Move it to the primary axis with "y_axis": "left", or '
+                "set `scaley_right` explicitly.",
+            ),
+        ]
+        if self.projection != "polar":
+            axes.append(
+                ScaledAxis(
+                    key="scaley" if horizontal else "scalex",
+                    parameter="scaley" if literal else "scalex",
+                    role="category",
+                    scale=scaley if horizontal else scalex,
+                    twin=None,
+                    remedy="Set `scalex` explicitly to choose one.",
+                )
+            )
+
+        for group, group_ax in zip(self.groups, group_axes):
+            on_twin = ax_right is not None and group_ax is ax_right
+            for axis in axes:
+                if axis.scale != SCALE.LOG or axis.twin not in (None, on_twin):
+                    continue
+                category = axis.twin is None
+                stamp = group.category_scale if category else group.value_scale
+                hint = None
+                if not s.get(axis.key) and stamp != SCALE.LOG:
+                    hint = (
+                        "The figure was built on another scale and inherited "
+                        f"'log' from the first figure on this axis. {axis.remedy}"
+                    )
+                for layer in group.layers:
+                    values = layer.category_data() if category else layer.value_data()
+                    if axis_kind(values) == AXIS_NUMERIC:
+                        validate_log_values(
+                            axis.parameter, axis.role, axis.scale, values, hint
+                        )
+
+    def _finalize(
+        self, ax, ax_right, bar_layers, horizontal, scales, group_axes
+    ) -> None:
         """Apply the furniture; x/y keys are literal, `*_right` keys hit the twin."""
 
         s = self.settings
@@ -7092,7 +7214,7 @@ class Panel:
         bare = self.bare
 
         # scales, per axis: an explicit setting beats the groups' stamps
-        scalex, scaley, scale_right = self._resolve_scales(ax_right, group_axes)
+        scalex, scaley, scale_right = scales
         value_scale = scalex if horizontal else scaley
         if layers and not bare and (scalex or scaley):
             layers[0].apply_scales(ax, scalex, scaley)
@@ -7224,8 +7346,6 @@ class Panel:
 
         # beeswarm packing reads the display transform, so it runs once the
         # scales and limits are final (ADR 0020)
-        if group_axes is None:
-            group_axes = [ax] * len(self.groups)
         for group, owner_ax in zip(self.groups, group_axes):
             for layer in group.layers:
                 if isinstance(layer, SwarmLayer):
@@ -7752,6 +7872,8 @@ def build_chart_panel_settings(
         "furniture": Panel.snapshot_furniture(),
         "scalex": scalex,
         "scaley": scaley,
+        # horizontal bars and histograms take their scale keys literally
+        "literal_scale_keys": chart_type not in GROUP_CHART_TYPES,
         "show_grid": show_grid,
         "grid_style": get_grid_style(first_style),
         "hatch_cycle": config.get("plot_hatch_cycle"),
