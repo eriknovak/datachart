@@ -51,9 +51,11 @@ Methods:
         Estimates the density of the (x, y) points as a gridded surface.
 """
 
+from datetime import datetime, timezone
 from numbers import Real
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
+import matplotlib.dates as mdates
 import numpy as np
 from matplotlib.mlab import GaussianKDE
 
@@ -314,7 +316,8 @@ def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float
     The Pearson correlation coefficient measures the linear relationship
     between two datasets. It ranges from -1 (perfect negative correlation)
     to 1 (perfect positive correlation), with 0 indicating no linear
-    correlation.
+    correlation. A temporal `x` (dates, datetimes, or `datetime64`) is
+    correlated as matplotlib date numbers.
 
     Examples:
         >>> from datachart.utils.stats import correlation
@@ -324,37 +327,76 @@ def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float
         -1.0
 
     Args:
-        x: The first list of values.
+        x: The first list of values, numeric or temporal.
         y: The second list of values.
 
     Returns:
         The Pearson correlation coefficient.
 
     Raises:
-        TypeError: If x or y is not a list or numpy array.
+        TypeError: If x or y is not a list or numpy array, or x mixes
+            temporal and numeric values.
         ValueError: If x and y have different lengths.
     """
-    if not isinstance(x, (list, np.ndarray)):
-        raise TypeError("The x variable must be a list or numpy array.")
-    if not isinstance(y, (list, np.ndarray)):
-        raise TypeError("The y variable must be a list or numpy array.")
-    if len(x) == 0 or len(y) == 0:
+    xs, ys, _ = _paired(x, y)
+    if len(xs) == 0:
         raise ValueError("x and y must have at least one value.")
-    if len(x) != len(y):
-        raise ValueError("x and y must have the same length.")
-    return float(np.corrcoef(x, y)[0, 1])
+    return float(np.corrcoef(xs, ys)[0, 1])
 
 
-def _paired(x: Any, y: Any) -> Tuple[np.ndarray, np.ndarray]:
-    """The (x, y) inputs as float arrays, checked for type and equal length."""
+def _is_temporal_column(values: Any, name: str) -> bool:
+    """Whether the values are temporal; a mix of temporal and numeric raises."""
 
+    from ._internal.layers import is_temporal
+
+    if isinstance(values, np.ndarray) and values.dtype.kind == "M":
+        return True
+    flags = [is_temporal(value) for value in values]
+    if any(flags) and not all(flags):
+        raise TypeError(f"The {name} values must be all temporal or all numeric.")
+    return any(flags)
+
+
+def _x_numbers(x: Any) -> Tuple[np.ndarray, Callable[[np.ndarray], List[Any]]]:
+    """The x values as floats, and the map from float positions back to x's type.
+
+    A temporal x converts to matplotlib date numbers (days) and maps back to
+    datetimes in the column's zone, naive when the column is naive.
+    """
+
+    from ._internal.layers import _column_tz, to_date_numbers
+
+    if not _is_temporal_column(x, "x"):
+        return np.asarray(x, dtype=float), lambda numbers: [float(v) for v in numbers]
+    tz = None if isinstance(x, np.ndarray) else _column_tz(x)
+
+    def as_dates(numbers: np.ndarray) -> List[datetime]:
+        # date2num reads naive values as UTC, so naive ones map back through UTC
+        dates = mdates.num2date(numbers, tz=tz or timezone.utc)
+        return [d if tz else d.replace(tzinfo=None) for d in dates]
+
+    return to_date_numbers(x), as_dates
+
+
+def _paired(
+    x: Any, y: Any
+) -> Tuple[np.ndarray, np.ndarray, Callable[[np.ndarray], List[Any]]]:
+    """The (x, y) inputs as float arrays, checked for type and equal length.
+
+    The third item maps float x positions back to x's type (see `_x_numbers`).
+    """
+
+    # a pandas DatetimeIndex or datetime Series iterates as zone-aware Timestamps
+    if getattr(getattr(x, "dtype", None), "kind", None) == "M":
+        x = x if isinstance(x, np.ndarray) else list(x)
     if not isinstance(x, (list, np.ndarray)):
         raise TypeError("The x variable must be a list or numpy array.")
     if not isinstance(y, (list, np.ndarray)):
         raise TypeError("The y variable must be a list or numpy array.")
     if len(x) != len(y):
         raise ValueError("x and y must have the same length.")
-    return np.asarray(x, dtype=float), np.asarray(y, dtype=float)
+    xs, as_x = _x_numbers(x)
+    return xs, np.asarray(y, dtype=float), as_x
 
 
 def spearman(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
@@ -362,7 +404,8 @@ def spearman(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
 
     The Spearman coefficient is the Pearson correlation of the ranks, so it
     measures any monotone relationship, not only a linear one, and is robust
-    to outliers. It ranges from -1 to 1 like `correlation`.
+    to outliers. It ranges from -1 to 1 like `correlation`, and likewise
+    accepts a temporal `x`.
 
     !!! info "Added in Unreleased"
 
@@ -374,7 +417,7 @@ def spearman(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
         -1.0
 
     Args:
-        x: The first list of values.
+        x: The first list of values, numeric or temporal.
         y: The second list of values.
 
     Returns:
@@ -382,10 +425,11 @@ def spearman(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
         constant list.
 
     Raises:
-        TypeError: If x or y is not a list or numpy array.
+        TypeError: If x or y is not a list or numpy array, or x mixes
+            temporal and numeric values.
         ValueError: If x and y have different lengths.
     """
-    xs, ys = _paired(x, y)
+    xs, ys, _ = _paired(x, y)
     if len(xs) < 2 or np.ptp(xs) == 0 or np.ptp(ys) == 0:
         return np.nan
     from scipy import stats as scipy_stats
@@ -500,7 +544,9 @@ def linear_fit(
 
     An ordinary least-squares fit of `y = slope * x + intercept`, with the
     coefficient of determination `r2` saying how much of the variation in
-    `y` the line explains (1 is a perfect fit).
+    `y` the line explains (1 is a perfect fit). A temporal `x` (dates,
+    datetimes, or `datetime64`) is fitted as matplotlib date numbers, so the
+    slope is per day and the intercept is relative to matplotlib's date epoch.
 
     !!! info "Added in Unreleased"
 
@@ -511,19 +557,21 @@ def linear_fit(
         (2.0, 1.0, 1.0)
 
     Args:
-        x: The x values of the points.
+        x: The x values of the points, numeric or temporal.
         y: The y values of the points, one per x value.
 
     Returns:
-        The `(slope, intercept, r2)` of the fitted line; all `nan` for fewer
-        than two points or a constant `x`, and `r2` alone `nan` for a
-        constant `y`, which leaves no variation to explain.
+        The `(slope, intercept, r2)` of the fitted line, the slope per day
+        for a temporal `x`; all `nan` for fewer than two points or a constant
+        `x`, and `r2` alone `nan` for a constant `y`, which leaves no
+        variation to explain.
 
     Raises:
-        TypeError: If x or y is not a list or numpy array.
+        TypeError: If x or y is not a list or numpy array, or x mixes
+            temporal and numeric values.
         ValueError: If x and y have different lengths.
     """
-    xs, ys = _paired(x, y)
+    xs, ys, _ = _paired(x, y)
     if len(xs) < 2 or np.ptp(xs) == 0:
         return (np.nan, np.nan, np.nan)
     from scipy import stats as scipy_stats
@@ -734,7 +782,9 @@ def loess(
     points, weighted by a tricube kernel so closer points count more, and the
     smoothed `y` is that line's value there (LOESS/LOWESS). The result is a
     list of `{x, y}` points sorted by `x`, ready for `LineChart`, as `kde1d`
-    returns. A smaller `frac` follows the data more closely.
+    returns. A smaller `frac` follows the data more closely. A temporal `x`
+    (dates, datetimes, or `datetime64`) is smoothed as date numbers and the
+    curve's `x` values come back as datetimes, in the input's zone.
 
     !!! info "Added in Unreleased"
 
@@ -745,7 +795,7 @@ def loess(
         [(1.0, 3.0), (2.0, 5.0), (3.0, 7.0), (4.0, 9.0), (5.0, 11.0)]
 
     Args:
-        x: The x values of the points.
+        x: The x values of the points, numeric or temporal.
         y: The y values of the points, one per x value.
         frac: The share of the points each local fit uses, in `(0, 1]`.
 
@@ -754,18 +804,19 @@ def loess(
         `nan` for fewer than two points.
 
     Raises:
-        TypeError: If x or y is not a list or numpy array.
+        TypeError: If x or y is not a list or numpy array, or x mixes
+            temporal and numeric values.
         ValueError: If x and y have different lengths or frac is not in
             `(0, 1]`.
     """
-    xs, ys = _paired(x, y)
+    xs, ys, as_x = _paired(x, y)
     if not 0 < frac <= 1:
         raise ValueError("The `frac` must be in the interval (0, 1].")
     order = np.argsort(xs, kind="stable")
     xs, ys = xs[order], ys[order]
     n = len(xs)
     if n < 2:
-        return [{"x": float(xi), "y": np.nan} for xi in xs]
+        return [{"x": xi, "y": np.nan} for xi in as_x(xs)]
     k = max(2, int(np.ceil(frac * n)))
     smoothed = []
     for xi in xs:
@@ -787,7 +838,7 @@ def loess(
             continue
         slope = (sw * sxy - sx * sy) / denominator
         smoothed.append((sy - slope * sx) / sw)
-    return [{"x": float(xi), "y": float(yi)} for xi, yi in zip(xs, smoothed)]
+    return [{"x": xi, "y": float(yi)} for xi, yi in zip(as_x(xs), smoothed)]
 
 
 # ================================================
@@ -868,7 +919,7 @@ def kde2d(
     bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
     gridsize: Union[int, Tuple[int, int]] = 100,
     cut: float = 3,
-    xlim: Optional[Tuple[float, float]] = None,
+    xlim: Optional[Tuple[Any, Any]] = None,
     ylim: Optional[Tuple[float, float]] = None,
 ) -> Dict[str, List]:
     """Estimates the density of the (x, y) points as a gridded surface.
@@ -878,7 +929,9 @@ def kde2d(
     side so the outer contours close instead of being clipped, or over explicit
     `xlim`/`ylim` so several surfaces share one grid. The result is
     an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of
-    a scattered dataset is `ContourChart(kde2d(x, y))`.
+    a scattered dataset is `ContourChart(kde2d(x, y))`. A temporal `x`
+    (dates, datetimes, or `datetime64`) gives a grid of datetime `x` values,
+    in the input's zone, and `xlim` may then be a pair of datetimes.
 
     !!! info "Added in 0.9.0"
 
@@ -891,7 +944,7 @@ def kde2d(
         [[0.075, 0.038, 0.001], [0.001, 0.038, 0.075]]
 
     Args:
-        x: The x values of the points.
+        x: The x values of the points, numeric or temporal.
         y: The y values of the points, one per x value.
         bandwidth: The kernel bandwidth: None or "scott" (Scott's rule),
             "silverman", or a scalar factor. See `BANDWIDTH`.
@@ -905,22 +958,30 @@ def kde2d(
         The `{x, y, z}` chart dict of the density surface.
 
     Raises:
+        TypeError: If x or xlim mixes temporal and numeric values, or xlim
+            is temporal while x is not, or the other way around.
         ValueError: If the bandwidth is invalid, x and y differ in length,
             there are fewer than two points, or a value is not finite.
     """
     if len(x) != len(y):
         raise ValueError("x and y must have the same length.")
-    points = np.asarray([x, y], dtype=float)
+    xs, as_x = _x_numbers(x)
+    points = np.asarray([xs, np.asarray(y, dtype=float)])
     kde, (pad_x, pad_y) = _kde(points, bandwidth, cut)
     n_cols, n_rows = (gridsize, gridsize) if isinstance(gridsize, int) else gridsize
-    x_lo, x_hi = xlim or (points[0].min() - pad_x, points[0].max() + pad_x)
+    if xlim is None:
+        x_lo, x_hi = xs.min() - pad_x, xs.max() + pad_x
+    elif _is_temporal_column(xlim, "xlim") != _is_temporal_column(x, "x"):
+        raise TypeError("The xlim must be temporal exactly when x is.")
+    else:
+        x_lo, x_hi = _x_numbers(xlim)[0]
     y_lo, y_hi = ylim or (points[1].min() - pad_y, points[1].max() + pad_y)
     grid_x = np.linspace(x_lo, x_hi, n_cols)
     grid_y = np.linspace(y_lo, y_hi, n_rows)
     mesh_x, mesh_y = np.meshgrid(grid_x, grid_y)
     density = kde.evaluate(np.vstack([mesh_x.ravel(), mesh_y.ravel()]))
     return {
-        "x": grid_x.tolist(),
+        "x": as_x(grid_x),
         "y": grid_y.tolist(),
         "z": density.reshape(mesh_x.shape).tolist(),
     }

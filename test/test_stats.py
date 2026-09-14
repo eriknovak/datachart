@@ -1,6 +1,19 @@
 import unittest
+from datetime import datetime, timedelta, timezone
 
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 import numpy as np
+
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
+
+from datachart.charts import ContourChart
 
 from datachart.utils.stats import (
     minimum,
@@ -441,6 +454,116 @@ class TestStats(unittest.TestCase):
             kde2d([1, 2, 3], [1, 2])
         with self.assertRaises(ValueError):
             kde2d([1, 2, 3], [1, 2, 3], cut=-1)
+
+
+# =====================================
+# Test Stats: temporal x
+# =====================================
+
+
+class Stamp(datetime):
+    """A datetime subclass, standing in for a pandas Timestamp."""
+
+
+class TestStatsTemporalX(unittest.TestCase):
+
+    def setUp(self):
+        self.days = [datetime(2024, 1, 1) + timedelta(days=i) for i in range(10)]
+        self.y = [2.0 * i + (0.5 if i % 3 == 0 else -0.25) for i in range(10)]
+
+    def forms(self):
+        """The same days as a datetime list, a Timestamp list, and datetime64."""
+
+        return {
+            "datetime": self.days,
+            "timestamp": [Stamp.fromisoformat(d.isoformat()) for d in self.days],
+            "datetime64": np.array(self.days, dtype="datetime64[s]"),
+        }
+
+    def test_helpers_accept_every_temporal_form(self):
+        for name, x in self.forms().items():
+            with self.subTest(form=name):
+                correlation(x, self.y)
+                spearman(x, self.y)
+                linear_fit(x, self.y)
+                loess(x, self.y)
+                kde2d(x, self.y, gridsize=5)
+
+    def test_correlations_match_date_numbers(self):
+        numbers = list(mdates.date2num(self.days))
+        for name, x in self.forms().items():
+            with self.subTest(form=name):
+                self.assertAlmostEqual(
+                    correlation(x, self.y), correlation(numbers, self.y)
+                )
+                self.assertAlmostEqual(spearman(x, self.y), spearman(numbers, self.y))
+
+    def test_linear_fit_slope_is_per_day(self):
+        slope, _, r2 = linear_fit(self.days, [2.0 * i for i in range(10)])
+        self.assertAlmostEqual(slope, 2.0)
+        self.assertAlmostEqual(r2, 1.0)
+
+    def test_loess_returns_sorted_datetimes(self):
+        curve = loess(list(reversed(self.days)), self.y)
+        xs = [point["x"] for point in curve]
+        self.assertTrue(all(isinstance(value, datetime) for value in xs))
+        self.assertEqual(xs, sorted(xs))
+        self.assertEqual([value.date() for value in xs], [d.date() for d in self.days])
+
+    def test_loess_numeric_output_unchanged(self):
+        curve = loess([5, 1, 3, 2, 4], [11, 3, 7, 5, 9], frac=0.6)
+        self.assertEqual([type(point["x"]) for point in curve], [float] * 5)
+
+    def test_loess_keeps_the_zone(self):
+        zone = timezone(timedelta(hours=2))
+        days = [d.replace(tzinfo=zone) for d in self.days]
+        curve = loess(days, self.y)
+        self.assertEqual(curve[0]["x"].utcoffset(), timedelta(hours=2))
+        self.assertEqual(curve[0]["x"], days[0])
+
+    def test_kde2d_returns_datetime_grid(self):
+        surface = kde2d(self.days, self.y, gridsize=5, cut=0)
+        self.assertTrue(all(isinstance(value, datetime) for value in surface["x"]))
+        self.assertEqual(surface["x"][0].date(), self.days[0].date())
+        self.assertEqual(surface["x"][-1].date(), self.days[-1].date())
+        self.assertIsInstance(surface["y"][0], float)
+
+    def test_kde2d_accepts_datetime_xlim(self):
+        xlim = (datetime(2023, 12, 25), datetime(2024, 1, 20))
+        surface = kde2d(self.days, self.y, gridsize=3, xlim=xlim)
+        self.assertEqual(surface["x"][0].replace(tzinfo=None), xlim[0])
+        self.assertEqual(surface["x"][-1].replace(tzinfo=None), xlim[1])
+
+    def test_contour_chart_renders_kde2d(self):
+        figure = ContourChart(kde2d(self.days, self.y, gridsize=10))
+        self.assertIsNotNone(figure)
+        plt.close(figure)
+
+    def test_mixed_temporal_and_numeric_raises(self):
+        mixed = [self.days[0], 1.0, self.days[2]]
+        y = [1.0, 2.0, 3.0]
+        for helper in (correlation, spearman, linear_fit, loess, kde2d):
+            with self.subTest(helper=helper.__name__):
+                with self.assertRaises(TypeError):
+                    helper(mixed, y)
+        with self.assertRaises(TypeError):
+            kde2d([1.0, 2.0, 3.0, 4.0], [1.0, 3.0, 2.0, 4.0], xlim=(self.days[0], 3.0))
+
+    def test_kde2d_xlim_kind_must_match_x(self):
+        with self.assertRaises(TypeError):
+            kde2d(self.days, self.y, xlim=(0.0, 1.0))
+        with self.assertRaises(TypeError):
+            kde2d(list(range(10)), self.y, xlim=(self.days[0], self.days[-1]))
+
+    @unittest.skipIf(pd is None, "pandas is not installed")
+    def test_helpers_accept_a_datetime_index(self):
+        x = pd.DatetimeIndex(self.days)
+        numbers = list(mdates.date2num(self.days))
+        self.assertAlmostEqual(correlation(x, self.y), correlation(numbers, self.y))
+        self.assertAlmostEqual(spearman(x, self.y), spearman(numbers, self.y))
+        self.assertAlmostEqual(linear_fit(x, self.y)[0], linear_fit(numbers, self.y)[0])
+        self.assertIsInstance(loess(x, self.y)[0]["x"], datetime)
+        self.assertIsInstance(kde2d(x, self.y, gridsize=5)["x"][0], datetime)
 
 
 if __name__ == "__main__":
