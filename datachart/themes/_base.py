@@ -176,6 +176,11 @@ BASE_THEME: StyleAttrs = {
     "plot_line_alpha": 1.0,
     "plot_line_drawstyle": LINE_DRAW_STYLE.DEFAULT,
     "plot_line_zorder": 3,
+    # plot bump style; the line takes the plot_line_* keys besides these (ADR 0046)
+    "plot_bump_line_width": 2.5,
+    "plot_bump_marker": "o",
+    "plot_bump_marker_size": 7,
+    "plot_bump_label_padding": 6,
     # plot bar style
     "plot_bar_color": None,
     "plot_bar_alpha": 0.9,

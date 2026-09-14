@@ -19,7 +19,9 @@ from ...constants import (
     BASELINE,
     DATE_FORMAT,
     EMPHASIS,
+    LABEL_POSITION,
     NETWORK_LAYOUT,
+    RANK,
     SCALE,
     SORT,
     WEEKDAY,
@@ -31,6 +33,8 @@ AXIS_TEMPORAL = "temporal"
 AXIS_NUMERIC = "numeric"
 AXIS_CATEGORICAL = "categorical"
 EMPHASIS_ROLES = (EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT)
+RANK_RULES = (RANK.VALUE_DESCENDING, RANK.VALUE_ASCENDING, RANK.GIVEN)
+LABEL_POSITIONS = (LABEL_POSITION.START, LABEL_POSITION.END, LABEL_POSITION.BOTH)
 STACK_BASELINES = (
     BASELINE.ZERO,
     BASELINE.PERCENT,
@@ -95,6 +99,56 @@ def validate_baseline(baseline):
             f"Must be one of {STACK_BASELINES} or None."
         )
     return baseline
+
+
+def validate_rank_by(rank_by):
+    """Validate a bump chart ranking rule; None means highest value first."""
+
+    if rank_by is None:
+        return RANK.DEFAULT
+    if rank_by not in RANK_RULES:
+        raise ValueError(
+            f"Invalid `rank_by` value {rank_by!r}. Must be one of {RANK_RULES} or None."
+        )
+    return rank_by
+
+
+def validate_label_position(position):
+    """Validate an end label position; None means beside the last point."""
+
+    if position is None:
+        return LABEL_POSITION.DEFAULT
+    if position not in LABEL_POSITIONS:
+        raise ValueError(
+            f"Invalid `label_position` value {position!r}. "
+            f"Must be one of {LABEL_POSITIONS} or None."
+        )
+    return position
+
+
+def validate_line_curve(curve) -> float:
+    """Validate a bump line curve: None (straight) or a number in [0, 1]."""
+
+    if curve is None:
+        return 0.0
+    if not _is_number(curve) or not 0 <= curve <= 1:
+        raise ValueError(
+            f"Invalid `line_curve` value {curve!r}. Must be None or a number in [0, 1]."
+        )
+    return float(curve)
+
+
+def validate_given_ranks(ranks) -> None:
+    """Raise unless every present rank is a positive whole number; NaN is a gap."""
+
+    for rank in ranks:
+        if _is_number(rank) and math.isnan(rank):
+            continue
+        if not _is_number(rank) or rank < 1 or rank != int(rank):
+            raise ValueError(
+                f"`rank_by` GIVEN reads `y` as the rank, which must be a positive "
+                f"integer; got {rank!r}."
+            )
 
 
 def validate_shared_x(columns) -> None:

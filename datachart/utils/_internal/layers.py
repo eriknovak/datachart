@@ -48,6 +48,10 @@ from .validate import (
     treemap_record_total,
     validate_baseline,
     validate_emphasis,
+    validate_given_ranks,
+    validate_label_position,
+    validate_line_curve,
+    validate_rank_by,
     validate_emphasis_rule,
     validate_log_values,
     validate_sort,
@@ -65,6 +69,7 @@ from .config_helpers import (
     get_attr_value,
     resolve_font_family,
     get_area_style,
+    get_bump_style,
     get_sketch_halo,
     get_stackedarea_style,
     get_sankey_style,
@@ -128,8 +133,10 @@ from ...constants import (
     EMPHASIS,
     HISTOGRAM_TYPE,
     LEGEND_LOCATION,
+    LABEL_POSITION,
     NETWORK_LAYOUT,
     ORIENTATION,
+    RANK,
     SWARM_MODE,
     RADIAL_TYPE,
     SCALE,
@@ -1641,6 +1648,251 @@ class LineLayer(PointLabelMixin, Layer):
         # the sketch filter would split the off-screen floor edge into millions
         # of wobble segments; the top edge sits under the line and its halo
         collection.set_sketch_params()
+
+
+# vertices per segment of a curved bump line
+BUMP_CURVE_SAMPLES = 24
+
+
+def _series_periods(xs: list) -> list:
+    """The union of the series' periods: sorted, or first-seen when categorical."""
+
+    periods = []
+    seen = set()
+    for x in xs:
+        for period in x:
+            if period not in seen:
+                seen.add(period)
+                periods.append(period)
+    if axis_kind(periods) == AXIS_CATEGORICAL:
+        return periods
+    return sorted(periods)
+
+
+def _align_to_periods(x, y, periods: list, index: int) -> np.ndarray:
+    """A series' `y` at each period as floats; NaN where it has no value."""
+
+    position = {period: i for i, period in enumerate(periods)}
+    aligned = np.full(len(periods), np.nan)
+    seen = set()
+    for period, value in zip(x, y):
+        if period in seen:
+            raise ValueError(
+                f"Bump chart series {index} has period {period!r} more than once; "
+                "a series takes one value per period."
+            )
+        seen.add(period)
+        if value is not None:
+            aligned[position[period]] = float(value)
+    return aligned
+
+
+def rank_series(xs: list, ys: list, rank_by: str) -> tuple:
+    """The periods and each series' rank at them (ADR 0046).
+
+    Values rank per period over the series present there, ties in input
+    order; `GIVEN` takes `y` as the rank. A series without a value at a
+    period holds NaN there: a gap in its line.
+    """
+
+    periods = _series_periods(xs)
+    values = [
+        _align_to_periods(x, y, periods, i) for i, (x, y) in enumerate(zip(xs, ys))
+    ]
+    if rank_by == RANK.GIVEN:
+        for column in values:
+            validate_given_ranks(column)
+        return periods, values
+    ranks = [np.full(len(periods), np.nan) for _ in values]
+    sign = -1 if rank_by == RANK.VALUE_DESCENDING else 1
+    for p in range(len(periods)):
+        present = [i for i, column in enumerate(values) if not np.isnan(column[p])]
+        for rank, i in enumerate(sorted(present, key=lambda i: sign * values[i][p])):
+            ranks[i][p] = rank + 1
+    return periods, ranks
+
+
+def rank_bump_charts(charts: List[dict], settings: dict) -> List[dict]:
+    """The charts with their data as periods, ranks and the original values.
+
+    Ranking reads every series of the figure at once, so the layers draw
+    ranks without knowing their siblings.
+    """
+
+    rank_by = validate_rank_by(settings.get("rank_by"))
+    xs, ys = [], []
+    for chart in charts:
+        x, y = get_chart_data("x", chart), get_chart_data("y", chart)
+        if x is None or y is None or len(x) != len(y):
+            raise ValueError(
+                "A bump chart requires the `x` and `y` columns, one `y` per `x`."
+            )
+        xs.append(list(x))
+        ys.append(list(y))
+    periods, ranks = rank_series(xs, ys, rank_by)
+    return [
+        {
+            **{k: v for k, v in chart.items() if k not in ("x", "y", "yerr")},
+            "data": {
+                "x": periods,
+                "y": rank,
+                "value": _align_to_periods(x, y, periods, i),
+            },
+        }
+        for i, (chart, x, y, rank) in enumerate(zip(charts, xs, ys, ranks))
+    ]
+
+
+def _bump_path(x: np.ndarray, y: np.ndarray, curve: float) -> tuple:
+    """The drawn vertices through every point and the indices of the points.
+
+    Between two present points the rank eases along a sigmoid blended with
+    the straight segment by `curve`; the points themselves never move. A
+    gap stays a NaN vertex, so the line breaks there.
+    """
+
+    if curve == 0:
+        return x, y, None
+    t = np.linspace(0, 1, BUMP_CURVE_SAMPLES + 1)[1:]
+    ease = (1 - curve) * t + curve * t**3 * (t * (6 * t - 15) + 10)
+    px, py, marks = [x[0]], [y[0]], [0]
+    for i in range(1, len(x)):
+        if not (np.isnan(y[i - 1]) or np.isnan(y[i])):
+            px.extend(x[i - 1] + (x[i] - x[i - 1]) * t[:-1])
+            py.extend(y[i - 1] + (y[i] - y[i - 1]) * ease[:-1])
+        marks.append(len(px))
+        px.append(x[i])
+        py.append(y[i])
+    return np.asarray(px), np.asarray(py), marks
+
+
+class BumpLayer(LineLayer):
+    """One series of a bump chart, drawn on its per-period ranks (ADR 0046)."""
+
+    kind = "bump"
+    # value labels sit beside the marks inside the half-rank margin
+    labels_past_mark = False
+
+    def _resolve_style(self):
+        style = get_bump_style(self.style)
+        self.label_padding = style.pop("label_padding", 0)
+        if self.settings.get("show_markers") is False:
+            style.pop("marker", None)
+        self.line_style = style
+        self.area_style = get_area_style(self.style)
+        self.show_yerr = False
+        self.show_area = False
+        self.line_curve = validate_line_curve(self.settings.get("line_curve"))
+        self.show_labels = self.settings.get("show_labels") is not False
+        self.label_position = validate_label_position(
+            self.settings.get("label_position")
+        )
+        self._resolve_value_labels()
+        self._init_point_labels()
+
+    def ranks(self) -> np.ndarray:
+        return np.asarray(get_chart_data("y", self.chart), dtype=float)
+
+    def y_range(self):
+        ranks = self.ranks()
+        if np.isnan(ranks).all():
+            return None
+        return (float(np.nanmin(ranks)), float(np.nanmax(ranks)))
+
+    def value_data(self):
+        return None
+
+    def draw(self, ax, ctx):
+        periods = self.x_values()
+        ranks = self.ranks()
+        values = np.asarray(get_chart_data("value", self.chart), dtype=float)
+
+        line_style = self._merge_color("color", ctx.color, self.line_style)
+        if ctx.z_order is not None:
+            line_style["zorder"] = ctx.z_order
+        self._apply_emphasis(line_style, ctx.emphasis)
+        self._stroke_halo(line_style)
+
+        # periods draw as axis numbers so a curve can interpolate between them
+        axis = ax.yaxis if ctx.transpose else ax.xaxis
+        axis.update_units(periods)
+        x = np.asarray(axis.convert_units(periods), dtype=float)
+        px, py, marks = _bump_path(x, ranks, self.line_curve)
+
+        plot, _, _ = _oriented(ax, ctx.transpose)
+        (line,) = plot(px, py, **line_style, markevery=marks, label=self.label(ctx))
+
+        label = self.label(ctx)
+
+        def resolve(index: int) -> dict:
+            i = _nearest(x, px[index])
+            datum = {"label": label, "x": _scalar(periods[i]), "y": _scalar(ranks[i])}
+            if ctx.transpose:
+                datum["x"], datum["y"] = datum["y"], datum["x"]
+            datum["value"] = _scalar(values[i])
+            return datum
+
+        self.register_hover(line, resolve)
+
+        present = ~np.isnan(ranks)
+        if self.show_values and ctx.emphasis != EMPHASIS_BACKGROUND and present.any():
+            self._record_points(
+                ax,
+                ctx,
+                x[present],
+                ranks[present],
+                (2 * _mark_radius(line_style)) ** 2,
+                self._value_texts(ax, values[present], ctx.transpose),
+                self.value_font,
+                self.value_padding,
+            )
+
+        if self.show_labels and self.subtitle and present.any():
+            color = (
+                self.muted_color
+                if ctx.emphasis == EMPHASIS_BACKGROUND
+                else line.get_color()
+            )
+            self._draw_end_labels(ax, ctx, x, ranks, present, line_style, color)
+
+    def start_label_extent(self) -> float:
+        """The points a start label reaches left of the first mark; 0 without one."""
+
+        if not (
+            self.show_labels
+            and self.subtitle
+            and self.label_position in (LABEL_POSITION.START, LABEL_POSITION.BOTH)
+        ):
+            return 0.0
+        width, _ = _text_size(self.label_font["fontsize"], str(self.subtitle))
+        return width + _mark_radius(self.line_style) + self.label_padding
+
+    def _draw_end_labels(self, ax, ctx, x, ranks, present, line_style, color):
+        """Print the series name beside its first and/or last present point."""
+
+        indices = np.flatnonzero(present)
+        ends = []
+        if self.label_position in (LABEL_POSITION.START, LABEL_POSITION.BOTH):
+            ends.append((indices[0], -1))
+        if self.label_position in (LABEL_POSITION.END, LABEL_POSITION.BOTH):
+            ends.append((indices[-1], 1))
+        gap = _mark_radius(line_style) + self.label_padding
+        font = {k: v for k, v in self.label_font.items() if k != "color"}
+        for i, side in ends:
+            xy = (ranks[i], x[i]) if ctx.transpose else (x[i], ranks[i])
+            offset = (0, -side * gap) if ctx.transpose else (side * gap, 0)
+            ax.annotate(
+                self.subtitle,
+                xy=xy,
+                xytext=offset,
+                textcoords="offset points",
+                ha=("center" if ctx.transpose else "left" if side > 0 else "right"),
+                va=("top" if side > 0 else "bottom") if ctx.transpose else "center",
+                color=color,
+                annotation_clip=False,
+                zorder=TEXT_ANNOTATION_ZORDER,
+                **font,
+            )
 
 
 class StackedAreaLayer(Layer):
@@ -5843,6 +6095,7 @@ LAYER_TYPES = {
     "contourchart": ContourLayer,
     "hexbinchart": HexbinLayer,
     "stackedareachart": StackedAreaLayer,
+    "bumpchart": BumpLayer,
     "sankeychart": SankeyLayer,
     "treemap": TreemapLayer,
     "networkchart": NetworkLayer,
@@ -6170,6 +6423,7 @@ EMPHASIS_RULE_UNITS = {
     "linechart": (_series_units("y"), "mean"),
     "scatterchart": (_series_units("y"), "mean"),
     "stackedareachart": (_series_units("y"), "mean"),
+    "bumpchart": (_series_units("y"), "mean"),
     "histogram": (_series_units("x"), "mean"),
     "contourchart": (_series_units("z"), "mean"),
 }
@@ -6186,6 +6440,9 @@ def apply_emphasis_rule(chart_type: str, charts: List[dict], settings: dict) -> 
     rule = validate_emphasis_rule(settings.get("emphasis_rule"), by)
     if rule is None:
         return charts
+    if chart_type == "bumpchart":
+        # a bump chart reads ranks, best when lowest: `top` picks them (ADR 0046)
+        rule = ({"top": "bottom", "bottom": "top"}.get(rule[0], rule[0]),) + rule[1:]
     charts, units = units_of(charts, settings, rule[2])
     roles = emphasis_rule_roles(rule, [value for value, _ in units])
     for (_, fill), role in zip(units, roles):
@@ -6204,6 +6461,9 @@ def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[La
     bar_records = chart_type in BAR_RECORD_CHARTS or (
         chart_type == "radialchart" and visual == RADIAL_TYPE.BAR
     )
+    if chart_type == "bumpchart":
+        # the rule reads the ranks, so they come first
+        charts = rank_bump_charts(charts, settings)
     if chart_type in EMPHASIS_RULE_UNITS and (
         chart_type != "radialchart" or bar_records
     ):
@@ -7249,6 +7509,21 @@ class Panel:
                     min(r[0] for r in ranges), max(r[1] for r in ranges)
                 )
 
+        # the rank axis: whole ranks with half a rank of margin (ADR 0046)
+        bump_layers = [l for l in layers if isinstance(l, BumpLayer)]
+        rank_ranges = [r for r in (l.y_range() for l in bump_layers) if r is not None]
+        if rank_ranges and not bare and not polar:
+            rank_axis = ax.xaxis if horizontal else ax.yaxis
+            rank_axis.set_major_locator(MaxNLocator(integer=True))
+            # start labels sit where the rank tick labels would; push these out
+            extent = max(l.start_label_extent() for l in bump_layers)
+            if extent and not horizontal:
+                pad = rank_axis.get_major_ticks()[0].get_pad()
+                rank_axis.set_tick_params(which="major", pad=pad + extent)
+            (ax.set_xlim if horizontal else ax.set_ylim)(
+                0.5, max(r[1] for r in rank_ranges) + 0.5
+            )
+
         # bar category ticks
         bar_ticks = s.get("bar_ticks")
         if bar_ticks and bar_layers and not polar:
@@ -7333,6 +7608,10 @@ class Panel:
         limits = {k: s.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
         if not bare:
             configure_axis_limits(ax, limits)
+        # rank 1 sits at the top, inverted after any user limits apply
+        if rank_ranges and not bare and not polar and not horizontal:
+            if not ax.yaxis_inverted():
+                ax.invert_yaxis()
         if ax_right is not None and (
             s.get("ymin_right") is not None or s.get("ymax_right") is not None
         ):
@@ -7892,7 +8171,7 @@ def build_chart_panel_settings(
         # histograms stack by default; bars group (ADR 0014)
         "bar_mode": settings.get("bar_mode")
         or ("stack" if chart_type == "histogram" else "group"),
-        "tighten_xlim": chart_type in ("linechart", "stackedareachart"),
+        "tighten_xlim": chart_type in ("linechart", "stackedareachart", "bumpchart"),
         # validated here so a bad value fails at the front, like the emphasis roles
         "baseline": validate_baseline(settings.get("baseline")),
         # radial furniture; only polar panels read these

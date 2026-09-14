@@ -8,6 +8,8 @@ Methods:
         Creates the line chart.
     StackedAreaChart(attrs):
         Creates the stacked area chart.
+    BumpChart(attrs):
+        Creates the bump chart.
     BarChart(attrs):
         Creates the bar chart.
     PyramidChart(attrs):
@@ -48,6 +50,7 @@ Methods:
 # trends and comparisons
 from .line_chart import LineChart
 from .stacked_area_chart import StackedAreaChart
+from .bump_chart import BumpChart
 from .bar_chart import BarChart
 from .pyramid_chart import PyramidChart
 from .radial_chart import RadialChart
@@ -78,6 +81,7 @@ __all__ = [
     # trends and comparisons
     "LineChart",
     "StackedAreaChart",
+    "BumpChart",
     "BarChart",
     "PyramidChart",
     "RadialChart",
