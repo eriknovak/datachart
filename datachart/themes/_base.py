@@ -5,6 +5,9 @@ overriding just the attributes that define its identity via `make_theme`.
 """
 
 import copy
+import os
+
+from matplotlib import font_manager
 
 from ..typings import StyleAttrs
 from ..constants import (
@@ -390,6 +393,22 @@ BASE_THEME: StyleAttrs = {
     "overlay_warn_scale_groups": True,
     "overlay_warn_scale_conflict": True,
 }
+
+
+# the faces themes ship with (SIL OFL, licence alongside)
+FONT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_fonts")
+
+
+def register_bundled_fonts(*names: str) -> None:
+    """Register bundled faces with matplotlib once, so a theme's font stack
+    resolves on every machine."""
+
+    known = {entry.fname for entry in font_manager.fontManager.ttflist}
+    for name in names:
+        path = os.path.join(FONT_DIR, name)
+        # a face missing from the install leaves the stack to its fallbacks
+        if path not in known and os.path.isfile(path):
+            font_manager.fontManager.addfont(path)
 
 
 def make_theme(overrides: StyleAttrs) -> StyleAttrs:

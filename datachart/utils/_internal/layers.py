@@ -7962,7 +7962,13 @@ class Panel:
         # hatch, line-style and marker cycles: per series, parallel to the
         # color cycle (ADR 0004, ADR 0048)
         hatch_assignments = _style_assignments(s.get("hatch_cycle"))
-        linestyle_assignments = _style_assignments(s.get("linestyle_cycle"))
+        # a theme file stores a dash tuple as a list; matplotlib wants the tuple
+        linestyle_assignments = _style_assignments(
+            [
+                tuple(entry) if isinstance(entry, list) else entry
+                for entry in s.get("linestyle_cycle") or []
+            ]
+        )
         marker_assignments = _style_assignments(
             [_marker_entry(entry) for entry in s.get("marker_cycle") or []]
         )

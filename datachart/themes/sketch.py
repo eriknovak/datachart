@@ -1,29 +1,9 @@
-import os
-
-from matplotlib import font_manager
-
-from ._base import make_theme
+from ._base import make_theme, register_bundled_fonts
 from ..typings import StyleAttrs
 from ..constants import COLORS, FONT_WEIGHT
 
 # Comic Neue Regular + Bold (SIL OFL, licence alongside) ship with the package
-_FONT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_fonts")
-_FONT_FILES = ("ComicNeue-Regular.ttf", "ComicNeue-Bold.ttf")
-
-
-def _register_bundled_fonts() -> None:
-    """Register the bundled faces with matplotlib once, so the theme's font
-    stack resolves on every machine."""
-
-    known = {entry.fname for entry in font_manager.fontManager.ttflist}
-    for name in _FONT_FILES:
-        path = os.path.join(_FONT_DIR, name)
-        # a face missing from the install leaves the stack to its fallbacks
-        if path not in known and os.path.isfile(path):
-            font_manager.fontManager.addfont(path)
-
-
-_register_bundled_fonts()
+register_bundled_fonts("ComicNeue-Regular.ttf", "ComicNeue-Bold.ttf")
 
 SKETCH_THEME: StyleAttrs = make_theme(
     {

@@ -1,4 +1,5 @@
 Copyright 2014 The Comic Neue Project Authors (https://github.com/crozynski/comicneue)
+Copyright (c) 2007 Igino Marini (www.iginomarini.com), with Reserved Font Name IM FELL English (IMFeENrm28P.ttf, IMFeENit28P.ttf, IMFeENsc28P.ttf)
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:

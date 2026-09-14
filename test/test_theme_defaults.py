@@ -60,6 +60,7 @@ class TestThemeDefaults(unittest.TestCase):
             THEME.MINIMAL,
             THEME.MATERIAL,
             THEME.SKETCH,
+            THEME.QUILL,
         ]:
             config.set_theme(theme)
             figure = BarChart(BAR)
@@ -132,6 +133,7 @@ class TestThemeDefaults(unittest.TestCase):
             THEME.INK,
             THEME.HATCH,
             THEME.SKETCH,
+            THEME.QUILL,
         ]:
             config.set_theme(theme)
             self.assertEqual(config.theme, theme)
@@ -148,6 +150,7 @@ class TestThemeDefaults(unittest.TestCase):
             THEME.MINIMAL,
             THEME.MATERIAL,
             THEME.SKETCH,
+            THEME.QUILL,
         ]:
             config.set_theme(theme)
             for key in TextStyleAttrs.__annotations__:

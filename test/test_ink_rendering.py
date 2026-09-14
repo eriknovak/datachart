@@ -2,13 +2,17 @@
 
 import copy
 import io
+import os
+import tempfile
 import unittest
+import warnings
 
 import matplotlib
 import numpy as np
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
 from matplotlib.colors import to_hex
 
 from datachart.charts import (
@@ -25,7 +29,9 @@ from datachart.charts import (
 )
 from datachart.config import config
 from datachart.constants import THEME
+from datachart.themes import QUILL_THEME
 from datachart.utils import Grid
+from datachart.utils._internal.config_helpers import _font_available
 from datachart.utils._internal.layers import Etch, InkStroke
 
 LINE = [{"x": x, "y": y} for x, y in enumerate([1.0, 3.0, 2.0, 4.0, 3.5])]
@@ -325,6 +331,50 @@ class TestStyleCycles(unittest.TestCase):
         points = [{"x": float(i), "y": float(i)} for i in range(4)]
         figure = ScatterChart(points, style={"plot_scatter_marker": "^"})
         self.assertEqual(len(figure.axes[0].collections[0].get_facecolor()), 1)
+
+
+class TestQuillTheme(unittest.TestCase):
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_theme_registered(self):
+        config.set_theme(THEME.QUILL)
+        self.assertEqual(config.config, QUILL_THEME)
+        self.assertEqual(config["color_general_multiple"], [INK])
+
+    def test_bundled_fonts_registered(self):
+        self.assertTrue(_font_available("IM FELL English"))
+        styles = {
+            entry.style
+            for entry in font_manager.fontManager.ttflist
+            if entry.name == "IM FELL English"
+        }
+        self.assertEqual(styles, {"normal", "italic"})
+        self.assertTrue(_font_available("IM FELL English SC"))
+
+    def test_series_draw_in_ink_with_their_own_marks(self):
+        config.set_theme(THEME.QUILL)
+        figure = LineChart([LINE, LINE_2], title="Runs")
+        first, second = data_lines(figure)
+        self.assertEqual(to_hex(first.get_color()), INK.lower())
+        self.assertNotEqual(first.get_linestyle(), second.get_linestyle())
+        self.assertTrue(ink_effects(first))
+        self.assertEqual(figure._suptitle.get_fontstyle(), "italic")
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            png(figure)
+
+    def test_theme_file_round_trip_renders_the_same(self):
+        config.set_theme(THEME.QUILL)
+        bars = [BAR, [{"label": l, "y": y} for l, y in zip("ABC", [2.0, 4.0, 1.0])]]
+        native = png(LineChart([LINE, LINE_2])) + png(BarChart(bars))
+        with tempfile.TemporaryDirectory() as folder:
+            path = os.path.join(folder, "quill_copy.json")
+            config.save_theme(path, name=THEME.QUILL)
+            config.set_theme(config.load_theme(path))
+        loaded = png(LineChart([LINE, LINE_2])) + png(BarChart(bars))
+        self.assertEqual(native, loaded)
 
 
 class _RecordingRenderer:
