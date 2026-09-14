@@ -428,6 +428,7 @@ class TestValueEtch(unittest.TestCase):
         self.assertEqual(legend.get_title().get_text(), "Score")
         self.assertEqual(len(legend.get_texts()), 5)
         self.assertEqual(legend.get_texts()[0].get_text(), "0 – 1.6")
+        self.assertFalse(legend.get_clip_on())
         png(figure)
 
     def test_no_legend_without_colorbars(self):

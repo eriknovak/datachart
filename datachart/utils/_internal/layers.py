@@ -1491,6 +1491,8 @@ class Layer:
         for text in legend.get_texts() + [legend.get_title()]:
             text.set_fontfamily(self.legend_family)
         ax.add_artist(legend)
+        # add_artist clips to the axes patch; the legend sits outside it
+        legend.set_clip_on(False)
         _defer_legend_fit(
             ax, lambda renderer: _fit_outside_legend(legend, [ax], renderer)
         )

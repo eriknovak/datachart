@@ -80,6 +80,12 @@ EXPECTED_CHANGES = {
     "emphasis_hist_reference",
     "emphasis_box_labels",
     "emphasis_panel_cross_type",
+    # new quill theme cases (ADR 0048)
+    "theme_quill_line",
+    "theme_quill_bar_scatter",
+    "theme_quill_heatmap_steps",
+    "theme_quill_contour_relief",
+    "theme_quill_network_treemap",
     # show_area now fills down to the axis floor instead of y=0
     "line_area_styled",
     # new panel axis-scale case (ADR 0041)
@@ -843,6 +849,83 @@ def theme_sketch_line():
 def theme_sketch_bar():
     config.set_theme(THEME.SKETCH)
     return BarChart(data=[BAR1, BAR2], show_legend=True)
+
+
+@case
+def theme_quill_line():
+    config.set_theme(THEME.QUILL)
+    return LineChart(
+        data=[LINE1, LINE2], subtitle=["a", "b"], show_legend=True, show_area=True
+    )
+
+
+@case
+def theme_quill_bar_scatter():
+    config.set_theme(THEME.QUILL)
+    bars = BarChart(data=[BAR1, BAR2], subtitle=["a", "b"], show_legend=True)
+    shifted = [{"x": p["x"], "y": p["y"] + 2} for p in SCAT1]
+    scatter = ScatterChart(data=[SCAT1, shifted], subtitle=["c", "d"], show_legend=True)
+    return Grid([[bars, scatter]], figsize=(9, 4))
+
+
+@case
+def theme_quill_heatmap_steps():
+    config.set_theme(THEME.QUILL)
+    data = {"z": [[(i * j) % 7 for j in range(5)] for i in range(4)]}
+    return Heatmap(
+        data=data,
+        show_heatmap_values=True,
+        show_colorbars=True,
+        colorbar={"label": "value"},
+    )
+
+
+@case
+def theme_quill_contour_relief():
+    config.set_theme(THEME.QUILL)
+    grid = np.linspace(-2, 2, 40)
+    z = [[float(np.exp(-(a * a + b * b)) - 0.5 * np.exp(-((a - 1) ** 2 + b * b))) for a in grid] for b in grid]
+    return ContourChart(
+        data={"x": list(grid), "y": list(grid), "z": z},
+        filled=True,
+        show_colorbars=True,
+    )
+
+
+@case
+def theme_quill_network_treemap():
+    config.set_theme(THEME.QUILL)
+    network = NetworkChart(
+        data={
+            "nodes": [
+                {"id": n, "group": g}
+                for n, g in (("a", "x"), ("b", "x"), ("c", "y"), ("d", "y"))
+            ],
+            "edges": [
+                {"source": s, "target": t, "weight": w}
+                for s, t, w in (("a", "b", 3), ("b", "c", 1), ("c", "d", 2))
+            ],
+        },
+        directed=True,
+        layout=NETWORK_LAYOUT.GROUPED,
+        show_legend=True,
+    )
+    treemap = Treemap(
+        data={
+            "data": [
+                {
+                    "label": "Asia",
+                    "children": [
+                        {"label": "India", "value": 14},
+                        {"label": "China", "value": 14},
+                    ],
+                },
+                {"label": "Africa", "value": 15},
+            ]
+        },
+        show_legend=True,
+    )
+    return Grid([[network, treemap]], figsize=(9, 4))
 
 
 @case
