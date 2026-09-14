@@ -221,6 +221,19 @@ class AxesStyleAttrs(TypedDict):
         axes_spines_zorder (Union[int, None]): The zorder of the spines.
         axes_ticks_length (Union[int, float, None]): The length of the ticks.
         axes_ticks_label_size (Union[int, float, None]): The size of the tick labels.
+        figure_facecolor (Union[str, None]): The color of the figure ground.
+            `None` keeps matplotlib's.
+        axes_facecolor (Union[str, None]): The color of the axes ground; label
+            halos and etch washes take it. `None` keeps matplotlib's.
+        axes_spines_color (Union[str, None]): The color of the spines. `None`
+            keeps matplotlib's.
+        axes_ticks_color (Union[str, None]): The color of the tick marks. `None`
+            keeps matplotlib's.
+
+    !!! info "Added in Unreleased"
+
+        The `figure_facecolor`, `axes_facecolor`, `axes_spines_color` and
+        `axes_ticks_color` attributes.
 
     """
 
@@ -232,6 +245,10 @@ class AxesStyleAttrs(TypedDict):
     axes_spines_zorder: Union[int, None]
     axes_ticks_length: Union[int, float, None]
     axes_ticks_label_size: Union[int, float, None]
+    figure_facecolor: Union[str, None]
+    axes_facecolor: Union[str, None]
+    axes_spines_color: Union[str, None]
+    axes_ticks_color: Union[str, None]
 
 
 class LegendStyleAttrs(TypedDict):
@@ -247,10 +264,15 @@ class LegendStyleAttrs(TypedDict):
         plot_legend_label_color (Union[str, None]): The label color of the legend.
         plot_legend_title (Union[str, None]): The legend title; an empty string draws none.
         plot_legend_ncols (Union[int, None]): The number of legend columns.
+        plot_legend_edge_color (Union[str, None]): The legend frame color.
+            `None` keeps matplotlib's.
+        plot_legend_face_color (Union[str, None]): The legend background color.
+            `None` keeps matplotlib's.
 
     !!! info "Added in Unreleased"
 
-        The `plot_legend_title` and `plot_legend_ncols` attributes.
+        The `plot_legend_title`, `plot_legend_ncols`, `plot_legend_edge_color`
+        and `plot_legend_face_color` attributes.
 
     """
 
@@ -263,6 +285,8 @@ class LegendStyleAttrs(TypedDict):
     plot_legend_label_color: Union[str, None]
     plot_legend_title: Union[str, None]
     plot_legend_ncols: Union[int, None]
+    plot_legend_edge_color: Union[str, None]
+    plot_legend_face_color: Union[str, None]
 
 
 class AreaStyleAttrs(TypedDict):

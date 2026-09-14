@@ -1350,7 +1350,7 @@ class Layer:
 
         if self.halo is not None:
             width = (line_style.get("linewidth") or 0) + self.halo
-            line_style["path_effects"] = _halo_effects(width)
+            line_style["path_effects"] = _halo_effects(width, self.ground)
         if self.ink_stroke is not None:
             # the ribbon replaces the plain line the halo effect redraws on top
             halo = [
@@ -5085,12 +5085,15 @@ def _ribbon_centerline(x1, y1, x2, y2, t):
     return x, y
 
 
-def _halo_effects(width) -> list:
-    """The path effects stroking a white halo of `width` points; none when 0."""
+def _halo_effects(width, ground: Optional[str] = None) -> list:
+    """The path effects stroking a halo of `width` points in the ground color.
+
+    None when the width is 0; a None ground is white.
+    """
 
     if not width or width <= 0:
         return []
-    return [patheffects.withStroke(linewidth=width, foreground="#FFFFFF")]
+    return [patheffects.withStroke(linewidth=width, foreground=ground or "#FFFFFF")]
 
 
 # ================================================
@@ -5456,7 +5459,9 @@ def _value_label_font(style: dict) -> dict:
         "fontsize": style["fontsize"],
         "color": style["color"],
         "family": resolve_font_family(),
-        "path_effects": _halo_effects(style.get("halo_width")),
+        "path_effects": _halo_effects(
+            style.get("halo_width"), config.get("axes_facecolor")
+        ),
     }
 
 
@@ -5675,7 +5680,7 @@ class SankeyLayer(Layer):
         ax.set_ylim(0, 1 + (SANKEY_COLUMN_LABEL_HEADROOM if self.column_labels else 0))
         # every label and value placed so far, for the ribbon values to avoid
         occupied = []
-        effects = _halo_effects(halo)
+        effects = _halo_effects(halo, self.ground)
 
         for ci, column in enumerate(self.columns):
             for name in column:
@@ -5994,7 +5999,10 @@ class TreemapLayer(Layer):
         pos = ax.get_position()
         axes_pt = (fig_w * pos.width * 72, fig_h * pos.height * 72)
         frame = TileFrame(
-            axes_pt, axes_pt[0] / axes_pt[1], _halo_effects(style.get("halo_width")), []
+            axes_pt,
+            axes_pt[0] / axes_pt[1],
+            _halo_effects(style.get("halo_width"), self.ground),
+            [],
         )
         aspect = frame.aspect
         pad = style["group_pad"]
@@ -6560,7 +6568,7 @@ class NetworkLayer(Layer):
         ax.set_ylim(0, 1)
         ax.set_aspect("equal", adjustable="box")
         ax.axis("off")
-        effects = _halo_effects(style.get("halo_width"))
+        effects = _halo_effects(style.get("halo_width"), self.ground)
         muted, highlighted = self.muted, self.highlighted
         # scatter sizes are the marker's bounding-box diameter squared
         radii = np.sqrt(self.areas) / 2
@@ -7619,11 +7627,24 @@ class Panel:
                 "labelsize": config["axes_ticks_label_size"],
                 "labelcolor": config["font_general_color"],
             },
+            # ground and furniture colors (ADR 0048); None keeps matplotlib's
+            "colors": {
+                "figure": config.get("figure_facecolor"),
+                "axes": config.get("axes_facecolor"),
+                "spines": config.get("axes_spines_color"),
+                "ticks": config.get("axes_ticks_color"),
+            },
             # tick_params cannot set a font family; applied to the labels directly
             "font_family": resolve_font_family(),
             # the render-scoped rc attribute (ADR 0027); None means off
             "sketch_params": config.get("plot_sketch_params"),
         }
+
+    def _text_halo(self) -> dict:
+        """The soft box behind polar texts, in the axes ground color."""
+
+        colors = (self.settings.get("furniture") or {}).get("colors") or {}
+        return {**TEXT_HALO, "facecolor": colors.get("axes") or TEXT_HALO["facecolor"]}
 
     def _sketch_rc(self) -> dict:
         """The rc override for the path wobble, empty when it is off."""
@@ -7637,7 +7658,14 @@ class Panel:
         self, ax: plt.Axes, axes_types=("xaxis", "yaxis"), spines=True
     ) -> None:
         furniture = self.settings.get("furniture")
-        if furniture is None or self.bare:
+        if furniture is None:
+            return
+        colors = furniture.get("colors") or {}
+        if colors.get("figure") is not None:
+            ax.figure.set_facecolor(colors["figure"])
+        if colors.get("axes") is not None:
+            ax.set_facecolor(colors["axes"])
+        if self.bare:
             return
         if spines:
             ax.axis("on")
@@ -7651,11 +7679,16 @@ class Panel:
                     ax.spines[axis].set(**spine_style)
             # the spines predate the render, so the rc context never saw them
             sketch = self._sketch_rc().get("path.sketch")
-            if sketch is not None:
-                for spine in ax.spines.values():
+            for spine in ax.spines.values():
+                if sketch is not None:
                     spine.set_sketch_params(*sketch)
+                if colors.get("spines") is not None:
+                    spine.set_edgecolor(colors["spines"])
+        ticks = dict(furniture["ticks"])
+        if colors.get("ticks") is not None:
+            ticks["color"] = colors["ticks"]
         for axis_type in axes_types:
-            getattr(ax, axis_type).set_tick_params(which="major", **furniture["ticks"])
+            getattr(ax, axis_type).set_tick_params(which="major", **ticks)
 
     # ---------------- rendering ----------------
 
@@ -8652,7 +8685,7 @@ class Panel:
                 fontfamily=furniture.get("font_family"),
                 color="#000000",
                 zorder=self._spine_zorder() + RADIAL_LABEL_Z_OVER_SPINE,
-                bbox=TEXT_HALO,
+                bbox=self._text_halo(),
             )
 
     def _draw_radial_tip_texts(self, ax) -> None:
@@ -8708,7 +8741,7 @@ class Panel:
                     va="center",
                     zorder=z_order,
                     fontfamily=family,
-                    bbox=TEXT_HALO,
+                    bbox=self._text_halo(),
                     **value_style,
                 )
 
@@ -8747,7 +8780,7 @@ class Panel:
                     fontsize=tick_style.get("labelsize"),
                     color=tick_style.get("labelcolor"),
                     fontfamily=family,
-                    bbox=TEXT_HALO,
+                    bbox=self._text_halo(),
                 )
 
     @staticmethod

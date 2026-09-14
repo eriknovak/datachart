@@ -8,12 +8,14 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.colors import to_hex
 
 from datachart.charts import (
     BarChart,
     Histogram,
     LineChart,
     RadialChart,
+    SankeyChart,
     ScatterChart,
     StackedAreaChart,
 )
@@ -177,6 +179,56 @@ class TestEtch(unittest.TestCase):
         first = png(BarChart(BAR, style={"plot_bar_hatch": "x."}))
         second = png(BarChart(BAR, style={"plot_bar_hatch": "x."}))
         self.assertEqual(first, second)
+
+
+PARCHMENT = "#F3E7CB"
+INK = "#1A120A"
+GROUND = {
+    "figure_facecolor": PARCHMENT,
+    "axes_facecolor": PARCHMENT,
+    "axes_spines_color": INK,
+    "axes_ticks_color": INK,
+    "plot_legend_edge_color": INK,
+    "plot_legend_face_color": PARCHMENT,
+}
+
+
+class TestGroundColors(unittest.TestCase):
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_off_by_default(self):
+        for key in GROUND:
+            self.assertIsNone(config[key], key)
+
+    def test_panel_applies_ground_and_furniture(self):
+        config.update_config(GROUND)
+        figure = LineChart(LINE, subtitle="Run", show_legend=True)
+        ax = figure.axes[0]
+        self.assertEqual(to_hex(figure.get_facecolor()), PARCHMENT.lower())
+        self.assertEqual(to_hex(ax.get_facecolor()), PARCHMENT.lower())
+        self.assertEqual(to_hex(ax.spines["left"].get_edgecolor()), INK.lower())
+        tick = ax.xaxis.get_major_ticks()[0]
+        self.assertEqual(to_hex(tick.tick1line.get_color()), INK.lower())
+        frame = ax.get_legend().get_frame()
+        self.assertEqual(to_hex(frame.get_edgecolor()), INK.lower())
+        self.assertEqual(to_hex(frame.get_facecolor()), PARCHMENT.lower())
+
+    def test_bare_panel_takes_the_ground(self):
+        config.update_config(GROUND)
+        figure = SankeyChart(
+            {"links": [{"source": "a", "target": "b", "value": 1.0}]}
+        )
+        self.assertEqual(to_hex(figure.get_facecolor()), PARCHMENT.lower())
+
+    def test_halo_follows_the_ground(self):
+        config.update_config({**GROUND, "plot_sketch_halo_width": 2})
+        figure = BarChart(BAR, show_values=True)
+        (effect,) = figure.axes[0].texts[0].get_path_effects()
+        self.assertEqual(to_hex(effect._gc["foreground"]), PARCHMENT.lower())
+        (halo,) = data_lines(LineChart(LINE))[0].get_path_effects()
+        self.assertEqual(to_hex(halo._gc["foreground"]), PARCHMENT.lower())
 
 
 class _RecordingRenderer:

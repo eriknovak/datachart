@@ -1547,6 +1547,8 @@ def get_legend_style(legend: Optional[dict] = None) -> dict:
         ("labelcolor", "plot_legend_label_color"),
         ("title", "plot_legend_title"),
         ("ncols", "plot_legend_ncols"),
+        ("edgecolor", "plot_legend_edge_color"),
+        ("facecolor", "plot_legend_face_color"),
     ]
     style = create_config_dict({}, config_attrs)
     for key, field in LEGEND_SETTING_KEYS:

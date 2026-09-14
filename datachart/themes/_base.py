@@ -96,6 +96,11 @@ BASE_THEME: StyleAttrs = {
     "axes_spines_zorder": 100,
     "axes_ticks_length": 3,
     "axes_ticks_label_size": 8,
+    # ground and furniture colors (ADR 0048); None keeps matplotlib's
+    "figure_facecolor": None,
+    "axes_facecolor": None,
+    "axes_spines_color": None,
+    "axes_ticks_color": None,
     # theme-level chart-setting defaults (ADR 0004)
     "chart_default_show_grid": SHOW_GRID.Y,
     "chart_default_show_values": None,
@@ -116,6 +121,8 @@ BASE_THEME: StyleAttrs = {
     "plot_legend_label_color": "#000000",
     "plot_legend_title": "Legend",
     "plot_legend_ncols": 1,
+    "plot_legend_edge_color": None,
+    "plot_legend_face_color": None,
     # plot area style
     "plot_area_alpha": 0.25,
     "plot_area_color": None,
