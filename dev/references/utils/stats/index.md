@@ -309,7 +309,7 @@ Calculates the Pearson correlation coefficient between two lists.
 
 Added in v0.7.0
 
-The Pearson correlation coefficient measures the linear relationship between two datasets. It ranges from -1 (perfect negative correlation) to 1 (perfect positive correlation), with 0 indicating no linear correlation.
+The Pearson correlation coefficient measures the linear relationship between two datasets. It ranges from -1 (perfect negative correlation) to 1 (perfect positive correlation), with 0 indicating no linear correlation. A temporal `x` (dates, datetimes, or `datetime64`) is correlated as matplotlib date numbers.
 
 Examples:
 
@@ -321,19 +321,19 @@ Examples:
 -1.0
 ```
 
-| PARAMETER | DESCRIPTION                                                    |
-| --------- | -------------------------------------------------------------- |
-| `x`       | The first list of values. **TYPE:** `List[Union[int, float]]`  |
-| `y`       | The second list of values. **TYPE:** `List[Union[int, float]]` |
+| PARAMETER | DESCRIPTION                                                                        |
+| --------- | ---------------------------------------------------------------------------------- |
+| `x`       | The first list of values, numeric or temporal. **TYPE:** `List[Union[int, float]]` |
+| `y`       | The second list of values. **TYPE:** `List[Union[int, float]]`                     |
 
 | RETURNS | DESCRIPTION                          |
 | ------- | ------------------------------------ |
 | `float` | The Pearson correlation coefficient. |
 
-| RAISES       | DESCRIPTION                             |
-| ------------ | --------------------------------------- |
-| `TypeError`  | If x or y is not a list or numpy array. |
-| `ValueError` | If x and y have different lengths.      |
+| RAISES       | DESCRIPTION                                                                     |
+| ------------ | ------------------------------------------------------------------------------- |
+| `TypeError`  | If x or y is not a list or numpy array, or x mixes temporal and numeric values. |
+| `ValueError` | If x and y have different lengths.                                              |
 
 ### datachart.utils.stats.spearman
 
@@ -345,7 +345,7 @@ spearman(
 
 Calculates the Spearman rank correlation between two lists.
 
-The Spearman coefficient is the Pearson correlation of the ranks, so it measures any monotone relationship, not only a linear one, and is robust to outliers. It ranges from -1 to 1 like `correlation`.
+The Spearman coefficient is the Pearson correlation of the ranks, so it measures any monotone relationship, not only a linear one, and is robust to outliers. It ranges from -1 to 1 like `correlation`, and likewise accepts a temporal `x`.
 
 Added in Unreleased
 
@@ -359,20 +359,20 @@ Examples:
 -1.0
 ```
 
-| PARAMETER | DESCRIPTION                                                    |
-| --------- | -------------------------------------------------------------- |
-| `x`       | The first list of values. **TYPE:** `List[Union[int, float]]`  |
-| `y`       | The second list of values. **TYPE:** `List[Union[int, float]]` |
+| PARAMETER | DESCRIPTION                                                                        |
+| --------- | ---------------------------------------------------------------------------------- |
+| `x`       | The first list of values, numeric or temporal. **TYPE:** `List[Union[int, float]]` |
+| `y`       | The second list of values. **TYPE:** `List[Union[int, float]]`                     |
 
 | RETURNS | DESCRIPTION                                                       |
 | ------- | ----------------------------------------------------------------- |
 | `float` | The Spearman rank correlation; nan for fewer than two points or a |
 | `float` | constant list.                                                    |
 
-| RAISES       | DESCRIPTION                             |
-| ------------ | --------------------------------------- |
-| `TypeError`  | If x or y is not a list or numpy array. |
-| `ValueError` | If x and y have different lengths.      |
+| RAISES       | DESCRIPTION                                                                     |
+| ------------ | ------------------------------------------------------------------------------- |
+| `TypeError`  | If x or y is not a list or numpy array, or x mixes temporal and numeric values. |
+| `ValueError` | If x and y have different lengths.                                              |
 
 ### datachart.utils.stats.mode
 
@@ -484,7 +484,7 @@ linear_fit(
 
 Fits a straight line to the (x, y) points.
 
-An ordinary least-squares fit of `y = slope * x + intercept`, with the coefficient of determination `r2` saying how much of the variation in `y` the line explains (1 is a perfect fit).
+An ordinary least-squares fit of `y = slope * x + intercept`, with the coefficient of determination `r2` saying how much of the variation in `y` the line explains (1 is a perfect fit). A temporal `x` (dates, datetimes, or `datetime64`) is fitted as matplotlib date numbers, so the slope is per day and the intercept is relative to matplotlib's date epoch.
 
 Added in Unreleased
 
@@ -497,21 +497,22 @@ Examples:
 (2.0, 1.0, 1.0)
 ```
 
-| PARAMETER | DESCRIPTION                                                                      |
-| --------- | -------------------------------------------------------------------------------- |
-| `x`       | The x values of the points. **TYPE:** `List[Union[int, float]]`                  |
-| `y`       | The y values of the points, one per x value. **TYPE:** `List[Union[int, float]]` |
+| PARAMETER | DESCRIPTION                                                                          |
+| --------- | ------------------------------------------------------------------------------------ |
+| `x`       | The x values of the points, numeric or temporal. **TYPE:** `List[Union[int, float]]` |
+| `y`       | The y values of the points, one per x value. **TYPE:** `List[Union[int, float]]`     |
 
-| RETURNS | DESCRIPTION                                                      |
-| ------- | ---------------------------------------------------------------- |
-| `float` | The (slope, intercept, r2) of the fitted line; all nan for fewer |
-| `float` | than two points or a constant x, and r2 alone nan for a          |
-| `float` | constant y, which leaves no variation to explain.                |
+| RETURNS                      | DESCRIPTION                                                       |
+| ---------------------------- | ----------------------------------------------------------------- |
+| `float`                      | The (slope, intercept, r2) of the fitted line, the slope per day  |
+| `float`                      | for a temporal x; all nan for fewer than two points or a constant |
+| `float`                      | x, and r2 alone nan for a constant y, which leaves no             |
+| `Tuple[float, float, float]` | variation to explain.                                             |
 
-| RAISES       | DESCRIPTION                             |
-| ------------ | --------------------------------------- |
-| `TypeError`  | If x or y is not a list or numpy array. |
-| `ValueError` | If x and y have different lengths.      |
+| RAISES       | DESCRIPTION                                                                     |
+| ------------ | ------------------------------------------------------------------------------- |
+| `TypeError`  | If x or y is not a list or numpy array, or x mixes temporal and numeric values. |
+| `ValueError` | If x and y have different lengths.                                              |
 
 ### datachart.utils.stats.bootstrap_ci
 
@@ -684,7 +685,7 @@ loess(
 
 Smooths the (x, y) points with a locally weighted linear fit.
 
-At each `x` a straight line is fitted to the nearest `frac` share of the points, weighted by a tricube kernel so closer points count more, and the smoothed `y` is that line's value there (LOESS/LOWESS). The result is a list of `{x, y}` points sorted by `x`, ready for `LineChart`, as `kde1d` returns. A smaller `frac` follows the data more closely.
+At each `x` a straight line is fitted to the nearest `frac` share of the points, weighted by a tricube kernel so closer points count more, and the smoothed `y` is that line's value there (LOESS/LOWESS). The result is a list of `{x, y}` points sorted by `x`, ready for `LineChart`, as `kde1d` returns. A smaller `frac` follows the data more closely. A temporal `x` (dates, datetimes, or `datetime64`) is smoothed as date numbers and the curve's `x` values come back as datetimes, in the input's zone.
 
 Added in Unreleased
 
@@ -699,7 +700,7 @@ Examples:
 
 | PARAMETER | DESCRIPTION                                                                                   |
 | --------- | --------------------------------------------------------------------------------------------- |
-| `x`       | The x values of the points. **TYPE:** `List[Union[int, float]]`                               |
+| `x`       | The x values of the points, numeric or temporal. **TYPE:** `List[Union[int, float]]`          |
 | `y`       | The y values of the points, one per x value. **TYPE:** `List[Union[int, float]]`              |
 | `frac`    | The share of the points each local fit uses, in (0, 1\]. **TYPE:** `float` **DEFAULT:** `0.3` |
 
@@ -708,10 +709,10 @@ Examples:
 | `List[Dict[str, float]]` | The {x, y} points of the smoothed curve, sorted by x; the y is |
 | `List[Dict[str, float]]` | nan for fewer than two points.                                 |
 
-| RAISES       | DESCRIPTION                                                  |
-| ------------ | ------------------------------------------------------------ |
-| `TypeError`  | If x or y is not a list or numpy array.                      |
-| `ValueError` | If x and y have different lengths or frac is not in (0, 1\]. |
+| RAISES       | DESCRIPTION                                                                     |
+| ------------ | ------------------------------------------------------------------------------- |
+| `TypeError`  | If x or y is not a list or numpy array, or x mixes temporal and numeric values. |
+| `ValueError` | If x and y have different lengths or frac is not in (0, 1\].                    |
 
 ### datachart.utils.stats.kde1d
 
@@ -773,14 +774,14 @@ kde2d(
     ] = None,
     gridsize: Union[int, Tuple[int, int]] = 100,
     cut: float = 3,
-    xlim: Optional[Tuple[float, float]] = None,
+    xlim: Optional[Tuple[Any, Any]] = None,
     ylim: Optional[Tuple[float, float]] = None
 ) -> Dict[str, List]
 ```
 
 Estimates the density of the (x, y) points as a gridded surface.
 
-A Gaussian kernel density estimate evaluated on a `gridsize` × `gridsize` grid over the range of the points, extended by `cut` bandwidths on each side so the outer contours close instead of being clipped, or over explicit `xlim`/`ylim` so several surfaces share one grid. The result is an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of a scattered dataset is `ContourChart(kde2d(x, y))`.
+A Gaussian kernel density estimate evaluated on a `gridsize` × `gridsize` grid over the range of the points, extended by `cut` bandwidths on each side so the outer contours close instead of being clipped, or over explicit `xlim`/`ylim` so several surfaces share one grid. The result is an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of a scattered dataset is `ContourChart(kde2d(x, y))`. A temporal `x` (dates, datetimes, or `datetime64`) gives a grid of datetime `x` values, in the input's zone, and `xlim` may then be a pair of datetimes.
 
 Added in 0.9.0
 
@@ -797,12 +798,12 @@ Examples:
 
 | PARAMETER   | DESCRIPTION                                                                                                                                                                  |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `x`         | The x values of the points. **TYPE:** `List[Union[int, float]]`                                                                                                              |
+| `x`         | The x values of the points, numeric or temporal. **TYPE:** `List[Union[int, float]]`                                                                                         |
 | `y`         | The y values of the points, one per x value. **TYPE:** `List[Union[int, float]]`                                                                                             |
 | `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** `Optional[Union[BANDWIDTH, str, float]]` **DEFAULT:** `None` |
 | `gridsize`  | The number of grid columns and rows, as one number or an (x, y) pair. **TYPE:** `Union[int, Tuple[int, int]]` **DEFAULT:** `100`                                             |
 | `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                                                                 |
-| `xlim`      | The (min, max) x range of the grid; overrides the padded range. **TYPE:** `Optional[Tuple[float, float]]` **DEFAULT:** `None`                                                |
+| `xlim`      | The (min, max) x range of the grid; overrides the padded range. **TYPE:** `Optional[Tuple[Any, Any]]` **DEFAULT:** `None`                                                    |
 | `ylim`      | The (min, max) y range of the grid; overrides the padded range. **TYPE:** `Optional[Tuple[float, float]]` **DEFAULT:** `None`                                                |
 
 | RETURNS           | DESCRIPTION                                      |
@@ -811,4 +812,5 @@ Examples:
 
 | RAISES       | DESCRIPTION                                                                                                       |
 | ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `TypeError`  | If x or xlim mixes temporal and numeric values, or xlim is temporal while x is not, or the other way around.      |
 | `ValueError` | If the bandwidth is invalid, x and y differ in length, there are fewer than two points, or a value is not finite. |

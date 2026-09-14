@@ -431,7 +431,7 @@ Panel(
 
 ### LOESS
 
-The `loess` function smooths `(x, y)` points with a locally weighted linear fit: at each `x` a line is fitted to the nearest `frac` share of the points, weighted so closer points count more. It returns `{x, y}` points sorted by `x`, ready to draw as a [datachart.charts.LineChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.LineChart) over the raw points. The fit runs on numbers, so a datetime `x` goes through `matplotlib.dates.date2num` on the way in and `num2date` on the way back.
+The `loess` function smooths `(x, y)` points with a locally weighted linear fit: at each `x` a line is fitted to the nearest `frac` share of the points, weighted so closer points count more. It returns `{x, y}` points sorted by `x`, ready to draw as a [datachart.charts.LineChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.LineChart) over the raw points.
 
 ```
 from datachart.utils.stats import loess
@@ -456,6 +456,29 @@ Panel(
     title="LOESS through noisy points",
     xlabel="x",
     ylabel_left="y",
+    show_legend=True,
+    show_grid=SHOW_GRID.Y,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+The `x` may also be dates or datetimes: the fit runs on them directly and the smoothed points keep datetime `x` values, so the curve lands on a date axis. The same holds for `linear_fit` (whose slope is then per day), `correlation`, `spearman`, and `kde2d`.
+
+```
+from datetime import date, timedelta
+
+random.seed(3)
+days = [date(2024, 1, 1) + timedelta(days=i) for i in range(90)]
+visits = [100 + 30 * math.sin(i / 14) + random.gauss(0, 8) for i in range(len(days))]
+
+Panel(
+    [
+        ScatterChart(data=[{"x": d, "y": v} for d, v in zip(days, visits)], subtitle="daily visits"),
+        LineChart(data=loess(days, visits, frac=0.2), subtitle="loess (frac 0.2)"),
+    ],
+    title="LOESS over a date axis",
+    xlabel="date",
+    ylabel_left="visits",
     show_legend=True,
     show_grid=SHOW_GRID.Y,
     figsize=FIG_SIZE.FULL_MEDIUM,
