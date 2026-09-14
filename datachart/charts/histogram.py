@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    EmphasisRuleAttrs,
     LegendSettingAttrs,
     HistDataPointAttrs,
     HistStyleAttrs,
@@ -38,6 +39,7 @@ def Histogram(
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: Optional[Union[EMPHASIS, str, List[Optional[str]]]] = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     xmin: Optional[Union[int, float]] = None,
     xmax: Optional[Union[int, float]] = None,
@@ -135,6 +137,7 @@ def Histogram(
 
         The `show_values`, `value_format` and `legend` parameters.
         The `vspans` and `hspans` reference bands.
+        The `emphasis_rule` parameter.
 
     Args:
         data: The data points for the histogram(s). Can be a single list of data points
@@ -149,6 +152,13 @@ def Histogram(
             it and brings it to the front, None leaves it unchanged. When
             any chart carries a role, the histograms draw individually
             overlaid instead of stacked.
+        emphasis_rule: A rule that highlights the histograms matching it and
+            mutes the rest: `{"above": v}` or `{"below": v}` (strict),
+            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
+            `{"bottom": n}`, read against a summary of each histogram's own `x`
+            values, chosen by `by`: `"mean"` (default), `"median"`, `"min"`,
+            `"max"`, or `"sum"`. An explicit `emphasis` role wins, and a count
+            ranks across every histogram. See `EmphasisRuleAttrs`.
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -218,6 +228,7 @@ def Histogram(
 
     # Figure-level settings; None values resolve to defaults downstream
     settings = {
+        "emphasis_rule": emphasis_rule,
         "title": title,
         "xlabel": xlabel,
         "ylabel": ylabel,

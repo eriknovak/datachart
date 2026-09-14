@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    EmphasisRuleAttrs,
     LegendSettingAttrs,
     LineDataPointAttrs,
     LineStyleAttrs,
@@ -38,6 +39,7 @@ def LineChart(
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: Optional[Union[EMPHASIS, str, List[Optional[str]]]] = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     xmin: Optional[Union[int, float, datetime]] = None,
     xmax: Optional[Union[int, float, datetime]] = None,
@@ -141,6 +143,7 @@ def LineChart(
         The `xticks_format` and `yticks_format` tick formats.
         The `show_values`, `value_format`, `value_step` and `legend` parameters.
         The `vspans` and `hspans` reference bands.
+        The `emphasis_rule` parameter.
 
     Args:
         data: The data points for the line chart(s). Can be a single list of data points
@@ -154,6 +157,13 @@ def LineChart(
             alpha, thinner line, behind the others, no legend entry),
             "highlight" bolds it and brings it to the front, None leaves it
             unchanged.
+        emphasis_rule: A rule that highlights the lines matching it and mutes
+            the rest: `{"above": v}` or `{"below": v}` (strict),
+            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
+            `{"bottom": n}`, read against a summary of each line's own `y`
+            values, chosen by `by`: `"mean"` (default), `"median"`, `"min"`,
+            `"max"`, or `"sum"`. An explicit `emphasis` role wins, and a count
+            ranks across every line. See `EmphasisRuleAttrs`.
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -227,6 +237,7 @@ def LineChart(
 
     # Figure-level settings; None values resolve to defaults downstream
     settings = {
+        "emphasis_rule": emphasis_rule,
         "title": title,
         "xlabel": xlabel,
         "ylabel": ylabel,

@@ -39,6 +39,10 @@ title: Typings Module
     options:
         heading_level: 4
 
+::: datachart.typings.EmphasisRuleAttrs
+    options:
+        heading_level: 4
+
 ### Line Chart Typings
 
 ::: datachart.typings.LineSingleChartAttrs
