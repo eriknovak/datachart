@@ -6147,6 +6147,8 @@ SwarmPlot(
     emphasis_rule=Optional[dict],                       # One-key rule on a per-group summary; optional "by": median, mean, min, max, sum
     mode: Union[str, None],                             # "swarm" (the default) or "strip" (optional)
     jitter: Union[float, None],                         # The strip jitter width, a fraction of the category width (optional)
+    show_values: Union[bool, None],                     # Whether to print each group's min, median and max (optional)
+    value_format: Union[str, None],                     # The format of the value labels (optional)
     orientation: Union[str, None],                      # "vertical" (the default) or "horizontal" (optional)
     scaley: Union[str, None],                           # The value axis scale (optional)
     figsize: Union[Tuple[float, float], None],          # The figure size (optional)
@@ -6199,6 +6201,7 @@ Every customization is either a keyword argument of `SwarmPlot` or a `plot_swarm
 | change the point marker or edge               | `style={"plot_swarm_marker": ..., "plot_swarm_edge_color": ..., ...}`              | [Point style](#point-style)                                     |
 | jitter the points instead of packing them     | `mode`, `jitter`                                                                   | [Swarm and strip modes](#swarm-and-strip-modes)                 |
 | draw the swarms horizontally                  | `orientation`                                                                      | [Swarm orientation](#swarm-orientation)                         |
+| print each group's min, median and max        | `show_values`, `value_format`                                                      | [Value labels](#value-labels)                                   |
 | highlight one group, mute the rest            | `emphasis`                                                                         | [Emphasis](#emphasis)                                           |
 | highlight the groups that match a rule        | `emphasis_rule`                                                                    | [Emphasis](#emphasis)                                           |
 | draw a threshold or reference line            | `hlines`, `vlines`                                                                 | [Reference lines](#reference-lines)                             |
@@ -6342,6 +6345,26 @@ SwarmPlot(
     figsize=FIG_SIZE.FULL_SHORT,
     # the value axis is now the x-axis
     show_grid=SHOW_GRID.X,
+).show()
+```
+
+### Value labels
+
+To print each group's minimum, median and maximum, add the `show_values` attribute; `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)). The minimum and maximum label the points holding them, and the median labels the point nearest it, each at the least overlapping spot around the marker.
+
+```
+from datachart.constants import VALUE_FORMAT
+
+SwarmPlot(
+    data=chart_data,
+    # print the min, median and max of every group
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
+    title="Body mass of Palmer penguins",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
 ).show()
 ```
 
@@ -6790,6 +6813,8 @@ RaincloudPlot(
     jitter: Union[float, None],                         # The strip jitter width, a fraction of the category width (optional)
     bandwidth: Union[str, float, None],                 # The cloud's KDE bandwidth rule or factor (optional)
     show_outliers: Union[bool, None],                   # Whether the box shows outliers (optional)
+    show_values: Union[bool, None],                     # Whether to print each group's median, min and max (optional)
+    value_format: Union[str, None],                     # The format of the value labels (optional)
     orientation: Union[str, None],                      # "vertical" (the default) or "horizontal" (optional)
     scaley: Union[str, None],                           # The value axis scale (optional)
     figsize: Union[Tuple[float, float], None],          # The figure size (optional)
@@ -6843,6 +6868,7 @@ Every customization is either a keyword argument of `RaincloudPlot` or an attrib
 | smooth or sharpen the cloud             | `bandwidth`                                                                           | [Cloud bandwidth](#cloud-bandwidth)                           |
 | jitter the rain instead of packing it   | `mode`, `jitter`                                                                      | [Rain modes](#rain-modes)                                     |
 | hide the box outliers                   | `show_outliers`                                                                       | [Box outliers](#box-outliers)                                 |
+| print each group's median, min and max  | `show_values`, `value_format`                                                         | [Value labels](#value-labels)                                 |
 | draw the rainclouds horizontally        | `orientation`                                                                         | [Raincloud orientation](#raincloud-orientation)               |
 | highlight one group, mute the rest      | `emphasis`                                                                            | [Emphasis](#emphasis)                                         |
 | highlight the groups that match a rule  | `emphasis_rule`                                                                       | [Emphasis](#emphasis)                                         |
@@ -6986,6 +7012,26 @@ RaincloudPlot(
     data=chart_data,
     # the rain already shows every value
     show_outliers=False,
+    title="Body mass of Palmer penguins",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+).show()
+```
+
+### Value labels
+
+To print each group's median, minimum and maximum, add the `show_values` attribute; `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)). The box prints the median beside its median line, and the rain prints the minimum and maximum beside the points holding them. The cloud carries no labels.
+
+```
+from datachart.constants import VALUE_FORMAT
+
+RaincloudPlot(
+    data=chart_data,
+    # print the median, min and max of every group
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
     title="Body mass of Palmer penguins",
     xlabel="Species",
     ylabel="Body mass (g)",
@@ -16735,6 +16781,8 @@ SwarmPlot(
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     mode: Union[SWARM_MODE, str] = SWARM_MODE.SWARM,
     jitter: float = 0.4,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[
         Union[ORIENTATION, str]
@@ -16857,7 +16905,7 @@ Added in 0.9.0
 
 Added in Unreleased
 
-The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter.
+The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The `show_values` and `value_format` parameters.
 
 Examples:
 
@@ -16897,6 +16945,8 @@ Examples:
 | `show_grid`     | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                |
 | `mode`          | How the points spread across the category width. See SWARM_MODE: "swarm" packs the points so none overlap, from the marker size at draw time (axis limits changed afterwards can shift the spacing); "strip" jitters them uniformly. **TYPE:** `Union[SWARM_MODE, str]` **DEFAULT:** `SWARM_MODE.SWARM`                                                                                                                                                           |
 | `jitter`        | The strip jitter width, as a fraction of the category width. Only used with mode="strip". **TYPE:** `float` **DEFAULT:** `0.4`                                                                                                                                                                                                                                                                                                                                    |
+| `show_values`   | Whether to print each group's minimum, median, and maximum beside the points nearest them. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                         |
+| `value_format`  | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                 |
 | `aspect_ratio`  | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** `Optional[Union[ASPECT_RATIO, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                            |
 | `orientation`   | The orientation of the swarms (vertical or horizontal). **TYPE:** `Optional[Union[ORIENTATION, str]]` **DEFAULT:** `ORIENTATION.VERTICAL`                                                                                                                                                                                                                                                                                                                         |
 | `scaley`        | The y-axis scale (e.g., "log", "linear"). **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                             |
@@ -16955,6 +17005,8 @@ RaincloudPlot(
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_outliers: Optional[bool] = True,
+    show_values: Optional[bool] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     mode: Union[SWARM_MODE, str] = SWARM_MODE.SWARM,
     jitter: float = 0.4,
     bandwidth: Optional[
@@ -17083,7 +17135,7 @@ Added in 0.9.0
 
 Added in Unreleased
 
-The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter.
+The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The `show_values` and `value_format` parameters.
 
 Examples:
 
@@ -17122,6 +17174,8 @@ Examples:
 | `legend`        | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                                                                                                                                              |
 | `show_grid`     | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                |
 | `show_outliers` | Whether the box shows outliers. **TYPE:** `Optional[bool]` **DEFAULT:** `True`                                                                                                                                                                                                                                                                                                                                                                                    |
+| `show_values`   | Whether to print each group's median beside its box, and its minimum and maximum beside the rain points holding them. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                              |
+| `value_format`  | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                 |
 | `mode`          | How the rain spreads across its width. See SWARM_MODE: "swarm" packs the points so none overlap; "strip" jitters them uniformly. **TYPE:** `Union[SWARM_MODE, str]` **DEFAULT:** `SWARM_MODE.SWARM`                                                                                                                                                                                                                                                               |
 | `jitter`        | The strip jitter width, as a fraction of the category width like SwarmPlot, scaled down to the rain's narrower cell. Only used with mode="strip". **TYPE:** `float` **DEFAULT:** `0.4`                                                                                                                                                                                                                                                                            |
 | `bandwidth`     | The cloud's KDE bandwidth: None or "scott" (Scott's rule), "silverman" (Silverman's rule), or a scalar factor. See BANDWIDTH. **TYPE:** `Optional[Union[BANDWIDTH, str, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                              |

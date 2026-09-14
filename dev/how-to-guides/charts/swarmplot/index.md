@@ -37,6 +37,8 @@ SwarmPlot(
     emphasis_rule=Optional[dict],                       # One-key rule on a per-group summary; optional "by": median, mean, min, max, sum
     mode: Union[str, None],                             # "swarm" (the default) or "strip" (optional)
     jitter: Union[float, None],                         # The strip jitter width, a fraction of the category width (optional)
+    show_values: Union[bool, None],                     # Whether to print each group's min, median and max (optional)
+    value_format: Union[str, None],                     # The format of the value labels (optional)
     orientation: Union[str, None],                      # "vertical" (the default) or "horizontal" (optional)
     scaley: Union[str, None],                           # The value axis scale (optional)
     figsize: Union[Tuple[float, float], None],          # The figure size (optional)
@@ -89,6 +91,7 @@ Every customization is either a keyword argument of `SwarmPlot` or a `plot_swarm
 | change the point marker or edge               | `style={"plot_swarm_marker": ..., "plot_swarm_edge_color": ..., ...}`              | [Point style](#point-style)                                     |
 | jitter the points instead of packing them     | `mode`, `jitter`                                                                   | [Swarm and strip modes](#swarm-and-strip-modes)                 |
 | draw the swarms horizontally                  | `orientation`                                                                      | [Swarm orientation](#swarm-orientation)                         |
+| print each group's min, median and max        | `show_values`, `value_format`                                                      | [Value labels](#value-labels)                                   |
 | highlight one group, mute the rest            | `emphasis`                                                                         | [Emphasis](#emphasis)                                           |
 | highlight the groups that match a rule        | `emphasis_rule`                                                                    | [Emphasis](#emphasis)                                           |
 | draw a threshold or reference line            | `hlines`, `vlines`                                                                 | [Reference lines](#reference-lines)                             |
@@ -232,6 +235,26 @@ SwarmPlot(
     figsize=FIG_SIZE.FULL_SHORT,
     # the value axis is now the x-axis
     show_grid=SHOW_GRID.X,
+).show()
+```
+
+### Value labels
+
+To print each group's minimum, median and maximum, add the `show_values` attribute; `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)). The minimum and maximum label the points holding them, and the median labels the point nearest it, each at the least overlapping spot around the marker.
+
+```
+from datachart.constants import VALUE_FORMAT
+
+SwarmPlot(
+    data=chart_data,
+    # print the min, median and max of every group
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
+    title="Body mass of Palmer penguins",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
 ).show()
 ```
 

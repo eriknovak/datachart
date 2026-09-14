@@ -41,6 +41,8 @@ RaincloudPlot(
     jitter: Union[float, None],                         # The strip jitter width, a fraction of the category width (optional)
     bandwidth: Union[str, float, None],                 # The cloud's KDE bandwidth rule or factor (optional)
     show_outliers: Union[bool, None],                   # Whether the box shows outliers (optional)
+    show_values: Union[bool, None],                     # Whether to print each group's median, min and max (optional)
+    value_format: Union[str, None],                     # The format of the value labels (optional)
     orientation: Union[str, None],                      # "vertical" (the default) or "horizontal" (optional)
     scaley: Union[str, None],                           # The value axis scale (optional)
     figsize: Union[Tuple[float, float], None],          # The figure size (optional)
@@ -94,6 +96,7 @@ Every customization is either a keyword argument of `RaincloudPlot` or an attrib
 | smooth or sharpen the cloud             | `bandwidth`                                                                           | [Cloud bandwidth](#cloud-bandwidth)                           |
 | jitter the rain instead of packing it   | `mode`, `jitter`                                                                      | [Rain modes](#rain-modes)                                     |
 | hide the box outliers                   | `show_outliers`                                                                       | [Box outliers](#box-outliers)                                 |
+| print each group's median, min and max  | `show_values`, `value_format`                                                         | [Value labels](#value-labels)                                 |
 | draw the rainclouds horizontally        | `orientation`                                                                         | [Raincloud orientation](#raincloud-orientation)               |
 | highlight one group, mute the rest      | `emphasis`                                                                            | [Emphasis](#emphasis)                                         |
 | highlight the groups that match a rule  | `emphasis_rule`                                                                       | [Emphasis](#emphasis)                                         |
@@ -237,6 +240,26 @@ RaincloudPlot(
     data=chart_data,
     # the rain already shows every value
     show_outliers=False,
+    title="Body mass of Palmer penguins",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+).show()
+```
+
+### Value labels
+
+To print each group's median, minimum and maximum, add the `show_values` attribute; `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)). The box prints the median beside its median line, and the rain prints the minimum and maximum beside the points holding them. The cloud carries no labels.
+
+```
+from datachart.constants import VALUE_FORMAT
+
+RaincloudPlot(
+    data=chart_data,
+    # print the median, min and max of every group
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
     title="Body mass of Palmer penguins",
     xlabel="Species",
     ylabel="Body mass (g)",
