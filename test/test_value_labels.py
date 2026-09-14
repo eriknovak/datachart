@@ -41,7 +41,7 @@ GROUPS = [
     for lab, values in {"A": [1, 2, 3, 4, 5], "B": [10, 20, 30]}.items()
     for v in values
 ]
-# 200 normal draws in one group: too many to label every point
+# 200 normal draws in one group
 DENSE = [
     {"label": "A", "value": float(v)}
     for v in np.random.default_rng(0).normal(10, 2, 200)
@@ -210,45 +210,41 @@ def packed_points(ax):
 
 
 class TestSwarm(ValueLabelCase):
-    def test_labels_each_point_at_its_packed_position(self):
-        figure = SwarmPlot(GROUPS, show_values=True, value_step=1)
-        ax = figure.axes[0]
+    def test_labels_min_median_max_per_group(self):
+        figure = SwarmPlot(GROUPS, show_values=True)
         self.assertEqual(
-            sorted(texts(ax)), sorted(["1", "2", "3", "4", "5", "10", "20", "30"])
+            sorted(texts(figure.axes[0]), key=float), ["1", "3", "5", "10", "20", "30"]
         )
+
+    def test_labels_sit_at_packed_points(self):
+        figure = SwarmPlot(GROUPS, show_values=True)
+        ax = figure.axes[0]
         points = packed_points(ax)
         for label in labels(ax):
             self.assertIn(tuple(label.xy), points)
 
-    def test_labels_follow_the_packing(self):
-        tied = [{"label": "A", "value": 5.0}] * 3 + [{"label": "A", "value": 50.0}]
-        figure = SwarmPlot(tied, show_values=True, value_step=1)
-        xs = [label.xy[0] for label in labels(figure.axes[0])]
-        # tied values spread off the category center; so do their labels
-        self.assertGreater(len(set(np.round(xs, 6))), 1)
-
-    def test_default_step_labels_a_subset_of_a_dense_group(self):
+    def test_dense_group_still_prints_three_values(self):
         figure = SwarmPlot(DENSE, show_values=True)
-        count = len(labels(figure.axes[0]))
-        self.assertGreater(count, 5)
-        self.assertLess(count, 60)
+        values = [p["value"] for p in DENSE]
+        expected = [f"{v:g}" for v in (min(values), np.median(values), max(values))]
+        self.assertEqual(sorted(texts(figure.axes[0]), key=float), expected)
 
-    def test_default_step_is_per_group(self):
-        sparse = [{"label": "B", "value": v} for v in (0.0, 20.0)]
-        figure = SwarmPlot(DENSE + sparse, show_values=True)
-        self.assertEqual(texts(figure.axes[0])[-2:], ["0", "20"])
+    def test_even_group_median_sits_on_the_nearest_point(self):
+        even = [{"label": "A", "value": float(v)} for v in (1, 2, 3, 4)]
+        figure = SwarmPlot(even, show_values=True)
+        placed = {t.get_text(): t.xy for t in labels(figure.axes[0])}
+        self.assertEqual(sorted(placed, key=float), ["1", "2.5", "4"])
+        self.assertEqual(placed["2.5"][1], 2.0)
 
-    def test_value_step_steps_along_the_value_axis(self):
-        figure = SwarmPlot(DENSE, show_values=True, value_step=50)
-        values = sorted(p["value"] for p in DENSE)
-        self.assertEqual(
-            sorted(texts(figure.axes[0]), key=float),
-            [f"{values[i]:g}" for i in (0, 50, 100, 150)],
-        )
+    def test_small_groups_do_not_repeat_a_point(self):
+        pair = [{"label": "A", "value": 1.0}, {"label": "A", "value": 3.0}]
+        single = [{"label": "B", "value": 7.0}]
+        figure = SwarmPlot(pair + single, show_values=True)
+        self.assertEqual(sorted(texts(figure.axes[0]), key=float), ["1", "3", "7"])
 
     def test_value_format_applies(self):
         figure = SwarmPlot(GROUPS, show_values=True, value_format=VALUE_FORMAT.DECIMAL)
-        self.assertIn("1.0", texts(figure.axes[0]))
+        self.assertIn("3.0", texts(figure.axes[0]))
 
     def test_strip_and_horizontal(self):
         for kwargs in (
@@ -256,9 +252,9 @@ class TestSwarm(ValueLabelCase):
             {"orientation": ORIENTATION.HORIZONTAL},
             {"mode": SWARM_MODE.STRIP, "orientation": ORIENTATION.HORIZONTAL},
         ):
-            figure = SwarmPlot(GROUPS, show_values=True, value_step=1, **kwargs)
+            figure = SwarmPlot(GROUPS, show_values=True, **kwargs)
             ax = figure.axes[0]
-            self.assertEqual(len(labels(ax)), len(GROUPS), kwargs)
+            self.assertEqual(len(labels(ax)), 6, kwargs)
             points = packed_points(ax)
             for label in labels(ax):
                 self.assertIn(tuple(label.xy), points)
@@ -275,7 +271,7 @@ class TestSwarm(ValueLabelCase):
 
     def test_background_group_carries_no_labels(self):
         figure = SwarmPlot(GROUPS, show_values=True, emphasis=["background", None])
-        self.assertEqual(sorted(texts(figure.axes[0])), ["10", "20", "30"])
+        self.assertEqual(sorted(texts(figure.axes[0]), key=float), ["10", "20", "30"])
 
 
 class TestRaincloud(ValueLabelCase):
@@ -346,12 +342,12 @@ class TestComposition(ValueLabelCase):
         self.assertEqual(len(labels(figure.axes[1])), 6)
 
     def test_swarm_and_raincloud_labels_survive_composition(self):
-        swarm = SwarmPlot(GROUPS, show_values=True, value_step=1)
+        swarm = SwarmPlot(GROUPS, show_values=True)
         box = BoxPlot(GROUPS)
-        self.assertEqual(len(labels(Panel([box, swarm]).axes[0])), len(GROUPS))
+        self.assertEqual(len(labels(Panel([box, swarm]).axes[0])), 6)
         rain = RaincloudPlot(GROUPS, show_values=True)
         figure = Grid([[swarm, rain]])
-        self.assertEqual(len(labels(figure.axes[0])), len(GROUPS))
+        self.assertEqual(len(labels(figure.axes[0])), 6)
         self.assertEqual(texts(figure.axes[1]), ["3", "20"])
 
 

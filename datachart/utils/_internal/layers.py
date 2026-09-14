@@ -1219,19 +1219,16 @@ class Layer:
         # a bare layer strokes its values with its own label halo
         self.value_font.pop("path_effects")
 
-    def _value_texts(
-        self, ax, values, along_y: bool = False, span_pt=None
-    ) -> np.ndarray:
+    def _value_texts(self, ax, values, along_y: bool = False) -> np.ndarray:
         """One formatted value per mark, `None` where the step skips it.
 
         Without a `value_step` the step keeps the widest label from meeting
-        its neighbours along the series axis (or `span_pt` of it), so a dense
-        series stays legible.
+        its neighbours along the series axis, so a dense series stays legible.
         """
 
         texts = [_format_value(self.value_format, v) for v in values]
         step = self.value_step or _default_value_step(
-            ax, texts, self.value_font["fontsize"], along_y, span_pt
+            ax, texts, self.value_font["fontsize"], along_y
         )
         return np.array(
             [t if i % step == 0 else None for i, t in enumerate(texts)], dtype=object
@@ -2713,9 +2710,7 @@ class SwarmLayer(PointLabelMixin, GroupLayer):
             # labels read the packed positions; every point is an obstacle
             texts = None
             if self.show_values and role != EMPHASIS_BACKGROUND:
-                texts = np.concatenate(
-                    [self._group_value_texts(ax, v) for _, v in groups]
-                )
+                texts = np.concatenate([self._group_value_texts(v) for _, v in groups])
             self._pending_labels.setdefault(id(ax), []).append(
                 (
                     xy[:, 0],
@@ -2727,17 +2722,26 @@ class SwarmLayer(PointLabelMixin, GroupLayer):
                 )
             )
 
-    def _group_value_texts(self, ax, values: np.ndarray) -> np.ndarray:
-        """One group's value texts, `None` where the step skips a point.
+    def _group_value_texts(self, values: np.ndarray) -> np.ndarray:
+        """One group's min, median, and max texts, `None` on every other point.
 
-        The step walks the group in value order, so the labels spread along
-        the value axis. Without a `value_step` it lets the labels stack apart
-        over the stretch of the value axis the group spans (ADR 0033).
+        The median labels the point nearest it; when that point is also the
+        min or max, the extreme keeps it, so no point prints twice (ADR 0033).
         """
 
         labelled = np.full(len(values), None, dtype=object)
         if len(values) == 0:
             return labelled
+        median = float(np.median(values))
+        lowest, highest = int(np.argmin(values)), int(np.argmax(values))
+        nearest = int(np.argmin(np.abs(values - median)))
+        for index, value in (
+            (nearest, median),
+            (lowest, values[lowest]),
+            (highest, values[highest]),
+        ):
+            labelled[index] = _format_value(self.value_format, value)
+        return labelled
         order = np.argsort(values, kind="stable")
         along = 0 if self.is_horizontal else 1
         ends = np.zeros((2, 2))
@@ -4616,13 +4620,8 @@ def _format_value(value_format, value) -> str:
     return value_format % (value,)
 
 
-def _default_value_step(
-    ax, texts: list, fontsize, along_y: bool = False, span_pt=None
-) -> int:
-    """Every Nth mark, so the widest label fits between neighbours along the axes.
-
-    `span_pt` narrows the stretch the labels share from the whole axes.
-    """
+def _default_value_step(ax, texts: list, fontsize, along_y: bool = False) -> int:
+    """Every Nth mark, so the widest label fits between neighbours along the axes."""
 
     fig_w, fig_h = ax.figure.get_size_inches()
     pos = ax.get_position()
@@ -4632,8 +4631,6 @@ def _default_value_step(
     else:
         axis_pt = fig_w * pos.width * 72
         widest = max(_text_size(fontsize, t)[0] for t in texts)
-    if span_pt is not None:
-        axis_pt = span_pt
     fits = max(int(axis_pt // (widest + 2 * POINT_LABEL_PAD)), 1)
     return max(1, math.ceil(len(texts) / fits))
 

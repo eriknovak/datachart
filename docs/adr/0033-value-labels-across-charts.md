@@ -47,13 +47,14 @@ of individual charts.
 - **A distribution chart labels one statistic.** Box and violin print the
   median beside the median line. Quartiles and whiskers crowd a narrow box,
   and the median is the number readers actually take from it.
-- **A swarm labels its points; a raincloud labels its box.** A swarm offers
-  its packed points to the collision placer, and without a `value_step` each
-  group steps through its values in value order, as densely as its labels
-  stack over the stretch of the value axis the group spans: a group's points
-  spread along the value axis, not the series axis the shared default
-  measures. A raincloud forwards `show_values` to its box only, so it prints
-  one median per group; the cloud and the rain never label.
+- **A swarm labels its range; a raincloud labels its box.** A swarm prints
+  each group's minimum, median, and maximum through the collision placer, on
+  the points holding them (the median on the point nearest it). Labelling
+  every point, even stepped, printed numbers at arbitrary ranks that told a
+  reader nothing, while the extremes and the centre are what a swarm is read
+  for. So a swarm takes no `value_step`. A raincloud forwards `show_values` to
+  its box only, so it prints one median per group; the cloud and the rain
+  never label.
 - **Charts with no per-mark value stay out.** `ParallelCoords` has no mark
   value, `HexbinChart` has only bin counts already served by its colorbar, and
   `ContourChart` labels its iso-lines through `show_labels`. Adding
