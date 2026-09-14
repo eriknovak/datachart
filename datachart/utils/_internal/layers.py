@@ -80,6 +80,7 @@ from .config_helpers import (
     resolve_font_family,
     get_area_style,
     get_bump_style,
+    get_etch,
     get_ink_stroke,
     get_sketch_halo,
     get_stackedarea_style,
@@ -1189,6 +1190,8 @@ class Layer:
         self.halo = get_sketch_halo(self.style)
         # the ink stroke on the same series lines (ADR 0048); None means off
         self.ink_stroke = get_ink_stroke(self.style)
+        self.etch = get_etch(self.style)
+        self.ground = config.get("axes_facecolor") or "#FFFFFF"
         self._resolve_style()
 
     def _resolve_emphasis(self, value):
@@ -1355,6 +1358,22 @@ class Layer:
                 for effect in line_style.get("path_effects", [])
             ]
             line_style["path_effects"] = halo + [InkStroke(**self.ink_stroke)]
+
+    def _etch(self, artists, wash: bool = True) -> None:
+        """Etch the hatched fills among `artists` (ADR 0048); nothing when off.
+
+        A fill under a line takes no wash, so what sits beneath stays visible.
+        """
+
+        if self.etch is None:
+            return
+        options = {**self.etch, "ground": self.ground}
+        if not wash:
+            options["wash"] = None
+        effect = Etch(**options)
+        for artist in artists:
+            if artist is not None:
+                artist.set_path_effects([effect])
 
     @staticmethod
     def _merge_color(color_key: str, ctx_color: Optional[str], style: dict) -> dict:
@@ -1633,7 +1652,8 @@ class LineLayer(PointLabelMixin, Layer):
         plot, fill, _ = _oriented(ax, ctx.transpose)
 
         if draw_yerr:
-            fill(x, y - yerr, y + yerr, **self._resolved_area_style(ctx))
+            band = fill(x, y - yerr, y + yerr, **self._resolved_area_style(ctx))
+            self._etch([band], wash=False)
 
         (line,) = plot(x, y, **line_style, label=self.label(ctx))
         self.register_hover(line, _point_resolver(self.label(ctx), x, y, ctx.transpose))
@@ -1653,16 +1673,22 @@ class LineLayer(PointLabelMixin, Layer):
         if self.show_area:
             drawstyle = line_style.get("drawstyle", "")
             step = drawstyle.split("-")[1] if "steps-" in drawstyle else None
-            self._fill_to_floor(fill, ax, x, y, step, self._resolved_area_style(ctx))
+            area = self._fill_to_floor(
+                fill, ax, x, y, step, self._resolved_area_style(ctx)
+            )
+            self._etch([area], wash=False)
 
     @staticmethod
     def _fill_to_floor(fill, ax, x, y, step, area_style):
-        """Fill under the line past any plausible axis floor, outside the autoscale."""
+        """Fill under the line past any plausible axis floor, outside the autoscale.
+
+        Returns the fill, or None when the line has no finite value.
+        """
 
         values = np.asarray(y, dtype=float)
         values = values[np.isfinite(values)]
         if values.size == 0:
-            return
+            return None
         floor = values.min() - AREA_FLOOR_FACTOR * max(np.abs(values).max(), 1.0)
         data_lim = ax.dataLim.frozen()
         collection = fill(x, y, floor, step=step, **area_style)
@@ -1670,6 +1696,7 @@ class LineLayer(PointLabelMixin, Layer):
         # the sketch filter would split the off-screen floor edge into millions
         # of wobble segments; the top edge sits under the line and its halo
         collection.set_sketch_params()
+        return collection
 
 
 # vertices per segment of a curved bump line
@@ -1965,6 +1992,7 @@ class StackedAreaLayer(Layer):
             **fill_style,
             label=self.label(ctx),
         )
+        self._etch([band], wash=False)
         # the band picks by containment and reports the point nearest the
         # picked vertex, under its own value, never the stack total
         y = get_chart_data("y", self.chart)
@@ -2136,6 +2164,7 @@ class BarLayer(Layer):
             **error_range,
             **bar_style,
         )
+        self._etch(bars.patches)
         roles = self._record_roles(ctx.emphasis, len(bars))
         self._apply_patch_emphasis(bars.patches, roles)
         self._name_legend_patch(bars, roles)
@@ -2252,6 +2281,7 @@ class HistogramLayer(Layer):
                 orientation=self.orientation,
                 **hist_style,
             )
+        self._etch(bars.patches if isinstance(bars, BarContainer) else bars)
         self._register_bins(ax, ctx, bars, edges, counts)
         if self.show_values and ctx.emphasis != EMPHASIS_BACKGROUND:
             self._label_bins(ax, bars, edges, counts, ctx.hist_slot is not None)
@@ -4822,14 +4852,18 @@ class RadialLineLayer(RadialLayer):
         yerr = get_chart_data("yerr", self.chart)
         if self.show_yerr and isinstance(yerr, np.ndarray) and len(yerr) == len(y) - 1:
             yerr = np.append(yerr, yerr[0])
-            ax.fill_between(theta, y - yerr, y + yerr, **self._resolved_area_style(ctx))
+            band = ax.fill_between(
+                theta, y - yerr, y + yerr, **self._resolved_area_style(ctx)
+            )
+            self._etch([band], wash=False)
 
         (line,) = ax.plot(theta, y, **line_style, label=self.label(ctx))
         self.register_hover(line, _radial_resolver(self.label(ctx), labels, y[:-1]))
 
         if self.show_area:
             # the fill reaches the center (or the innerradius hole clips it)
-            ax.fill_between(theta, 0.0, y, **self._resolved_area_style(ctx))
+            area = ax.fill_between(theta, 0.0, y, **self._resolved_area_style(ctx))
+            self._etch([area], wash=False)
 
 
 class RadialBarLayer(RadialLayer):
@@ -4903,6 +4937,7 @@ class RadialBarLayer(RadialLayer):
         bars = ax.bar(
             theta + theta_offset, y, yerr=yerr, label=self.label(ctx), **bar_style
         )
+        self._etch(bars.patches)
         self._apply_patch_emphasis(bars.patches, roles)
         self._name_legend_patch(bars, roles)
         self.register_hover(bars, _radial_resolver(self.label(ctx), labels, y))
@@ -5009,6 +5044,7 @@ class RadialHistogramLayer(RadialLayer):
             label=self.label(ctx),
             **hist_style,
         )
+        self._etch(bars.patches)
         spans = [
             _span_text(lo, hi, lambda value: f"{value:g}°")
             for lo, hi in zip(edges[:-1], edges[1:])
@@ -5240,6 +5276,177 @@ class InkStroke(patheffects.AbstractPathEffect):
                     renderer.draw_path(fill, ribbon, IdentityTransform(), gc.get_rgb())
         finally:
             fill.restore()
+
+
+# etch line directions per matplotlib hatch character, in degrees
+ETCH_ANGLES = {
+    "/": (45,),
+    "\\": (135,),
+    "|": (90,),
+    "-": (0,),
+    "x": (45, 135),
+    "X": (45, 135),
+    "+": (0, 90),
+}
+# the tightest etch line spacing and stipple spacing, in pixels
+ETCH_MIN_SPACING = 2.5
+ETCH_MIN_STIPPLE = 3.0
+# a stipple is a short tick this long in pixels, scattered this far
+ETCH_STIPPLE_TICK = (1.0, 0.6)
+ETCH_STIPPLE_SCATTER = 0.8
+# stipples sit this much further apart than lines of the same density
+ETCH_STIPPLE_SPREAD = 1.3
+
+
+class Etch(patheffects.AbstractPathEffect):
+    """Draws a hatched fill as hand-etched lines clipped to its outline.
+
+    The hatch string still selects the pattern (matplotlib's characters, a
+    repeated character is denser), but each line is drawn on its own with a
+    small jitter in spacing and angle, so the renderer's sketch wobble reaches
+    it; `.` stipples. Under the lines lies a `wash` of the face color over
+    the `ground` (`None`: no fill). A path without a hatch draws as it is.
+
+    `steps` switches to the value mode: the face's darkness picks one of the
+    `(wash, hatch)` steps, so a colormap reads as wash and etch density.
+    """
+
+    def __init__(
+        self,
+        spacing: float = 4.2,
+        jitter: float = 0.3,
+        angle_jitter: float = 2.5,
+        line_width: float = 0.6,
+        wash: Optional[float] = 0.1,
+        color: str = "#000000",
+        ground: str = "#FFFFFF",
+        steps: Optional[list] = None,
+        hatch: Optional[str] = None,
+    ):
+        super().__init__()
+        self.spacing = spacing
+        self.jitter = jitter
+        self.angle_jitter = angle_jitter
+        self.line_width = line_width
+        self.wash = wash
+        self.color = to_rgb(color)
+        self.ground = np.asarray(to_rgb(ground))
+        self.steps = steps
+        # a fixed pattern for the paths whose gc carries no hatch
+        self.hatch = hatch
+
+    def _stipples(self, bbox, char, count, rng, spacing_px) -> tuple:
+        spacing = max(spacing_px * ETCH_STIPPLE_SPREAD / count, ETCH_MIN_STIPPLE)
+        xs = np.arange(bbox.x0, bbox.x1 + spacing, spacing)
+        ys = np.arange(bbox.y0, bbox.y1 + spacing, spacing)
+        gx, gy = np.meshgrid(xs, ys)
+        # every other row shifts half a step, as a hand stipples
+        gx = gx + (np.arange(len(ys)) % 2)[:, None] * spacing / 2
+        starts = np.column_stack([gx.ravel(), gy.ravel()])
+        starts = starts + rng.uniform(
+            -ETCH_STIPPLE_SCATTER, ETCH_STIPPLE_SCATTER, starts.shape
+        )
+        return starts, starts + ETCH_STIPPLE_TICK
+
+    def _strokes(self, bbox, char, count, rng, spacing_px) -> tuple:
+        centre = np.array([(bbox.x0 + bbox.x1) / 2, (bbox.y0 + bbox.y1) / 2])
+        diagonal = np.hypot(bbox.width, bbox.height) + 4
+        spacing = max(spacing_px / count, ETCH_MIN_SPACING)
+        starts, ends = [], []
+        for angle in ETCH_ANGLES.get(char, (45,)):
+            offsets = np.arange(-diagonal / 2, diagonal / 2, spacing)
+            offsets = offsets + rng.uniform(-self.jitter, self.jitter, len(offsets)) * spacing
+            angles = np.radians(
+                angle + rng.uniform(-self.angle_jitter, self.angle_jitter, len(offsets))
+            )
+            u = np.column_stack([np.cos(angles), np.sin(angles)])
+            v = np.column_stack([-np.sin(angles), np.cos(angles)])
+            base = centre + v * offsets[:, None]
+            starts.append(base - u * diagonal / 2)
+            ends.append(base + u * diagonal / 2)
+        return np.vstack(starts), np.vstack(ends)
+
+    def _lines(self, bbox, hatch: str, rng, spacing_px: float) -> Optional[Path]:
+        starts, ends = [], []
+        # sorted, so the random draws follow the same order on every run
+        for char in sorted(set(hatch)):
+            make = self._stipples if char == "." else self._strokes
+            a, b = make(bbox, char, hatch.count(char), rng, spacing_px)
+            starts.append(a)
+            ends.append(b)
+        if not starts:
+            return None
+        starts, ends = np.vstack(starts), np.vstack(ends)
+        vertices = np.empty((2 * len(starts), 2))
+        vertices[0::2], vertices[1::2] = starts, ends
+        codes = np.tile([Path.MOVETO, Path.LINETO], len(starts))
+        return Path(vertices, codes)
+
+    def _pattern(self, gc, face) -> tuple:
+        """The `(hatch, wash color)` of a path; the hatch is empty when unetched."""
+
+        if self.steps is not None:
+            level = value_step(face, len(self.steps))
+            wash, hatch = self.steps[level]
+            return hatch, np.asarray(to_rgb(wash))
+        hatch = self.hatch or gc.get_hatch()
+        if not hatch or self.wash is None:
+            return hatch, None
+        return hatch, (1 - self.wash) * self.ground + self.wash * face
+
+    def draw_path(self, renderer, gc, tpath, affine, rgbFace=None):
+        if rgbFace is None:
+            return renderer.draw_path(gc, tpath, affine, rgbFace)
+        hatch, wash = self._pattern(gc, np.asarray(to_rgb(rgbFace[:3])))
+        if not hatch and wash is None:
+            return renderer.draw_path(gc, tpath, affine, rgbFace)
+        bbox = tpath.transformed(affine).get_extents()
+        # an area fill reaches a floor far off-screen: etch the visible part
+        clip = gc.get_clip_rectangle()
+        if clip is not None:
+            bbox = Bbox.intersection(bbox, clip) or Bbox.null()
+        if bbox.width <= 0 or bbox.height <= 0:
+            return
+        rng = np.random.default_rng(_path_seed(tpath.vertices))
+
+        if wash is not None:
+            fill = renderer.new_gc()
+            fill.copy_properties(gc)
+            fill.set_hatch(None)
+            fill.set_linewidth(0.0)
+            renderer.draw_path(fill, tpath, affine, (*wash, 1.0))
+            fill.restore()
+
+        lines = (
+            self._lines(bbox, hatch, rng, renderer.points_to_pixels(self.spacing))
+            if hatch
+            else None
+        )
+        if lines is not None:
+            stroke = renderer.new_gc()
+            stroke.copy_properties(gc)
+            stroke.set_hatch(None)
+            stroke.set_foreground((*self.color, 1.0), isRGBA=True)
+            stroke.set_linewidth(self.line_width)
+            stroke.set_capstyle("round")
+            stroke.set_dashes(0, None)
+            stroke.set_clip_path(TransformedPath(tpath, affine))
+            renderer.draw_path(stroke, lines, IdentityTransform(), None)
+            stroke.restore()
+
+        if gc.get_linewidth() > 0:
+            outline = renderer.new_gc()
+            outline.copy_properties(gc)
+            outline.set_hatch(None)
+            renderer.draw_path(outline, tpath, affine, None)
+            outline.restore()
+
+
+def value_step(face, n: int) -> int:
+    """The step, 0 (lightest) to `n - 1`, a face color's darkness falls in."""
+
+    luminance = float(np.dot(np.asarray(to_rgb(face))[:3], (0.2126, 0.7152, 0.0722)))
+    return int(np.clip((1 - luminance) * (n - 1e-3), 0, n - 1))
 
 
 def _value_label_font(style: dict) -> dict:

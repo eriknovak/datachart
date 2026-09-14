@@ -363,6 +363,21 @@ def get_ink_stroke(chart_style: dict) -> Optional[dict]:
     return dict(stroke) if stroke else None
 
 
+def get_etch(chart_style: dict) -> Optional[dict]:
+    """The etch parameters of a chart's hatched fills (ADR 0048).
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        A copy of the `Etch` keyword arguments, or None when off.
+
+    """
+
+    etch = get_attr_value("plot_etch", chart_style, config)
+    return dict(etch) if etch else None
+
+
 # -------------------------------------
 # Stacked Area Style
 # -------------------------------------

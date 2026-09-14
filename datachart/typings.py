@@ -1051,10 +1051,20 @@ class InkStyleAttrs(TypedDict):
             (degrees), `nib_floor` (the hairline width as a share of the nib),
             `wobble` (the ink wobble amplitude), `taper` (the end taper, in
             pixels). `None` draws plain lines.
+        plot_etch (Union[Dict[str, Union[float, str, None]], None]): The
+            etching that replaces the hatch tile of a hatched fill with
+            hand-drawn lines clipped to its outline; the hatch pattern still
+            picks the lines and `.` stipples. Keys: `spacing` (points between
+            lines), `jitter` (the spacing jitter as a share of it),
+            `angle_jitter` (degrees), `line_width` (points), `wash` (the share
+            of the face color laid over the axes face under the lines; fills
+            under lines take none), `color` (the etch ink). `None` keeps
+            matplotlib's hatch.
 
     """
 
     plot_ink_stroke: Union[Dict[str, float], None]
+    plot_etch: Union[Dict[str, Union[float, str, None]], None]
 
 
 class StyleAttrs(
