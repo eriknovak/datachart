@@ -6,6 +6,7 @@ from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..utils._internal.validate import validate_bandwidth
 from ..typings import (
+    EmphasisRuleAttrs,
     LegendSettingAttrs,
     RaincloudDataPointAttrs,
     RaincloudStyleAttrs,
@@ -41,6 +42,7 @@ def RaincloudPlot(
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: Optional[Union[EMPHASIS, str, List[Optional[str]]]] = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     xmin: Optional[Union[int, float]] = None,
     xmax: Optional[Union[int, float]] = None,
@@ -130,6 +132,7 @@ def RaincloudPlot(
         The `xticks_format` and `yticks_format` tick formats.
         The `legend` parameter.
         The `vspans` and `hspans` reference bands.
+        The `emphasis_rule` parameter.
 
     Examples:
         >>> from datachart.charts import RaincloudPlot
@@ -160,6 +163,13 @@ def RaincloudPlot(
             call (a single value applies to every group): "background" mutes
             a group's cloud, rain, and box, "highlight" bolds their edges,
             None leaves them unchanged.
+        emphasis_rule: A rule that highlights the groups matching it and mutes
+            the rest: `{"above": v}` or `{"below": v}` (strict),
+            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
+            `{"bottom": n}`, read against a summary of each group's values,
+            chosen by `by`: `"median"` (default), `"mean"`, `"min"`, `"max"`, or
+            `"sum"`. An explicit `emphasis` role wins, and a count ranks across
+            every group of every chart. See `EmphasisRuleAttrs`.
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -235,6 +245,7 @@ def RaincloudPlot(
 
     # Figure-level settings; None values resolve to defaults downstream
     settings = {
+        "emphasis_rule": emphasis_rule,
         "title": title,
         "xlabel": xlabel,
         "ylabel": ylabel,

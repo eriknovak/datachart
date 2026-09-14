@@ -7,6 +7,10 @@ import matplotlib.pyplot as plt
 import pytest
 
 from datachart.charts import (
+    BoxPlot,
+    RaincloudPlot,
+    SwarmPlot,
+    ViolinPlot,
     ContourChart,
     Histogram,
     LineChart,
@@ -106,3 +110,56 @@ class TestSeriesFronts:
     def test_unknown_by_raises_at_the_front(self):
         with pytest.raises(ValueError, match="`by`"):
             LineChart(LINES, emphasis_rule={"top": 1, "by": "mode"})
+
+
+def groups(**values):
+    return [
+        {"label": label, "value": float(v)} for label, vs in values.items() for v in vs
+    ]
+
+
+# medians 2, 3, 8; means 2, 4, 6; maxima 3, 9, 9
+GROUPS = groups(A=[1, 2, 3], B=[0, 3, 9], C=[0, 8, 9, 9, 4])
+
+
+class TestGroupFronts:
+    @pytest.mark.parametrize("front", [BoxPlot, ViolinPlot, SwarmPlot])
+    def test_defaults_to_median(self, front):
+        figure = front(GROUPS, emphasis_rule={"top": 1})
+        assert chart_roles(figure) == [[BG, BG, HL]]
+
+    def test_raincloud_layers_share_the_roles(self):
+        figure = RaincloudPlot(GROUPS, emphasis_rule={"above": 2.5})
+        assert chart_roles(figure) == [[BG, HL, HL]] * 3
+
+    def test_by_mean(self):
+        figure = BoxPlot(GROUPS, emphasis_rule={"between": (3, 5), "by": "mean"})
+        assert chart_roles(figure) == [[BG, HL, BG]]
+
+    def test_by_max_ties_keep_input_order(self):
+        figure = BoxPlot(GROUPS, emphasis_rule={"top": 1, "by": "max"})
+        assert chart_roles(figure) == [[BG, HL, BG]]
+
+    def test_explicit_group_role_wins(self):
+        figure = BoxPlot(GROUPS, emphasis=[HL, None, BG], emphasis_rule={"top": 1})
+        assert chart_roles(figure) == [[HL, BG, BG]]
+
+    def test_single_role_covers_every_group(self):
+        figure = BoxPlot(GROUPS, emphasis=BG, emphasis_rule={"top": 1})
+        assert chart_roles(figure) == [BG]
+
+    def test_rule_ranks_across_charts(self):
+        figure = BoxPlot(
+            [groups(A=[1], B=[5]), groups(A=[9], B=[2])], emphasis_rule={"top": 1}
+        )
+        assert chart_roles(figure) == [[BG, BG], [HL, BG]]
+
+    def test_length_mismatch_still_raises(self):
+        with pytest.raises(ValueError, match="length"):
+            BoxPlot(GROUPS, emphasis=[HL], emphasis_rule={"top": 1})
+
+    def test_muted_box_is_drawn_muted(self):
+        ax = BoxPlot(GROUPS, emphasis_rule={"top": 1}).axes[0]
+        boxes = [p for p in ax.patches if hasattr(p, "get_path")]
+        muted = config["muted_alpha"]
+        assert [box.get_alpha() == muted for box in boxes] == [True, True, False]
