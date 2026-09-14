@@ -58,6 +58,9 @@ temporal detection (ADR 0037), the heatmap's cells, value labels (ADR
   `plot_heatmap_frame_color`, as the contour and hexbin colormaps do (ADR
   0022, ADR 0024), so a theme that recolors its heatmap recolors its
   calendars without a second key.
+  Amended: the base theme sets the month line to black at width 1.5, since
+  light frame colors left the separators hard to see; `None` still falls
+  back to the frame color.
 - **A bare figure.** `Panel` rejects it with the "use `Grid`" message the
   other bare charts give (ADR 0026); `Grid` accepts it. The metadata
   transport carries the per-year panels only.

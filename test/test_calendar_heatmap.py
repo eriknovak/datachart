@@ -407,8 +407,18 @@ class TestYearPanels(unittest.TestCase):
         norms = [ax.images[0].norm for ax in figure.axes]
         self.assertEqual([(n.vmin, n.vmax) for n in norms], [(1, 5), (1, 5)])
 
-    def test_month_line_color_follows_the_theme_frame(self):
+    def test_month_line_is_black_in_every_theme(self):
+        for theme in THEMES:
+            config.set_theme(theme)
+            (lines,) = _month_lines(year_calendar(2024).axes[0])
+            self.assertEqual(
+                lines.get_edgecolor()[0].tolist(), [0.0, 0.0, 0.0, 1.0], theme
+            )
+            self.assertEqual(list(lines.get_linewidths()), [1.5], theme)
+
+    def test_month_line_color_none_follows_the_theme_frame(self):
         config.set_theme(THEME.INK)
+        config.update_config({"plot_calendar_heatmap_month_line_color": None})
         (lines,) = _month_lines(year_calendar(2024).axes[0])
         self.assertEqual(
             lines.get_edgecolor()[0].tolist(),
