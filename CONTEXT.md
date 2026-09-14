@@ -212,6 +212,17 @@ integer positions. `x`/`y` are tick labels, not coordinates — uneven spacing
 never changes cell size; that is the contour's job.
 _Avoid_: matrix plot, image plot, colormesh
 
+**Calendar heatmap**:
+A daily series (`CalendarHeatmap`: a `{date, value}` dict per dataset,
+temporal dates only, each once) drawn as one cell per day, weeks as
+columns and weekdays as rows from `week_start` (a `WEEKDAY` member), with
+stepped month separators and month/weekday labels. Data spanning several
+years draws one panel per year sharing one value range; `year` keeps one.
+The heatmap's cells, value labels, and colorbar, under
+`plot_calendar_heatmap_*` keys. A bare figure: rejected in `Panel`, a cell
+in `Grid`.
+_Avoid_: contributions graph, GitHub calendar, date heatmap
+
 **Contour**:
 A gridded surface (`ContourChart`: 1-D `x`, `y` axes and a 2-D `z` grid per
 chart) drawn as iso-lines in the chart's cycle color or, when `filled`, as

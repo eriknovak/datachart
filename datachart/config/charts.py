@@ -17,6 +17,10 @@ CHART_CONFIGS = {
         "multiplot": False,
         "subplots": True,
     },
+    "calendarheatmap": {
+        "multiplot": False,
+        "subplots": True,
+    },
     "contourchart": {
         "multiplot": True,
         "subplots": True,

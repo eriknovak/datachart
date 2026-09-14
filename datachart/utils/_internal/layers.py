@@ -12,7 +12,7 @@ import json
 import math
 import warnings
 from collections import defaultdict
-from datetime import date, datetime, tzinfo
+from datetime import date, datetime, timedelta, tzinfo
 from dataclasses import dataclass
 from itertools import cycle as iter_cycle
 from typing import Callable, List, NamedTuple, Optional, Union
@@ -57,6 +57,7 @@ from .validate import (
     validate_span_bounds,
     validate_ticks_format,
     validate_value_step,
+    validate_week_start,
 )
 from .config_helpers import (
     get_attr_value,
@@ -80,6 +81,7 @@ from .config_helpers import (
     get_heatmap_style,
     get_heatmap_font_style,
     get_heatmap_edge_style,
+    get_calendar_month_line_style,
     get_contour_style,
     get_contour_label_style,
     get_hexbin_style,
@@ -131,6 +133,7 @@ from ...constants import (
     SCALE,
     SORT,
     VALUE_FORMAT,
+    WEEKDAY,
     VIOLIN_INNER,
 )
 from ...config import config
@@ -3020,24 +3023,26 @@ def _value_formatter(valfmt):
 
 class HeatmapLayer(Layer):
     kind = "heatmap"
+    # the theme keys the cells, values, and borders read
+    style_prefix = "plot_heatmap"
 
     def _resolve_style(self):
-        self.show_heatmap_values = self.settings.get("show_heatmap_values")
         self.show_colorbars = self.settings.get("show_colorbars")
         self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
-        heatmap_style = get_heatmap_style(self.style)
+        heatmap_style = get_heatmap_style(self.style, self.style_prefix)
         heatmap_style["cmap"] = get_colormap(heatmap_style["cmap"])
         self.heatmap_style = heatmap_style
-        self.font_style = get_heatmap_font_style(self.style)
-        self.edge_style = get_heatmap_edge_style(self.style)
+        self.font_style = get_heatmap_font_style(self.style, self.style_prefix)
+        self.edge_style = get_heatmap_edge_style(self.style, self.style_prefix)
+        # white value text only helps when the cmap's high end is actually dark
+        r, g, b = heatmap_style["cmap"](1.0)[:3]
+        self.contrast_values = (0.2126 * r + 0.7152 * g + 0.0722 * b) < 0.5
         self.frame_color = self.style.get(
             "plot_heatmap_frame_color",
             config.get("plot_heatmap_frame_color") or "#000000",
         )
         self.frame_width = config.get("axes_spines_width") or 0.8
-        # white value text only helps when the cmap's high end is actually dark
-        r, g, b = heatmap_style["cmap"](1.0)[:3]
-        self.contrast_values = (0.2126 * r + 0.7152 * g + 0.0722 * b) < 0.5
+        self._resolve_cell_values()
         x, y, self.z = self._grid()
         self.date_axes = {
             axis
@@ -3045,6 +3050,13 @@ class HeatmapLayer(Layer):
             if axis_kind(labels) == AXIS_TEMPORAL
         }
         self._label_axes(x, y)
+
+    def _resolve_cell_values(self) -> None:
+        """The cell value switch and text; the heatmap keeps its own names."""
+
+        self.show_cell_values = bool(self.settings.get("show_heatmap_values"))
+        formatter = _value_formatter(self.chart.get("valfmt", DEFAULT_VALUE_FORMAT))
+        self.cell_text = lambda value: formatter(value, None)
 
     def _grid(self) -> tuple:
         """The validated (x, y, z); x and y are None when not given, z lists."""
@@ -3072,7 +3084,6 @@ class HeatmapLayer(Layer):
 
     def draw(self, ax, ctx):
         data = self.z
-        valfmt = self.chart.get("valfmt", DEFAULT_VALUE_FORMAT)
 
         # the panel owns the aspect; imshow's own "equal" would size the
         # colorbar to a box the panel then stretches
@@ -3085,39 +3096,10 @@ class HeatmapLayer(Layer):
             **self.heatmap_style,
         )
         label = self.label(ctx)
+        self.register_hover(im, lambda index: self._cell_datum(label, *index))
 
-        def resolve(index):
-            row, col = index
-            # cell indices: the axes' tick labels name them
-            return {
-                "label": label,
-                "x": col,
-                "y": row,
-                "value": _scalar(data[row][col]),
-            }
-
-        self.register_hover(im, resolve)
-
-        if self.show_heatmap_values:
-            valfmt = _value_formatter(valfmt)
-            for i in range(len(data)):
-                for j in range(len(data[i])):
-                    value = data[i][j]
-                    font_style = dict(self.font_style)
-                    if (
-                        self.contrast_values
-                        and not np.isnan(value)
-                        and float(im.norm(value)) > HEATMAP_TEXT_CONTRAST_THRESHOLD
-                    ):
-                        font_style["color"] = "#FFFFFF"
-                    ax.text(
-                        j,
-                        i,
-                        valfmt(value, None),
-                        ha="center",
-                        va="center",
-                        **font_style,
-                    )
+        if self.show_cell_values:
+            self._draw_cell_values(ax, im)
 
         if self.edge_style.get("linewidth"):
             self._draw_cell_borders(ax, len(data), len(data[0]))
@@ -3125,6 +3107,36 @@ class HeatmapLayer(Layer):
         if self.show_colorbars:
             _draw_colorbar(ax, im, self.colorbar, ctx.aspect_locked)
 
+        self._draw_frame(ax)
+
+    def _cell_datum(self, label, row, col) -> dict:
+        """The hover datum of a cell: the indices the tick labels name."""
+
+        return {
+            "label": label,
+            "x": col,
+            "y": row,
+            "value": _scalar(self.z[row][col]),
+        }
+
+    def _draw_cell_values(self, ax, im) -> None:
+        """Print each cell's value at its centre; a blank cell stays bare."""
+
+        for i, row in enumerate(self.z):
+            for j, value in enumerate(row):
+                if np.isnan(value):
+                    continue
+                font_style = dict(self.font_style)
+                if (
+                    self.contrast_values
+                    and float(im.norm(value)) > HEATMAP_TEXT_CONTRAST_THRESHOLD
+                ):
+                    font_style["color"] = "#FFFFFF"
+                ax.text(
+                    j, i, self.cell_text(value), ha="center", va="center", **font_style
+                )
+
+    def _draw_frame(self, ax) -> None:
         # heatmaps always draw a full frame, regardless of theme spine visibility
         for spine in ax.spines.values():
             spine.set_visible(True)
@@ -3141,6 +3153,187 @@ class HeatmapLayer(Layer):
         ax.add_collection(
             LineCollection(segments, zorder=1, **self.edge_style), autolim=False
         )
+
+
+# calendar heatmap furniture (ADR 0044): month and weekday labels, in week order
+MONTH_LABELS = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+]
+WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+# every other weekday is labelled: seven labels overlap at the default cell size
+WEEKDAY_LABEL_STEP = 2
+CALENDAR_MONTH_LINE_ZORDER = 2
+
+
+def week_row(day: date, week_start: str) -> int:
+    """The row of a day in a week column: 0 is the week start, 6 the day before it."""
+
+    offset = 6 if week_start == WEEKDAY.SUNDAY else 0
+    return (day.weekday() - offset) % 7
+
+
+def calendar_layout(
+    year: int, week_start: str, first_month: int, last_month: int
+) -> tuple:
+    """The cell of every day of the months drawn: `(cells, n_weeks)`, cells as `(row, col)`.
+
+    Columns are weeks, rows weekdays from the week start down; the days of
+    the first and last week that fall outside the drawn months hold no cell.
+    """
+
+    first = date(year, first_month, 1)
+    end = date(year + 1, 1, 1) if last_month == 12 else date(year, last_month + 1, 1)
+    n_days = (end - first).days
+    first_row = week_row(first, week_start)
+    cells = {
+        first + timedelta(days=i): divmod(first_row + i, 7)[::-1] for i in range(n_days)
+    }
+    return cells, (first_row + n_days + 6) // 7
+
+
+def _resolve_flag(settings: dict, key: str, default: bool = True) -> bool:
+    """A boolean setting; None takes the default."""
+
+    value = settings.get(key)
+    return default if value is None else bool(value)
+
+
+class CalendarHeatmapLayer(HeatmapLayer):
+    """One year of dated values as a weeks-by-weekdays grid of cells (ADR 0044).
+
+    The cells, value labels, and colorbar are the heatmap's; the layer adds
+    the year layout, month separators, and the month and weekday labels.
+    The drawn range spans the months holding data, whole months at a time.
+    """
+
+    kind = "calendarheatmap"
+    style_prefix = "plot_calendar_heatmap"
+
+    def _resolve_style(self):
+        week_start = self.settings.get("week_start")
+        if week_start is None:
+            week_start = get_attr_value(
+                "plot_calendar_heatmap_week_start", self.style, config
+            )
+        self.week_start = validate_week_start(week_start) or WEEKDAY.MONDAY
+        self.month_line_style = get_calendar_month_line_style(self.style)
+        self.show_month_labels = _resolve_flag(self.settings, "show_month_labels")
+        self.show_weekday_labels = _resolve_flag(self.settings, "show_weekday_labels")
+        super()._resolve_style()
+
+    def _resolve_cell_values(self) -> None:
+        """The shared `show_values` and `value_format` vocabulary (ADR 0033)."""
+
+        self.show_cell_values = _resolve_show_values(self.settings)
+        value_format = self.settings.get("value_format")
+        self.value_format = (
+            DEFAULT_VALUE_FORMAT if value_format is None else value_format
+        )
+        self.cell_text = lambda value: _format_value(self.value_format, value)
+
+    def _grid(self) -> tuple:
+        """The 7 x n_weeks grid of the months holding data; NaN off them and on missing days."""
+
+        self.year = self.chart["year"]
+        months = {day.month for day in self.chart["data"]["date"]}
+        self.months = range(min(months), max(months) + 1)
+        self.cells, n_weeks = calendar_layout(
+            self.year, self.week_start, self.months[0], self.months[-1]
+        )
+        # python scalars, as the heatmap holds them: a whole number prints whole
+        z = [[np.nan] * n_weeks for _ in range(7)]
+        self.dates = {}
+        data = self.chart["data"]
+        for day, value in zip(data["date"], data["value"]):
+            row, col = self.cells[day]
+            self.dates[(row, col)] = day
+            z[row][col] = np.nan if value is None else value
+        return None, None, z
+
+    def _label_axes(self, x, y):
+        chart = dict(self.chart)
+        chart["xticks"], chart["xticklabels"] = [], []
+        chart["yticks"], chart["yticklabels"] = [], []
+        if self.show_month_labels:
+            # a month's label sits over the middle of its weeks
+            spans = defaultdict(list)
+            for day, (_, col) in self.cells.items():
+                spans[day.month].append(col)
+            chart["xticks"] = [
+                (min(cols) + max(cols)) / 2 for _, cols in sorted(spans.items())
+            ]
+            chart["xticklabels"] = [MONTH_LABELS[month - 1] for month in self.months]
+        if self.show_weekday_labels:
+            start = 6 if self.week_start == WEEKDAY.SUNDAY else 0
+            chart["yticks"] = list(range(0, 7, WEEKDAY_LABEL_STEP))
+            chart["yticklabels"] = [
+                WEEKDAY_LABELS[(start + row) % 7] for row in chart["yticks"]
+            ]
+        self.chart = chart
+
+    def _cell_datum(self, label, row, col) -> dict:
+        day = self.dates.get((row, col))
+        value = self.z[row][col]
+        return {
+            "label": label,
+            "date": day.isoformat() if day is not None else None,
+            "value": None if np.isnan(value) else _scalar(value),
+        }
+
+    def draw(self, ax, ctx):
+        super().draw(ax, ctx)
+        if self.month_line_style.get("linewidth"):
+            self._draw_month_separators(ax)
+        # the labels alone name the rows and columns
+        ax.tick_params(which="both", length=0)
+
+    def _draw_frame(self, ax) -> None:
+        # the month separators and cell borders are the calendar's only lines
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+
+    def _draw_cell_borders(self, ax, n_rows, n_cols):
+        # borders sit between two days of the year, never around the blank
+        # cells the first and last week hold off the year
+        segments = []
+        for day, (row, col) in self.cells.items():
+            if row < 6 and day + timedelta(days=1) in self.cells:
+                segments.append([(col - 0.5, row + 0.5), (col + 0.5, row + 0.5)])
+            if day + timedelta(days=7) in self.cells:
+                segments.append([(col + 0.5, row - 0.5), (col + 0.5, row + 0.5)])
+        ax.add_collection(
+            LineCollection(segments, zorder=1, **self.edge_style), autolim=False
+        )
+
+    def _draw_month_separators(self, ax) -> None:
+        """A stepped line along the left edge of every month but the first."""
+
+        paths = []
+        for month in self.months[1:]:
+            row, col = self.cells[date(self.year, month, 1)]
+            left, right = col - 0.5, col + 0.5
+            if row == 0:
+                paths.append([(left, -0.5), (left, 6.5)])
+            else:
+                paths.append(
+                    [(right, -0.5), (right, row - 0.5), (left, row - 0.5), (left, 6.5)]
+                )
+        lines = LineCollection(
+            paths, zorder=CALENDAR_MONTH_LINE_ZORDER, **self.month_line_style
+        )
+        lines.set_gid("month-separators")
+        ax.add_collection(lines, autolim=False)
 
 
 # rule-of-thumb level counts stay readable in this range (ADR 0022)
@@ -5423,6 +5616,7 @@ LAYER_TYPES = {
     "sankeychart": SankeyLayer,
     "treemap": TreemapLayer,
     "networkchart": NetworkLayer,
+    "calendarheatmap": CalendarHeatmapLayer,
 }
 
 RADIAL_LAYER_TYPES = {
@@ -7140,7 +7334,7 @@ def build_chart_panel_settings(
 
     show_grid = settings.get("show_grid")
     # rasters (a heatmap, hexagons, filled contour bands) cover the grid: off
-    raster = chart_type in ("heatmap", "hexbinchart") or (
+    raster = chart_type in ("heatmap", "calendarheatmap", "hexbinchart") or (
         chart_type == "contourchart" and settings.get("filled")
     )
     if show_grid is None and not raster:

@@ -26,6 +26,8 @@ Classes:
     HeatmapSingleChartAttrs: The single chart attributes for the heatmap chart.
     HeatmapDataAttrs: The data attributes for the heatmap chart.
     ColorbarSettingAttrs: The per-figure colorbar setting.
+    CalendarHeatmapSingleChartAttrs: The single chart attributes for the calendar heatmap.
+    CalendarHeatmapDataAttrs: The data attributes for the calendar heatmap.
     ContourSingleChartAttrs: The single chart attributes for the contour chart.
     ContourDataAttrs: The data attributes for the contour chart.
     HexbinSingleChartAttrs: The single chart attributes for the hexbin chart.
@@ -66,6 +68,7 @@ Classes:
     HSpanStyleAttrs: The typing for the horizontal reference band style.
     TextStyleAttrs: The typing for the text annotation style.
     HeatmapStyleAttrs: The typing for the heatmap style.
+    CalendarHeatmapStyleAttrs: The typing for the calendar heatmap style.
     ContourStyleAttrs: The typing for the contour chart style.
     HexbinStyleAttrs: The typing for the hexbin chart style.
     ScatterStyleAttrs: The typing for the scatter chart style.
@@ -80,7 +83,7 @@ Classes:
 """
 
 import warnings
-from datetime import datetime
+from datetime import date, datetime
 from typing import TypedDict, Union, Tuple, List, Optional, Dict
 
 import matplotlib.colors as colors
@@ -107,6 +110,7 @@ from .constants import (
     ASPECT_RATIO,
     VALUE_FORMAT,
     EMPHASIS,
+    WEEKDAY,
 )
 
 # ================================================
@@ -668,6 +672,41 @@ class HeatmapStyleAttrs(TypedDict):
     plot_heatmap_edge_color: Union[str, None]
 
 
+class CalendarHeatmapStyleAttrs(TypedDict):
+    """The typing for the calendar heatmap style.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        plot_calendar_heatmap_cmap (Union[str, List[str], colors.LinearSegmentedColormap, None]): The colormap of the day cells (palette name, single color, list of hex colors, or colormap); `None` takes the heatmap colormap.
+        plot_calendar_heatmap_alpha (Union[float, None]): The alpha value of the day cells.
+        plot_calendar_heatmap_font_size (Union[int, float, str, None]): The font size of the cell values.
+        plot_calendar_heatmap_font_color (Union[str, None]): The font color of the cell values.
+        plot_calendar_heatmap_font_style (Union[FONT_STYLE, str, None]): The font style of the cell values.
+        plot_calendar_heatmap_font_weight (Union[FONT_WEIGHT, str, None]): The font weight of the cell values.
+        plot_calendar_heatmap_edge_width (Union[int, float, None]): The width of the borders drawn between the day cells (0 draws none).
+        plot_calendar_heatmap_edge_color (Union[str, None]): The color of the borders drawn between the day cells.
+        plot_calendar_heatmap_month_line_width (Union[int, float, None]): The width of the separators drawn between months (0 draws none).
+        plot_calendar_heatmap_month_line_color (Union[str, None]): The color of the separators drawn between months; `None` takes the heatmap frame color.
+        plot_calendar_heatmap_week_start (Union[WEEKDAY, str, None]): The weekday in the top row of every week, the default of `week_start`.
+
+    """
+
+    plot_calendar_heatmap_cmap: Union[
+        str, List[str], colors.LinearSegmentedColormap, None
+    ]
+    plot_calendar_heatmap_alpha: Union[float, None]
+    plot_calendar_heatmap_font_size: Union[int, float, str, None]
+    plot_calendar_heatmap_font_color: Union[str, None]
+    plot_calendar_heatmap_font_style: Union[FONT_STYLE, str, None]
+    plot_calendar_heatmap_font_weight: Union[FONT_WEIGHT, str, None]
+    plot_calendar_heatmap_edge_width: Union[int, float, None]
+    plot_calendar_heatmap_edge_color: Union[str, None]
+    plot_calendar_heatmap_month_line_width: Union[int, float, None]
+    plot_calendar_heatmap_month_line_color: Union[str, None]
+    plot_calendar_heatmap_week_start: Union[WEEKDAY, str, None]
+
+
 class ContourStyleAttrs(TypedDict):
     """The typing for the contour chart style.
 
@@ -969,6 +1008,7 @@ class StyleAttrs(
     HSpanStyleAttrs,
     TextStyleAttrs,
     HeatmapStyleAttrs,
+    CalendarHeatmapStyleAttrs,
     ContourStyleAttrs,
     HexbinStyleAttrs,
     ScatterStyleAttrs,
@@ -1695,6 +1735,57 @@ class HeatmapSingleChartAttrs(TypedDict):
     yticks: Union[int, float, None]
     yticklabels: Union[List[str], None]
     ytickrotate: Union[int, None]
+
+    colorbar: Union[ColorbarSettingAttrs, None]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+
+
+# ================================================
+# Calendar Heatmap Attributes
+# ================================================
+
+
+class CalendarHeatmapDataAttrs(TypedDict):
+    """The data attributes for the calendar heatmap.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        date (List[Union[date, datetime]]): One temporal object per day: a `date`, `datetime`, `numpy.datetime64`, or pandas `Timestamp`. Date strings are never parsed, and every date appears once.
+        value (List[Union[int, float, None]]): The value of each day, one per date; `None` leaves the day blank.
+
+    """
+
+    date: List[Union[date, datetime]]
+    value: List[Union[int, float, None]]
+
+
+class CalendarHeatmapSingleChartAttrs(TypedDict):
+    """The single chart attributes for the calendar heatmap.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        data (CalendarHeatmapDataAttrs): The dated values defining the calendar.
+        subtitle (Union[str, None]): The subtitle of the calendar; a multi-year calendar appends the year to it.
+        style (Union[CalendarHeatmapStyleAttrs, None]): The style of the calendar.
+
+        norm (Union[NORMALIZE, str, None]): The value normalization.
+        vmin (Union[float, None]): The minimum value to normalize the data points.
+        vmax (Union[float, None]): The maximum value to normalize the data points.
+
+        colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting of the calendar.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
+
+    """
+
+    data: CalendarHeatmapDataAttrs
+    subtitle: Union[str, None]
+    style: Union[CalendarHeatmapStyleAttrs, None]
+
+    norm: Union[str, None]
+    vmin: Union[float, None]
+    vmax: Union[float, None]
 
     colorbar: Union[ColorbarSettingAttrs, None]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]

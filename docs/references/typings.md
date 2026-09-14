@@ -83,6 +83,16 @@ title: Typings Module
     options:
         heading_level: 4
 
+### Calendar Heatmap Typings
+
+::: datachart.typings.CalendarHeatmapSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.CalendarHeatmapDataAttrs
+    options:
+        heading_level: 4
+
 
 ### Scatter Chart Typings
 
@@ -191,6 +201,8 @@ title: Typings Module
 ::: datachart.typings.TextStyleAttrs
 
 ::: datachart.typings.HeatmapStyleAttrs
+
+::: datachart.typings.CalendarHeatmapStyleAttrs
 
 ::: datachart.typings.ScatterStyleAttrs
 

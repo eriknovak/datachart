@@ -19,6 +19,7 @@ Values along an axis or across categories: how a quantity moves and how the cate
 | [Bar Chart](barchart.ipynb)                   | The showcase of the bar chart.               |
 | [Pyramid Chart](pyramidchart.ipynb)           | The showcase of the pyramid chart.           |
 | [Radial Chart](radialchart.ipynb)             | The showcase of the radial chart.            |
+| [Calendar Heatmap](calendarheatmap.ipynb)     | The showcase of the calendar heatmap.        |
 
 ## Distributions
 

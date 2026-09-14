@@ -97,6 +97,10 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.WEEKDAY
+    options:
+        heading_level: 3
+
 ::: datachart.constants.VIOLIN_INNER
     options:
         heading_level: 3

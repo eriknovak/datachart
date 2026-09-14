@@ -732,11 +732,15 @@ def get_plot_text_arrow_style(text_style: dict) -> dict:
 # -------------------------------------
 
 
-def get_heatmap_style(heatmap_style: dict) -> dict:
+def get_heatmap_style(heatmap_style: dict, prefix: str = "plot_heatmap") -> dict:
     """Get the heatmap style.
+
+    The calendar heatmap reads the same keys under its own prefix; its `None`
+    colormap derives from the heatmap colormap (ADR 0044).
 
     Args:
         heatmap_style: The heatmap style dictionary.
+        prefix: The style key prefix of the chart reading the style.
 
     Returns:
         The heatmap style setting.
@@ -744,18 +748,21 @@ def get_heatmap_style(heatmap_style: dict) -> dict:
     """
 
     config_attrs = [
-        ("cmap", "plot_heatmap_cmap"),
-        ("alpha", "plot_heatmap_alpha"),
+        ("cmap", f"{prefix}_cmap"),
+        ("alpha", f"{prefix}_alpha"),
     ]
 
-    return create_config_dict(heatmap_style, config_attrs)
+    style = create_config_dict(heatmap_style, config_attrs)
+    style.setdefault("cmap", get_attr_value("plot_heatmap_cmap", heatmap_style, config))
+    return style
 
 
-def get_heatmap_font_style(heatmap_style: dict) -> dict:
+def get_heatmap_font_style(heatmap_style: dict, prefix: str = "plot_heatmap") -> dict:
     """Get the heatmap font style.
 
     Args:
         heatmap_style: The heatmap font style dictionary.
+        prefix: The style key prefix of the chart reading the style.
 
     Returns:
         The heatmap font style setting.
@@ -763,20 +770,21 @@ def get_heatmap_font_style(heatmap_style: dict) -> dict:
     """
 
     config_attrs = [
-        ("size", "plot_heatmap_font_size"),
-        ("color", "plot_heatmap_font_color"),
-        ("style", "plot_heatmap_font_style"),
-        ("weight", "plot_heatmap_font_weight"),
+        ("size", f"{prefix}_font_size"),
+        ("color", f"{prefix}_font_color"),
+        ("style", f"{prefix}_font_style"),
+        ("weight", f"{prefix}_font_weight"),
     ]
 
     return create_config_dict(heatmap_style, config_attrs)
 
 
-def get_heatmap_edge_style(heatmap_style: dict) -> dict:
+def get_heatmap_edge_style(heatmap_style: dict, prefix: str = "plot_heatmap") -> dict:
     """Get the style of the borders drawn between heatmap cells.
 
     Args:
         heatmap_style: The heatmap style dictionary.
+        prefix: The style key prefix of the chart reading the style.
 
     Returns:
         The cell border style setting.
@@ -784,11 +792,37 @@ def get_heatmap_edge_style(heatmap_style: dict) -> dict:
     """
 
     config_attrs = [
-        ("linewidth", "plot_heatmap_edge_width"),
-        ("color", "plot_heatmap_edge_color"),
+        ("linewidth", f"{prefix}_edge_width"),
+        ("color", f"{prefix}_edge_color"),
     ]
 
     return create_config_dict(heatmap_style, config_attrs)
+
+
+def get_calendar_month_line_style(calendar_style: dict) -> dict:
+    """Get the style of the separators drawn between the months of a calendar heatmap.
+
+    A `None` color derives from the heatmap frame color (ADR 0044).
+
+    Args:
+        calendar_style: The calendar heatmap style dictionary.
+
+    Returns:
+        The month separator style setting.
+
+    """
+
+    config_attrs = [
+        ("linewidth", "plot_calendar_heatmap_month_line_width"),
+        ("color", "plot_calendar_heatmap_month_line_color"),
+    ]
+
+    style = create_config_dict(calendar_style, config_attrs)
+    # the theme's heatmap frame color is its line color for rasters
+    style.setdefault(
+        "color", get_attr_value("plot_heatmap_frame_color", calendar_style, config)
+    )
+    return style
 
 
 # -------------------------------------
