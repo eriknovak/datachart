@@ -205,6 +205,21 @@ least-overlap spot, never dropped; a background layer's labels take the muted
 color.
 _Avoid_: annotation (for this), tag, name label, adjusted text
 
+**Bump chart**:
+Rank over time (`BumpChart`: an `{x, y}` point list per series, one line
+each) drawn with rank 1 at the top of an integer y-axis. `rank_by` (a `RANK`
+member) says whether `y` is already a rank (`GIVEN`) or a value ranked per
+period (`VALUE_DESCENDING`, the default, highest first; `VALUE_ASCENDING`,
+lowest first). A series absent at a period leaves a gap and is not ranked
+there. Overlayable in `Panel` like a line chart.
+_Avoid_: rank chart, slope chart (two periods only), ranking line chart
+
+**End label**:
+A series' label (its `subtitle`) printed beside its first and/or last point in the series
+color (`show_labels`, with `label_position` a `LABEL_POSITION` member), so the
+line is named where it ends instead of in a legend.
+_Avoid_: direct label (for this), line label, legend label
+
 **Heatmap**:
 A per-cell matrix (`Heatmap`: a 2-D `z` grid per chart with optional `x`, `y`
 labels for its columns and rows) drawn as one colored cell per value at

@@ -53,6 +53,12 @@ title: Typings Module
     options:
         heading_level: 4
 
+### Bump Chart Typings
+
+::: datachart.typings.BumpSingleChartAttrs
+    options:
+        heading_level: 4
+
 ### Bar Chart Typings
 
 ::: datachart.typings.BarSingleChartAttrs
@@ -187,6 +193,8 @@ title: Typings Module
 ::: datachart.typings.GridStyleAttrs
 
 ::: datachart.typings.LineStyleAttrs
+
+::: datachart.typings.BumpStyleAttrs
 
 ::: datachart.typings.BarStyleAttrs
 

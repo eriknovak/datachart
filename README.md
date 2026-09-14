@@ -91,7 +91,7 @@ split them apart. The dict keys per chart are listed in each guide.
 
 | Family            | Charts                                                                     | Use for                                                                |
 | ----------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| **Trends**        | [LineChart], [StackedAreaChart]                                            | values over an ordered axis; area for part-of-whole over time          |
+| **Trends**        | [LineChart], [StackedAreaChart], [BumpChart]                               | values over an ordered axis; area for part-of-whole over time; rank over time |
 | **Comparisons**   | [BarChart], [PyramidChart], [RadialChart], [CalendarHeatmap]               | category totals, paired populations, cyclic/periodic values, daily rhythm |
 | **Distributions** | [Histogram], [BoxPlot], [ViolinPlot], [SwarmPlot], [RaincloudPlot]         | shape and spread of one variable, per group                            |
 | **Relationships** | [ScatterChart], [Heatmap], [ContourChart], [HexbinChart], [ParallelCoords], [NetworkChart] | two-variable correlation, matrices, dense 2-D density, many dimensions, who is linked to whom |
@@ -214,6 +214,7 @@ Code is formatted with `black`; the pre-commit hook runs it for you.
 [uv]: https://docs.astral.sh/uv/
 [LineChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/linechart/
 [StackedAreaChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/stackedareachart/
+[BumpChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/bumpchart/
 [BarChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/barchart/
 [PyramidChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/pyramidchart/
 [RadialChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/radialchart/

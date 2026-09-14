@@ -481,6 +481,39 @@ def get_network_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Bump Style
+# -------------------------------------
+
+
+def get_bump_style(chart_style: dict) -> dict:
+    """Get the bump chart style.
+
+    The line reuses the line color, alpha, style and zorder with the bump's
+    own width and markers; `label_padding` is the end label gap in points.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The bump style setting.
+
+    """
+
+    config_attrs = [
+        ("color", "plot_line_color"),
+        ("alpha", "plot_line_alpha"),
+        ("linestyle", "plot_line_style"),
+        ("zorder", "plot_line_zorder"),
+        ("linewidth", "plot_bump_line_width"),
+        ("marker", "plot_bump_marker"),
+        ("markersize", "plot_bump_marker_size"),
+        ("label_padding", "plot_bump_label_padding"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+# -------------------------------------
 # Grid Style
 # -------------------------------------
 

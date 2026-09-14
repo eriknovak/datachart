@@ -12,6 +12,7 @@ Classes:
     LineSingleChartAttrs: The single chart attributes for the line chart.
     LineDataPointAttrs: The data point attributes for the line chart.
     StackedAreaSingleChartAttrs: The single chart attributes for the stacked area chart.
+    BumpSingleChartAttrs: The single chart attributes for the bump chart.
     SankeySingleChartAttrs: The single chart attributes for the Sankey chart.
     SankeyLinkAttrs: The link record attributes for the Sankey chart.
     TreemapSingleChartAttrs: The single chart attributes for the treemap.
@@ -58,6 +59,7 @@ Classes:
     GridStyleAttrs: The typing for the grid style.
     LineStyleAttrs: The typing for the line style.
     StackedAreaStyleAttrs: The typing for the stacked area chart style.
+    BumpStyleAttrs: The typing for the bump chart style.
     SankeyStyleAttrs: The typing for the Sankey chart style.
     TreemapStyleAttrs: The typing for the treemap style.
     NetworkStyleAttrs: The typing for the network chart style.
@@ -343,6 +345,26 @@ class StackedAreaStyleAttrs(TypedDict):
     plot_stackedarea_outline: Union[bool, None]
     plot_stackedarea_edge_color: Union[str, None]
     plot_stackedarea_edge_width: Union[float, None]
+
+
+class BumpStyleAttrs(TypedDict):
+    """The typing for the bump chart style.
+
+    The line takes the `plot_line_*` keys (color, alpha, style, zorder);
+    these keys set what is specific to a bump chart.
+
+    Attributes:
+        plot_bump_line_width (Union[int, float, None]): The line width.
+        plot_bump_marker (Union[LINE_MARKER, str, None]): The marker at every period.
+        plot_bump_marker_size (Union[int, float, None]): The marker size.
+        plot_bump_label_padding (Union[int, float, None]): The gap between a line end and its end label, in points.
+
+    """
+
+    plot_bump_line_width: Union[int, float, None]
+    plot_bump_marker: Union[LINE_MARKER, str, None]
+    plot_bump_marker_size: Union[int, float, None]
+    plot_bump_label_padding: Union[int, float, None]
 
 
 class SankeyStyleAttrs(TypedDict):
@@ -997,6 +1019,7 @@ class StyleAttrs(
     GridStyleAttrs,
     LineStyleAttrs,
     StackedAreaStyleAttrs,
+    BumpStyleAttrs,
     SankeyStyleAttrs,
     TreemapStyleAttrs,
     NetworkStyleAttrs,
@@ -1384,6 +1407,53 @@ class StackedAreaSingleChartAttrs(TypedDict):
     yticks: Union[int, float, None]
     yticklabels: Union[List[str], None]
     ytickrotate: Union[int, None]
+
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+
+    x: Union[str, None]
+    y: Union[str, None]
+
+
+# ================================================
+# Bump Chart Attributes
+# ================================================
+
+
+class BumpSingleChartAttrs(TypedDict):
+    """The single chart attributes for the bump chart.
+
+    Attributes:
+        data (List[LineDataPointAttrs]): The list of data points defining one series; `y` is a value ranked per period, or the rank itself.
+        subtitle (Union[str, None]): The subtitle of the series. Also used as its end label and legend label.
+        xlabel (Union[str, None]): The xlabel of the chart.
+        ylabel (Union[str, None]): The ylabel of the chart.
+        style (Union[BumpStyleAttrs, None]): The style of the series.
+        xticks (Union[int, float, None]): The xtick positions list.
+        xticklabels (Union[List[str], None]): The xtick labels.
+        xtickrotate (Union[int, None]): The xtick rotation value.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
+        x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
+        y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
+
+    """
+
+    data: List[LineDataPointAttrs]
+    subtitle: Union[str, None]
+    xlabel: Union[str, None]
+    ylabel: Union[str, None]
+    style: Union[BumpStyleAttrs, None]
+
+    xticks: Union[int, float, None]
+    xticklabels: Union[List[str], None]
+    xtickrotate: Union[int, None]
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]

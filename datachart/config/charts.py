@@ -29,6 +29,10 @@ CHART_CONFIGS = {
         "multiplot": True,
         "subplots": True,
     },
+    "bumpchart": {
+        "multiplot": True,
+        "subplots": True,
+    },
     "hexbinchart": {
         "multiplot": True,
         "subplots": True,

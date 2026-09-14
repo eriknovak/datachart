@@ -25,6 +25,8 @@ Classes:
     CONTOUR_LEVELS:     The supported contour level rules.
     HEXBIN_REDUCE:      The supported hexbin aggregations.
     BASELINE:           The supported stacked area baselines.
+    RANK:               The supported bump chart ranking rules.
+    LABEL_POSITION:     The supported end label positions.
     NETWORK_LAYOUT:     The supported network chart layouts.
     RADIAL_TYPE:        The supported radial chart visuals.
     SWARM_MODE:         The supported swarm plot modes.
@@ -993,6 +995,61 @@ class NETWORK_LAYOUT:
     GROUPED = "grouped"
     CIRCULAR = "circular"
     FIXED = "fixed"
+
+
+class RANK:
+    """The supported bump chart ranking rules.
+
+    Passed as the `rank_by` setting of the bump chart: whether each series'
+    `y` is already a rank or a value ranked per period, over the series
+    present there. Ties keep input order.
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> from datachart.constants import RANK
+        >>> RANK.DEFAULT
+        "value_descending"
+
+    Attributes:
+        DEFAULT (str): The default ranking. Same as `RANK.VALUE_DESCENDING`.
+        VALUE_DESCENDING (str): The highest value ranks first. Equals to `"value_descending"`.
+        VALUE_ASCENDING (str): The lowest value ranks first. Equals to `"value_ascending"`.
+        GIVEN (str): `y` is the rank, a positive integer. Equals to `"given"`.
+
+    """
+
+    DEFAULT = "value_descending"
+    VALUE_DESCENDING = "value_descending"
+    VALUE_ASCENDING = "value_ascending"
+    GIVEN = "given"
+
+
+class LABEL_POSITION:
+    """The supported end label positions.
+
+    Passed as the `label_position` setting of the bump chart: beside which
+    end of each line its series label prints.
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> from datachart.constants import LABEL_POSITION
+        >>> LABEL_POSITION.DEFAULT
+        "end"
+
+    Attributes:
+        DEFAULT (str): The default position. Same as `LABEL_POSITION.END`.
+        START (str): Beside the first point. Equals to `"start"`.
+        END (str): Beside the last point. Equals to `"end"`.
+        BOTH (str): Beside the first and the last point. Equals to `"both"`.
+
+    """
+
+    DEFAULT = "end"
+    START = "start"
+    END = "end"
+    BOTH = "both"
 
 
 class RADIAL_TYPE:
