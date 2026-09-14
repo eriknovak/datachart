@@ -24,7 +24,9 @@ axis, and placing text at the line ends.
   `y` as the rank and raises `ValueError` on a non-integer or non-positive one.
 - **Ranking is per period, over the series present there.** Ties keep input
   order, as sorting does everywhere (ADR 0042). A series with no point at a
-  period leaves a gap in its line and takes no rank there.
+  period leaves a gap in its line and takes no rank there. Ranking reads the
+  series of one figure: subplots rank across every series, and a `Panel` of
+  two bump figures keeps each figure's own ranks.
 - **The y-axis is the rank.** Integer ticks only, rank 1 at the top.
 - **End labels are `show_labels: bool` plus `label_position`.** `show_labels`
   keeps the bool type `ContourChart` already gives it; `label_position` is a
@@ -39,13 +41,16 @@ axis, and placing text at the line ends.
 - **`emphasis_rule` reads ranks.** The series family of ADR 0045 applies, with
   the rank as the value read and `top` meaning best ranks: `{"top": 3}`
   highlights the three series with the best mean rank (`by` defaults to
-  `"mean"`).
+  `"mean"`). `above`, `below` and `between` compare the rank number itself.
 - **Shared vocabularies.** `xticks_format` formats periods (ADR 0037);
   `show_values`/`value_format` print the original `y` through the line placer
   (ADR 0033).
 - **One layer on the line layer's drawing.** The bump layer builds on
-  `LineLayer` rather than copying it; style keys live under `plot_bump_*`.
+  `LineLayer` rather than copying it; the keys specific to a bump chart live
+  under `plot_bump_*`, while color, alpha, dash and z-order stay `plot_line_*`.
 - **Overlayable.** The figure composes in `Panel` and `Grid` like a line chart.
+  The rank axis applies only when every layer of the panel draws ranks;
+  beside other charts the y-axis follows the panel as usual.
 
 ## Considered options
 

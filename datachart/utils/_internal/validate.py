@@ -144,7 +144,7 @@ def validate_given_ranks(ranks) -> None:
     for rank in ranks:
         if _is_number(rank) and math.isnan(rank):
             continue
-        if not _is_number(rank) or rank < 1 or rank != int(rank):
+        if not _is_number(rank) or not math.isfinite(rank) or rank < 1 or rank % 1:
             raise ValueError(
                 f"`rank_by` GIVEN reads `y` as the rank, which must be a positive "
                 f"integer; got {rank!r}."

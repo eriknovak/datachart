@@ -65,7 +65,7 @@ class TestBumpValidation(unittest.TestCase):
         validate_given_ranks([1, 2, 3.0, float("nan")])
 
     def test_given_ranks_reject_non_integer_and_non_positive(self):
-        for bad in ([1, 2.5], [0, 1], [-1], [True]):
+        for bad in ([1, 2.5], [0, 1], [-1], [True], [float("inf")]):
             with self.subTest(bad=bad):
                 with self.assertRaisesRegex(ValueError, "positive integer"):
                     validate_given_ranks(bad)
@@ -121,6 +121,10 @@ class TestRankSeries(unittest.TestCase):
         periods, _ = rank_series([["b", "a"], ["c"]], [[1, 1], [1]], RANK.GIVEN)
         self.assertEqual(list(periods), ["b", "a", "c"])
 
+    def test_non_numeric_value_raises(self):
+        with self.assertRaisesRegex(ValueError, "non-numeric"):
+            rank_series([[1]], [["high"]], RANK.VALUE_DESCENDING)
+
     def test_repeated_period_in_one_series_raises(self):
         with self.assertRaisesRegex(ValueError, "period"):
             rank_series([[1, 1]], [[1, 2]], RANK.VALUE_DESCENDING)
@@ -153,8 +157,9 @@ class TestBumpChartDrawing(unittest.TestCase):
         ax = BumpChart(DATA, subtitle=NAMES).axes[0]
         self.assertEqual(ax.get_xlim(), (0, 1))
         self.assertFalse(ax.get_lines()[0].get_clip_on())
-        cropped = BumpChart(DATA, subtitle=NAMES, xmax=0.5).axes[0]
-        self.assertTrue(cropped.get_lines()[0].get_clip_on())
+        for limit in ({"xmax": 0.5}, {"ymax": 2}):
+            cropped = BumpChart(DATA, subtitle=NAMES, **limit).axes[0]
+            self.assertTrue(cropped.get_lines()[0].get_clip_on())
 
     def test_user_rank_limits_keep_rank_one_on_top(self):
         fig = BumpChart(DATA, subtitle=NAMES, ymin=1, ymax=2)
@@ -291,6 +296,14 @@ class TestBumpChartComposition(unittest.TestCase):
         self.assertTrue(all(isinstance(l, BumpLayer) for l in layers))
         self.assertTrue(ax.yaxis_inverted())
         self.assertEqual({"A", "B", "C", "D"}, set(_texts(ax)))
+
+    def test_panel_beside_a_value_chart_keeps_the_panel_y_axis(self):
+        from datachart.charts import LineChart
+
+        fig = Panel([LineChart(series([100, 300])), BumpChart(DATA, subtitle=NAMES)])
+        ax = fig.axes[0]
+        self.assertFalse(ax.yaxis_inverted())
+        self.assertGreaterEqual(ax.get_ylim()[1], 300)
 
     def test_grid_cell_renders_the_bump_panel(self):
         fig = Grid([BumpChart(DATA, subtitle=NAMES), BumpChart(DATA, subtitle=NAMES)])

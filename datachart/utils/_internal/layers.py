@@ -1682,8 +1682,14 @@ def _align_to_periods(x, y, periods: list, index: int) -> np.ndarray:
                 "a series takes one value per period."
             )
         seen.add(period)
-        if value is not None:
-            aligned[position[period]] = float(value)
+        if value is None:
+            continue
+        if not isinstance(value, Real) or isinstance(value, bool):
+            raise ValueError(
+                f"Bump chart series {index} has a non-numeric `y` {value!r} at "
+                f"period {period!r}; `y` must be a number."
+            )
+        aligned[position[period]] = float(value)
     return aligned
 
 
@@ -1820,13 +1826,12 @@ class BumpLayer(LineLayer):
         px, py, marks = _bump_path(x, ranks, self.line_curve)
 
         plot, _, _ = _oriented(ax, ctx.transpose)
-        (line,) = plot(px, py, **line_style, markevery=marks, label=self.label(ctx))
-        # the x-limits end at the first and last period: whole end markers
-        # overhang the spines unless the user crops the periods
-        if self.settings.get("xmin") is None and self.settings.get("xmax") is None:
-            line.set_clip_on(False)
-
         label = self.label(ctx)
+        (line,) = plot(px, py, **line_style, markevery=marks, label=label)
+        # the x-limits end at the first and last period: whole end markers
+        # overhang the spines unless the user crops the axes
+        if all(self.settings.get(k) is None for k in ("xmin", "xmax", "ymin", "ymax")):
+            line.set_clip_on(False)
 
         def resolve(index: int) -> dict:
             i = _nearest(x, px[index])
@@ -1851,7 +1856,7 @@ class BumpLayer(LineLayer):
                 self.value_padding,
             )
 
-        if self.show_labels and self.subtitle and present.any():
+        if present.any():
             color = (
                 self.muted_color
                 if ctx.emphasis == EMPHASIS_BACKGROUND
@@ -1859,14 +1864,18 @@ class BumpLayer(LineLayer):
             )
             self._draw_end_labels(ax, ctx, x, ranks, present, line_style, color)
 
+    def _labels_at(self, end: str) -> bool:
+        """Whether an end label prints at the `LABEL_POSITION.START` or `END`."""
+
+        return bool(self.show_labels and self.subtitle) and self.label_position in (
+            end,
+            LABEL_POSITION.BOTH,
+        )
+
     def start_label_extent(self) -> float:
         """The points a start label reaches left of the first mark; 0 without one."""
 
-        if not (
-            self.show_labels
-            and self.subtitle
-            and self.label_position in (LABEL_POSITION.START, LABEL_POSITION.BOTH)
-        ):
+        if not self._labels_at(LABEL_POSITION.START):
             return 0.0
         width, _ = _text_size(self.label_font["fontsize"], str(self.subtitle))
         return width + _mark_radius(self.line_style) + self.label_padding
@@ -1876,9 +1885,9 @@ class BumpLayer(LineLayer):
 
         indices = np.flatnonzero(present)
         ends = []
-        if self.label_position in (LABEL_POSITION.START, LABEL_POSITION.BOTH):
+        if self._labels_at(LABEL_POSITION.START):
             ends.append((indices[0], -1))
-        if self.label_position in (LABEL_POSITION.END, LABEL_POSITION.BOTH):
+        if self._labels_at(LABEL_POSITION.END):
             ends.append((indices[-1], 1))
         gap = _mark_radius(line_style) + self.label_padding
         font = {k: v for k, v in self.label_font.items() if k != "color"}
@@ -7513,20 +7522,22 @@ class Panel:
                     min(r[0] for r in ranges), max(r[1] for r in ranges)
                 )
 
-        # the rank axis: whole ranks with half a rank of margin (ADR 0046)
-        bump_layers = [l for l in layers if isinstance(l, BumpLayer)]
-        rank_ranges = [r for r in (l.y_range() for l in bump_layers) if r is not None]
-        if rank_ranges and not bare and not polar:
-            rank_axis = ax.xaxis if horizontal else ax.yaxis
-            rank_axis.set_major_locator(MaxNLocator(integer=True))
+        # the y-axis is a rank axis only when every data layer draws ranks;
+        # beside other charts it follows the panel as usual (ADR 0046)
+        data_layers = [l for l in layers if l.kind != "text"]
+        rank_axis = bool(data_layers) and all(
+            isinstance(l, BumpLayer) for l in data_layers
+        )
+        rank_ranges = [r for r in (l.y_range() for l in data_layers) if r is not None]
+        rank_axis = rank_axis and bool(rank_ranges) and not bare and not polar
+        if rank_axis:
+            ax.yaxis.set_major_locator(MaxNLocator(integer=True))
             # start labels sit where the rank tick labels would; push these out
-            extent = max(l.start_label_extent() for l in bump_layers)
-            if extent and not horizontal:
-                pad = rank_axis.get_major_ticks()[0].get_pad()
-                rank_axis.set_tick_params(which="major", pad=pad + extent)
-            (ax.set_xlim if horizontal else ax.set_ylim)(
-                0.5, max(r[1] for r in rank_ranges) + 0.5
-            )
+            extent = max(l.start_label_extent() for l in data_layers)
+            if extent:
+                pad = ax.yaxis.get_major_ticks()[0].get_pad()
+                ax.yaxis.set_tick_params(which="major", pad=pad + extent)
+            ax.set_ylim(0.5, max(r[1] for r in rank_ranges) + 0.5)
 
         # bar category ticks
         bar_ticks = s.get("bar_ticks")
@@ -7613,9 +7624,8 @@ class Panel:
         if not bare:
             configure_axis_limits(ax, limits)
         # rank 1 sits at the top, inverted after any user limits apply
-        if rank_ranges and not bare and not polar and not horizontal:
-            if not ax.yaxis_inverted():
-                ax.invert_yaxis()
+        if rank_axis and not ax.yaxis_inverted():
+            ax.invert_yaxis()
         if ax_right is not None and (
             s.get("ymin_right") is not None or s.get("ymax_right") is not None
         ):
