@@ -405,7 +405,7 @@ class SankeyStyleAttrs(TypedDict):
         plot_sankey_node_edge_width (Union[float, None]): The node stroke width.
         plot_sankey_link_color (Union[str, None]): Which node colors a ribbon: "source", "target", or "grey".
         plot_sankey_link_alpha (Union[float, None]): The ribbon alpha.
-        plot_sankey_label_halo_width (Union[float, None]): The width of the white halo behind labels; 0 disables it.
+        plot_sankey_label_halo_width (Union[float, None]): The width of the halo, in the axes face color, behind labels; 0 disables it.
         plot_sankey_node_fill (Union[bool, None]): Whether the node bars are filled; `False` draws them as outlines.
 
     !!! info "Added in Unreleased"
@@ -436,7 +436,7 @@ class TreemapStyleAttrs(TypedDict):
         plot_treemap_level_font_scale (Union[float, None]): The label font scale applied once more per nesting level.
         plot_treemap_min_fontsize (Union[float, None]): The smallest font size a label shrinks to before it is dropped.
         plot_treemap_highlight_edge_width (Union[float, None]): The border width of a highlighted record.
-        plot_treemap_label_halo_width (Union[float, None]): The width of the white halo behind labels; 0 disables it.
+        plot_treemap_label_halo_width (Union[float, None]): The width of the halo, in the axes face color, behind labels; 0 disables it.
         plot_treemap_etch_density (Union[List[int], None]): With `plot_etch` and a hatch cycle, how many times each nesting level repeats its top-level group's pattern, outermost first (a level past the list is blank); every box fills with the axes face so outer etching never shows through. `None` keeps the colored tiles.
 
     !!! info "Added in Unreleased"
@@ -476,7 +476,7 @@ class NetworkStyleAttrs(TypedDict):
         plot_network_edge_width_min (Union[int, float, None]): The width of the lightest edge, and of an edge without `weight`.
         plot_network_edge_width_max (Union[int, float, None]): The width of the heaviest edge.
         plot_network_highlight_edge_width (Union[float, None]): The stroke width of a highlighted node.
-        plot_network_label_halo_width (Union[float, None]): The width of the white halo behind labels; 0 disables it.
+        plot_network_label_halo_width (Union[float, None]): The width of the halo, in the axes face color, behind labels; 0 disables it.
         plot_network_group_alpha (Union[float, None]): The alpha of the disc in the group color behind each cluster of the grouped layout; 0 disables it.
         plot_network_group_linestyle (Union[LINE_STYLE, str, None]): Draws each cluster's mark as a ring in this line style and the edge color instead of a disc. `None` draws the disc.
         plot_network_node_washes (Union[List[str], None]): The node fills by group, in group order, cycling; an ungrouped node takes the first. `None` fills nodes in the group colors.
@@ -557,7 +557,7 @@ class ValueLabelStyleAttrs(TypedDict):
         plot_value_fontsize (Union[int, float, None]): The font size of the value labels.
         plot_value_color (Union[str, None]): The color of the value labels.
         plot_value_padding (Union[int, float, None]): The gap between a mark and its value label, in points.
-        plot_value_halo_width (Union[int, float, None]): The width, in points, of the white halo stroked around the value labels so they stay legible over marks and lines. `None` or `0` draws no halo.
+        plot_value_halo_width (Union[int, float, None]): The width, in points, of the halo, in the axes face color, stroked around the value labels so they stay legible over marks and lines. `None` or `0` draws no halo.
 
     """
 
@@ -1068,8 +1068,9 @@ class ThemeDefaultAttrs(TypedDict):
             when the chart call leaves it unset. `None` means the theme has no
             opinion.
         plot_hatch_cycle (Union[List[str], None]): The hatch patterns assigned
-            per bar/histogram series, parallel to the color cycle. An explicit
-            per-chart hatch style wins. `None` disables the cycle.
+            per bar/histogram series, parallel to the color cycle; with
+            `plot_etch` on, line area fills and stacked areas take them too. An
+            explicit per-chart hatch style wins. `None` disables the cycle.
         plot_linestyle_cycle (Union[List[Union[LINE_STYLE, str]], None]): The
             line styles assigned per line, bump and radial line series, parallel
             to the color cycle. An explicit per-chart line style wins. `None`
@@ -1109,7 +1110,7 @@ class SketchStyleAttrs(TypedDict):
             matplotlib sketch parameters `[scale, length, randomness]`;
             `plt.xkcd()` uses `[1, 100, 2]`. `None` draws clean paths.
         plot_sketch_halo_width (Union[float, None]): The extra width, added to
-            the line width, of the white halo stroked under series lines (line,
+            the line width, of the halo (in the axes face color) stroked under series lines (line,
             radial, regression), so crossing lines read as cut-outs; marks, text
             and patches stay clean. `None` or `0` draws no halo.
 

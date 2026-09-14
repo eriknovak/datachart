@@ -17,15 +17,17 @@ We extend the enumerated set, each attribute `None` (off) in every other
 theme, so the mechanism alone alters no output.
 
 **Path effects**, both in `layers.py` beside `_halo_effects`, both seeded from
-the data-space vertices so a redraw looks the same:
+the path (an etch also from its placement, since every bar shares one unit
+square) so a redraw looks the same:
 
 - `plot_ink_stroke` — a dict (`width_scale`, `nib_angle`, `nib_floor`,
-  `wobble`, `taper`). The `InkStroke` effect draws a series line as a filled
-  ribbon: the width is the nib projected on the travel direction, modulated
+  `wobble`, `taper`; `swell` and `noise` model pen pressure instead). The
+  `InkStroke` effect draws a series line as a filled ribbon: the width is the nib projected on the travel direction, modulated
   by a slow wobble, tapered at the ends, split along the dash pattern, and
   capped against the axes height so small multiples never blob. It rides on
   the halo seam (`Layer._stroke_halo`), so exactly the series lines that take
-  a halo take the stroke; legend handles inherit it through `update_from`.
+  a halo take the stroke, and contour level lines take it too; legend handles
+  inherit it through `update_from`.
 - `plot_etch` — a dict (`spacing`, `jitter`, `angle_jitter`, `line_width`,
   `wash`, `color`). The `Etch` effect replaces a hatched patch's hatch tile
   with jittered lines clipped to its outline; the hatch string still selects

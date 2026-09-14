@@ -515,8 +515,9 @@ _Avoid_: fantasy mode, rc path effects
 
 **Hatch cycle**:
 A theme-defined sequence of hatch patterns the panel assigns per bar/histogram
-series, the same way it assigns colors. Off (`None`) in every theme but
-`HATCH`; an explicit per-chart hatch style wins.
+series, the same way it assigns colors; etched areas take it too (ADR 0048).
+Off (`None`) in every theme but `HATCH` and `QUILL`; an explicit per-chart
+hatch style wins.
 _Avoid_: hatch palette
 
 **Figure size grid**:

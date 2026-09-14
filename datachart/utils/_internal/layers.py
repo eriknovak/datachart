@@ -9,6 +9,7 @@ frozen DrawContext with its per-layer instructions.
 """
 
 import hashlib
+from contextlib import contextmanager
 import json
 import math
 import warnings
@@ -1242,8 +1243,13 @@ class Layer:
         self.etch = get_etch(self.style)
         self.ground = config.get("axes_facecolor") or "#FFFFFF"
         # a value scale drawn in etched steps; only with the etch on
-        self.value_steps = get_value_etch(self.style) if self.etch else None
-        self.legend_family = resolve_font_family()
+        self.value_etch_steps = get_value_etch(self.style) if self.etch else None
+        self.step_legend_style = None
+        if self.value_etch_steps:
+            self.step_legend_style = {
+                **get_legend_style({"location": LEGEND_LOCATION.OUTSIDE_RIGHT}),
+                "family": resolve_font_family(),
+            }
         self._resolve_style()
 
     def _resolve_emphasis(self, value):
@@ -1400,16 +1406,17 @@ class Layer:
     def _stroke_halo(self, line_style: dict) -> None:
         """Stroke the sketch halo under a series line, sized to its width."""
 
+        halo = []
         if self.halo is not None:
             width = (line_style.get("linewidth") or 0) + self.halo
-            line_style["path_effects"] = _halo_effects(width, self.ground)
+            halo = _halo_effects(width, self.ground)
+        if self.ink_stroke is not None and halo:
+            # the ribbon replaces the plain line withStroke redraws on top
+            halo = [patheffects.Stroke(linewidth=width, foreground=self.ground)]
         if self.ink_stroke is not None:
-            # the ribbon replaces the plain line the halo effect redraws on top
-            halo = [
-                patheffects.Stroke(**effect._gc)
-                for effect in line_style.get("path_effects", [])
-            ]
-            line_style["path_effects"] = halo + [InkStroke(**self.ink_stroke)]
+            halo = halo + [InkStroke(**self.ink_stroke)]
+        if halo:
+            line_style["path_effects"] = halo
 
     def _apply_cycle_linestyle(self, line_style: dict, ctx: DrawContext) -> None:
         """Take the panel's cycle line style unless the chart style sets one."""
@@ -1447,12 +1454,20 @@ class Layer:
         return Etch(**{**self.etch, "wash": wash, "ground": self.ground})
 
     def _draw_value_steps(
-        self, ax, steps: np.ndarray, collection_for: Callable, zorder: float
+        self,
+        ax,
+        steps: np.ndarray,
+        collection_for: Callable,
+        zorder: float,
+        alphas: Optional[np.ndarray] = None,
     ) -> None:
-        """One etched collection per value step, built for the marks at `steps == k`."""
+        """One etched collection per value step, built for the marks at `steps == k`.
+
+        `alphas`, one per mark, carries the emphasis fade over to the steps.
+        """
 
         effect = self._etch_effect(1.0)
-        for k, (wash, hatch) in enumerate(self.value_steps):
+        for k, (wash, hatch) in enumerate(self.value_etch_steps):
             mask = steps == k
             if not mask.any():
                 continue
@@ -1466,6 +1481,8 @@ class Layer:
                 gid="value-step",
                 path_effects=[effect],
             )
+            if alphas is not None:
+                collection.set_alpha(alphas[mask])
             ax.add_collection(collection, autolim=False)
 
     def _draw_step_legend(self, ax, entries: list, title: Optional[str]) -> None:
@@ -1477,19 +1494,20 @@ class Layer:
         effect = self._etch_effect(1.0)
         handles = [
             Patch(
-                facecolor=self.value_steps[k][0],
+                facecolor=self.value_etch_steps[k][0],
                 edgecolor=self.etch["color"],
                 linewidth=STEP_LEGEND_EDGE_WIDTH,
-                hatch=self.value_steps[k][1] or None,
+                hatch=self.value_etch_steps[k][1] or None,
                 path_effects=[effect],
             )
             for k, _ in entries
         ]
-        style = get_legend_style({"location": LEGEND_LOCATION.OUTSIDE_RIGHT})
+        style = dict(self.step_legend_style)
+        family = style.pop("family")
         style["title"] = title or None
         legend = Legend(ax, handles, [label for _, label in entries], **style)
         for text in legend.get_texts() + [legend.get_title()]:
-            text.set_fontfamily(self.legend_family)
+            text.set_fontfamily(family)
         ax.add_artist(legend)
         # add_artist clips to the axes patch; the legend sits outside it
         legend.set_clip_on(False)
@@ -1500,7 +1518,7 @@ class Layer:
     def _draw_even_step_legend(self, ax, norm, title: Optional[str]) -> None:
         """The step legend of a normalized value scale: one entry per even step."""
 
-        n = len(self.value_steps)
+        n = len(self.value_etch_steps)
         edges = norm.inverse(np.linspace(0, 1, n + 1))
         entries = [(k, _step_label(edges[k], edges[k + 1])) for k in range(n)]
         self._draw_step_legend(ax, entries, title)
@@ -1720,17 +1738,24 @@ class PointLabelMixin:
         return self._pending_labels.pop(id(ax), [])
 
 
-def _area_style(layer: "Layer", ctx: DrawContext) -> dict:
-    """The fill style under a series line: cycle color and hatch, muted or not."""
+def _apply_cycle_hatch(style: dict, ctx: DrawContext) -> None:
+    """Take the panel's cycle hatch unless the resolved style sets one."""
 
-    area_style = layer._merge_color("color", ctx.color, layer.area_style)
-    if ctx.z_order is not None:
-        area_style["zorder"] = ctx.z_order - 0.1
-    if ctx.hatch is not None and "hatch" not in area_style:
-        area_style["hatch"] = ctx.hatch or None
-    if ctx.emphasis == EMPHASIS_BACKGROUND:
-        area_style["color"] = layer.muted_color
-    return area_style
+    if ctx.hatch is not None and "hatch" not in style:
+        style["hatch"] = ctx.hatch or None
+
+
+class AreaFillMixin:
+    """The fill under a series line: cycle color and hatch, muted or not."""
+
+    def _resolved_area_style(self, ctx):
+        area_style = self._merge_color("color", ctx.color, self.area_style)
+        if ctx.z_order is not None:
+            area_style["zorder"] = ctx.z_order - 0.1
+        _apply_cycle_hatch(area_style, ctx)
+        if ctx.emphasis == EMPHASIS_BACKGROUND:
+            area_style["color"] = self.muted_color
+        return area_style
 
 
 def _mark_radius(line_style: dict) -> float:
@@ -1742,7 +1767,7 @@ def _mark_radius(line_style: dict) -> float:
     return (line_style.get("markersize") or plt.rcParams["lines.markersize"]) / 2
 
 
-class LineLayer(PointLabelMixin, Layer):
+class LineLayer(PointLabelMixin, AreaFillMixin, Layer):
     kind = "line"
     label_spots = POINT_LABEL_SPOTS_VERTICAL
 
@@ -1765,9 +1790,6 @@ class LineLayer(PointLabelMixin, Layer):
 
     def value_data(self):
         return get_chart_data("y", self.chart)
-
-    def _resolved_area_style(self, ctx):
-        return _area_style(self, ctx)
 
     def draw(self, ax, ctx):
         x = get_chart_data("x", self.chart)
@@ -2122,8 +2144,7 @@ class StackedAreaLayer(Layer):
         fill_style = self._merge_color("color", ctx.color, self.fill_style)
         if ctx.z_order is not None:
             fill_style["zorder"] = ctx.z_order
-        if ctx.hatch is not None and "hatch" not in fill_style:
-            fill_style["hatch"] = ctx.hatch or None
+        _apply_cycle_hatch(fill_style, ctx)
         self._apply_emphasis(fill_style, ctx.emphasis)
 
         plot, fill, _ = _oriented(ax, ctx.transpose)
@@ -2282,8 +2303,7 @@ class BarLayer(Layer):
             bar_style["zorder"] = ctx.z_order
         if ctx.alpha is not None:
             bar_style["alpha"] = ctx.alpha
-        if ctx.hatch is not None and "hatch" not in bar_style:
-            bar_style["hatch"] = ctx.hatch or None
+        _apply_cycle_hatch(bar_style, ctx)
         self._apply_emphasis(bar_style, ctx.emphasis)
 
         slot = ctx.bar_slot
@@ -2395,8 +2415,7 @@ class HistogramLayer(Layer):
             hist_style["zorder"] = ctx.z_order
         if ctx.alpha is not None:
             hist_style["alpha"] = ctx.alpha
-        if ctx.hatch is not None and "hatch" not in hist_style:
-            hist_style["hatch"] = ctx.hatch or None
+        _apply_cycle_hatch(hist_style, ctx)
         self._apply_emphasis(hist_style, ctx.emphasis)
 
         if ctx.hist_slot is not None:
@@ -3882,7 +3901,7 @@ class HeatmapLayer(Layer):
         )
         label = self.label(ctx)
         self.register_hover(im, lambda index: self._cell_datum(label, *index))
-        if self.value_steps:
+        if self.value_etch_steps:
             self._draw_cell_steps(ax, im)
         self._draw_cell_emphasis(ax)
 
@@ -3892,7 +3911,7 @@ class HeatmapLayer(Layer):
         if self.edge_style.get("linewidth"):
             self._draw_cell_borders(ax, len(data), len(data[0]))
 
-        if self.show_colorbars and self.value_steps:
+        if self.show_colorbars and self.value_etch_steps:
             self._draw_even_step_legend(ax, im.norm, self.colorbar["label"])
         elif self.show_colorbars:
             _draw_colorbar(ax, im, self.colorbar, ctx.aspect_locked)
@@ -3904,7 +3923,7 @@ class HeatmapLayer(Layer):
 
         im.autoscale_None()
         values = np.asarray(self.z, dtype=float)
-        steps = value_steps(im.norm(np.ma.masked_invalid(values)), len(self.value_steps))
+        steps = value_steps(im.norm(np.ma.masked_invalid(values)), len(self.value_etch_steps))
         rows, cols = np.indices(values.shape)
         squares = np.array([[-0.5, -0.5], [0.5, -0.5], [0.5, 0.5], [-0.5, 0.5]])
 
@@ -3912,7 +3931,10 @@ class HeatmapLayer(Layer):
             centres = np.column_stack([cols[mask], rows[mask]])
             return PolyCollection([squares + centre for centre in centres])
 
-        self._draw_value_steps(ax, steps, cells, im.get_zorder())
+        # a muted cell keeps its fade (ADR 0045)
+        alpha = self._cell_style().get("alpha")
+        alphas = np.broadcast_to(1.0 if alpha is None else alpha, values.shape)
+        self._draw_value_steps(ax, steps, cells, im.get_zorder(), alphas)
         im.set_alpha(0)
 
     def _cell_datum(self, label, row, col) -> dict:
@@ -3940,7 +3962,7 @@ class HeatmapLayer(Layer):
                     and self.cell_roles[i][j] != EMPHASIS_BACKGROUND
                 ):
                     font_style["color"] = "#FFFFFF"
-                if self.value_steps:
+                if self.value_etch_steps:
                     # a value sits on a clear cartouche, never fighting the etching
                     font_style["color"] = self.font_style.get("color")
                     font_style["bbox"] = {**STEP_VALUE_CARTOUCHE, "facecolor": self.ground}
@@ -4328,27 +4350,33 @@ class ContourLayer(Layer):
                 **style,
             )
             # a legend proxy: the contour set itself carries no legend handle
-            ax.fill_between([], [], [], color=self.cmap(CONTOUR_SWATCH), label=label)
+            proxy = ax.fill_between(
+                [], [], [], color=self.cmap(CONTOUR_SWATCH), label=label
+            )
             self.register_hover(bands, self._level_resolver(bands, label))
-            if self.value_steps:
-                self._draw_relief(ax, ctx, bands)
+            if self.value_etch_steps:
+                self._draw_relief(ax, ctx, bands, proxy)
             elif self.show_colorbars:
                 _draw_colorbar(ax, bands, self.colorbar, ctx.aspect_locked)
             return
         self._draw_lines(ax, ctx, self.show_labels, legend_proxy=True)
 
-    def _draw_relief(self, ax, ctx, bands) -> None:
+    def _draw_relief(self, ax, ctx, bands, proxy) -> None:
         """Filled bands as a relief map: etched steps, then labelled level lines.
 
-        A band takes the step of its middle value on the level range; the
-        legend merges consecutive bands that share a step.
+        A band takes the step of its middle value under the bands' norm; the
+        legend merges consecutive bands that share a step, and the legend
+        proxy wears the middle step.
         """
 
         levels = np.asarray(bands.levels, dtype=float)
-        span = (levels[-1] - levels[0]) or 1.0
         middles = (levels[:-1] + levels[1:]) / 2
-        n = len(self.value_steps)
-        steps = value_steps((middles - levels[0]) / span, n)
+        n = len(self.value_etch_steps)
+        bands.autoscale_None()
+        steps = value_steps(bands.norm(middles), n)
+        wash, hatch = self.value_etch_steps[n // 2]
+        proxy.set(facecolor=wash, hatch=hatch or None)
+        proxy.set_path_effects([self._etch_effect(1.0)])
         paths = bands.get_paths()
 
         def band_paths(mask):
@@ -4402,6 +4430,8 @@ class ContourLayer(Layer):
         lines = ax.contour(
             self.x, self.y, self.z, levels=self.levels, **palette, **style
         )
+        if self.ink_stroke is not None:
+            lines.set_path_effects([InkStroke(**self.ink_stroke)])
         self.register_hover(lines, self._level_resolver(lines, label))
         if legend_proxy:
             ax.plot(
@@ -4544,8 +4574,8 @@ class HexbinLayer(Layer):
         values = tiles.get_array()
         if self.emphasis_rule is not None:
             self._apply_bin_emphasis(ax, tiles, values)
-        if self.value_steps:
-            self._draw_bin_steps(ax, tiles, values)
+        if self.value_etch_steps:
+            self._draw_bin_steps(ax, tiles, values, self.emphasis_rule is not None)
 
         def resolve(index):
             cx, cy = tiles.get_offsets()[index[0]]
@@ -4558,16 +4588,22 @@ class HexbinLayer(Layer):
             }
 
         self.register_hover(tiles, resolve)
-        if self.show_colorbars and self.value_steps:
+        if self.show_colorbars and self.value_etch_steps:
             self._draw_even_step_legend(ax, tiles.norm, self.colorbar["label"])
         elif self.show_colorbars:
             _draw_colorbar(ax, tiles, self.colorbar, ctx.aspect_locked)
 
-    def _draw_bin_steps(self, ax, tiles, values) -> None:
-        """The bins as etched value steps under their outlines."""
+    def _draw_bin_steps(self, ax, tiles, values, faded: bool) -> None:
+        """The bins as etched value steps under their outlines.
 
-        tiles.autoscale_None()
-        steps = value_steps(tiles.norm(values), len(self.value_steps))
+        `faded` bins carry the emphasis fade in their face alphas.
+        """
+
+        alphas = tiles.get_facecolors()[:, 3] if faded else None
+        # the emphasis fade already scaled the norm and dropped the array
+        if not faded:
+            tiles.autoscale_None()
+        steps = value_steps(tiles.norm(values), len(self.value_etch_steps))
         hexagon = tiles.get_paths()[0].vertices
         offsets = tiles.get_offsets()
 
@@ -4580,7 +4616,7 @@ class HexbinLayer(Layer):
             collection.set_transform(tiles.get_transform())
             return collection
 
-        self._draw_value_steps(ax, steps, bins, tiles.get_zorder() - 0.01)
+        self._draw_value_steps(ax, steps, bins, tiles.get_zorder() - 0.01, alphas)
         tiles.set_array(None)
         tiles.set_facecolor("none")
 
@@ -5061,7 +5097,7 @@ class RadialLayer(Layer):
             ax.set_yscale(scaley)
 
 
-class RadialLineLayer(RadialLayer):
+class RadialLineLayer(AreaFillMixin, RadialLayer):
     kind = "radial-line"
 
     def _resolve_style(self):
@@ -5069,9 +5105,6 @@ class RadialLineLayer(RadialLayer):
         self.area_style = get_area_style(self.style)
         self.show_yerr = self.settings.get("show_yerr")
         self.show_area = self.settings.get("show_area")
-
-    def _resolved_area_style(self, ctx):
-        return _area_style(self, ctx)
 
     def draw(self, ax, ctx):
         y = get_chart_data("y", self.chart)
@@ -5146,8 +5179,7 @@ class RadialBarLayer(RadialLayer):
             bar_style["zorder"] = ctx.z_order
         if ctx.alpha is not None:
             bar_style["alpha"] = ctx.alpha
-        if ctx.hatch is not None and "hatch" not in bar_style:
-            bar_style["hatch"] = ctx.hatch or None
+        _apply_cycle_hatch(bar_style, ctx)
         self._apply_emphasis(bar_style, ctx.emphasis, width_key="linewidth")
 
         yerr = get_chart_data("yerr", self.chart) if self.show_yerr else None
@@ -5276,8 +5308,7 @@ class RadialHistogramLayer(RadialLayer):
             hist_style["zorder"] = ctx.z_order
         if ctx.alpha is not None:
             hist_style["alpha"] = ctx.alpha
-        if ctx.hatch is not None and "hatch" not in hist_style:
-            hist_style["hatch"] = ctx.hatch or None
+        _apply_cycle_hatch(hist_style, ctx)
         self._apply_emphasis(hist_style, ctx.emphasis, width_key="linewidth")
 
         counts, edges = binned
@@ -5357,13 +5388,46 @@ INK_STROKE_STEP = 1.5
 INK_STROKE_MAX_SAMPLES = 6000
 # the narrowest a pressure stroke gets, as a share of its width
 INK_STROKE_PRESSURE_FLOOR = 0.45
+# the ink wobble: two sines of these periods in pixels and weights
+INK_WOBBLE_WAVES = ((37.0, 0.6), (11.0, 0.4))
+# pressure: sine half-waves over the stroke, and the grain's smoothing window
+INK_SWELL_HALF_WAVES = 3
+INK_GRAIN_WINDOW = 7
+# a tapered end keeps this share of the width; a stroke too short to taper
+# is drawn at the short share throughout
+INK_TAPER_FLOOR = 0.4
+INK_SHORT_STROKE_SHARE = 0.85
 
 
-def _path_seed(vertices) -> int:
+def _path_seed(*arrays) -> int:
     """A seed from a path's vertices, so a redraw of the same data looks the same."""
 
-    data = np.ascontiguousarray(np.asarray(vertices, dtype=np.float32))
-    return int(hashlib.md5(data.tobytes()).hexdigest()[:8], 16)
+    digest = hashlib.md5()
+    for array in arrays:
+        digest.update(np.ascontiguousarray(np.asarray(array, dtype=np.float32)).tobytes())
+    return int(digest.hexdigest()[:8], 16)
+
+
+@contextmanager
+def _derived_gc(renderer, gc, **changes):
+    """A copy of `gc` without its hatch, with `changes` set through its setters.
+
+    A tuple value spreads over the setter's arguments, as `dashes` takes two.
+    """
+
+    derived = renderer.new_gc()
+    derived.copy_properties(gc)
+    derived.set_hatch(None)
+    for name, value in changes.items():
+        setter = getattr(derived, f"set_{name}")
+        if isinstance(value, tuple):
+            setter(*value)
+        else:
+            setter(value)
+    try:
+        yield derived
+    finally:
+        derived.restore()
 
 
 def _polylines(path: Path):
@@ -5454,29 +5518,35 @@ class InkStroke(patheffects.AbstractPathEffect):
 
         across = np.abs(t[:, 0] * self.nib[1] - t[:, 1] * self.nib[0])
         profile = self.nib_floor + (1 - self.nib_floor) * across
+        (long_period, long_weight), (short_period, short_weight) = INK_WOBBLE_WAVES
         profile = profile * (
             1
             + self.wobble
-            * (0.6 * np.sin(s / 37.0 + phases[0]) + 0.4 * np.sin(s / 11.0 + phases[1]))
+            * (
+                long_weight * np.sin(s / long_period + phases[0])
+                + short_weight * np.sin(s / short_period + phases[1])
+            )
         )
         length = s[-1] - s[0]
         if self.swell and length > 0:
             profile = profile * (
-                1 + self.swell * np.sin(3 * np.pi * (s - s[0]) / length + phases[0])
+                1
+                + self.swell
+                * np.sin(INK_SWELL_HALF_WAVES * np.pi * (s - s[0]) / length + phases[0])
             )
         if self.noise:
             grain = np.random.default_rng(int(phases[1] * 1e6)).normal(
                 0, self.noise, len(s)
             )
-            profile = profile * (1 + np.convolve(grain, np.ones(7) / 7, "same"))
+            profile = profile * (1 + np.convolve(grain, np.ones(INK_GRAIN_WINDOW) / INK_GRAIN_WINDOW, "same"))
         if self.swell or self.noise:
             profile = np.clip(profile, INK_STROKE_PRESSURE_FLOOR, None)
         edge = np.minimum(s - s[0], s[-1] - s)
         ramp = np.clip(edge / max(self.taper, 1e-6), 0, 1)
         ramp = ramp * ramp * (3 - 2 * ramp)
         if length > 2 * self.taper:
-            return profile * (0.4 + 0.6 * ramp)
-        return profile * 0.85
+            return profile * (INK_TAPER_FLOOR + (1 - INK_TAPER_FLOOR) * ramp)
+        return profile * INK_SHORT_STROKE_SHARE
 
     def _ribbon(self, xy: np.ndarray, s: np.ndarray, half: float, phases) -> Path:
         d = np.gradient(xy, axis=0)
@@ -5505,12 +5575,7 @@ class InkStroke(patheffects.AbstractPathEffect):
         offset, dashes = gc.get_dashes()
         dashes = None if dashes is None else [renderer.points_to_pixels(v) for v in dashes]
         offset = renderer.points_to_pixels(offset or 0)
-        fill = renderer.new_gc()
-        fill.copy_properties(gc)
-        fill.set_linewidth(0.0)
-        fill.set_dashes(0, None)
-        fill.set_hatch(None)
-        try:
+        with _derived_gc(renderer, gc, linewidth=0.0, dashes=(0, None)) as fill:
             if rgbFace is not None:
                 renderer.draw_path(fill, tpath, affine, rgbFace)
             path = tpath.cleaned(transform=affine, remove_nans=True, curves=False)
@@ -5526,8 +5591,6 @@ class InkStroke(patheffects.AbstractPathEffect):
                 for run in runs:
                     ribbon = self._ribbon(xy[run], s[run], half, phases)
                     renderer.draw_path(fill, ribbon, IdentityTransform(), gc.get_rgb())
-        finally:
-            fill.restore()
 
 
 # etch line directions per matplotlib hatch character, in degrees
@@ -5580,7 +5643,7 @@ class Etch(patheffects.AbstractPathEffect):
         self.color = to_rgb(color)
         self.ground = np.asarray(to_rgb(ground))
 
-    def _stipples(self, bbox, char, count, rng, spacing_px) -> tuple:
+    def _stipples(self, bbox, count, rng, spacing_px) -> tuple:
         spacing = max(spacing_px * ETCH_STIPPLE_SPREAD / count, ETCH_MIN_STIPPLE)
         xs = np.arange(bbox.x0, bbox.x1 + spacing, spacing)
         ys = np.arange(bbox.y0, bbox.y1 + spacing, spacing)
@@ -5615,8 +5678,11 @@ class Etch(patheffects.AbstractPathEffect):
         starts, ends = [], []
         # sorted, so the random draws follow the same order on every run
         for char in sorted(set(hatch)):
-            make = self._stipples if char == "." else self._strokes
-            a, b = make(bbox, char, hatch.count(char), rng, spacing_px)
+            count = hatch.count(char)
+            if char == ".":
+                a, b = self._stipples(bbox, count, rng, spacing_px)
+            else:
+                a, b = self._strokes(bbox, char, count, rng, spacing_px)
             starts.append(a)
             ends.append(b)
         if not starts:
@@ -5648,15 +5714,12 @@ class Etch(patheffects.AbstractPathEffect):
             bbox = Bbox.intersection(bbox, clip) or Bbox.null()
         if bbox.width <= 0 or bbox.height <= 0:
             return
-        rng = np.random.default_rng(_path_seed(tpath.vertices))
+        # every bar shares the unit-square path: its placement tells them apart
+        rng = np.random.default_rng(_path_seed(tpath.vertices, affine.get_matrix()))
 
         if wash is not None:
-            fill = renderer.new_gc()
-            fill.copy_properties(gc)
-            fill.set_hatch(None)
-            fill.set_linewidth(0.0)
-            renderer.draw_path(fill, tpath, affine, (*wash, 1.0))
-            fill.restore()
+            with _derived_gc(renderer, gc, linewidth=0.0) as fill:
+                renderer.draw_path(fill, tpath, affine, (*wash, 1.0))
 
         lines = (
             self._lines(bbox, hatch, rng, renderer.points_to_pixels(self.spacing))
@@ -5664,23 +5727,20 @@ class Etch(patheffects.AbstractPathEffect):
             else None
         )
         if lines is not None:
-            stroke = renderer.new_gc()
-            stroke.copy_properties(gc)
-            stroke.set_hatch(None)
-            stroke.set_foreground((*self.color, 1.0), isRGBA=True)
-            stroke.set_linewidth(self.line_width)
-            stroke.set_capstyle("round")
-            stroke.set_dashes(0, None)
-            stroke.set_clip_path(TransformedPath(tpath, affine))
-            renderer.draw_path(stroke, lines, IdentityTransform(), None)
-            stroke.restore()
+            with _derived_gc(
+                renderer,
+                gc,
+                linewidth=self.line_width,
+                capstyle="round",
+                dashes=(0, None),
+                clip_path=TransformedPath(tpath, affine),
+            ) as stroke:
+                stroke.set_foreground((*self.color, 1.0), isRGBA=True)
+                renderer.draw_path(stroke, lines, IdentityTransform(), None)
 
         if gc.get_linewidth() > 0:
-            outline = renderer.new_gc()
-            outline.copy_properties(gc)
-            outline.set_hatch(None)
-            renderer.draw_path(outline, tpath, affine, None)
-            outline.restore()
+            with _derived_gc(renderer, gc) as outline:
+                renderer.draw_path(outline, tpath, affine, None)
 
 
 def value_steps(normed, n: int) -> np.ndarray:
@@ -6198,6 +6258,8 @@ class TileFrame(NamedTuple):
     effects: list
     # the (patch, datum) of every tile and band placed, for the hover container
     marks: list
+    # the top-level group being drawn, whose pattern its boxes etch in
+    group: Optional[str] = None
 
 
 class TreemapLayer(Layer):
@@ -6297,8 +6359,10 @@ class TreemapLayer(Layer):
         ):
             box = (x / aspect + pad / 2, y + pad / 2, w / aspect - pad, h - pad)
             color = self.group_colors[record["label"]]
-            self._group = record["label"]
-            self._draw_record(ax, record, box, color, record.get("emphasis"), 0, frame)
+            group_frame = frame._replace(group=record["label"])
+            self._draw_record(
+                ax, record, box, color, record.get("emphasis"), 0, group_frame
+            )
         # tiles and bands never overlap, so one containment pick names one
         self.register_patch_hover(frame.marks)
 
@@ -6314,7 +6378,7 @@ class TreemapLayer(Layer):
         """A group at any level: band, children, and one border (ADR 0032)."""
 
         style = self.treemap_style
-        axes_pt, aspect, effects, marks = frame
+        axes_pt, aspect, effects, marks, _ = frame
         x, y, w, h = box
         label = record["label"]
         muted = role == EMPHASIS_BACKGROUND
@@ -6336,7 +6400,7 @@ class TreemapLayer(Layer):
             )
         )
         if not muted:
-            self._etch_box(ax.patches[-1], self._group, level)
+            self._etch_box(ax.patches[-1], frame.group, level)
 
         # the band font scales per level, then shrinks to the minimum before
         # the group goes unlabelled
@@ -6380,7 +6444,7 @@ class TreemapLayer(Layer):
             )
             ax.add_patch(header)
             if not muted:
-                self._etch_box(header, self._group, level)
+                self._etch_box(header, frame.group, level)
             marks.append(
                 (header, {"label": label, "value": treemap_record_total(record)})
             )
@@ -6426,7 +6490,7 @@ class TreemapLayer(Layer):
 
     def _draw_tile(self, ax, record, box, color, role, level, frame):
         style = self.treemap_style
-        axes_pt, _, effects, marks = frame
+        axes_pt, _, effects, marks, _ = frame
         x, y, w, h = box
         muted = role == EMPHASIS_BACKGROUND
         highlight = role == EMPHASIS_HIGHLIGHT
@@ -6445,7 +6509,7 @@ class TreemapLayer(Layer):
         )
         ax.add_patch(tile)
         if not muted:
-            self._etch_box(tile, self._group, level)
+            self._etch_box(tile, frame.group, level)
         marks.append((tile, {"label": record["label"], "value": record["value"]}))
         scale = style["level_font_scale"] ** level
         value = (
@@ -7863,8 +7927,8 @@ def _marker_entry(entry) -> tuple:
 def _takes_hatch(layer: Layer) -> bool:
     """Whether the panel's hatch cycle reaches the layer's fills.
 
-    Areas take it only when etched: a tiled hatch on a translucent area reads
-    poorly, and the areas of a hatch-cycle theme stay as they were (ADR 0048).
+    Areas take it only when etched: a tiled hatch on a translucent area
+    reads poorly (ADR 0048).
     """
 
     if isinstance(

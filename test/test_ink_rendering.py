@@ -101,6 +101,11 @@ class TestInkStroke(unittest.TestCase):
         )
         self.assertTrue(any(ink_effects(line) for line in data_lines(figure)))
 
+    def test_contour_lines_take_the_stroke(self):
+        config.update_config({"plot_ink_stroke": STROKE})
+        figure = ContourChart(GRID)
+        self.assertTrue(any(ink_effects(c) for c in figure.axes[0].collections))
+
     def test_chart_style_turns_the_stroke_off(self):
         config.update_config({"plot_ink_stroke": STROKE})
         figure = LineChart(LINE, style={"plot_ink_stroke": None})
@@ -430,6 +435,18 @@ class TestValueEtch(unittest.TestCase):
         self.assertEqual(legend.get_texts()[0].get_text(), "0 – 1.6")
         self.assertFalse(legend.get_clip_on())
         png(figure)
+
+    def test_hexbin_steps_keep_the_emphasis_fade(self):
+        rng = np.random.default_rng(1)
+        figure = HexbinChart(
+            {"x": list(rng.normal(size=300)), "y": list(rng.normal(size=300))},
+            emphasis_rule={"top": 3},
+        )
+        alphas = np.concatenate(
+            [np.atleast_1d(c.get_alpha()) for c in step_collections(figure.axes[0])]
+        )
+        self.assertLess(alphas.min(), 1.0)
+        self.assertEqual(alphas.max(), 1.0)
 
     def test_no_legend_without_colorbars(self):
         figure = Heatmap(GRID, show_colorbars=False)
