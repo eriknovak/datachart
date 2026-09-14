@@ -35,6 +35,7 @@ LineChart(
     },
     subtitle=Optional[str],                             # The subtitle of the chart (or list for multiple charts)
     emphasis=Optional[str],                             # "highlight" or "background" (or list for multiple charts)
+    emphasis_rule=Optional[dict],                       # One-key rule on a per-series summary; optional "by": mean, median, min, max, sum
     title=Optional[str],                                # The title of the chart
     xlabel=Optional[str],                               # The x-axis label
     ylabel=Optional[str],                               # The y-axis label
@@ -100,31 +101,32 @@ LineChart(
 
 Every customization is either a keyword argument of `LineChart` or a `plot_line_*` / `plot_area_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                            | Use                                                                   | See                                                           |
-| ------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------- |
-| add a title and axis labels           | `title`, `xlabel`, `ylabel`                                           | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| set custom tick positions and labels  | `xticks`, `xticklabels`, `yticks`, `yticklabels`                      | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| rotate the tick labels                | `xtickrotate`, `ytickrotate`                                          | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| fix the axis range                    | `xmin`, `xmax`, `ymin`, `ymax`                                        | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| resize the figure                     | `figsize`                                                             | [Figure size and grid](#figure-size-and-grid)                 |
-| show grid lines                       | `show_grid`                                                           | [Figure size and grid](#figure-size-and-grid)                 |
-| fix the aspect ratio of the axes      | `aspect_ratio`                                                        | [Figure size and grid](#figure-size-and-grid)                 |
-| change the line color                 | `style={"plot_line_color": ...}`                                      | [Line style](#line-style)                                     |
-| dash or dot the line                  | `style={"plot_line_style": ...}`                                      | [Line style](#line-style)                                     |
-| mark the data points                  | `style={"plot_line_marker": ...}`                                     | [Line style](#line-style)                                     |
-| draw the line as steps                | `style={"plot_line_drawstyle": ...}`                                  | [Line style](#line-style)                                     |
-| change the line width or transparency | `style={"plot_line_width": ..., "plot_line_alpha": ...}`              | [Line style](#line-style)                                     |
-| fill the area under the line          | `show_area`, `style={"plot_area_color": ..., "plot_area_alpha": ...}` | [Area under the line](#area-under-the-line)                   |
-| print the value beside each point     | `show_values`, `value_format`, `value_step`                           | [Value labels](#value-labels)                                 |
-| highlight one series, mute the rest   | `emphasis`                                                            | [Emphasis](#emphasis)                                         |
-| mark a threshold or an event          | `hlines`, `vlines`                                                    | [Reference lines](#reference-lines)                           |
-| shade a period or a range             | `hspans`, `vspans`                                                    | [Reference bands](#reference-bands)                           |
-| compare several series in one chart   | `data` as a list of lists, `subtitle`, `show_legend`                  | [Multiple Line Charts](#multiple-line-charts)                 |
-| draw each series in its own subplot   | `subplots`, `sharex`, `sharey`, `max_cols`                            | [Subplots](#subplots)                                         |
-| draw a confidence interval            | `yerr` in `data`, `show_yerr`                                         | [Confidence interval](#confidence-interval)                   |
-| use a logarithmic axis                | `scaley`, `scalex`                                                    | [Axis scales](#axis-scales)                                   |
-| plot data with other key names        | `x`, `y`, `yerr`                                                      | [Custom data keys](#custom-data-keys)                         |
-| save the chart to a file              | `save_figure`                                                         | [Saving the Chart as an Image](#saving-the-chart-as-an-image) |
+| I want to…                             | Use                                                                   | See                                                           |
+| -------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------- |
+| add a title and axis labels            | `title`, `xlabel`, `ylabel`                                           | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
+| set custom tick positions and labels   | `xticks`, `xticklabels`, `yticks`, `yticklabels`                      | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
+| rotate the tick labels                 | `xtickrotate`, `ytickrotate`                                          | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
+| fix the axis range                     | `xmin`, `xmax`, `ymin`, `ymax`                                        | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
+| resize the figure                      | `figsize`                                                             | [Figure size and grid](#figure-size-and-grid)                 |
+| show grid lines                        | `show_grid`                                                           | [Figure size and grid](#figure-size-and-grid)                 |
+| fix the aspect ratio of the axes       | `aspect_ratio`                                                        | [Figure size and grid](#figure-size-and-grid)                 |
+| change the line color                  | `style={"plot_line_color": ...}`                                      | [Line style](#line-style)                                     |
+| dash or dot the line                   | `style={"plot_line_style": ...}`                                      | [Line style](#line-style)                                     |
+| mark the data points                   | `style={"plot_line_marker": ...}`                                     | [Line style](#line-style)                                     |
+| draw the line as steps                 | `style={"plot_line_drawstyle": ...}`                                  | [Line style](#line-style)                                     |
+| change the line width or transparency  | `style={"plot_line_width": ..., "plot_line_alpha": ...}`              | [Line style](#line-style)                                     |
+| fill the area under the line           | `show_area`, `style={"plot_area_color": ..., "plot_area_alpha": ...}` | [Area under the line](#area-under-the-line)                   |
+| print the value beside each point      | `show_values`, `value_format`, `value_step`                           | [Value labels](#value-labels)                                 |
+| highlight one series, mute the rest    | `emphasis`                                                            | [Emphasis](#emphasis)                                         |
+| highlight the series that match a rule | `emphasis_rule`                                                       | [Emphasis](#emphasis)                                         |
+| mark a threshold or an event           | `hlines`, `vlines`                                                    | [Reference lines](#reference-lines)                           |
+| shade a period or a range              | `hspans`, `vspans`                                                    | [Reference bands](#reference-bands)                           |
+| compare several series in one chart    | `data` as a list of lists, `subtitle`, `show_legend`                  | [Multiple Line Charts](#multiple-line-charts)                 |
+| draw each series in its own subplot    | `subplots`, `sharex`, `sharey`, `max_cols`                            | [Subplots](#subplots)                                         |
+| draw a confidence interval             | `yerr` in `data`, `show_yerr`                                         | [Confidence interval](#confidence-interval)                   |
+| use a logarithmic axis                 | `scaley`, `scalex`                                                    | [Axis scales](#axis-scales)                                   |
+| plot data with other key names         | `x`, `y`, `yerr`                                                      | [Custom data keys](#custom-data-keys)                         |
+| save the chart to a file               | `save_figure`                                                         | [Saving the Chart as an Image](#saving-the-chart-as-an-image) |
 
 The full list of style attributes is in the [datachart.typings.LineStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LineStyleAttrs) and [datachart.typings.AreaStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.AreaStyleAttrs) types; the full list of parameters is in the [datachart.charts.LineChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.LineChart) reference.
 
@@ -308,6 +310,8 @@ LineChart(
 When a chart carries several series, the story is often about one of them. The `emphasis` attribute expresses that directly: `"highlight"` thickens a line and brings it to the front, `"background"` mutes a line (the theme's muted color at a lower alpha, thinner and drawn behind the others), and `None` leaves a line unchanged. For multiple charts, `emphasis` is a list aligned with `data`, just like `subtitle` and `style`. Only emphasized-or-unset series appear in the legend — background lines drop out of it. The role strings are also available as the [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants.
 
 The example highlights Ljubljana against the other two cities. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide for how emphasis works across all chart types and themes.
+
+To pick the lines from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every line whose summary matches and mutes the rest. The summary is the mean of each line's own `y` values by default; a `"by"` key picks `"median"`, `"min"`, `"max"`, or `"sum"` instead, as in `{"top": 1, "by": "max"}`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
 
 ```
 LineChart(

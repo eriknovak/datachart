@@ -6,7 +6,7 @@ When a figure carries many series, the story is usually about one of them: one m
 - `"highlight"` bolds a series and brings it to the front of the data layers (never above axes or reference lines). It keeps its theme-assigned color and legend entry.
 - Leaving it unset (`None`) draws the series exactly as before.
 
-`emphasis` is accepted by `LineChart`, `BarChart`, `ScatterChart`, `Histogram`, `ParallelCoords` (per data row), and `BoxPlot` (per box label), and as a per-figure `"emphasis"` option in `Panel`. Bar records — in `BarChart`, `PyramidChart`, and the `RadialChart` bar visual — also carry their own `"emphasis"` key, and those fronts' `emphasis_rule` fills it in from the values. Because muting derives from the theme's `muted_color`/`muted_alpha` attributes, background series harmonize with whatever theme is active. The role strings are also available as constants: `datachart.constants.EMPHASIS.BACKGROUND` and `EMPHASIS.HIGHLIGHT`.
+`emphasis` is accepted by `LineChart`, `BarChart`, `ScatterChart`, `Histogram`, `ParallelCoords` (per data row), and `BoxPlot` (per box label), and as a per-figure `"emphasis"` option in `Panel`. Bar records — in `BarChart`, `PyramidChart`, and the `RadialChart` bar visual — also carry their own `"emphasis"` key. Every chart that carries emphasis, plus `Heatmap` and `HexbinChart`, also takes an `emphasis_rule` that fills the roles in from the values — see [Emphasis picked by a rule](#emphasis-picked-by-a-rule). Because muting derives from the theme's `muted_color`/`muted_alpha` attributes, background series harmonize with whatever theme is active. The role strings are also available as constants: `datachart.constants.EMPHASIS.BACKGROUND` and `EMPHASIS.HIGHLIGHT`.
 
 ```
 import numpy as np
@@ -14,6 +14,8 @@ import numpy as np
 from datachart.charts import (
     BarChart,
     BoxPlot,
+    Heatmap,
+    HexbinChart,
     Histogram,
     LineChart,
     ParallelCoords,
@@ -154,7 +156,29 @@ figure = BoxPlot(
 figure.show()
 ```
 
-## Bars Picked by a Rule
+## Emphasis Picked by a Rule
+
+Often the emphasis follows from the data — the best runs, the groups above a target, the densest region — and writing the roles by hand repeats what the values already say. `emphasis_rule` is a one-key dict that highlights every unit matching it and mutes the rest:
+
+| Rule                           | Highlights                                                |
+| ------------------------------ | --------------------------------------------------------- |
+| `{"above": v}`, `{"below": v}` | values strictly above or below `v`                        |
+| `{"between": (lo, hi)}`        | values from `lo` to `hi`, both included                   |
+| `{"top": n}`, `{"bottom": n}`  | the `n` largest or smallest values; ties keep input order |
+
+Each chart applies the rule to the unit it already gives emphasis to, and reads one number per unit:
+
+| Unit                                                                        | Number the rule reads                                  |
+| --------------------------------------------------------------------------- | ------------------------------------------------------ |
+| a bar record, treemap leaf, or network node                                 | its own value: `y`, `value`, or `size`                 |
+| a parallel coordinates row                                                  | its numeric `hue` value                                |
+| a heatmap cell or hexbin bin                                                | the cell value, or the bin's aggregated value          |
+| a group of a box, violin, swarm, or raincloud plot                          | a summary of the group's values, the median by default |
+| a series of a line, scatter, stacked area, histogram, or line contour chart | a summary of the series' values, the mean by default   |
+
+Groups and series take an optional `"by"` key next to the rule — `"mean"`, `"median"`, `"min"`, `"max"`, or `"sum"` — to choose the summary; a chart that reads one value per unit rejects it. On every chart an explicit role wins over the rule, and `top`/`bottom` rank across every unit of the call, across subplots too — except hexbin bins, which exist only once drawn and rank within their own chart. The rule's shape is documented in [EmphasisRuleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.EmphasisRuleAttrs).
+
+### Bars
 
 A bar chart's emphasis can come from the data instead of a hand-written list. `emphasis_rule` is a one-key dict — `{"above": v}`, `{"below": v}`, `{"between": (lo, hi)}`, `{"top": n}`, or `{"bottom": n}` — that highlights every bar matching it and mutes the rest; the contrast is the point, so the rule commits to both ends. Each bar record may also carry its own `"emphasis"` key, and an explicit record role always wins over the rule, which is how "the top three, and also this one" is said. `sort` orders the categories by value so the ranking reads left to right; it never changes which bars the rule picks.
 
@@ -175,6 +199,82 @@ figure = BarChart(
     emphasis_rule={"top": 3},
     show_values=True,
     value_format="{:.0f}",
+)
+figure.show()
+```
+
+### Series
+
+The random walks from above, picked by their peak instead of by hand: `"by": "max"` summarises each walk by its highest point, and `{"top": 2}` keeps the two highest.
+
+```
+figure = LineChart(
+    data=walks,
+    subtitle=[f"run {i}" for i in range(6)],
+    emphasis_rule={"top": 2, "by": "max"},
+    show_legend=True,
+    title="The two highest peaks",
+)
+figure.show()
+```
+
+### Groups
+
+The box plot from above, with the groups picked by their median. The rule reads the same median line the box draws, so the highlighted boxes are the ones whose line clears the threshold.
+
+```
+figure = BoxPlot(
+    data=data,
+    emphasis_rule={"above": 1.5},
+    title="Groups with a median above 1.5",
+)
+figure.show()
+```
+
+### Records
+
+Parallel coordinates read the rule against each row's `hue` value — the column the rows are already colored by — so the best runs from above no longer need a hand-built role list. The highlighted rows keep the hue ramp, spread over their own scores.
+
+```
+figure = ParallelCoords(
+    data=runs,
+    dimensions=["speed", "cost", "score"],
+    hue="score",
+    emphasis_rule={"top": 4},
+    title="The four best runs, picked by score",
+)
+figure.show()
+```
+
+### Cells and Bins
+
+A heatmap cell fades to the theme's `muted_alpha` when muted, so it still reads on the colormap, and a highlighted cell is outlined; a blank cell never matches. Cells also take explicit roles through an `emphasis` grid aligned with `z`, which wins over the rule. A hexbin's bins exist only once they are drawn, so `HexbinChart` takes the rule alone, read against each bin's count (or its reduced `c` value).
+
+```
+rng = np.random.RandomState(21)
+hours = [f"{h:02d}h" for h in range(8, 18)]
+days = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+load = {
+    "x": hours,
+    "y": days,
+    "z": [[int(rng.poisson(20 + 15 * np.sin((h - 8) / 3))) for h in range(8, 18)] for _ in days],
+}
+
+figure = Heatmap(
+    data=load,
+    emphasis_rule={"top": 5},
+    show_heatmap_values=True,
+    title="The five busiest hours",
+)
+figure.show()
+
+points = rng.multivariate_normal([0, 0], [[1, 0.6], [0.6, 1]], size=3000)
+figure = HexbinChart(
+    data={"x": points[:, 0].tolist(), "y": points[:, 1].tolist()},
+    gridsize=20,
+    emphasis_rule={"above": 40},
+    show_colorbars=True,
+    title="Bins with more than 40 points",
 )
 figure.show()
 ```

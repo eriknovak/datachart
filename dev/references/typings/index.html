@@ -2068,6 +2068,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#datachart.typings.EmphasisRuleAttrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;EmphasisRuleAttrs
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3062,6 +3073,17 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;LegendSettingAttrs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.typings.EmphasisRuleAttrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;EmphasisRuleAttrs
       
     </span>
   </a>
@@ -4301,6 +4323,14 @@ is intended to contain the typings for easier input value format checkup.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.EmphasisRuleAttrs&lt;/span&gt;" href="#datachart.typings.EmphasisRuleAttrs">EmphasisRuleAttrs</a></code></td>
+            <td class="doc-class-details">
+              <div class="doc-md-description">
+                <p>The emphasis rule setting.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.AreaStyleAttrs&lt;/span&gt;" href="#datachart.typings.AreaStyleAttrs">AreaStyleAttrs</a></code></td>
             <td class="doc-class-details">
               <div class="doc-md-description">
@@ -5311,6 +5341,160 @@ outside member places the legend beside the axes.</p>
                   <span class="doc-attribute-annotation">
                     <b>TYPE:</b>
                       <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.LEGEND_ALIGN&lt;/span&gt;" href="../constants/#datachart.constants.LEGEND_ALIGN">LEGEND_ALIGN</a>, <span title="str">str</span>, None]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="datachart.typings.EmphasisRuleAttrs" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.typings.EmphasisRuleAttrs</span>
+
+
+</h4>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
+
+
+
+        <p>The emphasis rule setting, passed to a chart front as <code>emphasis_rule</code>.</p>
+<p>Exactly one comparison key: a unit matching it is highlighted and every
+other unit muted. Each front selects its own unit — a bar, leaf, node,
+row, cell or bin reads its one value; a group or series reads a summary
+of its values, chosen by <code>by</code>. A unit's explicit <code>emphasis</code> role wins.</p>
+<div class="admonition info">
+<p class="admonition-title">Added in Unreleased</p>
+</div>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">ATTRIBUTE</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.EmphasisRuleAttrs.above">above</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Highlight values strictly above this.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="int">int</span>, <span title="float">float</span>]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.EmphasisRuleAttrs.below">below</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Highlight values strictly below this.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="int">int</span>, <span title="float">float</span>]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.EmphasisRuleAttrs.between">between</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Highlight
+values within <code>(lo, hi)</code>, both bounds inclusive.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Tuple">Tuple</span>[<span title="typing.Union">Union</span>[<span title="int">int</span>, <span title="float">float</span>], <span title="typing.Union">Union</span>[<span title="int">int</span>, <span title="float">float</span>]]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.EmphasisRuleAttrs.top">top</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Highlight the <code>n</code> largest values; ties keep input order.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.EmphasisRuleAttrs.bottom">bottom</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Highlight the <code>n</code> smallest values; ties keep input order.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.EmphasisRuleAttrs.by">by</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The summary a
+group or series is read by. Groups default to <code>"median"</code>, series
+to <code>"mean"</code>; a front reading one value per unit rejects it.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Literal">Literal</span>[&#39;mean&#39;, &#39;median&#39;, &#39;min&#39;, &#39;max&#39;, &#39;sum&#39;]</code>
                   </span>
               </p>
             </td>
@@ -6944,6 +7128,20 @@ outside member places the legend beside the axes.</p>
                   <span class="doc-attribute-annotation">
                     <b>TYPE:</b>
                       <code><span title="typing.List">List</span>[<span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<span title="int">int</span>, <span title="float">float</span>, None]]]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.HeatmapDataAttrs.emphasis">emphasis</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The per-cell emphasis roles, aligned with <code>z</code> ("background" or "highlight"); wins over the chart's <code>emphasis_rule</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>[<span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.EMPHASIS&lt;/span&gt;" href="../constants/#datachart.constants.EMPHASIS">EMPHASIS</a>, <span title="str">str</span>, None]]], None]</code>
                   </span>
               </p>
             </td>

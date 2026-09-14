@@ -34,6 +34,7 @@ Histogram(
     },
     subtitle=Optional[str],                             # The subtitle of the chart (or list for multiple charts)
     emphasis=Optional[str],                             # "highlight" or "background" (or list for multiple charts)
+    emphasis_rule=Optional[dict],                       # One-key rule on a per-series summary; optional "by": mean, median, min, max, sum
     title=Optional[str],                                # The title of the chart
     xlabel=Optional[str],                               # The x-axis label
     ylabel=Optional[str],                               # The y-axis label
@@ -114,6 +115,7 @@ Every customization is either a keyword argument of `Histogram` or a `plot_hist_
 | draw the bars horizontally              | `orientation`                                                                              | [Orientation](#orientation)                                   |
 | print the count at the top of each bin  | `show_values`, `value_format`                                                              | [Value labels](#value-labels)                                 |
 | highlight one series, mute the rest     | `emphasis`                                                                                 | [Emphasis](#emphasis)                                         |
+| highlight the series that match a rule  | `emphasis_rule`                                                                            | [Emphasis](#emphasis)                                         |
 | mark a threshold or a reference value   | `vlines`, `hlines`                                                                         | [Reference lines](#reference-lines)                           |
 | shade a range of values                 | `hspans`, `vspans`                                                                         | [Reference bands](#reference-bands)                           |
 | compare several series in one chart     | `data` as a list of lists, `subtitle`, `show_legend`                                       | [Multiple Histograms](#multiple-histograms)                   |
@@ -320,6 +322,8 @@ When a chart carries several series, the story is often about one of them. The `
 Emphasis also changes how the histograms are drawn: when any series carries an emphasis role, the histograms draw individually, overlaid on shared bins, instead of stacked on top of each other — a muted background stacked under the highlight would make no sense.
 
 The example highlights the Gentoo penguins against the other two species. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide for how emphasis works across all chart types and themes.
+
+To pick the histograms from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every histogram whose summary matches and mutes the rest. The summary is the mean of each histogram's own raw `x` values by default; a `"by"` key picks `"median"`, `"min"`, `"max"`, or `"sum"` instead, as in `{"top": 1, "by": "max"}`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
 
 ```
 Histogram(

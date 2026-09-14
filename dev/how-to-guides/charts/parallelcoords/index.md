@@ -59,6 +59,7 @@ ParallelCoords(
     hue=Optional[str],                                  # The key to color the lines by (categorical or numeric; or list for multiple charts)
     category_orders=Optional[Dict[str, List[str]]],     # The order of the categories of categorical dimensions
     emphasis=Optional[Union[str, List[Optional[str]]]], # The emphasis role of every row ("background", "highlight"; or one role for all rows)
+    emphasis_rule=Optional[dict],                       # One-key rule on each row's numeric hue value
 )
 ```
 
@@ -105,6 +106,7 @@ Every customization is either a keyword argument of `ParallelCoords` or a `plot_
 | style the tick marks and their labels        | `style={"plot_parallel_tick_color": ..., "plot_parallel_tick_label_size": ..., ...}`        | [Tick marks and labels](#tick-marks-and-labels)                                  |
 | style the dimension labels                   | `style={"plot_parallel_dim_label_size": ..., "plot_parallel_dim_label_rotation": ..., ...}` | [Dimension labels](#dimension-labels)                                            |
 | highlight some rows, mute the rest           | `emphasis`                                                                                  | [Emphasis](#emphasis)                                                            |
+| highlight the rows that match a rule         | `emphasis_rule`                                                                             | [Emphasis](#emphasis)                                                            |
 | overlay several sets of data points          | `data` as a list of lists, `style` and `hue` as lists                                       | [Multiple Parallel Coordinates Charts](#multiple-parallel-coordinates-charts)    |
 | save the chart to a file                     | `save_figure`                                                                               | [Saving the Chart as an Image](#saving-the-chart-as-an-image)                    |
 
@@ -369,6 +371,8 @@ When the story is about some of the rows, the `emphasis` attribute tells the res
 - `None` draws the row unchanged.
 
 The role strings are also available as constants in [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS). Because the background rows leave the legend, a hue legend over an emphasized chart names only the groups that are still colored. The example singles out the Chinstrap penguins: they are highlighted, the other two species are muted, and the legend names the Chinstrap alone. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide for how emphasis works across the other charts and in composed figures.
+
+To pick the rows from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every row whose `hue` value matches and mutes the rest. The rule reads the column the rows are already colored by, so it needs a numeric `hue`; without one it raises a `ValueError`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
 
 ```
 from datachart.constants import EMPHASIS

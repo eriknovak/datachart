@@ -3398,6 +3398,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">show_values</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span>                         <span class="c1"># Whether to write each edge's weight at its midpoint</span>
     <span class="n">value_format</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                         <span class="c1"># The format of the values, a VALUE_FORMAT constant or a format string</span>
     <span class="n">show_legend</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span>                         <span class="c1"># Whether to list the node groups in a legend</span>
+    <span class="n">emphasis_rule</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>                       <span class="c1"># One-key rule on each node's size</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span>                                             <span class="c1"># The style of the chart (optional; a list for multiple charts)</span>
         <span class="s2">"plot_network_node_color"</span><span class="p">:</span>            <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>    <span class="c1"># The node color; overrides the palette</span>
         <span class="s2">"plot_network_node_alpha"</span><span class="p">:</span>            <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>  <span class="c1"># The node alpha (0.95 by default)</span>
@@ -3735,6 +3736,11 @@ service = {
 <tr>
 <td style="text-align:left">mute or outline a node</td>
 <td style="text-align:left"><code>"emphasis"</code> on the node</td>
+<td style="text-align:left"><a href="#emphasis">Emphasis</a></td>
+</tr>
+<tr>
+<td style="text-align:left">highlight the nodes that match a rule</td>
+<td style="text-align:left"><code>emphasis_rule</code></td>
 <td style="text-align:left"><a href="#emphasis">Emphasis</a></td>
 </tr>
 <tr>
@@ -4476,6 +4482,7 @@ NetworkChart(
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="emphasis">Emphasis<a class="anchor-link" href="#emphasis">¶</a></h3><p>Emphasis is set per node with the <code>emphasis</code> key, using the <a href="../../../references/constants/#datachart.constants.EMPHASIS">datachart.constants.EMPHASIS</a> roles. <code>background</code> mutes a node, its label, and every edge touching it into the theme's muted color; <code>highlight</code> strokes the node's border in the text color. Roles are explicit: highlighting one node does not mute the others, and the <code>emphasis</code> argument of the function itself is not supported — pass the roles on the nodes. The example highlights the module every other module ends up depending on, and mutes the command-line entry point and what only it uses.</p>
+<p>To pick the nodes from the data instead, pass <code>emphasis_rule</code>, a one-key rule — <code>{"above": v}</code> or <code>{"below": v}</code> (strict), <code>{"between": (lo, hi)}</code> (inclusive), <code>{"top": n}</code> or <code>{"bottom": n}</code> — that highlights every node whose <code>size</code> matches and mutes the rest; a node without a <code>size</code> raises a <code>ValueError</code>. A node's own <code>emphasis</code> key wins over the rule. See the <a href="../../styling/highlighting/#emphasis-picked-by-a-rule">Highlighting</a> guide for the rule on every chart.</p>
 </div>
 </div>
 </div>

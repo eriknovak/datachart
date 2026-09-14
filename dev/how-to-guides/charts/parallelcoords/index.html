@@ -3356,6 +3356,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">hue</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                                  <span class="c1"># The key to color the lines by (categorical or numeric; or list for multiple charts)</span>
     <span class="n">category_orders</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span>     <span class="c1"># The order of the categories of categorical dimensions</span>
     <span class="n">emphasis</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]],</span> <span class="c1"># The emphasis role of every row ("background", "highlight"; or one role for all rows)</span>
+    <span class="n">emphasis_rule</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>                       <span class="c1"># One-key rule on each row's numeric hue value</span>
 <span class="p">)</span>
 </pre></div>
 <p><strong>Dimension types.</strong> Every dimension is one vertical axis, and each axis runs from its smallest value at the bottom to its largest at the top:</p>
@@ -3580,6 +3581,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <tr>
 <td style="text-align:left">highlight some rows, mute the rest</td>
 <td style="text-align:left"><code>emphasis</code></td>
+<td style="text-align:left"><a href="#emphasis">Emphasis</a></td>
+</tr>
+<tr>
+<td style="text-align:left">highlight the rows that match a rule</td>
+<td style="text-align:left"><code>emphasis_rule</code></td>
 <td style="text-align:left"><a href="#emphasis">Emphasis</a></td>
 </tr>
 <tr>
@@ -4434,7 +4440,7 @@ ParallelCoords(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f4ff5866">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=76a5f917">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4445,7 +4451,7 @@ ParallelCoords(
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=54a3ca42">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4c63a156">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4537,6 +4543,7 @@ ParallelCoords(
 <li><code>None</code> draws the row unchanged.</li>
 </ul>
 <p>The role strings are also available as constants in <a href="../../../references/constants/#datachart.constants.EMPHASIS">datachart.constants.EMPHASIS</a>. Because the background rows leave the legend, a hue legend over an emphasized chart names only the groups that are still colored. The example singles out the Chinstrap penguins: they are highlighted, the other two species are muted, and the legend names the Chinstrap alone. See the <a href="../../styling/highlighting/">Highlighting</a> guide for how emphasis works across the other charts and in composed figures.</p>
+<p>To pick the rows from the data instead, pass <code>emphasis_rule</code>, a one-key rule — <code>{"above": v}</code> or <code>{"below": v}</code> (strict), <code>{"between": (lo, hi)}</code> (inclusive), <code>{"top": n}</code> or <code>{"bottom": n}</code> — that highlights every row whose <code>hue</code> value matches and mutes the rest. The rule reads the column the rows are already colored by, so it needs a numeric <code>hue</code>; without one it raises a <code>ValueError</code>. An explicit <code>emphasis</code> role wins over the rule. See the <a href="../../styling/highlighting/#emphasis-picked-by-a-rule">Highlighting</a> guide for the rule on every chart.</p>
 </div>
 </div>
 </div>

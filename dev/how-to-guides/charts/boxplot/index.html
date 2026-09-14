@@ -3461,6 +3461,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">xlabel</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                               <span class="c1"># The x-axis label</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                               <span class="c1"># The y-axis label</span>
     <span class="n">emphasis</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]],</span> <span class="c1"># The emphasis role per box label ("background", "highlight", None)</span>
+    <span class="n">emphasis_rule</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>                       <span class="c1"># One-key rule on a per-group summary; optional "by": median, mean, min, max, sum</span>
 
     <span class="n">figsize</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>              <span class="c1"># The figure size in inches</span>
     <span class="n">show_grid</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                            <span class="c1"># Which grid lines to show ("both", "x", "y")</span>
@@ -3700,6 +3701,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <tr>
 <td style="text-align:left">highlight one box, mute the rest</td>
 <td style="text-align:left"><code>emphasis</code></td>
+<td style="text-align:left"><a href="#emphasis">Emphasis</a></td>
+</tr>
+<tr>
+<td style="text-align:left">highlight the boxes that match a rule</td>
+<td style="text-align:left"><code>emphasis_rule</code></td>
 <td style="text-align:left"><a href="#emphasis">Emphasis</a></td>
 </tr>
 <tr>
@@ -4240,7 +4246,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e606ce94">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c0e56a01">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4251,10 +4257,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input" id="cell-id=06261787">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input" id="cell-id=fc829132">
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a4062ded">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d3a27bcc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4561,6 +4567,7 @@ BoxPlot(
 </tbody>
 </table>
 <p>A single value instead of a list applies the role to every box. Again, <code>datachart</code> provides a <a href="../../../references/constants/#datachart.constants.EMPHASIS">datachart.constants.EMPHASIS</a> constant, which contains the supported roles. The example puts the Gentoo box under scrutiny and pushes the other two species into the background. See the <a href="../../styling/highlighting/">Highlighting</a> guide for the full model — how the muted color follows the theme and how emphasis works across the other charts.</p>
+<p>To pick the boxes from the data instead, pass <code>emphasis_rule</code>, a one-key rule — <code>{"above": v}</code> or <code>{"below": v}</code> (strict), <code>{"between": (lo, hi)}</code> (inclusive), <code>{"top": n}</code> or <code>{"bottom": n}</code> — that highlights every box whose summary matches and mutes the rest. The summary is the median of each box's values by default, what a box already draws; a <code>"by"</code> key picks <code>"mean"</code>, <code>"min"</code>, <code>"max"</code>, or <code>"sum"</code> instead, as in <code>{"above": 4000, "by": "mean"}</code>. An explicit <code>emphasis</code> role wins over the rule. See the <a href="../../styling/highlighting/#emphasis-picked-by-a-rule">Highlighting</a> guide for the rule on every chart.</p>
 </div>
 </div>
 </div>
@@ -4778,7 +4785,7 @@ BoxPlot(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cdb4548e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ffa27700">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4790,7 +4797,7 @@ BoxPlot(
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=590f38fe">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=16630630">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

@@ -34,6 +34,7 @@ ScatterChart(
     },
     subtitle=Optional[str],                             # The subtitle of the chart (or list for multiple charts)
     emphasis=Optional[str],                             # "highlight" or "background" (or list for multiple charts)
+    emphasis_rule=Optional[dict],                       # One-key rule on a per-series summary; optional "by": mean, median, min, max, sum
     title=Optional[str],                                # The title of the chart
     xlabel=Optional[str],                               # The x-axis label
     ylabel=Optional[str],                               # The y-axis label
@@ -122,6 +123,7 @@ Every customization is either a keyword argument of `ScatterChart` or a `plot_sc
 | fit a regression line                  | `show_regression`, `show_ci`, `ci_level`, `show_correlation`             | [Regression line](#regression-line)                           |
 | fix the aspect ratio of the axes       | `aspect_ratio`                                                           | [Aspect ratio](#aspect-ratio)                                 |
 | highlight one series, mute the rest    | `emphasis`                                                               | [Emphasis](#emphasis)                                         |
+| highlight the series that match a rule | `emphasis_rule`                                                          | [Emphasis](#emphasis)                                         |
 | mark a threshold or a reference value  | `hlines`, `vlines`                                                       | [Reference lines](#reference-lines)                           |
 | shade a range of values                | `hspans`, `vspans`                                                       | [Reference bands](#reference-bands)                           |
 | compare several series in one chart    | `data` as a list of lists, `subtitle`, `show_legend`                     | [Multiple Scatter Charts](#multiple-scatter-charts)           |
@@ -419,6 +421,8 @@ The `aspect_ratio` attribute fixes the aspect ratio of the axes rather than of t
 When a chart carries several series, the story is often about one of them. The `emphasis` attribute expresses that directly: `"highlight"` gives the markers a contrasting edge and brings them to the front, `"background"` mutes a series (the theme's muted color at a lower alpha, drawn behind the others), and `None` leaves a series unchanged. For multiple charts, `emphasis` is a list aligned with `data`, just like `subtitle` and `style`. Only emphasized-or-unset series appear in the legend — background series drop out of it. The role strings are also available as the [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants.
 
 The example highlights the European countries against the rest of the world, passed as two series. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide for how emphasis works across all chart types and themes.
+
+To pick the series from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every series whose summary matches and mutes the rest. The summary is the mean of each series's own `y` values by default; a `"by"` key picks `"median"`, `"min"`, `"max"`, or `"sum"` instead, as in `{"top": 1, "by": "max"}`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
 
 ```
 europe = [point for point in countries if point["continent"] == "Europe"]

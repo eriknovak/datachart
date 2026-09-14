@@ -3419,6 +3419,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="s2">"y"</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>                   <span class="c1"># The y values of the points, one per x</span>
         <span class="s2">"c"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span>         <span class="c1"># The value of each point; when given, the hexagons show its aggregate instead of the count</span>
     <span class="p">},</span>
+    <span class="n">emphasis_rule</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>                       <span class="c1"># One-key rule on each bin's aggregated value</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span>                                             <span class="c1"># The style of the hexbin chart (optional)</span>
         <span class="s2">"plot_hexbin_cmap"</span><span class="p">:</span>       <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span> <span class="c1"># The colormap of the hexagons (the heatmap colormap by default)</span>
         <span class="s2">"plot_hexbin_alpha"</span><span class="p">:</span>      <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>      <span class="c1"># The alpha of the hexagons</span>
@@ -4460,8 +4461,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>!!! note "No emphasis"</p>
-<pre><code>A hexbin chart is a single colormapped layer, so it does not take the `emphasis` attribute of the series charts: there is no series color to mute or highlight. To draw attention to a region, overlay a marker or a reference line instead (see [Composing hexbins](#composing-hexbins) and [Reference lines](#reference-lines)).</code></pre>
+<p>!!! note "Emphasis by rule"</p>
+<pre><code>A hexbin chart is a single colormapped layer, so it does not take the `emphasis` attribute of the series charts, and its bins exist only once drawn, so they cannot carry roles of their own. `emphasis_rule` works on the bins: a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — highlights every bin whose aggregated value (its count, or `c` reduced by `reduce`) matches with an outline, and fades the rest to the theme's `muted_alpha`. See the [Highlighting](../../styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.</code></pre>
 </div>
 </div>
 </div>
@@ -4842,7 +4843,7 @@ Grid(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=43036b21">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=63b9199d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4853,10 +4854,10 @@ Grid(
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input" id="cell-id=159724a7">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input" id="cell-id=d4abe9ea">
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4ea94d55">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d6b1c3b5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -5032,7 +5033,7 @@ HexbinChart(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=02450909">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6ac4d11d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -5044,7 +5045,7 @@ HexbinChart(
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2864fd68">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b3378d5f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

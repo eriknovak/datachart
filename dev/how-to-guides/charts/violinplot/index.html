@@ -3412,6 +3412,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">xlabel</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                               <span class="c1"># The x-axis label</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                               <span class="c1"># The y-axis label</span>
     <span class="n">emphasis</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]],</span> <span class="c1"># The emphasis role per violin label ("background", "highlight", None)</span>
+    <span class="n">emphasis_rule</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>                       <span class="c1"># One-key rule on a per-group summary; optional "by": median, mean, min, max, sum</span>
 
     <span class="n">inner</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                                <span class="c1"># The inner marks ("box", "quartiles", "median", None; default: "box")</span>
     <span class="n">bandwidth</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>              <span class="c1"># The KDE bandwidth ("scott", "silverman", or a number; default: "scott")</span>
@@ -3654,6 +3655,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <tr>
 <td style="text-align:left">highlight one violin, mute the rest</td>
 <td style="text-align:left"><code>emphasis</code></td>
+<td style="text-align:left"><a href="#emphasis">Emphasis</a></td>
+</tr>
+<tr>
+<td style="text-align:left">highlight the violins that match a rule</td>
+<td style="text-align:left"><code>emphasis_rule</code></td>
 <td style="text-align:left"><a href="#emphasis">Emphasis</a></td>
 </tr>
 <tr>
@@ -4557,7 +4563,7 @@ ViolinPlot(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=693d53d2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b4368543">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4568,10 +4574,10 @@ ViolinPlot(
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input" id="cell-id=01fac5a9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_remove_input" id="cell-id=a4f5bfff">
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0de2716b">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=afbd82e4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4660,6 +4666,7 @@ ViolinPlot(
 </tbody>
 </table>
 <p>A single value instead of a list applies the role to every violin. Again, <code>datachart</code> provides a <a href="../../../references/constants/#datachart.constants.EMPHASIS">datachart.constants.EMPHASIS</a> constant, which contains the supported roles. The example puts the Gentoo violin under scrutiny and pushes the other two species into the background. See the <a href="../../styling/highlighting/">Highlighting</a> guide for the full picture.</p>
+<p>To pick the violins from the data instead, pass <code>emphasis_rule</code>, a one-key rule — <code>{"above": v}</code> or <code>{"below": v}</code> (strict), <code>{"between": (lo, hi)}</code> (inclusive), <code>{"top": n}</code> or <code>{"bottom": n}</code> — that highlights every violin whose summary matches and mutes the rest. The summary is the median of each violin's values by default, what a box already draws; a <code>"by"</code> key picks <code>"mean"</code>, <code>"min"</code>, <code>"max"</code>, or <code>"sum"</code> instead, as in <code>{"above": 4000, "by": "mean"}</code>. An explicit <code>emphasis</code> role wins over the rule. See the <a href="../../styling/highlighting/#emphasis-picked-by-a-rule">Highlighting</a> guide for the rule on every chart.</p>
 </div>
 </div>
 </div>
@@ -4863,7 +4870,7 @@ ViolinPlot(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c6b4ea13">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=744c1082">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4875,7 +4882,7 @@ ViolinPlot(
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e81f0d77">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c34d0f3b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

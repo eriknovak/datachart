@@ -44,6 +44,7 @@ NetworkChart(
     show_values=Optional[bool],                         # Whether to write each edge's weight at its midpoint
     value_format=Optional[str],                         # The format of the values, a VALUE_FORMAT constant or a format string
     show_legend=Optional[bool],                         # Whether to list the node groups in a legend
+    emphasis_rule=Optional[dict],                       # One-key rule on each node's size
     style={                                             # The style of the chart (optional; a list for multiple charts)
         "plot_network_node_color":            Optional[str],    # The node color; overrides the palette
         "plot_network_node_alpha":            Optional[float],  # The node alpha (0.95 by default)
@@ -155,6 +156,7 @@ Every customization is either a keyword argument of `NetworkChart` or a `plot_*`
 | color the nodes by a category             | `"group"` on the nodes, `show_legend`                                         | [Groups and the legend](#groups-and-the-legend)             |
 | cluster the nodes by their group          | `layout=NETWORK_LAYOUT.GROUPED`                                               | [Layouts](#layouts)                                         |
 | mute or outline a node                    | `"emphasis"` on the node                                                      | [Emphasis](#emphasis)                                       |
+| highlight the nodes that match a rule     | `emphasis_rule`                                                               | [Emphasis](#emphasis)                                       |
 | write the weights on the edges            | `show_values`, `value_format`                                                 | [Edge values](#edge-values)                                 |
 | draw straight edges, or bow them more     | `style={"plot_network_edge_style": ..., "plot_network_edge_curve": ...}`      | [Node and edge style](#node-and-edge-style)                 |
 | change the node markers or the edge color | `style={"plot_network_node_marker": ..., "plot_network_edge_color": ...}`     | [Node and edge style](#node-and-edge-style)                 |
@@ -345,6 +347,8 @@ NetworkChart(
 ### Emphasis
 
 Emphasis is set per node with the `emphasis` key, using the [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) roles. `background` mutes a node, its label, and every edge touching it into the theme's muted color; `highlight` strokes the node's border in the text color. Roles are explicit: highlighting one node does not mute the others, and the `emphasis` argument of the function itself is not supported — pass the roles on the nodes. The example highlights the module every other module ends up depending on, and mutes the command-line entry point and what only it uses.
+
+To pick the nodes from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every node whose `size` matches and mutes the rest; a node without a `size` raises a `ValueError`. A node's own `emphasis` key wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
 
 ```
 from datachart.constants import EMPHASIS

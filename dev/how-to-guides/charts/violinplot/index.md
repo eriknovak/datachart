@@ -36,6 +36,7 @@ ViolinPlot(
     xlabel=Optional[str],                               # The x-axis label
     ylabel=Optional[str],                               # The y-axis label
     emphasis=Optional[Union[str, List[Optional[str]]]], # The emphasis role per violin label ("background", "highlight", None)
+    emphasis_rule=Optional[dict],                       # One-key rule on a per-group summary; optional "by": median, mean, min, max, sum
 
     inner=Optional[str],                                # The inner marks ("box", "quartiles", "median", None; default: "box")
     bandwidth=Optional[Union[str, float]],              # The KDE bandwidth ("scott", "silverman", or a number; default: "scott")
@@ -111,6 +112,7 @@ Every customization is either a keyword argument of `ViolinPlot` or a `plot_viol
 | compare two groups within each category                | `split`, `show_legend`                                                                     | [Split violins](#split-violins)                                 |
 | draw the violins horizontally                          | `orientation`                                                                              | [Violin orientation](#violin-orientation)                       |
 | highlight one violin, mute the rest                    | `emphasis`                                                                                 | [Emphasis](#emphasis)                                           |
+| highlight the violins that match a rule                | `emphasis_rule`                                                                            | [Emphasis](#emphasis)                                           |
 | draw a threshold or reference line                     | `hlines`, `vlines`                                                                         | [Reference lines](#reference-lines)                             |
 | shade a range next to the violins                      | `hspans`, `vspans`                                                                         | [Reference bands](#reference-bands)                             |
 | draw a box plot or the observations inside the violins | `Panel`                                                                                    | [Violins with boxes and swarms](#violins-with-boxes-and-swarms) |
@@ -373,6 +375,8 @@ To draw attention to one violin, add the `emphasis` attribute. As with box plots
 | `None`         | Leaves the violin unchanged.                                                                                     |
 
 A single value instead of a list applies the role to every violin. Again, `datachart` provides a [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constant, which contains the supported roles. The example puts the Gentoo violin under scrutiny and pushes the other two species into the background. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide for the full picture.
+
+To pick the violins from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every violin whose summary matches and mutes the rest. The summary is the median of each violin's values by default, what a box already draws; a `"by"` key picks `"mean"`, `"min"`, `"max"`, or `"sum"` instead, as in `{"above": 4000, "by": "mean"}`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
 
 ```
 from datachart.constants import EMPHASIS

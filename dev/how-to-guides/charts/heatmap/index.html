@@ -3330,7 +3330,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="s2">"x"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span>    <span class="c1"># The column labels, one per column of z (optional)</span>
         <span class="s2">"y"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span>    <span class="c1"># The row labels, one per row of z (optional)</span>
         <span class="s2">"z"</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]],</span>       <span class="c1"># The heatmap matrix</span>
+        <span class="s2">"emphasis"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]],</span> <span class="c1"># The per-cell roles, aligned with z (optional)</span>
     <span class="p">},</span>
+    <span class="n">emphasis_rule</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>                       <span class="c1"># One-key rule on each cell's value</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span>                                             <span class="c1"># The style of the heatmap (optional)</span>
         <span class="s2">"plot_heatmap_cmap"</span><span class="p">:</span>        <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span> <span class="c1"># The colormap (palette name or list of hex colors)</span>
         <span class="s2">"plot_heatmap_alpha"</span><span class="p">:</span>       <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>    <span class="c1"># The alpha of the heatmap (how visible it is)</span>
@@ -3599,8 +3601,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <td style="text-align:left"><a href="#normalization">Normalization</a></td>
 </tr>
 <tr>
-<td style="text-align:left">highlight one series, mute the rest</td>
-<td style="text-align:left">not supported</td>
+<td style="text-align:left">highlight some cells, mute the rest</td>
+<td style="text-align:left">an <code>emphasis</code> grid in <code>data</code>, <code>emphasis_rule</code></td>
 <td style="text-align:left"><a href="#emphasis">Emphasis</a></td>
 </tr>
 <tr>
@@ -4510,7 +4512,8 @@ Heatmap(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="emphasis">Emphasis<a class="anchor-link" href="#emphasis">¶</a></h3><p>The other charts accept an <code>emphasis</code> attribute that highlights one series and mutes the rest. The heatmap does not: a heatmap is a single raster layer, not a set of series, so there is nothing to bring forward or push back, and <code>Heatmap</code> raises a <code>ValueError</code> if <code>emphasis</code> is passed. To draw attention to part of a heatmap, use the tools above instead — a diverging colormap with a pinned value range, or <code>vmin</code> and <code>vmax</code> that saturate everything outside the range of interest. See the <a href="../../styling/highlighting/">Highlighting</a> guide for how emphasis works on the charts that support it.</p>
+<h3 id="emphasis">Emphasis<a class="anchor-link" href="#emphasis">¶</a></h3><p>A heatmap has no series to mute, so the <code>emphasis</code> attribute of the series charts raises a <code>ValueError</code> here. Emphasis works per cell instead: <code>data</code> takes an optional <code>emphasis</code> grid aligned with <code>z</code>, one role per cell. A <code>"background"</code> cell fades to the theme's <code>muted_alpha</code>, so it still reads on the colormap; a <code>"highlight"</code> cell is outlined in the text color; <code>None</code> leaves a cell unchanged.</p>
+<p>To pick the cells from the values instead, pass <code>emphasis_rule</code>, a one-key rule — <code>{"above": v}</code> or <code>{"below": v}</code> (strict), <code>{"between": (lo, hi)}</code> (inclusive), <code>{"top": n}</code> or <code>{"bottom": n}</code> — that highlights every cell whose value matches and mutes the rest. A blank cell never matches, and a role in the <code>emphasis</code> grid wins over the rule. To draw attention to a value range without muting, use the tools above — a diverging colormap with a pinned value range, or <code>vmin</code> and <code>vmax</code>. See the <a href="../../styling/highlighting/#emphasis-picked-by-a-rule">Highlighting</a> guide for the rule on every chart.</p>
 </div>
 </div>
 </div>

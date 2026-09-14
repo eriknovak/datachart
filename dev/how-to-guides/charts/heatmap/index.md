@@ -20,7 +20,9 @@ Heatmap(
         "x": Optional[List[Union[str, int, float]]],    # The column labels, one per column of z (optional)
         "y": Optional[List[Union[str, int, float]]],    # The row labels, one per row of z (optional)
         "z": List[List[Union[int, float, None]]],       # The heatmap matrix
+        "emphasis": Optional[List[List[Optional[str]]]], # The per-cell roles, aligned with z (optional)
     },
+    emphasis_rule=Optional[dict],                       # One-key rule on each cell's value
     style={                                             # The style of the heatmap (optional)
         "plot_heatmap_cmap":        Optional[Union[str, List[str]]], # The colormap (palette name or list of hex colors)
         "plot_heatmap_alpha":       Optional[float],    # The alpha of the heatmap (how visible it is)
@@ -110,7 +112,7 @@ Every customization is either a keyword argument of `Heatmap` or a `plot_heatmap
 | draw borders between the cells         | `style={"plot_heatmap_edge_width": ..., "plot_heatmap_edge_color": ...}`     | [Heatmap style](#heatmap-style)                                   |
 | fix the value range of the colormap    | `vmin`, `vmax`                                                               | [Normalization](#normalization)                                   |
 | spread skewed values over the colormap | `norm`                                                                       | [Normalization](#normalization)                                   |
-| highlight one series, mute the rest    | not supported                                                                | [Emphasis](#emphasis)                                             |
+| highlight some cells, mute the rest    | an `emphasis` grid in `data`, `emphasis_rule`                                | [Emphasis](#emphasis)                                             |
 | compare several matrices side by side  | `data` as a list of matrices, `subtitle`                                     | [Multiple Heatmap Charts](#multiple-heatmap-charts)               |
 | arrange the subplots                   | `max_cols`, `sharex`, `sharey`                                               | [Subplot layout and shared axes](#subplot-layout-and-shared-axes) |
 | save the chart to a file               | `save_figure`                                                                | [Saving the Chart as an Image](#saving-the-chart-as-an-image)     |
@@ -360,7 +362,9 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
 
 ### Emphasis
 
-The other charts accept an `emphasis` attribute that highlights one series and mutes the rest. The heatmap does not: a heatmap is a single raster layer, not a set of series, so there is nothing to bring forward or push back, and `Heatmap` raises a `ValueError` if `emphasis` is passed. To draw attention to part of a heatmap, use the tools above instead — a diverging colormap with a pinned value range, or `vmin` and `vmax` that saturate everything outside the range of interest. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide for how emphasis works on the charts that support it.
+A heatmap has no series to mute, so the `emphasis` attribute of the series charts raises a `ValueError` here. Emphasis works per cell instead: `data` takes an optional `emphasis` grid aligned with `z`, one role per cell. A `"background"` cell fades to the theme's `muted_alpha`, so it still reads on the colormap; a `"highlight"` cell is outlined in the text color; `None` leaves a cell unchanged.
+
+To pick the cells from the values instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every cell whose value matches and mutes the rest. A blank cell never matches, and a role in the `emphasis` grid wins over the rule. To draw attention to a value range without muting, use the tools above — a diverging colormap with a pinned value range, or `vmin` and `vmax`. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
 
 ## Multiple Heatmap Charts
 

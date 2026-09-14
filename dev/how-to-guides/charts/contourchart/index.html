@@ -3468,6 +3468,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">ylabel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                              <span class="c1"># The y-axis label</span>
     <span class="n">subtitle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span>          <span class="c1"># The subtitle(s), also used as legend labels</span>
     <span class="n">emphasis</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]],</span> <span class="c1"># The emphasis role(s) of the iso-lines ("background", "highlight", None)</span>
+    <span class="n">emphasis_rule</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>                        <span class="c1"># One-key rule on a per-series summary; optional "by": mean, median, min, max, sum</span>
     <span class="n">figsize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>             <span class="c1"># The size of the figure</span>
     <span class="n">xmin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>                  <span class="c1"># The minimum x-axis value</span>
     <span class="n">xmax</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>                  <span class="c1"># The maximum x-axis value</span>
@@ -3756,6 +3757,11 @@ chart_data = {"x": GRID.tolist(), "y": GRID.tolist(), "z": himmelblau.tolist()}<
 <tr>
 <td style="text-align:left">highlight one surface among several</td>
 <td style="text-align:left"><code>emphasis</code></td>
+<td style="text-align:left"><a href="#emphasis">Emphasis</a></td>
+</tr>
+<tr>
+<td style="text-align:left">highlight the series that match a rule</td>
+<td style="text-align:left"><code>emphasis_rule</code></td>
 <td style="text-align:left"><a href="#emphasis">Emphasis</a></td>
 </tr>
 <tr>
@@ -4951,6 +4957,7 @@ penguin_points = [
 </tbody>
 </table>
 <p>A single value applies to every chart. Emphasis mutes and bolds lines, so it applies to iso-lines only; a filled contour takes the colormap and raises a <code>ValueError</code> when <code>emphasis</code> is passed. The <a href="../../../references/constants/#datachart.constants.EMPHASIS">datachart.constants.EMPHASIS</a> constant holds the roles; the <a href="../../styling/highlighting.ipynb">highlighting guide</a> covers emphasis across chart types and themes.</p>
+<p>To pick the surfaces from the data instead, pass <code>emphasis_rule</code>, a one-key rule — <code>{"above": v}</code> or <code>{"below": v}</code> (strict), <code>{"between": (lo, hi)}</code> (inclusive), <code>{"top": n}</code> or <code>{"bottom": n}</code> — that highlights every surface whose summary matches and mutes the rest. The summary is the mean of each surface's own <code>z</code> values (line contours only; filled contours raise) by default; a <code>"by"</code> key picks <code>"median"</code>, <code>"min"</code>, <code>"max"</code>, or <code>"sum"</code> instead, as in <code>{"top": 1, "by": "max"}</code>. An explicit <code>emphasis</code> role wins over the rule. See the <a href="../../styling/highlighting/#emphasis-picked-by-a-rule">Highlighting</a> guide for the rule on every chart.</p>
 </div>
 </div>
 </div>
@@ -5288,7 +5295,7 @@ Grid(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=98ac372a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4057f104">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -5299,7 +5306,7 @@ Grid(
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d1a8b224">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6f135528">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -5456,7 +5463,7 @@ ContourChart(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5c9dc7fe">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5c8f5cf3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -5468,7 +5475,7 @@ ContourChart(
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=daacfd21">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=277442f3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

@@ -21,6 +21,7 @@ HexbinChart(
         "y": List[Union[int, float]],                   # The y values of the points, one per x
         "c": Optional[List[Union[int, float]]],         # The value of each point; when given, the hexagons show its aggregate instead of the count
     },
+    emphasis_rule=Optional[dict],                       # One-key rule on each bin's aggregated value
     style={                                             # The style of the hexbin chart (optional)
         "plot_hexbin_cmap":       Optional[Union[str, List[str]]], # The colormap of the hexagons (the heatmap colormap by default)
         "plot_hexbin_alpha":      Optional[float],      # The alpha of the hexagons
@@ -286,10 +287,10 @@ HexbinChart(
 ).show()
 ```
 
-!!! note "No emphasis"
+!!! note "Emphasis by rule"
 
 ```
-A hexbin chart is a single colormapped layer, so it does not take the `emphasis` attribute of the series charts: there is no series color to mute or highlight. To draw attention to a region, overlay a marker or a reference line instead (see [Composing hexbins](#composing-hexbins) and [Reference lines](#reference-lines)).
+A hexbin chart is a single colormapped layer, so it does not take the `emphasis` attribute of the series charts, and its bins exist only once drawn, so they cannot carry roles of their own. `emphasis_rule` works on the bins: a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — highlights every bin whose aggregated value (its count, or `c` reduced by `reduce`) matches with an outline, and fades the rest to the theme's `muted_alpha`. See the [Highlighting](../../styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
 ```
 
 ## Multiple Hexbin Charts

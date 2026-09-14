@@ -3533,6 +3533,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="p">},</span>
     <span class="n">subtitle</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                             <span class="c1"># The subtitle of the chart (or list for multiple charts)</span>
     <span class="n">emphasis</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                             <span class="c1"># "highlight" or "background" (or list for multiple charts)</span>
+    <span class="n">emphasis_rule</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>                       <span class="c1"># One-key rule on a per-series summary; optional "by": mean, median, min, max, sum</span>
     <span class="n">title</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                                <span class="c1"># The title of the chart</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                               <span class="c1"># The x-axis label</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>                               <span class="c1"># The y-axis label</span>
@@ -3796,6 +3797,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <tr>
 <td style="text-align:left">highlight one series, mute the rest</td>
 <td style="text-align:left"><code>emphasis</code></td>
+<td style="text-align:left"><a href="#emphasis">Emphasis</a></td>
+</tr>
+<tr>
+<td style="text-align:left">highlight the series that match a rule</td>
+<td style="text-align:left"><code>emphasis_rule</code></td>
 <td style="text-align:left"><a href="#emphasis">Emphasis</a></td>
 </tr>
 <tr>
@@ -4476,6 +4482,7 @@ LineChart(
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="emphasis">Emphasis<a class="anchor-link" href="#emphasis">¶</a></h3><p>When a chart carries several series, the story is often about one of them. The <code>emphasis</code> attribute expresses that directly: <code>"highlight"</code> thickens a line and brings it to the front, <code>"background"</code> mutes a line (the theme's muted color at a lower alpha, thinner and drawn behind the others), and <code>None</code> leaves a line unchanged. For multiple charts, <code>emphasis</code> is a list aligned with <code>data</code>, just like <code>subtitle</code> and <code>style</code>. Only emphasized-or-unset series appear in the legend — background lines drop out of it. The role strings are also available as the <a href="../../../references/constants/#datachart.constants.EMPHASIS">datachart.constants.EMPHASIS</a> constants.</p>
 <p>The example highlights Ljubljana against the other two cities. See the <a href="../../styling/highlighting/">Highlighting</a> guide for how emphasis works across all chart types and themes.</p>
+<p>To pick the lines from the data instead, pass <code>emphasis_rule</code>, a one-key rule — <code>{"above": v}</code> or <code>{"below": v}</code> (strict), <code>{"between": (lo, hi)}</code> (inclusive), <code>{"top": n}</code> or <code>{"bottom": n}</code> — that highlights every line whose summary matches and mutes the rest. The summary is the mean of each line's own <code>y</code> values by default; a <code>"by"</code> key picks <code>"median"</code>, <code>"min"</code>, <code>"max"</code>, or <code>"sum"</code> instead, as in <code>{"top": 1, "by": "max"}</code>. An explicit <code>emphasis</code> role wins over the rule. See the <a href="../../styling/highlighting/#emphasis-picked-by-a-rule">Highlighting</a> guide for the rule on every chart.</p>
 </div>
 </div>
 </div>

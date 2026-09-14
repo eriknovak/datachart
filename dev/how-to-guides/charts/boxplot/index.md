@@ -41,6 +41,7 @@ BoxPlot(
     xlabel=Optional[str],                               # The x-axis label
     ylabel=Optional[str],                               # The y-axis label
     emphasis=Optional[Union[str, List[Optional[str]]]], # The emphasis role per box label ("background", "highlight", None)
+    emphasis_rule=Optional[dict],                       # One-key rule on a per-group summary; optional "by": median, mean, min, max, sum
 
     figsize=Optional[Tuple[float, float]],              # The figure size in inches
     show_grid=Optional[str],                            # Which grid lines to show ("both", "x", "y")
@@ -113,6 +114,7 @@ Every customization is either a keyword argument of `BoxPlot` or a `plot_box_*` 
 | show the confidence interval of the median       | `show_notch`                                                                      | [Notched box plots](#notched-box-plots)                         |
 | print the median of each box                     | `show_values`, `value_format`                                                     | [Value labels](#value-labels)                                   |
 | highlight one box, mute the rest                 | `emphasis`                                                                        | [Emphasis](#emphasis)                                           |
+| highlight the boxes that match a rule            | `emphasis_rule`                                                                   | [Emphasis](#emphasis)                                           |
 | draw a threshold or reference line               | `hlines`, `vlines`                                                                | [Reference lines](#reference-lines)                             |
 | shade a range next to the boxes                  | `hspans`, `vspans`                                                                | [Reference bands](#reference-bands)                             |
 | draw the observations or a violin with the boxes | `Panel`                                                                           | [Boxes with swarms and violins](#boxes-with-swarms-and-violins) |
@@ -338,6 +340,8 @@ To draw attention to one box, add the `emphasis` attribute. Box plots never over
 | `None`         | Leaves the box unchanged.                                                                                                       |
 
 A single value instead of a list applies the role to every box. Again, `datachart` provides a [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constant, which contains the supported roles. The example puts the Gentoo box under scrutiny and pushes the other two species into the background. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide for the full model — how the muted color follows the theme and how emphasis works across the other charts.
+
+To pick the boxes from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every box whose summary matches and mutes the rest. The summary is the median of each box's values by default, what a box already draws; a `"by"` key picks `"mean"`, `"min"`, `"max"`, or `"sum"` instead, as in `{"above": 4000, "by": "mean"}`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
 
 ```
 from datachart.constants import EMPHASIS

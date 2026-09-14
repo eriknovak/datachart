@@ -36,6 +36,7 @@ ContourChart(
     ylabel: Optional[str],                              # The y-axis label
     subtitle: Optional[Union[str, List[str]]],          # The subtitle(s), also used as legend labels
     emphasis: Optional[Union[str, List[Optional[str]]]], # The emphasis role(s) of the iso-lines ("background", "highlight", None)
+    emphasis_rule=Optional[dict],                        # One-key rule on a per-series summary; optional "by": mean, median, min, max, sum
     figsize: Optional[Tuple[float, float]],             # The size of the figure
     xmin: Optional[Union[int, float]],                  # The minimum x-axis value
     xmax: Optional[Union[int, float]],                  # The maximum x-axis value
@@ -124,6 +125,7 @@ Every customization is either a keyword argument of `ContourChart` or a `plot_co
 | overlay several surfaces                 | `data=[...]`, `subtitle`, `show_legend`                             | [Multiple Contour Charts](#multiple-contour-charts)           |
 | draw each surface in its own subplot     | `subplots=True`, `max_cols`, `sharex`, `sharey`                     | [Subplots and shared axes](#subplots-and-shared-axes)         |
 | highlight one surface among several      | `emphasis`                                                          | [Emphasis](#emphasis)                                         |
+| highlight the series that match a rule   | `emphasis_rule`                                                     | [Emphasis](#emphasis)                                         |
 | draw the contours over a scatter chart   | `Panel`                                                             | [Composing contours](#composing-contours)                     |
 | keep one unit equal on both axes         | `aspect_ratio`                                                      | [Aspect ratio](#aspect-ratio)                                 |
 | mark a position with a reference line    | `vlines`, `hlines`                                                  | [Reference lines](#reference-lines)                           |
@@ -438,6 +440,8 @@ To draw attention to one surface among several, add the `emphasis` attribute. Th
 | `None`         | Leaves the chart unchanged.                                                                            |
 
 A single value applies to every chart. Emphasis mutes and bolds lines, so it applies to iso-lines only; a filled contour takes the colormap and raises a `ValueError` when `emphasis` is passed. The [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constant holds the roles; the [highlighting guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting.ipynb) covers emphasis across chart types and themes.
+
+To pick the surfaces from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every surface whose summary matches and mutes the rest. The summary is the mean of each surface's own `z` values (line contours only; filled contours raise) by default; a `"by"` key picks `"median"`, `"min"`, `"max"`, or `"sum"` instead, as in `{"top": 1, "by": "max"}`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
 
 ```
 from datachart.constants import EMPHASIS

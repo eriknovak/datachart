@@ -30,6 +30,7 @@ Treemap(
     show_values=Optional[bool],                         # Whether to write each tile's value under its label
     value_format=Optional[str],                         # The format of the values, a VALUE_FORMAT constant or a format string
     show_legend=Optional[bool],                         # Whether to list the top-level records in a legend
+    emphasis_rule=Optional[dict],                       # One-key rule on each leaf's value; group roles win
     style={                                             # The style of the chart (optional; a list for multiple charts)
         "plot_treemap_edge_color":           Optional[str],    # The stroke color between tiles and around groups
         "plot_treemap_edge_width":           Optional[float],  # The stroke width between tiles (0.6 by default)
@@ -85,6 +86,7 @@ Every customization is either a keyword argument of `Treemap` or a `plot_*` attr
 | nest groups inside groups               | `children` on a child record, up to four levels                            | [Nested groups](#nested-groups)                 |
 | write the values on the tiles           | `show_values`, `value_format`                                              | [Tile values](#tile-values)                     |
 | mute or outline a tile or a group       | `"emphasis"` on the record                                                 | [Emphasis](#emphasis)                           |
+| highlight the tiles that match a rule   | `emphasis_rule`                                                            | [Emphasis](#emphasis)                           |
 | name the groups in a legend             | `show_legend`                                                              | [Legend](#legend)                               |
 | widen the gap around groups             | `style={"plot_treemap_group_pad": ...}`                                    | [Tile style](#tile-style)                       |
 | change the tint of the tiles in a group | `style={"plot_treemap_level_shade": ...}`                                  | [Tile style](#tile-style)                       |
@@ -192,6 +194,8 @@ Treemap(
 ### Emphasis
 
 Emphasis is set per record with the `emphasis` key, using the [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) roles. `background` mutes a tile or a whole group into the theme's muted color; `highlight` strokes the border of a tile or a group in the text color. A child's role overrides its group's, so a highlighted country stays vivid inside a muted continent. Roles are explicit: highlighting one record does not mute the others, and the `emphasis` argument of the function itself is not supported — pass the roles on the records.
+
+To pick the tiles from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every leaf whose `value` matches and mutes the other leaves. A record's own `emphasis` key wins over the rule, and so does a group's for every leaf inside it. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
 
 ```
 from datachart.constants import EMPHASIS

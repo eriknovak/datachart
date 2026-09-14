@@ -56,6 +56,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `AxesStyleAttrs`                  | The typing for the axes style.                                  |
 | `LegendStyleAttrs`                | The typing for the legend style.                                |
 | `LegendSettingAttrs`              | The per-figure legend setting.                                  |
+| `EmphasisRuleAttrs`               | The emphasis rule setting.                                      |
 | `AreaStyleAttrs`                  | The typing for the area style.                                  |
 | `GridStyleAttrs`                  | The typing for the grid style.                                  |
 | `LineStyleAttrs`                  | The typing for the line style.                                  |
@@ -197,6 +198,25 @@ Added in Unreleased
 | `location`  | The legend location. An outside member places the legend beside the axes. **TYPE:** `Union[LEGEND_LOCATION, str, None]` |
 | `ncols`     | The number of legend columns. **TYPE:** `Union[int, None]`                                                              |
 | `alignment` | The legend alignment. **TYPE:** `Union[LEGEND_ALIGN, str, None]`                                                        |
+
+#### datachart.typings.EmphasisRuleAttrs
+
+Bases: `TypedDict`
+
+The emphasis rule setting, passed to a chart front as `emphasis_rule`.
+
+Exactly one comparison key: a unit matching it is highlighted and every other unit muted. Each front selects its own unit — a bar, leaf, node, row, cell or bin reads its one value; a group or series reads a summary of its values, chosen by `by`. A unit's explicit `emphasis` role wins.
+
+Added in Unreleased
+
+| ATTRIBUTE | DESCRIPTION                                                                                                                                                                                       |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `above`   | Highlight values strictly above this. **TYPE:** `Union[int, float]`                                                                                                                               |
+| `below`   | Highlight values strictly below this. **TYPE:** `Union[int, float]`                                                                                                                               |
+| `between` | Highlight values within (lo, hi), both bounds inclusive. **TYPE:** `Tuple[Union[int, float], Union[int, float]]`                                                                                  |
+| `top`     | Highlight the n largest values; ties keep input order. **TYPE:** `int`                                                                                                                            |
+| `bottom`  | Highlight the n smallest values; ties keep input order. **TYPE:** `int`                                                                                                                           |
+| `by`      | The summary a group or series is read by. Groups default to "median", series to "mean"; a front reading one value per unit rejects it. **TYPE:** `Literal['mean', 'median', 'min', 'max', 'sum']` |
 
 ### Line Chart Typings
 
@@ -354,11 +374,12 @@ Bases: `TypedDict`
 
 The data attributes for the heatmap chart.
 
-| ATTRIBUTE | DESCRIPTION                                                                                                                   |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `x`       | The column labels, one per column of z. Defaults to the column indices. **TYPE:** `Union[List[Union[str, int, float]], None]` |
-| `y`       | The row labels, one per row of z. Defaults to the row indices. **TYPE:** `Union[List[Union[str, int, float]], None]`          |
-| `z`       | The 2-D grid of cell values, one row per y and one column per x. **TYPE:** `List[List[Union[int, float, None]]]`              |
+| ATTRIBUTE  | DESCRIPTION                                                                                                                                                                     |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `x`        | The column labels, one per column of z. Defaults to the column indices. **TYPE:** `Union[List[Union[str, int, float]], None]`                                                   |
+| `y`        | The row labels, one per row of z. Defaults to the row indices. **TYPE:** `Union[List[Union[str, int, float]], None]`                                                            |
+| `z`        | The 2-D grid of cell values, one row per y and one column per x. **TYPE:** `List[List[Union[int, float, None]]]`                                                                |
+| `emphasis` | The per-cell emphasis roles, aligned with z ("background" or "highlight"); wins over the chart's emphasis_rule. **TYPE:** `Union[List[List[Union[EMPHASIS, str, None]]], None]` |
 
 #### datachart.typings.ColorbarSettingAttrs
 

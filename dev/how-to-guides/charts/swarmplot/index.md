@@ -34,6 +34,7 @@ SwarmPlot(
     ylabel: Union[str, None],                           # The y-axis label (optional)
     subtitle: Union[str, List[str], None],              # The subtitle(s), used as legend labels (optional)
     emphasis: Union[str, List[str], None],              # The emphasis role(s), aligned with the group labels (optional)
+    emphasis_rule=Optional[dict],                       # One-key rule on a per-group summary; optional "by": median, mean, min, max, sum
     mode: Union[str, None],                             # "swarm" (the default) or "strip" (optional)
     jitter: Union[float, None],                         # The strip jitter width, a fraction of the category width (optional)
     orientation: Union[str, None],                      # "vertical" (the default) or "horizontal" (optional)
@@ -89,6 +90,7 @@ Every customization is either a keyword argument of `SwarmPlot` or a `plot_swarm
 | jitter the points instead of packing them     | `mode`, `jitter`                                                                   | [Swarm and strip modes](#swarm-and-strip-modes)                 |
 | draw the swarms horizontally                  | `orientation`                                                                      | [Swarm orientation](#swarm-orientation)                         |
 | highlight one group, mute the rest            | `emphasis`                                                                         | [Emphasis](#emphasis)                                           |
+| highlight the groups that match a rule        | `emphasis_rule`                                                                    | [Emphasis](#emphasis)                                           |
 | draw a threshold or reference line            | `hlines`, `vlines`                                                                 | [Reference lines](#reference-lines)                             |
 | shade a range next to the swarms              | `hspans`, `vspans`                                                                 | [Reference bands](#reference-bands)                             |
 | put the points on top of a box or violin plot | `Panel`                                                                            | [Swarms over boxes and violins](#swarms-over-boxes-and-violins) |
@@ -262,6 +264,8 @@ To draw attention to one group, add the `emphasis` attribute. The `emphasis` lis
 | `None`         | Leaves the group unchanged.                                      |
 
 A single value applies to every group. The [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constant holds the roles; the [highlighting guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting.ipynb) covers emphasis across chart types and themes.
+
+To pick the groups from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every group whose summary matches and mutes the rest. The summary is the median of each group's values by default, what a box already draws; a `"by"` key picks `"mean"`, `"min"`, `"max"`, or `"sum"` instead, as in `{"above": 4000, "by": "mean"}`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
 
 ```
 from datachart.constants import EMPHASIS

@@ -41,6 +41,7 @@ StackedAreaChart(
     },
     subtitle=Optional[str],                             # The series name, used in the legend (or list for multiple series)
     emphasis=Optional[str],                             # "highlight" or "background" (or list for multiple series)
+    emphasis_rule=Optional[dict],                       # One-key rule on a per-series summary; optional "by": mean, median, min, max, sum
     title=Optional[str],                                # The chart title
     xlabel=Optional[str],                               # The x-axis label
     ylabel=Optional[str],                               # The y-axis label
@@ -104,6 +105,7 @@ Every customization is either a keyword argument of `StackedAreaChart` or a `plo
 | outline the top of every band               | `style={"plot_stackedarea_outline": True}`                      | [Band style](#band-style)                           |
 | print the values on the bands               | `show_values`, `value_format`, `value_step`                     | [Value labels](#value-labels)                       |
 | highlight one series, mute the rest         | `emphasis`                                                      | [Emphasis](#emphasis)                               |
+| highlight the series that match a rule      | `emphasis_rule`                                                 | [Emphasis](#emphasis)                               |
 | mark a year or a level                      | `vlines`, `hlines`                                              | [Reference lines](#reference-lines)                 |
 | shade a period or a level range             | `hspans`, `vspans`                                              | [Reference bands](#reference-bands)                 |
 | annotate a point of the chart               | `texts`                                                         | [Text annotations](#text-annotations)               |
@@ -252,6 +254,8 @@ StackedAreaChart(
 When a stack carries several series, the story is often about one of them. The `emphasis` attribute expresses that directly: `"highlight"` brings a band to the front, `"background"` mutes it (the theme's muted color at a lower alpha, dropped from the legend), and `None` leaves it unchanged. `emphasis` is a list aligned with `data`, just like `subtitle` and `style`; the role strings are also available as the [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants. The stack itself does not change — a muted band keeps its place, so the bands above it stay where they were.
 
 The example highlights wind and solar against the rest of the mix. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide for how emphasis works across all chart types and themes.
+
+To pick the series from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every series whose summary matches and mutes the rest. The summary is the mean of each series's own `y` values (never the stacked position) by default; a `"by"` key picks `"median"`, `"min"`, `"max"`, or `"sum"` instead, as in `{"top": 1, "by": "max"}`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
 
 ```
 from datachart.constants import EMPHASIS
