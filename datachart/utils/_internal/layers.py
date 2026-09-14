@@ -8,6 +8,7 @@ histogram bins, axis scales and limits, grid, legend assembly, and twin-axis
 frozen DrawContext with its per-layer instructions.
 """
 
+import hashlib
 import json
 import math
 import warnings
@@ -31,7 +32,12 @@ from matplotlib.mlab import GaussianKDE
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
 from matplotlib.path import Path
-from matplotlib.transforms import Bbox, ScaledTranslation
+from matplotlib.transforms import (
+    Bbox,
+    IdentityTransform,
+    ScaledTranslation,
+    TransformedPath,
+)
 import matplotlib.patheffects as patheffects
 from matplotlib.legend import Legend
 from matplotlib.legend_handler import HandlerPatch, HandlerPathCollection
@@ -74,6 +80,7 @@ from .config_helpers import (
     resolve_font_family,
     get_area_style,
     get_bump_style,
+    get_ink_stroke,
     get_sketch_halo,
     get_stackedarea_style,
     get_sankey_style,
@@ -1180,6 +1187,8 @@ class Layer:
         self.muted_alpha = DEFAULT_MUTED_ALPHA if muted_alpha is None else muted_alpha
         # the sketch halo around a series line (ADR 0027); None means off
         self.halo = get_sketch_halo(self.style)
+        # the ink stroke on the same series lines (ADR 0048); None means off
+        self.ink_stroke = get_ink_stroke(self.style)
         self._resolve_style()
 
     def _resolve_emphasis(self, value):
@@ -1339,6 +1348,13 @@ class Layer:
         if self.halo is not None:
             width = (line_style.get("linewidth") or 0) + self.halo
             line_style["path_effects"] = _halo_effects(width)
+        if self.ink_stroke is not None:
+            # the ribbon replaces the plain line the halo effect redraws on top
+            halo = [
+                patheffects.Stroke(**effect._gc)
+                for effect in line_style.get("path_effects", [])
+            ]
+            line_style["path_effects"] = halo + [InkStroke(**self.ink_stroke)]
 
     @staticmethod
     def _merge_color(color_key: str, ctx_color: Optional[str], style: dict) -> dict:
@@ -5039,6 +5055,191 @@ def _halo_effects(width) -> list:
     if not width or width <= 0:
         return []
     return [patheffects.withStroke(linewidth=width, foreground="#FFFFFF")]
+
+
+# ================================================
+# Ink Effects (ADR 0048)
+# ================================================
+
+# an ink ribbon never grows past this share of the axes height
+INK_STROKE_MAX_AXES_SHARE = 0.012
+# display pixels between the samples of a resampled path
+INK_STROKE_STEP = 1.5
+# the most samples one polyline takes, so a huge path stays drawable
+INK_STROKE_MAX_SAMPLES = 6000
+# the narrowest a pressure stroke gets, as a share of its width
+INK_STROKE_PRESSURE_FLOOR = 0.45
+
+
+def _path_seed(vertices) -> int:
+    """A seed from a path's vertices, so a redraw of the same data looks the same."""
+
+    data = np.ascontiguousarray(np.asarray(vertices, dtype=np.float32))
+    return int(hashlib.md5(data.tobytes()).hexdigest()[:8], 16)
+
+
+def _polylines(path: Path):
+    """The path split into polylines at every MOVETO and CLOSEPOLY."""
+
+    verts, codes = path.vertices, path.codes
+    if codes is None:
+        yield verts
+        return
+    start = 0
+    for i, code in enumerate(codes):
+        if code == Path.MOVETO and i > start:
+            yield verts[start:i]
+            start = i
+        elif code in (Path.CLOSEPOLY, Path.STOP):
+            if i > start:
+                yield verts[start:i]
+            start = i + 1
+    if len(verts) > start:
+        yield verts[start:]
+
+
+def _resample(points: np.ndarray, step: float) -> tuple:
+    """The polyline resampled every `step` pixels, with the arclength at each sample.
+
+    `(None, None)` for a polyline shorter than a pixel.
+    """
+
+    points = np.asarray(points, dtype=float)
+    if len(points) < 2:
+        return None, None
+    lengths = np.concatenate([[0.0], np.cumsum(np.hypot(*np.diff(points, axis=0).T))])
+    total = lengths[-1]
+    if total < 1.0:
+        return None, None
+    n = int(min(max(total / step, 2), INK_STROKE_MAX_SAMPLES))
+    s = np.linspace(0, total, n)
+    xy = np.column_stack(
+        [np.interp(s, lengths, points[:, 0]), np.interp(s, lengths, points[:, 1])]
+    )
+    return xy, s
+
+
+def _dash_runs(s: np.ndarray, offset: float, dashes: list) -> list:
+    """The sample index runs that fall on the dashes of `dashes`, in pixels."""
+
+    period = sum(dashes)
+    if period <= 0:
+        return [np.arange(len(s))]
+    on = np.searchsorted(np.cumsum(dashes), np.mod(s + offset, period), "right") % 2 == 0
+    edges = np.flatnonzero(np.diff(np.concatenate([[0], on.astype(int), [0]])))
+    return [np.arange(a, b) for a, b in zip(edges[::2], edges[1::2]) if b - a >= 2]
+
+
+class InkStroke(patheffects.AbstractPathEffect):
+    """Draws a stroked path as a filled ribbon whose width follows a pen.
+
+    The broad-nib model makes the width the nib projected across the travel
+    direction — thick across the nib, a hairline along it — modulated by a
+    slow ink wobble and tapered at the ends. With `nib_floor` 1 the nib has
+    no direction and `swell` and `noise` model pressure instead: sine swells
+    over the stroke and a smoothed grain. Dashes split the ribbon; a filled
+    shape (an arrowhead) keeps its fill under the ribbon of its outline.
+    """
+
+    def __init__(
+        self,
+        width_scale: float = 1.6,
+        nib_angle: float = 32.0,
+        nib_floor: float = 0.35,
+        wobble: float = 0.22,
+        taper: float = 7.0,
+        swell: float = 0.0,
+        noise: float = 0.0,
+    ):
+        super().__init__()
+        self.width_scale = width_scale
+        angle = np.radians(nib_angle)
+        self.nib = np.array([np.cos(angle), np.sin(angle)])
+        self.nib_floor = nib_floor
+        self.wobble = wobble
+        self.taper = taper
+        self.swell = swell
+        self.noise = noise
+
+    def _profile(self, t: np.ndarray, s: np.ndarray, phases) -> np.ndarray:
+        """The width along the stroke as a share of the full nib width."""
+
+        across = np.abs(t[:, 0] * self.nib[1] - t[:, 1] * self.nib[0])
+        profile = self.nib_floor + (1 - self.nib_floor) * across
+        profile = profile * (
+            1
+            + self.wobble
+            * (0.6 * np.sin(s / 37.0 + phases[0]) + 0.4 * np.sin(s / 11.0 + phases[1]))
+        )
+        length = s[-1] - s[0]
+        if self.swell and length > 0:
+            profile = profile * (
+                1 + self.swell * np.sin(3 * np.pi * (s - s[0]) / length + phases[0])
+            )
+        if self.noise:
+            grain = np.random.default_rng(int(phases[1] * 1e6)).normal(
+                0, self.noise, len(s)
+            )
+            profile = profile * (1 + np.convolve(grain, np.ones(7) / 7, "same"))
+        if self.swell or self.noise:
+            profile = np.clip(profile, INK_STROKE_PRESSURE_FLOOR, None)
+        edge = np.minimum(s - s[0], s[-1] - s)
+        ramp = np.clip(edge / max(self.taper, 1e-6), 0, 1)
+        ramp = ramp * ramp * (3 - 2 * ramp)
+        if length > 2 * self.taper:
+            return profile * (0.4 + 0.6 * ramp)
+        return profile * 0.85
+
+    def _ribbon(self, xy: np.ndarray, s: np.ndarray, half: float, phases) -> Path:
+        d = np.gradient(xy, axis=0)
+        norm = np.hypot(d[:, 0], d[:, 1])
+        norm[norm == 0] = 1.0
+        t = d / norm[:, None]
+        n = np.column_stack([-t[:, 1], t[:, 0]])
+        h = half * self._profile(t, s, phases)
+        left, right = xy + n * h[:, None], xy - n * h[:, None]
+        polygon = np.vstack([left, right[::-1], left[:1]])
+        codes = np.full(len(polygon), Path.LINETO)
+        codes[0], codes[-1] = Path.MOVETO, Path.CLOSEPOLY
+        return Path(polygon, codes)
+
+    def draw_path(self, renderer, gc, tpath, affine, rgbFace=None):
+        width = gc.get_linewidth()
+        if width <= 0:
+            return renderer.draw_path(gc, tpath, affine, rgbFace)
+        half = 0.5 * renderer.points_to_pixels(width) * self.width_scale
+        clip = gc.get_clip_rectangle()
+        if clip is not None and clip.height > 0:
+            half = min(half, max(INK_STROKE_MAX_AXES_SHARE * clip.height, 0.5))
+        phases = np.random.default_rng(_path_seed(tpath.vertices)).uniform(
+            0, 2 * np.pi, 2
+        )
+        offset, dashes = gc.get_dashes()
+        dashes = None if dashes is None else [renderer.points_to_pixels(v) for v in dashes]
+        offset = renderer.points_to_pixels(offset or 0)
+        fill = renderer.new_gc()
+        fill.copy_properties(gc)
+        fill.set_linewidth(0.0)
+        fill.set_dashes(0, None)
+        fill.set_hatch(None)
+        try:
+            if rgbFace is not None:
+                renderer.draw_path(fill, tpath, affine, rgbFace)
+            path = tpath.cleaned(transform=affine, remove_nans=True, curves=False)
+            for points in _polylines(path):
+                xy, s = _resample(points, INK_STROKE_STEP)
+                if xy is None:
+                    continue
+                runs = (
+                    [np.arange(len(s))]
+                    if dashes is None
+                    else _dash_runs(s, offset, dashes)
+                )
+                for run in runs:
+                    ribbon = self._ribbon(xy[run], s[run], half, phases)
+                    renderer.draw_path(fill, ribbon, IdentityTransform(), gc.get_rgb())
+        finally:
+            fill.restore()
 
 
 def _value_label_font(style: dict) -> dict:

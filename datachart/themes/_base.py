@@ -103,6 +103,8 @@ BASE_THEME: StyleAttrs = {
     # render-scoped rc attributes (ADR 0027); None means off
     "plot_sketch_params": None,
     "plot_sketch_halo_width": None,
+    # ink rendering attributes (ADR 0048); None means off
+    "plot_ink_stroke": None,
     # plot legend style
     "plot_legend_shadow": False,
     "plot_legend_frameon": True,

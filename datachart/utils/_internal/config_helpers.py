@@ -348,6 +348,21 @@ def get_sketch_halo(chart_style: dict):
     return halo if halo else None
 
 
+def get_ink_stroke(chart_style: dict) -> Optional[dict]:
+    """The ink stroke parameters of a series line (ADR 0048).
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        A copy of the `InkStroke` keyword arguments, or None when off.
+
+    """
+
+    stroke = get_attr_value("plot_ink_stroke", chart_style, config)
+    return dict(stroke) if stroke else None
+
+
 # -------------------------------------
 # Stacked Area Style
 # -------------------------------------

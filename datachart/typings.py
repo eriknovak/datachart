@@ -1036,6 +1036,27 @@ class SketchStyleAttrs(TypedDict):
     plot_sketch_halo_width: Union[float, None]
 
 
+class InkStyleAttrs(TypedDict):
+    """The typing for the ink attributes: marks drawn as a quill and an etching
+    needle would draw them. Every attribute resolves when the chart is built and
+    rides on its artists, so composition keeps the look; `None` turns it off.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        plot_ink_stroke (Union[Dict[str, float], None]): The broad-nib pen the
+            series lines (line, bump, radial, regression) are drawn with, as a
+            filled ribbon whose width varies along the line. Keys:
+            `width_scale` (the nib width over the line width), `nib_angle`
+            (degrees), `nib_floor` (the hairline width as a share of the nib),
+            `wobble` (the ink wobble amplitude), `taper` (the end taper, in
+            pixels). `None` draws plain lines.
+
+    """
+
+    plot_ink_stroke: Union[Dict[str, float], None]
+
+
 class StyleAttrs(
     ColorStyleAttrs,
     FontStyleAttrs,
@@ -1070,6 +1091,7 @@ class StyleAttrs(
     ParallelCoordsStyleAttrs,
     ThemeDefaultAttrs,
     SketchStyleAttrs,
+    InkStyleAttrs,
 ):
     """The style attributes. Combines all style typings."""
 
