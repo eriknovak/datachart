@@ -60,6 +60,7 @@ from .validate import (
     validate_emphasis,
     validate_given_ranks,
     validate_label_position,
+    validate_node_label_position,
     validate_line_curve,
     validate_rank_by,
     validate_emphasis_rule,
@@ -154,6 +155,7 @@ from ...constants import (
     LEGEND_LOCATION,
     LABEL_POSITION,
     NETWORK_LAYOUT,
+    NODE_LABEL_POSITION,
     ORIENTATION,
     RANK,
     RIDGELINE_SCALE,
@@ -273,6 +275,13 @@ NETWORK_CLUSTER_GRAVITY = 3.0
 # an arrowhead grows with its shaft, from this base in points
 NETWORK_ARROW_HEAD_BASE = 6.0
 NETWORK_ARROW_HEAD_PER_WIDTH = 1.5
+# an inked directed edge: its head's width as a share of its length (ADR 0048)
+NETWORK_INKED_HEAD_WIDTH = 0.6
+# a cluster ring's stroke and a washed legend swatch's rim, in points
+NETWORK_RING_WIDTH = 0.9
+NETWORK_LEGEND_RIM_WIDTH = 1.2
+# the gap between a node's marker and a name printed above it, in points
+NETWORK_LABEL_GAP = 2.0
 # matplotlib skips underscore-prefixed labels when assembling the legend
 NO_LEGEND = "_nolegend_"
 # radial furniture defaults: compass and calendar conventions (ADR 0015)
@@ -5923,7 +5932,11 @@ class SankeyLayer(Layer):
                     (box.x, box.bottom),
                     node_width,
                     box.height,
-                    facecolor=self.node_colors[name],
+                    facecolor=(
+                        self.node_colors[name]
+                        if style.get("node_fill", True)
+                        else "none"
+                    ),
                     edgecolor=style.get("edgecolor"),
                     linewidth=style.get("linewidth"),
                     zorder=3,
@@ -6213,12 +6226,47 @@ class TreemapLayer(Layer):
         self.group_colors = {
             record["label"]: cycle[i]["color"] for i, record in enumerate(self.groups)
         }
+        # etching by depth in the group's pattern (ADR 0048); None keeps colors
+        density = self.treemap_style.get("etch_density")
+        patterns = config.get("plot_hatch_cycle")
+        self.group_hatches = None
+        if density and patterns and self.etch is not None:
+            self.group_hatches = {
+                record["label"]: patterns[i % len(patterns)]
+                for i, record in enumerate(self.groups)
+            }
 
     def legend_handles(self):
+        if self.group_hatches is not None:
+            effect = self._etch_effect(0.0)
+            return [
+                Patch(
+                    facecolor=self.ground,
+                    edgecolor=self.treemap_style["edgecolor"],
+                    hatch=self.group_hatches[record["label"]] or None,
+                    path_effects=[effect],
+                    label=record["label"],
+                )
+                for record in self.groups
+            ]
         return [
             Patch(facecolor=self.group_colors[record["label"]], label=record["label"])
             for record in self.groups
         ]
+
+    def _etch_box(self, patch, group: str, level: int) -> None:
+        """Fill a box with the ground and etch it in its group's pattern for `level`.
+
+        The fill is opaque, so the etching of an outer box never shows through.
+        """
+
+        if self.group_hatches is None or patch.get_facecolor()[3] == 0:
+            return
+        density = self.treemap_style["etch_density"]
+        repeat = density[level] if level < len(density) else 0
+        patch.set_facecolor(self.ground)
+        patch.set_hatch(self.group_hatches[group] * repeat or None)
+        patch.set_path_effects([self._etch_effect(0.0)])
 
     def draw(self, ax: plt.Axes, ctx: DrawContext) -> None:
         style = self.treemap_style
@@ -6247,6 +6295,7 @@ class TreemapLayer(Layer):
         ):
             box = (x / aspect + pad / 2, y + pad / 2, w / aspect - pad, h - pad)
             color = self.group_colors[record["label"]]
+            self._group = record["label"]
             self._draw_record(ax, record, box, color, record.get("emphasis"), 0, frame)
         # tiles and bands never overlap, so one containment pick names one
         self.register_patch_hover(frame.marks)
@@ -6284,6 +6333,8 @@ class TreemapLayer(Layer):
                 gid=f"fill:{label}",
             )
         )
+        if not muted:
+            self._etch_box(ax.patches[-1], self._group, level)
 
         # the band font scales per level, then shrinks to the minimum before
         # the group goes unlabelled
@@ -6326,6 +6377,8 @@ class TreemapLayer(Layer):
                 gid=f"band:{label}",
             )
             ax.add_patch(header)
+            if not muted:
+                self._etch_box(header, self._group, level)
             marks.append(
                 (header, {"label": label, "value": treemap_record_total(record)})
             )
@@ -6389,6 +6442,8 @@ class TreemapLayer(Layer):
             gid=f"tile:{record['label']}",
         )
         ax.add_patch(tile)
+        if not muted:
+            self._etch_box(tile, self._group, level)
         marks.append((tile, {"label": record["label"], "value": record["value"]}))
         scale = style["level_font_scale"] ** level
         value = (
@@ -6758,6 +6813,18 @@ class NetworkLayer(Layer):
             base = create_color_cycle(config["color_general_singular"], 1)[0]["color"]
             self.group_colors = {}
         self.node_colors = [self.group_colors.get(g, base) for g in groups]
+        # node washes by group slot (ADR 0048); an ungrouped node takes the first
+        washes = style.get("node_washes")
+        self.group_faces = dict(self.group_colors)
+        if washes:
+            self.group_faces = {
+                g: washes[i % len(washes)] for i, g in enumerate(self.group_names)
+            }
+            self.node_colors = [self.group_faces.get(g, washes[0]) for g in groups]
+        self.label_position = validate_node_label_position(
+            self.settings.get("label_position")
+            or config.get("chart_default_node_label_position")
+        )
         roles = [node.get("emphasis") for node in self.nodes]
         self.muted = [role == EMPHASIS_BACKGROUND for role in roles]
         self.highlighted = [role == EMPHASIS_HIGHLIGHT for role in roles]
@@ -6781,16 +6848,23 @@ class NetworkLayer(Layer):
     def legend_handles(self):
         if not self.group_names:
             return None
+        rim = {}
+        if self.network_style.get("node_washes"):
+            rim = {
+                "markeredgecolor": self.network_style["edgecolor"],
+                "markeredgewidth": NETWORK_LEGEND_RIM_WIDTH,
+            }
         return [
             Line2D(
                 [],
                 [],
                 marker=self.network_style["node_marker"],
                 linestyle="",
-                color=self.group_colors[g],
+                color=self.group_faces[g],
                 # half the default marker's diameter: a legend swatch, not a node
                 markersize=math.sqrt(self.network_style["node_size"]) / 2,
                 label=g,
+                **rim,
             )
             for g in self.group_names
         ]
@@ -6810,23 +6884,38 @@ class NetworkLayer(Layer):
             0.0 if self.edge_style == ARROW_STYLE.STRAIGHT else style["edge_curve"]
         ) or 0.0
         connection = f"arc3,rad={curve}"
+        pen = style.get("edge_ink_stroke")
+        pen = [InkStroke(**pen)] if pen else []
 
         # a translucent disc in the group color behind each cluster, reaching
         # past the largest marker of the group (points to 0–1 data units)
         if style.get("group_alpha"):
             ax.apply_aspect()
             axis_pt = ax.get_window_extent().width * 72 / ax.figure.dpi
+            ring = style.get("group_linestyle")
             for group, centre, radius in self.clusters:
                 marker_pt = max(r for r, g in zip(radii, self.groups) if g == group)
+                look = {
+                    "facecolor": self.group_colors[group],
+                    "edgecolor": "none",
+                    "alpha": style["group_alpha"],
+                }
+                if ring is not None:
+                    # a ring marks the cluster without tinting what it holds
+                    look = {
+                        "facecolor": "none",
+                        "edgecolor": style["edge_color"],
+                        "linestyle": ring,
+                        "linewidth": NETWORK_RING_WIDTH,
+                        "alpha": style["edge_alpha"],
+                    }
                 ax.add_patch(
                     Circle(
                         centre,
                         radius + marker_pt / axis_pt + NETWORK_CLUSTER_HALO_PAD,
-                        facecolor=self.group_colors[group],
-                        edgecolor="none",
-                        alpha=style["group_alpha"],
                         zorder=1,
                         gid=f"group:{group}",
+                        **look,
                     )
                 )
 
@@ -6835,10 +6924,29 @@ class NetworkLayer(Layer):
             color = self.muted_color if edge_muted else style["edge_color"]
             alpha = self.muted_alpha if edge_muted else style["edge_alpha"]
             gid = f"edge:{record['source']}->{record['target']}"
-            if self.directed:
+            head = NETWORK_ARROW_HEAD_BASE + NETWORK_ARROW_HEAD_PER_WIDTH * width
+            if self.directed and pen:
+                # a stroked shaft with a small head lets the pen pressure show
+                patch = FancyArrowPatch(
+                    pos[i],
+                    pos[j],
+                    arrowstyle=(
+                        f"-|>,head_length={head},"
+                        f"head_width={NETWORK_INKED_HEAD_WIDTH * head}"
+                    ),
+                    mutation_scale=1,
+                    connectionstyle=connection,
+                    shrinkA=radii[i],
+                    shrinkB=radii[j],
+                    color=color,
+                    linewidth=width,
+                    alpha=alpha,
+                    zorder=2,
+                    gid=gid,
+                )
+            elif self.directed:
                 # one filled polygon: the shaft and the head share an outline,
                 # so the alpha never doubles where they meet
-                head = NETWORK_ARROW_HEAD_BASE + NETWORK_ARROW_HEAD_PER_WIDTH * width
                 patch = FancyArrowPatch(
                     pos[i],
                     pos[j],
@@ -6869,6 +6977,7 @@ class NetworkLayer(Layer):
                     zorder=2,
                     gid=gid,
                 )
+            patch.set_path_effects(pen)
             ax.add_patch(patch)
             datum = {
                 "label": None,
@@ -6930,17 +7039,22 @@ class NetworkLayer(Layer):
         )
         self.register_hover(points, lambda k: self.node_datums[k])
 
+        above = self.label_position == NODE_LABEL_POSITION.ABOVE
         for k, node in enumerate(self.nodes):
             label = node.get("label")
             label = node["id"] if label is None else label
             if label == "":
                 continue
+            # a name above its node sits clear of the marker, like a place name
+            lift = (radii[k] + NETWORK_LABEL_GAP) / 72 if above else 0
             ax.text(
                 pos[k, 0],
                 pos[k, 1],
                 label,
+                transform=ax.transData
+                + ScaledTranslation(0, lift, ax.figure.dpi_scale_trans),
                 ha="center",
-                va="center",
+                va="bottom" if above else "center",
                 zorder=5,
                 path_effects=effects,
                 gid=f"label:{node['id']}",

@@ -107,6 +107,7 @@ BASE_THEME: StyleAttrs = {
     # theme-level chart-setting defaults (ADR 0004)
     "chart_default_show_grid": SHOW_GRID.Y,
     "chart_default_show_values": None,
+    "chart_default_node_label_position": None,
     "plot_hatch_cycle": None,
     "plot_linestyle_cycle": None,
     "plot_marker_cycle": None,
@@ -149,6 +150,7 @@ BASE_THEME: StyleAttrs = {
     "plot_sankey_link_color": "source",
     "plot_sankey_link_alpha": 0.4,
     "plot_sankey_label_halo_width": 2,
+    "plot_sankey_node_fill": True,
     # plot treemap style; the leaf stroke mirrors plot_bar_edge_* (ADR 0028)
     "plot_treemap_edge_color": "#FFFFFF",
     "plot_treemap_edge_width": 0.6,
@@ -159,6 +161,7 @@ BASE_THEME: StyleAttrs = {
     "plot_treemap_min_fontsize": 6,
     "plot_treemap_highlight_edge_width": 2.0,
     "plot_treemap_label_halo_width": 2,
+    "plot_treemap_etch_density": None,
     # plot network style; nodes mirror plot_scatter_*, edges take the Sankey
     # grey (ADR 0029)
     "plot_network_node_color": None,
@@ -178,6 +181,9 @@ BASE_THEME: StyleAttrs = {
     "plot_network_highlight_edge_width": 2.0,
     "plot_network_label_halo_width": 2,
     "plot_network_group_alpha": 0.12,
+    "plot_network_group_linestyle": None,
+    "plot_network_node_washes": None,
+    "plot_network_edge_ink_stroke": None,
     # plot grid style
     "plot_grid_alpha": 0.5,
     "plot_grid_color": "#EAEAEA",

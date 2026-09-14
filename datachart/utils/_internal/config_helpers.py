@@ -452,6 +452,7 @@ def get_sankey_style(chart_style: dict) -> dict:
         ("link_color", "plot_sankey_link_color"),
         ("link_alpha", "plot_sankey_link_alpha"),
         ("halo_width", "plot_sankey_label_halo_width"),
+        ("node_fill", "plot_sankey_node_fill"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -483,6 +484,7 @@ def get_treemap_style(chart_style: dict) -> dict:
         ("min_fontsize", "plot_treemap_min_fontsize"),
         ("highlight_linewidth", "plot_treemap_highlight_edge_width"),
         ("halo_width", "plot_treemap_label_halo_width"),
+        ("etch_density", "plot_treemap_etch_density"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -522,6 +524,9 @@ def get_network_style(chart_style: dict) -> dict:
         ("highlight_linewidth", "plot_network_highlight_edge_width"),
         ("halo_width", "plot_network_label_halo_width"),
         ("group_alpha", "plot_network_group_alpha"),
+        ("group_linestyle", "plot_network_group_linestyle"),
+        ("node_washes", "plot_network_node_washes"),
+        ("edge_ink_stroke", "plot_network_edge_ink_stroke"),
     ]
 
     return create_config_dict(chart_style, config_attrs)

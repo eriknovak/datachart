@@ -27,7 +27,9 @@ from datachart.charts import (
     ViolinPlot,
     Histogram,
     LineChart,
+    NetworkChart,
     RadialChart,
+    Treemap,
     SankeyChart,
     ScatterChart,
     StackedAreaChart,
@@ -470,6 +472,110 @@ class TestValueEtch(unittest.TestCase):
         (legend,) = [a for a in ax.artists if isinstance(a, Legend)]
         self.assertLessEqual(len(legend.get_texts()), 5)
         png(figure)
+
+
+TREE = {
+    "data": [
+        {
+            "label": "Asia",
+            "children": [{"label": "China", "value": 14.0}, {"label": "India", "value": 13.0}],
+        },
+        {"label": "Africa", "value": 12.0},
+    ]
+}
+NETWORK = {
+    "nodes": [
+        {"id": "a", "group": "g1"},
+        {"id": "b", "group": "g1"},
+        {"id": "c", "group": "g2"},
+    ],
+    "edges": [
+        {"source": "a", "target": "b", "weight": 2.0},
+        {"source": "b", "target": "c", "weight": 1.0},
+    ],
+}
+WASHES = ["#e2d1a6", "#c1a874"]
+
+
+class TestChartInkLooks(unittest.TestCase):
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_sankey_nodes_as_outlines(self):
+        links = {"links": [{"source": "a", "target": "b", "value": 1.0}]}
+        filled = SankeyChart(links).axes[0].patches[0]
+        self.assertEqual(filled.get_facecolor()[3], 1.0)
+        config.update_config({"plot_sankey_node_fill": False})
+        outline = SankeyChart(links).axes[0].patches[0]
+        self.assertEqual(outline.get_facecolor()[3], 0.0)
+
+    def test_treemap_etching_thins_with_depth(self):
+        config.update_config(
+            {
+                "plot_etch": ETCH,
+                "plot_hatch_cycle": ["/", "."],
+                "plot_treemap_etch_density": [3, 1, 0],
+                **GROUND,
+            }
+        )
+        figure = Treemap(TREE, show_legend=True)
+        patches = {p.get_gid(): p for p in figure.axes[0].patches}
+        self.assertEqual(patches["fill:Asia"].get_hatch(), "///")
+        self.assertEqual(patches["tile:China"].get_hatch(), "/")
+        self.assertEqual(patches["tile:Africa"].get_hatch(), "...")
+        self.assertEqual(to_hex(patches["tile:China"].get_facecolor()), PARCHMENT.lower())
+        self.assertTrue(etch_effects(patches["tile:China"]))
+        swatch = figure.axes[0].get_legend().get_patches()[0]
+        self.assertEqual(swatch.get_hatch(), "/")
+        self.assertTrue(etch_effects(swatch))
+        png(figure)
+
+    def test_treemap_unchanged_without_density(self):
+        config.update_config({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "."]})
+        patches = Treemap(TREE).axes[0].patches
+        self.assertTrue(all(p.get_hatch() is None for p in patches))
+
+    def test_network_ink_roads_washes_and_rings(self):
+        config.update_config(
+            {
+                "plot_network_edge_ink_stroke": {
+                    "width_scale": 1.4,
+                    "nib_floor": 1.0,
+                    "wobble": 0.0,
+                    "swell": 0.5,
+                    "noise": 0.12,
+                },
+                "plot_network_node_washes": WASHES,
+                "plot_network_group_linestyle": ":",
+            }
+        )
+        figure = NetworkChart(NETWORK, directed=True, layout="grouped", show_legend=True)
+        ax = figure.axes[0]
+        edges = [p for p in ax.patches if (p.get_gid() or "").startswith("edge:")]
+        self.assertTrue(all(ink_effects(edge) for edge in edges))
+        self.assertTrue(all(edge.get_linewidth() > 0 for edge in edges))
+        rings = [p for p in ax.patches if (p.get_gid() or "").startswith("group:")]
+        self.assertTrue(rings)
+        self.assertEqual(rings[0].get_facecolor()[3], 0.0)
+        self.assertEqual(rings[0].get_linestyle(), ":")
+        faces = [to_hex(f) for f in ax.collections[0].get_facecolors()]
+        self.assertEqual(faces, [WASHES[0], WASHES[0], WASHES[1]])
+        handle = ax.get_legend().legend_handles[1]
+        self.assertEqual(to_hex(handle.get_markerfacecolor()), WASHES[1])
+        png(figure)
+
+    def test_node_label_position(self):
+        centred = NetworkChart(NETWORK).axes[0].texts[0]
+        self.assertEqual(centred.get_va(), "center")
+        above = NetworkChart(NETWORK, label_position="above").axes[0].texts[0]
+        self.assertEqual(above.get_va(), "bottom")
+        config.update_config({"chart_default_node_label_position": "above"})
+        self.assertEqual(NetworkChart(NETWORK).axes[0].texts[0].get_va(), "bottom")
+        explicit = NetworkChart(NETWORK, label_position="center").axes[0].texts[0]
+        self.assertEqual(explicit.get_va(), "center")
+        with self.assertRaises(ValueError):
+            NetworkChart(NETWORK, label_position="below")
 
 
 class _RecordingRenderer:

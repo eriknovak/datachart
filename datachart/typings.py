@@ -96,6 +96,7 @@ import matplotlib.colors as colors
 from .constants import (
     ARROW_STYLE,
     NETWORK_LAYOUT,
+    NODE_LABEL_POSITION,
     BAR_MODE,
     FIG_SIZE,
     FONT_STYLE,
@@ -405,6 +406,11 @@ class SankeyStyleAttrs(TypedDict):
         plot_sankey_link_color (Union[str, None]): Which node colors a ribbon: "source", "target", or "grey".
         plot_sankey_link_alpha (Union[float, None]): The ribbon alpha.
         plot_sankey_label_halo_width (Union[float, None]): The width of the white halo behind labels; 0 disables it.
+        plot_sankey_node_fill (Union[bool, None]): Whether the node bars are filled; `False` draws them as outlines.
+
+    !!! info "Added in Unreleased"
+
+        The `plot_sankey_node_fill` attribute.
 
     """
 
@@ -415,6 +421,7 @@ class SankeyStyleAttrs(TypedDict):
     plot_sankey_link_color: Union[str, None]
     plot_sankey_link_alpha: Union[float, None]
     plot_sankey_label_halo_width: Union[float, None]
+    plot_sankey_node_fill: Union[bool, None]
 
 
 class TreemapStyleAttrs(TypedDict):
@@ -430,6 +437,11 @@ class TreemapStyleAttrs(TypedDict):
         plot_treemap_min_fontsize (Union[float, None]): The smallest font size a label shrinks to before it is dropped.
         plot_treemap_highlight_edge_width (Union[float, None]): The border width of a highlighted record.
         plot_treemap_label_halo_width (Union[float, None]): The width of the white halo behind labels; 0 disables it.
+        plot_treemap_etch_density (Union[List[int], None]): With `plot_etch` and a hatch cycle, how many times each nesting level repeats its top-level group's pattern, outermost first (a level past the list is blank); every box fills with the axes face so outer etching never shows through. `None` keeps the colored tiles.
+
+    !!! info "Added in Unreleased"
+
+        The `plot_treemap_etch_density` attribute.
 
     """
 
@@ -442,6 +454,7 @@ class TreemapStyleAttrs(TypedDict):
     plot_treemap_min_fontsize: Union[float, None]
     plot_treemap_highlight_edge_width: Union[float, None]
     plot_treemap_label_halo_width: Union[float, None]
+    plot_treemap_etch_density: Union[List[int], None]
 
 
 class NetworkStyleAttrs(TypedDict):
@@ -465,6 +478,14 @@ class NetworkStyleAttrs(TypedDict):
         plot_network_highlight_edge_width (Union[float, None]): The stroke width of a highlighted node.
         plot_network_label_halo_width (Union[float, None]): The width of the white halo behind labels; 0 disables it.
         plot_network_group_alpha (Union[float, None]): The alpha of the disc in the group color behind each cluster of the grouped layout; 0 disables it.
+        plot_network_group_linestyle (Union[LINE_STYLE, str, None]): Draws each cluster's mark as a ring in this line style and the edge color instead of a disc. `None` draws the disc.
+        plot_network_node_washes (Union[List[str], None]): The node fills by group, in group order, cycling; an ungrouped node takes the first. `None` fills nodes in the group colors.
+        plot_network_edge_ink_stroke (Union[Dict[str, float], None]): The pen the edges are drawn with, as for `plot_ink_stroke`, plus `swell` (the pressure swell amplitude) and `noise` (the grain); a directed edge draws as a stroked shaft with a small head. `None` draws plain edges.
+
+    !!! info "Added in Unreleased"
+
+        The `plot_network_group_linestyle`, `plot_network_node_washes` and
+        `plot_network_edge_ink_stroke` attributes.
 
     """
 
@@ -485,6 +506,9 @@ class NetworkStyleAttrs(TypedDict):
     plot_network_highlight_edge_width: Union[float, None]
     plot_network_label_halo_width: Union[float, None]
     plot_network_group_alpha: Union[float, None]
+    plot_network_group_linestyle: Union[LINE_STYLE, str, None]
+    plot_network_node_washes: Union[List[str], None]
+    plot_network_edge_ink_stroke: Union[Dict[str, float], None]
 
 
 class BarStyleAttrs(TypedDict):
@@ -1039,6 +1063,10 @@ class ThemeDefaultAttrs(TypedDict):
         chart_default_show_values (Union[bool, None]): The theme default for
             `show_values`, applied to every chart that takes it when the chart
             call leaves it unset. `None` means the theme has no opinion.
+        chart_default_node_label_position (Union[NODE_LABEL_POSITION, str, None]):
+            The theme default for the network chart's `label_position`, applied
+            when the chart call leaves it unset. `None` means the theme has no
+            opinion.
         plot_hatch_cycle (Union[List[str], None]): The hatch patterns assigned
             per bar/histogram series, parallel to the color cycle. An explicit
             per-chart hatch style wins. `None` disables the cycle.
@@ -1054,12 +1082,14 @@ class ThemeDefaultAttrs(TypedDict):
 
     !!! info "Added in Unreleased"
 
-        The `plot_linestyle_cycle` and `plot_marker_cycle` attributes.
+        The `chart_default_node_label_position`, `plot_linestyle_cycle` and
+        `plot_marker_cycle` attributes.
 
     """
 
     chart_default_show_grid: Union[SHOW_GRID, str, None]
     chart_default_show_values: Union[bool, None]
+    chart_default_node_label_position: Union[NODE_LABEL_POSITION, str, None]
     plot_hatch_cycle: Union[List[str], None]
     plot_linestyle_cycle: Union[List[Union[LINE_STYLE, str]], None]
     plot_marker_cycle: Union[List[Union[LINE_MARKER, str, Dict[str, Union[str, bool]]]], None]

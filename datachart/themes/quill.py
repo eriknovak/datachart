@@ -1,6 +1,13 @@
 from ._base import make_theme, register_bundled_fonts
 from ..typings import StyleAttrs
-from ..constants import ARROW_STYLE, COLORS, FONT_STYLE, FONT_WEIGHT, LINE_STYLE
+from ..constants import (
+    ARROW_STYLE,
+    COLORS,
+    FONT_STYLE,
+    FONT_WEIGHT,
+    LINE_STYLE,
+    NODE_LABEL_POSITION,
+)
 
 # IM Fell English Roman, Italic and SC (SIL OFL, licence alongside)
 register_bundled_fonts("IMFeENrm28P.ttf", "IMFeENit28P.ttf", "IMFeENsc28P.ttf")
@@ -36,6 +43,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "axes_ticks_length": 5,
         "axes_ticks_label_size": 9,
         "chart_default_show_grid": None,
+        "chart_default_node_label_position": NODE_LABEL_POSITION.ABOVE,
         "plot_hatch_cycle": ["/", ".", "\\", "x", "-", "|"],
         # lists, not tuples, so the theme survives a JSON round trip (ADR 0040)
         "plot_linestyle_cycle": [
@@ -167,17 +175,40 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_sankey_link_alpha": 0.25,
         "plot_sankey_node_edge_color": INK,
         "plot_sankey_node_edge_width": 1.0,
+        "plot_sankey_node_fill": False,
         "plot_treemap_edge_color": INK,
         "plot_treemap_edge_width": 1.0,
         "plot_treemap_level_shade": 0.55,
+        # dense around a group's band and gutters, sparse on its tiles
+        "plot_treemap_etch_density": [3, 1, 0],
         "plot_network_node_edge_color": INK,
         "plot_network_node_edge_width": 1.6,
+        "plot_network_node_alpha": 1.0,
         "plot_network_edge_color": INK,
+        "plot_network_edge_alpha": 0.9,
         "plot_network_edge_style": ARROW_STYLE.STRAIGHT,
         "plot_network_edge_curve": 0.0,
         # roads share one base width; the pen, not the weight, varies it
         "plot_network_edge_width_min": 2.0,
         "plot_network_edge_width_max": 2.8,
+        # a road is pressure, not a nib: its width swells along its length
+        "plot_network_edge_ink_stroke": {
+            "width_scale": 1.4,
+            "nib_floor": 1.0,
+            "wobble": 0.0,
+            "swell": 0.5,
+            "noise": 0.12,
+        },
+        # tan steps by group, never blank, neighbours far apart
+        "plot_network_node_washes": [
+            "#E2D1A6",
+            "#C1A874",
+            "#A88C52",
+            "#D3BF90",
+            PARCHMENT,
+            "#C1A874",
+        ],
+        "plot_network_group_linestyle": LINE_STYLE.DOTTED,
     }
 )
 """The quill theme: black ink on parchment, as a quill and an etching needle draw.

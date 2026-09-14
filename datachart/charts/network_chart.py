@@ -15,7 +15,7 @@ from ..typings import (
     TextSettingAttrs,
     LegendSettingAttrs,
 )
-from ..constants import FIG_SIZE, NETWORK_LAYOUT, VALUE_FORMAT
+from ..constants import FIG_SIZE, NETWORK_LAYOUT, NODE_LABEL_POSITION, VALUE_FORMAT
 
 # ================================================
 # Main Chart Definition
@@ -28,6 +28,7 @@ def NetworkChart(
     layout: Optional[Union[NETWORK_LAYOUT, str]] = None,
     directed: Optional[bool] = None,
     seed: Optional[int] = None,
+    label_position: Optional[Union[NODE_LABEL_POSITION, str]] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     show_legend: Optional[bool] = None,
@@ -73,6 +74,7 @@ def NetworkChart(
 
         The `legend` parameter.
         The `emphasis_rule` parameter.
+        The `label_position` parameter.
 
     Examples:
         >>> from datachart.charts import NetworkChart
@@ -113,6 +115,9 @@ def NetworkChart(
             `False` (the default), an edge and its reverse draw as one line.
         seed: The seed of the spring layouts (default 0); another seed gives
             another arrangement of the same data.
+        label_position: Where the node names print: a `NODE_LABEL_POSITION`
+            constant (default `NODE_LABEL_POSITION.CENTER`, or the theme's
+            `chart_default_node_label_position`).
         show_values: Whether to write each edge's weight at its midpoint.
         value_format: The format of the edge values: a `VALUE_FORMAT`
             constant (default `VALUE_FORMAT.DEFAULT`) or any `"{x:.1f}"`,
@@ -190,6 +195,7 @@ def NetworkChart(
         "layout": resolved_layout,
         "directed": directed,
         "seed": seed,
+        "label_position": label_position,
         "show_values": show_values,
         "value_format": value_format,
         "show_legend": show_legend,
