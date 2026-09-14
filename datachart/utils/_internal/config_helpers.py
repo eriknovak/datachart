@@ -1080,6 +1080,7 @@ def get_box_style(chart_style: dict) -> dict:
         ("alpha", "plot_box_alpha"),
         ("linewidth", "plot_box_linewidth"),
         ("edgecolor", "plot_box_edgecolor"),
+        ("hatch", "plot_box_hatch"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -1185,6 +1186,7 @@ def get_violin_style(chart_style: dict) -> dict:
         ("linewidth", "plot_violin_linewidth"),
         ("edgecolor", "plot_violin_edgecolor"),
         ("width", "plot_violin_width"),
+        ("hatch", "plot_violin_hatch"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -1239,6 +1241,7 @@ def get_ridgeline_style(chart_style: dict) -> dict:
         ("overlap", "plot_ridgeline_overlap"),
         ("inner_color", "plot_ridgeline_inner_color"),
         ("inner_linewidth", "plot_ridgeline_inner_linewidth"),
+        ("hatch", "plot_ridgeline_hatch"),
     ]
 
     style = create_config_dict(chart_style, config_attrs)

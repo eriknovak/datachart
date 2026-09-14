@@ -863,6 +863,11 @@ class BoxStyleAttrs(TypedDict):
         plot_box_cap_linewidth (Union[int, float, None]): The cap line width.
         plot_xticks_label_rotate (Union[int, float, None]): The label rotation of the xticks.
         plot_yticks_label_rotate (Union[int, float, None]): The label rotation of the yticks.
+        plot_box_hatch (Union[HATCH_STYLE, str, None]): The hatch pattern of the box.
+
+    !!! info "Added in Unreleased"
+
+        The `plot_box_hatch` attribute.
 
     """
 
@@ -882,6 +887,7 @@ class BoxStyleAttrs(TypedDict):
     plot_box_cap_linewidth: Union[int, float, None]
     plot_xticks_label_rotate: Union[int, float, None]
     plot_yticks_label_rotate: Union[int, float, None]
+    plot_box_hatch: Union[HATCH_STYLE, str, None]
 
 
 class SwarmStyleAttrs(TypedDict):
@@ -920,6 +926,11 @@ class ViolinStyleAttrs(TypedDict):
         plot_violin_inner_linewidth (Union[int, float, None]): The line width of the inner marks.
         plot_violin_median_color (Union[str, None]): The color of the median dot.
         plot_violin_median_size (Union[int, float, None]): The size of the median dot.
+        plot_violin_hatch (Union[HATCH_STYLE, str, None]): The hatch pattern of the body.
+
+    !!! info "Added in Unreleased"
+
+        The `plot_violin_hatch` attribute.
 
     """
 
@@ -932,6 +943,7 @@ class ViolinStyleAttrs(TypedDict):
     plot_violin_inner_linewidth: Union[int, float, None]
     plot_violin_median_color: Union[str, None]
     plot_violin_median_size: Union[int, float, None]
+    plot_violin_hatch: Union[HATCH_STYLE, str, None]
 
 
 class RidgelineStyleAttrs(TypedDict):
@@ -945,6 +957,7 @@ class RidgelineStyleAttrs(TypedDict):
         plot_ridgeline_overlap (Union[float, None]): How far a peak rises into the row above, in `[0, 1]`.
         plot_ridgeline_inner_color (Union[str, None]): The color of the inner marks; defaults to the font color.
         plot_ridgeline_inner_linewidth (Union[int, float, None]): The line width of the inner marks.
+        plot_ridgeline_hatch (Union[HATCH_STYLE, str, None]): The hatch pattern of the ridge fill.
 
     """
 
@@ -955,6 +968,7 @@ class RidgelineStyleAttrs(TypedDict):
     plot_ridgeline_overlap: Union[float, None]
     plot_ridgeline_inner_color: Union[str, None]
     plot_ridgeline_inner_linewidth: Union[int, float, None]
+    plot_ridgeline_hatch: Union[HATCH_STYLE, str, None]
 
 
 class RaincloudStyleAttrs(ViolinStyleAttrs, SwarmStyleAttrs, BoxStyleAttrs):

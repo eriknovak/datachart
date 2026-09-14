@@ -40,7 +40,11 @@ from matplotlib.transforms import (
 )
 import matplotlib.patheffects as patheffects
 from matplotlib.legend import Legend
-from matplotlib.legend_handler import HandlerPatch, HandlerPathCollection
+from matplotlib.legend_handler import (
+    HandlerPatch,
+    HandlerPathCollection,
+    HandlerPolyCollection,
+)
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1.axes_size import Fixed as FixedPad
 
@@ -341,10 +345,19 @@ class HandlerBarSeries(HandlerPatch):
         return super().create_artists(legend, representative, *args, **kwargs)
 
 
+class HandlerEtchedFill(HandlerPolyCollection):
+    """Draws a fill's legend swatch with the fill's etching (ADR 0048)."""
+
+    def _update_prop(self, legend_handle, orig_handle):
+        super()._update_prop(legend_handle, orig_handle)
+        legend_handle.set_path_effects(orig_handle.get_path_effects())
+
+
 # bubble charts size markers by data; their legend entries keep the base size
 LEGEND_HANDLER_MAP = {
     PathCollection: HandlerPathCollection(update_func=_scatter_legend_handle),
     BarContainer: HandlerBarSeries(),
+    PolyCollection: HandlerEtchedFill(),
 }
 # fraction of the value-axis span added so bar value labels stay inside
 VALUE_HEADROOM_VERTICAL = 0.08
@@ -1590,6 +1603,19 @@ class PointLabelMixin:
         return self._pending_labels.pop(id(ax), [])
 
 
+def _area_style(layer: "Layer", ctx: DrawContext) -> dict:
+    """The fill style under a series line: cycle color and hatch, muted or not."""
+
+    area_style = layer._merge_color("color", ctx.color, layer.area_style)
+    if ctx.z_order is not None:
+        area_style["zorder"] = ctx.z_order - 0.1
+    if ctx.hatch is not None and "hatch" not in area_style:
+        area_style["hatch"] = ctx.hatch or None
+    if ctx.emphasis == EMPHASIS_BACKGROUND:
+        area_style["color"] = layer.muted_color
+    return area_style
+
+
 def _mark_radius(line_style: dict) -> float:
     """Half the marker size of a line's points, or half its stroke when unmarked."""
 
@@ -1624,12 +1650,7 @@ class LineLayer(PointLabelMixin, Layer):
         return get_chart_data("y", self.chart)
 
     def _resolved_area_style(self, ctx):
-        area_style = self._merge_color("color", ctx.color, self.area_style)
-        if ctx.z_order is not None:
-            area_style["zorder"] = ctx.z_order - 0.1
-        if ctx.emphasis == EMPHASIS_BACKGROUND:
-            area_style["color"] = self.muted_color
-        return area_style
+        return _area_style(self, ctx)
 
     def draw(self, ax, ctx):
         x = get_chart_data("x", self.chart)
@@ -1982,6 +2003,8 @@ class StackedAreaLayer(Layer):
         fill_style = self._merge_color("color", ctx.color, self.fill_style)
         if ctx.z_order is not None:
             fill_style["zorder"] = ctx.z_order
+        if ctx.hatch is not None and "hatch" not in fill_style:
+            fill_style["hatch"] = ctx.hatch or None
         self._apply_emphasis(fill_style, ctx.emphasis)
 
         plot, fill, _ = _oriented(ax, ctx.transpose)
@@ -2794,6 +2817,7 @@ class BoxLayer(GroupLayer):
             if alpha is not None:
                 patch.set_alpha(alpha)
 
+        self._etch(bp["boxes"])
         if self.side:
             self._clip_to_side(bp, positions)
         roles = self._group_roles(labels, ctx.emphasis)
@@ -3268,6 +3292,9 @@ class ViolinLayer(GroupLayer):
             body.set_alpha(style["alpha"])
         if style.get("linewidth") is not None:
             body.set_linewidth(style["linewidth"])
+        if style.get("hatch"):
+            body.set_hatch(style["hatch"])
+        self._etch([body])
         if side:
             axis = 1 if self.is_horizontal else 0
             clip = np.minimum if side < 0 else np.maximum
@@ -3477,8 +3504,10 @@ class RidgelineLayer(GroupLayer):
                     edgecolor="none",
                     linewidth=0,
                     alpha=style.get("alpha"),
+                    hatch=style.get("hatch"),
                     zorder=zorder,
                 )
+                self._etch([body])
                 artists.append(("fill", body))
             artists += [
                 ("mark", mark)
@@ -4821,12 +4850,7 @@ class RadialLineLayer(RadialLayer):
         self.show_area = self.settings.get("show_area")
 
     def _resolved_area_style(self, ctx):
-        area_style = self._merge_color("color", ctx.color, self.area_style)
-        if ctx.z_order is not None:
-            area_style["zorder"] = ctx.z_order - 0.1
-        if ctx.emphasis == EMPHASIS_BACKGROUND:
-            area_style["color"] = self.muted_color
-        return area_style
+        return _area_style(self, ctx)
 
     def draw(self, ax, ctx):
         y = get_chart_data("y", self.chart)
@@ -7493,6 +7517,25 @@ class ScaledAxis(NamedTuple):
     remedy: str  # the fix for a figure that only inherited the scale
 
 
+def _takes_hatch(layer: Layer) -> bool:
+    """Whether the panel's hatch cycle reaches the layer's fills.
+
+    Areas take it only when etched: a tiled hatch on a translucent area reads
+    poorly, and the areas of a hatch-cycle theme stay as they were (ADR 0048).
+    """
+
+    if isinstance(
+        layer, (BarLayer, HistogramLayer, RadialBarLayer, RadialHistogramLayer)
+    ):
+        return True
+    areas = (LineLayer, StackedAreaLayer, RadialLineLayer)
+    return (
+        isinstance(layer, areas)
+        and not isinstance(layer, BumpLayer)
+        and layer.etch is not None
+    )
+
+
 class Panel:
     """A group of layers sharing one coordinate space; owns all cross-layer concerns."""
 
@@ -7940,16 +7983,7 @@ class Panel:
                     bins=bins,
                     hatch=(
                         hatch_assignments[layer.chart_hash]
-                        if hatch_assignments is not None
-                        and isinstance(
-                            layer,
-                            (
-                                BarLayer,
-                                HistogramLayer,
-                                RadialBarLayer,
-                                RadialHistogramLayer,
-                            ),
-                        )
+                        if hatch_assignments is not None and _takes_hatch(layer)
                         else None
                     ),
                     emphasis=role,

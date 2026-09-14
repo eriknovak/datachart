@@ -12,6 +12,9 @@ from matplotlib.colors import to_hex
 
 from datachart.charts import (
     BarChart,
+    BoxPlot,
+    RidgelinePlot,
+    ViolinPlot,
     Histogram,
     LineChart,
     RadialChart,
@@ -25,6 +28,7 @@ from datachart.utils import Grid
 from datachart.utils._internal.layers import Etch, InkStroke
 
 LINE = [{"x": x, "y": y} for x, y in enumerate([1.0, 3.0, 2.0, 4.0, 3.5])]
+LINE_2 = [{"x": x, "y": y} for x, y in enumerate([2.0, 1.0, 3.0, 2.5, 1.5])]
 STROKE = {
     "width_scale": 1.6,
     "nib_angle": 32,
@@ -170,7 +174,7 @@ class TestEtch(unittest.TestCase):
         line = LineChart(LINE, show_area=True)
         (effect,) = etch_effects(line.axes[0].collections[0])
         self.assertIsNone(effect.wash)
-        stacked = StackedAreaChart([LINE, LINE])
+        stacked = StackedAreaChart([LINE, LINE_2])
         self.assertTrue(etch_effects(stacked.axes[0].collections[0]))
         self.assertEqual(hatched_draws(line), 0)
 
@@ -229,6 +233,55 @@ class TestGroundColors(unittest.TestCase):
         self.assertEqual(to_hex(effect._gc["foreground"]), PARCHMENT.lower())
         (halo,) = data_lines(LineChart(LINE))[0].get_path_effects()
         self.assertEqual(to_hex(halo._gc["foreground"]), PARCHMENT.lower())
+
+
+class TestAreaAndBodyEtching(unittest.TestCase):
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_hatch_cycle_skips_areas_without_etch(self):
+        config.update_config({"plot_hatch_cycle": ["/", "x"]})
+        figure = StackedAreaChart([LINE, LINE_2])
+        self.assertEqual([c.get_hatch() for c in figure.axes[0].collections], [None, None])
+
+    def test_each_area_takes_its_own_pattern(self):
+        config.update_config({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "x"]})
+        stacked = StackedAreaChart([LINE, LINE_2])
+        self.assertEqual([c.get_hatch() for c in stacked.axes[0].collections], ["/", "x"])
+        lines = LineChart([LINE, LINE_2], show_area=True)
+        self.assertEqual([c.get_hatch() for c in lines.axes[0].collections], ["/", "x"])
+
+    def test_chart_area_hatch_beats_the_cycle(self):
+        config.update_config({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "x"]})
+        figure = LineChart(LINE, show_area=True, style={"plot_area_hatch": "."})
+        self.assertEqual(figure.axes[0].collections[0].get_hatch(), ".")
+
+    def test_area_legend_swatch_carries_the_etch(self):
+        config.update_config({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "x"]})
+        figure = StackedAreaChart([LINE, LINE_2], subtitle=["a", "b"], show_legend=True)
+        swatch = figure.axes[0].get_legend().get_patches()[0]
+        self.assertTrue(etch_effects(swatch))
+
+    def test_bodies_take_their_hatch_and_etch(self):
+        config.update_config(
+            {
+                "plot_etch": ETCH,
+                "plot_box_hatch": "/",
+                "plot_violin_hatch": "\\",
+                "plot_ridgeline_hatch": "/",
+            }
+        )
+        points = [{"label": l, "value": float(v)} for l in "AB" for v in range(8)]
+        box = BoxPlot(points).axes[0].patches[0]
+        self.assertEqual(box.get_hatch(), "/")
+        self.assertTrue(etch_effects(box))
+        violin = ViolinPlot(points).axes[0].collections[0]
+        self.assertEqual(violin.get_hatch(), "\\")
+        self.assertTrue(etch_effects(violin))
+        ridge = RidgelinePlot(points).axes[0].collections[0]
+        self.assertEqual(ridge.get_hatch(), "/")
+        self.assertTrue(etch_effects(ridge))
 
 
 class _RecordingRenderer:

@@ -33,6 +33,7 @@ RIDGELINE_KEYS = (
     "plot_ridgeline_overlap",
     "plot_ridgeline_inner_color",
     "plot_ridgeline_inner_linewidth",
+    "plot_ridgeline_hatch",
 )
 
 
