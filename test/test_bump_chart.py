@@ -149,6 +149,13 @@ class TestBumpChartDrawing(unittest.TestCase):
         self.assertEqual((bottom, top), (3.5, 0.5))
         self.assertTrue(all(t == int(t) for t in ax.get_yticks()))
 
+    def test_periods_span_the_x_axis_with_whole_end_markers(self):
+        ax = BumpChart(DATA, subtitle=NAMES).axes[0]
+        self.assertEqual(ax.get_xlim(), (0, 1))
+        self.assertFalse(ax.get_lines()[0].get_clip_on())
+        cropped = BumpChart(DATA, subtitle=NAMES, xmax=0.5).axes[0]
+        self.assertTrue(cropped.get_lines()[0].get_clip_on())
+
     def test_user_rank_limits_keep_rank_one_on_top(self):
         fig = BumpChart(DATA, subtitle=NAMES, ymin=1, ymax=2)
         self.assertEqual(fig.axes[0].get_ylim(), (2, 1))

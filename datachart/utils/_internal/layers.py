@@ -1821,6 +1821,10 @@ class BumpLayer(LineLayer):
 
         plot, _, _ = _oriented(ax, ctx.transpose)
         (line,) = plot(px, py, **line_style, markevery=marks, label=self.label(ctx))
+        # the x-limits end at the first and last period: whole end markers
+        # overhang the spines unless the user crops the periods
+        if self.settings.get("xmin") is None and self.settings.get("xmax") is None:
+            line.set_clip_on(False)
 
         label = self.label(ctx)
 

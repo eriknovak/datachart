@@ -37,6 +37,7 @@ from datachart.charts import (
     ContourChart,
     HexbinChart,
     StackedAreaChart,
+    BumpChart,
     SankeyChart,
     Treemap,
     NetworkChart,
@@ -52,6 +53,8 @@ from datachart.constants import (
     DATE_FORMAT,
     HEXBIN_REDUCE,
     BASELINE,
+    LABEL_POSITION,
+    RANK,
     NETWORK_LAYOUT,
     NORMALIZE,
     SCALE,
@@ -259,6 +262,12 @@ EXPECTED_CHANGES = {
     "values_swarm_horizontal_strip",
     "values_raincloud",
     "values_theme_minimal_swarm_raincloud",
+    # new bump chart cases (ADR 0046)
+    "bump_default",
+    "bump_given",
+    "bump_both_curve",
+    "bump_rule_top",
+    "bump_panel",
 }
 
 
@@ -1755,6 +1764,76 @@ def stackedarea_grid():
     )
     right = LineChart(data=LINE1, title="line")
     return Grid([[top], [left, right]], figsize=(10, 7))
+
+
+BUMP_NAMES = ["Ljubljana", "Maribor", "Celje", "Koper", "Kranj"]
+
+
+def bump_series(seed=5, n=8, k=5, gap=True):
+    """`k` noisy scores over `n` seasons; the fourth misses one season."""
+
+    rng = np.random.RandomState(seed)
+    return [
+        [
+            {"x": 2017 + i, "y": float(v)}
+            for i, v in enumerate(rng.randint(40, 90, n))
+            if not (gap and s == 3 and i == 4)
+        ]
+        for s in range(k)
+    ]
+
+
+@case
+def bump_default():
+    return BumpChart(
+        data=bump_series(), subtitle=BUMP_NAMES, title="League", ylabel="Rank"
+    )
+
+
+@case
+def bump_given():
+    ranks = [[1, 2, 3, 1], [2, 1, 1, 3], [3, 3, 2, 2]]
+    return BumpChart(
+        data=[[{"x": i, "y": r} for i, r in enumerate(row)] for row in ranks],
+        subtitle=["a", "b", "c"],
+        rank_by=RANK.GIVEN,
+    )
+
+
+@case
+def bump_both_curve():
+    return BumpChart(
+        data=bump_series(),
+        subtitle=BUMP_NAMES,
+        label_position=LABEL_POSITION.BOTH,
+        line_curve=0.8,
+        show_values=True,
+    )
+
+
+@case
+def bump_rule_top():
+    return BumpChart(data=bump_series(), subtitle=BUMP_NAMES, emphasis_rule={"top": 2})
+
+
+@case
+def bump_panel():
+    lower = [[4, 5, 5, 4], [5, 4, 4, 5]]
+    return Panel(
+        [
+            BumpChart(data=bump_series(n=4, k=3, gap=False), subtitle=BUMP_NAMES[:3]),
+            BumpChart(
+                data=[
+                    [{"x": 2017 + i, "y": r} for i, r in enumerate(row)]
+                    for row in lower
+                ],
+                subtitle=BUMP_NAMES[3:],
+                rank_by=RANK.GIVEN,
+                line_curve=1,
+            ),
+        ],
+        title="Panel",
+    )
 
 
 SANKEY_LABELS = [
