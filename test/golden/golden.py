@@ -22,6 +22,7 @@ sys.path.insert(0, os.path.join(HERE, "..", ".."))
 
 from datachart.charts import (
     LineChart,
+    CalendarHeatmap,
     BarChart,
     Histogram,
     ScatterChart,
@@ -58,6 +59,7 @@ from datachart.constants import (
     LEGEND_LOCATION,
     THEME,
     VALUE_FORMAT,
+    WEEKDAY,
 )
 from datachart.utils.stats import kde1d, kde2d
 
@@ -238,6 +240,11 @@ EXPECTED_CHANGES = {
     # new category sort and emphasis rule cases (ADR 0042)
     "bar_sorted_grouped",
     "bar_rule_top3",
+    # new calendar heatmap cases (ADR 0044)
+    "calendar_single_year",
+    "calendar_multi_year",
+    "calendar_sunday_start",
+    "calendar_grid",
 }
 
 
@@ -1916,6 +1923,70 @@ def treemap_deep():
         value_format=VALUE_FORMAT.INTEGER,
         figsize=(8, 5),
     )
+
+
+def calendar_days(year, seed):
+    """One value per day of `year`: weekday commits with a summer lull."""
+    rng = np.random.RandomState(seed)
+    first = date(year, 1, 1)
+    n_days = (date(year + 1, 1, 1) - first).days
+    days = [first + timedelta(days=i) for i in range(n_days)]
+    values = [
+        int(
+            rng.poisson(3.0 if d.weekday() < 5 else 0.7)
+            * (0.5 if d.month in (7, 8) else 1)
+        )
+        for d in days
+    ]
+    return days, values
+
+
+@case
+def calendar_single_year():
+    days, values = calendar_days(2024, seed=4)
+    return CalendarHeatmap(
+        {"date": days, "value": values},
+        title="Commits, 2024",
+        show_colorbars=True,
+        colorbar={"label": "commits", "location": COLORBAR_LOCATION.BOTTOM},
+        figsize=(9, 2.6),
+    )
+
+
+@case
+def calendar_multi_year():
+    d1, v1 = calendar_days(2023, seed=5)
+    d2, v2 = calendar_days(2024, seed=6)
+    return CalendarHeatmap(
+        {"date": d1 + d2, "value": v1 + v2},
+        subtitle="commits",
+        title="Two years",
+        norm=NORMALIZE.ASINH,
+        figsize=(9, 4.4),
+    )
+
+
+@case
+def calendar_sunday_start():
+    days, values = calendar_days(2024, seed=4)
+    # the first quarter, valued: the values print in the cells
+    quarter = [(d, v) for d, v in zip(days, values) if d.month <= 3]
+    return CalendarHeatmap(
+        {"date": [d for d, _ in quarter], "value": [v for _, v in quarter]},
+        week_start=WEEKDAY.SUNDAY,
+        show_values=True,
+        style={"plot_calendar_heatmap_cmap": COLORS.Greens},
+        title="Q1 2024, weeks from Sunday",
+        figsize=(9, 2.6),
+    )
+
+
+@case
+def calendar_grid():
+    days, values = calendar_days(2024, seed=4)
+    left = CalendarHeatmap({"date": days, "value": values}, title="per day")
+    right = LineChart(data=LINE1, title="line")
+    return Grid([[left, right]], figsize=(12, 3))
 
 
 @case
