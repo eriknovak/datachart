@@ -414,7 +414,7 @@ class TestYearPanels(unittest.TestCase):
             self.assertEqual(
                 lines.get_edgecolor()[0].tolist(), [0.0, 0.0, 0.0, 1.0], theme
             )
-            self.assertEqual(list(lines.get_linewidths()), [1.5], theme)
+            self.assertEqual(list(lines.get_linewidths()), [1.0], theme)
 
     def test_month_line_color_none_follows_the_theme_frame(self):
         config.set_theme(THEME.INK)
