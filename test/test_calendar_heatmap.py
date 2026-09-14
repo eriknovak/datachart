@@ -44,6 +44,12 @@ def calendar(start, n, **kwargs):
     return CalendarHeatmap({"date": dates, "value": list(range(1, n + 1))}, **kwargs)
 
 
+def year_calendar(year, **kwargs):
+    """A full year valued by the day of the year."""
+    n = (date(year + 1, 1, 1) - date(year, 1, 1)).days
+    return calendar(date(year, 1, 1), n, **kwargs)
+
+
 def _image(ax):
     (image,) = ax.images
     return np.ma.filled(np.asarray(image.get_array(), dtype=float), np.nan)
@@ -189,11 +195,24 @@ class TestCalendarFront(unittest.TestCase):
             calendar(date(2024, 1, 1), 5, week_start="tuesday")
 
     def test_single_year_draws_one_axes_with_a_seven_row_grid(self):
-        figure = calendar(date(2024, 1, 1), 10)
+        figure = year_calendar(2024)
         self.assertEqual(len(figure.axes), 1)
         # 2024 starts on a Monday and has 366 days: 53 week columns
         self.assertEqual(_image(figure.axes[0]).shape, (7, 53))
         self.assertEqual(figure._chart_metadata["type"], "calendarheatmap")
+
+    def test_drawn_range_spans_the_months_with_data(self):
+        figure = calendar(date(2024, 10, 15), 20)
+        ax = figure.axes[0]
+        # 20 days from mid-October reach November: nine weeks from Tue Oct 1
+        z = _image(ax)
+        self.assertEqual(z.shape, (7, 9))
+        self.assertEqual(_tick_labels(ax, "x"), ["Oct", "Nov"])
+        (lines,) = _month_lines(ax)
+        self.assertEqual(len(lines.get_paths()), 1)
+        self.assertTrue(np.isnan(z[0, 0]))  # Mon Sep 30: off the range
+        self.assertEqual(z[1, 2], 1)  # Tue Oct 15
+        self.assertTrue(np.isnan(z[1, 0]))  # Tue Oct 1: missing
 
     def test_monday_start_places_each_date(self):
         figure = calendar(date(2024, 1, 1), 10)
@@ -210,7 +229,10 @@ class TestCalendarFront(unittest.TestCase):
         self.assertEqual(z[1, 0], 1)  # Mon Jan 1
         self.assertEqual(z[0, 1], 7)  # Sun Jan 7
         self.assertEqual(z[6, 0], 6)  # Sat Jan 6
-        self.assertEqual(z.shape, (7, 53))
+        self.assertEqual(
+            _image(year_calendar(2024, week_start=WEEKDAY.SUNDAY).axes[0]).shape,
+            (7, 53),
+        )
 
     def test_theme_week_start_is_the_default(self):
         config.update_config({"plot_calendar_heatmap_week_start": WEEKDAY.SUNDAY})
@@ -230,7 +252,7 @@ class TestCalendarFront(unittest.TestCase):
         self.assertEqual(np.count_nonzero(~np.isnan(z)), 1)
 
     def test_month_and_weekday_labels(self):
-        figure = calendar(date(2024, 1, 1), 3)
+        figure = year_calendar(2024)
         ax = figure.axes[0]
         self.assertEqual(
             _tick_labels(ax, "x"),
@@ -266,7 +288,7 @@ class TestCalendarFront(unittest.TestCase):
         self.assertFalse(any(spine.get_visible() for spine in ax.spines.values()))
 
     def test_month_separators_sit_between_months(self):
-        figure = calendar(date(2024, 1, 1), 3)
+        figure = year_calendar(2024)
         (lines,) = _month_lines(figure.axes[0])
         self.assertEqual(len(lines.get_paths()), 11)
         # a zero width draws none
@@ -337,7 +359,7 @@ class TestCalendarFront(unittest.TestCase):
             resolver((1, 0)), {"label": "steps", "date": "2024-01-02", "value": 2}
         )
         self.assertEqual(
-            resolver((6, 52)), {"label": "steps", "date": None, "value": None}
+            resolver((6, 4)), {"label": "steps", "date": None, "value": None}
         )
 
 
@@ -353,7 +375,7 @@ class TestYearPanels(unittest.TestCase):
             [ax.get_title() for ax in figure.axes], ["2022", "2024", "2025"]
         )
         self.assertEqual(figure._chart_metadata["shape"], (3, 1))
-        self.assertEqual(_image(figure.axes[1]).shape, (7, 53))
+        self.assertEqual(_tick_labels(figure.axes[1], "x"), ["Dec"])
         self.assertEqual(_image(figure.axes[2])[2, 0], 2)  # Wed Jan 1 2025
 
     def test_subtitle_prefixes_the_year(self):

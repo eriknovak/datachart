@@ -3183,15 +3183,18 @@ def week_row(day: date, week_start: str) -> int:
     return (day.weekday() - offset) % 7
 
 
-def calendar_layout(year: int, week_start: str) -> tuple:
-    """The cell of every day of `year`: `(cells, n_weeks)`, cells as `(row, col)`.
+def calendar_layout(
+    year: int, week_start: str, first_month: int = 1, last_month: int = 12
+) -> tuple:
+    """The cell of every day of the months drawn: `(cells, n_weeks)`, cells as `(row, col)`.
 
     Columns are weeks, rows weekdays from the week start down; the days of
-    the first and last week that fall outside the year hold no cell.
+    the first and last week that fall outside the drawn months hold no cell.
     """
 
-    first = date(year, 1, 1)
-    n_days = (date(year + 1, 1, 1) - first).days
+    first = date(year, first_month, 1)
+    end = date(year + 1, 1, 1) if last_month == 12 else date(year, last_month + 1, 1)
+    n_days = (end - first).days
     first_row = week_row(first, week_start)
     cells = {
         first + timedelta(days=i): divmod(first_row + i, 7)[::-1] for i in range(n_days)
@@ -3204,6 +3207,7 @@ class CalendarHeatmapLayer(HeatmapLayer):
 
     The cells, value labels, and colorbar are the heatmap's; the layer adds
     the year layout, month separators, and the month and weekday labels.
+    The drawn range spans the months holding data, whole months at a time.
     """
 
     kind = "calendarheatmap"
@@ -3230,10 +3234,14 @@ class CalendarHeatmapLayer(HeatmapLayer):
         self.cell_text = lambda value: _format_value(self.value_format, value)
 
     def _grid(self) -> tuple:
-        """The 7 x n_weeks grid of the chart's year; NaN off the year and on missing days."""
+        """The 7 x n_weeks grid of the months holding data; NaN off them and on missing days."""
 
         self.year = self.chart["year"]
-        self.cells, n_weeks = calendar_layout(self.year, self.week_start)
+        months = {day.month for day in self.chart["data"]["date"]}
+        self.months = range(min(months), max(months) + 1)
+        self.cells, n_weeks = calendar_layout(
+            self.year, self.week_start, self.months[0], self.months[-1]
+        )
         # python scalars, as the heatmap holds them: a whole number prints whole
         z = [[np.nan] * n_weeks for _ in range(7)]
         self.dates = {}
@@ -3256,7 +3264,7 @@ class CalendarHeatmapLayer(HeatmapLayer):
             chart["xticks"] = [
                 (min(cols) + max(cols)) / 2 for _, cols in sorted(spans.items())
             ]
-            chart["xticklabels"] = list(MONTH_LABELS)
+            chart["xticklabels"] = [MONTH_LABELS[month - 1] for month in self.months]
         if self.show_weekday_labels:
             start = 6 if self.week_start == WEEKDAY.SUNDAY else 0
             chart["yticks"] = list(range(0, 7, WEEKDAY_LABEL_STEP))
@@ -3303,7 +3311,7 @@ class CalendarHeatmapLayer(HeatmapLayer):
         """A stepped line along the left edge of every month but the first."""
 
         paths = []
-        for month in range(2, 13):
+        for month in self.months[1:]:
             row, col = self.cells[date(self.year, month, 1)]
             left, right = col - 0.5, col + 0.5
             if row == 0:

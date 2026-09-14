@@ -87,8 +87,9 @@ def CalendarHeatmap(
             a list of such dicts drawing one calendar per dataset. Dates are
             temporal objects (`date`, `datetime`, `numpy.datetime64`, or
             pandas `Timestamp`), each appearing once; date strings are never
-            parsed. A day absent from the list, or valued `None`, is drawn
-            blank.
+            parsed. A calendar spans the months that hold data, whole months
+            at a time; a day absent from the list, or valued `None`, is
+            drawn blank.
         title: The title of the chart.
         subtitle: The subtitle(s) for individual datasets. A dataset that
             spans several years names each calendar by its year, after the
@@ -124,8 +125,8 @@ def CalendarHeatmap(
         colorbar: The colorbar setting(s): label, location, tick format,
             and tick positions. See `ColorbarSettingAttrs`.
         texts: Text annotation(s) to draw. The cells sit at integer
-            positions: the week index along x, the weekday row along y,
-            counted from zero at the top left.
+            positions: the week column along x, the weekday row along y,
+            counted from zero at the top-left cell of the drawn range.
 
     Returns:
         The figure containing the calendar heatmap(s).
