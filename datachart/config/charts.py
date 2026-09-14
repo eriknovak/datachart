@@ -57,6 +57,10 @@ CHART_CONFIGS = {
         "multiplot": False,
         "subplots": True,
     },
+    "ridgelineplot": {
+        "multiplot": False,
+        "subplots": True,
+    },
     "parallelcoords": {
         "multiplot": True,
         "subplots": False,

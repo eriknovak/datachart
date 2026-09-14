@@ -43,6 +43,8 @@ Classes:
     ViolinDataPointAttrs: The data point attributes for the violin plot.
     RaincloudSingleChartAttrs: The single chart attributes for the raincloud plot.
     RaincloudDataPointAttrs: The data point attributes for the raincloud plot.
+    RidgelineSingleChartAttrs: The single chart attributes for the ridgeline plot.
+    RidgelineDataPointAttrs: The data point attributes for the ridgeline plot.
     ParallelCoordsSingleChartAttrs: The single chart attributes for the parallel coordinates chart.
     ParallelCoordsDataPointAttrs: The data point attributes for the parallel coordinates chart.
     RadialSingleChartAttrs: The single chart attributes for the radial chart.
@@ -80,6 +82,7 @@ Classes:
     SwarmStyleAttrs: The typing for the swarm plot style.
     ViolinStyleAttrs: The typing for the violin plot style.
     RaincloudStyleAttrs: The typing for the raincloud plot style.
+    RidgelineStyleAttrs: The typing for the ridgeline plot style.
     ParallelCoordsStyleAttrs: The typing for the parallel coordinates chart style.
     ThemeDefaultAttrs: The typing for theme-driven defaults and cycles.
 
@@ -907,6 +910,29 @@ class ViolinStyleAttrs(TypedDict):
     plot_violin_median_size: Union[int, float, None]
 
 
+class RidgelineStyleAttrs(TypedDict):
+    """The typing for the ridgeline plot style.
+
+    Attributes:
+        plot_ridgeline_color (Union[str, None]): The ridge fill color; defaults to the palette color.
+        plot_ridgeline_alpha (Union[float, None]): The alpha value of the ridge fill.
+        plot_ridgeline_linewidth (Union[int, float, None]): The line width of the ridge outline.
+        plot_ridgeline_edgecolor (Union[str, None]): The color of the ridge outline; defaults to the fill.
+        plot_ridgeline_overlap (Union[float, None]): How far a peak rises into the row above, in `[0, 1]`.
+        plot_ridgeline_inner_color (Union[str, None]): The color of the inner marks; defaults to the font color.
+        plot_ridgeline_inner_linewidth (Union[int, float, None]): The line width of the inner marks.
+
+    """
+
+    plot_ridgeline_color: Union[str, None]
+    plot_ridgeline_alpha: Union[float, None]
+    plot_ridgeline_linewidth: Union[int, float, None]
+    plot_ridgeline_edgecolor: Union[str, None]
+    plot_ridgeline_overlap: Union[float, None]
+    plot_ridgeline_inner_color: Union[str, None]
+    plot_ridgeline_inner_linewidth: Union[int, float, None]
+
+
 class RaincloudStyleAttrs(ViolinStyleAttrs, SwarmStyleAttrs, BoxStyleAttrs):
     """The typing for the raincloud plot style.
 
@@ -1040,6 +1066,7 @@ class StyleAttrs(
     BoxStyleAttrs,
     SwarmStyleAttrs,
     ViolinStyleAttrs,
+    RidgelineStyleAttrs,
     ParallelCoordsStyleAttrs,
     ThemeDefaultAttrs,
     SketchStyleAttrs,
@@ -2312,6 +2339,72 @@ class ViolinSingleChartAttrs(TypedDict):
     xlabel: Union[str, None]
     ylabel: Union[str, None]
     style: Union[ViolinStyleAttrs, None]
+
+    xticks: Union[int, float, None]
+    xticklabels: Union[List[str], None]
+    xtickrotate: Union[int, None]
+    yticks: Union[int, float, None]
+    yticklabels: Union[List[str], None]
+    ytickrotate: Union[int, None]
+
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+
+    label: Union[str, None]  # the name of the label attribute in data
+    value: Union[str, None]  # the name of the value attribute in data
+
+
+# ================================================
+# Ridgeline Plot Attributes
+# ================================================
+
+
+class RidgelineDataPointAttrs(TypedDict):
+    """The data point attributes for the ridgeline plot.
+
+    Attributes:
+        label (str): The category label; one ridge per label.
+        value (Union[int, float]): The numeric value.
+
+    """
+
+    label: str
+    value: Union[int, float]
+
+
+class RidgelineSingleChartAttrs(TypedDict):
+    """The single chart attributes for the ridgeline plot.
+
+    Attributes:
+        data (List[RidgelineDataPointAttrs]): The list of data points defining the ridgeline plot.
+        subtitle (Union[str, None]): The subtitle of the ridgeline plot.
+        xlabel (Union[str, None]): The xlabel of the ridgeline plot.
+        ylabel (Union[str, None]): The ylabel of the ridgeline plot.
+        style (Union[RidgelineStyleAttrs, None]): The style of the ridgeline plot.
+        xticks (Union[int, float, None]): The xtick positions list.
+        xticklabels (Union[List[str], None]): The xtick labels.
+        xtickrotate (Union[int, None]): The xtick rotation value.
+        yticks (Union[int, float, None]): The ytick position list.
+        yticklabels (Union[List[str], None]): The ytick labels.
+        ytickrotate (Union[int, None]): The ytick rotation value.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
+        label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
+        value (Union[str, None]): The key name in `data` that contains the value. Defaults to `"value"`.
+
+    """
+
+    data: List[RidgelineDataPointAttrs]
+    subtitle: Union[str, None]
+    xlabel: Union[str, None]
+    ylabel: Union[str, None]
+    style: Union[RidgelineStyleAttrs, None]
 
     xticks: Union[int, float, None]
     xticklabels: Union[List[str], None]

@@ -166,6 +166,27 @@ cloud and packed one-sided away from it, over a band narrower than a
 standalone swarm so it stays inside the category cell.
 _Avoid_: strip (for the concept), drops
 
+**Ridge**:
+A per-label kernel-density curve of a `RidgelinePlot`, drawn from its row's
+baseline on the category index and stacked with the other rows, first row
+at the top, later rows above earlier ones. Evaluated through `kde1d` on one
+grid shared by every ridge of the panel (ADR 0047).
+_Avoid_: joy plot (for the front), density row, layer (for the curve)
+
+**Row overlap**:
+How far a ridge rises into its neighbour's row: a peak stands `1 + overlap`
+slots above its baseline, so `0` makes rows touch and `0.5` sends each peak
+half a row into the next. A front parameter in `[0, 1]` with a theme
+default.
+_Avoid_: scale (for this), spacing, height
+
+**Ridge scale**:
+Whether ridges share one density scale (`RIDGELINE_SCALE.COMMON`: the
+tallest ridge reaches the peak height, the rest in proportion) or each is
+scaled to the same peak (`PER_ROW`, the default: shapes compare). Passed
+as `normalize`; distinct from the heatmap's `NORMALIZE` colormap norm.
+_Avoid_: normalization (for the concept), common scale (for the enum)
+
 **Text**:
 A per-chart annotation — a string placed at a position (data coordinates by
 default, axes-fraction on request) with an optional arrow to a target point,

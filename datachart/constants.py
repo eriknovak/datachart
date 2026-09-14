@@ -21,6 +21,7 @@ Classes:
     NORMALIZE:          The supported normalization options.
     ORIENTATION:        The supported orientations.
     VIOLIN_INNER:       The supported violin inner marks.
+    RIDGELINE_SCALE:    The supported ridgeline density scales.
     BANDWIDTH:          The supported kernel density bandwidth rules.
     CONTOUR_LEVELS:     The supported contour level rules.
     HEXBIN_REDUCE:      The supported hexbin aggregations.
@@ -809,6 +810,34 @@ class VIOLIN_INNER:
     BOX = "box"
     QUARTILES = "quartiles"
     MEDIAN = "median"
+
+
+class RIDGELINE_SCALE:
+    """The supported ridgeline density scales.
+
+    Passed as the `normalize` setting of ridgeline plots: whether every ridge
+    is scaled to the same peak height, so their shapes compare, or all
+    ridges share one density scale, so their heights compare.
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> from datachart.constants import RIDGELINE_SCALE
+        >>> RIDGELINE_SCALE.DEFAULT
+        "per_row"
+
+    Attributes:
+        DEFAULT (str): The default scale. Same as `RIDGELINE_SCALE.PER_ROW`.
+        PER_ROW (str): Every ridge reaches the same peak height. Equals to
+            `"per_row"`.
+        COMMON (str): One density scale: the tallest ridge reaches the peak
+            height and the others stay in proportion. Equals to `"common"`.
+
+    """
+
+    DEFAULT = "per_row"
+    PER_ROW = "per_row"
+    COMMON = "common"
 
 
 class BANDWIDTH:
