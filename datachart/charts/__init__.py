@@ -14,6 +14,8 @@ Methods:
         Creates the pyramid chart.
     RadialChart(attrs):
         Creates the radial chart.
+    CalendarHeatmap(attrs):
+        Creates the calendar heatmap.
     Histogram(attrs):
         Creates the histogram.
     BoxPlot(attrs):
@@ -49,6 +51,7 @@ from .stacked_area_chart import StackedAreaChart
 from .bar_chart import BarChart
 from .pyramid_chart import PyramidChart
 from .radial_chart import RadialChart
+from .calendar_heatmap import CalendarHeatmap
 
 # distributions
 from .histogram import Histogram
@@ -78,6 +81,7 @@ __all__ = [
     "BarChart",
     "PyramidChart",
     "RadialChart",
+    "CalendarHeatmap",
     # distributions
     "Histogram",
     "BoxPlot",

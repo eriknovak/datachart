@@ -9,16 +9,64 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from datachart.constants import WEEKDAY
+from datachart.charts import CalendarHeatmap, LineChart
+from datachart.config import config
+from datachart.constants import COLORBAR_LOCATION, THEME, VALUE_FORMAT, WEEKDAY
+from datachart.themes import _base
+from datachart.utils import Grid, Panel
 from datachart.utils._internal.validate import (
     validate_calendar_dates,
     validate_calendar_year,
     validate_unique_dates,
 )
 
+THEMES = [
+    THEME.DEFAULT,
+    THEME.GREYSCALE,
+    THEME.INK,
+    THEME.HATCH,
+    THEME.MINIMAL,
+    THEME.MATERIAL,
+    THEME.SKETCH,
+]
+CALENDAR_KEYS = tuple(
+    key for key in _base.BASE_THEME if key.startswith("plot_calendar_heatmap_")
+)
+
 
 def days(start, n):
     return [start + timedelta(days=i) for i in range(n)]
+
+
+def calendar(start, n, **kwargs):
+    """A calendar of `n` days from `start`, valued 1..n."""
+    dates = days(start, n)
+    return CalendarHeatmap({"date": dates, "value": list(range(1, n + 1))}, **kwargs)
+
+
+def _image(ax):
+    (image,) = ax.images
+    return np.ma.filled(np.asarray(image.get_array(), dtype=float), np.nan)
+
+
+def _tick_labels(ax, axis):
+    ax.figure.canvas.draw()
+    return [t.get_text() for t in getattr(ax, f"get_{axis}ticklabels")()]
+
+
+def _all_axes(figure):
+    """The figure's axes and the colorbar axes a locked aspect parents to them."""
+    return list(figure.axes) + [c for ax in figure.axes for c in ax.child_axes]
+
+
+def _month_lines(ax):
+    from matplotlib.collections import LineCollection
+
+    return [
+        c
+        for c in ax.collections
+        if isinstance(c, LineCollection) and c.get_gid() == "month-separators"
+    ]
 
 
 class TestWeekdayConstant(unittest.TestCase):
@@ -92,6 +140,300 @@ class TestTypings(unittest.TestCase):
         self.assertIn(
             "plot_calendar_heatmap_week_start", typings.StyleAttrs.__annotations__
         )
+
+
+class TestCalendarFront(unittest.TestCase):
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_exported_under_trends(self):
+        import datachart.charts as charts
+
+        self.assertIn("CalendarHeatmap", charts.__all__)
+        self.assertIn('!!! info "Added in Unreleased"', CalendarHeatmap.__doc__)
+
+    def test_bad_data_shape_raises(self):
+        with self.assertRaises(ValueError) as cm:
+            CalendarHeatmap([date(2024, 1, 1)])
+        self.assertIn('{"date": ', str(cm.exception))
+        with self.assertRaises(ValueError):
+            CalendarHeatmap({"date": [date(2024, 1, 1)]})
+
+    def test_length_mismatch_raises(self):
+        with self.assertRaises(ValueError) as cm:
+            CalendarHeatmap({"date": days(date(2024, 1, 1), 3), "value": [1, 2]})
+        self.assertIn("one value per date", str(cm.exception))
+
+    def test_empty_data_raises(self):
+        with self.assertRaises(ValueError):
+            CalendarHeatmap({"date": [], "value": []})
+
+    def test_string_date_raises_at_the_front(self):
+        with self.assertRaises(ValueError) as cm:
+            CalendarHeatmap({"date": ["2024-01-01"], "value": [1]})
+        self.assertIn("datetime64", str(cm.exception))
+
+    def test_duplicate_date_raises_at_the_front(self):
+        dates = [date(2024, 3, 5), date(2024, 3, 6), date(2024, 3, 5)]
+        with self.assertRaises(ValueError) as cm:
+            CalendarHeatmap({"date": dates, "value": [1, 2, 3]})
+        self.assertIn("2024-03-05", str(cm.exception))
+
+    def test_emphasis_raises(self):
+        with self.assertRaises(ValueError):
+            calendar(date(2024, 1, 1), 5, emphasis="highlight")
+
+    def test_invalid_week_start_raises(self):
+        with self.assertRaises(ValueError):
+            calendar(date(2024, 1, 1), 5, week_start="tuesday")
+
+    def test_single_year_draws_one_axes_with_a_seven_row_grid(self):
+        figure = calendar(date(2024, 1, 1), 10)
+        self.assertEqual(len(figure.axes), 1)
+        # 2024 starts on a Monday and has 366 days: 53 week columns
+        self.assertEqual(_image(figure.axes[0]).shape, (7, 53))
+        self.assertEqual(figure._chart_metadata["type"], "calendarheatmap")
+
+    def test_monday_start_places_each_date(self):
+        figure = calendar(date(2024, 1, 1), 10)
+        z = _image(figure.axes[0])
+        self.assertEqual(z[0, 0], 1)  # Mon Jan 1
+        self.assertEqual(z[6, 0], 7)  # Sun Jan 7
+        self.assertEqual(z[0, 1], 8)  # Mon Jan 8
+        self.assertEqual(z[2, 1], 10)  # Wed Jan 10
+
+    def test_sunday_start_places_each_date(self):
+        figure = calendar(date(2024, 1, 1), 10, week_start=WEEKDAY.SUNDAY)
+        z = _image(figure.axes[0])
+        self.assertTrue(np.isnan(z[0, 0]))  # Sun Dec 31 2023: outside the year
+        self.assertEqual(z[1, 0], 1)  # Mon Jan 1
+        self.assertEqual(z[0, 1], 7)  # Sun Jan 7
+        self.assertEqual(z[6, 0], 6)  # Sat Jan 6
+        self.assertEqual(z.shape, (7, 53))
+
+    def test_theme_week_start_is_the_default(self):
+        config.update_config({"plot_calendar_heatmap_week_start": WEEKDAY.SUNDAY})
+        figure = calendar(date(2024, 1, 1), 3)
+        self.assertEqual(_image(figure.axes[0])[1, 0], 1)
+        self.assertEqual(_tick_labels(figure.axes[0], "y")[0], "Sun")
+
+    def test_missing_days_and_none_values_are_blank(self):
+        dates = [date(2023, 1, 1), date(2023, 1, 3)]
+        figure = CalendarHeatmap({"date": dates, "value": [5, None]})
+        z = _image(figure.axes[0])
+        # 2023 starts on a Sunday: the six cells above it are outside the year
+        self.assertTrue(np.isnan(z[:6, 0]).all())
+        self.assertEqual(z[6, 0], 5)
+        self.assertTrue(np.isnan(z[0, 1]))  # Mon Jan 2: missing
+        self.assertTrue(np.isnan(z[1, 1]))  # Tue Jan 3: None
+        self.assertEqual(np.count_nonzero(~np.isnan(z)), 1)
+
+    def test_month_and_weekday_labels(self):
+        figure = calendar(date(2024, 1, 1), 3)
+        ax = figure.axes[0]
+        self.assertEqual(
+            _tick_labels(ax, "x"),
+            [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
+            ],
+        )
+        self.assertEqual(_tick_labels(ax, "y"), ["Mon", "Wed", "Fri", "Sun"])
+        self.assertEqual(list(ax.get_yticks()), [0, 2, 4, 6])
+        sunday = calendar(date(2024, 1, 1), 3, week_start=WEEKDAY.SUNDAY)
+        self.assertEqual(
+            _tick_labels(sunday.axes[0], "y"), ["Sun", "Tue", "Thu", "Sat"]
+        )
+
+    def test_label_toggles(self):
+        figure = calendar(
+            date(2024, 1, 1), 3, show_month_labels=False, show_weekday_labels=False
+        )
+        ax = figure.axes[0]
+        self.assertEqual(_tick_labels(ax, "x"), [])
+        self.assertEqual(_tick_labels(ax, "y"), [])
+        self.assertFalse(any(spine.get_visible() for spine in ax.spines.values()))
+
+    def test_month_separators_sit_between_months(self):
+        figure = calendar(date(2024, 1, 1), 3)
+        (lines,) = _month_lines(figure.axes[0])
+        self.assertEqual(len(lines.get_paths()), 11)
+        # a zero width draws none
+        bare = calendar(
+            date(2024, 1, 1), 3, style={"plot_calendar_heatmap_month_line_width": 0}
+        )
+        self.assertEqual(_month_lines(bare.axes[0]), [])
+
+    def test_values_print_only_on_dated_cells(self):
+        figure = calendar(date(2024, 1, 1), 4, show_values=True)
+        texts = [t.get_text() for t in figure.axes[0].texts]
+        self.assertEqual(texts, ["1", "2", "3", "4"])
+        fmt = calendar(
+            date(2024, 1, 1), 2, show_values=True, value_format=VALUE_FORMAT.DECIMAL
+        )
+        self.assertEqual([t.get_text() for t in fmt.axes[0].texts], ["1.0", "2.0"])
+
+    def test_theme_value_default_applies(self):
+        config.set_theme(THEME.MINIMAL)
+        figure = calendar(date(2024, 1, 1), 2)
+        self.assertEqual(len(figure.axes[0].texts), 2)
+
+    def test_colorbar_matches_heatmap(self):
+        figure = calendar(
+            date(2024, 1, 1),
+            5,
+            show_colorbars=True,
+            colorbar={"label": "Steps", "location": COLORBAR_LOCATION.BOTTOM},
+        )
+        bars = [ax for ax in _all_axes(figure) if ax.get_xlabel() == "Steps"]
+        self.assertEqual(len(bars), 1)
+        self.assertEqual(len(_all_axes(calendar(date(2024, 1, 1), 5))), 1)
+
+    def test_norm_and_range_apply(self):
+        figure = calendar(date(2024, 1, 1), 5, vmin=0, vmax=10, norm="log")
+        (image,) = figure.axes[0].images
+        self.assertEqual((image.norm.vmin, image.norm.vmax), (0, 10))
+        self.assertEqual(type(image.norm).__name__, "LogNorm")
+
+    def test_cmap_derives_from_the_heatmap_colormap(self):
+        config.set_theme(THEME.INK)
+        figure = calendar(date(2024, 1, 1), 5)
+        (image,) = figure.axes[0].images
+        self.assertIn("YlGnBu", image.get_cmap().name)
+        own = calendar(
+            date(2024, 1, 1), 5, style={"plot_calendar_heatmap_cmap": "Greys"}
+        )
+        self.assertIn("Greys", own.axes[0].images[0].get_cmap().name)
+
+    def test_every_theme_carries_the_calendar_keys(self):
+        self.assertIn("plot_calendar_heatmap_week_start", CALENDAR_KEYS)
+        for theme in THEMES:
+            config.set_theme(theme)
+            for key in CALENDAR_KEYS:
+                self.assertIn(key, config.config, f"{theme}: {key}")
+            figure = calendar(date(2024, 1, 1), 40, show_values=True)
+            self.assertEqual(len(figure.axes[0].images), 1)
+            plt.close(figure)
+
+    def test_hover_reports_the_date(self):
+        figure = calendar(date(2024, 1, 1), 3, subtitle="steps")
+        panel = figure._chart_metadata["panel"]
+        (layer,) = panel.layers
+        fig, ax = plt.subplots()
+        layer.draw(ax, panel_ctx())
+        ((image, resolver),) = layer.take_hover_targets()
+        self.assertEqual(
+            resolver((1, 0)), {"label": "steps", "date": "2024-01-02", "value": 2}
+        )
+        self.assertEqual(
+            resolver((6, 52)), {"label": "steps", "date": None, "value": None}
+        )
+
+
+class TestYearPanels(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+
+    def test_multi_year_draws_one_panel_per_year_in_order(self):
+        dates = days(date(2024, 12, 30), 5) + days(date(2022, 6, 1), 3)
+        figure = CalendarHeatmap({"date": dates, "value": list(range(8))})
+        self.assertEqual(len(figure.axes), 3)
+        self.assertEqual(
+            [ax.get_title() for ax in figure.axes], ["2022", "2024", "2025"]
+        )
+        self.assertEqual(figure._chart_metadata["shape"], (3, 1))
+        self.assertEqual(_image(figure.axes[1]).shape, (7, 53))
+        self.assertEqual(_image(figure.axes[2])[2, 0], 2)  # Wed Jan 1 2025
+
+    def test_subtitle_prefixes_the_year(self):
+        dates = days(date(2023, 12, 31), 2)
+        figure = CalendarHeatmap({"date": dates, "value": [1, 2]}, subtitle="steps")
+        self.assertEqual(
+            [ax.get_title() for ax in figure.axes], ["steps 2023", "steps 2024"]
+        )
+        single = calendar(date(2024, 1, 1), 2, subtitle="steps")
+        self.assertEqual(single.axes[0].get_title(), "")
+
+    def test_years_share_one_value_range(self):
+        dates = days(date(2023, 12, 31), 2)
+        figure = CalendarHeatmap({"date": dates, "value": [1, 9]})
+        norms = [ax.images[0].norm for ax in figure.axes]
+        self.assertEqual([(n.vmin, n.vmax) for n in norms], [(1, 9), (1, 9)])
+        pinned = CalendarHeatmap({"date": dates, "value": [1, 9]}, vmin=0, vmax=10)
+        norms = [ax.images[0].norm for ax in pinned.axes]
+        self.assertEqual([(n.vmin, n.vmax) for n in norms], [(0, 10), (0, 10)])
+
+    def test_year_filter_keeps_one_panel(self):
+        dates = days(date(2023, 12, 30), 4)
+        figure = CalendarHeatmap({"date": dates, "value": [1, 2, 3, 4]}, year=2024)
+        self.assertEqual(len(figure.axes), 1)
+        z = _image(figure.axes[0])
+        self.assertEqual(z[0, 0], 3)  # Mon Jan 1 2024
+        self.assertEqual(np.count_nonzero(~np.isnan(z)), 2)
+        self.assertNotIn("panels", figure._chart_metadata)
+
+    def test_missing_year_raises(self):
+        with self.assertRaises(ValueError) as cm:
+            calendar(date(2024, 1, 1), 3, year=2020)
+        self.assertIn("2020", str(cm.exception))
+
+    def test_datasets_each_split_into_their_years(self):
+        one = {"date": days(date(2023, 12, 31), 2), "value": [1, 2]}
+        two = {"date": days(date(2024, 5, 1), 2), "value": [3, 4]}
+        figure = CalendarHeatmap([one, two], subtitle=["a", "b"], max_cols=3)
+        self.assertEqual(
+            [ax.get_title() for ax in figure.axes], ["a 2023", "a 2024", "b"]
+        )
+        self.assertEqual(figure._chart_metadata["shape"], (1, 3))
+
+    def test_default_figure_is_wide_and_grows_per_calendar(self):
+        single = calendar(date(2024, 1, 1), 2)
+        double = CalendarHeatmap({"date": days(date(2023, 12, 31), 2), "value": [1, 2]})
+        w1, h1 = single.get_size_inches()
+        w2, h2 = double.get_size_inches()
+        self.assertEqual(w1, w2)
+        self.assertGreater(w1, h1)
+        self.assertGreater(h2, h1)
+
+
+class TestComposition(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+
+    def test_panel_rejects(self):
+        line = LineChart([{"x": 0, "y": 1}, {"x": 1, "y": 2}])
+        with self.assertRaisesRegex(ValueError, "Grid"):
+            Panel([calendar(date(2024, 1, 1), 3), line])
+
+    def test_grid_accepts_single_and_multi_year(self):
+        line = LineChart([{"x": 0, "y": 1}, {"x": 1, "y": 2}])
+        single = calendar(date(2024, 1, 1), 3, title="one")
+        multi = CalendarHeatmap({"date": days(date(2023, 12, 31), 2), "value": [1, 2]})
+        grid = Grid([[single, line], [multi]])
+        self.assertEqual(len(grid.axes), 4)
+        self.assertEqual(_image(grid.axes[0])[0, 0], 1)
+        self.assertEqual(grid.axes[0].get_title(), "one")
+        self.assertEqual(len(_month_lines(grid.axes[0])), 1)
+        titles = sorted(ax.get_title() for ax in grid.axes[2:])
+        self.assertEqual(titles, ["2023", "2024"])
+        self.assertFalse(any(s.get_visible() for s in grid.axes[0].spines.values()))
+
+
+def panel_ctx():
+    from datachart.utils._internal.layers import DrawContext
+
+    return DrawContext()
 
 
 if __name__ == "__main__":
