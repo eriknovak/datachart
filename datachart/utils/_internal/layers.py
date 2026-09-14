@@ -3068,6 +3068,15 @@ RAINCLOUD_OUTLIER_SIZE = 4
 INNER_QUARTILE_WIDTH_SCALE = 5.0
 
 
+def inner_line_marks(inner: str, values) -> list:
+    """The `(value, linestyle)` line marks of a median or quartiles inner."""
+
+    q1, median, q3 = np.percentile(np.asarray(values, dtype=float), [25, 50, 75])
+    if inner == VIOLIN_INNER.MEDIAN:
+        return [(median, "-")]
+    return [(q1, ":"), (median, "--"), (q3, ":")]
+
+
 class ViolinLayer(GroupLayer):
     """A per-label KDE body with inner marks drawn from the data."""
 
@@ -3256,9 +3265,7 @@ class ViolinLayer(GroupLayer):
                 lo_c, value, hi_c, value, linewidth=linewidth, linestyle=linestyle
             )
 
-        if self.inner == VIOLIN_INNER.MEDIAN:
-            return [span(median, "-")]
-        return [span(q1, ":"), span(median, "--"), span(q3, ":")]
+        return [span(v, style) for v, style in inner_line_marks(self.inner, values)]
 
     def _apply_violin_emphasis(self, artists: list, role: Optional[str]) -> None:
         if role is None:
@@ -3280,8 +3287,7 @@ class ViolinLayer(GroupLayer):
 
 # the points each ridge's density is evaluated on
 RIDGE_GRIDSIZE = 200
-# ridges stack in z from the violin body's level; every row's marks stay
-# below the swarm points' theme zorder so an overlaid swarm reads on top
+# rows stack in z from the violin body's level, below an overlaid swarm
 RIDGE_ZORDER = 2
 RIDGE_ZORDER_SPAN = 0.9
 
@@ -3426,14 +3432,8 @@ class RidgelineLayer(GroupLayer):
 
         if self.inner is None:
             return []
-        q1, median, q3 = np.percentile(np.asarray(values, dtype=float), [25, 50, 75])
-        marks = (
-            [(median, "-")]
-            if self.inner == VIOLIN_INNER.MEDIAN
-            else [(q1, ":"), (median, "--"), (q3, ":")]
-        )
         lines = []
-        for value, linestyle in marks:
+        for value, linestyle in inner_line_marks(self.inner, values):
             top = position - float(np.interp(value, grid, heights))
             xs, ys = [value, value], [position, top]
             lines.append(
