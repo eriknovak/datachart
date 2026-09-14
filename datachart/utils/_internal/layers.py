@@ -24,9 +24,9 @@ import matplotlib.dates as mdates
 from matplotlib import rc_context
 import matplotlib.ticker as mticker
 from matplotlib.ticker import MaxNLocator
-from matplotlib.collections import LineCollection, PathCollection
+from matplotlib.collections import LineCollection, PathCollection, PolyCollection
 from matplotlib.container import BarContainer
-from matplotlib.colors import LinearSegmentedColormap, to_hex, to_rgb
+from matplotlib.colors import LinearSegmentedColormap, to_hex, to_rgb, to_rgba
 from matplotlib.mlab import GaussianKDE
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
@@ -3079,6 +3079,8 @@ class HeatmapLayer(Layer):
         self.frame_width = config.get("axes_spines_width") or 0.8
         self._resolve_cell_values()
         x, y, self.z = self._grid()
+        self.cell_roles = heatmap_cell_roles(self.chart, self.z)
+        self.highlight_color = config["font_general_color"]
         self.date_axes = {
             axis
             for axis, labels in (("x", x), ("y", y))
@@ -3132,6 +3134,7 @@ class HeatmapLayer(Layer):
         )
         label = self.label(ctx)
         self.register_hover(im, lambda index: self._cell_datum(label, *index))
+        self._draw_cell_emphasis(ax)
 
         if self.show_cell_values:
             self._draw_cell_values(ax, im)
@@ -3169,6 +3172,36 @@ class HeatmapLayer(Layer):
                     font_style["color"] = "#FFFFFF"
                 ax.text(
                     j, i, self.cell_text(value), ha="center", va="center", **font_style
+                )
+
+    def _draw_cell_emphasis(self, ax) -> None:
+        """Veil the background cells and outline the highlighted ones (ADR 0045).
+
+        The veil lets the cell's own color through at the muted alpha, so a
+        muted cell still reads on the colormap; the outline takes the bolder
+        stroke a highlighted mark gets.
+        """
+
+        width = HIGHLIGHT_WIDTH_SCALE * max(
+            self.edge_style.get("linewidth") or 0, self.frame_width
+        )
+        for i, row in enumerate(self.cell_roles):
+            for j, role in enumerate(row):
+                if role is None:
+                    continue
+                background = role == EMPHASIS_BACKGROUND
+                ax.add_patch(
+                    Rectangle(
+                        (j - 0.5, i - 0.5),
+                        1,
+                        1,
+                        facecolor=self.muted_color if background else "none",
+                        alpha=1 - self.muted_alpha if background else None,
+                        edgecolor="none" if background else self.highlight_color,
+                        linewidth=0 if background else width,
+                        # outlines sit over the veils and borders, under values
+                        zorder=1 if background else 2,
+                    )
                 )
 
     def _draw_frame(self, ax) -> None:
@@ -3584,6 +3617,9 @@ class HexbinLayer(Layer):
         if self.gridsize is None:
             self.gridsize = get_attr_value("plot_hexbin_gridsize", self.style, config)
         self.mincnt = self.chart.get("mincnt")
+        # bins exist only once drawn, so the rule resolves in draw (ADR 0045)
+        self.emphasis_rule = validate_emphasis_rule(self.settings.get("emphasis_rule"))
+        self.highlight_color = config["font_general_color"]
         # counts need no reducer; `c` defaults to the mean
         self.reduce = None
         self.value_name = "count"
@@ -3650,10 +3686,13 @@ class HexbinLayer(Layer):
             **style,
         )
         label = self.label(ctx)
+        values = tiles.get_array()
+        if self.emphasis_rule is not None:
+            self._apply_bin_emphasis(ax, tiles, values)
 
         def resolve(index):
             cx, cy = tiles.get_offsets()[index[0]]
-            value = _scalar(tiles.get_array()[index[0]])
+            value = _scalar(values[index[0]])
             return {
                 "label": label,
                 "x": _scalar(cx),
@@ -3664,6 +3703,42 @@ class HexbinLayer(Layer):
         self.register_hover(tiles, resolve)
         if self.show_colorbars:
             _draw_colorbar(ax, tiles, self.colorbar, ctx.aspect_locked)
+
+    def _apply_bin_emphasis(self, ax, tiles, values) -> None:
+        """Veil the bins the rule rejects and outline the ones it picks.
+
+        The bin colors are fixed from the colormap first so the veil holds;
+        the outlines draw as their own collection so no neighbour covers them.
+        """
+
+        roles = emphasis_rule_roles(self.emphasis_rule, values)
+        tiles.autoscale_None()
+        background = np.array([role == EMPHASIS_BACKGROUND for role in roles])
+        faces = tiles.to_rgba(np.asarray(values))
+        muted = np.asarray(to_rgba(self.muted_color))
+        faces[background] = faces[background] * self.muted_alpha + muted * (
+            1 - self.muted_alpha
+        )
+        tiles.set_array(None)
+        tiles.set_facecolor(faces)
+
+        picked = ~background
+        if not picked.any():
+            return
+        width = HIGHLIGHT_WIDTH_SCALE * max(
+            float(np.max(tiles.get_linewidth())), config.get("axes_spines_width") or 0.8
+        )
+        outline = PolyCollection(
+            [tiles.get_paths()[0].vertices],
+            offsets=tiles.get_offsets()[picked],
+            offset_transform=tiles.get_offset_transform(),
+            facecolors="none",
+            edgecolors=self.highlight_color,
+            linewidths=width,
+            zorder=tiles.get_zorder() + EMPHASIS_Z_OFFSET[EMPHASIS_HIGHLIGHT],
+        )
+        outline.set_transform(tiles.get_transform())
+        ax.add_collection(outline, autolim=False)
 
 
 class ParallelCoordsLayer(Layer):
@@ -5950,8 +6025,11 @@ def _heatmap_units(charts: List[dict], settings: dict, by) -> tuple:
         roles = heatmap_cell_roles(chart, z)
         for i, row in enumerate(z):
             for j, value in enumerate(row):
-                value = math.nan if value is None else value
-                units.append((value, _fill_role(roles[i], j)))
+                # a blank cell draws nothing to mute
+                if value is None or math.isnan(value):
+                    units.append((math.nan, _keep_role))
+                else:
+                    units.append((value, _fill_role(roles[i], j)))
         filled.append({**chart, "data": {**chart["data"], "emphasis": roles}})
     return filled, units
 

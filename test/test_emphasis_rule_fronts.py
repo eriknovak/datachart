@@ -13,6 +13,8 @@ from datachart.charts import (
     Treemap,
     ViolinPlot,
     ContourChart,
+    Heatmap,
+    HexbinChart,
     Histogram,
     LineChart,
     NetworkChart,
@@ -280,3 +282,81 @@ class TestRecordFronts:
         rows = [dict(row, kind="x") for row in self.ROWS]
         with pytest.raises(ValueError, match="number"):
             ParallelCoords(rows, hue="kind", emphasis_rule={"top": 1})
+
+
+GRID = {"z": [[1.0, 5.0, None], [7.0, 2.0, 9.0]]}
+
+
+def cell_patches(figure):
+    """The (background, highlight) emphasis patches drawn over the cells."""
+    patches = [p for p in figure.axes[0].patches if p.get_zorder() in (1, 2)]
+    return (
+        sum(p.get_zorder() == 1 for p in patches),
+        sum(p.get_zorder() == 2 for p in patches),
+    )
+
+
+class TestCellFronts:
+    def test_heatmap_rule_roles_cells(self):
+        layer = layers(Heatmap(GRID, emphasis_rule={"above": 4}))[0]
+        assert layer.cell_roles == [[BG, HL, None], [HL, BG, HL]]
+
+    def test_heatmap_top_skips_blank_cells(self):
+        layer = layers(Heatmap(GRID, emphasis_rule={"bottom": 5}))[0]
+        assert layer.cell_roles == [[HL, HL, None], [HL, HL, HL]]
+
+    def test_heatmap_explicit_cell_role_wins(self):
+        grid = dict(GRID, emphasis=[[HL, None, None], [None, None, BG]])
+        layer = layers(Heatmap(grid, emphasis_rule={"top": 1}))[0]
+        assert layer.cell_roles == [[HL, BG, None], [BG, BG, BG]]
+
+    def test_heatmap_cell_roles_without_rule(self):
+        grid = dict(GRID, emphasis=[[BG, None, None], [None, HL, None]])
+        assert cell_patches(Heatmap(grid)) == (1, 1)
+
+    def test_heatmap_draws_veils_and_outlines(self):
+        assert cell_patches(Heatmap(GRID, emphasis_rule={"top": 2})) == (3, 2)
+
+    def test_heatmap_role_grid_shape_mismatch_raises(self):
+        grid = dict(GRID, emphasis=[[BG, None]])
+        with pytest.raises(ValueError, match="one role per cell"):
+            Heatmap(grid)
+
+    def test_heatmap_bad_cell_role_raises(self):
+        grid = dict(GRID, emphasis=[[BG, None, None], [None, "bold", None]])
+        with pytest.raises(ValueError, match="cell"):
+            Heatmap(grid)
+
+    def test_heatmap_rejects_by(self):
+        with pytest.raises(ValueError, match="`by`"):
+            Heatmap(GRID, emphasis_rule={"top": 1, "by": "max"})
+
+    def test_heatmap_input_is_not_mutated(self):
+        grid = {"z": [[1.0, 2.0]]}
+        Heatmap(grid, emphasis_rule={"top": 1})
+        assert grid == {"z": [[1.0, 2.0]]}
+
+    POINTS = {
+        "x": [0.0, 0.0, 0.0, 10.0, 10.0, 5.0],
+        "y": [0.0, 0.0, 0.0, 10.0, 10.0, 5.0],
+    }
+
+    def test_hexbin_rule_mutes_bins(self):
+        figure = HexbinChart(
+            self.POINTS, gridsize=5, mincnt=1, emphasis_rule={"top": 1}
+        )
+        tiles, outline = figure.axes[0].collections[:2]
+        assert len(tiles.get_offsets()) == 3
+        assert len(outline.get_offsets()) == 1
+        assert tiles.get_array() is None
+
+    def test_hexbin_hover_keeps_bin_values(self):
+        figure = HexbinChart(
+            self.POINTS, gridsize=5, mincnt=1, emphasis_rule={"top": 1}
+        )
+        ((_, resolve),) = figure._hover_targets
+        assert sorted(resolve([i])["count"] for i in range(3)) == [1.0, 2.0, 3.0]
+
+    def test_hexbin_rejects_by(self):
+        with pytest.raises(ValueError, match="`by`"):
+            HexbinChart(self.POINTS, emphasis_rule={"top": 1, "by": "max"})

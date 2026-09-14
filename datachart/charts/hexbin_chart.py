@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    EmphasisRuleAttrs,
     HexbinDataAttrs,
     HexbinStyleAttrs,
     ColorbarSettingAttrs,
@@ -38,6 +39,7 @@ def HexbinChart(
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: None = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     xmin: Optional[Union[int, float, datetime]] = None,
     xmax: Optional[Union[int, float, datetime]] = None,
@@ -133,6 +135,7 @@ def HexbinChart(
         The `label`, `location`, `format`, and `ticks` fields of the
         `colorbar` setting.
         The `vspans` and `hspans` reference bands.
+        The `emphasis_rule` parameter.
 
     Examples:
         >>> from datachart.charts import HexbinChart
@@ -157,6 +160,12 @@ def HexbinChart(
         emphasis: Not supported: a hexbin chart is a single colormapped layer
             with no series to mute or highlight. Passing a value raises
             `ValueError`.
+        emphasis_rule: A rule that highlights the bins matching it and mutes the
+            rest: `{"above": v}` or `{"below": v}` (strict),
+            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
+            `{"bottom": n}`, read against each bin's aggregated value (its
+            count, or `c` reduced by `reduce`). The rule takes no `by`. See
+            `EmphasisRuleAttrs`.
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -245,6 +254,7 @@ def HexbinChart(
 
     # Figure-level settings; None values resolve to defaults downstream
     settings = {
+        "emphasis_rule": emphasis_rule,
         "title": title,
         "xlabel": xlabel,
         "ylabel": ylabel,

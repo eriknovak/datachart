@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..typings import (
+    EmphasisRuleAttrs,
     LegendSettingAttrs,
     HeatmapDataAttrs,
     HeatmapStyleAttrs,
@@ -26,6 +27,7 @@ def Heatmap(
     ylabel: Optional[str] = None,
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: None = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     xmin: Optional[Union[int, float]] = None,
     xmax: Optional[Union[int, float]] = None,
@@ -84,6 +86,7 @@ def Heatmap(
         The `xticks_format` and `yticks_format` tick formats.
         The `legend` parameter, and the `label`, `location`, `format`, and
         `ticks` fields of the `colorbar` setting.
+        The `emphasis_rule` parameter and the per-cell `emphasis` grid of `data`.
 
     Examples:
         >>> from datachart.charts import Heatmap
@@ -109,13 +112,22 @@ def Heatmap(
             cells stay blank); `x` and `y` are optional tick labels for its
             columns and rows (any values, the indices by default). An
             explicit `xticks`/`xticklabels` (`yticks`/`yticklabels`)
-            overrides them.
+            overrides them. An optional `emphasis` grid aligned with `z`
+            gives a cell its own role: "background" veils it in the muted
+            color, "highlight" outlines it, None leaves it unchanged.
         title: The title of the chart.
         xlabel: The x-axis label.
         ylabel: The y-axis label.
         subtitle: The subtitle(s) for individual charts.
-        emphasis: Not supported: a heatmap is a single raster layer with no
-            series to mute or highlight. Passing a value raises `ValueError`.
+        emphasis: Not supported: a heatmap has no series to mute or
+            highlight; set per-cell roles through the `emphasis` grid of
+            `data`. Passing a value raises `ValueError`.
+        emphasis_rule: A rule that highlights the cells matching it and mutes
+            the rest: `{"above": v}` or `{"below": v}` (strict),
+            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
+            `{"bottom": n}`, read against each cell's value; a blank cell never
+            matches. A cell's role in the `emphasis` grid of `data` wins. The
+            rule takes no `by`. See `EmphasisRuleAttrs`.
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -160,8 +172,9 @@ def Heatmap(
     """
     if emphasis is not None:
         raise ValueError(
-            "Heatmap does not support `emphasis`: a heatmap is a single "
-            "raster layer with no series to mute or highlight."
+            "Heatmap does not support `emphasis`: a heatmap has no series to "
+            "mute or highlight. Set the `emphasis` grid on `data` for per-cell "
+            "roles instead."
         )
 
     if not all(
@@ -193,6 +206,7 @@ def Heatmap(
 
     # Figure-level settings; None values resolve to defaults downstream
     settings = {
+        "emphasis_rule": emphasis_rule,
         "title": title,
         "xlabel": xlabel,
         "ylabel": ylabel,
