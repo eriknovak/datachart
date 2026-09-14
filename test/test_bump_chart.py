@@ -197,11 +197,14 @@ class TestBumpChartDrawing(unittest.TestCase):
         starts = [t for t in ax.texts if t.get_ha() == "right"]
         self.assertEqual({t.xy[0] for t in starts}, {0})
 
-    def test_start_labels_push_the_rank_ticks_out(self):
-        plain = BumpChart(DATA, subtitle=NAMES)
-        start = BumpChart(DATA, subtitle=NAMES, label_position=LABEL_POSITION.START)
-        pad = lambda fig: fig.axes[0].yaxis.get_major_ticks()[0].get_pad()
-        self.assertGreater(pad(start), pad(plain))
+    def test_rank_axis_is_bare_and_x_keeps_its_ticks(self):
+        ax = BumpChart(DATA, subtitle=NAMES).axes[0]
+        self.assertFalse(ax.spines["left"].get_visible())
+        self.assertFalse(ax.spines["bottom"].get_visible())
+        ytick, xtick = ax.yaxis.get_major_ticks()[0], ax.xaxis.get_major_ticks()[0]
+        self.assertFalse(ytick.tick1line.get_visible())
+        self.assertFalse(ytick.label1.get_visible())
+        self.assertTrue(xtick.label1.get_visible())
 
     def test_legend_off_with_labels_and_on_without(self):
         self.assertIsNone(BumpChart(DATA, subtitle=NAMES).axes[0].get_legend())
@@ -304,6 +307,7 @@ class TestBumpChartComposition(unittest.TestCase):
         ax = fig.axes[0]
         self.assertFalse(ax.yaxis_inverted())
         self.assertGreaterEqual(ax.get_ylim()[1], 300)
+        self.assertTrue(ax.spines["left"].get_visible())
 
     def test_grid_cell_renders_the_bump_panel(self):
         fig = Grid([BumpChart(DATA, subtitle=NAMES), BumpChart(DATA, subtitle=NAMES)])

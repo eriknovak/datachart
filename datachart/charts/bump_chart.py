@@ -73,9 +73,6 @@ def BumpChart(
     ] = None,
     xticklabels: Optional[Union[List[str], List[List[str]]]] = None,
     xtickrotate: Optional[Union[int, List[Optional[int]]]] = None,
-    yticks: Optional[Union[List[int], List[List[int]]]] = None,
-    yticklabels: Optional[Union[List[str], List[List[str]]]] = None,
-    ytickrotate: Optional[Union[int, List[Optional[int]]]] = None,
     xticks_format: Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]] = None,
     vlines: Optional[
         Union[
@@ -117,9 +114,9 @@ def BumpChart(
 ) -> plt.Figure:
     """Creates the bump chart.
 
-    A bump chart shows rank over time: one line per series, rank 1 at the top
-    of an integer axis, a marker at every period, and the series named at the
-    line's end. Use it for league tables, popularity, or market-share rankings,
+    A bump chart shows rank over time: one line per series, rank 1 at the top,
+    a marker at every period, and the series named at the line's end in place
+    of a y-axis. Use it for league tables, popularity, or market-share rankings,
     where the order matters more than the gaps between values. For the values
     themselves use [`LineChart`][datachart.charts.LineChart]; for a single
     period's order use [`BarChart`][datachart.charts.BarChart] with `sort`.
@@ -199,9 +196,6 @@ def BumpChart(
         xticks: Custom x-axis tick positions.
         xticklabels: Custom x-axis tick labels.
         xtickrotate: Rotation angle for x-axis tick labels.
-        yticks: Custom rank tick positions.
-        yticklabels: Custom rank tick labels.
-        ytickrotate: Rotation angle for rank tick labels.
         xticks_format: The x-axis tick label format: a `DATE_FORMAT` member
             or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT`
             member or `"{x:.1f}"` style string.
@@ -225,9 +219,6 @@ def BumpChart(
         xticks=xticks,
         xticklabels=xticklabels,
         xtickrotate=xtickrotate,
-        yticks=yticks,
-        yticklabels=yticklabels,
-        ytickrotate=ytickrotate,
         vlines=vlines,
         hlines=hlines,
         vspans=vspans,

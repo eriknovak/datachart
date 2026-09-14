@@ -1872,14 +1872,6 @@ class BumpLayer(LineLayer):
             LABEL_POSITION.BOTH,
         )
 
-    def start_label_extent(self) -> float:
-        """The points a start label reaches left of the first mark; 0 without one."""
-
-        if not self._labels_at(LABEL_POSITION.START):
-            return 0.0
-        width, _ = _text_size(self.label_font["fontsize"], str(self.subtitle))
-        return width + _mark_radius(self.line_style) + self.label_padding
-
     def _draw_end_labels(self, ax, ctx, x, ranks, present, line_style, color):
         """Print the series name beside its first and/or last present point."""
 
@@ -7531,12 +7523,12 @@ class Panel:
         rank_ranges = [r for r in (l.y_range() for l in data_layers) if r is not None]
         rank_axis = rank_axis and bool(rank_ranges) and not bare and not polar
         if rank_axis:
+            # the end labels name the lines, so the rank axis carries no
+            # furniture; whole-rank ticks still place the grid lines
             ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-            # start labels sit where the rank tick labels would; push these out
-            extent = max(l.start_label_extent() for l in data_layers)
-            if extent:
-                pad = ax.yaxis.get_major_ticks()[0].get_pad()
-                ax.yaxis.set_tick_params(which="major", pad=pad + extent)
+            ax.tick_params(axis="y", which="both", left=False, labelleft=False)
+            for side in ("left", "bottom"):
+                ax.spines[side].set_visible(False)
             ax.set_ylim(0.5, max(r[1] for r in rank_ranges) + 0.5)
 
         # bar category ticks

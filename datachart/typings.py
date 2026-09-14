@@ -1435,9 +1435,6 @@ class BumpSingleChartAttrs(TypedDict):
         xticks (Union[int, float, None]): The xtick positions list.
         xticklabels (Union[List[str], None]): The xtick labels.
         xtickrotate (Union[int, None]): The xtick rotation value.
-        yticks (Union[int, float, None]): the ytick position list.
-        yticklabels (Union[List[str], None]): The ytick labels.
-        ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
@@ -1457,9 +1454,6 @@ class BumpSingleChartAttrs(TypedDict):
     xticks: Union[int, float, None]
     xticklabels: Union[List[str], None]
     xtickrotate: Union[int, None]
-    yticks: Union[int, float, None]
-    yticklabels: Union[List[str], None]
-    ytickrotate: Union[int, None]
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]

@@ -27,7 +27,9 @@ axis, and placing text at the line ends.
   period leaves a gap in its line and takes no rank there. Ranking reads the
   series of one figure: subplots rank across every series, and a `Panel` of
   two bump figures keeps each figure's own ranks.
-- **The y-axis is the rank.** Integer ticks only, rank 1 at the top.
+- **The y-axis is the rank, drawn bare.** Rank 1 at the top, one grid line
+  per whole rank, no y spine, ticks or tick labels: the end labels say which
+  line is which. The x spine is hidden too; its ticks stay.
 - **End labels are `show_labels: bool` plus `label_position`.** `show_labels`
   keeps the bool type `ContourChart` already gives it; `label_position` is a
   `LABEL_POSITION` member (`START`, `END` default, `BOTH`). A label prints
