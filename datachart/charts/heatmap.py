@@ -113,8 +113,8 @@ def Heatmap(
             columns and rows (any values, the indices by default). An
             explicit `xticks`/`xticklabels` (`yticks`/`yticklabels`)
             overrides them. An optional `emphasis` grid aligned with `z`
-            gives a cell its own role: "background" veils it in the muted
-            color, "highlight" outlines it, None leaves it unchanged.
+            gives a cell its own role: "background" fades it to the theme's
+            muted alpha, "highlight" outlines it, None leaves it unchanged.
         title: The title of the chart.
         xlabel: The x-axis label.
         ylabel: The y-axis label.

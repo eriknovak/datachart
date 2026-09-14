@@ -3638,6 +3638,7 @@ class HexbinLayer(Layer):
         # bins exist only once drawn, so the rule resolves in draw (ADR 0045)
         self.emphasis_rule = validate_emphasis_rule(self.settings.get("emphasis_rule"))
         self.highlight_color = config["font_general_color"]
+        self.frame_width = config.get("axes_spines_width") or 0.8
         # counts need no reducer; `c` defaults to the mean
         self.reduce = None
         self.value_name = "count"
@@ -3730,10 +3731,13 @@ class HexbinLayer(Layer):
         collection so no neighbour covers them.
         """
 
-        roles = emphasis_rule_roles(self.emphasis_rule, values)
+        values = np.asarray(values, dtype=float)
+        # an empty count bin holds no points to rank, so it never matches
+        ranked = np.where(values == 0, np.nan, values) if self.c is None else values
+        roles = emphasis_rule_roles(self.emphasis_rule, ranked)
         background = np.array([role == EMPHASIS_BACKGROUND for role in roles])
         tiles.autoscale_None()
-        faces = tiles.to_rgba(np.asarray(values))
+        faces = tiles.to_rgba(values)
         alpha = tiles.get_alpha()
         faces[:, 3] = 1.0 if alpha is None else alpha
         faces[background, 3] *= self.muted_alpha
@@ -3745,7 +3749,7 @@ class HexbinLayer(Layer):
         if not picked.any():
             return
         width = HIGHLIGHT_WIDTH_SCALE * max(
-            float(np.max(tiles.get_linewidth())), config.get("axes_spines_width") or 0.8
+            float(np.max(tiles.get_linewidth())), self.frame_width
         )
         outline = PolyCollection(
             [tiles.get_paths()[0].vertices],
@@ -6053,8 +6057,7 @@ def _heatmap_units(charts: List[dict], settings: dict, by) -> tuple:
     return filled, units
 
 
-# per front: the units a rule selects, and the default `by` of the fronts that
-# summarise a group or series (ADR 0045); hexbin resolves at draw time
+# per front: a rule's unit builder and default `by` (ADR 0045)
 EMPHASIS_RULE_UNITS = {
     "barchart": (_bar_units, None),
     "pyramidchart": (_bar_units, None),

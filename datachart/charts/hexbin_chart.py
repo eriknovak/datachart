@@ -164,8 +164,9 @@ def HexbinChart(
             rest: `{"above": v}` or `{"below": v}` (strict),
             `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
             `{"bottom": n}`, read against each bin's aggregated value (its
-            count, or `c` reduced by `reduce`). The rule takes no `by`. See
-            `EmphasisRuleAttrs`.
+            count, or `c` reduced by `reduce`). Bins exist only once drawn, so a
+            count ranks the bins of each chart on its own, and an empty bin
+            never matches. The rule takes no `by`. See `EmphasisRuleAttrs`.
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.

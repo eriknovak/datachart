@@ -359,6 +359,14 @@ class TestCellFronts:
         ((_, resolve),) = figure._hover_targets
         assert sorted(resolve([i])["count"] for i in range(3)) == [1.0, 2.0, 3.0]
 
+    def test_hexbin_bottom_skips_empty_bins(self):
+        figure = HexbinChart(self.POINTS, gridsize=5, emphasis_rule={"bottom": 1})
+        tiles, outline = figure.axes[0].collections[:2]
+        ((_, resolve),) = figure._hover_targets
+        offsets = [tuple(o) for o in tiles.get_offsets()]
+        (picked,) = [tuple(o) for o in outline.get_offsets()]
+        assert resolve([offsets.index(picked)])["count"] == 1.0
+
     def test_hexbin_rejects_by(self):
         with pytest.raises(ValueError, match="`by`"):
             HexbinChart(self.POINTS, emphasis_rule={"top": 1, "by": "max"})
