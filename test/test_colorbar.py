@@ -240,6 +240,25 @@ class TestColorbarRendering(unittest.TestCase):
                 self.assertFalse(bar.overlaps(ticks))
                 plt.close(figure)
 
+    def test_locked_bar_tick_labels_stay_inside_the_figure(self):
+        wide = [[z * 100000.0 for z in row] for row in Z]
+        for location in ("right", "left", "top", "bottom"):
+            for label in (None, "Value"):
+                with self.subTest(location=location, label=label):
+                    figure = Heatmap(
+                        data={"z": wide},
+                        show_colorbars=True,
+                        colorbar={"location": location, "label": label},
+                        aspect_ratio="equal",
+                        figsize=(3, 3),
+                    )
+                    colorbar = colorbar_of(figure)
+                    renderer = figure.canvas.get_renderer()
+                    bar = colorbar.ax.get_tightbbox(renderer)
+                    self.assertTrue(figure.bbox.contains(bar.x0, bar.y0))
+                    self.assertTrue(figure.bbox.contains(bar.x1, bar.y1))
+                    plt.close(figure)
+
     def test_grid_cell_keeps_label_and_edge(self):
         source = FRONTS["heatmap"](
             colorbar={"label": "Count", "location": "bottom", "format": "{x:.2f}"}

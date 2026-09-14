@@ -3046,10 +3046,9 @@ def _place_colorbar(ax: plt.Axes, mappable, setting: dict, aspect_locked: bool):
     cax = make_axes_locatable(ax).append_axes(
         location, size=f"{COLORBAR_FRACTION:.0%}", pad=pad
     )
-    if crosses_ticks or setting["label"]:
-        # the layout engine reserves room for a child axes, not a divider axes
-        ax.figure.delaxes(cax)
-        ax.add_child_axes(cax)
+    # the layout engine reserves room for a child axes, not a divider axes
+    ax.figure.delaxes(cax)
+    ax.add_child_axes(cax)
     kwargs = {"orientation": orientation}
     if location == COLORBAR_LOCATION.LEFT:
         # a left bar reads outward; the other edges keep matplotlib's tick side
