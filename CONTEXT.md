@@ -235,6 +235,49 @@ lowest first). A series absent at a period leaves a gap and is not ranked
 there. Overlayable in `Panel` like a line chart.
 _Avoid_: rank chart, slope chart (two periods only), ranking line chart
 
+**Gantt chart**:
+A schedule (`GanttChart`): one horizontal range bar per task from its `start`
+to its `end` on a temporal value axis, one row per task on the category axis.
+Always horizontal; a bare figure — `Grid` yes, `Panel` rejects it.
+_Avoid_: timeline chart, schedule chart, range bar chart
+
+**Task**:
+One record of a gantt chart: a `task` name (its row label), a `start` and an
+`end` (real temporal objects, never strings), and optionally a `group`, a
+`progress` fraction, and the names it `depends_on`.
+_Avoid_: activity, job, bar (for the record)
+
+**Task group**:
+The `group` a task belongs to: tasks of one group share a colour and a legend
+entry, and `sort_by="group"` clusters their rows together, groups ordered by
+their earliest start.
+_Avoid_: resource, category (for the key), swimlane
+
+**Dependency**:
+A task named in another task's `depends_on`, drawn under `show_dependencies`
+as an arrow from the dependency's end to the dependent's start.
+_Avoid_: predecessor, link, edge (for the arrow)
+
+**Today line**:
+The vertical reference line a gantt chart draws at `today` (the current date
+by default) under `show_today`, labelled by `today_label`.
+_Avoid_: now line, current-date marker
+
+**Milestone**:
+A task whose `end` equals its `start`, drawn as a marker instead of a bar.
+_Avoid_: event, zero-duration task
+
+**Group header**:
+Under `show_group_headers`, the row above a task group's rows naming the group,
+with its summary bar from the group's first start to its last end.
+_Avoid_: swimlane header, parent task
+
+**Date period**:
+The calendar unit (`period`: day, week, month, quarter, year) a date axis is
+divided into: edge lines, a label centred in each period, and a row naming the
+enclosing month or year.
+_Avoid_: time bucket, date bin
+
 **End label**:
 A series' label (its `subtitle`) printed beside its first and/or last point in the series
 color (`show_labels`, with `label_position` a `LABEL_POSITION` member), so the

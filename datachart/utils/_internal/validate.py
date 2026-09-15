@@ -11,6 +11,7 @@ from numbers import Real
 
 from typing import List, Optional
 
+import matplotlib.dates as mdates
 import numpy as np
 
 from ...constants import (
@@ -18,7 +19,11 @@ from ...constants import (
     BANDWIDTH,
     BASELINE,
     DATE_FORMAT,
+    DATE_PERIOD,
     EMPHASIS,
+    GANTT_ARROW_ENTRY,
+    GANTT_SORT_KEY,
+    GANTT_VALUE,
     LABEL_POSITION,
     NODE_LABEL_POSITION,
     NETWORK_LAYOUT,
@@ -231,8 +236,8 @@ def validate_shared_x(columns) -> None:
             )
 
 
-def validate_axis_kinds(kinds) -> Optional[str]:
-    """The one axis kind the layers' x columns ask for; a temporal/numeric mix raises.
+def validate_axis_kinds(kinds, column: str = "`x`") -> Optional[str]:
+    """The one axis kind the layers' `column` asks for; a temporal/numeric mix raises.
 
     Kinds are the `AXIS_*` values, or None for a layer without x. Time wins
     over category positions, which sit on their own index.
@@ -241,7 +246,7 @@ def validate_axis_kinds(kinds) -> Optional[str]:
     present = {kind for kind in kinds if kind is not None}
     if {AXIS_TEMPORAL, AXIS_NUMERIC} <= present:
         raise ValueError(
-            "Cannot mix temporal and numeric `x` values in one panel. "
+            f"Cannot mix temporal and numeric {column} values in one panel. "
             "Every chart sharing an axis must give datetimes or numbers, not both."
         )
     for kind in (AXIS_TEMPORAL, AXIS_NUMERIC, AXIS_CATEGORICAL):
@@ -775,3 +780,156 @@ def validate_week_start(value):
             f"Invalid `week_start` value {value!r}. Must be one of {WEEK_STARTS} or None."
         )
     return value
+
+
+GANTT_VALUES = (GANTT_VALUE.DURATION, GANTT_VALUE.PROGRESS)
+GANTT_SORT_KEYS = (GANTT_SORT_KEY.START, GANTT_SORT_KEY.GROUP)
+GANTT_ARROW_ENTRIES = (GANTT_ARROW_ENTRY.TOP, GANTT_ARROW_ENTRY.LEFT)
+DATE_PERIODS = (
+    DATE_PERIOD.DAY,
+    DATE_PERIOD.WEEK,
+    DATE_PERIOD.MONTH,
+    DATE_PERIOD.QUARTER,
+    DATE_PERIOD.YEAR,
+)
+
+
+def validate_date_period(value):
+    """Validate a date axis period; None keeps the concise date ticks."""
+
+    if value is not None and value not in DATE_PERIODS:
+        raise ValueError(
+            f"Invalid `period` value {value!r}. Must be one of {DATE_PERIODS} or None."
+        )
+    return value
+
+
+def validate_gantt_arrow_entry(value):
+    """Validate a dependency arrow entry; None enters from the top."""
+
+    if value is None:
+        return GANTT_ARROW_ENTRY.DEFAULT
+    if value not in GANTT_ARROW_ENTRIES:
+        raise ValueError(
+            f"Invalid `plot_gantt_dependency_entry` value {value!r}. "
+            f"Must be one of {GANTT_ARROW_ENTRIES} or None."
+        )
+    return value
+
+
+def validate_gantt_show_values(value):
+    """Validate a gantt value label; None or False prints none."""
+
+    if value is None or value is False:
+        return None
+    if value not in GANTT_VALUES:
+        raise ValueError(
+            f"Invalid `show_values` value {value!r}. "
+            f"Must be one of {GANTT_VALUES} or None."
+        )
+    return value
+
+
+def validate_gantt_sort_by(sort, sort_by) -> str:
+    """Validate a gantt sort key; None means by start."""
+
+    if sort_by is None:
+        return GANTT_SORT_KEY.DEFAULT
+    if sort_by not in GANTT_SORT_KEYS:
+        raise ValueError(
+            f"Invalid `sort_by` value {sort_by!r}. "
+            f"Must be one of {GANTT_SORT_KEYS} or None."
+        )
+    if sort is None:
+        raise ValueError("`sort_by` names the key to sort by; pass `sort` as well.")
+    return sort_by
+
+
+def _task_time(record: dict, key: str, index: int) -> float:
+    """A task's `start` or `end` as a date number; a non-temporal value raises."""
+
+    value = record.get(key)
+    # a datetime is a date; pandas Timestamps are datetimes
+    if not isinstance(value, (date, np.datetime64)):
+        raise ValueError(
+            f"Invalid `{key}` value {value!r} in task record {index}. Must be "
+            f"{CALENDAR_DATE_TYPES} objects; date strings are never parsed."
+        )
+    return float(mdates.date2num(value))
+
+
+def validate_gantt_tasks(records) -> None:
+    """Raise unless `records` is a list of well-formed, consistent task records.
+
+    Each record names a unique `task`, a temporal `start` and `end` with the
+    end never before the start, an optional `progress` in [0, 1], and a
+    `depends_on` list naming only tasks of the same chart.
+    """
+
+    if not isinstance(records, list) or not records:
+        raise ValueError(
+            "GanttChart `data` must be a non-empty list of task records "
+            "`{task, start, end}`, or a list of such lists."
+        )
+    names = set()
+    for index, record in enumerate(records):
+        if not isinstance(record, dict) or not isinstance(record.get("task"), str):
+            raise ValueError(
+                f"Task record {index} must be a dict with a string `task` name; "
+                f"got {record!r}."
+            )
+        name = record["task"]
+        if name in names:
+            raise ValueError(
+                f"Duplicate task name {name!r}. Every task names one row; "
+                "give each task a unique name."
+            )
+        names.add(name)
+        start = _task_time(record, "start", index)
+        end = _task_time(record, "end", index)
+        if end < start:
+            raise ValueError(
+                f"Task {name!r} ends before it starts: `end` {record['end']!r} "
+                f"is before `start` {record['start']!r}."
+            )
+        progress = record.get("progress")
+        if progress is not None and (
+            not _is_number(progress) or not 0 <= progress <= 1
+        ):
+            raise ValueError(
+                f"Invalid `progress` value {progress!r} for task {name!r}. "
+                "Must be a number in [0, 1] or None."
+            )
+        validate_emphasis(record.get("emphasis"), f"task {name!r} `emphasis`")
+    for record in records:
+        depends_on = record.get("depends_on")
+        if depends_on is None:
+            continue
+        if not isinstance(depends_on, list):
+            raise ValueError(
+                f"`depends_on` of task {record['task']!r} must be a list of task "
+                f"names; got {depends_on!r}."
+            )
+        for dependency in depends_on:
+            if dependency not in names:
+                raise ValueError(
+                    f"Task {record['task']!r} depends on unknown task "
+                    f"{dependency!r}. `depends_on` names tasks of the same chart."
+                )
+
+
+def validate_gantt_groups(records, sort_by, show_group_headers=False) -> None:
+    """Raise when rows cluster by group but no task carries a `group`."""
+
+    if any(record.get("group") is not None for record in records):
+        return
+    if sort_by == GANTT_SORT_KEY.GROUP:
+        raise ValueError(
+            '`sort_by="group"` clusters the rows by task group, but no task '
+            "carries a `group` key."
+        )
+    if show_group_headers:
+        raise ValueError(
+            "`show_group_headers` draws a header per task group, but no task "
+            "carries a `group` key."
+        )

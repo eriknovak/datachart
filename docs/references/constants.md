@@ -133,6 +133,22 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.GANTT_VALUE
+    options:
+        heading_level: 3
+
+::: datachart.constants.GANTT_SORT_KEY
+    options:
+        heading_level: 3
+
+::: datachart.constants.GANTT_ARROW_ENTRY
+    options:
+        heading_level: 3
+
+::: datachart.constants.DATE_PERIOD
+    options:
+        heading_level: 3
+
 ::: datachart.constants.NODE_LABEL_POSITION
     options:
         heading_level: 3

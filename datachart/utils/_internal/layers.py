@@ -22,7 +22,9 @@ from typing import Callable, List, NamedTuple, Optional, Union
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import matplotlib.dates as mdates
+from matplotlib.font_manager import FontProperties
 from matplotlib import rc_context
 import matplotlib.ticker as mticker
 from matplotlib.ticker import MaxNLocator
@@ -71,6 +73,10 @@ from .validate import (
     validate_line_curve,
     validate_rank_by,
     validate_emphasis_rule,
+    validate_date_period,
+    validate_gantt_arrow_entry,
+    validate_gantt_show_values,
+    validate_gantt_sort_by,
     validate_log_values,
     validate_overlap,
     validate_ridge_marks,
@@ -104,6 +110,7 @@ from .config_helpers import (
     get_grid_style,
     get_line_style,
     get_bar_style,
+    get_gantt_style,
     get_hist_style,
     get_legend_panel_settings,
     expand_legend_location,
@@ -154,10 +161,15 @@ from ...constants import (
     BASELINE,
     COLORBAR_LOCATION,
     DATE_FORMAT,
+    DATE_PERIOD,
     DIRECTION,
     CONTOUR_LEVELS,
     HEXBIN_REDUCE,
     EMPHASIS,
+    FONT_WEIGHT,
+    GANTT_ARROW_ENTRY,
+    GANTT_SORT_KEY,
+    GANTT_VALUE,
     HISTOGRAM_TYPE,
     LEGEND_LOCATION,
     LABEL_POSITION,
@@ -558,6 +570,143 @@ def _tick_formatter(fmt, temporal: bool, locator=None, tz=None):
     if _auto_format(fmt):
         return None
     return mticker.FuncFormatter(lambda value, _pos: _format_value(fmt, value))
+
+
+# a period's labels, and the enclosing period named in the row beneath
+DATE_PERIOD_LABELS = {
+    DATE_PERIOD.DAY: "%d",
+    DATE_PERIOD.WEEK: "W%V",
+    DATE_PERIOD.MONTH: "%b",
+    DATE_PERIOD.QUARTER: None,
+    DATE_PERIOD.YEAR: "%Y",
+}
+DATE_PERIOD_PARENT = {
+    DATE_PERIOD.DAY: DATE_PERIOD.MONTH,
+    DATE_PERIOD.WEEK: DATE_PERIOD.MONTH,
+    DATE_PERIOD.MONTH: DATE_PERIOD.YEAR,
+    DATE_PERIOD.QUARTER: DATE_PERIOD.YEAR,
+    DATE_PERIOD.YEAR: None,
+}
+DATE_PARENT_LABELS = {DATE_PERIOD.MONTH: "%b %Y", DATE_PERIOD.YEAR: "%Y"}
+# the longest period of each kind in days, to reach the edges beyond the view
+DATE_PERIOD_SPAN = {
+    DATE_PERIOD.DAY: 1,
+    DATE_PERIOD.WEEK: 7,
+    DATE_PERIOD.MONTH: 31,
+    DATE_PERIOD.QUARTER: 92,
+    DATE_PERIOD.YEAR: 366,
+}
+# a period cut to under this share of the widest visible one is unlabelled
+DATE_PERIOD_MIN_SHARE = 0.2
+# the parent row sits this many label heights below the period row
+DATE_PARENT_ROW_SPACING = 1.6
+
+
+def _period_edges(period: str, tz=None) -> mdates.DateLocator:
+    """The locator of a period's first instants: its edges on the axis."""
+
+    if period == DATE_PERIOD.DAY:
+        return mdates.DayLocator(tz=tz)
+    if period == DATE_PERIOD.WEEK:
+        return mdates.WeekdayLocator(byweekday=mdates.MO, tz=tz)
+    if period == DATE_PERIOD.MONTH:
+        return mdates.MonthLocator(tz=tz)
+    if period == DATE_PERIOD.QUARTER:
+        return mdates.MonthLocator(bymonth=(1, 4, 7, 10), tz=tz)
+    return mdates.YearLocator(tz=tz)
+
+
+class PeriodCentres(mticker.Locator):
+    """Ticks at the centre of each period's visible part, one per period.
+
+    A period cut by the view is centred on what remains of it, so a wide
+    period (a year over a few months) keeps its label.
+    """
+
+    def __init__(self, edges: mdates.DateLocator, span: float):
+        self.edges = edges
+        self.span = span
+
+    def __call__(self):
+        low, high = sorted(self.axis.get_view_interval())
+        self.edges.set_axis(self.axis)
+        edges = self.edges.tick_values(
+            mdates.num2date(low - self.span), mdates.num2date(high + self.span)
+        )
+        edges = np.unique(np.clip(np.asarray(edges, dtype=float), low, high))
+        widths = np.diff(edges)
+        # a sliver of a period at the view's edge has no room for its label
+        keep = widths >= widths.max() * DATE_PERIOD_MIN_SHARE if len(widths) else []
+        return list(((edges[:-1] + edges[1:]) / 2)[keep])
+
+
+def _period_formatter(period: str, fmt, tz=None) -> mticker.FuncFormatter:
+    """A period's label at its centre: the format given, else the period's own."""
+
+    def label(value, _pos=None):
+        moment = mdates.num2date(value, tz=tz)
+        if not _auto_format(fmt):
+            return moment.strftime(fmt)
+        if period == DATE_PERIOD.QUARTER:
+            return f"Q{(moment.month - 1) // 3 + 1}"
+        return moment.strftime(DATE_PERIOD_LABELS[period])
+
+    return mticker.FuncFormatter(label)
+
+
+def _apply_date_period(ax, axis_name: str, period: str, fmt, tz=None) -> None:
+    """Divide a date axis into calendar periods (ADR 0049).
+
+    Minor ticks mark the period edges and carry the grid lines; major ticks
+    label each period at its centre. The enclosing period names its span in
+    a row beneath, drawn on a secondary axis offset by one label row.
+    """
+
+    axis = getattr(ax, f"{axis_name}axis")
+    axis.set_minor_locator(_period_edges(period, tz))
+    axis.set_minor_formatter(mticker.NullFormatter())
+    axis.set_major_locator(
+        PeriodCentres(_period_edges(period, tz), DATE_PERIOD_SPAN[period])
+    )
+    axis.set_major_formatter(_period_formatter(period, fmt, tz))
+    params = axis.get_tick_params(which="major")
+    # the edge marks take the major tick look the furniture gave the axis
+    edge_marks = {k: params[k] for k in ("length", "width", "color") if k in params}
+    edge_marks.setdefault("length", mpl.rcParams[f"{axis_name}tick.major.size"])
+    axis.set_tick_params(which="minor", **edge_marks)
+    axis.set_tick_params(which="major", length=0)
+
+    parent = DATE_PERIOD_PARENT[period]
+    if parent is None:
+        return
+    size = params.get("labelsize", mpl.rcParams[f"{axis_name}tick.labelsize"])
+    size = FontProperties(size=size).get_size_in_points()
+    location = "bottom" if axis_name == "x" else "left"
+    secondary = (
+        ax.secondary_xaxis(location)
+        if axis_name == "x"
+        else ax.secondary_yaxis(location)
+    )
+    other = getattr(secondary, f"{axis_name}axis")
+    other.set_major_locator(
+        PeriodCentres(_period_edges(parent, tz), DATE_PERIOD_SPAN[parent])
+    )
+    other.set_major_formatter(
+        mticker.FuncFormatter(
+            lambda value, _pos=None: mdates.num2date(value, tz=tz).strftime(
+                DATE_PARENT_LABELS[parent]
+            )
+        )
+    )
+    other.set_tick_params(
+        length=0,
+        pad=params.get("pad", mpl.rcParams[f"{axis_name}tick.major.pad"])
+        + size * DATE_PARENT_ROW_SPACING,
+        labelsize=size,
+        **({"labelcolor": params["labelcolor"]} if "labelcolor" in params else {}),
+    )
+    for spine in secondary.spines.values():
+        spine.set_visible(False)
 
 
 def _normalize_sizes(sizes: np.ndarray, size_range: tuple) -> np.ndarray:
@@ -1398,6 +1547,14 @@ class Layer:
         if self.labels() is not None:
             return AXIS_CATEGORICAL
         return axis_kind(self.x_values())
+
+    def value_kind(self) -> Optional[str]:
+        """The kind of axis the layer's value column asks for; None by default.
+
+        Only a layer that plots time along its value axis reports one (ADR 0049).
+        """
+
+        return None
 
     def date_label_axes(self) -> set:
         """The drawn axes ("x", "y") whose category labels are dates."""
@@ -2372,6 +2529,554 @@ class BarLayer(Layer):
             )
 
 
+# the gantt value labels print whole days and whole percents by default
+GANTT_DURATION_FORMAT = "{x:.0f}d"
+GANTT_PROGRESS_FORMAT = VALUE_FORMAT.PERCENT_INT
+# the dependency arrow head, in points, and the elbow it bends through
+GANTT_ARROW_SCALE = 8
+GANTT_ARROW_CONNECTION = "angle,angleA=0,angleB=90,rad=0"
+GANTT_ARROW_FROM_LEFT = "angle,angleA=90,angleB=0,rad=0"
+# a milestone prints its date as the day and month unless a format is set
+GANTT_MILESTONE_FORMAT = "%d %b"
+GANTT_MILESTONE_Z_OFFSET = 0.2
+# the today label sits this many points off the foot of its line
+GANTT_TODAY_LABEL_OFFSET = 3
+# the progress bar darkens the task color by this much toward black
+GANTT_PROGRESS_DARKEN = 0.35
+# the progress bar sits just above its task bar
+GANTT_PROGRESS_Z_OFFSET = 0.1
+
+
+def _darken(color, amount: float) -> str:
+    """The color moved `amount` (0–1) of the way to black."""
+
+    return to_hex(tuple(c * (1 - amount) for c in to_rgb(color)))
+
+
+def gantt_tasks(chart: dict) -> list:
+    """The chart's task records, in drawing order."""
+
+    data = chart.get("data")
+    if not isinstance(data, list):
+        return []
+    return [record for record in data if isinstance(record, dict)]
+
+
+def gantt_durations(tasks: list) -> np.ndarray:
+    """Each task's duration in days, from its temporal `start` and `end`."""
+
+    if not tasks:
+        return np.array([], dtype=float)
+    starts = to_date_numbers([task["start"] for task in tasks])
+    ends = to_date_numbers([task["end"] for task in tasks])
+    return ends - starts
+
+
+def _gantt_cluster(tasks: list, index: int):
+    """The row cluster of a task: its group, or the task alone without one."""
+
+    group = tasks[index].get("group")
+    return ("task", index) if group is None else group
+
+
+def sort_gantt_charts(charts: List[dict], settings: dict) -> List[dict]:
+    """The charts with their task rows in `sort` order by `sort_by` (ADR 0049).
+
+    By start, every row orders by its start; by group, rows cluster by group,
+    groups ordered by their earliest start and tasks within a group by start.
+    A task without a group forms its own cluster. Ties keep input order.
+    """
+
+    sort = validate_sort(settings.get("sort"))
+    sort_by = validate_gantt_sort_by(sort, settings.get("sort_by"))
+    if sort is None:
+        return charts
+
+    sign = -1 if sort == SORT.DESCENDING else 1
+    sorted_charts = []
+    for chart in charts:
+        tasks = gantt_tasks(chart)
+        if not tasks:
+            sorted_charts.append(chart)
+            continue
+        starts = to_date_numbers([task["start"] for task in tasks])
+        if sort_by == GANTT_SORT_KEY.GROUP:
+            earliest = {}
+            for index in range(len(tasks)):
+                key = _gantt_cluster(tasks, index)
+                earliest[key] = min(earliest.get(key, starts[index]), starts[index])
+            order = sorted(
+                range(len(tasks)),
+                key=lambda i: (
+                    sign * earliest[_gantt_cluster(tasks, i)],
+                    sign * starts[i],
+                ),
+            )
+            # a group's rows stay contiguous even when two groups start together
+            clusters = {}
+            for i in order:
+                clusters.setdefault(_gantt_cluster(tasks, i), []).append(i)
+            order = [i for cluster in clusters.values() for i in cluster]
+        else:
+            order = sorted(range(len(tasks)), key=lambda i: sign * starts[i])
+        sorted_charts.append({**chart, "data": [tasks[i] for i in order]})
+    return sorted_charts
+
+
+class GanttLayer(BarLayer):
+    """One range bar per task over a temporal value axis (ADR 0049).
+
+    Draws on the bar layer's geometry: `barh` with each bar's left edge at
+    the task start and its width the duration, through the panel's slotting.
+    """
+
+    kind = "gantt"
+
+    def _resolve_style(self):
+        self.is_horizontal = True
+        self.is_pyramid = False
+        self.show_yerr = False
+        self.log_offset = 0
+        self.gantt_style = get_gantt_style(self.style)
+        bar_keys = ("color", "alpha", "hatch", "linewidth", "edgecolor", "zorder")
+        self.bar_style = {k: v for k, v in self.gantt_style.items() if k in bar_keys}
+        self.arrow_entry = validate_gantt_arrow_entry(
+            self.gantt_style.get("dependency_entry")
+        )
+        self.show_headers = bool(self.settings.get("show_group_headers"))
+        tasks = gantt_tasks(self.chart)
+        if self.show_headers:
+            # a header stands over its whole group, so the group's rows cluster
+            clusters = {}
+            for index in range(len(tasks)):
+                clusters.setdefault(_gantt_cluster(tasks, index), []).append(index)
+            tasks = [tasks[i] for cluster in clusters.values() for i in cluster]
+        self.tasks = tasks
+        times = [t["start"] for t in tasks] + [t["end"] for t in tasks]
+        self.x_tz = _column_tz(times)
+        self.starts = (
+            to_date_numbers([t["start"] for t in tasks])
+            if tasks
+            else np.array([], dtype=float)
+        )
+        self.durations = gantt_durations(tasks)
+        self.milestones = self.durations == 0
+        # the front validated the task records, their roles included
+        self.record_roles = [t.get("emphasis") for t in tasks]
+        self.value_mode = validate_gantt_show_values(self.settings.get("show_values"))
+        self._resolve_value_labels()
+        self.show_values = self.value_mode is not None
+        if self.settings.get("value_format") is None:
+            self.value_format = (
+                GANTT_PROGRESS_FORMAT
+                if self.value_mode == GANTT_VALUE.PROGRESS
+                else GANTT_DURATION_FORMAT
+            )
+        self.milestone_format = self.settings.get("xticks_format")
+        if _auto_format(self.milestone_format):
+            self.milestone_format = GANTT_MILESTONE_FORMAT
+        self.show_dependencies = bool(self.settings.get("show_dependencies"))
+        # the bars of the last draw stand for their groups in the legend
+        self._task_patches = []
+
+        # one color and hatch per task group, in first-seen order
+        groups = []
+        for task in tasks:
+            if task.get("group") is not None and task["group"] not in groups:
+                groups.append(task["group"])
+        self.groups = groups
+        cycle = (
+            create_color_cycle(config["color_general_multiple"], len(groups))
+            if groups
+            else None
+        )
+        hatches = config.get("plot_hatch_cycle") or []
+        self.group_colors = {g: cycle[i]["color"] for i, g in enumerate(groups)}
+        self.group_hatches = {
+            g: hatches[i % len(hatches)] or None
+            for i, g in enumerate(groups)
+            if hatches
+        }
+        self._layout_rows()
+
+        self.today = None
+        self.today_label = None
+        if self.settings.get("show_today"):
+            today = self.settings.get("today") or date.today()
+            self.today = float(to_date_numbers([today])[0])
+            self.today_label = self.settings.get("today_label")
+            line_style = get_vline_style(
+                {
+                    "plot_vline_color": self.gantt_style.get("today_color"),
+                    "plot_vline_style": self.gantt_style.get("today_style"),
+                    "plot_vline_width": self.gantt_style.get("today_width"),
+                    "plot_vline_alpha": self.gantt_style.get("today_alpha"),
+                }
+            )
+            self.vlines = [({"x": today}, line_style)] + self.vlines
+
+    def _layout_rows(self) -> None:
+        """Place the task rows, and under headers each group's header row.
+
+        A header row sits over its group's tasks and a gap of
+        `plot_gantt_group_gap` rows opens before every header but the first.
+        """
+
+        self.rows = np.arange(len(self.tasks), dtype=float)
+        self.header_rows = []
+        self.tick_rows = list(self.rows)
+        self.tick_labels = [t["task"] for t in self.tasks]
+        if not self.show_headers:
+            return
+        gap = self.gantt_style.get("group_gap", 0.0)
+        position = 0.0
+        ticks, labels, current = [], [], object()
+        for index, task in enumerate(self.tasks):
+            group = task.get("group")
+            if group is not None and group != current:
+                if index > 0:
+                    position += gap
+                self.header_rows.append((group, position))
+                ticks.append(position)
+                labels.append(str(group))
+                position += 1
+            current = group
+            self.rows[index] = position
+            ticks.append(position)
+            labels.append(task["task"])
+            position += 1
+        self.tick_rows, self.tick_labels = ticks, labels
+
+    def apply_row_ticks(self, ax) -> None:
+        """Label the task rows; group header labels print bold."""
+
+        ax.set_yticks(self.tick_rows, self.tick_labels)
+        ax.yaxis.set_major_locator(mticker.FixedLocator(self.tick_rows))
+        ax.set_yticklabels(self.tick_labels, rotation=self.chart.get("ytickrotate", 0))
+        headers = {position for _, position in self.header_rows}
+        for position, label in zip(self.tick_rows, ax.get_yticklabels()):
+            if position in headers:
+                label.set_fontweight(FONT_WEIGHT.BOLD)
+
+    def labels(self) -> Optional[np.ndarray]:
+        if not self.tasks:
+            return None
+        return np.array([t["task"] for t in self.tasks], dtype=object)
+
+    def y_values(self) -> Optional[np.ndarray]:
+        return self.durations if self.tasks else None
+
+    def value_data(self):
+        # time is never on a log scale; durations are derived
+        return None
+
+    def value_kind(self) -> Optional[str]:
+        return AXIS_TEMPORAL if self.tasks else None
+
+    def y_range(self):
+        if not self.tasks:
+            return None
+        return (
+            float(np.min(self.starts)),
+            float(np.max(self.starts + self.durations)),
+        )
+
+    @property
+    def bar_width(self) -> float:
+        return self.gantt_style.get("height", config["plot_gantt_bar_height"])
+
+    def task_color(self, task: dict, ctx_color: Optional[str]) -> Optional[str]:
+        """The task's fill: an explicit bar color, its group's, or the layer's."""
+
+        if "color" in self.bar_style:
+            return self.bar_style["color"]
+        return self.group_colors.get(task.get("group"), ctx_color)
+
+    def legend_handles(self):
+        """One key per task group; a group whose every task is muted stays out."""
+
+        if not self.groups:
+            return None
+        handles = []
+        for group in self.groups:
+            members = [
+                (role, patch, milestone)
+                for task, role, patch, milestone in zip(
+                    self.tasks, self.record_roles, self._task_patches, self.milestones
+                )
+                if task.get("group") == group
+            ]
+            if all(role == EMPHASIS_BACKGROUND for role, _, _ in members):
+                continue
+            # the group's first unmuted bar, so the key shows its hatch and etch
+            patch = next(
+                (
+                    patch
+                    for role, patch, milestone in members
+                    if role != EMPHASIS_BACKGROUND and not milestone
+                ),
+                None,
+            )
+            handle = Patch(facecolor=self.task_color({"group": group}, None))
+            if patch is not None:
+                handle.update_from(patch)
+            handle.set_label(str(group))
+            handles.append(handle)
+        return handles
+
+    def draw(self, ax, ctx):
+        if not self.tasks:
+            return
+
+        bar_style = dict(self.bar_style)
+        bar_style.pop("color", None)
+        if ctx.z_order is not None:
+            bar_style["zorder"] = ctx.z_order
+        if ctx.alpha is not None:
+            bar_style["alpha"] = ctx.alpha
+        if not self.groups:
+            _apply_cycle_hatch(bar_style, ctx)
+        colors = [self.task_color(task, ctx.color) for task in self.tasks]
+        self._apply_emphasis(bar_style, ctx.emphasis)
+        if "color" in bar_style:
+            colors = [bar_style.pop("color")] * len(self.tasks)
+
+        rows = self.rows
+        slot = ctx.bar_slot
+        height = self.bar_width
+        if slot is not None:
+            rows = rows + slot.offset
+            height = slot.width if slot.width is not None else height
+
+        bars = ax.barh(
+            rows,
+            self.durations,
+            left=self.starts,
+            height=height,
+            color=colors,
+            label=NO_LEGEND if self.groups else self.label(ctx),
+            **bar_style,
+        )
+        for patch, task, milestone in zip(bars.patches, self.tasks, self.milestones):
+            hatch = self.group_hatches.get(task.get("group"))
+            if hatch and "hatch" not in bar_style:
+                patch.set_hatch(hatch)
+            # a milestone is a marker, not a bar
+            patch.set_visible(not milestone)
+        roles = self._record_roles(ctx.emphasis, len(bars))
+        self._task_patches = bars.patches
+        self._draw_progress(ax, rows, height, colors, bar_style, roles)
+        self._draw_summaries(ax, bar_style, ctx)
+        self._draw_milestones(ax, rows, colors, bar_style, roles)
+        self._etch(bars.patches)
+        self._apply_patch_emphasis(bars.patches, roles)
+        self._name_legend_patch(bars, roles)
+        self.register_hover(bars, self._task_resolver(self.label(ctx)))
+
+        # date ticks come from the locator, so the rotation applies to the axis
+        rotation = self.chart.get("xtickrotate")
+        if rotation:
+            ax.xaxis.set_tick_params(labelrotation=rotation)
+
+        if self.show_dependencies:
+            self._draw_dependencies(ax, rows, height, ctx)
+        if self.today_label:
+            self._draw_today_label(ax)
+
+        if self.show_values and ctx.emphasis != EMPHASIS_BACKGROUND:
+            self._label_bars(
+                ax,
+                bars,
+                labels=[
+                    (
+                        ""
+                        if role == EMPHASIS_BACKGROUND or milestone
+                        else self._value_text(i)
+                    )
+                    for i, (role, milestone) in enumerate(zip(roles, self.milestones))
+                ],
+                stacked=False,
+            )
+
+    def _draw_progress(self, ax, rows, height, colors, bar_style, roles):
+        """The inner bars over each task's done fraction."""
+
+        indices = [
+            i
+            for i, t in enumerate(self.tasks)
+            if t.get("progress") is not None and not self.milestones[i]
+        ]
+        if not indices:
+            return
+        style = self.gantt_style
+        fraction = np.array([self.tasks[i]["progress"] for i in indices], dtype=float)
+        progress_color = style.get("progress_color")
+        bars = ax.barh(
+            rows[indices],
+            self.durations[indices] * fraction,
+            left=self.starts[indices],
+            height=height
+            * style.get("progress_height", config["plot_gantt_progress_height"]),
+            color=[
+                progress_color or _darken(colors[i], GANTT_PROGRESS_DARKEN)
+                for i in indices
+            ],
+            alpha=style.get("progress_alpha"),
+            linewidth=0,
+            zorder=bar_style.get("zorder", 0) + GANTT_PROGRESS_Z_OFFSET,
+            label=NO_LEGEND,
+        )
+        self._etch(bars.patches)
+        self._apply_patch_emphasis(bars.patches, [roles[i] for i in indices])
+
+    def _draw_summaries(self, ax, bar_style, ctx) -> None:
+        """A bar over each group header, from the group's first start to its last end."""
+
+        style = self.gantt_style
+        for group, position in self.header_rows:
+            members = [i for i, t in enumerate(self.tasks) if t.get("group") == group]
+            start = float(np.min(self.starts[members]))
+            end = float(np.max(self.starts[members] + self.durations[members]))
+            muted = ctx.emphasis == EMPHASIS_BACKGROUND or all(
+                self.record_roles[i] == EMPHASIS_BACKGROUND for i in members
+            )
+            color = style.get("summary_color") or self.task_color(
+                {"group": group}, None
+            )
+            ax.barh(
+                position,
+                end - start,
+                left=start,
+                height=style.get("summary_height"),
+                color=self.muted_color if muted else color,
+                alpha=self.muted_alpha if muted else None,
+                linewidth=0,
+                zorder=bar_style.get("zorder", 0),
+                label=NO_LEGEND,
+            )
+
+    def _draw_milestones(self, ax, rows, colors, bar_style, roles) -> None:
+        """A marker at each milestone; under value labels, its date beside it."""
+
+        style = self.gantt_style
+        size = style.get("milestone_size")
+        for i in np.flatnonzero(self.milestones):
+            muted = roles[i] == EMPHASIS_BACKGROUND
+            ax.plot(
+                [self.starts[i]],
+                [rows[i]],
+                linestyle="none",
+                marker=style.get("milestone_marker"),
+                markersize=size,
+                color=self.muted_color if muted else colors[i],
+                markeredgecolor=bar_style.get("edgecolor"),
+                markeredgewidth=bar_style.get("linewidth"),
+                alpha=self.muted_alpha if muted else None,
+                zorder=bar_style.get("zorder", 0) + GANTT_MILESTONE_Z_OFFSET,
+                label=NO_LEGEND,
+            )
+            if self.show_values and not muted:
+                ax.annotate(
+                    date_labels([self.tasks[i]["start"]], self.milestone_format)[0],
+                    (self.starts[i], rows[i]),
+                    xytext=(size / 2 + self.value_padding, 0),
+                    textcoords="offset points",
+                    ha="left",
+                    va="center",
+                    zorder=TEXT_ANNOTATION_ZORDER,
+                    **self.value_font,
+                )
+
+    def _draw_dependencies(self, ax, rows, height, ctx) -> None:
+        """An elbow arrow from each dependency's end to the dependent's start.
+
+        Entering from the top, the arrow runs along the dependency's row and
+        turns onto the dependent bar; from the left, it drops from the
+        dependency's end and turns into the dependent bar's start.
+        """
+
+        style = self.gantt_style
+        color = style.get("dependency_color")
+        if ctx.emphasis == EMPHASIS_BACKGROUND:
+            color = self.muted_color
+        # a milestone's marker, not its row centre, is where an arrow stops
+        clearance = style.get("milestone_size", 0) / 2
+        position = {task["task"]: i for i, task in enumerate(self.tasks)}
+        for j, task in enumerate(self.tasks):
+            for name in task.get("depends_on") or []:
+                i = position[name]
+                # with no room before the dependent's start, it enters from the top
+                from_left = (
+                    self.arrow_entry == GANTT_ARROW_ENTRY.LEFT
+                    and self.starts[j] > self.starts[i] + self.durations[i]
+                )
+                # the facing edge of a bar, toward the other task's row
+                toward = height / 2 if rows[j] > rows[i] else -height / 2
+                start_edge = 0.0 if self.milestones[i] or not from_left else toward
+                end_edge = 0.0 if self.milestones[j] or from_left else -toward
+                ax.add_patch(
+                    FancyArrowPatch(
+                        (self.starts[i] + self.durations[i], rows[i] + start_edge),
+                        (self.starts[j], rows[j] + end_edge),
+                        arrowstyle=style.get("dependency_style"),
+                        connectionstyle=(
+                            GANTT_ARROW_FROM_LEFT
+                            if from_left
+                            else GANTT_ARROW_CONNECTION
+                        ),
+                        mutation_scale=GANTT_ARROW_SCALE,
+                        color=color,
+                        linewidth=style.get("dependency_width"),
+                        shrinkA=clearance if self.milestones[i] else 0,
+                        shrinkB=clearance if self.milestones[j] else 0,
+                        zorder=style.get("dependency_zorder"),
+                    )
+                )
+
+    def _draw_today_label(self, ax) -> None:
+        """The today line's label, at the foot of the line."""
+
+        ax.annotate(
+            self.today_label,
+            (self.today, 0),
+            xycoords=ax.get_xaxis_transform(),
+            xytext=(GANTT_TODAY_LABEL_OFFSET, GANTT_TODAY_LABEL_OFFSET),
+            textcoords="offset points",
+            ha="left",
+            va="bottom",
+            zorder=TEXT_ANNOTATION_ZORDER,
+            **{**self.value_font, "color": self.gantt_style.get("today_color")},
+        )
+
+    def _value_text(self, index: int) -> str:
+        """The bar's value label: its duration in days or its progress."""
+
+        if self.value_mode == GANTT_VALUE.PROGRESS:
+            progress = self.tasks[index].get("progress")
+            return (
+                "" if progress is None else _format_value(self.value_format, progress)
+            )
+        return _format_value(self.value_format, float(self.durations[index]))
+
+    def _task_resolver(self, label) -> Callable[[int], dict]:
+        """The hover datum of a task bar: its name, span, duration and progress."""
+
+        def resolve(index: int) -> dict:
+            task = self.tasks[index]
+            datum = {
+                "label": label,
+                "task": task["task"],
+                "start": task["start"],
+                "end": task["end"],
+                "duration": f"{self.durations[index]:g} days",
+            }
+            if task.get("progress") is not None:
+                datum["progress"] = f"{task['progress']:.0%}"
+            return datum
+
+        return resolve
+
+
 class HistogramLayer(Layer):
     kind = "histogram"
     labels_past_mark = True
@@ -2734,7 +3439,11 @@ class ScatterLayer(PointLabelMixin, Layer):
 
             color = base_style.get("c", base_style.get("color"))
             collection = scatter(
-                x_data, y_data, s=sizes, label=self.label(ctx), **_hollow_marker(base_style)
+                x_data,
+                y_data,
+                s=sizes,
+                label=self.label(ctx),
+                **_hollow_marker(base_style),
             )
             self._mark_legend_size(collection, size_data)
             self.register_hover(
@@ -3937,7 +4646,9 @@ class HeatmapLayer(Layer):
 
         im.autoscale_None()
         values = np.asarray(self.z, dtype=float)
-        steps = value_steps(im.norm(np.ma.masked_invalid(values)), len(self.value_etch_steps))
+        steps = value_steps(
+            im.norm(np.ma.masked_invalid(values)), len(self.value_etch_steps)
+        )
         rows, cols = np.indices(values.shape)
         squares = np.array([[-0.5, -0.5], [0.5, -0.5], [0.5, 0.5], [-0.5, 0.5]])
 
@@ -4397,7 +5108,8 @@ class ContourLayer(Layer):
 
         def band_paths(mask):
             return PathCollection(
-                [paths[i] for i in np.flatnonzero(mask)], transform=bands.get_transform()
+                [paths[i] for i in np.flatnonzero(mask)],
+                transform=bands.get_transform(),
             )
 
         self._draw_value_steps(ax, steps, band_paths, bands.get_zorder())
@@ -5452,7 +6164,9 @@ def _path_seed(*arrays) -> int:
 
     digest = hashlib.md5()
     for array in arrays:
-        digest.update(np.ascontiguousarray(np.asarray(array, dtype=np.float32)).tobytes())
+        digest.update(
+            np.ascontiguousarray(np.asarray(array, dtype=np.float32)).tobytes()
+        )
     return int(digest.hexdigest()[:8], 16)
 
 
@@ -5525,7 +6239,9 @@ def _dash_runs(s: np.ndarray, offset: float, dashes: list) -> list:
     period = sum(dashes)
     if period <= 0:
         return [np.arange(len(s))]
-    on = np.searchsorted(np.cumsum(dashes), np.mod(s + offset, period), "right") % 2 == 0
+    on = (
+        np.searchsorted(np.cumsum(dashes), np.mod(s + offset, period), "right") % 2 == 0
+    )
     edges = np.flatnonzero(np.diff(np.concatenate([[0], on.astype(int), [0]])))
     return [np.arange(a, b) for a, b in zip(edges[::2], edges[1::2]) if b - a >= 2]
 
@@ -5586,7 +6302,12 @@ class InkStroke(patheffects.AbstractPathEffect):
             grain = np.random.default_rng(int(phases[1] * 1e6)).normal(
                 0, self.noise, len(s)
             )
-            profile = profile * (1 + np.convolve(grain, np.ones(INK_GRAIN_WINDOW) / INK_GRAIN_WINDOW, "same"))
+            profile = profile * (
+                1
+                + np.convolve(
+                    grain, np.ones(INK_GRAIN_WINDOW) / INK_GRAIN_WINDOW, "same"
+                )
+            )
         if self.swell or self.noise:
             profile = np.clip(profile, INK_STROKE_PRESSURE_FLOOR, None)
         edge = np.minimum(s - s[0], s[-1] - s)
@@ -5621,7 +6342,9 @@ class InkStroke(patheffects.AbstractPathEffect):
             0, 2 * np.pi, 2
         )
         offset, dashes = gc.get_dashes()
-        dashes = None if dashes is None else [renderer.points_to_pixels(v) for v in dashes]
+        dashes = (
+            None if dashes is None else [renderer.points_to_pixels(v) for v in dashes]
+        )
         offset = renderer.points_to_pixels(offset or 0)
         with _derived_gc(renderer, gc, linewidth=0.0, dashes=(0, None)) as fill:
             if rgbFace is not None:
@@ -5711,7 +6434,9 @@ class Etch(patheffects.AbstractPathEffect):
         starts, ends = [], []
         for angle in ETCH_ANGLES.get(char, (45,)):
             offsets = np.arange(-diagonal / 2, diagonal / 2, spacing)
-            offsets = offsets + rng.uniform(-self.jitter, self.jitter, len(offsets)) * spacing
+            offsets = (
+                offsets + rng.uniform(-self.jitter, self.jitter, len(offsets)) * spacing
+            )
             angles = np.radians(
                 angle + rng.uniform(-self.angle_jitter, self.angle_jitter, len(offsets))
             )
@@ -7148,7 +7873,9 @@ class NetworkLayer(Layer):
         # one scatter per marker: a scatter draws a single shape
         for marker, hollow in dict.fromkeys(self.node_markers):
             ks = [
-                k for k, entry in enumerate(self.node_markers) if entry == (marker, hollow)
+                k
+                for k, entry in enumerate(self.node_markers)
+                if entry == (marker, hollow)
             ]
             look = {
                 "c": [face[k] for k in ks],
@@ -7228,6 +7955,7 @@ LAYER_TYPES = {
     "treemap": TreemapLayer,
     "networkchart": NetworkLayer,
     "calendarheatmap": CalendarHeatmapLayer,
+    "ganttchart": GanttLayer,
 }
 
 RADIAL_LAYER_TYPES = {
@@ -7413,6 +8141,23 @@ def _bar_units(charts: List[dict], settings: dict, by) -> tuple:
     return filled, units
 
 
+def _gantt_units(charts: List[dict], settings: dict, by) -> tuple:
+    """One unit per task record, reading its duration in days (ADR 0049)."""
+
+    filled, units = [], []
+    for chart in charts:
+        data = [
+            {"emphasis": None, **r} if isinstance(r, dict) else r for r in chart["data"]
+        ]
+        tasks = gantt_tasks({"data": data})
+        units += [
+            (days, _fill_role(task, "emphasis"))
+            for task, days in zip(tasks, gantt_durations(tasks))
+        ]
+        filled.append({**chart, "data": data})
+    return filled, units
+
+
 def _series_units(column: str) -> Callable:
     """The unit builder of a per-series front: each chart, by its `column`."""
 
@@ -7553,6 +8298,7 @@ EMPHASIS_RULE_UNITS = {
     "scatterchart": (_series_units("y"), "mean"),
     "stackedareachart": (_series_units("y"), "mean"),
     "bumpchart": (_series_units("y"), "mean"),
+    "ganttchart": (_gantt_units, None),
     "histogram": (_series_units("x"), "mean"),
     "contourchart": (_series_units("z"), "mean"),
 }
@@ -7598,6 +8344,8 @@ def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[La
     ):
         # the rule breaks ties on input order, so it runs before the sort
         charts = apply_emphasis_rule(chart_type, charts, settings)
+    if chart_type == "ganttchart":
+        charts = sort_gantt_charts(charts, settings)
     if bar_records:
         charts = _sort_bar_charts(
             charts,
@@ -8026,6 +8774,9 @@ class Panel:
         self.settings = settings or {}
         # the axis kind is snapshotted at build, like the furniture (ADR 0037)
         self.x_kind = validate_axis_kinds([l.x_kind() for l in self.layers])
+        self.value_kind = validate_axis_kinds(
+            [l.value_kind() for l in self.layers], "value-axis"
+        )
         self.temporal_axis = self._temporal_axis()
         self.date_axes = self._date_axes()
         for axis in ("x", "y"):
@@ -8040,9 +8791,11 @@ class Panel:
     def _temporal_axis(self) -> Optional[str]:
         """The drawn axis ("x" or "y") that holds time; None when neither does."""
 
-        if self.x_kind != AXIS_TEMPORAL:
-            return None
-        return "y" if self.horizontal else "x"
+        if self.x_kind == AXIS_TEMPORAL:
+            return "y" if self.horizontal else "x"
+        if self.value_kind == AXIS_TEMPORAL:
+            return "x" if self.horizontal else "y"
+        return None
 
     def _date_axes(self) -> set:
         """The drawn axes whose ticks read as dates, by position or by label."""
@@ -8703,6 +9456,12 @@ class Panel:
         if s.get("show_grid") and not bare:
             ax.grid(axis=s["show_grid"], **s.get("grid_style", {}))
             ax.set_axisbelow(True)
+        if s.get("date_period") and self.temporal_axis and not bare:
+            # period edges are the minor ticks; the labelled centres draw no line
+            axis = getattr(ax, f"{self.temporal_axis}axis")
+            axis.grid(False, which="major")
+            axis.grid(True, which="minor", **s.get("grid_style", {}))
+            ax.set_axisbelow(True)
         if polar:
             # the r-value labels are redrawn above the marks in
             # _apply_radial_furniture
@@ -8827,7 +9586,9 @@ class Panel:
             ax.invert_yaxis()
         # the first ridge row reads at the top; overlaid groups follow (ADR 0047)
         ridges = any(isinstance(l, RidgelineLayer) for l in layers)
-        if ridges and horizontal and not bare and not ax.yaxis_inverted():
+        # the first task row reads at the top too (ADR 0049)
+        gantt = any(isinstance(l, GanttLayer) for l in layers)
+        if (ridges or gantt) and horizontal and not bare and not ax.yaxis_inverted():
             ax.invert_yaxis()
         if ax_right is not None and (
             s.get("ymin_right") is not None or s.get("ymax_right") is not None
@@ -8968,6 +9729,9 @@ class Panel:
             for target in [ax] + ([ax_right] if ax_right is not None else []):
                 for label in target.get_xticklabels() + target.get_yticklabels():
                     label.set_fontfamily(family)
+            # a date period's parent row lives on a secondary axes
+            for child in ax.child_axes:
+                child.tick_params(labelfontfamily=family)
             legend = top_ax.get_legend()
             if legend is not None:
                 for text in legend.get_texts():
@@ -9064,6 +9828,13 @@ class Panel:
                 tz = units if isinstance(units, tzinfo) else None
                 if tz is None:
                     tz = next((l.x_tz for l in self.layers if l.x_tz), None)
+                period = s.get("date_period")
+                if period is not None:
+                    _apply_date_period(ax, axis_name, period, fmt, tz)
+                    labelers[f"{axis_name}axis"] = lambda ticks, fmt=fmt: date_labels(
+                        ticks, fmt
+                    )
+                    continue
                 locator = mdates.AutoDateLocator(tz=tz)
                 axis.set_major_locator(locator)
             formatter = _tick_formatter(fmt, temporal, locator, tz)
@@ -9129,6 +9900,11 @@ class Panel:
             ax.xaxis.set_tick_params(labelrotation=rotation)
 
     def _apply_bar_ticks(self, ax, bar_ticks, bar_layers) -> None:
+        gantt = next((l for l in bar_layers if isinstance(l, GanttLayer)), None)
+        if gantt is not None:
+            # task rows skip the header and gap rows, so they place themselves
+            gantt.apply_row_ticks(ax)
+            return
         # the widest layer supplies the labels when category counts differ
         layer = max(bar_layers, key=lambda l: len(l.labels()))
         labels = layer.labels()
@@ -9388,6 +10164,7 @@ def build_chart_panel_settings(
         "ymin": settings.get("ymin"),
         "ymax": settings.get("ymax"),
         "xticks_format": settings.get("xticks_format"),
+        "date_period": validate_date_period(settings.get("period")),
         "yticks_format": settings.get("yticks_format"),
         "aspect_ratio": (
             ASPECT_RATIO.AUTO

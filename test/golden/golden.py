@@ -39,6 +39,7 @@ from datachart.charts import (
     HexbinChart,
     StackedAreaChart,
     BumpChart,
+    GanttChart,
     SankeyChart,
     Treemap,
     NetworkChart,
@@ -283,6 +284,13 @@ EXPECTED_CHANGES = {
     "bump_both_curve",
     "bump_rule_top",
     "bump_panel",
+    # new gantt chart cases (ADR 0049)
+    "gantt_basic",
+    "gantt_grouped_progress",
+    "gantt_dependencies_today",
+    "gantt_grid",
+    "gantt_week_headers_milestone",
+    "gantt_month_left_arrows",
 }
 
 
@@ -886,7 +894,13 @@ def theme_quill_heatmap_steps():
 def theme_quill_contour_relief():
     config.set_theme(THEME.QUILL)
     grid = np.linspace(-2, 2, 40)
-    z = [[float(np.exp(-(a * a + b * b)) - 0.5 * np.exp(-((a - 1) ** 2 + b * b))) for a in grid] for b in grid]
+    z = [
+        [
+            float(np.exp(-(a * a + b * b)) - 0.5 * np.exp(-((a - 1) ** 2 + b * b)))
+            for a in grid
+        ]
+        for b in grid
+    ]
     return ContourChart(
         data={"x": list(grid), "y": list(grid), "z": z},
         filled=True,
@@ -1976,6 +1990,130 @@ def bump_panel():
             ),
         ],
         title="Panel",
+    )
+
+
+GANTT_START = date(2024, 3, 4)
+
+
+def gantt_tasks(offset=0):
+    """A small release plan: (task, group, start day, days, progress, depends_on)."""
+
+    plan = [
+        ("Scope", "Plan", 0, 6, 1.0, []),
+        ("Design", "Plan", 4, 12, 0.8, ["Scope"]),
+        ("Backend", "Build", 14, 24, 0.5, ["Design"]),
+        ("Frontend", "Build", 18, 20, 0.3, ["Design"]),
+        ("QA", "Ship", 38, 10, None, ["Backend", "Frontend"]),
+        ("Launch", "Ship", 48, 3, None, ["QA"]),
+    ]
+    tasks = []
+    for name, group, start, days, progress, depends_on in plan:
+        begin = GANTT_START + timedelta(days=start + offset)
+        record = {
+            "task": name,
+            "start": begin,
+            "end": begin + timedelta(days=days),
+            "group": group,
+            "depends_on": depends_on,
+        }
+        if progress is not None:
+            record["progress"] = progress
+        tasks.append(record)
+    return tasks
+
+
+def without(records, *keys):
+    return [{k: v for k, v in r.items() if k not in keys} for r in records]
+
+
+@case
+def gantt_basic():
+    return GanttChart(
+        without(gantt_tasks(), "group", "progress", "depends_on"),
+        title="Release plan",
+        xlabel="Date",
+    )
+
+
+@case
+def gantt_grouped_progress():
+    return GanttChart(
+        without(gantt_tasks(), "depends_on"),
+        sort=SORT.ASCENDING,
+        sort_by="group",
+        show_values="progress",
+        title="Grouped with progress",
+    )
+
+
+@case
+def gantt_dependencies_today():
+    return GanttChart(
+        gantt_tasks(),
+        show_dependencies=True,
+        show_today=True,
+        today=date(2024, 3, 30),
+        show_values="duration",
+        emphasis_rule={"above": 11},
+        xticks_format=DATE_FORMAT.ISO,
+        xtickrotate=30,
+        title="Dependencies and today",
+    )
+
+
+def gantt_with_milestone():
+    tasks = gantt_tasks()
+    tasks.append(
+        {
+            "task": "Beta",
+            "start": date(2024, 4, 12),
+            "end": date(2024, 4, 12),
+            "group": "Ship",
+            "depends_on": ["QA"],
+        }
+    )
+    return tasks
+
+
+@case
+def gantt_week_headers_milestone():
+    return GanttChart(
+        gantt_with_milestone(),
+        period="week",
+        show_group_headers=True,
+        show_values="duration",
+        show_today=True,
+        today=date(2024, 3, 30),
+        today_label="Today",
+        title="Weeks, headers, milestone",
+    )
+
+
+@case
+def gantt_month_left_arrows():
+    return GanttChart(
+        gantt_with_milestone(),
+        period="month",
+        show_dependencies=True,
+        style={"plot_gantt_dependency_entry": "left"},
+        title="Months, arrows from the left",
+    )
+
+
+@case
+def gantt_grid():
+    return Grid(
+        [
+            [
+                GanttChart(gantt_tasks(), title="Plan"),
+                GanttChart(
+                    without(gantt_tasks(offset=7), "progress"),
+                    show_dependencies=True,
+                    title="Actual",
+                ),
+            ]
+        ]
     )
 
 

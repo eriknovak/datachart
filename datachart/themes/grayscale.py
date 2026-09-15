@@ -37,6 +37,8 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         "plot_hspan_color": "#5D6D7E",
         "plot_text_box_edgecolor": "#B0B0B0",
         "plot_text_arrow_color": "#5D6D7E",
+        "plot_gantt_dependency_color": "#2C3E50",
+        "plot_gantt_today_color": "#2C3E50",
         "plot_heatmap_cmap": COLORS.Greys,
         "plot_heatmap_frame_color": "#000000",
         "plot_regression_color": "#34495E",

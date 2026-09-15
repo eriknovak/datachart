@@ -19,6 +19,7 @@ title: Charts Module
 ::: datachart.charts.PyramidChart
 ::: datachart.charts.RadialChart
 ::: datachart.charts.CalendarHeatmap
+::: datachart.charts.GanttChart
 
 
 ## Distributions

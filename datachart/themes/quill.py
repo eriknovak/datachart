@@ -122,6 +122,8 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_text_box_edgecolor": INK,
         "plot_text_box_style": "round,pad=0.4,rounding_size=0.2",
         "plot_text_arrow_color": INK,
+        "plot_gantt_dependency_color": INK,
+        "plot_gantt_today_color": INK,
         "plot_heatmap_cmap": COLORS.Greys,
         "plot_heatmap_frame_color": INK,
         "plot_heatmap_font_color": INK,

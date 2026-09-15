@@ -103,6 +103,16 @@ title: Typings Module
     options:
         heading_level: 4
 
+### Gantt Chart Typings
+
+::: datachart.typings.GanttSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.GanttTaskAttrs
+    options:
+        heading_level: 4
+
 
 ### Scatter Chart Typings
 
@@ -225,6 +235,8 @@ title: Typings Module
 ::: datachart.typings.HeatmapStyleAttrs
 
 ::: datachart.typings.CalendarHeatmapStyleAttrs
+
+::: datachart.typings.GanttStyleAttrs
 
 ::: datachart.typings.ScatterStyleAttrs
 
