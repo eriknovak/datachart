@@ -251,8 +251,8 @@ def get_gantt_style(chart_style: dict) -> dict:
     """Get the gantt chart style.
 
     The task bars reuse the bar color, alpha, edge, hatch and zorder with the
-    gantt's own height; the `progress_*`, `dependency_*` and `today_*` keys
-    style the progress bar, the dependency arrows and the today line.
+    gantt's own height; the other keys style the progress bar, dependency
+    arrows, today line, group summary bars and milestones.
 
     Args:
         chart_style: The chart style dictionary.
@@ -277,6 +277,12 @@ def get_gantt_style(chart_style: dict) -> dict:
         ("dependency_width", "plot_gantt_dependency_width"),
         ("dependency_style", "plot_gantt_dependency_style"),
         ("dependency_zorder", "plot_gantt_dependency_zorder"),
+        ("dependency_entry", "plot_gantt_dependency_entry"),
+        ("summary_height", "plot_gantt_summary_height"),
+        ("summary_color", "plot_gantt_summary_color"),
+        ("group_gap", "plot_gantt_group_gap"),
+        ("milestone_marker", "plot_gantt_milestone_marker"),
+        ("milestone_size", "plot_gantt_milestone_size"),
         ("today_color", "plot_gantt_today_color"),
         ("today_style", "plot_gantt_today_style"),
         ("today_width", "plot_gantt_today_width"),

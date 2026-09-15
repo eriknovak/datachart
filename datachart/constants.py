@@ -30,6 +30,8 @@ Classes:
     LABEL_POSITION:     The supported end label positions.
     GANTT_VALUE:        The supported gantt chart value labels.
     GANTT_SORT_KEY:     The supported gantt chart sort keys.
+    GANTT_ARROW_ENTRY:  The supported gantt dependency arrow entries.
+    DATE_PERIOD:        The supported date axis periods.
     NODE_LABEL_POSITION: The supported network node label positions.
     NETWORK_LAYOUT:     The supported network chart layouts.
     RADIAL_TYPE:        The supported radial chart visuals.
@@ -1159,6 +1161,65 @@ class GANTT_SORT_KEY:
     DEFAULT = "start"
     START = "start"
     GROUP = "group"
+
+
+class GANTT_ARROW_ENTRY:
+    """The supported gantt dependency arrow entries.
+
+    Passed as the `plot_gantt_dependency_entry` style attribute of the gantt
+    chart: which side of the dependent task a dependency arrow enters.
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> from datachart.constants import GANTT_ARROW_ENTRY
+        >>> GANTT_ARROW_ENTRY.DEFAULT
+        "top"
+
+    Attributes:
+        DEFAULT (str): The default entry. Same as `GANTT_ARROW_ENTRY.TOP`.
+        TOP (str): Along the dependency's row, then down (or up) onto the
+            dependent bar's start. Equals to `"top"`.
+        LEFT (str): Down (or up) from the dependency's end, then into the
+            dependent bar's start from the left. Equals to `"left"`.
+
+    """
+
+    DEFAULT = "top"
+    TOP = "top"
+    LEFT = "left"
+
+
+class DATE_PERIOD:
+    """The supported date axis periods.
+
+    Passed as the `period` setting of the gantt chart: the calendar period
+    the date axis is divided into. Lines mark the period edges, each period
+    is labelled at its centre, and a second row names the enclosing period.
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> from datachart.constants import DATE_PERIOD
+        >>> DATE_PERIOD.MONTH
+        "month"
+
+    Attributes:
+        NONE (None): Concise date ticks, no period edges. Equals to `None`.
+        DAY (str): Days, under their month. Equals to `"day"`.
+        WEEK (str): ISO weeks starting on Monday, under their month. Equals to `"week"`.
+        MONTH (str): Months, under their year. Equals to `"month"`.
+        QUARTER (str): Quarters, under their year. Equals to `"quarter"`.
+        YEAR (str): Years. Equals to `"year"`.
+
+    """
+
+    NONE = None
+    DAY = "day"
+    WEEK = "week"
+    MONTH = "month"
+    QUARTER = "quarter"
+    YEAR = "year"
 
 
 class RADIAL_TYPE:

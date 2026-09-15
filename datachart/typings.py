@@ -98,6 +98,7 @@ from typing import TypedDict, Union, Tuple, List, Optional, Dict, Literal
 import matplotlib.colors as colors
 from .constants import (
     ARROW_STYLE,
+    GANTT_ARROW_ENTRY,
     NETWORK_LAYOUT,
     NODE_LABEL_POSITION,
     BAR_MODE,
@@ -764,6 +765,12 @@ class GanttStyleAttrs(TypedDict):
         plot_gantt_dependency_width (Union[int, float, None]): The line width of the dependency arrows.
         plot_gantt_dependency_style (Union[str, None]): The arrow head of the dependency arrows, as a matplotlib arrow style.
         plot_gantt_dependency_zorder (Union[int, float, None]): The zorder of the dependency arrows.
+        plot_gantt_dependency_entry (Union[GANTT_ARROW_ENTRY, str, None]): The side of the dependent task a dependency arrow enters ("top" or "left").
+        plot_gantt_summary_height (Union[int, float, None]): The height of a group's summary bar under `show_group_headers`, as a fraction of its row.
+        plot_gantt_summary_color (Union[str, None]): The color of the summary bars; `None` takes each group's color.
+        plot_gantt_group_gap (Union[int, float, None]): The empty space before each group header, in rows.
+        plot_gantt_milestone_marker (Union[LINE_MARKER, str, None]): The marker of a milestone, a task whose `start` equals its `end`.
+        plot_gantt_milestone_size (Union[int, float, None]): The size of the milestone marker, in points.
         plot_gantt_today_color (Union[str, None]): The color of the today line.
         plot_gantt_today_style (Union[LINE_STYLE, str, None]): The line style of the today line.
         plot_gantt_today_width (Union[int, float, None]): The line width of the today line.
@@ -779,6 +786,12 @@ class GanttStyleAttrs(TypedDict):
     plot_gantt_dependency_width: Union[int, float, None]
     plot_gantt_dependency_style: Union[str, None]
     plot_gantt_dependency_zorder: Union[int, float, None]
+    plot_gantt_dependency_entry: Union[GANTT_ARROW_ENTRY, str, None]
+    plot_gantt_summary_height: Union[int, float, None]
+    plot_gantt_summary_color: Union[str, None]
+    plot_gantt_group_gap: Union[int, float, None]
+    plot_gantt_milestone_marker: Union[LINE_MARKER, str, None]
+    plot_gantt_milestone_size: Union[int, float, None]
     plot_gantt_today_color: Union[str, None]
     plot_gantt_today_style: Union[LINE_STYLE, str, None]
     plot_gantt_today_width: Union[int, float, None]
@@ -2102,7 +2115,7 @@ class GanttTaskAttrs(TypedDict):
     Attributes:
         task (str): The task name, unique within the chart; the label of its row.
         start (Union[date, datetime]): When the task starts: a `date`, `datetime`, `numpy.datetime64`, or pandas `Timestamp`. Date strings are never parsed.
-        end (Union[date, datetime]): When the task ends, of the same temporal types; never before `start`.
+        end (Union[date, datetime]): When the task ends, of the same temporal types; never before `start`. A task ending when it starts is a milestone, drawn as a marker.
         group (Optional[str]): The task group; tasks of one group share a color and a legend entry.
         progress (Optional[Union[int, float]]): The fraction of the task done, in `[0, 1]`; drawn as an inner bar.
         depends_on (Optional[List[str]]): The names of the tasks this task depends on.

@@ -289,6 +289,8 @@ EXPECTED_CHANGES = {
     "gantt_grouped_progress",
     "gantt_dependencies_today",
     "gantt_grid",
+    "gantt_week_headers_milestone",
+    "gantt_month_left_arrows",
 }
 
 
@@ -2057,6 +2059,45 @@ def gantt_dependencies_today():
         xticks_format=DATE_FORMAT.ISO,
         xtickrotate=30,
         title="Dependencies and today",
+    )
+
+
+def gantt_with_milestone():
+    tasks = gantt_tasks()
+    tasks.append(
+        {
+            "task": "Beta",
+            "start": date(2024, 4, 12),
+            "end": date(2024, 4, 12),
+            "group": "Ship",
+            "depends_on": ["QA"],
+        }
+    )
+    return tasks
+
+
+@case
+def gantt_week_headers_milestone():
+    return GanttChart(
+        gantt_with_milestone(),
+        period="week",
+        show_group_headers=True,
+        show_values="duration",
+        show_today=True,
+        today=date(2024, 3, 30),
+        today_label="Today",
+        title="Weeks, headers, milestone",
+    )
+
+
+@case
+def gantt_month_left_arrows():
+    return GanttChart(
+        gantt_with_milestone(),
+        period="month",
+        show_dependencies=True,
+        style={"plot_gantt_dependency_entry": "left"},
+        title="Months, arrows from the left",
     )
 
 

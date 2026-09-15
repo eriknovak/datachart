@@ -22,6 +22,7 @@ from ..typings import (
 )
 from ..constants import (
     DATE_FORMAT,
+    DATE_PERIOD,
     EMPHASIS,
     FIG_SIZE,
     GANTT_SORT_KEY,
@@ -48,6 +49,8 @@ def GanttChart(
     xmin: Optional[Union[date, datetime]] = None,
     xmax: Optional[Union[date, datetime]] = None,
     max_cols: Optional[int] = None,
+    period: Optional[Union[DATE_PERIOD, str]] = None,
+    show_group_headers: Optional[bool] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
@@ -56,6 +59,7 @@ def GanttChart(
     show_dependencies: Optional[bool] = None,
     show_today: Optional[bool] = None,
     today: Optional[Union[date, datetime]] = None,
+    today_label: Optional[str] = None,
     sort: Optional[Union[SORT, str]] = None,
     sort_by: Optional[Union[GANTT_SORT_KEY, str]] = None,
     emphasis: Optional[Union[EMPHASIS, str, List[Optional[str]]]] = None,
@@ -74,8 +78,10 @@ def GanttChart(
     start to its end over a date axis, one row per task, the first task at
     the top. Use it for project plans, release roadmaps, or any set of
     activities where when and how long matter more than a single value. Task
-    groups share a colour, an optional progress fraction fills part of each
-    bar, dependency arrows link tasks, and a today line marks the present.
+    groups share a colour or get header rows with summary bars, an optional
+    progress fraction fills part of each bar, a task ending when it starts is
+    a milestone marker, dependency arrows link tasks, the date axis can be
+    divided into calendar periods, and a today line marks the present.
 
     The chart is always horizontal, so the axis parameters are spatial:
     `xlabel`, `xmin`, `xmax`, and `xticks_format` address the horizontal date
@@ -115,15 +121,26 @@ def GanttChart(
         xmin: The start of the date window, as a temporal object.
         xmax: The end of the date window, as a temporal object.
         max_cols: The maximum number of subplot columns for several schedules.
+        period: The calendar period the date axis is divided into: None
+            (concise date ticks), "day", "week", "month", "quarter", or
+            "year". Lines mark the period edges, each period is labelled at
+            its centre, and a row beneath names the enclosing month or year.
+            `xticks_format` sets the period labels. See `DATE_PERIOD`.
+        show_group_headers: Whether to give each task group a header row with
+            a summary bar from its first start to its last end, the group's
+            rows clustered beneath it and a gap before the next group. Raises
+            when no task carries a `group`.
         show_legend: Whether to show the legend of the task groups. Defaults
-            to on when any task carries a `group`.
+            to on when any task carries a `group` and the group headers are
+            off.
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             `LegendSettingAttrs`.
         show_grid: Which grid lines to show ("both", "x", "y"). See `SHOW_GRID`.
         show_values: The label printed past each bar end: None (none),
             `"duration"` (the duration in days), or `"progress"` (the progress
-            as a percentage). See `GANTT_VALUE`.
+            as a percentage). A milestone prints its date instead, in the
+            `xticks_format` or as day and month. See `GANTT_VALUE`.
         value_format: Format string for the value labels: a `VALUE_FORMAT`
             constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
             It formats the duration in days, or the progress fraction.
@@ -131,6 +148,8 @@ def GanttChart(
             named in `depends_on` to the start of the task depending on it.
         show_today: Whether to draw the today line.
         today: The date of the today line; the current date when not given.
+        today_label: The text printed at the foot of the today line; none
+            when not given.
         sort: The order of the task rows: None (input order), "ascending",
             or "descending" by the key `sort_by` names. Ties keep input
             order. See `SORT`.
@@ -164,10 +183,12 @@ def GanttChart(
     sort_key = validate_gantt_sort_by(validate_sort(sort), sort_by)
     for records in schedules:
         validate_gantt_tasks(records)
-        validate_gantt_groups(records, sort_key if sort is not None else None)
+        validate_gantt_groups(
+            records, sort_key if sort is not None else None, show_group_headers
+        )
 
     if show_legend is None:
-        show_legend = any(
+        show_legend = not show_group_headers and any(
             record.get("group") is not None
             for records in schedules
             for record in records
@@ -203,6 +224,9 @@ def GanttChart(
         "show_dependencies": show_dependencies,
         "show_today": show_today,
         "today": today,
+        "today_label": today_label,
+        "period": period,
+        "show_group_headers": show_group_headers,
         "sort": sort,
         "sort_by": sort_by,
         "emphasis_rule": emphasis_rule,

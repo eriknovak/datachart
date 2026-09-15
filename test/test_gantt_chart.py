@@ -11,12 +11,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.collections import LineCollection
 from matplotlib.colors import to_hex
+from matplotlib.lines import Line2D
 from matplotlib.patches import FancyArrowPatch
 
 from datachart.charts import BarChart, GanttChart, LineChart
 from datachart.config import config
 from datachart.constants import (
     DATE_FORMAT,
+    DATE_PERIOD,
+    GANTT_ARROW_ENTRY,
     EMPHASIS,
     GANTT_SORT_KEY,
     GANTT_VALUE,
@@ -330,16 +333,193 @@ class TestGanttMarks(unittest.TestCase):
             with self.subTest(theme=theme):
                 config.set_theme(theme)
                 GanttChart(
-                    schedule(),
+                    schedule() + [task("Release", 49, 0, group="Make")],
                     show_dependencies=True,
                     show_today=True,
+                    today_label="Today",
                     show_values=GANTT_VALUE.DURATION,
+                    show_group_headers=True,
+                    period=DATE_PERIOD.WEEK,
                 ).savefig(__import__("io").BytesIO(), format="png")
                 plt.close("all")
 
     def test_base_theme_carries_the_keys(self):
         keys = [k for k in _base.BASE_THEME if k.startswith("plot_gantt_")]
         self.assertGreaterEqual(len(keys), 10)
+
+
+def period_labels(figure):
+    """The period row and the parent row labels of a gantt figure, after a draw."""
+    figure.canvas.draw()
+    ax = figure.axes[0]
+    parent = [t.get_text() for c in ax.child_axes for t in c.get_xticklabels()]
+    return [t.get_text() for t in ax.get_xticklabels()], parent
+
+
+class TestGanttPeriods(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+
+    def span(self, start, end):
+        return [{"task": "A", "start": start, "end": end}]
+
+    def test_month_period(self):
+        figure = GanttChart(
+            self.span(date(2023, 11, 20), date(2024, 5, 1)), period=DATE_PERIOD.MONTH
+        )
+        months, years = period_labels(figure)
+        self.assertEqual(months, ["Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"])
+        self.assertEqual(years, ["2023", "2024"])
+
+    def test_period_edges_carry_the_grid(self):
+        ax = GanttChart(
+            self.span(date(2024, 1, 10), date(2024, 4, 20)), period=DATE_PERIOD.MONTH
+        ).axes[0]
+        edges = ax.xaxis.get_minorticklocs()
+        self.assertIn(mdates.date2num(date(2024, 2, 1)), edges)
+        ax.figure.canvas.draw()
+        minor = [t.gridline for t in ax.xaxis.get_minor_ticks()]
+        self.assertTrue(any(line.get_visible() for line in minor))
+        self.assertFalse(any(l.get_visible() for l in ax.xaxis.get_gridlines()))
+
+    def test_week_quarter_day_year_labels(self):
+        weeks, months = period_labels(
+            GanttChart(self.span(date(2024, 1, 1), date(2024, 1, 29)), period="week")
+        )
+        self.assertEqual(weeks[:2], ["W01", "W02"])
+        self.assertEqual(months, ["Jan 2024"])
+        quarters, _ = period_labels(
+            GanttChart(
+                self.span(date(2024, 1, 1), date(2024, 12, 20)), period="quarter"
+            )
+        )
+        self.assertEqual(quarters, ["Q1", "Q2", "Q3", "Q4"])
+        days, _ = period_labels(
+            GanttChart(self.span(date(2024, 3, 1), date(2024, 3, 4)), period="day")
+        )
+        self.assertEqual(days[:3], ["01", "02", "03"])
+        years, parent = period_labels(
+            GanttChart(self.span(date(2022, 3, 1), date(2024, 10, 1)), period="year")
+        )
+        self.assertEqual(years, ["2022", "2023", "2024"])
+        self.assertEqual(parent, [])
+
+    def test_xticks_format_sets_the_period_labels(self):
+        months, _ = period_labels(
+            GanttChart(
+                self.span(date(2024, 1, 10), date(2024, 3, 20)),
+                period="month",
+                xticks_format="%B",
+            )
+        )
+        self.assertEqual(months, ["January", "February", "March"])
+
+    def test_invalid_period_raises(self):
+        with self.assertRaises(ValueError):
+            GanttChart(schedule(), period="fortnight")
+
+
+class TestGanttGroupHeaders(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+
+    def test_header_rows_cluster_groups(self):
+        ax = GanttChart(schedule(), show_group_headers=True).axes[0]
+        self.assertEqual(
+            row_labels(ax), ["Plan", "Design", "Docs", "Make", "Build", "Test"]
+        )
+        bold = [
+            t.get_text() for t in ax.get_yticklabels() if t.get_fontweight() == "bold"
+        ]
+        self.assertEqual(bold, ["Plan", "Make"])
+        ticks = list(ax.get_yticks())
+        self.assertAlmostEqual(ticks[3] - ticks[2], 1 + config["plot_gantt_group_gap"])
+
+    def test_summary_bars_span_their_groups(self):
+        ax = GanttChart(schedule(), show_group_headers=True).axes[0]
+        make = [
+            p
+            for p in ax.patches
+            if not isinstance(p, FancyArrowPatch)
+            and abs(p.get_y() + p.get_height() / 2 - ax.get_yticks()[3]) < 1e-9
+        ]
+        self.assertEqual(len(make), 1)
+        self.assertAlmostEqual(make[0].get_x(), mdates.date2num(D0 + timedelta(days=8)))
+        self.assertAlmostEqual(
+            make[0].get_x() + make[0].get_width(),
+            mdates.date2num(D0 + timedelta(days=49)),
+        )
+
+    def test_headers_turn_the_legend_off(self):
+        ax = GanttChart(schedule(), show_group_headers=True).axes[0]
+        self.assertIsNone(ax.get_legend())
+
+    def test_headers_without_groups_raise(self):
+        with self.assertRaises(ValueError) as cm:
+            GanttChart([task("A", 0, 1)], show_group_headers=True)
+        self.assertIn("show_group_headers", str(cm.exception))
+
+
+class TestGanttMilestonesAndArrows(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+
+    def records(self):
+        records = schedule()
+        records.append(task("Release", 49, 0, group="Make", depends_on=["Test"]))
+        return records
+
+    def test_milestone_draws_a_marker(self):
+        ax = GanttChart(self.records()).axes[0]
+        (marker,) = [
+            l
+            for l in ax.lines
+            if l.get_marker() == config["plot_gantt_milestone_marker"]
+        ]
+        self.assertAlmostEqual(
+            marker.get_xdata()[0], mdates.date2num(D0 + timedelta(days=49))
+        )
+        self.assertFalse(task_bars(ax, 5)[4].get_visible())
+
+    def test_milestone_prints_its_date(self):
+        ax = GanttChart(self.records(), show_values=GANTT_VALUE.DURATION).axes[0]
+        texts = [t.get_text() for t in ax.texts]
+        self.assertIn("19 Feb", texts)
+        self.assertNotIn("0d", texts)
+
+    def test_left_entry_arrives_at_the_start(self):
+        records = [task("A", 0, 3), task("B", 5, 3, depends_on=["A"])]
+        ax = GanttChart(
+            records,
+            show_dependencies=True,
+            style={"plot_gantt_dependency_entry": GANTT_ARROW_ENTRY.LEFT},
+        ).axes[0]
+        (arrow,) = [p for p in ax.patches if isinstance(p, FancyArrowPatch)]
+        self.assertEqual(
+            arrow._posA_posB[1], (mdates.date2num(D0 + timedelta(days=5)), 1.0)
+        )
+
+    def test_left_entry_without_room_enters_from_the_top(self):
+        records = [task("A", 0, 3), task("B", 1, 3, depends_on=["A"])]
+        ax = GanttChart(
+            records,
+            show_dependencies=True,
+            style={"plot_gantt_dependency_entry": GANTT_ARROW_ENTRY.LEFT},
+        ).axes[0]
+        (arrow,) = [p for p in ax.patches if isinstance(p, FancyArrowPatch)]
+        self.assertLess(arrow._posA_posB[1][1], 1.0)
+
+    def test_invalid_arrow_entry_raises(self):
+        with self.assertRaises(ValueError):
+            GanttChart(schedule(), style={"plot_gantt_dependency_entry": "right"})
+
+    def test_today_label(self):
+        ax = GanttChart(
+            schedule(), show_today=True, today=date(2024, 1, 20), today_label="Today"
+        ).axes[0]
+        self.assertIn("Today", [t.get_text() for t in ax.texts])
+        ax = GanttChart(schedule(), show_today=True, today=date(2024, 1, 20)).axes[0]
+        self.assertEqual(len(ax.texts), 0)
 
 
 class TestGanttComposition(unittest.TestCase):

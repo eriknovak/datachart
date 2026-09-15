@@ -19,7 +19,9 @@ from ...constants import (
     BANDWIDTH,
     BASELINE,
     DATE_FORMAT,
+    DATE_PERIOD,
     EMPHASIS,
+    GANTT_ARROW_ENTRY,
     GANTT_SORT_KEY,
     GANTT_VALUE,
     LABEL_POSITION,
@@ -782,6 +784,37 @@ def validate_week_start(value):
 
 GANTT_VALUES = (GANTT_VALUE.DURATION, GANTT_VALUE.PROGRESS)
 GANTT_SORT_KEYS = (GANTT_SORT_KEY.START, GANTT_SORT_KEY.GROUP)
+GANTT_ARROW_ENTRIES = (GANTT_ARROW_ENTRY.TOP, GANTT_ARROW_ENTRY.LEFT)
+DATE_PERIODS = (
+    DATE_PERIOD.DAY,
+    DATE_PERIOD.WEEK,
+    DATE_PERIOD.MONTH,
+    DATE_PERIOD.QUARTER,
+    DATE_PERIOD.YEAR,
+)
+
+
+def validate_date_period(value):
+    """Validate a date axis period; None keeps the concise date ticks."""
+
+    if value is not None and value not in DATE_PERIODS:
+        raise ValueError(
+            f"Invalid `period` value {value!r}. Must be one of {DATE_PERIODS} or None."
+        )
+    return value
+
+
+def validate_gantt_arrow_entry(value):
+    """Validate a dependency arrow entry; None enters from the top."""
+
+    if value is None:
+        return GANTT_ARROW_ENTRY.DEFAULT
+    if value not in GANTT_ARROW_ENTRIES:
+        raise ValueError(
+            f"Invalid `plot_gantt_dependency_entry` value {value!r}. "
+            f"Must be one of {GANTT_ARROW_ENTRIES} or None."
+        )
+    return value
 
 
 def validate_gantt_show_values(value):
@@ -885,13 +918,18 @@ def validate_gantt_tasks(records) -> None:
                 )
 
 
-def validate_gantt_groups(records, sort_by) -> None:
-    """Raise when rows sort by group but no task carries a `group`."""
+def validate_gantt_groups(records, sort_by, show_group_headers=False) -> None:
+    """Raise when rows cluster by group but no task carries a `group`."""
 
-    if sort_by == GANTT_SORT_KEY.GROUP and not any(
-        record.get("group") is not None for record in records
-    ):
+    if any(record.get("group") is not None for record in records):
+        return
+    if sort_by == GANTT_SORT_KEY.GROUP:
         raise ValueError(
             '`sort_by="group"` clusters the rows by task group, but no task '
+            "carries a `group` key."
+        )
+    if show_group_headers:
+        raise ValueError(
+            "`show_group_headers` draws a header per task group, but no task "
             "carries a `group` key."
         )
