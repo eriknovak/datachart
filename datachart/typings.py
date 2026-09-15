@@ -29,6 +29,8 @@ Classes:
     ColorbarSettingAttrs: The per-figure colorbar setting.
     CalendarHeatmapSingleChartAttrs: The single chart attributes for the calendar heatmap.
     CalendarHeatmapDataAttrs: The data attributes for the calendar heatmap.
+    GanttSingleChartAttrs: The single chart attributes for the gantt chart.
+    GanttTaskAttrs: The task record attributes for the gantt chart.
     ContourSingleChartAttrs: The single chart attributes for the contour chart.
     ContourDataAttrs: The data attributes for the contour chart.
     HexbinSingleChartAttrs: The single chart attributes for the hexbin chart.
@@ -74,6 +76,7 @@ Classes:
     TextStyleAttrs: The typing for the text annotation style.
     HeatmapStyleAttrs: The typing for the heatmap style.
     CalendarHeatmapStyleAttrs: The typing for the calendar heatmap style.
+    GanttStyleAttrs: The typing for the gantt chart style.
     ContourStyleAttrs: The typing for the contour chart style.
     HexbinStyleAttrs: The typing for the hexbin chart style.
     ScatterStyleAttrs: The typing for the scatter chart style.
@@ -744,6 +747,44 @@ class HeatmapStyleAttrs(TypedDict):
     plot_heatmap_edge_color: Union[str, None]
 
 
+class GanttStyleAttrs(TypedDict):
+    """The typing for the gantt chart style.
+
+    The range bars take the `plot_bar_*` keys (color, alpha, edge, hatch,
+    zorder); these keys set what is specific to a gantt chart.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        plot_gantt_bar_height (Union[int, float, None]): The height of a task bar, as a fraction of its row.
+        plot_gantt_progress_color (Union[str, None]): The color of the progress bar; `None` darkens the task bar's color.
+        plot_gantt_progress_alpha (Union[float, None]): The alpha value of the progress bar.
+        plot_gantt_progress_height (Union[int, float, None]): The height of the progress bar, as a fraction of the task bar.
+        plot_gantt_dependency_color (Union[str, None]): The color of the dependency arrows.
+        plot_gantt_dependency_width (Union[int, float, None]): The line width of the dependency arrows.
+        plot_gantt_dependency_style (Union[str, None]): The arrow head of the dependency arrows, as a matplotlib arrow style.
+        plot_gantt_dependency_zorder (Union[int, float, None]): The zorder of the dependency arrows.
+        plot_gantt_today_color (Union[str, None]): The color of the today line.
+        plot_gantt_today_style (Union[LINE_STYLE, str, None]): The line style of the today line.
+        plot_gantt_today_width (Union[int, float, None]): The line width of the today line.
+        plot_gantt_today_alpha (Union[float, None]): The alpha value of the today line.
+
+    """
+
+    plot_gantt_bar_height: Union[int, float, None]
+    plot_gantt_progress_color: Union[str, None]
+    plot_gantt_progress_alpha: Union[float, None]
+    plot_gantt_progress_height: Union[int, float, None]
+    plot_gantt_dependency_color: Union[str, None]
+    plot_gantt_dependency_width: Union[int, float, None]
+    plot_gantt_dependency_style: Union[str, None]
+    plot_gantt_dependency_zorder: Union[int, float, None]
+    plot_gantt_today_color: Union[str, None]
+    plot_gantt_today_style: Union[LINE_STYLE, str, None]
+    plot_gantt_today_width: Union[int, float, None]
+    plot_gantt_today_alpha: Union[float, None]
+
+
 class CalendarHeatmapStyleAttrs(TypedDict):
     """The typing for the calendar heatmap style.
 
@@ -1092,7 +1133,9 @@ class ThemeDefaultAttrs(TypedDict):
     chart_default_node_label_position: Union[NODE_LABEL_POSITION, str, None]
     plot_hatch_cycle: Union[List[str], None]
     plot_linestyle_cycle: Union[List[Union[LINE_STYLE, str]], None]
-    plot_marker_cycle: Union[List[Union[LINE_MARKER, str, Dict[str, Union[str, bool]]]], None]
+    plot_marker_cycle: Union[
+        List[Union[LINE_MARKER, str, Dict[str, Union[str, bool]]]], None
+    ]
 
 
 class SketchStyleAttrs(TypedDict):
@@ -1181,6 +1224,7 @@ class StyleAttrs(
     TextStyleAttrs,
     HeatmapStyleAttrs,
     CalendarHeatmapStyleAttrs,
+    GanttStyleAttrs,
     ContourStyleAttrs,
     HexbinStyleAttrs,
     ScatterStyleAttrs,
@@ -2042,6 +2086,65 @@ class CalendarHeatmapSingleChartAttrs(TypedDict):
     vmax: Union[float, None]
 
     colorbar: Union[ColorbarSettingAttrs, None]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+
+
+# ================================================
+# Gantt Chart Attributes
+# ================================================
+
+
+class GanttTaskAttrs(TypedDict):
+    """The task record attributes for the gantt chart.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        task (str): The task name, unique within the chart; the label of its row.
+        start (Union[date, datetime]): When the task starts: a `date`, `datetime`, `numpy.datetime64`, or pandas `Timestamp`. Date strings are never parsed.
+        end (Union[date, datetime]): When the task ends, of the same temporal types; never before `start`.
+        group (Optional[str]): The task group; tasks of one group share a color and a legend entry.
+        progress (Optional[Union[int, float]]): The fraction of the task done, in `[0, 1]`; drawn as an inner bar.
+        depends_on (Optional[List[str]]): The names of the tasks this task depends on.
+        emphasis (Optional[Union[EMPHASIS, str]]): The task's own emphasis role ("background" or "highlight"); wins over the chart's `emphasis_rule`.
+
+    """
+
+    task: str
+    start: Union[date, datetime]
+    end: Union[date, datetime]
+    group: Optional[str]
+    progress: Optional[Union[int, float]]
+    depends_on: Optional[List[str]]
+    emphasis: Optional[Union[EMPHASIS, str]]
+
+
+class GanttSingleChartAttrs(TypedDict):
+    """The single chart attributes for the gantt chart.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        data (List[GanttTaskAttrs]): The task records defining one schedule.
+        subtitle (Union[str, None]): The subtitle of the schedule.
+        style (Union[GanttStyleAttrs, None]): The style of the schedule.
+        xtickrotate (Union[int, None]): The xtick rotation value.
+        ytickrotate (Union[int, None]): The ytick rotation value.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
+
+    """
+
+    data: List[GanttTaskAttrs]
+    subtitle: Union[str, None]
+    style: Union[GanttStyleAttrs, None]
+
+    xtickrotate: Union[int, None]
+    ytickrotate: Union[int, None]
+
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
 

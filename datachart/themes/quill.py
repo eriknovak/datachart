@@ -104,6 +104,8 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_value_halo_width": 5,
         "plot_hist_alpha": 1.0,
         "plot_hist_edge_width": 1.0,
+        "plot_gantt_dependency_color": INK,
+        "plot_gantt_today_color": INK,
         "plot_hist_edge_color": INK,
         "plot_vline_color": INK,
         "plot_vline_style": LINE_STYLE.DASHED,

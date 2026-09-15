@@ -107,6 +107,12 @@ def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
         raise ValueError(
             f"Figure at index {index} is a Grid figure; grid figures cannot be overlaid"
         )
+    if metadata.get("type") == "ganttchart":
+        # a horizontal panel's twin is a second x, off the task rows (ADR 0049)
+        raise ValueError(
+            f"Figure at index {index} is a gantt figure; "
+            "gantt figures cannot be overlaid. Use `Grid` instead."
+        )
     if metadata.get("type") == "pyramidchart":
         # unmirrored data on a mirrored axis would silently mangle (ADR 0017)
         raise ValueError(
