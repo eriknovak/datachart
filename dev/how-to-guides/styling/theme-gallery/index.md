@@ -1,18 +1,19 @@
 # Theme Gallery
 
-This gallery renders the same suite of example charts — the basic chart types plus research-style figures — under each of the seven predefined themes, composed into one grid per chart group so the whole suite is visible at a glance. The groups follow the [charts index](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md) — trends and comparisons, distributions, relationships, composition — so each tile sits next to the guide that documents it. The available themes are:
+This gallery renders the same suite of example charts — the basic chart types plus research-style figures — under each of the eight predefined themes, composed into one grid per chart group so the whole suite is visible at a glance. The groups follow the [charts index](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md) — trends and comparisons, distributions, relationships, composition — so each tile sits next to the guide that documents it. The available themes are:
 
-| Theme                           | Character                                                  |
-| ------------------------------- | ---------------------------------------------------------- |
-| [`THEME.DEFAULT`](#default)     | Tableau-style categorical palette, open spines, soft grid. |
-| [`THEME.GREYSCALE`](#greyscale) | Monochrome, print-friendly.                                |
-| [`THEME.INK`](#ink)             | Diversified YlGnBu palette with navy ink accents.          |
-| [`THEME.MINIMAL`](#minimal)     | Accent blue with deep grays, no spines, flat bars.         |
-| [`THEME.MATERIAL`](#material)   | Google palette, bottom spine only, light grid.             |
-| [`THEME.HATCH`](#hatch)         | Hatch cycle, black edges, dotted grid.                     |
-| [`THEME.SKETCH`](#sketch)       | Hand-drawn wobble and halo, Comic Neue font, no grid.      |
+| Theme                           | Character                                                                  |
+| ------------------------------- | -------------------------------------------------------------------------- |
+| [`THEME.DEFAULT`](#default)     | Tableau-style categorical palette, open spines, soft grid.                 |
+| [`THEME.GREYSCALE`](#greyscale) | Monochrome, print-friendly.                                                |
+| [`THEME.INK`](#ink)             | Diversified YlGnBu palette with navy ink accents.                          |
+| [`THEME.MINIMAL`](#minimal)     | Accent blue with deep grays, no spines, flat bars.                         |
+| [`THEME.MATERIAL`](#material)   | Google palette, bottom spine only, light grid.                             |
+| [`THEME.HATCH`](#hatch)         | Hatch cycle, black edges, dotted grid.                                     |
+| [`THEME.SKETCH`](#sketch)       | Hand-drawn wobble and halo, Comic Neue font, no grid.                      |
+| [`THEME.QUILL`](#quill)         | Black ink on white paper: pen strokes, etched fills, IM Fell English font. |
 
-Themes also carry *defaults for chart settings*: every theme but `SKETCH` shows a muted y-grid unless a chart call sets `show_grid` itself, and `HATCH` hatches bar series via its hatch cycle — which is why the very same chart code below renders with grids and hatches that differ per theme. No predefined theme turns value labels on; the tiles that print values ask for them with `show_values`. An explicit setting always wins.
+Themes also carry *defaults for chart settings*: every theme but `SKETCH` and `QUILL` shows a muted y-grid unless a chart call sets `show_grid` itself, and `HATCH` hatches bar series via its hatch cycle — which is why the very same chart code below renders with grids and hatches that differ per theme. No predefined theme turns value labels on; the tiles that print values ask for them with `show_values`. An explicit setting always wins.
 
 The small-multiples example is itself a `Grid`; grid figures nest inside `Grid`, so it takes one cell of each theme's composition grid. The calendar heatmap is wide by nature, so it spans two columns of its group's grid.
 
@@ -181,6 +182,31 @@ from datachart.config import config
 from datachart.constants import THEME
 
 config.set_theme(THEME.SKETCH)
+```
+
+### Trends and Comparisons
+
+### Distributions
+
+### Relationships
+
+### Flows
+
+### Part of a Whole
+
+### Composition
+
+## Quill
+
+Black ink on white paper, as a quill and an etching needle would draw it. There is one ink only, so series differ by line style, marker and etching, never by color. Series lines are broad-nib pen strokes whose width follows the pen's direction. Bars, areas and bodies are etched by hand instead of tiled with a hatch, with a faint ink wash under the bars and bodies. A value scale (heatmap, calendar, hexbin, filled contour) reads as steps of etch density; where a chart asks for a colorbar, a legend of the steps takes its place. Network edges are drawn with pen pressure, and text is set in the bundled IM Fell English font, titles in its italic. Like the sketch look, every effect is a theme attribute applied at render time, so nothing changes in matplotlib's global settings.
+
+Selected with [`THEME.QUILL`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`QUILL_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.QUILL_THEME).
+
+```
+from datachart.config import config
+from datachart.constants import THEME
+
+config.set_theme(THEME.QUILL)
 ```
 
 ### Trends and Comparisons

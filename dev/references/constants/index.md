@@ -6,44 +6,45 @@ Module containing the `constants`.
 
 The `constants` module provides a set of predefined constants used in the package. These include figure size, format, style, and other figure manipulation values.
 
-| CLASS               | DESCRIPTION                                    |
-| ------------------- | ---------------------------------------------- |
-| `FIG_SIZE`          | The predefined figure sizes.                   |
-| `FIG_FORMAT`        | The supported figure formats.                  |
-| `FONT_STYLE`        | The supported font styles.                     |
-| `FONT_WEIGHT`       | The supported font weights.                    |
-| `LINE_MARKER`       | The supported line markers.                    |
-| `LINE_STYLE`        | The supported line styles.                     |
-| `ARROW_STYLE`       | The supported text annotation connector looks. |
-| `LINE_DRAW_STYLE`   | The supported line draw styles.                |
-| `HATCH_STYLE`       | The supported hatch styles.                    |
-| `LEGEND_ALIGN`      | The supported legend alignments.               |
-| `LEGEND_LOCATION`   | The supported legend locations.                |
-| `HISTOGRAM_TYPE`    | The supported histogram types.                 |
-| `BAR_MODE`          | The supported bar modes.                       |
-| `COLORS`            | The predefined colors.                         |
-| `NORMALIZE`         | The supported normalization options.           |
-| `ORIENTATION`       | The supported orientations.                    |
-| `VIOLIN_INNER`      | The supported violin inner marks.              |
-| `RIDGELINE_SCALE`   | The supported ridgeline density scales.        |
-| `BANDWIDTH`         | The supported kernel density bandwidth rules.  |
-| `CONTOUR_LEVELS`    | The supported contour level rules.             |
-| `HEXBIN_REDUCE`     | The supported hexbin aggregations.             |
-| `BASELINE`          | The supported stacked area baselines.          |
-| `RANK`              | The supported bump chart ranking rules.        |
-| `LABEL_POSITION`    | The supported end label positions.             |
-| `NETWORK_LAYOUT`    | The supported network chart layouts.           |
-| `RADIAL_TYPE`       | The supported radial chart visuals.            |
-| `SWARM_MODE`        | The supported swarm plot modes.                |
-| `DIRECTION`         | The supported angular directions.              |
-| `VALUE_FORMAT`      | The predefined value formats.                  |
-| `DATE_FORMAT`       | The predefined date formats.                   |
-| `THEME`             | The predefined themes.                         |
-| `EMPHASIS`          | The supported emphasis roles.                  |
-| `SHOW_GRID`         | The supported show grid options.               |
-| `SCALE`             | The supported scale options.                   |
-| `ASPECT_RATIO`      | The supported aspect ratio options.            |
-| `COLORBAR_LOCATION` | The supported colorbar locations.              |
+| CLASS                 | DESCRIPTION                                    |
+| --------------------- | ---------------------------------------------- |
+| `FIG_SIZE`            | The predefined figure sizes.                   |
+| `FIG_FORMAT`          | The supported figure formats.                  |
+| `FONT_STYLE`          | The supported font styles.                     |
+| `FONT_WEIGHT`         | The supported font weights.                    |
+| `LINE_MARKER`         | The supported line markers.                    |
+| `LINE_STYLE`          | The supported line styles.                     |
+| `ARROW_STYLE`         | The supported text annotation connector looks. |
+| `LINE_DRAW_STYLE`     | The supported line draw styles.                |
+| `HATCH_STYLE`         | The supported hatch styles.                    |
+| `LEGEND_ALIGN`        | The supported legend alignments.               |
+| `LEGEND_LOCATION`     | The supported legend locations.                |
+| `HISTOGRAM_TYPE`      | The supported histogram types.                 |
+| `BAR_MODE`            | The supported bar modes.                       |
+| `COLORS`              | The predefined colors.                         |
+| `NORMALIZE`           | The supported normalization options.           |
+| `ORIENTATION`         | The supported orientations.                    |
+| `VIOLIN_INNER`        | The supported violin inner marks.              |
+| `RIDGELINE_SCALE`     | The supported ridgeline density scales.        |
+| `BANDWIDTH`           | The supported kernel density bandwidth rules.  |
+| `CONTOUR_LEVELS`      | The supported contour level rules.             |
+| `HEXBIN_REDUCE`       | The supported hexbin aggregations.             |
+| `BASELINE`            | The supported stacked area baselines.          |
+| `RANK`                | The supported bump chart ranking rules.        |
+| `LABEL_POSITION`      | The supported end label positions.             |
+| `NODE_LABEL_POSITION` | The supported network node label positions.    |
+| `NETWORK_LAYOUT`      | The supported network chart layouts.           |
+| `RADIAL_TYPE`         | The supported radial chart visuals.            |
+| `SWARM_MODE`          | The supported swarm plot modes.                |
+| `DIRECTION`           | The supported angular directions.              |
+| `VALUE_FORMAT`        | The predefined value formats.                  |
+| `DATE_FORMAT`         | The predefined date formats.                   |
+| `THEME`               | The predefined themes.                         |
+| `EMPHASIS`            | The supported emphasis roles.                  |
+| `SHOW_GRID`           | The supported show grid options.               |
+| `SCALE`               | The supported scale options.                   |
+| `ASPECT_RATIO`        | The supported aspect ratio options.            |
+| `COLORBAR_LOCATION`   | The supported colorbar locations.              |
 
 ## Figure Constants
 
@@ -356,15 +357,20 @@ Examples:
 "default"
 ```
 
-| ATTRIBUTE   | DESCRIPTION                                                                                                     |
-| ----------- | --------------------------------------------------------------------------------------------------------------- |
-| `DEFAULT`   | The default theme. Equals to "default". **TYPE:** `str`                                                         |
-| `GREYSCALE` | The greyscale theme. Equals to "greyscale". **TYPE:** `str`                                                     |
-| `INK`       | The ink theme (dark-ink accents, print-ready). Equals to "ink". **TYPE:** `str`                                 |
-| `HATCH`     | The hatch theme (hatch cycle, value labels, dotted grid). Equals to "hatch". **TYPE:** `str`                    |
-| `MINIMAL`   | The minimal theme (accent blue, no spines, flat bars). Equals to "minimal". **TYPE:** `str`                     |
-| `MATERIAL`  | The material theme (Google palette, light grid). Equals to "material". **TYPE:** `str`                          |
-| `SKETCH`    | The sketch theme (hand-drawn, xkcd-style wobble and halo, Comic Neue font). Equals to "sketch". **TYPE:** `str` |
+| ATTRIBUTE   | DESCRIPTION                                                                                                                           |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT`   | The default theme. Equals to "default". **TYPE:** `str`                                                                               |
+| `GREYSCALE` | The greyscale theme. Equals to "greyscale". **TYPE:** `str`                                                                           |
+| `INK`       | The ink theme (dark-ink accents, print-ready). Equals to "ink". **TYPE:** `str`                                                       |
+| `HATCH`     | The hatch theme (hatch cycle, value labels, dotted grid). Equals to "hatch". **TYPE:** `str`                                          |
+| `MINIMAL`   | The minimal theme (accent blue, no spines, flat bars). Equals to "minimal". **TYPE:** `str`                                           |
+| `MATERIAL`  | The material theme (Google palette, light grid). Equals to "material". **TYPE:** `str`                                                |
+| `SKETCH`    | The sketch theme (hand-drawn, xkcd-style wobble and halo, Comic Neue font). Equals to "sketch". **TYPE:** `str`                       |
+| `QUILL`     | The quill theme (black ink on white paper: pen-stroked lines, etched fills, IM Fell English font). Equals to "quill". **TYPE:** `str` |
+
+Added in Unreleased
+
+The `QUILL` theme.
 
 ### datachart.constants.EMPHASIS
 
@@ -746,6 +752,28 @@ Examples:
 | `START`   | Beside the first point. Equals to "start". **TYPE:** `str`             |
 | `END`     | Beside the last point. Equals to "end". **TYPE:** `str`                |
 | `BOTH`    | Beside the first and the last point. Equals to "both". **TYPE:** `str` |
+
+### datachart.constants.NODE_LABEL_POSITION
+
+The supported node label positions.
+
+Passed as the `label_position` setting of the network chart: where each node's name prints against its marker.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import NODE_LABEL_POSITION
+>>> NODE_LABEL_POSITION.DEFAULT
+"center"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                                                   |
+| --------- | --------------------------------------------------------------------------------------------- |
+| `DEFAULT` | The default position. Same as NODE_LABEL_POSITION.CENTER. **TYPE:** `str`                     |
+| `CENTER`  | On the marker. Equals to "center". **TYPE:** `str`                                            |
+| `ABOVE`   | Above the marker, clear of it, like a place name on a map. Equals to "above". **TYPE:** `str` |
 
 ### datachart.constants.NETWORK_LAYOUT
 

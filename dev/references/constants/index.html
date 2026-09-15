@@ -2416,6 +2416,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.constants.NODE_LABEL_POSITION" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;NODE_LABEL_POSITION
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.constants.NETWORK_LAYOUT" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3071,6 +3082,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.constants.NODE_LABEL_POSITION" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;NODE_LABEL_POSITION
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.constants.NETWORK_LAYOUT" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3419,6 +3441,14 @@ These include figure size, format, style, and other figure manipulation values.<
             <td class="doc-class-details">
               <div class="doc-md-description">
                 <p>The supported end label positions.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.NODE_LABEL_POSITION&lt;/span&gt;" href="#datachart.constants.NODE_LABEL_POSITION">NODE_LABEL_POSITION</a></code></td>
+            <td class="doc-class-details">
+              <div class="doc-md-description">
+                <p>The supported network node label positions.</p>
               </div>
             </td>
           </tr>
@@ -6051,8 +6081,27 @@ Comic Neue font). Equals to <code>"sketch"</code>.</p>
               </p>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.THEME.QUILL">QUILL</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The quill theme (black ink on white paper: pen-stroked lines,
+etched fills, IM Fell English font). Equals to <code>"quill"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
       </tbody>
     </table>
+        <div class="admonition info">
+<p class="admonition-title">Added in Unreleased</p>
+<p>The <code>QUILL</code> theme.</p>
+</div>
 
 
 
@@ -8286,6 +8335,119 @@ end of each line its series label prints.</p>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
                 <p>Beside the first and the last point. Equals to <code>"both"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="datachart.constants.NODE_LABEL_POSITION" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.constants.NODE_LABEL_POSITION</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>The supported node label positions.</p>
+<p>Passed as the <code>label_position</code> setting of the network chart: where each
+node's name prints against its marker.</p>
+<div class="admonition info">
+<p class="admonition-title">Added in Unreleased</p>
+</div>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">NODE_LABEL_POSITION</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">NODE_LABEL_POSITION</span><span class="o">.</span><span class="n">DEFAULT</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">"center"</span>
+</code></pre></div>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">ATTRIBUTE</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.NODE_LABEL_POSITION.DEFAULT">DEFAULT</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The default position. Same as <code>NODE_LABEL_POSITION.CENTER</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.NODE_LABEL_POSITION.CENTER">CENTER</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>On the marker. Equals to <code>"center"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.NODE_LABEL_POSITION.ABOVE">ABOVE</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Above the marker, clear of it, like a place name on a map.
+Equals to <code>"above"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">

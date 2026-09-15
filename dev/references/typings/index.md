@@ -785,7 +785,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
 
 The style attributes. Combines all style typings.
 
@@ -842,16 +842,24 @@ Bases: `TypedDict`
 
 The typing for the axes style.
 
-| ATTRIBUTE                    | DESCRIPTION                                                       |
-| ---------------------------- | ----------------------------------------------------------------- |
-| `axes_spines_top_visible`    | Make the top plot spine visible. **TYPE:** `Union[bool, None]`    |
-| `axes_spines_right_visible`  | Make the right plot spine visible. **TYPE:** `Union[bool, None]`  |
-| `axes_spines_bottom_visible` | Make the bottom plot spine visible. **TYPE:** `Union[bool, None]` |
-| `axes_spines_left_visible`   | Make the left plot spine visible. **TYPE:** `Union[bool, None]`   |
-| `axes_spines_width`          | The width of the spines. **TYPE:** `Union[int, float, None]`      |
-| `axes_spines_zorder`         | The zorder of the spines. **TYPE:** `Union[int, None]`            |
-| `axes_ticks_length`          | The length of the ticks. **TYPE:** `Union[int, float, None]`      |
-| `axes_ticks_label_size`      | The size of the tick labels. **TYPE:** `Union[int, float, None]`  |
+| ATTRIBUTE                    | DESCRIPTION                                                                                                              |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `axes_spines_top_visible`    | Make the top plot spine visible. **TYPE:** `Union[bool, None]`                                                           |
+| `axes_spines_right_visible`  | Make the right plot spine visible. **TYPE:** `Union[bool, None]`                                                         |
+| `axes_spines_bottom_visible` | Make the bottom plot spine visible. **TYPE:** `Union[bool, None]`                                                        |
+| `axes_spines_left_visible`   | Make the left plot spine visible. **TYPE:** `Union[bool, None]`                                                          |
+| `axes_spines_width`          | The width of the spines. **TYPE:** `Union[int, float, None]`                                                             |
+| `axes_spines_zorder`         | The zorder of the spines. **TYPE:** `Union[int, None]`                                                                   |
+| `axes_ticks_length`          | The length of the ticks. **TYPE:** `Union[int, float, None]`                                                             |
+| `axes_ticks_label_size`      | The size of the tick labels. **TYPE:** `Union[int, float, None]`                                                         |
+| `figure_facecolor`           | The color of the figure ground. None keeps matplotlib's. **TYPE:** `Union[str, None]`                                    |
+| `axes_facecolor`             | The color of the axes ground; label halos and etch washes take it. None keeps matplotlib's. **TYPE:** `Union[str, None]` |
+| `axes_spines_color`          | The color of the spines. None keeps matplotlib's. **TYPE:** `Union[str, None]`                                           |
+| `axes_ticks_color`           | The color of the tick marks. None keeps matplotlib's. **TYPE:** `Union[str, None]`                                       |
+
+Added in Unreleased
+
+The `figure_facecolor`, `axes_facecolor`, `axes_spines_color` and `axes_ticks_color` attributes.
 
 ### datachart.typings.LegendStyleAttrs
 
@@ -859,21 +867,23 @@ Bases: `TypedDict`
 
 The typing for the legend style.
 
-| ATTRIBUTE                 | DESCRIPTION                                                                |
-| ------------------------- | -------------------------------------------------------------------------- |
-| `plot_legend_shadow`      | Show the legends shadow. **TYPE:** `Union[bool, None]`                     |
-| `plot_legend_frameon`     | Show the legends frame. **TYPE:** `Union[bool, None]`                      |
-| `plot_legend_alignment`   | The legend alignment. **TYPE:** `Union[LEGEND_ALIGN, str, None]`           |
-| `plot_legend_location`    | The legend location. **TYPE:** `Union[LEGEND_LOCATION, str, None]`         |
-| `plot_legend_font_size`   | The font size within the legend. **TYPE:** `Union[int, float, str, None]`  |
-| `plot_legend_title_size`  | The title size of the legend. **TYPE:** `Union[int, float, str, None]`     |
-| `plot_legend_label_color` | The label color of the legend. **TYPE:** `Union[str, None]`                |
-| `plot_legend_title`       | The legend title; an empty string draws none. **TYPE:** `Union[str, None]` |
-| `plot_legend_ncols`       | The number of legend columns. **TYPE:** `Union[int, None]`                 |
+| ATTRIBUTE                 | DESCRIPTION                                                                        |
+| ------------------------- | ---------------------------------------------------------------------------------- |
+| `plot_legend_shadow`      | Show the legends shadow. **TYPE:** `Union[bool, None]`                             |
+| `plot_legend_frameon`     | Show the legends frame. **TYPE:** `Union[bool, None]`                              |
+| `plot_legend_alignment`   | The legend alignment. **TYPE:** `Union[LEGEND_ALIGN, str, None]`                   |
+| `plot_legend_location`    | The legend location. **TYPE:** `Union[LEGEND_LOCATION, str, None]`                 |
+| `plot_legend_font_size`   | The font size within the legend. **TYPE:** `Union[int, float, str, None]`          |
+| `plot_legend_title_size`  | The title size of the legend. **TYPE:** `Union[int, float, str, None]`             |
+| `plot_legend_label_color` | The label color of the legend. **TYPE:** `Union[str, None]`                        |
+| `plot_legend_title`       | The legend title; an empty string draws none. **TYPE:** `Union[str, None]`         |
+| `plot_legend_ncols`       | The number of legend columns. **TYPE:** `Union[int, None]`                         |
+| `plot_legend_edge_color`  | The legend frame color. None keeps matplotlib's. **TYPE:** `Union[str, None]`      |
+| `plot_legend_face_color`  | The legend background color. None keeps matplotlib's. **TYPE:** `Union[str, None]` |
 
 Added in Unreleased
 
-The `plot_legend_title` and `plot_legend_ncols` attributes.
+The `plot_legend_title`, `plot_legend_ncols`, `plot_legend_edge_color` and `plot_legend_face_color` attributes.
 
 ### datachart.typings.AreaStyleAttrs
 
@@ -966,12 +976,12 @@ The typing for the value labels: the numbers a chart prints beside its marks whe
 
 Added in Unreleased
 
-| ATTRIBUTE               | DESCRIPTION                                                                                                                                                                     |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plot_value_fontsize`   | The font size of the value labels. **TYPE:** `Union[int, float, None]`                                                                                                          |
-| `plot_value_color`      | The color of the value labels. **TYPE:** `Union[str, None]`                                                                                                                     |
-| `plot_value_padding`    | The gap between a mark and its value label, in points. **TYPE:** `Union[int, float, None]`                                                                                      |
-| `plot_value_halo_width` | The width, in points, of the white halo stroked around the value labels so they stay legible over marks and lines. None or 0 draws no halo. **TYPE:** `Union[int, float, None]` |
+| ATTRIBUTE               | DESCRIPTION                                                                                                                                                                                        |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_value_fontsize`   | The font size of the value labels. **TYPE:** `Union[int, float, None]`                                                                                                                             |
+| `plot_value_color`      | The color of the value labels. **TYPE:** `Union[str, None]`                                                                                                                                        |
+| `plot_value_padding`    | The gap between a mark and its value label, in points. **TYPE:** `Union[int, float, None]`                                                                                                         |
+| `plot_value_halo_width` | The width, in points, of the halo, in the axes face color, stroked around the value labels so they stay legible over marks and lines. None or 0 draws no halo. **TYPE:** `Union[int, float, None]` |
 
 ### datachart.typings.HistStyleAttrs
 
@@ -1154,24 +1164,29 @@ Bases: `TypedDict`
 
 The typing for the box plot style.
 
-| ATTRIBUTE                     | DESCRIPTION                                                           |
-| ----------------------------- | --------------------------------------------------------------------- |
-| `plot_box_color`              | The box fill color. **TYPE:** `Union[str, None]`                      |
-| `plot_box_alpha`              | The alpha value of the box. **TYPE:** `Union[float, None]`            |
-| `plot_box_linewidth`          | The line width of the box. **TYPE:** `Union[int, float, None]`        |
-| `plot_box_edgecolor`          | The edge color of the box. **TYPE:** `Union[str, None]`               |
-| `plot_box_outlier_marker`     | The outlier marker style. **TYPE:** `Union[LINE_MARKER, str, None]`   |
-| `plot_box_outlier_size`       | The outlier marker size. **TYPE:** `Union[int, float, None]`          |
-| `plot_box_outlier_color`      | The outlier marker color. **TYPE:** `Union[str, None]`                |
-| `plot_box_outlier_edge_color` | The outlier marker edge color. **TYPE:** `Union[str, None]`           |
-| `plot_box_median_color`       | The median line color. **TYPE:** `Union[str, None]`                   |
-| `plot_box_median_linewidth`   | The median line width. **TYPE:** `Union[int, float, None]`            |
-| `plot_box_whisker_color`      | The whisker line color. **TYPE:** `Union[str, None]`                  |
-| `plot_box_whisker_linewidth`  | The whisker line width. **TYPE:** `Union[int, float, None]`           |
-| `plot_box_cap_color`          | The cap line color. **TYPE:** `Union[str, None]`                      |
-| `plot_box_cap_linewidth`      | The cap line width. **TYPE:** `Union[int, float, None]`               |
-| `plot_xticks_label_rotate`    | The label rotation of the xticks. **TYPE:** `Union[int, float, None]` |
-| `plot_yticks_label_rotate`    | The label rotation of the yticks. **TYPE:** `Union[int, float, None]` |
+| ATTRIBUTE                     | DESCRIPTION                                                             |
+| ----------------------------- | ----------------------------------------------------------------------- |
+| `plot_box_color`              | The box fill color. **TYPE:** `Union[str, None]`                        |
+| `plot_box_alpha`              | The alpha value of the box. **TYPE:** `Union[float, None]`              |
+| `plot_box_linewidth`          | The line width of the box. **TYPE:** `Union[int, float, None]`          |
+| `plot_box_edgecolor`          | The edge color of the box. **TYPE:** `Union[str, None]`                 |
+| `plot_box_outlier_marker`     | The outlier marker style. **TYPE:** `Union[LINE_MARKER, str, None]`     |
+| `plot_box_outlier_size`       | The outlier marker size. **TYPE:** `Union[int, float, None]`            |
+| `plot_box_outlier_color`      | The outlier marker color. **TYPE:** `Union[str, None]`                  |
+| `plot_box_outlier_edge_color` | The outlier marker edge color. **TYPE:** `Union[str, None]`             |
+| `plot_box_median_color`       | The median line color. **TYPE:** `Union[str, None]`                     |
+| `plot_box_median_linewidth`   | The median line width. **TYPE:** `Union[int, float, None]`              |
+| `plot_box_whisker_color`      | The whisker line color. **TYPE:** `Union[str, None]`                    |
+| `plot_box_whisker_linewidth`  | The whisker line width. **TYPE:** `Union[int, float, None]`             |
+| `plot_box_cap_color`          | The cap line color. **TYPE:** `Union[str, None]`                        |
+| `plot_box_cap_linewidth`      | The cap line width. **TYPE:** `Union[int, float, None]`                 |
+| `plot_xticks_label_rotate`    | The label rotation of the xticks. **TYPE:** `Union[int, float, None]`   |
+| `plot_yticks_label_rotate`    | The label rotation of the yticks. **TYPE:** `Union[int, float, None]`   |
+| `plot_box_hatch`              | The hatch pattern of the box. **TYPE:** `Union[HATCH_STYLE, str, None]` |
+
+Added in Unreleased
+
+The `plot_box_hatch` attribute.
 
 ### datachart.typings.SwarmStyleAttrs
 
@@ -1206,6 +1221,11 @@ The typing for the violin plot style.
 | `plot_violin_inner_linewidth` | The line width of the inner marks. **TYPE:** `Union[int, float, None]`                 |
 | `plot_violin_median_color`    | The color of the median dot. **TYPE:** `Union[str, None]`                              |
 | `plot_violin_median_size`     | The size of the median dot. **TYPE:** `Union[int, float, None]`                        |
+| `plot_violin_hatch`           | The hatch pattern of the body. **TYPE:** `Union[HATCH_STYLE, str, None]`               |
+
+Added in Unreleased
+
+The `plot_violin_hatch` attribute.
 
 ### datachart.typings.RaincloudStyleAttrs
 
@@ -1230,6 +1250,7 @@ The typing for the ridgeline plot style.
 | `plot_ridgeline_overlap`         | How far a peak rises into the row above, in [0, 1]. **TYPE:** `Union[float, None]`     |
 | `plot_ridgeline_inner_color`     | The color of the inner marks; defaults to the font color. **TYPE:** `Union[str, None]` |
 | `plot_ridgeline_inner_linewidth` | The line width of the inner marks. **TYPE:** `Union[int, float, None]`                 |
+| `plot_ridgeline_hatch`           | The hatch pattern of the ridge fill. **TYPE:** `Union[HATCH_STYLE, str, None]`         |
 
 ### datachart.typings.ParallelCoordsStyleAttrs
 
@@ -1237,28 +1258,28 @@ Bases: `TypedDict`
 
 The typing for the parallel coordinates chart style.
 
-| ATTRIBUTE                           | DESCRIPTION                                                                 |
-| ----------------------------------- | --------------------------------------------------------------------------- |
-| `plot_parallel_color`               | The line color. **TYPE:** `Union[str, None]`                                |
-| `plot_parallel_alpha`               | The alpha value of the lines. **TYPE:** `Union[float, None]`                |
-| `plot_parallel_width`               | The line width. **TYPE:** `Union[int, float, None]`                         |
-| `plot_parallel_style`               | The line style. **TYPE:** `Union[LINE_STYLE, str, None]`                    |
-| `plot_parallel_marker`              | The marker style for data points. **TYPE:** `Union[LINE_MARKER, str, None]` |
-| `plot_parallel_zorder`              | The draw order of data lines. **TYPE:** `Union[int, None]`                  |
-| `plot_parallel_axis_color`          | The vertical axis line color. **TYPE:** `Union[str, None]`                  |
-| `plot_parallel_axis_width`          | The vertical axis line width. **TYPE:** `Union[int, float, None]`           |
-| `plot_parallel_axis_zorder`         | The vertical axis line draw order. **TYPE:** `Union[int, None]`             |
-| `plot_parallel_tick_color`          | The tick mark color. **TYPE:** `Union[str, None]`                           |
-| `plot_parallel_tick_width`          | The tick mark line width. **TYPE:** `Union[int, float, None]`               |
-| `plot_parallel_tick_length`         | The tick mark length. **TYPE:** `Union[float, None]`                        |
-| `plot_parallel_tick_label_size`     | The tick label font size. **TYPE:** `Union[int, float, None]`               |
-| `plot_parallel_tick_label_color`    | The tick label font color. **TYPE:** `Union[str, None]`                     |
-| `plot_parallel_tick_label_bg_color` | The tick label background color. **TYPE:** `Union[str, None]`               |
-| `plot_parallel_tick_label_bg_alpha` | The tick label background alpha. **TYPE:** `Union[float, None]`             |
-| `plot_parallel_dim_label_size`      | The dimension label font size. **TYPE:** `Union[int, float, None]`          |
-| `plot_parallel_dim_label_color`     | The dimension label font color. **TYPE:** `Union[str, None]`                |
-| `plot_parallel_dim_label_rotation`  | The dimension label rotation. **TYPE:** `Union[int, float, None]`           |
-| `plot_parallel_dim_label_pad`       | The dimension label padding from axis. **TYPE:** `Union[int, float, None]`  |
+| ATTRIBUTE                           | DESCRIPTION                                                                                                                        |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_parallel_color`               | The line color. **TYPE:** `Union[str, None]`                                                                                       |
+| `plot_parallel_alpha`               | The alpha value of the lines. **TYPE:** `Union[float, None]`                                                                       |
+| `plot_parallel_width`               | The line width. **TYPE:** `Union[int, float, None]`                                                                                |
+| `plot_parallel_style`               | The line style. **TYPE:** `Union[LINE_STYLE, str, None]`                                                                           |
+| `plot_parallel_marker`              | The marker style for data points. **TYPE:** `Union[LINE_MARKER, str, None]`                                                        |
+| `plot_parallel_zorder`              | The draw order of data lines. **TYPE:** `Union[int, None]`                                                                         |
+| `plot_parallel_axis_color`          | The vertical axis line color. **TYPE:** `Union[str, None]`                                                                         |
+| `plot_parallel_axis_width`          | The vertical axis line width. **TYPE:** `Union[int, float, None]`                                                                  |
+| `plot_parallel_axis_zorder`         | The vertical axis line draw order. **TYPE:** `Union[int, None]`                                                                    |
+| `plot_parallel_tick_color`          | The tick mark color. **TYPE:** `Union[str, None]`                                                                                  |
+| `plot_parallel_tick_width`          | The tick mark line width. **TYPE:** `Union[int, float, None]`                                                                      |
+| `plot_parallel_tick_length`         | The tick mark length. **TYPE:** `Union[float, None]`                                                                               |
+| `plot_parallel_tick_label_size`     | The tick label font size. **TYPE:** `Union[int, float, None]`                                                                      |
+| `plot_parallel_tick_label_color`    | The tick label font color. **TYPE:** `Union[str, None]`                                                                            |
+| `plot_parallel_tick_label_bg_color` | The tick label background color; None draws no box and strokes the label with the value halo instead. **TYPE:** `Union[str, None]` |
+| `plot_parallel_tick_label_bg_alpha` | The tick label background alpha. **TYPE:** `Union[float, None]`                                                                    |
+| `plot_parallel_dim_label_size`      | The dimension label font size. **TYPE:** `Union[int, float, None]`                                                                 |
+| `plot_parallel_dim_label_color`     | The dimension label font color. **TYPE:** `Union[str, None]`                                                                       |
+| `plot_parallel_dim_label_rotation`  | The dimension label rotation. **TYPE:** `Union[int, float, None]`                                                                  |
+| `plot_parallel_dim_label_pad`       | The dimension label padding from axis. **TYPE:** `Union[int, float, None]`                                                         |
 
 ### datachart.typings.ThemeDefaultAttrs
 
@@ -1266,11 +1287,18 @@ Bases: `TypedDict`
 
 The typing for theme-driven defaults and cycles.
 
-| ATTRIBUTE                   | DESCRIPTION                                                                                                                                                                            |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `chart_default_show_grid`   | The theme default for show_grid, applied when a chart call leaves it unset. Never applies to heatmaps. None means the theme has no opinion. **TYPE:** `Union[SHOW_GRID, str, None]`    |
-| `chart_default_show_values` | The theme default for show_values, applied to every chart that takes it when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** `Union[bool, None]`        |
-| `plot_hatch_cycle`          | The hatch patterns assigned per bar/histogram series, parallel to the color cycle. An explicit per-chart hatch style wins. None disables the cycle. **TYPE:** `Union[List[str], None]` |
+| ATTRIBUTE                           | DESCRIPTION                                                                                                                                                                                                                                                                                                                                 |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `chart_default_show_grid`           | The theme default for show_grid, applied when a chart call leaves it unset. Never applies to heatmaps. None means the theme has no opinion. **TYPE:** `Union[SHOW_GRID, str, None]`                                                                                                                                                         |
+| `chart_default_show_values`         | The theme default for show_values, applied to every chart that takes it when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** `Union[bool, None]`                                                                                                                                                             |
+| `chart_default_node_label_position` | The theme default for the network chart's label_position, applied when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** `Union[NODE_LABEL_POSITION, str, None]`                                                                                                                                               |
+| `plot_hatch_cycle`                  | The hatch patterns assigned per bar/histogram series, parallel to the color cycle; with plot_etch on, line area fills and stacked areas take them too. An explicit per-chart hatch style wins. None disables the cycle. **TYPE:** `Union[List[str], None]`                                                                                  |
+| `plot_linestyle_cycle`              | The line styles assigned per line, bump and radial line series, parallel to the color cycle. An explicit per-chart line style wins. None disables the cycle. **TYPE:** `Union[List[Union[LINE_STYLE, str]], None]`                                                                                                                          |
+| `plot_marker_cycle`                 | The markers assigned per scatter and radial scatter series, parallel to the color cycle, and per network node group: a marker, or {"marker": ..., "hollow": True} to draw it as an outline. An explicit per-chart marker wins. None disables the cycle. **TYPE:** `Union[List[Union[LINE_MARKER, str, Dict[str, Union[str, bool]]]], None]` |
+
+Added in Unreleased
+
+The `chart_default_node_label_position`, `plot_linestyle_cycle` and `plot_marker_cycle` attributes.
 
 ### datachart.typings.SketchStyleAttrs
 
@@ -1280,7 +1308,21 @@ The typing for the sketch attributes: the theme's render-scoped rc-level look (p
 
 Added in v0.9.1
 
-| ATTRIBUTE                | DESCRIPTION                                                                                                                                                                                                                                        |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plot_sketch_params`     | The path wobble as matplotlib sketch parameters [scale, length, randomness]; plt.xkcd() uses [1, 100, 2]. None draws clean paths. **TYPE:** `Union[List[float], None]`                                                                             |
-| `plot_sketch_halo_width` | The extra width, added to the line width, of the white halo stroked under series lines (line, radial, regression), so crossing lines read as cut-outs; marks, text and patches stay clean. None or 0 draws no halo. **TYPE:** `Union[float, None]` |
+| ATTRIBUTE                | DESCRIPTION                                                                                                                                                                                                                                                           |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_sketch_params`     | The path wobble as matplotlib sketch parameters [scale, length, randomness]; plt.xkcd() uses [1, 100, 2]. None draws clean paths. **TYPE:** `Union[List[float], None]`                                                                                                |
+| `plot_sketch_halo_width` | The extra width, added to the line width, of the halo (in the axes face color) stroked under series lines (line, radial, regression), so crossing lines read as cut-outs; marks, text and patches stay clean. None or 0 draws no halo. **TYPE:** `Union[float, None]` |
+
+### datachart.typings.InkStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the ink attributes: marks drawn as a quill and an etching needle would draw them. Every attribute resolves when the chart is built and rides on its artists, so composition keeps the look; `None` turns it off.
+
+Added in Unreleased
+
+| ATTRIBUTE         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_ink_stroke` | The broad-nib pen the series lines (line, bump, radial, regression) are drawn with, as a filled ribbon whose width varies along the line. Keys: width_scale (the nib width over the line width), nib_angle (degrees), nib_floor (the hairline width as a share of the nib), wobble (the ink wobble amplitude), taper (the end taper, in pixels). None draws plain lines. **TYPE:** `Union[Dict[str, float], None]`                                                                                                          |
+| `plot_etch`       | The etching that replaces the hatch tile of a hatched fill with hand-drawn lines clipped to its outline; the hatch pattern still picks the lines and . stipples. Keys: spacing (points between lines), jitter (the spacing jitter as a share of it), angle_jitter (degrees), line_width (points), wash (the share of the face color laid over the axes face under the lines; fills under lines take none), color (the etch ink). None keeps matplotlib's hatch. **TYPE:** `Union[Dict[str, Union[float, str, None]], None]` |
+| `plot_value_etch` | The steps a value scale draws in when plot_etch is on: washes (one fill color per step, lightest first) and hatches (one pattern per step, sparsest first). Heatmap, calendar heatmap and hexbin cells and filled contour bands take the step their value falls in, a filled contour draws its level lines and labels over the bands, and a legend of the steps replaces the colorbar. None keeps the colormap. **TYPE:** `Union[Dict[str, List[str]], None]`                                                               |
