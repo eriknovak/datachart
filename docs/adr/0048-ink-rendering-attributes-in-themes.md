@@ -6,11 +6,11 @@ status: accepted
 
 ADR 0027 let a theme carry exactly two render-scoped attributes, the sketch
 wobble and the halo, and nothing else past the `StyleAttrs` contract. A
-quill-and-parchment theme (`THEME.QUILL`) needs marks matplotlib has no
+quill-and-ink theme (`THEME.QUILL`) needs marks matplotlib has no
 property for: a series line whose width varies along its length like a
 broad-nib pen, fills etched by hand instead of tiled with a hatch, a value
-scale drawn as wash darkness plus etch density instead of a colormap, and a
-parchment ground under ink furniture. It also needs series to differ by line
+scale drawn as etch density instead of a colormap, and ink-colored
+furniture on a ground a theme can tint. It also needs series to differ by line
 style and marker instead of color, since the theme owns one ink.
 
 We extend the enumerated set, each attribute `None` (off) in every other

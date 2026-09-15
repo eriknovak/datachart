@@ -13,7 +13,7 @@ from ..constants import (
 register_bundled_fonts("IMFeENrm28P.ttf", "IMFeENit28P.ttf", "IMFeENsc28P.ttf")
 
 INK = "#1A120A"
-PARCHMENT = "#F3E7CB"
+PAPER = "#FFFFFF"
 
 QUILL_THEME: StyleAttrs = make_theme(
     {
@@ -35,9 +35,6 @@ QUILL_THEME: StyleAttrs = make_theme(
         "font_subtitle_color": INK,
         "font_xlabel_color": INK,
         "font_ylabel_color": INK,
-        # the page stays white like every theme's; the plots are parchment
-        "figure_facecolor": "#FFFFFF",
-        "axes_facecolor": PARCHMENT,
         "axes_spines_color": INK,
         "axes_ticks_color": INK,
         "axes_spines_width": 1.4,
@@ -82,16 +79,15 @@ QUILL_THEME: StyleAttrs = make_theme(
             "wash": 0.1,
             "color": INK,
         },
-        # a value scale reads as etch density alone, on bare parchment
+        # a value scale reads as etch density alone, on bare paper
         "plot_value_etch": {
-            "washes": [PARCHMENT] * 5,
+            "washes": [PAPER] * 5,
             "hatches": ["", ".", "..", "//", "xx"],
         },
         "plot_legend_label_color": INK,
         "plot_legend_font_size": 9,
         "plot_legend_title_size": 10,
         "plot_legend_edge_color": INK,
-        "plot_legend_face_color": PARCHMENT,
         "plot_line_width": 2.2,
         "plot_area_alpha": 1.0,
         "plot_area_linewidth": 0.8,
@@ -122,7 +118,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_vspan_edge_color": INK,
         "plot_hspan_edge_color": INK,
         "plot_text_color": INK,
-        "plot_text_box_facecolor": PARCHMENT,
+        "plot_text_box_facecolor": PAPER,
         "plot_text_box_edgecolor": INK,
         "plot_text_box_style": "round,pad=0.4,rounding_size=0.2",
         "plot_text_arrow_color": INK,
@@ -134,7 +130,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_calendar_heatmap_font_size": 8,
         "plot_heatmap_edge_width": 0.6,
         "plot_heatmap_edge_color": INK,
-        "plot_calendar_heatmap_edge_color": PARCHMENT,
+        "plot_calendar_heatmap_edge_color": PAPER,
         "plot_calendar_heatmap_month_line_color": INK,
         "plot_contour_color": INK,
         "plot_contour_line_width": 1.8,
@@ -154,7 +150,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_parallel_tick_color": INK,
         "plot_parallel_tick_label_color": INK,
         "plot_parallel_tick_label_size": 9,
-        # labels read through a parchment halo, as Sankey and treemap labels do
+        # labels read through a paper halo, as Sankey and treemap labels do
         "plot_parallel_tick_label_bg_color": None,
         "plot_parallel_dim_label_color": INK,
         "plot_box_edgecolor": INK,
@@ -166,7 +162,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_box_whisker_linewidth": 1.2,
         "plot_box_cap_color": INK,
         "plot_box_cap_linewidth": 1.2,
-        "plot_box_outlier_color": PARCHMENT,
+        "plot_box_outlier_color": PAPER,
         "plot_box_outlier_edge_color": INK,
         "plot_box_alpha": 1.0,
         "plot_violin_edgecolor": INK,
@@ -174,7 +170,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_violin_alpha": 1.0,
         "plot_violin_hatch": "\\",
         "plot_violin_inner_color": INK,
-        "plot_violin_median_color": PARCHMENT,
+        "plot_violin_median_color": PAPER,
         "plot_ridgeline_edgecolor": INK,
         "plot_ridgeline_linewidth": 1.2,
         "plot_ridgeline_alpha": 1.0,
@@ -211,7 +207,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_network_group_linestyle": LINE_STYLE.DOTTED,
     }
 )
-"""The quill theme: black ink on parchment, as a quill and an etching needle draw.
+"""The quill theme: black ink on white paper, as a quill and an etching needle draw.
 
 One ink only: series differ by line style, marker and etching, never by
 color. Series lines are broad-nib pen strokes whose width varies along the

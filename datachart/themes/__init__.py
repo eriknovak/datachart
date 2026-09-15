@@ -12,7 +12,7 @@ Attributes:
     MINIMAL_THEME (datachart.typings.StyleAttrs): The minimal theme style (accent blue, no spines, flat bars).
     MATERIAL_THEME (datachart.typings.StyleAttrs): The material theme style (Google palette, light grid).
     SKETCH_THEME (datachart.typings.StyleAttrs): The sketch theme style (hand-drawn, xkcd-style wobble and halo, Comic Neue font).
-    QUILL_THEME (datachart.typings.StyleAttrs): The quill theme style (black ink on parchment, pen-stroked lines, etched fills, IM Fell English font).
+    QUILL_THEME (datachart.typings.StyleAttrs): The quill theme style (black ink on white paper, pen-stroked lines, etched fills, IM Fell English font).
 
 """
 

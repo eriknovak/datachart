@@ -1256,7 +1256,7 @@ class THEME:
         MATERIAL (str): The material theme (Google palette, light grid). Equals to `"material"`.
         SKETCH (str): The sketch theme (hand-drawn, xkcd-style wobble and halo,
             Comic Neue font). Equals to `"sketch"`.
-        QUILL (str): The quill theme (black ink on parchment: pen-stroked lines,
+        QUILL (str): The quill theme (black ink on white paper: pen-stroked lines,
             etched fills, IM Fell English font). Equals to `"quill"`.
 
     !!! info "Added in Unreleased"

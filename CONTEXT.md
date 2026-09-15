@@ -506,7 +506,7 @@ nothing global changes.
 _Avoid_: xkcd mode, rc theme
 
 **Ink attributes**:
-The theme's quill-and-parchment look (ADR 0048): the ink stroke (a series
+The theme's quill-and-ink look (ADR 0048): the ink stroke (a series
 line drawn as a broad-nib ribbon), the etch (a hatched fill drawn as
 hand-etched lines over a wash), and the value etch (a value scale drawn as
 wash-and-etch steps with a step legend in place of the colorbar). Each rides
