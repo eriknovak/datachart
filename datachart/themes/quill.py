@@ -126,6 +126,9 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_heatmap_cmap": COLORS.Greys,
         "plot_heatmap_frame_color": INK,
         "plot_heatmap_font_color": INK,
+        # IM Fell's old-style figures run small: values sit a size up
+        "plot_heatmap_font_size": 10,
+        "plot_calendar_heatmap_font_size": 8,
         "plot_heatmap_edge_width": 0.6,
         "plot_heatmap_edge_color": INK,
         "plot_calendar_heatmap_edge_color": PARCHMENT,
@@ -147,6 +150,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_parallel_axis_color": INK,
         "plot_parallel_tick_color": INK,
         "plot_parallel_tick_label_color": INK,
+        "plot_parallel_tick_label_size": 9,
         "plot_parallel_tick_label_bg_color": PARCHMENT,
         "plot_parallel_dim_label_color": INK,
         "plot_box_edgecolor": INK,

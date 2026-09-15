@@ -28,6 +28,7 @@ from datachart.charts import (
     Histogram,
     LineChart,
     NetworkChart,
+    ParallelCoords,
     RadialChart,
     Treemap,
     SankeyChart,
@@ -376,6 +377,17 @@ class TestQuillTheme(unittest.TestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("error")
             png(figure)
+
+    def test_value_texts_take_the_theme_font(self):
+        config.set_theme(THEME.QUILL)
+        heatmap = Heatmap(GRID, show_heatmap_values=True)
+        self.assertEqual(heatmap.axes[0].texts[0].get_fontname(), "IM FELL English")
+        contour = ContourChart(GRID, show_labels=True)
+        self.assertEqual(contour.axes[0].texts[0].get_fontname(), "IM FELL English")
+        parallel = ParallelCoords(
+            [{"a": 1.0, "b": 2.0}, {"a": 2.0, "b": 1.0}], dimensions=["a", "b"]
+        )
+        self.assertEqual(parallel.axes[0].texts[0].get_fontname(), "IM FELL English")
 
     def test_theme_file_round_trip_renders_the_same(self):
         config.set_theme(THEME.QUILL)

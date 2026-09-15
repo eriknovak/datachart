@@ -3722,6 +3722,10 @@ def _draw_colorbar(
         colorbar.set_ticks(setting["ticks"])
     if setting["label"]:
         colorbar.set_label(setting["label"], **setting["label_style"])
+    # tick labels take no family through tick_params; restyled directly
+    family = setting["label_style"]["family"]
+    for label in colorbar.ax.get_xticklabels() + colorbar.ax.get_yticklabels():
+        label.set_fontfamily(family)
 
 
 def _place_colorbar(ax: plt.Axes, mappable, setting: dict, aspect_locked: bool):
@@ -4292,6 +4296,8 @@ class ContourLayer(Layer):
             )
         self.contour_style = style
         self.label_style = get_contour_label_style(self.style)
+        # clabel takes no font family; the level labels are restyled after
+        self.label_family = resolve_font_family()
         self.x, self.y, self.z = self._grid()
         self.levels = contour_levels(self.z, self.settings.get("levels"))
 
@@ -4448,7 +4454,8 @@ class ContourLayer(Layer):
                 label_style["fmt"] = fmt
             if ctx.emphasis == EMPHASIS_BACKGROUND:
                 label_style["colors"] = self.muted_color
-            ax.clabel(lines, **label_style)
+            for text in ax.clabel(lines, **label_style):
+                text.set_fontfamily(self.label_family)
 
     @staticmethod
     def _level_resolver(contours, label) -> Callable:

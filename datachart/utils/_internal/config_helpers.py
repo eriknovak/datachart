@@ -860,7 +860,9 @@ def get_heatmap_font_style(heatmap_style: dict, prefix: str = "plot_heatmap") ->
         ("weight", f"{prefix}_font_weight"),
     ]
 
-    return create_config_dict(heatmap_style, config_attrs)
+    style = create_config_dict(heatmap_style, config_attrs)
+    style["family"] = resolve_font_family()
+    return style
 
 
 def get_heatmap_edge_style(heatmap_style: dict, prefix: str = "plot_heatmap") -> dict:
@@ -1370,7 +1372,9 @@ def get_parallel_tick_label_style(chart_style: dict) -> dict:
         ("color", "plot_parallel_tick_label_color"),
     ]
 
-    return create_config_dict(chart_style, config_attrs)
+    style = create_config_dict(chart_style, config_attrs)
+    style["family"] = resolve_font_family()
+    return style
 
 
 def get_parallel_tick_label_bbox(chart_style: dict) -> dict:
@@ -1415,7 +1419,9 @@ def get_parallel_dim_label_style(chart_style: dict) -> dict:
         ("color", "plot_parallel_dim_label_color"),
     ]
 
-    return create_config_dict(chart_style, config_attrs)
+    style = create_config_dict(chart_style, config_attrs)
+    style["family"] = resolve_font_family()
+    return style
 
 
 def get_parallel_dim_label_rotation(chart_style: dict) -> float:
