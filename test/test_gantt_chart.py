@@ -163,6 +163,18 @@ class TestGanttRowOrder(unittest.TestCase):
         ).axes[0]
         self.assertEqual(row_labels(ax), ["Test", "Build", "Docs", "Design"])
 
+    def test_missing_and_none_group_sort_alike(self):
+        records = [
+            task("A", 0, 3, group="g"),
+            task("B", 1, 3, group=None),
+            task("C", 2, 3),
+            task("D", 3, 3, group="g"),
+        ]
+        ax = GanttChart(
+            records, sort=SORT.ASCENDING, sort_by=GANTT_SORT_KEY.GROUP
+        ).axes[0]
+        self.assertEqual(row_labels(ax), ["A", "D", "B", "C"])
+
     def test_groups_stay_contiguous(self):
         records = [
             task("A1", 0, 3, group="A"),

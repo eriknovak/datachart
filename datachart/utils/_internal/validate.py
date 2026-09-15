@@ -234,7 +234,7 @@ def validate_shared_x(columns) -> None:
             )
 
 
-def validate_axis_kinds(kinds, column: str = "x") -> Optional[str]:
+def validate_axis_kinds(kinds, column: str = "`x`") -> Optional[str]:
     """The one axis kind the layers' `column` asks for; a temporal/numeric mix raises.
 
     Kinds are the `AXIS_*` values, or None for a layer without x. Time wins
@@ -244,7 +244,7 @@ def validate_axis_kinds(kinds, column: str = "x") -> Optional[str]:
     present = {kind for kind in kinds if kind is not None}
     if {AXIS_TEMPORAL, AXIS_NUMERIC} <= present:
         raise ValueError(
-            f"Cannot mix temporal and numeric `{column}` values in one panel. "
+            f"Cannot mix temporal and numeric {column} values in one panel. "
             "Every chart sharing an axis must give datetimes or numbers, not both."
         )
     for kind in (AXIS_TEMPORAL, AXIS_NUMERIC, AXIS_CATEGORICAL):
@@ -872,7 +872,7 @@ def validate_gantt_tasks(records) -> None:
         depends_on = record.get("depends_on")
         if depends_on is None:
             continue
-        if isinstance(depends_on, str) or not isinstance(depends_on, list):
+        if not isinstance(depends_on, list):
             raise ValueError(
                 f"`depends_on` of task {record['task']!r} must be a list of task "
                 f"names; got {depends_on!r}."

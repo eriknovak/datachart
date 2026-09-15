@@ -68,10 +68,12 @@ lines that take datetimes (ADR 0037), value labels (ADR 0033).
   in days (a per-record front, so no `by`; ADR 0045).
 - **One layer on the bar layer's drawing.** `GanttLayer` builds on
   `BarLayer` — `barh` with `left` at the start and width the duration —
-  through the panel's bar slotting rather than copying it; the keys
-  specific to a gantt live under `plot_gantt_*` (bar, progress, dependency
-  arrow, today line, value labels, z-order), and themes override only
-  identity keys. Listed under "trends and comparisons".
+  through the panel's bar slotting rather than copying it. The bars take
+  the `plot_bar_*` color, alpha, edge, hatch and z-order keys and the
+  shared value label keys; only what is specific to a gantt lives under
+  `plot_gantt_*` (bar height, progress, dependency arrow and its z-order,
+  today line), and themes override only identity keys. Listed under
+  "trends and comparisons".
 
 ## Considered options
 

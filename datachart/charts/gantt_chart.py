@@ -7,7 +7,6 @@ from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
 from ..utils._internal.validate import (
     validate_gantt_groups,
-    validate_gantt_show_values,
     validate_gantt_sort_by,
     validate_gantt_tasks,
     validate_sort,
@@ -160,13 +159,12 @@ def GanttChart(
         The figure containing the gantt chart.
 
     """
+    # records fail here, before layers are built; settings fail in the layer
     schedules = data if data and isinstance(data[0], list) else [data]
-    sort = validate_sort(sort)
-    sort_by = None if sort_by is None else validate_gantt_sort_by(sort, sort_by)
-    validate_gantt_show_values(show_values)
+    sort_key = validate_gantt_sort_by(validate_sort(sort), sort_by)
     for records in schedules:
         validate_gantt_tasks(records)
-        validate_gantt_groups(records, sort_by)
+        validate_gantt_groups(records, sort_key if sort is not None else None)
 
     if show_legend is None:
         show_legend = any(

@@ -2422,6 +2422,13 @@ def gantt_durations(tasks: list) -> np.ndarray:
     return ends - starts
 
 
+def _gantt_cluster(tasks: list, index: int):
+    """The row cluster of a task: its group, or the task alone without one."""
+
+    group = tasks[index].get("group")
+    return ("task", index) if group is None else group
+
+
 def sort_gantt_charts(charts: List[dict], settings: dict) -> List[dict]:
     """The charts with their task rows in `sort` order by `sort_by` (ADR 0049).
 
@@ -2445,20 +2452,20 @@ def sort_gantt_charts(charts: List[dict], settings: dict) -> List[dict]:
         starts = to_date_numbers([task["start"] for task in tasks])
         if sort_by == GANTT_SORT_KEY.GROUP:
             earliest = {}
-            for index, task in enumerate(tasks):
-                key = task.get("group", ("task", index))
+            for index in range(len(tasks)):
+                key = _gantt_cluster(tasks, index)
                 earliest[key] = min(earliest.get(key, starts[index]), starts[index])
             order = sorted(
                 range(len(tasks)),
                 key=lambda i: (
-                    sign * earliest[tasks[i].get("group", ("task", i))],
+                    sign * earliest[_gantt_cluster(tasks, i)],
                     sign * starts[i],
                 ),
             )
             # a group's rows stay contiguous even when two groups start together
             clusters = {}
             for i in order:
-                clusters.setdefault(tasks[i].get("group", ("task", i)), []).append(i)
+                clusters.setdefault(_gantt_cluster(tasks, i), []).append(i)
             order = [i for cluster in clusters.values() for i in cluster]
         else:
             order = sorted(range(len(tasks)), key=lambda i: sign * starts[i])
@@ -2492,10 +2499,8 @@ class GanttLayer(BarLayer):
             else np.array([], dtype=float)
         )
         self.durations = gantt_durations(self.tasks)
-        self.record_roles = [
-            validate_emphasis(t.get("emphasis"), f"task {t.get('task')!r} `emphasis`")
-            for t in self.tasks
-        ]
+        # the front validated the task records, their roles included
+        self.record_roles = [t.get("emphasis") for t in self.tasks]
         self.value_mode = validate_gantt_show_values(self.settings.get("show_values"))
         self._resolve_value_labels()
         self.show_values = self.value_mode is not None
@@ -2666,11 +2671,11 @@ class GanttLayer(BarLayer):
             )
 
     def _draw_progress(self, ax, rows, height, colors, bar_style, roles):
-        """The inner bars over each task's done fraction; None without progress."""
+        """The inner bars over each task's done fraction."""
 
         indices = [i for i, t in enumerate(self.tasks) if t.get("progress") is not None]
         if not indices:
-            return None
+            return
         style = self.gantt_style
         fraction = np.array([self.tasks[i]["progress"] for i in indices], dtype=float)
         progress_color = style.get("progress_color")
@@ -2678,7 +2683,8 @@ class GanttLayer(BarLayer):
             rows[indices],
             self.durations[indices] * fraction,
             left=self.starts[indices],
-            height=height * style.get("progress_height", 1.0),
+            height=height
+            * style.get("progress_height", config["plot_gantt_progress_height"]),
             color=[
                 progress_color or _darken(colors[i], GANTT_PROGRESS_DARKEN)
                 for i in indices
@@ -2690,7 +2696,6 @@ class GanttLayer(BarLayer):
         )
         self._etch(bars.patches)
         self._apply_patch_emphasis(bars.patches, [roles[i] for i in indices])
-        return bars
 
     def _draw_dependencies(self, ax, rows, height, ctx) -> None:
         """An elbow arrow from each dependency's end to the dependent's start."""
@@ -8447,7 +8452,7 @@ class Panel:
         # the axis kind is snapshotted at build, like the furniture (ADR 0037)
         self.x_kind = validate_axis_kinds([l.x_kind() for l in self.layers])
         self.value_kind = validate_axis_kinds(
-            [l.value_kind() for l in self.layers], "value"
+            [l.value_kind() for l in self.layers], "value-axis"
         )
         self.temporal_axis = self._temporal_axis()
         self.date_axes = self._date_axes()
