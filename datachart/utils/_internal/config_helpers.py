@@ -525,7 +525,6 @@ def get_network_style(chart_style: dict) -> dict:
         ("halo_width", "plot_network_label_halo_width"),
         ("group_alpha", "plot_network_group_alpha"),
         ("group_linestyle", "plot_network_group_linestyle"),
-        ("node_washes", "plot_network_node_washes"),
         ("edge_ink_stroke", "plot_network_edge_ink_stroke"),
     ]
 

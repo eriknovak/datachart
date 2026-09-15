@@ -479,13 +479,12 @@ class NetworkStyleAttrs(TypedDict):
         plot_network_label_halo_width (Union[float, None]): The width of the halo, in the axes face color, behind labels; 0 disables it.
         plot_network_group_alpha (Union[float, None]): The alpha of the disc in the group color behind each cluster of the grouped layout; 0 disables it.
         plot_network_group_linestyle (Union[LINE_STYLE, str, None]): Draws each cluster's mark as a ring in this line style and the edge color instead of a disc. `None` draws the disc.
-        plot_network_node_washes (Union[List[str], None]): The node fills by group, in group order, cycling; an ungrouped node takes the first. `None` fills nodes in the group colors.
         plot_network_edge_ink_stroke (Union[Dict[str, float], None]): The pen the edges are drawn with, as for `plot_ink_stroke`, plus `swell` (the pressure swell amplitude) and `noise` (the grain); a directed edge draws as a stroked shaft with a small head. `None` draws plain edges.
 
     !!! info "Added in Unreleased"
 
-        The `plot_network_group_linestyle`, `plot_network_node_washes` and
-        `plot_network_edge_ink_stroke` attributes.
+        The `plot_network_group_linestyle` and `plot_network_edge_ink_stroke`
+        attributes.
 
     """
 
@@ -507,7 +506,6 @@ class NetworkStyleAttrs(TypedDict):
     plot_network_label_halo_width: Union[float, None]
     plot_network_group_alpha: Union[float, None]
     plot_network_group_linestyle: Union[LINE_STYLE, str, None]
-    plot_network_node_washes: Union[List[str], None]
     plot_network_edge_ink_stroke: Union[Dict[str, float], None]
 
 
@@ -1077,8 +1075,9 @@ class ThemeDefaultAttrs(TypedDict):
             disables the cycle.
         plot_marker_cycle (Union[List[Union[LINE_MARKER, str, Dict[str, Union[str, bool]]]], None]):
             The markers assigned per scatter and radial scatter series,
-            parallel to the color cycle: a marker, or `{"marker": ..., "hollow":
-            True}` to draw it as an outline. An explicit per-chart marker wins.
+            parallel to the color cycle, and per network node group: a marker,
+            or `{"marker": ..., "hollow": True}` to draw it as an outline. An
+            explicit per-chart marker wins.
             `None` disables the cycle.
 
     !!! info "Added in Unreleased"

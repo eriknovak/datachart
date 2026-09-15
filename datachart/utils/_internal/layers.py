@@ -28,7 +28,7 @@ import matplotlib.ticker as mticker
 from matplotlib.ticker import MaxNLocator
 from matplotlib.collections import LineCollection, PathCollection, PolyCollection
 from matplotlib.container import BarContainer
-from matplotlib.colors import LinearSegmentedColormap, to_hex, to_rgb
+from matplotlib.colors import LinearSegmentedColormap, to_hex, to_rgb, to_rgba
 from matplotlib.mlab import GaussianKDE
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
@@ -278,9 +278,8 @@ NETWORK_ARROW_HEAD_BASE = 6.0
 NETWORK_ARROW_HEAD_PER_WIDTH = 1.5
 # an inked directed edge: its head's width as a share of its length (ADR 0048)
 NETWORK_INKED_HEAD_WIDTH = 0.6
-# a cluster ring's stroke and a washed legend swatch's rim, in points
+# a cluster ring's stroke, in points
 NETWORK_RING_WIDTH = 0.9
-NETWORK_LEGEND_RIM_WIDTH = 1.2
 # the gap between a node's marker and a name printed above it, in points
 NETWORK_LABEL_GAP = 2.0
 # matplotlib skips underscore-prefixed labels when assembling the legend
@@ -6879,14 +6878,17 @@ class NetworkLayer(Layer):
             base = create_color_cycle(config["color_general_singular"], 1)[0]["color"]
             self.group_colors = {}
         self.node_colors = [self.group_colors.get(g, base) for g in groups]
-        # node washes by group slot (ADR 0048); an ungrouped node takes the first
-        washes = style.get("node_washes")
-        self.group_faces = dict(self.group_colors)
-        if washes:
-            self.group_faces = {
-                g: washes[i % len(washes)] for i, g in enumerate(self.group_names)
+        # groups take the theme's marker cycle, as series do (ADR 0048); a chart
+        # style that sets the node marker wins
+        cycle = config.get("plot_marker_cycle")
+        plain = (style["node_marker"], False)
+        self.group_markers = {g: plain for g in self.group_names}
+        if cycle and "plot_network_node_marker" not in self.style:
+            self.group_markers = {
+                g: _marker_entry(cycle[i % len(cycle)])
+                for i, g in enumerate(self.group_names)
             }
-            self.node_colors = [self.group_faces.get(g, washes[0]) for g in groups]
+        self.node_markers = [self.group_markers.get(g, plain) for g in groups]
         self.label_position = validate_node_label_position(
             self.settings.get("label_position")
             or config.get("chart_default_node_label_position")
@@ -6914,26 +6916,29 @@ class NetworkLayer(Layer):
     def legend_handles(self):
         if not self.group_names:
             return None
-        rim = {}
-        if self.network_style.get("node_washes"):
-            rim = {
-                "markeredgecolor": self.network_style["edgecolor"],
-                "markeredgewidth": NETWORK_LEGEND_RIM_WIDTH,
-            }
-        return [
-            Line2D(
-                [],
-                [],
-                marker=self.network_style["node_marker"],
-                linestyle="",
-                color=self.group_faces[g],
-                # half the default marker's diameter: a legend swatch, not a node
-                markersize=math.sqrt(self.network_style["node_size"]) / 2,
-                label=g,
-                **rim,
+        handles = []
+        for g in self.group_names:
+            marker, hollow = self.group_markers[g]
+            hollow_look = {}
+            if hollow:
+                hollow_look = {
+                    "markerfacecolor": "none",
+                    "markeredgewidth": HOLLOW_MARKER_EDGE_WIDTH,
+                }
+            handles.append(
+                Line2D(
+                    [],
+                    [],
+                    marker=marker,
+                    linestyle="",
+                    color=self.group_colors[g],
+                    # half the default marker's diameter: a legend swatch, not a node
+                    markersize=math.sqrt(self.network_style["node_size"]) / 2,
+                    label=g,
+                    **hollow_look,
+                )
             )
-            for g in self.group_names
-        ]
+        return handles
 
     def draw(self, ax: plt.Axes, ctx: DrawContext) -> None:
         style = self.network_style
@@ -7086,24 +7091,45 @@ class NetworkLayer(Layer):
         rim_widths = np.broadcast_to(
             _marker_edge_widths(style["linewidth"], self.areas), len(self.nodes)
         )
-        points = ax.scatter(
-            pos[:, 0],
-            pos[:, 1],
-            s=self.areas,
-            c=face,
-            alpha=alpha,
-            marker=style["node_marker"],
-            edgecolors=[
-                self.highlight_color if h else style["edgecolor"] for h in highlighted
-            ],
-            linewidths=[
-                style["highlight_linewidth"] if h else w
-                for h, w in zip(highlighted, rim_widths)
-            ],
-            zorder=3,
-            gid="nodes",
-        )
-        self.register_hover(points, lambda k: self.node_datums[k])
+        edges = [self.highlight_color if h else style["edgecolor"] for h in highlighted]
+        widths = [
+            style["highlight_linewidth"] if h else w
+            for h, w in zip(highlighted, rim_widths)
+        ]
+        # one scatter per marker: a scatter draws a single shape
+        for marker, hollow in dict.fromkeys(self.node_markers):
+            ks = [
+                k for k, entry in enumerate(self.node_markers) if entry == (marker, hollow)
+            ]
+            look = {
+                "c": [face[k] for k in ks],
+                "alpha": [alpha[k] for k in ks],
+                "edgecolors": [edges[k] for k in ks],
+                "linewidths": [widths[k] for k in ks],
+            }
+            if hollow:
+                # the outline in the face color is the mark; a collection alpha
+                # would fill "none" faces, so the alpha rides on the edge color
+                look = {
+                    "facecolors": "none",
+                    "edgecolors": [
+                        to_rgba(edges[k] if highlighted[k] else face[k], alpha[k])
+                        for k in ks
+                    ],
+                    "linewidths": [
+                        max(widths[k], HOLLOW_MARKER_EDGE_WIDTH) for k in ks
+                    ],
+                }
+            points = ax.scatter(
+                pos[ks, 0],
+                pos[ks, 1],
+                s=self.areas[ks],
+                marker=marker,
+                zorder=3,
+                gid="nodes",
+                **look,
+            )
+            self.register_hover(points, lambda i, ks=ks: self.node_datums[ks[i]])
 
         above = self.label_position == NODE_LABEL_POSITION.ABOVE
         for k, node in enumerate(self.nodes):

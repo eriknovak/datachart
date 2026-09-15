@@ -69,9 +69,9 @@ bodies a pattern of their own.
 (the top-level group's pattern repeated per depth; boxes fill with the
 ground so outer etching never shows through), `plot_network_edge_ink_stroke`
 (edges as pressure strokes: a directed edge draws as a stroked shaft so the
-pressure shows), `plot_network_node_washes` (node faces by group slot, ink
-rim), and `plot_network_group_linestyle` (a group hull as a ring, not a
-tinted disc). The theme-defaultable settings grow by
+pressure shows) and `plot_network_group_linestyle` (a group hull as a ring,
+not a tinted disc). Network node groups take the marker cycle's shapes, as
+series do. The theme-defaultable settings grow by
 `chart_default_node_label_position`, the network's node label placement.
 
 ## Commitments

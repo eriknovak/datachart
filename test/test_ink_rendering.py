@@ -512,7 +512,6 @@ NETWORK = {
         {"source": "b", "target": "c", "weight": 1.0},
     ],
 }
-WASHES = ["#e2d1a6", "#c1a874"]
 
 
 class TestChartInkLooks(unittest.TestCase):
@@ -554,7 +553,7 @@ class TestChartInkLooks(unittest.TestCase):
         patches = Treemap(TREE).axes[0].patches
         self.assertTrue(all(p.get_hatch() is None for p in patches))
 
-    def test_network_ink_roads_washes_and_rings(self):
+    def test_network_ink_roads_shapes_and_rings(self):
         config.update_config(
             {
                 "plot_network_edge_ink_stroke": {
@@ -564,7 +563,7 @@ class TestChartInkLooks(unittest.TestCase):
                     "swell": 0.5,
                     "noise": 0.12,
                 },
-                "plot_network_node_washes": WASHES,
+                "plot_marker_cycle": ["o", {"marker": "s", "hollow": True}],
                 "plot_network_group_linestyle": ":",
             }
         )
@@ -577,10 +576,12 @@ class TestChartInkLooks(unittest.TestCase):
         self.assertTrue(rings)
         self.assertEqual(rings[0].get_facecolor()[3], 0.0)
         self.assertEqual(rings[0].get_linestyle(), ":")
-        faces = [to_hex(f) for f in ax.collections[0].get_facecolors()]
-        self.assertEqual(faces, [WASHES[0], WASHES[0], WASHES[1]])
+        nodes = [c for c in ax.collections if c.get_gid() == "nodes"]
+        self.assertEqual([len(c.get_offsets()) for c in nodes], [2, 1])
+        self.assertEqual(len(nodes[1].get_facecolors()), 0)
         handle = ax.get_legend().legend_handles[1]
-        self.assertEqual(to_hex(handle.get_markerfacecolor()), WASHES[1])
+        self.assertEqual(handle.get_marker(), "s")
+        self.assertEqual(handle.get_markerfacecolor(), "none")
         png(figure)
 
     def test_node_label_position(self):

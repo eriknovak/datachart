@@ -182,7 +182,6 @@ BASE_THEME: StyleAttrs = {
     "plot_network_label_halo_width": 2,
     "plot_network_group_alpha": 0.12,
     "plot_network_group_linestyle": None,
-    "plot_network_node_washes": None,
     "plot_network_edge_ink_stroke": None,
     # plot grid style
     "plot_grid_alpha": 0.5,

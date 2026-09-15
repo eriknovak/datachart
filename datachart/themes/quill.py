@@ -184,6 +184,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_network_node_edge_color": INK,
         "plot_network_node_edge_width": 1.6,
         "plot_network_node_alpha": 1.0,
+        # groups differ by the marker cycle's shapes, filled and hollow
         "plot_network_edge_color": INK,
         "plot_network_edge_alpha": 0.9,
         "plot_network_edge_style": ARROW_STYLE.STRAIGHT,
@@ -199,15 +200,6 @@ QUILL_THEME: StyleAttrs = make_theme(
             "swell": 0.5,
             "noise": 0.12,
         },
-        # tan steps by group, never blank, neighbours far apart
-        "plot_network_node_washes": [
-            "#E2D1A6",
-            "#C1A874",
-            "#A88C52",
-            "#D3BF90",
-            PARCHMENT,
-            "#C1A874",
-        ],
         "plot_network_group_linestyle": LINE_STYLE.DOTTED,
     }
 )
