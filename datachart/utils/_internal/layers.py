@@ -670,8 +670,10 @@ def _apply_date_period(ax, axis_name: str, period: str, fmt, tz=None) -> None:
     )
     axis.set_major_formatter(_period_formatter(period, fmt, tz))
     params = axis.get_tick_params(which="major")
-    length = params.get("length", mpl.rcParams[f"{axis_name}tick.major.size"])
-    axis.set_tick_params(which="minor", length=length, width=params.get("width"))
+    # the edge marks take the major tick look the furniture gave the axis
+    edge_marks = {k: params[k] for k in ("length", "width", "color") if k in params}
+    edge_marks.setdefault("length", mpl.rcParams[f"{axis_name}tick.major.size"])
+    axis.set_tick_params(which="minor", **edge_marks)
     axis.set_tick_params(which="major", length=0)
 
     parent = DATE_PERIOD_PARENT[period]
