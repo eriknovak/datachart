@@ -57,11 +57,38 @@ lines that take datetimes (ADR 0037), value labels (ADR 0033).
   per subplot.
 - **Dependencies and today line are sugar over existing marks.**
   `show_dependencies` draws a `FancyArrowPatch` from each dependency's end
-  to the dependent's start (`plot_gantt_dependency_*`), off by default.
-  `show_today` draws a vertical reference line at `today` — `date.today()`
-  when not given — through the reference-line machinery with
-  `plot_gantt_today_*` style, so it lands on the temporal axis like any
-  datetime `vlines` entry.
+  to the dependent's start (`plot_gantt_dependency_*`), off by default. The
+  arrow enters the dependent bar from the top (along the dependency's row,
+  then onto the bar) or, with `plot_gantt_dependency_entry` `"left"`, from
+  the left (down from the dependency's end, then into the start); a
+  dependent starting no later than its dependency ends has no room on the
+  left and enters from the top. `show_today` draws a vertical reference
+  line at `today` — `date.today()` when not given — through the
+  reference-line machinery with `plot_gantt_today_*` style, so it lands on
+  the temporal axis like any datetime `vlines` entry; `today_label` prints
+  a label at its foot.
+- **A zero-length task is a milestone.** A task whose `end` equals its
+  `start` draws a marker (`plot_gantt_milestone_*`) instead of an empty
+  bar. Under `show_values` it prints its date — a milestone has no
+  duration or progress to show — in the `xticks_format`, else as day and
+  month. Arrows stop at the marker's edge.
+- **Group headers are rows, not a second axis.** `show_group_headers`
+  clusters each group's rows in first-seen order, after any `sort`, under
+  a header row: the group name in bold on the task axis and a summary bar
+  (`plot_gantt_summary_*`) from the group's first start to its last end,
+  with `plot_gantt_group_gap` rows before every header but the first. The
+  header already names the group, so the legend defaults off; headers
+  without any `group` raise. The rows place their own ticks, since header
+  and gap rows break the bar ticks' one-row-per-record index.
+- **A date axis can be divided into calendar periods.** `period`, a
+  `DATE_PERIOD` (day, week, month, quarter, year), swaps the concise
+  date ticks for period furniture: minor ticks at the period edges carry
+  the grid lines, major ticks label each period at the centre of its
+  visible part, and a secondary axis one label row below names the
+  enclosing month (for days and weeks) or year (for months and
+  quarters). A period cut to a sliver by the view goes unlabelled.
+  `xticks_format` sets the period labels. The panel owns it, like the
+  temporal locator (ADR 0037), so only the setting is gantt-specific.
 - **Emphasis is per record.** A task record's `emphasis` key carries an
   `EMPHASIS` role, like a bar record (ADR 0042); the front-level
   `emphasis` applies per figure; `emphasis_rule` reads the task's duration
@@ -71,9 +98,9 @@ lines that take datetimes (ADR 0037), value labels (ADR 0033).
   through the panel's bar slotting rather than copying it. The bars take
   the `plot_bar_*` color, alpha, edge, hatch and z-order keys and the
   shared value label keys; only what is specific to a gantt lives under
-  `plot_gantt_*` (bar height, progress, dependency arrow and its z-order,
-  today line), and themes override only identity keys. Listed under
-  "trends and comparisons".
+  `plot_gantt_*` (bar height, progress, dependency arrow, today line,
+  summary bars, group gap, milestones), and themes override only identity
+  keys. Listed under "trends and comparisons".
 
 ## Considered options
 
@@ -83,3 +110,8 @@ lines that take datetimes (ADR 0037), value labels (ADR 0033).
   compose, and gantt-on-gantt needs slotting work with no request yet.
 - *A `SORT.GROUP` member.* Rejected: group order is a `sort_by` key,
   not a sort direction — the same split `BarChart` already uses.
+- *Period labels on the edge ticks.* Rejected: a label under an edge
+  reads as the instant, not the span; centred labels read as the period,
+  as project tools print them.
+- *Group headers as a second category axis.* Rejected: a nested axis needs
+  its own layout pass; header rows reuse the task axis and the bar drawing.

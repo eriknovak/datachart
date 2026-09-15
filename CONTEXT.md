@@ -260,8 +260,23 @@ _Avoid_: predecessor, link, edge (for the arrow)
 
 **Today line**:
 The vertical reference line a gantt chart draws at `today` (the current date
-by default) under `show_today`.
+by default) under `show_today`, labelled by `today_label`.
 _Avoid_: now line, current-date marker
+
+**Milestone**:
+A task whose `end` equals its `start`, drawn as a marker instead of a bar.
+_Avoid_: event, zero-duration task
+
+**Group header**:
+Under `show_group_headers`, the row above a task group's rows naming the group,
+with its summary bar from the group's first start to its last end.
+_Avoid_: swimlane header, parent task
+
+**Date period**:
+The calendar unit (`period`: day, week, month, quarter, year) a date axis is
+divided into: edge lines, a label centred in each period, and a row naming the
+enclosing month or year.
+_Avoid_: time bucket, date bin
 
 **End label**:
 A series' label (its `subtitle`) printed beside its first and/or last point in the series
