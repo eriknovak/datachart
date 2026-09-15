@@ -28,7 +28,13 @@ import matplotlib.ticker as mticker
 from matplotlib.ticker import MaxNLocator
 from matplotlib.collections import LineCollection, PathCollection, PolyCollection
 from matplotlib.container import BarContainer
-from matplotlib.colors import LinearSegmentedColormap, to_hex, to_rgb, to_rgba
+from matplotlib.colors import (
+    LinearSegmentedColormap,
+    to_hex,
+    to_rgb,
+    to_rgba,
+    to_rgba_array,
+)
 from matplotlib.mlab import GaussianKDE
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
@@ -401,10 +407,8 @@ HEATMAP_TEXT_CONTRAST_THRESHOLD = 0.55
 CONTOUR_LINE_CMAP_START = 0.3
 # the cmap sample that stands in for a cmap-colored contour in the legend
 CONTOUR_SWATCH = 0.7
-# value steps (ADR 0048): the legend swatch outline, and the clear box a cell
-# value sits on over the etching
+# value steps (ADR 0048): the legend swatch outline
 STEP_LEGEND_EDGE_WIDTH = 0.8
-STEP_VALUE_CARTOUCHE = {"boxstyle": "round,pad=0.15", "edgecolor": "none", "alpha": 0.85}
 
 
 # ================================================
@@ -1240,9 +1244,15 @@ class Layer:
         # the ink stroke on the same series lines (ADR 0048); None means off
         self.ink_stroke = get_ink_stroke(self.style)
         self.etch = get_etch(self.style)
-        self.ground = config.get("axes_facecolor") or "#FFFFFF"
+        # a bare layer turns its axes off, so the figure is what lies behind it
+        ground_key = "figure_facecolor" if self.bare else "axes_facecolor"
+        self.ground = config.get(ground_key) or "#FFFFFF"
         # a value scale drawn in etched steps; only with the etch on
         self.value_etch_steps = get_value_etch(self.style) if self.etch else None
+        # the ground halo of a value over value steps, as value labels take it
+        self.value_halo = _halo_effects(
+            get_value_label_style(self.style)["halo_width"], self.ground
+        )
         self.step_legend_style = None
         if self.value_etch_steps:
             self.step_legend_style = {
@@ -1408,7 +1418,8 @@ class Layer:
         halo = []
         if self.halo is not None:
             width = (line_style.get("linewidth") or 0) + self.halo
-            halo = _halo_effects(width, self.ground)
+            # a line's halo wobbles with the line it cuts out
+            halo = [patheffects.withStroke(linewidth=width, foreground=self.ground)]
         if self.ink_stroke is not None and halo:
             # the ribbon replaces the plain line withStroke redraws on top
             halo = [patheffects.Stroke(linewidth=width, foreground=self.ground)]
@@ -3966,9 +3977,9 @@ class HeatmapLayer(Layer):
                 ):
                     font_style["color"] = "#FFFFFF"
                 if self.value_etch_steps:
-                    # a value sits on a clear cartouche, never fighting the etching
+                    # a value over the etching reads through a halo of the ground
                     font_style["color"] = self.font_style.get("color")
-                    font_style["bbox"] = {**STEP_VALUE_CARTOUCHE, "facecolor": self.ground}
+                    font_style["path_effects"] = self.value_halo
                 ax.text(
                     j, i, self.cell_text(value), ha="center", va="center", **font_style
                 )
@@ -4454,8 +4465,11 @@ class ContourLayer(Layer):
                 label_style["fmt"] = fmt
             if ctx.emphasis == EMPHASIS_BACKGROUND:
                 label_style["colors"] = self.muted_color
+            # a relief's labels sit over the etching and read through a halo
+            halo = self.value_halo if self.filled and self.value_etch_steps else []
             for text in ax.clabel(lines, **label_style):
                 text.set_fontfamily(self.label_family)
+                text.set_path_effects(halo)
 
     @staticmethod
     def _level_resolver(contours, label) -> Callable:
@@ -4602,7 +4616,8 @@ class HexbinLayer(Layer):
     def _draw_bin_steps(self, ax, tiles, values, faded: bool) -> None:
         """The bins as etched value steps under their outlines.
 
-        `faded` bins carry the emphasis fade in their face alphas.
+        `faded` bins carry the emphasis fade in their face alphas. A count bin
+        holding no point draws nothing, outline included.
         """
 
         alphas = tiles.get_facecolors()[:, 3] if faded else None
@@ -4610,6 +4625,9 @@ class HexbinLayer(Layer):
         if not faded:
             tiles.autoscale_None()
         steps = value_steps(tiles.norm(values), len(self.value_etch_steps))
+        if self.c is None:
+            steps = np.where(np.ma.filled(values, 0) == 0, -1, steps)
+        empty = steps < 0
         hexagon = tiles.get_paths()[0].vertices
         offsets = tiles.get_offsets()
 
@@ -4625,6 +4643,12 @@ class HexbinLayer(Layer):
         self._draw_value_steps(ax, steps, bins, tiles.get_zorder() - 0.01, alphas)
         tiles.set_array(None)
         tiles.set_facecolor("none")
+        edges = np.array(to_rgba_array(tiles.get_edgecolor()), dtype=float)
+        edges = np.broadcast_to(edges, (len(steps), 4)).copy()
+        edges[empty, 3] = 0.0
+        # a collection alpha would overwrite the per-bin edge alphas
+        tiles.set_alpha(None)
+        tiles.set_edgecolor(edges)
 
     def _apply_bin_emphasis(self, ax, tiles, values) -> None:
         """Fade the bins the rule rejects and outline the ones it picks.
@@ -4707,6 +4731,14 @@ class ParallelCoordsLayer(Layer):
         self.tick_length = get_parallel_tick_length(shared_style)
         self.tick_label_style = get_parallel_tick_label_style(shared_style)
         self.tick_label_bbox = get_parallel_tick_label_bbox(shared_style)
+        # a label without a box reads over the lines through the value halo
+        self.tick_label_halo = (
+            []
+            if self.tick_label_bbox is not None
+            else _halo_effects(
+                get_value_label_style(shared_style)["halo_width"], self.ground
+            )
+        )
         self.dim_label_style = get_parallel_dim_label_style(shared_style)
         self.dim_label_rotation = get_parallel_dim_label_rotation(shared_style)
         self.dim_label_pad = get_parallel_dim_label_pad(shared_style)
@@ -4914,6 +4946,7 @@ class ParallelCoordsLayer(Layer):
                         ha=label_ha,
                         va="center",
                         bbox=self.tick_label_bbox,
+                        path_effects=self.tick_label_halo,
                         zorder=tick_zorder + 1,
                         **self.tick_label_style,
                     )
@@ -4938,6 +4971,7 @@ class ParallelCoordsLayer(Layer):
                         ha=label_ha,
                         va="center",
                         bbox=self.tick_label_bbox,
+                        path_effects=self.tick_label_halo,
                         zorder=tick_zorder + 1,
                         **self.tick_label_style,
                     )
@@ -5371,15 +5405,23 @@ def _ribbon_centerline(x1, y1, x2, y2, t):
     return x, y
 
 
+class _TextHalo(patheffects.withStroke):
+    """A label halo drawn without the sketch wobble, which breaks it into gaps."""
+
+    def draw_path(self, renderer, gc, tpath, affine, rgbFace=None):
+        gc.set_sketch_params(None)
+        super().draw_path(renderer, gc, tpath, affine, rgbFace)
+
+
 def _halo_effects(width, ground: Optional[str] = None) -> list:
-    """The path effects stroking a halo of `width` points in the ground color.
+    """The path effects stroking a text halo of `width` points in the ground color.
 
     None when the width is 0; a None ground is white.
     """
 
     if not width or width <= 0:
         return []
-    return [patheffects.withStroke(linewidth=width, foreground=ground or "#FFFFFF")]
+    return [_TextHalo(linewidth=width, foreground=ground or "#FFFFFF")]
 
 
 # ================================================

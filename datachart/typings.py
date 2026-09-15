@@ -1020,7 +1020,7 @@ class ParallelCoordsStyleAttrs(TypedDict):
         plot_parallel_tick_length (Union[float, None]): The tick mark length.
         plot_parallel_tick_label_size (Union[int, float, None]): The tick label font size.
         plot_parallel_tick_label_color (Union[str, None]): The tick label font color.
-        plot_parallel_tick_label_bg_color (Union[str, None]): The tick label background color.
+        plot_parallel_tick_label_bg_color (Union[str, None]): The tick label background color; `None` draws no box and strokes the label with the value halo instead.
         plot_parallel_tick_label_bg_alpha (Union[float, None]): The tick label background alpha.
         plot_parallel_dim_label_size (Union[int, float, None]): The dimension label font size.
         plot_parallel_dim_label_color (Union[str, None]): The dimension label font color.

@@ -1384,7 +1384,8 @@ def get_parallel_tick_label_bbox(chart_style: dict) -> dict:
         chart_style: The chart style dictionary.
 
     Returns:
-        The tick label background box style setting.
+        The tick label background box style setting; None without a
+        background color, when the label takes the value halo instead.
 
     """
 
@@ -1395,6 +1396,8 @@ def get_parallel_tick_label_bbox(chart_style: dict) -> dict:
         "plot_parallel_tick_label_bg_alpha", config["plot_parallel_tick_label_bg_alpha"]
     )
 
+    if bg_color is None:
+        return None
     return dict(
         boxstyle="round,pad=0.15",
         facecolor=bg_color,

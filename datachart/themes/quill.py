@@ -35,7 +35,8 @@ QUILL_THEME: StyleAttrs = make_theme(
         "font_subtitle_color": INK,
         "font_xlabel_color": INK,
         "font_ylabel_color": INK,
-        "figure_facecolor": PARCHMENT,
+        # the page stays white like every theme's; the plots are parchment
+        "figure_facecolor": "#FFFFFF",
         "axes_facecolor": PARCHMENT,
         "axes_spines_color": INK,
         "axes_ticks_color": INK,
@@ -103,6 +104,8 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_bar_edge_color": INK,
         "plot_bar_error_color": INK,
         "plot_value_color": INK,
+        # a thin old-style figure needs a wide halo to read over dense etching
+        "plot_value_halo_width": 5,
         "plot_hist_alpha": 1.0,
         "plot_hist_edge_width": 1.0,
         "plot_hist_edge_color": INK,
@@ -151,7 +154,8 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_parallel_tick_color": INK,
         "plot_parallel_tick_label_color": INK,
         "plot_parallel_tick_label_size": 9,
-        "plot_parallel_tick_label_bg_color": PARCHMENT,
+        # labels read through a parchment halo, as Sankey and treemap labels do
+        "plot_parallel_tick_label_bg_color": None,
         "plot_parallel_dim_label_color": INK,
         "plot_box_edgecolor": INK,
         "plot_box_linewidth": 1.2,

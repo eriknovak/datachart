@@ -460,15 +460,39 @@ class TestValueEtch(unittest.TestCase):
         self.assertLess(alphas.min(), 1.0)
         self.assertEqual(alphas.max(), 1.0)
 
+    def test_empty_hexbin_bins_draw_nothing(self):
+        figure = HexbinChart({"x": [0.0, 0.1, 5.0], "y": [0.0, 0.1, 5.0]}, gridsize=5)
+        tiles = figure.axes[0].collections[0]
+        values = [c for c in figure.axes[0].collections if c.get_gid() != "value-step"]
+        drawn = sum(len(c.get_offsets()) for c in step_collections(figure.axes[0]))
+        self.assertEqual(drawn, int((tiles.get_edgecolor()[:, 3] > 0).sum()))
+        self.assertLess(drawn, len(tiles.get_offsets()))
+
     def test_no_legend_without_colorbars(self):
         figure = Heatmap(GRID, show_colorbars=False)
         self.assertTrue(step_collections(figure.axes[0]))
         self.assertFalse([a for a in figure.axes[0].artists if isinstance(a, Legend)])
 
-    def test_cell_values_sit_on_a_cartouche(self):
-        figure = Heatmap(GRID, show_heatmap_values=True)
-        text = figure.axes[0].texts[-1]
-        self.assertIsNotNone(text.get_bbox_patch())
+    def test_values_read_through_a_ground_halo(self):
+        config.update_config(GROUND)
+        text = Heatmap(GRID, show_heatmap_values=True).axes[0].texts[-1]
+        self.assertIsNone(text.get_bbox_patch())
+        (halo,) = text.get_path_effects()
+        self.assertEqual(to_hex(halo._gc["foreground"]), PARCHMENT.lower())
+        x = np.linspace(-2, 2, 20)
+        z = [[float(np.exp(-(a * a + b * b))) for a in x] for b in x]
+        relief = ContourChart({"x": list(x), "y": list(x), "z": z}, filled=True)
+        self.assertTrue(all(t.get_path_effects() for t in relief.axes[0].texts))
+
+    def test_boxless_parallel_labels_take_the_halo(self):
+        rows = [{"a": 1.0, "b": 2.0}, {"a": 2.0, "b": 1.0}]
+        boxed = ParallelCoords(rows, dimensions=["a", "b"]).axes[0].texts[0]
+        self.assertIsNotNone(boxed.get_bbox_patch())
+        self.assertFalse(boxed.get_path_effects())
+        config.update_config({"plot_parallel_tick_label_bg_color": None})
+        halo = ParallelCoords(rows, dimensions=["a", "b"]).axes[0].texts[0]
+        self.assertIsNone(halo.get_bbox_patch())
+        self.assertTrue(halo.get_path_effects())
 
     def test_calendar_and_hexbin_draw_steps(self):
         from datetime import date, timedelta
