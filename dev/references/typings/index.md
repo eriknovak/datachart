@@ -33,6 +33,8 @@ The `typings` module contains the typings for all chart components. The module i
 | `ColorbarSettingAttrs`            | The per-figure colorbar setting.                                |
 | `CalendarHeatmapSingleChartAttrs` | The single chart attributes for the calendar heatmap.           |
 | `CalendarHeatmapDataAttrs`        | The data attributes for the calendar heatmap.                   |
+| `GanttSingleChartAttrs`           | The single chart attributes for the gantt chart.                |
+| `GanttTaskAttrs`                  | The task record attributes for the gantt chart.                 |
 | `ContourSingleChartAttrs`         | The single chart attributes for the contour chart.              |
 | `ContourDataAttrs`                | The data attributes for the contour chart.                      |
 | `HexbinSingleChartAttrs`          | The single chart attributes for the hexbin chart.               |
@@ -77,6 +79,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `TextStyleAttrs`                  | The typing for the text annotation style.                       |
 | `HeatmapStyleAttrs`               | The typing for the heatmap style.                               |
 | `CalendarHeatmapStyleAttrs`       | The typing for the calendar heatmap style.                      |
+| `GanttStyleAttrs`                 | The typing for the gantt chart style.                           |
 | `ContourStyleAttrs`               | The typing for the contour chart style.                         |
 | `HexbinStyleAttrs`                | The typing for the hexbin chart style.                          |
 | `ScatterStyleAttrs`               | The typing for the scatter chart style.                         |
@@ -466,6 +469,45 @@ Added in Unreleased
 | `date`    | One temporal object per day: a date, datetime, numpy.datetime64, or pandas Timestamp. Date strings are never parsed, and every date appears once. **TYPE:** `List[Union[date, datetime]]` |
 | `value`   | The value of each day, one per date; None leaves the day blank. **TYPE:** `List[Union[int, float, None]]`                                                                                 |
 
+### Gantt Chart Typings
+
+#### datachart.typings.GanttSingleChartAttrs
+
+Bases: `TypedDict`
+
+The single chart attributes for the gantt chart.
+
+Added in Unreleased
+
+| ATTRIBUTE     | DESCRIPTION                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------ |
+| `data`        | The task records defining one schedule. **TYPE:** `List[GanttTaskAttrs]`                                     |
+| `subtitle`    | The subtitle of the schedule. **TYPE:** `Union[str, None]`                                                   |
+| `style`       | The style of the schedule. **TYPE:** `Union[GanttStyleAttrs, None]`                                          |
+| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                       |
+| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                       |
+| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`           |
+| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]` |
+| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`          |
+
+#### datachart.typings.GanttTaskAttrs
+
+Bases: `TypedDict`
+
+The task record attributes for the gantt chart.
+
+Added in Unreleased
+
+| ATTRIBUTE    | DESCRIPTION                                                                                                                                                           |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `task`       | The task name, unique within the chart; the label of its row. **TYPE:** `str`                                                                                         |
+| `start`      | When the task starts: a date, datetime, numpy.datetime64, or pandas Timestamp. Date strings are never parsed. **TYPE:** `Union[date, datetime]`                       |
+| `end`        | When the task ends, of the same temporal types; never before start. A task ending when it starts is a milestone, drawn as a marker. **TYPE:** `Union[date, datetime]` |
+| `group`      | The task group; tasks of one group share a color and a legend entry. **TYPE:** `Optional[str]`                                                                        |
+| `progress`   | The fraction of the task done, in [0, 1]; drawn as an inner bar. **TYPE:** `Optional[Union[int, float]]`                                                              |
+| `depends_on` | The names of the tasks this task depends on. **TYPE:** `Optional[List[str]]`                                                                                          |
+| `emphasis`   | The task's own emphasis role ("background" or "highlight"); wins over the chart's emphasis_rule. **TYPE:** `Optional[Union[EMPHASIS, str]]`                           |
+
 ### Scatter Chart Typings
 
 #### datachart.typings.ScatterSingleChartAttrs
@@ -785,7 +827,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `GanttStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
 
 The style attributes. Combines all style typings.
 
@@ -1127,6 +1169,37 @@ Added in Unreleased
 | `plot_calendar_heatmap_month_line_width` | The width of the separators drawn between months (0 draws none). **TYPE:** `Union[int, float, None]`                                                                                                  |
 | `plot_calendar_heatmap_month_line_color` | The color of the separators drawn between months; None takes the heatmap frame color. **TYPE:** `Union[str, None]`                                                                                    |
 | `plot_calendar_heatmap_week_start`       | The weekday in the top row of every week, the default of week_start. **TYPE:** `Union[WEEKDAY, str, None]`                                                                                            |
+
+### datachart.typings.GanttStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the gantt chart style.
+
+The range bars take the `plot_bar_*` keys (color, alpha, edge, hatch, zorder); these keys set what is specific to a gantt chart.
+
+Added in Unreleased
+
+| ATTRIBUTE                      | DESCRIPTION                                                                                                                 |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| `plot_gantt_bar_height`        | The height of a task bar, as a fraction of its row. **TYPE:** `Union[int, float, None]`                                     |
+| `plot_gantt_progress_color`    | The color of the progress bar; None darkens the task bar's color. **TYPE:** `Union[str, None]`                              |
+| `plot_gantt_progress_alpha`    | The alpha value of the progress bar. **TYPE:** `Union[float, None]`                                                         |
+| `plot_gantt_progress_height`   | The height of the progress bar, as a fraction of the task bar. **TYPE:** `Union[int, float, None]`                          |
+| `plot_gantt_dependency_color`  | The color of the dependency arrows. **TYPE:** `Union[str, None]`                                                            |
+| `plot_gantt_dependency_width`  | The line width of the dependency arrows. **TYPE:** `Union[int, float, None]`                                                |
+| `plot_gantt_dependency_style`  | The arrow head of the dependency arrows, as a matplotlib arrow style. **TYPE:** `Union[str, None]`                          |
+| `plot_gantt_dependency_zorder` | The zorder of the dependency arrows. **TYPE:** `Union[int, float, None]`                                                    |
+| `plot_gantt_dependency_entry`  | The side of the dependent task a dependency arrow enters ("top" or "left"). **TYPE:** `Union[GANTT_ARROW_ENTRY, str, None]` |
+| `plot_gantt_summary_height`    | The height of a group's summary bar under show_group_headers, as a fraction of its row. **TYPE:** `Union[int, float, None]` |
+| `plot_gantt_summary_color`     | The color of the summary bars; None takes each group's color. **TYPE:** `Union[str, None]`                                  |
+| `plot_gantt_group_gap`         | The empty space before each group header, in rows. **TYPE:** `Union[int, float, None]`                                      |
+| `plot_gantt_milestone_marker`  | The marker of a milestone, a task whose start equals its end. **TYPE:** `Union[LINE_MARKER, str, None]`                     |
+| `plot_gantt_milestone_size`    | The size of the milestone marker, in points. **TYPE:** `Union[int, float, None]`                                            |
+| `plot_gantt_today_color`       | The color of the today line. **TYPE:** `Union[str, None]`                                                                   |
+| `plot_gantt_today_style`       | The line style of the today line. **TYPE:** `Union[LINE_STYLE, str, None]`                                                  |
+| `plot_gantt_today_width`       | The line width of the today line. **TYPE:** `Union[int, float, None]`                                                       |
+| `plot_gantt_today_alpha`       | The alpha value of the today line. **TYPE:** `Union[float, None]`                                                           |
 
 ### datachart.typings.ScatterStyleAttrs
 

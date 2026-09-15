@@ -6,7 +6,7 @@ datachart is a Python data visualization package built on matplotlib.
 It provides simple chart functions (BarChart, LineChart, StackedAreaChart, BumpChart, ScatterChart,
 Histogram, Heatmap, ContourChart, HexbinChart, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot,
 RidgelinePlot,
-ParallelCoords, PyramidChart, RadialChart, CalendarHeatmap, SankeyChart, NetworkChart,
+ParallelCoords, PyramidChart, RadialChart, CalendarHeatmap, GanttChart, SankeyChart, NetworkChart,
 Treemap), figure
 composition via Panel (overlaying charts on shared axes) and Grid
 (arranging charts in a grid), and a global configuration system with
@@ -78,7 +78,7 @@ Every chart is a single function call taking plain lists of dicts, and every fun
 | Family            | Charts                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Use for                                                                                       |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | **Trends**        | [LineChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/linechart/), [StackedAreaChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/stackedareachart/), [BumpChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/bumpchart/)                                                                                                                                                                                                                                                                                                | values over an ordered axis; area for part-of-whole over time; rank over time                 |
-| **Comparisons**   | [BarChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/barchart/), [PyramidChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/pyramidchart/), [RadialChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/radialchart/), [CalendarHeatmap](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/calendarheatmap/)                                                                                                                                                                                               | category totals, paired populations, cyclic/periodic values, daily rhythm                     |
+| **Comparisons**   | [BarChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/barchart/), [PyramidChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/pyramidchart/), [RadialChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/radialchart/), [CalendarHeatmap](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/calendarheatmap/), [GanttChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/ganttchart/)                                                                                                  | category totals, paired populations, cyclic/periodic values, daily rhythm, schedules          |
 | **Distributions** | [Histogram](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/histogram/), [BoxPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/boxplot/), [ViolinPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/violinplot/), [SwarmPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/swarmplot/), [RaincloudPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/raincloudplot/)                                                                                                                  | shape and spread of one variable, per group                                                   |
 | **Relationships** | [ScatterChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/scatterchart/), [Heatmap](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/heatmap/), [ContourChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/contourchart/), [HexbinChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/hexbinchart/), [ParallelCoords](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/parallelcoords/), [NetworkChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/networkchart/) | two-variable correlation, matrices, dense 2-D density, many dimensions, who is linked to whom |
 | **Flows**         | [SankeyChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/sankeychart/)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | quantities moving between stages                                                              |
@@ -214,6 +214,7 @@ Values along an axis or across categories: how a quantity moves and how the cate
 | [Pyramid Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/pyramidchart/index.md)          | The showcase of the pyramid chart.      |
 | [Radial Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/radialchart/index.md)            | The showcase of the radial chart.       |
 | [Calendar Heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/calendarheatmap/index.md)    | The showcase of the calendar heatmap.   |
+| [Gantt Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/ganttchart/index.md)              | The showcase of the gantt chart.        |
 
 ## Distributions
 
@@ -4041,6 +4042,477 @@ RadialChart(
     title="Mountain hut visitors by month",
     figsize=FIG_SIZE.SQUARE,
 ).show()
+```
+
+# Gantt Chart
+
+This section showcases the gantt chart. It contains examples of how to create gantt charts using the [datachart.charts.GanttChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.GanttChart) function.
+
+Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-gantt-chart), which maps common tasks to the parameter or style attribute that does the job.
+
+As mentioned above, the gantt charts are created using the `GanttChart` function found in the [datachart.charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md) module. Let's import it:
+
+```
+from datachart.charts import GanttChart
+```
+
+## Gantt Chart Input Attributes
+
+The `GanttChart` function accepts keyword arguments for chart configuration. The main argument is `data`, a list of task records. Each record names its `task` and its `start` and `end` as temporal objects — `datetime.date`, `datetime.datetime`, `numpy.datetime64`, or pandas `Timestamp`; date strings are never parsed. A record may add its `group`, the `progress` done, the tasks it `depends_on`, and its own `emphasis`; a task whose `end` equals its `start` is a milestone. A list of such lists draws one schedule per subplot.
+
+```
+GanttChart(
+    data=[                                              # The task records (or list of lists for multiple schedules)
+        {
+            "task": str,                                # The task name, unique within the chart; its row label
+            "start": Union[date, datetime],             # When the task starts
+            "end": Union[date, datetime],               # When the task ends, never before start; equal to start for a milestone
+            "group": Optional[str],                     # The task group: one color and legend entry per group
+            "progress": Optional[float],                # The fraction done, in [0, 1]; drawn as an inner bar
+            "depends_on": Optional[List[str]],          # The names of the tasks this task depends on
+            "emphasis": Optional[EMPHASIS],             # The task's own emphasis role ("background", "highlight")
+        },
+    ],
+    style={                                             # The style of the schedule (optional)
+        "plot_bar_color":              Optional[str],   # The bar color; None takes the group or palette color
+        "plot_bar_alpha":              Optional[float], # The alpha of the bars
+        "plot_bar_edge_width":         Optional[float], # The width of the bar edges
+        "plot_bar_edge_color":         Optional[str],   # The color of the bar edges
+        "plot_gantt_bar_height":       Optional[float], # The bar height, as a fraction of its row
+        "plot_gantt_progress_color":   Optional[str],   # The progress bar color; None darkens the bar color
+        "plot_gantt_progress_alpha":   Optional[float], # The alpha of the progress bar
+        "plot_gantt_progress_height":  Optional[float], # The progress bar height, as a fraction of the bar
+        "plot_gantt_dependency_color": Optional[str],   # The color of the dependency arrows
+        "plot_gantt_dependency_width": Optional[float], # The line width of the dependency arrows
+        "plot_gantt_dependency_style": Optional[str],   # The arrow head, as a matplotlib arrow style
+        "plot_gantt_dependency_zorder": Optional[float],# The zorder of the dependency arrows
+        "plot_gantt_dependency_entry": Optional[GANTT_ARROW_ENTRY], # The side an arrow enters the task ("top", "left")
+        "plot_gantt_summary_height":   Optional[float], # The height of a group's summary bar, as a fraction of its row
+        "plot_gantt_summary_color":    Optional[str],   # The color of the summary bars; None takes the group color
+        "plot_gantt_group_gap":        Optional[float], # The gap before each group header, in rows
+        "plot_gantt_milestone_marker": Optional[LINE_MARKER], # The marker of a milestone
+        "plot_gantt_milestone_size":   Optional[float], # The size of the milestone marker, in points
+        "plot_gantt_today_color":      Optional[str],   # The color of the today line
+        "plot_gantt_today_style":      Optional[LINE_STYLE], # The line style of the today line
+        "plot_gantt_today_width":      Optional[float], # The line width of the today line
+        "plot_gantt_today_alpha":      Optional[float], # The alpha of the today line
+    },
+    subtitle=Optional[str],                             # The subtitle of the schedule (or list for multiple schedules)
+    title=Optional[str],                                # The title of the chart
+    xlabel=Optional[str],                               # The label of the date axis
+    ylabel=Optional[str],                               # The label of the task axis
+    figsize=Optional[Tuple[float, float]],              # The figure size in inches
+    max_cols=Optional[int],                             # Maximum number of schedules per row (1 by default)
+
+    xmin=Optional[Union[date, datetime]],               # The start of the date window
+    xmax=Optional[Union[date, datetime]],               # The end of the date window
+    period=Optional[DATE_PERIOD],                       # Divide the date axis into periods ("day", "week", "month", "quarter", "year")
+    xticks_format=Optional[DATE_FORMAT],                # The date tick format (a DATE_FORMAT or strftime pattern)
+    xtickrotate=Optional[int],                          # The rotation of the date tick labels
+    ytickrotate=Optional[int],                          # The rotation of the task labels
+
+    show_group_headers=Optional[bool],                  # Whether to give each group a header row and summary bar
+    show_legend=Optional[bool],                         # Whether to list the groups (on when any task has a group, headers off)
+    legend=Optional[LegendSettingAttrs],                # The legend title, location, and columns
+    show_grid=Optional[SHOW_GRID],                      # Which grid lines to show ("both", "x", "y")
+    show_values=Optional[GANTT_VALUE],                  # The label past each bar ("duration", "progress")
+    value_format=Optional[str],                         # The format of the value labels
+    show_dependencies=Optional[bool],                   # Whether to draw the dependency arrows
+    show_today=Optional[bool],                          # Whether to draw the today line
+    today=Optional[Union[date, datetime]],              # The date of the today line (the current date by default)
+    today_label=Optional[str],                          # The label at the foot of the today line
+
+    sort=Optional[SORT],                                # The row order (None, "ascending", "descending")
+    sort_by=Optional[GANTT_SORT_KEY],                   # What the rows sort by ("start", "group")
+
+    emphasis=Optional[EMPHASIS],                        # The emphasis role of the whole schedule
+    emphasis_rule=Optional[EmphasisRuleAttrs],          # Highlight the tasks matching a rule on their duration in days
+
+    vlines=Optional[List[VLineSettingAttrs]],           # Vertical lines at temporal positions
+    vspans=Optional[List[VSpanSettingAttrs]],           # Vertical bands between temporal positions
+    texts=Optional[List[TextSettingAttrs]],             # Text annotations
+)
+```
+
+For more details, see the [datachart.charts.GanttChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.GanttChart) function.
+
+## Basics
+
+The examples in this guide share one dataset: the plan for relaunching a public library's website, a fourteen-week project run by a small team. The plan is illustrative, written out in a hidden cell with the shape such projects take: discovery first, design and content in parallel, development once the designs settle, and testing and launch at the end. `plan` holds the task records; the project stands on 3 June 2024, `TODAY`.
+
+The data is a list of dictionaries, one per task. `start` and `end` are `datetime.date` objects; the other keys are optional.
+
+```
+plan[3]
+```
+
+**Basic example.** Only the `data` argument is required to draw the gantt chart. Every task is a bar from its start to its end on the date axis, one row per task in input order, the first at the top. The date ticks are concise: the month where it changes and the day between. Tasks carrying a `group` take one color per group, and the legend lists the groups; a task with a `progress` fraction fills that part of its bar with a darker inner bar; the design sign-off, which ends when it starts, is a milestone marker.
+
+```
+GanttChart(
+    # add the data to the chart
+    data=plan
+).show()
+```
+
+## Customizing the Gantt Chart
+
+Every customization is either a keyword argument of `GanttChart` or a `plot_gantt_*` (or `plot_bar_*`) attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
+
+| I want to…                                   | Use                                                                      | See                                                               |
+| -------------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| add a title or axis labels                   | `title`, `xlabel`, `ylabel`                                              | [Title, labels, and figure size](#title-labels-and-figure-size)   |
+| resize the figure                            | `figsize`                                                                | [Title, labels, and figure size](#title-labels-and-figure-size)   |
+| zoom to a date window                        | `xmin`, `xmax`                                                           | [Date axis](#date-axis)                                           |
+| change or rotate the date labels             | `xticks_format`, `xtickrotate`                                           | [Date axis](#date-axis)                                           |
+| divide the date axis into weeks or months    | `period`                                                                 | [Periods](#periods)                                               |
+| order the rows by start or by group          | `sort`, `sort_by`                                                        | [Row order](#row-order)                                           |
+| hide or move the group legend                | `show_legend`, `legend`                                                  | [Groups and legend](#groups-and-legend)                           |
+| give each group a header row and summary bar | `show_group_headers`                                                     | [Group headers](#group-headers)                                   |
+| mark a milestone                             | a task with `end` equal to `start`                                       | [Milestones](#milestones)                                         |
+| label each bar with its duration or progress | `show_values`, `value_format`                                            | [Value labels](#value-labels)                                     |
+| draw the dependency arrows                   | `show_dependencies`, `style={"plot_gantt_dependency_entry": ...}`        | [Dependencies](#dependencies)                                     |
+| mark today or a period                       | `show_today`, `today`, `today_label`, `vlines`, `vspans`                 | [Today line and reference lines](#today-line-and-reference-lines) |
+| change the bar, progress, or arrow style     | `style={"plot_gantt_bar_height": ..., "plot_gantt_progress_color": ...}` | [Gantt style](#gantt-style)                                       |
+| highlight some tasks, mute the rest          | `emphasis` record key, `emphasis_rule`, `emphasis`                       | [Emphasis](#emphasis)                                             |
+| draw several schedules                       | `data` as a list of lists, `subtitle`, `max_cols`                        | [Multiple schedules](#multiple-schedules)                         |
+| place a schedule beside other charts         | `Grid`                                                                   | [Composing gantt charts](#composing-gantt-charts)                 |
+| save the chart to a file                     | `save_figure`                                                            | [Saving the Chart as an Image](#saving-the-chart-as-an-image)     |
+
+The full list of style attributes is in the [datachart.typings.GanttStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.GanttStyleAttrs) type; the full list of parameters is in the [datachart.charts.GanttChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.GanttChart) reference.
+
+### Title, labels, and figure size
+
+To add the chart title and the axis labels, add the `title`, `xlabel`, and `ylabel` attributes. The gantt chart is always horizontal, so the axis attributes are spatial: `xlabel` names the horizontal date axis and `ylabel` the vertical task axis.
+
+To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains some of the predefined figure sizes.
+
+```
+from datachart.constants import FIG_SIZE
+```
+
+```
+GanttChart(
+    data=plan,
+    # add the title and the axis labels
+    title="Library website relaunch",
+    xlabel="2024",
+    ylabel="Task",
+    # add to determine the figure size
+    figsize=FIG_SIZE.A4_LANDSCAPE,
+).show()
+```
+
+### Date axis
+
+The date axis spans the tasks. To zoom to a window, add the `xmin` and `xmax` attributes as temporal objects; the bars outside the window are clipped at its edges.
+
+The date ticks are concise by default. To print them in one format instead, add the `xticks_format` attribute with a [datachart.constants.DATE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) constant or any `strftime` pattern, and `xtickrotate` to rotate the labels when they crowd.
+
+```
+from datachart.constants import DATE_FORMAT
+```
+
+```
+GanttChart(
+    data=plan,
+    title="Library website relaunch, May and June",
+    # zoom to a date window
+    xmin=datetime.date(2024, 5, 1),
+    xmax=datetime.date(2024, 7, 1),
+    # print every tick as day and month
+    xticks_format="%d %b",
+    xtickrotate=30,
+).show()
+```
+
+### Periods
+
+To divide the date axis into calendar periods, as project plans are printed, add the `period` attribute with a [datachart.constants.DATE_PERIOD](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_PERIOD) constant: `DAY`, `WEEK` (ISO weeks starting on Monday), `MONTH`, `QUARTER`, or `YEAR`. Lines mark the period edges, each period is labelled at its centre, and a second row names the enclosing month (for days and weeks) or year (for months and quarters). `xticks_format` sets the period labels.
+
+```
+from datachart.constants import DATE_PERIOD
+```
+
+```
+GanttChart(
+    data=plan,
+    title="Library website relaunch, by week",
+    # divide the date axis into weeks, named under their months
+    period=DATE_PERIOD.WEEK,
+    figsize=(10, 5),
+).show()
+```
+
+### Row order
+
+The rows follow the input order by default. To order them, add the `sort` attribute with a [datachart.constants.SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT) constant; the `sort_by` attribute, a [datachart.constants.GANTT_SORT_KEY](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_SORT_KEY) constant, names what they sort by. By `START`, the default, every row orders by its start date. By `GROUP`, the rows cluster by group — the groups ordered by their earliest start, the tasks within a group by start — so every group reads as one block. Ties keep the input order; `sort_by` without `sort`, or `GROUP` when no task has a `group`, raises a `ValueError`.
+
+```
+from datachart.constants import SORT, GANTT_SORT_KEY
+```
+
+```
+GanttChart(
+    data=plan,
+    title="Library website relaunch, by group",
+    # cluster the rows by group, earliest group first
+    sort=SORT.ASCENDING,
+    sort_by=GANTT_SORT_KEY.GROUP,
+).show()
+```
+
+### Groups and legend
+
+Tasks of one `group` share a color from the theme's multiple palette, in first-seen order, and the legend lists one entry per group; it is on whenever a task carries a `group`. To hide it, set `show_legend=False`; to give it a title or move it, add the `legend` attribute, a [datachart.typings.LegendSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendSettingAttrs) dictionary. Tasks without a `group` draw in the chart's palette color and carry no legend entry.
+
+```
+from datachart.constants import LEGEND_LOCATION
+```
+
+```
+GanttChart(
+    data=plan,
+    title="Library website relaunch",
+    # title the legend and place it beside the chart
+    legend={"title": "Workstream", "location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+).show()
+```
+
+### Value labels
+
+To label each bar past its end, add the `show_values` attribute with a [datachart.constants.GANTT_VALUE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_VALUE) constant: `DURATION` prints the task's duration in days, `PROGRESS` its progress as a percentage (a task without `progress` stays unlabelled). The `value_format` attribute formats the number: the days, or the progress fraction — use a [datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant or any `"{x:.1f}"` style string.
+
+```
+from datachart.constants import GANTT_VALUE
+```
+
+```
+GanttChart(
+    data=plan,
+    title="Library website relaunch, days per task",
+    # label each bar with its duration
+    show_values=GANTT_VALUE.DURATION,
+    value_format="{x:.0f} days",
+).show()
+```
+
+```
+GanttChart(
+    data=plan,
+    title="Library website relaunch, progress",
+    # label each bar with its progress
+    show_values=GANTT_VALUE.PROGRESS,
+).show()
+```
+
+### Group headers
+
+To set each group apart as a block, add `show_group_headers=True`. Every group gets a header row with its name in bold and a summary bar from its first start to its last end; the group's tasks follow beneath it in their order, and a gap opens before the next header. The headers already name the groups, so the legend is off unless `show_legend` turns it on. The summary bar and the gap take the `plot_gantt_summary_height`, `plot_gantt_summary_color`, and `plot_gantt_group_gap` style attributes; without any `group`, `show_group_headers` raises a `ValueError`.
+
+```
+GanttChart(
+    data=plan,
+    title="Library website relaunch",
+    # a header row and a summary bar for every group
+    show_group_headers=True,
+    period=DATE_PERIOD.MONTH,
+    figsize=(8, 7),
+).show()
+```
+
+### Milestones
+
+A task whose `end` equals its `start` has no duration: it is a milestone, drawn as a marker instead of a bar — the design sign-off in this plan. Under `show_values` a milestone prints its date beside the marker, in the `xticks_format` or as day and month, since there is no duration or progress to show. Dependency arrows stop at the marker's edge. The `plot_gantt_milestone_marker` and `plot_gantt_milestone_size` style attributes set its look.
+
+```
+GanttChart(
+    data=plan,
+    title="Library website relaunch, milestone dates",
+    # a milestone prints its date; every other task its duration
+    show_values=GANTT_VALUE.DURATION,
+).show()
+```
+
+### Dependencies
+
+A task's `depends_on` list names the tasks that must finish before it. To draw them, add `show_dependencies=True`: an arrow leaves the end of each dependency, runs along its row, and turns down (or up) onto the start of the task depending on it. With the `plot_gantt_dependency_entry` style attribute set to `"left"`, a [datachart.constants.GANTT_ARROW_ENTRY](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_ARROW_ENTRY) constant, the arrow drops from the dependency's end and enters the task's start from the left instead; a task starting before its dependency ends has no room there and is entered from the top. An unknown name in `depends_on` raises a `ValueError`, drawn or not.
+
+```
+GanttChart(
+    data=plan,
+    title="Library website relaunch, dependencies",
+    # draw an arrow for every dependency
+    show_dependencies=True,
+).show()
+```
+
+```
+from datachart.constants import GANTT_ARROW_ENTRY
+
+GanttChart(
+    data=plan,
+    title="Library website relaunch, dependencies entering from the left",
+    show_dependencies=True,
+    style={"plot_gantt_dependency_entry": GANTT_ARROW_ENTRY.LEFT},
+).show()
+```
+
+### Today line and reference lines
+
+To mark the present, add `show_today=True`: a dashed line crosses the chart at `today`, the current date unless the `today` attribute sets one — as here, so the guide renders the same every day. The `today_label` attribute prints a label at the foot of the line. The `vlines` and `vspans` attributes draw more lines and bands at temporal positions, such as a milestone or a holiday; see the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) and [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) types.
+
+```
+GanttChart(
+    data=plan,
+    title="Library website relaunch",
+    # mark the day the project stands on
+    show_today=True,
+    today=TODAY,
+    today_label="Today",
+    # shade the summer holiday and mark the board review
+    vspans={"xmin": datetime.date(2024, 7, 15), "xmax": datetime.date(2024, 7, 29), "label": "Holiday"},
+    vlines={"x": datetime.date(2024, 5, 27), "style": {"plot_vline_style": ":"}},
+).show()
+```
+
+### Gantt style
+
+To change the style, add the `style` attribute with the corresponding attributes. The bars take the bar chart's `plot_bar_*` attributes — color, alpha, edge, hatch — and the attributes specific to a gantt chart are shown in the [datachart.typings.GanttStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.GanttStyleAttrs) type:
+
+| Attribute                      | Description                                                                               |
+| :----------------------------- | :---------------------------------------------------------------------------------------- |
+| `plot_gantt_bar_height`        | The height of a task bar, as a fraction of its row.                                       |
+| `plot_gantt_progress_color`    | The color of the progress bar; `None` darkens the task bar's color.                       |
+| `plot_gantt_progress_alpha`    | The alpha (transparency) of the progress bar.                                             |
+| `plot_gantt_progress_height`   | The height of the progress bar, as a fraction of the task bar.                            |
+| `plot_gantt_dependency_color`  | The color of the dependency arrows.                                                       |
+| `plot_gantt_dependency_width`  | The line width of the dependency arrows.                                                  |
+| `plot_gantt_dependency_style`  | The arrow head, as a matplotlib arrow style such as \`"-                                  |
+| `plot_gantt_dependency_zorder` | The zorder of the dependency arrows.                                                      |
+| `plot_gantt_dependency_entry`  | The side a dependency arrow enters its task: `"top"` or `"left"`.                         |
+| `plot_gantt_summary_height`    | The height of a group's summary bar under `show_group_headers`, as a fraction of its row. |
+| `plot_gantt_summary_color`     | The color of the summary bars; `None` takes each group's color.                           |
+| `plot_gantt_group_gap`         | The empty space before each group header, in rows.                                        |
+| `plot_gantt_milestone_marker`  | The marker of a milestone.                                                                |
+| `plot_gantt_milestone_size`    | The size of the milestone marker, in points.                                              |
+| `plot_gantt_today_color`       | The color of the today line.                                                              |
+| `plot_gantt_today_style`       | The line style of the today line.                                                         |
+| `plot_gantt_today_width`       | The line width of the today line.                                                         |
+| `plot_gantt_today_alpha`       | The alpha (transparency) of the today line.                                               |
+
+```
+GanttChart(
+    data=plan,
+    title="Library website relaunch",
+    show_dependencies=True,
+    show_today=True,
+    today=TODAY,
+    # define the style of the schedule
+    style={
+        "plot_bar_edge_width": 0,
+        "plot_gantt_bar_height": 0.8,
+        "plot_gantt_progress_color": "#1B2631",
+        "plot_gantt_progress_height": 0.25,
+        "plot_gantt_dependency_color": "#7F8C8D",
+        "plot_gantt_dependency_style": "->",
+        "plot_gantt_today_color": "#8E44AD",
+        "plot_gantt_today_style": "-",
+    },
+).show()
+```
+
+### Emphasis
+
+A task record's own `emphasis` key takes a [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) role: `"highlight"` strokes the bar bolder, `"background"` mutes it in the theme's muted color. The `emphasis_rule` attribute sets the roles by a rule on each task's duration in days — `{"above": v}`, `{"below": v}`, `{"between": (lo, hi)}`, `{"top": n}`, or `{"bottom": n}` — highlighting the tasks that match and muting the rest; a record's own key wins over the rule. A group whose every task is muted leaves the legend. See the [highlighting guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting.ipynb) for emphasis across the charts.
+
+```
+GanttChart(
+    data=plan,
+    title="Library website relaunch, tasks longer than a month",
+    # highlight the tasks longer than 30 days
+    emphasis_rule={"above": 30},
+    show_values=GANTT_VALUE.DURATION,
+).show()
+```
+
+## Multiple Gantt Charts
+
+### Multiple schedules
+
+To compare several schedules, pass a list of lists to the `data` argument. Each is drawn in its own subplot with the `subtitle` at the top, one per row unless `max_cols` sets more columns; per-schedule attributes like `style` can be lists. The example sets the plan beside what actually happened: the visual design took two weeks longer and pushed the tasks waiting on it.
+
+```
+def delayed(record, weeks):
+    shift = datetime.timedelta(weeks=weeks)
+    return {**record, "start": record["start"] + shift, "end": record["end"] + shift}
+
+
+# the visual design took two weeks longer; the tasks waiting on it moved with it
+late = {"Page templates", "Accessibility audit", "Go live"}
+actual = [
+    {**r, "end": r["end"] + datetime.timedelta(weeks=2)}
+    if r["task"] == "Visual design"
+    else delayed(r, 2 if r["task"] in late else 0)
+    for r in plan
+]
+
+GanttChart(
+    # use a list of lists to define multiple schedules
+    data=[plan, actual],
+    subtitle=["Plan", "Actual"],
+    title="Library website relaunch",
+    show_legend=False,
+    figsize=(8, 8),
+).show()
+```
+
+### Composing gantt charts
+
+A gantt chart draws time along its horizontal axis and tasks down its vertical one, so there is no shared coordinate space to overlay another chart on: [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) rejects a gantt figure. [datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) arranges it beside other charts. The example sets the schedule over a bar chart of the days each group takes.
+
+```
+from datachart.charts import BarChart
+from datachart.utils import Grid
+
+groups = []
+for record in plan:
+    if record["group"] not in groups:
+        groups.append(record["group"])
+days = [
+    {"label": group, "y": sum((r["end"] - r["start"]).days for r in plan if r["group"] == group)}
+    for group in groups
+]
+
+schedule = GanttChart(data=plan, title="Schedule", show_legend=False)
+effort = BarChart(data=days, title="Task days per group", figsize=(6.4, 2.4))
+
+Grid([[schedule], [effort]], title="Library website relaunch", figsize=(8, 7)).show()
+```
+
+### Themes
+
+A theme sets the palette, the fonts, and the bar, arrow, and today-line styles of every chart at once; themes that tell series apart by hatching give each task group its own hatch. See the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery.ipynb) for the whole suite under each theme. Apply one with [datachart.config.Config.set_theme](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) from the [config](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/config.ipynb).
+
+```
+from datachart.config import config
+from datachart.constants import THEME
+
+config.set_theme(THEME.HATCH)
+figure = GanttChart(data=plan, title="Library website relaunch", show_dependencies=True)
+config.set_theme(THEME.DEFAULT)
+figure.show()
+```
+
+## Saving the Chart as an Image
+
+To save the chart as an image, use the [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.save_figure) function.
+
+```
+from datachart.utils import save_figure
+
+figure = GanttChart(data=plan, title="Library website relaunch")
+save_figure(figure, "./fig_gantt_chart.png", dpi=300)
 ```
 
 # Calendar Heatmap
@@ -15009,6 +15481,7 @@ Every chart type has hover support. Filled marks — bars, bands, boxes, bodies,
 | [Bump Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/bumpchart/index.md)                | line, at the nearest period   | legend label, `x`, the rank as `y`, the original `value`                                                                                                    |
 | [Bar Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md)                  | bar                           | legend label, category, the bar's own value (never the stack total)                                                                                         |
 | [Pyramid Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/pyramidchart/index.md)          | bar                           | legend label, category, the value as passed, positive                                                                                                       |
+| [Gantt Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/ganttchart/index.md)              | task bar                      | legend label, `task`, `start`, `end`, `duration` in days, and `progress` when set                                                                           |
 | [Radial Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/radialchart/index.md)            | point, bar, or bin            | legend label, `angle` (the category, or a bin's degree range), `radius`                                                                                     |
 | [Histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md)                 | bin                           | legend label, the bin's range, its count (or density)                                                                                                       |
 | [Box Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/boxplot/index.md)                    | box                           | legend label, category, `median`, `q1`, `q3`, `min`, `max`                                                                                                  |
@@ -16198,6 +16671,7 @@ The `charts` module contains the methods to create the plots and figures, groupe
 | `PyramidChart`     | Creates the pyramid chart.              |
 | `RadialChart`      | Creates the radial chart.               |
 | `CalendarHeatmap`  | Creates the calendar heatmap.           |
+| `GanttChart`       | Creates the gantt chart.                |
 | `Histogram`        | Creates the histogram.                  |
 | `BoxPlot`          | Creates the box plot.                   |
 | `ViolinPlot`       | Creates the violin plot.                |
@@ -17522,6 +17996,128 @@ Examples:
 | RAISES       | DESCRIPTION                                                                                                                                                                              |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ValueError` | If emphasis is given, the data is not a dated-values dict, a date is not a temporal object, a date appears twice, year names a year without data, or week_start is not a WEEKDAY member. |
+
+### datachart.charts.GanttChart
+
+```
+GanttChart(
+    data: Union[
+        List[GanttTaskAttrs], List[List[GanttTaskAttrs]]
+    ],
+    *,
+    title: Optional[str] = None,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
+    subtitle: Optional[
+        Union[str, List[Optional[str]]]
+    ] = None,
+    figsize: Optional[
+        Union[FIG_SIZE, Tuple[float, float]]
+    ] = None,
+    xmin: Optional[Union[date, datetime]] = None,
+    xmax: Optional[Union[date, datetime]] = None,
+    max_cols: Optional[int] = None,
+    period: Optional[Union[DATE_PERIOD, str]] = None,
+    show_group_headers: Optional[bool] = None,
+    show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
+    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_values: Optional[Union[GANTT_VALUE, str]] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    show_dependencies: Optional[bool] = None,
+    show_today: Optional[bool] = None,
+    today: Optional[Union[date, datetime]] = None,
+    today_label: Optional[str] = None,
+    sort: Optional[Union[SORT, str]] = None,
+    sort_by: Optional[Union[GANTT_SORT_KEY, str]] = None,
+    emphasis: Optional[
+        Union[EMPHASIS, str, List[Optional[str]]]
+    ] = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
+    style: Optional[
+        Union[
+            GanttStyleAttrs, List[Optional[GanttStyleAttrs]]
+        ]
+    ] = None,
+    xtickrotate: Optional[int] = None,
+    ytickrotate: Optional[int] = None,
+    xticks_format: Optional[Union[DATE_FORMAT, str]] = None,
+    vlines: Optional[
+        Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    ] = None,
+    vspans: Optional[
+        Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    ] = None,
+    texts: Optional[
+        Union[TextSettingAttrs, List[TextSettingAttrs]]
+    ] = None
+) -> plt.Figure
+```
+
+Creates the gantt chart.
+
+A gantt chart shows a schedule: one horizontal bar per task from its start to its end over a date axis, one row per task, the first task at the top. Use it for project plans, release roadmaps, or any set of activities where when and how long matter more than a single value. Task groups share a colour or get header rows with summary bars, an optional progress fraction fills part of each bar, a task ending when it starts is a milestone marker, dependency arrows link tasks, the date axis can be divided into calendar periods, and a today line marks the present.
+
+The chart is always horizontal, so the axis parameters are spatial: `xlabel`, `xmin`, `xmax`, and `xticks_format` address the horizontal date axis, and `ylabel` the vertical task axis. It composes in `Grid`, but not in `Panel`.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datetime import date
+>>> from datachart.charts import GanttChart
+>>> figure = GanttChart(
+...     data=[
+...         {"task": "Design", "start": date(2024, 1, 1), "end": date(2024, 1, 12),
+...          "group": "Plan", "progress": 1.0},
+...         {"task": "Build", "start": date(2024, 1, 10), "end": date(2024, 2, 9),
+...          "group": "Make", "progress": 0.4, "depends_on": ["Design"]},
+...         {"task": "Test", "start": date(2024, 2, 5), "end": date(2024, 2, 23),
+...          "group": "Make", "depends_on": ["Build"]},
+...     ],
+...     title="Release Plan",
+...     show_dependencies=True,
+... )
+```
+
+| PARAMETER            | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                     |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`               | The task records of the schedule: a list of {task, start, end} dicts with optional group, progress, depends_on, and emphasis keys. start and end are date, datetime, numpy.datetime64, or pandas Timestamp objects; date strings are never parsed. A list of such lists draws one schedule per subplot. See GanttTaskAttrs. **TYPE:** `Union[List[GanttTaskAttrs], List[List[GanttTaskAttrs]]]` |
+| `title`              | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                           |
+| `xlabel`             | The label of the horizontal date axis. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                            |
+| `ylabel`             | The label of the vertical task axis. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                              |
+| `subtitle`           | The subtitle of each schedule. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                        |
+| `figsize`            | The size of the figure as (width, height) in inches. See FIG_SIZE. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                               |
+| `xmin`               | The start of the date window, as a temporal object. **TYPE:** `Optional[Union[date, datetime]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                             |
+| `xmax`               | The end of the date window, as a temporal object. **TYPE:** `Optional[Union[date, datetime]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                               |
+| `max_cols`           | The maximum number of subplot columns for several schedules. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                      |
+| `period`             | The calendar period the date axis is divided into: None (concise date ticks), "day", "week", "month", "quarter", or "year". Lines mark the period edges, each period is labelled at its centre, and a row beneath names the enclosing month or year. xticks_format sets the period labels. See DATE_PERIOD. **TYPE:** `Optional[Union[DATE_PERIOD, str]]` **DEFAULT:** `None`                   |
+| `show_group_headers` | Whether to give each task group a header row with a summary bar from its first start to its last end, the group's rows clustered beneath it and a gap before the next group. Raises when no task carries a group. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                |
+| `show_legend`        | Whether to show the legend of the task groups. Defaults to on when any task carries a group and the group headers are off. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                       |
+| `legend`             | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                                                                            |
+| `show_grid`          | Which grid lines to show ("both", "x", "y"). See SHOW_GRID. **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                     |
+| `show_values`        | The label printed past each bar end: None (none), "duration" (the duration in days), or "progress" (the progress as a percentage). A milestone prints its date instead, in the xticks_format or as day and month. See GANTT_VALUE. **TYPE:** `Optional[Union[GANTT_VALUE, str]]` **DEFAULT:** `None`                                                                                            |
+| `value_format`       | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. It formats the duration in days, or the progress fraction. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                    |
+| `show_dependencies`  | Whether to draw an arrow from the end of each task named in depends_on to the start of the task depending on it. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                 |
+| `show_today`         | Whether to draw the today line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                  |
+| `today`              | The date of the today line; the current date when not given. **TYPE:** `Optional[Union[date, datetime]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                    |
+| `today_label`        | The text printed at the foot of the today line; none when not given. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                              |
+| `sort`               | The order of the task rows: None (input order), "ascending", or "descending" by the key sort_by names. Ties keep input order. See SORT. **TYPE:** `Optional[Union[SORT, str]]` **DEFAULT:** `None`                                                                                                                                                                                              |
+| `sort_by`            | The key sort orders by: "start" (default) orders every row by its start; "group" clusters the rows by group, the groups ordered by their earliest start and the tasks within a group by start. Requires sort. See GANTT_SORT_KEY. **TYPE:** `Optional[Union[GANTT_SORT_KEY, str]]` **DEFAULT:** `None`                                                                                          |
+| `emphasis`           | The emphasis role of the whole schedule ("background" or "highlight"), or one role per schedule. See EMPHASIS. **TYPE:** `Optional[Union[EMPHASIS, str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                              |
+| `emphasis_rule`      | A one-key dict that highlights the tasks matching it and mutes the rest: {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}. Reads each task's duration in days; a task's own emphasis key wins over the rule. See EmphasisRuleAttrs. **TYPE:** `Optional[EmphasisRuleAttrs]` **DEFAULT:** `None`                                            |
+| `style`              | Style configuration(s) for the schedule. See GanttStyleAttrs. **TYPE:** `Optional[Union[GanttStyleAttrs, List[Optional[GanttStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                 |
+| `xtickrotate`        | Rotation angle for the date-axis tick labels. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                     |
+| `ytickrotate`        | Rotation angle for the task-axis tick labels. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                     |
+| `xticks_format`      | The date-axis tick label format: a DATE_FORMAT member or strftime pattern. **TYPE:** `Optional[Union[DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                    |
+| `vlines`             | Vertical line(s) to plot, at temporal x positions. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                  |
+| `vspans`             | Vertical reference band(s) to shade, between two temporal positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                |
+| `texts`              | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                           |
+
+| RETURNS      | DESCRIPTION                            |
+| ------------ | -------------------------------------- |
+| `plt.Figure` | The figure containing the gantt chart. |
 
 ## Distributions
 
@@ -21822,6 +22418,8 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         "plot_hspan_color": "#5D6D7E",
         "plot_text_box_edgecolor": "#B0B0B0",
         "plot_text_arrow_color": "#5D6D7E",
+        "plot_gantt_dependency_color": "#2C3E50",
+        "plot_gantt_today_color": "#2C3E50",
         "plot_heatmap_cmap": COLORS.Greys,
         "plot_heatmap_frame_color": "#000000",
         "plot_regression_color": "#34495E",
@@ -21874,6 +22472,8 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_hspan_color": "#7F8C8D",
         "plot_text_box_edgecolor": "#000000",
         "plot_text_arrow_color": "#000000",
+        "plot_gantt_dependency_color": "#0B1F44",
+        "plot_gantt_today_color": "#0B1F44",
         "plot_heatmap_cmap": COLORS.YlGnBu,
         "plot_heatmap_frame_color": "#0B1F44",
         "plot_scatter_edge_width": 0.6,
@@ -21941,6 +22541,8 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_swarm_edge_width": 0.6,
         "plot_text_box_edgecolor": "#000000",
         "plot_text_arrow_color": "#000000",
+        "plot_gantt_dependency_color": "#000000",
+        "plot_gantt_today_color": "#000000",
         "plot_heatmap_cmap": COLORS.Blues,
         "plot_heatmap_frame_color": "#000000",
         "plot_violin_edgecolor": "#000000",
@@ -22208,6 +22810,8 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_text_box_edgecolor": INK,
         "plot_text_box_style": "round,pad=0.4,rounding_size=0.2",
         "plot_text_arrow_color": INK,
+        "plot_gantt_dependency_color": INK,
+        "plot_gantt_today_color": INK,
         "plot_heatmap_cmap": COLORS.Greys,
         "plot_heatmap_frame_color": INK,
         "plot_heatmap_font_color": INK,
@@ -22329,6 +22933,10 @@ The `constants` module provides a set of predefined constants used in the packag
 | `BASELINE`            | The supported stacked area baselines.          |
 | `RANK`                | The supported bump chart ranking rules.        |
 | `LABEL_POSITION`      | The supported end label positions.             |
+| `GANTT_VALUE`         | The supported gantt chart value labels.        |
+| `GANTT_SORT_KEY`      | The supported gantt chart sort keys.           |
+| `GANTT_ARROW_ENTRY`   | The supported gantt dependency arrow entries.  |
+| `DATE_PERIOD`         | The supported date axis periods.               |
 | `NODE_LABEL_POSITION` | The supported network node label positions.    |
 | `NETWORK_LAYOUT`      | The supported network chart layouts.           |
 | `RADIAL_TYPE`         | The supported radial chart visuals.            |
@@ -23050,6 +23658,97 @@ Examples:
 | `END`     | Beside the last point. Equals to "end". **TYPE:** `str`                |
 | `BOTH`    | Beside the first and the last point. Equals to "both". **TYPE:** `str` |
 
+### datachart.constants.GANTT_VALUE
+
+The supported gantt chart value labels.
+
+Passed as the `show_values` setting of the gantt chart: what each bar prints past its end. None prints nothing.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import GANTT_VALUE
+>>> GANTT_VALUE.DURATION
+"duration"
+```
+
+| ATTRIBUTE  | DESCRIPTION                                                                |
+| ---------- | -------------------------------------------------------------------------- |
+| `NONE`     | No value labels. Equals to None. **TYPE:** `None`                          |
+| `DURATION` | The task's duration in days. Equals to "duration". **TYPE:** `str`         |
+| `PROGRESS` | The task's progress as a percentage. Equals to "progress". **TYPE:** `str` |
+
+### datachart.constants.GANTT_SORT_KEY
+
+The supported gantt chart sort keys.
+
+Passed as the `sort_by` setting of the gantt chart: what a `sort` other than `SORT.NONE` orders the task rows by.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import GANTT_SORT_KEY
+>>> GANTT_SORT_KEY.DEFAULT
+"start"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                                                                                   |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT` | The default key. Same as GANTT_SORT_KEY.START. **TYPE:** `str`                                                                |
+| `START`   | Every row by its start. Equals to "start". **TYPE:** `str`                                                                    |
+| `GROUP`   | Rows clustered by group, groups by their earliest start and tasks within a group by start. Equals to "group". **TYPE:** `str` |
+
+### datachart.constants.GANTT_ARROW_ENTRY
+
+The supported gantt dependency arrow entries.
+
+Passed as the `plot_gantt_dependency_entry` style attribute of the gantt chart: which side of the dependent task a dependency arrow enters.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import GANTT_ARROW_ENTRY
+>>> GANTT_ARROW_ENTRY.DEFAULT
+"top"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                                                                                  |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT` | The default entry. Same as GANTT_ARROW_ENTRY.TOP. **TYPE:** `str`                                                            |
+| `TOP`     | Along the dependency's row, then down (or up) onto the dependent bar's start. Equals to "top". **TYPE:** `str`               |
+| `LEFT`    | Down (or up) from the dependency's end, then into the dependent bar's start from the left. Equals to "left". **TYPE:** `str` |
+
+### datachart.constants.DATE_PERIOD
+
+The supported date axis periods.
+
+Passed as the `period` setting of the gantt chart: the calendar period the date axis is divided into. Lines mark the period edges, each period is labelled at its centre, and a second row names the enclosing period.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import DATE_PERIOD
+>>> DATE_PERIOD.MONTH
+"month"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                                        |
+| --------- | ---------------------------------------------------------------------------------- |
+| `NONE`    | Concise date ticks, no period edges. Equals to None. **TYPE:** `None`              |
+| `DAY`     | Days, under their month. Equals to "day". **TYPE:** `str`                          |
+| `WEEK`    | ISO weeks starting on Monday, under their month. Equals to "week". **TYPE:** `str` |
+| `MONTH`   | Months, under their year. Equals to "month". **TYPE:** `str`                       |
+| `QUARTER` | Quarters, under their year. Equals to "quarter". **TYPE:** `str`                   |
+| `YEAR`    | Years. Equals to "year". **TYPE:** `str`                                           |
+
 ### datachart.constants.NODE_LABEL_POSITION
 
 The supported node label positions.
@@ -23332,6 +24031,8 @@ The `typings` module contains the typings for all chart components. The module i
 | `ColorbarSettingAttrs`            | The per-figure colorbar setting.                                |
 | `CalendarHeatmapSingleChartAttrs` | The single chart attributes for the calendar heatmap.           |
 | `CalendarHeatmapDataAttrs`        | The data attributes for the calendar heatmap.                   |
+| `GanttSingleChartAttrs`           | The single chart attributes for the gantt chart.                |
+| `GanttTaskAttrs`                  | The task record attributes for the gantt chart.                 |
 | `ContourSingleChartAttrs`         | The single chart attributes for the contour chart.              |
 | `ContourDataAttrs`                | The data attributes for the contour chart.                      |
 | `HexbinSingleChartAttrs`          | The single chart attributes for the hexbin chart.               |
@@ -23376,6 +24077,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `TextStyleAttrs`                  | The typing for the text annotation style.                       |
 | `HeatmapStyleAttrs`               | The typing for the heatmap style.                               |
 | `CalendarHeatmapStyleAttrs`       | The typing for the calendar heatmap style.                      |
+| `GanttStyleAttrs`                 | The typing for the gantt chart style.                           |
 | `ContourStyleAttrs`               | The typing for the contour chart style.                         |
 | `HexbinStyleAttrs`                | The typing for the hexbin chart style.                          |
 | `ScatterStyleAttrs`               | The typing for the scatter chart style.                         |
@@ -23765,6 +24467,45 @@ Added in Unreleased
 | `date`    | One temporal object per day: a date, datetime, numpy.datetime64, or pandas Timestamp. Date strings are never parsed, and every date appears once. **TYPE:** `List[Union[date, datetime]]` |
 | `value`   | The value of each day, one per date; None leaves the day blank. **TYPE:** `List[Union[int, float, None]]`                                                                                 |
 
+### Gantt Chart Typings
+
+#### datachart.typings.GanttSingleChartAttrs
+
+Bases: `TypedDict`
+
+The single chart attributes for the gantt chart.
+
+Added in Unreleased
+
+| ATTRIBUTE     | DESCRIPTION                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------ |
+| `data`        | The task records defining one schedule. **TYPE:** `List[GanttTaskAttrs]`                                     |
+| `subtitle`    | The subtitle of the schedule. **TYPE:** `Union[str, None]`                                                   |
+| `style`       | The style of the schedule. **TYPE:** `Union[GanttStyleAttrs, None]`                                          |
+| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                       |
+| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                       |
+| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`           |
+| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]` |
+| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`          |
+
+#### datachart.typings.GanttTaskAttrs
+
+Bases: `TypedDict`
+
+The task record attributes for the gantt chart.
+
+Added in Unreleased
+
+| ATTRIBUTE    | DESCRIPTION                                                                                                                                                           |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `task`       | The task name, unique within the chart; the label of its row. **TYPE:** `str`                                                                                         |
+| `start`      | When the task starts: a date, datetime, numpy.datetime64, or pandas Timestamp. Date strings are never parsed. **TYPE:** `Union[date, datetime]`                       |
+| `end`        | When the task ends, of the same temporal types; never before start. A task ending when it starts is a milestone, drawn as a marker. **TYPE:** `Union[date, datetime]` |
+| `group`      | The task group; tasks of one group share a color and a legend entry. **TYPE:** `Optional[str]`                                                                        |
+| `progress`   | The fraction of the task done, in [0, 1]; drawn as an inner bar. **TYPE:** `Optional[Union[int, float]]`                                                              |
+| `depends_on` | The names of the tasks this task depends on. **TYPE:** `Optional[List[str]]`                                                                                          |
+| `emphasis`   | The task's own emphasis role ("background" or "highlight"); wins over the chart's emphasis_rule. **TYPE:** `Optional[Union[EMPHASIS, str]]`                           |
+
 ### Scatter Chart Typings
 
 #### datachart.typings.ScatterSingleChartAttrs
@@ -24084,7 +24825,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `GanttStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
 
 The style attributes. Combines all style typings.
 
@@ -24426,6 +25167,37 @@ Added in Unreleased
 | `plot_calendar_heatmap_month_line_width` | The width of the separators drawn between months (0 draws none). **TYPE:** `Union[int, float, None]`                                                                                                  |
 | `plot_calendar_heatmap_month_line_color` | The color of the separators drawn between months; None takes the heatmap frame color. **TYPE:** `Union[str, None]`                                                                                    |
 | `plot_calendar_heatmap_week_start`       | The weekday in the top row of every week, the default of week_start. **TYPE:** `Union[WEEKDAY, str, None]`                                                                                            |
+
+### datachart.typings.GanttStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the gantt chart style.
+
+The range bars take the `plot_bar_*` keys (color, alpha, edge, hatch, zorder); these keys set what is specific to a gantt chart.
+
+Added in Unreleased
+
+| ATTRIBUTE                      | DESCRIPTION                                                                                                                 |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| `plot_gantt_bar_height`        | The height of a task bar, as a fraction of its row. **TYPE:** `Union[int, float, None]`                                     |
+| `plot_gantt_progress_color`    | The color of the progress bar; None darkens the task bar's color. **TYPE:** `Union[str, None]`                              |
+| `plot_gantt_progress_alpha`    | The alpha value of the progress bar. **TYPE:** `Union[float, None]`                                                         |
+| `plot_gantt_progress_height`   | The height of the progress bar, as a fraction of the task bar. **TYPE:** `Union[int, float, None]`                          |
+| `plot_gantt_dependency_color`  | The color of the dependency arrows. **TYPE:** `Union[str, None]`                                                            |
+| `plot_gantt_dependency_width`  | The line width of the dependency arrows. **TYPE:** `Union[int, float, None]`                                                |
+| `plot_gantt_dependency_style`  | The arrow head of the dependency arrows, as a matplotlib arrow style. **TYPE:** `Union[str, None]`                          |
+| `plot_gantt_dependency_zorder` | The zorder of the dependency arrows. **TYPE:** `Union[int, float, None]`                                                    |
+| `plot_gantt_dependency_entry`  | The side of the dependent task a dependency arrow enters ("top" or "left"). **TYPE:** `Union[GANTT_ARROW_ENTRY, str, None]` |
+| `plot_gantt_summary_height`    | The height of a group's summary bar under show_group_headers, as a fraction of its row. **TYPE:** `Union[int, float, None]` |
+| `plot_gantt_summary_color`     | The color of the summary bars; None takes each group's color. **TYPE:** `Union[str, None]`                                  |
+| `plot_gantt_group_gap`         | The empty space before each group header, in rows. **TYPE:** `Union[int, float, None]`                                      |
+| `plot_gantt_milestone_marker`  | The marker of a milestone, a task whose start equals its end. **TYPE:** `Union[LINE_MARKER, str, None]`                     |
+| `plot_gantt_milestone_size`    | The size of the milestone marker, in points. **TYPE:** `Union[int, float, None]`                                            |
+| `plot_gantt_today_color`       | The color of the today line. **TYPE:** `Union[str, None]`                                                                   |
+| `plot_gantt_today_style`       | The line style of the today line. **TYPE:** `Union[LINE_STYLE, str, None]`                                                  |
+| `plot_gantt_today_width`       | The line width of the today line. **TYPE:** `Union[int, float, None]`                                                       |
+| `plot_gantt_today_alpha`       | The alpha value of the today line. **TYPE:** `Union[float, None]`                                                           |
 
 ### datachart.typings.ScatterStyleAttrs
 

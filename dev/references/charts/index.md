@@ -15,6 +15,7 @@ The `charts` module contains the methods to create the plots and figures, groupe
 | `PyramidChart`     | Creates the pyramid chart.              |
 | `RadialChart`      | Creates the radial chart.               |
 | `CalendarHeatmap`  | Creates the calendar heatmap.           |
+| `GanttChart`       | Creates the gantt chart.                |
 | `Histogram`        | Creates the histogram.                  |
 | `BoxPlot`          | Creates the box plot.                   |
 | `ViolinPlot`       | Creates the violin plot.                |
@@ -1339,6 +1340,128 @@ Examples:
 | RAISES       | DESCRIPTION                                                                                                                                                                              |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ValueError` | If emphasis is given, the data is not a dated-values dict, a date is not a temporal object, a date appears twice, year names a year without data, or week_start is not a WEEKDAY member. |
+
+### datachart.charts.GanttChart
+
+```
+GanttChart(
+    data: Union[
+        List[GanttTaskAttrs], List[List[GanttTaskAttrs]]
+    ],
+    *,
+    title: Optional[str] = None,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
+    subtitle: Optional[
+        Union[str, List[Optional[str]]]
+    ] = None,
+    figsize: Optional[
+        Union[FIG_SIZE, Tuple[float, float]]
+    ] = None,
+    xmin: Optional[Union[date, datetime]] = None,
+    xmax: Optional[Union[date, datetime]] = None,
+    max_cols: Optional[int] = None,
+    period: Optional[Union[DATE_PERIOD, str]] = None,
+    show_group_headers: Optional[bool] = None,
+    show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
+    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_values: Optional[Union[GANTT_VALUE, str]] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
+    show_dependencies: Optional[bool] = None,
+    show_today: Optional[bool] = None,
+    today: Optional[Union[date, datetime]] = None,
+    today_label: Optional[str] = None,
+    sort: Optional[Union[SORT, str]] = None,
+    sort_by: Optional[Union[GANTT_SORT_KEY, str]] = None,
+    emphasis: Optional[
+        Union[EMPHASIS, str, List[Optional[str]]]
+    ] = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
+    style: Optional[
+        Union[
+            GanttStyleAttrs, List[Optional[GanttStyleAttrs]]
+        ]
+    ] = None,
+    xtickrotate: Optional[int] = None,
+    ytickrotate: Optional[int] = None,
+    xticks_format: Optional[Union[DATE_FORMAT, str]] = None,
+    vlines: Optional[
+        Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    ] = None,
+    vspans: Optional[
+        Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    ] = None,
+    texts: Optional[
+        Union[TextSettingAttrs, List[TextSettingAttrs]]
+    ] = None
+) -> plt.Figure
+```
+
+Creates the gantt chart.
+
+A gantt chart shows a schedule: one horizontal bar per task from its start to its end over a date axis, one row per task, the first task at the top. Use it for project plans, release roadmaps, or any set of activities where when and how long matter more than a single value. Task groups share a colour or get header rows with summary bars, an optional progress fraction fills part of each bar, a task ending when it starts is a milestone marker, dependency arrows link tasks, the date axis can be divided into calendar periods, and a today line marks the present.
+
+The chart is always horizontal, so the axis parameters are spatial: `xlabel`, `xmin`, `xmax`, and `xticks_format` address the horizontal date axis, and `ylabel` the vertical task axis. It composes in `Grid`, but not in `Panel`.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datetime import date
+>>> from datachart.charts import GanttChart
+>>> figure = GanttChart(
+...     data=[
+...         {"task": "Design", "start": date(2024, 1, 1), "end": date(2024, 1, 12),
+...          "group": "Plan", "progress": 1.0},
+...         {"task": "Build", "start": date(2024, 1, 10), "end": date(2024, 2, 9),
+...          "group": "Make", "progress": 0.4, "depends_on": ["Design"]},
+...         {"task": "Test", "start": date(2024, 2, 5), "end": date(2024, 2, 23),
+...          "group": "Make", "depends_on": ["Build"]},
+...     ],
+...     title="Release Plan",
+...     show_dependencies=True,
+... )
+```
+
+| PARAMETER            | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                     |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`               | The task records of the schedule: a list of {task, start, end} dicts with optional group, progress, depends_on, and emphasis keys. start and end are date, datetime, numpy.datetime64, or pandas Timestamp objects; date strings are never parsed. A list of such lists draws one schedule per subplot. See GanttTaskAttrs. **TYPE:** `Union[List[GanttTaskAttrs], List[List[GanttTaskAttrs]]]` |
+| `title`              | The title of the chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                           |
+| `xlabel`             | The label of the horizontal date axis. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                            |
+| `ylabel`             | The label of the vertical task axis. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                              |
+| `subtitle`           | The subtitle of each schedule. **TYPE:** `Optional[Union[str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                        |
+| `figsize`            | The size of the figure as (width, height) in inches. See FIG_SIZE. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                               |
+| `xmin`               | The start of the date window, as a temporal object. **TYPE:** `Optional[Union[date, datetime]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                             |
+| `xmax`               | The end of the date window, as a temporal object. **TYPE:** `Optional[Union[date, datetime]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                               |
+| `max_cols`           | The maximum number of subplot columns for several schedules. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                      |
+| `period`             | The calendar period the date axis is divided into: None (concise date ticks), "day", "week", "month", "quarter", or "year". Lines mark the period edges, each period is labelled at its centre, and a row beneath names the enclosing month or year. xticks_format sets the period labels. See DATE_PERIOD. **TYPE:** `Optional[Union[DATE_PERIOD, str]]` **DEFAULT:** `None`                   |
+| `show_group_headers` | Whether to give each task group a header row with a summary bar from its first start to its last end, the group's rows clustered beneath it and a gap before the next group. Raises when no task carries a group. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                |
+| `show_legend`        | Whether to show the legend of the task groups. Defaults to on when any task carries a group and the group headers are off. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                       |
+| `legend`             | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                                                                            |
+| `show_grid`          | Which grid lines to show ("both", "x", "y"). See SHOW_GRID. **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                     |
+| `show_values`        | The label printed past each bar end: None (none), "duration" (the duration in days), or "progress" (the progress as a percentage). A milestone prints its date instead, in the xticks_format or as day and month. See GANTT_VALUE. **TYPE:** `Optional[Union[GANTT_VALUE, str]]` **DEFAULT:** `None`                                                                                            |
+| `value_format`       | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. It formats the duration in days, or the progress fraction. **TYPE:** `Optional[Union[VALUE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                    |
+| `show_dependencies`  | Whether to draw an arrow from the end of each task named in depends_on to the start of the task depending on it. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                 |
+| `show_today`         | Whether to draw the today line. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                  |
+| `today`              | The date of the today line; the current date when not given. **TYPE:** `Optional[Union[date, datetime]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                    |
+| `today_label`        | The text printed at the foot of the today line; none when not given. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                              |
+| `sort`               | The order of the task rows: None (input order), "ascending", or "descending" by the key sort_by names. Ties keep input order. See SORT. **TYPE:** `Optional[Union[SORT, str]]` **DEFAULT:** `None`                                                                                                                                                                                              |
+| `sort_by`            | The key sort orders by: "start" (default) orders every row by its start; "group" clusters the rows by group, the groups ordered by their earliest start and the tasks within a group by start. Requires sort. See GANTT_SORT_KEY. **TYPE:** `Optional[Union[GANTT_SORT_KEY, str]]` **DEFAULT:** `None`                                                                                          |
+| `emphasis`           | The emphasis role of the whole schedule ("background" or "highlight"), or one role per schedule. See EMPHASIS. **TYPE:** `Optional[Union[EMPHASIS, str, List[Optional[str]]]]` **DEFAULT:** `None`                                                                                                                                                                                              |
+| `emphasis_rule`      | A one-key dict that highlights the tasks matching it and mutes the rest: {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}. Reads each task's duration in days; a task's own emphasis key wins over the rule. See EmphasisRuleAttrs. **TYPE:** `Optional[EmphasisRuleAttrs]` **DEFAULT:** `None`                                            |
+| `style`              | Style configuration(s) for the schedule. See GanttStyleAttrs. **TYPE:** `Optional[Union[GanttStyleAttrs, List[Optional[GanttStyleAttrs]]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                 |
+| `xtickrotate`        | Rotation angle for the date-axis tick labels. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                     |
+| `ytickrotate`        | Rotation angle for the task-axis tick labels. **TYPE:** `Optional[int]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                     |
+| `xticks_format`      | The date-axis tick label format: a DATE_FORMAT member or strftime pattern. **TYPE:** `Optional[Union[DATE_FORMAT, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                    |
+| `vlines`             | Vertical line(s) to plot, at temporal x positions. **TYPE:** `Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                  |
+| `vspans`             | Vertical reference band(s) to shade, between two temporal positions. **TYPE:** `Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                |
+| `texts`              | Text annotation(s) to draw. **TYPE:** `Optional[Union[TextSettingAttrs, List[TextSettingAttrs]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                           |
+
+| RETURNS      | DESCRIPTION                            |
+| ------------ | -------------------------------------- |
+| `plt.Figure` | The figure containing the gantt chart. |
 
 ## Distributions
 

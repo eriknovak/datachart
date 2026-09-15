@@ -17,6 +17,7 @@ Values along an axis or across categories: how a quantity moves and how the cate
 | [Pyramid Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/pyramidchart/index.md)          | The showcase of the pyramid chart.      |
 | [Radial Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/radialchart/index.md)            | The showcase of the radial chart.       |
 | [Calendar Heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/calendarheatmap/index.md)    | The showcase of the calendar heatmap.   |
+| [Gantt Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/ganttchart/index.md)              | The showcase of the gantt chart.        |
 
 ## Distributions
 
