@@ -23,9 +23,10 @@ lines that take datetimes (ADR 0037), value labels (ADR 0033).
   axis from the layers' `x` kind. A gantt layer reports the kind of its
   *value* column instead, through a second layer hook; the panel's
   temporal-axis resolution reads both, so the value axis gets the date
-  locator and formatter, `yticks_format` takes a `DATE_FORMAT`, and
-  `ymin` / `ymax` — the value-axis limits in either orientation — take
-  datetimes as the time window. The category axis holds the task rows.
+  locator and formatter. The front's axis keys are spatial, as
+  `PyramidChart`'s and a horizontal `BarChart`'s: `xticks_format` takes a
+  `DATE_FORMAT` and `xmin` / `xmax` take datetimes as the time window. The
+  category axis (y) holds the task rows, the first task at the top.
 - **Always horizontal, and a bare figure.** There is no `orientation`
   parameter, as for `PyramidChart`: a vertical gantt is rare and would
   double the label paths. The figure composes in `Grid` only; `Panel`
@@ -40,15 +41,20 @@ lines that take datetimes (ADR 0037), value labels (ADR 0033).
   by `start`, every row orders by its start date; by `group`, rows cluster
   by group, groups ordered by their earliest start, tasks within a group by
   start. Both are value sorts — never by label (ADR 0042); a `sort_by` of
-  `"group"` with no `group` keys raises.
+  `"group"` with no `group` keys raises, and a `sort_by` without `sort`
+  raises as it does on the bar fronts.
 - **Colour follows the group.** Without `group`, every bar takes the
-  singular palette colour. With `group`, one colour per group from the
-  multiple palette, in first-seen order, and one legend entry per group.
+  layer's cycle colour. With `group`, one colour (and, where the theme
+  cycles hatches, one hatch) per group from the multiple palette, in
+  first-seen order, and one legend entry per group; the legend is on by
+  default only when a task carries a `group`.
 - **Progress is an inner bar.** A `progress` fraction draws a second,
   darker bar over that fraction of the range (`plot_gantt_progress_*`);
   a record without `progress` is a plain range. `show_values` is off,
-  `"duration"` (whole days, through `value_format`), or `"progress"` (a
-  percentage), placed past the bar end as bar labels are (ADR 0033).
+  `"duration"` (days, `"{x:.0f}d"` unless `value_format` is set), or
+  `"progress"` (the fraction, `"{x:.0%}"` by default), placed past the bar
+  end as bar labels are (ADR 0033). Several task lists draw one schedule
+  per subplot.
 - **Dependencies and today line are sugar over existing marks.**
   `show_dependencies` draws a `FancyArrowPatch` from each dependency's end
   to the dependent's start (`plot_gantt_dependency_*`), off by default.
