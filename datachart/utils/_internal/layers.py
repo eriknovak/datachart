@@ -2646,6 +2646,11 @@ class GanttLayer(BarLayer):
         self._name_legend_patch(bars, roles)
         self.register_hover(bars, self._task_resolver(self.label(ctx)))
 
+        # date ticks come from the locator, so the rotation applies to the axis
+        rotation = self.chart.get("xtickrotate")
+        if rotation:
+            ax.xaxis.set_tick_params(labelrotation=rotation)
+
         if self.show_dependencies:
             self._draw_dependencies(ax, rows, height, ctx)
 

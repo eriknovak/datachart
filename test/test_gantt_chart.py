@@ -212,6 +212,12 @@ class TestGanttMarks(unittest.TestCase):
             (mdates.date2num(date(2023, 12, 25)), mdates.date2num(date(2024, 3, 1))),
         )
 
+    def test_date_tick_rotation(self):
+        figure = GanttChart(schedule(), xtickrotate=30)
+        figure.canvas.draw()
+        rotations = {t.get_rotation() for t in figure.axes[0].get_xticklabels()}
+        self.assertEqual(rotations, {30.0})
+
     def test_group_colours_and_legend(self):
         ax = GanttChart(schedule()).axes[0]
         bars = task_bars(ax, 4)
@@ -242,9 +248,7 @@ class TestGanttMarks(unittest.TestCase):
 
     def test_duration_and_progress_values(self):
         ax = GanttChart(schedule(), show_values=GANTT_VALUE.DURATION).axes[0]
-        self.assertEqual(
-            [t.get_text() for t in ax.texts], ["10d", "30d", "12d", "14d"]
-        )
+        self.assertEqual([t.get_text() for t in ax.texts], ["10d", "30d", "12d", "14d"])
         ax = GanttChart(schedule(), show_values=GANTT_VALUE.PROGRESS).axes[0]
         self.assertEqual([t.get_text() for t in ax.texts], ["100%", "50%", "", ""])
         ax = GanttChart(
@@ -254,9 +258,7 @@ class TestGanttMarks(unittest.TestCase):
 
     def test_dependencies(self):
         ax = GanttChart(schedule()).axes[0]
-        self.assertEqual(
-            [p for p in ax.patches if isinstance(p, FancyArrowPatch)], []
-        )
+        self.assertEqual([p for p in ax.patches if isinstance(p, FancyArrowPatch)], [])
         ax = GanttChart(schedule(), show_dependencies=True).axes[0]
         arrows = [p for p in ax.patches if isinstance(p, FancyArrowPatch)]
         self.assertEqual(len(arrows), 2)
@@ -266,7 +268,9 @@ class TestGanttMarks(unittest.TestCase):
         (line,) = [c for c in ax.collections if isinstance(c, LineCollection)]
         x = line.get_segments()[0][0][0]
         self.assertAlmostEqual(x, mdates.date2num(date(2024, 1, 20)))
-        self.assertEqual(to_hex(line.get_color()[0]), to_hex(config["plot_gantt_today_color"]))
+        self.assertEqual(
+            to_hex(line.get_color()[0]), to_hex(config["plot_gantt_today_color"])
+        )
 
     def test_today_defaults_to_the_current_date(self):
         ax = GanttChart(schedule(), show_today=True).axes[0]
@@ -285,7 +289,9 @@ class TestGanttMarks(unittest.TestCase):
     def test_emphasis_rule_reads_duration(self):
         ax = GanttChart(schedule(), emphasis_rule={"above": 12}).axes[0]
         bars = task_bars(ax, 4)
-        muted = [to_hex(b.get_facecolor()) == to_hex(config["muted_color"]) for b in bars]
+        muted = [
+            to_hex(b.get_facecolor()) == to_hex(config["muted_color"]) for b in bars
+        ]
         self.assertEqual(muted, [True, False, True, False])
 
     def test_emphasis_rule_rejects_by(self):
@@ -296,7 +302,9 @@ class TestGanttMarks(unittest.TestCase):
         ax = GanttChart(schedule(), emphasis=EMPHASIS.BACKGROUND).axes[0]
         bars = task_bars(ax, 4)
         self.assertTrue(
-            all(to_hex(b.get_facecolor()) == to_hex(config["muted_color"]) for b in bars)
+            all(
+                to_hex(b.get_facecolor()) == to_hex(config["muted_color"]) for b in bars
+            )
         )
 
     def test_several_schedules_draw_subplots(self):
@@ -353,7 +361,9 @@ class TestValueAxisKind(unittest.TestCase):
         self.assertNotIsInstance(
             ax.yaxis.get_major_formatter(), mdates.ConciseDateFormatter
         )
-        ax = LineChart([{"x": D0, "y": 1}, {"x": D0 + timedelta(days=3), "y": 2}]).axes[0]
+        ax = LineChart([{"x": D0, "y": 1}, {"x": D0 + timedelta(days=3), "y": 2}]).axes[
+            0
+        ]
         self.assertIsInstance(
             ax.xaxis.get_major_formatter(), mdates.ConciseDateFormatter
         )
