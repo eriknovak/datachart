@@ -118,7 +118,7 @@ plugins:
         It provides simple chart functions (BarChart, LineChart, StackedAreaChart, BumpChart, ScatterChart,
         Histogram, Heatmap, ContourChart, HexbinChart, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot,
         RidgelinePlot,
-        ParallelCoords, PyramidChart, RadialChart, CalendarHeatmap, SankeyChart, NetworkChart,
+        ParallelCoords, PyramidChart, RadialChart, CalendarHeatmap, GanttChart, SankeyChart, NetworkChart,
         Treemap), figure
         composition via Panel (overlaying charts on shared axes) and Grid
         (arranging charts in a grid), and a global configuration system with
@@ -139,6 +139,7 @@ plugins:
           - how-to-guides/charts/barchart.ipynb: Bar chart input attributes, single and multiple datasets, customization, date labels, and saving.
           - how-to-guides/charts/pyramidchart.ipynb: Pyramid chart input attributes, the two-sides data contract, mirrored value axis controls, date labels, and composing pyramids with Grid.
           - how-to-guides/charts/radialchart.ipynb: Radial chart input attributes, the line, bar, scatter, and histogram visuals, and polar settings (start angle, direction, inner radius).
+          - how-to-guides/charts/ganttchart.ipynb: Gantt chart input attributes, the task record data contract, date axis window and tick formats, row order by start or by group, task groups and legend, duration and progress value labels, dependency arrows, the today line and reference lines, gantt style, emphasis rules on duration, multiple schedules, composing with Grid, and saving.
           - how-to-guides/charts/calendarheatmap.ipynb: Calendar heatmap input attributes, the dated values data contract, week start, month and weekday labels, colorbar and cell values, calendar style, normalization, one calendar per year and the year filter, composing with Grid, and saving.
           - how-to-guides/charts/histogram.ipynb: Histogram input attributes, single and multiple datasets, and histogram views.
           - how-to-guides/charts/boxplot.ipynb: Box plot input attributes, customization, date labels, composing boxes with swarm and violin plots; multiple datasets require subplots.
@@ -214,6 +215,7 @@ nav:
       - Pyramid Chart: how-to-guides/charts/pyramidchart.ipynb
       - Radial Chart: how-to-guides/charts/radialchart.ipynb
       - Calendar Heatmap: how-to-guides/charts/calendarheatmap.ipynb
+      - Gantt Chart: how-to-guides/charts/ganttchart.ipynb
       # distributions
       - Histogram: how-to-guides/charts/histogram.ipynb
       - Box Plot: how-to-guides/charts/boxplot.ipynb
