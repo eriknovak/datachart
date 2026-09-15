@@ -28,6 +28,7 @@ Classes:
     BASELINE:           The supported stacked area baselines.
     RANK:               The supported bump chart ranking rules.
     LABEL_POSITION:     The supported end label positions.
+    NODE_LABEL_POSITION: The supported network node label positions.
     NETWORK_LAYOUT:     The supported network chart layouts.
     RADIAL_TYPE:        The supported radial chart visuals.
     SWARM_MODE:         The supported swarm plot modes.
@@ -1081,6 +1082,32 @@ class LABEL_POSITION:
     BOTH = "both"
 
 
+class NODE_LABEL_POSITION:
+    """The supported node label positions.
+
+    Passed as the `label_position` setting of the network chart: where each
+    node's name prints against its marker.
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> from datachart.constants import NODE_LABEL_POSITION
+        >>> NODE_LABEL_POSITION.DEFAULT
+        "center"
+
+    Attributes:
+        DEFAULT (str): The default position. Same as `NODE_LABEL_POSITION.CENTER`.
+        CENTER (str): On the marker. Equals to `"center"`.
+        ABOVE (str): Above the marker, clear of it, like a place name on a map.
+            Equals to `"above"`.
+
+    """
+
+    DEFAULT = "center"
+    CENTER = "center"
+    ABOVE = "above"
+
+
 class RADIAL_TYPE:
     """The supported radial chart visuals.
 
@@ -1229,6 +1256,12 @@ class THEME:
         MATERIAL (str): The material theme (Google palette, light grid). Equals to `"material"`.
         SKETCH (str): The sketch theme (hand-drawn, xkcd-style wobble and halo,
             Comic Neue font). Equals to `"sketch"`.
+        QUILL (str): The quill theme (black ink on white paper: pen-stroked lines,
+            etched fills, IM Fell English font). Equals to `"quill"`.
+
+    !!! info "Added in Unreleased"
+
+        The `QUILL` theme.
 
     """
 
@@ -1239,6 +1272,7 @@ class THEME:
     MINIMAL = "minimal"
     MATERIAL = "material"
     SKETCH = "sketch"
+    QUILL = "quill"
 
 
 class EMPHASIS:

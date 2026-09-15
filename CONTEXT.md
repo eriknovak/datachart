@@ -427,7 +427,7 @@ _Avoid_: pickable, tooltip source, hover artist
 
 **Theme**:
 A complete, named set of style attributes (`DEFAULT`, `GREYSCALE`, `MINIMAL`,
-`MATERIAL`, `INK`, `HATCH`, `SKETCH`). Applying one replaces the whole global
+`MATERIAL`, `INK`, `HATCH`, `SKETCH`, `QUILL`). Applying one replaces the whole global
 configuration. Themes are named for their visual trait, never for a use case
 or audience.
 _Avoid_: publication, academic, background (former role-based theme names)
@@ -505,10 +505,19 @@ series lines only; `None` means off. The set is exactly those two attributes;
 nothing global changes.
 _Avoid_: xkcd mode, rc theme
 
+**Ink attributes**:
+The theme's quill-and-ink look (ADR 0048): the ink stroke (a series
+line drawn as a broad-nib ribbon), the etch (a hatched fill drawn as
+hand-etched lines over a wash), and the value etch (a value scale drawn as
+wash-and-etch steps with a step legend in place of the colorbar). Each rides
+on its artists; `None` means off.
+_Avoid_: fantasy mode, rc path effects
+
 **Hatch cycle**:
 A theme-defined sequence of hatch patterns the panel assigns per bar/histogram
-series, the same way it assigns colors. Off (`None`) in every theme but
-`HATCH`; an explicit per-chart hatch style wins.
+series, the same way it assigns colors; etched areas take it too (ADR 0048).
+Off (`None`) in every theme but `HATCH` and `QUILL`; an explicit per-chart
+hatch style wins.
 _Avoid_: hatch palette
 
 **Figure size grid**:

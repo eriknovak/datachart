@@ -240,3 +240,4 @@ title: Typings Module
 ::: datachart.typings.ParallelCoordsStyleAttrs
 ::: datachart.typings.ThemeDefaultAttrs
 ::: datachart.typings.SketchStyleAttrs
+::: datachart.typings.InkStyleAttrs

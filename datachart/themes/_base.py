@@ -5,6 +5,9 @@ overriding just the attributes that define its identity via `make_theme`.
 """
 
 import copy
+import os
+
+from matplotlib import font_manager
 
 from ..typings import StyleAttrs
 from ..constants import (
@@ -96,13 +99,25 @@ BASE_THEME: StyleAttrs = {
     "axes_spines_zorder": 100,
     "axes_ticks_length": 3,
     "axes_ticks_label_size": 8,
+    # ground and furniture colors (ADR 0048); None keeps matplotlib's
+    "figure_facecolor": None,
+    "axes_facecolor": None,
+    "axes_spines_color": None,
+    "axes_ticks_color": None,
     # theme-level chart-setting defaults (ADR 0004)
     "chart_default_show_grid": SHOW_GRID.Y,
     "chart_default_show_values": None,
+    "chart_default_node_label_position": None,
     "plot_hatch_cycle": None,
+    "plot_linestyle_cycle": None,
+    "plot_marker_cycle": None,
     # render-scoped rc attributes (ADR 0027); None means off
     "plot_sketch_params": None,
     "plot_sketch_halo_width": None,
+    # ink rendering attributes (ADR 0048); None means off
+    "plot_ink_stroke": None,
+    "plot_etch": None,
+    "plot_value_etch": None,
     # plot legend style
     "plot_legend_shadow": False,
     "plot_legend_frameon": True,
@@ -113,6 +128,8 @@ BASE_THEME: StyleAttrs = {
     "plot_legend_label_color": "#000000",
     "plot_legend_title": "Legend",
     "plot_legend_ncols": 1,
+    "plot_legend_edge_color": None,
+    "plot_legend_face_color": None,
     # plot area style
     "plot_area_alpha": 0.25,
     "plot_area_color": None,
@@ -133,6 +150,7 @@ BASE_THEME: StyleAttrs = {
     "plot_sankey_link_color": "source",
     "plot_sankey_link_alpha": 0.4,
     "plot_sankey_label_halo_width": 2,
+    "plot_sankey_node_fill": True,
     # plot treemap style; the leaf stroke mirrors plot_bar_edge_* (ADR 0028)
     "plot_treemap_edge_color": "#FFFFFF",
     "plot_treemap_edge_width": 0.6,
@@ -143,6 +161,7 @@ BASE_THEME: StyleAttrs = {
     "plot_treemap_min_fontsize": 6,
     "plot_treemap_highlight_edge_width": 2.0,
     "plot_treemap_label_halo_width": 2,
+    "plot_treemap_etch_density": None,
     # plot network style; nodes mirror plot_scatter_*, edges take the Sankey
     # grey (ADR 0029)
     "plot_network_node_color": None,
@@ -162,6 +181,8 @@ BASE_THEME: StyleAttrs = {
     "plot_network_highlight_edge_width": 2.0,
     "plot_network_label_halo_width": 2,
     "plot_network_group_alpha": 0.12,
+    "plot_network_group_linestyle": None,
+    "plot_network_edge_ink_stroke": None,
     # plot grid style
     "plot_grid_alpha": 0.5,
     "plot_grid_color": "#EAEAEA",
@@ -324,6 +345,7 @@ BASE_THEME: StyleAttrs = {
     "plot_box_alpha": 0.85,
     "plot_box_linewidth": 0.8,
     "plot_box_edgecolor": "#000000",
+    "plot_box_hatch": None,
     "plot_box_outlier_marker": "o",
     "plot_box_outlier_size": 5,
     "plot_box_outlier_color": "#FFFFFF",
@@ -347,6 +369,7 @@ BASE_THEME: StyleAttrs = {
     "plot_violin_alpha": 1.0,
     "plot_violin_linewidth": 1.0,
     "plot_violin_edgecolor": None,
+    "plot_violin_hatch": None,
     "plot_violin_width": 0.8,
     "plot_violin_inner_color": None,
     "plot_violin_inner_linewidth": 1.0,
@@ -357,6 +380,7 @@ BASE_THEME: StyleAttrs = {
     "plot_ridgeline_alpha": 0.8,
     "plot_ridgeline_linewidth": 1.0,
     "plot_ridgeline_edgecolor": None,
+    "plot_ridgeline_hatch": None,
     "plot_ridgeline_overlap": 0.5,
     "plot_ridgeline_inner_color": None,
     "plot_ridgeline_inner_linewidth": 1.0,
@@ -375,6 +399,22 @@ BASE_THEME: StyleAttrs = {
     "overlay_warn_scale_groups": True,
     "overlay_warn_scale_conflict": True,
 }
+
+
+# the faces themes ship with (SIL OFL, licence alongside)
+FONT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_fonts")
+
+
+def register_bundled_fonts(*names: str) -> None:
+    """Register bundled faces with matplotlib once, so a theme's font stack
+    resolves on every machine."""
+
+    known = {entry.fname for entry in font_manager.fontManager.ttflist}
+    for name in names:
+        path = os.path.join(FONT_DIR, name)
+        # a face missing from the install leaves the stack to its fallbacks
+        if path not in known and os.path.isfile(path):
+            font_manager.fontManager.addfont(path)
 
 
 def make_theme(overrides: StyleAttrs) -> StyleAttrs:

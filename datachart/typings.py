@@ -96,6 +96,7 @@ import matplotlib.colors as colors
 from .constants import (
     ARROW_STYLE,
     NETWORK_LAYOUT,
+    NODE_LABEL_POSITION,
     BAR_MODE,
     FIG_SIZE,
     FONT_STYLE,
@@ -221,6 +222,19 @@ class AxesStyleAttrs(TypedDict):
         axes_spines_zorder (Union[int, None]): The zorder of the spines.
         axes_ticks_length (Union[int, float, None]): The length of the ticks.
         axes_ticks_label_size (Union[int, float, None]): The size of the tick labels.
+        figure_facecolor (Union[str, None]): The color of the figure ground.
+            `None` keeps matplotlib's.
+        axes_facecolor (Union[str, None]): The color of the axes ground; label
+            halos and etch washes take it. `None` keeps matplotlib's.
+        axes_spines_color (Union[str, None]): The color of the spines. `None`
+            keeps matplotlib's.
+        axes_ticks_color (Union[str, None]): The color of the tick marks. `None`
+            keeps matplotlib's.
+
+    !!! info "Added in Unreleased"
+
+        The `figure_facecolor`, `axes_facecolor`, `axes_spines_color` and
+        `axes_ticks_color` attributes.
 
     """
 
@@ -232,6 +246,10 @@ class AxesStyleAttrs(TypedDict):
     axes_spines_zorder: Union[int, None]
     axes_ticks_length: Union[int, float, None]
     axes_ticks_label_size: Union[int, float, None]
+    figure_facecolor: Union[str, None]
+    axes_facecolor: Union[str, None]
+    axes_spines_color: Union[str, None]
+    axes_ticks_color: Union[str, None]
 
 
 class LegendStyleAttrs(TypedDict):
@@ -247,10 +265,15 @@ class LegendStyleAttrs(TypedDict):
         plot_legend_label_color (Union[str, None]): The label color of the legend.
         plot_legend_title (Union[str, None]): The legend title; an empty string draws none.
         plot_legend_ncols (Union[int, None]): The number of legend columns.
+        plot_legend_edge_color (Union[str, None]): The legend frame color.
+            `None` keeps matplotlib's.
+        plot_legend_face_color (Union[str, None]): The legend background color.
+            `None` keeps matplotlib's.
 
     !!! info "Added in Unreleased"
 
-        The `plot_legend_title` and `plot_legend_ncols` attributes.
+        The `plot_legend_title`, `plot_legend_ncols`, `plot_legend_edge_color`
+        and `plot_legend_face_color` attributes.
 
     """
 
@@ -263,6 +286,8 @@ class LegendStyleAttrs(TypedDict):
     plot_legend_label_color: Union[str, None]
     plot_legend_title: Union[str, None]
     plot_legend_ncols: Union[int, None]
+    plot_legend_edge_color: Union[str, None]
+    plot_legend_face_color: Union[str, None]
 
 
 class AreaStyleAttrs(TypedDict):
@@ -380,7 +405,12 @@ class SankeyStyleAttrs(TypedDict):
         plot_sankey_node_edge_width (Union[float, None]): The node stroke width.
         plot_sankey_link_color (Union[str, None]): Which node colors a ribbon: "source", "target", or "grey".
         plot_sankey_link_alpha (Union[float, None]): The ribbon alpha.
-        plot_sankey_label_halo_width (Union[float, None]): The width of the white halo behind labels; 0 disables it.
+        plot_sankey_label_halo_width (Union[float, None]): The width of the halo, in the axes face color, behind labels; 0 disables it.
+        plot_sankey_node_fill (Union[bool, None]): Whether the node bars are filled; `False` draws them as outlines.
+
+    !!! info "Added in Unreleased"
+
+        The `plot_sankey_node_fill` attribute.
 
     """
 
@@ -391,6 +421,7 @@ class SankeyStyleAttrs(TypedDict):
     plot_sankey_link_color: Union[str, None]
     plot_sankey_link_alpha: Union[float, None]
     plot_sankey_label_halo_width: Union[float, None]
+    plot_sankey_node_fill: Union[bool, None]
 
 
 class TreemapStyleAttrs(TypedDict):
@@ -405,7 +436,12 @@ class TreemapStyleAttrs(TypedDict):
         plot_treemap_level_font_scale (Union[float, None]): The label font scale applied once more per nesting level.
         plot_treemap_min_fontsize (Union[float, None]): The smallest font size a label shrinks to before it is dropped.
         plot_treemap_highlight_edge_width (Union[float, None]): The border width of a highlighted record.
-        plot_treemap_label_halo_width (Union[float, None]): The width of the white halo behind labels; 0 disables it.
+        plot_treemap_label_halo_width (Union[float, None]): The width of the halo, in the axes face color, behind labels; 0 disables it.
+        plot_treemap_etch_density (Union[List[int], None]): With `plot_etch` and a hatch cycle, how many times each nesting level repeats its top-level group's pattern, outermost first (a level past the list is blank); every box fills with the axes face so outer etching never shows through. `None` keeps the colored tiles.
+
+    !!! info "Added in Unreleased"
+
+        The `plot_treemap_etch_density` attribute.
 
     """
 
@@ -418,6 +454,7 @@ class TreemapStyleAttrs(TypedDict):
     plot_treemap_min_fontsize: Union[float, None]
     plot_treemap_highlight_edge_width: Union[float, None]
     plot_treemap_label_halo_width: Union[float, None]
+    plot_treemap_etch_density: Union[List[int], None]
 
 
 class NetworkStyleAttrs(TypedDict):
@@ -439,8 +476,15 @@ class NetworkStyleAttrs(TypedDict):
         plot_network_edge_width_min (Union[int, float, None]): The width of the lightest edge, and of an edge without `weight`.
         plot_network_edge_width_max (Union[int, float, None]): The width of the heaviest edge.
         plot_network_highlight_edge_width (Union[float, None]): The stroke width of a highlighted node.
-        plot_network_label_halo_width (Union[float, None]): The width of the white halo behind labels; 0 disables it.
+        plot_network_label_halo_width (Union[float, None]): The width of the halo, in the axes face color, behind labels; 0 disables it.
         plot_network_group_alpha (Union[float, None]): The alpha of the disc in the group color behind each cluster of the grouped layout; 0 disables it.
+        plot_network_group_linestyle (Union[LINE_STYLE, str, None]): Draws each cluster's mark as a ring in this line style and the edge color instead of a disc. `None` draws the disc.
+        plot_network_edge_ink_stroke (Union[Dict[str, float], None]): The pen the edges are drawn with, as for `plot_ink_stroke`, plus `swell` (the pressure swell amplitude) and `noise` (the grain); a directed edge draws as a stroked shaft with a small head. `None` draws plain edges.
+
+    !!! info "Added in Unreleased"
+
+        The `plot_network_group_linestyle` and `plot_network_edge_ink_stroke`
+        attributes.
 
     """
 
@@ -461,6 +505,8 @@ class NetworkStyleAttrs(TypedDict):
     plot_network_highlight_edge_width: Union[float, None]
     plot_network_label_halo_width: Union[float, None]
     plot_network_group_alpha: Union[float, None]
+    plot_network_group_linestyle: Union[LINE_STYLE, str, None]
+    plot_network_edge_ink_stroke: Union[Dict[str, float], None]
 
 
 class BarStyleAttrs(TypedDict):
@@ -509,7 +555,7 @@ class ValueLabelStyleAttrs(TypedDict):
         plot_value_fontsize (Union[int, float, None]): The font size of the value labels.
         plot_value_color (Union[str, None]): The color of the value labels.
         plot_value_padding (Union[int, float, None]): The gap between a mark and its value label, in points.
-        plot_value_halo_width (Union[int, float, None]): The width, in points, of the white halo stroked around the value labels so they stay legible over marks and lines. `None` or `0` draws no halo.
+        plot_value_halo_width (Union[int, float, None]): The width, in points, of the halo, in the axes face color, stroked around the value labels so they stay legible over marks and lines. `None` or `0` draws no halo.
 
     """
 
@@ -839,6 +885,11 @@ class BoxStyleAttrs(TypedDict):
         plot_box_cap_linewidth (Union[int, float, None]): The cap line width.
         plot_xticks_label_rotate (Union[int, float, None]): The label rotation of the xticks.
         plot_yticks_label_rotate (Union[int, float, None]): The label rotation of the yticks.
+        plot_box_hatch (Union[HATCH_STYLE, str, None]): The hatch pattern of the box.
+
+    !!! info "Added in Unreleased"
+
+        The `plot_box_hatch` attribute.
 
     """
 
@@ -858,6 +909,7 @@ class BoxStyleAttrs(TypedDict):
     plot_box_cap_linewidth: Union[int, float, None]
     plot_xticks_label_rotate: Union[int, float, None]
     plot_yticks_label_rotate: Union[int, float, None]
+    plot_box_hatch: Union[HATCH_STYLE, str, None]
 
 
 class SwarmStyleAttrs(TypedDict):
@@ -896,6 +948,11 @@ class ViolinStyleAttrs(TypedDict):
         plot_violin_inner_linewidth (Union[int, float, None]): The line width of the inner marks.
         plot_violin_median_color (Union[str, None]): The color of the median dot.
         plot_violin_median_size (Union[int, float, None]): The size of the median dot.
+        plot_violin_hatch (Union[HATCH_STYLE, str, None]): The hatch pattern of the body.
+
+    !!! info "Added in Unreleased"
+
+        The `plot_violin_hatch` attribute.
 
     """
 
@@ -908,6 +965,7 @@ class ViolinStyleAttrs(TypedDict):
     plot_violin_inner_linewidth: Union[int, float, None]
     plot_violin_median_color: Union[str, None]
     plot_violin_median_size: Union[int, float, None]
+    plot_violin_hatch: Union[HATCH_STYLE, str, None]
 
 
 class RidgelineStyleAttrs(TypedDict):
@@ -921,6 +979,7 @@ class RidgelineStyleAttrs(TypedDict):
         plot_ridgeline_overlap (Union[float, None]): How far a peak rises into the row above, in `[0, 1]`.
         plot_ridgeline_inner_color (Union[str, None]): The color of the inner marks; defaults to the font color.
         plot_ridgeline_inner_linewidth (Union[int, float, None]): The line width of the inner marks.
+        plot_ridgeline_hatch (Union[HATCH_STYLE, str, None]): The hatch pattern of the ridge fill.
 
     """
 
@@ -931,6 +990,7 @@ class RidgelineStyleAttrs(TypedDict):
     plot_ridgeline_overlap: Union[float, None]
     plot_ridgeline_inner_color: Union[str, None]
     plot_ridgeline_inner_linewidth: Union[int, float, None]
+    plot_ridgeline_hatch: Union[HATCH_STYLE, str, None]
 
 
 class RaincloudStyleAttrs(ViolinStyleAttrs, SwarmStyleAttrs, BoxStyleAttrs):
@@ -960,7 +1020,7 @@ class ParallelCoordsStyleAttrs(TypedDict):
         plot_parallel_tick_length (Union[float, None]): The tick mark length.
         plot_parallel_tick_label_size (Union[int, float, None]): The tick label font size.
         plot_parallel_tick_label_color (Union[str, None]): The tick label font color.
-        plot_parallel_tick_label_bg_color (Union[str, None]): The tick label background color.
+        plot_parallel_tick_label_bg_color (Union[str, None]): The tick label background color; `None` draws no box and strokes the label with the value halo instead.
         plot_parallel_tick_label_bg_alpha (Union[float, None]): The tick label background alpha.
         plot_parallel_dim_label_size (Union[int, float, None]): The dimension label font size.
         plot_parallel_dim_label_color (Union[str, None]): The dimension label font color.
@@ -1001,15 +1061,38 @@ class ThemeDefaultAttrs(TypedDict):
         chart_default_show_values (Union[bool, None]): The theme default for
             `show_values`, applied to every chart that takes it when the chart
             call leaves it unset. `None` means the theme has no opinion.
+        chart_default_node_label_position (Union[NODE_LABEL_POSITION, str, None]):
+            The theme default for the network chart's `label_position`, applied
+            when the chart call leaves it unset. `None` means the theme has no
+            opinion.
         plot_hatch_cycle (Union[List[str], None]): The hatch patterns assigned
-            per bar/histogram series, parallel to the color cycle. An explicit
-            per-chart hatch style wins. `None` disables the cycle.
+            per bar/histogram series, parallel to the color cycle; with
+            `plot_etch` on, line area fills and stacked areas take them too. An
+            explicit per-chart hatch style wins. `None` disables the cycle.
+        plot_linestyle_cycle (Union[List[Union[LINE_STYLE, str]], None]): The
+            line styles assigned per line, bump and radial line series, parallel
+            to the color cycle. An explicit per-chart line style wins. `None`
+            disables the cycle.
+        plot_marker_cycle (Union[List[Union[LINE_MARKER, str, Dict[str, Union[str, bool]]]], None]):
+            The markers assigned per scatter and radial scatter series,
+            parallel to the color cycle, and per network node group: a marker,
+            or `{"marker": ..., "hollow": True}` to draw it as an outline. An
+            explicit per-chart marker wins.
+            `None` disables the cycle.
+
+    !!! info "Added in Unreleased"
+
+        The `chart_default_node_label_position`, `plot_linestyle_cycle` and
+        `plot_marker_cycle` attributes.
 
     """
 
     chart_default_show_grid: Union[SHOW_GRID, str, None]
     chart_default_show_values: Union[bool, None]
+    chart_default_node_label_position: Union[NODE_LABEL_POSITION, str, None]
     plot_hatch_cycle: Union[List[str], None]
+    plot_linestyle_cycle: Union[List[Union[LINE_STYLE, str]], None]
+    plot_marker_cycle: Union[List[Union[LINE_MARKER, str, Dict[str, Union[str, bool]]]], None]
 
 
 class SketchStyleAttrs(TypedDict):
@@ -1026,7 +1109,7 @@ class SketchStyleAttrs(TypedDict):
             matplotlib sketch parameters `[scale, length, randomness]`;
             `plt.xkcd()` uses `[1, 100, 2]`. `None` draws clean paths.
         plot_sketch_halo_width (Union[float, None]): The extra width, added to
-            the line width, of the white halo stroked under series lines (line,
+            the line width, of the halo (in the axes face color) stroked under series lines (line,
             radial, regression), so crossing lines read as cut-outs; marks, text
             and patches stay clean. `None` or `0` draws no halo.
 
@@ -1034,6 +1117,45 @@ class SketchStyleAttrs(TypedDict):
 
     plot_sketch_params: Union[List[float], None]
     plot_sketch_halo_width: Union[float, None]
+
+
+class InkStyleAttrs(TypedDict):
+    """The typing for the ink attributes: marks drawn as a quill and an etching
+    needle would draw them. Every attribute resolves when the chart is built and
+    rides on its artists, so composition keeps the look; `None` turns it off.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        plot_ink_stroke (Union[Dict[str, float], None]): The broad-nib pen the
+            series lines (line, bump, radial, regression) are drawn with, as a
+            filled ribbon whose width varies along the line. Keys:
+            `width_scale` (the nib width over the line width), `nib_angle`
+            (degrees), `nib_floor` (the hairline width as a share of the nib),
+            `wobble` (the ink wobble amplitude), `taper` (the end taper, in
+            pixels). `None` draws plain lines.
+        plot_etch (Union[Dict[str, Union[float, str, None]], None]): The
+            etching that replaces the hatch tile of a hatched fill with
+            hand-drawn lines clipped to its outline; the hatch pattern still
+            picks the lines and `.` stipples. Keys: `spacing` (points between
+            lines), `jitter` (the spacing jitter as a share of it),
+            `angle_jitter` (degrees), `line_width` (points), `wash` (the share
+            of the face color laid over the axes face under the lines; fills
+            under lines take none), `color` (the etch ink). `None` keeps
+            matplotlib's hatch.
+        plot_value_etch (Union[Dict[str, List[str]], None]): The steps a value
+            scale draws in when `plot_etch` is on: `washes` (one fill color per
+            step, lightest first) and `hatches` (one pattern per step, sparsest
+            first). Heatmap, calendar heatmap and hexbin cells and filled
+            contour bands take the step their value falls in, a filled contour
+            draws its level lines and labels over the bands, and a legend of
+            the steps replaces the colorbar. `None` keeps the colormap.
+
+    """
+
+    plot_ink_stroke: Union[Dict[str, float], None]
+    plot_etch: Union[Dict[str, Union[float, str, None]], None]
+    plot_value_etch: Union[Dict[str, List[str]], None]
 
 
 class StyleAttrs(
@@ -1070,6 +1192,7 @@ class StyleAttrs(
     ParallelCoordsStyleAttrs,
     ThemeDefaultAttrs,
     SketchStyleAttrs,
+    InkStyleAttrs,
 ):
     """The style attributes. Combines all style typings."""
 

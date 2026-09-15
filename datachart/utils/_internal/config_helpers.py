@@ -348,6 +348,53 @@ def get_sketch_halo(chart_style: dict):
     return halo if halo else None
 
 
+def get_ink_stroke(chart_style: dict) -> Optional[dict]:
+    """The ink stroke parameters of a series line (ADR 0048).
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        A copy of the `InkStroke` keyword arguments, or None when off.
+
+    """
+
+    stroke = get_attr_value("plot_ink_stroke", chart_style, config)
+    return dict(stroke) if stroke else None
+
+
+def get_etch(chart_style: dict) -> Optional[dict]:
+    """The etch parameters of a chart's hatched fills (ADR 0048).
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        A copy of the `Etch` keyword arguments, or None when off.
+
+    """
+
+    etch = get_attr_value("plot_etch", chart_style, config)
+    return dict(etch) if etch else None
+
+
+def get_value_etch(chart_style: dict) -> Optional[list]:
+    """The `(wash, hatch)` steps a value scale draws in (ADR 0048).
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The steps, lightest first, or None when off.
+
+    """
+
+    steps = get_attr_value("plot_value_etch", chart_style, config)
+    if not steps:
+        return None
+    return list(zip(steps["washes"], steps["hatches"]))
+
+
 # -------------------------------------
 # Stacked Area Style
 # -------------------------------------
@@ -405,6 +452,7 @@ def get_sankey_style(chart_style: dict) -> dict:
         ("link_color", "plot_sankey_link_color"),
         ("link_alpha", "plot_sankey_link_alpha"),
         ("halo_width", "plot_sankey_label_halo_width"),
+        ("node_fill", "plot_sankey_node_fill"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -436,6 +484,7 @@ def get_treemap_style(chart_style: dict) -> dict:
         ("min_fontsize", "plot_treemap_min_fontsize"),
         ("highlight_linewidth", "plot_treemap_highlight_edge_width"),
         ("halo_width", "plot_treemap_label_halo_width"),
+        ("etch_density", "plot_treemap_etch_density"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -475,6 +524,8 @@ def get_network_style(chart_style: dict) -> dict:
         ("highlight_linewidth", "plot_network_highlight_edge_width"),
         ("halo_width", "plot_network_label_halo_width"),
         ("group_alpha", "plot_network_group_alpha"),
+        ("group_linestyle", "plot_network_group_linestyle"),
+        ("edge_ink_stroke", "plot_network_edge_ink_stroke"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -809,7 +860,9 @@ def get_heatmap_font_style(heatmap_style: dict, prefix: str = "plot_heatmap") ->
         ("weight", f"{prefix}_font_weight"),
     ]
 
-    return create_config_dict(heatmap_style, config_attrs)
+    style = create_config_dict(heatmap_style, config_attrs)
+    style["family"] = resolve_font_family()
+    return style
 
 
 def get_heatmap_edge_style(heatmap_style: dict, prefix: str = "plot_heatmap") -> dict:
@@ -1050,6 +1103,7 @@ def get_box_style(chart_style: dict) -> dict:
         ("alpha", "plot_box_alpha"),
         ("linewidth", "plot_box_linewidth"),
         ("edgecolor", "plot_box_edgecolor"),
+        ("hatch", "plot_box_hatch"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -1155,6 +1209,7 @@ def get_violin_style(chart_style: dict) -> dict:
         ("linewidth", "plot_violin_linewidth"),
         ("edgecolor", "plot_violin_edgecolor"),
         ("width", "plot_violin_width"),
+        ("hatch", "plot_violin_hatch"),
     ]
 
     return create_config_dict(chart_style, config_attrs)
@@ -1209,6 +1264,7 @@ def get_ridgeline_style(chart_style: dict) -> dict:
         ("overlap", "plot_ridgeline_overlap"),
         ("inner_color", "plot_ridgeline_inner_color"),
         ("inner_linewidth", "plot_ridgeline_inner_linewidth"),
+        ("hatch", "plot_ridgeline_hatch"),
     ]
 
     style = create_config_dict(chart_style, config_attrs)
@@ -1316,7 +1372,9 @@ def get_parallel_tick_label_style(chart_style: dict) -> dict:
         ("color", "plot_parallel_tick_label_color"),
     ]
 
-    return create_config_dict(chart_style, config_attrs)
+    style = create_config_dict(chart_style, config_attrs)
+    style["family"] = resolve_font_family()
+    return style
 
 
 def get_parallel_tick_label_bbox(chart_style: dict) -> dict:
@@ -1326,7 +1384,8 @@ def get_parallel_tick_label_bbox(chart_style: dict) -> dict:
         chart_style: The chart style dictionary.
 
     Returns:
-        The tick label background box style setting.
+        The tick label background box style setting; None without a
+        background color, when the label takes the value halo instead.
 
     """
 
@@ -1337,6 +1396,8 @@ def get_parallel_tick_label_bbox(chart_style: dict) -> dict:
         "plot_parallel_tick_label_bg_alpha", config["plot_parallel_tick_label_bg_alpha"]
     )
 
+    if bg_color is None:
+        return None
     return dict(
         boxstyle="round,pad=0.15",
         facecolor=bg_color,
@@ -1361,7 +1422,9 @@ def get_parallel_dim_label_style(chart_style: dict) -> dict:
         ("color", "plot_parallel_dim_label_color"),
     ]
 
-    return create_config_dict(chart_style, config_attrs)
+    style = create_config_dict(chart_style, config_attrs)
+    style["family"] = resolve_font_family()
+    return style
 
 
 def get_parallel_dim_label_rotation(chart_style: dict) -> float:
@@ -1517,6 +1580,8 @@ def get_legend_style(legend: Optional[dict] = None) -> dict:
         ("labelcolor", "plot_legend_label_color"),
         ("title", "plot_legend_title"),
         ("ncols", "plot_legend_ncols"),
+        ("edgecolor", "plot_legend_edge_color"),
+        ("facecolor", "plot_legend_face_color"),
     ]
     style = create_config_dict({}, config_attrs)
     for key, field in LEGEND_SETTING_KEYS:

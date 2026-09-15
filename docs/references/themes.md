@@ -19,3 +19,4 @@ title: Themes Module
 ::: datachart.themes.MINIMAL_THEME
 ::: datachart.themes.MATERIAL_THEME
 ::: datachart.themes.SKETCH_THEME
+::: datachart.themes.QUILL_THEME

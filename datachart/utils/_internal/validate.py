@@ -20,6 +20,7 @@ from ...constants import (
     DATE_FORMAT,
     EMPHASIS,
     LABEL_POSITION,
+    NODE_LABEL_POSITION,
     NETWORK_LAYOUT,
     RANK,
     RIDGELINE_SCALE,
@@ -37,6 +38,7 @@ AXIS_CATEGORICAL = "categorical"
 EMPHASIS_ROLES = (EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT)
 RANK_RULES = (RANK.VALUE_DESCENDING, RANK.VALUE_ASCENDING, RANK.GIVEN)
 LABEL_POSITIONS = (LABEL_POSITION.START, LABEL_POSITION.END, LABEL_POSITION.BOTH)
+NODE_LABEL_POSITIONS = (NODE_LABEL_POSITION.CENTER, NODE_LABEL_POSITION.ABOVE)
 STACK_BASELINES = (
     BASELINE.ZERO,
     BASELINE.PERCENT,
@@ -173,6 +175,19 @@ def validate_label_position(position):
         raise ValueError(
             f"Invalid `label_position` value {position!r}. "
             f"Must be one of {LABEL_POSITIONS} or None."
+        )
+    return position
+
+
+def validate_node_label_position(position):
+    """Validate a node label position; None means on the marker."""
+
+    if position is None:
+        return NODE_LABEL_POSITION.DEFAULT
+    if position not in NODE_LABEL_POSITIONS:
+        raise ValueError(
+            f"Invalid `label_position` value {position!r}. "
+            f"Must be one of {NODE_LABEL_POSITIONS} or None."
         )
     return position
 

@@ -405,6 +405,8 @@ def Panel(
         "show_grid": show_grid,
         "grid_style": get_grid_style({}),
         "hatch_cycle": config.get("plot_hatch_cycle"),
+        "linestyle_cycle": config.get("plot_linestyle_cycle"),
+        "marker_cycle": config.get("plot_marker_cycle"),
         "show_legend": show_legend,
         "legend_mode": "combined",
         **get_legend_panel_settings(legend),
