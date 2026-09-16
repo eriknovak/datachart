@@ -262,6 +262,18 @@ class TestScatterMatrixCells(unittest.TestCase):
         # the diagonal's count axis is never labelled
         self.assertFalse(labelled(axes[(0, 0)], "y"))
 
+    def test_blank_diagonal_moves_edge_labels_inward(self):
+        figure = ScatterMatrix(columns(), diagonal=DIAGONAL.NONE)
+        axes = cell_axes(figure)
+        figure.canvas.draw()
+        # row 0 and the last column have a blank outer cell
+        self.assertEqual(axes[(0, 1)].get_ylabel(), "a")
+        self.assertTrue(any(t.get_text() for t in axes[(0, 1)].get_yticklabels()))
+        self.assertEqual(axes[(1, 2)].get_xlabel(), "c")
+        self.assertTrue(any(t.get_text() for t in axes[(1, 2)].get_xticklabels()))
+        self.assertEqual(axes[(2, 0)].get_xlabel(), "a")
+        self.assertEqual(axes[(1, 2)].get_ylabel(), "")
+
     def test_unshared_axes_keep_their_tick_labels(self):
         figure = ScatterMatrix(columns(), sharex=False, sharey=False)
         axes = cell_axes(figure)

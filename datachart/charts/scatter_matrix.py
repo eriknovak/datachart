@@ -351,14 +351,26 @@ def ScatterMatrix(
     }
 
     n = len(dims)
+    blank = [
+        [
+            (i == j and diagonal == DIAGONAL.NONE) or (i < j and bool(lower_only))
+            for j in range(n)
+        ]
+        for i in range(n)
+    ]
+    # the edge labels go to the outermost drawn cell of each column and row
+    drawn = [[not cell for cell in row] for row in blank]
+    bottom = [
+        max((i for i in range(n) if drawn[i][j]), default=n - 1) for j in range(n)
+    ]
+    left = [min((j for j in range(n) if drawn[i][j]), default=0) for i in range(n)]
     # a blank diagonal under lower_only leaves the top row and right column empty
     trim = 1 if lower_only and diagonal == DIAGONAL.NONE and n > 1 else 0
     cells, kinds = [], []
-    for i, ydim in enumerate(dims):
-        for j, xdim in enumerate(dims):
-            if i < trim or j >= n - trim:
-                continue
-            outer_x, outer_y = i == n - 1, j == 0
+    for i in range(trim, n):
+        for j in range(n - trim):
+            xdim, ydim = dims[j], dims[i]
+            outer_x, outer_y = i == bottom[j], j == left[i]
             hidden = []
             if sharex and not outer_x:
                 hidden.append("x")
@@ -375,41 +387,32 @@ def ScatterMatrix(
             }
             if sharex:
                 settings["xmin"], settings["xmax"] = limits[xdim]
-            if i == j:
+            if sharey and i != j:
+                settings["ymin"], settings["ymax"] = limits[ydim]
+
+            if blank[i][j]:
+                kind, panel = "blank", _blank()
+            elif i == j:
                 kind = "diagonal"
-                if diagonal == DIAGONAL.NONE:
-                    panel = _blank()
-                else:
-                    settings["bar_mode"] = BAR_MODE.OVERLAY
-                    settings["kde_xlim"] = limits[xdim]
-                    panel = _diagonal_panel(
-                        values[xdim], groups, diagonal, diagonal_style, settings
-                    )
+                settings["bar_mode"] = BAR_MODE.OVERLAY
+                settings["kde_xlim"] = limits[xdim]
+                panel = _diagonal_panel(
+                    values[xdim], groups, diagonal, diagonal_style, settings
+                )
+            elif i < j and show_correlation:
+                kind = "correlation"
+                settings["show_grid"] = False
+                settings["hide_ticklabels"] = ["x", "y"]
+                panel = _correlation_panel(
+                    values[xdim], values[ydim], groups, colors, style, settings
+                )
             else:
-                if sharey:
-                    settings["ymin"], settings["ymax"] = limits[ydim]
-                upper = i < j
-                if upper and lower_only:
-                    kind, panel = "blank", _blank()
-                elif upper and show_correlation:
-                    kind = "correlation"
-                    settings["show_grid"] = False
-                    settings["hide_ticklabels"] = ["x", "y"]
-                    panel = _correlation_panel(
-                        values[xdim],
-                        values[ydim],
-                        groups,
-                        colors,
-                        style,
-                        settings,
-                    )
-                else:
-                    kind = "scatter"
-                    settings["show_regression"] = show_regression
-                    settings["regression_style"] = regression_style
-                    panel = _scatter_panel(
-                        values[xdim], values[ydim], groups, style, settings
-                    )
+                kind = "scatter"
+                settings["show_regression"] = show_regression
+                settings["regression_style"] = regression_style
+                panel = _scatter_panel(
+                    values[xdim], values[ydim], groups, style, settings
+                )
             kinds.append(kind)
             cells.append(
                 {
