@@ -145,6 +145,14 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.DUMBBELL_VALUE
+    options:
+        heading_level: 3
+
+::: datachart.constants.DUMBBELL_SORT_KEY
+    options:
+        heading_level: 3
+
 ::: datachart.constants.DATE_PERIOD
     options:
         heading_level: 3

@@ -55,6 +55,7 @@ Every chart type has hover support. Filled marks — bars, bands, boxes, bodies,
 | [Bar Chart](../charts/barchart.ipynb) | bar | legend label, category, the bar's own value (never the stack total) |
 | [Pyramid Chart](../charts/pyramidchart.ipynb) | bar | legend label, category, the value as passed, positive |
 | [Gantt Chart](../charts/ganttchart.ipynb) | task bar | legend label, `task`, `start`, `end`, `duration` in days, and `progress` when set |
+| [Dumbbell Chart](../charts/dumbbellchart.ipynb) | start or end dot | legend label (the endpoint name), category, value |
 | [Radial Chart](../charts/radialchart.ipynb) | point, bar, or bin | legend label, `angle` (the category, or a bin's degree range), `radius` |
 | [Histogram](../charts/histogram.ipynb) | bin | legend label, the bin's range, its count (or density) |
 | [Box Plot](../charts/boxplot.ipynb) | box | legend label, category, `median`, `q1`, `q3`, `min`, `max` |

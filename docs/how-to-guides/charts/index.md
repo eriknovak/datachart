@@ -22,6 +22,7 @@ Values along an axis or across categories: how a quantity moves and how the cate
 | [Radial Chart](radialchart.ipynb)             | The showcase of the radial chart.            |
 | [Calendar Heatmap](calendarheatmap.ipynb)     | The showcase of the calendar heatmap.        |
 | [Gantt Chart](ganttchart.ipynb)               | The showcase of the gantt chart.             |
+| [Dumbbell Chart](dumbbellchart.ipynb)         | The showcase of the dumbbell chart.          |
 
 ## Distributions
 
