@@ -17,6 +17,7 @@ exclude_docs: |
 # fails the build when a nav page is missing from llmstxt sections (ADR 0016)
 hooks:
   - docs/hooks/llmstxt_guard.py
+  - docs/hooks/readme_links.py
 
 theme:
   name: material
