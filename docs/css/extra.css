@@ -43,3 +43,79 @@
 [data-md-color-scheme=slate] .highlight pre {
     background-color: var(--md-code-bg-color) !important;
 }
+
+/* chart gallery on the charts index: three cards per row, two on a tablet,
+   one on a phone; the image sits below the description */
+.md-typeset .grid.cards.chart-gallery {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media screen and (max-width: 44.984375em) {
+    .md-typeset .grid.cards.chart-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media screen and (max-width: 29.984375em) {
+    .md-typeset .grid.cards.chart-gallery {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.md-typeset .grid.cards.chart-gallery > ul > li {
+    display: flex;
+    flex-direction: column;
+    font-size: .7rem;
+}
+
+.md-typeset .grid.cards.chart-gallery > ul > li > p:first-child {
+    margin-bottom: 0;
+    font-size: .8rem;
+    font-weight: 700;
+}
+
+.md-typeset .grid.cards.chart-gallery > ul > li > p:nth-child(2) {
+    margin-top: .2em;
+}
+
+.md-typeset .grid.cards.chart-gallery > ul > li > p:last-child {
+    margin-top: auto;
+}
+
+.md-typeset .grid.cards.chart-gallery img {
+    display: block;
+    width: 100%;
+    border-radius: .1rem;
+}
+
+/* composition chips on the gallery cards: a check for a supported utility,
+   a cross for one the chart cannot take part in */
+.md-typeset .chip {
+    display: inline-block;
+    padding: 0 .4em;
+    border-radius: 1em;
+    font-size: .5rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--md-default-fg-color--light);
+    background-color: var(--md-default-fg-color--lightest);
+    text-decoration: none;
+}
+
+.md-typeset a.chip:hover {
+    color: var(--md-accent-fg-color);
+}
+
+.md-typeset .chip::before {
+    content: "\2713\00a0";
+    color: var(--md-accent-fg-color);
+}
+
+.md-typeset .chip-no {
+    color: var(--md-default-fg-color--lighter);
+}
+
+.md-typeset .chip-no::before {
+    content: "\2715\00a0";
+    color: inherit;
+}
