@@ -856,25 +856,41 @@ def _apply_date_period(
         spine.set_visible(False)
 
 
-def _snap_limits_to_ticks(ax, axis_name: str, fixed=(False, False)) -> None:
+def _snap_limits_to_ticks(
+    ax, axis_name: str, fixed=(False, False), data_ends: bool = True
+) -> bool:
     """Move an axis's free view ends outward to its locator's ticks.
 
     A continuous axis then starts and ends on a tick. Only an automatic
     locator on a linear scale qualifies: a fixed tick set (a category axis,
     user ticks) or a log-family scale keeps its view, as does a user limit.
+    With `data_ends`, an end whose data already sits on a tick and is
+    overshot by the autoscale margin alone stops on that tick: the margin
+    never adds a whole step, while headroom added on purpose still does.
+    Returns whether a free end now lands on the data, so the marks there
+    can draw whole.
     """
 
     axis = getattr(ax, f"{axis_name}axis")
     if all(fixed) or axis.get_scale() != "linear":
-        return
+        return False
     # a polar r axis wraps its locator
     locator = getattr(axis.get_major_locator(), "base", axis.get_major_locator())
     if not isinstance(locator, (mticker.MaxNLocator, mdates.AutoDateLocator)):
-        return
+        return False
     lo, hi = sorted(axis.get_view_interval())
     if not np.isfinite([lo, hi]).all() or hi <= lo:
-        return
+        return False
     dated = isinstance(locator, mdates.AutoDateLocator)
+    data_lo, data_hi = sorted(axis.get_data_interval())
+    # the overshoot the autoscale margin alone accounts for at each end
+    margin = (
+        (ax.get_xmargin() if axis_name == "x" else ax.get_ymargin())
+        * (data_hi - data_lo)
+        * (1 + 1e-6)
+    )
+    lo_by_margin = data_ends and data_lo - lo <= margin
+    hi_by_margin = data_ends and hi - data_hi <= margin
 
     def tick_values(vmin, vmax):
         if dated:
@@ -888,26 +904,41 @@ def _snap_limits_to_ticks(ax, axis_name: str, fixed=(False, False)) -> None:
     for _ in range(3):
         ticks = tick_values(new_lo, new_hi)
         if len(ticks) < 2:
-            return
+            return False
         step = float(np.min(np.diff(ticks)))
         tol = step * 1e-6
         below, above = ticks[ticks <= new_lo + tol], ticks[ticks >= new_hi - tol]
+        # the tick the data edge itself sits on, when there is one
+        lo_on_data = ticks[np.isclose(ticks, data_lo, rtol=0, atol=tol)]
+        hi_on_data = ticks[np.isclose(ticks, data_hi, rtol=0, atol=tol)]
+        if not lo_by_margin:
+            lo_on_data = lo_on_data[:0]
+        if not hi_by_margin:
+            hi_on_data = hi_on_data[:0]
         lo_next = (
             new_lo
             if fixed[0]
             else (
-                float(below.max())
-                if len(below)
-                else ticks[0] - step * math.ceil((ticks[0] - new_lo - tol) / step)
+                float(lo_on_data[0])
+                if len(lo_on_data)
+                else (
+                    float(below.max())
+                    if len(below)
+                    else ticks[0] - step * math.ceil((ticks[0] - new_lo - tol) / step)
+                )
             )
         )
         hi_next = (
             new_hi
             if fixed[1]
             else (
-                float(above.min())
-                if len(above)
-                else ticks[-1] + step * math.ceil((new_hi - ticks[-1] - tol) / step)
+                float(hi_on_data[0])
+                if len(hi_on_data)
+                else (
+                    float(above.min())
+                    if len(above)
+                    else ticks[-1] + step * math.ceil((new_hi - ticks[-1] - tol) / step)
+                )
             )
         )
         if (lo_next, hi_next) == (new_lo, new_hi):
@@ -915,15 +946,19 @@ def _snap_limits_to_ticks(ax, axis_name: str, fixed=(False, False)) -> None:
         new_lo, new_hi = lo_next, hi_next
     # the snap never crosses zero when the data does not: a margin dipping
     # below all-positive values rounds to zero, not a whole step under it
-    data_lo, data_hi = sorted(axis.get_data_interval())
     if not fixed[0] and new_lo < 0 <= data_lo:
         new_lo = 0.0
     if not fixed[1] and new_hi > 0 >= data_hi:
         new_hi = 0.0
+    on_data = data_ends and (
+        (not fixed[0] and math.isclose(new_lo, data_lo, abs_tol=tol))
+        or (not fixed[1] and math.isclose(new_hi, data_hi, abs_tol=tol))
+    )
     if (new_lo, new_hi) == (lo, hi):
-        return
+        return on_data
     bounds = (new_hi, new_lo) if axis.get_inverted() else (new_lo, new_hi)
     (ax.set_xlim if axis_name == "x" else ax.set_ylim)(*bounds)
+    return on_data
 
 
 def _snap_to_periods(ax, axis_name, period, tz, origin, bounds) -> None:
@@ -3631,6 +3666,22 @@ class KdeLayer(Layer):
 class ScatterLayer(PointLabelMixin, Layer):
     kind = "scatter"
 
+    def __init__(self, chart: dict, settings: dict):
+        # the mark collections drawn per axes, so the panel can unclip them
+        self._marks = {}
+        super().__init__(chart, settings)
+
+    def unclip_marks(self, ax) -> None:
+        """Let the markers on the axes edge draw whole, past the frame."""
+
+        for collection in self._marks.get(id(ax), ()):
+            sizes = np.asarray(collection.get_sizes(), dtype=float)
+            radius = float(np.sqrt(sizes.max()) / 2) if sizes.size else 0.0
+            widths = np.asarray(collection.get_linewidths(), dtype=float)
+            pad = radius + (float(widths.max()) if widths.size else 0.0)
+            collection.set_clip_path(None)
+            collection.set_clip_box(MarkClipBox(ax, pad))
+
     def _resolve_style(self):
         self.scatter_style = get_scatter_style(self.style)
         self._resolve_value_labels()
@@ -3821,6 +3872,7 @@ class ScatterLayer(PointLabelMixin, Layer):
                     label,
                     ctx.emphasis == EMPHASIS_HIGHLIGHT,
                 )
+                self._marks.setdefault(id(ax), []).append(collection)
                 self._mark_legend_size(collection, size_data)
                 self.register_hover(
                     collection,
@@ -3860,6 +3912,7 @@ class ScatterLayer(PointLabelMixin, Layer):
                 self.label(ctx),
                 ctx.emphasis == EMPHASIS_HIGHLIGHT,
             )
+            self._marks.setdefault(id(ax), []).append(collection)
             self._mark_legend_size(collection, size_data)
             self.register_hover(
                 collection,
@@ -10548,34 +10601,41 @@ class Panel:
             )
 
         # a continuous axis starts and ends on a tick: each free end of the
-        # view moves outward to the next tick (a polar theta axis excepted);
-        # an axis pinned to the data ends on the data
+        # view moves outward to the next tick (a polar theta axis excepted),
+        # or stops on the tick the data itself sits on; an axis pinned to
+        # the data ends on the data
+        ends_on_data = {ax: ("y" if horizontal else "x") in pinned}
         if not bare and all(l.ticks_at_axis_ends for l in layers):
             for axis_name in ("y",) if polar else ("x", "y"):
                 # ranks are whole positions with their own half-unit ends
                 if (rank_axis and axis_name == "y") or axis_name in pinned:
                     continue
-                _snap_limits_to_ticks(
+                # a polar r axis keeps its ring past the data
+                ends_on_data[ax] |= _snap_limits_to_ticks(
                     ax,
                     axis_name,
                     tuple(
                         s.get(f"{axis_name}{end}") is not None for end in ("min", "max")
                     ),
+                    data_ends=not polar,
                 )
             if ax_right is not None:
-                _snap_limits_to_ticks(
+                ends_on_data[ax_right] = _snap_limits_to_ticks(
                     ax_right,
                     "x" if horizontal else "y",
                     tuple(s.get(f"y{end}_right") is not None for end in ("min", "max")),
                 )
 
-        # a line pinned to its data range ends on its last point: the end
-        # markers draw whole over the frame instead of half-clipped by it;
-        # a user limit keeps the clip, since it may cut the line on purpose
-        if ("y" if horizontal else "x") in pinned and not any(limits.values()):
-            for layer in layers:
-                if isinstance(layer, LineLayer):
-                    layer.unclip_marks(ax)
+        # an axis end on the data puts marks on the frame: they draw whole
+        # over it instead of half-clipped by it; a user limit keeps the
+        # clip, since it may cut the data on purpose
+        if not any(limits.values()):
+            for axes, on_data in ends_on_data.items():
+                if not on_data:
+                    continue
+                for layer in layers:
+                    if isinstance(layer, (LineLayer, ScatterLayer)):
+                        layer.unclip_marks(axes)
 
         # radial furniture reads the final r limits, so it follows them
         if polar:
