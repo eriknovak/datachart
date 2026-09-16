@@ -35,6 +35,8 @@ The `typings` module contains the typings for all chart components. The module i
 | `CalendarHeatmapDataAttrs`        | The data attributes for the calendar heatmap.                   |
 | `GanttSingleChartAttrs`           | The single chart attributes for the gantt chart.                |
 | `GanttTaskAttrs`                  | The task record attributes for the gantt chart.                 |
+| `DumbbellSingleChartAttrs`        | The single chart attributes for the dumbbell chart.             |
+| `DumbbellRecordAttrs`             | The record attributes for the dumbbell chart.                   |
 | `ContourSingleChartAttrs`         | The single chart attributes for the contour chart.              |
 | `ContourDataAttrs`                | The data attributes for the contour chart.                      |
 | `HexbinSingleChartAttrs`          | The single chart attributes for the hexbin chart.               |
@@ -80,6 +82,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `HeatmapStyleAttrs`               | The typing for the heatmap style.                               |
 | `CalendarHeatmapStyleAttrs`       | The typing for the calendar heatmap style.                      |
 | `GanttStyleAttrs`                 | The typing for the gantt chart style.                           |
+| `DumbbellStyleAttrs`              | The typing for the dumbbell chart style.                        |
 | `ContourStyleAttrs`               | The typing for the contour chart style.                         |
 | `HexbinStyleAttrs`                | The typing for the hexbin chart style.                          |
 | `ScatterStyleAttrs`               | The typing for the scatter chart style.                         |
@@ -508,6 +511,44 @@ Added in Unreleased
 | `depends_on` | The names of the tasks this task depends on. **TYPE:** `Optional[List[str]]`                                                                                          |
 | `emphasis`   | The task's own emphasis role ("background" or "highlight"); wins over the chart's emphasis_rule. **TYPE:** `Optional[Union[EMPHASIS, str]]`                           |
 
+### Dumbbell Chart Typings
+
+#### datachart.typings.DumbbellSingleChartAttrs
+
+Bases: `TypedDict`
+
+The single chart attributes for the dumbbell chart.
+
+Added in Unreleased
+
+| ATTRIBUTE     | DESCRIPTION                                                                                                    |
+| ------------- | -------------------------------------------------------------------------------------------------------------- |
+| `data`        | The records defining one set of dumbbells. **TYPE:** `List[DumbbellRecordAttrs]`                               |
+| `subtitle`    | The subtitle of the set. **TYPE:** `Union[str, None]`                                                          |
+| `style`       | The style of the set. **TYPE:** `Union[DumbbellStyleAttrs, None]`                                              |
+| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                         |
+| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                         |
+| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`             |
+| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLineSettingAttrs, List[HLineSettingAttrs], None]`           |
+| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`   |
+| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]` |
+| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`            |
+
+#### datachart.typings.DumbbellRecordAttrs
+
+Bases: `TypedDict`
+
+The record attributes for the dumbbell chart.
+
+Added in Unreleased
+
+| ATTRIBUTE  | DESCRIPTION                                                                                                                                   |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`    | The category, unique within the chart; the label of its row (or column). **TYPE:** `str`                                                      |
+| `start`    | The value of the start endpoint. **TYPE:** `Union[int, float]`                                                                                |
+| `end`      | The value of the end endpoint. **TYPE:** `Union[int, float]`                                                                                  |
+| `emphasis` | The record's own emphasis role ("background" or "highlight"); wins over the chart's emphasis_rule. **TYPE:** `Optional[Union[EMPHASIS, str]]` |
+
 ### Scatter Chart Typings
 
 #### datachart.typings.ScatterSingleChartAttrs
@@ -827,7 +868,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `GanttStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `GanttStyleAttrs`, `DumbbellStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
 
 The style attributes. Combines all style typings.
 
@@ -1200,6 +1241,37 @@ Added in Unreleased
 | `plot_gantt_today_style`       | The line style of the today line. **TYPE:** `Union[LINE_STYLE, str, None]`                                                  |
 | `plot_gantt_today_width`       | The line width of the today line. **TYPE:** `Union[int, float, None]`                                                       |
 | `plot_gantt_today_alpha`       | The alpha value of the today line. **TYPE:** `Union[float, None]`                                                           |
+
+### datachart.typings.DumbbellStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the dumbbell chart style.
+
+The value labels take the shared `plot_value_*` keys.
+
+Added in Unreleased
+
+| ATTRIBUTE                        | DESCRIPTION                                                                                                                                                        |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `plot_dumbbell_start_color`      | The color of the start dots; None takes the first color of the PaperAccent pair. **TYPE:** `Union[str, None]`                                                      |
+| `plot_dumbbell_end_color`        | The color of the end dots; None takes the second color of the PaperAccent pair. **TYPE:** `Union[str, None]`                                                       |
+| `plot_dumbbell_alpha`            | The alpha value of the dots. **TYPE:** `Union[float, None]`                                                                                                        |
+| `plot_dumbbell_size`             | The size of the dots, in points squared. **TYPE:** `Union[int, float, None]`                                                                                       |
+| `plot_dumbbell_start_marker`     | The marker of the start dots. **TYPE:** `Union[LINE_MARKER, str, None]`                                                                                            |
+| `plot_dumbbell_end_marker`       | The marker of the end dots. **TYPE:** `Union[LINE_MARKER, str, None]`                                                                                              |
+| `plot_dumbbell_edge_width`       | The edge width of the dots. **TYPE:** `Union[int, float, None]`                                                                                                    |
+| `plot_dumbbell_edge_color`       | The edge color of the dots. **TYPE:** `Union[str, None]`                                                                                                           |
+| `plot_dumbbell_zorder`           | The zorder of the dots. **TYPE:** `Union[int, float, None]`                                                                                                        |
+| `plot_dumbbell_connector_color`  | The color of the connectors. **TYPE:** `Union[str, None]`                                                                                                          |
+| `plot_dumbbell_connector_width`  | The line width of the connectors. **TYPE:** `Union[int, float, None]`                                                                                              |
+| `plot_dumbbell_connector_style`  | The line style of the connectors. **TYPE:** `Union[LINE_STYLE, str, None]`                                                                                         |
+| `plot_dumbbell_connector_zorder` | The zorder of the connectors; below the dots by default. **TYPE:** `Union[int, float, None]`                                                                       |
+| `plot_dumbbell_arrow_color`      | The color of the direction arrows under show_direction. **TYPE:** `Union[str, None]`                                                                               |
+| `plot_dumbbell_arrow_width`      | The line width of the direction arrows. **TYPE:** `Union[int, float, None]`                                                                                        |
+| `plot_dumbbell_arrow_style`      | The direction arrow head, as a matplotlib arrow style. **TYPE:** `Union[str, None]`                                                                                |
+| `plot_dumbbell_arrow_gap`        | The space between a dot's edge and its direction arrow, in points. **TYPE:** `Union[int, float, None]`                                                             |
+| `plot_dumbbell_grid_minor`       | The parts each step between labelled values splits into with fainter gridlines, on a gridded linear value axis; 0 or None draws none. **TYPE:** `Union[int, None]` |
 
 ### datachart.typings.ScatterStyleAttrs
 

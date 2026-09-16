@@ -535,6 +535,8 @@
       
         
       
+        
+      
     
     
     
@@ -798,6 +800,34 @@
     
   
     Gantt Chart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../how-to-guides/charts/dumbbellchart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dumbbell Chart
   
 
     
@@ -2479,6 +2509,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.constants.DUMBBELL_VALUE" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;DUMBBELL_VALUE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.constants.DUMBBELL_SORT_KEY" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;DUMBBELL_SORT_KEY
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.constants.DATE_PERIOD" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3189,6 +3241,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.constants.DUMBBELL_VALUE" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;DUMBBELL_VALUE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.constants.DUMBBELL_SORT_KEY" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;DUMBBELL_SORT_KEY
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.constants.DATE_PERIOD" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3583,6 +3657,22 @@ These include figure size, format, style, and other figure manipulation values.<
             <td class="doc-class-details">
               <div class="doc-md-description">
                 <p>The supported gantt dependency arrow entries.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.DUMBBELL_VALUE&lt;/span&gt;" href="#datachart.constants.DUMBBELL_VALUE">DUMBBELL_VALUE</a></code></td>
+            <td class="doc-class-details">
+              <div class="doc-md-description">
+                <p>The supported dumbbell chart value labels.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.DUMBBELL_SORT_KEY&lt;/span&gt;" href="#datachart.constants.DUMBBELL_SORT_KEY">DUMBBELL_SORT_KEY</a></code></td>
+            <td class="doc-class-details">
+              <div class="doc-md-description">
+                <p>The supported dumbbell chart sort keys.</p>
               </div>
             </td>
           </tr>
@@ -8824,6 +8914,246 @@ dependent bar's start. Equals to <code>"top"</code>.</p>
               <div class="doc-md-description">
                 <p>Down (or up) from the dependency's end, then into the
 dependent bar's start from the left. Equals to <code>"left"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="datachart.constants.DUMBBELL_VALUE" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.constants.DUMBBELL_VALUE</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>The supported dumbbell chart value labels.</p>
+<p>Passed as the <code>show_values</code> setting of the dumbbell chart: what each
+record prints. None prints nothing.</p>
+<div class="admonition info">
+<p class="admonition-title">Added in Unreleased</p>
+</div>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DUMBBELL_VALUE</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">DUMBBELL_VALUE</span><span class="o">.</span><span class="n">DELTA</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">"delta"</span>
+</code></pre></div>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">ATTRIBUTE</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DUMBBELL_VALUE.NONE">NONE</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>No value labels. Equals to <code>None</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DUMBBELL_VALUE.ENDPOINTS">ENDPOINTS</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Each endpoint's value, past its dot, away from the
+connector. Equals to <code>"endpoints"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DUMBBELL_VALUE.DELTA">DELTA</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The record's <code>end - start</code>, at the connector midpoint.
+Equals to <code>"delta"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="datachart.constants.DUMBBELL_SORT_KEY" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.constants.DUMBBELL_SORT_KEY</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>The supported dumbbell chart sort keys.</p>
+<p>Passed as the <code>sort_by</code> setting of the dumbbell chart: what a <code>sort</code>
+other than <code>SORT.NONE</code> orders the categories by.</p>
+<div class="admonition info">
+<p class="admonition-title">Added in Unreleased</p>
+</div>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DUMBBELL_SORT_KEY</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">DUMBBELL_SORT_KEY</span><span class="o">.</span><span class="n">DEFAULT</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">"start"</span>
+</code></pre></div>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">ATTRIBUTE</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DUMBBELL_SORT_KEY.DEFAULT">DEFAULT</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The default key. Same as <code>DUMBBELL_SORT_KEY.START</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DUMBBELL_SORT_KEY.START">START</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Each category by its <code>start</code>. Equals to <code>"start"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DUMBBELL_SORT_KEY.END">END</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Each category by its <code>end</code>. Equals to <code>"end"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DUMBBELL_SORT_KEY.DELTA">DELTA</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>Each category by its <code>end - start</code>. Equals to <code>"delta"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">

@@ -35,6 +35,8 @@ The `constants` module provides a set of predefined constants used in the packag
 | `GANTT_VALUE`         | The supported gantt chart value labels.        |
 | `GANTT_SORT_KEY`      | The supported gantt chart sort keys.           |
 | `GANTT_ARROW_ENTRY`   | The supported gantt dependency arrow entries.  |
+| `DUMBBELL_VALUE`      | The supported dumbbell chart value labels.     |
+| `DUMBBELL_SORT_KEY`   | The supported dumbbell chart sort keys.        |
 | `DATE_PERIOD`         | The supported date axis periods.               |
 | `NODE_LABEL_POSITION` | The supported network node label positions.    |
 | `NETWORK_LAYOUT`      | The supported network chart layouts.           |
@@ -822,6 +824,51 @@ Examples:
 | `DEFAULT` | The default entry. Same as GANTT_ARROW_ENTRY.TOP. **TYPE:** `str`                                                            |
 | `TOP`     | Along the dependency's row, then down (or up) onto the dependent bar's start. Equals to "top". **TYPE:** `str`               |
 | `LEFT`    | Down (or up) from the dependency's end, then into the dependent bar's start from the left. Equals to "left". **TYPE:** `str` |
+
+### datachart.constants.DUMBBELL_VALUE
+
+The supported dumbbell chart value labels.
+
+Passed as the `show_values` setting of the dumbbell chart: what each record prints. None prints nothing.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import DUMBBELL_VALUE
+>>> DUMBBELL_VALUE.DELTA
+"delta"
+```
+
+| ATTRIBUTE   | DESCRIPTION                                                                                          |
+| ----------- | ---------------------------------------------------------------------------------------------------- |
+| `NONE`      | No value labels. Equals to None. **TYPE:** `None`                                                    |
+| `ENDPOINTS` | Each endpoint's value, past its dot, away from the connector. Equals to "endpoints". **TYPE:** `str` |
+| `DELTA`     | The record's end - start, at the connector midpoint. Equals to "delta". **TYPE:** `str`              |
+
+### datachart.constants.DUMBBELL_SORT_KEY
+
+The supported dumbbell chart sort keys.
+
+Passed as the `sort_by` setting of the dumbbell chart: what a `sort` other than `SORT.NONE` orders the categories by.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import DUMBBELL_SORT_KEY
+>>> DUMBBELL_SORT_KEY.DEFAULT
+"start"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                          |
+| --------- | -------------------------------------------------------------------- |
+| `DEFAULT` | The default key. Same as DUMBBELL_SORT_KEY.START. **TYPE:** `str`    |
+| `START`   | Each category by its start. Equals to "start". **TYPE:** `str`       |
+| `END`     | Each category by its end. Equals to "end". **TYPE:** `str`           |
+| `DELTA`   | Each category by its end - start. Equals to "delta". **TYPE:** `str` |
 
 ### datachart.constants.DATE_PERIOD
 

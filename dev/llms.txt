@@ -6,7 +6,7 @@ datachart is a Python data visualization package built on matplotlib.
 It provides simple chart functions (BarChart, LineChart, StackedAreaChart, BumpChart, ScatterChart,
 Histogram, Heatmap, ContourChart, HexbinChart, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot,
 RidgelinePlot,
-ParallelCoords, PyramidChart, RadialChart, CalendarHeatmap, GanttChart, SankeyChart, NetworkChart,
+ParallelCoords, PyramidChart, RadialChart, CalendarHeatmap, GanttChart, DumbbellChart, SankeyChart, NetworkChart,
 Treemap), figure
 composition via Panel (overlaying charts on shared axes) and Grid
 (arranging charts in a grid), and a global configuration system with
@@ -32,6 +32,7 @@ themes; per-chart overrides go in each chart's `style` parameter.
 - [Pyramid Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/pyramidchart/index.md): Pyramid chart input attributes, the two-sides data contract, mirrored value axis controls, date labels, and composing pyramids with Grid.
 - [Radial Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/radialchart/index.md): Radial chart input attributes, the line, bar, scatter, and histogram visuals, and polar settings (start angle, direction, inner radius).
 - [Gantt Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/ganttchart/index.md): Gantt chart input attributes, the task record data contract, date axis window and tick formats, calendar periods (day, week, month, quarter, year) with a parent row, row order by start or by group, task groups and legend, group header rows with summary bars, milestones, duration and progress value labels, dependency arrows entering from the top or the left, the today line and its label, reference lines, gantt style, emphasis rules on duration, multiple schedules, composing with Grid, and saving.
+- [Dumbbell Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md): Dumbbell chart input attributes, the start and end record data contract, orientation, category order by start, end, or delta, endpoint names and the legend, endpoint and delta value labels, marker pairs and connector styles, dumbbell style, emphasis rules on the delta, overlaid and subplot charts, composing with Panel and Grid, and saving.
 - [Calendar Heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/calendarheatmap/index.md): Calendar heatmap input attributes, the dated values data contract, week start, month and weekday labels, colorbar and cell values, calendar style, normalization, one calendar per year and the year filter, composing with Grid, and saving.
 - [Histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md): Histogram input attributes, single and multiple datasets, and histogram views.
 - [Box Plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/boxplot/index.md): Box plot input attributes, customization, date labels, composing boxes with swarm and violin plots; multiple datasets require subplots.
