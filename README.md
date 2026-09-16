@@ -93,7 +93,7 @@ split them apart. The dict keys per chart are listed in each guide.
 | ----------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | **Trends**        | [LineChart], [StackedAreaChart], [BumpChart]                               | values over an ordered axis; area for part-of-whole over time; rank over time |
 | **Comparisons**   | [BarChart], [PyramidChart], [RadialChart], [CalendarHeatmap], [GanttChart], [DumbbellChart] | category totals, paired populations, cyclic/periodic values, daily rhythm, schedules, before/after change |
-| **Distributions** | [Histogram], [BoxPlot], [ViolinPlot], [SwarmPlot], [RaincloudPlot]         | shape and spread of one variable, per group                            |
+| **Distributions** | [Histogram], [BoxPlot], [ViolinPlot], [SwarmPlot], [RaincloudPlot], [RidgelinePlot] | shape and spread of one variable, per group; many groups stacked in ridges |
 | **Relationships** | [ScatterChart], [Heatmap], [ContourChart], [HexbinChart], [ParallelCoords], [NetworkChart], [ScatterMatrix] | two-variable correlation, matrices, dense 2-D density, many dimensions, who is linked to whom, every pair at once |
 | **Flows**         | [SankeyChart]                                                              | quantities moving between stages                                       |
 | **Proportions**   | [Treemap]                                                                  | how a whole splits into parts, grouped up to four levels deep          |
@@ -226,6 +226,7 @@ Code is formatted with `black`; the pre-commit hook runs it for you.
 [ViolinPlot]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/violinplot/
 [SwarmPlot]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/swarmplot/
 [RaincloudPlot]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/raincloudplot/
+[RidgelinePlot]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/ridgelineplot/
 [ScatterChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/scatterchart/
 [Heatmap]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/heatmap/
 [ContourChart]: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/contourchart/
