@@ -48,6 +48,7 @@ from matplotlib.transforms import (
     Bbox,
     IdentityTransform,
     ScaledTranslation,
+    TransformedBbox,
     TransformedPath,
 )
 import matplotlib.patheffects as patheffects
@@ -2180,6 +2181,18 @@ class AreaFillMixin:
         return area_style
 
 
+class MarkClipBox(TransformedBbox):
+    """The axes box grown by `pad` points, read live so it follows the layout."""
+
+    def __init__(self, ax, pad: float):
+        super().__init__(Bbox.unit(), ax.transAxes)
+        self._figure, self._pad = ax.figure, pad
+
+    def get_points(self):
+        pad = self._pad * self._figure.dpi / 72.0
+        return super().get_points() + [[-pad, -pad], [pad, pad]]
+
+
 def _mark_radius(line_style: dict) -> float:
     """Half the marker size of a line's points, or half its stroke when unmarked."""
 
@@ -2192,6 +2205,11 @@ def _mark_radius(line_style: dict) -> float:
 class LineLayer(PointLabelMixin, AreaFillMixin, Layer):
     kind = "line"
     label_spots = POINT_LABEL_SPOTS_VERTICAL
+
+    def __init__(self, chart: dict, settings: dict):
+        # the lines drawn per axes, so the panel can unclip their end markers
+        self._lines = {}
+        super().__init__(chart, settings)
 
     def _resolve_style(self):
         self.line_style = get_line_style(self.style)
@@ -2212,6 +2230,14 @@ class LineLayer(PointLabelMixin, AreaFillMixin, Layer):
 
     def value_data(self):
         return get_chart_data("y", self.chart)
+
+    def unclip_marks(self, ax) -> None:
+        """Let the markers on the axes edge draw whole, past the frame."""
+
+        for line in self._lines.get(id(ax), ()):
+            pad = line.get_markersize() / 2 + line.get_markeredgewidth()
+            line.set_clip_path(None)
+            line.set_clip_box(MarkClipBox(ax, pad))
 
     def draw(self, ax, ctx):
         x = get_chart_data("x", self.chart)
@@ -2239,6 +2265,7 @@ class LineLayer(PointLabelMixin, AreaFillMixin, Layer):
             self._etch([band], wash=False)
 
         (line,) = plot(x, y, **line_style, label=self.label(ctx))
+        self._lines.setdefault(id(ax), []).append(line)
         self.register_hover(line, _point_resolver(self.label(ctx), x, y, ctx.transpose))
 
         if self.show_values and ctx.emphasis != EMPHASIS_BACKGROUND:
@@ -10298,6 +10325,9 @@ class Panel:
             # _apply_radial_furniture
             ax.set_axisbelow(True)
 
+        # the axes pinned to the data below keep their ends: no tick snap,
+        # no legend headroom
+        pinned = set()
         # line charts pin the category-axis limits to the union of their data ranges
         if s.get("tighten_xlim"):
             ranges = [
@@ -10310,6 +10340,7 @@ class Panel:
                 (ax.set_ylim if horizontal else ax.set_xlim)(
                     min(r[0] for r in ranges), max(r[1] for r in ranges)
                 )
+                pinned.add("y" if horizontal else "x")
 
         # the y-axis is a rank axis only when every data layer draws ranks;
         # beside other charts it follows the panel as usual (ADR 0046)
@@ -10418,6 +10449,7 @@ class Panel:
             lo, hi = ax.dataLim.intervalx if horizontal else ax.dataLim.intervaly
             if np.isfinite([lo, hi]).all() and hi > lo:
                 (ax.set_xlim if horizontal else ax.set_ylim)(lo, hi)
+                pinned.add("x" if horizontal else "y")
 
         # axis limits; a bare layer fixed its own
         limits = {k: s.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
@@ -10460,11 +10492,12 @@ class Panel:
             )
 
         # a continuous axis starts and ends on a tick: each free end of the
-        # view moves outward to the next tick (a polar theta axis excepted)
+        # view moves outward to the next tick (a polar theta axis excepted);
+        # an axis pinned to the data ends on the data
         if not bare and all(l.ticks_at_axis_ends for l in layers):
             for axis_name in ("y",) if polar else ("x", "y"):
                 # ranks are whole positions with their own half-unit ends
-                if rank_axis and axis_name == "y":
+                if (rank_axis and axis_name == "y") or axis_name in pinned:
                     continue
                 _snap_limits_to_ticks(
                     ax,
@@ -10479,6 +10512,14 @@ class Panel:
                     "x" if horizontal else "y",
                     tuple(s.get(f"y{end}_right") is not None for end in ("min", "max")),
                 )
+
+        # a line pinned to its data range ends on its last point: the end
+        # markers draw whole over the frame instead of half-clipped by it;
+        # a user limit keeps the clip, since it may cut the line on purpose
+        if ("y" if horizontal else "x") in pinned and not any(limits.values()):
+            for layer in layers:
+                if isinstance(layer, LineLayer):
+                    layer.unclip_marks(ax)
 
         # radial furniture reads the final r limits, so it follows them
         if polar:
@@ -10605,9 +10646,15 @@ class Panel:
             legend.set_zorder(self._spine_zorder() + RADIAL_LEGEND_Z_OVER_SPINE)
         elif legend is not None and not bare:
             # a legend over the marks gets headroom at draw time, once layout
-            # has sized the axes; explicit value-axis limits stay as set
-            value_max = s.get("xmax" if horizontal else "ymax")
-            if value_max is None and (ax_right is None or s.get("ymax_right") is None):
+            # has sized the axes; an explicit value-axis limit, or a stack
+            # filling its frame, stays as set
+            value_axis = "x" if horizontal else "y"
+            value_max = s.get(f"{value_axis}max")
+            if (
+                value_max is None
+                and value_axis not in pinned
+                and (ax_right is None or s.get("ymax_right") is None)
+            ):
                 axes = [ax] + ([ax_right] if ax_right is not None else [])
                 dim = 0 if horizontal else 1
                 _defer_legend_fit(

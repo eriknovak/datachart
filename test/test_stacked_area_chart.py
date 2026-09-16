@@ -15,6 +15,7 @@ from datachart.constants import BASELINE, THEME
 from datachart.utils import Panel, Grid
 from datachart.utils._internal.config_helpers import get_stackedarea_style
 from datachart.utils._internal.layers import (
+    MarkClipBox,
     build_layers,
     stack_first_line,
     _stack_slots,
@@ -199,6 +200,41 @@ class TestStackedAreaChart(unittest.TestCase):
     def test_panel_of_line_layers_tightens_x(self):
         fig = Panel([StackedAreaChart(data=DATA), LineChart(data=DATA[0])])
         self.assertEqual(fig.axes[0].get_xlim(), (0.0, 3.0))
+
+    def test_tightened_x_never_snaps_to_a_tick(self):
+        """The data range wins over the tick grid: no empty step before 1."""
+        line = LineChart(data=[{"x": x, "y": x} for x in range(1, 17)])
+        self.assertEqual(line.axes[0].get_xlim(), (1.0, 16.0))
+        stack = StackedAreaChart(data=[series([1, 2, 3]) for _ in range(2)])
+        self.assertEqual(stack.axes[0].get_xlim(), (0.0, 2.0))
+
+    def test_line_end_markers_draw_whole(self):
+        """Markers on the pinned x ends clip to the axes grown by their radius."""
+        fig = LineChart(
+            data=[{"x": x, "y": x} for x in range(1, 17)],
+            style={"plot_line_marker": "o"},
+        )
+        fig.canvas.draw()
+        ax = fig.axes[0]
+        line = ax.lines[0]
+        box = line.get_clip_box()
+        self.assertIsInstance(box, MarkClipBox)
+        radius = line.get_markersize() / 2 * fig.dpi / 72
+        self.assertGreaterEqual(box.x0, ax.bbox.x0 - radius - 2)
+        self.assertLess(box.x0, ax.bbox.x0 - radius + 1e-6)
+        self.assertGreater(box.x1, ax.bbox.x1 + radius - 1e-6)
+        # a user limit may cut the line on purpose: the axes clip stays
+        cropped = LineChart(data=[{"x": x, "y": x} for x in range(1, 17)], xmax=8)
+        self.assertNotIsInstance(cropped.axes[0].lines[0].get_clip_box(), MarkClipBox)
+
+    def test_legend_adds_no_headroom_over_a_pinned_stack(self):
+        fig = StackedAreaChart(
+            data=DATA, baseline=BASELINE.PERCENT, subtitle=list("abc"), show_legend=True
+        )
+        fig.canvas.draw()
+        lo, hi = fig.axes[0].get_ylim()
+        self.assertEqual(lo, 0.0)
+        self.assertAlmostEqual(hi, 100.0)
 
     def test_log_scale_keeps_its_own_floor(self):
         import warnings
