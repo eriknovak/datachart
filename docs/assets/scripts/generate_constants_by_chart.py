@@ -19,10 +19,16 @@ import datachart.charts as ch
 import datachart.constants as K
 
 CLASSES = {n for n in dir(K) if n.isupper() and inspect.isclass(getattr(K, n))}
-ORDER = re.findall(
-    r"::: datachart\.charts\.(\w+)",
-    pathlib.Path("docs/references/charts.md").read_text(),
-)
+# chart families and their fronts, in the order of the charts reference
+GROUPS = [
+    (title, re.findall(r"::: datachart\.charts\.(\w+)", body))
+    for title, body in re.findall(
+        r"^## (.+)\n((?:(?!^## ).*\n?)*)",
+        pathlib.Path("docs/references/charts.md").read_text(),
+        re.M,
+    )
+]
+ORDER = [n for _, fronts in GROUPS for n in fronts]
 # constants a parameter takes inside its payload, keyed by the parameter
 PAYLOADS = {
     "norm": ("norm", ["NORMALIZE"]),
@@ -81,6 +87,10 @@ for n, rows in TABLE.items():
     for _, cs in rows:
         for c in cs:
             uses.setdefault(c, set()).add(n)
+PAGE_ORDER = re.findall(
+    r"::: datachart\.constants\.(\w+)",
+    pathlib.Path("docs/references/constants.md").read_text(),
+)
 CHART_BLOCKS = re.findall(
     r"::: datachart\.constants\.(\w+)",
     pathlib.Path("docs/references/constants.md")
@@ -98,16 +108,22 @@ def link(c, rel):
 lines = [
     "## Constants by Chart",
     "",
-    "Which constants the parameters of each chart accept. A constant used by one chart carries that chart's prefix; one shared across charts carries none. Style attributes take the constants named in their [typings](typings.md).",
-    "",
-    "| Chart | Chart-specific | Shared |",
-    "| :-- | :-- | :-- |",
+    "Which constants the parameters of each chart accept, by chart family. A constant used by one chart carries that chart's prefix; one shared across charts carries none. Style attributes take the constants named in their [typings](typings.md).",
 ]
-for n, rows in TABLE.items():
-    cs = list(dict.fromkeys(c for _, cc in rows for c in cc))
-    spec = ", ".join(link(c, "") for c in cs if c in SPECIFIC) or "—"
-    shared = ", ".join(link(c, "") for c in cs if c not in SPECIFIC) or "—"
-    lines.append(f"| [{n}](charts.md#datachart.charts.{n}) | {spec} | {shared} |")
+for title, fronts in GROUPS:
+    lines += [
+        "",
+        f"### {title}",
+        "",
+        "| Chart | Chart-specific | Shared |",
+        "| :-- | :-- | :-- |",
+    ]
+    for n in fronts:
+        # every row lists its constants in the order they appear on the page
+        cs = sorted({c for _, cc in TABLE[n] for c in cc}, key=PAGE_ORDER.index)
+        spec = ", ".join(link(c, "") for c in cs if c in SPECIFIC) or "—"
+        shared = ", ".join(link(c, "") for c in cs if c not in SPECIFIC) or "—"
+        lines.append(f"| [{n}](charts.md#datachart.charts.{n}) | {spec} | {shared} |")
 ref_table = "\n".join(lines) + "\n"
 
 p = pathlib.Path("docs/references/constants.md")

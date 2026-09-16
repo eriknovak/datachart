@@ -3,51 +3,79 @@
 The `constants` module provides a set of predefined constants used in the package.
 These include figure size, format, style, and other figure manipulation values.
 
+**Figure Constants**
+
 Classes:
-    FIG_SIZE:                The predefined figure sizes.
-    FIG_FORMAT:              The supported figure formats.
-    FONT_STYLE:              The supported font styles.
-    FONT_WEIGHT:             The supported font weights.
-    LINE_MARKER:             The supported line markers.
-    LINE_STYLE:              The supported line styles.
-    ARROW_STYLE:             The supported text annotation connector looks.
-    LINE_DRAW_STYLE:         The supported line draw styles.
-    HATCH_STYLE:             The supported hatch styles.
-    LEGEND_ALIGN:            The supported legend alignments.
-    LEGEND_LOCATION:         The supported legend locations.
-    HISTOGRAM_TYPE:          The supported histogram types.
-    BAR_MODE:                The supported bar modes.
-    COLORS:                  The predefined colors.
-    NORMALIZE:               The supported normalization options.
-    ORIENTATION:             The supported orientations.
-    VIOLIN_INNER:            The supported violin inner marks.
-    RIDGELINE_SCALE:         The supported ridgeline density scales.
-    BANDWIDTH:               The supported kernel density bandwidth rules.
-    CONTOUR_LEVELS:          The supported contour level rules.
-    HEXBIN_REDUCE:           The supported hexbin aggregations.
+    FIG_SIZE:   The predefined figure sizes.
+    FIG_FORMAT: The supported figure formats.
+
+**Font Constants**
+
+Classes:
+    FONT_STYLE:  The supported font styles.
+    FONT_WEIGHT: The supported font weights.
+
+**Line Constants**
+
+Classes:
+    LINE_MARKER:     The supported line markers.
+    LINE_STYLE:      The supported line styles.
+    LINE_DRAW_STYLE: The supported line draw styles.
+    ARROW_STYLE:     The supported text annotation connector looks.
+
+**Style Constants**
+
+Classes:
+    HATCH_STYLE: The supported hatch styles.
+    COLORS:      The predefined colors.
+    THEME:       The predefined themes.
+    EMPHASIS:    The supported emphasis roles.
+
+**Legend Constants**
+
+Classes:
+    LEGEND_ALIGN:    The supported legend alignments.
+    LEGEND_LOCATION: The supported legend locations.
+
+**Chart Constants**
+
+Classes:
+    BAR_MODE:          The supported bar modes.
+    SORT:              The supported category sort orders.
+    NORMALIZE:         The supported normalization options.
+    ORIENTATION:       The supported orientations.
+    VIOLIN_INNER:      The supported violin inner marks.
+    BANDWIDTH:         The supported kernel density bandwidth rules.
+    SWARM_MODE:        The supported swarm plot modes.
+    VALUE_FORMAT:      The predefined value formats.
+    DATE_FORMAT:       The predefined date formats.
+    SHOW_GRID:         The supported show grid options.
+    SCALE:             The supported scale options.
+    ASPECT_RATIO:      The supported aspect ratio options.
+    COLORBAR_LOCATION: The supported colorbar locations.
+
+**Chart-Specific Constants**
+
+Classes:
     STACKED_AREA_BASELINE:   The supported stacked area baselines.
     BUMP_RANK:               The supported bump chart ranking rules.
     BUMP_LABEL_POSITION:     The supported end label positions.
+    RADIAL_TYPE:             The supported radial chart visuals.
+    RADIAL_DIRECTION:        The supported angular directions.
+    CALENDAR_WEEKDAY:        The supported week start days.
+    GANTT_DATE_PERIOD:       The supported date axis periods.
     GANTT_VALUE:             The supported gantt chart value labels.
     GANTT_SORT_KEY:          The supported gantt chart sort keys.
     GANTT_ARROW_ENTRY:       The supported gantt dependency arrow entries.
     DUMBBELL_VALUE:          The supported dumbbell chart value labels.
     DUMBBELL_SORT_KEY:       The supported dumbbell chart sort keys.
-    SCATTER_MATRIX_DIAGONAL: The supported scatter matrix diagonal cells.
-    GANTT_DATE_PERIOD:       The supported date axis periods.
-    NODE_LABEL_POSITION:     The supported network node label positions.
+    HISTOGRAM_TYPE:          The supported histogram types.
+    RIDGELINE_SCALE:         The supported ridgeline density scales.
+    CONTOUR_LEVELS:          The supported contour level rules.
+    HEXBIN_REDUCE:           The supported hexbin aggregations.
     NETWORK_LAYOUT:          The supported network chart layouts.
-    RADIAL_TYPE:             The supported radial chart visuals.
-    SWARM_MODE:              The supported swarm plot modes.
-    RADIAL_DIRECTION:        The supported angular directions.
-    VALUE_FORMAT:            The predefined value formats.
-    DATE_FORMAT:             The predefined date formats.
-    THEME:                   The predefined themes.
-    EMPHASIS:                The supported emphasis roles.
-    SHOW_GRID:               The supported show grid options.
-    SCALE:                   The supported scale options.
-    ASPECT_RATIO:            The supported aspect ratio options.
-    COLORBAR_LOCATION:       The supported colorbar locations.
+    NODE_LABEL_POSITION:     The supported network node label positions.
+    SCATTER_MATRIX_DIAGONAL: The supported scatter matrix diagonal cells.
 
 """
 
