@@ -53,6 +53,12 @@ title: Typings Module
     options:
         heading_level: 4
 
+### Stacked Area Chart Typings
+
+::: datachart.typings.StackedAreaSingleChartAttrs
+    options:
+        heading_level: 4
+
 ### Bump Chart Typings
 
 ::: datachart.typings.BumpSingleChartAttrs
@@ -90,6 +96,26 @@ title: Typings Module
         heading_level: 4
 
 ::: datachart.typings.ColorbarSettingAttrs
+    options:
+        heading_level: 4
+
+### Contour Chart Typings
+
+::: datachart.typings.ContourSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.ContourDataAttrs
+    options:
+        heading_level: 4
+
+### Hexbin Chart Typings
+
+::: datachart.typings.HexbinSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.HexbinDataAttrs
     options:
         heading_level: 4
 
@@ -195,6 +221,20 @@ title: Typings Module
         heading_level: 4
 
 
+### Network Chart Typings
+
+::: datachart.typings.NetworkSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.NetworkNodeAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.NetworkEdgeAttrs
+    options:
+        heading_level: 4
+
 ### Scatter Matrix Typings
 
 ::: datachart.typings.ScatterMatrixDataPointAttrs
@@ -209,6 +249,27 @@ title: Typings Module
         heading_level: 4
 
 ::: datachart.typings.RadialDataPointAttrs
+    options:
+        heading_level: 4
+
+
+### Sankey Chart Typings
+
+::: datachart.typings.SankeySingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.SankeyLinkAttrs
+    options:
+        heading_level: 4
+
+### Treemap Typings
+
+::: datachart.typings.TreemapSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.TreemapRecordAttrs
     options:
         heading_level: 4
 
@@ -231,6 +292,8 @@ title: Typings Module
 
 ::: datachart.typings.LineStyleAttrs
 
+::: datachart.typings.StackedAreaStyleAttrs
+
 ::: datachart.typings.BumpStyleAttrs
 
 ::: datachart.typings.BarStyleAttrs
@@ -251,6 +314,10 @@ title: Typings Module
 
 ::: datachart.typings.HeatmapStyleAttrs
 
+::: datachart.typings.ContourStyleAttrs
+
+::: datachart.typings.HexbinStyleAttrs
+
 ::: datachart.typings.CalendarHeatmapStyleAttrs
 
 ::: datachart.typings.GanttStyleAttrs
@@ -269,7 +336,13 @@ title: Typings Module
 ::: datachart.typings.RidgelineStyleAttrs
 
 ::: datachart.typings.ParallelCoordsStyleAttrs
+::: datachart.typings.NetworkStyleAttrs
+
 ::: datachart.typings.ScatterMatrixStyleAttrs
+::: datachart.typings.SankeyStyleAttrs
+
+::: datachart.typings.TreemapStyleAttrs
+
 ::: datachart.typings.ThemeDefaultAttrs
 ::: datachart.typings.SketchStyleAttrs
 ::: datachart.typings.InkStyleAttrs
