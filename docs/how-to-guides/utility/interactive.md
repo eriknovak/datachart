@@ -62,8 +62,10 @@ Every chart type has hover support. Filled marks — bars, bands, boxes, bodies,
 | [Violin Plot](../charts/violinplot.ipynb) | body | legend label (or the split value), category, `median`, `q1`, `q3`, `min`, `max` |
 | [Swarm Plot](../charts/swarmplot.ipynb) | point | legend label, category, value |
 | [Raincloud Plot](../charts/raincloudplot.ipynb) | box, body, or rain point | as the box, violin, and swarm marks |
+| [Ridgeline Plot](../charts/ridgelineplot.ipynb) | ridge | legend label, category, `median`, `q1`, `q3`, `min`, `max` |
 | [Scatter Chart](../charts/scatterchart.ipynb) | point | legend label (or the `hue` group), `x`, `y` |
 | [Heatmap](../charts/heatmap.ipynb) | cell | legend label, `x`, `y`, `value` |
+| [Calendar Heatmap](../charts/calendarheatmap.ipynb) | day cell | legend label, `date`, `value` |
 | [Contour Chart](../charts/contourchart.ipynb) | level line or filled band | legend label, `level` (a band's two levels) |
 | [Hexbin Chart](../charts/hexbinchart.ipynb) | hexagon | legend label, `x`, `y` (the cell center), `count` (or the reduced `c` under its reducer's name) |
 | [Parallel Coordinates](../charts/parallelcoords.ipynb) | row line, at the nearest axis | the `hue` value (or the legend label), the axis name and the row's value there |
@@ -78,33 +80,45 @@ The annotation on each chart, from the figure shown with `show(interactive=True)
 | :-- | :-- |
 | ![A line chart with a hovered point](../../assets/imgs/hover-line.png) | ![A stacked area chart with a hovered band](../../assets/imgs/hover-stackedarea.png) |
 
-| **Bar Chart** — a hovered bar | **Pyramid Chart** — a hovered bar |
+| **Bump Chart** — a hovered period | **Bar Chart** — a hovered bar |
 | :-- | :-- |
-| ![A grouped bar chart with a hovered bar](../../assets/imgs/hover-bar.png) | ![A pyramid chart with a hovered bar](../../assets/imgs/hover-pyramid.png) |
+| ![A bump chart with a hovered period](../../assets/imgs/hover-bump.png) | ![A grouped bar chart with a hovered bar](../../assets/imgs/hover-bar.png) |
 
-| **Radial Chart** — a hovered bar | **Histogram** — a hovered bin |
+| **Pyramid Chart** — a hovered bar | **Gantt Chart** — a hovered task bar |
 | :-- | :-- |
-| ![A radial bar chart with a hovered bar](../../assets/imgs/hover-radial.png) | ![A histogram with a hovered bin](../../assets/imgs/hover-histogram.png) |
+| ![A pyramid chart with a hovered bar](../../assets/imgs/hover-pyramid.png) | ![A gantt chart with a hovered task bar](../../assets/imgs/hover-gantt.png) |
 
-| **Box Plot** — a hovered box | **Violin Plot** — a hovered body |
+| **Dumbbell Chart** — a hovered start dot | **Radial Chart** — a hovered bar |
 | :-- | :-- |
-| ![A box plot with a hovered box](../../assets/imgs/hover-box.png) | ![A violin plot with a hovered body](../../assets/imgs/hover-violin.png) |
+| ![A dumbbell chart with a hovered start dot](../../assets/imgs/hover-dumbbell.png) | ![A radial bar chart with a hovered bar](../../assets/imgs/hover-radial.png) |
 
-| **Swarm Plot** — a hovered point | **Raincloud Plot** — a hovered box |
+| **Histogram** — a hovered bin | **Box Plot** — a hovered box |
 | :-- | :-- |
-| ![A swarm plot with a hovered point](../../assets/imgs/hover-swarm.png) | ![A raincloud plot with a hovered box](../../assets/imgs/hover-raincloud.png) |
+| ![A histogram with a hovered bin](../../assets/imgs/hover-histogram.png) | ![A box plot with a hovered box](../../assets/imgs/hover-box.png) |
+
+| **Violin Plot** — a hovered body | **Swarm Plot** — a hovered point |
+| :-- | :-- |
+| ![A violin plot with a hovered body](../../assets/imgs/hover-violin.png) | ![A swarm plot with a hovered point](../../assets/imgs/hover-swarm.png) |
+
+| **Raincloud Plot** — a hovered box | **Ridgeline Plot** — a hovered ridge |
+| :-- | :-- |
+| ![A raincloud plot with a hovered box](../../assets/imgs/hover-raincloud.png) | ![A ridgeline plot with a hovered ridge](../../assets/imgs/hover-ridgeline.png) |
 
 | **Scatter Chart** — a hovered point | **Heatmap** — a hovered cell |
 | :-- | :-- |
 | ![A scatter chart with a hovered point](../../assets/imgs/hover-scatter.png) | ![A heatmap with a hovered cell](../../assets/imgs/hover-heatmap.png) |
 
-| **Contour Chart** — a hovered level line | **Hexbin Chart** — a hovered hexagon |
+| **Calendar Heatmap** — a hovered day | **Contour Chart** — a hovered level line |
 | :-- | :-- |
-| ![A contour chart with a hovered level line](../../assets/imgs/hover-contour.png) | ![A hexbin chart with a hovered hexagon](../../assets/imgs/hover-hexbin.png) |
+| ![A calendar heatmap with a hovered day](../../assets/imgs/hover-calendarheatmap.png) | ![A contour chart with a hovered level line](../../assets/imgs/hover-contour.png) |
 
-| **Parallel Coordinates** — a hovered row | **Network Chart** — a hovered node |
+| **Hexbin Chart** — a hovered hexagon | **Parallel Coordinates** — a hovered row |
 | :-- | :-- |
-| ![A parallel coordinates chart with a hovered row](../../assets/imgs/hover-parallelcoords.png) | ![A network chart with a hovered node](../../assets/imgs/hover-network.png) |
+| ![A hexbin chart with a hovered hexagon](../../assets/imgs/hover-hexbin.png) | ![A parallel coordinates chart with a hovered row](../../assets/imgs/hover-parallelcoords.png) |
+
+| **Network Chart** — a hovered node | **Scatter Matrix** — a hovered point |
+| :-- | :-- |
+| ![A network chart with a hovered node](../../assets/imgs/hover-network.png) | ![A scatter matrix with a hovered point](../../assets/imgs/hover-scattermatrix.png) |
 
 | **Sankey Chart** — a hovered link | **Treemap** — a hovered tile |
 | :-- | :-- |
