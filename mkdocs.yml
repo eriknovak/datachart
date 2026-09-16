@@ -214,37 +214,37 @@ nav:
     - how-to-guides/index.md
     - Charts:
       - how-to-guides/charts/index.md
-      # trends and comparisons
-      - Line Chart: how-to-guides/charts/linechart.ipynb
-      - Stacked Area Chart: how-to-guides/charts/stackedareachart.ipynb
-      - Bump Chart: how-to-guides/charts/bumpchart.ipynb
-      - Bar Chart: how-to-guides/charts/barchart.ipynb
-      - Pyramid Chart: how-to-guides/charts/pyramidchart.ipynb
-      - Radial Chart: how-to-guides/charts/radialchart.ipynb
-      - Calendar Heatmap: how-to-guides/charts/calendarheatmap.ipynb
-      - Gantt Chart: how-to-guides/charts/ganttchart.ipynb
-      - Dumbbell Chart: how-to-guides/charts/dumbbellchart.ipynb
-      # distributions
-      - Histogram: how-to-guides/charts/histogram.ipynb
-      - Box Plot: how-to-guides/charts/boxplot.ipynb
-      - Violin Plot: how-to-guides/charts/violinplot.ipynb
-      - Swarm Plot: how-to-guides/charts/swarmplot.ipynb
-      - Raincloud Plot: how-to-guides/charts/raincloudplot.ipynb
-      - Ridgeline Plot: how-to-guides/charts/ridgelineplot.ipynb
-      # relationships
-      - Scatter Chart: how-to-guides/charts/scatterchart.ipynb
-      - Heatmap: how-to-guides/charts/heatmap.ipynb
-      - Contour Chart: how-to-guides/charts/contourchart.ipynb
-      - Hexbin Chart: how-to-guides/charts/hexbinchart.ipynb
-      - Parallel Coordinates: how-to-guides/charts/parallelcoords.ipynb
-      - Network Chart: how-to-guides/charts/networkchart.ipynb
-      - Scatter Matrix: how-to-guides/charts/scattermatrix.ipynb
-      # flows
-      - Sankey Chart: how-to-guides/charts/sankeychart.ipynb
-      # part of a whole
-      - Treemap: how-to-guides/charts/treemap.ipynb
-      # across charts
-      - Highlighting: how-to-guides/styling/highlighting.ipynb
+      - Trends and Comparisons:
+        - Line Chart: how-to-guides/charts/linechart.ipynb
+        - Stacked Area Chart: how-to-guides/charts/stackedareachart.ipynb
+        - Bump Chart: how-to-guides/charts/bumpchart.ipynb
+        - Bar Chart: how-to-guides/charts/barchart.ipynb
+        - Pyramid Chart: how-to-guides/charts/pyramidchart.ipynb
+        - Radial Chart: how-to-guides/charts/radialchart.ipynb
+        - Calendar Heatmap: how-to-guides/charts/calendarheatmap.ipynb
+        - Gantt Chart: how-to-guides/charts/ganttchart.ipynb
+        - Dumbbell Chart: how-to-guides/charts/dumbbellchart.ipynb
+      - Distributions:
+        - Histogram: how-to-guides/charts/histogram.ipynb
+        - Box Plot: how-to-guides/charts/boxplot.ipynb
+        - Violin Plot: how-to-guides/charts/violinplot.ipynb
+        - Swarm Plot: how-to-guides/charts/swarmplot.ipynb
+        - Raincloud Plot: how-to-guides/charts/raincloudplot.ipynb
+        - Ridgeline Plot: how-to-guides/charts/ridgelineplot.ipynb
+      - Relationships:
+        - Scatter Chart: how-to-guides/charts/scatterchart.ipynb
+        - Heatmap: how-to-guides/charts/heatmap.ipynb
+        - Contour Chart: how-to-guides/charts/contourchart.ipynb
+        - Hexbin Chart: how-to-guides/charts/hexbinchart.ipynb
+        - Parallel Coordinates: how-to-guides/charts/parallelcoords.ipynb
+        - Network Chart: how-to-guides/charts/networkchart.ipynb
+        - Scatter Matrix: how-to-guides/charts/scattermatrix.ipynb
+      - Flows:
+        - Sankey Chart: how-to-guides/charts/sankeychart.ipynb
+      - Part of a Whole:
+        - Treemap: how-to-guides/charts/treemap.ipynb
+      - Across Charts:
+        - Highlighting: how-to-guides/styling/highlighting.ipynb
     - Composition:
       - how-to-guides/composition/index.md
       - Panel: how-to-guides/utility/panel.ipynb
