@@ -4,12 +4,32 @@ title: Styling
 
 # Styling
 
-The styling guides cover everything that controls how charts look: the global configuration, the predefined themes and how to create your own, emphasis for highlighting data, and the available colormaps.
+The styling guides cover everything that controls how charts look: the global configuration, the predefined themes and how to create your own, and the available colormaps. Each card names a guide, says what it covers, and links to it.
 
-| Guide                                 | Description                                                              |
-| :------------------------------------ | :------------------------------------------------------------------------ |
-| [config](config.ipynb)                | Customizing the global style: themes, attributes, scoped changes, theme files. |
-| [themes](themes.ipynb)                | How to apply the predefined themes and create your own.                   |
-| [theme gallery](theme-gallery.ipynb)  | Showcases the themes across basic charts and research-style figures.      |
-| [highlighting](highlighting.ipynb)    | Emphasizing and muting data series with the `emphasis` option.            |
-| [colormaps](colormaps.ipynb)          | Showcases the existing colormaps available via the `COLORS` constant.     |
+<div class="grid cards card-gallery" markdown>
+
+-   [Config](config.ipynb)
+
+    Customizing the global style through the [config](../../references/config.md) singleton: themes, attributes, scoped changes, and theme files.
+
+    <p class="card-icon" markdown="span">:material-tune:</p>
+
+-   [Themes](themes.ipynb)
+
+    Applying the predefined themes with `config.set_theme`, and creating your own from a style dictionary or a theme file.
+
+    ![The same bar chart under the default, ink, material, and sketch themes](../../assets/imgs/gallery-themes.png)
+
+-   [Theme Gallery](theme-gallery.ipynb)
+
+    Every predefined theme across basic charts and research-style figures, to pick one by eye.
+
+    ![The same bar chart under all eight predefined themes](../../assets/imgs/gallery-themegallery.png)
+
+-   [Colormaps](colormaps.ipynb)
+
+    The colormaps and palettes available through the `COLORS` constant, sequential, diverging, and categorical.
+
+    ![Gradient strips of eight colormaps](../../assets/imgs/gallery-colormaps.png)
+
+</div>

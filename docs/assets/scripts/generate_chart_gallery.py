@@ -1,6 +1,7 @@
 """Generates docs/assets/imgs/gallery-*.png — one figure per chart type for
-the gallery cards of the charts index, and one per composition utility for
-the cards of the utilities index.
+the gallery cards of the charts index, one per composition utility for the
+cards of the utilities index, and one per styling guide for the cards of the
+styling index.
 
 Each figure is a small but realistic chart, with several series, a legend
 where the chart has one, and the axes labelled, so a reader can tell from the
@@ -18,9 +19,13 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
+from datachart.constants import COLORS
 from datachart.utils import Annotate, Grid, Panel
+from datachart.utils._internal.colors import get_colormap
+from generate_example_themes import THEMES, tile
 from datachart.charts import (
     BarChart,
     BoxPlot,
@@ -533,6 +538,78 @@ def annotate():
 
 UTILITIES = (panel, grid, annotate)
 
+
+def _sheet(names, columns):
+    """The README bar chart under each named theme, tiled `columns` wide."""
+
+    tiles = [tile(name) for name in names]
+    width, height = tiles[0].size
+    rows = -(-len(tiles) // columns)
+    sheet = Image.new("RGB", (width * columns, height * rows), "white")
+    for i, image in enumerate(tiles):
+        sheet.paste(image, ((i % columns) * width, (i // columns) * height))
+    return sheet
+
+
+def themes():
+    return _sheet(("DEFAULT", "INK", "MATERIAL", "SKETCH"), columns=2)
+
+
+def themegallery():
+    return _sheet(THEMES, columns=3)
+
+
+def highlighting():
+    walks = np.random.default_rng(3).standard_normal((6, 60)).cumsum(axis=1)
+    return LineChart(
+        data=_series(range(60), walks.tolist()),
+        subtitle=[f"run {i}" for i in range(6)],
+        emphasis=[
+            "background",
+            "background",
+            "background",
+            None,
+            "highlight",
+            "background",
+        ],
+        show_legend=True,
+        xlabel="Step",
+        ylabel="Value",
+        figsize=FIGSIZE,
+    )
+
+
+def colormaps():
+    names = [
+        "Blues",
+        "Viridis",
+        "Plasma",
+        "Spectral",
+        "RdBu",
+        "Sunset2",
+        "Set2",
+        "OkabeIto",
+    ]
+    gradient = np.vstack([np.linspace(0, 1, 256)] * 2)
+    figure, axes = plt.subplots(nrows=len(names), figsize=FIGSIZE)
+    figure.subplots_adjust(left=0.22, right=0.98, top=0.98, bottom=0.02, hspace=0.35)
+    for ax, name in zip(axes, names):
+        ax.imshow(gradient, aspect="auto", cmap=get_colormap(getattr(COLORS, name)))
+        ax.text(
+            -0.02,
+            0.5,
+            name,
+            va="center",
+            ha="right",
+            fontsize=9,
+            transform=ax.transAxes,
+        )
+        ax.set_axis_off()
+    return figure
+
+
+STYLING = (themes, themegallery, highlighting, colormaps)
+
 CHARTS = (
     line,
     stackedarea,
@@ -562,10 +639,13 @@ CHARTS = (
 
 
 def main():
-    for chart in CHARTS + UTILITIES:
+    for chart in CHARTS + UTILITIES + STYLING:
         figure = chart()
         path = OUT / f"gallery-{chart.__name__}.png"
-        figure.savefig(path, dpi=DPI, bbox_inches="tight", facecolor="white")
+        if isinstance(figure, Image.Image):
+            figure.save(path)
+        else:
+            figure.savefig(path, dpi=DPI, bbox_inches="tight", facecolor="white")
         plt.close("all")
         print(path.name)
 

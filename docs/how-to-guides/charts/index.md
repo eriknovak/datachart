@@ -6,7 +6,7 @@ title: Charts
 
 The [datachart.charts](../../references/charts.md) module of the `datachart` package provides various chart types to create data visualizations. The module is designed to be highly customizable and easy to use.
 
-The charts are grouped by the question they answer. Each card names a chart, says what it is for, and links to its how-to guide. The chips under the name say how the chart composes with the other charts:
+The charts are grouped by the question they answer. Each card names a chart, says what it is for, and links to its how-to guide. The chips under the name say how the chart composes with the other charts through the [composition](../composition/index.md) functions:
 
 - <span class="chip">Panel</span> — the chart can be overlaid with other charts in one coordinate space through [Panel](../utility/panel.ipynb). A chart that owns its whole axes (the Sankey chart, treemap, network chart, calendar heatmap, and scatter matrix) or draws a mirrored or task axis (the pyramid and gantt charts) cannot, and shows <span class="chip chip-no">Panel</span>. The box, violin, raincloud, and ridgeline plots overlay with other kinds of charts, but a panel holds one dataset of each of these kinds.
 - <span class="chip">Grid</span> — the chart can take a cell of a combined figure through [Grid](../utility/grid.ipynb). Every chart can.
@@ -243,15 +243,18 @@ How a whole splits into parts, and parts into smaller parts.
 
 </div>
 
-## Composition and Utilities
+## Across Charts
 
-The guides that take a finished chart further; the [utilities index](../utility/index.md) maps them in full.
+The options every chart shares, worth a guide of their own.
 
-| Utility                                          | Description                                                   |
-| :----------------------------------------------- | :------------------------------------------------------------ |
-| [Panel](../utility/panel.ipynb)                  | How to overlay multiple charts in one plot.                   |
-| [Grid Layout](../utility/grid.ipynb)             | How to combine multiple charts in a grid.                     |
-| [Text Annotations](../utility/annotations.ipynb) | How to annotate charts and finished figures with `Annotate`.  |
-| [Statistics](../utility/stats.ipynb)             | How to prepare chart data with the statistical utilities.     |
-| [Saving Figures](../utility/saving.md)           | How to save figures in vector or raster formats.              |
-| [Interactive Figures](../utility/interactive.md) | How to zoom, pan, and hover over the marks of a figure.       |
+<div class="grid cards card-gallery" markdown>
+
+-   [Highlighting](../styling/highlighting.ipynb)
+
+    Emphasizing and muting data series with the `emphasis` option, by role or by rule, on any chart.
+
+    ![A line chart with one series highlighted and the rest muted](../../assets/imgs/gallery-highlighting.png)
+
+</div>
+
+A finished chart goes further through the [composition](../composition/index.md) guides, the [styling](../styling/index.md) guides, and the [utility](../utility/index.md) guides.

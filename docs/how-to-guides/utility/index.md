@@ -1,30 +1,12 @@
 ---
-title: Composition & Utilities
+title: Utility
 ---
 
-# Composition & Utilities
+# Utility
 
-The [datachart.utils](../../references/utils/index.md) module of the `datachart` package provides the figure composition functions and various utilities for data visualization. Each card names a utility, says what it is for, and links to its how-to guide.
+The utilities of the [datachart.utils](../../references/utils/index.md) module around a figure: the statistics behind the charts, saving, and interactive display. Each card names a guide, says what it is for, and links to it.
 
 <div class="grid cards card-gallery" markdown>
-
--   [Panel](panel.ipynb)
-
-    Overlays several charts in one coordinate space, with a shared x-axis and up to two y-axes, through [datachart.utils.Panel](../../references/utils/index.md#datachart.utils.Panel).
-
-    ![A bar chart and a line chart overlaid on two y-axes](../../assets/imgs/gallery-panel.png)
-
--   [Grid Layout](grid.ipynb)
-
-    Arranges several charts in the cells of one figure, with nested rows for the layout, through [datachart.utils.Grid](../../references/utils/index.md#datachart.utils.Grid).
-
-    ![Four charts arranged in a two-by-two grid](../../assets/imgs/gallery-grid.png)
-
--   [Text Annotations](annotations.ipynb)
-
-    Attaches text, boxes, and connectors to a chart through its `texts` parameter, or to a finished figure through [datachart.utils.Annotate](../../references/utils/index.md#datachart.utils.Annotate).
-
-    ![A line chart with two annotations pointing at data points](../../assets/imgs/gallery-annotate.png)
 
 -   [Statistics](stats.ipynb)
 
