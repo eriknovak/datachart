@@ -11,6 +11,8 @@ The charts are grouped by the question they answer. Each card names a chart, say
 - <span class="chip">Panel</span> — the chart can be overlaid with other charts in one coordinate space through [Panel](../utility/panel.ipynb). A chart that owns its whole axes (the Sankey chart, treemap, network chart, calendar heatmap, and scatter matrix) or draws a mirrored or task axis (the pyramid and gantt charts) cannot, and shows <span class="chip chip-no">Panel</span>. The box, violin, raincloud, and ridgeline plots overlay with other kinds of charts, but a panel holds one dataset of each of these kinds.
 - <span class="chip">Grid</span> — the chart can take a cell of a combined figure through [Grid](../utility/grid.ipynb). Every chart can.
 
+A finished chart goes further through the [composition](../composition/index.md) guides, the [styling](../styling/index.md) guides, and the [utility](../utility/index.md) guides.
+
 ## Trends and Comparisons
 
 Values along an axis or across categories: how a quantity moves and how the categories compare.
@@ -256,5 +258,3 @@ The options every chart shares, worth a guide of their own.
     ![A line chart with one series highlighted and the rest muted](../../assets/imgs/gallery-highlighting.png)
 
 </div>
-
-A finished chart goes further through the [composition](../composition/index.md) guides, the [styling](../styling/index.md) guides, and the [utility](../utility/index.md) guides.
