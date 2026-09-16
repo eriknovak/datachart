@@ -12,6 +12,7 @@ import math
 import os
 from typing import FrozenSet, List, Optional, Tuple, Union, Dict, Any
 
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec, SubplotSpec
 
@@ -313,12 +314,15 @@ def _column_window(subplot_spec: SubplotSpec) -> Tuple[float, float]:
         ss = getattr(ss.get_gridspec(), "_subplot_spec", None)
     x0, x1 = 0.0, 1.0
     for ss in reversed(chain):
-        ncols = ss.get_gridspec().ncols
+        gs = ss.get_gridspec()
+        # a legend column is narrower: edges follow the width ratios
+        ratios = gs.get_width_ratios() or [1] * gs.ncols
+        edges = np.concatenate([[0.0], np.cumsum(ratios)]) / sum(ratios)
         cols = ss.colspan
         width = x1 - x0
         x0, x1 = (
-            x0 + width * cols.start / ncols,
-            x0 + width * cols.stop / ncols,
+            x0 + width * edges[cols.start],
+            x0 + width * edges[cols.stop],
         )
     return (x0, x1)
 

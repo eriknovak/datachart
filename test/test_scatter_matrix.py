@@ -389,6 +389,30 @@ class TestScatterMatrixComposition(unittest.TestCase):
         outer = Grid([[figure]])
         self.assertEqual(len(outer.axes), 8)
 
+    def test_nested_columns_keep_equal_widths(self):
+        matrix = ScatterMatrix(columns(), hue="species", dimensions=["a", "b", "c"])
+        line = LineChart([{"x": 0, "y": 1}, {"x": 1, "y": 2}])
+        # a full row above puts outer column edges where a legend-blind
+        # split of the matrix would also place one
+        def spec(row, col, span=1):
+            return {"row": row, "col": col, "rowspan": 1, "colspan": span}
+
+        cells = [{"figure": line, "layout_spec": spec(0, c)} for c in range(3)]
+        cells += [
+            {"figure": line, "layout_spec": spec(1, 0)},
+            {"figure": matrix, "layout_spec": spec(1, 1, 2)},
+        ]
+        figure = Grid(cells, figsize=(12, 8))
+        figure.canvas.draw()
+        bottom = [
+            ax
+            for ax in figure.axes
+            if ax.get_xlabel() in ("a", "b", "c")
+        ]
+        widths = [ax.get_position().width for ax in bottom]
+        self.assertEqual(len(widths), 3)
+        self.assertAlmostEqual(min(widths) / max(widths), 1, delta=0.05)
+
     def test_renders_under_every_theme(self):
         for theme in THEMES:
             with self.subTest(theme=theme):
