@@ -153,6 +153,10 @@ title: Constants Module
     options:
         heading_level: 3
 
+::: datachart.constants.DIAGONAL
+    options:
+        heading_level: 3
+
 ::: datachart.constants.DATE_PERIOD
     options:
         heading_level: 3

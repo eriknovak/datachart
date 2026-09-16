@@ -357,6 +357,15 @@ BASE_THEME: StyleAttrs = {
     "plot_regression_width": 2,
     "plot_regression_style": LINE_STYLE.SOLID,
     "plot_regression_ci_alpha": 0.15,
+    # plot scatter matrix style (ADR 0051); a None color follows the hue group
+    "plot_scatter_matrix_regression_color": None,
+    "plot_scatter_matrix_regression_width": 1.5,
+    "plot_scatter_matrix_regression_style": LINE_STYLE.SOLID,
+    "plot_scatter_matrix_correlation_size": 11,
+    "plot_scatter_matrix_correlation_weight": FONT_WEIGHT.NORMAL,
+    "plot_scatter_matrix_kde_width": 1.5,
+    "plot_scatter_matrix_kde_alpha": 0.25,
+    "plot_scatter_matrix_diagonal_alpha": 0.6,
     # plot parallel coords style
     "plot_parallel_color": None,
     "plot_parallel_alpha": 0.6,
