@@ -44,45 +44,53 @@
     background-color: var(--md-code-bg-color) !important;
 }
 
-/* chart gallery on the charts index: three cards per row, two on a tablet,
+/* card galleries on the guide indexes: three cards per row, two on a tablet,
    one on a phone; the image sits below the description */
-.md-typeset .grid.cards.chart-gallery {
+.md-typeset .grid.cards.card-gallery {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 @media screen and (max-width: 44.984375em) {
-    .md-typeset .grid.cards.chart-gallery {
+    .md-typeset .grid.cards.card-gallery {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media screen and (max-width: 29.984375em) {
-    .md-typeset .grid.cards.chart-gallery {
+    .md-typeset .grid.cards.card-gallery {
         grid-template-columns: minmax(0, 1fr);
     }
 }
 
-.md-typeset .grid.cards.chart-gallery > ul > li {
+.md-typeset .grid.cards.card-gallery > ul > li {
     display: flex;
     flex-direction: column;
     font-size: .7rem;
 }
 
-.md-typeset .grid.cards.chart-gallery > ul > li > p:first-child {
+.md-typeset .grid.cards.card-gallery > ul > li > p:first-child {
     margin-bottom: 0;
     font-size: .8rem;
     font-weight: 700;
 }
 
-.md-typeset .grid.cards.chart-gallery > ul > li > p:nth-child(2) {
+.md-typeset .grid.cards.card-gallery > ul > li > p:nth-child(2) {
     margin-top: .2em;
 }
 
-.md-typeset .grid.cards.chart-gallery > ul > li > p:last-child {
+.md-typeset .grid.cards.card-gallery > ul > li > p:last-child {
     margin-top: auto;
 }
 
-.md-typeset .grid.cards.chart-gallery img {
+.md-typeset .grid.cards.card-gallery .card-icon {
+    margin-top: auto;
+    font-size: 2.4rem;
+    line-height: 1;
+    text-align: center;
+    color: var(--md-default-fg-color--lighter);
+}
+
+.md-typeset .grid.cards.card-gallery img {
     display: block;
     width: 100%;
     border-radius: .1rem;

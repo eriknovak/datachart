@@ -15,7 +15,7 @@ The charts are grouped by the question they answer. Each card names a chart, say
 
 Values along an axis or across categories: how a quantity moves and how the categories compare.
 
-<div class="grid cards chart-gallery" markdown>
+<div class="grid cards card-gallery" markdown>
 
 -   [Line Chart](linechart.ipynb)
 
@@ -95,7 +95,7 @@ Values along an axis or across categories: how a quantity moves and how the cate
 
 The spread of the values within each group, from a binned summary to every observation.
 
-<div class="grid cards chart-gallery" markdown>
+<div class="grid cards card-gallery" markdown>
 
 -   [Histogram](histogram.ipynb)
 
@@ -151,7 +151,7 @@ The spread of the values within each group, from a binned summary to every obser
 
 How two or more variables relate to each other.
 
-<div class="grid cards chart-gallery" markdown>
+<div class="grid cards card-gallery" markdown>
 
 -   [Scatter Chart](scatterchart.ipynb)
 
@@ -215,7 +215,7 @@ How two or more variables relate to each other.
 
 How a quantity moves between categories: where it comes from and where it goes.
 
-<div class="grid cards chart-gallery" markdown>
+<div class="grid cards card-gallery" markdown>
 
 -   [Sankey Chart](sankeychart.ipynb)
 
@@ -231,7 +231,7 @@ How a quantity moves between categories: where it comes from and where it goes.
 
 How a whole splits into parts, and parts into smaller parts.
 
-<div class="grid cards chart-gallery" markdown>
+<div class="grid cards card-gallery" markdown>
 
 -   [Treemap](treemap.ipynb)
 

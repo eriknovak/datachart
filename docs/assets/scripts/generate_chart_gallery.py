@@ -1,5 +1,6 @@
 """Generates docs/assets/imgs/gallery-*.png — one figure per chart type for
-the gallery cards of the charts index.
+the gallery cards of the charts index, and one per composition utility for
+the cards of the utilities index.
 
 Each figure is a small but realistic chart, with several series, a legend
 where the chart has one, and the axes labelled, so a reader can tell from the
@@ -19,6 +20,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
+from datachart.utils import Annotate, Grid, Panel
 from datachart.charts import (
     BarChart,
     BoxPlot,
@@ -484,6 +486,53 @@ def treemap():
     )
 
 
+def panel():
+    quarters = ["Q1", "Q2", "Q3", "Q4"]
+    revenue = BarChart(
+        data=[{"label": q, "y": y} for q, y in zip(quarters, [12, 19, 15, 22])],
+        subtitle="Revenue (M€)",
+    )
+    margin = LineChart(
+        data=[{"x": q, "y": y} for q, y in zip(quarters, [18, 24, 21, 27])],
+        subtitle="Margin (%)",
+    )
+    return Panel(
+        [revenue, {"figure": margin, "y_axis": "right"}],
+        xlabel="Quarter",
+        ylabel_left="Revenue (M€)",
+        ylabel_right="Margin (%)",
+        show_legend=True,
+        figsize=FIGSIZE,
+    )
+
+
+def grid():
+    return Grid(
+        [[line(), bar()], [scatter(), box()]],
+        figsize=(FIGSIZE[0], FIGSIZE[1] * 1.15),
+    )
+
+
+def annotate():
+    years = list(range(2016, 2025))
+    values = [12, 15, 14, 19, 23, 21, 26, 30, 29]
+    figure = LineChart(
+        data=_series(years, [values]),
+        xlabel="Year",
+        ylabel="Signups (k)",
+        figsize=FIGSIZE,
+    )
+    return Annotate(
+        figure,
+        [
+            {"text": "Record year", "x": 2020.4, "y": 31.5, "target": (2023, 30)},
+            {"text": "Pricing change", "x": 2017.2, "y": 25, "target": (2019, 19)},
+        ],
+    )
+
+
+UTILITIES = (panel, grid, annotate)
+
 CHARTS = (
     line,
     stackedarea,
@@ -513,7 +562,7 @@ CHARTS = (
 
 
 def main():
-    for chart in CHARTS:
+    for chart in CHARTS + UTILITIES:
         figure = chart()
         path = OUT / f"gallery-{chart.__name__}.png"
         figure.savefig(path, dpi=DPI, bbox_inches="tight", facecolor="white")
