@@ -49,6 +49,7 @@ How two or more variables relate to each other.
 | [Hexbin Chart](hexbinchart.ipynb)             | The showcase of the hexbin chart.            |
 | [Parallel Coordinates](parallelcoords.ipynb)  | The showcase of the parallel coordinates.    |
 | [Network Chart](networkchart.ipynb)           | The showcase of the network chart.           |
+| [Scatter Matrix](scattermatrix.ipynb)         | The showcase of the scatter matrix.          |
 
 ## Flows
 

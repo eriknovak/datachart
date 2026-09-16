@@ -119,6 +119,7 @@ plugins:
         Histogram, Heatmap, ContourChart, HexbinChart, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot,
         RidgelinePlot,
         ParallelCoords, PyramidChart, RadialChart, CalendarHeatmap, GanttChart, DumbbellChart, SankeyChart, NetworkChart,
+        ScatterMatrix,
         Treemap), figure
         composition via Panel (overlaying charts on shared axes) and Grid
         (arranging charts in a grid), and a global configuration system with
@@ -156,6 +157,7 @@ plugins:
           - how-to-guides/charts/networkchart.ipynb: Network chart input attributes, the nodes and edges data contract, spring, circular, and fixed layouts, directed edges, weight and size encodings, groups and the legend, per-node emphasis, edge values, node and edge style, text annotations, subplots, composing with Grid, and saving.
           - how-to-guides/charts/treemap.ipynb: Treemap input attributes, the records data contract with one level of children, tile values, per-record emphasis, the group legend, tile style, text annotations, subplots, composing with Grid, and saving.
           - how-to-guides/charts/parallelcoords.ipynb: Parallel coordinates input attributes and customization for multivariate data, including date dimensions.
+          - how-to-guides/charts/scattermatrix.ipynb: Scatter matrix input attributes, the columns and records data contract, dimension selection, hue groups and the single legend, histogram, density and blank diagonals, the lower triangle only, correlation text, regression lines, shared axes, scatter matrix style, nesting in Grid, and saving.
         Composition & Utilities:
           - how-to-guides/utility/index.md: Map of Panel, Grid, statistics, figure saving, and interactive figures.
           - how-to-guides/utility/panel.ipynb: "Overlaying multiple charts on one plot with Panel: dual y-axes, z-order, emphasis, and nesting panels."
@@ -232,6 +234,7 @@ nav:
       - Hexbin Chart: how-to-guides/charts/hexbinchart.ipynb
       - Parallel Coordinates: how-to-guides/charts/parallelcoords.ipynb
       - Network Chart: how-to-guides/charts/networkchart.ipynb
+      - Scatter Matrix: how-to-guides/charts/scattermatrix.ipynb
       # flows
       - Sankey Chart: how-to-guides/charts/sankeychart.ipynb
       # part of a whole

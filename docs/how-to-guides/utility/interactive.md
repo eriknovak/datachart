@@ -68,6 +68,7 @@ Every chart type has hover support. Filled marks — bars, bands, boxes, bodies,
 | [Hexbin Chart](../charts/hexbinchart.ipynb) | hexagon | legend label, `x`, `y` (the cell center), `count` (or the reduced `c` under its reducer's name) |
 | [Parallel Coordinates](../charts/parallelcoords.ipynb) | row line, at the nearest axis | the `hue` value (or the legend label), the axis name and the row's value there |
 | [Network Chart](../charts/networkchart.ipynb) | node or edge | node: its label, `degree` (`in` / `out` when directed, the weight sum when weighted), its `group` and `size` when given; edge: `source`, `target`, `weight` |
+| [Scatter Matrix](../charts/scattermatrix.ipynb) | point, bin, or density curve | as the scatter chart and histogram marks; a density curve reports the legend label (the `hue` group), `x`, and the density as `y` |
 | [Sankey Chart](../charts/sankeychart.ipynb) | node or link | node: its name, `flow`; link: `source`, `target`, `flow` |
 | [Treemap](../charts/treemap.ipynb) | tile or group band | its label, `value` (a band's group total) |
 

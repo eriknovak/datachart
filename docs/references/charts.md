@@ -41,6 +41,7 @@ title: Charts Module
 ::: datachart.charts.HexbinChart
 ::: datachart.charts.ParallelCoords
 ::: datachart.charts.NetworkChart
+::: datachart.charts.ScatterMatrix
 
 
 ## Flows
