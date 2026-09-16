@@ -51,6 +51,7 @@ Classes:
     RidgelineDataPointAttrs: The data point attributes for the ridgeline plot.
     ParallelCoordsSingleChartAttrs: The single chart attributes for the parallel coordinates chart.
     ParallelCoordsDataPointAttrs: The data point attributes for the parallel coordinates chart.
+    ScatterMatrixDataPointAttrs: The record attributes for the scatter matrix.
     RadialSingleChartAttrs: The single chart attributes for the radial chart.
     RadialDataPointAttrs: The data point attributes for the radial chart.
 
@@ -90,6 +91,7 @@ Classes:
     RaincloudStyleAttrs: The typing for the raincloud plot style.
     RidgelineStyleAttrs: The typing for the ridgeline plot style.
     ParallelCoordsStyleAttrs: The typing for the parallel coordinates chart style.
+    ScatterMatrixStyleAttrs: The typing for the scatter matrix style.
     ThemeDefaultAttrs: The typing for theme-driven defaults and cycles.
 
 """
@@ -1157,6 +1159,36 @@ class ParallelCoordsStyleAttrs(TypedDict):
     plot_parallel_dim_label_pad: Union[int, float, None]
 
 
+class ScatterMatrixStyleAttrs(TypedDict):
+    """The typing for the scatter matrix style.
+
+    The cells take the scatter, histogram and plot text keys; these keys
+    style what the matrix adds on top of them.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        plot_scatter_matrix_regression_color (Union[str, None]): The color of the regression lines under `show_regression`; `None` takes each hue group's color.
+        plot_scatter_matrix_regression_width (Union[int, float, None]): The line width of the regression lines.
+        plot_scatter_matrix_regression_style (Union[LINE_STYLE, str, None]): The line style of the regression lines.
+        plot_scatter_matrix_correlation_size (Union[int, float, None]): The font size of the correlation text under `show_correlation`.
+        plot_scatter_matrix_correlation_weight (Union[FONT_WEIGHT, str, None]): The font weight of the correlation text.
+        plot_scatter_matrix_kde_width (Union[int, float, None]): The line width of the diagonal density curves.
+        plot_scatter_matrix_kde_alpha (Union[float, None]): The alpha value of the fill under the diagonal density curves; 0 draws no fill.
+        plot_scatter_matrix_diagonal_alpha (Union[float, None]): The alpha value of the diagonal histograms, overlaid per hue group.
+
+    """
+
+    plot_scatter_matrix_regression_color: Union[str, None]
+    plot_scatter_matrix_regression_width: Union[int, float, None]
+    plot_scatter_matrix_regression_style: Union[LINE_STYLE, str, None]
+    plot_scatter_matrix_correlation_size: Union[int, float, None]
+    plot_scatter_matrix_correlation_weight: Union[FONT_WEIGHT, str, None]
+    plot_scatter_matrix_kde_width: Union[int, float, None]
+    plot_scatter_matrix_kde_alpha: Union[float, None]
+    plot_scatter_matrix_diagonal_alpha: Union[float, None]
+
+
 class ThemeDefaultAttrs(TypedDict):
     """The typing for theme-driven defaults and cycles.
 
@@ -1300,6 +1332,7 @@ class StyleAttrs(
     ViolinStyleAttrs,
     RidgelineStyleAttrs,
     ParallelCoordsStyleAttrs,
+    ScatterMatrixStyleAttrs,
     ThemeDefaultAttrs,
     SketchStyleAttrs,
     InkStyleAttrs,
@@ -2882,6 +2915,29 @@ class ParallelCoordsSingleChartAttrs(TypedDict):
     hue: Union[str, None]
     category_orders: Union[Dict[str, List[str]], None]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+
+
+# ================================================
+# Scatter Matrix Attributes
+# ================================================
+
+
+class ScatterMatrixDataPointAttrs(TypedDict):
+    """The record attributes for the scatter matrix.
+
+    A dictionary where keys are column names: numeric columns become
+    dimensions, and one categorical column may be named as the `hue`. The
+    same columns can be passed as one dictionary of lists instead.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        hue (Optional[str]): The category for color grouping, under the
+            column name the `hue` setting names.
+
+    """
+
+    hue: Optional[str]
 
 
 # ================================================

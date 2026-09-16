@@ -122,6 +122,7 @@ from .config_helpers import (
     get_gantt_style,
     get_dumbbell_style,
     get_hist_style,
+    get_kde_style,
     get_legend_panel_settings,
     expand_legend_location,
     get_vline_style,
@@ -3240,6 +3241,67 @@ class HistogramLayer(Layer):
         self.register_hover(outline, resolve)
 
 
+class KdeLayer(Layer):
+    """A density curve of one chart's `x` values, with a soft fill beneath.
+
+    The scatter matrix draws one per hue group on its diagonal (ADR 0051);
+    `kde_xlim` pins the evaluation grid to the column's shared limits.
+    """
+
+    kind = "kde"
+
+    def _resolve_style(self):
+        self.kde_style = get_kde_style(self.style)
+        self.xlim = self.settings.get("kde_xlim")
+
+    def x_values(self) -> Optional[np.ndarray]:
+        return get_chart_data("x", self.chart)
+
+    def curve(self) -> Optional[tuple]:
+        """The (x, density) samples; None when the values have no spread."""
+
+        # the estimate is fixed once built; the range and the draw share it
+        if not hasattr(self, "_curve"):
+            x = self.x_values()
+            self._curve = None
+            if x is not None and len(x) > 1 and np.ptp(x) > 0:
+                points = kde1d(x, xlim=self.xlim)
+                self._curve = (
+                    np.array([p["x"] for p in points]),
+                    np.array([p["y"] for p in points]),
+                )
+        return self._curve
+
+    def y_range(self):
+        curve = self.curve()
+        return None if curve is None else (0.0, float(np.max(curve[1])))
+
+    def draw(self, ax, ctx):
+        curve = self.curve()
+        if curve is None:
+            return
+        x, y = curve
+        color = self.muted_color if ctx.emphasis == EMPHASIS_BACKGROUND else ctx.color
+        line_style = {"color": color, "linewidth": self.kde_style["linewidth"]}
+        if ctx.z_order is not None:
+            line_style["zorder"] = ctx.z_order
+        self._stroke_halo(line_style)
+        (line,) = ax.plot(x, y, label=self.label(ctx), **line_style)
+        if self.kde_style["alpha"]:
+            ax.fill_between(
+                x,
+                0,
+                y,
+                color=color,
+                alpha=self.kde_style["alpha"],
+                linewidth=0,
+                zorder=line.get_zorder() - 0.1,
+            )
+        # a density starts at zero: the autoscale margin stops there
+        line.sticky_edges.y.append(0)
+        self.register_hover(line, _point_resolver(self.label(ctx), x, y, ctx.transpose))
+
+
 class ScatterLayer(PointLabelMixin, Layer):
     kind = "scatter"
 
@@ -3258,7 +3320,12 @@ class ScatterLayer(PointLabelMixin, Layer):
         self.default_size = config["plot_scatter_size"]
         # a highlight edge contrasts in the theme's own text color
         self.highlight_edge_color = config.get("font_general_color") or "#000000"
-        self.regression_style = get_regression_style({})
+        # a front may restyle the line; a color it pins beats the group's
+        regression_style = self.settings.get("regression_style") or {}
+        self.regression_style = get_regression_style(regression_style)
+        self.regression_color_pinned = (
+            regression_style.get("plot_regression_color") is not None
+        )
         self.regression_ci_alpha = config["plot_regression_ci_alpha"]
         # the correlation box wears the plot_text_* family (ADR 0018)
         self.correlation_font = get_plot_text_style({})
@@ -3338,7 +3405,7 @@ class ScatterLayer(PointLabelMixin, Layer):
         y_line = slope * x_line + intercept
 
         reg_style = dict(self.regression_style)
-        if color is not None:
+        if color is not None and not self.regression_color_pinned:
             reg_style["color"] = color
         self._stroke_halo(reg_style)
         plot(x_line, y_line, **reg_style)
@@ -8321,6 +8388,7 @@ LAYER_TYPES = {
     # a pyramid is the bar seam under mirrored panel furniture (ADR 0017)
     "pyramidchart": BarLayer,
     "histogram": HistogramLayer,
+    "kde": KdeLayer,
     "scatterchart": ScatterLayer,
     "boxplot": BoxLayer,
     "swarmplot": SwarmLayer,
@@ -9423,6 +9491,16 @@ class Panel:
                     spines=False,
                 )
 
+        # the host axis keeps a shared scale; the marks draw on a hidden twin
+        # with their own (a scatter matrix diagonal, ADR 0051)
+        if s.get("marks_on_twin") and not polar and ax_right is None:
+            ax_right = ax.twinx()
+            ax_right.axis("off")
+            assignments = [
+                "right" if any(l.kind != "text" for l in group.layers) else "left"
+                for group in self.groups
+            ]
+
         # bar slotting across every layer in the panel; radial bars share the
         # machinery — their slots are sector fractions, scaled at draw time
         bar_layers = [
@@ -10070,6 +10148,15 @@ class Panel:
         if s.get("aspect_ratio") and not polar and not bare:
             ax.set(adjustable="box", aspect=s["aspect_ratio"])
 
+        # a cell inside a shared grid leaves its inner tick labels to the edge
+        for axis in s.get("hide_ticklabels") or ():
+            side = "labelbottom" if axis == "x" else "labelleft"
+            ax.tick_params(axis=axis, **{side: False})
+        # a cell holding only text has no scale to mark
+        for axis in s.get("hide_ticks") or ():
+            side = "bottom" if axis == "x" else "left"
+            ax.tick_params(axis=axis, which="both", **{side: False})
+
         # panel-level labels (used when a panel renders into a grid cell)
         label_styles = s.get("label_styles", {})
         for key, action in [
@@ -10660,6 +10747,9 @@ def build_chart_panel_settings(
         panel_settings["bar_ticks"] = "group"
 
     if mode == "composition":
+        panel_settings["hide_ticklabels"] = settings.get("hide_ticklabels")
+        panel_settings["marks_on_twin"] = settings.get("marks_on_twin")
+        panel_settings["hide_ticks"] = settings.get("hide_ticks")
         panel_settings["xlabel"] = settings.get("xlabel")
         panel_settings["ylabel"] = settings.get("ylabel")
         panel_settings["label_styles"] = Panel.snapshot_label_styles()

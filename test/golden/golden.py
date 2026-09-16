@@ -41,6 +41,7 @@ from datachart.charts import (
     BumpChart,
     GanttChart,
     DumbbellChart,
+    ScatterMatrix,
     SankeyChart,
     Treemap,
     NetworkChart,
@@ -54,6 +55,7 @@ from datachart.constants import (
     COLORS,
     CONTOUR_LEVELS,
     DATE_FORMAT,
+    DIAGONAL,
     HEXBIN_REDUCE,
     BASELINE,
     LABEL_POSITION,
@@ -298,6 +300,12 @@ EXPECTED_CHANGES = {
     "dumbbell_panel_two",
     "dumbbell_grid_themes",
     "dumbbell_direction_mixed",
+    # new scatter matrix cases (ADR 0051)
+    "matrix_default",
+    "matrix_hue",
+    "matrix_lower_only",
+    "matrix_kde_correlation_regression",
+    "matrix_blank_diagonal_grid",
 }
 
 
@@ -3099,6 +3107,80 @@ def hexbin_rule_top():
     return HexbinChart(
         data=hexbin_points(), emphasis_rule={"top": 5}, title="Five densest bins"
     )
+
+
+# ----- scatter matrix (ADR 0051) -----
+
+# Palmer penguins sample (CC0): bill length, bill depth, flipper, species
+MATRIX_PENGUINS = [
+    (39.1, 18.7, 181, "Adelie"),
+    (39.5, 17.4, 186, "Adelie"),
+    (40.3, 18.0, 195, "Adelie"),
+    (36.7, 19.3, 193, "Adelie"),
+    (37.8, 18.3, 174, "Adelie"),
+    (46.5, 17.9, 192, "Chinstrap"),
+    (50.0, 19.5, 196, "Chinstrap"),
+    (51.3, 19.2, 193, "Chinstrap"),
+    (45.4, 18.7, 188, "Chinstrap"),
+    (52.7, 19.8, 197, "Chinstrap"),
+    (46.1, 13.2, 211, "Gentoo"),
+    (50.0, 16.3, 230, "Gentoo"),
+    (48.7, 14.1, 210, "Gentoo"),
+    (47.6, 14.5, 215, "Gentoo"),
+    (46.7, 15.3, 219, "Gentoo"),
+]
+
+
+def matrix_records():
+    keys = ("bill length", "bill depth", "flipper", "species")
+    return [dict(zip(keys, row)) for row in MATRIX_PENGUINS]
+
+
+@case
+def matrix_default():
+    return ScatterMatrix(matrix_records())
+
+
+@case
+def matrix_hue():
+    return ScatterMatrix(matrix_records(), hue="species", title="Penguins")
+
+
+@case
+def matrix_lower_only():
+    return ScatterMatrix(
+        matrix_records(),
+        hue="species",
+        lower_only=True,
+        show_correlation=True,
+        legend={"title": "Species"},
+    )
+
+
+@case
+def matrix_kde_correlation_regression():
+    return ScatterMatrix(
+        matrix_records(),
+        hue="species",
+        diagonal=DIAGONAL.KDE,
+        show_correlation=True,
+        show_regression=True,
+    )
+
+
+@case
+def matrix_blank_diagonal_grid():
+    config.set_theme(THEME.INK)
+    matrix = ScatterMatrix(
+        matrix_records(),
+        dimensions=["flipper", "bill length"],
+        diagonal=DIAGONAL.NONE,
+        show_regression=True,
+        show_grid="both",
+        title="Nested",
+    )
+    bar = BarChart(data=[{"label": "a", "y": 3}, {"label": "b", "y": 5}])
+    return Grid([[bar, matrix]])
 
 
 if __name__ == "__main__":

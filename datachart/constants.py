@@ -33,6 +33,7 @@ Classes:
     GANTT_ARROW_ENTRY:  The supported gantt dependency arrow entries.
     DUMBBELL_VALUE:     The supported dumbbell chart value labels.
     DUMBBELL_SORT_KEY:  The supported dumbbell chart sort keys.
+    DIAGONAL:           The supported scatter matrix diagonal cells.
     DATE_PERIOD:        The supported date axis periods.
     NODE_LABEL_POSITION: The supported network node label positions.
     NETWORK_LAYOUT:     The supported network chart layouts.
@@ -1244,6 +1245,35 @@ class DUMBBELL_SORT_KEY:
     START = "start"
     END = "end"
     DELTA = "delta"
+
+
+class DIAGONAL:
+    """The supported scatter matrix diagonal cells.
+
+    Passed as the `diagonal` setting of the scatter matrix: what each
+    dimension's own cell shows.
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> from datachart.constants import DIAGONAL
+        >>> DIAGONAL.DEFAULT
+        "hist"
+
+    Attributes:
+        DEFAULT (str): The default diagonal. Same as `DIAGONAL.HIST`.
+        HIST (str): A histogram of the dimension, one per hue group.
+            Equals to `"hist"`.
+        KDE (str): A kernel density curve of the dimension, one per hue
+            group. Equals to `"kde"`.
+        NONE (str): A blank cell. Equals to `"none"`.
+
+    """
+
+    DEFAULT = "hist"
+    HIST = "hist"
+    KDE = "kde"
+    NONE = "none"
 
 
 class DATE_PERIOD:

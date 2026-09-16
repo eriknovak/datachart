@@ -8,13 +8,14 @@ consume.
 """
 
 import warnings
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 import matplotlib.pyplot as plt
 
 from .config_helpers import get_subplot_config, configure_labels
 from .figures import new_figure
 from .layers import (
+    Layer,
     Panel,
     LayerGroup,
     build_layers,
@@ -27,6 +28,42 @@ from ...constants import FIG_SIZE, ORIENTATION
 # ================================================
 # Chart Rendering
 # ================================================
+
+
+def composition_panel(
+    chart_type: str,
+    charts: List[Dict],
+    settings: dict,
+    layers: Optional[List[Layer]] = None,
+) -> Panel:
+    """The panel a chart front's figure carries for composition.
+
+    Args:
+        chart_type: The chart type, e.g. `"linechart"`.
+        charts: The charts structure built by `build_charts_structure`.
+        settings: The figure-level settings forwarded by the chart front.
+        layers: The layers already built from `charts`; built here when None.
+
+    Returns:
+        One panel holding every layer, with the composition settings.
+
+    """
+
+    if layers is None:
+        layers = build_layers(chart_type, charts, settings)
+    first_style = charts[0].get("style", {}) or {}
+    composition_settings = build_chart_panel_settings(
+        chart_type, settings, "composition", first_style
+    )
+    # grid cells keep the figure title; single-chart subtitles are the fallback
+    composition_settings["title"] = (
+        settings.get("title")
+        if settings.get("title") is not None
+        else charts[0].get("subtitle", None)
+    )
+    return Panel(
+        [group_from_chart(layers, settings, mode="multiple")], composition_settings
+    )
 
 
 def render_chart(
@@ -165,20 +202,9 @@ def render_chart(
     configure_labels(settings, figure_labels)
 
     # metadata transport: the layers and panel settings compositions consume
-    composition_settings = build_chart_panel_settings(
-        chart_type, settings, "composition", first_style
-    )
-    # grid cells keep the figure title; single-chart subtitles are the fallback
-    composition_settings["title"] = (
-        settings.get("title")
-        if settings.get("title") is not None
-        else charts[0].get("subtitle", None)
-    )
     figure._chart_metadata = {
         "type": chart_type,
-        "panel": Panel(
-            [group_from_chart(layers, settings, mode="multiple")], composition_settings
-        ),
+        "panel": composition_panel(chart_type, charts, settings, layers),
     }
 
     # multi-subplot figures also carry one panel per subplot, so grids can

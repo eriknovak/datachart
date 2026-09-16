@@ -195,6 +195,13 @@ title: Typings Module
         heading_level: 4
 
 
+### Scatter Matrix Typings
+
+::: datachart.typings.ScatterMatrixDataPointAttrs
+    options:
+        heading_level: 4
+
+
 ### Radial Chart Typings
 
 ::: datachart.typings.RadialSingleChartAttrs
@@ -262,6 +269,7 @@ title: Typings Module
 ::: datachart.typings.RidgelineStyleAttrs
 
 ::: datachart.typings.ParallelCoordsStyleAttrs
+::: datachart.typings.ScatterMatrixStyleAttrs
 ::: datachart.typings.ThemeDefaultAttrs
 ::: datachart.typings.SketchStyleAttrs
 ::: datachart.typings.InkStyleAttrs

@@ -12,6 +12,7 @@ import math
 import os
 from typing import FrozenSet, List, Optional, Tuple, Union, Dict, Any
 
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec, SubplotSpec
 
@@ -22,6 +23,9 @@ from ._internal.figures import new_figure
 # =====================================
 # Helper functions
 # =====================================
+
+# a grid legend column, as a fraction of a cell; layout widens it to fit
+LEGEND_COLUMN_WIDTH = 0.3
 
 
 _FORMAT_EXTENSIONS: FrozenSet[str] = frozenset(
@@ -155,13 +159,21 @@ def _render_grid_node(
     envelope with sibling cells. A title reserves a thin heading row rendered
     in the subtitle style — a section heading, not the figure's title — and
     the axis labels a footer row and a left column; sharing stays local to
-    the node, anchored on its first shareable axes.
+    the node, anchored on its first shareable axes — or, for a `"col"` x or
+    `"row"` y share, on the first one in the cell's column or row. A node
+    `legend` — the entries of one cell's axes, for the whole grid — takes a
+    right column.
     """
     nrows, ncols = node["shape"]
     title, xlabel, ylabel = node.get("title"), node.get("xlabel"), node.get("ylabel")
+    legend = node.get("legend")
     # 0.12: thin label rows and column, roughly one text line each (ADR 0007)
     heights = ([0.12] if title else []) + [1] * nrows + ([0.12] if xlabel else [])
-    widths = ([0.12] if ylabel else []) + [1] * ncols
+    widths = (
+        ([0.12] if ylabel else [])
+        + [1] * ncols
+        + ([LEGEND_COLUMN_WIDTH] if legend else [])
+    )
     sub_gs = subplot_spec.subgridspec(
         len(heights), len(widths), height_ratios=heights, width_ratios=widths
     )
@@ -195,8 +207,17 @@ def _render_grid_node(
             90,
         )
 
-    first_ax = None
-    for cell in node["cells"]:
+    anchors: Dict[Tuple[str, Any], plt.Axes] = {}
+
+    def share_key(mode, layout):
+        if mode == "col":
+            return ("col", layout["col"])
+        if mode == "row":
+            return ("row", layout["row"])
+        return ("all", None) if mode else None
+
+    legend_ax = None
+    for index, cell in enumerate(node["cells"]):
         layout = cell["spec"]
         row = layout["row"] + row_offset
         col = layout["col"] + col_offset
@@ -213,14 +234,24 @@ def _render_grid_node(
         shareable = "panels" not in cell and (
             not cell["panel"].layers or cell["panel"].projection != "polar"
         )
+        keys = {
+            axis: share_key(node[f"share{axis}"], layout) if shareable else None
+            for axis in ("x", "y")
+        }
         ax = owner.add_subplot(
             cell_spec,
-            sharex=first_ax if node["sharex"] and shareable else None,
-            sharey=first_ax if node["sharey"] and shareable else None,
+            sharex=anchors.get(keys["x"]),
+            sharey=anchors.get(keys["y"]),
         )
-        if shareable and first_ax is None:
-            first_ax = ax
+        for key in keys.values():
+            if key is not None:
+                anchors.setdefault(key, ax)
         _render_cell(owner, cell, ax)
+        if legend and index == legend["cell"]:
+            legend_ax = ax
+
+    if legend_ax is not None:
+        _legend_axes(owner, sub_gs[body_rows, -1], legend_ax, legend)
 
 
 def _label_axes(
@@ -247,6 +278,32 @@ def _label_axes(
     )
 
 
+def _legend_axes(
+    owner: plt.Figure, spec: SubplotSpec, source: plt.Axes, legend: Dict[str, Any]
+) -> None:
+    """An invisible axes in `spec` carrying the legend of `source`'s entries."""
+    # the marks may sit on a hidden twin of the cell's axes
+    handles, labels = [], []
+    for sibling in source._twinned_axes.get_siblings(source):
+        entries = sibling.get_legend_handles_labels()
+        handles += entries[0]
+        labels += entries[1]
+    if not labels:
+        return
+    ax = owner.add_subplot(spec)
+    ax.axis("off")
+    drawn = ax.legend(
+        handles,
+        labels,
+        **legend["style"],
+        loc="center left",
+        bbox_to_anchor=(0.0, 0.5),
+    )
+    if legend.get("family"):
+        for text in drawn.get_texts() + [drawn.get_title()]:
+            text.set_fontfamily(legend["family"])
+
+
 def _column_window(subplot_spec: SubplotSpec) -> Tuple[float, float]:
     """The horizontal span of a gridspec cell as fractions of the figure width."""
     chain = []
@@ -257,12 +314,15 @@ def _column_window(subplot_spec: SubplotSpec) -> Tuple[float, float]:
         ss = getattr(ss.get_gridspec(), "_subplot_spec", None)
     x0, x1 = 0.0, 1.0
     for ss in reversed(chain):
-        ncols = ss.get_gridspec().ncols
+        gs = ss.get_gridspec()
+        # a legend column is narrower: edges follow the width ratios
+        ratios = gs.get_width_ratios() or [1] * gs.ncols
+        edges = np.concatenate([[0.0], np.cumsum(ratios)]) / sum(ratios)
         cols = ss.colspan
         width = x1 - x0
         x0, x1 = (
-            x0 + width * cols.start / ncols,
-            x0 + width * cols.stop / ncols,
+            x0 + width * edges[cols.start],
+            x0 + width * edges[cols.stop],
         )
     return (x0, x1)
 
