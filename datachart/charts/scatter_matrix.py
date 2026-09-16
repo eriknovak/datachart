@@ -10,7 +10,11 @@ from ..utils.figure import _align_axes_columns, _apply_figure_labels, _render_gr
 from ..utils.stats import correlation
 from ..utils._internal.chart_builder import build_charts_structure
 from ..utils._internal.colors import create_color_cycle
-from ..utils._internal.config_helpers import get_legend_style
+from ..utils._internal.config_helpers import (
+    get_legend_style,
+    get_scatter_matrix_style,
+    resolve_font_family,
+)
 from ..utils._internal.figures import new_figure
 from ..utils._internal.layers import (
     LayerGroup,
@@ -19,6 +23,7 @@ from ..utils._internal.layers import (
     build_chart_panel_settings,
 )
 from ..utils._internal.plot_engine import composition_panel
+from ..utils._internal.validate import validate_diagonal
 from ..typings import (
     LegendSettingAttrs,
     ScatterMatrixDataPointAttrs,
@@ -28,6 +33,8 @@ from ..constants import BAR_MODE, DIAGONAL, SHOW_GRID
 
 # a matrix cell's side, in inches, when no figsize is given
 CELL_SIZE = 2.2
+# the extra figure width, in inches, the legend column takes
+LEGEND_WIDTH = 1.2
 # the share of a dimension's range padded onto each end of its limits
 LIMIT_MARGIN = 0.05
 
@@ -171,14 +178,7 @@ def _correlation_panel(x, y, groups, colors, style, settings) -> Panel:
 
     font = {
         **style,
-        "plot_text_size": style.get(
-            "plot_scatter_matrix_correlation_size",
-            config["plot_scatter_matrix_correlation_size"],
-        ),
-        "plot_text_weight": style.get(
-            "plot_scatter_matrix_correlation_weight",
-            config["plot_scatter_matrix_correlation_weight"],
-        ),
+        **get_scatter_matrix_style(style)["correlation"],
         "plot_text_halign": "center",
         "plot_text_box_visible": False,
     }
@@ -258,7 +258,12 @@ def ScatterMatrix(
         ...     hue="species",
         ... )
         >>>
-        >>> # correlations above the diagonal, regression lines below
+        >>> # records work too; correlations above the diagonal
+        >>> records = [
+        ...     {"length": 5.1, "width": 3.5, "petal": 1.4},
+        ...     {"length": 6.3, "width": 3.3, "petal": 6.0},
+        ...     {"length": 5.8, "width": 2.7, "petal": 5.1},
+        ... ]
         >>> figure = ScatterMatrix(
         ...     data=records,
         ...     diagonal="kde",
@@ -312,12 +317,7 @@ def ScatterMatrix(
     columns = _columns(data)
     dims = _resolve_dimensions(columns, dimensions, hue)
     groups = _resolve_groups(columns, hue)
-    diagonal = DIAGONAL.DEFAULT if diagonal is None else diagonal
-    if diagonal not in (DIAGONAL.HIST, DIAGONAL.KDE, DIAGONAL.NONE):
-        raise ValueError(
-            f"Invalid `diagonal` value {diagonal!r}. "
-            f"Must be one of {[DIAGONAL.HIST, DIAGONAL.KDE, DIAGONAL.NONE]}."
-        )
+    diagonal = validate_diagonal(diagonal)
     sharex = True if sharex is None else sharex
     sharey = True if sharey is None else sharey
     show_legend = hue is not None if show_legend is None else show_legend
@@ -325,30 +325,11 @@ def ScatterMatrix(
 
     values = {name: _as_floats(columns[name]) for name in dims}
     limits = {name: _limits(values[name]) for name in dims}
-    palette = config["color_general_multiple"]
-    cycle = create_color_cycle(palette, len(groups))
+    # a cell's panel pools one cycle over the same groups: the same colors
+    cycle = create_color_cycle(config["color_general_multiple"], len(groups))
     colors = [cycle[k]["color"] for k in range(len(groups))]
-    regression_style = {
-        "plot_regression_color": style.get(
-            "plot_scatter_matrix_regression_color",
-            config["plot_scatter_matrix_regression_color"],
-        ),
-        "plot_regression_width": style.get(
-            "plot_scatter_matrix_regression_width",
-            config["plot_scatter_matrix_regression_width"],
-        ),
-        "plot_regression_style": style.get(
-            "plot_scatter_matrix_regression_style",
-            config["plot_scatter_matrix_regression_style"],
-        ),
-    }
-    diagonal_style = {
-        "plot_hist_alpha": style.get(
-            "plot_scatter_matrix_diagonal_alpha",
-            config["plot_scatter_matrix_diagonal_alpha"],
-        ),
-        **style,
-    }
+    matrix_style = get_scatter_matrix_style(style)
+    diagonal_style = {**matrix_style["diagonal"], **style}
 
     n = len(dims)
     blank = [
@@ -409,7 +390,7 @@ def ScatterMatrix(
             else:
                 kind = "scatter"
                 settings["show_regression"] = show_regression
-                settings["regression_style"] = regression_style
+                settings["regression_style"] = matrix_style["regression"]
                 panel = _scatter_panel(
                     values[xdim], values[ydim], groups, style, settings
                 )
@@ -420,16 +401,10 @@ def ScatterMatrix(
                     "spec": {"row": i - trim, "col": j, "rowspan": 1, "colspan": 1},
                 }
             )
-    # any cell drawing every hue group can lend its entries to the legend
-    legend_cell = next(
-        (
-            k
-            for kind in ("scatter", "diagonal")
-            for k, c in enumerate(kinds)
-            if c == kind
-        ),
-        None,
-    )
+    # any cell drawing every hue group can lend its entries; scatters first
+    donors = [k for k, kind in enumerate(kinds) if kind == "scatter"]
+    donors += [k for k, kind in enumerate(kinds) if kind == "diagonal"]
+    legend_cell = donors[0] if donors else None
 
     node_legend = None
     if show_legend and hue is not None and legend_cell is not None:
@@ -440,9 +415,7 @@ def ScatterMatrix(
                 for k, v in get_legend_style(legend).items()
                 if k not in ("loc", "bbox_to_anchor")
             },
-            "family": cells[0]["panel"]
-            .settings.get("furniture", {})
-            .get("font_family"),
+            "family": resolve_font_family(),
         }
 
     node = {
@@ -459,7 +432,10 @@ def ScatterMatrix(
 
     size = n - trim
     if figsize is None:
-        figsize = (CELL_SIZE * size + (1.2 if node_legend else 0), CELL_SIZE * size)
+        figsize = (
+            CELL_SIZE * size + (LEGEND_WIDTH if node_legend else 0),
+            CELL_SIZE * size,
+        )
     figure = new_figure(figsize=figsize)
     # the figure title is the suptitle; nested, the node renders it as a heading
     _render_grid_node(figure, {**node, "title": None}, GridSpec(1, 1, figure=figure)[0])

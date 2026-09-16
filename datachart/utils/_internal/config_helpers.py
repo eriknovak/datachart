@@ -1190,6 +1190,39 @@ def get_kde_style(chart_style: dict) -> dict:
     }
 
 
+def get_scatter_matrix_style(chart_style: dict) -> dict:
+    """Get the scatter matrix additions, in the families of the cells they style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The `regression`, `correlation` and `diagonal` style dictionaries,
+        keyed as the regression, plot text and histogram attributes.
+
+    """
+
+    def pick(pairs):
+        return {key: get_attr_value(attr, chart_style, config) for key, attr in pairs}
+
+    return {
+        "regression": pick(
+            [
+                ("plot_regression_color", "plot_scatter_matrix_regression_color"),
+                ("plot_regression_width", "plot_scatter_matrix_regression_width"),
+                ("plot_regression_style", "plot_scatter_matrix_regression_style"),
+            ]
+        ),
+        "correlation": pick(
+            [
+                ("plot_text_size", "plot_scatter_matrix_correlation_size"),
+                ("plot_text_weight", "plot_scatter_matrix_correlation_weight"),
+            ]
+        ),
+        "diagonal": pick([("plot_hist_alpha", "plot_scatter_matrix_diagonal_alpha")]),
+    }
+
+
 # -------------------------------------
 # Box Plot Style
 # -------------------------------------

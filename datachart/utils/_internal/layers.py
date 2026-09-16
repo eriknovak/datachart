@@ -3260,14 +3260,17 @@ class KdeLayer(Layer):
     def curve(self) -> Optional[tuple]:
         """The (x, density) samples; None when the values have no spread."""
 
-        x = self.x_values()
-        if x is None or len(x) < 2 or np.ptp(x) == 0:
-            return None
-        points = kde1d(x, xlim=self.xlim)
-        return (
-            np.array([p["x"] for p in points]),
-            np.array([p["y"] for p in points]),
-        )
+        # the estimate is fixed once built; the range and the draw share it
+        if not hasattr(self, "_curve"):
+            x = self.x_values()
+            self._curve = None
+            if x is not None and len(x) > 1 and np.ptp(x) > 0:
+                points = kde1d(x, xlim=self.xlim)
+                self._curve = (
+                    np.array([p["x"] for p in points]),
+                    np.array([p["y"] for p in points]),
+                )
+        return self._curve
 
     def y_range(self):
         curve = self.curve()

@@ -20,6 +20,7 @@ from ...constants import (
     BASELINE,
     DATE_FORMAT,
     DATE_PERIOD,
+    DIAGONAL,
     DUMBBELL_SORT_KEY,
     DUMBBELL_VALUE,
     EMPHASIS,
@@ -38,6 +39,7 @@ from ...constants import (
 )
 
 BANDWIDTH_RULES = (BANDWIDTH.SCOTT, BANDWIDTH.SILVERMAN)
+DIAGONAL_CELLS = (DIAGONAL.HIST, DIAGONAL.KDE, DIAGONAL.NONE)
 # the kinds of axis a data column asks for (ADR 0037)
 AXIS_TEMPORAL = "temporal"
 AXIS_NUMERIC = "numeric"
@@ -159,6 +161,19 @@ def validate_baseline(baseline):
             f"Must be one of {STACK_BASELINES} or None."
         )
     return baseline
+
+
+def validate_diagonal(diagonal):
+    """Validate a scatter matrix diagonal; None means a histogram."""
+
+    if diagonal is None:
+        return DIAGONAL.DEFAULT
+    if diagonal not in DIAGONAL_CELLS:
+        raise ValueError(
+            f"Invalid `diagonal` value {diagonal!r}. "
+            f"Must be one of {DIAGONAL_CELLS} or None."
+        )
+    return diagonal
 
 
 def validate_rank_by(rank_by):

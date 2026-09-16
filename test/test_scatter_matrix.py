@@ -309,6 +309,16 @@ class TestScatterMatrixLegend(unittest.TestCase):
         (legend,) = self.legends(figure)
         self.assertEqual(legend.get_title().get_text(), "Species")
 
+    def test_legend_wears_theme_font_with_blank_diagonal(self):
+        config.set_theme(THEME.QUILL)
+        try:
+            figure = ScatterMatrix(columns(), hue="species", diagonal=DIAGONAL.NONE)
+            (legend,) = self.legends(figure)
+            family = legend.get_texts()[0].get_fontfamily()
+            self.assertIn(config["font_general_serif"][0], family)
+        finally:
+            config.set_theme(THEME.DEFAULT)
+
     def test_single_dimension_takes_legend_from_diagonal(self):
         figure = ScatterMatrix(columns(), hue="species", dimensions=["a"])
         (legend,) = self.legends(figure)
