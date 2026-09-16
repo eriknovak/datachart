@@ -33,6 +33,9 @@ MATERIAL_THEME: StyleAttrs = make_theme(
         "plot_line_width": 2.0,
         "plot_text_box_edgecolor": "#757575",
         "plot_text_arrow_color": "#757575",
+        "plot_dumbbell_start_color": "#FBBC04",
+        "plot_dumbbell_end_color": "#4285F4",
+        "plot_dumbbell_edge_width": 0,
         "plot_heatmap_cmap": COLORS.Blues,
         "plot_heatmap_frame_color": "#000000",
     }

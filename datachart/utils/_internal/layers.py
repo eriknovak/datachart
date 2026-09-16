@@ -42,6 +42,7 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
 from matplotlib.path import Path
 from matplotlib.transforms import (
+    offset_copy,
     Bbox,
     IdentityTransform,
     ScaledTranslation,
@@ -57,7 +58,12 @@ from matplotlib.legend_handler import (
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1.axes_size import Fixed as FixedPad
 
-from .colors import create_color_cycle, create_colormap, get_colormap
+from .colors import (
+    create_color_cycle,
+    create_colormap,
+    get_colormap,
+    get_discrete_colors,
+)
 from .validate import (
     AXIS_CATEGORICAL,
     AXIS_NUMERIC,
@@ -74,6 +80,9 @@ from .validate import (
     validate_rank_by,
     validate_emphasis_rule,
     validate_date_period,
+    validate_dumbbell_show_values,
+    validate_dumbbell_sort_by,
+    validate_marker_pair,
     validate_gantt_arrow_entry,
     validate_gantt_show_values,
     validate_gantt_sort_by,
@@ -111,6 +120,7 @@ from .config_helpers import (
     get_line_style,
     get_bar_style,
     get_gantt_style,
+    get_dumbbell_style,
     get_hist_style,
     get_legend_panel_settings,
     expand_legend_location,
@@ -160,9 +170,12 @@ from ...constants import (
     ASPECT_RATIO,
     BASELINE,
     COLORBAR_LOCATION,
+    COLORS,
     DATE_FORMAT,
     DATE_PERIOD,
     DIRECTION,
+    DUMBBELL_SORT_KEY,
+    DUMBBELL_VALUE,
     CONTOUR_LEVELS,
     HEXBIN_REDUCE,
     EMPHASIS,
@@ -374,6 +387,15 @@ def _hollow_marker(style: dict) -> dict:
     width = np.max(style.get("linewidths") or 0)
     style["linewidths"] = max(float(width), HOLLOW_MARKER_EDGE_WIDTH)
     return style
+
+
+def _draw_scatter_marks(scatter, x, y, sizes, style: dict, label, highlighted: bool):
+    """One marker collection; the edge fits its markers unless it is the highlight cue."""
+
+    style = dict(style)
+    if not highlighted:
+        style["linewidths"] = _marker_edge_widths(style.get("linewidths"), sizes)
+    return scatter(x, y, s=sizes, label=label, **_hollow_marker(style))
 
 
 class HandlerBarSeries(HandlerPatch):
@@ -1323,6 +1345,8 @@ class DrawContext:
     transpose: bool = False
     # label -> position of the panel's category axis (ADR 0020)
     category_index: Optional[dict] = None
+    # the panel's only dumbbell layer wears the style's pair colors (ADR 0050)
+    sole_dumbbell: bool = False
     # the panel pins its aspect ratio, so colorbars size to the axes box
     aspect_locked: bool = False
 
@@ -1365,6 +1389,8 @@ class Layer:
     bare: bool = False
     # value labels sit past the mark on the value axis and need headroom there
     labels_past_mark: bool = False
+    # value labels also sit below the value range, so the low end needs room
+    labels_below_range: bool = False
     # one emphasis role per drawn record, on the layers whose records carry one
     record_roles: list = ()
     # the zone of a temporal x column a layer draws as date numbers
@@ -3393,16 +3419,14 @@ class ScatterLayer(PointLabelMixin, Layer):
                 if ctx.emphasis == EMPHASIS_BACKGROUND:
                     group_style["c"] = self.muted_color
                     label = NO_LEGEND
-                if ctx.emphasis != EMPHASIS_HIGHLIGHT:
-                    group_style["linewidths"] = _marker_edge_widths(
-                        group_style.get("linewidths"), group_sizes
-                    )
-                collection = scatter(
+                collection = _draw_scatter_marks(
+                    scatter,
                     x_data[mask],
                     y_data[mask],
-                    s=group_sizes,
-                    label=label,
-                    **_hollow_marker(group_style),
+                    group_sizes,
+                    group_style,
+                    label,
+                    ctx.emphasis == EMPHASIS_HIGHLIGHT,
                 )
                 self._mark_legend_size(collection, size_data)
                 self.register_hover(
@@ -3432,18 +3456,16 @@ class ScatterLayer(PointLabelMixin, Layer):
                 base_style["c"] = ctx.color
             if ctx.emphasis == EMPHASIS_BACKGROUND:
                 base_style["c"] = self.muted_color
-            if ctx.emphasis != EMPHASIS_HIGHLIGHT:
-                base_style["linewidths"] = _marker_edge_widths(
-                    base_style.get("linewidths"), sizes
-                )
 
             color = base_style.get("c", base_style.get("color"))
-            collection = scatter(
+            collection = _draw_scatter_marks(
+                scatter,
                 x_data,
                 y_data,
-                s=sizes,
-                label=self.label(ctx),
-                **_hollow_marker(base_style),
+                sizes,
+                base_style,
+                self.label(ctx),
+                ctx.emphasis == EMPHASIS_HIGHLIGHT,
             )
             self._mark_legend_size(collection, size_data)
             self.register_hover(
@@ -4007,6 +4029,364 @@ RAINCLOUD_RAIN_SIZE = 6
 # outliers are hollow rings, small enough not to outweigh the rain
 RAINCLOUD_OUTLIER_SIZE = 4
 INNER_QUARTILE_WIDTH_SCALE = 5.0
+
+
+def dumbbell_records(chart: dict) -> list:
+    """The chart's dumbbell records, in drawing order."""
+
+    data = chart.get("data")
+    if not isinstance(data, list):
+        return []
+    return [record for record in data if isinstance(record, dict)]
+
+
+DUMBBELL_SORT_KEYS = {
+    DUMBBELL_SORT_KEY.START: lambda record: record["start"],
+    DUMBBELL_SORT_KEY.END: lambda record: record["end"],
+    DUMBBELL_SORT_KEY.DELTA: lambda record: record["end"] - record["start"],
+}
+
+
+def sort_dumbbell_charts(charts: List[dict], settings: dict) -> List[dict]:
+    """The charts with their records in `sort` order by `sort_by` (ADR 0050).
+
+    Each chart sorts on its own; overlaid charts share the first one's rows.
+    Ties keep input order.
+    """
+
+    sort = validate_sort(settings.get("sort"))
+    key = DUMBBELL_SORT_KEYS[validate_dumbbell_sort_by(sort, settings.get("sort_by"))]
+    if sort is None:
+        return charts
+    sign = -1 if sort == SORT.DESCENDING else 1
+    return [
+        {
+            **chart,
+            "data": sorted(dumbbell_records(chart), key=lambda r: sign * key(r)),
+        }
+        for chart in charts
+    ]
+
+
+# how far a composed dumbbell's start dot fades toward white from its end dot
+DUMBBELL_START_LIGHTEN = 0.5
+# a minor value gridline is this much fainter than a labelled one
+MINOR_GRID_ALPHA_SCALE = 0.6
+# a composed z-order puts the connectors this far under the dots
+DUMBBELL_CONNECTOR_Z_BELOW = 0.5
+
+
+class DumbbellLayer(GroupLayer):
+    """Two dots per category joined by a connector, on the category index (ADR 0050).
+
+    The dots draw through the scatter marks; one role batch at a time, each
+    batch its connectors under a start and an end collection.
+    """
+
+    kind = "dumbbell"
+    labels_past_mark = True
+
+    def _resolve_style(self):
+        # the front validated the records, their roles included
+        self.records = dumbbell_records(self.chart)
+        super()._resolve_style()
+        self.starts = np.array([r["start"] for r in self.records], dtype=float)
+        self.ends = np.array([r["end"] for r in self.records], dtype=float)
+        self.record_roles = [r.get("emphasis") for r in self.records]
+        self.dumbbell_style = get_dumbbell_style(self.style)
+        # a front's marker pair and connector style yield to the chart style
+        overrides = zip(
+            ("start_marker", "end_marker"),
+            validate_marker_pair(self.settings.get("marker")) or (),
+        )
+        for key, value in overrides:
+            if f"plot_dumbbell_{key}" not in self.style:
+                self.dumbbell_style[key] = value
+        connector_style = self.settings.get("connector_style")
+        if (
+            connector_style is not None
+            and "plot_dumbbell_connector_style" not in self.style
+        ):
+            self.dumbbell_style["connector_style"] = connector_style
+        accent = get_discrete_colors(COLORS.PaperAccent, 2)
+        self.pair_colors = tuple(
+            self.dumbbell_style.get(key) or default
+            for key, default in zip(("start_color", "end_color"), accent)
+        )
+        # composed, only the chart's own colors outrank the cycle color
+        self.own_colors = tuple(
+            self.style.get(f"plot_dumbbell_{key}")
+            for key in ("start_color", "end_color")
+        )
+        self.names = (self.settings.get("start_name"), self.settings.get("end_name"))
+        self.value_mode = validate_dumbbell_show_values(
+            self.settings.get("show_values")
+        )
+        self._resolve_value_labels()
+        self.show_values = self.value_mode is not None
+        self.labels_below_range = self.value_mode == DUMBBELL_VALUE.ENDPOINTS
+        self.show_direction = bool(self.settings.get("show_direction"))
+        self.grid_minor = int(self.dumbbell_style.get("grid_minor") or 0)
+        # a highlight edge contrasts in the theme's own text color
+        self.highlight_edge_color = config.get("font_general_color") or "#000000"
+
+    def labels(self) -> list:
+        return [record["label"] for record in self.records]
+
+    def value_data(self):
+        return list(self.starts) + list(self.ends)
+
+    def _endpoint_colors(self, ctx: DrawContext) -> tuple:
+        """The start and end colors: the pair alone, a cycle shade pair composed."""
+
+        if ctx.sole_dumbbell or ctx.color is None:
+            return self.pair_colors
+        start, end = self.own_colors
+        return (
+            start or _lighten(ctx.color, DUMBBELL_START_LIGHTEN),
+            end or ctx.color,
+        )
+
+    def _endpoint_labels(self, ctx: DrawContext) -> tuple:
+        """The legend labels of the start and end dots, named after the endpoints.
+
+        Composed, the series label prefixes each name; the end dot alone
+        carries it when the endpoints have no names.
+        """
+
+        start_name, end_name = self.names
+        series = None if ctx.sole_dumbbell else self.label(ctx)
+        if series is not None:
+            start_name = start_name and f"{series} ({start_name})"
+            end_name = f"{series} ({end_name})" if end_name else series
+        return tuple(NO_LEGEND if n is None else n for n in (start_name, end_name))
+
+    def draw(self, ax, ctx):
+        if not self.records:
+            return
+        index = ctx.category_index
+        positions = np.array([index[label] for label in self.labels()], dtype=float)
+        roles = [
+            panel_role or record_role
+            for panel_role, record_role in zip(
+                self._group_roles(self.labels(), ctx.emphasis), self.record_roles
+            )
+        ]
+        style = self.dumbbell_style
+        dot_style = {
+            k: style[k]
+            for k in ("alpha", "linewidths", "edgecolors", "zorder")
+            if k in style
+        }
+        line_style = {
+            "color": style.get("connector_color"),
+            "linewidth": style.get("connector_width"),
+            "linestyle": style.get("connector_style"),
+            "zorder": style.get("connector_zorder"),
+        }
+        if ctx.z_order is not None:
+            dot_style["zorder"] = ctx.z_order
+            line_style["zorder"] = ctx.z_order - DUMBBELL_CONNECTOR_Z_BELOW
+        size = style["s"]
+        colors = self._endpoint_colors(ctx)
+        names = self._endpoint_labels(ctx)
+        distinct = self.starts != self.ends
+        lo, hi = positions.min() - 0.5, positions.max() + 0.5
+
+        legend_taken = False
+        for role in (None, EMPHASIS_HIGHLIGHT, EMPHASIS_BACKGROUND):
+            members = np.array([r == role for r in roles])
+            if not members.any():
+                continue
+            named = role != EMPHASIS_BACKGROUND and not legend_taken
+            legend_taken = legend_taken or named
+            self._draw_connectors(ax, positions, members & distinct, line_style, role)
+            # coincident endpoints draw the end dot alone
+            endpoints = (
+                (self.starts, members & distinct, "start_marker", 0),
+                (self.ends, members, "end_marker", 1),
+            )
+            for values, mask, marker_key, k in endpoints:
+                if not mask.any():
+                    continue
+                marks = dict(dot_style, c=colors[k], marker=style.get(marker_key))
+                self._apply_emphasis(marks, role, width_key="linewidths", color_key="c")
+                if role == EMPHASIS_HIGHLIGHT:
+                    marks["edgecolors"] = self.highlight_edge_color
+                x, y = values[mask], positions[mask]
+                if not self.is_horizontal:
+                    x, y = y, x
+                label = names[k] if named else NO_LEGEND
+                # an unnamed or unlisted dot still hovers under its series
+                hover_label = self.label(ctx) if label == NO_LEGEND else label
+                collection = _draw_scatter_marks(
+                    ax.scatter,
+                    x,
+                    y,
+                    size,
+                    marks,
+                    label,
+                    role == EMPHASIS_HIGHLIGHT,
+                )
+                self.register_hover(
+                    collection,
+                    _point_resolver(
+                        hover_label,
+                        positions[mask],
+                        values[mask],
+                        self.is_horizontal,
+                    ),
+                )
+                # the category axis spans every row edge to edge, like boxes
+                edges = (
+                    collection.sticky_edges.y
+                    if self.is_horizontal
+                    else collection.sticky_edges.x
+                )
+                edges[:] = [lo, hi]
+        interval = ax.dataLim.intervaly if self.is_horizontal else ax.dataLim.intervalx
+        interval[:] = (min(interval[0], lo), max(interval[1], hi))
+
+        radius = np.sqrt(size) / 2
+        if self.show_direction:
+            self._draw_arrows(ax, positions, roles, radius)
+        if self.show_values:
+            self._label_values(ax, positions, roles, radius)
+
+    def _arrow_offset(self, radius: float) -> float:
+        """How far off the connector a direction arrow runs, in points."""
+
+        return radius + self.dumbbell_style.get("arrow_gap", 0)
+
+    def _draw_arrows(self, ax, positions, roles, radius: float) -> None:
+        """A thin arrow beside each distinct record, from its start to its end.
+
+        It runs above a horizontal dumbbell and right of a vertical one.
+        """
+
+        offset = self._arrow_offset(radius)
+        shift = {"y": offset} if self.is_horizontal else {"x": offset}
+        transform = offset_copy(ax.transData, fig=ax.figure, units="points", **shift)
+        style = self.dumbbell_style
+        for position, start, end, role in zip(positions, self.starts, self.ends, roles):
+            if start == end:
+                continue
+            props = {
+                "arrowstyle": style.get("arrow_style"),
+                "color": style.get("arrow_color"),
+                "linewidth": style.get("arrow_width"),
+                "shrinkA": 0,
+                "shrinkB": 0,
+            }
+            self._apply_emphasis(props, role)
+            zorder = props.pop("zorder", 0) + style.get("connector_zorder", 0)
+            tail, head = (start, position), (end, position)
+            if not self.is_horizontal:
+                tail, head = tail[::-1], head[::-1]
+            ax.annotate(
+                "",
+                xy=head,
+                xytext=tail,
+                xycoords=transform,
+                textcoords=transform,
+                arrowprops=props,
+                zorder=zorder,
+                annotation_clip=False,
+            )
+
+    def _draw_connectors(self, ax, positions, mask, line_style, role) -> None:
+        """One line per masked record from its start to its end."""
+
+        if not mask.any():
+            return
+        segments = [
+            (
+                [(start, position), (end, position)]
+                if self.is_horizontal
+                else [(position, start), (position, end)]
+            )
+            for position, start, end in zip(
+                positions[mask], self.starts[mask], self.ends[mask]
+            )
+        ]
+        style = dict(line_style)
+        self._apply_emphasis(style, role)
+        ax.add_collection(LineCollection(segments, **style))
+
+    def _label_values(self, ax, positions, roles, radius: float) -> None:
+        """Print each unmuted record's endpoints past its dots, or its delta.
+
+        An endpoint label sits away from the connector; the delta sits at the
+        connector midpoint, above it (or beside it when vertical).
+        """
+
+        pad = radius + self.value_padding
+        connector_pad = (
+            self.dumbbell_style.get("connector_width", 0) / 2 + self.value_padding
+        )
+        arrow_pad = (
+            self._arrow_offset(radius)
+            + self.dumbbell_style.get("arrow_width", 0)
+            + self.value_padding
+        )
+        for position, start, end, role in zip(positions, self.starts, self.ends, roles):
+            if role == EMPHASIS_BACKGROUND:
+                continue
+            if self.value_mode == DUMBBELL_VALUE.DELTA:
+                offset = connector_pad if start != end else pad
+                if self.show_direction and start != end:
+                    # the delta reads past the direction arrow, not over it
+                    offset = arrow_pad
+                self._annotate(ax, (start + end) / 2, position, end - start, offset, 0)
+                continue
+            marks = (
+                [(end, 1)]
+                if start == end
+                else [
+                    (start, np.sign(start - end)),
+                    (end, np.sign(end - start)),
+                ]
+            )
+            for value, side in marks:
+                self._annotate(ax, value, position, value, pad, int(side))
+
+    def _annotate(self, ax, value, position, number, pad, side: int) -> None:
+        """Print `number` at a record's `value`, `pad` points away from it.
+
+        A `side` of -1 or +1 moves it down or up the value axis; 0 moves it
+        off the connector, across the category axis.
+        """
+
+        if self.is_horizontal:
+            xy = (value, position)
+            if side:
+                offset, ha, va = (
+                    (side * pad, 0),
+                    "left" if side > 0 else "right",
+                    "center",
+                )
+            else:
+                offset, ha, va = (0, pad), "center", "bottom"
+        else:
+            xy = (position, value)
+            if side:
+                offset, ha, va = (
+                    (0, side * pad),
+                    "center",
+                    "bottom" if side > 0 else "top",
+                )
+            else:
+                offset, ha, va = (pad, 0), "left", "center"
+        ax.annotate(
+            _format_value(self.value_format, number),
+            xy=xy,
+            xytext=offset,
+            textcoords="offset points",
+            ha=ha,
+            va=va,
+            zorder=TEXT_ANNOTATION_ZORDER,
+            **self.value_font,
+        )
 
 
 def inner_line_marks(inner: str, values) -> list:
@@ -7956,6 +8336,7 @@ LAYER_TYPES = {
     "networkchart": NetworkLayer,
     "calendarheatmap": CalendarHeatmapLayer,
     "ganttchart": GanttLayer,
+    "dumbbellchart": DumbbellLayer,
 }
 
 RADIAL_LAYER_TYPES = {
@@ -8158,6 +8539,17 @@ def _gantt_units(charts: List[dict], settings: dict, by) -> tuple:
     return filled, units
 
 
+def _dumbbell_units(charts: List[dict], settings: dict, by) -> tuple:
+    """One unit per dumbbell record, reading its delta (ADR 0050)."""
+
+    filled, units = [], []
+    for chart in charts:
+        records = [{"emphasis": None, **r} for r in dumbbell_records(chart)]
+        units += [(r["end"] - r["start"], _fill_role(r, "emphasis")) for r in records]
+        filled.append({**chart, "data": records})
+    return filled, units
+
+
 def _series_units(column: str) -> Callable:
     """The unit builder of a per-series front: each chart, by its `column`."""
 
@@ -8299,6 +8691,7 @@ EMPHASIS_RULE_UNITS = {
     "stackedareachart": (_series_units("y"), "mean"),
     "bumpchart": (_series_units("y"), "mean"),
     "ganttchart": (_gantt_units, None),
+    "dumbbellchart": (_dumbbell_units, None),
     "histogram": (_series_units("x"), "mean"),
     "contourchart": (_series_units("z"), "mean"),
 }
@@ -8346,6 +8739,8 @@ def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[La
         charts = apply_emphasis_rule(chart_type, charts, settings)
     if chart_type == "ganttchart":
         charts = sort_gantt_charts(charts, settings)
+    if chart_type == "dumbbellchart":
+        charts = sort_dumbbell_charts(charts, settings)
     if bar_records:
         charts = _sort_bar_charts(
             charts,
@@ -9129,6 +9524,7 @@ class Panel:
         # group layers share one category axis (ADR 0020)
         group_layers = [l for l in self.layers if isinstance(l, GroupLayer)]
         category_index = self.category_index(group_layers)
+        dumbbell_count = sum(isinstance(l, DumbbellLayer) for l in group_layers)
 
         # hatch, line-style and marker cycles: per series, parallel to the
         # color cycle (ADR 0004, ADR 0048)
@@ -9245,6 +9641,7 @@ class Panel:
                     parallel_axes=layer is parallel_axes_owner,
                     transpose=horizontal and layer.is_horizontal is None,
                     category_index=category_index,
+                    sole_dumbbell=dumbbell_count == 1,
                     aspect_locked=aspect_locked,
                 )
                 layer.draw(target_ax, ctx)
@@ -9428,6 +9825,30 @@ class Panel:
                             axis.parameter, axis.role, axis.scale, values, hint
                         )
 
+    def _apply_minor_value_grid(self, ax, horizontal: bool, value_scale) -> None:
+        """Fainter gridlines between a dumbbell's labelled values (ADR 0050).
+
+        Only on a gridded, linear value axis; the densest layer's split wins.
+        """
+
+        splits = max(
+            (l.grid_minor for l in self.layers if isinstance(l, DumbbellLayer)),
+            default=0,
+        )
+        name = "x" if horizontal else "y"
+        if (
+            splits < 2
+            or self.settings["show_grid"] not in (name, "both")
+            or value_scale not in (None, SCALE.LINEAR)
+        ):
+            return
+        axis = ax.xaxis if horizontal else ax.yaxis
+        axis.set_minor_locator(mticker.AutoMinorLocator(splits))
+        ax.tick_params(axis=name, which="minor", length=0)
+        style = dict(self.settings.get("grid_style", {}))
+        style["alpha"] = style.get("alpha", 1.0) * MINOR_GRID_ALPHA_SCALE
+        ax.grid(axis=name, which="minor", **style)
+
     def _finalize(
         self, ax, ax_right, bar_layers, horizontal, scales, group_axes
     ) -> None:
@@ -9456,6 +9877,7 @@ class Panel:
         if s.get("show_grid") and not bare:
             ax.grid(axis=s["show_grid"], **s.get("grid_style", {}))
             ax.set_axisbelow(True)
+            self._apply_minor_value_grid(ax, horizontal, value_scale)
         if s.get("date_period") and self.temporal_axis and not bare:
             # period edges are the minor ticks; the labelled centres draw no line
             axis = getattr(ax, f"{self.temporal_axis}axis")
@@ -9559,7 +9981,8 @@ class Panel:
                 pad = (hi - lo) * (
                     VALUE_HEADROOM_HORIZONTAL if horizontal else VALUE_HEADROOM_VERTICAL
                 )
-                lo = lo - pad if lo < 0 else lo
+                below = lo < 0 or any(l.labels_below_range for l in value_layers)
+                lo = lo - pad if below else lo
                 hi = hi + pad
                 (ax.set_xlim if horizontal else ax.set_ylim)(lo, hi)
 
@@ -9586,9 +10009,14 @@ class Panel:
             ax.invert_yaxis()
         # the first ridge row reads at the top; overlaid groups follow (ADR 0047)
         ridges = any(isinstance(l, RidgelineLayer) for l in layers)
-        # the first task row reads at the top too (ADR 0049)
-        gantt = any(isinstance(l, GanttLayer) for l in layers)
-        if (ridges or gantt) and horizontal and not bare and not ax.yaxis_inverted():
+        # the first task or dumbbell row reads at the top too (ADR 0049, 0050)
+        rows_down = any(isinstance(l, (GanttLayer, DumbbellLayer)) for l in layers)
+        if (
+            (ridges or rows_down)
+            and horizontal
+            and not bare
+            and not ax.yaxis_inverted()
+        ):
             ax.invert_yaxis()
         if ax_right is not None and (
             s.get("ymin_right") is not None or s.get("ymax_right") is not None
@@ -10116,11 +10544,24 @@ class Panel:
 
 GROUP_CHART_TYPES = (
     "boxplot",
+    "dumbbellchart",
     "violinplot",
     "swarmplot",
     "raincloudplot",
     "ridgelineplot",
 )
+
+
+def value_axis_grid(show_grid, horizontal: bool):
+    """A theme's one-axis grid default, moved onto a horizontal value axis.
+
+    Themes name the grid of an upright chart, whose values run along y; a
+    dumbbell's gridlines follow its values whichever way they run (ADR 0050).
+    """
+
+    if not horizontal:
+        return show_grid
+    return {"x": "y", "y": "x"}.get(show_grid, show_grid)
 
 
 def build_chart_panel_settings(
@@ -10139,6 +10580,11 @@ def build_chart_panel_settings(
     )
     if show_grid is None and not raster:
         show_grid = config.get("chart_default_show_grid")
+        if chart_type == "dumbbellchart":
+            orientation = settings.get("orientation") or DEFAULT_ORIENTATION
+            show_grid = value_axis_grid(
+                show_grid, orientation == ORIENTATION.HORIZONTAL
+            )
 
     # the seam's scale keys are literal; group fronts mean the value axis
     scalex, scaley = settings.get("scalex"), settings.get("scaley")

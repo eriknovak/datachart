@@ -292,6 +292,45 @@ def get_gantt_style(chart_style: dict) -> dict:
     return create_config_dict(chart_style, config_attrs)
 
 
+def get_dumbbell_style(chart_style: dict) -> dict:
+    """Get the dumbbell chart style.
+
+    The dots take matplotlib scatter keys, one color and marker per endpoint;
+    the `connector_*` keys style the line between them and the `arrow_*` keys
+    the optional direction arrow beside it.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The dumbbell style setting.
+
+    """
+
+    config_attrs = [
+        ("start_color", "plot_dumbbell_start_color"),
+        ("end_color", "plot_dumbbell_end_color"),
+        ("alpha", "plot_dumbbell_alpha"),
+        ("s", "plot_dumbbell_size"),
+        ("start_marker", "plot_dumbbell_start_marker"),
+        ("end_marker", "plot_dumbbell_end_marker"),
+        ("linewidths", "plot_dumbbell_edge_width"),
+        ("edgecolors", "plot_dumbbell_edge_color"),
+        ("zorder", "plot_dumbbell_zorder"),
+        ("connector_color", "plot_dumbbell_connector_color"),
+        ("connector_width", "plot_dumbbell_connector_width"),
+        ("connector_style", "plot_dumbbell_connector_style"),
+        ("connector_zorder", "plot_dumbbell_connector_zorder"),
+        ("arrow_color", "plot_dumbbell_arrow_color"),
+        ("arrow_width", "plot_dumbbell_arrow_width"),
+        ("arrow_style", "plot_dumbbell_arrow_style"),
+        ("arrow_gap", "plot_dumbbell_arrow_gap"),
+        ("grid_minor", "plot_dumbbell_grid_minor"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
 # -------------------------------------
 # Value Label Style
 # -------------------------------------

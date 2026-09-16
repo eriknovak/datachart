@@ -31,6 +31,8 @@ Classes:
     GANTT_VALUE:        The supported gantt chart value labels.
     GANTT_SORT_KEY:     The supported gantt chart sort keys.
     GANTT_ARROW_ENTRY:  The supported gantt dependency arrow entries.
+    DUMBBELL_VALUE:     The supported dumbbell chart value labels.
+    DUMBBELL_SORT_KEY:  The supported dumbbell chart sort keys.
     DATE_PERIOD:        The supported date axis periods.
     NODE_LABEL_POSITION: The supported network node label positions.
     NETWORK_LAYOUT:     The supported network chart layouts.
@@ -1188,6 +1190,60 @@ class GANTT_ARROW_ENTRY:
     DEFAULT = "top"
     TOP = "top"
     LEFT = "left"
+
+
+class DUMBBELL_VALUE:
+    """The supported dumbbell chart value labels.
+
+    Passed as the `show_values` setting of the dumbbell chart: what each
+    record prints. None prints nothing.
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> from datachart.constants import DUMBBELL_VALUE
+        >>> DUMBBELL_VALUE.DELTA
+        "delta"
+
+    Attributes:
+        NONE (None): No value labels. Equals to `None`.
+        ENDPOINTS (str): Each endpoint's value, past its dot, away from the
+            connector. Equals to `"endpoints"`.
+        DELTA (str): The record's `end - start`, at the connector midpoint.
+            Equals to `"delta"`.
+
+    """
+
+    NONE = None
+    ENDPOINTS = "endpoints"
+    DELTA = "delta"
+
+
+class DUMBBELL_SORT_KEY:
+    """The supported dumbbell chart sort keys.
+
+    Passed as the `sort_by` setting of the dumbbell chart: what a `sort`
+    other than `SORT.NONE` orders the categories by.
+
+    !!! info "Added in Unreleased"
+
+    Examples:
+        >>> from datachart.constants import DUMBBELL_SORT_KEY
+        >>> DUMBBELL_SORT_KEY.DEFAULT
+        "start"
+
+    Attributes:
+        DEFAULT (str): The default key. Same as `DUMBBELL_SORT_KEY.START`.
+        START (str): Each category by its `start`. Equals to `"start"`.
+        END (str): Each category by its `end`. Equals to `"end"`.
+        DELTA (str): Each category by its `end - start`. Equals to `"delta"`.
+
+    """
+
+    DEFAULT = "start"
+    START = "start"
+    END = "end"
+    DELTA = "delta"
 
 
 class DATE_PERIOD:

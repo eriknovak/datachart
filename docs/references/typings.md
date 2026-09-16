@@ -113,6 +113,16 @@ title: Typings Module
     options:
         heading_level: 4
 
+### Dumbbell Chart Typings
+
+::: datachart.typings.DumbbellSingleChartAttrs
+    options:
+        heading_level: 4
+
+::: datachart.typings.DumbbellRecordAttrs
+    options:
+        heading_level: 4
+
 
 ### Scatter Chart Typings
 
@@ -237,6 +247,8 @@ title: Typings Module
 ::: datachart.typings.CalendarHeatmapStyleAttrs
 
 ::: datachart.typings.GanttStyleAttrs
+
+::: datachart.typings.DumbbellStyleAttrs
 
 ::: datachart.typings.ScatterStyleAttrs
 

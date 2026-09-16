@@ -32,6 +32,10 @@ SKETCH_THEME: StyleAttrs = make_theme(
         "plot_bar_edge_width": 1.0,
         "plot_hist_edge_width": 1.0,
         "plot_scatter_edge_color": "#222222",
+        "plot_dumbbell_start_color": "#2E86AB",
+        "plot_dumbbell_end_color": "#E4572E",
+        "plot_dumbbell_edge_color": "#222222",
+        "plot_dumbbell_connector_color": "#8A8A8A",
         "plot_heatmap_cmap": COLORS.Blues,
         # a wobbled box around wobbled tiles reads as a second drawing; the
         # band and the pad already mark the group

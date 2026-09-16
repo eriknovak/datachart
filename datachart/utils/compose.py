@@ -39,6 +39,7 @@ from ._internal.config_helpers import (
 from ._internal.figures import new_figure
 from ._internal.layers import (
     Panel as _PanelSeam,
+    DumbbellLayer,
     LayerGroup,
     LineLayer,
     BarLayer,
@@ -53,6 +54,7 @@ from ._internal.layers import (
     RadialLayer,
     GroupLayer,
     TextLayer,
+    value_axis_grid,
 )
 
 # figures whose layer owns its axes: no shared coordinate space to overlay
@@ -359,7 +361,8 @@ def Panel(
         auto_secondary_axis = config.get("overlay_auto_threshold", 3.0)
     if bar_mode is None:
         bar_mode = config.get("overlay_bar_mode", "group")
-    if show_grid is None:
+    theme_grid = show_grid is None
+    if theme_grid:
         show_grid = config.get("chart_default_show_grid")
     if figsize is None:
         figsize = FIG_SIZE.DEFAULT
@@ -384,6 +387,8 @@ def Panel(
     # them, and the projection (also raising on a mix) picks the axes kind
     probe = _PanelSeam(groups)
     projection = probe.projection
+    if theme_grid and any(isinstance(l, DumbbellLayer) for l in probe.layers):
+        show_grid = value_axis_grid(show_grid, probe.horizontal)
     if probe.horizontal:
         xlabel, ylabel_left = ylabel_left, xlabel
         xmin, xmax, ymin, ymax = ymin, ymax, xmin, xmax

@@ -40,6 +40,7 @@ from datachart.charts import (
     StackedAreaChart,
     BumpChart,
     GanttChart,
+    DumbbellChart,
     SankeyChart,
     Treemap,
     NetworkChart,
@@ -291,6 +292,12 @@ EXPECTED_CHANGES = {
     "gantt_grid",
     "gantt_week_headers_milestone",
     "gantt_month_left_arrows",
+    # new dumbbell chart cases (ADR 0050)
+    "dumbbell_basic",
+    "dumbbell_vertical_delta_sorted",
+    "dumbbell_panel_two",
+    "dumbbell_grid_themes",
+    "dumbbell_direction_mixed",
 }
 
 
@@ -2115,6 +2122,132 @@ def gantt_grid():
             ]
         ]
     )
+
+
+# ----- dumbbell chart (ADR 0050) -----
+
+DUMBBELL_LIFE = [
+    ("Norway", 79.8, 83.2),
+    ("Chile", 77.1, 81.2),
+    ("India", 62.5, 70.9),
+    ("Russia", 65.4, 65.4),
+    ("Japan", 81.1, 84.4),
+    ("Nigeria", 46.3, 54.7),
+]
+
+
+def dumbbell_records(rows=DUMBBELL_LIFE):
+    return [{"label": label, "start": start, "end": end} for label, start, end in rows]
+
+
+@case
+def dumbbell_basic():
+    return DumbbellChart(
+        dumbbell_records(),
+        start_name="2000",
+        end_name="2019",
+        show_values="endpoints",
+        xlabel="Life expectancy (years)",
+        title="Life expectancy",
+    )
+
+
+@case
+def dumbbell_vertical_delta_sorted():
+    records = dumbbell_records()
+    records[4]["emphasis"] = "highlight"
+    return DumbbellChart(
+        records,
+        orientation="vertical",
+        sort=SORT.DESCENDING,
+        sort_by="delta",
+        show_values="delta",
+        value_format="{:+.1f}",
+        marker=("s", "o"),
+        connector_style="--",
+        emphasis_rule={"top": 3},
+        title="Gain, largest first",
+    )
+
+
+@case
+def dumbbell_direction_mixed():
+    # 2019 to 2021: some countries fell, some rose, one held (WHO, rounded)
+    rows = [
+        ("Japan", 84.5, 84.5),
+        ("Norway", 82.7, 82.9),
+        ("Germany", 81.0, 80.5),
+        ("United States", 78.7, 76.4),
+        ("China", 77.3, 77.6),
+        ("India", 70.7, 67.3),
+    ]
+    return Grid(
+        [
+            [
+                DumbbellChart(
+                    dumbbell_records(rows),
+                    start_name="2019",
+                    end_name="2021",
+                    show_direction=True,
+                    show_values="delta",
+                    value_format="{:+.1f}",
+                    title="Horizontal",
+                ),
+                DumbbellChart(
+                    dumbbell_records(rows),
+                    orientation="vertical",
+                    show_direction=True,
+                    show_values="endpoints",
+                    title="Vertical",
+                ),
+            ]
+        ]
+    )
+
+
+@case
+def dumbbell_panel_two():
+    women = [
+        ("Norway", 81.6, 84.9),
+        ("Chile", 80.1, 83.5),
+        ("Brazil", 74.1, 79.6),
+    ]
+    return Panel(
+        [
+            DumbbellChart(
+                dumbbell_records(DUMBBELL_LIFE[:3]),
+                subtitle="Men",
+                start_name="2000",
+                end_name="2019",
+            ),
+            DumbbellChart(
+                dumbbell_records(women),
+                subtitle="Women",
+                start_name="2000",
+                end_name="2019",
+            ),
+        ],
+        show_legend=True,
+        title="Two dumbbell layers",
+    )
+
+
+@case
+def dumbbell_grid_themes():
+    figures = []
+    for theme in (THEME.GREYSCALE, THEME.QUILL, THEME.SKETCH, THEME.MATERIAL):
+        config.set_theme(theme)
+        figures.append(
+            DumbbellChart(
+                dumbbell_records(DUMBBELL_LIFE[:4]),
+                start_name="2000",
+                end_name="2019",
+                show_values="endpoints",
+                title=theme,
+            )
+        )
+    config.set_theme(THEME.DEFAULT)
+    return Grid([figures[:2], figures[2:]])
 
 
 SANKEY_LABELS = [

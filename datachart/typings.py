@@ -31,6 +31,8 @@ Classes:
     CalendarHeatmapDataAttrs: The data attributes for the calendar heatmap.
     GanttSingleChartAttrs: The single chart attributes for the gantt chart.
     GanttTaskAttrs: The task record attributes for the gantt chart.
+    DumbbellSingleChartAttrs: The single chart attributes for the dumbbell chart.
+    DumbbellRecordAttrs: The record attributes for the dumbbell chart.
     ContourSingleChartAttrs: The single chart attributes for the contour chart.
     ContourDataAttrs: The data attributes for the contour chart.
     HexbinSingleChartAttrs: The single chart attributes for the hexbin chart.
@@ -77,6 +79,7 @@ Classes:
     HeatmapStyleAttrs: The typing for the heatmap style.
     CalendarHeatmapStyleAttrs: The typing for the calendar heatmap style.
     GanttStyleAttrs: The typing for the gantt chart style.
+    DumbbellStyleAttrs: The typing for the dumbbell chart style.
     ContourStyleAttrs: The typing for the contour chart style.
     HexbinStyleAttrs: The typing for the hexbin chart style.
     ScatterStyleAttrs: The typing for the scatter chart style.
@@ -798,6 +801,55 @@ class GanttStyleAttrs(TypedDict):
     plot_gantt_today_alpha: Union[float, None]
 
 
+class DumbbellStyleAttrs(TypedDict):
+    """The typing for the dumbbell chart style.
+
+    The value labels take the shared `plot_value_*` keys.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        plot_dumbbell_start_color (Union[str, None]): The color of the start dots; `None` takes the first color of the `PaperAccent` pair.
+        plot_dumbbell_end_color (Union[str, None]): The color of the end dots; `None` takes the second color of the `PaperAccent` pair.
+        plot_dumbbell_alpha (Union[float, None]): The alpha value of the dots.
+        plot_dumbbell_size (Union[int, float, None]): The size of the dots, in points squared.
+        plot_dumbbell_start_marker (Union[LINE_MARKER, str, None]): The marker of the start dots.
+        plot_dumbbell_end_marker (Union[LINE_MARKER, str, None]): The marker of the end dots.
+        plot_dumbbell_edge_width (Union[int, float, None]): The edge width of the dots.
+        plot_dumbbell_edge_color (Union[str, None]): The edge color of the dots.
+        plot_dumbbell_zorder (Union[int, float, None]): The zorder of the dots.
+        plot_dumbbell_connector_color (Union[str, None]): The color of the connectors.
+        plot_dumbbell_connector_width (Union[int, float, None]): The line width of the connectors.
+        plot_dumbbell_connector_style (Union[LINE_STYLE, str, None]): The line style of the connectors.
+        plot_dumbbell_connector_zorder (Union[int, float, None]): The zorder of the connectors; below the dots by default.
+        plot_dumbbell_arrow_color (Union[str, None]): The color of the direction arrows under `show_direction`.
+        plot_dumbbell_arrow_width (Union[int, float, None]): The line width of the direction arrows.
+        plot_dumbbell_arrow_style (Union[str, None]): The direction arrow head, as a matplotlib arrow style.
+        plot_dumbbell_arrow_gap (Union[int, float, None]): The space between a dot's edge and its direction arrow, in points.
+        plot_dumbbell_grid_minor (Union[int, None]): The parts each step between labelled values splits into with fainter gridlines, on a gridded linear value axis; 0 or `None` draws none.
+
+    """
+
+    plot_dumbbell_start_color: Union[str, None]
+    plot_dumbbell_end_color: Union[str, None]
+    plot_dumbbell_alpha: Union[float, None]
+    plot_dumbbell_size: Union[int, float, None]
+    plot_dumbbell_start_marker: Union[LINE_MARKER, str, None]
+    plot_dumbbell_end_marker: Union[LINE_MARKER, str, None]
+    plot_dumbbell_edge_width: Union[int, float, None]
+    plot_dumbbell_edge_color: Union[str, None]
+    plot_dumbbell_zorder: Union[int, float, None]
+    plot_dumbbell_connector_color: Union[str, None]
+    plot_dumbbell_connector_width: Union[int, float, None]
+    plot_dumbbell_connector_style: Union[LINE_STYLE, str, None]
+    plot_dumbbell_connector_zorder: Union[int, float, None]
+    plot_dumbbell_arrow_color: Union[str, None]
+    plot_dumbbell_arrow_width: Union[int, float, None]
+    plot_dumbbell_arrow_style: Union[str, None]
+    plot_dumbbell_arrow_gap: Union[int, float, None]
+    plot_dumbbell_grid_minor: Union[int, None]
+
+
 class CalendarHeatmapStyleAttrs(TypedDict):
     """The typing for the calendar heatmap style.
 
@@ -1238,6 +1290,7 @@ class StyleAttrs(
     HeatmapStyleAttrs,
     CalendarHeatmapStyleAttrs,
     GanttStyleAttrs,
+    DumbbellStyleAttrs,
     ContourStyleAttrs,
     HexbinStyleAttrs,
     ScatterStyleAttrs,
@@ -2158,6 +2211,63 @@ class GanttSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+
+
+# ================================================
+# Dumbbell Chart Attributes
+# ================================================
+
+
+class DumbbellRecordAttrs(TypedDict):
+    """The record attributes for the dumbbell chart.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        label (str): The category, unique within the chart; the label of its row (or column).
+        start (Union[int, float]): The value of the start endpoint.
+        end (Union[int, float]): The value of the end endpoint.
+        emphasis (Optional[Union[EMPHASIS, str]]): The record's own emphasis role ("background" or "highlight"); wins over the chart's `emphasis_rule`.
+
+    """
+
+    label: str
+    start: Union[int, float]
+    end: Union[int, float]
+    emphasis: Optional[Union[EMPHASIS, str]]
+
+
+class DumbbellSingleChartAttrs(TypedDict):
+    """The single chart attributes for the dumbbell chart.
+
+    !!! info "Added in Unreleased"
+
+    Attributes:
+        data (List[DumbbellRecordAttrs]): The records defining one set of dumbbells.
+        subtitle (Union[str, None]): The subtitle of the set.
+        style (Union[DumbbellStyleAttrs, None]): The style of the set.
+        xtickrotate (Union[int, None]): The xtick rotation value.
+        ytickrotate (Union[int, None]): The ytick rotation value.
+        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
+        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
+        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
+        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
+
+    """
+
+    data: List[DumbbellRecordAttrs]
+    subtitle: Union[str, None]
+    style: Union[DumbbellStyleAttrs, None]
+
+    xtickrotate: Union[int, None]
+    ytickrotate: Union[int, None]
+
+    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
+    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
+    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
 
 

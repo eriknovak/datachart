@@ -20,6 +20,7 @@ title: Charts Module
 ::: datachart.charts.RadialChart
 ::: datachart.charts.CalendarHeatmap
 ::: datachart.charts.GanttChart
+::: datachart.charts.DumbbellChart
 
 
 ## Distributions
