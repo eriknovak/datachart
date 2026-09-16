@@ -285,6 +285,21 @@ A group layer on the category index — it overlays other dumbbells and the
 group fronts, not bars; `orientation` picks the category axis.
 _Avoid_: range chart, connected dot plot, Cleveland dot plot (for the chart)
 
+**Scatter matrix**:
+A relationship view (`ScatterMatrix`): an n × n grid figure with a scatter
+chart for every pair of numeric `dimensions` and each dimension's
+distribution on the diagonal (histogram, KDE curve, or blank), optionally
+coloured by a categorical `hue` with one figure-level legend. Composed from
+scatter and histogram cells through the grid transport, so it nests in
+`Grid` and never in `Panel` (ADR 0051).
+_Avoid_: pair plot, pairs plot, SPLOM (for the chart name)
+
+**Upper triangle**:
+The cells of a scatter matrix above the diagonal; they mirror the lower
+triangle, so `show_correlation` replaces them with the Pearson r per hue
+group and `lower_only` blanks them.
+_Avoid_: mirror cells
+
 **Endpoint**:
 One of a dumbbell's two dots — the `start` or the `end` of every record.
 The two endpoints share one colour and one legend entry each, named by the
