@@ -149,11 +149,16 @@ class TestStackedAreaChart(unittest.TestCase):
             fig = StackedAreaChart(data=DATA, baseline=baseline)
             self.assertEqual(fig.axes[0].get_ylim()[0], 0.0)
 
-    def test_sym_keeps_the_margin(self):
+    def test_sym_ends_on_the_stack(self):
         fig = StackedAreaChart(data=DATA, baseline=BASELINE.SYM)
         lo, hi = fig.axes[0].get_ylim()
-        self.assertLess(lo, -3.0)
-        self.assertAlmostEqual(lo, -hi)
+        self.assertEqual((lo, hi), (-3.0, 3.0))
+
+    def test_percent_ends_at_one_hundred(self):
+        fig = StackedAreaChart(data=DATA, baseline=BASELINE.PERCENT)
+        lo, hi = fig.axes[0].get_ylim()
+        self.assertEqual(lo, 0.0)
+        self.assertAlmostEqual(hi, 100.0)
 
     def test_x_is_tightened(self):
         fig = StackedAreaChart(data=DATA)

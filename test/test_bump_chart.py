@@ -32,6 +32,16 @@ def _nan_list(values):
 
 
 class TestBumpValidation(unittest.TestCase):
+    def test_no_grid_unless_asked(self):
+        ax = BumpChart(data=DATA).axes[0]
+        ax.figure.canvas.draw()
+        self.assertFalse(
+            any(l.get_visible() for l in ax.get_xgridlines() + ax.get_ygridlines())
+        )
+        ax = BumpChart(data=DATA, show_grid="y").axes[0]
+        ax.figure.canvas.draw()
+        self.assertTrue(any(l.get_visible() for l in ax.get_ygridlines()))
+
     def test_rank_by_defaults_to_descending(self):
         self.assertEqual(validate_rank_by(None), RANK.VALUE_DESCENDING)
         for member in (RANK.VALUE_ASCENDING, RANK.GIVEN):

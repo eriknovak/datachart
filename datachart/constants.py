@@ -548,6 +548,8 @@ class SORT:
 
     !!! info "Added in Unreleased"
 
+    ![SORT at a glance](../assets/imgs/const-sort.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import SORT
         >>> SORT.DEFAULT
@@ -829,6 +831,8 @@ class RIDGELINE_SCALE:
 
     !!! info "Added in Unreleased"
 
+    ![RIDGELINE_SCALE at a glance](../assets/imgs/const-ridgeline-scale.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import RIDGELINE_SCALE
         >>> RIDGELINE_SCALE.DEFAULT
@@ -1043,6 +1047,8 @@ class RANK:
 
     !!! info "Added in Unreleased"
 
+    ![RANK at a glance](../assets/imgs/const-rank.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import RANK
         >>> RANK.DEFAULT
@@ -1069,6 +1075,8 @@ class LABEL_POSITION:
     end of each line its series label prints.
 
     !!! info "Added in Unreleased"
+
+    ![LABEL_POSITION at a glance](../assets/imgs/const-label-position.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import LABEL_POSITION
@@ -1097,6 +1105,8 @@ class NODE_LABEL_POSITION:
 
     !!! info "Added in Unreleased"
 
+    ![NODE_LABEL_POSITION at a glance](../assets/imgs/const-node-label-position.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import NODE_LABEL_POSITION
         >>> NODE_LABEL_POSITION.DEFAULT
@@ -1107,12 +1117,16 @@ class NODE_LABEL_POSITION:
         CENTER (str): On the marker. Equals to `"center"`.
         ABOVE (str): Above the marker, clear of it, like a place name on a map.
             Equals to `"above"`.
+        BEST (str): Beside the marker, at the spot with the least overlap
+            with other nodes, edges, and labels, as scatter point labels are
+            placed. Equals to `"best"`.
 
     """
 
     DEFAULT = "center"
     CENTER = "center"
     ABOVE = "above"
+    BEST = "best"
 
 
 class GANTT_VALUE:
@@ -1122,6 +1136,8 @@ class GANTT_VALUE:
     prints past its end. None prints nothing.
 
     !!! info "Added in Unreleased"
+
+    ![GANTT_VALUE at a glance](../assets/imgs/const-gantt-value.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import GANTT_VALUE
@@ -1148,6 +1164,8 @@ class GANTT_SORT_KEY:
 
     !!! info "Added in Unreleased"
 
+    ![GANTT_SORT_KEY at a glance](../assets/imgs/const-gantt-sort-key.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import GANTT_SORT_KEY
         >>> GANTT_SORT_KEY.DEFAULT
@@ -1173,6 +1191,8 @@ class GANTT_ARROW_ENTRY:
     chart: which side of the dependent task a dependency arrow enters.
 
     !!! info "Added in Unreleased"
+
+    ![GANTT_ARROW_ENTRY at a glance](../assets/imgs/const-gantt-arrow-entry.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import GANTT_ARROW_ENTRY
@@ -1201,6 +1221,8 @@ class DUMBBELL_VALUE:
 
     !!! info "Added in Unreleased"
 
+    ![DUMBBELL_VALUE at a glance](../assets/imgs/const-dumbbell-value.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import DUMBBELL_VALUE
         >>> DUMBBELL_VALUE.DELTA
@@ -1228,6 +1250,8 @@ class DUMBBELL_SORT_KEY:
 
     !!! info "Added in Unreleased"
 
+    ![DUMBBELL_SORT_KEY at a glance](../assets/imgs/const-dumbbell-sort-key.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import DUMBBELL_SORT_KEY
         >>> DUMBBELL_SORT_KEY.DEFAULT
@@ -1254,6 +1278,8 @@ class DIAGONAL:
     dimension's own cell shows.
 
     !!! info "Added in Unreleased"
+
+    ![DIAGONAL at a glance](../assets/imgs/const-diagonal.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import DIAGONAL
@@ -1285,6 +1311,8 @@ class DATE_PERIOD:
 
     !!! info "Added in Unreleased"
 
+    ![DATE_PERIOD at a glance](../assets/imgs/const-date-period.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import DATE_PERIOD
         >>> DATE_PERIOD.MONTH
@@ -1297,6 +1325,9 @@ class DATE_PERIOD:
         MONTH (str): Months, under their year. Equals to `"month"`.
         QUARTER (str): Quarters, under their year. Equals to `"quarter"`.
         YEAR (str): Years. Equals to `"year"`.
+        PROJECT_MONTH (str): Months counted from the project start, M1, M2, …,
+            under their project year, Y1, Y2, …. The start is `xmin` when
+            given, else the earliest task start. Equals to `"project_month"`.
 
     """
 
@@ -1306,6 +1337,7 @@ class DATE_PERIOD:
     MONTH = "month"
     QUARTER = "quarter"
     YEAR = "year"
+    PROJECT_MONTH = "project_month"
 
 
 class RADIAL_TYPE:
@@ -1408,6 +1440,8 @@ class DATE_FORMAT:
     the time when any label carries one.
 
     !!! info "Added in Unreleased"
+
+    ![DATE_FORMAT at a glance](../assets/imgs/const-date-format.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import DATE_FORMAT

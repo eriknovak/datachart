@@ -295,7 +295,8 @@ def ScatterMatrix(
             axis shows its row's scale too; its histogram or density curve
             keeps its own, unlabelled height.
         title: The title of the figure.
-        figsize: The size of the figure. Defaults to 2.2 inches per cell.
+        figsize: The size of the figure; the cells stay square inside it.
+            Defaults to 2.2 inches per cell.
         show_legend: Whether to show the legend of the hue groups (default
             `True` when `hue` is set).
         legend: The legend setting: title, column count and alignment; the
@@ -432,6 +433,8 @@ def ScatterMatrix(
         "sharex": "col" if sharex else False,
         "sharey": "row" if sharey else False,
         "legend": node_legend,
+        # cells stay square whatever figure or grid cell holds the matrix
+        "box_aspect": 1,
     }
 
     size = n - trim

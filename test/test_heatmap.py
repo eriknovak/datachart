@@ -96,11 +96,10 @@ class TestHeatmapLabels(unittest.TestCase):
             figure = Heatmap({"z": Z})
         figure.canvas.draw()
         ax = figure.axes[0]
-        plain = plt.figure().add_subplot()
-        plain.imshow(Z)
-        plain.figure.canvas.draw()
-        self.assertEqual(_tick_labels(ax, "x"), _tick_labels(plain, "x"))
-        self.assertEqual(_tick_labels(ax, "y"), _tick_labels(plain, "y"))
+        # cells are categories: one tick per cell, at its centre, by index
+        self.assertEqual(_tick_labels(ax, "x"), [str(i) for i in range(len(Z[0]))])
+        self.assertEqual(_tick_labels(ax, "y"), [str(i) for i in range(len(Z))])
+        self.assertEqual(list(ax.get_xticks()), list(range(len(Z[0]))))
 
     def test_tick_rotation_applies_to_x_labels(self):
         figure = Heatmap({"x": ["a", "b", "c"], "z": Z}, xtickrotate=45)

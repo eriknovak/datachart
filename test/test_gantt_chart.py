@@ -28,7 +28,7 @@ from datachart.constants import (
 )
 from datachart.themes import _base
 from datachart.utils import Grid, Panel
-from datachart.utils._internal.layers import GanttLayer, Layer
+from datachart.utils._internal.layers import GanttLayer, Layer, ScheduleTicks
 
 D0 = date(2024, 1, 1)
 THEMES = [
@@ -207,7 +207,7 @@ class TestGanttMarks(unittest.TestCase):
 
     def test_time_on_the_x_axis(self):
         ax = GanttChart(schedule()).axes[0]
-        self.assertIsInstance(ax.xaxis.get_major_locator(), mdates.AutoDateLocator)
+        self.assertIsInstance(ax.xaxis.get_major_locator(), ScheduleTicks)
         self.assertIsInstance(
             ax.xaxis.get_major_formatter(), mdates.ConciseDateFormatter
         )
@@ -363,13 +363,66 @@ class TestGanttPeriods(unittest.TestCase):
     def span(self, start, end):
         return [{"task": "A", "start": start, "end": end}]
 
+    def test_date_ticks_run_from_the_first_start_to_the_last_end(self):
+        figure = GanttChart(self.span(date(2024, 3, 4), date(2024, 3, 24)))
+        figure.canvas.draw()
+        ticks = [
+            mdates.num2date(t).date() for t in figure.axes[0].xaxis.get_majorticklocs()
+        ]
+        self.assertEqual(ticks[0], date(2024, 3, 4))
+        self.assertEqual(ticks[-1], date(2024, 3, 24))
+        self.assertEqual({(b - a).days for a, b in zip(ticks, ticks[1:])}, {4})
+        long = GanttChart(self.span(date(2024, 1, 15), date(2026, 1, 15)))
+        long.canvas.draw()
+        ticks = [
+            mdates.num2date(t).date() for t in long.axes[0].xaxis.get_majorticklocs()
+        ]
+        self.assertEqual(ticks[0], date(2024, 1, 15))
+        self.assertEqual(ticks[-1], date(2026, 1, 15))
+        self.assertTrue(all(t.day == 15 for t in ticks))
+
+    def test_period_view_covers_whole_periods(self):
+        ax = GanttChart(
+            self.span(date(2024, 2, 20), date(2025, 8, 10)), period="quarter"
+        ).axes[0]
+        lo, hi = (mdates.num2date(v).date() for v in ax.get_xlim())
+        self.assertEqual((lo, hi), (date(2024, 1, 1), date(2025, 10, 1)))
+        ax.figure.canvas.draw()
+        self.assertEqual(len(ax.get_xticklabels()), 7)
+        fixed = GanttChart(
+            self.span(date(2024, 2, 20), date(2025, 8, 10)),
+            period="quarter",
+            xmax=date(2025, 9, 1),
+        ).axes[0]
+        self.assertEqual(mdates.num2date(fixed.get_xlim()[1]).date(), date(2025, 9, 1))
+
     def test_month_period(self):
         figure = GanttChart(
             self.span(date(2023, 11, 20), date(2024, 5, 1)), period=DATE_PERIOD.MONTH
         )
         months, years = period_labels(figure)
-        self.assertEqual(months, ["Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"])
+        # the task ends at the start of May, so the view ends there too
+        self.assertEqual(months, ["Nov", "Dec", "Jan", "Feb", "Mar", "Apr"])
         self.assertEqual(years, ["2023", "2024"])
+
+    def test_project_month_period_counts_from_the_start(self):
+        months, years = period_labels(
+            GanttChart(
+                self.span(date(2024, 3, 15), date(2025, 9, 1)), period="project_month"
+            )
+        )
+        self.assertEqual(months, [f"M{i}" for i in range(1, len(months) + 1)])
+        self.assertGreaterEqual(len(months), 18)
+        self.assertEqual(years, ["Y1", "Y2"])
+        figure = GanttChart(
+            self.span(date(2024, 3, 15), date(2024, 6, 1)),
+            period="project_month",
+            xmin=date(2024, 3, 1),
+        )
+        self.assertIn(
+            mdates.date2num(date(2024, 4, 1)), figure.axes[0].xaxis.get_minorticklocs()
+        )
+        self.assertEqual(period_labels(figure)[0][:2], ["M1", "M2"])
 
     def test_period_edges_carry_the_grid(self):
         ax = GanttChart(

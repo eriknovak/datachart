@@ -122,9 +122,10 @@ def GanttChart(
         xmax: The end of the date window, as a temporal object.
         max_cols: The maximum number of subplot columns for several schedules.
         period: The calendar period the date axis is divided into: None
-            (concise date ticks), "day", "week", "month", "quarter", or
-            "year". Lines mark the period edges, each period is labelled at
-            its centre, and a row beneath names the enclosing month or year.
+            (concise date ticks), "day", "week", "month", "quarter", "year",
+            or "project_month" (M1, M2, … from `xmin` or the earliest start).
+            Lines mark the period edges, each period is labelled at its
+            centre, and a row beneath names the enclosing month or year.
             `xticks_format` sets the period labels. See `DATE_PERIOD`.
         show_group_headers: Whether to give each task group a header row with
             a summary bar from its first start to its last end, the group's
