@@ -244,6 +244,10 @@ BASE_THEME: StyleAttrs = {
     "plot_dumbbell_connector_width": 2.5,
     "plot_dumbbell_connector_style": LINE_STYLE.SOLID,
     "plot_dumbbell_connector_zorder": 2.5,
+    "plot_dumbbell_arrow_color": "#8C8C8C",
+    "plot_dumbbell_arrow_width": 0.6,
+    "plot_dumbbell_arrow_style": "-|>,head_length=0.3,head_width=0.15",
+    "plot_dumbbell_arrow_gap": 3,
     # value label style, shared by every chart that prints values (ADR 0033)
     "plot_value_fontsize": 8,
     "plot_value_color": "#000000",

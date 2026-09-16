@@ -296,7 +296,8 @@ def get_dumbbell_style(chart_style: dict) -> dict:
     """Get the dumbbell chart style.
 
     The dots take matplotlib scatter keys, one color and marker per endpoint;
-    the `connector_*` keys style the line between them.
+    the `connector_*` keys style the line between them and the `arrow_*` keys
+    the optional direction arrow beside it.
 
     Args:
         chart_style: The chart style dictionary.
@@ -320,6 +321,10 @@ def get_dumbbell_style(chart_style: dict) -> dict:
         ("connector_width", "plot_dumbbell_connector_width"),
         ("connector_style", "plot_dumbbell_connector_style"),
         ("connector_zorder", "plot_dumbbell_connector_zorder"),
+        ("arrow_color", "plot_dumbbell_arrow_color"),
+        ("arrow_width", "plot_dumbbell_arrow_width"),
+        ("arrow_style", "plot_dumbbell_arrow_style"),
+        ("arrow_gap", "plot_dumbbell_arrow_gap"),
     ]
 
     return create_config_dict(chart_style, config_attrs)

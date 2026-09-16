@@ -129,6 +129,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_edge_color": INK,
         "plot_dumbbell_edge_width": 0.8,
         "plot_dumbbell_connector_color": INK,
+        "plot_dumbbell_arrow_color": INK,
         "plot_dumbbell_connector_width": 1.2,
         "plot_heatmap_cmap": COLORS.Greys,
         "plot_heatmap_frame_color": INK,

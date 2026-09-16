@@ -39,3 +39,12 @@ panel category index the group fronts share (ADR 0020, 1-based, overlaid).
   `ENDPOINTS` (past each dot, away from the connector), `DELTA` (at the
   connector midpoint). Coincident endpoints draw one dot, no connector,
   and a delta of zero.
+- **Gridlines follow the values.** Themes name their default grid for an
+  upright chart, where values run along y; a horizontal dumbbell moves that
+  default onto x, in its front and in a `Panel`. An explicit `show_grid`
+  stays literal.
+- **Direction is an opt-in arrow beside the connector.** `show_direction`
+  draws a thin `start` → `end` arrow above each horizontal dumbbell (right of
+  a vertical one), styled by `plot_dumbbell_arrow_*`, so colour alone need
+  not tell a rise from a fall. Arrowheads on the connector itself stay out:
+  they would sit under the end dot. A delta label moves out past the arrow.

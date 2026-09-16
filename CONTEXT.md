@@ -297,6 +297,11 @@ The line a dumbbell draws between a record's two endpoints; absent when they
 coincide.
 _Avoid_: link, bar (for the line), range line
 
+**Direction arrow**:
+The thin, optional arrow (`show_direction`) drawn beside a dumbbell's
+connector, pointing from `start` to `end`; absent when the endpoints coincide.
+_Avoid_: trend arrow, arrowhead (for the whole mark)
+
 **Delta**:
 `end - start` of one dumbbell record: a sort key (`sort_by="delta"`) and a
 value label (`show_values="delta"`) printed at the connector midpoint.

@@ -42,6 +42,7 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
 from matplotlib.path import Path
 from matplotlib.transforms import (
+    offset_copy,
     Bbox,
     IdentityTransform,
     ScaledTranslation,
@@ -4122,6 +4123,7 @@ class DumbbellLayer(GroupLayer):
         self._resolve_value_labels()
         self.show_values = self.value_mode is not None
         self.labels_below_range = self.value_mode == DUMBBELL_VALUE.ENDPOINTS
+        self.show_direction = bool(self.settings.get("show_direction"))
         # a highlight edge contrasts in the theme's own text color
         self.highlight_edge_color = config.get("font_general_color") or "#000000"
 
@@ -4242,8 +4244,52 @@ class DumbbellLayer(GroupLayer):
         interval = ax.dataLim.intervaly if self.is_horizontal else ax.dataLim.intervalx
         interval[:] = (min(interval[0], lo), max(interval[1], hi))
 
+        radius = np.sqrt(size) / 2
+        if self.show_direction:
+            self._draw_arrows(ax, positions, roles, radius)
         if self.show_values:
-            self._label_values(ax, positions, roles, np.sqrt(size) / 2)
+            self._label_values(ax, positions, roles, radius)
+
+    def _arrow_offset(self, radius: float) -> float:
+        """How far off the connector a direction arrow runs, in points."""
+
+        return radius + self.dumbbell_style.get("arrow_gap", 0)
+
+    def _draw_arrows(self, ax, positions, roles, radius: float) -> None:
+        """A thin arrow beside each distinct record, from its start to its end.
+
+        It runs above a horizontal dumbbell and right of a vertical one.
+        """
+
+        offset = self._arrow_offset(radius)
+        shift = {"y": offset} if self.is_horizontal else {"x": offset}
+        transform = offset_copy(ax.transData, fig=ax.figure, units="points", **shift)
+        style = self.dumbbell_style
+        for position, start, end, role in zip(positions, self.starts, self.ends, roles):
+            if start == end:
+                continue
+            props = {
+                "arrowstyle": style.get("arrow_style"),
+                "color": style.get("arrow_color"),
+                "linewidth": style.get("arrow_width"),
+                "shrinkA": 0,
+                "shrinkB": 0,
+            }
+            self._apply_emphasis(props, role)
+            zorder = props.pop("zorder", 0) + style.get("connector_zorder", 0)
+            tail, head = (start, position), (end, position)
+            if not self.is_horizontal:
+                tail, head = tail[::-1], head[::-1]
+            ax.annotate(
+                "",
+                xy=head,
+                xytext=tail,
+                xycoords=transform,
+                textcoords=transform,
+                arrowprops=props,
+                zorder=zorder,
+                annotation_clip=False,
+            )
 
     def _draw_connectors(self, ax, positions, mask, line_style, role) -> None:
         """One line per masked record from its start to its end."""
@@ -4275,11 +4321,19 @@ class DumbbellLayer(GroupLayer):
         connector_pad = (
             self.dumbbell_style.get("connector_width", 0) / 2 + self.value_padding
         )
+        arrow_pad = (
+            self._arrow_offset(radius)
+            + self.dumbbell_style.get("arrow_width", 0)
+            + self.value_padding
+        )
         for position, start, end, role in zip(positions, self.starts, self.ends, roles):
             if role == EMPHASIS_BACKGROUND:
                 continue
             if self.value_mode == DUMBBELL_VALUE.DELTA:
                 offset = connector_pad if start != end else pad
+                if self.show_direction and start != end:
+                    # the delta reads past the direction arrow, not over it
+                    offset = arrow_pad
                 self._annotate(ax, (start + end) / 2, position, end - start, offset, 0)
                 continue
             marks = (
@@ -10470,6 +10524,18 @@ GROUP_CHART_TYPES = (
 )
 
 
+def value_axis_grid(show_grid, horizontal: bool):
+    """A theme's one-axis grid default, moved onto a horizontal value axis.
+
+    Themes name the grid of an upright chart, whose values run along y; a
+    dumbbell's gridlines follow its values whichever way they run (ADR 0050).
+    """
+
+    if not horizontal:
+        return show_grid
+    return {"x": "y", "y": "x"}.get(show_grid, show_grid)
+
+
 def build_chart_panel_settings(
     chart_type: str, settings: dict, mode: str, first_style: dict
 ) -> dict:
@@ -10486,6 +10552,11 @@ def build_chart_panel_settings(
     )
     if show_grid is None and not raster:
         show_grid = config.get("chart_default_show_grid")
+        if chart_type == "dumbbellchart":
+            orientation = settings.get("orientation") or DEFAULT_ORIENTATION
+            show_grid = value_axis_grid(
+                show_grid, orientation == ORIENTATION.HORIZONTAL
+            )
 
     # the seam's scale keys are literal; group fronts mean the value axis
     scalex, scaley = settings.get("scalex"), settings.get("scaley")

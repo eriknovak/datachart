@@ -65,6 +65,7 @@ def DumbbellChart(
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_values: Optional[Union[DUMBBELL_VALUE, str]] = None,
+    show_direction: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     sort: Optional[Union[SORT, str]] = None,
     sort_by: Optional[Union[DUMBBELL_SORT_KEY, str]] = None,
@@ -91,7 +92,8 @@ def DumbbellChart(
     minimum and a maximum), when the gap matters as much as either value.
     Rows read top to bottom in input order, or sorted by start, end, or the
     delta `end - start`; the endpoints print their values, or the delta
-    prints at the connector midpoint.
+    prints at the connector midpoint, and an optional thin arrow shows
+    which way each value moved.
 
     The rows sit on the category index the box, violin and swarm plots
     share, so the chart composes with them and with other dumbbell charts in
@@ -146,11 +148,16 @@ def DumbbellChart(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             `LegendSettingAttrs`.
-        show_grid: Which grid lines to show ("both", "x", "y"). See `SHOW_GRID`.
+        show_grid: Which grid lines to show ("both", "x", "y"). Unset, the
+            theme's grid runs along the value axis, whichever way it points.
+            See `SHOW_GRID`.
         show_values: The value labels: None (none), `"endpoints"` (each
             endpoint's value past its dot, away from the connector), or
             `"delta"` (`end - start` at the connector midpoint). See
             `DUMBBELL_VALUE`.
+        show_direction: Whether to draw a thin arrow beside each connector,
+            pointing from `start` to `end`: above a horizontal dumbbell, right
+            of a vertical one. Records whose endpoints coincide draw none.
         value_format: Format string for the value labels: a `VALUE_FORMAT`
             constant or any `"{x:.1f}"`, `"{:+.1f}"`, or `"%g"` style string.
         sort: The order of the categories: None (input order), "ascending",
@@ -228,6 +235,7 @@ def DumbbellChart(
         "legend": legend,
         "show_grid": show_grid,
         "show_values": show_values,
+        "show_direction": show_direction,
         "value_format": value_format,
         "sort": sort,
         "sort_by": sort_by,

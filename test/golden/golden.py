@@ -297,6 +297,7 @@ EXPECTED_CHANGES = {
     "dumbbell_vertical_delta_sorted",
     "dumbbell_panel_two",
     "dumbbell_grid_themes",
+    "dumbbell_direction_mixed",
 }
 
 
@@ -2166,6 +2167,41 @@ def dumbbell_vertical_delta_sorted():
         connector_style="--",
         emphasis_rule={"top": 3},
         title="Gain, largest first",
+    )
+
+
+@case
+def dumbbell_direction_mixed():
+    # 2019 to 2021: some countries fell, some rose, one held (WHO, rounded)
+    rows = [
+        ("Japan", 84.5, 84.5),
+        ("Norway", 82.7, 82.9),
+        ("Germany", 81.0, 80.5),
+        ("United States", 78.7, 76.4),
+        ("China", 77.3, 77.6),
+        ("India", 70.7, 67.3),
+    ]
+    return Grid(
+        [
+            [
+                DumbbellChart(
+                    dumbbell_records(rows),
+                    start_name="2019",
+                    end_name="2021",
+                    show_direction=True,
+                    show_values="delta",
+                    value_format="{:+.1f}",
+                    title="Horizontal",
+                ),
+                DumbbellChart(
+                    dumbbell_records(rows),
+                    orientation="vertical",
+                    show_direction=True,
+                    show_values="endpoints",
+                    title="Vertical",
+                ),
+            ]
+        ]
     )
 
 

@@ -47,6 +47,7 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_gantt_today_color": "#000000",
         "plot_dumbbell_edge_color": "#000000",
         "plot_dumbbell_connector_color": "#8C8C8C",
+        "plot_dumbbell_arrow_color": "#000000",
         "plot_heatmap_cmap": COLORS.Blues,
         "plot_heatmap_frame_color": "#000000",
         "plot_violin_edgecolor": "#000000",

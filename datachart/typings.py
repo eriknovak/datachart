@@ -822,6 +822,10 @@ class DumbbellStyleAttrs(TypedDict):
         plot_dumbbell_connector_width (Union[int, float, None]): The line width of the connectors.
         plot_dumbbell_connector_style (Union[LINE_STYLE, str, None]): The line style of the connectors.
         plot_dumbbell_connector_zorder (Union[int, float, None]): The zorder of the connectors; below the dots by default.
+        plot_dumbbell_arrow_color (Union[str, None]): The color of the direction arrows under `show_direction`.
+        plot_dumbbell_arrow_width (Union[int, float, None]): The line width of the direction arrows.
+        plot_dumbbell_arrow_style (Union[str, None]): The direction arrow head, as a matplotlib arrow style.
+        plot_dumbbell_arrow_gap (Union[int, float, None]): The space between a dot's edge and its direction arrow, in points.
 
     """
 
@@ -838,6 +842,10 @@ class DumbbellStyleAttrs(TypedDict):
     plot_dumbbell_connector_width: Union[int, float, None]
     plot_dumbbell_connector_style: Union[LINE_STYLE, str, None]
     plot_dumbbell_connector_zorder: Union[int, float, None]
+    plot_dumbbell_arrow_color: Union[str, None]
+    plot_dumbbell_arrow_width: Union[int, float, None]
+    plot_dumbbell_arrow_style: Union[str, None]
+    plot_dumbbell_arrow_gap: Union[int, float, None]
 
 
 class CalendarHeatmapStyleAttrs(TypedDict):

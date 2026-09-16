@@ -272,6 +272,79 @@ class TestDumbbellMarks(unittest.TestCase):
                 plt.close(figure)
 
 
+def gridlines(ax, axis):
+    lines = ax.xaxis.get_gridlines() if axis == "x" else ax.yaxis.get_gridlines()
+    return any(line.get_visible() for line in lines)
+
+
+def arrows(ax):
+    return [t for t in ax.texts if t.arrow_patch is not None and not t.get_text()]
+
+
+class TestDumbbellGrid(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+
+    def test_horizontal_grid_runs_along_the_values(self):
+        ax = DumbbellChart(records()).axes[0]
+        self.assertTrue(gridlines(ax, "x"))
+        self.assertFalse(gridlines(ax, "y"))
+
+    def test_vertical_grid_runs_along_the_values(self):
+        ax = DumbbellChart(records(), orientation=ORIENTATION.VERTICAL).axes[0]
+        self.assertTrue(gridlines(ax, "y"))
+        self.assertFalse(gridlines(ax, "x"))
+
+    def test_explicit_grid_is_literal(self):
+        ax = DumbbellChart(records(), show_grid="y").axes[0]
+        self.assertTrue(gridlines(ax, "y"))
+        self.assertFalse(gridlines(ax, "x"))
+
+    def test_panel_grid_runs_along_the_values(self):
+        ax = Panel([DumbbellChart(records())]).axes[0]
+        self.assertTrue(gridlines(ax, "x"))
+        self.assertFalse(gridlines(ax, "y"))
+
+
+class TestDumbbellDirection(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+
+    def test_no_arrows_by_default(self):
+        self.assertEqual(arrows(DumbbellChart(records()).axes[0]), [])
+
+    def test_one_arrow_per_distinct_record_pointing_to_the_end(self):
+        data = records() + [{"label": "D", "start": 2, "end": 2}]
+        ax = DumbbellChart(data, show_direction=True).axes[0]
+        found = arrows(ax)
+        self.assertEqual(len(found), 3)
+        # B falls: its arrow points from 5 down to 4
+        self.assertEqual(found[1].xy[0], 4.0)
+        self.assertEqual(found[1].xyann[0], 5.0)
+
+    def test_arrow_is_thinner_than_the_connector(self):
+        ax = DumbbellChart(records(), show_direction=True).axes[0]
+        connector = connectors(ax)[0]
+        self.assertLess(
+            arrows(ax)[0].arrow_patch.get_linewidth(), connector.get_linewidth()[0]
+        )
+
+    def test_vertical_arrows_follow_the_values(self):
+        ax = DumbbellChart(
+            records(), show_direction=True, orientation=ORIENTATION.VERTICAL
+        ).axes[0]
+        first = arrows(ax)[0]
+        self.assertEqual((first.xyann[1], first.xy[1]), (3.0, 7.0))
+
+    def test_arrow_style_override(self):
+        ax = DumbbellChart(
+            records(),
+            show_direction=True,
+            style={"plot_dumbbell_arrow_color": "#123456"},
+        ).axes[0]
+        self.assertEqual(to_hex(arrows(ax)[0].arrow_patch.get_edgecolor()), "#123456")
+
+
 class TestDumbbellLabelsAndLegend(unittest.TestCase):
     def tearDown(self):
         plt.close("all")
