@@ -89,7 +89,8 @@ plugins:
       # keys are .md stand-ins for the renamed notebooks' old URLs
       redirect_maps:
         how-to-guides/utility/overlay.md: how-to-guides/utility/panel.ipynb
-        how-to-guides/config.md: how-to-guides/styling/config.ipynb
+        how-to-guides/config.md: how-to-guides/styling/themes.ipynb
+        how-to-guides/styling/config.md: how-to-guides/styling/themes.ipynb
         how-to-guides/themes.md: how-to-guides/styling/themes.ipynb
         how-to-guides/theme-gallery.md: how-to-guides/styling/theme-gallery.ipynb
         how-to-guides/highlighting.md: how-to-guides/styling/highlighting.ipynb
@@ -166,9 +167,8 @@ plugins:
           - how-to-guides/utility/grid.ipynb: Arranging multiple charts in a grid layout with Grid, including nested rows and layout specs.
           - how-to-guides/utility/annotations.ipynb: "Text annotations on any chart: placement and coordinates, connector looks, text and box styling, and annotating finished figures with Annotate."
         Styling:
-          - how-to-guides/styling/index.md: Map of configuration, themes, the theme gallery, and colormaps.
-          - how-to-guides/styling/config.ipynb: "Customizing the global style via the config singleton: applying and listing themes, updating attributes, scoping a change with override and using_theme, saving and loading JSON theme files, resetting."
-          - how-to-guides/styling/themes.ipynb: Applying the predefined themes and creating custom ones.
+          - how-to-guides/styling/index.md: Map of themes, the theme gallery, and colormaps.
+          - how-to-guides/styling/themes.ipynb: "Applying the predefined themes through the config singleton, what a theme controls, building a custom theme with register_theme, and sharing it as a JSON theme file."
           - how-to-guides/styling/theme-gallery.ipynb: Each predefined theme's swatches with hex codes and six signature charts, grouped by use.
           - how-to-guides/styling/colormaps.ipynb: The colormaps available via the COLORS constant.
         Utility:
@@ -252,7 +252,6 @@ nav:
       - Text Annotations: how-to-guides/utility/annotations.ipynb
     - Styling:
       - how-to-guides/styling/index.md
-      - Config: how-to-guides/styling/config.ipynb
       - Themes: how-to-guides/styling/themes.ipynb
       - Theme Gallery: how-to-guides/styling/theme-gallery.ipynb
       - Colormaps: how-to-guides/styling/colormaps.ipynb

@@ -4,19 +4,13 @@ title: Styling
 
 # Styling
 
-The styling guides cover everything that controls how charts look: the global configuration, the predefined themes and how to create your own, and the available colormaps. Each card names a guide, says what it covers, and links to it.
+The styling guides cover everything that controls how charts look: the predefined themes and how to apply, build, and share your own through the [config](../../references/config.md) singleton, and the available colormaps. Each card names a guide, says what it covers, and links to it.
 
 <div class="grid cards card-gallery" markdown>
 
--   [Config](config.ipynb)
-
-    Customizing the global style through the [config](../../references/config.md) singleton: themes, attributes, scoped changes, and theme files.
-
-    <p class="card-icon" markdown="span">:material-tune:</p>
-
 -   [Themes](themes.ipynb)
 
-    Applying the predefined themes with `config.set_theme`, and creating your own from a style dictionary or a theme file.
+    Applying the predefined themes, what a theme controls, and building and sharing your own, shown on a neon noir theme.
 
     ![The same bar chart under the default, ink, material, and sketch themes](../../assets/imgs/gallery-themes.png)
 
