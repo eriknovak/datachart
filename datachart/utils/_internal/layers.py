@@ -1325,6 +1325,9 @@ def _draw_legend(
         else {"handles": handles, "labels": labels}
     )
     legend = top_ax.legend(**entries, **legend_style)
+    # matplotlib leaves the title in rc text.color; the label color covers it
+    if isinstance(legend_style.get("labelcolor"), str):
+        legend.get_title().set_color(legend_style["labelcolor"])
     if ax_right is None:
         return legend
 
