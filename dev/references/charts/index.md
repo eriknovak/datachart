@@ -29,6 +29,7 @@ The `charts` module contains the methods to create the plots and figures, groupe
 | `HexbinChart`      | Creates the hexbin chart.               |
 | `ParallelCoords`   | Creates the parallel coordinates chart. |
 | `NetworkChart`     | Creates the network chart.              |
+| `ScatterMatrix`    | Creates the scatter matrix.             |
 | `SankeyChart`      | Creates the Sankey chart.               |
 | `Treemap`          | Creates the treemap.                    |
 
@@ -4129,6 +4130,94 @@ Examples:
 | RAISES       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `ValueError` | If emphasis is given, layout is unknown, the records are malformed (a node without an id or a repeated id, an edge naming an unknown node or joining a node to itself, a size or weight not above zero, a node without x/y under the fixed layout, an emphasis that is not a role), or plot_network_edge_style is a headed connector look. |
+
+### datachart.charts.ScatterMatrix
+
+```
+ScatterMatrix(
+    data: Union[
+        Dict[str, List[Any]],
+        List[ScatterMatrixDataPointAttrs],
+    ],
+    *,
+    dimensions: Optional[List[str]] = None,
+    hue: Optional[str] = None,
+    diagonal: Optional[Union[DIAGONAL, str]] = None,
+    lower_only: Optional[bool] = None,
+    show_regression: Optional[bool] = None,
+    show_correlation: Optional[bool] = None,
+    sharex: Optional[bool] = None,
+    sharey: Optional[bool] = None,
+    title: Optional[str] = None,
+    figsize: Optional[Tuple[float, float]] = None,
+    show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
+    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    style: Optional[StyleAttrs] = None
+) -> plt.Figure
+```
+
+Creates a scatter matrix.
+
+Every pair of numeric dimensions gets a scatter chart, and each dimension's own distribution sits on the diagonal. Use it to scan many variables for relationships, clusters and outliers at once, optionally split by a categorical `hue`. For two variables use ScatterChart; for many dimensions per observation read as lines, use ParallelCoords.
+
+The figure is a grid: it nests inside Grid and cannot be overlaid with Panel.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.charts import ScatterMatrix
+>>> figure = ScatterMatrix(
+...     data={
+...         "length": [5.1, 4.9, 6.3, 5.8, 7.1, 6.5],
+...         "width": [3.5, 3.0, 3.3, 2.7, 3.0, 3.2],
+...         "petal": [1.4, 1.4, 6.0, 5.1, 5.9, 5.1],
+...         "species": ["a", "a", "b", "b", "b", "b"],
+...     },
+...     hue="species",
+... )
+>>>
+>>> # records work too; correlations above the diagonal
+>>> records = [
+...     {"length": 5.1, "width": 3.5, "petal": 1.4},
+...     {"length": 6.3, "width": 3.3, "petal": 6.0},
+...     {"length": 5.8, "width": 2.7, "petal": 5.1},
+... ]
+>>> figure = ScatterMatrix(
+...     data=records,
+...     diagonal="kde",
+...     show_correlation=True,
+...     show_regression=True,
+... )
+```
+
+| PARAMETER          | DESCRIPTION                                                                                                                                                                                                                                                             |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`             | The observations: a dict of equal-length columns, or a list of records. Missing values (None) are left out pair by pair. **TYPE:** `Union[Dict[str, List[Any]], List[ScatterMatrixDataPointAttrs]]`                                                                     |
+| `dimensions`       | The numeric columns to plot, in order. Defaults to every numeric column except the hue, in input order. **TYPE:** `Optional[List[str]]` **DEFAULT:** `None`                                                                                                             |
+| `hue`              | The column whose categories colour the points, one colour per category and one legend for the whole figure. A numeric column raises. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                      |
+| `diagonal`         | What each dimension's own cell shows: a histogram ("hist", default), a density curve ("kde"), or nothing ("none"). See DIAGONAL. **TYPE:** `Optional[Union[DIAGONAL, str]]` **DEFAULT:** `None`                                                                         |
+| `lower_only`       | Whether to leave the cells above the diagonal empty. Wins over show_correlation. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                         |
+| `show_regression`  | Whether to draw a least-squares line per hue group in every scatter cell. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                                |
+| `show_correlation` | Whether to replace the scatters above the diagonal with the Pearson correlation of each hue group. **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                       |
+| `sharex`           | Whether the cells of a column share one x-axis and only the bottom row labels its ticks (default True). **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                  |
+| `sharey`           | Whether the cells of a row share one y-axis and only the left column labels its ticks (default True). A diagonal cell's axis shows its row's scale too; its histogram or density curve keeps its own, unlabelled height. **TYPE:** `Optional[bool]` **DEFAULT:** `None` |
+| `title`            | The title of the figure. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                  |
+| `figsize`          | The size of the figure. Defaults to 2.2 inches per cell. **TYPE:** `Optional[Tuple[float, float]]` **DEFAULT:** `None`                                                                                                                                                  |
+| `show_legend`      | Whether to show the legend of the hue groups (default True when hue is set). **TYPE:** `Optional[bool]` **DEFAULT:** `None`                                                                                                                                             |
+| `legend`           | The legend setting: title, column count and alignment; the legend sits to the right of the matrix. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                 |
+| `show_grid`        | Which grid lines to show in the cells (e.g., "both", "x", "y"). **TYPE:** `Optional[Union[SHOW_GRID, str]]` **DEFAULT:** `None`                                                                                                                                         |
+| `style`            | Style attributes for every cell: the scatter, histogram, plot text and plot_scatter_matrix\_\* keys. See ScatterMatrixStyleAttrs. **TYPE:** `Optional[StyleAttrs]` **DEFAULT:** `None`                                                                                  |
+
+| RETURNS      | DESCRIPTION                               |
+| ------------ | ----------------------------------------- |
+| `plt.Figure` | The figure containing the scatter matrix. |
+
+| RAISES       | DESCRIPTION                                                                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If data is malformed or has no numeric column, a dimension is missing or not numeric, or hue is missing, has missing values, or is numeric. |
 
 ## Flows
 

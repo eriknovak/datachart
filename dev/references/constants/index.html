@@ -537,6 +537,8 @@
       
         
       
+        
+      
     
     
     
@@ -1164,6 +1166,34 @@
     
   
     Network Chart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../how-to-guides/charts/scattermatrix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scatter Matrix
   
 
     
@@ -2531,6 +2561,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.constants.DIAGONAL" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;DIAGONAL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.constants.DATE_PERIOD" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3263,6 +3304,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.constants.DIAGONAL" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;DIAGONAL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.constants.DATE_PERIOD" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3673,6 +3725,14 @@ These include figure size, format, style, and other figure manipulation values.<
             <td class="doc-class-details">
               <div class="doc-md-description">
                 <p>The supported dumbbell chart sort keys.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.DIAGONAL&lt;/span&gt;" href="#datachart.constants.DIAGONAL">DIAGONAL</a></code></td>
+            <td class="doc-class-details">
+              <div class="doc-md-description">
+                <p>The supported scatter matrix diagonal cells.</p>
               </div>
             </td>
           </tr>
@@ -9154,6 +9214,134 @@ other than <code>SORT.NONE</code> orders the categories by.</p>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
                 <p>Each category by its <code>end - start</code>. Equals to <code>"delta"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="datachart.constants.DIAGONAL" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.constants.DIAGONAL</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>The supported scatter matrix diagonal cells.</p>
+<p>Passed as the <code>diagonal</code> setting of the scatter matrix: what each
+dimension's own cell shows.</p>
+<div class="admonition info">
+<p class="admonition-title">Added in Unreleased</p>
+</div>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DIAGONAL</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">DIAGONAL</span><span class="o">.</span><span class="n">DEFAULT</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">"hist"</span>
+</code></pre></div>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">ATTRIBUTE</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DIAGONAL.DEFAULT">DEFAULT</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The default diagonal. Same as <code>DIAGONAL.HIST</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DIAGONAL.HIST">HIST</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>A histogram of the dimension, one per hue group.
+Equals to <code>"hist"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DIAGONAL.KDE">KDE</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>A kernel density curve of the dimension, one per hue
+group. Equals to <code>"kde"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DIAGONAL.NONE">NONE</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>A blank cell. Equals to <code>"none"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">

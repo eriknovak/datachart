@@ -45,6 +45,7 @@ How two or more variables relate to each other.
 | [Hexbin Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md)            | The showcase of the hexbin chart.         |
 | [Parallel Coordinates](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/parallelcoords/index.md) | The showcase of the parallel coordinates. |
 | [Network Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/networkchart/index.md)          | The showcase of the network chart.        |
+| [Scatter Matrix](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scattermatrix/index.md)        | The showcase of the scatter matrix.       |
 
 ## Flows
 

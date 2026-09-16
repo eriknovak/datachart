@@ -55,6 +55,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `RidgelineDataPointAttrs`         | The data point attributes for the ridgeline plot.               |
 | `ParallelCoordsSingleChartAttrs`  | The single chart attributes for the parallel coordinates chart. |
 | `ParallelCoordsDataPointAttrs`    | The data point attributes for the parallel coordinates chart.   |
+| `ScatterMatrixDataPointAttrs`     | The record attributes for the scatter matrix.                   |
 | `RadialSingleChartAttrs`          | The single chart attributes for the radial chart.               |
 | `RadialDataPointAttrs`            | The data point attributes for the radial chart.                 |
 | `StyleAttrs`                      | The style typing.                                               |
@@ -93,6 +94,7 @@ The `typings` module contains the typings for all chart components. The module i
 | `RaincloudStyleAttrs`             | The typing for the raincloud plot style.                        |
 | `RidgelineStyleAttrs`             | The typing for the ridgeline plot style.                        |
 | `ParallelCoordsStyleAttrs`        | The typing for the parallel coordinates chart style.            |
+| `ScatterMatrixStyleAttrs`         | The typing for the scatter matrix style.                        |
 | `ThemeDefaultAttrs`               | The typing for theme-driven defaults and cycles.                |
 
 ## Chart Typings
@@ -827,6 +829,22 @@ A dictionary where keys are dimension names and values are numeric values. Can o
 | --------- | ---------------------------------------------------------- |
 | `hue`     | The category for color grouping. **TYPE:** `Optional[str]` |
 
+### Scatter Matrix Typings
+
+#### datachart.typings.ScatterMatrixDataPointAttrs
+
+Bases: `TypedDict`
+
+The record attributes for the scatter matrix.
+
+A dictionary where keys are column names: numeric columns become dimensions, and one categorical column may be named as the `hue`. The same columns can be passed as one dictionary of lists instead.
+
+Added in Unreleased
+
+| ATTRIBUTE | DESCRIPTION                                                                                             |
+| --------- | ------------------------------------------------------------------------------------------------------- |
+| `hue`     | The category for color grouping, under the column name the hue setting names. **TYPE:** `Optional[str]` |
+
 ### Radial Chart Typings
 
 #### datachart.typings.RadialSingleChartAttrs
@@ -868,7 +886,7 @@ The line, bar, and scatter visuals take `label`/`y` points whose labels are plac
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `GanttStyleAttrs`, `DumbbellStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `GanttStyleAttrs`, `DumbbellStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ScatterMatrixStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
 
 The style attributes. Combines all style typings.
 
@@ -1425,6 +1443,27 @@ The typing for the parallel coordinates chart style.
 | `plot_parallel_dim_label_color`     | The dimension label font color. **TYPE:** `Union[str, None]`                                                                       |
 | `plot_parallel_dim_label_rotation`  | The dimension label rotation. **TYPE:** `Union[int, float, None]`                                                                  |
 | `plot_parallel_dim_label_pad`       | The dimension label padding from axis. **TYPE:** `Union[int, float, None]`                                                         |
+
+### datachart.typings.ScatterMatrixStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the scatter matrix style.
+
+The cells take the scatter, histogram and plot text keys; these keys style what the matrix adds on top of them.
+
+Added in Unreleased
+
+| ATTRIBUTE                                | DESCRIPTION                                                                                                              |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `plot_scatter_matrix_regression_color`   | The color of the regression lines under show_regression; None takes each hue group's color. **TYPE:** `Union[str, None]` |
+| `plot_scatter_matrix_regression_width`   | The line width of the regression lines. **TYPE:** `Union[int, float, None]`                                              |
+| `plot_scatter_matrix_regression_style`   | The line style of the regression lines. **TYPE:** `Union[LINE_STYLE, str, None]`                                         |
+| `plot_scatter_matrix_correlation_size`   | The font size of the correlation text under show_correlation. **TYPE:** `Union[int, float, None]`                        |
+| `plot_scatter_matrix_correlation_weight` | The font weight of the correlation text. **TYPE:** `Union[FONT_WEIGHT, str, None]`                                       |
+| `plot_scatter_matrix_kde_width`          | The line width of the diagonal density curves. **TYPE:** `Union[int, float, None]`                                       |
+| `plot_scatter_matrix_kde_alpha`          | The alpha value of the fill under the diagonal density curves; 0 draws no fill. **TYPE:** `Union[float, None]`           |
+| `plot_scatter_matrix_diagonal_alpha`     | The alpha value of the diagonal histograms, overlaid per hue group. **TYPE:** `Union[float, None]`                       |
 
 ### datachart.typings.ThemeDefaultAttrs
 

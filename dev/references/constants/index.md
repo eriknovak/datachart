@@ -37,6 +37,7 @@ The `constants` module provides a set of predefined constants used in the packag
 | `GANTT_ARROW_ENTRY`   | The supported gantt dependency arrow entries.  |
 | `DUMBBELL_VALUE`      | The supported dumbbell chart value labels.     |
 | `DUMBBELL_SORT_KEY`   | The supported dumbbell chart sort keys.        |
+| `DIAGONAL`            | The supported scatter matrix diagonal cells.   |
 | `DATE_PERIOD`         | The supported date axis periods.               |
 | `NODE_LABEL_POSITION` | The supported network node label positions.    |
 | `NETWORK_LAYOUT`      | The supported network chart layouts.           |
@@ -869,6 +870,29 @@ Examples:
 | `START`   | Each category by its start. Equals to "start". **TYPE:** `str`       |
 | `END`     | Each category by its end. Equals to "end". **TYPE:** `str`           |
 | `DELTA`   | Each category by its end - start. Equals to "delta". **TYPE:** `str` |
+
+### datachart.constants.DIAGONAL
+
+The supported scatter matrix diagonal cells.
+
+Passed as the `diagonal` setting of the scatter matrix: what each dimension's own cell shows.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.constants import DIAGONAL
+>>> DIAGONAL.DEFAULT
+"hist"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                                                  |
+| --------- | -------------------------------------------------------------------------------------------- |
+| `DEFAULT` | The default diagonal. Same as DIAGONAL.HIST. **TYPE:** `str`                                 |
+| `HIST`    | A histogram of the dimension, one per hue group. Equals to "hist". **TYPE:** `str`           |
+| `KDE`     | A kernel density curve of the dimension, one per hue group. Equals to "kde". **TYPE:** `str` |
+| `NONE`    | A blank cell. Equals to "none". **TYPE:** `str`                                              |
 
 ### datachart.constants.DATE_PERIOD
 
