@@ -278,6 +278,30 @@ divided into: edge lines, a label centred in each period, and a row naming the
 enclosing month or year.
 _Avoid_: time bucket, date bin
 
+**Dumbbell chart**:
+A comparison (`DumbbellChart`): per category, a dot at `start` and a dot at
+`end` joined by a connector, showing a change between two states or a range.
+A group layer on the category index — it overlays other dumbbells and the
+group fronts, not bars; `orientation` picks the category axis.
+_Avoid_: range chart, connected dot plot, Cleveland dot plot (for the chart)
+
+**Endpoint**:
+One of a dumbbell's two dots — the `start` or the `end` of every record.
+The two endpoints share one colour and one legend entry each, named by the
+chart's `start_name` / `end_name`; the legend is on by default only when a
+name is given.
+_Avoid_: state, side, series (for an endpoint)
+
+**Connector**:
+The line a dumbbell draws between a record's two endpoints; absent when they
+coincide.
+_Avoid_: link, bar (for the line), range line
+
+**Delta**:
+`end - start` of one dumbbell record: a sort key (`sort_by="delta"`) and a
+value label (`show_values="delta"`) printed at the connector midpoint.
+_Avoid_: change, difference, gap
+
 **End label**:
 A series' label (its `subtitle`) printed beside its first and/or last point in the series
 color (`show_labels`, with `label_position` a `LABEL_POSITION` member), so the
