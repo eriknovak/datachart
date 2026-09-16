@@ -2,6 +2,7 @@
 
 import math
 import unittest
+import warnings
 
 import numpy as np
 import matplotlib
@@ -290,6 +291,37 @@ class TestBumpChartDrawing(unittest.TestCase):
             with self.subTest(theme=theme):
                 config.set_theme(theme)
                 BumpChart(DATA, subtitle=NAMES, line_curve=0.5).canvas.draw()
+
+
+class TestPeriodTicks(unittest.TestCase):
+    PERIODS = [1980, 1990, 2000, 2010, 2020, 2023]
+
+    def _chart(self, width):
+        data = [
+            [{"x": x, "y": v} for x, v in zip(self.PERIODS, vals)]
+            for vals in ([5, 4, 3, 2, 1, 1], [1, 2, 3, 4, 5, 6])
+        ]
+        fig = BumpChart(data, subtitle=["a", "b"], figsize=(width, 3))
+        fig.canvas.draw()
+        return fig.axes[0]
+
+    def test_every_period_is_a_tick_when_the_labels_fit(self):
+        self.assertEqual(list(self._chart(10).get_xticks()), self.PERIODS)
+
+    def test_colliding_labels_drop_out_but_the_ends_stay(self):
+        ax = self._chart(3)
+        ticks = list(ax.get_xticks())
+        self.assertEqual(ticks[0], 1980)
+        self.assertEqual(ticks[-1], 2023)
+        self.assertNotIn(2020, ticks)
+        boxes = [t.get_window_extent() for t in ax.get_xticklabels() if t.get_visible()]
+        for a, b in zip(boxes, boxes[1:]):
+            self.assertLess(a.x1, b.x0)
+
+    def test_subplots_do_not_warn_about_the_legend(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            BumpChart(data=DATA, subtitle=NAMES, subplots=True, show_labels=False)
 
 
 class TestBumpChartComposition(unittest.TestCase):

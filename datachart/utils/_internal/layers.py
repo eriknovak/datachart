@@ -2311,6 +2311,59 @@ class LineLayer(PointLabelMixin, AreaFillMixin, Layer):
 
 # vertices per segment of a curved bump line
 BUMP_CURVE_SAMPLES = 24
+# the least gap between two period tick labels, in font sizes
+PERIOD_LABEL_GAP = 0.5
+
+
+class PeriodTicks(mticker.Locator):
+    """One tick per period, thinned so the labels never touch.
+
+    Every period is a tick when its labels fit along the axis; otherwise
+    the first and last periods stay and a period drops out when its label
+    would run into the previous kept one. Measured from the axis length at
+    draw time, so a narrow subplot keeps fewer ticks than a wide figure.
+    """
+
+    def __init__(self, periods):
+        self.periods = np.unique(np.asarray(periods, dtype=float))
+
+    def __call__(self):
+        return self.tick_values(*self.axis.get_view_interval())
+
+    def tick_values(self, vmin, vmax):
+        periods, axis = self.periods, self.axis
+        span = abs(vmax - vmin)
+        if axis is None or len(periods) < 3 or span <= 0:
+            return periods
+        along_x = axis.axis_name == "x"
+        length = axis.axes.bbox.width if along_x else axis.axes.bbox.height
+        if length <= 0:
+            return periods
+        size = FontProperties(
+            size=axis.get_tick_params(which="major").get(
+                "labelsize", mpl.rcParams[f"{axis.axis_name}tick.labelsize"]
+            )
+        ).get_size_in_points()
+        px = axis.figure.dpi / 72.0
+        labels = axis.get_major_formatter().format_ticks(periods)
+        extents = [
+            _text_size(size, label)[0 if along_x else 1] * px for label in labels
+        ]
+        centres = (periods - min(vmin, vmax)) / span * length
+        gap = PERIOD_LABEL_GAP * size * px
+
+        def fits(i, j):
+            return centres[j] - extents[j] / 2 >= centres[i] + extents[i] / 2 + gap
+
+        kept = [0]
+        for j in range(1, len(periods) - 1):
+            if fits(kept[-1], j):
+                kept.append(j)
+        last = len(periods) - 1
+        while len(kept) > 1 and not fits(kept[-1], last):
+            kept.pop()
+        kept.append(last)
+        return periods[kept]
 
 
 def _series_periods(xs: list) -> list:
@@ -10488,7 +10541,7 @@ class Panel:
                 np.concatenate([np.asarray(l.x_values(), float) for l in layers])
             )
             (ax.yaxis if horizontal else ax.xaxis).set_major_locator(
-                mticker.FixedLocator(periods)
+                PeriodTicks(periods)
             )
 
         # a continuous axis starts and ends on a tick: each free end of the

@@ -229,9 +229,10 @@ def BumpChart(
         y=y,
     )
 
-    # end labels name the lines, so the legend is off unless asked for
+    # end labels name the lines, so the legend is off unless asked for;
+    # subplots have no shared legend to show
     if show_legend is None:
-        show_legend = show_labels is False
+        show_legend = show_labels is False and not subplots
 
     # Figure-level settings; None values resolve to defaults downstream
     settings = {
