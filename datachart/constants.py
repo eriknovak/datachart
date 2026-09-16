@@ -621,10 +621,10 @@ class COLORS:
         Cividis (str): Color-blind friendly (optimized for CVD). Equals to `"Cividis"`.
         Inferno (str): Perceptually uniform, color-blind friendly. Equals to `"Inferno"`.
         Plasma (str): Perceptually uniform, color-blind friendly. Equals to `"Plasma"`.
-        Magma (str): Perceptually uniform, color-blind friendly. Equals to `"Magma"`.
-        Turbo (str): Rainbow-like but perceptually better. Equals to `"Turbo"`.
+        Magma (str): Perceptually uniform, color-blind friendly. Equals to `"magma"`.
+        Turbo (str): Rainbow-like but perceptually better. Equals to `"turbo"`.
         OkabeIto (str): Okabe-Ito categorical palette, color-blind safe. Equals to `"OkabeIto"`.
-        OkabeIto_Black (str): Okabe-Ito palette including black. Equals to `"OkabeIto_Black"`.
+        OkabeIto_Black (str): Okabe-Ito palette including black. Equals to `"OkabeIto_black"`.
         Coolwarm (str): Diverging cool-warm palette. Equals to `"coolwarm"`.
         Tab10 (str): Tableau 10-color categorical palette. Equals to `"tab10"`.
         Tab20 (str): Tableau 20-color categorical palette. Equals to `"tab20"`.
@@ -675,10 +675,10 @@ class COLORS:
     Cividis = "Cividis"
     Inferno = "Inferno"
     Plasma = "Plasma"
-    Magma = "Magma"
-    Turbo = "Turbo"
+    Magma = "magma"
+    Turbo = "turbo"
     OkabeIto = "OkabeIto"
-    OkabeIto_Black = "OkabeIto_Black"
+    OkabeIto_Black = "OkabeIto_black"
 
     # Additional Diverging
     Coolwarm = "coolwarm"
