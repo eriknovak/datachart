@@ -127,7 +127,7 @@ def RaincloudPlot(
     experimental results per condition. Vertical rainclouds keep the cloud on
     the left; horizontal ones keep it above.
 
-    !!! info "Added in 0.9.0"
+    !!! info "Added in v0.9.0"
 
     !!! info "Added in Unreleased"
 

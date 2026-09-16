@@ -879,7 +879,7 @@ def kde1d(
     result is a list of `{x, y}` points ready for `LineChart`; the curve
     integrates to 1, so it overlays a density `Histogram` of the same values.
 
-    !!! info "Added in 0.9.0"
+    !!! info "Added in v0.9.0"
 
     Examples:
         >>> from datachart.utils.stats import kde1d
@@ -933,7 +933,7 @@ def kde2d(
     (dates, datetimes, or `datetime64`) gives a grid of datetime `x` values,
     in the input's zone, and `xlim` may then be a pair of datetimes.
 
-    !!! info "Added in 0.9.0"
+    !!! info "Added in v0.9.0"
 
     Examples:
         >>> from datachart.utils.stats import kde2d

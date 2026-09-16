@@ -127,7 +127,7 @@ def HexbinChart(
     estimate use [`ContourChart`][datachart.charts.ContourChart] on
     [`stats.kde2d`][datachart.utils.stats.kde2d].
 
-    !!! info "Added in 0.9.0"
+    !!! info "Added in v0.9.0"
 
     !!! info "Added in Unreleased"
 

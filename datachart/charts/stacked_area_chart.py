@@ -127,7 +127,7 @@ def StackedAreaChart(
     discrete categories use [`BarChart`][datachart.charts.BarChart] with
     `bar_mode="stack"`.
 
-    !!! info "Added in 0.9.0"
+    !!! info "Added in v0.9.0"
 
     Examples:
         >>> from datachart.charts import StackedAreaChart

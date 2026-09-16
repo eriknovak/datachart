@@ -121,7 +121,7 @@ def SwarmPlot(
     positions). For large samples prefer
     [`ViolinPlot`][datachart.charts.ViolinPlot].
 
-    !!! info "Added in 0.9.0"
+    !!! info "Added in v0.9.0"
 
     !!! info "Added in Unreleased"
 
