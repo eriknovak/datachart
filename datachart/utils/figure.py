@@ -158,8 +158,10 @@ def _render_grid_node(
     envelope with sibling cells. A title reserves a thin heading row rendered
     in the subtitle style — a section heading, not the figure's title — and
     the axis labels a footer row and a left column; sharing stays local to
-    the node, anchored on its first shareable axes. A node `legend` — the
-    entries of one cell's axes, for the whole grid — takes a right column.
+    the node, anchored on its first shareable axes — or, for a `"col"` x or
+    `"row"` y share, on the first one in the cell's column or row. A node
+    `legend` — the entries of one cell's axes, for the whole grid — takes a
+    right column.
     """
     nrows, ncols = node["shape"]
     title, xlabel, ylabel = node.get("title"), node.get("xlabel"), node.get("ylabel")
@@ -204,7 +206,15 @@ def _render_grid_node(
             90,
         )
 
-    first_ax = None
+    anchors: Dict[Tuple[str, Any], plt.Axes] = {}
+
+    def share_key(mode, layout):
+        if mode == "col":
+            return ("col", layout["col"])
+        if mode == "row":
+            return ("row", layout["row"])
+        return ("all", None) if mode else None
+
     legend_ax = None
     for index, cell in enumerate(node["cells"]):
         layout = cell["spec"]
@@ -223,13 +233,18 @@ def _render_grid_node(
         shareable = "panels" not in cell and (
             not cell["panel"].layers or cell["panel"].projection != "polar"
         )
+        keys = {
+            axis: share_key(node[f"share{axis}"], layout) if shareable else None
+            for axis in ("x", "y")
+        }
         ax = owner.add_subplot(
             cell_spec,
-            sharex=first_ax if node["sharex"] and shareable else None,
-            sharey=first_ax if node["sharey"] and shareable else None,
+            sharex=anchors.get(keys["x"]),
+            sharey=anchors.get(keys["y"]),
         )
-        if shareable and first_ax is None:
-            first_ax = ax
+        for key in keys.values():
+            if key is not None:
+                anchors.setdefault(key, ax)
         _render_cell(owner, cell, ax)
         if legend and index == legend["cell"]:
             legend_ax = ax
@@ -266,7 +281,12 @@ def _legend_axes(
     owner: plt.Figure, spec: SubplotSpec, source: plt.Axes, legend: Dict[str, Any]
 ) -> None:
     """An invisible axes in `spec` carrying the legend of `source`'s entries."""
-    handles, labels = source.get_legend_handles_labels()
+    # the marks may sit on a hidden twin of the cell's axes
+    handles, labels = [], []
+    for sibling in source._twinned_axes.get_siblings(source):
+        entries = sibling.get_legend_handles_labels()
+        handles += entries[0]
+        labels += entries[1]
     if not labels:
         return
     ax = owner.add_subplot(spec)

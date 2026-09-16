@@ -288,11 +288,12 @@ def ScatterMatrix(
             in every scatter cell.
         show_correlation: Whether to replace the scatters above the diagonal
             with the Pearson correlation of each hue group.
-        sharex: Whether the cells of a column share their x limits and only
+        sharex: Whether the cells of a column share one x-axis and only
             the bottom row labels its ticks (default `True`).
-        sharey: Whether the cells of a row share their y limits and only the
-            left column labels its ticks (default `True`). The diagonal
-            cells never share it: their axis is a count or a density.
+        sharey: Whether the cells of a row share one y-axis and only the
+            left column labels its ticks (default `True`). A diagonal cell's
+            axis shows its row's scale too; its histogram or density curve
+            keeps its own, unlabelled height.
         title: The title of the figure.
         figsize: The size of the figure. Defaults to 2.2 inches per cell.
         show_legend: Whether to show the legend of the hue groups (default
@@ -355,7 +356,7 @@ def ScatterMatrix(
             hidden = []
             if sharex and not outer_x:
                 hidden.append("x")
-            if (sharey and not outer_y) or i == j:
+            if sharey and not outer_y:
                 hidden.append("y")
             settings = {
                 # an empty title keeps a hue group's name off the cell
@@ -368,7 +369,7 @@ def ScatterMatrix(
             }
             if sharex:
                 settings["xmin"], settings["xmax"] = limits[xdim]
-            if sharey and i != j:
+            if sharey:
                 settings["ymin"], settings["ymax"] = limits[ydim]
 
             if blank[i][j]:
@@ -377,6 +378,8 @@ def ScatterMatrix(
                 kind = "diagonal"
                 settings["bar_mode"] = BAR_MODE.OVERLAY
                 settings["kde_xlim"] = limits[xdim]
+                # a count or density keeps its own scale beside the row's
+                settings["marks_on_twin"] = sharey
                 panel = _diagonal_panel(
                     values[xdim], groups, diagonal, diagonal_style, settings
                 )
@@ -425,8 +428,8 @@ def ScatterMatrix(
         "title": title,
         "xlabel": None,
         "ylabel": None,
-        "sharex": False,
-        "sharey": False,
+        "sharex": "col" if sharex else False,
+        "sharey": "row" if sharey else False,
         "legend": node_legend,
     }
 

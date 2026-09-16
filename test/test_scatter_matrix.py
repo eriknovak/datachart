@@ -59,13 +59,14 @@ def cell_kinds(figure):
 
 
 def cell_axes(figure):
-    """The drawn cell axes keyed by (row, col); the legend axes is left out."""
+    """The cell axes keyed by (row, col); legend axes and twins are left out."""
     shape = figure._chart_metadata["shape"]
     axes = {}
     for ax in figure.axes:
         ss = ax.get_subplotspec()
         if ss.colspan.start < shape[1]:
-            axes[(ss.rowspan.start, ss.colspan.start)] = ax
+            # a host axes is added before its twin
+            axes.setdefault((ss.rowspan.start, ss.colspan.start), ax)
     return axes
 
 
@@ -157,7 +158,8 @@ class TestScatterMatrixCells(unittest.TestCase):
 
     def test_kde_draws_one_curve_per_group(self):
         figure = ScatterMatrix(columns(), hue="species", diagonal=DIAGONAL.KDE)
-        ax = cell_axes(figure)[(0, 0)]
+        host = cell_axes(figure)[(0, 0)]
+        (ax,) = [a for a in host._twinned_axes.get_siblings(host) if a is not host]
         self.assertEqual(len(ax.lines), 3)
         self.assertEqual(ax.get_ylim()[0], 0)
 
@@ -242,25 +244,47 @@ class TestScatterMatrixCells(unittest.TestCase):
         self.assertEqual(colors[0], colors[1])
         self.assertEqual(colors[0], colors[2])
 
-    def test_shared_limits_and_outer_tick_labels(self):
+    def test_axes_share_by_column_and_row(self):
         figure = ScatterMatrix(columns())
         axes = cell_axes(figure)
         figure.canvas.draw()
-        self.assertEqual(axes[(1, 0)].get_xlim(), axes[(2, 0)].get_xlim())
-        self.assertEqual(axes[(0, 0)].get_xlim(), axes[(2, 0)].get_xlim())
-        self.assertEqual(axes[(1, 0)].get_ylim(), axes[(1, 2)].get_ylim())
-        self.assertNotEqual(axes[(1, 1)].get_ylim(), axes[(1, 0)].get_ylim())
+        for j in range(3):
+            for i in range(3):
+                self.assertTrue(
+                    axes[(i, j)].get_shared_x_axes().joined(axes[(i, j)], axes[(2, j)])
+                )
+                self.assertTrue(
+                    axes[(j, i)].get_shared_y_axes().joined(axes[(j, i)], axes[(j, 0)])
+                )
+        self.assertFalse(
+            axes[(0, 0)].get_shared_x_axes().joined(axes[(0, 0)], axes[(0, 1)])
+        )
+        # the diagonal shows its row's scale; its bars sit on a hidden twin
+        self.assertEqual(axes[(1, 1)].get_ylim(), axes[(1, 0)].get_ylim())
+        self.assertEqual(len(axes[(1, 1)].patches), 0)
+        (twin,) = [
+            a
+            for a in axes[(1, 1)]._twinned_axes.get_siblings(axes[(1, 1)])
+            if a is not axes[(1, 1)]
+        ]
+        self.assertGreater(len(twin.patches), 0)
+        self.assertEqual(twin.get_ylim()[0], 0)
+
+    def test_outer_tick_labels(self):
+        figure = ScatterMatrix(columns(), show_correlation=True)
+        axes = cell_axes(figure)
+        figure.canvas.draw()
 
         def labelled(ax, axis):
             ticks = ax.get_xticklabels() if axis == "x" else ax.get_yticklabels()
             return any(t.get_visible() and t.get_text() for t in ticks)
 
-        self.assertTrue(labelled(axes[(2, 1)], "x"))
+        for i in range(3):
+            self.assertTrue(labelled(axes[(i, 0)], "y"), i)
+            self.assertTrue(labelled(axes[(2, i)], "x"), i)
         self.assertFalse(labelled(axes[(1, 1)], "x"))
-        self.assertTrue(labelled(axes[(1, 0)], "y"))
         self.assertFalse(labelled(axes[(1, 2)], "y"))
-        # the diagonal's count axis is never labelled
-        self.assertFalse(labelled(axes[(0, 0)], "y"))
+        self.assertFalse(labelled(axes[(0, 1)], "x"))
 
     def test_blank_diagonal_moves_edge_labels_inward(self):
         figure = ScatterMatrix(columns(), diagonal=DIAGONAL.NONE)
@@ -283,6 +307,12 @@ class TestScatterMatrixCells(unittest.TestCase):
         self.assertIsNone(
             figure._chart_metadata["cells"][1]["panel"].settings.get("xmin")
         )
+        self.assertFalse(
+            axes[(0, 1)].get_shared_x_axes().joined(axes[(0, 1)], axes[(2, 1)])
+        )
+        # without a shared row the diagonal draws its counts on its own axis
+        self.assertGreater(len(axes[(1, 1)].patches), 0)
+        self.assertTrue(any(t.get_text() for t in axes[(1, 1)].get_yticklabels()))
 
 
 class TestScatterMatrixLegend(unittest.TestCase):
@@ -346,11 +376,11 @@ class TestScatterMatrixComposition(unittest.TestCase):
         matrix = ScatterMatrix(columns(), hue="species", dimensions=["a", "b"])
         line = LineChart([{"x": 0, "y": 1}, {"x": 1, "y": 2}])
         figure = Grid([[line, matrix]])
-        # the line, four matrix cells, and the matrix legend
-        self.assertEqual(len(figure.axes), 6)
+        # the line, four matrix cells, two diagonal twins, and the legend
+        self.assertEqual(len(figure.axes), 8)
         self.assertEqual(len([ax for ax in figure.axes if ax.get_legend()]), 1)
         outer = Grid([[figure]])
-        self.assertEqual(len(outer.axes), 6)
+        self.assertEqual(len(outer.axes), 8)
 
     def test_renders_under_every_theme(self):
         for theme in THEMES:

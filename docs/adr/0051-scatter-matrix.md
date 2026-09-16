@@ -34,10 +34,13 @@ grid machinery `Grid` uses (ADR 0002, 0006).
   the upper triangle entirely and wins over `show_correlation`.
   `show_regression` draws a `stats.linear_fit` line per hue group in every
   scatter cell.
-- **Axes share by column and row.** `sharex` per column and `sharey` per
-  row default on; diagonal cells never share y — their axis is a count or
-  density. Tick labels show only on the outer edge; dimension names label
-  the outer left column and bottom row.
+- **Axes share by column and row.** `sharex` links every cell of a column
+  and `sharey` every cell of a row, both on by default, so each scale is
+  labelled on the outer edge. A diagonal cell shares its row too: its
+  visible axis shows the row's scale, while its histogram or density curve
+  draws on a hidden twin axis with its own height. Tick labels show only on
+  the outer edge; dimension names label the outer left column and bottom
+  row.
 - **Input shape.** One dict of columns or a list of records; `dimensions`
   selects and orders columns and defaults to every numeric non-hue column
   in input order.

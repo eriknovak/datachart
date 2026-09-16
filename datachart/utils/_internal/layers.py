@@ -9491,6 +9491,16 @@ class Panel:
                     spines=False,
                 )
 
+        # the host axis keeps a shared scale; the marks draw on a hidden twin
+        # with their own (a scatter matrix diagonal, ADR 0051)
+        if s.get("marks_on_twin") and not polar and ax_right is None:
+            ax_right = ax.twinx()
+            ax_right.axis("off")
+            assignments = [
+                "right" if any(l.kind != "text" for l in group.layers) else "left"
+                for group in self.groups
+            ]
+
         # bar slotting across every layer in the panel; radial bars share the
         # machinery — their slots are sector fractions, scaled at draw time
         bar_layers = [
@@ -10734,6 +10744,7 @@ def build_chart_panel_settings(
 
     if mode == "composition":
         panel_settings["hide_ticklabels"] = settings.get("hide_ticklabels")
+        panel_settings["marks_on_twin"] = settings.get("marks_on_twin")
         panel_settings["xlabel"] = settings.get("xlabel")
         panel_settings["ylabel"] = settings.get("ylabel")
         panel_settings["label_styles"] = Panel.snapshot_label_styles()
