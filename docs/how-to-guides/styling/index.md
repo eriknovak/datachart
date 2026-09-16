@@ -22,7 +22,7 @@ The styling guides cover everything that controls how charts look: the predefine
 
 -   [Colormaps](colormaps.ipynb)
 
-    The colormaps and palettes available through the `COLORS` constant, sequential, diverging, and categorical.
+    Every `COLORS` palette by kind, with the predefined themes that use it, and which kind fits which theme attribute.
 
     ![Gradient strips of eight colormaps](../../assets/imgs/gallery-colormaps.png)
 
