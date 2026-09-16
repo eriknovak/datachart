@@ -67,11 +67,15 @@ How a whole splits into parts, and parts into smaller parts.
 | :-------------------------------------------- | :------------------------------------------- |
 | [Treemap](treemap.ipynb)                      | The showcase of the treemap.                 |
 
-## Composition
+## Composition and Utilities
 
-Here are some utility functions, that could help you.
+The guides that take a finished chart further; the [utilities index](../utility/index.md) maps them in full.
 
-| Utility                                       | Description                                  |
-| :-------------------------------------------- | :------------------------------------------- |
-| [Panel](../utility/panel.ipynb)               | How to overlay multiple charts in one plot.  |
-| [Grid Layout](../utility/grid.ipynb)          | How to combine multiple charts in a grid.    |
+| Utility                                          | Description                                                   |
+| :----------------------------------------------- | :------------------------------------------------------------ |
+| [Panel](../utility/panel.ipynb)                  | How to overlay multiple charts in one plot.                   |
+| [Grid Layout](../utility/grid.ipynb)             | How to combine multiple charts in a grid.                     |
+| [Text Annotations](../utility/annotations.ipynb) | How to annotate charts and finished figures with `Annotate`.  |
+| [Statistics](../utility/stats.ipynb)             | How to prepare chart data with the statistical utilities.     |
+| [Saving Figures](../utility/saving.md)           | How to save figures in vector or raster formats.              |
+| [Interactive Figures](../utility/interactive.md) | How to zoom, pan, and hover over the marks of a figure.       |

@@ -134,7 +134,7 @@ plugins:
           - index.md: Package overview, installation, and a first example.
           - how-to-guides/index.md: "Map of the guide sections: charts, composition & utilities, styling."
         Charts:
-          - how-to-guides/charts/index.md: The chart functions, their common data format, and how to save figures.
+          - how-to-guides/charts/index.md: Map of the chart guides by family, and of the composition and utility guides.
           - how-to-guides/charts/linechart.ipynb: Line chart input attributes, single and multiple datasets, customization, datetime axes, and saving.
           - how-to-guides/charts/stackedareachart.ipynb: Stacked area chart input attributes, baselines (zero, percent, sym, wiggle), band style and outlines, emphasis, subplots, composing with Panel and Grid, datetime axes, and saving.
           - how-to-guides/charts/bumpchart.ipynb: Bump chart input attributes, per-period ranking (value descending, value ascending, given ranks) with ties and gaps, end labels, line curves and markers, line style, value labels, emphasis rules on ranks, subplots, composing with Panel and Grid, datetime axes, and saving.
