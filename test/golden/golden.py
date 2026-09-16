@@ -51,23 +51,23 @@ from datachart.config import config
 from datachart.constants import (
     ARROW_STYLE,
     ASPECT_RATIO,
+    BUMP_LABEL_POSITION,
+    BUMP_RANK,
+    CALENDAR_WEEKDAY,
     COLORBAR_LOCATION,
     COLORS,
     CONTOUR_LEVELS,
     DATE_FORMAT,
-    DIAGONAL,
     HEXBIN_REDUCE,
-    BASELINE,
-    LABEL_POSITION,
-    RANK,
+    LEGEND_LOCATION,
     NETWORK_LAYOUT,
     NORMALIZE,
     SCALE,
+    SCATTER_MATRIX_DIAGONAL,
     SORT,
-    LEGEND_LOCATION,
+    STACKED_AREA_BASELINE,
     THEME,
     VALUE_FORMAT,
-    WEEKDAY,
 )
 from datachart.utils.stats import kde1d, kde2d
 
@@ -1881,17 +1881,19 @@ def stackedarea_zero():
 
 @case
 def stackedarea_percent():
-    return StackedAreaChart(data=stack_series(), baseline=BASELINE.PERCENT)
+    return StackedAreaChart(data=stack_series(), baseline=STACKED_AREA_BASELINE.PERCENT)
 
 
 @case
 def stackedarea_sym():
-    return StackedAreaChart(data=stack_series(), baseline=BASELINE.SYM)
+    return StackedAreaChart(data=stack_series(), baseline=STACKED_AREA_BASELINE.SYM)
 
 
 @case
 def stackedarea_wiggle():
-    return StackedAreaChart(data=stack_series(k=4), baseline=BASELINE.WIGGLE)
+    return StackedAreaChart(
+        data=stack_series(k=4), baseline=STACKED_AREA_BASELINE.WIGGLE
+    )
 
 
 @case
@@ -1932,7 +1934,7 @@ def stackedarea_panel_line():
 def stackedarea_grid():
     top = StackedAreaChart(data=stack_series(), title="zero")
     left = StackedAreaChart(
-        data=stack_series(), baseline=BASELINE.PERCENT, title="percent"
+        data=stack_series(), baseline=STACKED_AREA_BASELINE.PERCENT, title="percent"
     )
     right = LineChart(data=LINE1, title="line")
     return Grid([[top], [left, right]], figsize=(10, 7))
@@ -1968,7 +1970,7 @@ def bump_given():
     return BumpChart(
         data=[[{"x": i, "y": r} for i, r in enumerate(row)] for row in ranks],
         subtitle=["a", "b", "c"],
-        rank_by=RANK.GIVEN,
+        rank_by=BUMP_RANK.GIVEN,
     )
 
 
@@ -1977,7 +1979,7 @@ def bump_both_curve():
     return BumpChart(
         data=bump_series(),
         subtitle=BUMP_NAMES,
-        label_position=LABEL_POSITION.BOTH,
+        label_position=BUMP_LABEL_POSITION.BOTH,
         line_curve=0.8,
         show_values=True,
     )
@@ -2000,7 +2002,7 @@ def bump_panel():
                     for row in lower
                 ],
                 subtitle=BUMP_NAMES[3:],
-                rank_by=RANK.GIVEN,
+                rank_by=BUMP_RANK.GIVEN,
                 line_curve=1,
             ),
         ],
@@ -2527,7 +2529,7 @@ def calendar_sunday_start():
     quarter = [(d, v) for d, v in zip(days, values) if d.month <= 3]
     return CalendarHeatmap(
         {"date": [d for d, _ in quarter], "value": [v for _, v in quarter]},
-        week_start=WEEKDAY.SUNDAY,
+        week_start=CALENDAR_WEEKDAY.SUNDAY,
         show_values=True,
         style={"plot_calendar_heatmap_cmap": COLORS.Greens},
         title="Q1 2024, weeks from Sunday",
@@ -3162,7 +3164,7 @@ def matrix_kde_correlation_regression():
     return ScatterMatrix(
         matrix_records(),
         hue="species",
-        diagonal=DIAGONAL.KDE,
+        diagonal=SCATTER_MATRIX_DIAGONAL.KDE,
         show_correlation=True,
         show_regression=True,
     )
@@ -3174,7 +3176,7 @@ def matrix_blank_diagonal_grid():
     matrix = ScatterMatrix(
         matrix_records(),
         dimensions=["flipper", "bill length"],
-        diagonal=DIAGONAL.NONE,
+        diagonal=SCATTER_MATRIX_DIAGONAL.NONE,
         show_regression=True,
         show_grid="both",
         title="Nested",

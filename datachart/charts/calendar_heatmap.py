@@ -16,7 +16,7 @@ from ..typings import (
     ColorbarSettingAttrs,
     TextSettingAttrs,
 )
-from ..constants import ASPECT_RATIO, FIG_SIZE, VALUE_FORMAT, WEEKDAY
+from ..constants import ASPECT_RATIO, FIG_SIZE, VALUE_FORMAT, CALENDAR_WEEKDAY
 
 # a calendar is wide and short: the default figure keeps the default width
 # and stacks this much height per row of calendars
@@ -34,7 +34,7 @@ def CalendarHeatmap(
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: None = None,
     year: Optional[int] = None,
-    week_start: Optional[Union[WEEKDAY, str]] = None,
+    week_start: Optional[Union[CALENDAR_WEEKDAY, str]] = None,
     show_month_labels: Optional[bool] = None,
     show_weekday_labels: Optional[bool] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
@@ -99,8 +99,8 @@ def CalendarHeatmap(
             every year the dates span is drawn, one calendar per year in
             year order, sharing one value range so the colors compare
             across years.
-        week_start: The weekday of the top row: `WEEKDAY.MONDAY` or
-            `WEEKDAY.SUNDAY`. Defaults to the theme's
+        week_start: The weekday of the top row: `CALENDAR_WEEKDAY.MONDAY` or
+            `CALENDAR_WEEKDAY.SUNDAY`. Defaults to the theme's
             `plot_calendar_heatmap_week_start`.
         show_month_labels: Whether to label the months along the top axis.
             Defaults to `True`.
@@ -136,7 +136,7 @@ def CalendarHeatmap(
         ValueError: If `emphasis` is given, the data is not a dated-values
             dict, a date is not a temporal object, a date appears twice,
             `year` names a year without data, or `week_start` is not a
-            `WEEKDAY` member.
+            `CALENDAR_WEEKDAY` member.
 
     """
     if emphasis is not None:

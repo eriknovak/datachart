@@ -13,7 +13,7 @@ from matplotlib.collections import LineCollection
 
 from datachart.charts import CalendarHeatmap, LineChart
 from datachart.config import config
-from datachart.constants import COLORBAR_LOCATION, THEME, VALUE_FORMAT, WEEKDAY
+from datachart.constants import COLORBAR_LOCATION, THEME, VALUE_FORMAT, CALENDAR_WEEKDAY
 from datachart.themes import _base
 from datachart.utils import Grid, Panel
 from datachart.utils._internal.layers import DrawContext
@@ -78,8 +78,8 @@ def _month_lines(ax):
 
 class TestWeekdayConstant(unittest.TestCase):
     def test_members(self):
-        self.assertEqual(WEEKDAY.MONDAY, "monday")
-        self.assertEqual(WEEKDAY.SUNDAY, "sunday")
+        self.assertEqual(CALENDAR_WEEKDAY.MONDAY, "monday")
+        self.assertEqual(CALENDAR_WEEKDAY.SUNDAY, "sunday")
 
 
 class TestCalendarValidators(unittest.TestCase):
@@ -224,19 +224,23 @@ class TestCalendarFront(unittest.TestCase):
         self.assertEqual(z[2, 1], 10)  # Wed Jan 10
 
     def test_sunday_start_places_each_date(self):
-        figure = calendar(date(2024, 1, 1), 10, week_start=WEEKDAY.SUNDAY)
+        figure = calendar(date(2024, 1, 1), 10, week_start=CALENDAR_WEEKDAY.SUNDAY)
         z = _image(figure.axes[0])
         self.assertTrue(np.isnan(z[0, 0]))  # Sun Dec 31 2023: outside the year
         self.assertEqual(z[1, 0], 1)  # Mon Jan 1
         self.assertEqual(z[0, 1], 7)  # Sun Jan 7
         self.assertEqual(z[6, 0], 6)  # Sat Jan 6
         self.assertEqual(
-            _image(year_calendar(2024, week_start=WEEKDAY.SUNDAY).axes[0]).shape,
+            _image(
+                year_calendar(2024, week_start=CALENDAR_WEEKDAY.SUNDAY).axes[0]
+            ).shape,
             (7, 53),
         )
 
     def test_theme_week_start_is_the_default(self):
-        config.update_config({"plot_calendar_heatmap_week_start": WEEKDAY.SUNDAY})
+        config.update_config(
+            {"plot_calendar_heatmap_week_start": CALENDAR_WEEKDAY.SUNDAY}
+        )
         figure = calendar(date(2024, 1, 1), 3)
         self.assertEqual(_image(figure.axes[0])[1, 0], 1)
         self.assertEqual(_tick_labels(figure.axes[0], "y")[0], "Sun")
@@ -274,7 +278,7 @@ class TestCalendarFront(unittest.TestCase):
         )
         self.assertEqual(_tick_labels(ax, "y"), ["Mon", "Wed", "Fri", "Sun"])
         self.assertEqual(list(ax.get_yticks()), [0, 2, 4, 6])
-        sunday = calendar(date(2024, 1, 1), 3, week_start=WEEKDAY.SUNDAY)
+        sunday = calendar(date(2024, 1, 1), 3, week_start=CALENDAR_WEEKDAY.SUNDAY)
         self.assertEqual(
             _tick_labels(sunday.axes[0], "y"), ["Sun", "Tue", "Thu", "Sat"]
         )

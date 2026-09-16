@@ -172,35 +172,35 @@ from ..stats import minimum, maximum, iqr, kde1d
 from ...constants import (
     ARROW_STYLE,
     ASPECT_RATIO,
-    BASELINE,
+    BUMP_LABEL_POSITION,
+    BUMP_RANK,
+    CALENDAR_WEEKDAY,
     COLORBAR_LOCATION,
     COLORS,
+    CONTOUR_LEVELS,
     DATE_FORMAT,
-    DATE_PERIOD,
-    DIRECTION,
     DUMBBELL_SORT_KEY,
     DUMBBELL_VALUE,
-    CONTOUR_LEVELS,
-    HEXBIN_REDUCE,
     EMPHASIS,
     FONT_WEIGHT,
     GANTT_ARROW_ENTRY,
+    GANTT_DATE_PERIOD,
     GANTT_SORT_KEY,
     GANTT_VALUE,
+    HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
     LEGEND_LOCATION,
-    LABEL_POSITION,
     NETWORK_LAYOUT,
     NODE_LABEL_POSITION,
     ORIENTATION,
-    RANK,
-    RIDGELINE_SCALE,
-    SWARM_MODE,
+    RADIAL_DIRECTION,
     RADIAL_TYPE,
+    RIDGELINE_SCALE,
     SCALE,
     SORT,
+    STACKED_AREA_BASELINE,
+    SWARM_MODE,
     VALUE_FORMAT,
-    WEEKDAY,
     VIOLIN_INNER,
 )
 from ...config import config
@@ -323,7 +323,7 @@ NETWORK_OBSTACLE_STEP = 6.0
 NO_LEGEND = "_nolegend_"
 # radial furniture defaults: compass and calendar conventions (ADR 0015)
 DEFAULT_STARTANGLE = "N"
-DEFAULT_DIRECTION = DIRECTION.CLOCKWISE
+DEFAULT_DIRECTION = RADIAL_DIRECTION.CLOCKWISE
 COMPASS_LOCATIONS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
 # the polar border circle crosses the plot area, so the r-value labels and
 # the legend stack above the spine zorder, not just above the marks
@@ -598,32 +598,32 @@ def _tick_formatter(fmt, temporal: bool, locator=None, tz=None):
 
 # a period's labels, and the enclosing period named in the row beneath
 DATE_PERIOD_LABELS = {
-    DATE_PERIOD.DAY: "%d",
-    DATE_PERIOD.WEEK: "W%V",
-    DATE_PERIOD.MONTH: "%b",
-    DATE_PERIOD.QUARTER: None,
-    DATE_PERIOD.YEAR: "%Y",
-    DATE_PERIOD.PROJECT_MONTH: None,
+    GANTT_DATE_PERIOD.DAY: "%d",
+    GANTT_DATE_PERIOD.WEEK: "W%V",
+    GANTT_DATE_PERIOD.MONTH: "%b",
+    GANTT_DATE_PERIOD.QUARTER: None,
+    GANTT_DATE_PERIOD.YEAR: "%Y",
+    GANTT_DATE_PERIOD.PROJECT_MONTH: None,
 }
 # the project year, the row beneath project months; never a period of its own
 PROJECT_YEAR = "project_year"
 DATE_PERIOD_PARENT = {
-    DATE_PERIOD.DAY: DATE_PERIOD.MONTH,
-    DATE_PERIOD.WEEK: DATE_PERIOD.MONTH,
-    DATE_PERIOD.MONTH: DATE_PERIOD.YEAR,
-    DATE_PERIOD.QUARTER: DATE_PERIOD.YEAR,
-    DATE_PERIOD.YEAR: None,
-    DATE_PERIOD.PROJECT_MONTH: PROJECT_YEAR,
+    GANTT_DATE_PERIOD.DAY: GANTT_DATE_PERIOD.MONTH,
+    GANTT_DATE_PERIOD.WEEK: GANTT_DATE_PERIOD.MONTH,
+    GANTT_DATE_PERIOD.MONTH: GANTT_DATE_PERIOD.YEAR,
+    GANTT_DATE_PERIOD.QUARTER: GANTT_DATE_PERIOD.YEAR,
+    GANTT_DATE_PERIOD.YEAR: None,
+    GANTT_DATE_PERIOD.PROJECT_MONTH: PROJECT_YEAR,
 }
-DATE_PARENT_LABELS = {DATE_PERIOD.MONTH: "%b %Y", DATE_PERIOD.YEAR: "%Y"}
+DATE_PARENT_LABELS = {GANTT_DATE_PERIOD.MONTH: "%b %Y", GANTT_DATE_PERIOD.YEAR: "%Y"}
 # the longest period of each kind in days, to reach the edges beyond the view
 DATE_PERIOD_SPAN = {
-    DATE_PERIOD.DAY: 1,
-    DATE_PERIOD.WEEK: 7,
-    DATE_PERIOD.MONTH: 31,
-    DATE_PERIOD.QUARTER: 92,
-    DATE_PERIOD.YEAR: 366,
-    DATE_PERIOD.PROJECT_MONTH: 31,
+    GANTT_DATE_PERIOD.DAY: 1,
+    GANTT_DATE_PERIOD.WEEK: 7,
+    GANTT_DATE_PERIOD.MONTH: 31,
+    GANTT_DATE_PERIOD.QUARTER: 92,
+    GANTT_DATE_PERIOD.YEAR: 366,
+    GANTT_DATE_PERIOD.PROJECT_MONTH: 31,
     PROJECT_YEAR: 366,
 }
 # a period cut to under this share of the widest visible one is unlabelled
@@ -728,17 +728,17 @@ class ScheduleTicks(mticker.Locator):
 def _period_edges(period: str, tz=None, origin=None) -> mticker.Locator:
     """The locator of a period's first instants: its edges on the axis."""
 
-    if period == DATE_PERIOD.PROJECT_MONTH:
+    if period == GANTT_DATE_PERIOD.PROJECT_MONTH:
         return ProjectPeriodEdges(origin, 1)
     if period == PROJECT_YEAR:
         return ProjectPeriodEdges(origin, 12)
-    if period == DATE_PERIOD.DAY:
+    if period == GANTT_DATE_PERIOD.DAY:
         return mdates.DayLocator(tz=tz)
-    if period == DATE_PERIOD.WEEK:
+    if period == GANTT_DATE_PERIOD.WEEK:
         return mdates.WeekdayLocator(byweekday=mdates.MO, tz=tz)
-    if period == DATE_PERIOD.MONTH:
+    if period == GANTT_DATE_PERIOD.MONTH:
         return mdates.MonthLocator(tz=tz)
-    if period == DATE_PERIOD.QUARTER:
+    if period == GANTT_DATE_PERIOD.QUARTER:
         return mdates.MonthLocator(bymonth=(1, 4, 7, 10), tz=tz)
     return mdates.YearLocator(tz=tz)
 
@@ -771,7 +771,7 @@ def _project_label(period: str, moment, origin) -> str:
     """M1, M2, … or Y1, Y2, … counted from the project origin."""
 
     months = _months_since(origin, moment)
-    if period == DATE_PERIOD.PROJECT_MONTH:
+    if period == GANTT_DATE_PERIOD.PROJECT_MONTH:
         return f"M{months + 1}"
     return f"Y{months // 12 + 1}"
 
@@ -783,9 +783,9 @@ def _period_formatter(period: str, fmt, tz=None, origin=None) -> mticker.FuncFor
         moment = mdates.num2date(value, tz=tz)
         if not _auto_format(fmt):
             return moment.strftime(fmt)
-        if period == DATE_PERIOD.QUARTER:
+        if period == GANTT_DATE_PERIOD.QUARTER:
             return f"Q{(moment.month - 1) // 3 + 1}"
-        if period == DATE_PERIOD.PROJECT_MONTH:
+        if period == GANTT_DATE_PERIOD.PROJECT_MONTH:
             return _project_label(period, moment, origin)
         return moment.strftime(DATE_PERIOD_LABELS[period])
 
@@ -2420,12 +2420,12 @@ def rank_series(xs: list, ys: list, rank_by: str) -> tuple:
     values = [
         _align_to_periods(x, y, periods, i) for i, (x, y) in enumerate(zip(xs, ys))
     ]
-    if rank_by == RANK.GIVEN:
+    if rank_by == BUMP_RANK.GIVEN:
         for column in values:
             validate_given_ranks(column)
         return periods, values
     ranks = [np.full(len(periods), np.nan) for _ in values]
-    sign = -1 if rank_by == RANK.VALUE_DESCENDING else 1
+    sign = -1 if rank_by == BUMP_RANK.VALUE_DESCENDING else 1
     for p in range(len(periods)):
         present = [i for i, column in enumerate(values) if not np.isnan(column[p])]
         for rank, i in enumerate(sorted(present, key=lambda i: sign * values[i][p])):
@@ -2581,11 +2581,11 @@ class BumpLayer(LineLayer):
             self._draw_end_labels(ax, ctx, x, ranks, present, line_style, color)
 
     def _labels_at(self, end: str) -> bool:
-        """Whether an end label prints at the `LABEL_POSITION.START` or `END`."""
+        """Whether an end label prints at the `BUMP_LABEL_POSITION.START` or `END`."""
 
         return bool(self.show_labels and self.subtitle) and self.label_position in (
             end,
-            LABEL_POSITION.BOTH,
+            BUMP_LABEL_POSITION.BOTH,
         )
 
     def _draw_end_labels(self, ax, ctx, x, ranks, present, line_style, color):
@@ -2593,9 +2593,9 @@ class BumpLayer(LineLayer):
 
         indices = np.flatnonzero(present)
         ends = []
-        if self._labels_at(LABEL_POSITION.START):
+        if self._labels_at(BUMP_LABEL_POSITION.START):
             ends.append((indices[0], -1))
-        if self._labels_at(LABEL_POSITION.END):
+        if self._labels_at(BUMP_LABEL_POSITION.END):
             ends.append((indices[-1], 1))
         gap = _mark_radius(line_style) + self.label_padding
         font = {k: v for k, v in self.label_font.items() if k != "color"}
@@ -2723,12 +2723,12 @@ class StackedAreaLayer(Layer):
 def stack_first_line(y: np.ndarray, baseline: str) -> np.ndarray:
     """Where the stack starts at each x; matplotlib's `stackplot` baselines."""
 
-    if baseline in (BASELINE.ZERO, BASELINE.PERCENT):
+    if baseline in (STACKED_AREA_BASELINE.ZERO, STACKED_AREA_BASELINE.PERCENT):
         return np.zeros(y.shape[1])
-    if baseline == BASELINE.SYM:
+    if baseline == STACKED_AREA_BASELINE.SYM:
         return -0.5 * np.sum(y, 0)
     m = y.shape[0]
-    if baseline == BASELINE.WIGGLE:
+    if baseline == STACKED_AREA_BASELINE.WIGGLE:
         return (y * (m - 0.5 - np.arange(m)[:, None])).sum(0) / -m
     validate_baseline(baseline)
     total = np.sum(y, 0)
@@ -2748,7 +2748,7 @@ def _stack_slots(layers: List[StackedAreaLayer], baseline: str) -> dict:
 
     validate_shared_x([l.x_values() for l in layers])
     y = np.vstack([l.y_values() for l in layers])
-    if baseline == BASELINE.PERCENT:
+    if baseline == STACKED_AREA_BASELINE.PERCENT:
         total = y.sum(0)
         y = np.divide(y * 100.0, total, out=np.zeros_like(y), where=total != 0)
     first_line = stack_first_line(y, baseline)
@@ -5583,7 +5583,7 @@ CALENDAR_MONTH_LINE_ZORDER = 2
 def week_row(day: date, week_start: str) -> int:
     """The row of a day in a week column: 0 is the week start, 6 the day before it."""
 
-    offset = 6 if week_start == WEEKDAY.SUNDAY else 0
+    offset = 6 if week_start == CALENDAR_WEEKDAY.SUNDAY else 0
     return (day.weekday() - offset) % 7
 
 
@@ -5630,7 +5630,7 @@ class CalendarHeatmapLayer(HeatmapLayer):
             week_start = get_attr_value(
                 "plot_calendar_heatmap_week_start", self.style, config
             )
-        self.week_start = validate_week_start(week_start) or WEEKDAY.MONDAY
+        self.week_start = validate_week_start(week_start) or CALENDAR_WEEKDAY.MONDAY
         self.month_line_style = get_calendar_month_line_style(self.style)
         self.show_month_labels = _resolve_flag(self.settings, "show_month_labels")
         self.show_weekday_labels = _resolve_flag(self.settings, "show_weekday_labels")
@@ -5679,7 +5679,7 @@ class CalendarHeatmapLayer(HeatmapLayer):
             ]
             chart["xticklabels"] = [MONTH_LABELS[month - 1] for month in self.months]
         if self.show_weekday_labels:
-            start = 6 if self.week_start == WEEKDAY.SUNDAY else 0
+            start = 6 if self.week_start == CALENDAR_WEEKDAY.SUNDAY else 0
             chart["yticks"] = list(range(0, 7, WEEKDAY_LABEL_STEP))
             chart["yticklabels"] = [
                 WEEKDAY_LABELS[(start + row) % 7] for row in chart["yticks"]
@@ -10491,7 +10491,7 @@ class Panel:
         if (
             any(isinstance(l, StackedAreaLayer) for l in layers)
             and validate_baseline(s.get("baseline"))
-            in (BASELINE.ZERO, BASELINE.PERCENT)
+            in (STACKED_AREA_BASELINE.ZERO, STACKED_AREA_BASELINE.PERCENT)
             and value_scale != "log"
         ):
             (ax.set_xlim if horizontal else ax.set_ylim)(0, None)
@@ -10827,7 +10827,7 @@ class Panel:
                 period = s.get("date_period")
                 if period is not None:
                     origin = None
-                    if period == DATE_PERIOD.PROJECT_MONTH:
+                    if period == GANTT_DATE_PERIOD.PROJECT_MONTH:
                         origin = self._project_origin(tz)
                     bounds = self._schedule_bounds()
                     if bounds is not None:
@@ -10981,7 +10981,7 @@ class Panel:
             ax.set_theta_zero_location("N", offset=-float(startangle))
 
         direction = s.get("direction") or DEFAULT_DIRECTION
-        ax.set_theta_direction(-1 if direction == DIRECTION.CLOCKWISE else 1)
+        ax.set_theta_direction(-1 if direction == RADIAL_DIRECTION.CLOCKWISE else 1)
 
         innerradius = s.get("innerradius") or 0.0
         if innerradius:

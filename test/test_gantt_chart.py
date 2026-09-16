@@ -18,9 +18,9 @@ from datachart.charts import BarChart, GanttChart, LineChart
 from datachart.config import config
 from datachart.constants import (
     DATE_FORMAT,
-    DATE_PERIOD,
-    GANTT_ARROW_ENTRY,
     EMPHASIS,
+    GANTT_ARROW_ENTRY,
+    GANTT_DATE_PERIOD,
     GANTT_SORT_KEY,
     GANTT_VALUE,
     SORT,
@@ -339,7 +339,7 @@ class TestGanttMarks(unittest.TestCase):
                     today_label="Today",
                     show_values=GANTT_VALUE.DURATION,
                     show_group_headers=True,
-                    period=DATE_PERIOD.WEEK,
+                    period=GANTT_DATE_PERIOD.WEEK,
                 ).savefig(__import__("io").BytesIO(), format="png")
                 plt.close("all")
 
@@ -398,7 +398,8 @@ class TestGanttPeriods(unittest.TestCase):
 
     def test_month_period(self):
         figure = GanttChart(
-            self.span(date(2023, 11, 20), date(2024, 5, 1)), period=DATE_PERIOD.MONTH
+            self.span(date(2023, 11, 20), date(2024, 5, 1)),
+            period=GANTT_DATE_PERIOD.MONTH,
         )
         months, years = period_labels(figure)
         # the task ends at the start of May, so the view ends there too
@@ -426,7 +427,8 @@ class TestGanttPeriods(unittest.TestCase):
 
     def test_period_edges_carry_the_grid(self):
         ax = GanttChart(
-            self.span(date(2024, 1, 10), date(2024, 4, 20)), period=DATE_PERIOD.MONTH
+            self.span(date(2024, 1, 10), date(2024, 4, 20)),
+            period=GANTT_DATE_PERIOD.MONTH,
         ).axes[0]
         edges = ax.xaxis.get_minorticklocs()
         self.assertIn(mdates.date2num(date(2024, 2, 1)), edges)

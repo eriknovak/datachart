@@ -19,8 +19,8 @@ grid machinery `Grid` uses (ADR 0002, 0006).
   layer exists; the only new drawable is a KDE curve for the diagonal.
 - **Cells are ordinary charts.** Off-diagonal cells are `ScatterChart`
   figures with one chart per hue group; the diagonal is a `Histogram`
-  (`DIAGONAL.HIST`, default), a KDE curve from `stats.kde1d` per hue group
-  (`DIAGONAL.KDE`), or blank (`DIAGONAL.NONE`). Every cell lists the hue
+  (`SCATTER_MATRIX_DIAGONAL.HIST`, default), a KDE curve from `stats.kde1d` per hue group
+  (`SCATTER_MATRIX_DIAGONAL.KDE`), or blank (`SCATTER_MATRIX_DIAGONAL.NONE`). Every cell lists the hue
   groups in the same order, so the panel colour cycle gives the whole
   figure one group → colour map without a shared-cycle mechanism.
 - **One legend.** Per-cell legends are off; a figure-level legend names

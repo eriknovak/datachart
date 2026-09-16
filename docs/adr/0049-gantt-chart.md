@@ -81,7 +81,7 @@ lines that take datetimes (ADR 0037), value labels (ADR 0033).
   without any `group` raise. The rows place their own ticks, since header
   and gap rows break the bar ticks' one-row-per-record index.
 - **A date axis can be divided into calendar periods.** `period`, a
-  `DATE_PERIOD` (day, week, month, quarter, year), swaps the concise
+  `GANTT_DATE_PERIOD` (day, week, month, quarter, year), swaps the concise
   date ticks for period furniture: minor ticks at the period edges carry
   the grid lines, major ticks label each period at the centre of its
   visible part, and a secondary axis one label row below names the

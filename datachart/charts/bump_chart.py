@@ -18,11 +18,11 @@ from ..typings import (
 )
 from ..constants import (
     ASPECT_RATIO,
+    BUMP_LABEL_POSITION,
+    BUMP_RANK,
     DATE_FORMAT,
     EMPHASIS,
     FIG_SIZE,
-    LABEL_POSITION,
-    RANK,
     SCALE,
     SHOW_GRID,
     VALUE_FORMAT,
@@ -36,7 +36,7 @@ from ..constants import (
 def BumpChart(
     data: Union[List[LineDataPointAttrs], List[List[LineDataPointAttrs]]],
     *,
-    rank_by: Optional[Union[RANK, str]] = None,
+    rank_by: Optional[Union[BUMP_RANK, str]] = None,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
@@ -49,7 +49,7 @@ def BumpChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_labels: Optional[bool] = None,
-    label_position: Optional[Union[LABEL_POSITION, str]] = None,
+    label_position: Optional[Union[BUMP_LABEL_POSITION, str]] = None,
     show_markers: Optional[bool] = None,
     line_curve: Optional[float] = None,
     show_legend: Optional[bool] = None,
@@ -140,7 +140,7 @@ def BumpChart(
     Args:
         data: The data points of the series. Can be a single list of data
             points for one series, or a list of lists for several.
-        rank_by: How `y` becomes a rank, a `RANK` member: `VALUE_DESCENDING`
+        rank_by: How `y` becomes a rank, a `BUMP_RANK` member: `VALUE_DESCENDING`
             (default) ranks the highest value first at each period,
             `VALUE_ASCENDING` the lowest, and `GIVEN` reads `y` as the rank
             (a positive integer). Ranking reads the series present at a
@@ -167,7 +167,7 @@ def BumpChart(
         ymax: The maximum rank shown (the bottom of the axis).
         show_labels: Whether to print each series' subtitle beside its line
             end, in the series color. Defaults to True.
-        label_position: Which line end carries the label, a `LABEL_POSITION`
+        label_position: Which line end carries the label, a `BUMP_LABEL_POSITION`
             member: `START`, `END` (default), or `BOTH`.
         show_markers: Whether to draw a marker at every period. Defaults to True.
         line_curve: How far each segment eases between two periods, in

@@ -29,7 +29,7 @@ from ..typings import (
     ScatterMatrixDataPointAttrs,
     StyleAttrs,
 )
-from ..constants import BAR_MODE, DIAGONAL, SHOW_GRID
+from ..constants import BAR_MODE, SCATTER_MATRIX_DIAGONAL, SHOW_GRID
 
 # a matrix cell's side, in inches, when no figsize is given
 CELL_SIZE = 2.2
@@ -169,7 +169,7 @@ def _diagonal_panel(values, groups, diagonal, style, settings) -> Panel:
     charts = build_charts_structure(
         series, subtitle=[label for label, _ in groups], style=style
     )
-    chart_type = "kde" if diagonal == DIAGONAL.KDE else "histogram"
+    chart_type = "kde" if diagonal == SCATTER_MATRIX_DIAGONAL.KDE else "histogram"
     return composition_panel(chart_type, charts, settings)
 
 
@@ -217,7 +217,7 @@ def ScatterMatrix(
     *,
     dimensions: Optional[List[str]] = None,
     hue: Optional[str] = None,
-    diagonal: Optional[Union[DIAGONAL, str]] = None,
+    diagonal: Optional[Union[SCATTER_MATRIX_DIAGONAL, str]] = None,
     lower_only: Optional[bool] = None,
     show_regression: Optional[bool] = None,
     show_correlation: Optional[bool] = None,
@@ -281,7 +281,7 @@ def ScatterMatrix(
             raises.
         diagonal: What each dimension's own cell shows: a histogram
             (`"hist"`, default), a density curve (`"kde"`), or nothing
-            (`"none"`). See `DIAGONAL`.
+            (`"none"`). See `SCATTER_MATRIX_DIAGONAL`.
         lower_only: Whether to leave the cells above the diagonal empty.
             Wins over `show_correlation`.
         show_regression: Whether to draw a least-squares line per hue group
@@ -336,7 +336,8 @@ def ScatterMatrix(
     n = len(dims)
     blank = [
         [
-            (i == j and diagonal == DIAGONAL.NONE) or (i < j and bool(lower_only))
+            (i == j and diagonal == SCATTER_MATRIX_DIAGONAL.NONE)
+            or (i < j and bool(lower_only))
             for j in range(n)
         ]
         for i in range(n)
@@ -348,7 +349,7 @@ def ScatterMatrix(
     ]
     left = [min((j for j in range(n) if drawn[i][j]), default=0) for i in range(n)]
     # a blank diagonal under lower_only leaves the top row and right column empty
-    trim = 1 if lower_only and diagonal == DIAGONAL.NONE and n > 1 else 0
+    trim = 1 if lower_only and diagonal == SCATTER_MATRIX_DIAGONAL.NONE and n > 1 else 0
     cells, kinds = [], []
     for i in range(trim, n):
         for j in range(n - trim):

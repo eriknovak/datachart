@@ -22,9 +22,9 @@ from ..typings import (
 )
 from ..constants import (
     DATE_FORMAT,
-    DATE_PERIOD,
     EMPHASIS,
     FIG_SIZE,
+    GANTT_DATE_PERIOD,
     GANTT_SORT_KEY,
     GANTT_VALUE,
     ORIENTATION,
@@ -49,7 +49,7 @@ def GanttChart(
     xmin: Optional[Union[date, datetime]] = None,
     xmax: Optional[Union[date, datetime]] = None,
     max_cols: Optional[int] = None,
-    period: Optional[Union[DATE_PERIOD, str]] = None,
+    period: Optional[Union[GANTT_DATE_PERIOD, str]] = None,
     show_group_headers: Optional[bool] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
@@ -126,7 +126,7 @@ def GanttChart(
             or "project_month" (M1, M2, … from `xmin` or the earliest start).
             Lines mark the period edges, each period is labelled at its
             centre, and a row beneath names the enclosing month or year.
-            `xticks_format` sets the period labels. See `DATE_PERIOD`.
+            `xticks_format` sets the period labels. See `GANTT_DATE_PERIOD`.
         show_group_headers: Whether to give each task group a header row with
             a summary bar from its first start to its last end, the group's
             rows clustered beneath it and a gap before the next group. Raises

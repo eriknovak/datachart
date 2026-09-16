@@ -17,14 +17,14 @@ from ..typings import (
     TextSettingAttrs,
 )
 from ..constants import (
-    DATE_FORMAT,
-    VALUE_FORMAT,
     ASPECT_RATIO,
-    BASELINE,
+    DATE_FORMAT,
     EMPHASIS,
     FIG_SIZE,
-    SHOW_GRID,
     SCALE,
+    SHOW_GRID,
+    STACKED_AREA_BASELINE,
+    VALUE_FORMAT,
 )
 
 # ================================================
@@ -35,7 +35,7 @@ from ..constants import (
 def StackedAreaChart(
     data: Union[List[LineDataPointAttrs], List[List[LineDataPointAttrs]]],
     *,
-    baseline: Optional[Union[BASELINE, str]] = None,
+    baseline: Optional[Union[STACKED_AREA_BASELINE, str]] = None,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
@@ -156,7 +156,7 @@ def StackedAreaChart(
             the same order.
         baseline: Where the first series starts: "zero" (default), "percent"
             (each `x` normalised to 100), "sym" (centred on zero), "wiggle" or
-            "weighted_wiggle" (streamgraph baselines). See `BASELINE`.
+            "weighted_wiggle" (streamgraph baselines). See `STACKED_AREA_BASELINE`.
         title: The title of the chart.
         xlabel: The x-axis label.
         ylabel: The y-axis label.
@@ -219,7 +219,7 @@ def StackedAreaChart(
 
     Raises:
         ValueError: If the series do not share the same `x` values, or
-            `baseline` is not a `BASELINE` value.
+            `baseline` is not a `STACKED_AREA_BASELINE` value.
 
     """
     charts = build_charts_structure(

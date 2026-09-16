@@ -48,25 +48,24 @@ from datachart.constants import (
     ASPECT_RATIO,
     BANDWIDTH,
     BAR_MODE,
-    BASELINE,
+    BUMP_LABEL_POSITION,
+    BUMP_RANK,
+    CALENDAR_WEEKDAY,
     COLORBAR_LOCATION,
     CONTOUR_LEVELS,
     DATE_FORMAT,
-    DATE_PERIOD,
-    DIAGONAL,
-    DIRECTION,
     DUMBBELL_SORT_KEY,
     DUMBBELL_VALUE,
-    GANTT_ARROW_ENTRY,
-    GANTT_SORT_KEY,
-    GANTT_VALUE,
-    HEXBIN_REDUCE,
     EMPHASIS,
     FONT_STYLE,
     FONT_WEIGHT,
+    GANTT_ARROW_ENTRY,
+    GANTT_DATE_PERIOD,
+    GANTT_SORT_KEY,
+    GANTT_VALUE,
     HATCH_STYLE,
+    HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
-    LABEL_POSITION,
     LEGEND_ALIGN,
     LINE_DRAW_STYLE,
     LINE_MARKER,
@@ -75,16 +74,17 @@ from datachart.constants import (
     NODE_LABEL_POSITION,
     NORMALIZE,
     ORIENTATION,
+    RADIAL_DIRECTION,
     RADIAL_TYPE,
-    RANK,
     RIDGELINE_SCALE,
     SCALE,
+    SCATTER_MATRIX_DIAGONAL,
     SHOW_GRID,
     SORT,
-    VALUE_FORMAT,
+    STACKED_AREA_BASELINE,
     SWARM_MODE,
+    VALUE_FORMAT,
     VIOLIN_INNER,
-    WEEKDAY,
 )
 from datachart.themes import DEFAULT_THEME
 from datachart.utils import Grid
@@ -646,14 +646,16 @@ AREA_SERIES = [
 
 def baseline():
     members = [
-        ("ZERO", BASELINE.ZERO),
-        ("PERCENT", BASELINE.PERCENT),
-        ("SYM", BASELINE.SYM),
-        ("WIGGLE", BASELINE.WIGGLE),
-        ("WEIGHTED_WIGGLE", BASELINE.WEIGHTED_WIGGLE),
+        ("ZERO", STACKED_AREA_BASELINE.ZERO),
+        ("PERCENT", STACKED_AREA_BASELINE.PERCENT),
+        ("SYM", STACKED_AREA_BASELINE.SYM),
+        ("WIGGLE", STACKED_AREA_BASELINE.WIGGLE),
+        ("WEIGHTED_WIGGLE", STACKED_AREA_BASELINE.WEIGHTED_WIGGLE),
     ]
     figs = [
-        StackedAreaChart(data=AREA_SERIES, baseline=value, title=f"BASELINE.{label}")
+        StackedAreaChart(
+            data=AREA_SERIES, baseline=value, title=f"STACKED_AREA_BASELINE.{label}"
+        )
         for label, value in members
     ]
     chart_grid(
@@ -719,14 +721,14 @@ def orientation():
 
 
 def weekday():
-    members = [("MONDAY", WEEKDAY.MONDAY), ("SUNDAY", WEEKDAY.SUNDAY)]
+    members = [("MONDAY", CALENDAR_WEEKDAY.MONDAY), ("SUNDAY", CALENDAR_WEEKDAY.SUNDAY)]
     days = [date(2024, 1, 1) + timedelta(days=i) for i in range(91)]
     values = [(i % 7) * (i % 5) for i in range(len(days))]
     figs = [
         CalendarHeatmap(
             data={"date": days, "value": values},
             week_start=value,
-            title=f"WEEKDAY.{label}",
+            title=f"CALENDAR_WEEKDAY.{label}",
         )
         for label, value in members
     ]
@@ -904,8 +906,8 @@ def radial_type():
 
 def direction():
     members = [
-        ("CLOCKWISE", DIRECTION.CLOCKWISE),
-        ("COUNTERCLOCKWISE", DIRECTION.COUNTERCLOCKWISE),
+        ("CLOCKWISE", RADIAL_DIRECTION.CLOCKWISE),
+        ("COUNTERCLOCKWISE", RADIAL_DIRECTION.COUNTERCLOCKWISE),
     ]
     months = [
         {"label": m, "y": y}
@@ -916,7 +918,7 @@ def direction():
             data=months,
             type=RADIAL_TYPE.BAR,
             direction=value,
-            title=f"DIRECTION.{label}",
+            title=f"RADIAL_DIRECTION.{label}",
         )
         for label, value in members
     ]
@@ -1174,9 +1176,9 @@ BUMP_SERIES = [
 
 def rank():
     members = [
-        ("VALUE_DESCENDING", RANK.VALUE_DESCENDING),
-        ("VALUE_ASCENDING", RANK.VALUE_ASCENDING),
-        ("GIVEN", RANK.GIVEN),
+        ("VALUE_DESCENDING", BUMP_RANK.VALUE_DESCENDING),
+        ("VALUE_ASCENDING", BUMP_RANK.VALUE_ASCENDING),
+        ("GIVEN", BUMP_RANK.GIVEN),
     ]
     given = [
         [{"x": x, "y": y} for x, y in enumerate(ys, start=1)]
@@ -1184,11 +1186,11 @@ def rank():
     ]
     figs = [
         BumpChart(
-            data=given if value == RANK.GIVEN else BUMP_SERIES,
+            data=given if value == BUMP_RANK.GIVEN else BUMP_SERIES,
             rank_by=value,
             subtitle=["alpha", "beta", "gamma"],
             show_values=True,
-            title=f"RANK.{label}",
+            title=f"BUMP_RANK.{label}",
         )
         for label, value in members
     ]
@@ -1203,9 +1205,9 @@ def rank():
 
 def label_position():
     members = [
-        ("START", LABEL_POSITION.START),
-        ("END", LABEL_POSITION.END),
-        ("BOTH", LABEL_POSITION.BOTH),
+        ("START", BUMP_LABEL_POSITION.START),
+        ("END", BUMP_LABEL_POSITION.END),
+        ("BOTH", BUMP_LABEL_POSITION.BOTH),
     ]
     figs = [
         BumpChart(
@@ -1213,7 +1215,7 @@ def label_position():
             label_position=value,
             subtitle=["alpha", "beta", "gamma"],
             xticks=[1, 2, 3, 4],
-            title=f"LABEL_POSITION.{label}",
+            title=f"BUMP_LABEL_POSITION.{label}",
         )
         for label, value in members
     ]
@@ -1350,13 +1352,13 @@ def gantt_arrow_entry():
 
 def date_period():
     members = [
-        ("NONE", DATE_PERIOD.NONE),
-        ("DAY", DATE_PERIOD.DAY),
-        ("WEEK", DATE_PERIOD.WEEK),
-        ("MONTH", DATE_PERIOD.MONTH),
-        ("QUARTER", DATE_PERIOD.QUARTER),
-        ("YEAR", DATE_PERIOD.YEAR),
-        ("PROJECT_MONTH", DATE_PERIOD.PROJECT_MONTH),
+        ("NONE", GANTT_DATE_PERIOD.NONE),
+        ("DAY", GANTT_DATE_PERIOD.DAY),
+        ("WEEK", GANTT_DATE_PERIOD.WEEK),
+        ("MONTH", GANTT_DATE_PERIOD.MONTH),
+        ("QUARTER", GANTT_DATE_PERIOD.QUARTER),
+        ("YEAR", GANTT_DATE_PERIOD.YEAR),
+        ("PROJECT_MONTH", GANTT_DATE_PERIOD.PROJECT_MONTH),
     ]
     # each period needs a span that shows a handful of its edges: the three
     # week schedule as is, and stretched to seven and twenty months
@@ -1384,7 +1386,7 @@ def date_period():
             data=spans.get(label, short),
             period=value,
             show_legend=False,
-            title=f"DATE_PERIOD.{label}",
+            title=f"GANTT_DATE_PERIOD.{label}",
         )
         for label, value in members
     ]
@@ -1455,15 +1457,17 @@ def dumbbell_sort_key():
 
 def diagonal():
     members = [
-        ("HIST", DIAGONAL.HIST),
-        ("KDE", DIAGONAL.KDE),
-        ("NONE", DIAGONAL.NONE),
+        ("HIST", SCATTER_MATRIX_DIAGONAL.HIST),
+        ("KDE", SCATTER_MATRIX_DIAGONAL.KDE),
+        ("NONE", SCATTER_MATRIX_DIAGONAL.NONE),
     ]
     rng = np.random.default_rng(3)
     a = rng.normal(0, 1, 120)
     data = {"a": a.tolist(), "b": (0.7 * a + rng.normal(0, 0.6, 120)).tolist()}
     figs = [
-        ScatterMatrix(data=data, diagonal=value, title=f"DIAGONAL.{label}")
+        ScatterMatrix(
+            data=data, diagonal=value, title=f"SCATTER_MATRIX_DIAGONAL.{label}"
+        )
         for label, value in members
     ]
     chart_grid(

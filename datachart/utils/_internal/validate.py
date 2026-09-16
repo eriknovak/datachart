@@ -17,47 +17,55 @@ import numpy as np
 from ...constants import (
     ARROW_STYLE,
     BANDWIDTH,
-    BASELINE,
+    BUMP_LABEL_POSITION,
+    BUMP_RANK,
+    CALENDAR_WEEKDAY,
     DATE_FORMAT,
-    DATE_PERIOD,
-    DIAGONAL,
     DUMBBELL_SORT_KEY,
     DUMBBELL_VALUE,
     EMPHASIS,
     GANTT_ARROW_ENTRY,
+    GANTT_DATE_PERIOD,
     GANTT_SORT_KEY,
     GANTT_VALUE,
-    LABEL_POSITION,
-    NODE_LABEL_POSITION,
     NETWORK_LAYOUT,
-    RANK,
+    NODE_LABEL_POSITION,
     RIDGELINE_SCALE,
     SCALE,
+    SCATTER_MATRIX_DIAGONAL,
     SORT,
+    STACKED_AREA_BASELINE,
     VIOLIN_INNER,
-    WEEKDAY,
 )
 
 BANDWIDTH_RULES = (BANDWIDTH.SCOTT, BANDWIDTH.SILVERMAN)
-DIAGONAL_CELLS = (DIAGONAL.HIST, DIAGONAL.KDE, DIAGONAL.NONE)
+DIAGONAL_CELLS = (
+    SCATTER_MATRIX_DIAGONAL.HIST,
+    SCATTER_MATRIX_DIAGONAL.KDE,
+    SCATTER_MATRIX_DIAGONAL.NONE,
+)
 # the kinds of axis a data column asks for (ADR 0037)
 AXIS_TEMPORAL = "temporal"
 AXIS_NUMERIC = "numeric"
 AXIS_CATEGORICAL = "categorical"
 EMPHASIS_ROLES = (EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT)
-RANK_RULES = (RANK.VALUE_DESCENDING, RANK.VALUE_ASCENDING, RANK.GIVEN)
-LABEL_POSITIONS = (LABEL_POSITION.START, LABEL_POSITION.END, LABEL_POSITION.BOTH)
+RANK_RULES = (BUMP_RANK.VALUE_DESCENDING, BUMP_RANK.VALUE_ASCENDING, BUMP_RANK.GIVEN)
+LABEL_POSITIONS = (
+    BUMP_LABEL_POSITION.START,
+    BUMP_LABEL_POSITION.END,
+    BUMP_LABEL_POSITION.BOTH,
+)
 NODE_LABEL_POSITIONS = (
     NODE_LABEL_POSITION.CENTER,
     NODE_LABEL_POSITION.ABOVE,
     NODE_LABEL_POSITION.BEST,
 )
 STACK_BASELINES = (
-    BASELINE.ZERO,
-    BASELINE.PERCENT,
-    BASELINE.SYM,
-    BASELINE.WIGGLE,
-    BASELINE.WEIGHTED_WIGGLE,
+    STACKED_AREA_BASELINE.ZERO,
+    STACKED_AREA_BASELINE.PERCENT,
+    STACKED_AREA_BASELINE.SYM,
+    STACKED_AREA_BASELINE.WIGGLE,
+    STACKED_AREA_BASELINE.WEIGHTED_WIGGLE,
 )
 
 
@@ -158,7 +166,7 @@ def validate_baseline(baseline):
     """Validate a stacked area baseline; None means the zero baseline."""
 
     if baseline is None:
-        return BASELINE.ZERO
+        return STACKED_AREA_BASELINE.ZERO
     if baseline not in STACK_BASELINES:
         raise ValueError(
             f"Invalid `baseline` value {baseline!r}. "
@@ -171,7 +179,7 @@ def validate_diagonal(diagonal):
     """Validate a scatter matrix diagonal; None means a histogram."""
 
     if diagonal is None:
-        return DIAGONAL.DEFAULT
+        return SCATTER_MATRIX_DIAGONAL.DEFAULT
     if diagonal not in DIAGONAL_CELLS:
         raise ValueError(
             f"Invalid `diagonal` value {diagonal!r}. "
@@ -184,7 +192,7 @@ def validate_rank_by(rank_by):
     """Validate a bump chart ranking rule; None means highest value first."""
 
     if rank_by is None:
-        return RANK.DEFAULT
+        return BUMP_RANK.DEFAULT
     if rank_by not in RANK_RULES:
         raise ValueError(
             f"Invalid `rank_by` value {rank_by!r}. Must be one of {RANK_RULES} or None."
@@ -196,7 +204,7 @@ def validate_label_position(position):
     """Validate an end label position; None means beside the last point."""
 
     if position is None:
-        return LABEL_POSITION.DEFAULT
+        return BUMP_LABEL_POSITION.DEFAULT
     if position not in LABEL_POSITIONS:
         raise ValueError(
             f"Invalid `label_position` value {position!r}. "
@@ -746,7 +754,7 @@ def validate_network_edge_style(value):
 
 # the temporal types a calendar date may be (ADR 0037); strings never parse
 CALENDAR_DATE_TYPES = "`date`, `datetime`, `numpy.datetime64`, or pandas `Timestamp`"
-WEEK_STARTS = (WEEKDAY.MONDAY, WEEKDAY.SUNDAY)
+WEEK_STARTS = (CALENDAR_WEEKDAY.MONDAY, CALENDAR_WEEKDAY.SUNDAY)
 
 
 def validate_calendar_dates(dates) -> List[date]:
@@ -813,12 +821,12 @@ DUMBBELL_SORT_KEYS = (
 )
 GANTT_ARROW_ENTRIES = (GANTT_ARROW_ENTRY.TOP, GANTT_ARROW_ENTRY.LEFT)
 DATE_PERIODS = (
-    DATE_PERIOD.DAY,
-    DATE_PERIOD.WEEK,
-    DATE_PERIOD.MONTH,
-    DATE_PERIOD.QUARTER,
-    DATE_PERIOD.YEAR,
-    DATE_PERIOD.PROJECT_MONTH,
+    GANTT_DATE_PERIOD.DAY,
+    GANTT_DATE_PERIOD.WEEK,
+    GANTT_DATE_PERIOD.MONTH,
+    GANTT_DATE_PERIOD.QUARTER,
+    GANTT_DATE_PERIOD.YEAR,
+    GANTT_DATE_PERIOD.PROJECT_MONTH,
 )
 
 

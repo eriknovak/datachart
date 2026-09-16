@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 
 from datachart.charts import RadialChart
-from datachart.constants import DIRECTION, RADIAL_TYPE
+from datachart.constants import RADIAL_DIRECTION, RADIAL_TYPE
 
 WIND = [
     {"label": d, "y": v}
@@ -84,7 +84,7 @@ class TestPolarAxes:
         assert ax.get_theta_offset() == pytest.approx(0.0)
 
     def test_counterclockwise_direction(self):
-        ax = RadialChart(data=WIND, direction=DIRECTION.COUNTERCLOCKWISE).axes[0]
+        ax = RadialChart(data=WIND, direction=RADIAL_DIRECTION.COUNTERCLOCKWISE).axes[0]
         assert ax.get_theta_direction() == 1
 
     def test_innerradius_moves_rorigin(self):

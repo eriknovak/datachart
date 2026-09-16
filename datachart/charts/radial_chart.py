@@ -18,9 +18,9 @@ from ..typings import (
 )
 from ..constants import (
     BAR_MODE,
-    DIRECTION,
     EMPHASIS,
     FIG_SIZE,
+    RADIAL_DIRECTION,
     RADIAL_TYPE,
     SCALE,
     SHOW_GRID,
@@ -33,7 +33,7 @@ _RADIAL_TYPES = (
     RADIAL_TYPE.SCATTER,
     RADIAL_TYPE.HISTOGRAM,
 )
-_DIRECTIONS = (DIRECTION.CLOCKWISE, DIRECTION.COUNTERCLOCKWISE)
+_DIRECTIONS = (RADIAL_DIRECTION.CLOCKWISE, RADIAL_DIRECTION.COUNTERCLOCKWISE)
 _COMPASS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
 
 _RadialStyleAttrs = Union[
@@ -72,7 +72,7 @@ def RadialChart(
     emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     num_bins: Optional[int] = None,
     startangle: Optional[Union[str, int, float]] = None,
-    direction: Optional[Union[DIRECTION, str]] = None,
+    direction: Optional[Union[RADIAL_DIRECTION, str]] = None,
     innerradius: Optional[float] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -191,7 +191,7 @@ def RadialChart(
             "E", "SE", "S", "SW", "W", "NW") or a numeric compass bearing in
             degrees clockwise from north. Defaults to "N".
         direction: Which way the angles increase: "clockwise" (default) or
-            "counterclockwise". See `DIRECTION`.
+            "counterclockwise". See `RADIAL_DIRECTION`.
         innerradius: The donut hole, as a fraction (0 <= f < 1) of the radial
             extent. Defaults to 0.
         scalex: Not supported; the angular axis has no scale. Raises when passed.

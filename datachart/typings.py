@@ -103,30 +103,29 @@ from typing import TypedDict, Union, Tuple, List, Optional, Dict, Literal
 import matplotlib.colors as colors
 from .constants import (
     ARROW_STYLE,
-    GANTT_ARROW_ENTRY,
-    NETWORK_LAYOUT,
-    NODE_LABEL_POSITION,
+    ASPECT_RATIO,
     BAR_MODE,
+    CALENDAR_WEEKDAY,
+    COLORBAR_LOCATION,
+    COLORS,
+    EMPHASIS,
     FIG_SIZE,
     FONT_STYLE,
     FONT_WEIGHT,
+    GANTT_ARROW_ENTRY,
     HATCH_STYLE,
-    LINE_MARKER,
-    LINE_STYLE,
-    LINE_DRAW_STYLE,
+    HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
     LEGEND_ALIGN,
     LEGEND_LOCATION,
-    COLORBAR_LOCATION,
+    LINE_DRAW_STYLE,
+    LINE_MARKER,
+    LINE_STYLE,
+    NETWORK_LAYOUT,
+    NODE_LABEL_POSITION,
     ORIENTATION,
-    BAR_MODE,
-    COLORS,
     SHOW_GRID,
-    HEXBIN_REDUCE,
-    ASPECT_RATIO,
     VALUE_FORMAT,
-    EMPHASIS,
-    WEEKDAY,
 )
 
 # ================================================
@@ -868,7 +867,7 @@ class CalendarHeatmapStyleAttrs(TypedDict):
         plot_calendar_heatmap_edge_color (Union[str, None]): The color of the borders drawn between the day cells.
         plot_calendar_heatmap_month_line_width (Union[int, float, None]): The width of the separators drawn between months (0 draws none).
         plot_calendar_heatmap_month_line_color (Union[str, None]): The color of the separators drawn between months; `None` takes the heatmap frame color.
-        plot_calendar_heatmap_week_start (Union[WEEKDAY, str, None]): The weekday in the top row of every week, the default of `week_start`.
+        plot_calendar_heatmap_week_start (Union[CALENDAR_WEEKDAY, str, None]): The weekday in the top row of every week, the default of `week_start`.
 
     """
 
@@ -884,7 +883,7 @@ class CalendarHeatmapStyleAttrs(TypedDict):
     plot_calendar_heatmap_edge_color: Union[str, None]
     plot_calendar_heatmap_month_line_width: Union[int, float, None]
     plot_calendar_heatmap_month_line_color: Union[str, None]
-    plot_calendar_heatmap_week_start: Union[WEEKDAY, str, None]
+    plot_calendar_heatmap_week_start: Union[CALENDAR_WEEKDAY, str, None]
 
 
 class ContourStyleAttrs(TypedDict):
