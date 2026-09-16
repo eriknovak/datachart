@@ -21,6 +21,10 @@ CHART_CONFIGS = {
         "multiplot": False,
         "subplots": True,
     },
+    "dumbbellchart": {
+        "multiplot": True,
+        "subplots": True,
+    },
     "calendarheatmap": {
         "multiplot": False,
         "subplots": True,

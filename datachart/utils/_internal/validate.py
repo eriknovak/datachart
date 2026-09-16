@@ -20,6 +20,8 @@ from ...constants import (
     BASELINE,
     DATE_FORMAT,
     DATE_PERIOD,
+    DUMBBELL_SORT_KEY,
+    DUMBBELL_VALUE,
     EMPHASIS,
     GANTT_ARROW_ENTRY,
     GANTT_SORT_KEY,
@@ -784,6 +786,12 @@ def validate_week_start(value):
 
 GANTT_VALUES = (GANTT_VALUE.DURATION, GANTT_VALUE.PROGRESS)
 GANTT_SORT_KEYS = (GANTT_SORT_KEY.START, GANTT_SORT_KEY.GROUP)
+DUMBBELL_VALUES = (DUMBBELL_VALUE.ENDPOINTS, DUMBBELL_VALUE.DELTA)
+DUMBBELL_SORT_KEYS = (
+    DUMBBELL_SORT_KEY.START,
+    DUMBBELL_SORT_KEY.END,
+    DUMBBELL_SORT_KEY.DELTA,
+)
 GANTT_ARROW_ENTRIES = (GANTT_ARROW_ENTRY.TOP, GANTT_ARROW_ENTRY.LEFT)
 DATE_PERIODS = (
     DATE_PERIOD.DAY,
@@ -817,32 +825,104 @@ def validate_gantt_arrow_entry(value):
     return value
 
 
-def validate_gantt_show_values(value):
-    """Validate a gantt value label; None or False prints none."""
+def _validate_value_mode(value, modes: tuple):
+    """Validate a `show_values` mode of a range front; None or False prints none."""
 
     if value is None or value is False:
         return None
-    if value not in GANTT_VALUES:
+    if value not in modes:
         raise ValueError(
-            f"Invalid `show_values` value {value!r}. "
-            f"Must be one of {GANTT_VALUES} or None."
+            f"Invalid `show_values` value {value!r}. Must be one of {modes} or None."
         )
     return value
+
+
+def _validate_sort_key(sort, sort_by, keys: tuple, default: str) -> str:
+    """Validate the key `sort` orders a range front's rows by; None means `default`."""
+
+    if sort_by is None:
+        return default
+    if sort_by not in keys:
+        raise ValueError(
+            f"Invalid `sort_by` value {sort_by!r}. Must be one of {keys} or None."
+        )
+    if sort is None:
+        raise ValueError("`sort_by` names the key to sort by; pass `sort` as well.")
+    return sort_by
+
+
+def validate_gantt_show_values(value):
+    """Validate a gantt value label; None or False prints none."""
+
+    return _validate_value_mode(value, GANTT_VALUES)
 
 
 def validate_gantt_sort_by(sort, sort_by) -> str:
     """Validate a gantt sort key; None means by start."""
 
-    if sort_by is None:
-        return GANTT_SORT_KEY.DEFAULT
-    if sort_by not in GANTT_SORT_KEYS:
+    return _validate_sort_key(sort, sort_by, GANTT_SORT_KEYS, GANTT_SORT_KEY.DEFAULT)
+
+
+def validate_dumbbell_show_values(value):
+    """Validate a dumbbell value label; None or False prints none."""
+
+    return _validate_value_mode(value, DUMBBELL_VALUES)
+
+
+def validate_dumbbell_sort_by(sort, sort_by) -> str:
+    """Validate a dumbbell sort key; None means by start."""
+
+    return _validate_sort_key(
+        sort, sort_by, DUMBBELL_SORT_KEYS, DUMBBELL_SORT_KEY.DEFAULT
+    )
+
+
+def validate_dumbbell_records(records) -> None:
+    """Raise unless `records` is a non-empty list of `{label, start, end}` records.
+
+    Each record names a unique string `label` and finite numeric endpoints.
+    """
+
+    if not isinstance(records, list) or not records:
         raise ValueError(
-            f"Invalid `sort_by` value {sort_by!r}. "
-            f"Must be one of {GANTT_SORT_KEYS} or None."
+            "DumbbellChart `data` must be a non-empty list of records "
+            "`{label, start, end}`, or a list of such lists."
         )
-    if sort is None:
-        raise ValueError("`sort_by` names the key to sort by; pass `sort` as well.")
-    return sort_by
+    labels = set()
+    for index, record in enumerate(records):
+        if not isinstance(record, dict) or not isinstance(record.get("label"), str):
+            raise ValueError(
+                f"Dumbbell record {index} must be a dict with a string `label`; "
+                f"got {record!r}."
+            )
+        label = record["label"]
+        if label in labels:
+            raise ValueError(
+                f"Duplicate label {label!r}. Every record names one category; "
+                "give each record a unique label."
+            )
+        labels.add(label)
+        for key in ("start", "end"):
+            value = record.get(key)
+            if not _is_number(value) or not math.isfinite(value):
+                raise ValueError(
+                    f"Invalid `{key}` value {value!r} for record {label!r}. "
+                    "Must be a finite number."
+                )
+        validate_emphasis(record.get("emphasis"), f"record {label!r} `emphasis`")
+
+
+def validate_marker_pair(value) -> Optional[tuple]:
+    """Validate a `(start, end)` marker pair; None keeps the theme's markers."""
+
+    if value is None:
+        return None
+    if not isinstance(value, (list, tuple)) or len(value) != 2:
+        raise ValueError(
+            f"Invalid `marker` value {value!r}. Must be a `(start, end)` pair "
+            "of `LINE_MARKER` values, or None."
+        )
+    return tuple(value)
 
 
 def _task_time(record: dict, key: str, index: int) -> float:

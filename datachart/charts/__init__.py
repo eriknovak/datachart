@@ -20,6 +20,8 @@ Methods:
         Creates the calendar heatmap.
     GanttChart(attrs):
         Creates the gantt chart.
+    DumbbellChart(attrs):
+        Creates the dumbbell chart.
     Histogram(attrs):
         Creates the histogram.
     BoxPlot(attrs):
@@ -60,6 +62,7 @@ from .pyramid_chart import PyramidChart
 from .radial_chart import RadialChart
 from .calendar_heatmap import CalendarHeatmap
 from .gantt_chart import GanttChart
+from .dumbbell_chart import DumbbellChart
 
 # distributions
 from .histogram import Histogram
@@ -93,6 +96,7 @@ __all__ = [
     "RadialChart",
     "CalendarHeatmap",
     "GanttChart",
+    "DumbbellChart",
     # distributions
     "Histogram",
     "BoxPlot",
