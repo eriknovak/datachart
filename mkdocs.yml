@@ -169,7 +169,7 @@ plugins:
           - how-to-guides/styling/index.md: Map of configuration, themes, the theme gallery, and colormaps.
           - how-to-guides/styling/config.ipynb: "Customizing the global style via the config singleton: applying and listing themes, updating attributes, scoping a change with override and using_theme, saving and loading JSON theme files, resetting."
           - how-to-guides/styling/themes.ipynb: Applying the predefined themes and creating custom ones.
-          - how-to-guides/styling/theme-gallery.ipynb: Every predefined theme rendered across the chart types.
+          - how-to-guides/styling/theme-gallery.ipynb: Each predefined theme's swatches with hex codes and six signature charts, grouped by use.
           - how-to-guides/styling/colormaps.ipynb: The colormaps available via the COLORS constant.
         Utility:
           - how-to-guides/utility/index.md: Map of statistics, figure saving, and interactive figures.

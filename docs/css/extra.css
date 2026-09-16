@@ -21,6 +21,12 @@
     margin: 0 -0.8rem !important;
 }
 
+/* let a notebook table that asks for the full width have it: Material's
+   wrapper otherwise shrinks to the table's content */
+.jupyter-wrapper .md-typeset__table {
+    display: block;
+}
+
 .jupyter-wrapper .jp-InputArea-editor {
     border: 0px !important;
 }

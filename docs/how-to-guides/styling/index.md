@@ -22,7 +22,7 @@ The styling guides cover everything that controls how charts look: the global co
 
 -   [Theme Gallery](theme-gallery.ipynb)
 
-    Every predefined theme across basic charts and research-style figures, to pick one by eye.
+    Every predefined theme as a card of color swatches with hex codes and six signature charts, grouped by use, to pick one by eye.
 
     ![The same bar chart under all eight predefined themes](../../assets/imgs/gallery-themegallery.png)
 
