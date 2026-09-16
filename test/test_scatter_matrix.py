@@ -194,6 +194,13 @@ class TestScatterMatrixCells(unittest.TestCase):
         data = columns()
         a, b = (np.array(data[k][0::3]) for k in ("a", "b"))
         self.assertEqual(texts[0], f"x: {np.corrcoef(a, b)[0, 1]:.2f}")
+        ax = cell_axes(figure)[(0, 1)]
+        figure.canvas.draw()
+        ticks = ax.xaxis.get_major_ticks() + ax.yaxis.get_major_ticks()
+        self.assertFalse(any(t.tick1line.get_visible() for t in ticks))
+        # the scatter cells keep their tick marks
+        scatter = cell_axes(figure)[(1, 0)]
+        self.assertTrue(scatter.xaxis.get_major_ticks()[0].tick1line.get_visible())
 
     def test_correlation_without_hue_reads_r(self):
         figure = ScatterMatrix(columns(), dimensions=["a", "b"], show_correlation=True)

@@ -10152,6 +10152,10 @@ class Panel:
         for axis in s.get("hide_ticklabels") or ():
             side = "labelbottom" if axis == "x" else "labelleft"
             ax.tick_params(axis=axis, **{side: False})
+        # a cell holding only text has no scale to mark
+        for axis in s.get("hide_ticks") or ():
+            side = "bottom" if axis == "x" else "left"
+            ax.tick_params(axis=axis, which="both", **{side: False})
 
         # panel-level labels (used when a panel renders into a grid cell)
         label_styles = s.get("label_styles", {})
@@ -10745,6 +10749,7 @@ def build_chart_panel_settings(
     if mode == "composition":
         panel_settings["hide_ticklabels"] = settings.get("hide_ticklabels")
         panel_settings["marks_on_twin"] = settings.get("marks_on_twin")
+        panel_settings["hide_ticks"] = settings.get("hide_ticks")
         panel_settings["xlabel"] = settings.get("xlabel")
         panel_settings["ylabel"] = settings.get("ylabel")
         panel_settings["label_styles"] = Panel.snapshot_label_styles()

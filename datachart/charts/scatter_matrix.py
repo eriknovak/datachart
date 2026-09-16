@@ -387,6 +387,7 @@ def ScatterMatrix(
                 kind = "correlation"
                 settings["show_grid"] = False
                 settings["hide_ticklabels"] = ["x", "y"]
+                settings["hide_ticks"] = ["x", "y"]
                 panel = _correlation_panel(
                     values[xdim], values[ydim], groups, colors, style, settings
                 )
