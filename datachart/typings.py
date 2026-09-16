@@ -826,6 +826,7 @@ class DumbbellStyleAttrs(TypedDict):
         plot_dumbbell_arrow_width (Union[int, float, None]): The line width of the direction arrows.
         plot_dumbbell_arrow_style (Union[str, None]): The direction arrow head, as a matplotlib arrow style.
         plot_dumbbell_arrow_gap (Union[int, float, None]): The space between a dot's edge and its direction arrow, in points.
+        plot_dumbbell_grid_minor (Union[int, None]): The parts each step between labelled values splits into with fainter gridlines, on a gridded linear value axis; 0 or `None` draws none.
 
     """
 
@@ -846,6 +847,7 @@ class DumbbellStyleAttrs(TypedDict):
     plot_dumbbell_arrow_width: Union[int, float, None]
     plot_dumbbell_arrow_style: Union[str, None]
     plot_dumbbell_arrow_gap: Union[int, float, None]
+    plot_dumbbell_grid_minor: Union[int, None]
 
 
 class CalendarHeatmapStyleAttrs(TypedDict):

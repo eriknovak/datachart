@@ -42,7 +42,9 @@ panel category index the group fronts share (ADR 0020, 1-based, overlaid).
 - **Gridlines follow the values.** Themes name their default grid for an
   upright chart, where values run along y; a horizontal dumbbell moves that
   default onto x, in its front and in a `Panel`. An explicit `show_grid`
-  stays literal.
+  stays literal. A gridded linear value axis also draws fainter minor
+  gridlines between the labelled values (`plot_dumbbell_grid_minor`, two
+  parts per step by default) so a dot's value reads off without labels.
 - **Direction is an opt-in arrow beside the connector.** `show_direction`
   draws a thin `start` → `end` arrow above each horizontal dumbbell (right of
   a vertical one), styled by `plot_dumbbell_arrow_*`, so colour alone need

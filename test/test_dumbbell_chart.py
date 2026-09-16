@@ -300,6 +300,25 @@ class TestDumbbellGrid(unittest.TestCase):
         self.assertTrue(gridlines(ax, "y"))
         self.assertFalse(gridlines(ax, "x"))
 
+    def test_minor_gridlines_split_each_value_step(self):
+        ax = DumbbellChart(records()).axes[0]
+        ax.figure.canvas.draw()
+        majors = ax.xaxis.get_majorticklocs()
+        minors = ax.xaxis.get_minorticklocs()
+        step = majors[1] - majors[0]
+        # one fainter line halfway between each pair of labelled values
+        self.assertAlmostEqual((minors[0] - majors[0]) % step, step / 2)
+        self.assertTrue(ax.xaxis.get_minor_ticks()[0].gridline.get_visible())
+        self.assertEqual(ax.yaxis.get_minorticklocs().size, 0)
+
+    def test_minor_gridlines_off_by_style(self):
+        ax = DumbbellChart(records(), style={"plot_dumbbell_grid_minor": 0}).axes[0]
+        self.assertEqual(ax.xaxis.get_minorticklocs().size, 0)
+
+    def test_no_minor_gridlines_without_the_value_grid(self):
+        ax = DumbbellChart(records(), show_grid="y").axes[0]
+        self.assertEqual(ax.xaxis.get_minorticklocs().size, 0)
+
     def test_panel_grid_runs_along_the_values(self):
         ax = Panel([DumbbellChart(records())]).axes[0]
         self.assertTrue(gridlines(ax, "x"))

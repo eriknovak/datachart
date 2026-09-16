@@ -4070,6 +4070,8 @@ def sort_dumbbell_charts(charts: List[dict], settings: dict) -> List[dict]:
 
 # how far a composed dumbbell's start dot fades toward white from its end dot
 DUMBBELL_START_LIGHTEN = 0.5
+# a minor value gridline is this much fainter than a labelled one
+MINOR_GRID_ALPHA_SCALE = 0.6
 # a composed z-order puts the connectors this far under the dots
 DUMBBELL_CONNECTOR_Z_BELOW = 0.5
 
@@ -4124,6 +4126,7 @@ class DumbbellLayer(GroupLayer):
         self.show_values = self.value_mode is not None
         self.labels_below_range = self.value_mode == DUMBBELL_VALUE.ENDPOINTS
         self.show_direction = bool(self.settings.get("show_direction"))
+        self.grid_minor = int(self.dumbbell_style.get("grid_minor") or 0)
         # a highlight edge contrasts in the theme's own text color
         self.highlight_edge_color = config.get("font_general_color") or "#000000"
 
@@ -9822,6 +9825,30 @@ class Panel:
                             axis.parameter, axis.role, axis.scale, values, hint
                         )
 
+    def _apply_minor_value_grid(self, ax, horizontal: bool, value_scale) -> None:
+        """Fainter gridlines between a dumbbell's labelled values (ADR 0050).
+
+        Only on a gridded, linear value axis; the densest layer's split wins.
+        """
+
+        splits = max(
+            (l.grid_minor for l in self.layers if isinstance(l, DumbbellLayer)),
+            default=0,
+        )
+        name = "x" if horizontal else "y"
+        if (
+            splits < 2
+            or self.settings["show_grid"] not in (name, "both")
+            or value_scale not in (None, SCALE.LINEAR)
+        ):
+            return
+        axis = ax.xaxis if horizontal else ax.yaxis
+        axis.set_minor_locator(mticker.AutoMinorLocator(splits))
+        ax.tick_params(axis=name, which="minor", length=0)
+        style = dict(self.settings.get("grid_style", {}))
+        style["alpha"] = style.get("alpha", 1.0) * MINOR_GRID_ALPHA_SCALE
+        ax.grid(axis=name, which="minor", **style)
+
     def _finalize(
         self, ax, ax_right, bar_layers, horizontal, scales, group_axes
     ) -> None:
@@ -9850,6 +9877,7 @@ class Panel:
         if s.get("show_grid") and not bare:
             ax.grid(axis=s["show_grid"], **s.get("grid_style", {}))
             ax.set_axisbelow(True)
+            self._apply_minor_value_grid(ax, horizontal, value_scale)
         if s.get("date_period") and self.temporal_axis and not bare:
             # period edges are the minor ticks; the labelled centres draw no line
             axis = getattr(ax, f"{self.temporal_axis}axis")

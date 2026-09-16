@@ -325,6 +325,7 @@ def get_dumbbell_style(chart_style: dict) -> dict:
         ("arrow_width", "plot_dumbbell_arrow_width"),
         ("arrow_style", "plot_dumbbell_arrow_style"),
         ("arrow_gap", "plot_dumbbell_arrow_gap"),
+        ("grid_minor", "plot_dumbbell_grid_minor"),
     ]
 
     return create_config_dict(chart_style, config_attrs)

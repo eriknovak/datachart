@@ -248,6 +248,7 @@ BASE_THEME: StyleAttrs = {
     "plot_dumbbell_arrow_width": 0.6,
     "plot_dumbbell_arrow_style": "-|>,head_length=0.3,head_width=0.15",
     "plot_dumbbell_arrow_gap": 3,
+    "plot_dumbbell_grid_minor": 2,
     # value label style, shared by every chart that prints values (ADR 0033)
     "plot_value_fontsize": 8,
     "plot_value_color": "#000000",
