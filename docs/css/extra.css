@@ -21,10 +21,17 @@
     margin: 0 -0.8rem !important;
 }
 
-/* let a notebook table that asks for the full width have it: Material's
-   wrapper otherwise shrinks to the table's content */
-.jupyter-wrapper .md-typeset__table {
+/* tables span the content width; Material's wrapper and table are
+   inline-blocks that shrink to the content, which leaves narrow tables
+   with row borders that stop short of the table border */
+.md-typeset .md-typeset__table {
     display: block;
+}
+
+.md-typeset table:not([class]) {
+    display: table;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .jupyter-wrapper .jp-InputArea-editor {
