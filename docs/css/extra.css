@@ -104,11 +104,11 @@
    a cross for one the chart cannot take part in */
 .md-typeset .chip {
     display: inline-block;
-    padding: 0 .4em;
+    padding: 0 .5em;
     border-radius: 1em;
-    font-size: .5rem;
+    font-size: .6rem;
     font-weight: 400;
-    line-height: 1.5;
+    line-height: 1.7;
     color: var(--md-default-fg-color--light);
     background-color: var(--md-default-fg-color--lightest);
     text-decoration: none;
