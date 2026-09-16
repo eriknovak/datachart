@@ -230,7 +230,7 @@ BASE_THEME: StyleAttrs = {
     "plot_gantt_today_style": LINE_STYLE.DASHED,
     "plot_gantt_today_width": 1.2,
     "plot_gantt_today_alpha": 0.9,
-    # plot dumbbell style; None endpoint colors take the PaperAccent pair (ADR 0050)
+    # plot dumbbell style; None end colors take PaperAccent (ADR 0050)
     "plot_dumbbell_start_color": None,
     "plot_dumbbell_end_color": None,
     "plot_dumbbell_alpha": 1.0,

@@ -1344,8 +1344,8 @@ class DrawContext:
     transpose: bool = False
     # label -> position of the panel's category axis (ADR 0020)
     category_index: Optional[dict] = None
-    # the panel's only dumbbell layer wears the style's endpoint pair (ADR 0050)
-    endpoint_pair: bool = False
+    # the panel's only dumbbell layer wears the style's pair colors (ADR 0050)
+    sole_dumbbell: bool = False
     # the panel pins its aspect ratio, so colorbars size to the axes box
     aspect_locked: bool = False
 
@@ -1388,7 +1388,7 @@ class Layer:
     bare: bool = False
     # value labels sit past the mark on the value axis and need headroom there
     labels_past_mark: bool = False
-    # ...and past the low end of the value range too, not only past zero
+    # value labels also sit below the value range, so the low end needs room
     labels_below_range: bool = False
     # one emphasis role per drawn record, on the layers whose records carry one
     record_roles: list = ()
@@ -4084,9 +4084,9 @@ class DumbbellLayer(GroupLayer):
     labels_past_mark = True
 
     def _resolve_style(self):
-        super()._resolve_style()
         # the front validated the records, their roles included
         self.records = dumbbell_records(self.chart)
+        super()._resolve_style()
         self.starts = np.array([r["start"] for r in self.records], dtype=float)
         self.ends = np.array([r["end"] for r in self.records], dtype=float)
         self.record_roles = [r.get("emphasis") for r in self.records]
@@ -4106,7 +4106,7 @@ class DumbbellLayer(GroupLayer):
         ):
             self.dumbbell_style["connector_style"] = connector_style
         accent = get_discrete_colors(COLORS.PaperAccent, 2)
-        self.endpoint_pair = tuple(
+        self.pair_colors = tuple(
             self.dumbbell_style.get(key) or default
             for key, default in zip(("start_color", "end_color"), accent)
         )
@@ -4134,8 +4134,8 @@ class DumbbellLayer(GroupLayer):
     def _endpoint_colors(self, ctx: DrawContext) -> tuple:
         """The start and end colors: the pair alone, a cycle shade pair composed."""
 
-        if ctx.endpoint_pair or ctx.color is None:
-            return self.endpoint_pair
+        if ctx.sole_dumbbell or ctx.color is None:
+            return self.pair_colors
         start, end = self.own_colors
         return (
             start or _lighten(ctx.color, DUMBBELL_START_LIGHTEN),
@@ -4149,15 +4149,12 @@ class DumbbellLayer(GroupLayer):
         carries it when the endpoints have no names.
         """
 
-        series = None if ctx.endpoint_pair else self.label(ctx)
-        start, end = (NO_LEGEND if name is None else name for name in self.names)
-        if series is None:
-            return start, end
         start_name, end_name = self.names
-        return (
-            NO_LEGEND if start_name is None else f"{series} ({start_name})",
-            series if end_name is None else f"{series} ({end_name})",
-        )
+        series = None if ctx.sole_dumbbell else self.label(ctx)
+        if series is not None:
+            start_name = start_name and f"{series} ({start_name})"
+            end_name = f"{series} ({end_name})" if end_name else series
+        return tuple(NO_LEGEND if n is None else n for n in (start_name, end_name))
 
     def draw(self, ax, ctx):
         if not self.records:
@@ -4185,7 +4182,7 @@ class DumbbellLayer(GroupLayer):
         if ctx.z_order is not None:
             dot_style["zorder"] = ctx.z_order
             line_style["zorder"] = ctx.z_order - DUMBBELL_CONNECTOR_Z_BELOW
-        size = style.get("s", config["plot_dumbbell_size"])
+        size = style["s"]
         colors = self._endpoint_colors(ctx)
         names = self._endpoint_labels(ctx)
         distinct = self.starts != self.ends
@@ -4215,6 +4212,8 @@ class DumbbellLayer(GroupLayer):
                 if not self.is_horizontal:
                     x, y = y, x
                 label = names[k] if named else NO_LEGEND
+                # an unnamed or unlisted dot still hovers under its series
+                hover_label = self.label(ctx) if label == NO_LEGEND else label
                 collection = _draw_scatter_marks(
                     ax.scatter,
                     x,
@@ -4227,13 +4226,13 @@ class DumbbellLayer(GroupLayer):
                 self.register_hover(
                     collection,
                     _point_resolver(
-                        label if named else self.label(ctx),
+                        hover_label,
                         positions[mask],
                         values[mask],
                         self.is_horizontal,
                     ),
                 )
-                # the category axis spans every row edge to edge, like a box plot
+                # the category axis spans every row edge to edge, like boxes
                 edges = (
                     collection.sticky_edges.y
                     if self.is_horizontal
@@ -9585,7 +9584,7 @@ class Panel:
                     parallel_axes=layer is parallel_axes_owner,
                     transpose=horizontal and layer.is_horizontal is None,
                     category_index=category_index,
-                    endpoint_pair=dumbbell_count == 1,
+                    sole_dumbbell=dumbbell_count == 1,
                     aspect_locked=aspect_locked,
                 )
                 layer.draw(target_ax, ctx)

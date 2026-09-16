@@ -183,7 +183,8 @@ def DumbbellChart(
 
     """
     # records and settings fail here, before layers are built
-    charts_data = data if data and isinstance(data[0], list) else [data]
+    nested = isinstance(data, list) and bool(data) and isinstance(data[0], list)
+    charts_data = data if nested else [data]
     for records in charts_data:
         validate_dumbbell_records(records)
     validate_dumbbell_sort_by(validate_sort(sort), sort_by)

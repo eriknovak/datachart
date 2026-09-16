@@ -119,6 +119,11 @@ class TestDumbbellValidation(unittest.TestCase):
     def test_invalid_marker_pair_raises(self):
         self.assertRaisesWith("`marker`", data=records(), marker="o")
 
+    def test_single_dict_raises(self):
+        self.assertRaisesWith(
+            "non-empty list", data={"label": "A", "start": 1, "end": 2}
+        )
+
     def test_numpy_numbers_accepted(self):
         figure = DumbbellChart(
             [{"label": "A", "start": np.float64(1.5), "end": np.int64(3)}]
@@ -300,6 +305,11 @@ class TestDumbbellLabelsAndLegend(unittest.TestCase):
         ax = DumbbellChart(records(), start_name="2010", end_name="2020").axes[0]
         legend = ax.get_legend()
         self.assertEqual([t.get_text() for t in legend.get_texts()], ["2010", "2020"])
+
+    def test_unnamed_dots_hover_under_the_series(self):
+        figure = DumbbellChart(records(), subtitle="Life")
+        labels = [resolve(0)["label"] for _, resolve in figure._hover_targets]
+        self.assertEqual(labels, ["Life", "Life"])
 
     def test_no_legend_without_names(self):
         self.assertIsNone(DumbbellChart(records()).axes[0].get_legend())
