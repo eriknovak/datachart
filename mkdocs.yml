@@ -136,10 +136,10 @@ plugins:
           - how-to-guides/index.md: "Map of the guide sections: charts, composition, styling, utility."
         Charts:
           - how-to-guides/charts/index.md: Map of the chart guides by family, with Panel and Grid support per chart, and the highlighting guide.
-          - how-to-guides/charts/linechart.ipynb: Line chart input attributes, single and multiple datasets, customization, datetime axes, and saving.
+          - how-to-guides/charts/linechart.ipynb: Line chart basics on the global temperature record, line and area style, value labels, reference lines and bands, annotations, several series with emphasis, legend and confidence bands, subplots, datetime axes, axis scales, and worked examples on real data.
           - how-to-guides/charts/stackedareachart.ipynb: Stacked area chart input attributes, baselines (zero, percent, sym, wiggle), band style and outlines, emphasis, subplots, composing with Panel and Grid, datetime axes, and saving.
           - how-to-guides/charts/bumpchart.ipynb: Bump chart input attributes, per-period ranking (value descending, value ascending, given ranks) with ties and gaps, end labels, line curves and markers, line style, value labels, emphasis rules on ranks, subplots, composing with Panel and Grid, datetime axes, and saving.
-          - how-to-guides/charts/barchart.ipynb: Bar chart input attributes, single and multiple datasets, customization, date labels, and saving.
+          - how-to-guides/charts/barchart.ipynb: Bar chart basics on the Paris 2024 medal table, horizontal bars, sorting, value labels, emphasis, reference lines and bands, annotations, date labels, grouped, stacked and overlaid series, legend, subplots, error bars, axis scales, and worked examples on real data.
           - how-to-guides/charts/pyramidchart.ipynb: Pyramid chart input attributes, the two-sides data contract, mirrored value axis controls, date labels, and composing pyramids with Grid.
           - how-to-guides/charts/radialchart.ipynb: Radial chart input attributes, the line, bar, scatter, and histogram visuals, and polar settings (start angle, direction, inner radius).
           - how-to-guides/charts/ganttchart.ipynb: Gantt chart input attributes, the task record data contract, date axis window and tick formats, calendar periods (day, week, month, quarter, year) with a parent row, row order by start or by group, task groups and legend, group header rows with summary bars, milestones, duration and progress value labels, dependency arrows entering from the top or the left, the today line and its label, reference lines, gantt style, emphasis rules on duration, multiple schedules, composing with Grid, and saving.
@@ -163,7 +163,7 @@ plugins:
           - how-to-guides/charts/scattermatrix.ipynb: Scatter matrix input attributes, the columns and records data contract, dimension selection, hue groups and the single legend, histogram, density and blank diagonals, the lower triangle only, correlation text, regression lines, shared axes, scatter matrix style, nesting in Grid, and saving.
         Composition:
           - how-to-guides/composition/index.md: Map of Panel, Grid, and text annotations with Annotate.
-          - how-to-guides/utility/panel.ipynb: "Overlaying multiple charts on one plot with Panel: dual y-axes, z-order, emphasis, and nesting panels."
+          - how-to-guides/utility/panel.ipynb: "Overlaying charts in one coordinate space with Panel: two value axes, legend, drawing order, emphasis, limits and scales, bar mode, nesting, horizontal panels, configuration, and worked examples."
           - how-to-guides/utility/grid.ipynb: Arranging multiple charts in a grid layout with Grid, including nested rows and layout specs.
           - how-to-guides/utility/annotations.ipynb: "Text annotations on any chart: placement and coordinates, connector looks, text and box styling, and annotating finished figures with Annotate."
         Styling:
