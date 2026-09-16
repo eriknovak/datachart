@@ -1171,6 +1171,25 @@ def get_regression_style(chart_style: dict) -> dict:
     return create_config_dict(chart_style, config_attrs)
 
 
+def get_kde_style(chart_style: dict) -> dict:
+    """Get the scatter matrix density curve style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The curve `linewidth` and the `alpha` of the fill beneath it.
+
+    """
+
+    return {
+        "linewidth": get_attr_value(
+            "plot_scatter_matrix_kde_width", chart_style, config
+        ),
+        "alpha": get_attr_value("plot_scatter_matrix_kde_alpha", chart_style, config),
+    }
+
+
 # -------------------------------------
 # Box Plot Style
 # -------------------------------------

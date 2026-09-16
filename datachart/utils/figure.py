@@ -23,6 +23,9 @@ from ._internal.figures import new_figure
 # Helper functions
 # =====================================
 
+# a grid legend column, as a fraction of a cell; layout widens it to fit
+LEGEND_COLUMN_WIDTH = 0.3
+
 
 _FORMAT_EXTENSIONS: FrozenSet[str] = frozenset(
     value.lower()
@@ -155,13 +158,19 @@ def _render_grid_node(
     envelope with sibling cells. A title reserves a thin heading row rendered
     in the subtitle style — a section heading, not the figure's title — and
     the axis labels a footer row and a left column; sharing stays local to
-    the node, anchored on its first shareable axes.
+    the node, anchored on its first shareable axes. A node `legend` — the
+    entries of one cell's axes, for the whole grid — takes a right column.
     """
     nrows, ncols = node["shape"]
     title, xlabel, ylabel = node.get("title"), node.get("xlabel"), node.get("ylabel")
+    legend = node.get("legend")
     # 0.12: thin label rows and column, roughly one text line each (ADR 0007)
     heights = ([0.12] if title else []) + [1] * nrows + ([0.12] if xlabel else [])
-    widths = ([0.12] if ylabel else []) + [1] * ncols
+    widths = (
+        ([0.12] if ylabel else [])
+        + [1] * ncols
+        + ([LEGEND_COLUMN_WIDTH] if legend else [])
+    )
     sub_gs = subplot_spec.subgridspec(
         len(heights), len(widths), height_ratios=heights, width_ratios=widths
     )
@@ -196,7 +205,8 @@ def _render_grid_node(
         )
 
     first_ax = None
-    for cell in node["cells"]:
+    legend_ax = None
+    for index, cell in enumerate(node["cells"]):
         layout = cell["spec"]
         row = layout["row"] + row_offset
         col = layout["col"] + col_offset
@@ -221,6 +231,11 @@ def _render_grid_node(
         if shareable and first_ax is None:
             first_ax = ax
         _render_cell(owner, cell, ax)
+        if legend and index == legend["cell"]:
+            legend_ax = ax
+
+    if legend_ax is not None:
+        _legend_axes(owner, sub_gs[body_rows, -1], legend_ax, legend)
 
 
 def _label_axes(
@@ -245,6 +260,27 @@ def _label_axes(
         transform=ax.transAxes,
         **get_text_style(text_type),
     )
+
+
+def _legend_axes(
+    owner: plt.Figure, spec: SubplotSpec, source: plt.Axes, legend: Dict[str, Any]
+) -> None:
+    """An invisible axes in `spec` carrying the legend of `source`'s entries."""
+    handles, labels = source.get_legend_handles_labels()
+    if not labels:
+        return
+    ax = owner.add_subplot(spec)
+    ax.axis("off")
+    drawn = ax.legend(
+        handles,
+        labels,
+        **legend["style"],
+        loc="center left",
+        bbox_to_anchor=(0.0, 0.5),
+    )
+    if legend.get("family"):
+        for text in drawn.get_texts() + [drawn.get_title()]:
+            text.set_fontfamily(legend["family"])
 
 
 def _column_window(subplot_spec: SubplotSpec) -> Tuple[float, float]:

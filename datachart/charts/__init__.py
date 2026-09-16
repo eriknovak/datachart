@@ -46,6 +46,8 @@ Methods:
         Creates the parallel coordinates chart.
     NetworkChart(attrs):
         Creates the network chart.
+    ScatterMatrix(attrs):
+        Creates the scatter matrix.
     SankeyChart(attrs):
         Creates the Sankey chart.
     Treemap(attrs):
@@ -79,6 +81,7 @@ from .contour_chart import ContourChart
 from .hexbin_chart import HexbinChart
 from .parallel_coords import ParallelCoords
 from .network_chart import NetworkChart
+from .scatter_matrix import ScatterMatrix
 
 # flows
 from .sankey_chart import SankeyChart
@@ -111,6 +114,7 @@ __all__ = [
     "HexbinChart",
     "ParallelCoords",
     "NetworkChart",
+    "ScatterMatrix",
     # flows
     "SankeyChart",
     # part of a whole
