@@ -80,6 +80,12 @@ lines that take datetimes (ADR 0037), value labels (ADR 0033).
   header already names the group, so the legend defaults off; headers
   without any `group` raise. The rows place their own ticks, since header
   and gap rows break the bar ticks' one-row-per-record index.
+- **Date ticks run from the first start to the last end.** Without
+  `period`, the first start and the last end are always ticks; regular
+  ticks step between them in minutes or hours (only when the schedule
+  carries times) or days from the first start, or on the first of the
+  month for month steps, at most eight steps. Month ticks snap to the 1st
+  because ticks stepped from a mid-month start repeated its day as labels.
 - **A date axis can be divided into calendar periods.** `period`, a
   `GANTT_DATE_PERIOD` (day, week, month, quarter, year), swaps the concise
   date ticks for period furniture: minor ticks at the period edges carry

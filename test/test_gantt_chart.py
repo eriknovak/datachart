@@ -379,7 +379,49 @@ class TestGanttPeriods(unittest.TestCase):
         ]
         self.assertEqual(ticks[0], date(2024, 1, 15))
         self.assertEqual(ticks[-1], date(2026, 1, 15))
-        self.assertTrue(all(t.day == 15 for t in ticks))
+        self.assertTrue(all(t.day == 1 for t in ticks[1:-1]))
+
+    def ticks(self, figure):
+        figure.canvas.draw()
+        return [
+            mdates.num2date(t).replace(tzinfo=None)
+            for t in figure.axes[0].xaxis.get_majorticklocs()
+        ]
+
+    def test_month_ticks_fall_on_the_first_of_the_month(self):
+        ticks = self.ticks(GanttChart(self.span(date(2024, 1, 3), date(2024, 9, 20))))
+        self.assertEqual(ticks[0], datetime(2024, 1, 3))
+        self.assertEqual(ticks[-1], datetime(2024, 9, 20))
+        interior = ticks[1:-1]
+        self.assertGreater(len(interior), 1)
+        self.assertTrue(all(t.day == 1 for t in interior), interior)
+        self.assertEqual(len({t.month for t in interior}), len(interior))
+
+    def test_sub_day_schedule_ticks_hourly(self):
+        ticks = self.ticks(
+            GanttChart(
+                self.span(datetime(2024, 3, 4, 9), datetime(2024, 3, 4, 17))
+            )
+        )
+        self.assertEqual(ticks, [datetime(2024, 3, 4, h) for h in range(9, 18)])
+        minutes = self.ticks(
+            GanttChart(
+                self.span(datetime(2024, 3, 4, 9), datetime(2024, 3, 4, 10))
+            )
+        )
+        self.assertEqual(minutes[0], datetime(2024, 3, 4, 9))
+        self.assertEqual(minutes[-1], datetime(2024, 3, 4, 10))
+        self.assertGreater(len(minutes), 2)
+        self.assertEqual(
+            {round((b - a).total_seconds()) for a, b in zip(minutes, minutes[1:])},
+            {600},
+        )
+
+    def test_date_only_schedules_keep_day_steps(self):
+        ticks = self.ticks(GanttChart(self.span(date(2024, 3, 4), date(2024, 3, 6))))
+        self.assertEqual(
+            ticks, [datetime(2024, 3, 4), datetime(2024, 3, 5), datetime(2024, 3, 6)]
+        )
 
     def test_period_view_covers_whole_periods(self):
         ax = GanttChart(

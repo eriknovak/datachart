@@ -14,7 +14,7 @@ import json
 import math
 import warnings
 from collections import defaultdict
-from datetime import date, datetime, timedelta, tzinfo
+from datetime import date, datetime, time, timedelta, tzinfo
 from numbers import Real
 from dataclasses import dataclass
 from itertools import cycle as iter_cycle
@@ -676,6 +676,10 @@ class ProjectPeriodEdges(mticker.Locator):
 
 # a schedule's date ticks: at most this many regular steps from the first start
 SCHEDULE_TICKS_MAX = 8
+# sub-day steps in days: 1, 2, 5, 10, 15, 30 minutes; 1, 2, 3, 4, 6, 12 hours
+SCHEDULE_TICK_SUBDAY = tuple(m / 1440 for m in (1, 2, 5, 10, 15, 30)) + tuple(
+    h / 24 for h in (1, 2, 3, 4, 6, 12)
+)
 SCHEDULE_TICK_DAYS = (1, 2, 3, 4, 5, 7, 14, 21, 28)
 SCHEDULE_TICK_MONTHS = (1, 2, 3, 4, 6, 12, 24, 60)
 
@@ -683,9 +687,11 @@ SCHEDULE_TICK_MONTHS = (1, 2, 3, 4, 6, 12, 24, 60)
 class ScheduleTicks(mticker.Locator):
     """Date ticks from a schedule's first start to its last end (ADR 0049).
 
-    The ticks step regularly from the first start, in whole days or months,
-    and the last end is always a tick; a regular tick within half a step of
-    it gives way, so the two never crowd.
+    Minute, hour, and day steps run regularly from the first start; minutes
+    and hours only when the schedule carries times. Month steps fall on the
+    first of the month. The first start and the last end are always ticks;
+    a regular tick within half a step of either gives way, so they never
+    crowd.
     """
 
     def __init__(self, start: float, end: float, tz=None):
@@ -695,32 +701,36 @@ class ScheduleTicks(mticker.Locator):
         span = self.end - self.start
         if span <= 0:
             return [self.start]
-        # the finest day step that keeps the count, preferring one that
-        # divides the span so the last interval is no shorter than the rest
-        fitting = [d for d in SCHEDULE_TICK_DAYS if span / d <= SCHEDULE_TICKS_MAX]
-        even = [d for d in fitting if span % d == 0]
+        start, end = mdates.num2date([self.start, self.end], tz=self.tz)
+        timed = any(d.time() != time() for d in (start, end))
+        steps = (SCHEDULE_TICK_SUBDAY if timed else ()) + SCHEDULE_TICK_DAYS
+        # the finest step that keeps the count, preferring one that divides
+        # the span so the last interval is no shorter than the rest
+        fitting = [d for d in steps if span / d <= SCHEDULE_TICKS_MAX]
+        even = [d for d in fitting if np.isclose(span / d, round(span / d))]
         step = (even or fitting or [None])[0]
         if step is not None:
-            ticks = list(np.arange(self.start, self.end, step))
-        else:
-            months = next(
-                (
-                    m
-                    for m in SCHEDULE_TICK_MONTHS
-                    if span / (m * 30.4) <= SCHEDULE_TICKS_MAX
-                ),
-                SCHEDULE_TICK_MONTHS[-1],
-            )
-            step = months * 30.4
-            origin = mdates.num2date(self.start, tz=self.tz)
-            ticks, k = [], 0
-            while (
-                tick := mdates.date2num(origin + relativedelta(months=months * k))
-            ) < self.end:
+            ticks = [self.start + k * step for k in range(round(span / step) + 1)]
+            ticks = [t for t in ticks if t < self.end - step / 2]
+            return ticks + [self.end]
+        months = next(
+            (
+                m
+                for m in SCHEDULE_TICK_MONTHS
+                if span / (m * 30.4) <= SCHEDULE_TICKS_MAX
+            ),
+            SCHEDULE_TICK_MONTHS[-1],
+        )
+        step = months * 30.4
+        # month labels read the day when ticks keep the start's, so snap to the 1st
+        first = start.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        ticks, k = [self.start], 1
+        while (
+            tick := mdates.date2num(first + relativedelta(months=months * k))
+        ) < self.end - step / 2:
+            if tick - self.start >= step / 2:
                 ticks.append(tick)
-                k += 1
-        if ticks and self.end - ticks[-1] < step / 2:
-            ticks.pop()
+            k += 1
         return ticks + [self.end]
 
     def __call__(self):
