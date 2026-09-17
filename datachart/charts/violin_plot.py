@@ -154,14 +154,16 @@ def ViolinPlot(
 
     Args:
         data: The data points for the violin plot(s). Can be a single list of data points
-            for one chart, or a list of lists for multiple charts/subplots.
+            for one chart, or a list of lists for subplots (requires `subplots=True`).
             Each data point should have a `label` (category) and `value` (numeric).
         title: The title of the chart.
         xlabel: The x-axis label.
         ylabel: The y-axis label.
-        subtitle: The subtitle(s) for individual charts (subplots).
+        subtitle: The subtitle(s) for individual charts: the subplot title and the
+            legend label.
         emphasis: The emphasis role(s), aligned with the violin labels of one
-            call (a single value applies to every violin): "background" mutes
+            call in input order, whatever the `sort` (a single value applies
+            to every violin): "background" mutes
             a violin body and its inner marks, "highlight" bolds the body
             edge, None leaves it unchanged.
         emphasis_rule: A rule that highlights the groups matching it and mutes the rest:
@@ -194,7 +196,8 @@ def ViolinPlot(
             is no second series to key on and no `sort_by`. See
             [`SORT`][datachart.constants.SORT].
         scaley: The y-axis scale (e.g., "log", "linear").
-        subplots: Whether to create separate subplots for each chart.
+        subplots: Whether to create separate subplots for each chart; required
+            for a list of datasets.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.
         sharey: Whether to share the y-axis in subplots.

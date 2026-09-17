@@ -149,14 +149,16 @@ def BoxPlot(
 
     Args:
         data: The data points for the box plot(s). Can be a single list of data points
-            for one chart, or a list of lists for multiple charts/subplots.
+            for one chart, or a list of lists for subplots (requires `subplots=True`).
             Each data point should have a `label` (category) and `value` (numeric).
         title: The title of the chart.
         xlabel: The x-axis label.
         ylabel: The y-axis label.
-        subtitle: The subtitle(s) for individual charts. Used as legend labels.
+        subtitle: The subtitle(s) for individual charts: the subplot title and the
+            legend label.
         emphasis: The emphasis role(s), aligned with the box labels of one
-            call (a single value applies to every box): "background" mutes
+            call in input order, whatever the `sort` (a single value applies
+            to every box): "background" mutes
             a box and its whiskers, caps, median, and outliers,
             "highlight" bolds the box edges and median, None leaves it
             unchanged.
@@ -192,7 +194,8 @@ def BoxPlot(
             is no second series to key on and no `sort_by`. See
             [`SORT`][datachart.constants.SORT].
         scaley: The y-axis scale (e.g., "log", "linear").
-        subplots: Whether to create separate subplots for each chart.
+        subplots: Whether to create separate subplots for each chart; required
+            for a list of datasets.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.
         sharey: Whether to share the y-axis in subplots.
