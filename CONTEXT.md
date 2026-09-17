@@ -646,7 +646,9 @@ The per-figure colorbar controls — label, location, tick format, tick
 positions — passed to a front as `colorbar` on Heatmap, filled Contour, and
 Hexbin. `location` is a `COLORBAR_LOCATION` edge and is what the bar follows;
 `orientation` stays accepted and derives the edge when no location is given
-(ADR 0035).
+(ADR 0035). A left or bottom bar on a single-axes figure moves that axis label
+onto the axes, beside its ticks; tick positions outside the mapped value range
+are not drawn.
 _Avoid_: color legend, colorbar style, scale bar
 
 **Style resolution**:

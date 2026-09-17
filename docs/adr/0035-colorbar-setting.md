@@ -42,6 +42,23 @@ the legend, and spend `COLORBAR_LOCATION` the way that ADR spent
 - **The colorbar belongs to the layer, so composition carries it.** A figure
   redrawn into a `Grid` cell keeps its label, edge, and format, because the
   panel redraws the layer that owns the bar.
+- **The bar sits beside its axes, clear of the axis it crosses.** On an
+  aspect-locked axes, where the layout engine would size the bar to the grid
+  cell rather than the drawn box, the bar is a child axes placed from the
+  axes' drawn box, padded past the tick labels on a left or bottom edge.
+  Amended (issue #192): the placement is computed in display pixels, not
+  inches against the figure box, because a `bbox_inches="tight"` save swaps
+  the figure box and an inch-based divider then put the bar outside the
+  saved area.
+  Amended (issue #213): a single-axes figure with a left or bottom bar
+  carries that edge's axis label on the axes, not the figure, so the label
+  stays beside its ticks and the bar pads past it; a figure-level label sits
+  at the figure edge, past the bar, where it reads as the bar's caption.
+  Subplot figures keep the shared figure-level label.
+- **Amended (issue #208): explicit `ticks` never move the bar's ends.**
+  Positions outside the mapped value range are dropped silently, as
+  matplotlib's own tick locator drops them; setting them would widen the bar
+  so its colors no longer match the figure.
 
 ## Considered options
 
