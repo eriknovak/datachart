@@ -60,8 +60,6 @@ from matplotlib.legend_handler import (
     HandlerPathCollection,
     HandlerPolyCollection,
 )
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-from mpl_toolkits.axes_grid1.axes_size import Fixed as FixedPad
 
 from .colors import (
     create_color_cycle,
@@ -1853,6 +1851,8 @@ class Layer:
     x_tz: Optional[tzinfo] = None
     # a filled background layer; a Panel overlay draws it under marks (ADR 0054)
     surface: bool = False
+    # the edge the layer's drawn colorbar takes; None when it draws none
+    colorbar_edge: Optional[str] = None
 
     def __init__(self, chart: dict, settings: dict):
         self.chart = chart
@@ -1898,6 +1898,12 @@ class Layer:
 
     def _resolve_emphasis(self, value):
         return validate_emphasis(value)
+
+    def _colorbar_edge(self, shown) -> Optional[str]:
+        """The resolved colorbar's edge, when shown; etched steps draw none."""
+        if shown and not self.value_etch_steps:
+            return self.colorbar["location"]
+        return None
 
     def _resolve_style(self) -> None:
         """Collapse config → theme → chart style into concrete style dicts."""
@@ -5797,7 +5803,12 @@ def _draw_colorbar(
         colorbar.formatter = fmt
         colorbar.update_ticks()
     if setting["ticks"] is not None:
-        colorbar.set_ticks(setting["ticks"])
+        # set_ticks widens the bar to every tick; keep it to the mapped range
+        low, high = colorbar.vmin, colorbar.vmax
+        slack = (high - low) * 1e-9
+        colorbar.set_ticks(
+            [t for t in setting["ticks"] if low - slack <= t <= high + slack]
+        )
     if setting["label"]:
         colorbar.set_label(setting["label"], **setting["label_style"])
     # tick labels take no family through tick_params; restyled directly
@@ -5832,17 +5843,8 @@ def _place_colorbar(ax: plt.Axes, mappable, setting: dict, aspect_locked: bool):
             pad=COLORBAR_PAD,
             aspect=along / (across * COLORBAR_FRACTION),
         )
-    # a left or bottom bar crosses the chart's tick labels: pad past them
-    crosses_ticks = location in (COLORBAR_LOCATION.LEFT, COLORBAR_LOCATION.BOTTOM)
-    pad = COLORBAR_DIVIDER_PAD
-    if crosses_ticks:
-        pad = _AxisClearance(ax, location, pad)
-    cax = make_axes_locatable(ax).append_axes(
-        location, size=f"{COLORBAR_FRACTION:.0%}", pad=pad
-    )
-    # the layout engine reserves room for a child axes, not a divider axes
-    ax.figure.delaxes(cax)
-    ax.add_child_axes(cax)
+    cax = ax.inset_axes((0, 0, 1, 1))
+    cax.set_axes_locator(_LockedBarLocator(ax, location))
     kwargs = {"orientation": orientation}
     if location == COLORBAR_LOCATION.LEFT:
         # a left bar reads outward; the other edges keep matplotlib's tick side
@@ -5850,22 +5852,42 @@ def _place_colorbar(ax: plt.Axes, mappable, setting: dict, aspect_locked: bool):
     return ax.figure.colorbar(mappable, cax=cax, **kwargs)
 
 
-class _AxisClearance(FixedPad):
-    """A divider pad that clears the chart axis' tick labels on one edge."""
+class _LockedBarLocator:
+    """Places a bar beside the axes' drawn box, in display space.
 
-    def __init__(self, ax: plt.Axes, location: str, pad: float):
-        super().__init__(pad)
+    Display space stays valid while a tight-bbox save swaps the figure box,
+    which an inch-based divider does not (#192).
+    """
+
+    def __init__(self, ax: plt.Axes, location: str):
         self._ax, self._location = ax, location
 
-    def get_size(self, renderer):
-        ax = self._ax
-        if self._location == COLORBAR_LOCATION.LEFT:
-            bbox = ax.yaxis.get_tightbbox(renderer)
-            extent = ax.bbox.x0 - bbox.x0 if bbox else 0.0
+    def __call__(self, cax: plt.Axes, renderer) -> Bbox:
+        ax, location = self._ax, self._location
+        ax.apply_aspect()
+        box = ax.get_position(original=False).transformed(ax.figure.transSubfigure)
+        pad = COLORBAR_DIVIDER_PAD * ax.figure.dpi
+        # a left or bottom bar crosses the chart's tick labels: pad past them
+        if location == COLORBAR_LOCATION.LEFT:
+            ticks = ax.yaxis.get_tightbbox(renderer)
+            pad += max(box.x0 - ticks.x0, 0.0) if ticks else 0.0
+        elif location == COLORBAR_LOCATION.BOTTOM:
+            ticks = ax.xaxis.get_tightbbox(renderer)
+            pad += max(box.y0 - ticks.y0, 0.0) if ticks else 0.0
+        x0, y0, width, height = box.bounds
+        if location in (COLORBAR_LOCATION.LEFT, COLORBAR_LOCATION.RIGHT):
+            size = width * COLORBAR_FRACTION
+            x0 = x0 - pad - size if location == COLORBAR_LOCATION.LEFT else box.x1 + pad
+            bar = Bbox.from_bounds(x0, y0, size, height)
         else:
-            bbox = ax.xaxis.get_tightbbox(renderer)
-            extent = ax.bbox.y0 - bbox.y0 if bbox else 0.0
-        return 0.0, self.fixed_size + max(extent, 0.0) / ax.figure.dpi
+            size = height * COLORBAR_FRACTION
+            y0 = (
+                y0 - pad - size
+                if location == COLORBAR_LOCATION.BOTTOM
+                else box.y1 + pad
+            )
+            bar = Bbox.from_bounds(x0, y0, width, size)
+        return bar.transformed(ax.figure.transSubfigure.inverted())
 
 
 def _value_formatter(valfmt):
@@ -5913,6 +5935,7 @@ class HeatmapLayer(Layer):
     def _resolve_style(self):
         self.show_colorbars = self.settings.get("show_colorbars")
         self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
+        self.colorbar_edge = self._colorbar_edge(self.show_colorbars)
         heatmap_style = get_heatmap_style(self.style, self.style_prefix)
         heatmap_style["cmap"] = get_colormap(heatmap_style["cmap"])
         self.heatmap_style = heatmap_style
@@ -6379,6 +6402,7 @@ class ContourLayer(Layer):
         self.show_labels = self.settings.get("show_labels")
         self.show_colorbars = self.settings.get("show_colorbars")
         self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
+        self.colorbar_edge = self._colorbar_edge(self.filled and self.show_colorbars)
         style = get_contour_style(self.style)
         self.cmap = get_colormap(style.pop("cmap"))
         # lines take a pinned contour cmap only, past its washed-out low end
@@ -6620,6 +6644,7 @@ class HexbinLayer(Layer):
         self.colorbar = get_colorbar_setting(
             self.chart.get("colorbar"), self.chart.get("valfmt")
         )
+        self.colorbar_edge = self._colorbar_edge(self.show_colorbars)
         style = get_hexbin_style(self.style)
         style["cmap"] = get_colormap(style["cmap"])
         self.hexbin_style = style

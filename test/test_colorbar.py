@@ -1,6 +1,8 @@
 """Tests for the per-figure colorbar setting (ADR 0035)."""
 
+import io
 import unittest
+from datetime import date, timedelta
 
 import matplotlib
 
@@ -8,8 +10,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
+from matplotlib.transforms import Bbox
 
-from datachart.charts import ContourChart, Heatmap, HexbinChart
+from datachart.charts import CalendarHeatmap, ContourChart, Heatmap, HexbinChart
 from datachart.config import config
 from datachart.constants import COLORBAR_LOCATION, ORIENTATION, THEME
 from datachart.typings import ColorbarSettingAttrs
@@ -64,6 +67,22 @@ def edge_of(figure, colorbar):
     if colorbar.orientation == "vertical":
         return "right" if cax.x0 >= ax.x1 else "left"
     return "top" if cax.y0 >= ax.y1 else "bottom"
+
+
+def saved_bar_extent(figure):
+    """The colorbar's and the saved area's extents during a tight-bbox save."""
+    seen = {}
+
+    def record(event):
+        renderer = event.renderer
+        (bar,) = colorbars_of(figure)
+        seen["bar"] = bar.ax.get_tightbbox(renderer)
+        seen["saved"] = figure.bbox.frozen()
+
+    cid = figure.canvas.mpl_connect("draw_event", record)
+    figure.savefig(io.BytesIO(), bbox_inches="tight")
+    figure.canvas.mpl_disconnect(cid)
+    return seen["bar"], seen["saved"]
 
 
 def pixels(figure):
@@ -220,11 +239,34 @@ class TestColorbarRendering(unittest.TestCase):
         self.assertTrue(all(len(t.split(".")[-1]) == 3 for t in ticks))
 
     def test_ticks_place_explicit_ticks(self):
+        in_range = {
+            "heatmap": [1, 2, 5],
+            "contour": [0.25, 0.5],
+            "hexbin": [1, 2, 5],
+        }
         for name, front in FRONTS.items():
             with self.subTest(front=name):
-                figure = front(colorbar={"ticks": [1, 2, 5]})
+                ticks = in_range[name]
+                figure = front(colorbar={"ticks": ticks})
                 colorbar = colorbar_of(figure)
-                self.assertEqual(list(colorbar.get_ticks()), [1, 2, 5])
+                self.assertEqual(list(colorbar.get_ticks()), ticks)
+                plt.close(figure)
+
+    def test_ticks_outside_the_mapped_range_are_dropped(self):
+        for name, front in FRONTS.items():
+            with self.subTest(front=name):
+                figure = front()
+                clim = figure.axes[0].collections or figure.axes[0].images
+                low, high = clim[0].get_clim()
+                plt.close(figure)
+                inside = (low + high) / 2
+                figure = front(colorbar={"ticks": [low - 1, inside, high + 1]})
+                colorbar = colorbar_of(figure)
+                self.assertEqual(list(colorbar.get_ticks()), [inside])
+                self.assertEqual(
+                    tuple(colorbar.ax.get_ylim()), (colorbar.vmin, colorbar.vmax)
+                )
+                self.assertEqual((colorbar.vmin, colorbar.vmax), (low, high))
                 plt.close(figure)
 
     def test_locked_bar_clears_the_axis_tick_labels(self):
@@ -258,6 +300,87 @@ class TestColorbarRendering(unittest.TestCase):
                     self.assertTrue(figure.bbox.contains(bar.x0, bar.y0))
                     self.assertTrue(figure.bbox.contains(bar.x1, bar.y1))
                     plt.close(figure)
+
+    def test_locked_bar_survives_the_tight_bbox_save(self):
+        start = date(2024, 1, 1)
+        dates = [start + timedelta(days=i) for i in range(60)]
+        figures = {
+            "calendar": lambda location: CalendarHeatmap(
+                {"date": dates, "value": list(range(60))},
+                show_colorbars=True,
+                colorbar={"label": "Steps", "location": location},
+            ),
+            "heatmap": lambda location: FRONTS["heatmap"](
+                colorbar={"label": "Value", "location": location},
+                aspect_ratio="equal",
+            ),
+        }
+        for name, front in figures.items():
+            for location in ("right", "left", "top", "bottom"):
+                with self.subTest(front=name, location=location):
+                    bar, saved = saved_bar_extent(front(location))
+                    self.assertTrue(saved.contains(bar.x0, bar.y0), (bar, saved))
+                    self.assertTrue(saved.contains(bar.x1, bar.y1), (bar, saved))
+                    plt.close("all")
+
+    def test_axis_label_sits_between_ticks_and_a_left_or_bottom_bar(self):
+        fronts = {
+            **FRONTS,
+            "heatmap_locked": lambda **kw: FRONTS["heatmap"](
+                aspect_ratio="equal", **kw
+            ),
+        }
+        for name, front in fronts.items():
+            for location, axis in [("bottom", "xaxis"), ("left", "yaxis")]:
+                with self.subTest(front=name, location=location):
+                    figure = front(
+                        colorbar={"location": location}, xlabel="X", ylabel="Y"
+                    )
+                    colorbar = colorbar_of(figure)
+                    renderer = figure.canvas.get_renderer()
+                    chart_axis = getattr(figure.axes[0], axis)
+                    label = chart_axis.label.get_window_extent(renderer)
+                    ticks = Bbox.union(
+                        [
+                            t.get_window_extent(renderer)
+                            for t in chart_axis.get_ticklabels()
+                            if t.get_visible() and t.get_text()
+                        ]
+                    )
+                    bar = colorbar.ax.get_tightbbox(renderer)
+                    if location == "bottom":
+                        self.assertFalse(figure.get_supxlabel())
+                        self.assertEqual(figure.get_supylabel(), "Y")
+                        self.assertLessEqual(label.y1, ticks.y0)
+                        self.assertGreaterEqual(label.y0, bar.y1)
+                    else:
+                        self.assertFalse(figure.get_supylabel())
+                        self.assertEqual(figure.get_supxlabel(), "X")
+                        self.assertLessEqual(label.x1, ticks.x0)
+                        self.assertGreaterEqual(label.x0, bar.x1)
+                    plt.close(figure)
+
+    def test_axis_labels_stay_on_the_figure_beside_a_right_or_top_bar(self):
+        for name, front in FRONTS.items():
+            for location in ("right", "top"):
+                with self.subTest(front=name, location=location):
+                    figure = front(
+                        colorbar={"location": location}, xlabel="X", ylabel="Y"
+                    )
+                    self.assertEqual(figure.get_supxlabel(), "X")
+                    self.assertEqual(figure.get_supylabel(), "Y")
+                    self.assertEqual(figure.axes[0].get_xlabel(), "")
+                    plt.close(figure)
+
+    def test_subplots_keep_the_figure_axis_labels(self):
+        figure = HexbinChart(
+            data=[points(seed=1), points(seed=2)],
+            subplots=True,
+            gridsize=8,
+            colorbar={"location": "bottom"},
+            xlabel="X",
+        )
+        self.assertEqual(figure.get_supxlabel(), "X")
 
     def test_grid_cell_keeps_label_and_edge(self):
         source = FRONTS["heatmap"](

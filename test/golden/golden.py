@@ -317,6 +317,9 @@ EXPECTED_CHANGES = {
     "parallel_sets_dimensions",
     "network_fixed_inset",
     "network_spring_components",
+    # colorbar fixes: tight-bbox locked bar, axis label beside its ticks
+    "calendar_narrow_colorbar",
+    "hexbin_bottom_bar_xlabel",
 }
 
 
@@ -1888,6 +1891,16 @@ def hexbin_grid():
 
 
 @case
+def hexbin_bottom_bar_xlabel():
+    return HexbinChart(
+        data=hexbin_points(),
+        xlabel="Area (m2)",
+        ylabel="Rent",
+        colorbar={"label": "count", "location": COLORBAR_LOCATION.BOTTOM},
+    )
+
+
+@case
 def hexbin_log_scales():
     rng = np.random.RandomState(4)
     xy = np.exp(rng.normal(0, 1, (3000, 2)))
@@ -2597,6 +2610,17 @@ def calendar_grid():
     left = CalendarHeatmap({"date": days, "value": values}, title="per day")
     right = LineChart(data=LINE1, title="line")
     return Grid([[left, right]], figsize=(12, 3))
+
+
+@case
+def calendar_narrow_colorbar():
+    days, values = calendar_days(2024, seed=4)
+    return CalendarHeatmap(
+        {"date": days[:60], "value": values[:60]},
+        title="Two months",
+        show_colorbars=True,
+        colorbar={"label": "commits"},
+    )
 
 
 @case
