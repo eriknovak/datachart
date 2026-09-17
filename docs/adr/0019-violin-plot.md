@@ -15,10 +15,16 @@ positioning contract, so the two compose in `Panel` without a new seam.
   `BoxPlot` (`orientation`, `emphasis`, `scaley`, ticks, limits, `vlines`/
   `hlines`/`texts`, `label`/`value` key remaps). A list of lists requires
   `subplots=True`; there is no side-by-side dodging. Violins draw at
-  positions 1…n in first-seen label order — the same implicit contract the
+  positions 0…n-1 in first-seen label order — the same implicit contract the
   box layer uses — so a `Panel` of violin + box figures over the same labels
   lines up. That contract is documented, not enforced by a seam; a
   categorical-position seam waits for a swarm layer.
+  Amended (issues #200, #201): positions start at 0, as bars do, so a
+  reference line or note target means the same group across categorical
+  fronts. The front enforces the list-of-lists rule: a dataset list without
+  `subplots=True` raises instead of silently becoming a subplot grid. A
+  subtitle keys the layer in the legend, so a violin composed with a box or
+  swarm names itself; split violins keep their per-half keys.
 - **`inner` is one enum, not booleans.** `inner="box" | "quartiles" |
   "median" | None`, default `"box"`. Box = thin Q1–Q3 bar, 1.5·IQR whisker
   line, median dot; quartiles = dashed median and dotted Q1/Q3 clipped to

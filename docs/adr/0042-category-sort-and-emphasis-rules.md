@@ -73,6 +73,12 @@ something different for each. Extending `emphasis_rule` to the rest is
 tracked separately (issue #151); the per-record key on bar records is the
 pattern the rest would follow.
 
+Amended (issue #200): `BoxPlot` and `ViolinPlot` gain `sort`, keyed by each
+group's median as `RidgelinePlot` is (ADR 0047), sharing one implementation
+on the group layer. A panel holds one box or violin dataset, so there is no
+second series to key on and no `sort_by`; an `emphasis` list stays aligned
+with the input label order. `RaincloudPlot` stays unsorted.
+
 ## Considered options
 
 - *A `sort` that also takes a label order.* Rejected: an explicit category

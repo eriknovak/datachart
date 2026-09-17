@@ -76,8 +76,9 @@ _Avoid_: bar offset (for the concept), dodge
 **Category index**:
 A panel's shared map from group label to position on the category axis, built
 as the first-seen union of labels across its group-oriented layers (box,
-swarm, later violin) and handed to each through the `DrawContext`. The panel
-sets the category ticks from it once; layers never place their own groups.
+swarm, violin) and handed to each through the `DrawContext`. Positions are
+0-based, the first group at 0 like the first bar. The panel sets the category
+ticks from it once; layers never place their own groups.
 _Avoid_: box positions, group order (for the map)
 
 **Swarm**:
@@ -136,7 +137,8 @@ _Avoid_: negative axis, diverging axis
 **Violin**:
 A per-label kernel-density body (`ViolinPlot`) drawn at the same positions
 and with the same API as a box group, so violin and box figures over the same
-labels line up in `Panel`. Multiple datasets require subplots, as for boxes.
+labels line up in `Panel`. Multiple datasets raise unless `subplots=True`, as
+for boxes.
 _Avoid_: density plot, bean plot
 
 **Inner**:
@@ -468,7 +470,8 @@ The order the categories of a bar-type front are drawn in — input order by
 default, ascending or descending by value under `sort`. One order serves every
 series in the chart, keyed by the total across them or by the one series
 `sort_by` names; a category that series does not carry sorts last, and ties
-keep input order (ADR 0042). Never a sort by label.
+keep input order (ADR 0042). Box, violin and ridgeline fronts sort their
+groups by median instead. Never a sort by label.
 _Avoid_: ordering, rank, bar order
 
 **Metadata transport**:

@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.validate import validate_single_dataset
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -23,6 +24,7 @@ from ..constants import (
     SHOW_GRID,
     ORIENTATION,
     SCALE,
+    SORT,
     VALUE_FORMAT,
 )
 
@@ -54,6 +56,7 @@ def BoxPlot(
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
+    sort: Optional[Union[SORT, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
@@ -142,17 +145,20 @@ def BoxPlot(
         The `show_values`, `value_format` and `legend` parameters.
         The `vspans` and `hspans` reference bands.
         The `emphasis_rule` parameter.
+        The `sort` group order.
 
     Args:
         data: The data points for the box plot(s). Can be a single list of data points
-            for one chart, or a list of lists for multiple charts/subplots.
+            for one chart, or a list of lists for subplots (requires `subplots=True`).
             Each data point should have a `label` (category) and `value` (numeric).
         title: The title of the chart.
         xlabel: The x-axis label.
         ylabel: The y-axis label.
-        subtitle: The subtitle(s) for individual charts. Used as legend labels.
+        subtitle: The subtitle(s) for individual charts: the subplot title and the
+            legend label.
         emphasis: The emphasis role(s), aligned with the box labels of one
-            call (a single value applies to every box): "background" mutes
+            call in input order, whatever the `sort` (a single value applies
+            to every box): "background" mutes
             a box and its whiskers, caps, median, and outliers,
             "highlight" bolds the box edges and median, None leaves it
             unchanged.
@@ -182,8 +188,14 @@ def BoxPlot(
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         orientation: The orientation of the boxes (vertical or horizontal).
+        sort: The order the groups are drawn in: None (input order),
+            "ascending", or "descending" by each group's median; ties keep
+            input order. One call draws one box dataset per axes, so there
+            is no second series to key on and no `sort_by`. See
+            [`SORT`][datachart.constants.SORT].
         scaley: The y-axis scale (e.g., "log", "linear").
-        subplots: Whether to create separate subplots for each chart.
+        subplots: Whether to create separate subplots for each chart; required
+            for a list of datasets.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.
         sharey: Whether to share the y-axis in subplots.
@@ -257,9 +269,11 @@ def BoxPlot(
         "show_values": show_values,
         "value_format": value_format,
         "orientation": orientation,
+        "sort": sort,
         "scaley": scaley,
         "xticks_format": xticks_format,
         "yticks_format": yticks_format,
     }
 
+    validate_single_dataset(charts, "box plot", subplots)
     return render_chart("boxplot", charts, settings)

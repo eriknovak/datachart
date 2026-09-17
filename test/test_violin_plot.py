@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import PolyCollection
 import numpy as np
 
-from datachart.charts import BoxPlot, ViolinPlot
+from datachart.charts import BoxPlot, RaincloudPlot, SwarmPlot, ViolinPlot
 from datachart.config import config
 from datachart.constants import THEME, VIOLIN_INNER
 from datachart.utils import Panel
@@ -42,7 +42,7 @@ class TestViolinPlot(unittest.TestCase):
         ax = figure.axes[0]
         self.assertEqual(len(bodies(ax)), 3)
         self.assertEqual([t.get_text() for t in ax.get_xticklabels()], list("CAB"))
-        self.assertEqual(list(ax.get_xticks()), [1, 2, 3])
+        self.assertEqual(list(ax.get_xticks()), [0, 1, 2])
 
     def test_inner_modes_draw_expected_marks(self):
         base = len(ViolinPlot(violin_data(), inner=None).axes[0].lines)
@@ -78,8 +78,8 @@ class TestViolinPlot(unittest.TestCase):
         self.assertEqual(len(halves), 6)
         # left halves never cross the centre, right halves never go left of it
         left, right = halves[0], halves[1]
-        self.assertLessEqual(left.get_paths()[0].vertices[:, 0].max(), 1.0 + 1e-9)
-        self.assertGreaterEqual(right.get_paths()[0].vertices[:, 0].min(), 1.0 - 1e-9)
+        self.assertLessEqual(left.get_paths()[0].vertices[:, 0].max(), 1e-9)
+        self.assertGreaterEqual(right.get_paths()[0].vertices[:, 0].min(), -1e-9)
         self.assertNotEqual(
             tuple(left.get_facecolor()[0]), tuple(right.get_facecolor()[0])
         )
@@ -92,8 +92,8 @@ class TestViolinPlot(unittest.TestCase):
         wide = bodies(ViolinPlot(data, bandwidth=1.0).axes[0])[0]
         # a wider kernel spreads the density: the peak half-width shrinks
         self.assertGreater(
-            np.abs(narrow.get_paths()[0].vertices[:, 0] - 1).max(),
-            np.abs(wide.get_paths()[0].vertices[:, 0] - 1).max() * 0.99,
+            np.abs(narrow.get_paths()[0].vertices[:, 0]).max(),
+            np.abs(wide.get_paths()[0].vertices[:, 0]).max() * 0.99,
         )
         with self.assertRaises(ValueError):
             ViolinPlot(data, bandwidth="gaussian")
@@ -145,6 +145,15 @@ class TestViolinPlot(unittest.TestCase):
         figure = ViolinPlot([violin_data(), violin_data("DE")], subplots=True)
         self.assertEqual(len(figure.axes), 2)
 
+    def test_dataset_list_requires_subplots(self):
+        for front in (BoxPlot, ViolinPlot):
+            for subplots in (None, False):
+                with self.subTest(front=front.__name__, subplots=subplots):
+                    with self.assertRaisesRegex(ValueError, "require `subplots=True`"):
+                        front([violin_data(), violin_data("DE")], subplots=subplots)
+            # one dataset in a list is still a single chart
+            self.assertEqual(len(front([violin_data()]).axes), 1)
+
     def test_every_theme_declares_violin_keys(self):
         from datachart.themes import (
             DEFAULT_THEME,
@@ -175,6 +184,70 @@ class TestViolinPlot(unittest.TestCase):
                 "plot_violin_median_size",
             ):
                 self.assertIn(key, theme)
+
+
+def legend_texts(ax):
+    legend = ax.get_legend()
+    return None if legend is None else [t.get_text() for t in legend.get_texts()]
+
+
+class TestSubtitleLegend(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+
+    def test_subtitle_names_the_layer(self):
+        fronts = [
+            (BoxPlot, lambda ax: ax.patches[0].get_facecolor()),
+            (ViolinPlot, lambda ax: bodies(ax)[0].get_facecolor()[0]),
+        ]
+        for front, body_color in fronts:
+            with self.subTest(front=front.__name__):
+                ax = front(violin_data(), subtitle="scores", show_legend=True).axes[0]
+                self.assertEqual(legend_texts(ax), ["scores"])
+                # the key is drawn like the body it names
+                (handle,) = ax.get_legend().legend_handles
+                np.testing.assert_allclose(handle.get_facecolor(), body_color(ax))
+
+    def test_no_subtitle_no_entry(self):
+        for front in (BoxPlot, ViolinPlot):
+            with self.subTest(front=front.__name__):
+                ax = front(violin_data(), show_legend=True).axes[0]
+                self.assertIsNone(ax.get_legend())
+
+    def test_muted_layer_adds_no_entry(self):
+        for front in (BoxPlot, ViolinPlot):
+            with self.subTest(front=front.__name__):
+                figure = front(
+                    violin_data(),
+                    subtitle="scores",
+                    emphasis=["background"] * 3,
+                    show_legend=True,
+                )
+                self.assertIsNone(figure.axes[0].get_legend())
+
+    def test_composed_layers_name_themselves(self):
+        data = violin_data()
+        figure = Panel(
+            [
+                ViolinPlot(data, inner=None, subtitle="density"),
+                BoxPlot(data, show_outliers=False, subtitle="quartiles"),
+                SwarmPlot(data, subtitle="runs"),
+            ],
+            show_legend=True,
+        )
+        self.assertEqual(
+            sorted(legend_texts(figure.axes[0])), ["density", "quartiles", "runs"]
+        )
+
+    def test_split_keeps_only_its_halves(self):
+        figure = ViolinPlot(
+            violin_data(split=True), split="sex", subtitle="mass", show_legend=True
+        )
+        self.assertEqual(legend_texts(figure.axes[0]), ["M", "F"])
+
+    def test_raincloud_keeps_its_group_keys(self):
+        figure = RaincloudPlot(violin_data("AB"), subtitle="mass", show_legend=True)
+        self.assertEqual(legend_texts(figure.axes[0]), ["A", "B"])
 
 
 if __name__ == "__main__":

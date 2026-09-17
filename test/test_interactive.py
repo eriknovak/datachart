@@ -222,10 +222,10 @@ class TestCartesianLayers:
         figure = SwarmPlot(data=GROUP_DATA, subtitle="scores")
         ((points, resolver),) = _targets(figure)
         assert isinstance(points, PathCollection)
-        assert resolver(4) == {"label": "scores", "x": 1, "y": 10}
-        assert resolver(6) == {"label": "scores", "x": 2, "y": 6}
+        assert resolver(4) == {"label": "scores", "x": 0, "y": 10}
+        assert resolver(6) == {"label": "scores", "x": 1, "y": 6}
         horizontal = SwarmPlot(data=GROUP_DATA, orientation="horizontal")
-        assert _targets(horizontal)[0][1](0) == {"label": None, "x": 1, "y": 1}
+        assert _targets(horizontal)[0][1](0) == {"label": None, "x": 1, "y": 0}
 
     def test_hexbin_hexagons_report_center_and_count(self):
         rng = np.random.default_rng(0)
@@ -292,18 +292,18 @@ class TestAggregateLayers:
         figure = BoxPlot(data=GROUP_DATA, subtitle="scores")
         ((boxes, resolver),) = _targets(figure)
         assert isinstance(boxes, BarContainer) and len(boxes) == 2
-        assert resolver(0) == {"label": "scores", "x": 1, **SUMMARY_A}
+        assert resolver(0) == {"label": "scores", "x": 0, **SUMMARY_A}
         horizontal = BoxPlot(data=GROUP_DATA, orientation="horizontal")
         datum = _targets(horizontal)[0][1](1)
         assert list(datum) == ["label", "y", "median", "q1", "q3", "min", "max"]
-        assert datum["y"] == 2
+        assert datum["y"] == 1
 
     def test_violin_bodies_report_the_same_summary(self):
         figure = ViolinPlot(data=GROUP_DATA, subtitle="scores")
         targets = _targets(figure)
         assert all(isinstance(a, PolyCollection) for a, _ in targets)
         assert len(targets) == 2
-        assert targets[0][1]((0, 7)) == {"label": "scores", "x": 1, **SUMMARY_A}
+        assert targets[0][1]((0, 7)) == {"label": "scores", "x": 0, **SUMMARY_A}
         assert targets[1][1]((0, 0))["median"] == 6
 
     def test_split_violins_report_the_split_value(self):
@@ -657,8 +657,8 @@ class TestShowInteractive:
     def test_box_hover_picks_the_body_by_containment(self):
         figure = BoxPlot(data=GROUP_DATA, subtitle="scores", xlabel="Group")
         _show_interactive(figure)
-        # the first box sits at position 1 and spans q1..q3 = 2..4
-        assert _hover(figure, figure.axes[0], 1, 3) == [
+        # the first box sits at position 0 and spans q1..q3 = 2..4
+        assert _hover(figure, figure.axes[0], 0, 3) == [
             "scores\nGroup: A\nmedian: 3\nq1: 2\nq3: 4\nmin: 1\nmax: 10"
         ]
 
@@ -705,7 +705,7 @@ class TestShowInteractive:
             xlabel="Year",
         )
         _show_interactive(box)
-        assert _hover(box, box.axes[0], 2, 2)[0].startswith("Year: 2021\n")
+        assert _hover(box, box.axes[0], 1, 2)[0].startswith("Year: 2021\n")
         bar = BarChart(data=[{"label": year, "y": 3} for year in (2020, 2021)])
         _show_interactive(bar)
         assert _hover(bar, bar.axes[0], 0, 1)[0].startswith("x: 2020\n")

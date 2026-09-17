@@ -184,13 +184,13 @@ class TestDumbbellMarks(unittest.TestCase):
     def test_dot_positions_horizontal(self):
         ax = DumbbellChart(records()).axes[0]
         start, end = dots(ax)
-        np.testing.assert_allclose(start.get_offsets(), [[3, 1], [5, 2], [1, 3]])
-        np.testing.assert_allclose(end.get_offsets(), [[7, 1], [4, 2], [9, 3]])
+        np.testing.assert_allclose(start.get_offsets(), [[3, 0], [5, 1], [1, 2]])
+        np.testing.assert_allclose(end.get_offsets(), [[7, 0], [4, 1], [9, 2]])
 
     def test_vertical_flips_axes(self):
         ax = DumbbellChart(records(), orientation=ORIENTATION.VERTICAL).axes[0]
         start, _ = dots(ax)
-        np.testing.assert_allclose(start.get_offsets(), [[1, 3], [2, 5], [3, 1]])
+        np.testing.assert_allclose(start.get_offsets(), [[0, 3], [1, 5], [2, 1]])
 
     def test_scaley_addresses_the_value_axis(self):
         ax = DumbbellChart(records(), scaley="log").axes[0]
@@ -428,7 +428,7 @@ class TestDumbbellEmphasis(unittest.TestCase):
         highlighted = [c for c in dots(ax) if len(c.get_offsets()) == 1]
         # C (delta 8) is highlighted; A and B are muted together
         self.assertEqual(len(highlighted), 2)
-        np.testing.assert_allclose(highlighted[0].get_offsets(), [[1, 3]])
+        np.testing.assert_allclose(highlighted[0].get_offsets(), [[1, 2]])
 
     def test_record_role_wins_over_rule(self):
         data = records()
@@ -529,4 +529,4 @@ class TestSharedSortOrder(unittest.TestCase):
         # the second subplot draws its rows in that order: C, A, B
         offsets = dots(figure.axes[1])[-1].get_offsets()
         self.assertEqual(offsets[:, 0].tolist(), [5.0, 1.0, 9.0])
-        self.assertEqual(offsets[:, 1].tolist(), [1.0, 2.0, 3.0])
+        self.assertEqual(offsets[:, 1].tolist(), [0.0, 1.0, 2.0])

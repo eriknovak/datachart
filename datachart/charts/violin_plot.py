@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
-from ..utils._internal.validate import validate_bandwidth
+from ..utils._internal.validate import validate_bandwidth, validate_single_dataset
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -25,6 +25,7 @@ from ..constants import (
     SHOW_GRID,
     ORIENTATION,
     SCALE,
+    SORT,
     VIOLIN_INNER,
     BANDWIDTH,
 )
@@ -57,6 +58,7 @@ def ViolinPlot(
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
+    sort: Optional[Union[SORT, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
@@ -148,17 +150,20 @@ def ViolinPlot(
         The `show_values`, `value_format` and `legend` parameters.
         The `vspans` and `hspans` reference bands.
         The `emphasis_rule` parameter.
+        The `sort` group order.
 
     Args:
         data: The data points for the violin plot(s). Can be a single list of data points
-            for one chart, or a list of lists for multiple charts/subplots.
+            for one chart, or a list of lists for subplots (requires `subplots=True`).
             Each data point should have a `label` (category) and `value` (numeric).
         title: The title of the chart.
         xlabel: The x-axis label.
         ylabel: The y-axis label.
-        subtitle: The subtitle(s) for individual charts (subplots).
+        subtitle: The subtitle(s) for individual charts: the subplot title and the
+            legend label.
         emphasis: The emphasis role(s), aligned with the violin labels of one
-            call (a single value applies to every violin): "background" mutes
+            call in input order, whatever the `sort` (a single value applies
+            to every violin): "background" mutes
             a violin body and its inner marks, "highlight" bolds the body
             edge, None leaves it unchanged.
         emphasis_rule: A rule that highlights the groups matching it and mutes the rest:
@@ -185,8 +190,14 @@ def ViolinPlot(
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         orientation: The orientation of the violins (vertical or horizontal).
+        sort: The order the groups are drawn in: None (input order),
+            "ascending", or "descending" by each group's median; ties keep
+            input order. One call draws one violin dataset per axes, so there
+            is no second series to key on and no `sort_by`. See
+            [`SORT`][datachart.constants.SORT].
         scaley: The y-axis scale (e.g., "log", "linear").
-        subplots: Whether to create separate subplots for each chart.
+        subplots: Whether to create separate subplots for each chart; required
+            for a list of datasets.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.
         sharey: Whether to share the y-axis in subplots.
@@ -275,9 +286,11 @@ def ViolinPlot(
         "bandwidth": bandwidth,
         "split": split,
         "orientation": orientation,
+        "sort": sort,
         "scaley": scaley,
         "xticks_format": xticks_format,
         "yticks_format": yticks_format,
     }
 
+    validate_single_dataset(charts, "violin plot", subplots)
     return render_chart("violinplot", charts, settings)

@@ -69,7 +69,7 @@ class TestRidgelineLayout(unittest.TestCase):
         ax = RidgelinePlot(ridge_data(labels="CAB")).axes[0]
         self.assertEqual(len(fills(ax)), 3)
         self.assertEqual([t.get_text() for t in ax.get_yticklabels()], list("CAB"))
-        self.assertEqual(list(ax.get_yticks()), [1, 2, 3])
+        self.assertEqual(list(ax.get_yticks()), [0, 1, 2])
         self.assertTrue(ax.yaxis_inverted())
 
     def test_later_rows_draw_above_earlier_ones(self):
@@ -96,25 +96,25 @@ class TestRidgelineLayout(unittest.TestCase):
     def test_overlap_sets_the_peak_height(self):
         for overlap in (0.0, 0.5, 1.0):
             ax = RidgelinePlot(ridge_data(), overlap=overlap).axes[0]
-            for position, fill in enumerate(fills(ax), start=1):
+            for position, fill in enumerate(fills(ax)):
                 self.assertAlmostEqual(rise(fill, position), 1 + overlap)
 
     def test_theme_overlap_default(self):
         ax = RidgelinePlot(ridge_data()).axes[0]
         self.assertAlmostEqual(
-            rise(fills(ax)[0], 1), 1 + config["plot_ridgeline_overlap"]
+            rise(fills(ax)[0], 0), 1 + config["plot_ridgeline_overlap"]
         )
 
     def test_per_row_scales_every_ridge_to_the_same_peak(self):
         data = ridge_data(scales=[0.5, 1.0, 3.0])
         ax = RidgelinePlot(data, overlap=0.5, normalize=RIDGELINE_SCALE.PER_ROW).axes[0]
-        rises = [rise(f, p) for p, f in enumerate(fills(ax), start=1)]
+        rises = [rise(f, p) for p, f in enumerate(fills(ax))]
         np.testing.assert_allclose(rises, [1.5, 1.5, 1.5])
 
     def test_common_keeps_one_density_scale(self):
         data = ridge_data(scales=[0.5, 1.0, 3.0])
         ax = RidgelinePlot(data, overlap=0.5, normalize="common").axes[0]
-        rises = [rise(f, p) for p, f in enumerate(fills(ax), start=1)]
+        rises = [rise(f, p) for p, f in enumerate(fills(ax))]
         self.assertAlmostEqual(max(rises), 1.5)
         # the narrowest spread is the densest row, the widest the flattest
         self.assertEqual(int(np.argmax(rises)), 0)
@@ -138,9 +138,9 @@ class TestRidgelineLayout(unittest.TestCase):
         self.assertEqual([t.get_text() for t in ax.get_xticklabels()], list("ABC"))
         self.assertFalse(ax.xaxis_inverted())
         self.assertFalse(ax.yaxis_inverted())
-        self.assertAlmostEqual(rise(fills(ax)[0], 1, horizontal=False), 1.5, places=6)
+        self.assertAlmostEqual(rise(fills(ax)[0], 0, horizontal=False), 1.5, places=6)
         # each vertical ridge rises from its own tick
-        for position, fill in enumerate(fills(ax), start=1):
+        for position, fill in enumerate(fills(ax)):
             self.assertAlmostEqual(fill.get_paths()[0].vertices[:, 0].min(), position)
         # rows rise rightward, so earlier rows draw over the later ones they reach
         zorders = [f.get_zorder() for f in fills(ax)]
@@ -163,7 +163,7 @@ class TestRidgelineMarks(unittest.TestCase):
     def test_inner_marks_stop_at_the_ridge(self):
         ax = RidgelinePlot(ridge_data(), inner="median", show_outline=False).axes[0]
         self.assertEqual(len(ax.lines), 3)
-        for position, (fill, mark) in enumerate(zip(fills(ax), ax.lines), start=1):
+        for position, (fill, mark) in enumerate(zip(fills(ax), ax.lines)):
             ys = mark.get_ydata()
             self.assertAlmostEqual(max(ys), position)
             self.assertGreater(min(ys), position - rise(fill, position) - 1e-9)
@@ -280,7 +280,7 @@ class TestRidgelineComposition(unittest.TestCase):
         swarms = [c for c in ax.collections if isinstance(c, PathCollection)]
         rows = np.concatenate([c.get_offsets()[:, 1] for c in swarms])
         # ridges rise from their tick and the points pack upward, inside them
-        for position, fill in enumerate(fills(ax), start=1):
+        for position, fill in enumerate(fills(ax)):
             base = fill.get_paths()[0].vertices[:, 1].max()
             self.assertAlmostEqual(base, position)
         offsets = rows - np.round(rows + 0.2)

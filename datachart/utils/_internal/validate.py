@@ -82,6 +82,21 @@ def validate_bandwidth(bandwidth) -> None:
         )
 
 
+def validate_single_dataset(datasets, name: str, subplots=None) -> None:
+    """Raise when several datasets of a non-overlaying chart share one axes.
+
+    `datasets` is one chart dict, or a list of charts or of their layers.
+    """
+
+    n_datasets = len(datasets) if isinstance(datasets, list) else 1
+    if n_datasets > 1 and subplots is not True:
+        raise ValueError(
+            f"Multiple {name} datasets require `subplots=True`. "
+            f"{name.capitalize()}s do not support overlaying multiple "
+            "datasets on a single axis."
+        )
+
+
 RIDGELINE_SCALES = (RIDGELINE_SCALE.PER_ROW, RIDGELINE_SCALE.COMMON)
 RIDGELINE_INNERS = (VIOLIN_INNER.MEDIAN, VIOLIN_INNER.QUARTILES)
 

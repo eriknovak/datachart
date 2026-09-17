@@ -181,7 +181,7 @@ class TestFronts(ValueLabelCase):
         figure = BoxPlot(GROUPS, show_values=True)
         ax = figure.axes[0]
         self.assertEqual(texts(ax), ["3", "20"])
-        self.assertEqual(tuple(labels(ax)[1].xy), (2.0, 20.0))
+        self.assertEqual(tuple(labels(ax)[1].xy), (1.0, 20.0))
 
     def test_violin_labels_the_median(self):
         figure = ViolinPlot(GROUPS, show_values=True)
@@ -189,7 +189,7 @@ class TestFronts(ValueLabelCase):
         horizontal = ViolinPlot(
             GROUPS, show_values=True, orientation=ORIENTATION.HORIZONTAL
         )
-        self.assertEqual(tuple(labels(horizontal.axes[0])[1].xy), (20.0, 2.0))
+        self.assertEqual(tuple(labels(horizontal.axes[0])[1].xy), (20.0, 1.0))
 
     def test_headroom_keeps_labels_inside(self):
         figure = LineChart(LINE, show_values=True)
@@ -283,7 +283,7 @@ class TestRaincloud(ValueLabelCase):
         figure = RaincloudPlot(GROUPS, show_values=True)
         ax = figure.axes[0]
         medians = [t for t in labels(ax) if t.get_text() in ("3", "20")]
-        self.assertEqual([tuple(t.xy) for t in medians], [(1.0, 3.0), (2.0, 20.0)])
+        self.assertEqual([tuple(t.xy) for t in medians], [(0.0, 3.0), (1.0, 20.0)])
 
     def test_rain_labels_min_and_max_only(self):
         figure = RaincloudPlot(GROUPS, show_values=True)
@@ -308,7 +308,7 @@ class TestRaincloud(ValueLabelCase):
             sorted(texts(ax), key=float), ["1.0", "3.0", "5.0", "10.0", "20.0", "30.0"]
         )
         median = next(t for t in labels(ax) if t.get_text() == "20.0")
-        self.assertEqual(tuple(median.xy), (20.0, 2.0))
+        self.assertEqual(tuple(median.xy), (20.0, 1.0))
 
 
 class TestThemeDefault(ValueLabelCase):

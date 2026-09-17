@@ -99,6 +99,7 @@ from .validate import (
     validate_ridge_marks,
     validate_ridgeline_inner,
     validate_ridgeline_scale,
+    validate_single_dataset,
     validate_sort,
     validate_sort_by,
     validate_network_edge_style,
@@ -4258,6 +4259,13 @@ def grouped_values(chart: dict) -> dict:
 class GroupLayer(Layer):
     """A layer of labeled groups placed on the panel's category index."""
 
+    # box, violin and ridgeline fronts order their groups by median (ADR 0042)
+    sorts_by_median = False
+    sort = None
+    # the first unmuted body and the subtitle, kept for the legend key
+    legend_body = None
+    legend_label = None
+
     def _resolve_emphasis(self, value):
         # group layers never dodge; emphasis aligns with the group labels
         if isinstance(value, list):
@@ -4267,6 +4275,8 @@ class GroupLayer(Layer):
         return validate_emphasis(value)
 
     def _resolve_style(self):
+        if self.sorts_by_median:
+            self.sort = validate_sort(self.settings.get("sort"))
         self.orientation = self.settings.get("orientation") or DEFAULT_ORIENTATION
         self.is_horizontal = self.orientation == ORIENTATION.HORIZONTAL
         # a raincloud colors its groups from the multiple palette (ADR 0021);
@@ -4316,10 +4326,52 @@ class GroupLayer(Layer):
             )
         ]
 
-    def grouped_values(self) -> dict:
-        """The layer's values keyed by label, in first-seen label order."""
+    def keep_legend_body(self, bodies: list, roles: list, ctx: DrawContext) -> None:
+        """Remember the first unmuted body to key the subtitle in the legend."""
 
-        return grouped_values(self.chart)
+        # a group-colored layer keys its groups instead
+        self.legend_label = None if self.color_by_group else self.label(ctx)
+        self.legend_body = next(
+            (b for b, role in zip(bodies, roles) if role != EMPHASIS_BACKGROUND),
+            None,
+        )
+
+    def body_legend_handles(self) -> Optional[list]:
+        """One key named by the subtitle, drawn like the body it stands for."""
+
+        body = self.legend_body
+        if self.legend_label is None or body is None:
+            return None
+        if isinstance(body, Patch):
+            handle = Patch()
+            handle.update_from(body)
+        else:
+            handle = Patch(
+                facecolor=body.get_facecolor()[0],
+                edgecolor=body.get_edgecolor()[0],
+                linewidth=body.get_linewidth()[0],
+                hatch=body.get_hatch(),
+            )
+            handle.set_path_effects(body.get_path_effects())
+        handle.set_label(str(self.legend_label))
+        return [handle]
+
+    def grouped_values(self) -> dict:
+        """The layer's values keyed by label: input order, or by median."""
+
+        grouped = grouped_values(self.chart)
+        if self.sort is None:
+            return grouped
+        sign = -1 if self.sort == SORT.DESCENDING else 1
+        # a stable sort: ties keep input order
+        order = sorted(grouped, key=lambda label: sign * np.median(grouped[label]))
+        return {label: grouped[label] for label in order}
+
+    def label_roles(self, panel_role: Optional[str] = None) -> dict:
+        """Label -> emphasis role; a role list aligns with the input order."""
+
+        labels = list(grouped_values(self.chart))
+        return dict(zip(labels, self._group_roles(labels, panel_role)))
 
     def labels(self) -> list:
         return list(self.grouped_values().keys())
@@ -4380,6 +4432,7 @@ class GroupLayer(Layer):
 
 class BoxLayer(GroupLayer):
     kind = "box"
+    sorts_by_median = True
 
     def _resolve_style(self):
         super()._resolve_style()
@@ -4477,8 +4530,10 @@ class BoxLayer(GroupLayer):
         self._etch(bp["boxes"])
         if self.side:
             self._clip_to_side(bp, positions)
-        roles = self._group_roles(labels, ctx.emphasis)
+        label_roles = self.label_roles(ctx.emphasis)
+        roles = [label_roles[lbl] for lbl in labels]
         self._apply_box_emphasis(bp, roles)
+        self.keep_legend_body(bp["boxes"], roles, ctx)
         if self.show_values:
             # the median is the number a reader takes from a box (ADR 0033)
             for position, vals, role in zip(positions, values, roles):
@@ -4491,6 +4546,9 @@ class BoxLayer(GroupLayer):
                 for box, lbl, vals in zip(bp["boxes"], labels, values)
             ]
         )
+
+    def legend_handles(self):
+        return self.body_legend_handles()
 
     def _clip_to_side(self, bp: dict, positions: list) -> None:
         """Keep the box, median, and caps on one side of each box center."""
@@ -5262,6 +5320,7 @@ class ViolinLayer(GroupLayer):
     """A per-label KDE body with inner marks drawn from the data."""
 
     kind = "violin"
+    sorts_by_median = True
 
     def _resolve_style(self):
         super()._resolve_style()
@@ -5291,7 +5350,9 @@ class ViolinLayer(GroupLayer):
         if self.color_by_group:
             return self.group_legend_handles(self._legend_roles)
         # split values are known once draw() has grouped the data
-        if not self.split or not self.split_values:
+        if not self.split:
+            return self.body_legend_handles()
+        if not self.split_values:
             return None
         return [
             Patch(facecolor=self.split_colors[i]["color"], label=str(value))
@@ -5320,7 +5381,7 @@ class ViolinLayer(GroupLayer):
                 f"values, found {len(split_values)}."
             )
         self.split_values = split_values
-        return list(grouped.keys()), grouped
+        return self.labels(), grouped
 
     def draw(self, ax, ctx):
         labels, grouped = self._group()
@@ -5332,10 +5393,12 @@ class ViolinLayer(GroupLayer):
         width = body_style.pop("width")
         if body_style.get("facecolor") is None:
             body_style["facecolor"] = ctx.color
-        roles = self._group_roles(labels, ctx.emphasis)
+        label_roles = self.label_roles(ctx.emphasis)
+        roles = [label_roles[label] for label in labels]
         # (split value, side): -1 draws the low half, +1 the high half, 0 both
         sides = list(zip(self.split_values, (-1, 1))) or [(None, self.side)]
         self._legend_roles = roles
+        drawn_bodies, drawn_roles = [], []
 
         for i, label in enumerate(labels):
             position = ctx.category_index[label] + self.offset
@@ -5358,6 +5421,8 @@ class ViolinLayer(GroupLayer):
                         ax, values, position, width, style, side, ctx.value_scale
                     )
                 ]
+                drawn_bodies.append(artists[0])
+                drawn_roles.append(roles[i])
                 artists += self._draw_inner(ax, values, position, width, side)
                 self._apply_violin_emphasis(artists, roles[i])
                 if self.show_values and roles[i] != EMPHASIS_BACKGROUND:
@@ -5370,6 +5435,7 @@ class ViolinLayer(GroupLayer):
                     values,
                 )
                 self.register_hover(artists[0], lambda _, datum=datum: datum)
+        self.keep_legend_body(drawn_bodies, drawn_roles, ctx)
 
     def _draw_body(self, ax, values, position, width, style, side, scale):
         options = dict(
@@ -5497,9 +5563,9 @@ class RidgelineLayer(GroupLayer):
     """Per-label density ridges stacked on the category index (ADR 0047)."""
 
     kind = "ridge"
+    sorts_by_median = True
 
     def _resolve_style(self):
-        self.sort = validate_sort(self.settings.get("sort"))
         super()._resolve_style()
         if self.settings.get("orientation") is None:
             self.orientation = ORIENTATION.HORIZONTAL
@@ -5518,17 +5584,6 @@ class RidgelineLayer(GroupLayer):
         self.show_values = False
         # subplots share one value range, set once every layer is built
         self.shared_range = None
-
-    def grouped_values(self) -> dict:
-        """The values per label, in row order: input order or by median."""
-
-        grouped = super().grouped_values()
-        if self.sort is None:
-            return grouped
-        sign = -1 if self.sort == SORT.DESCENDING else 1
-        # a stable sort: ties keep input order
-        order = sorted(grouped, key=lambda label: sign * np.median(grouped[label]))
-        return {label: grouped[label] for label in order}
 
     def padded_range(self, log: Optional[bool] = None) -> Optional[tuple]:
         """The union of the rows' padded density ranges; None without a density.
@@ -5587,9 +5642,7 @@ class RidgelineLayer(GroupLayer):
                     f"Ridge {label!r} needs at least two values to estimate a density."
                 )
 
-        # emphasis aligns with the labels in input order, whatever the sort
-        input_labels = list(super().grouped_values())
-        roles = dict(zip(input_labels, self._group_roles(input_labels, ctx.emphasis)))
+        roles = self.label_roles(ctx.emphasis)
 
         # on a log value axis the densities are estimated on log10 values
         log = ctx.value_scale == SCALE.LOG
@@ -10414,12 +10467,7 @@ class Panel:
             ("violin", "violin plot"),
             ("ridge", "ridgeline plot"),
         ):
-            if sum(1 for l in self.layers if l.kind == kind) > 1:
-                raise ValueError(
-                    f"Multiple {name} datasets require `subplots=True`. "
-                    f"{name.capitalize()}s do not support overlaying multiple "
-                    "datasets on a single axis."
-                )
+            validate_single_dataset([l for l in self.layers if l.kind == kind], name)
 
         horizontal = self.horizontal
         polar = self.projection == "polar"
@@ -10721,13 +10769,13 @@ class Panel:
 
     @staticmethod
     def category_index(layers: List[Layer]) -> Optional[dict]:
-        """Label -> position (1..n), the first-seen union across group layers."""
+        """Label -> position (0..n-1), the first-seen union across group layers."""
 
         index = {}
         for layer in layers:
             if isinstance(layer, GroupLayer):
                 for label in layer.labels():
-                    index.setdefault(label, len(index) + 1)
+                    index.setdefault(label, len(index))
         return index or None
 
     def _category_labels(self, labels, axis: str) -> list:
