@@ -1971,7 +1971,7 @@ class ColorbarSettingAttrs(TypedDict):
             labels, with the value named `x` (e.g. `"{x:.0f}"`). On a hexbin
             chart, `valfmt` still applies when this is unset.
         ticks (Union[List[Union[int, float]], None]): Explicit tick positions
-            on the bar.
+            on the bar; positions outside the mapped value range are not drawn.
         orientation (Union[ORIENTATION, str, None]): The orientation; derives
             the edge when `location` is unset.
 

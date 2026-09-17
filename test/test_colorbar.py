@@ -239,11 +239,34 @@ class TestColorbarRendering(unittest.TestCase):
         self.assertTrue(all(len(t.split(".")[-1]) == 3 for t in ticks))
 
     def test_ticks_place_explicit_ticks(self):
+        in_range = {
+            "heatmap": [1, 2, 5],
+            "contour": [0.25, 0.5],
+            "hexbin": [1, 2, 5],
+        }
         for name, front in FRONTS.items():
             with self.subTest(front=name):
-                figure = front(colorbar={"ticks": [1, 2, 5]})
+                ticks = in_range[name]
+                figure = front(colorbar={"ticks": ticks})
                 colorbar = colorbar_of(figure)
-                self.assertEqual(list(colorbar.get_ticks()), [1, 2, 5])
+                self.assertEqual(list(colorbar.get_ticks()), ticks)
+                plt.close(figure)
+
+    def test_ticks_outside_the_mapped_range_are_dropped(self):
+        for name, front in FRONTS.items():
+            with self.subTest(front=name):
+                figure = front()
+                clim = figure.axes[0].collections or figure.axes[0].images
+                low, high = clim[0].get_clim()
+                plt.close(figure)
+                inside = (low + high) / 2
+                figure = front(colorbar={"ticks": [low - 1, inside, high + 1]})
+                colorbar = colorbar_of(figure)
+                self.assertEqual(list(colorbar.get_ticks()), [inside])
+                self.assertEqual(
+                    tuple(colorbar.ax.get_ylim()), (colorbar.vmin, colorbar.vmax)
+                )
+                self.assertEqual((colorbar.vmin, colorbar.vmax), (low, high))
                 plt.close(figure)
 
     def test_locked_bar_clears_the_axis_tick_labels(self):

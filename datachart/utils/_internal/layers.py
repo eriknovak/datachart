@@ -5803,7 +5803,12 @@ def _draw_colorbar(
         colorbar.formatter = fmt
         colorbar.update_ticks()
     if setting["ticks"] is not None:
-        colorbar.set_ticks(setting["ticks"])
+        # set_ticks widens the bar to every tick; keep it to the mapped range
+        low, high = colorbar.vmin, colorbar.vmax
+        slack = (high - low) * 1e-9
+        colorbar.set_ticks(
+            [t for t in setting["ticks"] if low - slack <= t <= high + slack]
+        )
     if setting["label"]:
         colorbar.set_label(setting["label"], **setting["label_style"])
     # tick labels take no family through tick_params; restyled directly
