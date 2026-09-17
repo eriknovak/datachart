@@ -281,6 +281,38 @@ class TestLayouts(unittest.TestCase):
         # a single node sits at the centre
         np.testing.assert_allclose(spring_layout(1, [], seed=0), [[0.5, 0.5]])
 
+    def test_spring_packs_components_apart(self):
+        # two five-node rings: neither collapses while the other spreads
+        ring = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 0)]
+        pairs = ring + [(i + 5, j + 5) for i, j in ring]
+        pos = spring_layout(10, pairs, seed=0)
+        spreads = [np.ptp(pos[:5], axis=0).max(), np.ptp(pos[5:], axis=0).max()]
+        self.assertLess(max(spreads) / min(spreads), 1.5)
+        self.assertGreater(min(spreads), 0.2)
+        # the components keep clear of each other
+        centres = pos[:5].mean(axis=0), pos[5:].mean(axis=0)
+        self.assertGreater(np.linalg.norm(centres[0] - centres[1]), max(spreads))
+        np.testing.assert_array_equal(pos, spring_layout(10, pairs, seed=0))
+
+    def test_spring_rings_the_isolates_round_the_component(self):
+        # a six-node ring and three isolates
+        pairs = [(i, (i + 1) % 6) for i in range(6)]
+        pos = spring_layout(9, pairs, seed=0)
+        centre = pos[:6].mean(axis=0)
+        reach = np.linalg.norm(pos[:6] - centre, axis=1).max()
+        away = np.linalg.norm(pos[6:] - centre, axis=1)
+        self.assertTrue((away > reach).all())
+        np.testing.assert_allclose(away, away[0], atol=0.05)
+        # the component is not squashed into a blob
+        self.assertGreater(np.ptp(pos[:6], axis=0).max(), 0.4)
+        self.assertGreaterEqual(pos.min(), 0.1 - 1e-9)
+        self.assertLessEqual(pos.max(), 0.9 + 1e-9)
+
+    def test_spring_without_edges_is_a_ring(self):
+        pos = spring_layout(5, [], seed=0)
+        radii = np.linalg.norm(pos - pos.mean(axis=0), axis=1)
+        np.testing.assert_allclose(radii, radii[0])
+
     def test_seed_changes_the_picture(self):
         same = _positions(NetworkChart(DATA))
         again = _positions(NetworkChart(DATA))
