@@ -4262,6 +4262,9 @@ class GroupLayer(Layer):
     # box, violin and ridgeline fronts order their groups by median (ADR 0042)
     sorts_by_median = False
     sort = None
+    # the drawn body a subtitle legend key copies, and the subtitle
+    legend_body = None
+    legend_label = None
 
     def _resolve_emphasis(self, value):
         # group layers never dodge; emphasis aligns with the group labels
@@ -4322,6 +4325,36 @@ class GroupLayer(Layer):
                 for r in records[label]
             )
         ]
+
+    def keep_legend_body(self, bodies: list, roles: list, ctx: DrawContext) -> None:
+        """Remember the first unmuted body to key the subtitle in the legend."""
+
+        # a group-colored layer keys its groups instead
+        self.legend_label = None if self.color_by_group else self.label(ctx)
+        self.legend_body = next(
+            (b for b, role in zip(bodies, roles) if role != EMPHASIS_BACKGROUND),
+            None,
+        )
+
+    def body_legend_handles(self) -> Optional[list]:
+        """One key named by the subtitle, drawn like the body it stands for."""
+
+        body = self.legend_body
+        if self.legend_label is None or body is None:
+            return None
+        if isinstance(body, Patch):
+            handle = Patch()
+            handle.update_from(body)
+        else:
+            handle = Patch(
+                facecolor=body.get_facecolor()[0],
+                edgecolor=body.get_edgecolor()[0],
+                linewidth=body.get_linewidth()[0],
+                hatch=body.get_hatch(),
+            )
+            handle.set_path_effects(body.get_path_effects())
+        handle.set_label(str(self.legend_label))
+        return [handle]
 
     def grouped_values(self) -> dict:
         """The layer's values keyed by label: input order, or by median."""
@@ -4500,6 +4533,7 @@ class BoxLayer(GroupLayer):
         label_roles = self.label_roles(ctx.emphasis)
         roles = [label_roles[lbl] for lbl in labels]
         self._apply_box_emphasis(bp, roles)
+        self.keep_legend_body(bp["boxes"], roles, ctx)
         if self.show_values:
             # the median is the number a reader takes from a box (ADR 0033)
             for position, vals, role in zip(positions, values, roles):
@@ -4512,6 +4546,9 @@ class BoxLayer(GroupLayer):
                 for box, lbl, vals in zip(bp["boxes"], labels, values)
             ]
         )
+
+    def legend_handles(self):
+        return self.body_legend_handles()
 
     def _clip_to_side(self, bp: dict, positions: list) -> None:
         """Keep the box, median, and caps on one side of each box center."""
@@ -5313,7 +5350,9 @@ class ViolinLayer(GroupLayer):
         if self.color_by_group:
             return self.group_legend_handles(self._legend_roles)
         # split values are known once draw() has grouped the data
-        if not self.split or not self.split_values:
+        if not self.split:
+            return self.body_legend_handles()
+        if not self.split_values:
             return None
         return [
             Patch(facecolor=self.split_colors[i]["color"], label=str(value))
@@ -5359,6 +5398,7 @@ class ViolinLayer(GroupLayer):
         # (split value, side): -1 draws the low half, +1 the high half, 0 both
         sides = list(zip(self.split_values, (-1, 1))) or [(None, self.side)]
         self._legend_roles = roles
+        drawn_bodies, drawn_roles = [], []
 
         for i, label in enumerate(labels):
             position = ctx.category_index[label] + self.offset
@@ -5381,6 +5421,8 @@ class ViolinLayer(GroupLayer):
                         ax, values, position, width, style, side, ctx.value_scale
                     )
                 ]
+                drawn_bodies.append(artists[0])
+                drawn_roles.append(roles[i])
                 artists += self._draw_inner(ax, values, position, width, side)
                 self._apply_violin_emphasis(artists, roles[i])
                 if self.show_values and roles[i] != EMPHASIS_BACKGROUND:
@@ -5393,6 +5435,7 @@ class ViolinLayer(GroupLayer):
                     values,
                 )
                 self.register_hover(artists[0], lambda _, datum=datum: datum)
+        self.keep_legend_body(drawn_bodies, drawn_roles, ctx)
 
     def _draw_body(self, ax, values, position, width, style, side, scale):
         options = dict(

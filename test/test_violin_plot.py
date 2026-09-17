@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import PolyCollection
 import numpy as np
 
-from datachart.charts import BoxPlot, ViolinPlot
+from datachart.charts import BoxPlot, RaincloudPlot, SwarmPlot, ViolinPlot
 from datachart.config import config
 from datachart.constants import THEME, VIOLIN_INNER
 from datachart.utils import Panel
@@ -184,6 +184,70 @@ class TestViolinPlot(unittest.TestCase):
                 "plot_violin_median_size",
             ):
                 self.assertIn(key, theme)
+
+
+def legend_texts(ax):
+    legend = ax.get_legend()
+    return None if legend is None else [t.get_text() for t in legend.get_texts()]
+
+
+class TestSubtitleLegend(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+
+    def test_subtitle_names_the_layer(self):
+        fronts = [
+            (BoxPlot, lambda ax: ax.patches[0].get_facecolor()),
+            (ViolinPlot, lambda ax: bodies(ax)[0].get_facecolor()[0]),
+        ]
+        for front, body_color in fronts:
+            with self.subTest(front=front.__name__):
+                ax = front(violin_data(), subtitle="scores", show_legend=True).axes[0]
+                self.assertEqual(legend_texts(ax), ["scores"])
+                # the key is drawn like the body it names
+                (handle,) = ax.get_legend().legend_handles
+                np.testing.assert_allclose(handle.get_facecolor(), body_color(ax))
+
+    def test_no_subtitle_no_entry(self):
+        for front in (BoxPlot, ViolinPlot):
+            with self.subTest(front=front.__name__):
+                ax = front(violin_data(), show_legend=True).axes[0]
+                self.assertIsNone(ax.get_legend())
+
+    def test_muted_layer_adds_no_entry(self):
+        for front in (BoxPlot, ViolinPlot):
+            with self.subTest(front=front.__name__):
+                figure = front(
+                    violin_data(),
+                    subtitle="scores",
+                    emphasis=["background"] * 3,
+                    show_legend=True,
+                )
+                self.assertIsNone(figure.axes[0].get_legend())
+
+    def test_composed_layers_name_themselves(self):
+        data = violin_data()
+        figure = Panel(
+            [
+                ViolinPlot(data, inner=None, subtitle="density"),
+                BoxPlot(data, show_outliers=False, subtitle="quartiles"),
+                SwarmPlot(data, subtitle="runs"),
+            ],
+            show_legend=True,
+        )
+        self.assertEqual(
+            sorted(legend_texts(figure.axes[0])), ["density", "quartiles", "runs"]
+        )
+
+    def test_split_keeps_only_its_halves(self):
+        figure = ViolinPlot(
+            violin_data(split=True), split="sex", subtitle="mass", show_legend=True
+        )
+        self.assertEqual(legend_texts(figure.axes[0]), ["M", "F"])
+
+    def test_raincloud_keeps_its_group_keys(self):
+        figure = RaincloudPlot(violin_data("AB"), subtitle="mass", show_legend=True)
+        self.assertEqual(legend_texts(figure.axes[0]), ["A", "B"])
 
 
 if __name__ == "__main__":
