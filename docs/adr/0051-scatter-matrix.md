@@ -25,6 +25,18 @@ grid machinery `Grid` uses (ADR 0002, 0006).
   figure one group → colour map without a shared-cycle mechanism.
 - **One legend.** Per-cell legends are off; a figure-level legend names
   the hue groups when `hue` is set (`show_legend` opts out).
+  Amended (issue #207): the legend's `location` picks one of the four
+  `OUTSIDE_*` edges (default right), a column or a row inside the node's
+  subgrid, so it nests in `Grid` unchanged; a row lays the groups side by
+  side. Any other location raises: a grid-level legend has no inside to sit
+  in, and silently ignoring the setting hid that. The title defaults to the
+  `hue` column's name rather than the theme's generic `"Legend"`, since the
+  column is what the colours encode.
+- **Default size fits the page.** Amended (issue #207): without `figsize`
+  a cell is 2.2 in, shrunk so the figure is at most `FIG_SIZE.FULL_MEDIUM`
+  wide (6.3 in, a legend column included); a top or bottom legend row adds
+  0.5 in of height. A four-dimension matrix at 2.2 in cells was nine inches
+  wide, wider than any page it is published on.
 - **Categorical hue only.** A numeric `hue` raises. The continuous ramp
   `ParallelCoords` offers has no clean reading across per-group KDEs and
   correlation text; a colorbar on a grid is a separate design.
