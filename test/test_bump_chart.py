@@ -325,6 +325,30 @@ class TestPeriodTicks(unittest.TestCase):
         for a, b in zip(boxes, boxes[1:]):
             self.assertLess(a.x1, b.x0)
 
+    def test_string_periods_tick_as_categories_in_first_seen_order(self):
+        seasons = ["spring", "summer", "autumn", "winter"]
+        data = [
+            [{"x": x, "y": v} for x, v in zip(seasons, vals)]
+            for vals in ([4, 3, 2, 1], [1, 2, 3, 4])
+        ]
+        fig = BumpChart(data, subtitle=["a", "b"], figsize=(10, 3))
+        fig.canvas.draw()
+        ax = fig.axes[0]
+        self.assertEqual(list(ax.get_xticks()), [0, 1, 2, 3])
+        self.assertEqual([t.get_text() for t in ax.get_xticklabels()], seasons)
+
+    def test_string_periods_thin_but_keep_the_ends(self):
+        periods = [f"season {i}" for i in range(12)]
+        data = [
+            [{"x": x, "y": v} for x, v in zip(periods, vals)]
+            for vals in (range(12), range(12, 0, -1))
+        ]
+        fig = BumpChart(data, subtitle=["a", "b"], figsize=(3, 3))
+        fig.canvas.draw()
+        ticks = list(fig.axes[0].get_xticks())
+        self.assertEqual((ticks[0], ticks[-1]), (0, 11))
+        self.assertLess(len(ticks), 12)
+
     def test_subplots_do_not_warn_about_the_legend(self):
         with warnings.catch_warnings():
             warnings.simplefilter("error")

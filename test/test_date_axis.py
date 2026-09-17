@@ -27,7 +27,7 @@ from datachart.charts import (
     ViolinPlot,
 )
 from datachart.constants import DATE_FORMAT, ORIENTATION, VALUE_FORMAT
-from datachart.utils import Grid, Panel
+from datachart.utils import Annotate, Grid, Panel
 from datachart.utils._internal.layers import NumpyEncoder, get_chart_hash
 from datachart.utils.stats import maximum, minimum
 
@@ -316,6 +316,32 @@ class TestExplicitPositions(unittest.TestCase):
         self.assertEqual(ax.get_xlim(), tuple(mdates.date2num([DAYS[1], DAYS[8]])))
         self.assertGreater(len(ax.collections), 0)
         self.assertGreater(len(ax.patches), 0)
+
+    def test_texts_take_datetime_positions_and_targets(self):
+        plain = LineChart(
+            data=LINE_DAYS, texts={"text": "peak", "x": DAYS[3], "y": 5}
+        ).axes[0]
+        self.assertEqual(plain.texts[0].xy, (mdates.date2num(DAYS[3]), 5))
+        arrow = LineChart(
+            data=LINE_DAYS,
+            texts={"text": "peak", "x": DAYS[2], "y": 8, "target": (DAYS[7], 7)},
+        ).axes[0]
+        text = arrow.texts[0]
+        self.assertEqual(text.xy, (mdates.date2num(DAYS[7]), 7))
+        self.assertEqual(text.xyann, (mdates.date2num(DAYS[2]), 8))
+        annotated = Annotate(
+            LineChart(data=LINE_DAYS),
+            texts={"text": "peak", "x": DAYS[2], "y": 8, "target": (DAYS[7], 7)},
+        ).axes[0]
+        self.assertEqual(annotated.texts[0].xy, (mdates.date2num(DAYS[7]), 7))
+
+    def test_texts_take_category_positions(self):
+        data = [{"x": label, "y": i} for i, label in enumerate("abc")]
+        ax = LineChart(
+            data=data, texts={"text": "c", "x": "a", "y": 2, "target": ("c", 2)}
+        ).axes[0]
+        self.assertEqual(ax.texts[0].xy, (2, 2))
+        self.assertEqual(ax.texts[0].xyann, (0, 2))
 
     def test_explicit_ticks_take_a_date_format(self):
         ax = LineChart(

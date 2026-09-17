@@ -1189,6 +1189,19 @@ def _resolve_texts(chart: dict) -> List[tuple]:
     return resolved
 
 
+def _data_point(ax: plt.Axes, point) -> tuple:
+    """A data position in axis units, so dates and categories can transform.
+
+    An axis without units keeps the raw value: converting would install a
+    converter that disagrees with the positions its marks already use.
+    """
+
+    return tuple(
+        axis.convert_units(value) if axis.have_units() else value
+        for axis, value in zip((ax.xaxis, ax.yaxis), point)
+    )
+
+
 def _draw_texts(
     ax: plt.Axes, texts: List[tuple], data_ax: plt.Axes = None, clearance=None
 ) -> None:
@@ -1220,6 +1233,8 @@ def _draw_texts(
         # the host and its twin share the axes rectangle, so axes fractions
         # need no owner transform
         textcoords = data_ax.transData if coords == "data" else "axes fraction"
+        if coords == "data":
+            x, y = _data_point(data_ax, (x, y))
 
         kwargs = dict(style["font"])
         kwargs["zorder"] = TEXT_ANNOTATION_ZORDER
@@ -1230,10 +1245,11 @@ def _draw_texts(
         if target is None:
             ax.annotate(content, xy=(x, y), xycoords=textcoords, **kwargs)
             continue
+        target = _data_point(data_ax, target)
 
         text_tr = data_ax.transData if coords == "data" else ax.transAxes
         start = np.asarray(text_tr.transform((x, y)), dtype=float)
-        end = np.asarray(data_ax.transData.transform(tuple(target)), dtype=float)
+        end = np.asarray(data_ax.transData.transform(target), dtype=float)
         length = np.hypot(*(end - start)) - TEXT_BOX_PAD
 
         # a connector shorter than the gaps that frame it is pure noise
@@ -1260,7 +1276,7 @@ def _draw_texts(
         # box border (flush at gap 0, the TOUCHING look)
         ax.annotate(
             content,
-            xy=tuple(target),
+            xy=target,
             xycoords=data_ax.transData,
             xytext=(x, y),
             textcoords=textcoords,
@@ -10769,19 +10785,19 @@ class Panel:
             )
 
         # bump periods are discrete: one tick per period, none between, when
-        # the user gave no ticks and the periods are numbers (dates keep theirs)
+        # the user gave no ticks and the periods are numbers or categories
+        # (dates keep theirs)
         if (
             layers
             and all(isinstance(l, BumpLayer) for l in layers)
             and self.temporal_axis is None
             and all(l.chart.get("xticks") is None for l in layers)
         ):
-            periods = np.unique(
-                np.concatenate([np.asarray(l.x_values(), float) for l in layers])
+            period_axis = ax.yaxis if horizontal else ax.xaxis
+            periods = np.concatenate(
+                [_axis_numbers(ax, horizontal, l.x_values()) for l in layers]
             )
-            (ax.yaxis if horizontal else ax.xaxis).set_major_locator(
-                PeriodTicks(periods)
-            )
+            period_axis.set_major_locator(PeriodTicks(periods))
 
         # a continuous axis starts and ends on a tick: each free end of the
         # view moves outward to the next tick (a polar theta axis excepted),
