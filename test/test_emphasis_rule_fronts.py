@@ -193,7 +193,9 @@ class TestGroupFronts:
 
     def test_rule_ranks_across_charts(self):
         figure = BoxPlot(
-            [groups(A=[1], B=[5]), groups(A=[9], B=[2])], emphasis_rule={"top": 1}
+            [groups(A=[1], B=[5]), groups(A=[9], B=[2])],
+            emphasis_rule={"top": 1},
+            subplots=True,
         )
         assert chart_roles(figure) == [[BG, BG], [HL, BG]]
 

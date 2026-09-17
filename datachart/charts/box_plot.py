@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.validate import validate_single_dataset
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -271,4 +272,7 @@ def BoxPlot(
         "yticks_format": yticks_format,
     }
 
+    validate_single_dataset(
+        len(charts) if isinstance(charts, list) else 1, subplots, "box plot"
+    )
     return render_chart("boxplot", charts, settings)

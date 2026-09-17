@@ -145,6 +145,15 @@ class TestViolinPlot(unittest.TestCase):
         figure = ViolinPlot([violin_data(), violin_data("DE")], subplots=True)
         self.assertEqual(len(figure.axes), 2)
 
+    def test_dataset_list_requires_subplots(self):
+        for front in (BoxPlot, ViolinPlot):
+            for subplots in (None, False):
+                with self.subTest(front=front.__name__, subplots=subplots):
+                    with self.assertRaisesRegex(ValueError, "require `subplots=True`"):
+                        front([violin_data(), violin_data("DE")], subplots=subplots)
+            # one dataset in a list is still a single chart
+            self.assertEqual(len(front([violin_data()]).axes), 1)
+
     def test_every_theme_declares_violin_keys(self):
         from datachart.themes import (
             DEFAULT_THEME,

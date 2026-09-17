@@ -99,6 +99,7 @@ from .validate import (
     validate_ridge_marks,
     validate_ridgeline_inner,
     validate_ridgeline_scale,
+    validate_single_dataset,
     validate_sort,
     validate_sort_by,
     validate_network_edge_style,
@@ -10424,12 +10425,8 @@ class Panel:
             ("violin", "violin plot"),
             ("ridge", "ridgeline plot"),
         ):
-            if sum(1 for l in self.layers if l.kind == kind) > 1:
-                raise ValueError(
-                    f"Multiple {name} datasets require `subplots=True`. "
-                    f"{name.capitalize()}s do not support overlaying multiple "
-                    "datasets on a single axis."
-                )
+            count = sum(1 for l in self.layers if l.kind == kind)
+            validate_single_dataset(count, False, name)
 
         horizontal = self.horizontal
         polar = self.projection == "polar"
