@@ -572,6 +572,17 @@ class TestRendering(unittest.TestCase):
         self.assertGreaterEqual(legend.get_bbox_to_anchor().x0, legend.axes.bbox.x1)
         self.assertIsNone(Treemap({"data": NESTED}).axes[0].get_legend())
 
+    def test_legend_leaves_out_muted_groups(self):
+        """A muted group is context: it keeps its tiles but not a legend entry."""
+        data = [
+            {**r, "emphasis": "background"} if r["label"] == "Africa" else r
+            for r in NESTED
+        ]
+        fig = Treemap({"data": data}, show_legend=True)
+        labels = [t.get_text() for t in fig.axes[0].get_legend().get_texts()]
+        self.assertEqual(labels, ["Asia", "Europe", "Oceania"])
+        self.assertIn("Africa", _boxes(fig.axes[0]))
+
     def test_texts_in_unit_space(self):
         fig = Treemap({"data": FLAT}, texts={"x": 0.5, "y": 0.5, "text": "note"})
         ax = fig.axes[0]

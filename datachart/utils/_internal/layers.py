@@ -856,6 +856,19 @@ def _apply_date_period(
         spine.set_visible(False)
 
 
+def _shared_data_interval(ax, axis_name: str) -> tuple:
+    """The data range of an axis, across every axes that shares it."""
+
+    intervals = [
+        getattr(a.dataLim, f"interval{axis_name}")
+        for a in ax._shared_axes[axis_name].get_siblings(ax)
+    ]
+    intervals = [i for i in intervals if np.isfinite(i).all()]
+    if not intervals:
+        return tuple(sorted(getattr(ax, f"{axis_name}axis").get_data_interval()))
+    return min(min(i) for i in intervals), max(max(i) for i in intervals)
+
+
 def _snap_limits_to_ticks(
     ax, axis_name: str, fixed=(False, False), data_ends: bool = True
 ) -> bool:
@@ -882,7 +895,7 @@ def _snap_limits_to_ticks(
     if not np.isfinite([lo, hi]).all() or hi <= lo:
         return False
     dated = isinstance(locator, mdates.AutoDateLocator)
-    data_lo, data_hi = sorted(axis.get_data_interval())
+    data_lo, data_hi = _shared_data_interval(ax, axis_name)
     # the overshoot the autoscale margin alone accounts for at each end
     margin = (
         (ax.get_xmargin() if axis_name == "x" else ax.get_ymargin())
@@ -7930,6 +7943,8 @@ class TreemapLayer(Layer):
             }
 
     def legend_handles(self):
+        # a muted group is context, and like any background mark it has no entry
+        groups = [r for r in self.groups if r.get("emphasis") != EMPHASIS_BACKGROUND]
         if self.group_hatches is not None:
             effect = self._etch_effect(0.0)
             return [
@@ -7940,11 +7955,11 @@ class TreemapLayer(Layer):
                     path_effects=[effect],
                     label=record["label"],
                 )
-                for record in self.groups
+                for record in groups
             ]
         return [
             Patch(facecolor=self.group_colors[record["label"]], label=record["label"])
-            for record in self.groups
+            for record in groups
         ]
 
     def _etch_box(self, patch, group: str, level: int) -> None:
@@ -9901,6 +9916,11 @@ class Panel:
     # ---------------- rendering ----------------
 
     def render(self, ax: plt.Axes) -> None:
+        # an axes drawn earlier fixed the limits this one shares; autoscale
+        # again, over the data of every axes that shares them
+        for axis_name in ("x", "y"):
+            if len(ax._shared_axes[axis_name].get_siblings(ax)) > 1:
+                getattr(ax, f"set_autoscale{axis_name}_on")(True)
         # every artist created here copies the wobble from the rc context at
         # construction (ADR 0027); nothing global changes
         with rc_context(self._sketch_rc()):
@@ -10446,10 +10466,15 @@ class Panel:
             ]
             ranges = [r for r in ranges if r is not None]
             if ranges:
-                (ax.set_ylim if horizontal else ax.set_xlim)(
-                    min(r[0] for r in ranges), max(r[1] for r in ranges)
-                )
-                pinned.add("y" if horizontal else "x")
+                lo, hi = min(r[0] for r in ranges), max(r[1] for r in ranges)
+                # subplots sharing this axis pin it to all of their data
+                axis_name = "y" if horizontal else "x"
+                siblings = ax._shared_axes[axis_name].get_siblings(ax)
+                if len(siblings) > 1:
+                    shared = _shared_data_interval(ax, axis_name)
+                    lo, hi = min(lo, shared[0]), max(hi, shared[1])
+                (ax.set_ylim if horizontal else ax.set_xlim)(lo, hi)
+                pinned.add(axis_name)
 
         # the y-axis is a rank axis only when every data layer draws ranks;
         # beside other charts it follows the panel as usual (ADR 0046)
