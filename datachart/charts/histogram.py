@@ -152,13 +152,13 @@ def Histogram(
             it and brings it to the front, None leaves it unchanged. When
             any chart carries a role, the histograms draw individually
             overlaid instead of stacked.
-        emphasis_rule: A rule that highlights the histograms matching it and
-            mutes the rest: `{"above": v}` or `{"below": v}` (strict),
-            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
-            `{"bottom": n}`, read against a summary of each histogram's own `x`
-            values, chosen by `by`: `"mean"` (default), `"median"`, `"min"`,
-            `"max"`, or `"sum"`. An explicit `emphasis` role wins, and a count
-            ranks across every histogram. See `EmphasisRuleAttrs`.
+        emphasis_rule: A rule that highlights the histograms matching it and mutes the
+            rest: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}`
+            (inclusive), `{"top": n}` or `{"bottom": n}`, read against a summary of each
+            histogram's own `x` values, chosen by `by`: `"mean"` (default), `"median"`,
+            `"min"`, `"max"`, or `"sum"`. An explicit `emphasis` role wins, and a count
+            ranks across every histogram. See
+            [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -167,20 +167,21 @@ def Histogram(
         show_legend: Whether to show the legend.
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
-            `LegendSettingAttrs`.
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_density: Whether to plot the density histogram.
         show_cumulative: Whether to plot the cumulative histogram.
         show_values: Whether to print each bin's height at its top; empty bins stay bare.
-        value_format: Format string for the value labels: a `VALUE_FORMAT`
-            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
+        value_format: Format string for the value labels: a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant or any
+            `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
-            `ASPECT_RATIO`.
+            [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         orientation: The orientation of the histogram (vertical or horizontal).
-        bar_mode: How multiple histogram series share the axis: "stack"
-            (stacked on shared bins, the default) or "overlay" (each series
-            drawn individually over the others). "group" has no histogram
-            meaning and behaves like "overlay". See `BAR_MODE`.
+        bar_mode: How multiple histogram series share the axis: "stack" (stacked on
+            shared bins, the default) or "overlay" (each series drawn individually over
+            the others). "group" has no histogram meaning and behaves like "overlay".
+            See [`BAR_MODE`][datachart.constants.BAR_MODE].
         num_bins: The number of bins to split the data into.
         scalex: The x-axis scale (e.g., "log", "linear"). Useful for log-distributed data.
         scaley: The y-axis scale (e.g., "log", "linear").

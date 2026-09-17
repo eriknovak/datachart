@@ -166,7 +166,8 @@ def HexbinChart(
             `{"bottom": n}`, read against each bin's aggregated value (its
             count, or `c` reduced by `reduce`). Bins exist only once drawn, so a
             count ranks the bins of each chart on its own, and an empty bin
-            never matches. The rule takes no `by`. See `EmphasisRuleAttrs`.
+            never matches. The rule takes no `by`. See
+            [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -176,7 +177,7 @@ def HexbinChart(
             default: the hexagons cover it.
         show_colorbars: Whether to show the colorbar(s).
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
-            `ASPECT_RATIO`.
+            [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         scalex: The x-axis scale (e.g., "log", "linear").
         scaley: The y-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each chart.
@@ -186,34 +187,37 @@ def HexbinChart(
         style: Style configuration(s) for the hexbin chart(s).
         gridsize: The number of hexagons across the x-axis; the
             `plot_hexbin_gridsize` config value by default.
-        reduce: How the `c` values in a hexagon collapse into its color, one
-            of `HEXBIN_REDUCE` (the mean by default). Ignored without `c`,
-            where every hexagon shows its point count.
+        reduce: How the `c` values in a hexagon collapse into its color, one of
+            [`HEXBIN_REDUCE`][datachart.constants.HEXBIN_REDUCE] (the mean by default).
+            Ignored without `c`, where every hexagon shows its point count.
         mincnt: The point count below which a hexagon stays blank; every
             hexagon is drawn by default.
         norm: Value normalization method(s) of the colormap; `"log"` spreads
             heavy-tailed counts.
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
-        valfmt: Format string(s) for the colorbar tick labels, with the value
-            named `x` (e.g., `"{x:.0f}"`). See `VALUE_FORMAT`. The `format`
-            field of the `colorbar` setting wins when set.
+        valfmt: Format string(s) for the colorbar tick labels, with the value named `x`
+            (e.g., `"{x:.0f}"`). See [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT].
+            The `format` field of the `colorbar` setting wins when set.
         xticks: Custom x-axis tick positions.
         xticklabels: Custom x-axis tick labels.
         xtickrotate: Rotation angle for x-axis tick labels.
         yticks: Custom y-axis tick positions.
         yticklabels: Custom y-axis tick labels.
         ytickrotate: Rotation angle for y-axis tick labels.
-        xticks_format: The x-axis tick label format: a `DATE_FORMAT` member
-            or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT`
-            member or `"{x:.1f}"` style string.
+        xticks_format: The x-axis tick label format: a
+            [`DATE_FORMAT`][datachart.constants.DATE_FORMAT] member or `strftime`
+            pattern on a datetime axis, else a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] member or `"{x:.1f}"`
+            style string.
         yticks_format: The y-axis tick label format, as `xticks_format`.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
         vspans: Vertical reference band(s) to shade, between two x positions.
         hspans: Horizontal reference band(s) to shade, between two y positions.
-        colorbar: The colorbar setting(s): label, location, tick format,
-            and tick positions. See `ColorbarSettingAttrs`.
+        colorbar: The colorbar setting(s): label, location, tick format, and tick
+            positions. See
+            [`ColorbarSettingAttrs`][datachart.typings.ColorbarSettingAttrs].
         texts: Text annotation(s) to draw.
 
     Returns:

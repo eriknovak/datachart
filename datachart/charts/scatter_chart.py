@@ -209,13 +209,13 @@ def ScatterChart(
             alpha, behind the others, no legend entry), "highlight" gives
             it a contrasting edge and brings it to the front, None leaves
             it unchanged.
-        emphasis_rule: A rule that highlights the series matching it and mutes
-            the rest: `{"above": v}` or `{"below": v}` (strict),
-            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
-            `{"bottom": n}`, read against a summary of each series's own `y`
-            values, chosen by `by`: `"mean"` (default), `"median"`, `"min"`,
-            `"max"`, or `"sum"`. An explicit `emphasis` role wins, and a count
-            ranks across every series. See `EmphasisRuleAttrs`.
+        emphasis_rule: A rule that highlights the series matching it and mutes the rest:
+            `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}`
+            (inclusive), `{"top": n}` or `{"bottom": n}`, read against a summary of each
+            series's own `y` values, chosen by `by`: `"mean"` (default), `"median"`,
+            `"min"`, `"max"`, or `"sum"`. An explicit `emphasis` role wins, and a count
+            ranks across every series. See
+            [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -224,7 +224,7 @@ def ScatterChart(
         show_legend: Whether to show the legend.
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
-            `LegendSettingAttrs`.
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_regression: Whether to show the regression line.
         show_ci: Whether to show the confidence interval around the regression line.
@@ -232,12 +232,13 @@ def ScatterChart(
         show_correlation: Whether to show the Pearson correlation coefficient (r-value) as an annotation.
         show_values: Whether to print each point's y value beside it. Cannot be
             combined with `label`: a point carries its label or its value.
-        value_format: Format string for the value labels: a `VALUE_FORMAT`
-            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
+        value_format: Format string for the value labels: a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant or any
+            `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
         value_step: Label every Nth point (`1` labels all of them). Defaults
             to the smallest step that keeps neighbouring labels apart.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
-            `ASPECT_RATIO`.
+            [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         scalex: The x-axis scale (e.g., "log", "linear").
         scaley: The y-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each chart.
@@ -251,9 +252,11 @@ def ScatterChart(
         yticks: Custom y-axis tick positions.
         yticklabels: Custom y-axis tick labels.
         ytickrotate: Rotation angle for y-axis tick labels.
-        xticks_format: The x-axis tick label format: a `DATE_FORMAT` member
-            or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT`
-            member or `"{x:.1f}"` style string.
+        xticks_format: The x-axis tick label format: a
+            [`DATE_FORMAT`][datachart.constants.DATE_FORMAT] member or `strftime`
+            pattern on a datetime axis, else a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] member or `"{x:.1f}"`
+            style string.
         yticks_format: The y-axis tick label format, as `xticks_format`.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.

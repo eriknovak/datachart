@@ -90,21 +90,21 @@ def ParallelCoords(
             color, lowered alpha, thinner line, behind the others, no hue
             legend entry), "highlight" bolds it and brings it to the front
             among the data rows, None leaves it unchanged.
-        emphasis_rule: A rule that highlights the data rows matching it and
-            mutes the rest: `{"above": v}` or `{"below": v}` (strict),
-            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
-            `{"bottom": n}`, read against each row's numeric `hue` value; no
-            `hue`, or a non-numeric one, raises. An explicit `emphasis` role
-            wins, and a count ranks across the rows of every chart. The rule
-            takes no `by`. See `EmphasisRuleAttrs`.
+        emphasis_rule: A rule that highlights the data rows matching it and mutes the
+            rest: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}`
+            (inclusive), `{"top": n}` or `{"bottom": n}`, read against each row's
+            numeric `hue` value; no `hue`, or a non-numeric one, raises. An explicit
+            `emphasis` role wins, and a count ranks across the rows of every chart. The
+            rule takes no `by`. See
+            [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
         figsize: The size of the figure.
         show_legend: Whether to show the legend (for hue categories).
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
-            `LegendSettingAttrs`.
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
-            `ASPECT_RATIO`.
+            [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         style: Style configuration(s) for the lines.
         dimensions: List of dimension names to include and their order. If None,
             all columns (except hue) are auto-detected.

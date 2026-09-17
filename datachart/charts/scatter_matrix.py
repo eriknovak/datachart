@@ -279,9 +279,9 @@ def ScatterMatrix(
         hue: The column whose categories colour the points, one colour per
             category and one legend for the whole figure. A numeric column
             raises.
-        diagonal: What each dimension's own cell shows: a histogram
-            (`"hist"`, default), a density curve (`"kde"`), or nothing
-            (`"none"`). See `SCATTER_MATRIX_DIAGONAL`.
+        diagonal: What each dimension's own cell shows: a histogram (`"hist"`, default),
+            a density curve (`"kde"`), or nothing (`"none"`). See
+            [`SCATTER_MATRIX_DIAGONAL`][datachart.constants.SCATTER_MATRIX_DIAGONAL].
         lower_only: Whether to leave the cells above the diagonal empty.
             Wins over `show_correlation`.
         show_regression: Whether to draw a least-squares line per hue group
@@ -299,13 +299,14 @@ def ScatterMatrix(
             Defaults to 2.2 inches per cell.
         show_legend: Whether to show the legend of the hue groups (default
             `True` when `hue` is set).
-        legend: The legend setting: title, column count and alignment; the
-            legend sits to the right of the matrix. See `LegendSettingAttrs`.
+        legend: The legend setting: title, column count and alignment; the legend sits
+            to the right of the matrix. See
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show in the cells (e.g., "both", "x",
             "y").
         style: Style attributes for every cell: the scatter, histogram,
             plot text and `plot_scatter_matrix_*` keys. See
-            `ScatterMatrixStyleAttrs`.
+            [`ScatterMatrixStyleAttrs`][datachart.typings.ScatterMatrixStyleAttrs].
 
     Returns:
         The figure containing the scatter matrix.

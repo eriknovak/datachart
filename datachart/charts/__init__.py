@@ -1,57 +1,9 @@
 """Module containing the `charts`.
 
-The `charts` module contains the methods to create the plots and figures,
-grouped by the question they answer.
-
-Methods:
-    LineChart(attrs):
-        Creates the line chart.
-    StackedAreaChart(attrs):
-        Creates the stacked area chart.
-    BumpChart(attrs):
-        Creates the bump chart.
-    BarChart(attrs):
-        Creates the bar chart.
-    PyramidChart(attrs):
-        Creates the pyramid chart.
-    RadialChart(attrs):
-        Creates the radial chart.
-    CalendarHeatmap(attrs):
-        Creates the calendar heatmap.
-    GanttChart(attrs):
-        Creates the gantt chart.
-    DumbbellChart(attrs):
-        Creates the dumbbell chart.
-    Histogram(attrs):
-        Creates the histogram.
-    BoxPlot(attrs):
-        Creates the box plot.
-    ViolinPlot(attrs):
-        Creates the violin plot.
-    SwarmPlot(attrs):
-        Creates the swarm plot.
-    RaincloudPlot(attrs):
-        Creates the raincloud plot.
-    RidgelinePlot(attrs):
-        Creates the ridgeline plot.
-    ScatterChart(attrs):
-        Creates the scatter chart.
-    Heatmap(attrs):
-        Creates the heatmap.
-    ContourChart(attrs):
-        Creates the contour chart.
-    HexbinChart(attrs):
-        Creates the hexbin chart.
-    ParallelCoords(attrs):
-        Creates the parallel coordinates chart.
-    NetworkChart(attrs):
-        Creates the network chart.
-    ScatterMatrix(attrs):
-        Creates the scatter matrix.
-    SankeyChart(attrs):
-        Creates the Sankey chart.
-    Treemap(attrs):
-        Creates the treemap.
+The `charts` module contains the functions that create the figures, one per
+chart type, grouped by the question they answer. Every function takes the data
+as a list of records, keyword settings, and an optional `style` dictionary, and
+returns a matplotlib figure.
 
 """
 

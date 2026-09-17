@@ -158,13 +158,13 @@ def RidgelinePlot(
             call in input order (a single value applies to every ridge):
             "background" mutes a ridge and its inner marks, "highlight" bolds
             its outline, None leaves it unchanged.
-        emphasis_rule: A rule that highlights the groups matching it and mutes
-            the rest: `{"above": v}` or `{"below": v}` (strict),
-            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
-            `{"bottom": n}`, read against a summary of each group's values,
-            chosen by `by`: `"median"` (default), `"mean"`, `"min"`, `"max"`, or
-            `"sum"`. An explicit `emphasis` role wins, and a count ranks across
-            every group of every chart. See `EmphasisRuleAttrs`.
+        emphasis_rule: A rule that highlights the groups matching it and mutes the rest:
+            `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}`
+            (inclusive), `{"top": n}` or `{"bottom": n}`, read against a summary of each
+            group's values, chosen by `by`: `"median"` (default), `"mean"`, `"min"`,
+            `"max"`, or `"sum"`. An explicit `emphasis` role wins, and a count ranks
+            across every group of every chart. See
+            [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
         figsize: The size of the figure.
         xmin: The minimum x-axis value; on the value axis it also bounds the
             density grid.
@@ -176,15 +176,15 @@ def RidgelinePlot(
             their labels sit on the category axis.
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
-            `LegendSettingAttrs`.
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
-            `ASPECT_RATIO`.
+            [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         orientation: "horizontal" (default) runs the value axis along x and
             stacks the rows along y, first row at the top; "vertical" runs
             the rows along x, first row at the left, each ridge rising
             rightward from its tick.
-            See `ORIENTATION`.
+            See [`ORIENTATION`][datachart.constants.ORIENTATION].
         scaley: The value-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each chart.
         max_cols: Maximum number of columns in subplots (when subplots=True).
@@ -197,9 +197,11 @@ def RidgelinePlot(
         yticks: Custom y-axis tick positions.
         yticklabels: Custom y-axis tick labels.
         ytickrotate: Rotation angle for y-axis tick labels.
-        xticks_format: The x-axis tick label format: a `DATE_FORMAT` member
-            or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT`
-            member or `"{x:.1f}"` style string.
+        xticks_format: The x-axis tick label format: a
+            [`DATE_FORMAT`][datachart.constants.DATE_FORMAT] member or `strftime`
+            pattern on a datetime axis, else a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] member or `"{x:.1f}"`
+            style string.
         yticks_format: The y-axis tick label format, as `xticks_format`.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
@@ -208,22 +210,22 @@ def RidgelinePlot(
         texts: Text annotation(s) to draw.
         label: The key name in data for label/category values (default: "label").
         value: The key name in data for numeric values (default: "value").
-        bandwidth: The KDE bandwidth: None or "scott" (Scott's rule),
-            "silverman", or a scalar factor. See `BANDWIDTH`.
+        bandwidth: The KDE bandwidth: None or "scott" (Scott's rule), "silverman", or a
+            scalar factor. See [`BANDWIDTH`][datachart.constants.BANDWIDTH].
         overlap: How far a ridge's peak rises into the row above, in `[0, 1]`:
             a ridge rises from its tick and its peak stands `1 + overlap`
             rows above it, so 0 makes rows touch. None takes the theme's `plot_ridgeline_overlap`.
         normalize: "per_row" scales every ridge to the same peak so shapes
             compare; "common" keeps one density scale so heights compare. See
-            `RIDGELINE_SCALE`.
-        inner: The marks drawn inside each ridge, up to its height: "median"
-            (one line), "quartiles" (dashed median, dotted Q1/Q3), or None.
-            See `VIOLIN_INNER`; "box" is not supported.
+            [`RIDGELINE_SCALE`][datachart.constants.RIDGELINE_SCALE].
+        inner: The marks drawn inside each ridge, up to its height: "median" (one line),
+            "quartiles" (dashed median, dotted Q1/Q3), or None. See
+            [`VIOLIN_INNER`][datachart.constants.VIOLIN_INNER]; "box" is not supported.
         fill: Whether to fill each ridge.
         show_outline: Whether to stroke each ridge's density curve.
         sort: The row order: None keeps input order, "ascending" or
             "descending" orders the rows by their median; ties keep input
-            order. See `SORT`.
+            order. See [`SORT`][datachart.constants.SORT].
 
     Returns:
         The figure containing the ridgeline plot.

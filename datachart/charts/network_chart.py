@@ -102,30 +102,33 @@ def NetworkChart(
             mutes the node, its label, and its edges, `"highlight"` strokes
             its border. `nodes` may be omitted; the node set is then read
             from the edges in first-seen order.
-        layout: How the nodes are placed: a `NETWORK_LAYOUT` constant
-            (default `NETWORK_LAYOUT.SPRING`). `WEIGHTED` lets each edge's
-            weight set how hard it pulls its nodes together; `GROUPED`
-            clusters the nodes by `group`, arranges the clusters by the
-            summed weight of the edges between them, and marks each with a
-            disc in the group color (`plot_network_group_alpha`). `FIXED` reads each
-            node's `x`/`y` in the 0–1 layout space. The three spring
-            layouts cost the square of the node count; past about 1,000
-            nodes prefer `CIRCULAR` or `FIXED`.
+        layout: How the nodes are placed: a
+            [`NETWORK_LAYOUT`][datachart.constants.NETWORK_LAYOUT] constant (default
+            [`NETWORK_LAYOUT.SPRING`][datachart.constants.NETWORK_LAYOUT]). `WEIGHTED`
+            lets each edge's weight set how hard it pulls its nodes together; `GROUPED`
+            clusters the nodes by `group`, arranges the clusters by the summed weight of
+            the edges between them, and marks each with a disc in the group color
+            (`plot_network_group_alpha`). `FIXED` reads each node's `x`/`y` in the 0–1
+            layout space. The three spring layouts cost the square of the node count;
+            past about 1,000 nodes prefer `CIRCULAR` or `FIXED`.
         directed: Whether the edges end in an arrowhead at the target. When
             `False` (the default), an edge and its reverse draw as one line.
         seed: The seed of the spring layouts (default 0); another seed gives
             another arrangement of the same data.
-        label_position: Where the node names print: a `NODE_LABEL_POSITION`
-            constant (default `NODE_LABEL_POSITION.CENTER`, or the theme's
-            `chart_default_node_label_position`).
+        label_position: Where the node names print: a
+            [`NODE_LABEL_POSITION`][datachart.constants.NODE_LABEL_POSITION] constant
+            (default
+            [`NODE_LABEL_POSITION.CENTER`][datachart.constants.NODE_LABEL_POSITION], or
+            the theme's `chart_default_node_label_position`).
         show_values: Whether to write each edge's weight at its midpoint.
-        value_format: The format of the edge values: a `VALUE_FORMAT`
-            constant (default `VALUE_FORMAT.DEFAULT`) or any `"{x:.1f}"`,
-            `"{:.1f}%"`, or `"%g"` style string.
+        value_format: The format of the edge values: a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant (default
+            [`VALUE_FORMAT.DEFAULT`][datachart.constants.VALUE_FORMAT]) or any
+            `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
         show_legend: Whether to list the node groups in a legend.
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
-            `LegendSettingAttrs`.
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         title: The title of the chart.
         subtitle: The subtitle(s) for individual charts.
         emphasis: Not supported: emphasis is set per node through its
@@ -135,14 +138,16 @@ def NetworkChart(
             `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
             `{"bottom": n}`, read against each node's `size`; a node without one
             raises. A node's own `emphasis` key wins. The rule takes no `by`.
-            See `EmphasisRuleAttrs`.
+            See [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
         figsize: The size of the figure.
         subplots: Whether to show each chart in its own subplot; several
             charts always split into subplots.
         max_cols: Maximum number of columns in subplots.
         style: Style configuration(s) for the chart(s). The edge geometry,
-            `plot_network_edge_style`, takes `ARROW_STYLE.CURVE` (default)
-            or `ARROW_STYLE.STRAIGHT`; the arrowhead comes from `directed`.
+            `plot_network_edge_style`, takes
+            [`ARROW_STYLE.CURVE`][datachart.constants.ARROW_STYLE] (default) or
+            [`ARROW_STYLE.STRAIGHT`][datachart.constants.ARROW_STYLE]; the arrowhead
+            comes from `directed`.
         texts: Text annotation(s) to draw. The layout spans 0–1 in both
             directions.
 

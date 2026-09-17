@@ -79,10 +79,10 @@ class Config:
     def set_theme(self, theme: THEME) -> None:
         """Sets the global configuration to match the theme.
 
-        Replaces the whole style configuration with a deep copy of the theme:
-        one of the `THEME` constants or a name registered with `register_theme`.
-        Use it to switch the look of every chart rendered afterwards; call
-        `update_config` on top for per-attribute tweaks.
+        Replaces the whole style configuration with a deep copy of the theme: one of the
+        [`THEME`][datachart.constants.THEME] constants or a name registered with
+        `register_theme`. Use it to switch the look of every chart rendered afterwards;
+        call `update_config` on top for per-attribute tweaks.
 
         !!! info "Added in v0.5.0"
 
@@ -246,8 +246,8 @@ class Config:
             'default'
 
         Args:
-            theme: The theme to apply: one of the `THEME` constants or a
-                registered name.
+            theme: The theme to apply: one of the [`THEME`][datachart.constants.THEME]
+                constants or a registered name.
 
         """
         with self._scope():

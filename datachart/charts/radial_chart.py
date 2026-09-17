@@ -144,8 +144,8 @@ def RadialChart(
             The line, bar, and scatter visuals take `label`/`y` points whose labels
             are placed evenly around the circle; the histogram visual takes numeric
             `x` observations in degrees, binned over [0, 360).
-        type: The visual the whole figure draws: "line" (default), "bar",
-            "scatter", or "histogram". See `RADIAL_TYPE`.
+        type: The visual the whole figure draws: "line" (default), "bar", "scatter", or
+            "histogram". See [`RADIAL_TYPE`][datachart.constants.RADIAL_TYPE].
         title: The title of the chart.
         xlabel: The angular-axis label.
         ylabel: The radial-axis label.
@@ -159,7 +159,7 @@ def RadialChart(
         show_legend: Whether to show the legend.
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
-            `LegendSettingAttrs`.
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_yerr: Whether to show the radial error band (line visual).
         show_area: Whether to fill the area inside the line (line visual).
@@ -171,13 +171,13 @@ def RadialChart(
             theme's spine visibility; `False` hides it.
         value_format: Format for the values written by `show_values` — a
             printf format (e.g. `"%.1f"`) or a `{x}`-style string. See
-            `VALUE_FORMAT`.
-        bar_mode: How multiple bar series share the circle: "group",
-            "stack", or "overlay" (bar visual). See `BAR_MODE`.
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT].
+        bar_mode: How multiple bar series share the circle: "group", "stack", or
+            "overlay" (bar visual). See [`BAR_MODE`][datachart.constants.BAR_MODE].
         sort: The order the categories are drawn in around the circle: None
             (input order), "ascending", or "descending" by value (bar
             visual). One order serves every series, keyed by the total
-            across them; ties keep input order. See `SORT`.
+            across them; ties keep input order. See [`SORT`][datachart.constants.SORT].
         sort_by: The subtitle of the one series whose values key the sort
             instead of the total (bar visual). A category that series lacks
             sorts last.
@@ -191,7 +191,8 @@ def RadialChart(
             "E", "SE", "S", "SW", "W", "NW") or a numeric compass bearing in
             degrees clockwise from north. Defaults to "N".
         direction: Which way the angles increase: "clockwise" (default) or
-            "counterclockwise". See `RADIAL_DIRECTION`.
+            "counterclockwise". See
+            [`RADIAL_DIRECTION`][datachart.constants.RADIAL_DIRECTION].
         innerradius: The donut hole, as a fraction (0 <= f < 1) of the radial
             extent. Defaults to 0.
         scalex: Not supported; the angular axis has no scale. Raises when passed.
