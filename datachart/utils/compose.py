@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 from ..config import config
-from ..constants import BAR_MODE, FIG_SIZE, SCALE
+from ..constants import BAR_MODE, FIG_SIZE, SCALE, SHOW_GRID
 from ..typings import LegendSettingAttrs, TextSettingAttrs
 from .figure import (
     _grid_from_dicts,
@@ -195,7 +195,7 @@ def Panel(
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     show_legend: Optional[bool] = False,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[str] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     auto_secondary_axis: Optional[float] = None,
     xmin: Optional[float] = None,
     xmax: Optional[float] = None,
@@ -323,8 +323,8 @@ def Panel(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show ("x", "y", "both", or None); these
-            name the matplotlib axes literally.
+        show_grid: Which grid lines to show ("x", "y", "both", or None);
+            `False` draws none. These name the matplotlib axes literally.
         auto_secondary_axis: Threshold ratio for automatic secondary axis creation.
             Default is taken from config (overlay_auto_threshold, default 3.0).
         xmin: Minimum value for the category-axis limits.

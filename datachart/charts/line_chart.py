@@ -47,7 +47,7 @@ def LineChart(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_yerr: Optional[bool] = None,
     show_area: Optional[bool] = None,
     show_values: Optional[bool] = None,
@@ -173,7 +173,8 @@ def LineChart(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_grid: Which grid lines to show (e.g., "both", "x", "y");
+            `False` draws none.
         show_yerr: Whether to show y-axis error bars.
         show_area: Whether to show the area under the line.
         show_values: Whether to print each point's value above or below it.

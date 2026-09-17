@@ -41,7 +41,7 @@ def PyramidChart(
     xmax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_yerr: Optional[bool] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
@@ -126,8 +126,8 @@ def PyramidChart(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show ("both", "x", "y"). See
-            [`SHOW_GRID`][datachart.constants.SHOW_GRID].
+        show_grid: Which grid lines to show ("both", "x", "y"); `False`
+            draws none. See [`SHOW_GRID`][datachart.constants.SHOW_GRID].
         show_yerr: Whether to show error bars on the bars.
         show_values: Whether to show bar value labels at the edge of each bar.
         value_format: Format string for bar value labels: a

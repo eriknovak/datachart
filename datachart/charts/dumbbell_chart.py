@@ -63,7 +63,7 @@ def DumbbellChart(
     sharey: Optional[bool] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_values: Optional[Union[DUMBBELL_VALUE, str]] = None,
     show_direction: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
@@ -150,9 +150,10 @@ def DumbbellChart(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show ("both", "x", "y"). Unset, the
-            theme's grid runs along the value axis, whichever way it points.
-            See [`SHOW_GRID`][datachart.constants.SHOW_GRID].
+        show_grid: Which grid lines to show ("both", "x", "y"); `False`
+            draws none. Unset, the theme's grid runs along the value axis,
+            whichever way it points. See
+            [`SHOW_GRID`][datachart.constants.SHOW_GRID].
         show_values: The value labels: None (none), `"endpoints"` (each
             endpoint's value past its dot, away from the connector), or
             `"delta"` (`end - start` at the connector midpoint). See

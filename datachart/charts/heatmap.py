@@ -35,7 +35,7 @@ def Heatmap(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_colorbars: Optional[bool] = None,
     show_heatmap_values: Optional[bool] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
@@ -137,7 +137,8 @@ def Heatmap(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_grid: Which grid lines to show (e.g., "both", "x", "y");
+            `False` draws none.
         show_colorbars: Whether to show the colorbar(s).
         show_heatmap_values: Whether to show values on the heatmap cells.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See

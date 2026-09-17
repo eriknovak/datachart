@@ -48,7 +48,7 @@ def HexbinChart(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_colorbars: bool = True,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
@@ -182,8 +182,8 @@ def HexbinChart(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show (e.g., "both", "x", "y"). Off by
-            default: the hexagons cover it.
+        show_grid: Which grid lines to show (e.g., "both", "x", "y"); `False`
+            draws none. Off by default: the hexagons cover it.
         show_colorbars: Whether to show the colorbar(s).
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
