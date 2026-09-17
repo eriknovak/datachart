@@ -125,7 +125,7 @@ def RaincloudPlot(
     color. Use it when you want the shape, the summary statistics, and the
     individual observations in a single view, for example when reporting
     experimental results per condition. Vertical rainclouds keep the cloud on
-    the left; horizontal ones keep it above.
+    the right; horizontal ones keep it above.
 
     !!! info "Added in v0.9.0"
 
