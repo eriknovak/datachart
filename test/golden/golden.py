@@ -59,6 +59,7 @@ from datachart.constants import (
     CONTOUR_LEVELS,
     DATE_FORMAT,
     HEXBIN_REDUCE,
+    HISTOGRAM_TYPE,
     LEGEND_LOCATION,
     NETWORK_LABEL_POSITION,
     NETWORK_LAYOUT,
@@ -329,6 +330,10 @@ EXPECTED_CHANGES = {
     "hist_multi_subplots",
     "scatter_multi_subplots",
     "stackedarea_subplots",
+    # new step outline cases: the drops to zero that state nothing are gone
+    # (#199, #198)
+    "hist_step_log",
+    "hist_step_cumulative",
 }
 
 
@@ -550,6 +555,32 @@ def hist_multi_subplots():
 def hist_horizontal_density():
     return Histogram(
         data=hist_data(), orientation="horizontal", show_density=True, num_bins=10
+    )
+
+
+@case
+def hist_step_log():
+    # Gutenberg-Richter magnitudes: the tail leaves empty bins, and on a log
+    # count axis the outline breaks over them instead of spiking to the floor
+    rng = np.random.RandomState(42)
+    data = [{"x": float(2.5 + m)} for m in rng.exponential(1 / np.log(10), 5000)]
+    return Histogram(
+        data=data,
+        num_bins=40,
+        scaley=SCALE.LOG,
+        style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
+    )
+
+
+@case
+def hist_step_cumulative():
+    # the running share ends at 1, with no drop back to zero
+    return Histogram(
+        data=hist_data(),
+        num_bins=15,
+        show_cumulative=True,
+        show_density=True,
+        style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
     )
 
 

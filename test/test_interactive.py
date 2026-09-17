@@ -218,6 +218,19 @@ class TestCartesianLayers:
         assert 2 <= vertex_x <= 4
         assert resolver(3)["y"] == 2
 
+    def test_step_histogram_gap_vertex_still_names_its_bin(self):
+        figure = Histogram(
+            data=[{"x": v} for v in [0.5] * 100 + [2.5] * 2],
+            num_bins=3,
+            scaley="log",
+            style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
+        )
+        ((outline, resolver),) = _targets(figure)
+        vertices = np.asarray(outline.get_xy(), dtype=float)
+        # a log axis breaks the outline at the empty bin: the vertex is still picked
+        assert np.isnan(vertices[3][1])
+        assert resolver(3)["y"] == 0
+
     def test_swarm_points_report_category_and_value(self):
         figure = SwarmPlot(data=GROUP_DATA, subtitle="scores")
         ((points, resolver),) = _targets(figure)

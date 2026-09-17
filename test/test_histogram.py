@@ -4,9 +4,11 @@ import unittest
 
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 
 from datachart.charts import Histogram
 from datachart.config import config
+from datachart.constants import HISTOGRAM_TYPE, ORIENTATION, SCALE
 from datachart.utils import Panel
 from datachart.utils._internal.layers import build_chart_panel_settings
 
@@ -14,10 +16,16 @@ from datachart.utils._internal.layers import build_chart_panel_settings
 # 0.5 / 1.5 / 2.5 into bins 0 / 1 / 2 with counts A=[4,2,0], B=[1,0,3]
 HIST_A = [{"x": v} for v in [0.5] * 4 + [1.5] * 2]
 HIST_B = [{"x": v} for v in [0.5] * 1 + [2.5] * 3]
+# num_bins=3 leaves the middle bin empty: counts [100, 0, 2] over two decades
+HIST_GAP = [{"x": v} for v in [0.5] * 100 + [2.5] * 2]
 
 
 def container_bottoms(figure, index):
     return [p.get_y() for p in figure.axes[0].containers[index].patches]
+
+
+def outline_vertices(figure):
+    return np.asarray(figure.axes[0].patches[0].get_xy(), dtype=float)
 
 
 class TestHistogramBarMode(unittest.TestCase):
@@ -155,6 +163,151 @@ class TestStepEdgeDefaults(unittest.TestCase):
         self.assertTrue(all(not p.get_fill() for p in patches))
         edges = {matplotlib.colors.to_hex(p.get_edgecolor()) for p in patches}
         self.assertEqual(len(edges), 2)
+
+
+class TestCumulativeStepEnd(unittest.TestCase):
+    """A cumulative step outline ends at its total, with no drop back to zero."""
+
+    def setUp(self):
+        config.reset_config()
+
+    def tearDown(self):
+        config.reset_config()
+        plt.close("all")
+
+    def test_cumulative_step_ends_at_its_total(self):
+        figure = Histogram(
+            HIST_A,
+            num_bins=3,
+            show_cumulative=True,
+            style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
+        )
+        vertices = outline_vertices(figure)
+        self.assertEqual(vertices[-1][1], 6)
+        # only the closing drop goes: the initial rise from zero stays
+        self.assertEqual(vertices[0][1], 0)
+        self.assertEqual(len(vertices), 2 * 3 + 1)
+
+    def test_horizontal_cumulative_step_ends_at_its_total(self):
+        figure = Histogram(
+            HIST_A,
+            num_bins=3,
+            show_cumulative=True,
+            orientation=ORIENTATION.HORIZONTAL,
+            style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
+        )
+        vertices = outline_vertices(figure)
+        self.assertEqual(vertices[-1][0], 6)
+        self.assertEqual(vertices[0][0], 0)
+
+    def test_plain_step_keeps_its_closing_drop(self):
+        figure = Histogram(
+            HIST_A, num_bins=3, style={"plot_hist_type": HISTOGRAM_TYPE.STEP}
+        )
+        vertices = outline_vertices(figure)
+        # a plain histogram's fall to zero is a true count
+        self.assertEqual(vertices[-1][1], 0)
+        self.assertEqual(len(vertices), 2 * 3 + 2)
+
+    def test_cumulative_step_filled_keeps_its_closing_drop(self):
+        figure = Histogram(
+            HIST_A,
+            num_bins=3,
+            show_cumulative=True,
+            style={"plot_hist_type": HISTOGRAM_TYPE.STEP_FILLED},
+        )
+        vertices = outline_vertices(figure)
+        # a filled step is an area: it needs the closing edge
+        self.assertEqual(vertices[-1][1], 0)
+
+    def test_stacked_cumulative_step_keeps_its_closing_drop(self):
+        figure = Histogram(
+            [HIST_A, HIST_B],
+            num_bins=3,
+            show_cumulative=True,
+            style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
+        )
+        for patch in figure.axes[0].patches:
+            # a stacked slot draws as a filled step: it closes on its bottom
+            vertices = np.asarray(patch.get_xy(), dtype=float)
+            self.assertEqual(vertices[-1].tolist(), vertices[0].tolist())
+
+
+class TestLogStepGaps(unittest.TestCase):
+    """A log value axis has no zero: the step outline breaks over the drops to it."""
+
+    def setUp(self):
+        config.reset_config()
+
+    def tearDown(self):
+        config.reset_config()
+        plt.close("all")
+
+    def step(self, data=HIST_GAP, **kwargs):
+        kwargs.setdefault("num_bins", 3)
+        kwargs.setdefault("style", {"plot_hist_type": HISTOGRAM_TYPE.STEP})
+        return outline_vertices(Histogram(data, **kwargs))
+
+    def test_log_step_breaks_over_an_empty_bin(self):
+        values = self.step(scaley=SCALE.LOG)[:, 1]
+        self.assertTrue(np.isnan(values[[0, 3, 4, 7]]).all())
+        self.assertEqual(values[np.isfinite(values)].tolist(), [100, 100, 2, 2])
+
+    def test_log_step_gaps_count_the_empty_bins_and_the_ends(self):
+        values = self.step(scaley=SCALE.LOG)[:, 1]
+        # two vertices per empty bin, plus the rise in and the drop out
+        self.assertEqual(int(np.isnan(values).sum()), 2 * 1 + 2)
+
+    def test_linear_step_keeps_its_zeros(self):
+        values = self.step()[:, 1]
+        self.assertFalse(np.isnan(values).any())
+        self.assertEqual(int((values == 0).sum()), 4)
+
+    def test_horizontal_log_step_breaks_on_the_value_axis(self):
+        vertices = self.step(scalex=SCALE.LOG, orientation=ORIENTATION.HORIZONTAL)
+        # the counts run along x when the histogram lies down
+        self.assertEqual(int(np.isnan(vertices[:, 0]).sum()), 4)
+        self.assertFalse(np.isnan(vertices[:, 1]).any())
+
+    def test_panel_log_breaks_an_inherited_step_outline(self):
+        figure = Histogram(
+            HIST_GAP, num_bins=3, style={"plot_hist_type": HISTOGRAM_TYPE.STEP}
+        )
+        panel = Panel([{"figure": figure}], scaley=SCALE.LOG)
+        self.assertEqual(int(np.isnan(outline_vertices(panel)[:, 1]).sum()), 4)
+
+    def test_cumulative_log_step_keeps_only_its_opening_gap(self):
+        values = self.step(scaley=SCALE.LOG, show_cumulative=True)[:, 1]
+        # the closing drop is already gone; the rise from zero becomes the gap
+        self.assertTrue(np.isnan(values[0]))
+        self.assertEqual(int(np.isnan(values).sum()), 1)
+        self.assertEqual(values[-1], 102)
+
+    def test_log_step_filled_keeps_its_zeros(self):
+        values = self.step(
+            scaley=SCALE.LOG, style={"plot_hist_type": HISTOGRAM_TYPE.STEP_FILLED}
+        )[:, 1]
+        # a filled step needs its baseline to have an area at all
+        self.assertFalse(np.isnan(values).any())
+
+    def test_log_step_draws_no_spike_into_the_gap(self):
+        def inked_rows(scale):
+            figure = Histogram(
+                HIST_GAP,
+                num_bins=3,
+                scaley=scale,
+                style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
+            )
+            figure.canvas.draw()
+            image = np.asarray(figure.canvas.buffer_rgba())[:, :, :3]
+            ink = (image != image[0, 0]).any(axis=2)
+            # the column where the outline falls into the empty bin
+            edge = outline_vertices(figure)[3][0]
+            column = int(round(figure.axes[0].transData.transform((edge, 1))[0]))
+            return int(ink[:, column].sum())
+
+        # the renderer breaks the path where the linear outline drops
+        self.assertLess(inked_rows(SCALE.LOG) * 5, inked_rows(SCALE.LINEAR))
 
 
 if __name__ == "__main__":
