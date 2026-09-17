@@ -1,103 +1,24 @@
 # Dumbbell Chart
 
-This section showcases the dumbbell chart. It contains examples of how to create dumbbell charts using the [datachart.charts.DumbbellChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.DumbbellChart) function.
+A dumbbell chart shows two values per category, a dot at each and a connector between them, so the reader sees the change from one state to the other (before and after, one year and a later one) or the gap between two groups, and how that change or gap compares across the categories. This guide shows how to create dumbbell charts with the [datachart.charts.DumbbellChart](https://eriknovak.github.io/datachart/dev/references/charts/dumbbellchart/#datachart.charts.DumbbellChart) function, starting with the basics and building up to worked examples on real data.
 
 Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-dumbbell-chart), which maps common tasks to the parameter or style attribute that does the job.
-
-As mentioned above, the dumbbell charts are created using the `DumbbellChart` function found in the [datachart.charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md) module. Let's import it:
 
 ```
 from datachart.charts import DumbbellChart
 ```
 
-## Dumbbell Chart Input Attributes
-
-The `DumbbellChart` function accepts keyword arguments for chart configuration. The main argument is `data`, a list of records. Each record names its category in `label` and its two endpoints, `start` and `end`, as finite numbers; it may add its own `emphasis`. A list of such lists overlays several charts on the same categories, or draws one per subplot with `subplots=True`.
-
-```
-DumbbellChart(
-    data=[                                               # The records (or list of lists for multiple charts)
-        {
-            "label": str,                                # The category, unique within the chart; its row label
-            "start": Union[int, float],                  # The value of the start endpoint
-            "end": Union[int, float],                    # The value of the end endpoint
-            "emphasis": Optional[EMPHASIS],              # The record's own emphasis role ("background", "highlight")
-        },
-    ],
-    style={                                              # The style of the chart (optional)
-        "plot_dumbbell_start_color":     Optional[str],  # The start dot color; None takes the PaperAccent blue
-        "plot_dumbbell_end_color":       Optional[str],  # The end dot color; None takes the PaperAccent red
-        "plot_dumbbell_alpha":           Optional[float],# The alpha of the dots
-        "plot_dumbbell_size":            Optional[float],# The dot size, in points squared
-        "plot_dumbbell_start_marker":    Optional[LINE_MARKER], # The marker of the start dots
-        "plot_dumbbell_end_marker":      Optional[LINE_MARKER], # The marker of the end dots
-        "plot_dumbbell_edge_width":      Optional[float],# The edge width of the dots
-        "plot_dumbbell_edge_color":      Optional[str],  # The edge color of the dots
-        "plot_dumbbell_zorder":          Optional[float],# The zorder of the dots
-        "plot_dumbbell_connector_color": Optional[str],  # The color of the connectors
-        "plot_dumbbell_connector_width": Optional[float],# The line width of the connectors
-        "plot_dumbbell_connector_style": Optional[LINE_STYLE], # The line style of the connectors
-        "plot_dumbbell_connector_zorder": Optional[float], # The zorder of the connectors, below the dots
-        "plot_dumbbell_arrow_color":     Optional[str],  # The color of the direction arrows
-        "plot_dumbbell_arrow_width":     Optional[float],# The line width of the direction arrows
-        "plot_dumbbell_arrow_style":     Optional[str],  # The direction arrow head, as a matplotlib arrow style
-        "plot_dumbbell_arrow_gap":       Optional[float],# The space between a dot and its direction arrow, in points
-        "plot_dumbbell_grid_minor":      Optional[int],  # The parts each value step splits into with fainter gridlines (0 for none)
-    },
-    subtitle=Optional[str],                              # The subtitle (or list for multiple charts)
-    title=Optional[str],                                 # The title of the chart
-    xlabel=Optional[str],                                # The label of the horizontal axis
-    ylabel=Optional[str],                                # The label of the vertical axis
-    figsize=Optional[Tuple[float, float]],               # The figure size in inches
-    xmin=Optional[float], xmax=Optional[float],          # The horizontal axis limits
-    ymin=Optional[float], ymax=Optional[float],          # The vertical axis limits
-    orientation=Optional[ORIENTATION],                   # Which way the values run ("horizontal" by default, "vertical")
-    scaley=Optional[SCALE],                              # The scale of the value axis
-    xtickrotate=Optional[int],                           # The rotation of the horizontal tick labels
-    ytickrotate=Optional[int],                           # The rotation of the vertical tick labels
-
-    start_name=Optional[str],                            # The name of the start endpoint, in the legend
-    end_name=Optional[str],                              # The name of the end endpoint, in the legend
-    show_legend=Optional[bool],                          # Whether to show the legend (on when a name is given)
-    legend=Optional[LegendSettingAttrs],                 # The legend title, location, and columns
-    show_grid=Optional[SHOW_GRID],                       # Which grid lines to show ("both", "x", "y"); the value axis by default
-    show_values=Optional[DUMBBELL_VALUE],                # The value labels ("endpoints", "delta")
-    show_direction=Optional[bool],                       # Whether to draw a thin start-to-end arrow beside each connector
-    value_format=Optional[str],                          # The format of the value labels
-
-    sort=Optional[SORT],                                 # The category order (None, "ascending", "descending")
-    sort_by=Optional[DUMBBELL_SORT_KEY],                 # What the categories sort by ("start", "end", "delta")
-    marker=Optional[Tuple[LINE_MARKER, LINE_MARKER]],    # The (start, end) marker pair
-    connector_style=Optional[LINE_STYLE],                # The line style of the connectors
-
-    emphasis=Optional[EMPHASIS],                         # The emphasis role of the whole chart (or list per chart)
-    emphasis_rule=Optional[EmphasisRuleAttrs],           # Highlight the records matching a rule on their delta
-
-    subplots=Optional[bool],                             # Whether to draw each chart in its own subplot
-    max_cols=Optional[int],                              # Maximum number of subplots per row
-    sharex=Optional[bool], sharey=Optional[bool],        # Whether the subplots share their axes
-
-    vlines=Optional[List[VLineSettingAttrs]],            # Vertical lines
-    hlines=Optional[List[HLineSettingAttrs]],            # Horizontal lines
-    vspans=Optional[List[VSpanSettingAttrs]],            # Vertical bands
-    hspans=Optional[List[HSpanSettingAttrs]],            # Horizontal bands
-    texts=Optional[List[TextSettingAttrs]],              # Text annotations
-)
-```
-
-For more details, see the [datachart.charts.DumbbellChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.DumbbellChart) function.
-
 ## Basics
 
-The examples in this guide share one dataset: life expectancy at birth in twelve countries in 2000 and in 2019, the last year before the COVID-19 pandemic, from the [World Health Organization's Global Health Observatory](<https://www.who.int/data/gho/data/indicators/indicator-details/GHO/life-expectancy-at-birth-(years)>), rounded to one decimal. `life` holds one record per country for both sexes together; `women` and `men` hold the same records per sex. `recent` runs from 2019 to 2021, across the COVID-19 pandemic, when life expectancy fell in most of these countries and rose in a few.
+The examples in this guide share one dataset: life expectancy at birth in twelve countries in 2000 and in 2019, the last year before the COVID-19 pandemic, in years (source: the World Health Organization's Global Health Observatory, indicator WHOSIS_000001, 2024 release, rounded to one decimal). The data lives in a hidden cell. `life` holds one record per country for both sexes together, `women` and `men` hold the same records per sex, and `recent` runs from 2019 to 2021, across the pandemic. Two decades of gains, a gap between women and men that is closing in some countries and opening in others, and a pandemic that undid part of the progress: the customizations below help to read each of these.
 
-The data is a list of dictionaries, one per country: `label` names the category, `start` holds the value in 2000, and `end` the value in 2019.
+Each record is a dictionary with a `label` (the category), a `start` value and an `end` value; here the value in 2000 and the value in 2019:
 
 ```
-life[0]
+life[:3]
 ```
 
-**Basic example.** Only the `data` argument is required to draw the dumbbell chart. Every record is one row: a blue dot at its start, a red dot at its end, and a grey connector between them, the first record at the top. The dots take the two colors of the `PaperAccent` palette unless the theme or the style sets its own pair, and the gridlines run along the values.
+**Basic example.** Only the `data` argument is required. Every record is one row, the first at the top: a dot at its start, a dot at its end, and a connector between them. Every country gained, and the length of each connector is the gain:
 
 ```
 DumbbellChart(
@@ -110,84 +31,123 @@ DumbbellChart(
 
 Every customization is either a keyword argument of `DumbbellChart` or a `plot_dumbbell_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                                    | Use                                                | See                                                             |
-| --------------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------- |
-| add a title or axis labels                    | `title`, `xlabel`, `ylabel`                        | [Title, labels, and figure size](#title-labels-and-figure-size) |
-| resize the figure                             | `figsize`                                          | [Title, labels, and figure size](#title-labels-and-figure-size) |
-| change the gridlines                          | `show_grid`                                        | [Orientation](#orientation)                                     |
-| draw the values up the page instead of across | `orientation`                                      | [Orientation](#orientation)                                     |
-| order the categories by start, end, or change | `sort`, `sort_by`                                  | [Category order](#category-order)                               |
-| name the two endpoints in a legend            | `start_name`, `end_name`, `legend`                 | [Endpoint names and legend](#endpoint-names-and-legend)         |
-| print the endpoint values or the change       | `show_values`, `value_format`                      | [Value labels](#value-labels)                                   |
-| show whether each value rose or fell          | `show_direction`                                   | [Rises and falls](#rises-and-falls)                             |
-| tell the endpoints apart by shape             | `marker`                                           | [Markers and connectors](#markers-and-connectors)               |
-| dash the connectors                           | `connector_style`                                  | [Markers and connectors](#markers-and-connectors)               |
-| change the dot and connector colors and sizes | `style={"plot_dumbbell_start_color": ..., ...}`    | [Dumbbell style](#dumbbell-style)                               |
-| highlight some categories, mute the rest      | `emphasis` record key, `emphasis_rule`, `emphasis` | [Emphasis](#emphasis)                                           |
-| mark a reference value                        | `vlines`, `vspans`, `hlines`, `hspans`             | [Reference lines](#reference-lines)                             |
-| compare several groups on the same categories | `data` as a list of lists, `subtitle`              | [Overlaid charts](#overlaid-charts)                             |
-| draw each group in its own subplot            | `subplots`, `max_cols`, `sharex`                   | [Subplots](#subplots)                                           |
-| combine with other charts                     | `Panel`, `Grid`                                    | [Composing dumbbell charts](#composing-dumbbell-charts)         |
-| save the chart to a file                      | `save_figure`                                      | [Saving the Chart as an Image](#saving-the-chart-as-an-image)   |
+| I want to…                                    | Use                                                    | See                                                                                                     |
+| --------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| add a title and axis labels                   | `title`, `xlabel`, `ylabel`                            | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| rotate the tick labels                        | `xtickrotate`, `ytickrotate`                           | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| fix the axis range                            | `xmin`, `xmax`, `ymin`, `ymax`                         | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| resize the figure                             | `figsize`                                              | [Figure size and grid](#figure-size-and-grid)                                                           |
+| change the grid lines                         | `show_grid`, `style={"plot_dumbbell_grid_minor": ...}` | [Figure size and grid](#figure-size-and-grid)                                                           |
+| run the values up the page                    | `orientation`                                          | [Orientation](#orientation)                                                                             |
+| order the categories by start, end, or change | `sort`, `sort_by`                                      | [Category order](#category-order)                                                                       |
+| name the two endpoints in a legend            | `start_name`, `end_name`, `show_legend`, `legend`      | [Endpoint names and legend](#endpoint-names-and-legend)                                                 |
+| print the endpoint values or the change       | `show_values`, `value_format`                          | [Value labels](#value-labels)                                                                           |
+| show whether each value rose or fell          | `show_direction`                                       | [Rises and falls](#rises-and-falls)                                                                     |
+| tell the endpoints apart by shape             | `marker`                                               | [Markers and connectors](#markers-and-connectors)                                                       |
+| dash the connectors                           | `connector_style`                                      | [Markers and connectors](#markers-and-connectors)                                                       |
+| change the dot and connector colors and sizes | `style={"plot_dumbbell_start_color": ..., ...}`        | [Dumbbell style](#dumbbell-style)                                                                       |
+| highlight some categories, mute the rest      | `emphasis_rule`, the `"emphasis"` key of a record      | [Emphasis](#emphasis)                                                                                   |
+| mark a reference value                        | `vlines`, `hlines`                                     | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| shade a range of values                       | `vspans`, `hspans`                                     | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| put a note on the chart                       | `texts`                                                | [Text annotations](#text-annotations)                                                                   |
+| compare several groups on the same categories | `data` as a list of lists, `subtitle`                  | [Multiple Dumbbell Charts](#multiple-dumbbell-charts)                                                   |
+| highlight one group, mute the rest            | `emphasis`                                             | [Multiple Dumbbell Charts](#multiple-dumbbell-charts)                                                   |
+| draw each group in its own subplot            | `subplots`, `sharex`, `sharey`, `max_cols`             | [Subplots](#subplots)                                                                                   |
+| combine with other charts                     | `Panel`, `Grid`                                        | [Composing dumbbell charts](#composing-dumbbell-charts)                                                 |
+| use a logarithmic value axis                  | `scaley`                                               | [Axis scales](#axis-scales)                                                                             |
+| restyle every chart at once                   | `config.set_theme`                                     | [Themes](#themes)                                                                                       |
+| save the chart to a file                      | `save_figure`                                          | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
-The full list of style attributes is in the [datachart.typings.DumbbellStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DumbbellStyleAttrs) type; the full list of parameters is in the [datachart.charts.DumbbellChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.DumbbellChart) reference.
+The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
 
-### Title, labels, and figure size
+| Parameter                                    | Constant                                                                                                                                                                                                                                     |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `show_values`                                | [`DUMBBELL_VALUE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DUMBBELL_VALUE)                                                                                                                       |
+| `sort_by`                                    | [`DUMBBELL_SORT_KEY`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DUMBBELL_SORT_KEY)                                                                                                                 |
+| `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
+| `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
+| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
+| `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
+| `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
+| `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
+| `marker`                                     | [`LINE_MARKER`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_MARKER)                                                                                                                             |
+| `connector_style`                            | [`LINE_STYLE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE)                                                                                                                               |
+| `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
 
-To add the chart title and the axis labels, add the `title`, `xlabel`, and `ylabel` attributes. The axis attributes are spatial: in the default horizontal chart, `xlabel` names the value axis and `ylabel` the category axis.
+The full list of style attributes is in the [datachart.typings.DumbbellStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/dumbbellchart/#datachart.typings.DumbbellStyleAttrs) type; the full list of parameters is in the [datachart.charts.DumbbellChart](https://eriknovak.github.io/datachart/dev/references/charts/dumbbellchart/#datachart.charts.DumbbellChart) reference.
 
-To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains some of the predefined figure sizes.
+### Title, axis labels and ticks
 
-```
-from datachart.constants import FIG_SIZE
-```
+Without a title and axis labels the reader cannot tell what the two dots stand for; `title`, `xlabel` and `ylabel` say it. The axis arguments are spatial: in the default horizontal chart `xlabel` names the value axis and `ylabel` the category axis. `xtickrotate` and `ytickrotate` tilt the tick labels when they crowd each other, which country names on the vertical axis do not need. `xmin`, `xmax`, `ymin` and `ymax` fix the axis range: a dumbbell encodes value by position, not by length, so the value axis need not start at zero, and a tighter range spreads the dots out.
 
 ```
 DumbbellChart(
     data=life,
-    # add the title and the axis labels
+    # add the title
+    title="Life expectancy at birth, 2000 to 2019",
+    # add the x and y axis labels
+    xlabel="Years",
+    ylabel="Country",
+    # fix the value axis range
+    xmin=50,
+    xmax=90,
+).show()
+```
+
+### Figure size and grid
+
+Twelve rows need height, and a chart with a few rows should not get it. `figsize` takes a `(width, height)` tuple in inches or one of the presets in [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE), sized for a full or half page width.
+
+The grid lines let the eye carry a dot across to the value axis. By default they follow the values, whichever way the chart runs, with fainter lines halfway between the labelled values so a value reads off quickly; the `plot_dumbbell_grid_minor` style attribute sets how many parts each step splits into (`0` draws no fainter lines). An explicit `show_grid`, a [SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) member, names the axes literally (`SHOW_GRID.X`, `SHOW_GRID.Y` or `SHOW_GRID.BOTH`). The example keeps the vertical value grid and drops the fainter lines.
+
+```
+from datachart.constants import FIG_SIZE, SHOW_GRID
+
+DumbbellChart(
+    data=life,
     title="Life expectancy at birth, 2000 to 2019",
     xlabel="Years",
     ylabel="Country",
-    # add to determine the figure size
-    figsize=FIG_SIZE.A4_LANDSCAPE,
+    # a full-width, medium-height figure
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    # grid lines along the value axis, without the fainter lines in between
+    show_grid=SHOW_GRID.X,
+    style={"plot_dumbbell_grid_minor": 0},
 ).show()
 ```
 
 ### Orientation
 
-The values run along the horizontal axis by default, one row per category. To run them up the page, one column per category, add the `orientation` attribute with a [datachart.constants.ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) constant. The first category sits at the left; `xtickrotate` turns long category names.
-
-The gridlines follow the values: vertical lines in a horizontal chart, horizontal lines in a vertical one, with a fainter line halfway between each pair of labelled values so a dot's value reads off quickly. The `plot_dumbbell_grid_minor` style attribute sets how many parts each step splits into (0 draws no fainter lines). An explicit `show_grid`, a [datachart.constants.SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) constant, picks the axes literally.
+Rows suit a long list of names, but a change reads naturally as a rise or a fall, and for that the values should run up the page. `orientation=ORIENTATION.VERTICAL` ([ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)) draws one column per category, the first at the left, so the end dot of a gain sits above its start dot. The axis labels, the grid and the axis limits swap with it; `xtickrotate` turns the country names out of each other's way.
 
 ```
 from datachart.constants import ORIENTATION
-```
 
-```
 DumbbellChart(
     data=life,
     title="Life expectancy at birth, 2000 to 2019",
+    # the axis labels swap with the orientation
     ylabel="Years",
     # run the values up the page
     orientation=ORIENTATION.VERTICAL,
     xtickrotate=45,
-    figsize=(9, 5),
+    figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
 ### Category order
 
-The categories follow the input order by default. To order them, add the `sort` attribute with a [datachart.constants.SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT) constant; the `sort_by` attribute, a [datachart.constants.DUMBBELL_SORT_KEY](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DUMBBELL_SORT_KEY) constant, names what they sort by: `START` (the default), `END`, or `DELTA`, the change `end - start`. Ties keep the input order; `sort_by` without `sort` raises a `ValueError`.
+The input order ranks the countries by their life expectancy in 2000, which is one story; ranking them by how much they gained is another. `sort` orders the categories ([SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)): `SORT.DESCENDING` puts the largest first, `SORT.ASCENDING` the smallest, `None` keeps the input order. `sort_by` names the key ([DUMBBELL_SORT_KEY](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DUMBBELL_SORT_KEY)): `START` (the default), `END`, or `DELTA`, the change `end - start`. Ties keep the input order, and `sort_by` needs a `sort` to act on. Ordered by the gain, the ranking flips: the countries that started lowest gained the most, Nigeria nine years, while the United States gained two.
 
 ```
 from datachart.constants import SORT, DUMBBELL_SORT_KEY
-```
 
-```
 DumbbellChart(
     data=life,
     title="Life expectancy at birth, largest gain first",
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
     # order the countries by their change, the largest first
     sort=SORT.DESCENDING,
     sort_by=DUMBBELL_SORT_KEY.DELTA,
@@ -196,106 +156,101 @@ DumbbellChart(
 
 ### Endpoint names and legend
 
-The two endpoints are named by the `start_name` and `end_name` attributes; each named endpoint gets one legend entry, and the legend is on as soon as a name is given. To hide it, set `show_legend=False`; to give it a title or move it, add the `legend` attribute, a [datachart.typings.LegendSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendSettingAttrs) dictionary.
+Two colors of dot mean nothing until the legend says which is which. `start_name` and `end_name` name the endpoints, each gets one legend entry, and the legend switches on as soon as a name is given (`show_legend=False` hides it again). `legend` says where and how, with a `title`, a `location` from [LEGEND_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), the number of columns `ncols`, and the `alignment` of the entries from [LEGEND_ALIGN](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN); a field left out falls back to the theme ([LegendSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendSettingAttrs)). The top rows of this chart reach the right edge, so the legend goes outside the axes.
 
 ```
 from datachart.constants import LEGEND_LOCATION
-```
 
-```
 DumbbellChart(
     data=life,
     title="Life expectancy at birth",
-    # name the endpoints
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    # name the endpoints; the legend switches on with them
     start_name="2000",
     end_name="2019",
-    # title the legend and place it beside the chart
+    # a titled legend outside the axes, to the right
     legend={"title": "Year", "location": LEGEND_LOCATION.OUTSIDE_RIGHT},
 ).show()
 ```
 
 ### Value labels
 
-To print the values, add the `show_values` attribute with a [datachart.constants.DUMBBELL_VALUE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DUMBBELL_VALUE) constant: `ENDPOINTS` prints each endpoint's value past its dot, on the side away from the connector; `DELTA` prints the change `end - start` at the connector midpoint. A record whose endpoints coincide draws a single dot, no connector, and a delta of zero. The `value_format` attribute formats the numbers — use a [datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant or any `"{x:.1f}"` style string; `"{:+.1f}"` signs the delta.
+When the exact numbers matter, `show_values` prints them ([DUMBBELL_VALUE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DUMBBELL_VALUE)): `ENDPOINTS` prints each endpoint's value past its dot, on the side away from the connector, and `DELTA` prints the change `end - start` at the connector midpoint. `value_format` formats the numbers: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant or any `"{x:.1f}"`, `"{:+.1f}"` or `"%g"` style string, and the label font size, color and padding are the `plot_value_*` style attributes ([ValueLabelStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)). Endpoint labels answer *what were the values*; the value axis is widened a little so the outer labels have room.
 
 ```
 from datachart.constants import DUMBBELL_VALUE
-```
 
-```
 DumbbellChart(
     data=life,
     title="Life expectancy at birth, 2000 and 2019",
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
     start_name="2000",
     end_name="2019",
-    # print both endpoint values
+    # print both endpoint values, with one decimal
     show_values=DUMBBELL_VALUE.ENDPOINTS,
-    figsize=(8, 6),
+    value_format="{:.1f}",
+    legend={"title": "Year", "location": LEGEND_LOCATION.LOWER_RIGHT},
+    # room for the labels on both sides
+    xmin=45,
+    xmax=95,
 ).show()
 ```
+
+Delta labels answer *how much did it change*, and a signed format (`"{:+.1f}"`) keeps a gain and a loss apart at a glance. Sorted by the change, the labels turn the chart into a ranked table of gains:
 
 ```
 DumbbellChart(
     data=life,
     title="Years gained, 2000 to 2019",
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
     sort=SORT.DESCENDING,
     sort_by=DUMBBELL_SORT_KEY.DELTA,
     # print the signed change at every connector
     show_values=DUMBBELL_VALUE.DELTA,
     value_format="{:+.1f}",
-    figsize=(8, 6),
 ).show()
 ```
 
 ### Rises and falls
 
-The end dot can sit on either side of the start dot: a value that fell has its end dot left of (or below) its start dot. From 2019 to 2021 life expectancy fell in most of these countries, rose slightly in Norway, China, and Nigeria, and held in Japan, whose record draws a single dot. Color alone tells the two endpoints apart; to show the direction at a glance, add `show_direction=True`. A thin arrow runs beside each connector from the start to the end — above a horizontal dumbbell, right of a vertical one — and a delta label moves out past it. The `plot_dumbbell_arrow_*` style attributes set its look.
+A value that fell has its end dot on the other side of its start dot, and when some rows rise while others fall, the color of the dots is a slow way to tell them apart. `show_direction=True` draws a thin arrow beside each connector from the start to the end: above a horizontal dumbbell, right of a vertical one, with the delta label moving out past it. The `plot_dumbbell_arrow_*` style attributes set its look. From 2019 to 2021, across the pandemic, life expectancy fell in most of these countries, by more than three years in Brazil, Russia, India and South Africa, rose a little in Norway, China and Nigeria, and held in Japan, whose record draws a single dot and no arrow.
 
 ```
 DumbbellChart(
     data=recent,
     title="Life expectancy at birth, 2019 to 2021",
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
     start_name="2019",
     end_name="2021",
+    legend={"title": "Year", "location": LEGEND_LOCATION.LOWER_RIGHT},
     # an arrow beside every connector, from start to end
     show_direction=True,
     show_values=DUMBBELL_VALUE.DELTA,
     value_format="{:+.1f}",
-    figsize=(8, 6),
-).show()
-```
-
-```
-DumbbellChart(
-    data=recent,
-    title="Life expectancy at birth, 2019 to 2021",
-    ylabel="Years",
-    start_name="2019",
-    end_name="2021",
-    # the arrows follow the values up the page
-    orientation=ORIENTATION.VERTICAL,
-    xtickrotate=45,
-    show_direction=True,
-    sort=SORT.ASCENDING,
-    sort_by=DUMBBELL_SORT_KEY.DELTA,
-    figsize=(9, 5),
+    xmin=55,
+    xmax=90,
 ).show()
 ```
 
 ### Markers and connectors
 
-To tell the endpoints apart by shape as well as color — for print in greyscale, say — add the `marker` attribute, a `(start, end)` pair of [datachart.constants.LINE_MARKER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_MARKER) values. The `connector_style` attribute sets the line style of the connectors with a [datachart.constants.LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE) constant. Both replace the theme's choice; a chart's `style` dictionary still wins over them.
+A chart that will be printed in greyscale loses the color of the dots, and then the shape has to tell the endpoints apart. `marker` takes a `(start, end)` pair of [LINE_MARKER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_MARKER) members, and `connector_style` sets the line style of the connectors with a [LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE) member. Both replace the theme's choice; a chart's `style` dictionary still wins over them.
 
 ```
 from datachart.constants import LINE_MARKER, LINE_STYLE
-```
 
-```
 DumbbellChart(
     data=life,
     title="Life expectancy at birth",
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
     start_name="2000",
     end_name="2019",
+    legend={"title": "Year", "location": LEGEND_LOCATION.LOWER_RIGHT},
     # a square for the start, a circle for the end
     marker=(LINE_MARKER.SQUARE, LINE_MARKER.CIRCLE),
     # dotted connectors
@@ -305,42 +260,24 @@ DumbbellChart(
 
 ### Dumbbell style
 
-To change the style, add the `style` attribute with the corresponding attributes; they are shown in the [datachart.typings.DumbbellStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DumbbellStyleAttrs) type. The value labels take the shared `plot_value_*` attributes.
-
-| Attribute                        | Description                                                                                   |
-| -------------------------------- | --------------------------------------------------------------------------------------------- |
-| `plot_dumbbell_start_color`      | The color of the start dots; `None` takes the first color of the `PaperAccent` pair.          |
-| `plot_dumbbell_end_color`        | The color of the end dots; `None` takes the second color of the `PaperAccent` pair.           |
-| `plot_dumbbell_alpha`            | The alpha (transparency) of the dots.                                                         |
-| `plot_dumbbell_size`             | The size of the dots, in points squared.                                                      |
-| `plot_dumbbell_start_marker`     | The marker of the start dots.                                                                 |
-| `plot_dumbbell_end_marker`       | The marker of the end dots.                                                                   |
-| `plot_dumbbell_edge_width`       | The edge width of the dots.                                                                   |
-| `plot_dumbbell_edge_color`       | The edge color of the dots.                                                                   |
-| `plot_dumbbell_zorder`           | The zorder of the dots.                                                                       |
-| `plot_dumbbell_connector_color`  | The color of the connectors.                                                                  |
-| `plot_dumbbell_connector_width`  | The line width of the connectors.                                                             |
-| `plot_dumbbell_connector_style`  | The line style of the connectors.                                                             |
-| `plot_dumbbell_connector_zorder` | The zorder of the connectors; below the dots by default.                                      |
-| `plot_dumbbell_arrow_color`      | The color of the direction arrows under `show_direction`.                                     |
-| `plot_dumbbell_arrow_width`      | The line width of the direction arrows.                                                       |
-| `plot_dumbbell_arrow_style`      | The direction arrow head, as a matplotlib arrow style.                                        |
-| `plot_dumbbell_arrow_gap`        | The space between a dot's edge and its direction arrow, in points.                            |
-| `plot_dumbbell_grid_minor`       | The parts each step between labelled values splits into with fainter gridlines; 0 draws none. |
+The `style` dictionary sets the look of the dots and the connectors: the two endpoint colors, the dot size and alpha, the markers and edges, the connector color, width and style, and the direction arrows; the attributes are listed in [datachart.typings.DumbbellStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/dumbbellchart/#datachart.typings.DumbbellStyleAttrs), and any attribute left out keeps the value of the active theme. A muted start and a saturated end put the weight on where each country ended up, and a wider connector in a lighter shade makes the gain read as a bar between the two:
 
 ```
 DumbbellChart(
     data=life,
     title="Life expectancy at birth",
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
     start_name="2000",
     end_name="2019",
-    # define the style of the chart
+    legend={"title": "Year", "location": LEGEND_LOCATION.LOWER_RIGHT},
+    # a muted start, a saturated end, and a wide light connector
     style={
-        "plot_dumbbell_start_color": "#B0BEC5",
-        "plot_dumbbell_end_color": "#00796B",
-        "plot_dumbbell_size": 100,
+        "plot_dumbbell_start_color": "#b0bec5",
+        "plot_dumbbell_end_color": "#00796b",
+        "plot_dumbbell_size": 90,
         "plot_dumbbell_edge_width": 0,
-        "plot_dumbbell_connector_color": "#CFD8DC",
+        "plot_dumbbell_connector_color": "#cfd8dc",
         "plot_dumbbell_connector_width": 5,
     },
 ).show()
@@ -348,14 +285,37 @@ DumbbellChart(
 
 ### Emphasis
 
-A record's own `emphasis` key takes a [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) role: `"highlight"` rims the dots in the text color and thickens the connector, `"background"` mutes the dots and the connector in the theme's muted color and drops their labels. The `emphasis_rule` attribute sets the roles by a rule on each record's change `end - start` — `{"above": v}`, `{"below": v}`, `{"between": (lo, hi)}`, `{"top": n}`, or `{"bottom": n}` — highlighting the records that match and muting the rest; a record's own key wins over the rule. The `emphasis` attribute sets one role for a whole chart. See the [highlighting guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting.ipynb) for emphasis across the charts.
+A chart usually makes one point, and emphasis makes it visible. A record can carry its own `"emphasis"` key: `"highlight"` rims the dots in the text color and thickens the connector, `"background"` mutes the dots and the connector in the theme's muted color and drops their labels. The roles are also available as the [EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants, and the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis across every chart type and theme. Asking only about Slovenia is a matter of tagging one record and muting the rest:
+
+```
+# tag Slovenia, mute the rest
+slovenia_marked = [
+    {**record, "emphasis": "highlight" if record["label"] == "Slovenia" else "background"}
+    for record in life
+]
+
+DumbbellChart(
+    data=slovenia_marked,
+    title="Life expectancy at birth, Slovenia",
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    start_name="2000",
+    end_name="2019",
+    legend={"title": "Year", "location": LEGEND_LOCATION.LOWER_RIGHT},
+).show()
+```
+
+`emphasis_rule` picks the records from the data instead of tagging them by hand. It is a one-key dictionary read against each record's change `end - start`: `{"top": n}` or `{"bottom": n}` by rank, `{"above": v}` or `{"below": v}` (strict), or `{"between": (lo, hi)}` (inclusive); the records that match are highlighted, the rest muted, and a record's own `"emphasis"` key wins over the rule. With the delta labels, the three largest gains stand out and keep their labels while the muted rows drop theirs:
 
 ```
 DumbbellChart(
     data=life,
-    title="The three largest gains",
+    title="The three largest gains, 2000 to 2019",
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
     start_name="2000",
     end_name="2019",
+    legend={"title": "Year", "location": LEGEND_LOCATION.LOWER_RIGHT},
     # highlight the three largest changes, mute the rest
     emphasis_rule={"top": 3},
     show_values=DUMBBELL_VALUE.DELTA,
@@ -363,130 +323,315 @@ DumbbellChart(
 ).show()
 ```
 
-### Reference lines
+### Reference lines and bands
 
-The `vlines`, `hlines`, `vspans`, and `hspans` attributes draw reference lines and bands, such as the world average; see the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) and [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) types. In the default horizontal chart a value is marked with a vertical line.
+A reference value puts the rows in context: where does the world stand, which rows have crossed a threshold. In the default horizontal chart a value is marked with `vlines` (a vertical line at a value) and a range shaded with `vspans`; `hlines` and `hspans` take positions along the category axis, which are row positions (`1` for the first row, `2` for the second, …), so a half-integer sits between two rows; a vertical chart swaps the pairs. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) and [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs). The example marks the global life expectancy of 2019 with a dotted line and shades the band above 80 years, which five countries had reached by 2019 and only Japan had in 2000.
 
 ```
 DumbbellChart(
     data=life,
+    # a dotted line at the global value of 2019
+    vlines={
+        "x": WORLD_2019,
+        "label": "World, 2019",
+        "style": {"plot_vline_color": "#c1121f", "plot_vline_style": LINE_STYLE.DOTTED},
+    },
+    # shade the band above 80 years
+    vspans={"xmin": 80, "xmax": 90, "label": "80 years and above"},
     title="Life expectancy at birth",
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
     start_name="2000",
     end_name="2019",
-    # the global life expectancy at birth in 2019 (WHO)
-    vlines={"x": 73.1, "label": "World, 2019", "style": {"plot_vline_style": ":"}},
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+    xmin=50,
+    xmax=90,
+).show()
+```
+
+### Text annotations
+
+Where a reference line marks a value, a note explains a row. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (value and row position in a horizontal chart, the first row at `1`) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The note below points at Russia's start dot and explains the largest gain among the European countries.
+
+```
+# row positions start at 1
+RUSSIA = [record["label"] for record in life].index("Russia") + 1
+
+DumbbellChart(
+    data=life,
+    # a note pinned to the axes, pointing at Russia's start dot
+    texts={
+        "text": "Russia started at 65.2 years\nin 2000 and gained 8.0",
+        "x": 0.04,
+        "y": 0.62,
+        "coords": "axes",
+        "target": (LIFE["Russia"][0][0], RUSSIA),
+    },
+    title="Life expectancy at birth",
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    start_name="2000",
+    end_name="2019",
+    legend={"title": "Year", "location": LEGEND_LOCATION.LOWER_RIGHT},
+    xmin=50,
+    xmax=90,
 ).show()
 ```
 
 ## Multiple Dumbbell Charts
 
-### Overlaid charts
-
-To compare groups on the same categories, pass a list of lists to the `data` argument. The charts share one category axis — a category any chart lists gets a row — and overlay at its center, each in its own palette color: the end dot in the color, the start dot in a lighter shade. With `subtitle` and the endpoint names, the legend reads *subtitle (name)* per endpoint.
+To compare several groups on the same categories, pass a list of lists to `data`: each inner list is one chart, and the per-chart attributes (`subtitle`, `style`, `emphasis`) become lists aligned with it. The charts share one category axis (a category any chart lists gets a row) and overlay at its center, each in its own palette color, the end dot in the color and the start dot in a lighter shade of it. With `subtitle` and the endpoint names, the legend reads *subtitle (name)* per endpoint. `women` and `men` overlaid show the two changes side by side in each country, and the gap between them:
 
 ```
 DumbbellChart(
-    # use a list of lists to overlay charts on the same categories
+    # one chart per sex, overlaid on the same rows
     data=[women, men],
+    # named for the legend
     subtitle=["Women", "Men"],
     start_name="2000",
     end_name="2019",
     title="Life expectancy at birth, by sex",
-    figsize=(8, 6),
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+).show()
+```
+
+When the question is about one of the groups, `emphasis` takes one role per chart, aligned with `data` like `subtitle` and `style`: `"highlight"` bolds a chart, `"background"` mutes it and drops it from the legend, `None` leaves it as it is. Asking about men turns the women's rows into context, and it shows that men in Russia, Switzerland and Norway gained almost twice as many years as women:
+
+```
+DumbbellChart(
+    data=[women, men],
+    subtitle=["Women", "Men"],
+    start_name="2000",
+    end_name="2019",
+    # men are the question, women the context
+    emphasis=["background", "highlight"],
+    title="Life expectancy at birth, men against women",
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
 ).show()
 ```
 
 ### Subplots
 
-To draw each chart in its own subplot instead, add `subplots=True`; `max_cols` sets the subplots per row and `sharex` puts them on one value scale. Per-chart attributes like `subtitle` and `style` can be lists. The legend is off in subplots.
+When the overlay gets crowded, or the question is about the shape of each group rather than the gap between them, `subplots=True` draws each chart in its own panel. `subtitle` titles the panels; `title`, `xlabel` and `ylabel` stay global; `max_cols` limits the panels per row. `sharex=True` puts the panels on one value axis, so a dot in one panel is comparable with a dot in the next; without it each panel scales to its own range and the men's shorter lives would look as long as the women's. `sharey=True` keeps one category axis for all of them, so the country names print once and each country sits on the same row in every panel:
 
 ```
 DumbbellChart(
     data=[women, men],
     subtitle=["Women", "Men"],
     title="Life expectancy at birth, 2000 to 2019",
-    # one subplot per chart, on one value scale
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    # one panel per sex, on one value axis and one category axis
     subplots=True,
     sharex=True,
-    sort=SORT.ASCENDING,
-    sort_by=DUMBBELL_SORT_KEY.END,
-    figsize=(10, 5),
+    sharey=True,
 ).show()
 ```
 
 ### Composing dumbbell charts
 
-A dumbbell chart places its rows on the category axis the box, violin, and swarm plots share, so [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays it with them and with other dumbbell charts, and [datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) arranges it beside any chart. Bars place their categories differently, so a dumbbell chart does not overlay a bar chart. The example sets the gap between women and men beside the change for both sexes.
+A dumbbell chart places its rows on the category axis that the box, violin and swarm plots share, so [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) overlays it with them and with other dumbbell charts, and [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) puts it beside any chart. Bars place their categories differently, so a dumbbell chart does not overlay a bar chart. A panel is the way to combine two dumbbell charts drawn separately, with their own styles and names, and its legend merges their entries; the `subtitle` of each chart labels it. The example overlays the change for both sexes with the gap between men and women in 2019, drawn in its own colors:
+
+```
+from datachart.utils import Panel
+
+change = DumbbellChart(
+    data=life,
+    subtitle="Both sexes",
+    start_name="2000",
+    end_name="2019",
+)
+gap_2019 = DumbbellChart(
+    data=[{"label": w["label"], "start": m["end"], "end": w["end"]} for w, m in zip(women, men)],
+    subtitle="2019",
+    start_name="Men",
+    end_name="Women",
+    style={"plot_dumbbell_start_color": "#6c9a78", "plot_dumbbell_end_color": "#c9a227"},
+)
+
+Panel(
+    [change, gap_2019],
+    title="Life expectancy at birth",
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_legend=True,
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+).show()
+```
+
+A grid keeps the charts apart, each in its own coordinate space, which suits two questions that share the data but not the axis: the change over two decades and the gap in the latest year.
 
 ```
 from datachart.utils import Grid
 
-change = DumbbellChart(
-    data=life,
-    title="2000 to 2019",
-    start_name="2000",
-    end_name="2019",
-)
-gap = DumbbellChart(
-    data=[{"label": w["label"], "start": m["end"], "end": w["end"]} for w, m in zip(women, men)],
-    title="Men to women, 2019",
-    start_name="Men",
-    end_name="Women",
-    style={"plot_dumbbell_start_color": "#6C9A78", "plot_dumbbell_end_color": "#C9A227"},
-)
+Grid(
+    [[change, gap_2019]],
+    title="Life expectancy at birth",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
 
-Grid([[change, gap]], title="Life expectancy at birth", figsize=(12, 5)).show()
+## Additional Features
+
+### Axis scales
+
+A dumbbell encodes value by position, and a linear axis is the honest default. When the values span orders of magnitude, a logarithmic axis is what keeps the small categories readable: `scaley` takes a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member and applies to the value axis whichever way it runs. `populations`, defined in a hidden cell, holds the population of the twelve countries in 2000 and in 2024, in millions (source: the World Bank's World Development Indicators, indicator SP.POP.TOTL, rounded). On a linear axis Slovenia, Norway and Switzerland collapse into one dot at the left edge; on a log axis every country's change is visible, at the price that equal connector lengths now mean equal ratios, not equal differences.
+
+```
+from datachart.constants import SCALE
+
+for scale in [SCALE.LINEAR, SCALE.LOG]:
+    DumbbellChart(
+        data=populations,
+        title=f"Population, 2000 to 2024, on the '{scale}' scale",
+        xlabel="Population (millions)",
+        figsize=FIG_SIZE.FULL_MEDIUM,
+        start_name="2000",
+        end_name="2024",
+        show_direction=True,
+        # the scale of the value axis
+        scaley=scale,
+    ).show()
 ```
 
 ### Themes
 
-A theme sets the endpoint pair, the connector, the fonts, and the dot edges of every chart at once. See the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery.ipynb) for the whole suite under each theme. Apply one with [datachart.config.Config.set_theme](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) from the [config](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/config.ipynb).
+A theme sets the endpoint colors, the connector, the fonts and the dot edges of every chart at once, which is the way to restyle a whole document rather than one chart. Apply one with [datachart.config.Config.set_theme](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) as the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide shows; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows every chart under each theme. The style is resolved when the chart is built, so the theme can be reset right after the call:
 
 ```
 from datachart.config import config
 from datachart.constants import THEME
 
 config.set_theme(THEME.QUILL)
-figure = DumbbellChart(data=life, title="Life expectancy at birth", start_name="2000", end_name="2019")
+figure = DumbbellChart(
+    data=life,
+    title="Life expectancy at birth",
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    start_name="2000",
+    end_name="2019",
+    legend={"title": "Year", "location": LEGEND_LOCATION.LOWER_RIGHT},
+)
 config.set_theme(THEME.DEFAULT)
 figure.show()
 ```
 
-## Saving the Chart as an Image
-
-To save the chart as an image, use the [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.save_figure) function.
-
-```
-from datachart.utils import save_figure
-
-figure = DumbbellChart(data=life, title="Life expectancy at birth")
-save_figure(figure, "./fig_dumbbell_chart.png", dpi=300)
-```
-
 ## Real-World Examples
 
-### The gender gap in life expectancy
+The examples below put the features above to work on real or realistic data, each one answering a question. The data lives in hidden cells; each example says what its data is and where it comes from.
 
-A dumbbell also shows a range. Here each country runs from men's to women's life expectancy in 2019, sorted by the width of the gap: women outlive men in every country, by under three years in Nigeria and by almost ten in Russia. The highlighted rows are the gaps above six years.
+### Example 1: How Much Longer Do Women Live? (A Gap Sorted by Its Width, With Delta Labels and a Rule)
+
+A dumbbell also shows a gap between two groups rather than a change over time. `gender_gap` runs each country from men's to women's life expectancy at birth in 2019, from the shared dataset (source: WHO Global Health Observatory). The question is how wide the gap is and where it is widest, so the rows are sorted by the delta, the delta is printed on every connector, and `emphasis_rule` highlights the gaps above six years and mutes the rest. Women outlive men in every one of these countries: by 2.8 years in Nigeria, by almost ten in Russia. A square and a circle tell the endpoints apart even in print.
 
 ```
-gap_2019 = [
-    {"label": w["label"], "start": m["end"], "end": w["end"]}
-    for w, m in zip(women, men)
-]
-
 DumbbellChart(
-    data=gap_2019,
+    data=gender_gap,
     title="How much longer women live, 2019",
     xlabel="Life expectancy at birth (years)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
     start_name="Men",
     end_name="Women",
+    # widest gap first
     sort=SORT.DESCENDING,
     sort_by=DUMBBELL_SORT_KEY.DELTA,
+    # the width of each gap, in years
     show_values=DUMBBELL_VALUE.DELTA,
     value_format="{:.1f} y",
+    # the gaps above six years
     emphasis_rule={"above": 6},
     marker=(LINE_MARKER.SQUARE, LINE_MARKER.CIRCLE),
-    figsize=(8, 6),
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+).show()
+```
+
+### Example 2: Did the Triage Redesign Cut the Waiting Time? (Before and After, With Direction Arrows, a Target Band and a Note)
+
+`waits` holds the illustrative median waiting time, in minutes, of eight emergency departments in the quarter before and the quarter after a triage redesign. The question every intervention raises is whether it worked, and where: `show_direction` marks each row as a fall or a rise, the signed delta says by how much, `emphasis_rule` highlights the departments that cut their wait by more than fifteen minutes, a shaded band marks the 40-minute target, and a note points at the one department where the wait got longer. Sorted by the delta, the largest cut is at the top and the exception at the bottom.
+
+```
+# the row of the one department whose wait got longer, once sorted by the change
+by_change = sorted(waits, key=lambda record: record["end"] - record["start"])
+worse = next(record for record in by_change if record["end"] > record["start"])
+WORSE_ROW = by_change.index(worse) + 1
+
+DumbbellChart(
+    data=waits,
+    title="Median waiting time before and after the triage redesign",
+    xlabel="Minutes",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    start_name="Before",
+    end_name="After",
+    # largest cut first
+    sort=SORT.ASCENDING,
+    sort_by=DUMBBELL_SORT_KEY.DELTA,
+    # which way each department moved, and by how much
+    show_direction=True,
+    show_values=DUMBBELL_VALUE.DELTA,
+    value_format="{:+.0f} min",
+    # the departments that cut more than fifteen minutes
+    emphasis_rule={"below": -15},
+    # the target band
+    vspans={"xmin": 0, "xmax": TARGET, "label": "within target"},
+    # the exception
+    texts={
+        "text": "the only department where\nthe wait got longer",
+        "x": 0.62,
+        "y": 0.14,
+        "coords": "axes",
+        "target": (worse["end"], WORSE_ROW),
+    },
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+    xmin=20,
+    xmax=80,
+).show()
+```
+
+### Example 3: Is the Gap Between Women and Men Closing? (Rises and Falls in Two Colors, and a Grid)
+
+`narrowed` and `widened` hold the gap between women's and men's life expectancy in each country of the shared dataset, in years, in 2000 and in 2019 (source: WHO Global Health Observatory), split by whether the gap shrank or grew. A dumbbell chart draws one color pair per chart, so the split gives the two directions their own colors when the charts are overlaid; each chart sorts its own rows, and the first chart's rows come first, so the widened gaps lead and the narrowed ones follow, both ordered by the change. The gap narrowed in eight countries, most of all in Russia, and widened in four, all of them countries where women gained more years than men. The second chart of the grid shows those gains: `women` and `men` overlaid in the same row order, so each row of the top chart can be read against the two changes behind it.
+
+```
+gap = DumbbellChart(
+    # widened gaps first, narrowed gaps after, each chart in its own colors
+    data=[widened, narrowed],
+    subtitle=["Widened", "Narrowed"],
+    style=[
+        {"plot_dumbbell_start_color": "#f2b5a0", "plot_dumbbell_end_color": "#c1121f"},
+        {"plot_dumbbell_start_color": "#9bbcd6", "plot_dumbbell_end_color": "#1f5f8b"},
+    ],
+    title="The gap between women and men, 2000 to 2019",
+    xlabel="Years women outlive men",
+    start_name="2000",
+    end_name="2019",
+    sort=SORT.DESCENDING,
+    sort_by=DUMBBELL_SORT_KEY.DELTA,
+    # the colors carry the direction, the labels the size
+    show_values=DUMBBELL_VALUE.DELTA,
+    value_format="{:+.1f}",
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+    xmin=0,
+    xmax=15,
+)
+gains = DumbbellChart(
+    # the same rows, in the same order
+    data=[women_ordered, men_ordered],
+    subtitle=["Women", "Men"],
+    title="Life expectancy at birth by sex, 2000 to 2019",
+    xlabel="Years",
+    start_name="2000",
+    end_name="2019",
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+)
+
+Grid(
+    [[gap], [gains]],
+    title="Is the gap closing?",
+    # taller than FIG_SIZE.FULL_TALL, so twelve labelled rows fit per chart
+    figsize=(6.3, 9),
 ).show()
 ```

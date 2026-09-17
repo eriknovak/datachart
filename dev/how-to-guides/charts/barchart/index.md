@@ -1,103 +1,29 @@
 # Bar Chart
 
-This section showcases the bar chart. It contains examples of how to create the bar chart using the [datachart.charts.BarChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.BarChart) function.
+A bar chart compares a numeric value across a few categories: each category gets a bar, and the bar lengths answer *which is bigger, and by how much*. This guide shows how to create bar charts with the [datachart.charts.BarChart](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.charts.BarChart) function, starting with the basics and building up to worked examples on real data.
 
 Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-bar-chart), which maps common tasks to the parameter or style attribute that does the job.
-
-As mentioned above, the bar charts are created using the `BarChart` function found in the [datachart.charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md) module. Let's import it:
 
 ```
 from datachart.charts import BarChart
 ```
 
-## Bar Chart Input Attributes
-
-The `BarChart` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the data points. For a single bar chart, `data` is a list of dictionaries. For multiple bar charts, `data` is a list of lists.
-
-```
-BarChart(
-    data=[{                                             # A list of bar data points (or list of lists for multiple charts)
-        "label": str,                                   # The x-axis value
-        "y":     Union[int, float],                     # The y-axis value
-        "yerr":  Optional[Union[int, float]],           # The y-axis error value
-        "emphasis": Optional[str],                      # The bar's own role: "highlight" or "background"
-    }],
-    style={                                             # The style of the bar (optional)
-        "plot_bar_color":       Union[str, None],       # The color of the bar
-        "plot_bar_alpha":       Union[float, None],     # The alpha of the bar
-        "plot_bar_width":       Union[int, float, None], # The width of the bar
-        "plot_bar_zorder":      Union[int, float, None], # The z-order of the bar
-        "plot_bar_hatch":       Union[HATCH_STYLE, None], # The hatch style of the bar
-        "plot_bar_edge_width":  Union[int, float, None], # The edge line width of the edge
-        "plot_bar_edge_color":  Union[str, None],       # The edge line color
-        "plot_bar_error_color": Union[str, None],       # The error line color
-        "plot_bar_value_fontsize": Union[int, float, None], # The font size of bar value labels
-        "plot_bar_value_color": Union[str, None],       # The color of bar value labels
-        "plot_bar_value_padding": Union[int, float, None], # The padding between bar and value label
-    },
-    subtitle=Optional[str],                             # The subtitle of the chart (or list for multiple charts)
-    emphasis=Optional[str],                             # "highlight" or "background" (or list for multiple charts)
-    title=Optional[str],                                # The title of the chart
-    xlabel=Optional[str],                               # The x-axis label
-    ylabel=Optional[str],                               # The y-axis label
-
-    figsize=Optional[Tuple[float, float]],              # The figure size in inches
-    show_grid=Optional[str],                            # Which grid lines to show ("both", "x", "y")
-    aspect_ratio=Optional[str],                         # The aspect ratio of the axes ("auto", "equal")
-    show_legend=Optional[bool],                         # Whether to show the legend
-    orientation=Optional[str],                          # "vertical" (default) or "horizontal"
-    bar_mode=Optional[str],                             # How multiple series share the axis ("group", "stack", "overlay")
-    sort=Optional[str],                                 # Category order by value: None (input), "ascending", "descending"
-    sort_by=Optional[str],                              # The subtitle of the series whose values key the sort
-    emphasis_rule=Optional[dict],                       # One-key rule: {"above": v}, {"below": v}, {"between": (lo, hi)}, {"top": n}, {"bottom": n}
-
-    show_yerr=Optional[bool],                           # Whether to show the error bars
-    show_values=Optional[bool],                         # Whether to show bar value labels
-    value_format=Optional[str],                         # Format of the value labels (VALUE_FORMAT constant or e.g. "{:.1f}%")
-
-    subplots=Optional[bool],                            # Whether to draw each chart in its own subplot
-    max_cols=Optional[int],                             # Maximum number of subplots per row
-    sharex=Optional[bool],                              # Whether subplots share the x-axis
-    sharey=Optional[bool],                              # Whether subplots share the y-axis
-    scalex=Optional[str],                               # The x-axis scale ("linear", "log", "symlog", "asinh")
-    scaley=Optional[str],                               # The y-axis scale ("linear", "log", "symlog", "asinh")
-    xmin=Optional[Union[int, float]],                   # The x-axis range
-    xmax=Optional[Union[int, float]],
-    ymin=Optional[Union[int, float]],                   # The y-axis range
-    ymax=Optional[Union[int, float]],
-
-    xticks=Optional[List[Union[int, float]]],           # the x-axis ticks
-    xticklabels=Optional[List[str]],                    # the x-axis tick labels (must be same length as xticks)
-    xtickrotate=Optional[int],                          # the x-axis tick labels rotation
-    yticks=Optional[List[Union[int, float]]],           # the y-axis ticks
-    yticklabels=Optional[List[str]],                    # the y-axis tick labels (must be same length as yticks)
-    ytickrotate=Optional[int],                          # the y-axis tick labels rotation
-
-    vlines=Optional[Union[dict, List[dict]]],           # the vertical lines
-    hlines=Optional[Union[dict, List[dict]]],           # the horizontal lines
-    vspans=Optional[Union[dict, List[dict]]],           # the vertical reference bands
-    hspans=Optional[Union[dict, List[dict]]],           # the horizontal reference bands
-)
-```
-
-For more details, see the [datachart.charts.BarChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.BarChart) function.
-
 ## Basics
 
-The examples in this guide share one dataset: the monthly unit sales of a product in 2025, broken down by sales region. The data is hard-coded in a hidden cell; `sales_total` holds the company-wide monthly totals, `sales_by_region` holds one series per region (with the day-to-day standard deviation of daily sales as `yerr`), and `SALES_GOAL` is the monthly target.
+The examples in this guide share one dataset: the top ten countries of the Paris 2024 Olympic medal table, ranked by gold medals (source: the official Paris 2024 medal table). The data lives in a hidden cell. `medals_total` holds the total medals of each country, one data point per country, and `medals_by_metal` holds one series per metal (gold, silver, bronze) over the same countries. The table has stories in it, and the customizations below tell them: two countries tied on gold, a host nation, and a ranking that changes with the way it is counted.
 
 Each data point is a dictionary with a `label` (the category) and a `y` value:
 
 ```
-sales_total[:3]
+medals_total[:3]
 ```
 
-**Basic example.** Only the `data` argument is required to draw the bar chart.
+**Basic example.** Only the `data` argument is required. The bars follow the input order, which here is the official gold-medal ranking:
 
 ```
 BarChart(
     # add the data to the chart
-    data=sales_total
+    data=medals_total
 ).show()
 ```
 
@@ -105,507 +31,472 @@ BarChart(
 
 Every customization is either a keyword argument of `BarChart` or a `plot_bar_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                                    | Use                                                                                                  | See                                                           |
-| --------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| add a title and axis labels                   | `title`, `xlabel`, `ylabel`                                                                          | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| rotate the tick labels                        | `xtickrotate`, `ytickrotate`                                                                         | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| fix the axis range                            | `xmin`, `xmax`, `ymin`, `ymax`                                                                       | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| resize the figure                             | `figsize`                                                                                            | [Figure size and grid](#figure-size-and-grid)                 |
-| show grid lines                               | `show_grid`                                                                                          | [Figure size and grid](#figure-size-and-grid)                 |
-| fix the aspect ratio of the axes              | `aspect_ratio`                                                                                       | [Figure size and grid](#figure-size-and-grid)                 |
-| change the bar color                          | `style={"plot_bar_color": ...}`                                                                      | [Bar style](#bar-style)                                       |
-| change the bar width                          | `style={"plot_bar_width": ...}`                                                                      | [Bar style](#bar-style)                                       |
-| make the bars (semi-)transparent              | `style={"plot_bar_alpha": ...}`                                                                      | [Bar style](#bar-style)                                       |
-| add a hatch pattern                           | `style={"plot_bar_hatch": ...}`                                                                      | [Bar style](#bar-style)                                       |
-| outline the bars                              | `style={"plot_bar_edge_color": ..., "plot_bar_edge_width": ...}`                                     | [Bar style](#bar-style)                                       |
-| draw horizontal bars                          | `orientation`                                                                                        | [Bar orientation](#bar-orientation)                           |
-| highlight one series, mute the rest           | `emphasis`                                                                                           | [Emphasis](#emphasis)                                         |
-| order the bars by value                       | `sort`, `sort_by`                                                                                    | [Sorting and emphasis rules](#sorting-and-emphasis-rules)     |
-| highlight the bars above a value or the top n | `emphasis_rule`, a per-bar `emphasis` key                                                            | [Sorting and emphasis rules](#sorting-and-emphasis-rules)     |
-| mark a goal, threshold or event               | `hlines`, `vlines`                                                                                   | [Reference lines](#reference-lines)                           |
-| shade a period or a range                     | `hspans`, `vspans`                                                                                   | [Reference bands](#reference-bands)                           |
-| compare several series side by side           | `data` as a list of lists, `subtitle`, `show_legend`                                                 | [Multiple Bar Charts](#multiple-bar-charts)                   |
-| stack or overlay the series                   | `bar_mode`                                                                                           | [Bar mode](#bar-mode)                                         |
-| draw each series in its own subplot           | `subplots`, `sharex`, `sharey`, `max_cols`                                                           | [Subplots](#subplots)                                         |
-| add error bars                                | `yerr` in `data`, `show_yerr`, `style={"plot_bar_error_color": ...}`                                 | [Error bars](#error-bars)                                     |
-| print the value on each bar                   | `show_values`                                                                                        | [Bar value labels](#bar-value-labels)                         |
-| format the printed values                     | `value_format` (a `VALUE_FORMAT` constant or a format string)                                        | [Bar value labels](#bar-value-labels)                         |
-| style the value labels                        | `style={"plot_bar_value_fontsize": ..., "plot_bar_value_color": ..., "plot_bar_value_padding": ...}` | [Bar value labels](#bar-value-labels)                         |
-| use a logarithmic axis                        | `scaley`, `scalex`                                                                                   | [Axis scales](#axis-scales)                                   |
-| save the chart to a file                      | `save_figure`                                                                                        | [Saving the Chart as an Image](#saving-the-chart-as-an-image) |
+| I want to…                                  | Use                                                    | See                                                                                                     |
+| ------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| add a title and axis labels                 | `title`, `xlabel`, `ylabel`                            | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| rotate the tick labels                      | `xtickrotate`, `ytickrotate`                           | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| fix the axis range                          | `xmin`, `xmax`, `ymin`, `ymax`                         | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| resize the figure                           | `figsize`                                              | [Figure size and grid](#figure-size-and-grid)                                                           |
+| show grid lines                             | `show_grid`                                            | [Figure size and grid](#figure-size-and-grid)                                                           |
+| fix the aspect ratio of the axes            | `aspect_ratio`                                         | [Figure size and grid](#figure-size-and-grid)                                                           |
+| draw the bars horizontally                  | `orientation`                                          | [Horizontal bars](#horizontal-bars)                                                                     |
+| order the categories by value               | `sort`, `sort_by`                                      | [Sorting](#sorting)                                                                                     |
+| print the value on each bar                 | `show_values`, `value_format`                          | [Value labels](#value-labels)                                                                           |
+| change the bar color, width, hatch, or edge | `style={"plot_bar_color": ..., "plot_bar_hatch": ...}` | [Bar style](#bar-style)                                                                                 |
+| highlight some bars, mute the rest          | `emphasis_rule`, the `"emphasis"` key of a data point  | [Emphasis](#emphasis)                                                                                   |
+| mark a threshold or a boundary              | `hlines`, `vlines`                                     | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| shade a range or a group of bars            | `hspans`, `vspans`                                     | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| put a note on the chart                     | `texts`                                                | [Text annotations](#text-annotations)                                                                   |
+| use dates as category labels                | `date` objects as `label`, `xticks_format`             | [Date labels](#date-labels)                                                                             |
+| compare several series in one chart         | `data` as a list of lists, `subtitle`, `show_legend`   | [Multiple Bar Charts](#multiple-bar-charts)                                                             |
+| group, stack, or overlay the series         | `bar_mode`                                             | [Bar mode](#bar-mode)                                                                                   |
+| highlight one series, mute the rest         | `emphasis`                                             | [Multiple Bar Charts](#multiple-bar-charts)                                                             |
+| title and place the legend                  | `legend`                                               | [Legend](#legend)                                                                                       |
+| draw each series in its own subplot         | `subplots`, `sharex`, `sharey`, `max_cols`             | [Subplots](#subplots)                                                                                   |
+| show the uncertainty of each bar            | `yerr` in `data`, `show_yerr`                          | [Error bars](#error-bars)                                                                               |
+| use a logarithmic axis                      | `scaley`, `scalex`                                     | [Axis scales](#axis-scales)                                                                             |
+| plot data with other key names              | `label`, `y`, `yerr`                                   | [Custom data keys](#custom-data-keys)                                                                   |
+| save the chart to a file                    | `save_figure`                                          | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
-The full list of style attributes is in the [datachart.typings.BarStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BarStyleAttrs) type; the full list of parameters is in the [datachart.charts.BarChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.BarChart) reference.
+The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
+
+| Parameter                                    | Constant                                                                                                                                                                                                                                     |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
+| `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
+| `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
+| `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
+| `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
+| `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
+| `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
+| `bar_mode`                                   | [`BAR_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BAR_MODE)                                                                                                                                   |
+| `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
+| `scalex`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
+| `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
+
+The full list of style attributes is in the [datachart.typings.BarStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarStyleAttrs) type; the full list of parameters is in the [datachart.charts.BarChart](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.charts.BarChart) reference.
 
 ### Title, axis labels and ticks
 
-To add the chart title and axis labels, add the `title`, `xlabel` and `ylabel` attributes. Tick labels can be rotated with `xtickrotate` (or `ytickrotate`), and the axis range can be fixed with `xmin`, `xmax`, `ymin` and `ymax` — here the y-axis is pinned to start at zero so the bar heights stay comparable.
+A chart without a title and axis labels leaves the reader guessing what the bars measure; `title`, `xlabel` and `ylabel` say it. Ten country names crowd the category axis, so `xtickrotate` (or `ytickrotate`) tilts them out of each other's way. `xmin`, `xmax`, `ymin` and `ymax` fix the axis range: bars encode value by length, so the value axis should start at zero, and a little headroom leaves space for labels added later.
 
 ```
 BarChart(
-    data=sales_total,
+    data=medals_total,
     # add the title
-    title="Monthly unit sales (2025)",
+    title="Paris 2024 medal table",
     # add the x and y axis labels
-    xlabel="Month",
-    ylabel="Units sold",
+    xlabel="Country",
+    ylabel="Medals",
     # rotate the x-axis tick labels
     xtickrotate=45,
     # fix the y-axis range
     ymin=0,
-    ymax=2000,
-).show()
-```
-
-### Date labels
-
-Bar labels may be real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp`. Group labels that are real temporal objects print through `DATE_FORMAT`; the groups keep their categorical positions, and `{axis}ticks_format` picks the pattern (a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern).
-
-```
-from datetime import date
-
-from datachart.constants import DATE_FORMAT
-
-sales_dated = [
-    {"label": date(2025, index + 1, 1), "y": point["y"]}
-    for index, point in enumerate(sales_total)
-]
-
-BarChart(
-    data=sales_dated,
-    title="Monthly unit sales",
-    ylabel="Units",
-    xticks_format=DATE_FORMAT.YEAR_MONTH,
-    xtickrotate=45,
+    ymax=140,
 ).show()
 ```
 
 ### Figure size and grid
 
-To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains some of the predefined figure sizes.
+The default figure is nearly square, while a bar chart with many categories reads best wide and short. `figsize` takes a `(width, height)` tuple in inches or one of the presets in [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE), sized for a full or half page width.
 
-To add the grid, add the `show_grid` attribute. The possible options are:
-
-| Option   | Description                                     |
-| -------- | ----------------------------------------------- |
-| `"both"` | shows both the x-axis and the y-axis gridlines. |
-| `"x"`    | shows only the x-axis grid lines.               |
-| `"y"`    | shows only the y-axis grid lines.               |
-
-Again, `datachart` provides a [datachart.constants.SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) constant, which contains the supported options.
-
-Related is the `aspect_ratio` attribute, which fixes the aspect ratio of the axes rather than of the figure: `"auto"` (the default) lets the axes fill the figure, `"equal"` keeps one data unit the same length on both axes. The supported values are in the [datachart.constants.ASPECT_RATIO](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO) constant. Bar charts rarely need it, so the examples leave it at the default.
+Grid lines let the eye carry the top of a bar across to the axis. `show_grid` draws them along the value axis with [SHOW_GRID.Y](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID), the reading aid a bar chart needs, without cluttering the category axis (`SHOW_GRID.X` and `SHOW_GRID.BOTH` are the other options). `aspect_ratio` fixes the ratio of the axes rather than of the figure ([ASPECT_RATIO](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)); bar charts rarely need it, so the examples leave it at the default.
 
 ```
 from datachart.constants import FIG_SIZE, SHOW_GRID
-```
 
-```
 BarChart(
-    data=sales_total,
-    title="Monthly unit sales (2025)",
-    xlabel="Month",
-    ylabel="Units sold",
-    # add to determine the figure size
+    data=medals_total,
+    title="Paris 2024 medal table",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
+    ymin=0,
+    ymax=140,
+    # a wide, short figure
     figsize=FIG_SIZE.FULL_SHORT,
-    # add to show the grid lines
+    # grid lines along the value axis only
     show_grid=SHOW_GRID.Y,
 ).show()
 ```
 
-### Bar style
+### Horizontal bars
 
-To change the bar style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.BarStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BarStyleAttrs) type, which contains the following attributes:
-
-| Attribute                   | Description                                                                   |
-| --------------------------- | ----------------------------------------------------------------------------- |
-| `"plot_bar_color"`          | The color of the bar (hex color code).                                        |
-| `"plot_bar_alpha"`          | The alpha of the bar (how visible the bar is).                                |
-| `"plot_bar_width"`          | The width of the bar (as a fraction of the category width, `0.8` by default). |
-| `"plot_bar_zorder"`         | The zorder of the bar.                                                        |
-| `"plot_bar_hatch"`          | The hatch style of the bar.                                                   |
-| `"plot_bar_edge_width"`     | The edge line width of the edge.                                              |
-| `"plot_bar_edge_color"`     | The edge line color (hex color code).                                         |
-| `"plot_bar_error_color"`    | The error line color (hex color code).                                        |
-| `"plot_bar_value_fontsize"` | The font size of bar value labels.                                            |
-| `"plot_bar_value_color"`    | The color of bar value labels (hex color code).                               |
-| `"plot_bar_value_padding"`  | The padding between bar edge and value label.                                 |
-
-Again, to help with the style settings, the [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) module contains the following constants:
-
-| Constant                                                                                                                           | Description                 |
-| ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| [datachart.constants.HATCH_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HATCH_STYLE) | The hatch style of the bar. |
-
-The example below changes the color, alpha, width, hatch pattern and outline of the bars in one go. Any attribute you leave out keeps the value of the active theme.
-
-```
-from datachart.constants import HATCH_STYLE
-```
-
-```
-BarChart(
-    data=sales_total,
-    # define the style of the bars
-    style={
-        "plot_bar_color": "#2a9d8f",
-        "plot_bar_alpha": 0.8,
-        "plot_bar_width": 0.6,
-        "plot_bar_hatch": HATCH_STYLE.DIAGONAL,
-        "plot_bar_edge_width": 1.0,
-        "plot_bar_edge_color": "#264653",
-    },
-    title="Monthly unit sales (2025)",
-    xlabel="Month",
-    ylabel="Units sold",
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.Y,
-).show()
-```
-
-### Bar orientation
-
-To change the orientation of the bars, add the `orientation` attribute, which supports the following values:
-
-| Value          | Description              |
-| -------------- | ------------------------ |
-| `"horizontal"` | The bars are horizontal. |
-| `"vertical"`   | The bars are vertical.   |
-
-Again, to help with the style settings, the [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) module contains the following constants:
-
-| Constant                                                                                                                           | Description                  |
-| ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| [datachart.constants.ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) | The orientation of the bars. |
-
-With horizontal bars the categories run along the y-axis, so swap the axis labels and the grid accordingly.
+A ranking reads best top to bottom, and long category names read best unrotated. Horizontal bars give both: `orientation=ORIENTATION.HORIZONTAL` ([ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)) puts the categories on the y-axis and the values on the x-axis, so the axis labels and the grid swap with it. The first data point is drawn at the bottom, so the data is reversed to keep the ranking top-down.
 
 ```
 from datachart.constants import ORIENTATION
-```
 
-```
 BarChart(
-    data=sales_total,
-    title="Monthly unit sales (2025)",
-    # swap the axis labels to match the orientation
-    xlabel="Units sold",
-    ylabel="Month",
+    # reversed, so the first country ends up at the top
+    data=medals_total[::-1],
+    title="Paris 2024 medal table",
+    # the axis labels swap with the orientation
+    xlabel="Medals",
+    ylabel="Country",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    # change the grid to match the change in orientation
+    # and so does the grid
     show_grid=SHOW_GRID.X,
-    # change the orientation of the bars
+    # draw the bars horizontally
     orientation=ORIENTATION.HORIZONTAL,
+    xmin=0,
 ).show()
 ```
 
-### Emphasis
+### Sorting
 
-When a chart carries several series, the story is often about one of them. The `emphasis` attribute expresses that directly: `"highlight"` bolds a series' edges and brings it to the front, `"background"` mutes a series (the theme's muted color at a lower alpha, drawn behind the others and left out of the legend), and `None` leaves a series unchanged. For multiple charts, `emphasis` is a list aligned with `data`, just like `subtitle` and `style`. The role strings are also available as the [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants.
-
-The example highlights the Asia-Pacific region against the other two. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide for how emphasis works across all chart types and themes.
-
-```
-BarChart(
-    data=sales_by_region,
-    subtitle=REGIONS,
-    # highlight one region, mute the rest
-    emphasis=["background", "background", "highlight"],
-    title="Monthly unit sales by region (2025)",
-    xlabel="Month",
-    ylabel="Units sold",
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.Y,
-    show_legend=True,
-).show()
-```
-
-### Sorting and emphasis rules
-
-A comparison reads best when the bars are in order and the ones that matter stand out. `sort` orders the categories by value — `"ascending"`, `"descending"`, or `None` for input order — and one order serves every series in the chart, keyed by the total across them; `sort_by` names a series (by subtitle) to key the order instead, and ties keep input order. The orders are also available as the [datachart.constants.SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT) constants.
-
-`emphasis_rule` highlights the bars that match a one-key rule and mutes the rest: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}`. The rule reads each bar's own value, so it means the same thing under every `bar_mode`. A bar can also carry its own `"emphasis"` key, which wins over the rule — the way to say "the top three, and also this one".
-
-The first example ranks the months and highlights the ones that beat the sales goal; the second orders the grouped chart by the Asia-Pacific series.
+The medal table ranks by gold, but that is a convention, and the same numbers tell a different story ranked by total medals. `sort` orders the categories by value: `SORT.DESCENDING` puts the largest bar first, `SORT.ASCENDING` the smallest, and `None` keeps the input order ([SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)). Ranked by total, Great Britain climbs from seventh to third and France moves above Japan and Australia.
 
 ```
 from datachart.constants import SORT
 
 BarChart(
-    data=sales_total,
-    title="Monthly unit sales (2025), months above goal",
-    xlabel="Month",
-    ylabel="Units sold",
+    data=medals_total,
+    title="Paris 2024 medal table, ranked by total medals",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
-    # largest month first
+    # largest total first
     sort=SORT.DESCENDING,
-    # highlight the months that beat the goal, mute the rest
-    emphasis_rule={"above": SALES_GOAL},
-    hlines={"y": SALES_GOAL, "label": "Goal"},
-    show_legend=True,
+    ymin=0,
 ).show()
 ```
 
+With several series in one chart, one order serves all of them, keyed by the total across the series; `sort_by` names the series (by its `subtitle`) that keys the order instead. `medals_by_metal` holds one series per metal (the [Multiple Bar Charts](#multiple-bar-charts) section covers the list-of-lists form), and ranking it by silver medals moves France to third:
+
 ```
 BarChart(
-    data=sales_by_region,
-    subtitle=REGIONS,
-    title="Monthly unit sales by region (2025), ordered by Asia-Pacific",
-    xlabel="Month",
-    ylabel="Units sold",
+    data=medals_by_metal,
+    subtitle=METALS,
+    title="Paris 2024 medal table, ranked by silver medals",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
     # one order for every series, keyed by one of them
-    sort=SORT.ASCENDING,
-    sort_by="Asia-Pacific",
+    sort=SORT.DESCENDING,
+    sort_by="Silver",
 ).show()
 ```
 
-### Reference lines
+### Value labels
 
-Reference lines mark a threshold or an event on the chart.
-
-**Horizontal lines.** Use the `hlines` argument with the [datachart.typings.HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
+When the exact numbers matter, as they do in a medal table, `show_values` prints each bar's value at its edge, and `value_format` formats it: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant or any `"{x:.1f}"`, `"{:.1f}%"` or `"%g"` style string. The label font size, color and padding are the `plot_value_*` style attributes ([ValueLabelStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), shared by every chart that prints values. Value labels need headroom, so the value axis is extended a little past the longest bar.
 
 ```
-{
-  "y":    Union[int, float],                 # The y-axis value
-  "xmin": Optional[Union[int, float]],       # The minimum x-axis value  (values are bar indices, e.g. 0, 1, 2, etc.)
-  "xmax": Optional[Union[int, float]],       # The maximum x-axis value  (values are bar indices, e.g. 0, 1, 2, etc.)
-  "style": {                                 # The style of the line (optional)
-    "plot_hline_color": Optional[str],       # The color of the line (hex color code)
-    "plot_hline_style": Optional[LineStyle], # The line style (solid, dashed, etc.)
-    "plot_hline_width": Optional[float],     # The width of the line
-    "plot_hline_alpha": Optional[float],     # The alpha of the line (how visible the line is)
-  },
-  "label": Optional[str],                    # The label of the line (shown in the legend)
-}
+from datachart.constants import VALUE_FORMAT
+
+BarChart(
+    data=medals_total[::-1],
+    style={"plot_value_fontsize": 9, "plot_value_padding": 4},
+    title="Paris 2024 medal table",
+    xlabel="Medals",
+    ylabel="Country",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.X,
+    orientation=ORIENTATION.HORIZONTAL,
+    # room for the labels past the longest bar
+    xmin=0,
+    xmax=145,
+    # print the value of each bar
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
+).show()
 ```
 
-**Vertical lines.** Use the `vlines` argument with the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) typing, which has the same shape with `x`, `ymin`, `ymax` and `plot_vline_*` style attributes. The `x` value is a bar index (`0`, `1`, `2`, …), so a line *between* two bars sits at a half-integer position.
+### Bar style
 
-The example marks the monthly sales goal with a dashed horizontal line and the July price cut with a vertical line between June and July. The line labels appear in the legend.
+The `style` dictionary sets the look of the bars: the color and alpha, the width as a fraction of the category width, the hatch pattern, and the edge; the attributes are listed in [datachart.typings.BarStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarStyleAttrs), and any attribute left out keeps the value of the active theme. A chart that will be printed or photocopied has to survive without color: a hatch pattern from [HATCH_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HATCH_STYLE) and a dark edge keep the bars distinct in greyscale.
+
+```
+from datachart.constants import HATCH_STYLE
+
+BarChart(
+    data=medals_total,
+    # a print-safe look: hatched bars with a dark edge
+    style={
+        "plot_bar_color": "#f4f1de",
+        "plot_bar_width": 0.6,
+        "plot_bar_hatch": HATCH_STYLE.DIAGONAL,
+        "plot_bar_edge_width": 1.0,
+        "plot_bar_edge_color": "#3d405b",
+    },
+    title="Paris 2024 medal table",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    ymin=0,
+).show()
+```
+
+### Emphasis
+
+A chart usually makes one point, and emphasis makes it visible. A data point can carry its own `"emphasis"` key: `"highlight"` bolds the bar's edges and brings it to the front, `"background"` mutes it (the theme's muted color at a lower alpha), so marking the host nation is a matter of tagging one record and muting the rest. The roles are also available as the [EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants, and the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis across every chart type and theme.
+
+```
+# tag the host nation, mute the rest
+host_marked = [
+    {**point, "emphasis": "highlight" if point["label"] == HOST else "background"}
+    for point in medals_total
+]
+
+BarChart(
+    data=host_marked,
+    title="Paris 2024 medal table, the host nation",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    ymin=0,
+).show()
+```
+
+`emphasis_rule` picks the bars from the data instead of tagging them by hand. It is a one-key dictionary: `{"top": n}` or `{"bottom": n}` by rank, `{"above": v}` or `{"below": v}` (strict), or `{"between": (lo, hi)}` (inclusive); the bars that match are highlighted, the rest muted. A data point's own `"emphasis"` key wins over the rule, so tagging the host alone and letting the rule handle the rest says *the podium, and also the host*:
+
+```
+# tag the host only; the rule decides the rest
+host_tagged = [
+    {**point, "emphasis": "highlight"} if point["label"] == HOST else point
+    for point in medals_total
+]
+
+BarChart(
+    data=host_tagged,
+    title="Paris 2024 medal table, the podium and the host",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    sort=SORT.DESCENDING,
+    # the three largest bars; France's own key keeps it highlighted
+    emphasis_rule={"top": 3},
+    ymin=0,
+).show()
+```
+
+### Reference lines and bands
+
+Reference lines and bands put the bars in context. `hlines` draws a horizontal line at a value, such as the mean of the table, and `vlines` a vertical one at a bar position; positions along the category axis are bar indices (`0`, `1`, `2`, …), so a half-integer sits between two bars. `hspans` and `vspans` shade a range instead of marking a value: a band of acceptable values, or a group of bars. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). The example marks the mean of the top ten with a dashed line and shades the three podium positions.
 
 ```
 from datachart.constants import LINE_STYLE
-```
 
-```
+mean_medals = sum(point["y"] for point in medals_total) / len(medals_total)
+
 BarChart(
-    data=sales_total,
-    # add a horizontal line at the sales goal
+    data=medals_total,
+    # a dashed line at the mean of the top ten
     hlines={
-        "y": SALES_GOAL,
-        "label": "monthly goal",
-        "style": {
-            "plot_hline_color": "#c1121f",
-            "plot_hline_style": LINE_STYLE.DASHED,
-            "plot_hline_width": 1.5,
-        },
+        "y": mean_medals,
+        "label": "top-ten mean",
+        "style": {"plot_hline_color": "#c1121f", "plot_hline_style": LINE_STYLE.DASHED},
     },
-    # add a vertical line between the June and July bars
-    vlines={
-        "x": 5.5,
-        "label": "price cut",
-        "style": {
-            "plot_vline_color": "#555555",
-            "plot_vline_style": LINE_STYLE.DOTTED,
-            "plot_vline_width": 1.5,
-        },
-    },
-    title="Monthly unit sales (2025)",
-    xlabel="Month",
-    ylabel="Units sold",
+    # shade the first three bars
+    vspans={"xmin": -0.5, "xmax": 2.5, "label": "podium"},
+    title="Paris 2024 medal table, ranked by total medals",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
+    sort=SORT.DESCENDING,
+    ymin=0,
 ).show()
 ```
 
-### Reference bands
+### Text annotations
 
-Reference bands shade a region of the chart — a period, an acceptable range, a tolerance around a goal. A band sits over the grid lines and under the bars.
-
-**Horizontal bands.** Use the `hspans` argument with the [datachart.typings.HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
-
-```
-{
-  "ymin": Optional[Union[int, float]],            # The lower y-axis bound (default: the axis minimum)
-  "ymax": Optional[Union[int, float]],            # The upper y-axis bound (default: the axis maximum)
-  "style": {                                      # The style of the band (optional)
-    "plot_hspan_color":      Optional[str],       # The fill color (default: the theme's muted color)
-    "plot_hspan_alpha":      Optional[float],     # The alpha of the band (how visible the band is)
-    "plot_hspan_hatch":      Optional[HATCH_STYLE], # The hatch pattern of the band
-    "plot_hspan_edge_color": Optional[str],       # The edge color; the hatch draws in it
-    "plot_hspan_edge_width": Optional[float],     # The edge line width
-    "plot_hspan_zorder":     Optional[float],     # The zorder (default: over the grid, under the marks)
-  },
-  "label": Optional[str],                         # The label of the band (shown in the legend)
-}
-```
-
-**Vertical bands.** Use the `vspans` argument with the [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) typing, which has the same shape with `xmin`, `xmax` and `plot_vspan_*` style attributes. The bounds are bar indices (`0`, `1`, `2`, …), so a band that starts *between* two bars starts at a half-integer position. At least one bound is required; an omitted bound runs to the axis edge.
-
-The example shades a tolerance around the monthly goal with a horizontal band and the fourth quarter with a vertical band that starts between September and October and, with no `xmax`, runs to the right edge. The band labels appear in the legend.
+Where a reference line marks a value, a note explains it. `texts` places text on the chart, with an optional `target` to draw a connector to a data point; the position is in data coordinates by default (bar index, value) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The note below explains the tie at the top of the table.
 
 ```
 BarChart(
-    data=sales_total,
-    # shade the tolerance around the monthly goal
-    hspans={
-        "ymin": SALES_GOAL - 100,
-        "ymax": SALES_GOAL + 100,
-        "label": "goal ± 100",
-        "style": {"plot_hspan_color": "#c1121f"},
+    data=medals_total,
+    # a note pinned to the axes, pointing at China's bar
+    texts={
+        "text": "tied on 40 golds; the United States\nleads on silver and bronze",
+        "x": 0.5,
+        "y": 0.8,
+        "coords": "axes",
+        "target": (1, MEDAL_TABLE["China"][0]),
     },
-    # shade the fourth quarter: from between September and October to the edge
-    vspans={"xmin": 8.5, "label": "Q4"},
-    title="Monthly unit sales (2025)",
-    xlabel="Month",
-    ylabel="Units sold",
+    title="Paris 2024 medal table",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
-    show_legend=True,
+    ymin=0,
+    ymax=140,
+).show()
+```
+
+### Date labels
+
+Categories are often dates: quarters, months, editions of an event. A `label` that is a real temporal object (`datetime`, `date`, `numpy.datetime64` or a pandas `Timestamp`) keeps its categorical position but prints through `xticks_format`, a [DATE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern, so the tick labels come out tidy without hand-writing them. `france_golds`, defined in a hidden cell, holds France's gold medals at the last five Summer Games, labeled by the opening day of each Games (Tokyo 2020 was held in 2021, and the year format shows it).
+
+```
+from datachart.constants import DATE_FORMAT
+
+BarChart(
+    data=france_golds,
+    title="France's gold medals by Summer Games",
+    xlabel="Games",
+    ylabel="Gold medals",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    # print the date labels as years
+    xticks_format=DATE_FORMAT.YEAR,
+    yticks=[0, 5, 10, 15],
+    ymin=0,
 ).show()
 ```
 
 ## Multiple Bar Charts
 
-To create multiple bar charts, pass a list of lists to the `data` argument. Each inner list represents the data for one chart. Per-chart attributes like `subtitle`, `style` and `emphasis` can be passed as lists, where each element corresponds to a chart.
-
-Multiple charts pattern
-
-For multiple charts, `data` becomes a list of lists, and per-chart attributes like `subtitle` and `style` become lists where each element applies to the corresponding chart.
-
-The `sales_by_region` dataset is such a list of lists, one series per region. Series that share a label are grouped side by side.
+To compare several series, pass a list of lists to `data`: each inner list is one series, and the per-series attributes (`subtitle`, `style`, `emphasis`) become lists aligned with it. Series that share a label are drawn side by side in one group, and `show_legend` names them by their subtitles. `medals_by_metal` is such a list, one series per metal, and a style per series colors the bars like the metals they stand for.
 
 ```
+METAL_STYLE = [
+    {"plot_bar_color": "#d4af37"},  # gold
+    {"plot_bar_color": "#a8a9ad"},  # silver
+    {"plot_bar_color": "#cd7f32"},  # bronze
+]
+
 BarChart(
-    # use a list of lists to define multiple bar charts
-    data=sales_by_region,
-    title="Monthly unit sales by region (2025)",
-    xlabel="Month",
-    ylabel="Units sold",
+    # one series per metal
+    data=medals_by_metal,
+    # named for the legend
+    subtitle=METALS,
+    # and colored like the metal
+    style=METAL_STYLE,
+    title="Paris 2024 medal table by metal",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
+    show_legend=True,
 ).show()
 ```
 
-### Sub-chart subtitles
-
-We can name each chart by passing a list of subtitles to the `subtitle` argument. In addition, to help with discerning which chart is which, use the `show_legend` argument to show the legend of the charts.
+When the question is about one of the series, `emphasis` takes one role per series, aligned with `data` like `subtitle` and `style`: `"highlight"` bolds a series, `"background"` mutes it and drops it from the legend, `None` leaves it as it is. Asking only about gold turns the silver and bronze bars into context:
 
 ```
 BarChart(
-    data=sales_by_region,
-    # add a subtitle to each chart
-    subtitle=REGIONS,
-    title="Monthly unit sales by region (2025)",
-    xlabel="Month",
-    ylabel="Units sold",
+    data=medals_by_metal,
+    subtitle=METALS,
+    style=METAL_STYLE,
+    # gold is the question, silver and bronze the context
+    emphasis=["highlight", "background", "background"],
+    title="Paris 2024 medal table, gold against the rest",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
-    # show the legend
     show_legend=True,
 ).show()
 ```
 
 ### Bar mode
 
-The `bar_mode` attribute controls how the series share the axis:
-
-| Value       | Description                                                     |
-| ----------- | --------------------------------------------------------------- |
-| `"group"`   | The series are drawn side by side (default).                    |
-| `"stack"`   | The series are stacked on top of each other.                    |
-| `"overlay"` | The series are drawn on top of each other at the same position. |
-
-Again, `datachart` provides a [datachart.constants.BAR_MODE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BAR_MODE) constant, which contains the supported options.
-
-Stacking the regions shows both the regional split and the company-wide total in one chart.
+Grouped bars compare the series within each category, but hide the totals. `bar_mode` changes how the series share a category ([BAR_MODE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BAR_MODE)): `BAR_MODE.STACK` stacks them, so the height of each stack is the total and the segments are its split; `BAR_MODE.OVERLAY` draws them at the same position, one over the other, which suits a before-and-after pair; `BAR_MODE.GROUP` is the default. Stacked and sorted, the chart shows the ranking by total medals and what each total is made of.
 
 ```
 from datachart.constants import BAR_MODE
-```
 
-```
 BarChart(
-    data=sales_by_region,
-    subtitle=REGIONS,
-    # stack the series
-    bar_mode=BAR_MODE.STACK,
-    title="Monthly unit sales by region (2025)",
-    xlabel="Month",
-    ylabel="Units sold",
+    data=medals_by_metal,
+    subtitle=METALS,
+    style=METAL_STYLE,
+    title="Paris 2024 medal table by metal, ranked by total medals",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
+    # stack the metals; the sort keys on the total across them
+    bar_mode=BAR_MODE.STACK,
+    sort=SORT.DESCENDING,
+).show()
+```
+
+An overlay pairs each country's Paris result with its Tokyo result. `golds_2020`, defined in a hidden cell, holds the same ten countries' gold medals at Tokyo 2020 (source: the official Tokyo 2020 medal table). The Tokyo series is drawn first, in grey, and the Paris series over it in gold, so a grey bar showing above a gold one is a country that won fewer golds in Paris than in Tokyo: Japan, the previous host, and Great Britain.
+
+```
+BarChart(
+    data=[golds_2020, golds_2024],
+    subtitle=["Tokyo 2020", "Paris 2024"],
+    # the earlier Games in grey, the later ones in gold over them
+    style=GAMES_STYLE,
+    title="Gold medals, Tokyo 2020 and Paris 2024",
+    xlabel="Country",
+    ylabel="Gold medals",
+    xtickrotate=45,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+    # both series at the same positions
+    bar_mode=BAR_MODE.OVERLAY,
+).show()
+```
+
+### Legend
+
+`show_legend` lists the series; `legend` says where and how, with a `title`, a `location` from [LEGEND_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), the number of columns `ncols`, and the `alignment` of the entries from [LEGEND_ALIGN](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN); a field left out falls back to the theme ([LegendSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendSettingAttrs)). Ten groups of three bars leave no empty corner inside the axes, so the legend goes outside them.
+
+```
+from datachart.constants import LEGEND_LOCATION
+
+BarChart(
+    data=medals_by_metal,
+    subtitle=METALS,
+    style=METAL_STYLE,
+    title="Paris 2024 medal table by metal",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+    # a titled legend outside the axes, to the right
+    legend={"title": "Medal", "location": LEGEND_LOCATION.OUTSIDE_RIGHT},
 ).show()
 ```
 
 ### Subplots
 
-To draw each chart in its own subplot, add the `subplots` attribute. The chart's `subtitle` are then added at the top of each subplot, while the `title`, `xlabel` and `ylabel` are positioned to be global for all charts. The `max_cols` attribute limits the number of subplots per row.
+When the series are many, or the question is about the shape of each rather than the comparison within a category, `subplots=True` draws each series in its own panel. `subtitle` titles the panels; `title`, `xlabel` and `ylabel` stay global; `max_cols` limits the panels per row. `sharey=True` puts the panels on one value axis, so a bar in one panel is comparable with a bar in the next; without it each panel scales to its own maximum and the bronze counts would look as large as the golds. `sharex=True` keeps one category axis for all of them.
 
 ```
 BarChart(
-    data=sales_by_region,
-    subtitle=REGIONS,
-    title="Monthly unit sales by region (2025)",
-    xlabel="Month",
-    ylabel="Units sold",
-    figsize=FIG_SIZE.FULL_MEDIUM,
-    show_grid=SHOW_GRID.Y,
-    # show each chart in its own subplot
-    subplots=True,
-    # at most two subplots per row
-    max_cols=2,
-).show()
-```
-
-### Sharing the x-axis and/or y-axis across subplots
-
-To share the x-axis and/or y-axis across subplots, add the `sharex` and/or `sharey` attributes, which are boolean values that specify whether to share the axis across all subplots. With a shared y-axis, the regions become directly comparable.
-
-```
-BarChart(
-    data=sales_by_region,
-    subtitle=REGIONS,
-    title="Monthly unit sales by region (2025)",
-    xlabel="Month",
-    ylabel="Units sold",
-    figsize=FIG_SIZE.FULL_MEDIUM,
-    show_grid=SHOW_GRID.Y,
-    subplots=True,
-    max_cols=2,
-    # share the x-axis across subplots
-    sharex=True,
-    # share the y-axis across subplots
-    sharey=True,
-).show()
-```
-
-### Subplot orientation
-
-The `orientation` attribute can be used to change the orientation of all subplots.
-
-```
-BarChart(
-    data=sales_by_region,
-    subtitle=REGIONS,
-    title="Monthly unit sales by region (2025)",
-    xlabel="Units sold",
-    ylabel="Month",
+    data=medals_by_metal,
+    subtitle=METALS,
+    style=METAL_STYLE,
+    title="Paris 2024 medal table by metal",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
     figsize=FIG_SIZE.FULL_TALL,
+    show_grid=SHOW_GRID.Y,
+    # one panel per metal, stacked in a column
     subplots=True,
-    max_cols=2,
+    max_cols=1,
+    # one value axis and one category axis for all panels
     sharex=True,
     sharey=True,
-    # change the grid to match the change in orientation
-    show_grid=SHOW_GRID.X,
-    # change the orientation of the bars
-    orientation=ORIENTATION.HORIZONTAL,
 ).show()
 ```
 
@@ -613,209 +504,91 @@ BarChart(
 
 ### Error bars
 
-To add error bars, first define the `yerr` value of each data point in `data`, then add the `show_yerr` attribute. The `sales_by_region` data points carry the standard deviation of daily sales as `yerr`. The color of the error lines is set with the `plot_bar_error_color` style attribute.
+A bar shows an estimate; an error bar shows how sure the estimate is. Each data point carries its uncertainty as `yerr`, `show_yerr` draws it, and the `plot_bar_error_color` style attribute colors the whiskers. Medal counts are exact, so this example switches dataset: `poll`, defined in a hidden cell, is an illustrative pre-election poll, the support for five parties with the survey's margin of error. Two parties whose error bars overlap are not shown to be apart, which is what the error bars are there to say.
 
 ```
 BarChart(
-    data=sales_by_region,
-    subtitle=REGIONS,
-    # set the error bar color (a single style applies to every chart)
-    style={"plot_bar_error_color": "#000000"},
-    title="Monthly unit sales by region (2025)",
-    xlabel="Month",
-    ylabel="Units sold",
-    figsize=FIG_SIZE.FULL_MEDIUM,
-    show_grid=SHOW_GRID.Y,
-    subplots=True,
-    max_cols=2,
-    sharex=True,
-    sharey=True,
-    # show the error bars
-    show_yerr=True,
-    # make sure the y-axis starts at 0
-    ymin=0,
-).show()
-```
-
-### Bar value labels
-
-To display the actual value at the edge of each bar, use the `show_values` parameter. The `value_format` parameter controls how the values are formatted. It accepts a Python format string in which the value is named `x` (e.g., `"{x:.1f}"` for one decimal place, `"{x:.0%}"` to show a fraction as a percentage) — the [datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant collects the common ones:
-
-| Constant                  | Format       | Description                                                                 |
-| ------------------------- | ------------ | --------------------------------------------------------------------------- |
-| `VALUE_FORMAT.DEFAULT`    | `"{x}"`      | The value as is.                                                            |
-| `VALUE_FORMAT.INTEGER`    | `"{x:.0f}"`  | Rounded to an integer.                                                      |
-| `VALUE_FORMAT.DECIMAL`    | `"{x:.1f}"`  | One decimal place (`DECIMAL_2` and `DECIMAL_3` for two and three).          |
-| `VALUE_FORMAT.PERCENT`    | `"{x:.1%}"`  | A fraction as a percentage with one decimal place (`PERCENT_INT` for none). |
-| `VALUE_FORMAT.SCIENTIFIC` | `"{x:.2e}"`  | Scientific notation.                                                        |
-| `VALUE_FORMAT.THOUSANDS`  | `"{x:,.0f}"` | With a thousands separator.                                                 |
-
-Positional format strings (`"{:.1f}%"`) and printf-style ones (`"%g"`) work too, which is handy when the value already is a percentage.
-
-```
-from datachart.constants import VALUE_FORMAT
-```
-
-```
-BarChart(
-    data=sales_total,
-    title="Monthly unit sales (2025)",
-    xlabel="Month",
-    ylabel="Units sold",
+    data=poll,
+    # the color of the whiskers
+    style={"plot_bar_error_color": "#333333"},
+    title="Voting intention, with the margin of error",
+    xlabel="Party",
+    ylabel="Support (%)",
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
+    # draw the error bars
+    show_yerr=True,
     ymin=0,
-    ymax=2000,
-    # show bar value labels
-    show_values=True,
-    # format the values with a thousands separator
-    value_format=VALUE_FORMAT.THOUSANDS,
-).show()
-```
-
-Bar value labels also work with horizontal bar charts. You can customize the label appearance using the `plot_value_fontsize`, `plot_value_color`, and `plot_value_padding` style attributes, shared by every chart that prints values (the `plot_bar_value_*` names still work as aliases).
-
-```
-BarChart(
-    data=sales_total,
-    style={
-        "plot_value_fontsize": 9,
-        "plot_value_color": "#333333",
-        "plot_value_padding": 5,
-    },
-    title="Monthly unit sales (2025)",
-    xlabel="Units sold",
-    ylabel="Month",
-    figsize=FIG_SIZE.FULL_MEDIUM,
-    show_grid=SHOW_GRID.X,
-    xmin=0,
-    xmax=2000,
-    # horizontal orientation
-    orientation=ORIENTATION.HORIZONTAL,
-    # show bar value labels
-    show_values=True,
-    value_format=VALUE_FORMAT.INTEGER,
 ).show()
 ```
 
 ### Axis scales
 
-The user can change the axis scale using the `scaley` attribute (`scalex` for horizontal bars). The supported scale options are:
-
-| Options    | Description              |
-| ---------- | ------------------------ |
-| `"linear"` | The linear scale.        |
-| `"log"`    | The log scale.           |
-| `"symlog"` | The symmetric log scale. |
-| `"asinh"`  | The asinh scale.         |
-
-Again, to help with the options settings, the [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) module contains the following constants:
-
-| Constant                                                                                                               | Description       |
-| ---------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| [datachart.constants.SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) | The axis options. |
-
-A logarithmic scale pays off when the values span several orders of magnitude. The hidden cell below defines `populations`, the approximate mid-2024 populations of seven countries in thousands (UN World Population Prospects 2024, rounded) — from about 1.45 billion down to about 10 thousand.
+Bars encode value by length, so a linear axis is the honest default, and a logarithmic one is the exception for values that span orders of magnitude. `scaley` (or `scalex` for horizontal bars) takes a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member. `populations`, defined in a hidden cell, holds the approximate mid-2024 population of seven countries in thousands (UN World Population Prospects 2024, rounded), from about 1.45 billion down to about 10 thousand. On a linear scale the small countries vanish; on a log scale every bar is readable, at the price that bar lengths no longer compare.
 
 ```
 from datachart.constants import SCALE
-```
 
-On a linear scale the small countries vanish; on a log scale every bar is readable.
-
-```
 for scale in [SCALE.LINEAR, SCALE.LOG]:
-    figure = BarChart(
+    BarChart(
         data=populations,
         title=f"Population on the '{scale}' scale",
         xlabel="Country",
         ylabel="Population (thousands)",
         figsize=FIG_SIZE.FULL_SHORT,
         show_grid=SHOW_GRID.Y,
-        # set the scale of the y axis
+        # the scale of the value axis
         scaley=scale,
-    )
-    figure.show()
+    ).show()
 ```
 
-## Saving the Chart as an Image
+### Custom data keys
 
-To save the chart as an image, use the [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.save_figure) function.
-
-```
-from datachart.utils import save_figure
-```
+Data that comes from a file or an API rarely uses the `label`, `y` and `yerr` keys, and renaming every record just to plot it is a chore. Instead, tell `BarChart` which keys to read with the `label`, `y` and `yerr` arguments. `medal_records` stores the table the way a CSV export would, one record per country with a `country` and a `total` key:
 
 ```
-save_figure(figure, "./fig_bar_chart.png", dpi=300)
+medal_records = [
+    {"country": country, "gold": gold, "silver": silver, "bronze": bronze, "total": gold + silver + bronze}
+    for country, (gold, silver, bronze) in MEDAL_TABLE.items()
+]
+medal_records[:2]
 ```
 
-The figure should be saved in the current working directory.
+```
+BarChart(
+    data=medal_records,
+    # the keys that hold the label and the value
+    label="country",
+    y="total",
+    title="Paris 2024 medal table",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    ymin=0,
+).show()
+```
 
 ## Real-World Examples
 
-The following examples put the features above to work on real or realistic data. Each one states what its data is and where it comes from; the data itself lives in a hidden cell.
+The examples below put the features above to work on real or realistic data, each one answering a question. The data lives in hidden cells; each example says what its data is and where it comes from.
 
-### Example 1: Olympic Medal Table (Grouped Bars with Legend)
+### Example 1: Where Python Stands (Ranked Horizontal Bars with Value Labels)
 
-`medals` holds the gold, silver and bronze medal counts of the six countries that topped the Paris 2024 Olympic medal table (ranked by gold medals; source: the official Paris 2024 medal table). One series per medal type gives a grouped bar chart, colored to match the metals.
-
-```
-BarChart(
-    data=medals,
-    subtitle=["Gold", "Silver", "Bronze"],
-    style=[
-        {"plot_bar_color": "#d4af37"},  # gold
-        {"plot_bar_color": "#a8a9ad"},  # silver
-        {"plot_bar_color": "#cd7f32"},  # bronze
-    ],
-    title="Paris 2024 Olympic medal table",
-    xlabel="Country",
-    ylabel="Medals",
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.Y,
-    show_legend=True,
-    ymin=0,
-).show()
-```
-
-### Example 2: Quarterly Revenue by Region (Emphasis)
-
-`revenue` holds the illustrative quarterly revenue (in million USD) of a company across four sales regions over eight quarters, 2024–2025. The question is how the fastest-growing region compares with the rest, so `emphasis` highlights it and mutes the other three. Muted regions drop out of the legend automatically.
-
-```
-BarChart(
-    data=revenue,
-    subtitle=list(REVENUE),
-    # highlight Asia-Pacific, mute the other regions
-    emphasis=["background", "background", "highlight", "background"],
-    title="Quarterly revenue by region",
-    xlabel="Quarter",
-    ylabel="Revenue (million USD)",
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.Y,
-    show_legend=True,
-    ymin=0,
-).show()
-```
-
-### Example 3: Survey Results (Horizontal Bars with Value Labels)
-
-`languages` holds the share of respondents who worked with each programming language in the past year, for the ten most-used languages in the Stack Overflow Developer Survey 2024 (all respondents). Horizontal bars keep the long labels readable, and value labels print the exact share on each bar — the values already are percentages, so a positional `"{:.1f}%"` format appends the sign instead of `VALUE_FORMAT.PERCENT` (which would multiply by 100). The data is ordered from least to most used so the most-used language ends up at the top.
+`languages` holds the share of respondents who worked with each of the ten most-used programming languages in the past year, from the Stack Overflow Developer Survey 2024 (all respondents). The question is where Python stands among them. Horizontal bars keep the names readable and `sort` ranks them, value labels print the exact share (the values already are percentages, so a positional `"{:.1f}%"` format appends the sign; `VALUE_FORMAT.PERCENT` would multiply by 100), and Python's record carries its own `"emphasis"` key while the rest are muted.
 
 ```
 BarChart(
     data=languages,
-    style={
-        "plot_bar_color": "#f48024",
-        "plot_value_fontsize": 9,
-        "plot_value_padding": 4,
-    },
+    style={"plot_value_fontsize": 9, "plot_value_padding": 4},
     title="Most used programming languages, 2024",
     xlabel="Share of respondents",
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.X,
     orientation=ORIENTATION.HORIZONTAL,
+    # smallest first, so the most used ends up at the top
+    sort=SORT.ASCENDING,
     xmin=0,
     xmax=75,
     show_values=True,
@@ -823,9 +596,9 @@ BarChart(
 ).show()
 ```
 
-### Example 4: Monthly Trade Balance (Diverging Bars)
+### Example 2: A Trade Balance Turns Around (Diverging Bars with a Note)
 
-`trade_balance` holds two years of illustrative monthly trade balance figures (exports minus imports, in billion EUR) — a run of deficits in the first year turning into surpluses in the second. Since `BarChart` applies a single color per series, the data is split into a positive and a negative series (see the tip below).
+`trade_balance` holds two years of illustrative monthly trade balance figures (exports minus imports, in billion EUR): a run of deficits in the first year turning into surpluses in the second. Positive and negative months want different colors, and `BarChart` applies one color per series, so the data is split into a surplus series and a deficit series drawn at the same positions with `bar_mode=BAR_MODE.OVERLAY` (see the tip below). The months are `date` labels printed as year and month, a solid line marks zero, and a note points at the first month in surplus.
 
 ```
 BarChart(
@@ -839,20 +612,81 @@ BarChart(
     # mark the zero line
     hlines={
         "y": 0,
-        "style": {
-            "plot_hline_color": "black",
-            "plot_hline_style": LINE_STYLE.SOLID,
-            "plot_hline_width": 1,
-        },
+        "style": {"plot_hline_color": "black", "plot_hline_style": LINE_STYLE.SOLID, "plot_hline_width": 1},
+    },
+    # point at the first month in surplus
+    texts={
+        "text": "first surplus",
+        "x": 0.3,
+        "y": 0.85,
+        "coords": "axes",
+        "target": (FIRST_SURPLUS, BALANCE[FIRST_SURPLUS]),
     },
     title="Monthly trade balance",
     ylabel="Billion EUR",
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
+    xticks_format=DATE_FORMAT.YEAR_MONTH,
     xtickrotate=90,
 ).show()
 ```
 
 Tip: Diverging Bar Charts
 
-Each month is zero in one of the two series (positive values in one, negative in the other). Drawing them with `bar_mode=BAR_MODE.OVERLAY` puts both series at the same x-positions, so only one bar is visible per month — the visual effect of a single diverging bar chart with two colors.
+Each month is zero in one of the two series (positive values in one, negative in the other). Drawing them with `bar_mode=BAR_MODE.OVERLAY` puts both series at the same positions, so only one bar is visible per month: the visual effect of a single diverging bar chart with two colors.
+
+### Example 3: The Host Effect (Overlaid Games, Highlighted Home Games, and a Grid)
+
+Hosting the Games is said to lift a country's medal haul, and the medal tables of the last five Summer Games let us check. The top chart overlays each country's gold medals at Tokyo 2020 and Paris 2024 for the ten countries of the shared dataset, ranked by the Paris result with `sort_by`. The two charts below it follow the two most recent hosts, France and Japan, across five Games: `japan_golds`, defined in a hidden cell, holds Japan's gold medals (source: the official medal tables), and `emphasis_rule={"top": 1}` highlights each country's best Games, which in both cases is the one it hosted; a note on each says so. [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) puts the three charts in one figure, the comparison across the full top row and the two histories side by side below it, and the notes travel with their charts.
+
+```
+from datachart.utils import Grid
+
+games = BarChart(
+    data=[golds_2020, golds_2024],
+    subtitle=["Tokyo 2020", "Paris 2024"],
+    style=GAMES_STYLE,
+    title="Gold medals at the last two Games",
+    ylabel="Gold medals",
+    xtickrotate=45,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+    bar_mode=BAR_MODE.OVERLAY,
+    # ranked by the Paris result
+    sort=SORT.DESCENDING,
+    sort_by="Paris 2024",
+)
+
+
+def host_history(data, country, host_index):
+    # a country's golds over five Games, its best Games highlighted and annotated
+    return BarChart(
+        data=data,
+        title=f"{country}'s gold medals by Games",
+        ylabel="Gold medals",
+        show_grid=SHOW_GRID.Y,
+        xticks_format=DATE_FORMAT.YEAR,
+        emphasis_rule={"top": 1},
+        texts={
+            "text": "home Games",
+            "x": 0.08 if host_index == 4 else 0.62,
+            "y": 0.9,
+            "coords": "axes",
+            "target": (host_index, data[host_index]["y"]),
+        },
+        # the same value axis for both countries
+        yticks=[0, 10, 20, 30],
+        ymin=0,
+        ymax=30,
+    )
+
+
+Grid(
+    [
+        [games],
+        [host_history(france_golds, "France", 4), host_history(japan_golds, "Japan", 3)],
+    ],
+    title="The host effect",
+    figsize=FIG_SIZE.FULL_TALL,
+).show()
+```

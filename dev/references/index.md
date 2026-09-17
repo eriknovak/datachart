@@ -4,13 +4,17 @@
 
 `Datachart` is a data visualization package.
 
-The `datachart` package provides utilities for easier data visualization. It provides a set of modules and utilities for data visualization, creating different charts and plots. It also provides methods for defining your own plot styles, and support for calculating the statistics.
+The `datachart` package provides utilities for easier data visualization: chart functions that return a matplotlib figure, the composition of finished figures, a global style configuration with predefined themes, and the statistics behind the charts. Each module has its own reference page.
 
-| MODULE      | DESCRIPTION                                                                   |
-| ----------- | ----------------------------------------------------------------------------- |
-| `charts`    | The module containing the methods for creating different charts.              |
-| `utils`     | The module containing the utility classes and methods.                        |
-| `config`    | The module containing the utility for customizing the plot styles.            |
-| `themes`    | The module containing the predefined style themes.                            |
-| `constants` | The module containing the predefined constants used for easier plot creation. |
-| `typings`   | The module containing all of the typings used across the module.              |
+## Where to Look
+
+| I want to…                                                   | Page                                                                                                                                                                                                                |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| draw a chart and see what each parameter accepts             | [charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md), one page per chart: the function, its data record, its `style` keys, and its constants                                              |
+| know the settings any chart takes, or the keys a theme holds | [typings](https://eriknovak.github.io/datachart/dev/references/typings/index.md): reference lines and bands, texts, legend, emphasis rule, colorbar, and the theme style                                            |
+| find the values a parameter accepts                          | [constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md), with a table of constants by chart                                                                                            |
+| change the look of every chart                               | [config](https://eriknovak.github.io/datachart/dev/references/config/index.md) to apply and adjust a theme, [themes](https://eriknovak.github.io/datachart/dev/references/themes/index.md) for the predefined looks |
+| overlay charts, arrange them in a grid, annotate, or save    | [utils](https://eriknovak.github.io/datachart/dev/references/utils/index.md): `Panel`, `Grid`, `Annotate`, and `save_figure`                                                                                        |
+| compute the number a chart shows                             | [utils.stats](https://eriknovak.github.io/datachart/dev/references/utils/stats/index.md): centers, spreads, correlations, fits, intervals, smoothers, densities                                                     |
+
+The [how-to guides](https://eriknovak.github.io/datachart/dev/how-to-guides/index.md) show the same API on real data, feature by feature.

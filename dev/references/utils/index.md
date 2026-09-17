@@ -4,112 +4,49 @@
 
 The module containing the `utils`.
 
-The `utils` module provides a set of public utilities for the package.
+The `utils` module provides a set of public utilities for the package: the composition of finished figures (`Panel`, `Grid`, `Annotate`), saving them (`save_figure`), and the statistics behind the charts (`stats`).
 
 This module exports only the public API intended for end users. Internal implementation details are located in the `_internal` submodule and should not be imported directly by external code.
 
-| MODULE  | DESCRIPTION                                                                 |
-| ------- | --------------------------------------------------------------------------- |
-| `stats` | The module containing the statistics functions (count, mean, median, etc.). |
+## Choosing a Utility
 
-| FUNCTION      | DESCRIPTION                                                                 |
-| ------------- | --------------------------------------------------------------------------- |
-| `save_figure` | Saves the figure into a file using the provided format parameters.          |
-| `Panel`       | Overlays rendered chart figures on a single plot with optional dual y-axes. |
-| `Grid`        | Arranges rendered chart figures in a grid; nested rows define the layout.   |
-| `Annotate`    | Returns a new figure with text annotations added to a rendered figure.      |
+Everything here takes or returns the figure a chart function returns: three ways to compose finished figures, one to save them, and the statistics behind them.
 
-## Functions
+| I want to…                                                            | Use                                                                                  | Guide                                                                                                    |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| draw several charts in one coordinate space, with a second value axis | [`Panel`](#datachart.utils.Panel)                                                    | [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md)                  |
+| lay charts out side by side or in rows                                | [`Grid`](#datachart.utils.Grid)                                                      | [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md)                    |
+| add notes to a figure that is already drawn                           | [`Annotate`](#datachart.utils.Annotate)                                              | [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) |
+| write a figure to disk, in one format or several                      | [`save_figure`](#datachart.utils.save_figure)                                        | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md)        |
+| compute the number a chart shows                                      | [`stats`](https://eriknovak.github.io/datachart/dev/references/utils/stats/index.md) | [Statistics](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md)             |
 
-### datachart.utils.save_figure
-
-```
-save_figure(
-    figure: plt.Figure,
-    path: str,
-    dpi: int = 300,
-    format: Optional[
-        Union[FIG_FORMAT, List[FIG_FORMAT]]
-    ] = None,
-    transparent: bool = False,
-) -> List[str]
-```
-
-Save the figure to one or more files.
-
-Writes the rendered figure to disk in the format given by `format` or, when omitted, by the file extension. Use a vector format (PDF, SVG) for print and papers, PNG with `dpi` >= 300 for raster deliverables, and `transparent=True` to drop the figure background for slides and web pages. The theme is already baked into the figure, so saving never consults the global config.
-
-Pass a list of formats to write the same figure several times in one call. `path` is then a stem: its extension is dropped when it names a supported format, and one file per format is written next to it. `dpi` and `transparent` apply to every file.
-
-Examples:
-
-```
->>> # 1. create the figure
->>> from datachart.charts import LineChart
->>> figure = LineChart({...})
-```
-
-```
->>> # 2. save the figure
->>> from datachart.utils.figure import save_figure
->>> from datachart.constants import FIG_FORMAT
->>> path = "/path/to/save/chart.png"
->>> save_figure(figure, path, dpi=300, format=FIG_FORMAT.PNG, transparent=True)
-```
-
-```
->>> # 3. save the same figure as a PDF and a PNG
->>> save_figure(figure, "/path/to/save/chart", format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
-['/path/to/save/chart.pdf', '/path/to/save/chart.png']
-```
-
-Added in Unreleased
-
-The list form of `format`, and the returned paths.
-
-| PARAMETER     | DESCRIPTION                                                                                                                                                                                            |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `figure`      | The figure to save. **TYPE:** `plt.Figure`                                                                                                                                                             |
-| `path`        | The path where the figure is saved. A stem when format is a list. **TYPE:** `str`                                                                                                                      |
-| `dpi`         | The DPI of the figure. **TYPE:** `int` **DEFAULT:** `300`                                                                                                                                              |
-| `format`      | The format of the figure, or a list of formats to write. If None, the format will be determined from the file extension. **TYPE:** `Optional[Union[FIG_FORMAT, List[FIG_FORMAT]]]` **DEFAULT:** `None` |
-| `transparent` | Whether to make the background transparent. **TYPE:** `bool` **DEFAULT:** `False`                                                                                                                      |
-
-| RETURNS     | DESCRIPTION                                             |
-| ----------- | ------------------------------------------------------- |
-| `List[str]` | The paths written, in the order the formats were given. |
-
-| RAISES       | DESCRIPTION                 |
-| ------------ | --------------------------- |
-| `ValueError` | If format is an empty list. |
+## Composition
 
 ### datachart.utils.Panel
 
 ```
 Panel(
-    charts: List[Union[plt.Figure, Dict[str, Any]]],
+    charts: list[plt.Figure | dict[str, Any]],
     *,
-    title: Optional[str] = None,
-    xlabel: Optional[str] = None,
-    ylabel_left: Optional[str] = None,
-    ylabel_right: Optional[str] = None,
-    figsize: Optional[
-        Union[FIG_SIZE, Tuple[float, float]]
-    ] = None,
-    show_legend: Optional[bool] = False,
-    legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[str] = None,
-    auto_secondary_axis: Optional[float] = None,
-    xmin: Optional[float] = None,
-    xmax: Optional[float] = None,
-    ymin: Optional[float] = None,
-    ymax: Optional[float] = None,
-    ymin_right: Optional[float] = None,
-    ymax_right: Optional[float] = None,
-    scalex: Optional[Union[SCALE, str]] = None,
-    scaley: Optional[Union[SCALE, str]] = None,
-    scaley_right: Optional[Union[SCALE, str]] = None,
-    bar_mode: Optional[Union[BAR_MODE, str]] = None
+    title: str | None = None,
+    xlabel: str | None = None,
+    ylabel_left: str | None = None,
+    ylabel_right: str | None = None,
+    figsize: FIG_SIZE | tuple[float, float] | None = None,
+    show_legend: bool | None = False,
+    legend: LegendSettingAttrs | None = None,
+    show_grid: str | None = None,
+    auto_secondary_axis: float | None = None,
+    xmin: float | None = None,
+    xmax: float | None = None,
+    ymin: float | None = None,
+    ymax: float | None = None,
+    ymin_right: float | None = None,
+    ymax_right: float | None = None,
+    scalex: SCALE | str | None = None,
+    scaley: SCALE | str | None = None,
+    scaley_right: SCALE | str | None = None,
+    bar_mode: BAR_MODE | str | None = None
 ) -> plt.Figure
 ```
 
@@ -178,28 +115,28 @@ Examples:
 ... )
 ```
 
-| PARAMETER             | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `charts`              | The figures to overlay. Each item is either a bare matplotlib Figure created by a datachart chart function — including another Panel figure, which flattens into this one — or a dict with a "figure" key plus optional per-figure options: - "y_axis": "left", "right", or "auto" (chart figures default to "auto"; a nested panel's figures keep their own assignment). "left"/"right" name the primary/secondary value axis — the bottom/top axis in a horizontal panel - "z_order": Integer for layering control (higher values on top) - "legend_label": Custom legend label (overrides chart subtitle) - "emphasis": "background" or "highlight" role for every layer of this figure. Background layers are muted (theme muted color, lowered alpha, behind the others) and excluded from the legend; highlight layers are bolded and brought to the front among the data layers. A nested panel's figures keep their own roles. **TYPE:** `List[Union[plt.Figure, Dict[str, Any]]]` |
-| `title`               | Title for the combined chart. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `xlabel`              | Label for the category axis. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `ylabel_left`         | Label for the primary value axis. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `ylabel_right`        | Label for the secondary value axis (if using dual axes). **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `figsize`             | Size of the figure (width, height) in inches. **TYPE:** `Optional[Union[FIG_SIZE, Tuple[float, float]]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `show_legend`         | Whether to show the legend. **TYPE:** `Optional[bool]` **DEFAULT:** `False`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `legend`              | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** `Optional[LegendSettingAttrs]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `show_grid`           | Which grid lines to show ("x", "y", "both", or None); these name the matplotlib axes literally. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `auto_secondary_axis` | Threshold ratio for automatic secondary axis creation. Default is taken from config (overlay_auto_threshold, default 3.0). **TYPE:** `Optional[float]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `xmin`                | Minimum value for the category-axis limits. **TYPE:** `Optional[float]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `xmax`                | Maximum value for the category-axis limits. **TYPE:** `Optional[float]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `ymin`                | Minimum value for the primary value-axis limits. **TYPE:** `Optional[float]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `ymax`                | Maximum value for the primary value-axis limits. **TYPE:** `Optional[float]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `ymin_right`          | Minimum value for the secondary value-axis limits. **TYPE:** `Optional[float]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `ymax_right`          | Maximum value for the secondary value-axis limits. **TYPE:** `Optional[float]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `scalex`              | The category-axis scale ("linear", "log", "symlog", "asinh"). Default: the scale the first figure was built with. See SCALE. **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `scaley`              | The primary value-axis scale. Default: the scale the first figure on that axis was built with. **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `scaley_right`        | The secondary value-axis scale. Default: the scale the first figure on that axis was built with. Inert on a polar panel, which has no secondary axis. **TYPE:** `Optional[Union[SCALE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `bar_mode`            | How bar and histogram series share the axis: "group" (side-by-side bars; histograms overlay), "stack" (stacked), or "overlay" (overlapping). Default is taken from config (overlay_bar_mode, default "group"). See BAR_MODE. **TYPE:** `Optional[Union[BAR_MODE, str]]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| PARAMETER             | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `charts`              | The figures to overlay. Each item is either a bare matplotlib Figure created by a datachart chart function — including another Panel figure, which flattens into this one — or a dict with a "figure" key plus optional per-figure options: - "y_axis": "left", "right", or "auto" (chart figures default to "auto"; a nested panel's figures keep their own assignment). "left"/"right" name the primary/secondary value axis — the bottom/top axis in a horizontal panel - "z_order": Integer for layering control (higher values on top) - "legend_label": Custom legend label (overrides chart subtitle) - "emphasis": "background" or "highlight" role for every layer of this figure. Background layers are muted (theme muted color, lowered alpha, behind the others) and excluded from the legend; highlight layers are bolded and brought to the front among the data layers. A nested panel's figures keep their own roles. **TYPE:** \`list\[plt.Figure |
+| `title`               | Title for the combined chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `xlabel`              | Label for the category axis. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `ylabel_left`         | Label for the primary value axis. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `ylabel_right`        | Label for the secondary value axis (if using dual axes). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `figsize`             | Size of the figure (width, height) in inches. **TYPE:** \`FIG_SIZE                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `show_legend`         | Whether to show the legend. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `legend`              | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `show_grid`           | Which grid lines to show ("x", "y", "both", or None); these name the matplotlib axes literally. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `auto_secondary_axis` | Threshold ratio for automatic secondary axis creation. Default is taken from config (overlay_auto_threshold, default 3.0). **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `xmin`                | Minimum value for the category-axis limits. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `xmax`                | Maximum value for the category-axis limits. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `ymin`                | Minimum value for the primary value-axis limits. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `ymax`                | Maximum value for the primary value-axis limits. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `ymin_right`          | Minimum value for the secondary value-axis limits. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `ymax_right`          | Maximum value for the secondary value-axis limits. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `scalex`              | The category-axis scale ("linear", "log", "symlog", "asinh"). Default: the scale the first figure was built with. See SCALE. **TYPE:** \`SCALE                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `scaley`              | The primary value-axis scale. Default: the scale the first figure on that axis was built with. **TYPE:** \`SCALE                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `scaley_right`        | The secondary value-axis scale. Default: the scale the first figure on that axis was built with. Inert on a polar panel, which has no secondary axis. **TYPE:** \`SCALE                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `bar_mode`            | How bar and histogram series share the axis: "group" (side-by-side bars; histograms overlay), "stack" (stacked), or "overlay" (overlapping). Default is taken from config (overlay_bar_mode, default "group"). See BAR_MODE. **TYPE:** \`BAR_MODE                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 
 | RETURNS      | DESCRIPTION                                         |
 | ------------ | --------------------------------------------------- |
@@ -213,16 +150,16 @@ Examples:
 
 ```
 Grid(
-    charts: Union[
-        List[Union[plt.Figure, Dict[str, Any]]],
-        List[List[Optional[plt.Figure]]],
-    ],
+    charts: (
+        list[plt.Figure | dict[str, Any]]
+        | list[list[plt.Figure | None]]
+    ),
     *,
-    title: Optional[str] = None,
-    xlabel: Optional[str] = None,
-    ylabel: Optional[str] = None,
+    title: str | None = None,
+    xlabel: str | None = None,
+    ylabel: str | None = None,
     max_cols: int = 4,
-    figsize: Optional[Tuple[float, float]] = None,
+    figsize: tuple[float, float] | None = None,
     sharex: bool = False,
     sharey: bool = False
 ) -> plt.Figure
@@ -272,16 +209,16 @@ Examples:
 ... )
 ```
 
-| PARAMETER  | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                              |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `charts`   | Either nested rows — each inner list is one grid row of bare matplotlib Figures (or None for a blank cell) — or a flat list whose items are bare figures or dicts with a "figure" key and an optional "layout_spec" dict ('row', 'col', 'rowspan', 'colspan'). Nested rows and layout_spec cannot be mixed. **TYPE:** `Union[List[Union[plt.Figure, Dict[str, Any]]], List[List[Optional[plt.Figure]]]]` |
-| `title`    | Optional title for the combined figure. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                                                                                                    |
-| `xlabel`   | Optional x-axis label for the whole grid, drawn once below every cell. A nested grid keeps its own as a footer of its cell. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                                |
-| `ylabel`   | Optional y-axis label for the whole grid, drawn once to the left of every cell. A nested grid keeps its own beside its cell. **TYPE:** `Optional[str]` **DEFAULT:** `None`                                                                                                                                                                                                                               |
-| `max_cols` | Maximum number of columns for the flat-list automatic grid. **TYPE:** `int` **DEFAULT:** `4`                                                                                                                                                                                                                                                                                                             |
-| `figsize`  | Size of the combined figure (width, height) in inches. If None, calculated from the first figure's size. **TYPE:** `Optional[Tuple[float, float]]` **DEFAULT:** `None`                                                                                                                                                                                                                                   |
-| `sharex`   | Whether to share the x-axis across all subplots. **TYPE:** `bool` **DEFAULT:** `False`                                                                                                                                                                                                                                                                                                                   |
-| `sharey`   | Whether to share the y-axis across all subplots. **TYPE:** `bool` **DEFAULT:** `False`                                                                                                                                                                                                                                                                                                                   |
+| PARAMETER  | DESCRIPTION                                                                                                                                                                                                                                                                                                                              |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `charts`   | Either nested rows — each inner list is one grid row of bare matplotlib Figures (or None for a blank cell) — or a flat list whose items are bare figures or dicts with a "figure" key and an optional "layout_spec" dict ('row', 'col', 'rowspan', 'colspan'). Nested rows and layout_spec cannot be mixed. **TYPE:** \`list\[plt.Figure |
+| `title`    | Optional title for the combined figure. **TYPE:** \`str                                                                                                                                                                                                                                                                                  |
+| `xlabel`   | Optional x-axis label for the whole grid, drawn once below every cell. A nested grid keeps its own as a footer of its cell. **TYPE:** \`str                                                                                                                                                                                              |
+| `ylabel`   | Optional y-axis label for the whole grid, drawn once to the left of every cell. A nested grid keeps its own beside its cell. **TYPE:** \`str                                                                                                                                                                                             |
+| `max_cols` | Maximum number of columns for the flat-list automatic grid. **TYPE:** `int` **DEFAULT:** `4`                                                                                                                                                                                                                                             |
+| `figsize`  | Size of the combined figure (width, height) in inches. If None, calculated from the first figure's size. **TYPE:** \`tuple[float, float]                                                                                                                                                                                                 |
+| `sharex`   | Whether to share the x-axis across all subplots. **TYPE:** `bool` **DEFAULT:** `False`                                                                                                                                                                                                                                                   |
+| `sharey`   | Whether to share the y-axis across all subplots. **TYPE:** `bool` **DEFAULT:** `False`                                                                                                                                                                                                                                                   |
 
 | RETURNS      | DESCRIPTION                                                     |
 | ------------ | --------------------------------------------------------------- |
@@ -296,7 +233,7 @@ Examples:
 ```
 Annotate(
     figure: plt.Figure,
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]],
+    texts: TextSettingAttrs | list[TextSettingAttrs],
 ) -> plt.Figure
 ```
 
@@ -337,10 +274,10 @@ Examples:
 ... )
 ```
 
-| PARAMETER | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                       |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `figure`  | A figure created by a datachart chart function or Panel. **TYPE:** `plt.Figure`                                                                                                                                                                                                                                                                                   |
-| `texts`   | The text annotation(s) to add. Each annotation places text at (x, y) — data coordinates by default, axes fractions with "coords": "axes" — draws a connector to the optional target data point, and takes a per-text style override. On a multi-subplot figure each one also names its subplot index. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs]]` |
+| PARAMETER | DESCRIPTION                                                                                                                                                                                                                                                                                                                        |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `figure`  | A figure created by a datachart chart function or Panel. **TYPE:** `plt.Figure`                                                                                                                                                                                                                                                    |
+| `texts`   | The text annotation(s) to add. Each annotation places text at (x, y) — data coordinates by default, axes fractions with "coords": "axes" — draws a connector to the optional target data point, and takes a per-text style override. On a multi-subplot figure each one also names its subplot index. **TYPE:** \`TextSettingAttrs |
 
 | RETURNS      | DESCRIPTION                                         |
 | ------------ | --------------------------------------------------- |
@@ -349,3 +286,65 @@ Examples:
 | RAISES       | DESCRIPTION                                                                                                                                                                              |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ValueError` | If the figure has no chart metadata or is a Grid figure; if a text names a subplot on a single-panel figure; if, on a multi-subplot figure, a text names no subplot or one out of range. |
+
+## Output
+
+### datachart.utils.save_figure
+
+```
+save_figure(
+    figure: plt.Figure,
+    path: str,
+    dpi: int = 300,
+    format: FIG_FORMAT | list[FIG_FORMAT] | None = None,
+    transparent: bool = False,
+) -> list[str]
+```
+
+Save the figure to one or more files.
+
+Writes the rendered figure to disk in the format given by `format` or, when omitted, by the file extension. Use a vector format (PDF, SVG) for print and papers, PNG with `dpi` >= 300 for raster deliverables, and `transparent=True` to drop the figure background for slides and web pages. The theme is already baked into the figure, so saving never consults the global config.
+
+Pass a list of formats to write the same figure several times in one call. `path` is then a stem: its extension is dropped when it names a supported format, and one file per format is written next to it. `dpi` and `transparent` apply to every file.
+
+Examples:
+
+```
+>>> # 1. create the figure
+>>> from datachart.charts import LineChart
+>>> figure = LineChart({...})
+```
+
+```
+>>> # 2. save the figure
+>>> from datachart.utils.figure import save_figure
+>>> from datachart.constants import FIG_FORMAT
+>>> path = "/path/to/save/chart.png"
+>>> save_figure(figure, path, dpi=300, format=FIG_FORMAT.PNG, transparent=True)
+```
+
+```
+>>> # 3. save the same figure as a PDF and a PNG
+>>> save_figure(figure, "/path/to/save/chart", format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
+['/path/to/save/chart.pdf', '/path/to/save/chart.png']
+```
+
+Added in Unreleased
+
+The list form of `format`, and the returned paths.
+
+| PARAMETER     | DESCRIPTION                                                                                                                                     |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `figure`      | The figure to save. **TYPE:** `plt.Figure`                                                                                                      |
+| `path`        | The path where the figure is saved. A stem when format is a list. **TYPE:** `str`                                                               |
+| `dpi`         | The DPI of the figure. **TYPE:** `int` **DEFAULT:** `300`                                                                                       |
+| `format`      | The format of the figure, or a list of formats to write. If None, the format will be determined from the file extension. **TYPE:** \`FIG_FORMAT |
+| `transparent` | Whether to make the background transparent. **TYPE:** `bool` **DEFAULT:** `False`                                                               |
+
+| RETURNS     | DESCRIPTION                                             |
+| ----------- | ------------------------------------------------------- |
+| `list[str]` | The paths written, in the order the formats were given. |
+
+| RAISES       | DESCRIPTION                 |
+| ------------ | --------------------------- |
+| `ValueError` | If format is an empty list. |

@@ -1,99 +1,29 @@
 # Box Plot
 
-This section showcases the box plot. It contains examples of how to create box plots using the [datachart.charts.BoxPlot](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.BoxPlot) function.
+A box plot compares the center, the spread and the outliers of several groups at a glance: each group gets a box, and the boxes answer *which group is higher, which varies more, and which has unusual values*. This guide shows how to create box plots with the [datachart.charts.BoxPlot](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.charts.BoxPlot) function, starting with the basics and building up to worked examples on real data.
 
 Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-box-plot), which maps common tasks to the parameter or style attribute that does the job.
-
-As mentioned above, the box plots are created using the `BoxPlot` function found in the [datachart.charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md) module. Let's import it:
 
 ```
 from datachart.charts import BoxPlot
 ```
 
-## Box Plot Input Attributes
-
-The `BoxPlot` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the data points. For a single box plot, `data` is a list of dictionaries; the points that share a `label` form one box. For multiple box plots, `data` is a list of lists.
-
-```
-BoxPlot(
-    data=[{                                             # A list of box data points (or list of lists for multiple charts)
-        "label": str,                                   # The category label
-        "value": Union[int, float],                     # The numeric value
-    }],
-    style={                                             # The style of the box (optional)
-        "plot_box_color":           Union[str, None],       # The fill color of the box
-        "plot_box_alpha":           Union[float, None],     # The alpha of the box
-        "plot_box_linewidth":       Union[int, float, None], # The line width of the box
-        "plot_box_edgecolor":       Union[str, None],       # The edge color of the box
-        "plot_box_outlier_marker":  Union[str, None],       # The outlier marker style
-        "plot_box_outlier_size":    Union[int, float, None], # The outlier marker size
-        "plot_box_outlier_color":   Union[str, None],       # The outlier marker color
-        "plot_box_outlier_edge_color": Union[str, None],    # The outlier marker edge color
-        "plot_box_median_color":    Union[str, None],       # The median line color
-        "plot_box_median_linewidth": Union[int, float, None], # The median line width
-        "plot_box_whisker_color":   Union[str, None],       # The whisker line color
-        "plot_box_whisker_linewidth": Union[int, float, None], # The whisker line width
-        "plot_box_cap_color":       Union[str, None],       # The cap line color
-        "plot_box_cap_linewidth":   Union[int, float, None], # The cap line width
-    },
-    subtitle=Optional[str],                             # The subtitle of the chart (or list for multiple charts)
-    title=Optional[str],                                # The title of the chart
-    xlabel=Optional[str],                               # The x-axis label
-    ylabel=Optional[str],                               # The y-axis label
-    emphasis=Optional[Union[str, List[Optional[str]]]], # The emphasis role per box label ("background", "highlight", None)
-    emphasis_rule=Optional[dict],                       # One-key rule on a per-group summary; optional "by": median, mean, min, max, sum
-
-    figsize=Optional[Tuple[float, float]],              # The figure size in inches
-    show_grid=Optional[str],                            # Which grid lines to show ("both", "x", "y")
-    show_outliers=Optional[bool],                       # Whether to show outliers (default: True)
-    show_notch=Optional[bool],                          # Whether to show notched boxes (default: False)
-    orientation=Optional[ORIENTATION],                  # The orientation of the boxes
-    scaley=Optional[str],                               # The y-axis scale ("linear", "log", ...)
-    xmin=Optional[Union[int, float]],                   # The x-axis range
-    xmax=Optional[Union[int, float]],
-    ymin=Optional[Union[int, float]],                   # The y-axis range
-    ymax=Optional[Union[int, float]],
-
-    subplots=Optional[bool],                            # Whether to draw each chart in its own subplot (required for multiple charts)
-    max_cols=Optional[int],                             # Maximum number of subplots per row
-    sharex=Optional[bool],                              # Whether subplots share the x-axis
-    sharey=Optional[bool],                              # Whether subplots share the y-axis
-
-    xticks=Optional[List[Union[int, float]]],           # the x-axis ticks
-    xticklabels=Optional[List[str]],                    # the x-axis tick labels (must be same length as xticks)
-    xtickrotate=Optional[int],                          # the x-axis tick labels rotation
-    yticks=Optional[List[Union[int, float]]],           # the y-axis ticks
-    yticklabels=Optional[List[str]],                    # the y-axis tick labels (must be same length as yticks)
-    ytickrotate=Optional[int],                          # the y-axis tick labels rotation
-
-    vlines=Optional[Union[dict, List[dict]]],           # the vertical lines
-    hlines=Optional[Union[dict, List[dict]]],           # the horizontal lines
-    vspans=Optional[Union[dict, List[dict]]],           # the vertical reference bands
-    hspans=Optional[Union[dict, List[dict]]],           # the horizontal reference bands
-
-    label=Optional[str],                                # The key in data holding the category label (default: "label")
-    value=Optional[str],                                # The key in data holding the numeric value (default: "value")
-)
-```
-
-For more details, see the [datachart.charts.BoxPlot](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.BoxPlot) function.
-
 ## Basics
 
-The examples in this guide share one dataset: the body mass of the 342 penguins of the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0), three species measured on the islands of the Palmer Archipelago in Antarctica. The data is hard-coded in a hidden cell, which keeps the sex and the flipper length of every penguin alongside its species — the later sections and examples reuse them. `chart_data` holds the body mass (in g) of every penguin, labeled with its species.
+The examples in this guide share one dataset: the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) (Gorman, Williams and Fraser, 2014; released under CC0), measurements of the penguins of three species on the islands of the Palmer Archipelago in Antarctica. The hidden cell holds the 342 penguins with a recorded body mass, grouped by species and sex, with the flipper length of each. `body_mass` holds one data point per penguin, its body mass in grams labeled with its species, and `flipper_length` the same for the flipper length in millimeters. The question running through the guide is how the three species differ in size: Adelie and Chinstrap penguins weigh about the same, Gentoo penguins are much heavier, and the boxes show by how much.
 
-The data is a flat list of dictionaries, one per data point, each with a `label` and a `value`. The points that share a `label` are grouped into one box, so three species give three boxes:
+Each data point is a dictionary with a `label` (the group) and a `value`. The points that share a `label` form one box, so the three species give three boxes:
 
 ```
-chart_data[:3]
+body_mass[:3]
 ```
 
-**Basic example.** Only the `data` argument is required to draw the box plot. Each box spans the middle half of its values (the first to the third quartile), the line inside it is the median, the whiskers reach the furthest values within 1.5 times the box height, and the values beyond the whiskers are drawn as outliers.
+**Basic example.** Only the `data` argument is required. Each box spans the middle half of its group (from the first to the third quartile), the line inside it is the median, the whiskers reach the furthest values within 1.5 box heights of the box, and the values beyond the whiskers are drawn as outliers. The boxes follow the order in which the labels first appear in the data:
 
 ```
 BoxPlot(
     # add the data to the chart
-    data=chart_data
+    data=body_mass
 ).show()
 ```
 
@@ -101,209 +31,206 @@ BoxPlot(
 
 Every customization is either a keyword argument of `BoxPlot` or a `plot_box_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                                       | Use                                                                               | See                                                             |
-| ------------------------------------------------ | --------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| add a title and axis labels                      | `title`, `xlabel`, `ylabel`                                                       | [Title and axis labels](#title-and-axis-labels)                 |
-| resize the figure                                | `figsize`                                                                         | [Figure size and grid](#figure-size-and-grid)                   |
-| show the grid lines                              | `show_grid`                                                                       | [Figure size and grid](#figure-size-and-grid)                   |
-| change the box fill, edge or transparency        | `style={"plot_box_color": ..., "plot_box_edgecolor": ..., "plot_box_alpha": ...}` | [Box style](#box-style)                                         |
-| style the median, whiskers and caps              | `style={"plot_box_median_color": ..., "plot_box_whisker_color": ..., ...}`        | [Box style](#box-style)                                         |
-| style the outlier markers                        | `style={"plot_box_outlier_marker": ..., "plot_box_outlier_size": ..., ...}`       | [Box style](#box-style)                                         |
-| draw the boxes horizontally                      | `orientation`                                                                     | [Box orientation](#box-orientation)                             |
-| hide the outliers                                | `show_outliers`                                                                   | [Showing and hiding outliers](#showing-and-hiding-outliers)     |
-| show the confidence interval of the median       | `show_notch`                                                                      | [Notched box plots](#notched-box-plots)                         |
-| print the median of each box                     | `show_values`, `value_format`                                                     | [Value labels](#value-labels)                                   |
-| highlight one box, mute the rest                 | `emphasis`                                                                        | [Emphasis](#emphasis)                                           |
-| highlight the boxes that match a rule            | `emphasis_rule`                                                                   | [Emphasis](#emphasis)                                           |
-| draw a threshold or reference line               | `hlines`, `vlines`                                                                | [Reference lines](#reference-lines)                             |
-| shade a range next to the boxes                  | `hspans`, `vspans`                                                                | [Reference bands](#reference-bands)                             |
-| draw the observations or a violin with the boxes | `Panel`                                                                           | [Boxes with swarms and violins](#boxes-with-swarms-and-violins) |
-| compare several datasets side by side            | `data` as a list of lists, `subtitle`, `subplots`                                 | [Multiple Box Plots](#multiple-box-plots)                       |
-| arrange the subplots                             | `max_cols`, `sharex`, `sharey`                                                    | [Shared axes across subplots](#shared-axes-across-subplots)     |
-| draw every subplot horizontally                  | `orientation`                                                                     | [Subplot orientation](#subplot-orientation)                     |
-| save the chart to a file                         | `save_figure`                                                                     | [Saving the Chart as an Image](#saving-the-chart-as-an-image)   |
+| I want to…                                    | Use                                                           | See                                                                                                     |
+| --------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| add a title and axis labels                   | `title`, `xlabel`, `ylabel`                                   | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| set the axis range, ticks and tick format     | `ymin`, `ymax`, `yticks`, `yticks_format`                     | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| resize the figure                             | `figsize`                                                     | [Figure size and grid](#figure-size-and-grid)                                                           |
+| show grid lines                               | `show_grid`                                                   | [Figure size and grid](#figure-size-and-grid)                                                           |
+| order the boxes by their median               | the order of `data`                                           | [Box order](#box-order)                                                                                 |
+| change the box fill, edge, median or outliers | `style={"plot_box_color": ..., "plot_box_median_color": ...}` | [Box style](#box-style)                                                                                 |
+| draw the boxes horizontally                   | `orientation`                                                 | [Horizontal boxes](#horizontal-boxes)                                                                   |
+| hide the outliers                             | `show_outliers`                                               | [Showing and hiding outliers](#showing-and-hiding-outliers)                                             |
+| check whether two medians differ              | `show_notch`                                                  | [Notched boxes](#notched-boxes)                                                                         |
+| print the median of each box                  | `show_values`, `value_format`                                 | [Value labels](#value-labels)                                                                           |
+| highlight some boxes, mute the rest           | `emphasis`, `emphasis_rule`                                   | [Emphasis](#emphasis)                                                                                   |
+| mark a threshold or a summary value           | `hlines`, `vlines`                                            | [Reference lines](#reference-lines)                                                                     |
+| shade a range of values                       | `hspans`, `vspans`                                            | [Reference bands](#reference-bands)                                                                     |
+| title and place the legend                    | `show_legend`, `legend`                                       | [Reference bands](#reference-bands)                                                                     |
+| put a note on the chart                       | `texts`                                                       | [Text annotations](#text-annotations)                                                                   |
+| use dates as group labels                     | `date` objects as `label`, `xticks_format`                    | [Date labels](#date-labels)                                                                             |
+| draw the observations or a violin with boxes  | `Panel` with `SwarmPlot`, `ViolinPlot`                        | [Boxes with swarms and violins](#boxes-with-swarms-and-violins)                                         |
+| compare several datasets side by side         | `data` as a list of lists, `subtitle`, `subplots`             | [Multiple Box Plots](#multiple-box-plots)                                                               |
+| arrange the subplots and share their axes     | `max_cols`, `sharex`, `sharey`                                | [Shared axes across subplots](#shared-axes-across-subplots)                                             |
+| draw every subplot horizontally               | `orientation`                                                 | [Subplot orientation](#subplot-orientation)                                                             |
+| use a logarithmic value axis                  | `scaley`                                                      | [Axis scales](#axis-scales)                                                                             |
+| plot data with other key names                | `label`, `value`                                              | [Custom data keys](#custom-data-keys)                                                                   |
+| save the chart to a file                      | `save_figure`                                                 | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
-The full list of style attributes is in the [datachart.typings.BoxStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BoxStyleAttrs) type; the full list of parameters is in the [datachart.charts.BoxPlot](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.BoxPlot) reference.
+The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
 
-### Title and axis labels
+| Parameter                                    | Constant                                                                                                                                                                                                                                     |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
+| `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
+| `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
+| `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
+| `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
+| `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
+| `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
+| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
+| `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 
-To add the chart title and axis labels, add the `title`, `xlabel` and `ylabel` attributes.
+The full list of style attributes is in the [datachart.typings.BoxStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.typings.BoxStyleAttrs) type; the full list of parameters is in the [datachart.charts.BoxPlot](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.charts.BoxPlot) reference.
+
+### Title, axis labels and ticks
+
+A box plot without labels leaves the reader guessing what is measured and in which unit; `title`, `xlabel` and `ylabel` say it. `ymin` and `ymax` fix the value range, which matters when several charts should be read against each other, and `yticks` picks the tick positions. Body masses run into the thousands, so `yticks_format` prints them with a thousands separator through [VALUE_FORMAT.THOUSANDS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT); `xtickrotate` and `ytickrotate` tilt long tick labels.
 
 ```
+from datachart.constants import VALUE_FORMAT
+
 BoxPlot(
-    data=chart_data,
+    data=body_mass,
     # add the title
     title="Body mass of Palmer penguins",
     # add the x and y axis labels
     xlabel="Species",
     ylabel="Body mass (g)",
+    # fix the value range and its ticks
+    ymin=2500,
+    ymax=6500,
+    yticks=[3000, 4000, 5000, 6000],
+    # print the ticks with a thousands separator
+    yticks_format=VALUE_FORMAT.THOUSANDS,
 ).show()
 ```
 
 ### Figure size and grid
 
-To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains some of the predefined figure sizes.
+Three boxes do not need a square figure, and a wide, short one fits a page better. `figsize` takes a `(width, height)` tuple in inches or one of the presets in [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE), sized for a full or half page width.
 
-To add the grid, add the `show_grid` attribute. The possible options are:
-
-| Option   | Description                                     |
-| -------- | ----------------------------------------------- |
-| `"both"` | shows both the x-axis and the y-axis gridlines. |
-| `"x"`    | shows only the x-axis grid lines.               |
-| `"y"`    | shows only the y-axis grid lines.               |
-
-Again, `datachart` provides a [datachart.constants.SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) constant, which contains the supported options. The values of a vertical box plot are read off the y-axis, so the y-axis grid lines are the ones that help.
+The values of a vertical box plot are read off the y-axis, so grid lines along it help the eye carry a median or a quartile across to the scale. `show_grid` draws them with [SHOW_GRID.Y](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) (`SHOW_GRID.X` and `SHOW_GRID.BOTH` are the other options). `aspect_ratio` fixes the ratio of the axes rather than of the figure ([ASPECT_RATIO](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)); box plots rarely need it, so the examples leave it at the default.
 
 ```
 from datachart.constants import FIG_SIZE, SHOW_GRID
-```
 
-```
 BoxPlot(
-    data=chart_data,
+    data=body_mass,
     title="Body mass of Palmer penguins",
     xlabel="Species",
     ylabel="Body mass (g)",
-    # add to determine the figure size
+    yticks_format=VALUE_FORMAT.THOUSANDS,
+    # a wide, short figure
     figsize=FIG_SIZE.FULL_SHORT,
-    # add to show the grid lines
+    # grid lines along the value axis only
+    show_grid=SHOW_GRID.Y,
+).show()
+```
+
+### Box order
+
+The boxes follow the order in which their labels first appear in the data, which is often an accident of how the file was written. Ordered by their median, the boxes read as a ranking. `BoxPlot` has no sort parameter, so the order is set by sorting the data points themselves: here by the median body mass of each species, heaviest first. Adelie and Chinstrap penguins share a median of 3,700 g, and a stable sort keeps them in their input order.
+
+```
+from statistics import median
+
+SPECIES = ["Adelie", "Chinstrap", "Gentoo"]
+# the median body mass of each species
+species_median = {
+    species: median(point["value"] for point in body_mass if point["label"] == species)
+    for species in SPECIES
+}
+# heaviest species first
+by_median = sorted(body_mass, key=lambda point: -species_median[point["label"]])
+
+BoxPlot(
+    data=by_median,
+    title="Body mass of Palmer penguins, heaviest species first",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    yticks_format=VALUE_FORMAT.THOUSANDS,
+    figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
 ).show()
 ```
 
 ### Box style
 
-To change the box style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.BoxStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BoxStyleAttrs) type, which contains the following attributes:
-
-| Attribute                       | Description                                     |
-| ------------------------------- | ----------------------------------------------- |
-| `"plot_box_color"`              | The fill color of the box (hex color code).     |
-| `"plot_box_alpha"`              | The alpha of the box (how visible the box is).  |
-| `"plot_box_linewidth"`          | The line width of the box border.               |
-| `"plot_box_edgecolor"`          | The edge color of the box (hex color code).     |
-| `"plot_box_outlier_marker"`     | The outlier marker style.                       |
-| `"plot_box_outlier_size"`       | The outlier marker size.                        |
-| `"plot_box_outlier_color"`      | The outlier marker color (hex color code).      |
-| `"plot_box_outlier_edge_color"` | The outlier marker edge color (hex color code). |
-| `"plot_box_median_color"`       | The median line color (hex color code).         |
-| `"plot_box_median_linewidth"`   | The median line width.                          |
-| `"plot_box_whisker_color"`      | The whisker line color (hex color code).        |
-| `"plot_box_whisker_linewidth"`  | The whisker line width.                         |
-| `"plot_box_cap_color"`          | The cap line color (hex color code).            |
-| `"plot_box_cap_linewidth"`      | The cap line width.                             |
-
-Again, to help with the style settings, the [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) module contains the following constants:
-
-| Constant                                                                                                                           | Description               |
-| ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| [datachart.constants.LINE_MARKER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_MARKER) | The outlier marker style. |
-
-The `style` applies to every box of the chart. The median is the one line every reader looks for, so it earns a contrasting color and a heavier width; the outlier attributes style the two Chinstrap outliers. Any attribute you leave out keeps the value of the active theme.
+The `style` dictionary sets the look of the boxes: the fill and its alpha, the edge, the hatch, the median line, the whiskers and caps, and the outlier markers; the attributes are listed in [datachart.typings.BoxStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.typings.BoxStyleAttrs), and any attribute left out keeps the value of the active theme. The median is the one line every reader looks for, so it earns a contrasting color and a heavier width. The outlier marker takes a [LINE_MARKER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_MARKER) value; the diamonds below make the two Chinstrap outliers stand out from the whisker ends.
 
 ```
 from datachart.constants import LINE_MARKER
-```
 
-```
 BoxPlot(
-    data=chart_data,
-    # define the style of the boxes
+    data=body_mass,
+    # a light box, a strong median, and diamond outliers
     style={
-        "plot_box_color": "#6baed6",
+        "plot_box_color": "#c6dbef",
+        "plot_box_alpha": 1.0,
         "plot_box_edgecolor": "#08519c",
-        "plot_box_linewidth": 1.5,
+        "plot_box_linewidth": 1.2,
         "plot_box_median_color": "#d62728",
-        "plot_box_median_linewidth": 2,
+        "plot_box_median_linewidth": 2.5,
+        "plot_box_whisker_color": "#08519c",
+        "plot_box_cap_color": "#08519c",
         "plot_box_outlier_marker": LINE_MARKER.DIAMOND,
-        "plot_box_outlier_size": 5,
-        "plot_box_outlier_color": "#08519c",
+        "plot_box_outlier_size": 6,
+        "plot_box_outlier_color": "#d62728",
     },
     title="Body mass of Palmer penguins",
     xlabel="Species",
     ylabel="Body mass (g)",
+    yticks_format=VALUE_FORMAT.THOUSANDS,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
 ).show()
 ```
 
-### Box orientation
+### Horizontal boxes
 
-To change the orientation of the boxes, add the `orientation` attribute, which supports the following values:
-
-| Value          | Description                                                              |
-| -------------- | ------------------------------------------------------------------------ |
-| `"vertical"`   | The boxes are vertical, one per category along the x-axis (the default). |
-| `"horizontal"` | The boxes are horizontal, one per category along the y-axis.             |
-
-Again, `datachart` provides a [datachart.constants.ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) constant, which contains the supported options. Horizontal boxes swap the roles of the axes: the categories move to the y-axis and the values to the x-axis, so the axis labels and the grid follow.
+Long group names and many groups read best down the page. `orientation=ORIENTATION.HORIZONTAL` ([ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)) puts the groups on the y-axis and the values on the x-axis, so the axis labels, the tick format and the grid swap with it. The first group is drawn at the bottom.
 
 ```
 from datachart.constants import ORIENTATION
-```
 
-```
 BoxPlot(
-    data=chart_data,
-    # change the orientation of the boxes
+    data=body_mass,
+    # draw the boxes horizontally
     orientation=ORIENTATION.HORIZONTAL,
     title="Body mass of Palmer penguins",
-    # swap the axis labels to match the orientation
+    # the axis labels, the tick format and the grid swap with the orientation
     xlabel="Body mass (g)",
     ylabel="Species",
+    xticks_format=VALUE_FORMAT.THOUSANDS,
     figsize=FIG_SIZE.FULL_SHORT,
-    # the values are now read off the x-axis
     show_grid=SHOW_GRID.X,
-).show()
-```
-
-### Date labels
-
-Group labels may be real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp`. Group labels that are real temporal objects print through `DATE_FORMAT`; the groups keep their categorical positions, and `{axis}ticks_format` picks the pattern (a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern). Here twenty daily temperatures per month are grouped by the first day of the month (the data is drawn in a hidden cell).
-
-```
-from datachart.constants import DATE_FORMAT
-
-BoxPlot(
-    data=daily_temperatures,
-    title="Daily mean temperature in Ljubljana",
-    xlabel="Month",
-    ylabel="Temperature (°C)",
-    xticks_format=DATE_FORMAT.YEAR_MONTH,
-    xtickrotate=45,
-    figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
 ### Showing and hiding outliers
 
-By default, the values beyond the whiskers are drawn as outliers. To hide them, add the `show_outliers` attribute set to `False`. The Chinstrap penguins have two: one of 2,700 g and one of 4,800 g, far from the 3,700 g median. With the outliers hidden the whiskers stay where they are — they still end at the furthest values within 1.5 times the box height — so hiding outliers changes what is drawn, not what the boxes summarize.
+Outliers are the values beyond the whiskers, and whether to draw them depends on the question. When they are measurement errors or a distraction, `show_outliers=False` hides them; when they are the story, keep them (the default). The Chinstrap penguins have two: one of 2,700 g and one of 4,800 g. Hiding them does not move the whiskers, which still end at the furthest values within 1.5 box heights, so hiding outliers changes what is drawn, not what the boxes summarize.
 
 ```
 for show_outliers in [True, False]:
     BoxPlot(
-        data=chart_data,
+        data=body_mass,
         # show or hide the values beyond the whiskers
         show_outliers=show_outliers,
-        title=f"Body mass of Palmer penguins (outliers {'shown' if show_outliers else 'hidden'})",
+        title=f"Body mass of Palmer penguins, outliers {'shown' if show_outliers else 'hidden'}",
         xlabel="Species",
         ylabel="Body mass (g)",
+        yticks_format=VALUE_FORMAT.THOUSANDS,
         figsize=FIG_SIZE.FULL_SHORT,
         show_grid=SHOW_GRID.Y,
     ).show()
 ```
 
-### Notched box plots
+### Notched boxes
 
-To draw notched boxes, add the `show_notch` attribute set to `True`. The notch marks a confidence interval around the median: if the notches of two boxes do not overlap, their medians differ with some confidence. The notch narrows with the number of values — the 68 Chinstrap penguins get a wider notch than the 151 Adelie — and the Adelie and Chinstrap notches overlap, so their medians cannot be told apart, while the Gentoo are heavier beyond doubt.
+Two medians that look different may still be the same up to sampling noise, and a notch shows which. `show_notch=True` cuts a notch around each median that spans an approximate 95% confidence interval of it. When the notches of two boxes do not overlap, that is good evidence that their medians differ; when they overlap, the data cannot tell the medians apart. The notch narrows as the group grows, so the 68 Chinstrap penguins get a wider notch than the 151 Adelie. Here the Adelie and Chinstrap notches overlap (both medians are 3,700 g), while the Gentoo notch sits far above both: Gentoo penguins are heavier, beyond doubt.
 
 ```
 BoxPlot(
-    data=chart_data,
-    # draw the confidence interval of the median as a notch
+    data=body_mass,
+    # cut a confidence-interval notch around each median
     show_notch=True,
-    title="Body mass of Palmer penguins",
+    title="Body mass of Palmer penguins, with median notches",
     xlabel="Species",
     ylabel="Body mass (g)",
+    yticks_format=VALUE_FORMAT.THOUSANDS,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
 ).show()
@@ -311,19 +238,18 @@ BoxPlot(
 
 ### Value labels
 
-To print the median of each group beside its median line, add the `show_values` attribute; `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)). The median is the number readers take from a box, so it is the one value printed.
+The median is the number readers take away from a box, and reading it off the axis is imprecise. `show_values` prints each box's median beside its median line, and `value_format` formats it: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant or any `"{x:.1f}"`, `"{:.1f} g"` or `"%g"` style string. The label font size, color and padding are the `plot_value_*` style attributes ([ValueLabelStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)).
 
 ```
-from datachart.constants import VALUE_FORMAT
-
 BoxPlot(
-    data=chart_data,
-    # print the median of every box
+    data=body_mass,
+    # print the median of every box, with its unit
     show_values=True,
-    value_format=VALUE_FORMAT.INTEGER,
-    title="Body mass of Palmer penguins",
+    value_format="{x:,.0f} g",
+    title="Body mass of Palmer penguins, with the medians",
     xlabel="Species",
     ylabel="Body mass (g)",
+    yticks_format=VALUE_FORMAT.THOUSANDS,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
 ).show()
@@ -331,30 +257,35 @@ BoxPlot(
 
 ### Emphasis
 
-To draw attention to one box, add the `emphasis` attribute. Box plots never overlay, so the `emphasis` list aligns with the box **labels** of one call, in the order the labels first appear in the data — here Adelie, Chinstrap, Gentoo. Each entry is one of the following roles:
-
-| Role           | Description                                                                                                                     |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `"background"` | Mutes the box: it takes the muted color of the active theme, and its whiskers, caps, median and outliers mute together with it. |
-| `"highlight"`  | Bolds the box edges and the median line.                                                                                        |
-| `None`         | Leaves the box unchanged.                                                                                                       |
-
-A single value instead of a list applies the role to every box. Again, `datachart` provides a [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constant, which contains the supported roles. The example puts the Gentoo box under scrutiny and pushes the other two species into the background. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide for the full model — how the muted color follows the theme and how emphasis works across the other charts.
-
-To pick the boxes from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every box whose summary matches and mutes the rest. The summary is the median of each box's values by default, what a box already draws; a `"by"` key picks `"mean"`, `"min"`, `"max"`, or `"sum"` instead, as in `{"above": 4000, "by": "mean"}`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
+A chart usually makes one point, and emphasis makes it visible. `emphasis` takes one role per box, in the order the labels first appear in the data (here Adelie, Chinstrap, Gentoo): `"highlight"` bolds the box edges and the median, `"background"` mutes the box together with its whiskers, caps, median and outliers, and `None` leaves it as it is; a single value applies to every box. The roles are also available as the [EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants, and the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis across every chart type and theme. The example puts the heavy Gentoo penguins in front.
 
 ```
 from datachart.constants import EMPHASIS
+
+BoxPlot(
+    data=body_mass,
+    # one role per box: Adelie, Chinstrap, Gentoo
+    emphasis=[EMPHASIS.BACKGROUND, EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT],
+    title="Body mass of Palmer penguins, the Gentoo stand apart",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    yticks_format=VALUE_FORMAT.THOUSANDS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+).show()
 ```
+
+`emphasis_rule` picks the boxes from the data instead of naming them. It is a one-key dictionary read against a summary of each box: `{"top": n}` or `{"bottom": n}` by rank, `{"above": v}` or `{"below": v}` (strict), or `{"between": (lo, hi)}` (inclusive). The summary is the median by default, what the box already draws; a `"by"` key picks `"mean"`, `"min"`, `"max"` or `"sum"` instead. The boxes that match are highlighted, the rest muted, and an explicit `emphasis` role wins over the rule. Asking which species has penguins lighter than 3 kg picks the boxes by their minimum:
 
 ```
 BoxPlot(
-    data=chart_data,
-    # one role per box label: Adelie, Chinstrap, Gentoo
-    emphasis=[EMPHASIS.BACKGROUND, EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT],
-    title="Body mass of Palmer penguins",
+    data=body_mass,
+    # the species whose lightest penguin is under 3,000 g
+    emphasis_rule={"below": 3000, "by": "min"},
+    title="Species with penguins under 3 kg",
     xlabel="Species",
     ylabel="Body mass (g)",
+    yticks_format=VALUE_FORMAT.THOUSANDS,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
 ).show()
@@ -362,47 +293,27 @@ BoxPlot(
 
 ### Reference lines
 
-A reference line puts a threshold or a summary value next to the boxes. To add horizontal lines, add the `hlines` attribute with the [datachart.typings.HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
-
-```
-{
-  "y":    Union[int, float],                 # The y-axis value
-  "xmin": Optional[Union[int, float]],       # The minimum x-axis value
-  "xmax": Optional[Union[int, float]],       # The maximum x-axis value
-  "style": {                                 # The style of the line (optional)
-    "plot_hline_color": Optional[str],       # The color of the line (hex color code)
-    "plot_hline_style": Optional[LineStyle], # The line style (solid, dashed, etc.)
-    "plot_hline_width": Optional[float],     # The width of the line
-    "plot_hline_alpha": Optional[float],     # The alpha of the line (how visible the line is)
-  },
-  "label": Optional[str],                    # The label of the line
-}
-```
-
-Vertical lines work the same way through the `vlines` attribute and the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) typing, with `x`, `ymin`, `ymax` and `plot_vline_*` style attributes in place of their horizontal counterparts. The line style takes a [datachart.constants.LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE) value. The example marks the mean body mass of all 342 penguins, which shows at a glance that the whole Gentoo box sits above it.
+A box on its own says little about whether its values are high or low; a reference line gives it something to be compared with, such as a threshold or the overall mean. `hlines` draws a horizontal line at a value and `vlines` a vertical one; positions along the group axis are box positions, and the first box sits at `1`, so a half-integer sits between two boxes. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style` whose line style is a [LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE) value; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) and [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs). The dashed line marks the mean body mass of all 342 penguins: the whole Gentoo box sits above it, and the Adelie and Chinstrap boxes below it. A dotted vertical line separates the two small species from the Gentoo.
 
 ```
 from datachart.constants import LINE_STYLE
-```
 
-```
-mean_mass = sum(penguin["value"] for penguin in chart_data) / len(chart_data)
+masses = [point["value"] for point in body_mass]
+mean_mass = sum(masses) / len(masses)
 
 BoxPlot(
-    data=chart_data,
-    # add a horizontal line at the mean body mass of all penguins
+    data=body_mass,
+    # a dashed line at the mean of all penguins
     hlines={
         "y": mean_mass,
-        "style": {
-            "plot_hline_color": "#d62728",
-            "plot_hline_style": LINE_STYLE.DASHED,
-            "plot_hline_width": 1.5,
-            "plot_hline_alpha": 0.8,
-        },
+        "style": {"plot_hline_color": "#d62728", "plot_hline_style": LINE_STYLE.DASHED, "plot_hline_width": 1.5},
     },
-    title="Body mass of Palmer penguins",
+    # a dotted line between the second and the third box
+    vlines={"x": 2.5, "style": {"plot_vline_color": "#888888", "plot_vline_style": LINE_STYLE.DOTTED}},
+    title="Body mass of Palmer penguins against the overall mean",
     xlabel="Species",
     ylabel="Body mass (g)",
+    yticks_format=VALUE_FORMAT.THOUSANDS,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
 ).show()
@@ -410,78 +321,125 @@ BoxPlot(
 
 ### Reference bands
 
-A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
+A line marks one value; a band shades a range, such as a normal range or a tolerance around a value. `hspans` shades between `ymin` and `ymax` and `vspans` between `xmin` and `xmax`; at least one bound is required, and an omitted bound runs to the axis edge. Each takes a dictionary or a list of them, with an optional `label` and a `style` of `plot_hspan_*` or `plot_vspan_*` attributes ([HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs)).
 
-The example shades one standard deviation around the mean body mass of all penguins and keeps the mean itself as a line: the Adelie and Chinstrap boxes sit inside the band, the Gentoo box above it.
+Labeled lines and bands are what the legend of a box plot lists: `show_legend` turns it on, and `legend` gives it a `title`, a `location` from [LEGEND_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), the number of columns `ncols` and the `alignment` of the entries ([LegendSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendSettingAttrs)). The example shades one standard deviation around the overall mean: the Adelie and Chinstrap boxes sit inside the band, the Gentoo box mostly above it. The legend goes outside the axes, where it covers no box.
 
 ```
-masses = [penguin["value"] for penguin in chart_data]
-mean_mass = sum(masses) / len(masses)
+from datachart.constants import LEGEND_LOCATION
+
 std_mass = (sum((mass - mean_mass) ** 2 for mass in masses) / len(masses)) ** 0.5
 
 BoxPlot(
-    data=chart_data,
-    # shade one standard deviation around the mean body mass of all penguins
+    data=body_mass,
+    # shade one standard deviation around the mean
     hspans={
         "ymin": mean_mass - std_mass,
         "ymax": mean_mass + std_mass,
         "label": "mean ± 1 SD",
-        "style": {"plot_hspan_color": "#d62728"},
+        "style": {"plot_hspan_color": "#d62728", "plot_hspan_alpha": 0.12},
     },
-    # keep the mean itself as a line
+    # and keep the mean itself as a line
     hlines={
         "y": mean_mass,
         "label": "mean",
         "style": {"plot_hline_color": "#d62728", "plot_hline_style": LINE_STYLE.DASHED},
     },
+    title="Body mass of Palmer penguins against the overall spread",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    yticks_format=VALUE_FORMAT.THOUSANDS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    # a titled legend outside the axes
+    show_legend=True,
+    legend={"title": "All penguins", "location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+).show()
+```
+
+### Text annotations
+
+Where a reference line marks a value, a note explains it. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (box position, value) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The note below points at the lightest Chinstrap penguin, the lowest outlier of the dataset.
+
+```
+lightest = min(point["value"] for point in body_mass if point["label"] == "Chinstrap")
+
+BoxPlot(
+    data=body_mass,
+    # a note pinned to the axes, pointing at the Chinstrap outlier
+    texts={
+        "text": f"the lightest penguin\nof the dataset: {lightest:,} g",
+        "x": 0.6,
+        "y": 0.2,
+        "coords": "axes",
+        "target": (2, lightest),
+    },
     title="Body mass of Palmer penguins",
     xlabel="Species",
     ylabel="Body mass (g)",
+    yticks_format=VALUE_FORMAT.THOUSANDS,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
-    show_legend=True,
+).show()
+```
+
+### Date labels
+
+Groups are often days, weeks or months: one box per day of measurements. A `label` that is a real temporal object (`datetime`, `date`, `numpy.datetime64` or a pandas `Timestamp`) keeps its categorical position but prints through `xticks_format`, a [DATE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern. `daily_latency`, defined in a hidden cell, holds illustrative response times (in ms) of 100 requests per day to a web service over two weeks, drawn from a seeded log-normal generator, with a slow release on the ninth day that was rolled back two days later. One box per day shows the release as a jump in the median and a longer upper whisker.
+
+```
+from datachart.constants import DATE_FORMAT
+
+BoxPlot(
+    data=daily_latency,
+    title="Daily response times, a slow release on 9 March",
+    xlabel="Day (2024)",
+    ylabel="Response time (ms)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_outliers=False,
+    # print the date labels as month and day
+    xticks_format=DATE_FORMAT.MONTH_DAY,
+    xtickrotate=45,
 ).show()
 ```
 
 ### Boxes with swarms and violins
 
-A box summarizes its group; a [datachart.charts.SwarmPlot](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.SwarmPlot) shows every observation and a [datachart.charts.ViolinPlot](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.ViolinPlot) the shape of the distribution. Over the same labels the three draw at the same positions, so they compose with [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel). The points draw above the boxes; hide the outliers, which the swarm already shows.
+A box summarizes its group but hides how many values it holds and how they are spread inside it. A [datachart.charts.SwarmPlot](https://eriknovak.github.io/datachart/dev/references/charts/swarmplot/#datachart.charts.SwarmPlot) shows every observation and a [datachart.charts.ViolinPlot](https://eriknovak.github.io/datachart/dev/references/charts/violinplot/#datachart.charts.ViolinPlot) the shape of the distribution. Over the same labels they draw at the same positions as the boxes, so [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays them. A panel holds one box plot dataset, and it overlays with other kinds of chart; the [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) guide covers the rest. The swarm already draws every penguin, so the boxes hide their outliers. The swarm shows what the boxes cannot: there are fewer than half as many Chinstrap penguins as Adelie.
 
 ```
 from datachart.charts import SwarmPlot, ViolinPlot
 from datachart.utils import Panel
-```
 
-```
 Panel(
     [
-        # the boxes summarize the groups; the swarm already draws the outliers
-        BoxPlot(data=chart_data, show_outliers=False),
-        SwarmPlot(data=chart_data),
+        # the boxes summarize; the swarm draws every penguin, outliers included
+        BoxPlot(data=body_mass, show_outliers=False, style={"plot_box_alpha": 0.4}),
+        SwarmPlot(data=body_mass, style={"plot_swarm_size": 6}),
     ],
-    title="Body mass of Palmer penguins",
+    title="Body mass of Palmer penguins, every penguin",
     xlabel="Species",
     ylabel_left="Body mass (g)",
-    figsize=FIG_SIZE.FULL_SHORT,
+    figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.Y,
 ).show()
 ```
 
-A violin body behind the boxes adds the distribution shape: draw it with `inner=None`, since the box supplies the summaries, and give the box a white fill so it reads over the body. One box plot and one violin plot per panel; swarms may repeat.
+A violin body behind the box adds the shape of the distribution: draw the violin with `inner=None`, since the box supplies the summaries, and give the box a white fill so it reads over the body. The Gentoo violin stays wide across its whole box instead of peaking at the median, a hint of two groups of different size inside the species: the two sexes, which the [Multiple Box Plots](#multiple-box-plots) section splits apart.
 
 ```
 Panel(
     [
-        # the body only; the box plot supplies the summaries
-        ViolinPlot(data=chart_data, inner=None, style={"plot_violin_alpha": 0.3}),
+        # the body only; the box supplies the summaries
+        ViolinPlot(data=body_mass, inner=None, style={"plot_violin_alpha": 0.3}),
         BoxPlot(
-            data=chart_data,
+            data=body_mass,
             show_outliers=False,
             style={"plot_box_color": "#FFFFFF", "plot_box_alpha": 0.9},
         ),
-        SwarmPlot(data=chart_data, style={"plot_swarm_size": 12}),
     ],
-    title="Body mass of Palmer penguins",
+    title="Body mass of Palmer penguins, with the distribution shape",
     xlabel="Species",
     ylabel_left="Body mass (g)",
     figsize=FIG_SIZE.FULL_SHORT,
@@ -491,180 +449,255 @@ Panel(
 
 ## Multiple Box Plots
 
-To create multiple box plots, pass a list of lists to the `data` argument. Each inner list holds the data points of one chart, which is drawn in its own subplot with the `subtitle` at the top and the `title`, `xlabel` and `ylabel` positioned to be global for all charts. Per-chart attributes like `subtitle` and `style` can be passed as lists, where each element corresponds to a chart; a single value applies to every chart.
-
-Subplots required for multiple datasets
-
-When using multiple datasets (list of lists), you **must** set `subplots=True`. Box plots do not support overlaying multiple datasets on a single axis.
-
-The example draws the body mass and the flipper length of the three species side by side. The two charts hold different quantities, so each gets its own subtitle with its unit and there is no global `ylabel`.
+To compare several datasets over the same groups, pass a list of lists to `data`: each inner list is one dataset, and the per-dataset attributes (`subtitle`, `style`, `hlines` and the other reference settings) become lists aligned with it. Boxes never overlay each other, so each dataset is drawn in its own subplot, which `subplots=True` makes explicit; `subtitle` titles the subplots, while `title`, `xlabel` and `ylabel` stay global. The hidden cell splits the penguins by sex into `body_mass_by_sex`, the 165 female and the 168 male penguins (the 9 penguins without a recorded sex are left out). A style per subplot colors each sex.
 
 ```
+SEX_STYLE = [{"plot_box_color": "#e07a5f"}, {"plot_box_color": "#3d85c6"}]
+
 BoxPlot(
-    # use a list of lists to define multiple box plots
-    data=[chart_data, flipper_data],
-    # add a subtitle to each chart
-    subtitle=["Body mass (g)", "Flipper length (mm)"],
-    title="Palmer penguins",
+    # one dataset per sex
+    data=body_mass_by_sex,
+    # a subtitle and a color per subplot
+    subtitle=SEXES,
+    style=SEX_STYLE,
+    title="Body mass of Palmer penguins by sex",
     xlabel="Species",
+    ylabel="Body mass (g)",
+    yticks_format=VALUE_FORMAT.THOUSANDS,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
-    # draw each chart in its own subplot
+    # each dataset in its own subplot
     subplots=True,
 ).show()
 ```
 
+The two subplots above scale their value axes separately, so the female Gentoo box looks as high as the male one although it is 800 g lighter. The next section fixes that.
+
 ### Shared axes across subplots
 
-To share the x-axis and/or y-axis across subplots, add the `sharex` and/or `sharey` attributes, which are boolean values that specify whether to share the axis across all subplots; a shared axis is labeled once, on the outer subplots only. The `max_cols` attribute limits the number of subplots per row — with `max_cols=1` the charts stack vertically. Which axis to share follows from the orientation: the two vertical charts have the species on the x-axis, so stacked with `sharex` the species are labeled once, under the bottom chart, while the values are different quantities and keep their own y-axis.
+Boxes in two subplots only compare when they share a scale. `sharey=True` puts every subplot on one value axis and `sharex=True` on one group axis; a shared axis is labeled once, on the outer subplots. `ymin` and `ymax` set the shared range so that it covers the boxes of every subplot. `max_cols` limits the subplots per row, so `max_cols=1` stacks them. Side by side and on a shared mass axis, the males of every species are heavier than the females, and the gap is largest for the Gentoo.
 
 ```
 BoxPlot(
-    data=[chart_data, flipper_data],
+    data=body_mass_by_sex,
+    subtitle=SEXES,
+    style=SEX_STYLE,
+    title="Body mass of Palmer penguins by sex",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    yticks_format=VALUE_FORMAT.THOUSANDS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    subplots=True,
+    # one mass axis for both sexes, covering both
+    sharey=True,
+    ymin=2500,
+    ymax=6500,
+).show()
+```
+
+When the subplots hold different quantities, only the group axis can be shared. Body mass and flipper length stacked in one column share the species axis, labeled once under the bottom subplot, and each keeps its own value axis; the subtitles carry the units.
+
+```
+BoxPlot(
+    data=[body_mass, flipper_length],
     subtitle=["Body mass (g)", "Flipper length (mm)"],
-    title="Palmer penguins",
+    title="Size of Palmer penguins",
     xlabel="Species",
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.Y,
     subplots=True,
-    # stack the charts in one column
+    # stack the subplots and share the species axis
     max_cols=1,
-    # share the x-axis across subplots
     sharex=True,
 ).show()
 ```
 
 ### Subplot orientation
 
-The `orientation` attribute changes the orientation of every subplot at once. Horizontal boxes move the species to the y-axis, so side by side it is now `sharey` that labels them once, next to the left chart.
+`orientation` turns every subplot at once. Horizontal boxes move the species to the y-axis, so side by side it is `sharey` that labels them once, next to the left subplot, and the grid follows the values to the x-axis.
 
 ```
-figure = BoxPlot(
-    data=[chart_data, flipper_data],
+BoxPlot(
+    data=[body_mass, flipper_length],
     subtitle=["Body mass (g)", "Flipper length (mm)"],
-    # change the orientation of the boxes in every subplot
+    # every subplot horizontal
     orientation=ORIENTATION.HORIZONTAL,
-    title="Palmer penguins",
+    title="Size of Palmer penguins",
     ylabel="Species",
     figsize=FIG_SIZE.FULL_SHORT,
-    # the values are now read off the x-axis
     show_grid=SHOW_GRID.X,
     subplots=True,
     # the species are now on the y-axis
     sharey=True,
-)
-figure.show()
+).show()
 ```
 
-## Saving the Chart as an Image
+## Additional Features
 
-To save the chart as an image, use the [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.save_figure) function.
+### Axis scales
 
-```
-from datachart.utils import save_figure
-```
+Response times, incomes and file sizes are skewed: most values are small and a long tail runs far above them. On a linear axis the tail squeezes the boxes into a thin strip at the bottom. `scaley` takes a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member, and a logarithmic scale spreads the boxes out so that their medians and quartiles can be compared. `response_times`, defined in a hidden cell, holds illustrative response times (in ms) of 200 requests to each of four services, drawn from a seeded log-normal generator.
 
 ```
-save_figure(figure, "./fig_box_plot.png", dpi=300)
+from datachart.constants import SCALE
+
+for scale in [SCALE.LINEAR, SCALE.LOG]:
+    BoxPlot(
+        data=response_times,
+        title=f"Response times on the '{scale}' scale",
+        xlabel="Service",
+        ylabel="Response time (ms)",
+        figsize=FIG_SIZE.FULL_SHORT,
+        show_grid=SHOW_GRID.Y,
+        # the scale of the value axis
+        scaley=scale,
+    ).show()
 ```
 
-The figure should be saved in the current working directory.
+### Custom data keys
 
-## Real-World Examples
-
-The following examples put the features above to work on real or realistic data. Each one states what its data is and where it comes from; the data itself lives in a hidden cell.
-
-### Example 1: Model Benchmark Across Seeds (Emphasis)
-
-`benchmark` holds the illustrative test accuracy of five models, each trained and evaluated with 20 random seeds, drawn from a seeded generator. Reporting one number per model hides how much of the difference between them is seed noise; one box per model shows the spread and the median together. The question is which model to ship, so `emphasis` highlights the model with the best median accuracy and pushes the other four into the background — the highlighted box keeps its color and gets bold edges, the muted ones become context. A short figure and the y-axis grid make the small differences in accuracy readable.
+Data from a file or an API rarely uses the `label` and `value` keys, and renaming every record just to plot it is a chore. The `label` and `value` arguments name the keys to read instead. `penguin_records` stores the penguins the way the published CSV file does, one record per penguin with a `species` and a `body_mass_g` key:
 
 ```
-BEST_MODEL = "Deep + aug."
+penguin_records = [
+    {"species": group["species"], "sex": group["sex"], "body_mass_g": mass}
+    for group in PENGUINS
+    for mass in group["body_mass"]
+]
+penguin_records[:2]
+```
 
+```
 BoxPlot(
-    data=benchmark,
-    # highlight the best model, mute the rest
-    emphasis=[
-        EMPHASIS.HIGHLIGHT if model == BEST_MODEL else EMPHASIS.BACKGROUND
-        for model in MODELS
-    ],
-    title=f"Test accuracy across {N_SEEDS} seeds",
-    xlabel="Model",
-    ylabel="Accuracy",
+    data=penguin_records,
+    # the keys that hold the group and the value
+    label="species",
+    value="body_mass_g",
+    title="Body mass of Palmer penguins",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    yticks_format=VALUE_FORMAT.THOUSANDS,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
 ).show()
 ```
 
-### Example 2: Daily Temperatures by Month (Horizontal Boxes and Many Categories)
+## Real-World Examples
 
-`daily_temperatures` holds one year of daily mean temperatures (in °C) in Ljubljana, drawn from a seeded generator around the published 1991–2020 monthly climate normals of the city's weather station, with the larger day-to-day swings of winter. Twelve boxes are the case for horizontal boxes: the months stack from January at the bottom to December at the top, every label stays legible, and the temperature axis gets the full figure width, which a taller figure makes room for. The outliers are kept — an unusually cold or warm day is exactly what a reader of this chart looks for — and a dashed `vlines` reference marks the freezing point, so the months with days below zero are the boxes that cross it.
+The examples below put the features above to work, each one answering a question. The data lives in hidden cells; each example says what its data is and where it comes from.
+
+### Example 1: Which Model Should Ship? (Seed Spread, Notches, Median Labels, and a Rule-Picked Winner)
+
+`benchmark` holds the illustrative test accuracy of five models, each trained with 20 random seeds, drawn from a seeded generator. A single accuracy per model hides how much of the difference between models is seed noise; one box per model shows the spread, and the notches say whether two medians really differ. `emphasis_rule={"top": 1}` highlights the model with the best median accuracy and value labels print its median. The notches temper the verdict: the Ensemble notch overlaps the winner's, so the data cannot say the Ensemble is worse, while Baseline and Wide are behind beyond doubt. A notch that folds back past its box, as for Wide, means the confidence interval is wider than the box itself, a sign that 20 seeds are too few to pin that median down.
+
+```
+BoxPlot(
+    data=benchmark,
+    # highlight the model with the best median, mute the rest
+    emphasis_rule={"top": 1},
+    # do the medians really differ?
+    show_notch=True,
+    # print the medians as percentages
+    show_values=True,
+    value_format=VALUE_FORMAT.PERCENT,
+    title=f"Test accuracy across {N_SEEDS} seeds",
+    xlabel="Model",
+    ylabel="Accuracy",
+    yticks_format=VALUE_FORMAT.PERCENT_INT,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.Y,
+).show()
+```
+
+### Example 2: How Cold Does Each Month Get? (Horizontal Boxes, a Freezing Line, and a Band)
+
+`daily_temperatures` holds one illustrative year of daily mean temperatures (in °C) in a central European city, drawn from a seeded generator around approximate monthly means, with larger day-to-day swings in winter. Twelve boxes read best as horizontal boxes, with January at the top; since the first box is drawn at the bottom, the data is ordered from December to January. A dashed `vlines` line marks the freezing point, so the months with frosty days are the boxes that reach left of it, and a `vspans` band shades the 18 to 24 °C range of warm days, where only the summer boxes sit. The outliers stay: an unusually cold or warm day is what a reader of this chart looks for.
 
 ```
 BoxPlot(
     data=daily_temperatures,
     # twelve labeled boxes read best top to bottom
     orientation=ORIENTATION.HORIZONTAL,
-    # mark the freezing point
+    # the freezing point
     vlines={
         "x": 0,
-        "style": {
-            "plot_vline_color": "#4c72b0",
-            "plot_vline_style": LINE_STYLE.DASHED,
-            "plot_vline_width": 1.5,
-        },
+        "label": "freezing point",
+        "style": {"plot_vline_color": "#4c72b0", "plot_vline_style": LINE_STYLE.DASHED, "plot_vline_width": 1.5},
     },
-    title="Daily mean temperature in Ljubljana",
+    # the range of warm days
+    vspans={
+        "xmin": 18,
+        "xmax": 24,
+        "label": "warm days",
+        "style": {"plot_vspan_color": "#f4a261", "plot_vspan_alpha": 0.2},
+    },
+    title="Daily mean temperature by month",
     xlabel="Temperature (°C)",
     ylabel="Month",
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.X,
+    show_legend=True,
+    legend={"title": "Reference", "location": LEGEND_LOCATION.OUTSIDE_RIGHT},
 ).show()
 ```
 
-### Example 3: Service Response Times (Skewed Data, Outliers and an SLA Line)
+### Example 3: Do the Services Meet Their SLA? (A Log Scale, an SLA Line, a Note, and a Grid with Swarm Panels)
 
-`response_times` holds the illustrative response time (in ms) of 200 requests to each of four services, drawn from a seeded log-normal generator: most requests are fast and a long tail of slow ones stretches each distribution upwards, as in most latency data. A dashed `hlines` reference marks the 500 ms service level agreement. Drawn twice, once with and once without outliers, the two charts show why the default keeps them on skewed data: the slow requests are the outliers, so hiding them hides exactly the requests that breach the agreement — without them Search looks safely below the line, with them its slowest requests cross it and the Reports tail stretches to well over a second.
-
-```
-for show_outliers in [True, False]:
-    BoxPlot(
-        data=response_times,
-        # the slow requests are the outliers; hiding them hides the SLA breaches
-        show_outliers=show_outliers,
-        # mark the service level agreement
-        hlines={
-            "y": SLA_MS,
-            "style": {
-                "plot_hline_color": "#d62728",
-                "plot_hline_style": LINE_STYLE.DASHED,
-                "plot_hline_width": 1.5,
-            },
-        },
-        title=f"Response time of {N_REQUESTS} requests per service (outliers {'shown' if show_outliers else 'hidden'})",
-        xlabel="Service",
-        ylabel="Response time (ms)",
-        figsize=FIG_SIZE.FULL_SHORT,
-        show_grid=SHOW_GRID.Y,
-    ).show()
-```
-
-### Example 4: Penguin Body Mass by Sex (Multiple Box Plots and a Shared Value Axis)
-
-`body_mass_by_sex` splits the body mass of the Palmer penguins from the hidden cell of the [Basics](#basics) section into the 165 female and the 168 male penguins (the 9 penguins without a recorded sex are left out). Each sex gets its own chart, named with a list of `subtitle`, and `sharey` puts both on the same mass axis, so the boxes are comparable across the two subplots: the males of every species are heavier than the females, and the gap is largest for the Gentoo. The `xlabel` and `ylabel` label the species and the unit once for both.
+A service level agreement (SLA) promises that requests finish within 500 ms, and the `response_times` of the [Axis scales](#axis-scales) section show which of the four services keeps the promise. The top chart draws all four services on a log scale with the SLA as a dashed line; `emphasis_rule={"above": 500, "by": "max"}` highlights the services whose slowest request breaks the SLA, and a note points at Reports, whose median alone is above the line. Search is highlighted although its whole box sits below the line. The bottom row zooms into Search and Checkout on one linear range: a [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) per service overlays the box on a swarm of every request, so the breaches are counted, not guessed. Search breaks the SLA with a handful of slow requests, Checkout never. [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) puts the three charts in one figure.
 
 ```
-BoxPlot(
-    data=body_mass_by_sex,
-    # one subtitle per chart
-    subtitle=SEXES,
-    title="Body mass of Palmer penguins by sex",
-    xlabel="Species",
-    ylabel="Body mass (g)",
-    figsize=FIG_SIZE.FULL_SHORT,
+from datachart.utils import Grid
+
+SLA_MS = 500
+SLA_LINE = {
+    "y": SLA_MS,
+    "style": {"plot_hline_color": "#d62728", "plot_hline_style": LINE_STYLE.DASHED, "plot_hline_width": 1.5},
+}
+
+overview = BoxPlot(
+    data=response_times,
+    scaley=SCALE.LOG,
+    hlines=SLA_LINE,
+    # the services whose slowest request breaks the SLA
+    emphasis_rule={"above": SLA_MS, "by": "max"},
+    texts={
+        "text": "median above the SLA",
+        "x": 0.55,
+        "y": 0.9,
+        "coords": "axes",
+        "target": (4, 700),
+    },
+    title="All services, log scale",
+    ylabel="Response time (ms)",
     show_grid=SHOW_GRID.Y,
-    subplots=True,
-    # the same mass axis for both charts, so the boxes are comparable
-    sharey=True,
+)
+
+
+def service_zoom(service):
+    # one service: a box over every request, with the SLA line
+    requests = [point for point in response_times if point["label"] == service]
+    breaches = sum(point["value"] > SLA_MS for point in requests)
+    return Panel(
+        [
+            BoxPlot(data=requests, show_outliers=False, style={"plot_box_alpha": 0.4}, hlines=SLA_LINE),
+            SwarmPlot(data=requests, style={"plot_swarm_size": 4}),
+        ],
+        title=f"{service}: {breaches} of {N_REQUESTS} over {SLA_MS} ms",
+        ylabel_left="Response time (ms)",
+        show_grid=SHOW_GRID.Y,
+        # the same range for both services, the SLA line included
+        ymin=0,
+        ymax=700,
+    )
+
+
+Grid(
+    [
+        [overview],
+        [service_zoom("Search"), service_zoom("Checkout")],
+    ],
+    title="Response times against a 500 ms SLA",
+    figsize=FIG_SIZE.FULL_TALL,
 ).show()
 ```

@@ -1,90 +1,28 @@
 # Bump Chart
 
-This section showcases the bump chart. It contains examples of how to create bump charts using the [datachart.charts.BumpChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.BumpChart) function.
+A bump chart shows rank over time: one line per series, rank 1 at the top, so the crossings answer *who overtook whom, and when*. It suits league tables, popularity rankings and any table whose order matters more than the gaps between the values. This guide shows how to create bump charts with the [datachart.charts.BumpChart](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/#datachart.charts.BumpChart) function, starting with the basics and building up to worked examples on real data.
 
 Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-bump-chart), which maps common tasks to the parameter or style attribute that does the job.
-
-As mentioned above, the bump charts are created using the `BumpChart` function found in the [datachart.charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md) module. Let's import it:
 
 ```
 from datachart.charts import BumpChart
 ```
 
-## Bump Chart Input Attributes
-
-The `BumpChart` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the series to rank. Like the line chart, one series is a list of `{x, y}` points and several series are a list of such lists. The series do not need to share their `x` values: at every period the chart ranks the series that have a point there, and a series without one leaves a gap in its line.
-
-```
-BumpChart(
-    data=[                                              # The series to rank (or one list of points for a single series)
-        [
-            {
-                "x": Union[int, float, str, datetime],  # The period
-                "y": Union[int, float],                 # The value to rank, or the rank itself with rank_by="given"
-            },
-            ...
-        ],
-        ...
-    ],
-    rank_by=Optional[str],                              # "value_descending" (default), "value_ascending", or "given"
-    show_labels=Optional[bool],                         # Whether to name each line at its end (True by default)
-    label_position=Optional[str],                       # "start", "end" (default), or "both"
-    show_markers=Optional[bool],                        # Whether to draw a marker at every period (True by default)
-    line_curve=Optional[float],                         # 0 (default) draws straight segments, up to 1 for a full sigmoid
-    style={                                             # The style of the lines (optional; a list for multiple series)
-        "plot_bump_line_width":    Optional[float],     # The line width
-        "plot_bump_marker":        Optional[str],       # The marker at every period
-        "plot_bump_marker_size":   Optional[float],     # The marker size
-        "plot_bump_label_padding": Optional[float],     # The gap between a line end and its label, in points
-        "plot_line_color":         Optional[str],       # The line color
-        "plot_line_style":         Optional[str],       # The line style
-        "plot_line_alpha":         Optional[float],     # The line alpha
-    },
-    subtitle=Optional[str],                             # The series name, used as the end label (or list for multiple series)
-    emphasis=Optional[str],                             # "highlight" or "background" (or list for multiple series)
-    emphasis_rule=Optional[dict],                       # One-key rule on each series' ranks; "top" picks the best ranked
-    title=Optional[str],                                # The chart title
-    xlabel=Optional[str],                               # The x-axis label
-    ylabel=Optional[str],                               # The y-axis label
-    figsize=Optional[Tuple[float, float]],              # The figure size
-    show_legend=Optional[bool],                         # Whether to show the legend (on only without end labels)
-    show_grid=Optional[str],                            # Which grid lines to show
-    show_values=Optional[bool],                         # Whether to print each point's original value
-    subplots=Optional[bool],                            # Whether to draw each series in its own subplot
-    max_cols=Optional[int],                             # The maximum number of subplot columns
-    sharex=Optional[bool],                              # Whether the subplots share the x-axis
-    sharey=Optional[bool],                              # Whether the subplots share the y-axis
-    xmin=Optional[float],                               # The minimum x-axis value
-    xmax=Optional[float],                               # The maximum x-axis value
-    ymin=Optional[float],                               # The best rank shown
-    ymax=Optional[float],                               # The worst rank shown
-    vlines=Optional[Union[dict, List[dict]]],           # The vertical reference lines
-    hlines=Optional[Union[dict, List[dict]]],           # The horizontal reference lines
-    vspans=Optional[Union[dict, List[dict]]],           # The vertical reference bands
-    hspans=Optional[Union[dict, List[dict]]],           # The horizontal reference bands
-    texts=Optional[Union[dict, List[dict]]],            # The text annotations
-    x=Optional[str],                                    # The key holding the period (default: "x")
-    y=Optional[str],                                    # The key holding the value (default: "y")
-)
-```
-
-For more details, see the [datachart.charts.BumpChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.BumpChart) function.
-
 ## Basics
 
-The examples in this guide share one dataset: the populations of ten of the world's most populous countries in 1980, 1990, 2000, 2010, 2020 and 2023, in millions. The values are rounded from the estimates of the United Nations *World Population Prospects* and live in the hidden cell below. Population is a ranking story as much as a growth one: India passed China in 2023, Pakistan and Nigeria climbed past Brazil, and Russia and Japan slid down the table — and the order is exactly what a bump chart draws.
+The examples in this guide share one dataset: the populations of ten large countries in 1980, 1990, 2000, 2010, 2020 and 2023, in millions (source: United Nations, World Population Prospects 2022, rounded). The data lives in a hidden cell. `population` holds one series per country, and `COUNTRIES` holds the country names in the same order; the ranks in the charts are ranks among these ten. Population is a ranking story as much as a growth one: India passed China in 2023, Pakistan and Nigeria climbed past Brazil, and Russia and Japan slid down the table.
 
-The data is a list of series, one per country. Every series is a list of `{x, y}` points with the year as `x` and the population as `y` — the values, not the ranks; the chart ranks them for you:
+Each series is a list of `{x, y}` points, with the year as `x` and the population as `y`. These are the values, not the ranks: the chart ranks them at every year. The first two points of the first series:
 
 ```
-{country: points[:2] for country, points in zip(COUNTRIES, population)}
+population[0][:2]
 ```
 
-**Basic example.** Only the `data` argument is required to draw the bump chart. At every year the most populous country takes rank 1 at the top of the axis, and each line follows its country down or up the table. Add the `subtitle` attribute to name the lines: each name prints beside its line's last point, in the line's color, so no legend is needed.
+**Basic example.** Only the `data` argument is required, and `subtitle` names the lines: each name prints beside the line's last point, in the line's color, so the chart needs no legend and no rank axis. At every year the most populous country takes rank 1 at the top:
 
 ```
 BumpChart(
-    # add the data to the chart
+    # one series per country
     data=population,
     # name the lines at their ends
     subtitle=COUNTRIES,
@@ -93,28 +31,52 @@ BumpChart(
 
 ## Customizing the Bump Chart
 
-Every customization is either a keyword argument of `BumpChart` or a `plot_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
+Every customization is either a keyword argument of `BumpChart` or an attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                                  | Use                                                           | See                                                     |
-| ------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------- |
-| add a title and axis labels                 | `title`, `xlabel`, `ylabel`                                   | [Title and axis labels](#title-and-axis-labels)         |
-| resize the figure or show the grid          | `figsize`, `show_grid`                                        | [Figure size and grid](#figure-size-and-grid)           |
-| rank the lowest value first                 | `rank_by="value_ascending"`                                   | [Ranking](#ranking)                                     |
-| draw ranks I already have                   | `rank_by="given"`                                             | [Ranking](#ranking)                                     |
-| name the lines at the start or at both ends | `label_position`                                              | [End labels](#end-labels)                               |
-| use a legend instead of end labels          | `show_labels=False`, `show_legend`                            | [End labels](#end-labels)                               |
-| curve the lines or hide the markers         | `line_curve`, `show_markers`                                  | [Line shape](#line-shape)                               |
-| change the line width, markers, or colors   | `style={"plot_bump_line_width": ..., "plot_line_color": ...}` | [Line style](#line-style)                               |
-| print the values behind the ranks           | `show_values`, `value_format`, `value_step`                   | [Value labels](#value-labels)                           |
-| highlight one series, mute the rest         | `emphasis`                                                    | [Emphasis](#emphasis)                                   |
-| highlight the best-ranked series            | `emphasis_rule={"top": n}`                                    | [Emphasis](#emphasis)                                   |
-| mark a year or shade the top of the table   | `vlines`, `hspans`                                            | [Reference lines and bands](#reference-lines-and-bands) |
-| draw every series on its own                | `subplots`                                                    | [Subplots](#subplots)                                   |
-| overlay or arrange several bump charts      | `Panel`, `Grid`                                               | [Composing bump charts](#composing-bump-charts)         |
+| I want to…                                  | Use                                                           | See                                                                                                     |
+| ------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| add a title and axis labels                 | `title`, `xlabel`, `ylabel`                                   | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| choose, label, or rotate the period ticks   | `xticks`, `xticklabels`, `xtickrotate`                        | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| resize the figure or show the grid          | `figsize`, `show_grid`                                        | [Figure size and grid](#figure-size-and-grid)                                                           |
+| rank the lowest value first                 | `rank_by=BUMP_RANK.VALUE_ASCENDING`                           | [Ranking](#ranking)                                                                                     |
+| draw ranks I already have                   | `rank_by=BUMP_RANK.GIVEN`                                     | [Ranking](#ranking)                                                                                     |
+| leave a gap where a series has no rank      | leave the point out of the series                             | [Ranking](#ranking)                                                                                     |
+| name the lines at the start or at both ends | `show_labels`, `label_position`                               | [End labels](#end-labels)                                                                               |
+| curve the lines or hide the markers         | `line_curve`, `show_markers`                                  | [Line shape](#line-shape)                                                                               |
+| change the line width, markers, or colors   | `style={"plot_bump_line_width": ..., "plot_line_color": ...}` | [Line style](#line-style)                                                                               |
+| print the values behind the ranks           | `show_values`, `value_format`, `value_step`                   | [Value labels](#value-labels)                                                                           |
+| highlight some series, mute the rest        | `emphasis`, `emphasis_rule`                                   | [Emphasis](#emphasis)                                                                                   |
+| mark a period or shade a range of places    | `vlines`, `hlines`, `vspans`, `hspans`                        | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| show every place of the table, or crop it   | `ymin`, `ymax`, `xmin`, `xmax`                                | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| put a note on the chart                     | `texts`                                                       | [Text annotations](#text-annotations)                                                                   |
+| use a legend instead of end labels          | `show_labels=False`, `show_legend`, `legend`                  | [Legend](#legend)                                                                                       |
+| draw every series in its own subplot        | `subplots`, `sharex`, `sharey`, `max_cols`                    | [Subplots](#subplots)                                                                                   |
+| overlay or arrange several bump charts      | `Panel`, `Grid`                                               | [Composing with Panel and Grid](#composing-with-panel-and-grid)                                         |
+| use dates as periods                        | `date` objects as `x`, `xticks_format`                        | [Datetime axis](#datetime-axis)                                                                         |
+| plot data with other key names              | `x`, `y`                                                      | [Custom data keys](#custom-data-keys)                                                                   |
+| change the look of every chart at once      | `config.set_theme`                                            | [Themes](#themes)                                                                                       |
+| save the chart to a file                    | `save_figure`                                                 | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
-### Title and axis labels
+The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
 
-To add the chart title and axis labels, add the `title`, `xlabel` and `ylabel` attributes.
+| Parameter                                    | Constant                                                                                                                                                                                                                                     |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rank_by`                                    | [`BUMP_RANK`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BUMP_RANK)                                                                                                                                 |
+| `label_position`                             | [`BUMP_LABEL_POSITION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BUMP_LABEL_POSITION)                                                                                                             |
+| `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
+| `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
+| `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
+| `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
+| `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
+| `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
+| `scalex`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
+
+The full list of style attributes is in the [datachart.typings.BumpStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/#datachart.typings.BumpStyleAttrs) type; the full list of parameters is in the [datachart.charts.BumpChart](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/#datachart.charts.BumpChart) reference.
+
+### Title, axis labels and ticks
+
+A reader needs to know what is being ranked and by what; `title`, `xlabel` and `ylabel` say it. The period axis gets one tick per period by default. `xticks` picks other positions and `xticklabels` names them, and `xtickrotate` tilts long tick labels out of each other's way. Here the labels spell out that the last step is three years, not ten. `scalex` sets the scale of the period axis with a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member, which bump charts rarely need.
 
 ```
 BumpChart(
@@ -125,98 +87,90 @@ BumpChart(
     # add the x and y axis labels
     xlabel="Year",
     ylabel="Rank by population",
+    # name the periods and tilt the names
+    xticks=YEARS,
+    xticklabels=["1980", "1990", "2000", "2010", "2020", "2023 (latest)"],
+    xtickrotate=30,
 ).show()
 ```
 
 ### Figure size and grid
 
-To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains predefined figure sizes. To change which grid lines show, add the `show_grid` attribute, which supports the values of the [datachart.constants.SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) constant. The y-axis draws no line, ticks, or tick labels — the end labels already say which line is which — but a grid line still runs along every whole rank; the x-axis keeps its ticks without the axis line.
+The default figure is nearly square; ten lines and their end labels read better on a full-width figure. `figsize` takes a `(width, height)` tuple in inches or one of the presets in [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE), sized for a full or half page width.
+
+A bump chart draws no rank axis and no grid, since the end labels say which line is which. When the reader should count places, `show_grid` adds grid lines with a [SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) member: `Y` draws one line per rank, `X` one per period, `BOTH` both. `aspect_ratio` fixes the ratio of the axes rather than of the figure ([ASPECT_RATIO](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)); ranks and years share no unit, so the examples leave it at the default.
 
 ```
 from datachart.constants import FIG_SIZE, SHOW_GRID
-```
 
-```
 BumpChart(
     data=population,
     subtitle=COUNTRIES,
     title="The world's most populous countries",
     xlabel="Year",
     ylabel="Rank by population",
-    # add to determine the figure size
+    # a full-width figure with room for ten lines
     figsize=FIG_SIZE.FULL_MEDIUM,
-    # add to show the grid lines on both axes
-    show_grid=SHOW_GRID.BOTH,
+    # one grid line per rank
+    show_grid=SHOW_GRID.Y,
 ).show()
 ```
 
 ### Ranking
 
-The `rank_by` attribute says how `y` becomes a rank; the supported values are in the [datachart.constants.RANK](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RANK) constant. The default, `VALUE_DESCENDING`, gives rank 1 to the highest value at each period. `VALUE_ASCENDING` gives it to the lowest — the natural order for lap times, golf scores, or prices. Ranking the ten countries from the smallest population up flips the table:
+A bump chart draws ranks, and `rank_by` says where they come from, with a [BUMP_RANK](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BUMP_RANK) member. The choice depends on what "first" means in the data:
+
+- `BUMP_RANK.VALUE_DESCENDING` (the default) gives rank 1 to the highest value at each period: population, revenue, points, votes. Every chart above uses it.
+- `BUMP_RANK.VALUE_ASCENDING` gives rank 1 to the lowest value: race times, golf scores, prices, error rates.
+- `BUMP_RANK.GIVEN` reads `y` as the rank itself, for data that already holds positions: a published league table, a music chart, a poll ranking. Each rank must be a positive whole number.
+
+With the two value rules, ties get consecutive ranks in input order: the series listed first takes the better rank. When tied series should share a place, compute the ranks yourself and pass them with `GIVEN`, which accepts a repeated rank. A period where a series has no point is a gap: the series is left out of that period's ranking, and its line breaks there.
+
+`stage_race`, defined in a hidden cell, is an illustrative seven-stage cycling race: each rider's total time in minutes after every stage. The leader is the rider with the *lowest* total, so the ranking is ascending. The sprinter leads after the flat opening stage, the time trialist takes over with the first time trial, and the climber wins the race in the mountains.
 
 ```
-from datachart.constants import RANK
-```
+from datachart.constants import BUMP_RANK
 
-```
 BumpChart(
-    data=population,
-    subtitle=COUNTRIES,
-    # rank 1 is the smallest population of the ten
-    rank_by=RANK.VALUE_ASCENDING,
-    title="From the smallest population up",
-    xlabel="Year",
-    ylabel="Rank",
-    figsize=FIG_SIZE.FULL_MEDIUM,
+    data=stage_race,
+    subtitle=RIDERS,
+    # the lowest total time leads the race
+    rank_by=BUMP_RANK.VALUE_ASCENDING,
+    title="Overall standings of a stage race",
+    xlabel="After stage",
+    ylabel="Place",
+    figsize=FIG_SIZE.FULL_SHORT,
 ).show()
 ```
 
-When the data already holds the ranks — a published league table, a poll position — use `GIVEN`: the chart draws `y` as the rank as it is, and raises an error on a rank that is not a positive whole number. Ties at a period keep the input order under the value rules; with `GIVEN` the ranks are yours to set.
+`premier_league`, defined in a hidden cell, holds the final Premier League positions of six clubs over nine seasons, from 2015/16 to 2023/24 (source: the official Premier League tables). Each season is named by the year it ended in, so 2016 is the 2015/16 season. The positions already are ranks, so the chart takes them with `GIVEN`, and two things follow. The ranks may skip numbers, because the other fourteen clubs of the league hold the positions in between. And Leicester City, relegated in 2023, has no point for 2023/24, so its line ends a season early.
 
 ```
 BumpChart(
-    data=[
-        [{"x": season, "y": rank} for season, rank in zip(range(2019, 2024), ranks)]
-        for ranks in ([1, 1, 2, 3, 1], [2, 3, 1, 1, 2], [3, 2, 3, 2, 3])
-    ],
-    subtitle=["Team A", "Team B", "Team C"],
-    # y is already the rank
-    rank_by=RANK.GIVEN,
-    title="Final league positions",
-    xlabel="Season",
+    data=premier_league,
+    subtitle=CLUBS,
+    # y already holds the league position
+    rank_by=BUMP_RANK.GIVEN,
+    title="Final Premier League positions",
+    xlabel="Season ending",
     ylabel="Position",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.Y,
 ).show()
 ```
 
 ### End labels
 
-The `show_labels` attribute names every line with its `subtitle`, printed in the line's color; it is on by default. The `label_position` attribute picks the end that carries the name, from the [datachart.constants.LABEL_POSITION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LABEL_POSITION) constant: `END` (default), `START`, or `BOTH`. With labels at both ends the start and the end of every line read at a glance.
+End labels replace the legend and the rank axis: the eye follows a line to its name. `show_labels` turns them on or off (on by default), and `label_position` picks the end that carries the name with a [BUMP_LABEL_POSITION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BUMP_LABEL_POSITION) member: `END` (the default), `START`, or `BOTH`. Labels at both ends show where each country started and where it finished without tracing the line across.
 
 ```
-from datachart.constants import LABEL_POSITION
-```
+from datachart.constants import BUMP_LABEL_POSITION
 
-```
 BumpChart(
     data=population,
     subtitle=COUNTRIES,
     # name every line at both ends
-    label_position=LABEL_POSITION.BOTH,
-    title="The world's most populous countries",
-    xlabel="Year",
-    ylabel="Rank by population",
-    figsize=FIG_SIZE.FULL_MEDIUM,
-).show()
-```
-
-The legend is off while the end labels name the lines. Turn the labels off with `show_labels=False` and the legend takes over; `show_legend` sets it explicitly either way.
-
-```
-BumpChart(
-    data=population,
-    subtitle=COUNTRIES,
-    # a legend instead of end labels
-    show_labels=False,
+    label_position=BUMP_LABEL_POSITION.BOTH,
     title="The world's most populous countries",
     xlabel="Year",
     ylabel="Rank by population",
@@ -226,7 +180,7 @@ BumpChart(
 
 ### Line shape
 
-The `line_curve` attribute eases every segment between two periods along an S-shaped curve: `0` (default) draws straight segments and `1` a full sigmoid, with the values in between blending the two. The curve changes only the path between the points — every marker stays on its rank. The `show_markers` attribute hides the markers when the lines alone read better.
+Straight segments that cross at sharp angles are hard to follow when many lines swap places at once. `line_curve` eases every segment along an S-shaped curve: `0` (the default) draws straight segments, `1` a full curve, and the values in between blend the two. The curve only changes the path between two periods; every point stays on its rank. `show_markers=False` drops the markers when the lines alone read better, as in a dense table with many periods.
 
 ```
 BumpChart(
@@ -234,18 +188,6 @@ BumpChart(
     subtitle=COUNTRIES,
     # ease the lines between the years
     line_curve=0.8,
-    title="The world's most populous countries",
-    xlabel="Year",
-    ylabel="Rank by population",
-    figsize=FIG_SIZE.FULL_MEDIUM,
-).show()
-```
-
-```
-BumpChart(
-    data=population,
-    subtitle=COUNTRIES,
-    line_curve=1,
     # lines without the markers
     show_markers=False,
     title="The world's most populous countries",
@@ -257,19 +199,23 @@ BumpChart(
 
 ### Line style
 
-To change the line style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.BumpStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BumpStyleAttrs) typing: `plot_bump_line_width`, `plot_bump_marker`, `plot_bump_marker_size` and `plot_bump_label_padding` set what is specific to a bump chart, while the color, alpha and dash come from the `plot_line_*` attributes. A single dictionary applies to every series; a list, aligned with `data`, styles each on its own. The example draws thin square-marked lines and colors the two giants apart from the rest.
+The `style` dictionary sets the look of the lines. The `plot_bump_*` attributes set what is specific to a bump chart (the line width, the marker, its size, and the gap between a line end and its label), while the color, alpha and dash come from the `plot_line_*` attributes; the attributes are listed in [datachart.typings.BumpStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/#datachart.typings.BumpStyleAttrs), and the markers in [LINE_MARKER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_MARKER). A single dictionary applies to every series; a list, aligned with `data`, styles each series on its own. Coloring only the two giants and drawing the rest in grey puts the story at the top of the table.
 
 ```
+from datachart.constants import LINE_MARKER
+
+GIANTS = {"China": "#c8553d", "India": "#2e86ab"}
+
 BumpChart(
     data=population,
     subtitle=COUNTRIES,
-    # one style per series: China and India in their own colors, the rest grey
+    # one style per series: the two giants in color, the rest in grey
     style=[
         {
-            "plot_bump_line_width": 1.5,
-            "plot_bump_marker": "s",
+            "plot_bump_line_width": 2.5 if country in GIANTS else 1.5,
+            "plot_bump_marker": LINE_MARKER.SQUARE,
             "plot_bump_marker_size": 5,
-            "plot_line_color": {"China": "#C8553D", "India": "#2E86AB"}.get(country, "#9E9E9E"),
+            "plot_line_color": GIANTS.get(country, "#9e9e9e"),
         }
         for country in COUNTRIES
     ],
@@ -282,7 +228,7 @@ BumpChart(
 
 ### Value labels
 
-A rank hides the size of the gaps. To print the value behind every rank beside its marker, add the `show_values` attribute: the labels show the original `y`, not the rank. `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)) and `value_step` labels every Nth period (by default the step keeps neighbouring labels apart).
+A rank hides the size of the gaps: rank 1 and rank 2 look the same whether they are a million or a billion apart. `show_values` prints the value behind every rank beside its marker (the original `y`, not the rank), `value_format` formats it with a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a `"{x:.1f}"` style string, and `value_step` labels every Nth period (by default the smallest step that keeps neighbouring labels apart). Five countries keep the labels legible, and the labels show how close India and China were when they swapped places.
 
 ```
 from datachart.constants import VALUE_FORMAT
@@ -303,13 +249,11 @@ BumpChart(
 
 ### Emphasis
 
-A bump chart with ten lines usually tells the story of one or two of them. The `emphasis` attribute expresses that directly: `"highlight"` brings a line to the front, `"background"` mutes it (the theme's muted color at a lower alpha, and a muted end label), and `None` leaves it unchanged. `emphasis` is a list aligned with `data`, just like `subtitle` and `style`; the role strings are also available as the [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide for how emphasis works across all chart types and themes.
+A bump chart with ten lines usually tells the story of two or three of them. `emphasis` takes one role per series, aligned with `data`: `"highlight"` brings a line to the front, `"background"` mutes it (the theme's muted color at a lower alpha, with a muted end label), and `None` leaves it as it is. The roles are also available as the [EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants, and the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis across every chart type and theme. Highlighting the two climbers and the country they passed picks one story out of ten lines.
 
 ```
 from datachart.constants import EMPHASIS
-```
 
-```
 BumpChart(
     data=population,
     subtitle=COUNTRIES,
@@ -325,32 +269,70 @@ BumpChart(
 ).show()
 ```
 
-To pick the lines from the data instead, pass `emphasis_rule`, a one-key rule that highlights every series whose summary matches and mutes the rest. On a bump chart the rule reads each series' ranks, and `{"top": n}` means the `n` best-ranked series — the lowest rank numbers — while `{"bottom": n}` picks the worst. The summary is the mean rank by default; a `"by"` key picks `"median"`, `"min"`, `"max"`, or `"sum"` instead. The thresholds `{"above": v}`, `{"below": v}` and `{"between": (lo, hi)}` compare the rank number itself, so `{"below": 4}` keeps the series that ranked in the top three on average. An explicit `emphasis` role wins over the rule.
+`emphasis_rule` picks the lines from the data instead of naming them. On a bump chart the rule reads each series' ranks, so `{"top": n}` means the `n` best-ranked series (the lowest rank numbers) and `{"bottom": n}` the worst. The summary is the mean rank by default; a `"by"` key picks `"median"`, `"min"`, `"max"` or `"sum"` instead. The thresholds `{"above": v}`, `{"below": v}` (strict) and `{"between": (lo, hi)}` (inclusive) compare the rank number itself, so `{"below": 4}` keeps the series that ranked in the top three on average. An explicit `emphasis` role wins over the rule. In the Premier League table, `{"top": 3}` picks the three clubs with the best mean position over the nine seasons, and `"by": "median"` or `"max"` would ask about a typical or the worst season instead:
 
 ```
 BumpChart(
-    data=population,
-    subtitle=COUNTRIES,
-    # the three countries with the best mean rank
+    data=premier_league,
+    subtitle=CLUBS,
+    rank_by=BUMP_RANK.GIVEN,
+    # the three clubs with the best mean position
     emphasis_rule={"top": 3},
-    title="The three most populous countries on average",
-    xlabel="Year",
-    ylabel="Rank by population",
+    title="The most consistent clubs",
+    xlabel="Season ending",
+    ylabel="Position",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
 ### Reference lines and bands
 
-Reference lines and bands take the rank as their `y`. To add vertical lines, add the `vlines` attribute with the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) typing; to shade a horizontal band, add the `hspans` attribute with the [datachart.typings.HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) typing — the other directions work the same way through `hlines` and `vspans`. The band below shades the top three of the table and the line marks the turn of the millennium; a single line or band applies once to the whole figure.
+Reference lines and bands give the ranks a meaning. On a bump chart their `y` is a rank: `hspans` shades a range of places, such as the qualification places of a league, and `hlines` marks a cut-off between two places (a half-rank sits between them). `vlines` and `vspans` mark periods, such as a rule change or a disrupted season. Each takes a dictionary or a list of them, with the position, a `style`, and an optional `label` that names it in the legend when `show_legend` is on; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). The rank axis runs from the best rank at the top (`ymin`) to the worst at the bottom (`ymax`), both defaulting to the ranks in the data; `ymax=20.5` shows all twenty places of the league, so the bands mean what they say. `xmin` and `xmax` crop the period axis the same way. The example shades the four Champions League places and the three relegation places, marks the cut-off between 17th and 18th, and shades 2019/20, the season finished behind closed doors after the pandemic pause. The season is `2020` in the data, so the band runs from `2019.5` to `2020.5`.
+
+```
+from datachart.constants import LINE_STYLE
+
+BumpChart(
+    data=premier_league,
+    subtitle=CLUBS,
+    rank_by=BUMP_RANK.GIVEN,
+    # shade the Champions League and the relegation places
+    hspans=[
+        {"ymin": 0.5, "ymax": 4.5, "label": "Champions League"},
+        {"ymin": 17.5, "ymax": 20.5, "label": "relegation", "style": {"plot_hspan_color": "#f4cccc"}},
+    ],
+    # the cut-off between 17th and 18th
+    hlines={
+        "y": 17.5,
+        "style": {"plot_hline_color": "#c1121f", "plot_hline_style": LINE_STYLE.DASHED},
+    },
+    # the season finished after the pandemic pause
+    vspans={"xmin": 2019.5, "xmax": 2020.5, "label": "pandemic season"},
+    # all twenty places of the league
+    ymin=0.5,
+    ymax=20.5,
+    title="Final Premier League positions",
+    xlabel="Season ending",
+    ylabel="Position",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Text annotations
+
+A crossing is the event a bump chart exists to show, and a note can name it. `texts` places text on the chart, with an optional `target` to draw a connector to a point; positions are in data coordinates by default (period, rank) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the ranks. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The note below sits in the free space between ranks 2 and 3, in data coordinates, and points at India's first year at the top.
 
 ```
 BumpChart(
     data=population,
     subtitle=COUNTRIES,
-    # shade the top three ranks and mark the year 2000
-    hspans={"ymin": 0.5, "ymax": 3.5, "label": "top three"},
-    vlines={"x": 2000},
+    # a note between ranks 2 and 3, pointing at India in 2023
+    texts={
+        "text": "India passes China",
+        "x": 2002,
+        "y": 2.5,
+        "target": (2023, 1),
+    },
     title="The world's most populous countries",
     xlabel="Year",
     ylabel="Rank by population",
@@ -360,98 +342,95 @@ BumpChart(
 
 ## Multiple Bump Charts
 
+A bump chart always compares series, so `data` is a list of lists: each inner list is one series, and the per-series attributes (`subtitle`, `style`, `emphasis`) are lists aligned with it. The ranks are computed across all the series of one figure. The subsections below cover the legend, subplots, and composing bump charts with other figures.
+
+### Legend
+
+End labels crowd when the names are long or the lines finish close together; a legend is the alternative. With `show_labels=False` the legend takes over by default, and `show_legend` sets it explicitly either way. `legend` says where and how, with a `title`, a `location` from [LEGEND_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), the number of columns `ncols`, and the `alignment` of the entries from [LEGEND_ALIGN](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) ([LegendSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendSettingAttrs)). Six club names fit to the right of the chart.
+
+```
+from datachart.constants import LEGEND_LOCATION
+
+BumpChart(
+    data=premier_league,
+    subtitle=CLUBS,
+    rank_by=BUMP_RANK.GIVEN,
+    # a legend instead of end labels
+    show_labels=False,
+    legend={"title": "Club", "location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+    title="Final Premier League positions",
+    xlabel="Season ending",
+    ylabel="Position",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
 ### Subplots
 
-The `subplots` attribute draws each series in its own subplot. The ranks are still computed over every series, so each subplot shows its country's place among all ten. The `subtitle` becomes the subplot title and the `title`, `xlabel` and `ylabel` are positioned to be global for all charts. The `max_cols` attribute limits the number of columns, and `sharex` and `sharey` share an axis across the subplots.
+Ten crossing lines can hide one country's path. `subplots=True` draws each series in its own panel, and the ranks are still computed over every series, so each panel shows its country's place among all ten. `subtitle` titles the panels; `title`, `xlabel` and `ylabel` stay global; `max_cols` limits the panels per row. `sharey=True` keeps rank 1 at the same height in every panel, and `sharex=True` keeps one period axis.
 
 ```
 BumpChart(
     data=population,
     subtitle=COUNTRIES,
-    # one country per subplot, ranked among all ten
+    # one country per panel, ranked among all ten
     subplots=True,
     max_cols=5,
     sharex=True,
     sharey=True,
     show_labels=False,
+    xticks=[1980, 2023],
     title="Each country's place among the ten",
     xlabel="Year",
     ylabel="Rank",
-    figsize=(14, 5),
+    figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
-### Composing bump charts
+### Composing with Panel and Grid
 
-A bump figure composes like a line chart. [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays it with other figures on shared axes; every bump figure keeps the ranks it computed, so a panel overlays rankings that share a scale — here the table's top five and, drawn with dashed lines, the rest, both drawn from ranks computed over all ten. [datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) arranges bump figures next to other figures.
+[Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays figures built separately on one set of axes, and every bump figure keeps the ranks it computed. Two figures ranked on their own would both start at rank 1, so rankings that should share a scale are computed once and passed with `GIVEN`. The example computes the ranks of all ten countries, then draws the 2023 top five with solid lines and the rest dashed, as two figures in one panel. [Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) arranges a bump chart next to other charts; [Example 3](#example-3-why-did-the-table-reshuffle-a-bump-chart-and-a-bar-chart-in-a-grid) stacks one above a bar chart. The [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) and [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) guides cover both.
 
 ```
-from datachart.charts import BarChart
-from datachart.constants import LINE_STYLE
-from datachart.utils import Grid, Panel
+from datachart.utils import Panel
 
-# the ten ranks of every year, split by the 2023 table into the top five and the rest
+# the rank of every country in every year, among all ten
 ranks = {country: [] for country in COUNTRIES}
-for i, year in enumerate(YEARS):
-    ordered = sorted(COUNTRIES, key=lambda c: -POPULATION[c][i])
+for i in range(len(YEARS)):
+    ordered = sorted(COUNTRIES, key=lambda country: -POPULATION[country][i])
     for rank, country in enumerate(ordered, start=1):
         ranks[country].append(rank)
-top = [c for c in COUNTRIES if ranks[c][-1] <= 5]
-rest = [c for c in COUNTRIES if ranks[c][-1] > 5]
+top_five = [country for country in COUNTRIES if ranks[country][-1] <= 5]
+the_rest = [country for country in COUNTRIES if ranks[country][-1] > 5]
 
 
 def ranked(countries):
-    return [[{"x": y, "y": r} for y, r in zip(YEARS, ranks[c])] for c in countries]
+    return [[{"x": year, "y": rank} for year, rank in zip(YEARS, ranks[c])] for c in countries]
 
 
 Panel(
     [
-        BumpChart(data=ranked(top), subtitle=top, rank_by=RANK.GIVEN),
+        # both figures take the shared ranks as given
+        BumpChart(data=ranked(top_five), subtitle=top_five, rank_by=BUMP_RANK.GIVEN),
         BumpChart(
-            data=ranked(rest),
-            subtitle=rest,
-            rank_by=RANK.GIVEN,
+            data=ranked(the_rest),
+            subtitle=the_rest,
+            rank_by=BUMP_RANK.GIVEN,
             style={"plot_line_style": LINE_STYLE.DASHED},
         ),
     ],
-    title="The top five and the rest",
+    title="The 2023 top five and the rest",
     xlabel="Year",
     ylabel_left="Rank by population",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
-```
-bump = BumpChart(data=population, subtitle=COUNTRIES, title="Rank by population")
-bars = BarChart(
-    data=[{"label": country, "y": POPULATION[country][-1]} for country in COUNTRIES],
-    title="Population in 2023 (millions)",
-    sort="descending",
-)
-Grid([[bump, bars]], figsize=(14, 5)).show()
-```
-
 ## Additional Features
-
-### Custom data keys
-
-By default the chart reads the `x` and `y` keys of every point. When the data uses other names, add the `x` and `y` attributes with the key names — the hidden cell below holds the same population as `year`/`millions` records.
-
-```
-BumpChart(
-    data=records,
-    # read the year and millions keys instead of x and y
-    x="year",
-    y="millions",
-    subtitle=COUNTRIES,
-    title="The world's most populous countries",
-    figsize=FIG_SIZE.FULL_MEDIUM,
-).show()
-```
 
 ### Datetime axis
 
-The periods may be real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp` — instead of numbers, and the axis then reads as time: the points sit at their elapsed time, so uneven periods keep their spacing. `xticks_format` takes a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern. Date strings are not parsed; they draw as categories, in the order they first appear.
+Periods are often dates, and they are not always evenly spaced: the population table has ten-year steps and then a three-year one. When `x` holds real temporal objects (`datetime`, `date`, `numpy.datetime64` or a pandas `Timestamp`), the axis reads as time and the points sit at their elapsed time, so the last step is drawn shorter. `xticks_format` takes a [DATE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern.
 
 ```
 from datetime import date
@@ -459,21 +438,48 @@ from datetime import date
 from datachart.constants import DATE_FORMAT
 
 BumpChart(
+    # the populations dated at mid-year
     data=[
-        [{"x": date(year, 7, 1), "y": people} for year, people in zip(YEARS, POPULATION[country])]
-        for country in COUNTRIES
+        [{"x": date(point["x"], 7, 1), "y": point["y"]} for point in series]
+        for series in population
     ],
     subtitle=COUNTRIES,
-    line_curve=0.6,
+    # print the dates as years
     xticks_format=DATE_FORMAT.YEAR,
     title="Mid-year population ranks",
+    xlabel="Year",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Custom data keys
+
+Data from a file or an API rarely uses the `x` and `y` keys, and renaming every record just to plot it is a chore. Instead, tell `BumpChart` which keys to read with the `x` and `y` arguments. `records` stores the population table the way a CSV export would, with a `year` and a `millions` key:
+
+```
+records = [
+    [{"year": year, "millions": people} for year, people in zip(YEARS, POPULATION[country])]
+    for country in COUNTRIES
+]
+records[0][:2]
+```
+
+```
+BumpChart(
+    data=records,
+    # the keys that hold the period and the value
+    x="year",
+    y="millions",
+    subtitle=COUNTRIES,
+    title="The world's most populous countries",
+    xlabel="Year",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
 ### Themes
 
-A theme sets the palette, the line width, and the furniture of every chart at once; see the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery.ipynb) for the whole suite under each. Apply one with [datachart.config.Config.set_theme](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) from the [datachart.constants.THEME](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) constant, and reset the configuration afterwards so the following charts draw in the default again.
+A theme sets the palette, the line width and the furniture of every chart at once; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each one. Apply one with [config.set_theme](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) and a [THEME](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) member, and reset the configuration afterwards so the following charts draw in the default again.
 
 ```
 from datachart.config import config
@@ -493,42 +499,32 @@ config.reset_config()
 figure.show()
 ```
 
-## Saving the Chart as an Image
-
-To save the chart as an image, use the [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.save_figure) function.
-
-```
-from datachart.utils import save_figure
-
-figure = BumpChart(
-    data=population,
-    subtitle=COUNTRIES,
-    title="The world's most populous countries",
-    xlabel="Year",
-    ylabel="Rank by population",
-)
-save_figure(figure, "./fig_bump_chart.png", dpi=300)
-```
-
-The figure should be saved in the current working directory.
-
 ## Real-World Examples
 
-The following examples put the features above to work. Each one states what it shows; any derived data lives in a hidden cell.
+The examples below put the features above to work on real data, each one answering a question. The data comes from the sections above; each example says what it is and where it comes from.
 
-### Example 1: India Overtakes China (Emphasis, Curves, and Value Labels)
+### Example 1: How Close Was the Swap at the Top? (Emphasis, Curves, Value Labels, and a Note)
 
-For four decades the top of the table did not move; in 2023 India's population passed China's. Limited to the top four countries, highlighted and curved, with the populations printed behind the ranks, the chart shows how long the order held and how narrow the final crossing was.
+For four decades China was the most populous country; by 2023 India had passed it. `population` (UN World Population Prospects 2022, from the Basics section) answers how narrow the crossing was. The chart keeps the four largest countries, highlights the two giants and mutes the other two, curves the lines so the one crossing stands out, prints the populations behind the ranks, and a note names the swap: 1,429 million against 1,426.
 
 ```
 BumpChart(
     data=population[:4],
     subtitle=COUNTRIES[:4],
+    # the two giants against the context
     emphasis=[EMPHASIS.HIGHLIGHT, EMPHASIS.HIGHLIGHT, EMPHASIS.BACKGROUND, EMPHASIS.BACKGROUND],
     line_curve=1,
+    # the populations behind the ranks
     show_values=True,
     value_format=VALUE_FORMAT.INTEGER,
-    label_position=LABEL_POSITION.BOTH,
+    label_position=BUMP_LABEL_POSITION.BOTH,
+    texts={
+        "text": "India passes China by\nabout 3 million people",
+        "x": 0.45,
+        "y": 0.55,
+        "coords": "axes",
+        "target": (2023, 1),
+    },
     title="India overtakes China",
     xlabel="Year",
     ylabel="Rank by population",
@@ -536,25 +532,75 @@ BumpChart(
 ).show()
 ```
 
-### Example 2: A Season's League Table (Given Ranks, Gaps, and a Grid)
+### Example 2: Was Leicester's Title a One-Off? (Given Ranks, a Gap, Bands, and Value Labels)
 
-Illustrative weekly positions of six clubs over a ten-week stretch, with one club's week-6 match postponed so it holds no position that week. The positions are already ranks, so `rank_by` is `GIVEN`, and the postponed week leaves a gap in the club's line. The grid pairs the table with the final positions as a sorted bar chart.
+In 2015/16 Leicester City won the Premier League, a title priced at 5000 to 1 before the season, ahead of all the clubs that usually share the top places. `premier_league` (the official Premier League tables, from the [Ranking](#ranking) section) holds the final positions of Leicester and five of those clubs over the following seasons. The positions are given ranks, Leicester's line breaks after its relegation in 2023, the axis shows all twenty places with bands on the Champions League places (grey) and the relegation places (red), and Leicester is highlighted with its positions printed (value labels skip muted series). The answer: Leicester never returned to the top four, though it finished fifth twice.
 
 ```
-league = BumpChart(
-    data=table,
+BumpChart(
+    data=premier_league,
     subtitle=CLUBS,
-    rank_by=RANK.GIVEN,
+    rank_by=BUMP_RANK.GIVEN,
+    # Leicester against the clubs that usually finish on top
+    emphasis=[EMPHASIS.BACKGROUND] * 5 + [EMPHASIS.HIGHLIGHT],
+    # print Leicester's positions
+    show_values=True,
     line_curve=0.5,
-    emphasis_rule={"top": 2},
-    title="Weekly positions",
-    xlabel="Week",
+    # the Champions League and the relegation places
+    hspans=[
+        {"ymin": 0.5, "ymax": 4.5},
+        {"ymin": 17.5, "ymax": 20.5, "style": {"plot_hspan_color": "#f4cccc"}},
+    ],
+    ymin=0.5,
+    ymax=20.5,
+    title="Leicester City after the 2016 title",
+    xlabel="Season ending",
     ylabel="Position",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Example 3: Why Did the Table Reshuffle? (A Bump Chart and a Bar Chart in a Grid)
+
+A bump chart shows that the order changed, not why. Between 1980 and 2023 Pakistan and Nigeria tripled their populations while Russia and Japan barely grew (`population`, UN World Population Prospects 2022, from the Basics section), and the growth explains every crossing. The top chart ranks the ten countries, highlighting the two fastest climbers and the two countries that fell furthest; the bar chart below shows each country's growth factor (the 2023 population divided by the 1980 one), sorted, with the same four countries highlighted. [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) stacks the two charts in one figure.
+
+```
+from datachart.charts import BarChart
+from datachart.constants import ORIENTATION, SORT
+from datachart.utils import Grid
+
+MOVERS = ("Pakistan", "Nigeria", "Russia", "Japan")
+
+ranking = BumpChart(
+    data=population,
+    subtitle=COUNTRIES,
+    emphasis=[EMPHASIS.HIGHLIGHT if c in MOVERS else EMPHASIS.BACKGROUND for c in COUNTRIES],
+    line_curve=0.8,
+    title="Rank by population",
+    xlabel="Year",
 )
-final = BarChart(
-    data=[{"label": club, "y": 7 - POSITIONS[club][-1]} for club in CLUBS],
-    title="Final table (places above the bottom)",
-    sort="descending",
+growth = BarChart(
+    data=[
+        {
+            "label": c,
+            "y": POPULATION[c][-1] / POPULATION[c][0],
+            "emphasis": "highlight" if c in MOVERS else "background",
+        }
+        for c in COUNTRIES
+    ],
+    title="Growth factor, 1980 to 2023",
+    orientation=ORIENTATION.HORIZONTAL,
+    # the fastest growth at the top
+    sort=SORT.ASCENDING,
+    show_values=True,
+    value_format="{:.1f}x",
+    xmin=0,
+    xmax=3.5,
 )
-Grid([[league, final]], figsize=(14, 5)).show()
+
+Grid(
+    [[ranking], [growth]],
+    title="Growth reshuffles the table",
+    figsize=FIG_SIZE.FULL_TALL,
+).show()
 ```

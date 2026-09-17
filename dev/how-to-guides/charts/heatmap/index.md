@@ -1,90 +1,24 @@
 # Heatmap
 
-This section showcases the heatmap. It contains examples of how to create heatmaps using the [datachart.charts.Heatmap](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.Heatmap) function.
+A heatmap colors every cell of a table by its value, so a grid of numbers over two categorical dimensions reads at a glance: where the hot cells are, and what pattern they form. This guide shows how to create heatmaps with the [datachart.charts.Heatmap](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/#datachart.charts.Heatmap) function, starting with the basics and building up to worked examples on real data.
 
 Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-heatmap), which maps common tasks to the parameter or style attribute that does the job.
-
-As mentioned above, the heatmaps are created using the `Heatmap` function found in the [datachart.charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md) module. Let's import it:
 
 ```
 from datachart.charts import Heatmap
 ```
 
-## Heatmap Input Attributes
-
-The `Heatmap` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the heatmap grid. For a single heatmap, `data` is a dictionary with the 2D matrix `z` (a `None` cell is left blank) and the optional `x` and `y` labels of its columns and rows. For multiple heatmaps, `data` is a list of such dictionaries.
-
-```
-Heatmap(
-    data={                                              # The heatmap grid (or list of grids for multiple charts)
-        "x": Optional[List[Union[str, int, float]]],    # The column labels, one per column of z (optional)
-        "y": Optional[List[Union[str, int, float]]],    # The row labels, one per row of z (optional)
-        "z": List[List[Union[int, float, None]]],       # The heatmap matrix
-        "emphasis": Optional[List[List[Optional[str]]]], # The per-cell roles, aligned with z (optional)
-    },
-    emphasis_rule=Optional[dict],                       # One-key rule on each cell's value
-    style={                                             # The style of the heatmap (optional)
-        "plot_heatmap_cmap":        Optional[Union[str, List[str]]], # The colormap (palette name or list of hex colors)
-        "plot_heatmap_alpha":       Optional[float],    # The alpha of the heatmap (how visible it is)
-        "plot_heatmap_font_size":   Optional[Union[int, float, str]], # The font size of the cell values
-        "plot_heatmap_font_color":  Optional[str],      # The font color of the cell values (hex color code)
-        "plot_heatmap_font_style":  Optional[FONT_STYLE], # The font style of the cell values (normal, italic, etc.)
-        "plot_heatmap_font_weight": Optional[FONT_WEIGHT], # The font weight of the cell values (normal, bold, etc.)
-        "plot_heatmap_frame_color": Optional[str],      # The color of the frame around the heatmap (hex color code)
-        "plot_heatmap_edge_width":  Optional[float],    # The width of the borders between the cells (0 draws none)
-        "plot_heatmap_edge_color":  Optional[str],      # The color of the borders between the cells (hex color code)
-    },
-    subtitle=Optional[str],                             # The subtitle of the chart (or list for multiple charts)
-    title=Optional[str],                                # The title of the chart
-    xlabel=Optional[str],                               # The x-axis label
-    ylabel=Optional[str],                               # The y-axis label
-
-    figsize=Optional[Tuple[float, float]],              # The figure size in inches
-    aspect_ratio=Optional[str],                         # The aspect ratio of the cells ("auto", "equal")
-    show_colorbars=Optional[bool],                      # Whether to show the colorbar
-    show_heatmap_values=Optional[bool],                 # Whether to write the values into the cells
-    valfmt=Optional[str],                               # The format of the cell values (or list for multiple charts)
-    colorbar={                                          # The colorbar configuration (or list for multiple charts)
-        "orientation": Optional[ORIENTATION],           # The colorbar orientation ("vertical", "horizontal")
-    },
-
-    norm=Optional[str],                                 # The value normalization ("linear", "log", "symlog", "asinh", "logit"; or list for multiple charts)
-    vmin=Optional[float],                               # The value mapped to the first color (or list for multiple charts)
-    vmax=Optional[float],                               # The value mapped to the last color (or list for multiple charts)
-
-    show_grid=Optional[str],                            # Which grid lines to show ("both", "x", "y")
-    show_legend=Optional[bool],                         # Whether to show the legend (not typical for heatmaps)
-    xmin=Optional[Union[int, float]],                   # The x-axis range (column indices)
-    xmax=Optional[Union[int, float]],
-    ymin=Optional[Union[int, float]],                   # The y-axis range (row indices)
-    ymax=Optional[Union[int, float]],
-
-    max_cols=Optional[int],                             # Maximum number of subplots per row
-    sharex=Optional[bool],                              # Whether subplots share the x-axis
-    sharey=Optional[bool],                              # Whether subplots share the y-axis
-
-    xticks=Optional[List[Union[int, float]]],           # the x-axis ticks (column indices)
-    xticklabels=Optional[List[str]],                    # the x-axis tick labels (must be same length as xticks)
-    xtickrotate=Optional[int],                          # the x-axis tick labels rotation
-    yticks=Optional[List[Union[int, float]]],           # the y-axis ticks (row indices)
-    yticklabels=Optional[List[str]],                    # the y-axis tick labels (must be same length as yticks)
-    ytickrotate=Optional[int],                          # the y-axis tick labels rotation
-)
-```
-
-For more details, see the [datachart.charts.Heatmap](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.Heatmap) function.
-
 ## Basics
 
-The examples in this guide share one dataset: the monthly climate of six cities. `temperatures` holds the mean air temperature (in °C) and `precipitation` the mean rainfall (in mm) of every month, rounded from the published 1991–2020 climate normals of the cities' weather stations. The data is hard-coded in a hidden cell; each matrix has one row per city, in the order of `CITIES`, and one column per month, in the order of `MONTHS`.
+The examples in this guide share one dataset: the monthly climate of six cities on four continents, Reykjavik, Moscow, Ljubljana, Cairo, Singapore and Sydney. `temperatures` holds the mean air temperature of every month in °C, and `precipitation` the mean monthly rainfall in mm. The values are approximate, rounded from the published 1991 to 2020 climate normals of each city's main weather station, and live in a hidden cell. The table has several stories in it, and the customizations below bring them out: a freezing Moscow winter, a Singapore that never changes, a Sydney whose seasons run backwards, and a Cairo where it almost never rains.
 
-The data is a dictionary: `z` is a plain 2D list where each inner list is one row of the heatmap and each value in it is one cell, while `x` and `y` name its columns and rows. The first row is drawn at the top, the first column at the left:
+The data is a dictionary: `z` is a 2D list, one inner list per row and one value per cell, while `x` names the columns and `y` the rows. The first row is drawn at the top and the first column at the left:
 
 ```
 {key: value[:2] for key, value in temperatures.items()}
 ```
 
-**Basic example.** Only the `data` argument is required to draw the heatmap. Every cell is colored by its value: the lowest value gets the first color of the colormap, the highest the last. The `x` and `y` labels become the tick labels of the axes; without them, the axes are ticked with the cell indices.
+**Basic example.** Only the `data` argument is required. Every cell is colored by its value, the lowest value in the table getting the first color of the colormap and the highest the last, and the `x` and `y` labels name the columns and rows. The pattern is visible straight away: the Cairo and Singapore rows at the warm end all year, Moscow's winter corner at the cold end, and a Sydney row that is warmest where the others are coldest.
 
 ```
 Heatmap(
@@ -97,38 +31,55 @@ Heatmap(
 
 Every customization is either a keyword argument of `Heatmap` or a `plot_heatmap_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                             | Use                                                                          | See                                                               |
-| -------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| add a title and axis labels            | `title`, `xlabel`, `ylabel`                                                  | [Title and axis labels](#title-and-axis-labels)                   |
-| name the rows and columns              | `xticks`, `xticklabels`, `yticks`, `yticklabels`                             | [Ticks and labels](#ticks-and-labels)                             |
-| rotate the tick labels                 | `xtickrotate`, `ytickrotate`                                                 | [Ticks and labels](#ticks-and-labels)                             |
-| resize the figure                      | `figsize`                                                                    | [Figure size and aspect ratio](#figure-size-and-aspect-ratio)     |
-| keep the cells square                  | `aspect_ratio`                                                               | [Figure size and aspect ratio](#figure-size-and-aspect-ratio)     |
-| show the colorbar                      | `show_colorbars`, `colorbar`                                                 | [Colorbar and cell values](#colorbar-and-cell-values)             |
-| write the values into the cells        | `show_heatmap_values`, `valfmt`                                              | [Colorbar and cell values](#colorbar-and-cell-values)             |
-| change the colormap or transparency    | `style={"plot_heatmap_cmap": ..., "plot_heatmap_alpha": ...}`                | [Heatmap style](#heatmap-style)                                   |
-| style the cell values                  | `style={"plot_heatmap_font_size": ..., "plot_heatmap_font_color": ..., ...}` | [Heatmap style](#heatmap-style)                                   |
-| change the frame color                 | `style={"plot_heatmap_frame_color": ...}`                                    | [Heatmap style](#heatmap-style)                                   |
-| draw borders between the cells         | `style={"plot_heatmap_edge_width": ..., "plot_heatmap_edge_color": ...}`     | [Heatmap style](#heatmap-style)                                   |
-| fix the value range of the colormap    | `vmin`, `vmax`                                                               | [Normalization](#normalization)                                   |
-| spread skewed values over the colormap | `norm`                                                                       | [Normalization](#normalization)                                   |
-| highlight some cells, mute the rest    | an `emphasis` grid in `data`, `emphasis_rule`                                | [Emphasis](#emphasis)                                             |
-| compare several matrices side by side  | `data` as a list of matrices, `subtitle`                                     | [Multiple Heatmap Charts](#multiple-heatmap-charts)               |
-| arrange the subplots                   | `max_cols`, `sharex`, `sharey`                                               | [Subplot layout and shared axes](#subplot-layout-and-shared-axes) |
-| save the chart to a file               | `save_figure`                                                                | [Saving the Chart as an Image](#saving-the-chart-as-an-image)     |
+| I want to…                                 | Use                                                                          | See                                                                                                     |
+| ------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| add a title and axis labels                | `title`, `xlabel`, `ylabel`                                                  | [Title and axis labels](#title-and-axis-labels)                                                         |
+| tick only some rows or columns             | `xticks`, `xticklabels`, `yticks`, `yticklabels`                             | [Ticks and labels](#ticks-and-labels)                                                                   |
+| rotate the tick labels                     | `xtickrotate`, `ytickrotate`                                                 | [Ticks and labels](#ticks-and-labels)                                                                   |
+| resize the figure or keep the cells square | `figsize`, `aspect_ratio`                                                    | [Figure size and aspect ratio](#figure-size-and-aspect-ratio)                                           |
+| show the colorbar                          | `show_colorbars`                                                             | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
+| write the values into the cells            | `show_heatmap_values`, `valfmt`                                              | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
+| caption, move, or format the colorbar      | `colorbar={"label": ..., "location": ..., "format": ..., "ticks": ...}`      | [Colorbar placement](#colorbar-placement)                                                               |
+| change the colormap or transparency        | `style={"plot_heatmap_cmap": ..., "plot_heatmap_alpha": ...}`                | [Heatmap style](#heatmap-style)                                                                         |
+| style the cell values                      | `style={"plot_heatmap_font_size": ..., "plot_heatmap_font_color": ..., ...}` | [Heatmap style](#heatmap-style)                                                                         |
+| draw borders between the cells             | `style={"plot_heatmap_edge_width": ..., "plot_heatmap_edge_color": ...}`     | [Heatmap style](#heatmap-style)                                                                         |
+| center a diverging colormap on a value     | `vmin`, `vmax`                                                               | [Normalization](#normalization)                                                                         |
+| spread skewed values over the colormap     | `norm`                                                                       | [Normalization](#normalization)                                                                         |
+| highlight some cells, mute the rest        | `emphasis_rule`, an `emphasis` grid in `data`                                | [Emphasis](#emphasis)                                                                                   |
+| put a note on a cell                       | `texts`                                                                      | [Text annotations](#text-annotations)                                                                   |
+| compare several tables side by side        | `data` as a list of dicts, `subtitle`                                        | [Multiple Heatmaps](#multiple-heatmaps)                                                                 |
+| arrange the subplots                       | `max_cols`, `sharex`, `sharey`                                               | [Subplot layout and shared axes](#subplot-layout-and-shared-axes)                                       |
+| leave cells without data empty             | `None` in `z`                                                                | [Blank cells](#blank-cells)                                                                             |
+| show only part of the table                | `xmin`, `xmax`, `ymin`, `ymax`                                               | [Axis range](#axis-range)                                                                               |
+| use dates as row or column labels          | `date` objects as `x` or `y`, `xticks_format`, `yticks_format`               | [Date labels](#date-labels)                                                                             |
+| save the chart to a file                   | `save_figure`                                                                | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
-The full list of style attributes is in the [datachart.typings.HeatmapStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HeatmapStyleAttrs) type; the full list of parameters is in the [datachart.charts.Heatmap](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.Heatmap) reference.
+The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
+
+| Parameter                                                       | Constant                                                                                                                                                                                                                                                                                                                                                           |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `figsize`                                                       | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                                                                                                                                         |
+| `legend={"location": ..., "alignment": ...}`                    | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN)                                                                                                                       |
+| `show_grid`                                                     | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                                                                                                                                       |
+| `aspect_ratio`                                                  | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                                                                                                                                                 |
+| `norm`                                                          | [`NORMALIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE)                                                                                                                                                                                                                                                       |
+| `valfmt`                                                        | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                 |
+| `xticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
+| `yticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
+| `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) |
+
+The full list of style attributes is in the [datachart.typings.HeatmapStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/#datachart.typings.HeatmapStyleAttrs) type; the full list of parameters is in the [datachart.charts.Heatmap](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/#datachart.charts.Heatmap) reference.
 
 ### Title and axis labels
 
-To add the chart title and axis labels, add the `title`, `xlabel` and `ylabel` attributes.
+A heatmap has three quantities, the two axes and the color, and the reader needs all three named. `title` says what the colors measure, with its unit, and `xlabel` and `ylabel` name the dimensions of the table.
 
 ```
 Heatmap(
     data=temperatures,
-    # add the title
-    title="Mean monthly temperature",
-    # add the x and y axis labels
+    # say what the colors measure
+    title="Mean monthly temperature (°C)",
+    # name the columns and the rows
     xlabel="Month",
     ylabel="City",
 ).show()
@@ -136,164 +87,109 @@ Heatmap(
 
 ### Ticks and labels
 
-A heatmap places column *j* at `x = j` and row *i* at `y = i`, counting from zero. The `x` and `y` labels of the data name these positions; to tick the axes differently, add the `xticks` and `yticks` attributes with the indices to tick and the `xticklabels` and `yticklabels` attributes with their labels — an explicit `xticks`/`xticklabels` (`yticks`/`yticklabels`) pair overrides the `x` (`y`) labels of the data. Here every third month is ticked. Tick labels can be rotated with `xtickrotate` and `ytickrotate`, whichever labels are shown.
+Twelve month names are more labels than a small figure has room for, and a table with a hundred columns can never label them all. Column *j* sits at `x = j` and row *i* at `y = i`, counting from zero, so `xticks` and `yticks` take the indices to tick and `xticklabels` and `yticklabels` their labels; an explicit pair replaces the `x` or `y` labels of the data. Here only the first month of each season is ticked. `xtickrotate` and `ytickrotate` tilt the tick labels, whichever labels are shown, which keeps long names from crowding.
 
 ```
 Heatmap(
     data=temperatures,
-    title="Mean monthly temperature",
+    title="Mean monthly temperature (°C)",
     xlabel="Month",
     ylabel="City",
-    # tick every third month instead of the `x` labels
+    # tick the first month of each season
     xticks=[0, 3, 6, 9],
     xticklabels=["Jan", "Apr", "Jul", "Oct"],
-    # rotate the row labels
-    ytickrotate=45,
-).show()
-```
-
-### Date labels
-
-The `x` and `y` coordinates may be real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp`. The cells keep their grid positions, and the dates print into the tick labels through `xticks_format` / `yticks_format`: a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern.
-
-```
-from datetime import date
-
-from datachart.constants import DATE_FORMAT
-
-Heatmap(
-    data={"x": [date(2024, month, 1) for month in range(1, 13)], "y": CITIES, "z": TEMPERATURES},
-    title="Mean monthly temperature",
-    xlabel="Month",
-    ylabel="City",
-    xticks_format=DATE_FORMAT.YEAR_MONTH,
-    xtickrotate=45,
+    # tilt the city names
+    ytickrotate=30,
 ).show()
 ```
 
 ### Figure size and aspect ratio
 
-To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains some of the predefined figure sizes.
-
-By default the cells stretch to fill the figure, so their shape follows `figsize`. To keep the cells square whatever the figure size, add the `aspect_ratio` attribute. The possible options are:
-
-| Option    | Description                                       |
-| --------- | ------------------------------------------------- |
-| `"auto"`  | the cells stretch to fill the axes (the default). |
-| `"equal"` | the cells are square; the axes shrink to fit.     |
-
-Again, `datachart` provides a [datachart.constants.ASPECT_RATIO](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO) constant, which contains the supported options. A 6 × 12 matrix in a short figure is a natural fit for square cells.
+A table of six rows and twelve columns is twice as wide as it is tall, and the default figure is nearly square, so the cells come out tall and narrow. `figsize` takes a `(width, height)` tuple in inches or a preset from [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE). The cells stretch to fill the axes by default ([ASPECT_RATIO.AUTO](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)); `ASPECT_RATIO.EQUAL` keeps them square and shrinks the axes to fit, which suits a matrix whose rows and columns are the same kind of thing, like a correlation matrix, and a wide, short figure like this one.
 
 ```
 from datachart.constants import FIG_SIZE, ASPECT_RATIO
-```
 
-```
 Heatmap(
     data=temperatures,
-    title="Mean monthly temperature",
+    title="Mean monthly temperature (°C)",
     xlabel="Month",
     ylabel="City",
-    # add to determine the figure size
+    # a page-wide figure
     figsize=FIG_SIZE.FULL_SHORT,
-    # keep the cells square
+    # square cells
     aspect_ratio=ASPECT_RATIO.EQUAL,
 ).show()
 ```
 
 ### Colorbar and cell values
 
-A heatmap on its own shows which cells are higher and which are lower, not by how much. Two attributes add the numbers back: `show_colorbars` draws the colorbar that maps the colors to values, and `show_heatmap_values` writes every value into its cell. On dark cells the value is written in white automatically, so it stays legible across the whole colormap.
-
-The colorbar is vertical and sits to the right of the heatmap; to caption it or move it, add the `colorbar` attribute with the [datachart.typings.ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs) typing: `label` names the quantity, `location` takes a [datachart.constants.COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) value, and `orientation` alone still takes an [datachart.constants.ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) value.
-
-To format the values written into the cells, add the `valfmt` attribute, which is a `string` depicting how to format the values. Examples of such formats are:
-
-| Format      | Description                                                |
-| ----------- | ---------------------------------------------------------- |
-| `"{x}"`     | Formats the value as is (no change to the value).          |
-| `"{x:.0f}"` | Formats the value as an integer (rounds floats).           |
-| `"{x:.2f}"` | Formats the value as a float with two decimal places.      |
-| `"{x:.2%}"` | Formats the value as a percentage with two decimal places. |
-
-Required presence of `x`
-
-To format the heatmap values, the `x` value must be present in the string. For instance `"{z:.2f}"` is not a valid format, and `z` should be replaced with `x`.
-
-Again, to help with the settings, the [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) module contains the following constants:
-
-| Constant                                                                                                                             | Description                   |
-| ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
-| [datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) | The predefined value formats. |
-| [datachart.constants.ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)   | The colorbar orientation.     |
-
-The temperatures are given to one decimal place, so the example formats the cells with `VALUE_FORMAT.DECIMAL`.
+Colors show which cells are warmer, not by how much. `show_colorbars` adds the scale that maps colors back to values, and `show_heatmap_values` writes each value into its cell; a value on a dark cell is written in white, so it stays legible across the colormap. `valfmt` formats the cell values: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a format string that names the value `x`, such as `"{x:.1f}"` (a string without `x`, such as `"{z:.1f}"`, is not valid). The temperatures carry one decimal, so `VALUE_FORMAT.DECIMAL` keeps it. With the values written in, the chart answers both questions: the pattern from the colors, the exact numbers from the cells.
 
 ```
 from datachart.constants import VALUE_FORMAT
-```
 
-```
 Heatmap(
     data=temperatures,
-    title="Mean monthly temperature",
+    title="Mean monthly temperature (°C)",
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    # add to show the colorbar
+    # add the color scale
     show_colorbars=True,
-    # add to write the values into the cells
+    # write the values into the cells, with one decimal
     show_heatmap_values=True,
-    # format the values with one decimal place
     valfmt=VALUE_FORMAT.DECIMAL,
+).show()
+```
+
+### Colorbar placement
+
+A colorbar on the right takes width from the table, and a wide table needs every bit of it. `colorbar` takes a dictionary ([ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs)): `location` puts the bar on any edge with a [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) member, `label` captions it, `format` formats its tick labels (a `VALUE_FORMAT` member or a string naming the value `x`), and `ticks` picks the tick positions. `orientation`, an [ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) member, is the older control: with no `location`, a vertical bar sits on the right and a horizontal one on top; when both are given, `location` wins. Under the table, captioned and ticked every 5 °C, the bar reads like a legend; the month names need no axis label, which would otherwise print below the bar.
+
+```
+from datachart.constants import COLORBAR_LOCATION
+
+Heatmap(
+    data=temperatures,
+    title="Mean monthly temperature",
+    ylabel="City",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_colorbars=True,
+    # a captioned colorbar under the table, ticked every 5 degrees
+    colorbar={
+        "location": COLORBAR_LOCATION.BOTTOM,
+        "label": "Temperature (°C)",
+        "format": "{x:.0f}°",
+        "ticks": [-5, 0, 5, 10, 15, 20, 25],
+    },
 ).show()
 ```
 
 ### Heatmap style
 
-To change the heatmap style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.HeatmapStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HeatmapStyleAttrs) type, which contains the following attributes:
+The colormap is the style choice that matters most, because it decides what the reader sees as "a lot". A sequential colormap such as `COLORS.YlOrRd` or `COLORS.Blues` runs from light to dark and suits a magnitude, where more is simply more. A diverging colormap such as `COLORS.Coolwarm` or `COLORS.RdBu` runs through a neutral middle and suits signed values around a meaningful midpoint ([Normalization](#normalization) shows how to place that midpoint). `plot_heatmap_cmap` takes a [COLORS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORS) member or a list of hex colors, and the [Colormaps](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/colormaps/index.md) guide renders them all.
 
-| Attribute                    | Description                                                                     |
-| ---------------------------- | ------------------------------------------------------------------------------- |
-| `"plot_heatmap_cmap"`        | The colormap used to draw the heatmap (a palette name or a list of hex colors). |
-| `"plot_heatmap_alpha"`       | The alpha of the heatmap (how visible it is).                                   |
-| `"plot_heatmap_font_size"`   | The font size of the cell values.                                               |
-| `"plot_heatmap_font_color"`  | The font color of the cell values.                                              |
-| `"plot_heatmap_font_style"`  | The font style of the cell values (normal, italic, etc.).                       |
-| `"plot_heatmap_font_weight"` | The font weight of the cell values (normal, bold, etc.).                        |
-| `"plot_heatmap_frame_color"` | The color of the frame drawn around the heatmap.                                |
-| `"plot_heatmap_edge_width"`  | The width of the borders drawn between the cells (0, the default, draws none).  |
-| `"plot_heatmap_edge_color"`  | The color of the borders drawn between the cells.                               |
-
-Again, to help with the style settings, the [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) module contains the following constants:
-
-| Constant                                                                                                                           | Description                            |
-| ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| [datachart.constants.COLORS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORS)           | The predefined colormaps.              |
-| [datachart.constants.FONT_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FONT_STYLE)   | The font style (normal, italic, etc.). |
-| [datachart.constants.FONT_WEIGHT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FONT_WEIGHT) | The font weight (normal, bold, etc.).  |
-
-The colormap is the style choice that matters most. Sequential palettes such as `COLORS.Blues` or `COLORS.YlOrRd` run from light to dark and suit values with a natural zero; diverging palettes such as `COLORS.Coolwarm` or `COLORS.RdBu` run through a neutral middle and suit values with a meaningful center. All predefined palettes are rendered in the [Colormaps](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/colormaps/index.md) guide. The cells touch by default; a `plot_heatmap_edge_width` above zero draws borders between them in the `plot_heatmap_edge_color`, which separates neighboring cells of similar shade. Any attribute you leave out keeps the value of the active theme.
+The other attributes set the transparency (`plot_heatmap_alpha`), the look of the cell values (`plot_heatmap_font_size`, `plot_heatmap_font_color`, `plot_heatmap_font_style` with [FONT_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FONT_STYLE), `plot_heatmap_font_weight` with [FONT_WEIGHT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FONT_WEIGHT)), the frame around the table (`plot_heatmap_frame_color`), and the borders between the cells (`plot_heatmap_edge_width`, 0 by default, and `plot_heatmap_edge_color`). Thin white borders separate neighboring cells of similar shade, which the flat Singapore row needs. Any attribute left out keeps the value of the active theme. `show_grid` ([SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)) draws the axis grid, which runs through the cell centers, so borders are the better way to separate cells.
 
 ```
-from datachart.constants import COLORS, FONT_STYLE, FONT_WEIGHT
-```
+from datachart.constants import COLORS, FONT_WEIGHT
 
-```
 Heatmap(
     data=temperatures,
-    # define the style of the heatmap
     style={
+        # a sequential colormap: warmer is darker
         "plot_heatmap_cmap": COLORS.YlOrRd,
         "plot_heatmap_alpha": 0.9,
+        # small bold cell values
         "plot_heatmap_font_size": 7,
-        "plot_heatmap_font_style": FONT_STYLE.ITALIC,
         "plot_heatmap_font_weight": FONT_WEIGHT.BOLD,
-        "plot_heatmap_frame_color": "#b5442c",
-        "plot_heatmap_edge_width": 1,
+        # white borders between the cells, a dark red frame around them
+        "plot_heatmap_edge_width": 1.5,
         "plot_heatmap_edge_color": "#FFFFFF",
+        "plot_heatmap_frame_color": "#7f2704",
     },
-    title="Mean monthly temperature",
+    title="Mean monthly temperature (°C)",
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -305,18 +201,18 @@ Heatmap(
 
 ### Normalization
 
-The colors of a heatmap come from a two-step mapping: the values are first normalized to the 0–1 range, then each normalized value picks its color from the colormap. Both steps can be adjusted.
+The colors come from a two-step mapping: each value is first normalized to the 0 to 1 range, then picks its color from the colormap. Both steps can be tuned, and each tuning is a claim about the data, so it should be an honest one.
 
-**Value range.** By default the smallest value in the matrix maps to the first color and the largest to the last. The `vmin` and `vmax` attributes pin those endpoints instead. With a diverging colormap this is what puts the neutral middle color on a meaningful value: the temperatures run from −6.7 to 28.5 °C, so with the default range the white center of `COLORS.Coolwarm` would land on about 11 °C. Pinning the range to −30 … 30 °C places it on the freezing point, and every blue cell is a month below zero.
+**Value range.** By default the smallest value maps to the first color and the largest to the last. `vmin` and `vmax` pin the endpoints instead. With a diverging colormap this is what places the neutral middle on a meaningful value: the temperatures run from −6.7 to 28.5 °C, so the white center of `COLORS.Coolwarm` would land on about 11 °C, a value that means nothing. A range of −30 to 30 °C centers it on freezing, and every blue cell is now a month below zero. Pinning the range is also how two heatmaps get comparable colors (see [Example 3](#example-3-did-fine-tuning-fix-the-confusion-shared-value-range-and-a-grid)).
 
 ```
 Heatmap(
     data=temperatures,
+    # a diverging colormap, centered on 0 °C by a symmetric range
     style={"plot_heatmap_cmap": COLORS.Coolwarm},
-    # pin the value range so that 0 °C sits in the middle of the colormap
     vmin=-30,
     vmax=30,
-    title="Mean monthly temperature",
+    title="Mean monthly temperature (°C), centered on freezing",
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -326,31 +222,19 @@ Heatmap(
 ).show()
 ```
 
-**Normalization.** The `norm` attribute changes how the values are spread over the 0–1 range. The possible options are:
+**Normalization.** `norm` changes how the values spread over the 0 to 1 range, with a [NORMALIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE) member: `LINEAR` (the default); `LOG`, for positive values spanning orders of magnitude, where zero and negative values have no logarithm and are left blank; `SYMLOG` and `ASINH`, which are linear near zero and logarithmic beyond, so they keep zeros and signed values; and `LOGIT`, for proportions strictly between 0 and 1. It rescales the colors, not an axis, unlike the `scalex` and `scaley` of the other charts.
 
-| Option     | Description                                                                       |
-| ---------- | --------------------------------------------------------------------------------- |
-| `"linear"` | Linear normalization (the default).                                               |
-| `"log"`    | Log normalization. Non-positive values have no logarithm and are left blank.      |
-| `"symlog"` | Symmetric log normalization: linear near zero, logarithmic beyond.                |
-| `"asinh"`  | Inverse hyperbolic sine normalization: like `"symlog"`, with a smooth transition. |
-| `"logit"`  | Logit normalization, for values strictly between 0 and 1.                         |
-
-Again, `datachart` provides a [datachart.constants.NORMALIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE) constant, which contains the supported options. Note that `norm` is distinct from the `scalex` and `scaley` attributes of the other charts, which scale an axis — here it is the colors that are rescaled.
-
-A non-linear normalization earns its place on skewed data. The `precipitation` matrix runs from Cairo's rain-free summer to Singapore's 290 mm December: on the linear normalization Singapore claims the dark end of the colormap and the seasonal cycles of the other four cities are flattened into pale blues, while the symmetric log normalization spreads the lower values out and the wet and dry seasons of every city show.
+A non-linear normalization is honest when the question is about ratios rather than differences, or when a few large values would otherwise flatten everything else, and the colorbar must stay on so the reader can see the scale is not linear. The `precipitation` table is such a case: Singapore's 290 mm December claims the dark end of a linear colormap, and every other city's wet and dry seasons fade into the same pale shades. A log normalization would blank Cairo's rainless months; `SYMLOG` keeps them and spreads the low end, so Cairo's wet winter and dry summer show, at the price of compressing the differences between the wetter cities. The colorbar makes that trade visible, which is why it stays on.
 
 ```
 from datachart.constants import NORMALIZE
-```
 
-```
 for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
     Heatmap(
         data=precipitation,
-        # change how the values are spread over the colormap
+        # how the values spread over the colormap
         norm=norm,
-        title=f"Mean monthly precipitation with the '{norm}' normalization",
+        title=f"Mean monthly precipitation (mm), '{norm}' normalization",
         xlabel="Month",
         ylabel="City",
         figsize=FIG_SIZE.FULL_MEDIUM,
@@ -362,115 +246,224 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
 
 ### Emphasis
 
-A heatmap has no series to mute, so the `emphasis` attribute of the series charts raises a `ValueError` here. Emphasis works per cell instead: `data` takes an optional `emphasis` grid aligned with `z`, one role per cell. A `"background"` cell fades to the theme's `muted_alpha`, so it still reads on the colormap; a `"highlight"` cell is outlined in the text color; `None` leaves a cell unchanged.
-
-To pick the cells from the values instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every cell whose value matches and mutes the rest. A blank cell never matches, and a role in the `emphasis` grid wins over the rule. To draw attention to a value range without muting, use the tools above — a diverging colormap with a pinned value range, or `vmin` and `vmax`. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
-
-## Multiple Heatmap Charts
-
-To create multiple heatmaps, pass a list of grids to the `data` argument. Each grid is drawn in its own subplot — two rasters cannot share one set of axes — with the `subtitle` at the top of each subplot and the `title`, `xlabel` and `ylabel` positioned to be global for all charts. Per-chart attributes like `subtitle`, `style`, `valfmt`, `norm`, `vmin`, `vmax` and `colorbar` can be passed as lists, where each element corresponds to a chart; a single value applies to every chart.
-
-Multiple charts pattern
-
-For multiple charts, `data` becomes a list of grids, and per-chart attributes like `subtitle`, `style` and `valfmt` become lists where each element applies to the corresponding chart.
-
-The example draws the temperatures and the precipitation of the six cities side by side. The two grids hold different quantities, so each gets its own subtitle and its own colormap through a list of `style` dictionaries (`None` keeps the theme style for that chart). Twelve columns side by side leave no room for the cell values; the next section stacks the charts and writes them in.
+A heatmap shows every cell with the same weight, but a question is usually about a few of them. A heatmap has no series to mute, so the `emphasis` parameter of the series charts raises a `ValueError`; emphasis works per cell instead. `emphasis_rule` picks the cells from their values with a one-key rule: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}`. The matching cells are outlined, the rest fade to the theme's muted alpha and still read on the colormap, and a blank cell never matches. Asking which months average below freezing picks out Moscow's long winter and a single Reykjavik month:
 
 ```
 Heatmap(
-    # use a list of grids to define multiple heatmaps
-    data=[temperatures, precipitation],
-    # add a subtitle to each chart
-    subtitle=["Temperature (°C)", "Precipitation (mm)"],
-    # style can be a list (one per chart) or a single dict (applies to all)
-    style=[
-        {"plot_heatmap_cmap": COLORS.YlOrRd},
-        None,  # keep the theme style for the second chart
-    ],
-    title="Monthly climate",
+    data=temperatures,
+    # highlight the months below freezing, mute the rest
+    emphasis_rule={"below": 0},
+    title="Months with a mean temperature below 0 °C",
     xlabel="Month",
     ylabel="City",
-    xtickrotate=90,
     figsize=FIG_SIZE.FULL_MEDIUM,
+    show_heatmap_values=True,
+    valfmt=VALUE_FORMAT.DECIMAL,
+).show()
+```
+
+When the cells to mark do not follow from one threshold, `data` takes an `emphasis` grid aligned with `z`, one role per cell: `"highlight"`, `"background"`, or `None` to leave the cell as it is ([EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)). A role in the grid wins over the rule. Marking each city's warmest month, and muting the rest, shows Sydney's summer at the start of the year, Singapore's in May and June, and Cairo's July and August tied; the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide covers emphasis across every chart.
+
+```
+# each city's warmest month highlighted, every other cell muted
+warmest = [
+    ["highlight" if value == max(row) else "background" for value in row]
+    for row in TEMPERATURES
+]
+
+Heatmap(
+    data={**temperatures, "emphasis": warmest},
+    title="The warmest month of each city",
+    xlabel="Month",
+    ylabel="City",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_heatmap_values=True,
+    valfmt=VALUE_FORMAT.DECIMAL,
+).show()
+```
+
+### Text annotations
+
+A pattern that surprises the reader deserves a sentence. `texts` places a note on the chart; its position is in data coordinates by default, where a cell sits at (column index, row index), or in axes fractions with `"coords": "axes"`, and a `target` draws a connector to a cell. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement and styling ([TextSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextSettingAttrs)). The note below explains why Sydney's row runs backwards.
+
+```
+Heatmap(
+    data=temperatures,
+    style={"plot_heatmap_cmap": COLORS.Coolwarm},
+    vmin=-30,
+    vmax=30,
+    # a note pointing at Sydney's July, the middle of its winter
+    texts={
+        "text": "southern hemisphere:\nwinter in July",
+        "x": 8.5,
+        "y": 1.5,
+        "target": (6, 5),
+    },
+    title="Mean monthly temperature (°C)",
+    xlabel="Month",
+    ylabel="City",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_colorbars=True,
+).show()
+```
+
+## Multiple Heatmaps
+
+To compare several tables, pass a list of dictionaries to `data`. Each table gets its own subplot, since two tables cannot share one set of cells, with its `subtitle` above it, while `title`, `xlabel` and `ylabel` stay global. The per-chart parameters (`subtitle`, `style`, `valfmt`, `norm`, `vmin`, `vmax`, `colorbar`, and the tick parameters) take a list with one entry per table, or a single value for all of them; `None` in a list keeps the default for that table. Temperature and rainfall are different quantities, so each table gets its own colormap and its own normalization.
+
+```
+Heatmap(
+    # one table per subplot
+    data=[temperatures, precipitation],
+    subtitle=["Temperature (°C)", "Precipitation (mm)"],
+    # a colormap and a normalization per table
+    style=[{"plot_heatmap_cmap": COLORS.YlOrRd}, {"plot_heatmap_cmap": COLORS.Blues}],
+    norm=[None, NORMALIZE.SYMLOG],
+    title="The climate of six cities",
+    xlabel="Month",
+    ylabel="City",
+    xticks=[0, 3, 6, 9],
+    xticklabels=["Jan", "Apr", "Jul", "Oct"],
+    figsize=FIG_SIZE.FULL_SHORT,
     show_colorbars=True,
 ).show()
 ```
 
 ### Subplot layout and shared axes
 
-The `max_cols` attribute limits the number of subplots per row — with `max_cols=1` the charts stack vertically, which gives a wide matrix the full figure width and room for the cell values. Like `style`, `valfmt` can be a list with one format per chart: the temperatures keep their decimal place, the precipitation is written as integers. To share the x-axis and/or y-axis across subplots, add the `sharex` and/or `sharey` attributes, which are boolean values that specify whether to share the axis across all subplots; a shared axis is labeled once, on the outer subplots only.
+Side by side, twelve columns each leave no room for the cell values. `max_cols` limits the subplots per row, so `max_cols=1` stacks the tables and gives each the full width. `sharex` and `sharey` share an axis across subplots and label it once, on the outer subplots; both tables have the same months, so `sharex=True` drops the repeated month labels. `valfmt` as a list keeps the decimal on the temperatures and writes the rainfall as whole numbers.
 
 ```
-figure = Heatmap(
+Heatmap(
     data=[temperatures, precipitation],
     subtitle=["Temperature (°C)", "Precipitation (mm)"],
-    style=[
-        {"plot_heatmap_cmap": COLORS.YlOrRd},
-        None,
-    ],
-    # format the values of each chart on its own
+    style=[{"plot_heatmap_cmap": COLORS.YlOrRd}, {"plot_heatmap_cmap": COLORS.Blues}],
+    norm=[None, NORMALIZE.SYMLOG],
+    # one format per table
     valfmt=[VALUE_FORMAT.DECIMAL, VALUE_FORMAT.INTEGER],
-    title="Monthly climate",
+    title="The climate of six cities",
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_TALL,
     show_colorbars=True,
     show_heatmap_values=True,
-    # stack the charts in one column
+    # stack the tables, one month axis for both
     max_cols=1,
-    # share the x-axis across subplots
     sharex=True,
-)
-figure.show()
+).show()
 ```
 
-## Saving the Chart as an Image
+## Additional Features
 
-To save the chart as an image, use the [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.save_figure) function.
+### Blank cells
 
-```
-from datachart.utils import save_figure
-```
+Real tables have holes: a station that was not yet running, a pair of variables never measured together. A `None` in `z` leaves its cell blank, which is honest, where a zero would claim a value. `monthly_2024`, defined in a hidden cell, holds illustrative monthly temperatures of three weather stations in 2024; the newest station started recording in April, so its first three months are `None`.
 
 ```
-save_figure(figure, "./fig_heatmap.png", dpi=300)
+Heatmap(
+    # None cells stay blank
+    data=monthly_2024,
+    title="Monthly mean temperature in 2024 (°C)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_heatmap_values=True,
+    valfmt=VALUE_FORMAT.DECIMAL,
+).show()
 ```
 
-The figure should be saved in the current working directory.
+### Axis range
+
+A large table often has one interesting corner. `xmin`, `xmax`, `ymin` and `ymax` crop the view in cell indices, where a cell spans half a unit on either side of its index: `xmin=-0.5` and `xmax=2.5` keep the first three columns whole. The first row is drawn at the top, so the row limits run the other way: `ymin=2.5` and `ymax=-0.5` keep the first three rows in their order. Cropped to the first three months and the three European cities, the chart shows only where winter bites. The colormap still spans the whole table, so the colors stay comparable with the full chart.
+
+```
+Heatmap(
+    data=temperatures,
+    style={"plot_heatmap_cmap": COLORS.Coolwarm},
+    vmin=-30,
+    vmax=30,
+    # January to March
+    xmin=-0.5,
+    xmax=2.5,
+    # the first three rows, the first row on top
+    ymin=2.5,
+    ymax=-0.5,
+    title="Winter in Europe (°C)",
+    figsize=FIG_SIZE.HALF_SQUARE,
+    show_colorbars=True,
+).show()
+```
+
+### Date labels
+
+Rows or columns are often dates: months, weeks, years. `x` and `y` can hold real temporal objects (`datetime`, `date`, `numpy.datetime64`, or a pandas `Timestamp`); the cells keep their grid positions, and the dates print through `xticks_format` or `yticks_format`, a [DATE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern. The same `monthly_2024` table, labelled by the first day of each month, prints the months with their year.
+
+```
+from datetime import date
+
+from datachart.constants import DATE_FORMAT
+
+Heatmap(
+    # the first day of each month as the column labels
+    data={**monthly_2024, "x": [date(2024, month, 1) for month in range(1, 13)]},
+    title="Monthly mean temperature in 2024 (°C)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    # print the dates as year and month
+    xticks_format=DATE_FORMAT.YEAR_MONTH,
+    xtickrotate=45,
+).show()
+```
 
 ## Real-World Examples
 
-The following examples put the features above to work on real or realistic data. Each one states what its data is and where it comes from; the data itself lives in a hidden cell.
+The examples below put the features above to work, each one answering a question. The data lives in hidden cells; each example says what its data is and where it comes from.
 
-### Example 1: Correlation Matrix (Diverging Colormap and Pinned Value Range)
+### Example 1: How Do Penguin Measurements Move Together? (Diverging Colormap, Pinned Range, and a Note)
 
-`correlations` holds the Pearson correlation between the four body measurements — bill length, bill depth, flipper length and body mass — of the 342 penguins of the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0). A correlation matrix is the textbook case for a diverging colormap: the sign matters as much as the size, so `COLORS.Coolwarm` is pinned to the −1 … 1 range with `vmin` and `vmax`, which puts white on zero and the same shade on equal correlations of either sign. The variable names label both axes, `VALUE_FORMAT.DECIMAL_2` writes the coefficients into the cells, and `ASPECT_RATIO.EQUAL` keeps the matrix square.
+`correlations` holds the Pearson correlation between four body measurements (bill length, bill depth, flipper length and body mass) of the 342 penguins in the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0). A correlation is signed, so the chart needs a diverging colormap whose white middle sits on zero: `COLORS.RdBu` pinned to the −1 to 1 range with `vmin` and `vmax` gives equally strong correlations of either sign equally dark shades. The variables label both axes, square cells keep the matrix symmetric, and the cells carry the coefficients. One cell is a known trap: bill length and depth correlate negatively across all penguins but positively within each species, a case of Simpson's paradox, and a note says so.
 
 ```
 Heatmap(
     data=correlations,
     # a diverging colormap, pinned so that zero sits on white
-    style={"plot_heatmap_cmap": COLORS.Coolwarm},
+    style={
+        "plot_heatmap_cmap": COLORS.RdBu,
+        "plot_heatmap_edge_width": 1,
+        "plot_heatmap_edge_color": "#FFFFFF",
+    },
     vmin=-1,
     vmax=1,
+    # a note on the bill length and depth cell
+    texts={
+        "text": "positive within\neach species",
+        "x": 0.2,
+        "y": -0.95,
+        "target": (1, 0),
+    },
     title="Correlation of Palmer penguin measurements",
-    # the variable names come from the `x` and `y` labels of the data
-    xtickrotate=45,
+    xtickrotate=30,
     figsize=FIG_SIZE.SQUARE,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     show_colorbars=True,
+    colorbar={"label": "Pearson r", "ticks": [-1, -0.5, 0, 0.5, 1]},
     show_heatmap_values=True,
     valfmt=VALUE_FORMAT.DECIMAL_2,
 ).show()
 ```
 
-### Example 2: Confusion Matrix (Integer Cell Values and Class Labels)
+### Example 2: Which Topics Does the Classifier Confuse? (Integer Cells and an Emphasis Grid)
 
-`confusion` holds the illustrative confusion matrix of a topic classifier evaluated on 1,000 news articles, 250 in each of four topics: each row is the true topic, each column the predicted one, and each cell the number of articles. The diagonal holds the correct predictions; the off-diagonal cells show which topics get mixed up — here business and politics articles for one another. The class names label both axes, `VALUE_FORMAT.INTEGER` writes the counts into the cells, and the sequential default colormap makes the diagonal stand out. The colorbar is left out — the cell values already carry the numbers.
+`confusion` holds the illustrative confusion matrix of a topic classifier evaluated on 1,000 news articles, 250 per topic: each row is the true topic, each column the predicted one, and each cell a count of articles. The diagonal holds the correct predictions; the question is where the errors go. An `emphasis` grid highlights the two cells where business and politics articles are mistaken for each other and mutes the rest, so the largest confusion stands out without hiding the other counts. `VALUE_FORMAT.INTEGER` writes the counts, and the colorbar is left out because the cells already carry the numbers.
 
 ```
+# the business-politics mix-ups, both ways
+MIXUPS = {(0, 1), (1, 0)}
+roles = [
+    ["highlight" if (i, j) in MIXUPS else "background" for j in range(4)]
+    for i in range(4)
+]
+
 Heatmap(
-    data=confusion,
+    data={**confusion, "emphasis": roles},
+    style={"plot_heatmap_cmap": COLORS.Blues},
     title="Topic classifier on 1,000 news articles",
     xlabel="Predicted topic",
     ylabel="True topic",
@@ -482,63 +475,54 @@ Heatmap(
 ).show()
 ```
 
-### Example 3: Contributions Calendar (Blank Cells, Sparse Ticks and Skewed Counts)
+### Example 3: Did Fine-Tuning Fix the Confusion? (Shared Value Range and a Grid)
 
-`contributions` holds the number of commits on each day of 2025 by one illustrative developer, drawn from a seeded generator: most weekdays see a few commits, weekends rarely any, and two release weeks in March and September see a burst of them. The matrix is laid out like the GitHub contributions graph — one row per weekday from Monday to Sunday, one column per week of the year — and the days before January 1 and after December 31 in the first and last week are `None`, so they are left blank. The calendar only makes sense with square cells (`ASPECT_RATIO.EQUAL`) and a wide, short figure; `yticks` label every other weekday, `xticks` mark the week each month starts in (`month_weeks`, computed in the hidden cell), the colormap is GitHub's green scale passed as a list of hex colors, and white cell borders (`plot_heatmap_edge_width` and `plot_heatmap_edge_color`) stand in for the gaps between GitHub's squares. The release weeks would drown the everyday commits on a linear colormap, so `NORMALIZE.ASINH` spreads the low counts over the greens. There is no colorbar: the calendar is read by pattern, not by value.
-
-!!! tip "The calendar heatmap does this for you" [datachart.charts.CalendarHeatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/calendarheatmap.ipynb) takes the dates and values directly and lays out the weeks, month separators, and labels itself; this example shows what the layout is made of.
+`fine_tuned` holds the illustrative confusion matrix of a fine-tuned version of the Example 2 classifier, evaluated on the same 1,000 articles. The question is whether the business and politics mix-ups shrank. The two matrices are drawn as two heatmaps with the same `vmin` and `vmax`, pinned to the 0 to 250 range, so an equally dark cell means an equally large count in either one; without it, each matrix would stretch its own colormap and the shades would not compare. [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) sets them side by side and adds a bar chart of each topic's recall (the share of its 250 articles classified correctly) underneath, which states the improvement in one number per topic.
 
 ```
-# the green scale of the GitHub contributions graph, from no commits to many
-GITHUB_GREENS = ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"]
+from datachart.charts import BarChart
+from datachart.constants import LEGEND_LOCATION, SHOW_GRID
+from datachart.utils import Grid
 
-Heatmap(
-    data={"z": contributions},
-    style={
-        "plot_heatmap_cmap": GITHUB_GREENS,
-        # white borders separate the days like the gaps in the GitHub graph
-        "plot_heatmap_edge_width": 1,
-        "plot_heatmap_edge_color": "#FFFFFF",
-    },
-    # spread the everyday counts over the colormap despite the release weeks
-    norm=NORMALIZE.ASINH,
-    title=f"Contributions in {YEAR}",
-    # label every other weekday
-    yticks=[0, 2, 4],
-    yticklabels=["Mon", "Wed", "Fri"],
-    # mark the week each month starts in
-    xticks=month_weeks,
-    xticklabels=MONTHS,
-    figsize=(9.7, 2.0),
-    aspect_ratio=ASPECT_RATIO.EQUAL,
-    show_colorbars=False,
-).show()
-```
 
-### Example 4: Comparing Two Classifiers (Multiple Heatmaps and a Shared Value Range)
+def matrix(data, title, ylabel=None):
+    # one value range for every matrix, so the shades compare
+    return Heatmap(
+        data=data,
+        style={"plot_heatmap_cmap": COLORS.Blues},
+        vmin=0,
+        vmax=250,
+        title=title,
+        xlabel="Predicted topic",
+        ylabel=ylabel,
+        xtickrotate=30,
+        aspect_ratio=ASPECT_RATIO.EQUAL,
+        show_heatmap_values=True,
+        valfmt=VALUE_FORMAT.INTEGER,
+    )
 
-`confusions` holds the illustrative confusion matrices of two topic classifiers evaluated on the same 1,000 news articles as Example 2: the baseline model and a fine-tuned one. The question is whether the fine-tuning cleared up the business–politics confusion, so the two matrices are drawn side by side as multiple heatmaps, named with a list of `subtitle` and styled with a list of `style` dictionaries — grey for the baseline, blue for the new model. A single `vmin` and `vmax` pins both charts to the same 0 … 250 range, so an equally dark cell means an equally large count in either chart; `sharey` labels the true topics once.
 
-```
-Heatmap(
-    data=confusions,
+recalls = BarChart(
+    data=recall,
     subtitle=["Baseline", "Fine-tuned"],
-    style=[
-        {"plot_heatmap_cmap": COLORS.Greys},
-        {"plot_heatmap_cmap": COLORS.Blues},
+    style=[{"plot_bar_color": "#b0b7c3"}, {"plot_bar_color": "#2171b5"}],
+    title="Recall per topic",
+    ylabel="Recall",
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+    legend={"title": "Model", "location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+    ymin=0,
+    ymax=1.1,
+    show_values=True,
+    value_format=VALUE_FORMAT.PERCENT_INT,
+)
+
+Grid(
+    [
+        [matrix(confusion, "Baseline", ylabel="True topic"), matrix(fine_tuned, "Fine-tuned")],
+        [recalls],
     ],
-    # the same value range for both charts, so the shades are comparable
-    vmin=0,
-    vmax=250,
-    title="Topic classifiers on 1,000 news articles",
-    xlabel="Predicted topic",
-    ylabel="True topic",
-    xtickrotate=45,
-    figsize=(6.3, 4.0),
-    aspect_ratio=ASPECT_RATIO.EQUAL,
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.INTEGER,
-    # label the true topics once
-    sharey=True,
+    title="Fine-tuning the topic classifier",
+    figsize=FIG_SIZE.FULL_TALL,
 ).show()
 ```

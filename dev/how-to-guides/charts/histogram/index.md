@@ -1,93 +1,24 @@
 # Histogram
 
-This section showcases the histogram. It contains examples of how to create histograms using the [datachart.charts.Histogram](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.Histogram) function.
+A histogram sorts the values of one numeric variable into bins and counts them, so it answers *what shape does this distribution have*: where the values pile up, how widely they spread, whether they lean to one side, have two peaks, or trail off into outliers. This guide shows how to create histograms with the [datachart.charts.Histogram](https://eriknovak.github.io/datachart/dev/references/charts/histogram/#datachart.charts.Histogram) function, starting with the basics and building up to worked examples on real data.
 
 Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-histogram), which maps common tasks to the parameter or style attribute that does the job.
-
-As mentioned above, the histograms are created using the `Histogram` function found in the [datachart.charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md) module. Let's import it:
 
 ```
 from datachart.charts import Histogram
 ```
 
-## Histogram Input Attributes
-
-The `Histogram` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the values to bin. For a single histogram, `data` is a list of dictionaries. For multiple histograms, `data` is a list of lists.
-
-```
-Histogram(
-    data=[{                                             # A list of histogram data points (or list of lists for multiple charts)
-        "x":    Union[int, float],                      # The value to bin
-    }],
-    style={                                             # The style of the histogram (optional)
-        "plot_hist_color":         Optional[str],       # The color of the histogram (hex color code)
-        "plot_hist_alpha":         Optional[float],     # The alpha of the histogram (how visible it is)
-        "plot_hist_zorder":        Optional[int],       # The zorder of the histogram
-        "plot_hist_fill":          Optional[bool],      # Whether the bars are filled
-        "plot_hist_hatch":         Optional[HATCH_STYLE], # The hatch pattern of the bars
-        "plot_hist_type":          Optional[HISTOGRAM_TYPE], # The histogram type (bar, step, etc.)
-        "plot_hist_align":         Optional[str],       # The bar alignment within the bin ("left", "mid", "right")
-        "plot_hist_edge_width":    Optional[float],     # The edge width of the bars
-        "plot_hist_edge_color":    Optional[str],       # The edge color of the bars (hex color code)
-        "plot_xticks_label_rotate": Optional[float],    # The x-axis tick label rotation
-        "plot_yticks_label_rotate": Optional[float],    # The y-axis tick label rotation
-    },
-    subtitle=Optional[str],                             # The subtitle of the chart (or list for multiple charts)
-    emphasis=Optional[str],                             # "highlight" or "background" (or list for multiple charts)
-    emphasis_rule=Optional[dict],                       # One-key rule on a per-series summary; optional "by": mean, median, min, max, sum
-    title=Optional[str],                                # The title of the chart
-    xlabel=Optional[str],                               # The x-axis label
-    ylabel=Optional[str],                               # The y-axis label
-
-    figsize=Optional[Tuple[float, float]],              # The figure size in inches
-    show_grid=Optional[str],                            # Which grid lines to show ("both", "x", "y")
-    aspect_ratio=Optional[str],                         # The aspect ratio of the axes ("auto", "equal")
-    show_legend=Optional[bool],                         # Whether to show the legend
-    num_bins=Optional[int],                             # The number of bins (default: 20)
-    orientation=Optional[str],                          # The orientation of the bars ("vertical", "horizontal")
-    show_density=Optional[bool],                        # Whether to show the density instead of the count
-    show_cumulative=Optional[bool],                     # Whether to show the cumulative distribution
-
-    subplots=Optional[bool],                            # Whether to draw each chart in its own subplot
-    max_cols=Optional[int],                             # Maximum number of subplots per row
-    sharex=Optional[bool],                              # Whether subplots share the x-axis
-    sharey=Optional[bool],                              # Whether subplots share the y-axis
-    scalex=Optional[str],                               # The x-axis scale ("linear", "log", "symlog", "asinh")
-    scaley=Optional[str],                               # The y-axis scale ("linear", "log", "symlog", "asinh")
-    xmin=Optional[Union[int, float]],                   # The x-axis range
-    xmax=Optional[Union[int, float]],
-    ymin=Optional[Union[int, float]],                   # The y-axis range
-    ymax=Optional[Union[int, float]],
-
-    xticks=Optional[List[Union[int, float]]],           # the x-axis ticks
-    xticklabels=Optional[List[str]],                    # the x-axis tick labels (must be same length as xticks)
-    xtickrotate=Optional[int],                          # the x-axis tick labels rotation
-    yticks=Optional[List[Union[int, float]]],           # the y-axis ticks
-    yticklabels=Optional[List[str]],                    # the y-axis tick labels (must be same length as yticks)
-    ytickrotate=Optional[int],                          # the y-axis tick labels rotation
-
-    vlines=Optional[Union[dict, List[dict]]],           # the vertical lines
-    hlines=Optional[Union[dict, List[dict]]],           # the horizontal lines
-    vspans=Optional[Union[dict, List[dict]]],           # the vertical reference bands
-    hspans=Optional[Union[dict, List[dict]]],           # the horizontal reference bands
-
-    x=Optional[str],                                    # the key holding the value to bin (default: "x")
-)
-```
-
-For more details, see the [datachart.charts.Histogram](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.Histogram) function.
-
 ## Basics
 
-The examples in this guide share one dataset: the flipper length (in millimeters) and body mass (in grams) of the 342 penguins of the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset, measured on three islands of the Palmer Archipelago, Antarctica, and released under CC0. The data is hard-coded in a hidden cell; `penguins` holds one point per penguin, and `penguins_by_species` holds one list per species — Adelie, Chinstrap and Gentoo — in the order of `SPECIES`.
+The examples in this guide share one dataset: the flipper length, in millimeters, of the 342 penguins measured on three islands of the Palmer Archipelago, Antarctica (source: the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset, Gorman, Williams and Fraser 2014, released under CC0). The data lives in a hidden cell. `penguins` holds one data point per penguin, and `penguins_by_species` holds one list per species (Adelie, Chinstrap and Gentoo, in the order of `SPECIES`). The pooled flipper lengths hide a story: they come from three species of different build, and the histogram shows it as two peaks that the customizations below bring out.
 
-Each data point is a dictionary with an `x` value — here the flipper length — which the histogram bins and counts. The other keys are carried along and ignored — the histogram reads `x` only:
+Each data point is a dictionary with an `x` value, here the flipper length, which the histogram bins and counts. Other keys, such as the species, are carried along and ignored:
 
 ```
 penguins[:3]
 ```
 
-**Basic example.** Only the `data` argument is required to draw the histogram.
+**Basic example.** Only the `data` argument is required. The values are split into 20 equal-width bins by default, and the two peaks are already visible:
 
 ```
 Histogram(
@@ -100,42 +31,57 @@ Histogram(
 
 Every customization is either a keyword argument of `Histogram` or a `plot_hist_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                              | Use                                                                                        | See                                                           |
-| --------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| add a title and axis labels             | `title`, `xlabel`, `ylabel`                                                                | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| set custom tick positions and labels    | `xticks`, `xticklabels`, `yticks`, `yticklabels`                                           | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| rotate the tick labels                  | `xtickrotate`, `ytickrotate`                                                               | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| fix the axis range                      | `xmin`, `xmax`, `ymin`, `ymax`                                                             | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| resize the figure                       | `figsize`                                                                                  | [Figure size and grid](#figure-size-and-grid)                 |
-| show grid lines                         | `show_grid`                                                                                | [Figure size and grid](#figure-size-and-grid)                 |
-| change how finely the values are binned | `num_bins`                                                                                 | [Number of bins](#number-of-bins)                             |
-| change the bar color or transparency    | `style={"plot_hist_color": ..., "plot_hist_alpha": ...}`                                   | [Histogram style](#histogram-style)                           |
-| draw the histogram as a step outline    | `style={"plot_hist_type": ...}`                                                            | [Histogram style](#histogram-style)                           |
-| hatch or outline the bars               | `style={"plot_hist_hatch": ..., "plot_hist_edge_width": ..., "plot_hist_edge_color": ...}` | [Histogram style](#histogram-style)                           |
-| draw the bars horizontally              | `orientation`                                                                              | [Orientation](#orientation)                                   |
-| print the count at the top of each bin  | `show_values`, `value_format`                                                              | [Value labels](#value-labels)                                 |
-| highlight one series, mute the rest     | `emphasis`                                                                                 | [Emphasis](#emphasis)                                         |
-| highlight the series that match a rule  | `emphasis_rule`                                                                            | [Emphasis](#emphasis)                                         |
-| mark a threshold or a reference value   | `vlines`, `hlines`                                                                         | [Reference lines](#reference-lines)                           |
-| shade a range of values                 | `hspans`, `vspans`                                                                         | [Reference bands](#reference-bands)                           |
-| compare several series in one chart     | `data` as a list of lists, `subtitle`, `show_legend`                                       | [Multiple Histograms](#multiple-histograms)                   |
-| stack or overlay the series             | `bar_mode`                                                                                 | [Multiple Histograms](#multiple-histograms)                   |
-| draw each series in its own subplot     | `subplots`, `sharex`, `sharey`, `max_cols`                                                 | [Subplots](#subplots)                                         |
-| show densities or cumulative counts     | `show_density`, `show_cumulative`                                                          | [Histogram Views](#histogram-views)                           |
-| overlay a smooth density curve          | `stats.kde1d`, `Panel`                                                                     | [Density curve](#density-curve)                               |
-| use a logarithmic axis                  | `scalex`, `scaley`                                                                         | [Axis scales](#axis-scales)                                   |
-| plot data with other key names          | `x`                                                                                        | [Custom data keys](#custom-data-keys)                         |
-| save the chart to a file                | `save_figure`                                                                              | [Saving the Chart as an Image](#saving-the-chart-as-an-image) |
+| I want to…                                   | Use                                                           | See                                                                                                     |
+| -------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| add a title and axis labels                  | `title`, `xlabel`, `ylabel`                                   | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| set tick positions, labels, and rotation     | `xticks`, `xticklabels`, `xtickrotate` (and the `y` versions) | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| fix the axis range                           | `xmin`, `xmax`, `ymin`, `ymax`                                | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| resize the figure                            | `figsize`                                                     | [Figure size and grid](#figure-size-and-grid)                                                           |
+| show grid lines                              | `show_grid`                                                   | [Figure size and grid](#figure-size-and-grid)                                                           |
+| fix the aspect ratio of the axes             | `aspect_ratio`                                                | [Figure size and grid](#figure-size-and-grid)                                                           |
+| change how finely the values are binned      | `num_bins`                                                    | [Number of bins](#number-of-bins)                                                                       |
+| draw the bins as bars or a step outline      | `style={"plot_hist_type": ...}`                               | [Histogram style](#histogram-style)                                                                     |
+| change the color, hatch, or edge of the bins | `style={"plot_hist_color": ..., "plot_hist_hatch": ...}`      | [Histogram style](#histogram-style)                                                                     |
+| draw the bars horizontally                   | `orientation`                                                 | [Orientation](#orientation)                                                                             |
+| print the count at the top of each bin       | `show_values`, `value_format`                                 | [Value labels](#value-labels)                                                                           |
+| mark a mean, a median, or a cut-off          | `vlines`, `hlines`                                            | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| shade a range of values                      | `vspans`, `hspans`                                            | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| put a note on the chart                      | `texts`                                                       | [Text annotations](#text-annotations)                                                                   |
+| compare several distributions in one chart   | `data` as a list of lists, `subtitle`, `style`, `show_legend` | [Multiple Histograms](#multiple-histograms)                                                             |
+| stack or overlay the series                  | `bar_mode`                                                    | [Bar mode](#bar-mode)                                                                                   |
+| highlight one series, mute the rest          | `emphasis`, `emphasis_rule`                                   | [Emphasis](#emphasis)                                                                                   |
+| title and place the legend                   | `legend`                                                      | [Legend](#legend)                                                                                       |
+| draw each series in its own subplot          | `subplots`, `sharex`, `sharey`, `max_cols`                    | [Subplots](#subplots)                                                                                   |
+| compare samples of different sizes           | `show_density`                                                | [Density view](#density-view)                                                                           |
+| overlay a smooth density curve               | `stats.kde1d`, `LineChart`, `Panel`                           | [Density curve](#density-curve)                                                                         |
+| read off how many values fall below a value  | `show_cumulative`                                             | [Cumulative view](#cumulative-view)                                                                     |
+| use a logarithmic axis                       | `scaley`, `scalex`                                            | [Axis scales](#axis-scales)                                                                             |
+| plot data with other key names               | `x`                                                           | [Custom data keys](#custom-data-keys)                                                                   |
+| save the chart to a file                     | `save_figure`                                                 | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
-The full list of style attributes is in the [datachart.typings.HistStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HistStyleAttrs) type; the full list of parameters is in the [datachart.charts.Histogram](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.Histogram) reference.
+The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
+
+| Parameter                                    | Constant                                                                                                                                                                                                                                     |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `style={"plot_hist_type": ...}`              | [`HISTOGRAM_TYPE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HISTOGRAM_TYPE)                                                                                                                       |
+| `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
+| `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
+| `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
+| `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
+| `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
+| `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
+| `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
+| `bar_mode`                                   | [`BAR_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BAR_MODE)                                                                                                                                   |
+| `scalex`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+
+The full list of style attributes is in the [datachart.typings.HistStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/histogram/#datachart.typings.HistStyleAttrs) type; the full list of parameters is in the [datachart.charts.Histogram](https://eriknovak.github.io/datachart/dev/references/charts/histogram/#datachart.charts.Histogram) reference.
 
 ### Title, axis labels and ticks
 
-To add the chart title and axis labels, add the `title`, `xlabel` and `ylabel` attributes. The tick positions and their labels can be set with `xticks` and `xticklabels` (or `yticks` and `yticklabels`) — here the flipper length is ticked every 10 mm. Tick labels can be rotated with `xtickrotate` (or `ytickrotate`), and the axis range can be fixed with `xmin`, `xmax`, `ymin` and `ymax`.
+Without a title and axis labels the reader cannot tell what was measured or what the bars count; `title`, `xlabel` and `ylabel` say it. The automatic ticks rarely land on values people think in, so `xticks` places them every 10 mm (`xticklabels` would rename them, and `xtickrotate` would tilt them). `xmin` and `xmax` fix the range of the binned axis, which keeps several charts of the same variable aligned.
 
 ```
-FLIPPER_TICKS = [170, 180, 190, 200, 210, 220, 230]
-
 Histogram(
     data=penguins,
     # add the title
@@ -145,115 +91,70 @@ Histogram(
     ylabel="Number of penguins",
     # tick the flipper length every 10 mm
     xticks=FLIPPER_TICKS,
-    # fix the x-axis range
-    xmin=170,
+    # fix the range of the binned axis
+    xmin=165,
     xmax=235,
 ).show()
 ```
 
 ### Figure size and grid
 
-To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains some of the predefined figure sizes.
+A distribution is wider than it is tall, so a wide, short figure suits it. `figsize` takes a `(width, height)` tuple in inches or one of the presets in [FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE), sized for a full or half page width.
 
-To add the grid, add the `show_grid` attribute. The possible options are:
-
-| Option   | Description                                     |
-| -------- | ----------------------------------------------- |
-| `"both"` | shows both the x-axis and the y-axis gridlines. |
-| `"x"`    | shows only the x-axis grid lines.               |
-| `"y"`    | shows only the y-axis grid lines.               |
-
-Again, `datachart` provides a [datachart.constants.SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) constant, which contains the supported options. For a vertical histogram the counts are read off the y-axis, so `"y"` is usually all the grid a histogram needs.
+The counts are read off the y-axis, so [SHOW_GRID.Y](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) is the grid a vertical histogram needs; `SHOW_GRID.X` and `SHOW_GRID.BOTH` are the other options. `aspect_ratio` ([ASPECT_RATIO](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)) fixes the ratio of the axes rather than of the figure; a histogram has counts on one axis and values on the other, so the examples leave it at the default.
 
 ```
 from datachart.constants import FIG_SIZE, SHOW_GRID
-```
 
-```
 Histogram(
     data=penguins,
     title="Flipper length of Palmer penguins",
     xlabel="Flipper length (mm)",
     ylabel="Number of penguins",
     xticks=FLIPPER_TICKS,
-    # add to determine the figure size
+    # a wide, short figure
     figsize=FIG_SIZE.FULL_SHORT,
-    # add to show the grid lines
+    # grid lines along the count axis only
     show_grid=SHOW_GRID.Y,
 ).show()
 ```
 
 ### Number of bins
 
-The histogram splits the range of the values into equal-width bins and counts the values in each. By default there are 20 bins; the `num_bins` attribute changes that. Fewer bins smooth the distribution, more bins expose its detail — and its noise. The flipper lengths run from 172 to 231 mm: with 8 bins the distribution is reduced to a coarse silhouette, with 40 bins every bin is about 1.5 mm wide and the two peaks — the Adelie and Chinstrap penguins around 190 mm, the Gentoo penguins around 215 mm — stand apart, at the price of jagged bars.
+The bin count decides which story the histogram tells, so it is worth choosing on purpose. `num_bins` sets it (20 by default). The flipper lengths span 172 to 231 mm. With 4 bins, each about 15 mm wide, the two peaks merge into one, and the distribution looks like a single peak with a long right tail. With 20 bins the dip between the peaks shows. With 120 bins each bin is half a millimeter wide, narrower than the whole millimeters the lengths were recorded in, so every other bin is empty and the chart is mostly noise.
 
 ```
-for num_bins in [8, 40]:
+for num_bins in [4, 20, 120]:
     Histogram(
         data=penguins,
-        title=f"Flipper length of Palmer penguins in {num_bins} bins",
+        title=f"Flipper length in {num_bins} bins",
         xlabel="Flipper length (mm)",
         ylabel="Number of penguins",
         xticks=FLIPPER_TICKS,
         figsize=FIG_SIZE.FULL_SHORT,
         show_grid=SHOW_GRID.Y,
-        # change the number of bins
+        # the number of equal-width bins
         num_bins=num_bins,
     ).show()
 ```
 
 ### Histogram style
 
-To change the histogram style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.HistStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HistStyleAttrs) type, which contains the following attributes:
-
-| Attribute                    | Description                                                      |
-| ---------------------------- | ---------------------------------------------------------------- |
-| `"plot_hist_color"`          | The color of the histogram (hex color code).                     |
-| `"plot_hist_alpha"`          | The alpha of the histogram (how visible it is).                  |
-| `"plot_hist_zorder"`         | The zorder of the histogram.                                     |
-| `"plot_hist_fill"`           | Whether the bars are filled.                                     |
-| `"plot_hist_hatch"`          | The hatch pattern of the bars.                                   |
-| `"plot_hist_type"`           | The histogram type (bar, step, etc.).                            |
-| `"plot_hist_align"`          | The bar alignment within the bin (`"left"`, `"mid"`, `"right"`). |
-| `"plot_hist_edge_width"`     | The edge width of the bars.                                      |
-| `"plot_hist_edge_color"`     | The edge color of the bars (hex color code).                     |
-| `"plot_xticks_label_rotate"` | The rotation of the x-axis tick labels.                          |
-| `"plot_yticks_label_rotate"` | The rotation of the y-axis tick labels.                          |
-
-Again, to help with the style settings, the [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) module contains the following constants:
-
-| Constant                                                                                                                                 | Description                    |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| [datachart.constants.HATCH_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HATCH_STYLE)       | The hatch pattern of the bars. |
-| [datachart.constants.HISTOGRAM_TYPE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HISTOGRAM_TYPE) | The histogram type.            |
-
-The histogram type decides how the bins are drawn:
-
-| Type           | Description                                     |
-| -------------- | ----------------------------------------------- |
-| `"bar"`        | One bar per bin (the default).                  |
-| `"step"`       | An unfilled outline that steps from bin to bin. |
-| `"stepfilled"` | A filled outline that steps from bin to bin.    |
-
-The type is a per-series render style; how several series share the axis is the `bar_mode` argument's job (see [Multiple Histograms](#multiple-histograms)). For `"step"` the outline is the mark itself, so it draws in the series color at the theme's line width; `plot_hist_edge_color` and `plot_hist_edge_width` override that explicitly.
-
-The example below changes the color, transparency, hatch, outline and type of the histogram in one go. Any attribute you leave out keeps the value of the active theme.
+The `style` dictionary sets the look of the bins; the attributes are listed in [datachart.typings.HistStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/histogram/#datachart.typings.HistStyleAttrs), and any attribute left out keeps the value of the active theme. `plot_hist_type` takes a [HISTOGRAM_TYPE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HISTOGRAM_TYPE): `BAR` draws one bar per bin (the default), `STEP` an unfilled outline, and `STEP_FILLED` a filled outline with no lines between the bins, which reads as one shape rather than a row of bars. For `STEP` the outline is the mark itself and takes the series color; `plot_hist_edge_color` and `plot_hist_edge_width` override it. A hatch from [HATCH_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HATCH_STYLE) and a dark edge keep the shape readable when printed in greyscale.
 
 ```
 from datachart.constants import HATCH_STYLE, HISTOGRAM_TYPE
-```
 
-```
 Histogram(
     data=penguins,
-    # define the style of the histogram
+    # one filled shape with a hatch and a dark outline
     style={
-        "plot_hist_color": "#e76f51",
-        "plot_hist_alpha": 0.6,
+        "plot_hist_type": HISTOGRAM_TYPE.STEP_FILLED,
+        "plot_hist_color": "#a8dadc",
+        "plot_hist_alpha": 0.8,
         "plot_hist_hatch": HATCH_STYLE.DIAGONAL,
         "plot_hist_edge_width": 1.5,
         "plot_hist_edge_color": "#1d3557",
-        "plot_hist_type": HISTOGRAM_TYPE.STEP_FILLED,
     },
     title="Flipper length of Palmer penguins",
     xlabel="Flipper length (mm)",
@@ -266,38 +167,29 @@ Histogram(
 
 ### Orientation
 
-To draw the bars horizontally, add the `orientation` attribute, which supports the following values:
-
-| Value          | Description                                  |
-| -------------- | -------------------------------------------- |
-| `"vertical"`   | The bars rise from the x-axis (the default). |
-| `"horizontal"` | The bars extend from the y-axis.             |
-
-Again, to help with the settings, the [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) module contains the [datachart.constants.ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) constant. With horizontal bars the binned values sit on the y-axis and the counts on the x-axis, so the axis labels, the ticks and the grid swap places too.
+A horizontal histogram puts the values on the y-axis, which suits a variable people read top to bottom (depth, altitude, age) or a histogram placed beside another chart that shares that axis. `orientation=ORIENTATION.HORIZONTAL` ([ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)) draws the bars from the y-axis; the axis labels, the ticks and the grid swap with it.
 
 ```
 from datachart.constants import ORIENTATION
-```
 
-```
 Histogram(
     data=penguins,
     title="Flipper length of Palmer penguins",
-    # the flipper length is now on the y-axis
+    # the axis labels swap with the orientation
     xlabel="Number of penguins",
     ylabel="Flipper length (mm)",
     yticks=FLIPPER_TICKS,
     figsize=FIG_SIZE.FULL_MEDIUM,
-    # change the grid to match the change in orientation
+    # and so does the grid
     show_grid=SHOW_GRID.X,
-    # change the orientation of the bars
+    # draw the bars from the y-axis
     orientation=ORIENTATION.HORIZONTAL,
 ).show()
 ```
 
 ### Value labels
 
-To print the number of values in each bin at its top, add the `show_values` attribute; `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)). Empty bins stay bare. When several series are stacked, every segment prints its own count at its centre.
+When the reader needs the exact counts, say to check how many penguins fall in the dip between the peaks, `show_values` prints each bin's count at its top, and `value_format` formats it: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant or any `"{x:.1f}"`, `"{:.1f}%"` or `"%g"` style string. Empty bins stay bare. Labels need room, so the example uses fewer bins and extends the count axis a little.
 
 ```
 from datachart.constants import VALUE_FORMAT
@@ -310,161 +202,72 @@ Histogram(
     xticks=FLIPPER_TICKS,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
+    num_bins=12,
+    ymax=75,
     # print the count of every bin
     show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
 ).show()
 ```
 
-### Emphasis
+### Reference lines and bands
 
-When a chart carries several series, the story is often about one of them. The `emphasis` attribute expresses that directly: `"highlight"` thickens the outline of a series and brings it to the front, `"background"` mutes a series (the theme's muted color at a lower alpha, drawn behind the others), and `None` leaves a series unchanged. For multiple charts, `emphasis` is a list aligned with `data`, just like `subtitle` and `style`. Only emphasized-or-unset series appear in the legend — background series drop out of it. The role strings are also available as the [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants.
+A summary statistic means more when it sits on the distribution it summarizes. `vlines` draws a vertical line at a value of the binned variable (a mean, a median, a cut-off) and `hlines` a horizontal one at a count. `vspans` and `hspans` shade a range instead. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend, and a `style`; the keys are listed in [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) and [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs).
 
-Emphasis also changes how the histograms are drawn: when any series carries an emphasis role, the histograms draw individually, overlaid on shared bins, instead of stacked on top of each other — a muted background stacked under the highlight would make no sense.
-
-The example highlights the Gentoo penguins against the other two species. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide for how emphasis works across all chart types and themes.
-
-To pick the histograms from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every histogram whose summary matches and mutes the rest. The summary is the mean of each histogram's own raw `x` values by default; a `"by"` key picks `"median"`, `"min"`, `"max"`, or `"sum"` instead, as in `{"top": 1, "by": "max"}`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
-
-```
-Histogram(
-    data=penguins_by_species,
-    subtitle=SPECIES,
-    # mute the Adelie and Chinstrap penguins, highlight the Gentoo penguins
-    emphasis=["background", "background", "highlight"],
-    title="Flipper length of Palmer penguins",
-    xlabel="Flipper length (mm)",
-    ylabel="Number of penguins",
-    xticks=FLIPPER_TICKS,
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.Y,
-    show_legend=True,
-).show()
-```
-
-### Reference lines
-
-Reference lines mark a threshold or a reference value on the chart.
-
-**Vertical lines.** Use the `vlines` argument with the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
-
-```
-{
-  "x":    Union[int, float],                 # The x-axis value
-  "ymin": Optional[Union[int, float]],       # The minimum y-axis value
-  "ymax": Optional[Union[int, float]],       # The maximum y-axis value
-  "style": {                                 # The style of the line (optional)
-    "plot_vline_color": Optional[str],       # The color of the line (hex color code)
-    "plot_vline_style": Optional[LineStyle], # The line style (solid, dashed, etc.)
-    "plot_vline_width": Optional[float],     # The width of the line
-    "plot_vline_alpha": Optional[float],     # The alpha of the line (how visible the line is)
-  },
-  "label": Optional[str],                    # The label of the line (shown in the legend)
-}
-```
-
-**Horizontal lines.** Use the `hlines` argument with the [datachart.typings.HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) typing, which has the same shape with `y`, `xmin`, `xmax` and `plot_hline_*` style attributes.
-
-On a histogram a vertical line marks a value on the binned axis — a mean, a cut-off, a specification limit — while a horizontal line marks a count. The example marks the mean (201 mm) and the median (197 mm) of the flipper lengths; the gap between the two is the mark of the long-flippered Gentoo penguins pulling the mean to the right. The line labels appear in the legend.
+The example marks the mean (201 mm) and the median (197 mm) and shades one standard deviation around the mean. The mean sits right of the median because the long-flippered Gentoo penguins pull it, and it lands on the slope down into the dip between the peaks: for a two-peaked distribution the "typical" value describes few of the penguins. The taller figure and `ymax` leave the legend room above the bars.
 
 ```
 from datachart.constants import LINE_STYLE
-```
 
-```
-Histogram(
-    data=penguins,
-    # name the series for the legend
-    subtitle="all species",
-    # add vertical lines at the mean and the median flipper length
-    vlines=[
-        {
-            "x": 201,
-            "label": "mean",
-            "style": {
-                "plot_vline_color": "#1d3557",
-                "plot_vline_style": LINE_STYLE.DASHED,
-                "plot_vline_width": 1.5,
-            },
-        },
-        {
-            "x": 197,
-            "label": "median",
-            "style": {
-                "plot_vline_color": "#e9a03b",
-                "plot_vline_style": LINE_STYLE.DOTTED,
-                "plot_vline_width": 1.5,
-            },
-        },
-    ],
-    title="Flipper length of Palmer penguins",
-    xlabel="Flipper length (mm)",
-    ylabel="Number of penguins",
-    xticks=FLIPPER_TICKS,
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.Y,
-    show_legend=True,
-).show()
-```
-
-### Reference bands
-
-A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
-
-On a histogram a vertical band marks a range of the binned value and a horizontal band a range of counts. The example shades one standard deviation around the mean flipper length and keeps the mean itself as a line; the bins to the right of the band are the long-flippered Gentoo penguins.
-
-```
-flippers = [penguin["x"] for penguin in penguins]
+flippers = [point["x"] for point in penguins]
 mean_flipper = sum(flippers) / len(flippers)
+median_flipper = sorted(flippers)[len(flippers) // 2]
 std_flipper = (sum((f - mean_flipper) ** 2 for f in flippers) / len(flippers)) ** 0.5
 
 Histogram(
     data=penguins,
-    subtitle="all species",
-    # shade one standard deviation around the mean flipper length
+    subtitle="penguins",
+    # the mean and the median as lines
+    vlines=[
+        {
+            "x": mean_flipper,
+            "label": "mean",
+            "style": {"plot_vline_color": "#1d3557", "plot_vline_style": LINE_STYLE.DASHED},
+        },
+        {
+            "x": median_flipper,
+            "label": "median",
+            "style": {"plot_vline_color": "#e76f51", "plot_vline_style": LINE_STYLE.DOTTED},
+        },
+    ],
+    # one standard deviation around the mean as a band
     vspans={
         "xmin": mean_flipper - std_flipper,
         "xmax": mean_flipper + std_flipper,
         "label": "mean ± 1 SD",
     },
-    # keep the mean itself as a line
-    vlines={
-        "x": mean_flipper,
-        "label": "mean",
-        "style": {
-            "plot_vline_color": "#1d3557",
-            "plot_vline_style": LINE_STYLE.DASHED,
-            "plot_vline_width": 1.5,
-        },
-    },
     title="Flipper length of Palmer penguins",
     xlabel="Flipper length (mm)",
     ylabel="Number of penguins",
     xticks=FLIPPER_TICKS,
-    figsize=FIG_SIZE.FULL_SHORT,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    ymax=60,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
 ).show()
 ```
 
-## Multiple Histograms
+### Text annotations
 
-To create multiple histograms, pass a list of lists to the `data` argument. Each inner list represents the data for one histogram. Per-chart attributes like `subtitle`, `style` and `emphasis` can be passed as lists, where each element corresponds to a chart.
-
-Multiple charts pattern
-
-For multiple charts, `data` becomes a list of lists, and per-chart attributes like `subtitle` and `style` become lists where each element applies to the corresponding chart.
-
-The `penguins_by_species` dataset is such a list of lists, one series per species. By default, multiple histograms in one chart are binned on shared bins and **stacked** on top of each other, so the outline of the stack is the histogram of all the values together and each color shows a species' share of every bin. Pass `bar_mode="overlay"` to draw the series individually over each other instead. Separate series can also be styled separately: a single `style` dictionary applies to every chart, while a list of dictionaries styles each chart on its own (`None` keeps the theme style for that chart).
+A peak that has an explanation deserves one. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (value, count) or in axes fractions with `"coords": "axes"`. The keys are listed in [TextSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextSettingAttrs), and the [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement and styling. The notes below name the species behind each peak.
 
 ```
 Histogram(
-    # use a list of lists to define multiple histograms
-    data=penguins_by_species,
-    # style can be a list (one per chart) or a single dict (applies to all)
-    style=[
-        {"plot_hist_color": "#e76f51"},
-        {"plot_hist_color": "#2a9d8f"},
-        None,  # keep the theme style for the third chart
+    data=penguins,
+    # one note per peak, each pointing at the top of its peak
+    texts=[
+        {"text": "Adelie and Chinstrap", "x": 172, "y": 40, "target": (191, 38)},
+        {"text": "Gentoo", "x": 224, "y": 36, "target": (216, 27)},
     ],
     title="Flipper length of Palmer penguins",
     xlabel="Flipper length (mm)",
@@ -472,240 +275,264 @@ Histogram(
     xticks=FLIPPER_TICKS,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
+    ymax=50,
 ).show()
 ```
 
-### Sub-chart subtitles
+## Multiple Histograms
 
-We can name each chart by passing a list of subtitles to the `subtitle` argument. In addition, to help with discerning which chart is which, use the `show_legend` argument to show the legend of the charts.
+To compare distributions, pass a list of lists to `data`: each inner list is one series, and the per-series attributes (`subtitle`, `style`, `emphasis`, `x`) become lists aligned with it. A single `style` dictionary applies to every series, while a list styles each one (`None` keeps the theme style). `penguins_by_species` is such a list, and splitting the pooled data by species explains the two peaks. By default the series share one set of bins and are **stacked**, so the outline of the stack is the pooled histogram from the Basics section and the colors show which species fills each bin: the Adelie and Chinstrap penguins make the left peak, the Gentoo penguins the right one.
 
 ```
 Histogram(
+    # one series per species
     data=penguins_by_species,
-    # add a subtitle to each chart
+    # named for the legend
     subtitle=SPECIES,
-    title="Flipper length of Palmer penguins",
+    # one style per series; None keeps the theme color
+    style=[{"plot_hist_color": "#e76f51"}, {"plot_hist_color": "#e9c46a"}, None],
+    title="Flipper length of Palmer penguins by species",
     xlabel="Flipper length (mm)",
     ylabel="Number of penguins",
     xticks=FLIPPER_TICKS,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
-    # show the legend
     show_legend=True,
+).show()
+```
+
+### Bar mode
+
+A stack answers *what makes up each bin*, but hides the shape of every series except the bottom one. `bar_mode` ([BAR_MODE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BAR_MODE)) changes that: `BAR_MODE.OVERLAY` draws every series from zero on the shared bins, one over the other, so each species shows its own shape and the overlap between Adelie and Chinstrap becomes visible. `BAR_MODE.STACK` is the default, and `BAR_MODE.GROUP` behaves like overlay. A step outline keeps the overlaid series from hiding each other.
+
+```
+from datachart.constants import BAR_MODE
+
+Histogram(
+    data=penguins_by_species,
+    subtitle=SPECIES,
+    # outlines, so no series hides another
+    style={"plot_hist_type": HISTOGRAM_TYPE.STEP, "plot_hist_edge_width": 2},
+    title="Flipper length of Palmer penguins by species",
+    xlabel="Flipper length (mm)",
+    ylabel="Number of penguins",
+    xticks=FLIPPER_TICKS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+    # every series from zero, on the shared bins
+    bar_mode=BAR_MODE.OVERLAY,
+).show()
+```
+
+### Emphasis
+
+When the question is about one of the series, `emphasis` takes one role per series, aligned with `data`: `"highlight"` bolds a series and brings it to the front, `"background"` mutes it and drops it from the legend, `None` leaves it as it is ([EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)). As soon as any series carries a role, the histograms are overlaid rather than stacked, since a muted series stacked under a highlighted one would lift it off the axis. Asking *how do the Gentoo penguins differ* turns the other two species into context. The [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis across every chart type and theme.
+
+```
+Histogram(
+    data=penguins_by_species,
+    subtitle=SPECIES,
+    # the Gentoo penguins are the question, the rest the context
+    emphasis=["background", "background", "highlight"],
+    title="Gentoo penguins against the other species",
+    xlabel="Flipper length (mm)",
+    ylabel="Number of penguins",
+    xticks=FLIPPER_TICKS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+).show()
+```
+
+`emphasis_rule` picks the series from the data instead. It is a one-key rule, `{"top": n}` or `{"bottom": n}` by rank, `{"above": v}` or `{"below": v}` (strict), or `{"between": (lo, hi)}` (inclusive), read against a summary of each series' own values: the mean by default, or the `"median"`, `"min"`, `"max"` or `"sum"` named by a `"by"` key. An explicit `emphasis` role wins over the rule. The rule below highlights the species whose median flipper is shortest:
+
+```
+Histogram(
+    data=penguins_by_species,
+    subtitle=SPECIES,
+    # the series with the smallest median
+    emphasis_rule={"bottom": 1, "by": "median"},
+    title="The species with the shortest flippers",
+    xlabel="Flipper length (mm)",
+    ylabel="Number of penguins",
+    xticks=FLIPPER_TICKS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+).show()
+```
+
+### Legend
+
+`show_legend` lists the series; `legend` says where and how, with a `title`, a `location` from [LEGEND_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), the number of columns `ncols`, and the `alignment` of the entries from [LEGEND_ALIGN](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN); a field left out falls back to the theme ([LegendSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendSettingAttrs)). The two peaks leave little room at the top of the axes, so the legend moves above them, in one row.
+
+```
+from datachart.constants import LEGEND_LOCATION
+
+Histogram(
+    data=penguins_by_species,
+    subtitle=SPECIES,
+    style=[{"plot_hist_color": "#e76f51"}, {"plot_hist_color": "#e9c46a"}, None],
+    title="Flipper length of Palmer penguins by species",
+    xlabel="Flipper length (mm)",
+    ylabel="Number of penguins",
+    xticks=FLIPPER_TICKS,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+    # a titled, one-row legend above the axes
+    legend={"title": "Species", "location": LEGEND_LOCATION.OUTSIDE_TOP, "ncols": 3},
 ).show()
 ```
 
 ### Subplots
 
-To draw each chart in its own subplot, add the `subplots` attribute. The chart's `subtitle` are then added at the top of each subplot, while the `title`, `xlabel` and `ylabel` are positioned to be global for all charts. The `max_cols` attribute limits the number of subplots per row. Each subplot bins its own values and scales its own axes, so the three histograms are not yet comparable — the next section fixes that.
+Overlaid series get hard to read once their shapes cross. `subplots=True` draws each series in its own panel: `subtitle` titles the panels, `title`, `xlabel` and `ylabel` stay global, and `max_cols` limits the panels per row. On their own, the panels bin and scale independently, so a bar in one panel does not compare with a bar in the next. `sharex=True` puts the panels on one value axis with shared bins, so the species line up bin for bin, and `sharey=True` puts them on one count axis, so the smaller Chinstrap sample (68 penguins against 151 Adelie) no longer fills its panel.
 
 ```
 Histogram(
     data=penguins_by_species,
     subtitle=SPECIES,
-    title="Flipper length of Palmer penguins",
-    xlabel="Flipper length (mm)",
-    ylabel="Number of penguins",
-    figsize=FIG_SIZE.FULL_MEDIUM,
-    show_grid=SHOW_GRID.Y,
-    # show each chart in its own subplot
-    subplots=True,
-    # at most two subplots per row
-    max_cols=2,
-).show()
-```
-
-### Sharing the x-axis and/or y-axis across subplots
-
-To share the x-axis and/or y-axis across subplots, add the `sharex` and/or `sharey` attributes, which are boolean values that specify whether to share the axis across all subplots. With a shared x-axis the subplots also share their bins, so the species line up bin for bin; with a shared y-axis the bar heights become comparable and the smaller Chinstrap sample (68 penguins against 151 Adelie) no longer fills its subplot.
-
-```
-Histogram(
-    data=penguins_by_species,
-    subtitle=SPECIES,
-    title="Flipper length of Palmer penguins",
+    title="Flipper length of Palmer penguins by species",
     xlabel="Flipper length (mm)",
     ylabel="Number of penguins",
     xticks=FLIPPER_TICKS,
-    figsize=FIG_SIZE.FULL_MEDIUM,
+    figsize=FIG_SIZE.FULL_TALL,
     show_grid=SHOW_GRID.Y,
+    # one panel per species, stacked in a column
     subplots=True,
-    max_cols=2,
-    # share the x-axis across subplots
+    max_cols=1,
+    # one set of bins and one count axis for all panels
     sharex=True,
-    # share the y-axis across subplots
     sharey=True,
 ).show()
 ```
 
-## Histogram Views
+## Additional Features
 
-A histogram counts values per bin by default. Two attributes change what the bars measure: `show_density` turns the counts into a probability density, and `show_cumulative` accumulates the bins from left to right. They apply to every chart in the figure, and they combine.
+### Density view
 
-### Density distribution view
-
-To show the histograms as a density distribution, add the `show_density` attribute. The bars are scaled so that their total area is 1 — the bar heights are densities rather than counts, and the y-axis no longer depends on the sample size. That is what makes samples of different sizes comparable: per count, the 151 Adelie penguins tower over the 68 Chinstrap penguins; per density, the two species have distributions of about the same width, just shifted.
+Counts depend on the sample size: in the panels above the Chinstrap histogram is small because fewer Chinstrap penguins were measured, not because their flippers are unusual. `show_density=True` rescales the bars so that the total area of each series is 1, which makes samples of different sizes comparable. Per density, the Adelie and Chinstrap distributions have about the same height and width, with the Chinstrap one shifted about 6 mm to the right.
 
 ```
 Histogram(
     data=penguins_by_species,
     subtitle=SPECIES,
-    title="Flipper length of Palmer penguins",
+    title="Flipper length of Palmer penguins by species",
     xlabel="Flipper length (mm)",
     ylabel="Density",
     xticks=FLIPPER_TICKS,
-    figsize=FIG_SIZE.FULL_MEDIUM,
+    figsize=FIG_SIZE.FULL_TALL,
     show_grid=SHOW_GRID.Y,
     subplots=True,
-    max_cols=2,
+    max_cols=1,
     sharex=True,
     sharey=True,
-    # show the density instead of the count
+    # the density instead of the count
     show_density=True,
 ).show()
 ```
 
 ### Density curve
 
-A density histogram depends on where its bins fall; a kernel density estimate smooths the same values into a curve that does not. [datachart.utils.stats.kde1d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde1d) computes it and returns the `{x, y}` points a [datachart.charts.LineChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.LineChart) draws, so there is no separate density chart: overlay the curve on the density histogram with [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel). Both integrate to 1, so they share the y-axis. This is how a KDE chart is built from raw values: estimate the curve, then draw it. The `bandwidth` sets how smooth the curve is — a [datachart.constants.BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) rule (Scott's by default) or a scalar factor, where smaller values follow the values more closely — and `show_area` fills the curve, the way a density plot is usually drawn.
+A histogram's shape depends on where its bin edges fall; a kernel density estimate smooths the same values into a curve that does not. [datachart.utils.stats.kde1d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde1d) computes the curve and returns `{x, y}` points that a [LineChart](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.charts.LineChart) draws, and [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) lays the curve over a density histogram; both integrate to 1, so they share the y-axis. The `bandwidth` argument of `kde1d` sets how smooth the curve is: a [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) rule (Scott's by default) or a number, where smaller values follow the data more closely. The [Statistics](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md) guide covers the estimate in more depth.
 
 ```
 from datachart.charts import LineChart
 from datachart.utils import Panel
 from datachart.utils.stats import kde1d
-```
 
-```
-# the flipper lengths, smoothed into a density curve: what a KDE chart draws
-flipper_density = kde1d([point["x"] for point in penguins])
-flipper_density[:3]
-```
+# the default bandwidth and a narrower one
+smooth = kde1d(flippers)
+detailed = kde1d(flippers, bandwidth=0.15)
 
-```
 Panel(
     [
         Histogram(data=penguins, subtitle="binned", show_density=True),
-        # the curve over the bars
-        LineChart(data=flipper_density, subtitle="kernel density", show_area=True),
+        LineChart(data=smooth, subtitle="kernel density (Scott)"),
+        LineChart(data=detailed, subtitle="kernel density (bandwidth 0.15)"),
     ],
     title="Flipper length of Palmer penguins",
     xlabel="Flipper length (mm)",
     ylabel_left="Density",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.Y,
     show_legend=True,
-    show_grid=SHOW_GRID.Y,
-    figsize=FIG_SIZE.FULL_MEDIUM,
+    # the curves run past the data, so the range is fixed
+    xmin=165,
+    xmax=240,
 ).show()
 ```
 
-### Cumulative distribution view
+### Cumulative view
 
-To show the histograms as a cumulative distribution, add the `show_cumulative` attribute. Each bar then holds the count of all the values up to and including its bin, so the bars climb from left to right and the last bar reaches the sample size. The cumulative view answers "how many penguins have flippers shorter than *x*?" directly — at the 200 mm mark nearly every Adelie penguin is already counted, seven in ten Chinstrap penguins, and not a single Gentoo penguin.
+Some questions are about thresholds, not shapes: *how many penguins have flippers of 200 mm or less?* `show_cumulative=True` makes each bar hold the count of all values up to and including its bin, so the bars climb to the sample size. Combined with `show_density=True`, the bars hold the share of values instead and every series climbs to 1, which is the empirical cumulative distribution. At 200 mm, 95% of the Adelie penguins and 74% of the Chinstrap penguins are counted, and not a single Gentoo penguin.
 
 ```
 Histogram(
     data=penguins_by_species,
     subtitle=SPECIES,
-    title="Flipper length of Palmer penguins",
-    xlabel="Flipper length (mm)",
-    ylabel="Number of penguins",
-    xticks=FLIPPER_TICKS,
-    figsize=FIG_SIZE.FULL_MEDIUM,
-    show_grid=SHOW_GRID.Y,
-    subplots=True,
-    max_cols=2,
-    sharex=True,
-    sharey=True,
-    # show the cumulative count
-    show_cumulative=True,
-).show()
-```
-
-### Cumulative & density distribution view
-
-The `show_density` and `show_cumulative` attributes combine into the empirical cumulative distribution: every bar holds the share of the values up to its bin, the last bar reaches 1, and the species become comparable regardless of how many penguins were measured: four out of five Gentoo penguins have flippers longer than any Adelie penguin.
-
-```
-Histogram(
-    data=penguins_by_species,
-    subtitle=SPECIES,
-    title="Flipper length of Palmer penguins",
+    style={"plot_hist_type": HISTOGRAM_TYPE.STEP, "plot_hist_edge_width": 2},
+    bar_mode=BAR_MODE.OVERLAY,
+    # the 200 mm threshold
+    vlines={"x": 200, "style": {"plot_vline_style": LINE_STYLE.DASHED}},
+    title="Share of penguins up to each flipper length",
     xlabel="Flipper length (mm)",
     ylabel="Cumulative share",
     xticks=FLIPPER_TICKS,
-    figsize=FIG_SIZE.FULL_MEDIUM,
+    figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
-    subplots=True,
-    max_cols=2,
-    sharex=True,
-    sharey=True,
-    # show the cumulative density
-    show_density=True,
+    show_legend=True,
+    legend={"location": LEGEND_LOCATION.UPPER_LEFT},
+    num_bins=59,
+    xmax=231,
+    # the running share of each species
     show_cumulative=True,
+    show_density=True,
 ).show()
 ```
 
-## Additional Features
-
 ### Axis scales
 
-The user can change the axis scale using the `scalex` and `scaley` attributes. The supported scale options are:
+On a linear count axis the bins in the tail of a distribution hold a handful of values and vanish next to the peak. `scaley` (or `scalex` for a horizontal histogram) takes a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member, and a logarithmic count axis gives every occupied bin a visible bar. The bins stay equal-width on the data scale whichever axis scale is applied, so a log scale on the binned axis stretches them unevenly and is rarely what you want.
 
-| Options    | Description              |
-| ---------- | ------------------------ |
-| `"linear"` | The linear scale.        |
-| `"log"`    | The log scale.           |
-| `"symlog"` | The symmetric log scale. |
-| `"asinh"`  | The asinh scale.         |
-
-Again, to help with the options settings, the [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) module contains the following constants:
-
-| Constant                                                                                                               | Description       |
-| ---------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| [datachart.constants.SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) | The axis options. |
-
-On a histogram the scale of the count axis is the one that usually matters. Bins in the tails of a distribution hold a handful of values and are barely visible next to the peak on a linear scale; a logarithmic y-axis gives every occupied bin a visible bar and shows how quickly the tails fall off. Note that the bins themselves stay equal-width on the data scale whichever axis scale is applied.
+Flipper lengths have no long tail, so this example switches dataset. `quakes`, defined in a hidden cell, holds 5,000 illustrative earthquake magnitudes from a seeded generator that follows the Gutenberg-Richter law: every step of one magnitude up makes earthquakes about ten times rarer. On a linear axis the strong earthquakes are invisible; on a log axis the counts fall along a straight line, which is how seismologists read the law.
 
 ```
 from datachart.constants import SCALE
-```
 
-```
 for scale in [SCALE.LINEAR, SCALE.LOG]:
     Histogram(
-        data=penguins,
-        title=f"Flipper length of Palmer penguins on the '{scale}' scale",
-        xlabel="Flipper length (mm)",
-        ylabel="Number of penguins",
-        xticks=FLIPPER_TICKS,
+        data=quakes,
+        title=f"Earthquake magnitudes on a '{scale}' count axis",
+        xlabel="Magnitude",
+        ylabel="Number of earthquakes",
         figsize=FIG_SIZE.FULL_SHORT,
         show_grid=SHOW_GRID.Y,
-        num_bins=40,
-        # set the scale of the y axis
+        num_bins=30,
+        # the scale of the count axis
         scaley=scale,
     ).show()
 ```
 
 ### Custom data keys
 
-By default, the `data` items are dictionaries with the key `x` holding the value to bin. Data that comes from elsewhere rarely calls its columns `x`, and renaming every key just to plot it is a chore. Instead, tell `Histogram` which key to read with the `x` argument. The `penguin_records` list below stores the same penguins under their natural names, and the example bins their body mass instead of their flipper length.
+Data from a file or an API rarely calls its column `x`, and renaming every record just to plot it is a chore. The `x` argument names the key that holds the value to bin (a list of keys for several series). `penguin_records` stores the penguins the way the published dataset names its columns, so the same records can be binned by body mass instead of flipper length:
 
 ```
 penguin_records = [
-    {
-        "species": species,
-        "flipper_length_mm": flipper,
-        "body_mass_g": mass,
-    }
+    {"species": species, "flipper_length_mm": flipper, "body_mass_g": mass}
     for species in SPECIES
     for flipper, mass in PENGUINS[species]
 ]
-penguin_records[:3]
+penguin_records[:2]
 ```
 
 ```
-figure = Histogram(
+Histogram(
     data=penguin_records,
-    # specify which key holds the value to bin
+    # the key that holds the value to bin
     x="body_mass_g",
     title="Body mass of Palmer penguins",
     xlabel="Body mass (g)",
@@ -713,139 +540,126 @@ figure = Histogram(
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
     num_bins=30,
-)
-figure.show()
-```
-
-## Saving the Chart as an Image
-
-To save the chart as an image, use the [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.save_figure) function.
-
-```
-from datachart.utils import save_figure
-```
-
-```
-save_figure(figure, "./fig_histogram.png", dpi=300)
-```
-
-The figure should be saved in the current working directory.
-
-## Real-World Examples
-
-The following examples put the features above to work on real or realistic data. Each one states what its data is and where it comes from; the data itself lives in a hidden cell.
-
-### Example 1: Marathon Finish Times (Bimodal Shape and Reference Lines)
-
-`finish_times` holds the finish times, in minutes, of 3,000 illustrative marathon runners drawn from a seeded generator: a faster group of club runners finishing around 3:35 and a larger recreational group around 4:30, so the distribution has two peaks. The finish time is the kind of value people think of in round numbers, so `xticks` label the axis in hours and `vlines` mark the 3, 4 and 5 hour milestones most runners set themselves. Sixty bins make each bin about four minutes wide.
-
-```
-HOUR_TICKS = [150, 180, 210, 240, 270, 300, 330, 360]
-HOUR_TICK_LABELS = ["2:30", "3:00", "3:30", "4:00", "4:30", "5:00", "5:30", "6:00"]
-
-Histogram(
-    data=finish_times,
-    subtitle="finishers",
-    # mark the round-hour milestones
-    vlines=[
-        {
-            "x": minutes,
-            "label": f"{minutes // 60}:00 finish",
-            "style": {
-                "plot_vline_color": "#1d3557",
-                "plot_vline_style": LINE_STYLE.DASHED,
-                "plot_vline_width": 1.5,
-            },
-        }
-        for minutes in [180, 240, 300]
-    ],
-    title="Marathon finish times",
-    xlabel="Finish time (h:mm)",
-    ylabel="Number of runners",
-    # label the ticks in hours
-    xticks=HOUR_TICKS,
-    xticklabels=HOUR_TICK_LABELS,
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.Y,
-    num_bins=60,
-    show_legend=True,
 ).show()
 ```
 
-### Example 2: Session Duration of an A/B Test (Emphasis and Density View)
+## Real-World Examples
 
-`session_durations` holds two series of illustrative session durations, in minutes, from an A/B test of a redesigned onboarding flow: 5,000 sessions of the control group and the 600 sessions of the much smaller variant group, both drawn from seeded log-normal generators. The question is whether the variant moved the distribution, so `emphasis` mutes the control group into a background reference and highlights the variant. With the roles set, the two histograms are overlaid on shared bins rather than stacked; `show_density` puts the samples on the same footing despite their very different sizes. The muted series drops out of the legend automatically.
+The examples below put the features above to work, each one answering a question. The data lives in hidden cells; each example says what its data is and where it comes from.
+
+### Example 1: Do Marathoners Race the Clock? (Fine Bins, Hour Ticks, and Reference Lines)
+
+A study of millions of marathon results found that finish times bunch up just before round-number goals such as four hours, as runners push to beat them (Allen, Dechow, Pope and Wu, *Management Science*, 2017). `finish_times` holds 20,000 illustrative finish times in minutes from a seeded generator that reproduces the effect: a broad spread of times, where some runners heading for just over 3:00, 3:30, 4:00, 4:30 or 5:00 are pulled in under the mark, most strongly at the full hours. With the default 20 bins each bin is 12 minutes wide and the bunching disappears into a smooth hump, so the example uses one-minute bins. `xticks` and `xticklabels` print the axis in hours and minutes, and `vlines` mark the goals, so each spike can be seen to sit just left of its line.
+
+```
+Histogram(
+    data=finish_times,
+    style={"plot_hist_type": HISTOGRAM_TYPE.STEP_FILLED},
+    # the round-number goals
+    vlines=[
+        {
+            "x": goal,
+            "style": {"plot_vline_color": "#1d3557", "plot_vline_style": LINE_STYLE.DASHED, "plot_vline_width": 0.8},
+        }
+        for goal in GOALS
+    ],
+    title="Marathon finish times, in one-minute bins",
+    xlabel="Finish time (h:mm)",
+    ylabel="Number of runners",
+    # the axis in hours and minutes
+    xticks=HOUR_TICKS,
+    xticklabels=HOUR_LABELS,
+    xmin=150,
+    xmax=390,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    # one bin per minute
+    num_bins=240,
+).show()
+```
+
+### Example 2: Did the New Onboarding Lengthen Sessions? (Emphasis, Density View, and Medians)
+
+`session_durations` holds illustrative session durations, in minutes, from an A/B test of a redesigned onboarding flow: 5,000 sessions of the control group and 600 of the new variant, drawn from seeded log-normal generators. The groups differ eightfold in size, so `show_density` compares their shapes rather than their counts. `emphasis` mutes the control group into a reference and highlights the variant, which also overlays the two instead of stacking them, and `vlines` mark each group's median, the robust summary for a right-skewed duration.
 
 ```
 Histogram(
     data=session_durations,
     subtitle=["control", "variant"],
-    # mute the control group, highlight the variant
+    # the control group is the reference, the variant the question
     emphasis=["background", "highlight"],
+    # each group's median
+    vlines=[
+        {
+            "x": median,
+            "label": f"{group} median ({median:.1f} min)",
+            "style": {"plot_vline_color": color, "plot_vline_style": LINE_STYLE.DASHED},
+        }
+        for (group, median), color in zip(MEDIANS.items(), ["#6c757d", "#c1121f"])
+    ],
     title="Session duration with the redesigned onboarding",
     xlabel="Session duration (minutes)",
     ylabel="Density",
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
-    num_bins=50,
-    xmax=30,
+    num_bins=60,
+    xmin=0,
+    xmax=25,
     # compare the shapes, not the sample sizes
     show_density=True,
     show_legend=True,
 ).show()
 ```
 
-### Example 3: Request Latency (Log Scale and Density View)
+### Example 3: Did the Release Fatten the Latency Tail? (Log Counts, the Cumulative View, and a Grid)
 
-`latencies` holds the response time, in milliseconds, of 20,000 illustrative requests to a web service drawn from a seeded log-normal generator — the typical request answers in about 40 ms, but a long tail of slow requests stretches out to several hundred milliseconds. On a linear count axis the tail is invisible next to the peak, so `scaley` switches the y-axis to a log scale and every occupied bin gets a visible bar. `show_density` makes the y-axis independent of how many requests were sampled, and `vlines` mark the 200 ms latency objective that the tail has to stay under.
+`latency` holds the response times, in milliseconds, of 20,000 illustrative requests to a web service in the week before and the week after a release, from seeded log-normal generators; after the release, about 3% of requests take a slow path. The service promises that 99% of requests answer within 200 ms. The typical request did not change, so the peaks overlap, and the question lives in the tail. The left chart overlays both weeks as outlines on a log count axis, where the new bump of slow requests shows up. The right chart shows the cumulative share of requests, zoomed to the top 10% with `ymin`, with the 99% promise as a horizontal line and the 200 ms limit as a vertical one: before the release the curve reaches 99% left of the limit, after it only to the right. [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) puts the two views side by side.
 
 ```
-Histogram(
-    data=latencies,
-    subtitle="requests",
-    # mark the latency objective
-    vlines={
-        "x": 200,
-        "label": "200 ms objective",
-        "style": {
-            "plot_vline_color": "#e76f51",
-            "plot_vline_style": LINE_STYLE.DASHED,
-            "plot_vline_width": 1.5,
-        },
-    },
-    title="Request latency",
+from datachart.utils import Grid
+
+LIMIT = {"x": 200, "style": {"plot_vline_color": "#1d3557", "plot_vline_style": LINE_STYLE.DASHED}}
+
+counts = Histogram(
+    data=latency,
+    subtitle=WEEKS,
+    style=WEEK_STYLE,
+    bar_mode=BAR_MODE.OVERLAY,
+    vlines=LIMIT,
+    title="Requests per bin",
     xlabel="Response time (ms)",
-    ylabel="Density",
-    figsize=FIG_SIZE.FULL_SHORT,
+    ylabel="Requests",
     show_grid=SHOW_GRID.Y,
     num_bins=80,
-    # show the tail on a logarithmic density axis
-    show_density=True,
+    # the tail shows on a log count axis
     scaley=SCALE.LOG,
     show_legend=True,
-).show()
-```
+)
 
-### Example 4: Daily Rainfall at Four Stations (Subplots, Shared Axes and Custom Data Keys)
-
-`rainfall_by_station` holds one series per weather station: the rainfall, in millimeters, on each of the wet days of one illustrative year at four stations of differing climates — a dry station with frequent light showers up to a wet station with occasional downpours — drawn from seeded gamma generators. The readings are stored under `rainfall_mm`, so the key is mapped with the `x` argument; `subplots` gives each station its own panel and `sharex` and `sharey` put the panels on the same bins and the same count axis, so a bar in one panel means the same as a bar in another.
-
-```
-Histogram(
-    data=rainfall_by_station,
-    # the readings are stored as "rainfall_mm"
-    x="rainfall_mm",
-    subtitle=list(STATIONS),
-    title="Daily rainfall on wet days",
-    xlabel="Rainfall (mm)",
-    ylabel="Number of days",
-    figsize=FIG_SIZE.FULL_MEDIUM,
+cumulative = Histogram(
+    data=latency,
+    subtitle=WEEKS,
+    style=WEEK_STYLE,
+    bar_mode=BAR_MODE.OVERLAY,
+    vlines=LIMIT,
+    # the 99% promise
+    hlines={"y": 0.99, "style": {"plot_hline_color": "#1d3557", "plot_hline_style": LINE_STYLE.DOTTED}},
+    title="Share of requests answered",
+    xlabel="Response time (ms)",
+    ylabel="Cumulative share",
     show_grid=SHOW_GRID.Y,
-    num_bins=30,
-    # one panel per station, on the same bins and count axis
-    subplots=True,
-    max_cols=2,
-    sharex=True,
-    sharey=True,
+    num_bins=400,
+    show_cumulative=True,
+    show_density=True,
+    # zoom into the top 10%, and past the slowest requests
+    xmax=700,
+    ymin=0.9,
+    ymax=1.0,
+)
+
+Grid(
+    [[counts, cumulative]],
+    title="Latency before and after the release",
+    figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```

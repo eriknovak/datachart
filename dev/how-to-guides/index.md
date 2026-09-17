@@ -1,9 +1,19 @@
 # How-to Guides
 
-The how-to guides showcase how to utilize the `datachart` package: creating charts that reflect the data and the message the user wants to send, composing multiple charts into panels and grids, and styling everything through themes and the global configuration.
+The how-to guides showcase how to utilize the `datachart` package: creating charts that reflect the data and the message the user wants to send, composing multiple charts into panels and grids, styling everything through themes and the global configuration, and the utilities around a figure.
 
-| Section                                                                                             | Description                                                                             |
-| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| [charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md)                   | Showcases the creation and customization of charts available in the `charts` module.    |
-| [composition & utilities](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/index.md) | Composing figures with `Panel` and `Grid`, statistics, saving, and interactive figures. |
-| [styling](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/index.md)                 | Configuring the global style, applying and creating themes, emphasis, and colormaps.    |
+- [Charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md)
+
+  One guide per chart type, grouped by the question the chart answers, and the highlighting guide that applies to all of them.
+
+- [Composition](https://eriknovak.github.io/datachart/dev/how-to-guides/composition/index.md)
+
+  Overlaying charts with `Panel`, arranging them with `Grid`, and annotating charts and finished figures.
+
+- [Styling](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/index.md)
+
+  The global configuration, the predefined themes and how to create your own, and the colormaps.
+
+- [Utility](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/index.md)
+
+  The statistical helpers, saving figures to files and web pages, and interactive figures.

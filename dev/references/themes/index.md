@@ -4,18 +4,22 @@
 
 The module containing the `themes`.
 
-The `themes` module contains the predefined style themes that are used to visualize the plots. Themes are named for their visual trait, never for a use case or audience.
+The `themes` module contains the predefined style themes that are used to visualize the plots. Themes are named for their visual trait, never for a use case or audience; each is a complete `StyleAttrs` dictionary that `config.set_theme` applies.
 
-| ATTRIBUTE         | DESCRIPTION                                                                                                                     |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `DEFAULT_THEME`   | The default theme style. **TYPE:** `StyleAttrs`                                                                                 |
-| `GREYSCALE_THEME` | The greyscale theme style. **TYPE:** `StyleAttrs`                                                                               |
-| `INK_THEME`       | The ink theme style (dark-ink accents, print-ready). **TYPE:** `StyleAttrs`                                                     |
-| `HATCH_THEME`     | The hatch theme style (hatch cycle, black edges, dotted grid). **TYPE:** `StyleAttrs`                                           |
-| `MINIMAL_THEME`   | The minimal theme style (accent blue, no spines, flat bars). **TYPE:** `StyleAttrs`                                             |
-| `MATERIAL_THEME`  | The material theme style (Google palette, light grid). **TYPE:** `StyleAttrs`                                                   |
-| `SKETCH_THEME`    | The sketch theme style (hand-drawn, xkcd-style wobble and halo, Comic Neue font). **TYPE:** `StyleAttrs`                        |
-| `QUILL_THEME`     | The quill theme style (black ink on white paper, pen-stroked lines, etched fills, IM Fell English font). **TYPE:** `StyleAttrs` |
+## Choosing a Theme
+
+Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs) dictionary, named for its visual trait. Apply one with [`config.set_theme`](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) and the member of [`THEME`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) in the last column; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each on six charts, and the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) shows how to adjust one or build your own.
+
+| Theme                                                  | Look                                                                            | Apply with        |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------- | ----------------- |
+| [`DEFAULT_THEME`](#datachart.themes.DEFAULT_THEME)     | the package's baseline palette and furniture                                    | `THEME.DEFAULT`   |
+| [`GREYSCALE_THEME`](#datachart.themes.GREYSCALE_THEME) | greys only, for print without color                                             | `THEME.GREYSCALE` |
+| [`INK_THEME`](#datachart.themes.INK_THEME)             | dark-ink accents, print-ready                                                   | `THEME.INK`       |
+| [`HATCH_THEME`](#datachart.themes.HATCH_THEME)         | a hatch cycle, black edges, dotted grid                                         | `THEME.HATCH`     |
+| [`MINIMAL_THEME`](#datachart.themes.MINIMAL_THEME)     | accent blue, no spines, flat bars                                               | `THEME.MINIMAL`   |
+| [`MATERIAL_THEME`](#datachart.themes.MATERIAL_THEME)   | the Google palette, light grid                                                  | `THEME.MATERIAL`  |
+| [`SKETCH_THEME`](#datachart.themes.SKETCH_THEME)       | hand-drawn: xkcd-style wobble and halo, Comic Neue font                         | `THEME.SKETCH`    |
+| [`QUILL_THEME`](#datachart.themes.QUILL_THEME)         | black ink on white paper, pen-stroked lines, etched fills, IM Fell English font | `THEME.QUILL`     |
 
 ## Themes
 
@@ -398,7 +402,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "axes_ticks_length": 5,
         "axes_ticks_label_size": 9,
         "chart_default_show_grid": None,
-        "chart_default_node_label_position": NODE_LABEL_POSITION.ABOVE,
+        "chart_default_node_label_position": NETWORK_LABEL_POSITION.ABOVE,
         "plot_hatch_cycle": ["/", ".", "\\", "x", "-", "|"],
         "plot_linestyle_cycle": [
             "-",

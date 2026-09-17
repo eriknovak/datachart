@@ -1,86 +1,24 @@
 # Parallel Coordinates
 
-This section showcases the parallel coordinates chart. It contains examples of how to create parallel coordinates charts using the [datachart.charts.ParallelCoords](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.ParallelCoords) function.
-
-A parallel coordinates chart draws one vertical axis per variable and one line per data point, connecting its values across the axes. It shows many variables of many records at once, which makes it a natural fit for comparing groups in multivariate data — species of animals, models of cars, runs of a hyperparameter search.
+A parallel coordinates chart draws one vertical axis per variable and one line per record, so it shows many variables of many records at once: records with a similar profile run together as a bundle, and the segments between two neighboring axes show how those two variables relate (parallel segments for a positive relation, crossing segments for a negative one, a trade-off). This guide shows how to create parallel coordinates charts with the [datachart.charts.ParallelCoords](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.charts.ParallelCoords) function, starting with the basics and building up to worked examples on real data.
 
 Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-parallel-coordinates), which maps common tasks to the parameter or style attribute that does the job.
-
-As mentioned above, the parallel coordinates charts are created using the `ParallelCoords` function found in the [datachart.charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md) module. Let's import it:
 
 ```
 from datachart.charts import ParallelCoords
 ```
 
-## Parallel Coordinates Input Attributes
-
-The `ParallelCoords` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the data points. Each data point is a dictionary whose keys are the dimension names and whose values are numeric or categorical (string). For a single chart, `data` is a list of data points; for multiple charts drawn on the same axes, `data` is a list of such lists.
-
-```
-ParallelCoords(
-    data=[{                                             # A list of data points (or list of lists for multiple charts)
-        "dim1": Union[int, float],                      # Numeric dimension
-        "dim2": Union[int, float],                      # Numeric dimension
-        "dim3": str,                                    # Categorical dimension (string)
-        # ... more dimensions
-    }],
-    style={                                             # The style of the chart (optional; or list for multiple charts)
-        "plot_parallel_color":               Optional[str],          # The color of the lines (hex color code; overrides hue)
-        "plot_parallel_alpha":               Optional[float],        # The alpha of the lines (how visible they are)
-        "plot_parallel_width":               Optional[float],        # The width of the lines
-        "plot_parallel_style":               Optional[LINE_STYLE],   # The line style (solid, dashed, etc.)
-        "plot_parallel_marker":              Optional[LINE_MARKER],  # The marker drawn where a line crosses an axis
-        "plot_parallel_zorder":              Optional[int],          # The draw order of the lines
-        "plot_parallel_axis_color":          Optional[str],          # The color of the vertical axes (hex color code)
-        "plot_parallel_axis_width":          Optional[float],        # The width of the vertical axes
-        "plot_parallel_axis_zorder":         Optional[int],          # The draw order of the vertical axes
-        "plot_parallel_tick_color":          Optional[str],          # The color of the tick marks (hex color code)
-        "plot_parallel_tick_width":          Optional[float],        # The width of the tick marks
-        "plot_parallel_tick_length":         Optional[float],        # The length of the tick marks (in axis spacings)
-        "plot_parallel_tick_label_size":     Optional[float],        # The font size of the tick labels
-        "plot_parallel_tick_label_color":    Optional[str],          # The font color of the tick labels (hex color code)
-        "plot_parallel_tick_label_bg_color": Optional[str],          # The background color of the tick labels (hex color code)
-        "plot_parallel_tick_label_bg_alpha": Optional[float],        # The background alpha of the tick labels
-        "plot_parallel_dim_label_size":      Optional[float],        # The font size of the dimension labels
-        "plot_parallel_dim_label_color":     Optional[str],          # The font color of the dimension labels (hex color code)
-        "plot_parallel_dim_label_rotation":  Optional[float],        # The rotation of the dimension labels (degrees)
-        "plot_parallel_dim_label_pad":       Optional[float],        # The padding between the axes and the dimension labels
-    },
-    subtitle=Optional[str],                             # The subtitle of the chart (accepted, not drawn; or list for multiple charts)
-    title=Optional[str],                                # The title of the chart
-    xlabel=Optional[str],                               # The x-axis label
-    ylabel=Optional[str],                               # The y-axis label
-
-    figsize=Optional[Tuple[float, float]],              # The figure size in inches
-    show_legend=Optional[bool],                         # Whether to show the legend (of the hue categories)
-    show_grid=Optional[str],                            # Which grid lines to show (accepted; the chart draws none)
-
-    dimensions=Optional[List[str]],                     # The dimensions to draw, in order (default: every key but the hue)
-    hue=Optional[str],                                  # The key to color the lines by (categorical or numeric; or list for multiple charts)
-    category_orders=Optional[Dict[str, List[str]]],     # The order of the categories of categorical dimensions
-    emphasis=Optional[Union[str, List[Optional[str]]]], # The emphasis role of every row ("background", "highlight"; or one role for all rows)
-    emphasis_rule=Optional[dict],                       # One-key rule on each row's numeric hue value
-)
-```
-
-**Dimension types.** Every dimension is one vertical axis, and each axis runs from its smallest value at the bottom to its largest at the top:
-
-- **Numeric dimensions** are normalized to the 0–1 range of the axis, with tick marks at 0 %, 25 %, 50 %, 75 % and 100 % labeled with the actual values.
-- **Categorical dimensions** are detected from their string values and spaced evenly along the axis, with one labeled tick mark per category. The categories are sorted alphabetically unless `category_orders` says otherwise.
-
-For more details, see the [datachart.charts.ParallelCoords](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.ParallelCoords) function.
-
 ## Basics
 
-The examples in this guide share one dataset: a sample of 30 penguins from the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0), ten of each species. Every penguin has four body measurements — bill length and depth (in mm), flipper length (in mm) and body mass (in g) — and three categorical attributes: its species, sex and the island it was observed on. The data is hard-coded in a hidden cell as `penguins`, a list of one dictionary per penguin.
+The examples in this guide share one dataset: 30 penguins from the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (Gorman, Williams and Fraser, 2014; CC0), the first ten recorded penguins of each species (Adelie, Chinstrap, Gentoo). Every penguin has four body measurements, its `bill length` and `bill depth`, its `flipper length` (all in mm) and its `body mass` (in g), and three categorical attributes: its `species`, the `island` it was observed on, and its `sex`. The data lives in a hidden cell as `penguins`, a list of one dictionary per penguin. The measurements hold a question a parallel coordinates chart answers well: do the three species differ on every measurement, or only on some?
 
-The data is a plain list of dictionaries: each dictionary is one data point (one line of the chart), and each key is one dimension (one axis):
+Each data point is a dictionary: the dictionary is one line of the chart, and each key is one axis. Numeric values make a numeric axis; string values make a categorical axis with one tick per category:
 
 ```
 penguins[:2]
 ```
 
-**Basic example.** Only the `data` argument is required to draw the chart. Every key becomes an axis, in the order the keys first appear: the four measurements as numeric axes, and the species, island and sex as categorical axes with one tick per category. Each penguin is one line, drawn in the theme's default color.
+**Basic example.** Only the `data` argument is required. Every key becomes an axis, in the order the keys first appear, and every axis runs from its smallest value at the bottom to its largest at the top (a numeric axis carries five ticks labeled with the actual values). Even without color, two bundles show: a group of lines with shallow bills, long flippers and heavy bodies, and everyone else.
 
 ```
 ParallelCoords(
@@ -93,28 +31,39 @@ ParallelCoords(
 
 Every customization is either a keyword argument of `ParallelCoords` or a `plot_parallel_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                                   | Use                                                                                         | See                                                                              |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| add a title and axis labels                  | `title`, `xlabel`, `ylabel`                                                                 | [Title and axis labels](#title-and-axis-labels)                                  |
-| resize the figure                            | `figsize`                                                                                   | [Figure size](#figure-size)                                                      |
-| choose and order the axes                    | `dimensions`                                                                                | [Selecting dimensions](#selecting-dimensions)                                    |
-| color the lines by a category                | `hue`, `show_legend`                                                                        | [Hue](#hue)                                                                      |
-| color the lines by a value                   | `hue` on a numeric key                                                                      | [Hue](#hue)                                                                      |
-| order the categories on an axis              | `category_orders`                                                                           | [Example 1: Car Specs](#example-1-car-specs-categorical-axes-and-category-order) |
-| change the line color, transparency or width | `style={"plot_parallel_color": ..., "plot_parallel_alpha": ..., ...}`                       | [Line style](#line-style)                                                        |
-| style the vertical axes                      | `style={"plot_parallel_axis_color": ..., "plot_parallel_axis_width": ..., ...}`             | [Axis style](#axis-style)                                                        |
-| style the tick marks and their labels        | `style={"plot_parallel_tick_color": ..., "plot_parallel_tick_label_size": ..., ...}`        | [Tick marks and labels](#tick-marks-and-labels)                                  |
-| style the dimension labels                   | `style={"plot_parallel_dim_label_size": ..., "plot_parallel_dim_label_rotation": ..., ...}` | [Dimension labels](#dimension-labels)                                            |
-| highlight some rows, mute the rest           | `emphasis`                                                                                  | [Emphasis](#emphasis)                                                            |
-| highlight the rows that match a rule         | `emphasis_rule`                                                                             | [Emphasis](#emphasis)                                                            |
-| overlay several sets of data points          | `data` as a list of lists, `style` and `hue` as lists                                       | [Multiple Parallel Coordinates Charts](#multiple-parallel-coordinates-charts)    |
-| save the chart to a file                     | `save_figure`                                                                               | [Saving the Chart as an Image](#saving-the-chart-as-an-image)                    |
+| I want to…                                  | Use                                                                                    | See                                                                                                     |
+| ------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| add a title and axis labels                 | `title`, `xlabel`, `ylabel`                                                            | [Title and axis labels](#title-and-axis-labels)                                                         |
+| resize the figure                           | `figsize`                                                                              | [Figure size](#figure-size)                                                                             |
+| choose the axes and their order             | `dimensions`                                                                           | [Selecting and ordering dimensions](#selecting-and-ordering-dimensions)                                 |
+| color the lines by a category or a value    | `hue`, `show_legend`                                                                   | [Hue](#hue)                                                                                             |
+| order the categories on an axis             | `category_orders`                                                                      | [Category order](#category-order)                                                                       |
+| title and place the legend                  | `legend`                                                                               | [Legend](#legend)                                                                                       |
+| change the line color, alpha, width, marker | `style={"plot_parallel_color": ..., "plot_parallel_alpha": ...}`                       | [Line style](#line-style)                                                                               |
+| style the vertical axes                     | `style={"plot_parallel_axis_color": ..., "plot_parallel_axis_width": ...}`             | [Axis style](#axis-style)                                                                               |
+| style the tick marks and their labels       | `style={"plot_parallel_tick_color": ..., "plot_parallel_tick_label_size": ...}`        | [Tick marks and labels](#tick-marks-and-labels)                                                         |
+| style or rotate the axis names              | `style={"plot_parallel_dim_label_size": ..., "plot_parallel_dim_label_rotation": ...}` | [Dimension labels](#dimension-labels)                                                                   |
+| highlight some records, mute the rest       | `emphasis`, `emphasis_rule`                                                            | [Emphasis](#emphasis)                                                                                   |
+| put a note on the chart                     | `texts`                                                                                | [Text annotations](#text-annotations)                                                                   |
+| draw several sets of records on one chart   | `data` as a list of lists, `style` and `hue` as lists                                  | [Multiple Parallel Coordinates Charts](#multiple-parallel-coordinates-charts)                           |
+| use dates as an axis                        | `date` values in `data`                                                                | [Date dimensions](#date-dimensions)                                                                     |
+| save the chart to a file                    | `save_figure`                                                                          | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
-The full list of style attributes is in the [datachart.typings.ParallelCoordsStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ParallelCoordsStyleAttrs) type; the full list of parameters is in the [datachart.charts.ParallelCoords](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.ParallelCoords) reference.
+The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
+
+| Parameter                                    | Constant                                                                                                                                                                                                                                     |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
+| `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
+| `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
+| `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
+| `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
+
+The full list of style attributes is in the [datachart.typings.ParallelCoordsStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.typings.ParallelCoordsStyleAttrs) type; the full list of parameters is in the [datachart.charts.ParallelCoords](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.charts.ParallelCoords) reference.
 
 ### Title and axis labels
 
-To add the chart title and axis labels, add the `title`, `xlabel` and `ylabel` attributes. The y-axis label describes what the height of a line means — the position of every value within the range of its axis — so it is rarely needed; the x-axis label names what the axes are.
+A reader who does not know the data cannot tell what the lines stand for; `title` says it. The axes name themselves, so `xlabel` is for what they have in common (here, the attributes of a penguin). The height of a line on an axis is its position within that axis's own range, not a shared unit; `ylabel` can say so, though most charts leave it out.
 
 ```
 ParallelCoords(
@@ -122,109 +71,121 @@ ParallelCoords(
     # add the title
     title="Palmer penguins",
     # add the x and y axis labels
-    xlabel="Measurement",
+    xlabel="Penguin attribute",
     ylabel="Position within the range",
 ).show()
 ```
 
 ### Figure size
 
-To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains some of the predefined figure sizes. A parallel coordinates chart grows with the number of axes, so a wide figure keeps the tick labels of neighboring axes apart.
-
-The `show_grid` attribute of the other charts is accepted as well, but it has nothing to draw here: the chart has no y-axis ticks, and its x positions are the vertical axes themselves — they are the grid.
+Every axis carries its tick labels beside it, so a chart with many axes needs width to keep the labels of neighbors apart. `figsize` takes a `(width, height)` tuple in inches or one of the presets in [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE), sized for a full or half page width. A full-width, short figure fits the chart into a page of text; the lines flatten, but the bundles still show. `show_grid` and `aspect_ratio` are accepted like on the other charts, but a parallel coordinates chart has no value axis for grid lines: the vertical axes are its grid.
 
 ```
 from datachart.constants import FIG_SIZE
-```
 
-```
 ParallelCoords(
     data=penguins,
     title="Palmer penguins",
-    # add to determine the figure size
-    figsize=FIG_SIZE.FULL_MEDIUM,
+    # a full-width, short figure
+    figsize=FIG_SIZE.FULL_SHORT,
 ).show()
 ```
 
-### Selecting dimensions
+### Selecting and ordering dimensions
 
-By default every key of the data points is an axis, except the `hue` key. To draw a subset of the keys, or to draw them in a different order, add the `dimensions` attribute with the list of keys. The order matters: patterns are easiest to read between neighboring axes, so put the dimensions you want to compare next to each other. The example drops the island and sex and puts the flipper length next to the body mass, the two measurements that grow together. The four measurements are the axes of most examples below, so they are kept in `MEASUREMENTS`.
+Only neighboring axes can be compared: the segments between two axes show how those two variables relate, and a relation between axes that are far apart is lost. `dimensions` lists the keys to draw, in order, so it both drops the axes a question does not need and puts the variables to compare next to each other. Here the categorical attributes go, and bill depth sits between bill length and flipper length. The segments from bill depth to flipper length cross in an X: the penguins with the shallowest bills have the longest flippers, a negative relation. The segments from flipper length to body mass run parallel: long flippers go with heavy bodies. The four measurements are the axes of most examples below, so they are kept in `MEASUREMENTS`.
 
 ```
 MEASUREMENTS = ["bill length", "bill depth", "flipper length", "body mass"]
 
 ParallelCoords(
     data=penguins,
-    title="Palmer penguins",
-    # choose the axes and their order
-    dimensions=MEASUREMENTS + ["species"],
+    title="Palmer penguins: the measurements",
+    # the axes to draw, in this order
+    dimensions=MEASUREMENTS,
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
 ### Hue
 
-To color the lines by one of the keys, add the `hue` attribute with its name. The key is dropped from the auto-detected dimensions — list it in `dimensions` to keep it as an axis as well.
+One color for every line hides which record belongs to which group. `hue` names the key the lines are colored by; the key is left out of the automatic axes, so list it in `dimensions` to keep it as an axis too.
 
-**Categorical hue.** When the hue values are strings, every category gets its own color from the theme's `color_parallel_hue` palette, and `show_legend` adds the legend that names them. Coloring by species is what turns the penguin sample into three readable groups: the Gentoo are the heaviest with the longest flippers, the Adelie have the shortest bills, and the Chinstrap sit in between with the deepest bills.
+**Categorical hue.** When the hue values are strings, every category gets its own color from the theme's `color_parallel_hue` palette, and `show_legend` names them. Colored by species, the bundles of the basic example become three profiles: the Gentoo are the heavy penguins with long flippers and shallow bills, the Adelie have the shortest bills, and the Chinstrap have deep bills like the Adelie but long ones like the Gentoo. No single axis separates all three species; the profile across the axes does.
 
 ```
 ParallelCoords(
     data=penguins,
-    title="Palmer penguins",
+    title="Palmer penguins by species",
     dimensions=MEASUREMENTS,
     # color the lines by the species
     hue="species",
-    # show the legend that names the species
+    # name the species in a legend
     show_legend=True,
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
-**Numeric hue.** When the hue values are numbers, the lines are colored continuously along the theme's `color_parallel_hue_continuous` ramp, from the lightest color at the smallest value to the darkest at the largest. There is no legend for a continuous hue — the axis of the hue key, kept in `dimensions`, is the scale. Coloring by the body mass makes the heaviest penguins the darkest lines on every axis.
+**Numeric hue.** When the hue values are numbers, the lines are shaded along the theme's `color_parallel_hue_continuous` ramp, from the lightest color at the smallest value to the darkest at the largest. A continuous hue has no legend: keep its key as an axis, and that axis is the scale. Shaded by body mass, the heaviest penguins are the darkest lines, and they can be followed back to the long-flipper, shallow-bill end of the other axes.
 
 ```
 ParallelCoords(
     data=penguins,
-    title="Palmer penguins",
-    # keep the hue key (the body mass) as an axis
+    title="Palmer penguins by body mass",
+    # the hue key stays as the last axis, which serves as the scale
     dimensions=MEASUREMENTS,
-    # color the lines continuously by the body mass
+    # shade the lines by the body mass
     hue="body mass",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Category order
+
+Categories are spaced evenly along their axis in alphabetical order, from the bottom up, and alphabetical order rarely matches the data: lines then cross on their way into a categorical axis only because of how its categories are sorted. `category_orders` maps a dimension to the order of its categories (any category left out follows, sorted). The island axis sorts as Biscoe, Dream, Torgersen, which sends the heavy Gentoo (all from Biscoe) to the bottom; putting Biscoe on top lets the heavy lines run straight across, and the crossings that remain are the Adelie, who live on all three islands.
+
+```
+ParallelCoords(
+    data=penguins,
+    title="Palmer penguins by island",
+    dimensions=MEASUREMENTS + ["island"],
+    hue="species",
+    show_legend=True,
+    # bottom to top, instead of alphabetical
+    category_orders={"island": ["Torgersen", "Dream", "Biscoe"]},
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Legend
+
+The default legend sits where the theme puts it, which on a chart full of lines is often over some of them. `legend` sets the `title`, the `location` from [LEGEND_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), the number of columns `ncols`, and the `alignment` of the entries from [LEGEND_ALIGN](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN); a field left out falls back to the theme ([LegendSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendSettingAttrs)). A titled legend in one row above the axes covers no line at all.
+
+```
+from datachart.constants import LEGEND_LOCATION
+
+ParallelCoords(
+    data=penguins,
+    title="Palmer penguins by species",
+    dimensions=MEASUREMENTS,
+    hue="species",
+    show_legend=True,
+    # a titled, one-row legend above the axes
+    legend={"title": "Species", "location": LEGEND_LOCATION.OUTSIDE_TOP, "ncols": 3},
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
 ### Line style
 
-To change the style of the lines, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.ParallelCoordsStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ParallelCoordsStyleAttrs) type; the ones that style the lines are:
-
-| Attribute                | Description                                                                                                               |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `"plot_parallel_color"`  | The color of the lines. It overrides the hue colors, so leave it out when coloring by `hue`.                              |
-| `"plot_parallel_alpha"`  | The alpha of the lines (how visible they are).                                                                            |
-| `"plot_parallel_width"`  | The width of the lines.                                                                                                   |
-| `"plot_parallel_style"`  | The line style (solid, dashed, etc.).                                                                                     |
-| `"plot_parallel_marker"` | The marker drawn where a line crosses an axis (none by default).                                                          |
-| `"plot_parallel_zorder"` | The draw order of the lines (1 by default); the axes are drawn at `plot_parallel_axis_zorder` (2 by default), above them. |
-
-Again, to help with the style settings, the [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) module contains the following constants:
-
-| Constant                                                                                                                           | Description                              |
-| ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| [datachart.constants.LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE)   | The line style (solid, dashed, etc.).    |
-| [datachart.constants.LINE_MARKER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_MARKER) | The line markers (circle, square, etc.). |
-
-The alpha is the attribute that matters most: lines overlap by nature, and a lower alpha lets the dense regions show as darker bands while every single line stays traceable. A marker on the axis crossings shows where the values actually sit, which helps on the categorical axes where many lines meet at the same tick. Any attribute you leave out keeps the value of the active theme.
+Lines pile up on a parallel coordinates chart, and the line style decides whether a dense region reads as a band or as a solid block. The `plot_parallel_*` line attributes set the color (which overrides the hue colors, so leave it out when coloring by `hue`), the alpha, the width, the line style from [LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE), the marker drawn where a line crosses an axis from [LINE_MARKER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_MARKER), and the draw order (`plot_parallel_zorder`; the axes are drawn above the lines). A lower alpha lets overlapping lines darken where the records agree, and markers show where the values sit, which helps on a categorical axis where many lines meet at one tick. Any attribute left out keeps the value of the active theme.
 
 ```
 from datachart.constants import LINE_STYLE, LINE_MARKER
-```
 
-```
 ParallelCoords(
     data=penguins,
-    # define the style of the lines
+    # translucent lines with a marker at every axis crossing
     style={
         "plot_parallel_color": "#2a6f97",
         "plot_parallel_alpha": 0.35,
@@ -240,25 +201,17 @@ ParallelCoords(
 
 ### Axis style
 
-The vertical axes have their own style attributes:
-
-| Attribute                     | Description                                                                                                                         |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `"plot_parallel_axis_color"`  | The color of the vertical axes.                                                                                                     |
-| `"plot_parallel_axis_width"`  | The width of the vertical axes.                                                                                                     |
-| `"plot_parallel_axis_zorder"` | The draw order of the vertical axes (2 by default, above the lines). The tick marks and their labels are drawn just above the axes. |
-
-The default axes are black and heavier than the lines, so they read as the frame of the chart. Lighter, thinner axes hand the attention to the lines, which suits a chart whose story is in the data rather than in the scales.
+The default axes are black and heavier than the lines, so they read as the frame of the chart. When the story is in the lines, lighter and thinner axes hand the attention to them: `plot_parallel_axis_color` and `plot_parallel_axis_width` set the look, and `plot_parallel_axis_zorder` the draw order (above the lines by default; the tick marks and labels are drawn just above the axes).
 
 ```
 ParallelCoords(
     data=penguins,
-    # define the style of the vertical axes
+    # light, thin axes
     style={
         "plot_parallel_axis_color": "#9a9a9a",
         "plot_parallel_axis_width": 1.0,
     },
-    title="Palmer penguins",
+    title="Palmer penguins by species",
     dimensions=MEASUREMENTS,
     hue="species",
     show_legend=True,
@@ -268,19 +221,7 @@ ParallelCoords(
 
 ### Tick marks and labels
 
-Every axis carries tick marks — five on a numeric axis, one per category on a categorical axis — and each tick mark has a label. Both have their own style attributes:
-
-| Attribute                             | Description                                                                                    |
-| ------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `"plot_parallel_tick_color"`          | The color of the tick marks.                                                                   |
-| `"plot_parallel_tick_width"`          | The width of the tick marks.                                                                   |
-| `"plot_parallel_tick_length"`         | The length of the tick marks, as a fraction of the spacing between two axes (0.02 by default). |
-| `"plot_parallel_tick_label_size"`     | The font size of the tick labels.                                                              |
-| `"plot_parallel_tick_label_color"`    | The font color of the tick labels.                                                             |
-| `"plot_parallel_tick_label_bg_color"` | The background color of the tick labels.                                                       |
-| `"plot_parallel_tick_label_bg_alpha"` | The background alpha of the tick labels.                                                       |
-
-The tick labels sit right next to the axes, where the lines cross, so they are drawn on a background box that keeps them legible over the lines; the box is white at 80 % alpha by default. The example tones the tick marks down to match the grey axes of the previous section, enlarges the labels and gives them an opaque light box so no line shows through.
+The tick labels sit right where the lines cross the axes, so they have to stay legible over the lines. Every axis carries tick marks (five on a numeric axis, one per category on a categorical one), each with a label on a background box, white at 80% alpha by default. `plot_parallel_tick_color`, `plot_parallel_tick_width` and `plot_parallel_tick_length` (a fraction of the spacing between two axes) style the marks; `plot_parallel_tick_label_size`, `plot_parallel_tick_label_color`, `plot_parallel_tick_label_bg_color` and `plot_parallel_tick_label_bg_alpha` style the labels. The example matches the marks to grey axes and puts the labels on an opaque light box, so no line shows through them.
 
 ```
 ParallelCoords(
@@ -288,17 +229,17 @@ ParallelCoords(
     style={
         "plot_parallel_axis_color": "#9a9a9a",
         "plot_parallel_axis_width": 1.0,
-        # define the style of the tick marks
+        # grey, longer tick marks
         "plot_parallel_tick_color": "#9a9a9a",
         "plot_parallel_tick_width": 1.0,
         "plot_parallel_tick_length": 0.04,
-        # define the style of the tick labels
-        "plot_parallel_tick_label_size": 9,
+        # small labels on an opaque box
+        "plot_parallel_tick_label_size": 8,
         "plot_parallel_tick_label_color": "#4a4a4a",
         "plot_parallel_tick_label_bg_color": "#f3f3f3",
         "plot_parallel_tick_label_bg_alpha": 1.0,
     },
-    title="Palmer penguins",
+    title="Palmer penguins by species",
     dimensions=MEASUREMENTS,
     hue="species",
     show_legend=True,
@@ -308,80 +249,33 @@ ParallelCoords(
 
 ### Dimension labels
 
-The dimension labels name the axes along the bottom of the chart. Their style attributes are:
-
-| Attribute                            | Description                                                                     |
-| ------------------------------------ | ------------------------------------------------------------------------------- |
-| `"plot_parallel_dim_label_size"`     | The font size of the dimension labels.                                          |
-| `"plot_parallel_dim_label_color"`    | The font color of the dimension labels.                                         |
-| `"plot_parallel_dim_label_rotation"` | The rotation of the dimension labels, in degrees.                               |
-| `"plot_parallel_dim_label_pad"`      | The padding between the bottom of the axes and the dimension labels, in points. |
-
-Rotation is the attribute to reach for when the labels are long or the axes many: rotated labels no longer run into each other. A larger pad keeps them clear of the bottom tick labels.
+The dimension labels name the axes along the bottom of the chart, and with many axes or long names they run into each other. `plot_parallel_dim_label_rotation` tilts them (in degrees), `plot_parallel_dim_label_pad` moves them away from the bottom tick labels (in points), and `plot_parallel_dim_label_size` and `plot_parallel_dim_label_color` set the font. Tilted, the names of all seven attributes of the dataset fit at full width.
 
 ```
 ParallelCoords(
     data=penguins,
-    # define the style of the dimension labels
+    # tilted, padded axis names
     style={
-        "plot_parallel_dim_label_size": 11,
+        "plot_parallel_dim_label_size": 10,
         "plot_parallel_dim_label_color": "#2a6f97",
         "plot_parallel_dim_label_rotation": 20,
-        "plot_parallel_dim_label_pad": 14,
+        "plot_parallel_dim_label_pad": 10,
     },
     title="Palmer penguins",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
-### Date dimensions
-
-A dimension whose values are real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp` — is a categorical axis ordered by time, with each date printed as its ISO label. Date strings are not parsed; they sort as plain text.
-
-```
-from datetime import date
-
-# CPython feature releases: release date, bugfix releases shipped, and years of support
-releases = [
-    {"version": "3.8", "released": date(2019, 10, 14), "bugfix releases": 10, "years of support": 5},
-    {"version": "3.9", "released": date(2020, 10, 5), "bugfix releases": 13, "years of support": 5},
-    {"version": "3.10", "released": date(2021, 10, 4), "bugfix releases": 11, "years of support": 5},
-    {"version": "3.11", "released": date(2022, 10, 24), "bugfix releases": 9, "years of support": 5},
-    {"version": "3.12", "released": date(2023, 10, 2), "bugfix releases": 7, "years of support": 5},
-    {"version": "3.13", "released": date(2024, 10, 7), "bugfix releases": 3, "years of support": 5},
-]
-
-ParallelCoords(
-    data=releases,
-    title="CPython feature releases",
-    dimensions=["version", "released", "bugfix releases"],
-    hue="version",
-    # keep the versions in release order instead of sorting them as text
-    category_orders={"version": [release["version"] for release in releases]},
-    figsize=FIG_SIZE.FULL_MEDIUM,
-).show()
-```
-
 ### Emphasis
 
-When the story is about some of the rows, the `emphasis` attribute tells the rest to step back. It takes one role per data point, aligned with the rows of `data` (a single string applies the same role to every row):
-
-- `"background"` mutes a row: it takes the active theme's `muted_color` at `muted_alpha`, gets a thinner line, drops behind the other rows, and claims no hue color and no legend entry.
-- `"highlight"` bolds a row and brings it to the front of the rows — but stays below the axes, tick marks and labels, so the scales remain readable.
-- `None` draws the row unchanged.
-
-The role strings are also available as constants in [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS). Because the background rows leave the legend, a hue legend over an emphasized chart names only the groups that are still colored. The example singles out the Chinstrap penguins: they are highlighted, the other two species are muted, and the legend names the Chinstrap alone. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide for how emphasis works across the other charts and in composed figures.
-
-To pick the rows from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every row whose `hue` value matches and mutes the rest. The rule reads the column the rows are already colored by, so it needs a numeric `hue`; without one it raises a `ValueError`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
+When the question is about some of the records, the others should step back without leaving. `emphasis` takes one role per record, aligned with `data` (a single string applies to every record): `"background"` mutes a record (the theme's muted color, a lower alpha, a thinner line, drawn behind the rest, with no hue color and no legend entry), `"highlight"` bolds it and brings it to the front of the lines (still below the axes and labels), and `None` leaves it as it is. The roles are also the [EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants, and the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis on every chart. Singling out the Chinstrap shows the species in between: Adelie bill depth, Gentoo bill length.
 
 ```
 from datachart.constants import EMPHASIS
-```
 
-```
 ParallelCoords(
     data=penguins,
-    # one role per row: highlight the Chinstrap, mute the other species
+    # one role per penguin: the Chinstrap in front, the rest muted
     emphasis=[
         EMPHASIS.HIGHLIGHT if p["species"] == "Chinstrap" else EMPHASIS.BACKGROUND
         for p in penguins
@@ -394,112 +288,187 @@ ParallelCoords(
 ).show()
 ```
 
-## Multiple Parallel Coordinates Charts
-
-To draw several sets of data points on one chart, pass a list of lists to the `data` argument. The sets share the axes: the dimensions are the union of their keys, and every axis is normalized over the values of all sets together, so the same value lands at the same height whichever set it belongs to. What the sets do not share is their style: `style` and `hue` can be passed as lists, where each element applies to the corresponding set (a single value applies to every set), so one set can be drawn in a color of its own while another is colored by its hue. The `subtitle` attribute is accepted for consistency with the other charts, but a parallel coordinates chart has no per-set heading to draw it in — the sets are told apart by their style or by the hue legend.
-
-Multiple charts pattern
-
-For multiple charts, `data` becomes a list of lists of data points, and per-chart attributes like `style` and `hue` become lists where each element applies to the corresponding chart.
-
-The axes of multiple charts come from the keys of the data points, so each set is reduced to the keys it should be drawn on. The example separates the Gentoo penguins from the other two species: the Adelie and Chinstrap are drawn as a light grey context, the Gentoo in a bold color on top. The per-dimension ranges are the same as in the previous examples, because they are computed over both sets.
+`emphasis_rule` picks the records from the data instead. It is a one-key dictionary read against each record's numeric `hue` value: `{"top": n}` or `{"bottom": n}` by rank, `{"above": v}` or `{"below": v}` (strict), or `{"between": (lo, hi)}` (inclusive). The records that match are highlighted, the rest muted, and an explicit `emphasis` role wins over the rule. Without a numeric `hue` the rule raises a `ValueError`. With a numeric hue, the shading spans only the highlighted records, so the lowest of them gets the lightest color of the ramp; a fixed `plot_parallel_color` keeps every highlighted line equally visible, while the rule still reads the `hue` values. Keeping the penguins above 5 kg answers *what do the heaviest penguins have in common*: long flippers and shallow bills.
 
 ```
-# keep only the measurements: the keys of the data points are the axes
+ParallelCoords(
+    data=penguins,
+    title="Palmer penguins above 5 kg",
+    dimensions=MEASUREMENTS,
+    # the rule reads the body mass; the style fixes the color
+    hue="body mass",
+    style={"plot_parallel_color": "#0f7173"},
+    # highlight the records whose hue value is above 5000 g
+    emphasis_rule={"above": 5000},
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Text annotations
+
+A crossing between two axes is easy to miss for a reader who does not know to look for it; a note points it out. `texts` places text on the chart, with an optional `target` to draw a connector. In data coordinates, `x` counts the axes from `0` (a half-integer sits between two axes) and `y` runs from `0` at the bottom of every axis to `1` at the top; `"coords": "axes"` places the text in axes fractions instead. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connectors and styling.
+
+```
+ParallelCoords(
+    data=penguins,
+    title="Palmer penguins by species",
+    dimensions=MEASUREMENTS,
+    hue="species",
+    show_legend=True,
+    # a note on the crossing between bill depth (axis 1) and flipper length (axis 2)
+    texts={
+        "text": "shallow bills, long flippers:\na negative relation",
+        "x": 1.5,
+        "y": 0.9,
+        "target": (1.5, 0.5),
+    },
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+## Multiple Parallel Coordinates Charts
+
+To draw several sets of records on one chart, pass a list of lists to `data`. The sets share the axes: the axes are the union of their keys, and every axis spans the values of all sets together, so a value lands at the same height whichever set it is in. The per-set attributes `style` and `hue` take lists aligned with `data` (a single value applies to every set), so one set can be a grey context while another is colored. `subtitle` is accepted for consistency with the other charts, but the chart has no per-set heading to draw it in: the sets are told apart by their style or by the hue legend.
+
+The axes come from the keys, so each set is reduced to the keys it should be drawn on. The example draws the Adelie and Chinstrap as a grey context and the Gentoo in a bold color over them.
+
+```
+# keep only the measurements: the keys are the axes
 gentoo = [{k: p[k] for k in MEASUREMENTS} for p in penguins if p["species"] == "Gentoo"]
 others = [{k: p[k] for k in MEASUREMENTS} for p in penguins if p["species"] != "Gentoo"]
 
-figure = ParallelCoords(
-    # use a list of lists to define multiple charts
+ParallelCoords(
+    # one list per set of records
     data=[others, gentoo],
-    # style can be a list (one per chart) or a single dict (applies to all)
+    # one style per set: grey context, bold foreground
     style=[
         {"plot_parallel_color": "#c0c0c0", "plot_parallel_alpha": 0.8},
         {"plot_parallel_color": "#0f7173", "plot_parallel_width": 2.0},
     ],
     title="Palmer penguins: the Gentoo against the rest",
     figsize=FIG_SIZE.FULL_MEDIUM,
-)
-figure.show()
+).show()
 ```
 
-## Saving the Chart as an Image
-
-To save the chart as an image, use the [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.save_figure) function.
+With `hue` as a list, each set is colored by its own key, or not at all. Keeping the sex in the Gentoo records and coloring only that set by it shows that, within the Gentoo, the males are the heavier half, while the other species stay a grey context. A hue key is not an axis, so the axes are still the four measurements.
 
 ```
-from datachart.utils import save_figure
+gentoo_by_sex = [
+    {**{k: p[k] for k in MEASUREMENTS}, "sex": p["sex"]}
+    for p in penguins
+    if p["species"] == "Gentoo"
+]
+
+ParallelCoords(
+    data=[others, gentoo_by_sex],
+    style=[{"plot_parallel_color": "#c0c0c0", "plot_parallel_alpha": 0.8}, None],
+    # no hue for the context, the sex for the Gentoo
+    hue=[None, "sex"],
+    show_legend=True,
+    title="Gentoo penguins by sex, against the rest",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
 ```
 
-```
-save_figure(figure, "./fig_parallel_coords.png", dpi=300)
-```
+## Additional Features
 
-The figure should be saved in the current working directory.
+### Date dimensions
+
+A record often carries a date: a release, a survey wave, a measurement day. A dimension whose values are real temporal objects (`datetime`, `date`, `numpy.datetime64` or a pandas `Timestamp`) becomes a categorical axis ordered by time, each date printed as its ISO label; date strings are not parsed, and sort as plain text. `releases`, defined in a hidden cell, holds six illustrative releases of a mobile app: the `version`, the `released` date, the app size, the share of crash-free sessions, and the average store rating. With the date as the first axis, the segments from the date to the size run nearly parallel: the later the release, the larger the app. Highlighting release 3.0 shows the one release whose stability dropped, and its rating dropped with it.
+
+```
+ParallelCoords(
+    data=releases,
+    title="App releases",
+    # the date is an axis ordered by time
+    dimensions=["released", "size (MB)", "crash-free (%)", "rating"],
+    # release 3.0 in front, the others muted
+    emphasis=[
+        EMPHASIS.HIGHLIGHT if r["version"] == "3.0" else EMPHASIS.BACKGROUND
+        for r in releases
+    ],
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
 
 ## Real-World Examples
 
-The following examples put the features above to work on real or realistic data. Each one states what its data is and where it comes from; the data itself lives in a hidden cell.
+The examples below put the features above to work on real or realistic data, each one answering a question. The data lives in hidden cells; each example says what its data is and where it comes from.
 
-### Example 1: Car Specs (Categorical Axes and Category Order)
+### Example 1: Heavier Cars Travel Fewer Miles per Gallon (Categorical Axis and Category Order)
 
-`cars` holds the specifications of 30 cars from the [Auto MPG](https://archive.ics.uci.edu/dataset/9/auto+mpg) dataset of the UCI Machine Learning Repository (CC BY 4.0), which describes cars sold in the United States between 1970 and 1982: the number of cylinders, the horsepower, the weight (in lb), the fuel consumption (in mpg) and the region of origin. The sample spans the three regions and the whole range from heavy V8 sedans to small four-cylinder imports.
-
-Every car also has a `model` name. It is a label, not a variable — as a categorical axis it would have 30 ticks — so `dimensions` lists the axes to draw and leaves it out. The origin is both the `hue` and the last axis, which fans the lines out into the three regions at the right edge. Its categories would be sorted alphabetically (Europe, Japan, USA); `category_orders` puts the USA at the bottom and Japan at the top instead — the order the regions take on the mpg axis next to it — so the lines reach the last axis without crossing. The chart then tells the dataset's story at a glance: the American cars have the most cylinders, the most horsepower and the heaviest bodies, and travel the fewest miles per gallon; the Japanese cars are the mirror image.
+`cars` holds 30 cars from the [Auto MPG](https://archive.ics.uci.edu/dataset/9/auto+mpg) dataset of the UCI Machine Learning Repository (CC BY 4.0), sold in the United States between 1970 and 1982: the `model` name, the number of `cylinders`, the `horsepower`, the `weight (lb)`, the fuel economy in `mpg`, and the region of `origin`. The question is the trade-off between size and economy, so `weight (lb)` sits right next to `mpg`, where the segments cross in an X. The model name is a label, not a variable (as an axis it would have 30 ticks), so `dimensions` leaves it out. The origin is both the `hue` and the last axis; `category_orders` puts the USA at the bottom and Japan at the top, the order the regions take on the mpg axis next to it, so the lines reach the last axis without needless crossings. The American cars have the most cylinders, the most power and the heaviest bodies, and the fewest miles per gallon; the Japanese cars are their mirror image.
 
 ```
 ParallelCoords(
     data=cars,
-    title="Cars of the 1970s: specifications by region of origin",
-    # the model name is a label, not an axis
+    title="Cars of the 1970s by region of origin",
+    # the model name is a label, not an axis; weight sits next to mpg
     dimensions=["cylinders", "horsepower", "weight (lb)", "mpg", "origin"],
-    # color the lines by the origin, and keep the origin as the last axis
+    # color by the origin, and keep it as the last axis
     hue="origin",
     show_legend=True,
-    # order the origins instead of sorting them alphabetically
+    legend={"title": "Origin", "location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+    # bottom to top, the order the regions take on the mpg axis
     category_orders={"origin": ["USA", "Europe", "Japan"]},
     style={"plot_parallel_alpha": 0.7, "plot_parallel_width": 1.5},
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
-### Example 2: Hyperparameter Search (Numeric Hue)
+### Example 2: What the Best Runs Share (Emphasis Rule on a Numeric Hue)
 
-`runs` holds the 24 runs of an illustrative hyperparameter search of an image classifier, in the shape a tracking tool such as Weights & Biases or Optuna reports them: each run is one combination of optimizer, learning rate, batch size, dropout and number of epochs, and the validation accuracy it reached. The learning rate was sampled on a logarithmic grid from 10⁻⁴ to 10⁻², so it is stored as its base-10 logarithm — on a linear axis the raw values would pile up at the bottom.
-
-A parallel coordinates chart is the standard view of such a search, and its one question is which settings lead to a high score. Coloring the lines by the accuracy answers it: with the numeric `hue`, every run is shaded along the continuous ramp from the lightest (worst) to the darkest (best), and the dark lines can be followed back across the hyperparameter axes. The accuracy is kept as the last axis, so the ramp can be read off it. Here the best runs cluster around Adam, a learning rate of 10⁻³, a moderate dropout and the full 30 epochs, while the runs at either end of the learning-rate axis stay pale.
+`runs` holds the 24 runs of an illustrative hyperparameter search of an image classifier, in the shape a tracking tool such as MLflow or Optuna reports them: the `optimizer`, the `log10 learning rate` (the rate was sampled on a logarithmic grid from 10⁻⁴ to 10⁻², and on a linear axis the raw values would pile up at the bottom), the `batch size`, the `dropout`, the number of `epochs`, and the validation `accuracy` the run reached. A parallel coordinates chart is the standard view of such a search, and its question is which settings lead to a high score. The `hue` on the accuracy gives `emphasis_rule={"top": 3}` its values, the rule mutes all but the three best runs, and a fixed line color keeps the three equally visible (see [Emphasis](#emphasis)). The accuracy stays as the last axis, so the three lines end at the top of it, and their shared path stands out: Adam, a learning rate of 10⁻³, a dropout of 0.2 to 0.3 and 25 to 30 epochs. The batch size is where they disagree, so it matters least.
 
 ```
 ParallelCoords(
     data=runs,
-    title="Hyperparameter search: 24 runs colored by validation accuracy",
-    # keep the accuracy as the last axis, so the color ramp can be read off it
+    title="Hyperparameter search: the three best runs",
+    # the accuracy stays as the last axis
     dimensions=RUN_COLUMNS,
-    # color the lines continuously by the accuracy
+    # the rule ranks the runs by the hue key
     hue="accuracy",
-    style={"plot_parallel_alpha": 0.8, "plot_parallel_width": 1.5},
+    # keep the three most accurate runs, mute the rest
+    emphasis_rule={"top": 3},
+    style={"plot_parallel_color": "#c1121f"},
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
-### Example 3: Best Runs (Emphasis)
+### Example 3: What Sets Each Penguin Species Apart (Emphasis, Notes and a Grid)
 
-The same search, asked a sharper question: what do the three best runs have in common? The numeric hue grades every run; `emphasis` answers a yes-or-no question instead. The three runs with the highest accuracy are picked in code and given the `"highlight"` role, every other run the `"background"` role, so the field becomes a muted grey context and the three best runs are the only colored lines. The highlighted rows keep their hue color — here the categorical hue on the optimizer — and because the muted rows leave the legend, it names only the optimizer the best runs used. All three ran Adam at a learning rate of 10⁻³ with a dropout of 0.2 to 0.3 for 25 to 30 epochs; the batch size is what they disagree on.
+Back to the 30 Palmer penguins of the shared dataset, with one chart per species. Each chart highlights one species against the other two with `emphasis`, and a note from `texts` points at the trait that sets it apart: the Adelie's short bills, the Chinstrap's bills that are both long and deep, the Gentoo's shallow bills and long flippers. [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) stacks the three charts in one figure, and the notes travel with their charts. The charts draw the same records, so their axes span the same ranges and a height means the same value in each.
 
 ```
-best = sorted(runs, key=lambda run: run["accuracy"])[-3:]
+from datachart.utils import Grid
 
-ParallelCoords(
-    data=runs,
-    # highlight the three best runs, mute the rest
-    emphasis=[
-        EMPHASIS.HIGHLIGHT if run in best else EMPHASIS.BACKGROUND for run in runs
-    ],
-    title="Hyperparameter search: the three best runs",
-    dimensions=RUN_COLUMNS,
-    # the highlighted runs keep their hue color; the muted ones leave the legend
-    hue="optimizer",
-    show_legend=True,
-    figsize=FIG_SIZE.FULL_MEDIUM,
+# each species' note, its position, and the point it names (x = axis index)
+TRAITS = {
+    "Adelie": ("short bills", (0.45, 0.1), (0.02, 0.15)),
+    "Chinstrap": ("long, deep bills", (0.5, 1.05), (0.1, 0.9)),
+    "Gentoo": ("shallow bills,\nlong flippers", (1.3, 0.12), (1.02, 0.05)),
+}
+
+
+def species_profile(species):
+    # one species in front, the other two muted, and a note on its trait
+    text, (x, y), target = TRAITS[species]
+    return ParallelCoords(
+        data=penguins,
+        title=species,
+        dimensions=MEASUREMENTS,
+        hue="species",
+        emphasis=[
+            EMPHASIS.HIGHLIGHT if p["species"] == species else EMPHASIS.BACKGROUND
+            for p in penguins
+        ],
+        texts={"text": text, "x": x, "y": y, "target": target},
+    )
+
+
+Grid(
+    [[species_profile("Adelie")], [species_profile("Chinstrap")], [species_profile("Gentoo")]],
+    title="What sets each penguin species apart",
+    figsize=FIG_SIZE.FULL_TALL,
 ).show()
 ```

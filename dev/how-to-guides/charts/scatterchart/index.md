@@ -1,98 +1,24 @@
 # Scatter Chart
 
-This section showcases the scatter chart. It contains examples of how to create scatter charts using the [datachart.charts.ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.ScatterChart) function.
+A scatter chart places each observation by two numeric values, so it answers *do these two quantities move together, and which points break the pattern*. This guide shows how to create scatter charts with the [datachart.charts.ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.charts.ScatterChart) function, starting with the basics and building up to worked examples on real data.
 
 Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-scatter-chart), which maps common tasks to the parameter or style attribute that does the job.
-
-As mentioned above, the scatter charts are created using the `ScatterChart` function found in the [datachart.charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md) module. Let's import it:
 
 ```
 from datachart.charts import ScatterChart
 ```
 
-## Scatter Chart Input Attributes
-
-The `ScatterChart` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the data points. For a single scatter chart, `data` is a list of dictionaries. For multiple scatter charts, `data` is a list of lists.
-
-```
-ScatterChart(
-    data=[{                                             # A list of scatter data points (or list of lists for multiple charts)
-        "x":    Union[int, float],                      # The x-axis value
-        "y":    Union[int, float],                      # The y-axis value
-        "size": Optional[Union[int, float]],            # The marker size value (for bubble charts)
-        "hue":  Optional[str],                          # The category for color grouping
-        "label": Optional[str],                         # The label drawn beside the point
-    }],
-    style={                                             # The style of the scatter markers (optional)
-        "plot_scatter_color":      Optional[str],       # The color of the markers (hex color code)
-        "plot_scatter_alpha":      Optional[float],     # The alpha of the markers (how visible they are)
-        "plot_scatter_size":       Optional[float],     # The size of the markers
-        "plot_scatter_marker":     Optional[LINE_MARKER], # The marker shape (circle, square, etc.)
-        "plot_scatter_zorder":     Optional[int],       # The zorder of the markers
-        "plot_scatter_edge_width": Optional[float],     # The edge width of the markers
-        "plot_scatter_edge_color": Optional[str],       # The edge color of the markers (hex color code)
-    },
-    subtitle=Optional[str],                             # The subtitle of the chart (or list for multiple charts)
-    emphasis=Optional[str],                             # "highlight" or "background" (or list for multiple charts)
-    emphasis_rule=Optional[dict],                       # One-key rule on a per-series summary; optional "by": mean, median, min, max, sum
-    title=Optional[str],                                # The title of the chart
-    xlabel=Optional[str],                               # The x-axis label
-    ylabel=Optional[str],                               # The y-axis label
-
-    figsize=Optional[Tuple[float, float]],              # The figure size in inches
-    show_grid=Optional[str],                            # Which grid lines to show ("both", "x", "y")
-    aspect_ratio=Optional[str],                         # The aspect ratio of the axes ("auto", "equal")
-    show_legend=Optional[bool],                         # Whether to show the legend
-    show_regression=Optional[bool],                     # Whether to show the regression line
-    show_ci=Optional[bool],                             # Whether to show the confidence interval around the regression line
-    ci_level=Optional[float],                           # The confidence interval level (default: 0.95)
-    show_correlation=Optional[bool],                    # Whether to annotate the Pearson correlation coefficient
-
-    subplots=Optional[bool],                            # Whether to draw each chart in its own subplot
-    max_cols=Optional[int],                             # Maximum number of subplots per row
-    sharex=Optional[bool],                              # Whether subplots share the x-axis
-    sharey=Optional[bool],                              # Whether subplots share the y-axis
-    scalex=Optional[str],                               # The x-axis scale ("linear", "log", "symlog", "asinh")
-    scaley=Optional[str],                               # The y-axis scale ("linear", "log", "symlog", "asinh")
-    xmin=Optional[Union[int, float]],                   # The x-axis range
-    xmax=Optional[Union[int, float]],
-    ymin=Optional[Union[int, float]],                   # The y-axis range
-    ymax=Optional[Union[int, float]],
-
-    xticks=Optional[List[Union[int, float]]],           # the x-axis ticks
-    xticklabels=Optional[List[str]],                    # the x-axis tick labels (must be same length as xticks)
-    xtickrotate=Optional[int],                          # the x-axis tick labels rotation
-    yticks=Optional[List[Union[int, float]]],           # the y-axis ticks
-    yticklabels=Optional[List[str]],                    # the y-axis tick labels (must be same length as yticks)
-    ytickrotate=Optional[int],                          # the y-axis tick labels rotation
-
-    vlines=Optional[Union[dict, List[dict]]],           # the vertical lines
-    hlines=Optional[Union[dict, List[dict]]],           # the horizontal lines
-    vspans=Optional[Union[dict, List[dict]]],           # the vertical reference bands
-    hspans=Optional[Union[dict, List[dict]]],           # the horizontal reference bands
-
-    x=Optional[str],                                    # the key holding the x-axis value (default: "x")
-    y=Optional[str],                                    # the key holding the y-axis value (default: "y")
-    size=Optional[str],                                 # the key holding the marker size value (bubble charts)
-    hue=Optional[str],                                  # the key holding the category for color grouping
-    label=Optional[str],                                # the key holding the point label (default: "label")
-    size_range=Optional[Tuple[float, float]],           # the (min_size, max_size) range for bubble charts (default: (20, 200))
-)
-```
-
-For more details, see the [datachart.charts.ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.ScatterChart) function.
-
 ## Basics
 
-The examples in this guide share one dataset: the GDP per capita (in US dollars) and life expectancy (in years) of 36 countries, with their continent and population. The data is hard-coded in a hidden cell; `countries` holds one point per country, and `countries_by_continent` holds one list per continent — Africa, the Americas, Asia and Europe — in the order of `CONTINENTS`. The figures are rounded recent public statistics.
+The examples in this guide share one dataset: the GDP per capita and the life expectancy at birth of 49 countries in 2019, the last year before the COVID-19 pandemic. GDP per capita is in current US dollars, rounded to the nearest hundred, and population is in millions (source: World Bank, World Development Indicators); life expectancy is in years for both sexes, and the region is the country's WHO region (source: WHO Global Health Observatory). The data lives in a hidden cell. `countries` holds one data point per country, with the GDP per capita as `x`, the life expectancy as `y`, and the `country`, `region` and `population` as extra keys; `countries_by_region` holds one list per WHO region, in the order of `REGIONS`. The pattern is well known, richer countries live longer, and the interesting part is the countries that break it.
 
-Each data point is a dictionary with an `x` value (here the GDP per capita) and a `y` value (the life expectancy). The other keys are ignored until a later example asks for them:
+Each data point is a dictionary with an `x` and a `y` value; the other keys are ignored until a parameter asks for them:
 
 ```
 countries[:3]
 ```
 
-**Basic example.** Only the `data` argument is required to draw the scatter chart.
+**Basic example.** Only the `data` argument is required. Even without labels the shape is visible: life expectancy climbs steeply at low incomes and flattens out above them:
 
 ```
 ScatterChart(
@@ -105,183 +31,221 @@ ScatterChart(
 
 Every customization is either a keyword argument of `ScatterChart` or a `plot_scatter_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                             | Use                                                                      | See                                                           |
-| -------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| add a title and axis labels            | `title`, `xlabel`, `ylabel`                                              | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| set custom tick positions and labels   | `xticks`, `xticklabels`, `yticks`, `yticklabels`                         | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| rotate the tick labels                 | `xtickrotate`, `ytickrotate`                                             | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| fix the axis range                     | `xmin`, `xmax`, `ymin`, `ymax`                                           | [Title, axis labels and ticks](#title-axis-labels-and-ticks)  |
-| resize the figure                      | `figsize`                                                                | [Figure size and grid](#figure-size-and-grid)                 |
-| show grid lines                        | `show_grid`                                                              | [Figure size and grid](#figure-size-and-grid)                 |
-| change the marker color or shape       | `style={"plot_scatter_color": ..., "plot_scatter_marker": ...}`          | [Scatter style](#scatter-style)                               |
-| change the marker size or transparency | `style={"plot_scatter_size": ..., "plot_scatter_alpha": ...}`            | [Scatter style](#scatter-style)                               |
-| outline the markers                    | `style={"plot_scatter_edge_width": ..., "plot_scatter_edge_color": ...}` | [Scatter style](#scatter-style)                               |
-| color the points by a category         | `hue`, `show_legend`                                                     | [Hue grouping](#hue-grouping)                                 |
-| scale the markers by a value           | `size`, `size_range`                                                     | [Bubble chart](#bubble-chart)                                 |
-| name each point                        | `label`                                                                  | [Point labels](#point-labels)                                 |
-| print the value beside each point      | `show_values`, `value_format`, `value_step`                              | [Value labels](#value-labels)                                 |
-| fit a regression line                  | `show_regression`, `show_ci`, `ci_level`, `show_correlation`             | [Regression line](#regression-line)                           |
-| fix the aspect ratio of the axes       | `aspect_ratio`                                                           | [Aspect ratio](#aspect-ratio)                                 |
-| highlight one series, mute the rest    | `emphasis`                                                               | [Emphasis](#emphasis)                                         |
-| highlight the series that match a rule | `emphasis_rule`                                                          | [Emphasis](#emphasis)                                         |
-| mark a threshold or a reference value  | `hlines`, `vlines`                                                       | [Reference lines](#reference-lines)                           |
-| shade a range of values                | `hspans`, `vspans`                                                       | [Reference bands](#reference-bands)                           |
-| compare several series in one chart    | `data` as a list of lists, `subtitle`, `show_legend`                     | [Multiple Scatter Charts](#multiple-scatter-charts)           |
-| draw each series in its own subplot    | `subplots`, `sharex`, `sharey`, `max_cols`                               | [Subplots](#subplots)                                         |
-| use a logarithmic axis                 | `scalex`, `scaley`                                                       | [Axis scales](#axis-scales)                                   |
-| plot data with other key names         | `x`, `y`, `size`, `hue`, `label`                                         | [Custom data keys](#custom-data-keys)                         |
-| save the chart to a file               | `save_figure`                                                            | [Saving the Chart as an Image](#saving-the-chart-as-an-image) |
+| I want to…                                    | Use                                                             | See                                                                                                     |
+| --------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| add a title and axis labels                   | `title`, `xlabel`, `ylabel`                                     | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| set the tick positions and labels             | `xticks`, `xticklabels`, `yticks`, `yticklabels`                | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| format or rotate the tick labels              | `xticks_format`, `yticks_format`, `xtickrotate`, `ytickrotate`  | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| fix the axis range                            | `xmin`, `xmax`, `ymin`, `ymax`                                  | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| resize the figure                             | `figsize`                                                       | [Figure size and grid](#figure-size-and-grid)                                                           |
+| show grid lines                               | `show_grid`                                                     | [Figure size and grid](#figure-size-and-grid)                                                           |
+| change the marker color, shape, size, or edge | `style={"plot_scatter_color": ..., "plot_scatter_marker": ...}` | [Scatter style](#scatter-style)                                                                         |
+| color the points by a category                | `hue`, `show_legend`                                            | [Hue grouping](#hue-grouping)                                                                           |
+| scale the markers by a third value            | `size`, `size_range`                                            | [Bubble chart](#bubble-chart)                                                                           |
+| name some or all of the points                | `label`, the `"label"` key of a data point                      | [Point labels](#point-labels)                                                                           |
+| print the value beside each point             | `show_values`, `value_format`, `value_step`                     | [Value labels](#value-labels)                                                                           |
+| fit a trend line and measure the correlation  | `show_regression`, `show_ci`, `ci_level`, `show_correlation`    | [Regression line](#regression-line)                                                                     |
+| keep one unit the same length on both axes    | `aspect_ratio`                                                  | [Aspect ratio](#aspect-ratio)                                                                           |
+| highlight some series, mute the rest          | `emphasis`, `emphasis_rule`                                     | [Emphasis](#emphasis)                                                                                   |
+| mark a threshold or a reference value         | `hlines`, `vlines`                                              | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| shade a range of values                       | `hspans`, `vspans`                                              | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| put a note on the chart                       | `texts`                                                         | [Text annotations](#text-annotations)                                                                   |
+| compare several series in one chart           | `data` as a list of lists, `subtitle`, `show_legend`            | [Multiple Scatter Charts](#multiple-scatter-charts)                                                     |
+| title and place the legend                    | `legend`                                                        | [Legend](#legend)                                                                                       |
+| draw each series in its own subplot           | `subplots`, `sharex`, `sharey`, `max_cols`                      | [Subplots](#subplots)                                                                                   |
+| use a logarithmic axis                        | `scalex`, `scaley`                                              | [Axis scales](#axis-scales)                                                                             |
+| plot dates on the x-axis                      | `date` or `datetime` values as `x`, `xticks_format`             | [Datetime axis](#datetime-axis)                                                                         |
+| plot data with other key names                | `x`, `y`, `size`, `hue`, `label`                                | [Custom data keys](#custom-data-keys)                                                                   |
+| save the chart to a file                      | `save_figure`                                                   | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
-The full list of style attributes is in the [datachart.typings.ScatterStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ScatterStyleAttrs) type; the full list of parameters is in the [datachart.charts.ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.ScatterChart) reference.
+The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
+
+| Parameter                                    | Constant                                                                                                                                                                                                                                     |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
+| `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
+| `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
+| `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
+| `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
+| `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
+| `scalex`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
+| `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
+
+The full list of style attributes is in the [datachart.typings.ScatterStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterStyleAttrs) type; the full list of parameters is in the [datachart.charts.ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.charts.ScatterChart) reference.
 
 ### Title, axis labels and ticks
 
-To add the chart title and axis labels, add the `title`, `xlabel` and `ylabel` attributes. The tick positions and their labels can be set with `xticks` and `xticklabels` (or `yticks` and `yticklabels`) — here the GDP per capita ticks are labeled in thousands of dollars. Tick labels can be rotated with `xtickrotate` (or `ytickrotate`), and the axis range can be fixed with `xmin`, `xmax`, `ymin` and `ymax`.
+A chart without a title and axis labels leaves the reader guessing what the axes measure; `title`, `xlabel` and `ylabel` say it. GDP per capita runs from about 500 to 86,000 dollars, and on a linear axis the poorer half of the countries piles up against the left edge. `scalex=SCALE.LOG` ([SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)) spreads them out, so the examples below use it; the [Axis scales](#axis-scales) section compares the two. A log axis labels its ticks as powers of ten, so `xticks` places a tick at 1,000, 10,000 and 100,000 dollars and `xticklabels` names them. `xticks_format` (and `yticks_format`) is the alternative when the labels follow a pattern: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a `"{x:,.0f}"` style string. `xtickrotate` and `ytickrotate` tilt crowded labels, and `xmin`, `xmax`, `ymin` and `ymax` fix the axis range.
 
 ```
-GDP_TICKS = [0, 25_000, 50_000, 75_000, 100_000]
-GDP_TICK_LABELS = ["$0", "$25k", "$50k", "$75k", "$100k"]
+from datachart.constants import SCALE
+
+GDP_TICKS = [1_000, 10_000, 100_000]
+GDP_TICK_LABELS = ["$1k", "$10k", "$100k"]
 
 ScatterChart(
     data=countries,
     # add the title
-    title="Life expectancy vs. GDP per capita",
+    title="Life expectancy and income, 2019",
     # add the x and y axis labels
-    xlabel="GDP per capita (USD)",
+    xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    # label the GDP ticks in thousands of dollars
+    # a logarithmic income axis
+    scalex=SCALE.LOG,
+    # one labeled tick per power of ten
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     # fix the y-axis range
-    ymin=50,
+    ymin=55,
     ymax=90,
 ).show()
 ```
 
 ### Figure size and grid
 
-To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains some of the predefined figure sizes.
-
-To add the grid, add the `show_grid` attribute. The possible options are:
-
-| Option   | Description                                     |
-| -------- | ----------------------------------------------- |
-| `"both"` | shows both the x-axis and the y-axis gridlines. |
-| `"x"`    | shows only the x-axis grid lines.               |
-| `"y"`    | shows only the y-axis grid lines.               |
-
-Again, `datachart` provides a [datachart.constants.SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) constant, which contains the supported options.
+The default figure is 6.4 by 4.8 inches, a little wider than the text column of an A4 page. `figsize` takes a `(width, height)` tuple in inches or one of the presets in [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE), sized for a full or half page width; `FIG_SIZE.FULL_MEDIUM` fits the full width. The default grid draws only horizontal lines, but a scatter chart has no baseline to read from, so grid lines in both directions help the eye carry a point to either axis: `show_grid=SHOW_GRID.BOTH` ([SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)); `SHOW_GRID.X` and `SHOW_GRID.Y` draw one set only.
 
 ```
 from datachart.constants import FIG_SIZE, SHOW_GRID
-```
 
-```
 ScatterChart(
     data=countries,
-    title="Life expectancy vs. GDP per capita",
-    xlabel="GDP per capita (USD)",
+    title="Life expectancy and income, 2019",
+    xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
-    # add to determine the figure size
-    figsize=FIG_SIZE.FULL_SHORT,
-    # add to show the grid lines
+    # a figure as wide as the page
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    # grid lines in both directions
     show_grid=SHOW_GRID.BOTH,
 ).show()
 ```
 
 ### Scatter style
 
-To change the marker style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.ScatterStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ScatterStyleAttrs) type, which contains the following attributes:
-
-| Attribute                   | Description                                      |
-| --------------------------- | ------------------------------------------------ |
-| `"plot_scatter_color"`      | The color of the markers (hex color code).       |
-| `"plot_scatter_alpha"`      | The alpha of the markers (how visible they are). |
-| `"plot_scatter_size"`       | The size of the markers.                         |
-| `"plot_scatter_marker"`     | The marker shape (circle, square, etc.).         |
-| `"plot_scatter_zorder"`     | The zorder of the markers.                       |
-| `"plot_scatter_edge_width"` | The edge width of the markers.                   |
-| `"plot_scatter_edge_color"` | The edge color of the markers (hex color code).  |
-
-Again, to help with the style settings, the [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) module contains the following constants:
-
-| Constant                                                                                                                           | Description                             |
-| ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| [datachart.constants.LINE_MARKER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_MARKER) | The marker shape (circle, square, etc.) |
-
-The example below changes the color, transparency, size, shape and outline of the markers in one go. Any attribute you leave out keeps the value of the active theme.
+The `style` dictionary sets the look of the markers: the color and alpha, the size (the marker area in points squared), the shape from [LINE_MARKER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_MARKER), and the edge; the attributes are listed in [datachart.typings.ScatterStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterStyleAttrs), and any attribute left out keeps the value of the active theme. Where points overlap, as in the crowded top right corner of this chart, a lower alpha and a thin dark edge keep each marker visible.
 
 ```
 from datachart.constants import LINE_MARKER
-```
 
-```
 ScatterChart(
     data=countries,
-    # define the style of the markers
+    # translucent diamonds with a thin dark edge
     style={
         "plot_scatter_color": "#e76f51",
         "plot_scatter_alpha": 0.7,
-        "plot_scatter_size": 80,
+        "plot_scatter_size": 60,
         "plot_scatter_marker": LINE_MARKER.DIAMOND,
-        "plot_scatter_edge_width": 1,
+        "plot_scatter_edge_width": 0.8,
         "plot_scatter_edge_color": "#1d3557",
     },
-    title="Life expectancy vs. GDP per capita",
-    xlabel="GDP per capita (USD)",
+    title="Life expectancy and income, 2019",
+    xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
-    figsize=FIG_SIZE.FULL_SHORT,
+    figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
 ).show()
 ```
 
 ### Hue grouping
 
-To color the points by a categorical variable, add the `hue` attribute with the name of the key that holds the category — here the `continent` key of each country. Each category gets its own color from the theme's palette and its own legend entry, so `show_legend` tells the continents apart.
+Is the pattern the same everywhere, or do regions sit apart? `hue` names the key that holds a category, here the `region` of each country; each category gets its own color from the theme's palette and its own legend entry, which `show_legend` shows. The colors show that the bottom left corner, low income and short lives, is mostly African, while Europe and the Western Pacific share the top right.
 
 ```
 ScatterChart(
     data=countries,
-    # color the points by continent
-    hue="continent",
-    title="Life expectancy vs. GDP per capita",
-    xlabel="GDP per capita (USD)",
+    # color the points by WHO region
+    hue="region",
+    title="Life expectancy and income, 2019",
+    xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
-    figsize=FIG_SIZE.FULL_SHORT,
+    figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
-    # show the legend with the continent names
+    # name the regions
     show_legend=True,
 ).show()
 ```
 
 ### Bubble chart
 
-To scale the markers by a third variable, add the `size` attribute with the name of the key that holds the value — here the `population` key. The values are mapped linearly onto the marker area range given by `size_range` (the default is `(20, 200)`): the smallest value gets the smallest marker, the largest the largest. With populations from 2 million to 1.4 billion, the upper end is raised so that the gap between the two is visible. An outline and a lower alpha keep overlapping bubbles readable.
+A point for China and a point for Slovenia look the same, though one stands for 700 times as many people. `size` names the key whose value scales the marker, here `population`, which turns the chart into a bubble chart. The values map linearly onto the marker areas in `size_range` (the default is `(20, 200)`): the smallest value gets the smallest marker, the largest the largest. With populations from 1.7 million to 1.4 billion, a wide range keeps the difference visible, and a low alpha with an edge keeps overlapping bubbles readable. The two largest bubbles, China and India, show that most of the people in this chart live in the middle of the income range.
 
-`hue` and `size` combine freely. Note that the sizes are scaled within each hue group, so the largest country of every continent gets the largest bubble.
+`hue` and `size` combine, but the sizes are scaled within each hue group, so the largest country of every region would get the largest bubble; for sizes that compare across the whole chart, keep the points in one group.
 
 ```
 ScatterChart(
     data=countries,
-    hue="continent",
     # scale the markers by population
     size="population",
-    # widen the range of marker areas
-    size_range=(20, 800),
+    # a wide range of marker areas
+    size_range=(10, 1500),
     style={
-        "plot_scatter_alpha": 0.6,
-        "plot_scatter_edge_width": 0.5,
+        "plot_scatter_alpha": 0.5,
+        "plot_scatter_edge_width": 0.6,
         "plot_scatter_edge_color": "#1d3557",
     },
-    title="Life expectancy vs. GDP per capita, sized by population",
-    xlabel="GDP per capita (USD)",
+    title="Life expectancy and income, sized by population, 2019",
+    xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
+    xticks=GDP_TICKS,
+    xticklabels=GDP_TICK_LABELS,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.BOTH,
+).show()
+```
+
+### Point labels
+
+A scatter chart invites the question *which one is that?* `label` names the key that holds each point's label, here `country`. Each label is placed beside its marker at the spot with the least overlap with the other markers, the labels already placed, and the axes edge, so a chart of a dozen points stays readable without hand-placed notes; the labels use the `plot_text_*` font of the theme. The Americas alone show the spread within one region, from Haiti to the United States.
+
+```
+americas = [point for point in countries if point["region"] == "Americas"]
+
+ScatterChart(
+    data=americas,
+    # name each point after its country
+    label="country",
+    title="Life expectancy and income in the Americas, 2019",
+    xlabel="GDP per capita (USD, log scale)",
+    ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
+    xticks=GDP_TICKS,
+    xticklabels=GDP_TICK_LABELS,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.BOTH,
+).show()
+```
+
+Fifty labels would bury the chart, so label only the points the reader needs. Points without the label key stay unlabeled, and `"label"` is the default key, so adding it to a few records is enough. Here it names the five most populous countries in the chart:
+
+```
+most_populous = sorted(countries, key=lambda point: point["population"])[-5:]
+most_populous_names = {point["country"] for point in most_populous}
+
+populous_marked = [
+    {**point, "label": point["country"]} if point["country"] in most_populous_names else point
+    for point in countries
+]
+
+ScatterChart(
+    # only the five most populous countries carry a "label" key
+    data=populous_marked,
+    hue="region",
+    title="Life expectancy and income, 2019",
+    xlabel="GDP per capita (USD, log scale)",
+    ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -290,102 +254,33 @@ ScatterChart(
 ).show()
 ```
 
-### Point labels
-
-To name the points, add the `label` attribute with the name of the key that holds each point's label — here the `country` key. Each label sits beside its marker at the spot with the least overlap against the other markers, the labels already placed, the regression line and correlation box, and the axes edge, so a crowded chart stays readable without hand-placed annotations. Labels take the `plot_text_*` font of the active theme.
-
-```
-americas = [point for point in countries if point["continent"] == "Americas"]
-
-ScatterChart(
-    data=americas,
-    # name each point after its country
-    label="country",
-    title="Life expectancy vs. GDP per capita in the Americas",
-    xlabel="GDP per capita (USD)",
-    ylabel="Life expectancy (years)",
-    xticks=GDP_TICKS,
-    xticklabels=GDP_TICK_LABELS,
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.BOTH,
-).show()
-```
-
-**Labelling only some points.** Points without the key stay unlabelled, so a label on a handful of points singles them out among the rest. The `notable_countries` list below carries the `label` key — the default key, so `label` need not be passed — on the most populous country of every continent and the two richest ones.
-
-```
-NOTABLE = {"Nigeria", "United States", "India", "Germany", "Switzerland", "Norway"}
-
-notable_countries = [
-    {**point, "label": point["country"]} if point["country"] in NOTABLE else point
-    for point in countries
-]
-
-ScatterChart(
-    data=notable_countries,
-    hue="continent",
-    title="Life expectancy vs. GDP per capita",
-    xlabel="GDP per capita (USD)",
-    ylabel="Life expectancy (years)",
-    xticks=GDP_TICKS,
-    xticklabels=GDP_TICK_LABELS,
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.BOTH,
-    show_legend=True,
-).show()
-```
-
-**Labels and emphasis.** Labels combine with [emphasis](#emphasis): split the points into two series, mute the rest as `"background"` and highlight the notable ones. Like `subtitle` and `emphasis`, `label` takes one entry per series, and `None` leaves a series unlabelled — so the muted series needs no label key at all. A background series that does carry labels draws them in the muted color.
-
-```
-notable = [point for point in countries if point["country"] in NOTABLE]
-other = [point for point in countries if point["country"] not in NOTABLE]
-
-ScatterChart(
-    data=[other, notable],
-    subtitle=["other countries", "notable countries"],
-    # mute the rest, highlight the notable countries
-    emphasis=["background", "highlight"],
-    # label the notable countries only
-    label=[None, "country"],
-    title="Life expectancy vs. GDP per capita",
-    xlabel="GDP per capita (USD)",
-    ylabel="Life expectancy (years)",
-    xticks=GDP_TICKS,
-    xticklabels=GDP_TICK_LABELS,
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.BOTH,
-    show_legend=True,
-).show()
-```
-
 ### Value labels
 
-To print each point's y value beside it instead of a name, add the `show_values` attribute. `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)) and `value_step` labels every Nth point when the chart is crowded (by default the step keeps neighbouring labels apart). Value labels are placed like point labels, at the least overlapping spot around the marker. A point carries either its label or its value: combining `label` with `show_values` raises a `ValueError`.
+When the exact values matter more than the names, `show_values` prints each point's `y` value beside it, placed like the point labels. `value_format` formats it: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or any `"{x:.1f}"`, `"{:.1f}%"` or `"%g"` style string. On a crowded chart the default prints only every Nth value, choosing the step that keeps neighboring labels apart; `value_step` sets the step, and `1` prints them all. A point carries either its name or its value, so combining `label` with `show_values` raises a `ValueError`.
 
 ```
-from datachart.constants import VALUE_FORMAT
-
 ScatterChart(
     data=americas,
-    # print the life expectancy beside each point
+    # print the life expectancy beside every point
     show_values=True,
-    value_format=VALUE_FORMAT.INTEGER,
-    title="Life expectancy vs. GDP per capita in the Americas",
-    xlabel="GDP per capita (USD)",
+    value_format="{x:.1f}",
+    value_step=1,
+    title="Life expectancy and income in the Americas, 2019",
+    xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
-    figsize=FIG_SIZE.FULL_SHORT,
+    figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
 ).show()
 ```
 
 ### Regression line
 
-To fit a straight line through the points, add the `show_regression` attribute. `show_ci` draws the confidence band around the line and `ci_level` sets its level (the default is 0.95); `show_correlation` annotates the chart with the Pearson correlation coefficient.
+How strong is the link, and what does it predict? `show_regression` fits a straight line through the points by least squares, `show_ci` shades the confidence band of that line and `ci_level` sets its level (the default is 0.95), and `show_correlation` prints the Pearson correlation coefficient `r` in the top left corner. With `hue`, one line is fitted to all groups together.
 
-The line is fitted to the plotted values. Life expectancy grows with the *order of magnitude* of GDP per capita rather than with GDP itself, so the example plots `log10` of the GDP per capita and labels the ticks with the dollar amounts they stand for. With `hue` the regression is fitted to all groups together.
+The line is fitted to the values as they are in the data, whatever the axis scale, so on a log axis it would be a straight-line fit to raw dollars. Life expectancy grows with the *order of magnitude* of income, so the example plots `log10` of the GDP per capita and labels the ticks with the dollar amounts they stand for. The fit is tight, and the countries far below the band are the ones worth a closer look.
 
 ```
 import math
@@ -394,112 +289,153 @@ countries_log_gdp = [{**point, "x": math.log10(point["x"])} for point in countri
 
 ScatterChart(
     data=countries_log_gdp,
-    # fit a regression line through the points
+    # fit a straight line through the points
     show_regression=True,
-    # draw the 95% confidence band around the line
+    # shade its 95% confidence band
     show_ci=True,
     ci_level=0.95,
-    # annotate the correlation coefficient
+    # print the correlation coefficient
     show_correlation=True,
-    title="Life expectancy vs. GDP per capita",
-    xlabel="GDP per capita (USD)",
+    title="Life expectancy and income, 2019",
+    xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
     # the x values are log10(GDP); label them with the dollar amounts
     xticks=[3, 4, 5],
-    xticklabels=["$1k", "$10k", "$100k"],
-    figsize=FIG_SIZE.FULL_SHORT,
+    xticklabels=GDP_TICK_LABELS,
+    figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
 ).show()
 ```
 
 ### Aspect ratio
 
-The `aspect_ratio` attribute fixes the aspect ratio of the axes rather than of the figure: `"auto"` (the default) lets the axes fill the figure, `"equal"` keeps one data unit the same length on both axes. It makes sense when both axes share a unit — distances, coordinates, a predicted value against a measured one — which dollars and years do not. The supported values are in the [datachart.constants.ASPECT_RATIO](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO) constant; the [European cities example](#example-4-european-cities-bubble-chart-with-an-equal-aspect-ratio) below draws a map with it.
+Dollars and years have nothing in common, so the axes of the charts above can stretch freely. When both axes share a unit (coordinates, distances, a prediction against a measurement), stretching distorts the picture. `aspect_ratio=ASPECT_RATIO.EQUAL` ([ASPECT_RATIO](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)) keeps one data unit the same length on both axes, while the default `ASPECT_RATIO.AUTO` lets the axes fill the figure. `cities`, defined in a hidden cell, holds the longitude and latitude of 16 European capitals, rounded to two decimals; with an equal aspect ratio they draw a recognizable map (a plain longitude-latitude grid, without a map projection).
+
+```
+from datachart.constants import ASPECT_RATIO
+
+ScatterChart(
+    data=cities,
+    label="city",
+    title="European capitals",
+    xlabel="Longitude (°E)",
+    ylabel="Latitude (°N)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.BOTH,
+    # one degree is the same length on both axes
+    aspect_ratio=ASPECT_RATIO.EQUAL,
+).show()
+```
 
 ### Emphasis
 
-When a chart carries several series, the story is often about one of them. The `emphasis` attribute expresses that directly: `"highlight"` gives the markers a contrasting edge and brings them to the front, `"background"` mutes a series (the theme's muted color at a lower alpha, drawn behind the others), and `None` leaves a series unchanged. For multiple charts, `emphasis` is a list aligned with `data`, just like `subtitle` and `style`. Only emphasized-or-unset series appear in the legend — background series drop out of it. The role strings are also available as the [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants.
+A chart usually makes one point, and emphasis makes it visible. With the data split into several series (the [Multiple Scatter Charts](#multiple-scatter-charts) section covers the list-of-lists form), `emphasis` takes one role per series: `"highlight"` gives the markers a contrasting edge and brings them to the front, `"background"` mutes a series (the theme's muted color at a lower alpha, behind the others, without a legend entry), and `None` leaves it as it is. The roles are also available as the [EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants, and the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis across every chart type and theme.
 
-The example highlights the European countries against the rest of the world, passed as two series. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide for how emphasis works across all chart types and themes.
-
-To pick the series from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every series whose summary matches and mutes the rest. The summary is the mean of each series's own `y` values by default; a `"by"` key picks `"median"`, `"min"`, `"max"`, or `"sum"` instead, as in `{"top": 1, "by": "max"}`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
+`label` also takes one entry per series, with `None` for a series left unlabeled, so highlighting and naming go together. Which countries break the pattern? Four sit well below the trend (Nigeria, South Africa, Equatorial Guinea, and the United States among the rich), and three well above it (Cuba, Costa Rica and Sri Lanka).
 
 ```
-europe = [point for point in countries if point["continent"] == "Europe"]
-rest_of_world = [point for point in countries if point["continent"] != "Europe"]
+OUTLIERS = {"Nigeria", "South Africa", "Equatorial Guinea", "United States", "Cuba", "Costa Rica", "Sri Lanka"}
+outliers = [point for point in countries if point["country"] in OUTLIERS]
+others = [point for point in countries if point["country"] not in OUTLIERS]
 
 ScatterChart(
-    data=[rest_of_world, europe],
-    subtitle=["other continents", "Europe"],
-    # mute the rest of the world, highlight Europe
+    data=[others, outliers],
+    subtitle=["other countries", "far from the trend"],
+    # mute the rest, highlight the outliers
     emphasis=["background", "highlight"],
-    title="Life expectancy vs. GDP per capita",
-    xlabel="GDP per capita (USD)",
+    # name the outliers only
+    label=[None, "country"],
+    title="Countries that break the pattern, 2019",
+    xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
-    figsize=FIG_SIZE.FULL_SHORT,
+    figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
     show_legend=True,
 ).show()
 ```
 
-### Reference lines
-
-Reference lines mark a threshold or a reference value on the chart.
-
-**Horizontal lines.** Use the `hlines` argument with the [datachart.typings.HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary contains some of the following attributes:
+`emphasis_rule` picks the series from the data instead. It is a one-key dictionary read against a summary of each series's `y` values: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), or `{"top": n}` or `{"bottom": n}` by rank. The summary is the mean by default; a `"by"` key picks `"median"`, `"min"`, `"max"` or `"sum"` instead. The series that match are highlighted and the rest muted, and an explicit `emphasis` role wins over the rule. Asking which regions have a country with a life expectancy below 65 years is `{"below": 65, "by": "min"}`, and the answer is three regions, not only Africa:
 
 ```
-{
-  "y":    Union[int, float],                 # The y-axis value
-  "xmin": Optional[Union[int, float]],       # The minimum x-axis value
-  "xmax": Optional[Union[int, float]],       # The maximum x-axis value
-  "style": {                                 # The style of the line (optional)
-    "plot_hline_color": Optional[str],       # The color of the line (hex color code)
-    "plot_hline_style": Optional[LineStyle], # The line style (solid, dashed, etc.)
-    "plot_hline_width": Optional[float],     # The width of the line
-    "plot_hline_alpha": Optional[float],     # The alpha of the line (how visible the line is)
-  },
-  "label": Optional[str],                    # The label of the line (shown in the legend)
-}
+ScatterChart(
+    data=countries_by_region,
+    subtitle=REGIONS,
+    # highlight the regions whose lowest life expectancy is below 65
+    emphasis_rule={"below": 65, "by": "min"},
+    title="Regions with a life expectancy below 65 years, 2019",
+    xlabel="GDP per capita (USD, log scale)",
+    ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
+    xticks=GDP_TICKS,
+    xticklabels=GDP_TICK_LABELS,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.BOTH,
+    show_legend=True,
+).show()
 ```
 
-**Vertical lines.** Use the `vlines` argument with the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) typing, which has the same shape with `x`, `ymin`, `ymax` and `plot_vline_*` style attributes.
+### Reference lines and bands
 
-The example marks the world averages — a life expectancy of 73 years and a GDP per capita of $13,000 — so the lines split the countries into four quadrants. The line labels appear in the legend.
+Is a country above or below the world as a whole? Reference lines answer by marking a value: `hlines` draws a horizontal line at a `y` value and `vlines` a vertical one at an `x` value. `hspans` and `vspans` shade a range instead; a band needs at least one bound, and a missing bound runs to the axis edge. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs), and the line patterns in [LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE). The lines below split the chart into quadrants: the world life expectancy in 2019 (73.1 years, WHO) and the median GDP per capita of the countries shown.
 
 ```
+from statistics import median
+
 from datachart.constants import LINE_STYLE
+
+median_gdp = median(point["x"] for point in countries)
+
+ScatterChart(
+    data=countries,
+    hue="region",
+    # the world life expectancy
+    hlines={
+        "y": WORLD_LIFE_EXPECTANCY,
+        "label": "world life expectancy",
+        "style": {"plot_hline_color": "#1d3557", "plot_hline_style": LINE_STYLE.DASHED},
+    },
+    # the median income of the countries shown
+    vlines={
+        "x": median_gdp,
+        "label": "median GDP per capita",
+        "style": {"plot_vline_color": "#9d0208", "plot_vline_style": LINE_STYLE.DOTTED},
+    },
+    title="Life expectancy and income, 2019",
+    xlabel="GDP per capita (USD, log scale)",
+    ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
+    xticks=GDP_TICKS,
+    xticklabels=GDP_TICK_LABELS,
+    # a fixed income range, so the horizontal line spans it
+    xmin=400,
+    xmax=100_000,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.BOTH,
+    show_legend=True,
+).show()
 ```
+
+Bands work the same way. The chart below shades the countries with a life expectancy of 80 years or more, a band with no upper bound, and those with a GDP per capita under 1,000 dollars, a band with no lower bound. Costa Rica and Chile make it into the top band on a fraction of the income of the other countries in it.
 
 ```
 ScatterChart(
     data=countries,
-    hue="continent",
-    # add a horizontal line at the world average life expectancy
-    hlines={
-        "y": 73,
-        "label": "world average life expectancy",
-        "style": {
-            "plot_hline_color": "#1d3557",
-            "plot_hline_style": LINE_STYLE.DASHED,
-            "plot_hline_width": 1.5,
-        },
+    hue="region",
+    # no upper bound: the band runs to the top edge
+    hspans={"ymin": 80, "label": "80 years or more"},
+    # no lower bound: the band runs to the left edge
+    vspans={
+        "xmax": 1_000,
+        "label": "under $1,000 per person",
+        "style": {"plot_vspan_color": "#e9c46a"},
     },
-    # add a vertical line at the world average GDP per capita
-    vlines={
-        "x": 13_000,
-        "label": "world average GDP per capita",
-        "style": {
-            "plot_vline_color": "#e9a03b",
-            "plot_vline_style": LINE_STYLE.DOTTED,
-            "plot_vline_width": 1.5,
-        },
-    },
-    title="Life expectancy vs. GDP per capita",
-    xlabel="GDP per capita (USD)",
+    title="Life expectancy and income, 2019",
+    xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -508,130 +444,120 @@ ScatterChart(
 ).show()
 ```
 
-### Reference bands
+### Text annotations
 
-A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
-
-The example uses two half-open bands: the countries with a life expectancy above 80 years, and those with a GDP per capita below $5,000. Each omits one bound, so the bands run to the top and the left edge.
+Where a label names a point, a note explains it. `texts` places text on the chart, with an optional `target` to draw a connector to a data point; the position is in data coordinates by default, or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis range and scale. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The note below points at the United States, the richest large country in the chart and one of the shortest-lived among the rich.
 
 ```
+US_GDP, US_LIFE = COUNTRIES["United States"][1:3]
+
 ScatterChart(
     data=countries,
-    hue="continent",
-    # life expectancy above 80: no upper bound, so the band runs to the top edge
-    hspans={"ymin": 80, "label": "life expectancy above 80"},
-    # GDP per capita below $5,000: no lower bound, so the band runs to the left edge
-    vspans={
-        "xmax": 5_000,
-        "label": "GDP per capita below $5k",
-        "style": {"plot_vspan_color": "#e9a03b"},
+    # a note pinned to the axes, pointing at the United States
+    texts={
+        "text": "United States: $65k per person,\nyet shorter lives than Chile",
+        "x": 0.6,
+        "y": 0.2,
+        "coords": "axes",
+        "target": (US_GDP, US_LIFE),
     },
-    title="Life expectancy vs. GDP per capita",
-    xlabel="GDP per capita (USD)",
+    title="Life expectancy and income, 2019",
+    xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
-    show_legend=True,
 ).show()
 ```
 
 ## Multiple Scatter Charts
 
-To create multiple scatter charts, pass a list of lists to the `data` argument. Each inner list represents the data for one chart. Per-chart attributes like `subtitle`, `style` and `emphasis` can be passed as lists, where each element corresponds to a chart.
-
-Multiple charts pattern
-
-For multiple charts, `data` becomes a list of lists, and per-chart attributes like `subtitle` and `style` become lists where each element applies to the corresponding chart.
-
-The `countries_by_continent` dataset is such a list of lists, one series per continent. Unlike `hue`, which colors the groups of one series, separate series can also be styled separately: a single `style` dictionary applies to every chart, while a list of dictionaries styles each chart on its own (`None` keeps the theme style for that chart).
+To compare several groups as separate series, pass a list of lists to `data`: each inner list is one series, and the per-series attributes (`subtitle`, `style`, `emphasis`, `label`, and the data keys) become lists aligned with it. `subtitle` names each series and `show_legend` lists them. `countries_by_region` is such a list, one series per WHO region. Unlike `hue`, which colors the groups of one series, separate series take separate styles: a list of `style` dictionaries gives each region its own marker shape, which keeps the groups apart in greyscale too (`None` in the list keeps the theme style for a series).
 
 ```
+REGION_MARKERS = [
+    {"plot_scatter_marker": marker}
+    for marker in [
+        LINE_MARKER.CIRCLE,
+        LINE_MARKER.SQUARE,
+        LINE_MARKER.TRIANGLE,
+        LINE_MARKER.DIAMOND,
+        LINE_MARKER.PENTAGON,
+        LINE_MARKER.HEXAGON,
+    ]
+]
+
 ScatterChart(
-    # use a list of lists to define multiple scatter charts
-    data=countries_by_continent,
-    # style can be a list (one per chart) or a single dict (applies to all)
-    style=[
-        {"plot_scatter_marker": LINE_MARKER.CIRCLE},
-        {"plot_scatter_marker": LINE_MARKER.SQUARE},
-        {"plot_scatter_marker": LINE_MARKER.TRIANGLE},
-        None,  # keep the theme style for the fourth chart
-    ],
-    title="Life expectancy vs. GDP per capita",
-    xlabel="GDP per capita (USD)",
+    # one series per region
+    data=countries_by_region,
+    # named for the legend
+    subtitle=REGIONS,
+    # one marker shape per region
+    style=REGION_MARKERS,
+    title="Life expectancy and income by WHO region, 2019",
+    xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
-    figsize=FIG_SIZE.FULL_SHORT,
+    figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
+    show_legend=True,
 ).show()
 ```
 
-### Sub-chart subtitles
+### Legend
 
-We can name each chart by passing a list of subtitles to the `subtitle` argument. In addition, to help with discerning which chart is which, use the `show_legend` argument to show the legend of the charts.
+`show_legend` lists the series; `legend` says where and how, with a `title`, a `location` from [LEGEND_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), the number of columns `ncols`, and the `alignment` of the entries from [LEGEND_ALIGN](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN); a field left out falls back to the theme ([LegendSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendSettingAttrs)). No country in the chart is rich and short-lived, so the bottom right corner is empty and holds the legend without covering a point.
 
 ```
+from datachart.constants import LEGEND_LOCATION
+
 ScatterChart(
-    data=countries_by_continent,
-    # add a subtitle to each chart
-    subtitle=CONTINENTS,
-    title="Life expectancy vs. GDP per capita",
-    xlabel="GDP per capita (USD)",
+    data=countries_by_region,
+    subtitle=REGIONS,
+    style=REGION_MARKERS,
+    title="Life expectancy and income by WHO region, 2019",
+    xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
-    figsize=FIG_SIZE.FULL_SHORT,
+    figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
-    # show the legend
     show_legend=True,
+    # a titled legend in the empty corner
+    legend={"title": "WHO region", "location": LEGEND_LOCATION.LOWER_RIGHT},
 ).show()
 ```
 
 ### Subplots
 
-To draw each chart in its own subplot, add the `subplots` attribute. The chart's `subtitle` are then added at the top of each subplot, while the `title`, `xlabel` and `ylabel` are positioned to be global for all charts. The `max_cols` attribute limits the number of subplots per row.
+Six overlapping groups are hard to tell apart, however they are styled. `subplots=True` draws each series in its own panel: `subtitle` titles the panels, `title`, `xlabel` and `ylabel` stay global, and `max_cols` limits the panels per row. `sharex=True` and `sharey=True` put every panel on the same axes, so a position means the same in each panel; without them each panel zooms to its own points, and the African countries would fill their panel just like the European ones.
 
 ```
 ScatterChart(
-    data=countries_by_continent,
-    subtitle=CONTINENTS,
-    title="Life expectancy vs. GDP per capita",
-    xlabel="GDP per capita (USD)",
+    data=countries_by_region,
+    subtitle=REGIONS,
+    title="Life expectancy and income by WHO region, 2019",
+    xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
-    # show each chart in its own subplot
+    # one panel per region, three per row
     subplots=True,
-    # at most two subplots per row
-    max_cols=2,
-).show()
-```
-
-### Sharing the x-axis and/or y-axis across subplots
-
-To share the x-axis and/or y-axis across subplots, add the `sharex` and/or `sharey` attributes, which are boolean values that specify whether to share the axis across all subplots. With shared axes the continents become directly comparable — Africa's cluster no longer fills its subplot.
-
-```
-ScatterChart(
-    data=countries_by_continent,
-    subtitle=CONTINENTS,
-    title="Life expectancy vs. GDP per capita",
-    xlabel="GDP per capita (USD)",
-    ylabel="Life expectancy (years)",
-    xticks=GDP_TICKS,
-    xticklabels=GDP_TICK_LABELS,
-    figsize=FIG_SIZE.FULL_MEDIUM,
-    show_grid=SHOW_GRID.BOTH,
-    subplots=True,
-    max_cols=2,
-    # share the x-axis across subplots
+    max_cols=3,
+    # the same axes in every panel
     sharex=True,
-    # share the y-axis across subplots
     sharey=True,
+    # a y range that holds every region
+    ymin=55,
+    ymax=90,
 ).show()
 ```
 
@@ -639,238 +565,163 @@ ScatterChart(
 
 ### Axis scales
 
-The user can change the axis scale using the `scalex` and `scaley` attributes. The supported scale options are:
-
-| Options    | Description              |
-| ---------- | ------------------------ |
-| `"linear"` | The linear scale.        |
-| `"log"`    | The log scale.           |
-| `"symlog"` | The symmetric log scale. |
-| `"asinh"`  | The asinh scale.         |
-
-Again, to help with the options settings, the [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) module contains the following constants:
-
-| Constant                                                                                                               | Description       |
-| ---------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| [datachart.constants.SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) | The axis options. |
-
-A logarithmic scale pays off when the values span several orders of magnitude. GDP per capita runs from $1,000 to over $100,000: on a linear scale the poorer half of the countries piles up against the y-axis, on a log scale the relationship with life expectancy straightens out and every country gets room.
-
-```
-from datachart.constants import SCALE
-```
+A linear axis suits values of one order of magnitude; values that span several read better on a logarithmic one, where equal distances stand for equal ratios. `scalex` and `scaley` take a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member: `SCALE.LINEAR` (the default), `SCALE.LOG`, and `SCALE.SYMLOG` and `SCALE.ASINH` for data that also crosses zero. On the linear scale the countries under 10,000 dollars crowd into the left edge and the relationship looks like a sharp bend; on the log scale they spread out and the relationship is close to a straight line.
 
 ```
 for scale in [SCALE.LINEAR, SCALE.LOG]:
-    figure = ScatterChart(
+    ScatterChart(
         data=countries,
-        hue="continent",
-        title=f"Life expectancy vs. GDP per capita on the '{scale}' scale",
+        title=f"Life expectancy and income on the '{scale}' scale",
         xlabel="GDP per capita (USD)",
         ylabel="Life expectancy (years)",
         figsize=FIG_SIZE.FULL_SHORT,
         show_grid=SHOW_GRID.BOTH,
-        show_legend=True,
-        # set the scale of the x axis
+        # the scale of the income axis
         scalex=scale,
-    )
-    figure.show()
+    ).show()
 ```
 
 ### Datetime axis
 
-An `x` value that is a real temporal object — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp` — puts the chart on a time axis. Points sit at their elapsed time and the ticks pick concise, non-repeating labels for the visible span; date strings are not parsed and draw as categories. `xticks_format` takes a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern, and explicit `xticks`, `xmin` / `xmax`, reference lines, and reference bands take datetimes as well.
+When `x` is a date, the question becomes how a value changes over time, and whether the change is steady. An `x` value that is a real temporal object (`datetime`, `date`, `numpy.datetime64` or a pandas `Timestamp`) puts the chart on a time axis: points sit at their elapsed time, and the ticks choose concise labels for the visible span; date strings are not parsed. `xticks_format` takes a [DATE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern, and explicit `xticks`, `xmin` and `xmax`, reference lines and bands take dates as well. `records`, defined in a hidden cell, holds the progression of the men's marathon world record since 2003: the date of each record race, the finishing time in minutes, and the record holder as the label (source: World Athletics). The regression line shows a steady pace, about 13 seconds off the record per year.
 
 ```
-from datetime import date
-
 from datachart.constants import DATE_FORMAT
-
-# men's marathon world record progression: race date and finishing time in minutes
-records = [
-    {"x": date(2003, 9, 28), "y": 124.92, "label": "Tergat"},
-    {"x": date(2007, 9, 30), "y": 124.43, "label": "Gebrselassie"},
-    {"x": date(2008, 9, 28), "y": 123.98, "label": "Gebrselassie"},
-    {"x": date(2011, 9, 25), "y": 123.63, "label": "Makau"},
-    {"x": date(2013, 9, 29), "y": 123.38, "label": "Kipsang"},
-    {"x": date(2014, 9, 28), "y": 122.95, "label": "Kimetto"},
-    {"x": date(2018, 9, 16), "y": 121.65, "label": "Kipchoge"},
-    {"x": date(2022, 9, 25), "y": 121.15, "label": "Kipchoge"},
-    {"x": date(2023, 10, 8), "y": 120.58, "label": "Kiptum"},
-]
 
 ScatterChart(
     data=records,
-    title="Marathon world record progression",
+    title="Men's marathon world record",
     xlabel="Race date",
     ylabel="Finishing time (minutes)",
-    # one tick per five years, labelled with the year only
+    # a tick every five years, labeled with the year
     xticks=[date(year, 1, 1) for year in range(2005, 2025, 5)],
     xticks_format=DATE_FORMAT.YEAR,
     show_regression=True,
-    figsize=FIG_SIZE.FULL_SHORT,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.BOTH,
 ).show()
 ```
 
 ### Custom data keys
 
-By default, the `data` items are dictionaries with the keys `x` and `y`, and `size`, `hue` and `label` name whichever keys hold the bubble size, the category and the point label. Data that comes from elsewhere rarely calls its columns `x` and `y`, and renaming every key just to plot it is a chore. Instead, tell `ScatterChart` which keys to read with the `x` and `y` arguments. The `country_records` list below stores the same countries under their natural names.
+Data that comes from a file or an API rarely uses the `x` and `y` keys, and renaming every record just to plot it is a chore. The `x` and `y` arguments name the keys to read instead, just as `size`, `hue` and `label` name the keys of the bubble size, the category and the point label. `country_records` stores the countries the way a CSV export would:
 
 ```
 country_records = [
-    {
-        "country": name,
-        "continent": continent,
-        "gdp_per_capita": gdp,
-        "life_expectancy": life,
-        "population": population,
-    }
-    for name, (continent, gdp, life, population) in COUNTRIES.items()
+    {"country": name, "region": region, "gdp_per_capita": gdp, "life_expectancy": life, "population": population}
+    for name, (region, gdp, life, population) in COUNTRIES.items()
 ]
-country_records[:3]
+country_records[:2]
 ```
 
 ```
-figure = ScatterChart(
+ScatterChart(
     data=country_records,
-    # specify which keys hold the x and y values
+    # the keys that hold the x and y values
     x="gdp_per_capita",
     y="life_expectancy",
-    # and which hold the bubble size and the category
-    size="population",
-    hue="continent",
-    size_range=(20, 800),
-    style={
-        "plot_scatter_alpha": 0.6,
-        "plot_scatter_edge_width": 0.5,
-        "plot_scatter_edge_color": "#1d3557",
-    },
-    title="Life expectancy vs. GDP per capita, sized by population",
-    xlabel="GDP per capita (USD)",
+    # and the category
+    hue="region",
+    title="Life expectancy and income, 2019",
+    xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
+    scalex=SCALE.LOG,
+    xticks=GDP_TICKS,
+    xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
     show_legend=True,
-    scalex=SCALE.LOG,
-)
-figure.show()
+).show()
 ```
-
-## Saving the Chart as an Image
-
-To save the chart as an image, use the [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.save_figure) function.
-
-```
-from datachart.utils import save_figure
-```
-
-```
-save_figure(figure, "./fig_scatter_chart.png", dpi=300)
-```
-
-The figure should be saved in the current working directory.
 
 ## Real-World Examples
 
-The following examples put the features above to work on real or realistic data. Each one states what its data is and where it comes from; the data itself lives in a hidden cell.
+The examples below put the features above to work on real or realistic data, each one answering a question. The data lives in hidden cells; each example says what its data is and where it comes from.
 
-### Example 1: Model Accuracy vs. Parameter Count (Regression Line and Confidence Interval)
+### Example 1: Does Accuracy Keep Growing with Model Size? (Log-Transformed Regression with a Confidence Band)
 
-`model_accuracy` holds the benchmark accuracy of 24 illustrative language models with 0.1 to 100 billion parameters. Accuracy grows with the logarithm of the model size, so the points are plotted against `log10` of the parameter count (with the ticks labeled in billions) and `show_regression` fits the scaling trend, `show_ci` draws its 90% confidence band and `show_correlation` reports how tight the trend is. The run-to-run noise comes from a seeded random generator.
+`model_accuracy` holds the benchmark accuracy, in percent, of 24 illustrative language models with 0.1 to 100 billion parameters, drawn from a seeded random generator around a trend of 12 points per tenfold increase in size. Accuracy grows with the logarithm of the size, so the points are plotted against `log10` of the parameter count with the ticks labeled in billions; `show_regression` fits the trend, `show_ci` shades its 90% confidence band, and `show_correlation` reports how tight the trend is. The band is narrowest in the middle of the range, where the fit has data on both sides.
 
 ```
 ScatterChart(
     data=model_accuracy,
     style={"plot_scatter_alpha": 0.8},
-    # fit the scaling trend and its 90% confidence band
+    # the trend, its 90% confidence band, and its strength
     show_regression=True,
     show_ci=True,
     ci_level=0.9,
-    # report the correlation coefficient
     show_correlation=True,
-    title="Benchmark accuracy vs. model size",
-    xlabel="Parameters",
+    title="Benchmark accuracy and model size",
+    xlabel="Parameters (log scale)",
     ylabel="Accuracy (%)",
-    # the x values are log10(parameters); label them in billions
+    # the x values are log10(billions of parameters)
     xticks=[-1, 0, 1, 2],
     xticklabels=["0.1B", "1B", "10B", "100B"],
-    figsize=FIG_SIZE.FULL_SHORT,
+    figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
 ).show()
 ```
 
-### Example 2: Penguin Morphometrics (Hue Grouping and Custom Data Keys)
+### Example 2: Heavier Penguins Have Longer Flippers, Within Each Species Too (Per-Series Regression and Custom Data Keys)
 
-`penguins` holds the bill length and flipper length of 120 illustrative penguins of three species, 40 per species, drawn from a seeded Gaussian around the species means of the Palmer penguins dataset. The measurements are stored under `bill_length` and `flipper_length`, so the keys are mapped with the `x` and `y` arguments, and `hue` colors each species so the three clusters — and the overlap between Adelie and Chinstrap flippers — stand out.
+`penguins` holds the flipper length in millimeters and the body mass in grams of the 342 penguins with both measurements in the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (Gorman, Williams and Fraser, 2014; released under CC0), one list per species, stored under the keys `flipper_length_mm` and `body_mass_g`. Across all penguins the link is strong, but part of it only says that Gentoo penguins are bigger than the other two species. Does it hold within a species? One series per species answers it: `x` and `y` read the stored keys, and `show_regression` fits one line per series, in the series' color. All three lines rise.
 
 ```
 ScatterChart(
     data=penguins,
-    # the points are stored as "bill_length" and "flipper_length"
-    x="bill_length",
-    y="flipper_length",
-    # color the points by species
-    hue="species",
-    style={
-        "plot_scatter_alpha": 0.7,
-        "plot_scatter_edge_width": 0.5,
-        "plot_scatter_edge_color": "#1d3557",
-    },
-    title="Penguin flipper length vs. bill length",
-    xlabel="Bill length (mm)",
-    ylabel="Flipper length (mm)",
+    # the keys that hold the measurements
+    x="flipper_length_mm",
+    y="body_mass_g",
+    subtitle=SPECIES,
+    style={"plot_scatter_alpha": 0.5, "plot_scatter_size": 16},
+    # one regression line per species
+    show_regression=True,
+    title="Body mass and flipper length of Palmer penguins",
+    xlabel="Flipper length (mm)",
+    ylabel="Body mass (g)",
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
     show_legend=True,
+    legend={"title": "Species", "location": LEGEND_LOCATION.UPPER_LEFT},
 ).show()
 ```
 
-### Example 3: One Sweep Among Many (Emphasis)
+### Example 3: Did the Final Sweep Beat the Search? (Emphasis, a Frontier Line with Panel, and a Note)
 
-`tuning_runs` holds two series of illustrative hyperparameter tuning runs, each run a point of training time against validation accuracy: 150 runs of a broad random search and the 12 runs of a final, narrowed-down sweep. The question is whether the final sweep actually beat the search, so `emphasis` mutes the random search into a background cloud and highlights the sweep. Muted series drop out of the legend automatically; both series are drawn from seeded random generators.
+`tuning_runs` holds two sets of illustrative hyperparameter tuning runs, each run a point of training time in minutes against validation accuracy in percent: 150 runs of a broad random search and the 12 runs of a final, narrowed-down sweep, both drawn from seeded random generators. The question is whether the sweep found anything the search had not. `emphasis` mutes the search into a background cloud and highlights the sweep. `search_frontier` holds the best accuracy the search reached within each training time, drawn as a dashed [LineChart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) that runs flat to the longest run, and [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) puts the frontier over the runs in one axes; a note points at the best run of the sweep, above the frontier.
 
 ```
-ScatterChart(
+from datachart.charts import LineChart
+from datachart.utils import Panel
+
+runs = ScatterChart(
     data=tuning_runs,
     subtitle=["random search", "final sweep"],
-    # mute the random search, highlight the final sweep
+    # mute the search, highlight the sweep
     emphasis=["background", "highlight"],
+    # point at the best run of the sweep
+    texts={
+        "text": f"best sweep run: {BEST_SWEEP['y']:.1f}%",
+        "x": 0.1,
+        "y": 0.9,
+        "coords": "axes",
+        "target": (BEST_SWEEP["x"], BEST_SWEEP["y"]),
+    },
+)
+frontier = LineChart(
+    data=search_frontier,
+    subtitle="best of the search so far",
+    style={"plot_line_color": "#6c757d", "plot_line_style": LINE_STYLE.DASHED},
+)
+
+Panel(
+    [runs, frontier],
     title="Validation accuracy of the tuning runs",
     xlabel="Training time (minutes)",
-    ylabel="Validation accuracy (%)",
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.BOTH,
-    show_legend=True,
-).show()
-```
-
-### Example 4: European Cities (Bubble Chart with Point Labels and an Equal Aspect Ratio)
-
-`cities` holds the longitude, latitude and metropolitan population (in millions, rounded) of 21 European cities. Plotting longitude against latitude turns the scatter chart into a map, which only keeps its shape if a degree is the same length on both axes — hence `aspect_ratio`. `size` scales each bubble by population and `size_range` is widened so that the capitals dominate the map the way they dominate the continent; `label` names every bubble, and the names slide around their bubbles to stay clear of the neighbours.
-
-```
-from datachart.constants import ASPECT_RATIO
-```
-
-```
-ScatterChart(
-    data=cities,
-    # scale the bubbles by population
-    size="population",
-    size_range=(30, 900),
-    # name each bubble
-    label="city",
-    style={
-        "plot_scatter_alpha": 0.5,
-        "plot_scatter_edge_width": 0.8,
-        "plot_scatter_edge_color": "#1d3557",
-    },
-    title="Metropolitan population of European cities",
-    xlabel="Longitude (°E)",
-    ylabel="Latitude (°N)",
+    ylabel_left="Validation accuracy (%)",
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
-    # keep one degree the same length on both axes
-    aspect_ratio=ASPECT_RATIO.EQUAL,
+    show_legend=True,
+    legend={"title": "Tuning runs", "location": LEGEND_LOCATION.LOWER_RIGHT},
 ).show()
 ```

@@ -1,16 +1,17 @@
 """Generates docs/assets/imgs/const-*.svg — one at-a-glance visualization per
 constants class. Text-like constants (fonts, lines, hatches, legends, value
-formats, colorbars) are drawn with raw matplotlib; chart-setting constants
-(bar modes, histogram types, orientation, grid, scales, norms, emphasis,
-aspect ratios, annotation connectors) render through the chart fronts
-(ADR 0013).
+and date formats, colorbars) are drawn with raw matplotlib; chart-setting
+constants (bar modes, histogram types, orientation, grid, scales, norms,
+emphasis, aspect ratios, annotation connectors, sort orders, label positions,
+gantt and dumbbell settings, the scatter matrix diagonal) render through the
+chart fronts (ADR 0013).
 
 Run from the repo root: python docs/assets/scripts/generate_constant_viz.py
 """
 
 import pathlib
 import sys
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 import matplotlib
 
@@ -23,15 +24,20 @@ from matplotlib.patches import FancyBboxPatch, Rectangle
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
 from datachart.charts import (
     BarChart,
+    BumpChart,
     CalendarHeatmap,
     ContourChart,
+    DumbbellChart,
+    GanttChart,
     Heatmap,
     HexbinChart,
     Histogram,
     LineChart,
     NetworkChart,
     RadialChart,
+    RidgelinePlot,
     ScatterChart,
+    ScatterMatrix,
     StackedAreaChart,
     SwarmPlot,
     ViolinPlot,
@@ -42,30 +48,43 @@ from datachart.constants import (
     ASPECT_RATIO,
     BANDWIDTH,
     BAR_MODE,
-    BASELINE,
+    BUMP_LABEL_POSITION,
+    BUMP_RANK,
+    CALENDAR_WEEKDAY,
     COLORBAR_LOCATION,
     CONTOUR_LEVELS,
-    DIRECTION,
-    HEXBIN_REDUCE,
+    DATE_FORMAT,
+    DUMBBELL_SORT_KEY,
+    DUMBBELL_VALUE,
     EMPHASIS,
     FONT_STYLE,
     FONT_WEIGHT,
+    GANTT_ARROW_ENTRY,
+    GANTT_DATE_PERIOD,
+    GANTT_SORT_KEY,
+    GANTT_VALUE,
     HATCH_STYLE,
+    HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
     LEGEND_ALIGN,
     LINE_DRAW_STYLE,
     LINE_MARKER,
     LINE_STYLE,
     NETWORK_LAYOUT,
+    NETWORK_LABEL_POSITION,
     NORMALIZE,
     ORIENTATION,
+    RADIAL_DIRECTION,
     RADIAL_TYPE,
+    RIDGELINE_SCALE,
     SCALE,
+    SCATTER_MATRIX_DIAGONAL,
     SHOW_GRID,
-    VALUE_FORMAT,
+    SORT,
+    STACKED_AREA_BASELINE,
     SWARM_MODE,
+    VALUE_FORMAT,
     VIOLIN_INNER,
-    WEEKDAY,
 )
 from datachart.themes import DEFAULT_THEME
 from datachart.utils import Grid
@@ -394,10 +413,10 @@ def network_layout():
     chart_grid(
         figs,
         "const-network-layout.svg",
-        5.0,
-        cols=3,
+        10.0,
+        cols=2,
         footnote="The same six modules; SPRING is seeded so it repeats, WEIGHTED "
-        "pulls heavy edges short, GROUPED clusters by group, CIRCULAR keeps the "
+        "pulls heavy edges short,\nGROUPED clusters by group, CIRCULAR keeps the "
         "input order, FIXED reads each node's x and y.",
     )
 
@@ -627,14 +646,16 @@ AREA_SERIES = [
 
 def baseline():
     members = [
-        ("ZERO", BASELINE.ZERO),
-        ("PERCENT", BASELINE.PERCENT),
-        ("SYM", BASELINE.SYM),
-        ("WIGGLE", BASELINE.WIGGLE),
-        ("WEIGHTED_WIGGLE", BASELINE.WEIGHTED_WIGGLE),
+        ("ZERO", STACKED_AREA_BASELINE.ZERO),
+        ("PERCENT", STACKED_AREA_BASELINE.PERCENT),
+        ("SYM", STACKED_AREA_BASELINE.SYM),
+        ("WIGGLE", STACKED_AREA_BASELINE.WIGGLE),
+        ("WEIGHTED_WIGGLE", STACKED_AREA_BASELINE.WEIGHTED_WIGGLE),
     ]
     figs = [
-        StackedAreaChart(data=AREA_SERIES, baseline=value, title=f"BASELINE.{label}")
+        StackedAreaChart(
+            data=AREA_SERIES, baseline=value, title=f"STACKED_AREA_BASELINE.{label}"
+        )
         for label, value in members
     ]
     chart_grid(
@@ -700,14 +721,14 @@ def orientation():
 
 
 def weekday():
-    members = [("MONDAY", WEEKDAY.MONDAY), ("SUNDAY", WEEKDAY.SUNDAY)]
+    members = [("MONDAY", CALENDAR_WEEKDAY.MONDAY), ("SUNDAY", CALENDAR_WEEKDAY.SUNDAY)]
     days = [date(2024, 1, 1) + timedelta(days=i) for i in range(91)]
     values = [(i % 7) * (i % 5) for i in range(len(days))]
     figs = [
         CalendarHeatmap(
             data={"date": days, "value": values},
             week_start=value,
-            title=f"WEEKDAY.{label}",
+            title=f"CALENDAR_WEEKDAY.{label}",
         )
         for label, value in members
     ]
@@ -885,8 +906,8 @@ def radial_type():
 
 def direction():
     members = [
-        ("CLOCKWISE", DIRECTION.CLOCKWISE),
-        ("COUNTERCLOCKWISE", DIRECTION.COUNTERCLOCKWISE),
+        ("CLOCKWISE", RADIAL_DIRECTION.CLOCKWISE),
+        ("COUNTERCLOCKWISE", RADIAL_DIRECTION.COUNTERCLOCKWISE),
     ]
     months = [
         {"label": m, "y": y}
@@ -897,7 +918,7 @@ def direction():
             data=months,
             type=RADIAL_TYPE.BAR,
             direction=value,
-            title=f"DIRECTION.{label}",
+            title=f"RADIAL_DIRECTION.{label}",
         )
         for label, value in members
     ]
@@ -1039,6 +1060,425 @@ def aspect_ratio():
     )
 
 
+def date_format():
+    members = [
+        ("AUTO", DATE_FORMAT.AUTO),
+        ("ISO", DATE_FORMAT.ISO),
+        ("YEAR", DATE_FORMAT.YEAR),
+        ("YEAR_MONTH", DATE_FORMAT.YEAR_MONTH),
+        ("MONTH_DAY", DATE_FORMAT.MONTH_DAY),
+        ("DAY", DATE_FORMAT.DAY),
+        ("TIME", DATE_FORMAT.TIME),
+    ]
+    sample = datetime(2024, 3, 7, 14, 5)
+    fig, ax = plt.subplots(figsize=(7, 0.4 * (len(members) + 1) + 0.3))
+    full_width(fig)
+    n = len(members) + 1
+    header_y = 1 - 0.5 / n
+    for x, text in (
+        (0.0, "constant"),
+        (0.42, "pattern"),
+        (0.62, "2024-03-07 14:05 →"),
+    ):
+        ax.text(
+            x,
+            header_y,
+            text,
+            va="center",
+            fontsize=FS_LABEL,
+            color=INK,
+            fontweight="bold",
+        )
+    for i, (label, value) in enumerate(members):
+        y = 1 - (i + 1.5) / n
+        rendered = (
+            "picked from the visible span"
+            if value == DATE_FORMAT.AUTO
+            else sample.strftime(value)
+        )
+        ax.text(
+            0.0,
+            y,
+            f"DATE_FORMAT.{label}",
+            va="center",
+            fontsize=FS_LABEL,
+            color=INK,
+            family="monospace",
+        )
+        ax.text(
+            0.42,
+            y,
+            f'"{value}"',
+            va="center",
+            fontsize=FS_LABEL,
+            color=INK,
+            family="monospace",
+        )
+        ax.text(
+            0.62,
+            y,
+            rendered,
+            va="center",
+            fontsize=FS_LABEL,
+            color=DARK,
+            family="monospace",
+            style="italic" if value == DATE_FORMAT.AUTO else "normal",
+        )
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.axis("off")
+    save(fig, "const-date-format.svg")
+
+
+def sort():
+    members = [
+        ("NONE", SORT.NONE),
+        ("ASCENDING", SORT.ASCENDING),
+        ("DESCENDING", SORT.DESCENDING),
+    ]
+    figs = [
+        BarChart(data=BAR_SERIES[0], sort=value, title=f"SORT.{label}")
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-sort.svg",
+        2.2,
+        footnote="The same four categories; NONE keeps the input order.",
+    )
+
+
+def ridgeline_scale():
+    members = [
+        ("PER_ROW", RIDGELINE_SCALE.PER_ROW),
+        ("COMMON", RIDGELINE_SCALE.COMMON),
+    ]
+    figs = [
+        RidgelinePlot(
+            data=_violin_data(), normalize=value, title=f"RIDGELINE_SCALE.{label}"
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-ridgeline-scale.svg",
+        2.6,
+        footnote="The same three ridges; the narrow one peaks highest, so under "
+        "COMMON the wide ones flatten.",
+    )
+
+
+BUMP_SERIES = [
+    [{"x": x, "y": y} for x, y in enumerate(ys, start=1)]
+    for ys in ([30, 45, 20, 50], [40, 25, 35, 30], [20, 35, 45, 10])
+]
+
+
+def rank():
+    members = [
+        ("VALUE_DESCENDING", BUMP_RANK.VALUE_DESCENDING),
+        ("VALUE_ASCENDING", BUMP_RANK.VALUE_ASCENDING),
+        ("GIVEN", BUMP_RANK.GIVEN),
+    ]
+    given = [
+        [{"x": x, "y": y} for x, y in enumerate(ys, start=1)]
+        for ys in ([2, 1, 3, 1], [1, 3, 2, 2], [3, 2, 1, 3])
+    ]
+    figs = [
+        BumpChart(
+            data=given if value == BUMP_RANK.GIVEN else BUMP_SERIES,
+            rank_by=value,
+            subtitle=["alpha", "beta", "gamma"],
+            show_values=True,
+            title=f"BUMP_RANK.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-rank.svg",
+        2.4,
+        footnote="The value rules rank the same series per period; GIVEN "
+        "reads y as the rank itself.",
+    )
+
+
+def label_position():
+    members = [
+        ("START", BUMP_LABEL_POSITION.START),
+        ("END", BUMP_LABEL_POSITION.END),
+        ("BOTH", BUMP_LABEL_POSITION.BOTH),
+    ]
+    figs = [
+        BumpChart(
+            data=BUMP_SERIES,
+            label_position=value,
+            subtitle=["alpha", "beta", "gamma"],
+            xticks=[1, 2, 3, 4],
+            title=f"BUMP_LABEL_POSITION.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(figs, "const-label-position.svg", 4.4, cols=2)
+
+
+def network_label_position():
+    members = [
+        ("CENTER", NETWORK_LABEL_POSITION.CENTER),
+        ("ABOVE", NETWORK_LABEL_POSITION.ABOVE),
+        ("BEST", NETWORK_LABEL_POSITION.BEST),
+    ]
+    data = {
+        "nodes": [{"id": n} for n in ("core", "utils", "cli", "api", "web")],
+        "edges": [
+            {"source": s, "target": t}
+            for s, t in (
+                ("core", "utils"),
+                ("cli", "core"),
+                ("api", "core"),
+                ("web", "api"),
+            )
+        ],
+    }
+    figs = [
+        NetworkChart(
+            data=data,
+            layout=NETWORK_LAYOUT.CIRCULAR,
+            label_position=value,
+            title=f"NETWORK_LABEL_POSITION.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-network-label-position.svg",
+        2.6,
+        footnote="BEST tries the spots around each marker in turn and keeps the "
+        "one clear of nodes, edges, and other labels.",
+    )
+
+
+def _gantt_tasks():
+    d = date(2024, 3, 4)
+    rows = [
+        ("plan", "design", 0, 5, 1.0, []),
+        ("mockups", "design", 5, 12, 0.6, ["plan"]),
+        ("backend", "build", 3, 15, 0.4, ["plan"]),
+        ("frontend", "build", 12, 20, 0.1, ["mockups"]),
+        ("release", "build", 20, 20, 0.0, ["backend", "frontend"]),
+    ]
+    return [
+        {
+            "task": task,
+            "group": group,
+            "start": d + timedelta(days=a),
+            "end": d + timedelta(days=b),
+            "progress": progress,
+            "depends_on": deps,
+        }
+        for task, group, a, b, progress, deps in rows
+    ]
+
+
+def gantt_value():
+    members = [
+        ("NONE", GANTT_VALUE.NONE),
+        ("DURATION", GANTT_VALUE.DURATION),
+        ("PROGRESS", GANTT_VALUE.PROGRESS),
+    ]
+    figs = [
+        GanttChart(
+            data=_gantt_tasks(),
+            show_values=value,
+            show_legend=False,
+            title=f"GANTT_VALUE.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-gantt-value.svg",
+        2.4,
+        footnote="The same five tasks; the label prints past each bar's end.",
+    )
+
+
+def gantt_sort_key():
+    members = [
+        ("START", GANTT_SORT_KEY.START),
+        ("GROUP", GANTT_SORT_KEY.GROUP),
+    ]
+    figs = [
+        GanttChart(
+            data=_gantt_tasks(),
+            sort=SORT.ASCENDING,
+            sort_by=value,
+            title=f"GANTT_SORT_KEY.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-gantt-sort-key.svg",
+        2.6,
+        footnote="Both with sort=SORT.ASCENDING; GROUP keeps each group's "
+        "tasks together.",
+    )
+
+
+def gantt_arrow_entry():
+    members = [
+        ("TOP", GANTT_ARROW_ENTRY.TOP),
+        ("LEFT", GANTT_ARROW_ENTRY.LEFT),
+    ]
+    figs = [
+        GanttChart(
+            data=_gantt_tasks(),
+            show_dependencies=True,
+            show_legend=False,
+            style={"plot_gantt_dependency_entry": value},
+            title=f"GANTT_ARROW_ENTRY.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-gantt-arrow-entry.svg",
+        2.6,
+        footnote="The same dependencies; the entry is where the arrow meets "
+        "the dependent bar.",
+    )
+
+
+def date_period():
+    members = [
+        ("NONE", GANTT_DATE_PERIOD.NONE),
+        ("DAY", GANTT_DATE_PERIOD.DAY),
+        ("WEEK", GANTT_DATE_PERIOD.WEEK),
+        ("MONTH", GANTT_DATE_PERIOD.MONTH),
+        ("QUARTER", GANTT_DATE_PERIOD.QUARTER),
+        ("YEAR", GANTT_DATE_PERIOD.YEAR),
+        ("PROJECT_MONTH", GANTT_DATE_PERIOD.PROJECT_MONTH),
+    ]
+    # each period needs a span that shows a handful of its edges: the three
+    # week schedule as is, and stretched to seven and twenty months
+    short = _gantt_tasks()
+    origin = short[0]["start"]
+
+    def stretched(factor):
+        return [
+            {
+                **task,
+                "start": origin + (task["start"] - origin) * factor,
+                "end": origin + (task["end"] - origin) * factor,
+            }
+            for task in short
+        ]
+
+    spans = {
+        "MONTH": stretched(10),
+        "QUARTER": stretched(30),
+        "YEAR": stretched(30),
+        "PROJECT_MONTH": stretched(10),
+    }
+    figs = [
+        GanttChart(
+            data=spans.get(label, short),
+            period=value,
+            show_legend=False,
+            title=f"GANTT_DATE_PERIOD.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-date-period.svg",
+        8.0,
+        cols=2,
+        footnote="The same five tasks over three weeks (NONE, DAY, WEEK), seven "
+        "months (MONTH, PROJECT_MONTH), and twenty months (QUARTER, YEAR);\nthe "
+        "first label row names the period, the second its enclosing one.",
+    )
+
+
+DUMBBELL_RECORDS = [
+    {"label": label, "start": start, "end": end}
+    for label, start, end in (
+        ("w", 20, 35),
+        ("x", 40, 30),
+        ("y", 15, 45),
+        ("z", 30, 32),
+    )
+]
+
+
+def dumbbell_value():
+    members = [
+        ("NONE", DUMBBELL_VALUE.NONE),
+        ("ENDPOINTS", DUMBBELL_VALUE.ENDPOINTS),
+        ("DELTA", DUMBBELL_VALUE.DELTA),
+    ]
+    figs = [
+        DumbbellChart(
+            data=DUMBBELL_RECORDS,
+            show_values=value,
+            show_legend=False,
+            title=f"DUMBBELL_VALUE.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(figs, "const-dumbbell-value.svg", 2.2)
+
+
+def dumbbell_sort_key():
+    members = [
+        ("START", DUMBBELL_SORT_KEY.START),
+        ("END", DUMBBELL_SORT_KEY.END),
+        ("DELTA", DUMBBELL_SORT_KEY.DELTA),
+    ]
+    figs = [
+        DumbbellChart(
+            data=DUMBBELL_RECORDS,
+            sort=SORT.ASCENDING,
+            sort_by=value,
+            show_legend=False,
+            title=f"DUMBBELL_SORT_KEY.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-dumbbell-sort-key.svg",
+        2.2,
+        footnote="All with sort=SORT.ASCENDING; DELTA orders by end - start, "
+        "so a shrinking record comes first.",
+    )
+
+
+def diagonal():
+    members = [
+        ("HIST", SCATTER_MATRIX_DIAGONAL.HIST),
+        ("KDE", SCATTER_MATRIX_DIAGONAL.KDE),
+        ("NONE", SCATTER_MATRIX_DIAGONAL.NONE),
+    ]
+    rng = np.random.default_rng(3)
+    a = rng.normal(0, 1, 120)
+    data = {"a": a.tolist(), "b": (0.7 * a + rng.normal(0, 0.6, 120)).tolist()}
+    figs = [
+        ScatterMatrix(
+            data=data, diagonal=value, title=f"SCATTER_MATRIX_DIAGONAL.{label}"
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-diagonal.svg",
+        6.4,
+        cols=2,
+        footnote="The same two dimensions; only the cells on the diagonal change.",
+    )
+
+
 def main():
     font_style()
     font_weight()
@@ -1069,6 +1509,19 @@ def main():
     normalize()
     emphasis()
     aspect_ratio()
+    date_format()
+    sort()
+    ridgeline_scale()
+    rank()
+    label_position()
+    network_label_position()
+    gantt_value()
+    gantt_sort_key()
+    gantt_arrow_entry()
+    date_period()
+    dumbbell_value()
+    dumbbell_sort_key()
+    diagonal()
 
 
 if __name__ == "__main__":

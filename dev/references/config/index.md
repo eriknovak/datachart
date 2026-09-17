@@ -14,6 +14,23 @@ The `config` module contains the configuration objects, enabling the users to gl
 | -------- | ------------------------ |
 | `Config` | The configuration class. |
 
+## Choosing a Method
+
+One `config` instance holds the style every chart is drawn with. Its methods change that style for the rest of the session, for one block of code, or from a file; the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) walks through them on a chart.
+
+| I want to…                                  | Call                                                         | See                                                                                                  |
+| ------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| switch the look of every chart              | `config.set_theme(THEME.INK)`                                | [set_theme](#datachart.config.Config.set_theme)                                                      |
+| change a few attributes on top of the theme | `config.update_config({"font_general_size": 12})`            | [update_config](#datachart.config.Config.update_config)                                              |
+| change the look for one block of code       | `with config.override(...)`, `with config.using_theme(...)`  | [override](#datachart.config.Config.override), [using_theme](#datachart.config.Config.using_theme)   |
+| go back to the default theme                | `config.reset_config()`                                      | [reset_config](#datachart.config.Config.reset_config)                                                |
+| add a theme of my own                       | `config.register_theme(name, theme)`, then `set_theme(name)` | [register_theme](#datachart.config.Config.register_theme)                                            |
+| see which names `set_theme` accepts         | `config.list_themes()`                                       | [list_themes](#datachart.config.Config.list_themes)                                                  |
+| share a theme as a file                     | `config.save_theme(path)`, `config.load_theme(path)`         | [save_theme](#datachart.config.Config.save_theme), [load_theme](#datachart.config.Config.load_theme) |
+| read one attribute                          | `config.get("font_general_size")`                            | [get](#datachart.config.Config.get)                                                                  |
+
+The attribute names are the keys of [`StyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs): the theme-level keys on the [typings](https://eriknovak.github.io/datachart/dev/references/typings/#theme-style) page and each chart's own keys on its [reference page](https://eriknovak.github.io/datachart/dev/references/charts/index.md). The theme names are the members of [`THEME`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME).
+
 ## Attributes
 
 ### datachart.config.config
@@ -48,14 +65,6 @@ The class representing the configuration options.
 | `load_theme`     | Registers the theme in a theme file.                          |
 | `get`            | Gets the associated configuration attribute.                  |
 
-#### __init__
-
-```
-__init__()
-```
-
-Initializes the global configuration.
-
 #### set_theme
 
 ```
@@ -64,7 +73,7 @@ set_theme(theme: THEME) -> None
 
 Sets the global configuration to match the theme.
 
-Replaces the whole style configuration with a deep copy of the theme: one of the `THEME` constants or a name registered with `register_theme`. Use it to switch the look of every chart rendered afterwards; call `update_config` on top for per-attribute tweaks.
+Replaces the whole style configuration with a deep copy of the theme: one of the THEME constants or a name registered with `register_theme`. Use it to switch the look of every chart rendered afterwards; call `update_config` on top for per-attribute tweaks.
 
 Added in v0.5.0
 
@@ -152,11 +161,19 @@ Examples:
 | --------- | ------------------------------------------------------------------ |
 | `config`  | The configuration attributes to be updated. **TYPE:** `StyleAttrs` |
 
+#### \_scope
+
+```
+_scope() -> Iterator[None]
+```
+
+Restores the style dict and the active theme name on exit.
+
 #### override
 
 ```
 override(
-    config: Optional[StyleAttrs] = None, **attrs: Any
+    config: StyleAttrs | None = None, **attrs: Any
 ) -> Iterator[None]
 ```
 
@@ -177,10 +194,10 @@ Examples:
 10
 ```
 
-| PARAMETER | DESCRIPTION                                                                                       |
-| --------- | ------------------------------------------------------------------------------------------------- |
-| `config`  | The attributes to override, as a dictionary. **TYPE:** `Optional[StyleAttrs]` **DEFAULT:** `None` |
-| `**attrs` | The attributes to override, as keyword arguments. **TYPE:** `Any` **DEFAULT:** `{}`               |
+| PARAMETER | DESCRIPTION                                                                         |
+| --------- | ----------------------------------------------------------------------------------- |
+| `config`  | The attributes to override, as a dictionary. **TYPE:** \`StyleAttrs                 |
+| `**attrs` | The attributes to override, as keyword arguments. **TYPE:** `Any` **DEFAULT:** `{}` |
 
 #### using_theme
 
@@ -213,7 +230,7 @@ Examples:
 #### list_themes
 
 ```
-list_themes() -> List[str]
+list_themes() -> list[str]
 ```
 
 Lists the theme names `set_theme` accepts.
@@ -232,13 +249,13 @@ True
 
 | RETURNS     | DESCRIPTION      |
 | ----------- | ---------------- |
-| `List[str]` | The theme names. |
+| `list[str]` | The theme names. |
 
 #### save_theme
 
 ```
 save_theme(
-    path: Union[str, Path], name: Optional[str] = None
+    path: str | Path, name: str | None = None
 ) -> None
 ```
 
@@ -257,10 +274,10 @@ Examples:
 >>> config.save_theme("ink.json", name="ink")
 ```
 
-| PARAMETER | DESCRIPTION                                                                                                     |
-| --------- | --------------------------------------------------------------------------------------------------------------- |
-| `path`    | The file to write. **TYPE:** `Union[str, Path]`                                                                 |
-| `name`    | The registered theme to save. Defaults to the live configuration. **TYPE:** `Optional[str]` **DEFAULT:** `None` |
+| PARAMETER | DESCRIPTION                                                                       |
+| --------- | --------------------------------------------------------------------------------- |
+| `path`    | The file to write. **TYPE:** \`str                                                |
+| `name`    | The registered theme to save. Defaults to the live configuration. **TYPE:** \`str |
 
 | RAISES       | DESCRIPTION                        |
 | ------------ | ---------------------------------- |
@@ -270,7 +287,7 @@ Examples:
 
 ```
 load_theme(
-    path: Union[str, Path], name: Optional[str] = None
+    path: str | Path, name: str | None = None
 ) -> str
 ```
 
@@ -289,10 +306,10 @@ Examples:
 'house'
 ```
 
-| PARAMETER | DESCRIPTION                                                                                                                                    |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `path`    | The theme file to read. **TYPE:** `Union[str, Path]`                                                                                           |
-| `name`    | The name to register the theme under. Defaults to the name in the file, then to the file's stem. **TYPE:** `Optional[str]` **DEFAULT:** `None` |
+| PARAMETER | DESCRIPTION                                                                                                      |
+| --------- | ---------------------------------------------------------------------------------------------------------------- |
+| `path`    | The theme file to read. **TYPE:** \`str                                                                          |
+| `name`    | The name to register the theme under. Defaults to the name in the file, then to the file's stem. **TYPE:** \`str |
 
 | RETURNS | DESCRIPTION                              |
 | ------- | ---------------------------------------- |
@@ -352,11 +369,3 @@ Examples:
 | RETURNS | DESCRIPTION                                                           |
 | ------- | --------------------------------------------------------------------- |
 | `Any`   | The attribute value if present. Otherwise, returns the default value. |
-
-#### __repr__
-
-```
-__repr__()
-```
-
-Represents the configuration as a json string.

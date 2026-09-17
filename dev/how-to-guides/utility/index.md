@@ -1,12 +1,15 @@
-# Composition & Utilities
+# Utility
 
-The [datachart.utils](https://eriknovak.github.io/datachart/dev/references/utils/index.md) module of the `datachart` package provides the figure composition functions and various utilities for data visualization.
+The utilities of the [datachart.utils](https://eriknovak.github.io/datachart/dev/references/utils/index.md) module around a figure: the numbers behind the charts, getting a figure out to where it is read, and inspecting it while it is still on screen. Each card names a guide, says what it is for, and links to it.
 
-These include:
+- [Statistics](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md)
 
-- The [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) function for overlaying multiple charts on a single plot with optional dual y-axes, as illustrated in the [panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) section.
-- The [datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) function for arranging multiple charts in a grid layout, as illustrated in the [grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) section.
-- The `texts` chart parameter and the [datachart.utils.Annotate](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Annotate) function for attaching text annotations to charts and finished figures, as illustrated in the [text annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) section.
-- The [datachart.utils.stats](https://eriknovak.github.io/datachart/dev/references/utils/stats/index.md) module for statistical calculations, as illustrated in the [stats](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md) section.
-- The [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.save_figure) function for saving figures into files and embedding them in web pages, as described in the [saving figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) section.
-- The `interactive` flag of every figure's `show()` method for zooming, panning, and hovering over the marks, as described in the [interactive figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/interactive/index.md) section.
+  The numbers behind the charts, in [datachart.utils.stats](https://eriknovak.github.io/datachart/dev/references/utils/stats/index.md): centers, spreads, correlations, fits, intervals, smoothers and densities, each shown feeding back into a chart's title, error bars, or an overlaid series.
+
+- [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md)
+
+  Writes a figure to disk through [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.save_figure): the format, resolution and background for a manuscript, a slide, and a web page, in one call or several at once.
+
+- [Interactive Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/interactive/index.md)
+
+  Shows a figure with zoom, pan, and hover over its marks through the `interactive` flag of every figure's `show()` method, to read the point behind an outlier or check a value without labelling it.

@@ -1,120 +1,76 @@
 # Colormaps
 
-This section shows the different colormaps that are available in `datachart` module. The colormaps are used to customize the colors of the charts.
+A palette is named wherever a theme asks for colors: the two general palettes, the heatmap colormap, and the parallel-coordinates hues. The name is resolved through [pypalettes](https://y-sunflower.github.io/pypalettes/), which gives access to over 2500 palettes; the [COLORS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORS) constant is a curated selection of them, rendered on this page. Which kind of palette a role wants:
 
-`datachart` uses [pypalettes](https://y-sunflower.github.io/pypalettes/) under the hood, giving you access to **2500+ color palettes**. A curated selection of popular palettes is available via the [datachart.constants.COLORS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORS) constant, but you can use any valid pypalettes palette name directly.
+| Role                                    | Attribute                                             | Kind                    |
+| --------------------------------------- | ----------------------------------------------------- | ----------------------- |
+| Series sharing one axes                 | `color_general_multiple`                              | Categorical             |
+| Subplot series and single-series charts | `color_general_singular`                              | Sequential              |
+| Heatmap cells                           | `plot_heatmap_cmap`                                   | Sequential or diverging |
+| Parallel-coordinates hue                | `color_parallel_hue`, `color_parallel_hue_continuous` | Categorical, sequential |
 
-The predefined palettes include:
+A single series takes the palette's last color, so a sequential palette gives one strong color for a chart with one series and a graded set for subplots. The calendar heatmap, hexbin, and contour colormaps follow the heatmap's unless set. See the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for setting these attributes and building a theme around them.
 
-- **Sequential**: `Blues`, `Greens`, `Oranges`, `Purples`, `Reds`, `Sunset2`, `YlGnBu`, `YlOrRd`, `PuBuGn`
-- **Diverging**: `RdBu`, `BrBG`, `PuOr`, `Spectral`, `RdYlBu`, `RdYlGn`
-- **Categorical**: `Pastel`, `Set2`, `Accent`, `Dark2`, `Paired`, `Set1`
-- **Grayscale**: `Greys` (print-friendly)
-- **Color-blind friendly**: `Viridis`, `Cividis`, `Inferno`, `Plasma`
-
-```
-from typing import List, Tuple
-
-import numpy as np
-import matplotlib.pyplot as plt
-```
+Each palette below is shown as a continuous strip and as the six colors a chart with six series receives; hover a swatch for its hex code. A palette is passed as its `COLORS` value, or as the plain name string. A chip names a predefined theme that uses the palette and the role it plays there, and links to the theme's card in the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md).
 
 ```
 from datachart.constants import COLORS
-from datachart.utils._internal.colors import get_colormap
 ```
 
-```
-def plot_color_gradients(cmap_list: List[Tuple[str, str]], n_sections: int = 256):
-    """Plots the gradients of multiple colormaps.
+## Sequential, Single Hue
 
-    Args:
-        cmap_list (List[Tuple[str, str]]): The list of colormaps to plot.
-        n_sections (int, optional): The number of sections to plot. Defaults to 256.
+One hue from light to dark, ordered by magnitude. The natural `color_general_singular` palette: one series takes the dark end, subplots get graded tints. Also the safest heatmap colormap.
 
-    """
+## Sequential, Multiple Hues
 
-    gradient = np.linspace(0, 1, n_sections)
-    gradient = np.vstack((gradient, gradient))
+Light to dark through two or more hues, which separates neighbouring values better than a single hue. Suited to heatmaps and value scales; the last color still serves a single series.
 
-    # Create figure and adjust figure height to number of colormaps
-    nrows = len(cmap_list)
-    figh = 0.35 + 0.15 + (nrows + (nrows - 1) * 0.1) * 0.22
-    fig, axs = plt.subplots(nrows=nrows + 1, figsize=(8.2, figh))
-    fig.subplots_adjust(top=1 - 0.35 / figh, bottom=0.15 / figh, left=0.2, right=0.99)
-    axs[0].set_title(f"datachart colormaps", fontsize=14)
+## Diverging
 
-    for ax, (name, value) in zip(axs, cmap_list):
-        ax.imshow(gradient, aspect="auto", cmap=get_colormap(value))
-        ax.text(
-            -0.01,
-            0.5,
-            name,
-            va="center",
-            ha="right",
-            fontsize=10,
-            transform=ax.transAxes,
-        )
+Two hues meeting at a neutral center, for values with a meaningful midpoint: differences from a baseline, correlations, gains and losses. Use with a heatmap `norm` centred on that value.
 
-    # Turn off *all* ticks & spines, not just the ones with colormaps.
-    for ax in axs:
-        ax.set_axis_off()
-```
+## Categorical
+
+Distinct hues of similar weight, for series that are different in kind rather than in amount: the `color_general_multiple` palette. The six colors shown are the ones six series receive.
+
+## Perceptually Uniform and Color-Blind Safe
+
+Equal steps in value read as equal steps in color, and the palettes stay distinguishable under the common forms of color-vision deficiency. The first six are sequential, the Okabe-Ito pair categorical.
+
+## Greyscale
+
+For print and black-and-white reproduction; the greyscale themes pair it with hatching or markers to keep series apart.
+
+## Datachart's Own
+
+Two palettes registered by datachart rather than pypalettes, made for the ink theme's publication look. They cycle through their exact colors instead of interpolating, so the series colors are always the ones listed.
+
+## Beyond the Constant
+
+Any pypalettes name works where a `COLORS` value does. So does a single matplotlib color, which is a palette of one and repeats for every series, and a list of hex colors, which cycles through its exact colors like datachart's own palettes. The list is how the predefined themes define most of their series palettes, and how a custom theme states its own:
 
 ```
-cmap_list = [
-    ("COLORS.Blues", COLORS.Blues),
-    ("COLORS.Greens", COLORS.Greens),
-    ("COLORS.Oranges", COLORS.Oranges),
-    ("COLORS.Purples", COLORS.Purples),
-    ("COLORS.Reds", COLORS.Reds),
-    ("COLORS.Sunset2", COLORS.Sunset2),
-    ("COLORS.YlGnBu", COLORS.YlGnBu),
-    ("COLORS.YlOrRd", COLORS.YlOrRd),
-    ("COLORS.PuBuGn", COLORS.PuBuGn),
-    ("COLORS.RdBu", COLORS.RdBu),
-    ("COLORS.BrBG", COLORS.BrBG),
-    ("COLORS.PuOr", COLORS.PuOr),
-    ("COLORS.Spectral", COLORS.Spectral),
-    ("COLORS.RdYlBu", COLORS.RdYlBu),
-    ("COLORS.RdYlGn", COLORS.RdYlGn),
-    ("COLORS.Pastel", COLORS.Pastel),
-    ("COLORS.Set2", COLORS.Set2),
-    ("COLORS.Accent", COLORS.Accent),
-    ("COLORS.Dark2", COLORS.Dark2),
-    ("COLORS.Paired", COLORS.Paired),
-    ("COLORS.Set1", COLORS.Set1),
-    ("COLORS.Greys", COLORS.Greys),
-    ("COLORS.Viridis", COLORS.Viridis),
-    ("COLORS.Cividis", COLORS.Cividis),
-    ("COLORS.Inferno", COLORS.Inferno),
-    ("COLORS.Plasma", COLORS.Plasma)
-]
+palettes("Antique", "#B5651D", ["#0B3954", "#FF6663", "#E0FF4F"])
 ```
 
-**Continuous scales**
+## Using a Palette in a Theme
+
+A palette is set through the attributes in the table above, here for one figure with `override`; a theme sets the same attributes once. The heatmap takes its own colormap, the bars the general series palette:
 
 ```
-plot_color_gradients(cmap_list=cmap_list)
-```
+from datachart.charts import BarChart, Heatmap
+from datachart.config import config
+from datachart.utils import Grid
 
-**Discrete scales**
+CELLS = {"z": [[r * c for c in range(1, 8)] for r in range(1, 7)]}
+BARS = [[{"label": f"Q{q}", "y": 30 + 12 * s + 7 * q} for q in range(1, 5)] for s in range(4)]
 
-```
-# change the number of sections `n_sections`
-plot_color_gradients(cmap_list=cmap_list, n_sections=10)
-```
-
-**Custom datachart palettes**
-
-Besides the pypalettes names, `datachart` registers a few palettes of its own, resolved before pypalettes: `COLORS.PaperYlGnBu` (the diversified YlGnBu categorical palette used by the publication theme) and `COLORS.PaperAccent` (a two-color blue/red accent pair). Unlike pypalettes names, these cycle through their exact colors instead of interpolating.
-
-```
-plot_color_gradients(
-    cmap_list=[
-        ("COLORS.PaperYlGnBu", COLORS.PaperYlGnBu),
-        ("COLORS.PaperAccent", COLORS.PaperAccent),
-    ],
-    n_sections=6,
-)
+with config.override(plot_heatmap_cmap=COLORS.Cividis, color_general_multiple=COLORS.OkabeIto):
+    Grid(
+        [[
+            Heatmap(data=CELLS, title="Cividis cells", show_heatmap_values=True),
+            BarChart(data=BARS, title="Okabe-Ito series", subtitle=["A", "B", "C", "D"], show_legend=True),
+        ]],
+        figsize=(9, 3.2),
+    ).show()
 ```

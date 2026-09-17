@@ -1,87 +1,33 @@
 # Hexbin Chart
 
-This section showcases the hexbin chart. It contains examples of how to create hexbin charts using the [datachart.charts.HexbinChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.HexbinChart) function.
+A hexbin chart is a scatter chart for when there are too many points to see. It tiles the plane with hexagons and colors each one by the number of points that fall in it, or by an aggregate of a value the points carry, so the density and the trends of thousands of points stay readable. This guide shows how to create hexbin charts with the [datachart.charts.HexbinChart](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.charts.HexbinChart) function, starting with the basics and building up to worked examples on illustrative data.
 
 Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-hexbin-chart), which maps common tasks to the parameter or style attribute that does the job.
 
-As mentioned above, the hexbin charts are created using the `HexbinChart` function found in the [datachart.charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md) module. Let's import it:
-
 ```
-from datachart.charts import HexbinChart
+from datachart.charts import HexbinChart, ScatterChart
 ```
-
-## Hexbin Chart Input Attributes
-
-The `HexbinChart` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the points to bin. For a single hexbin chart, `data` is a dictionary with the `x` and `y` columns and an optional `c` column of per-point values; for multiple hexbin charts, `data` is a list of such dictionaries.
-
-```
-HexbinChart(
-    data={                                              # The points to bin (or list of them for multiple charts)
-        "x": List[Union[int, float]],                   # The x values of the points
-        "y": List[Union[int, float]],                   # The y values of the points, one per x
-        "c": Optional[List[Union[int, float]]],         # The value of each point; when given, the hexagons show its aggregate instead of the count
-    },
-    emphasis_rule=Optional[dict],                       # One-key rule on each bin's aggregated value
-    style={                                             # The style of the hexbin chart (optional)
-        "plot_hexbin_cmap":       Optional[Union[str, List[str]]], # The colormap of the hexagons (the heatmap colormap by default)
-        "plot_hexbin_alpha":      Optional[float],      # The alpha of the hexagons
-        "plot_hexbin_edge_width": Optional[Union[int, float]], # The width of the hexagon edges (0, no edges, by default)
-        "plot_hexbin_edge_color": Optional[str],        # The color of the hexagon edges
-        "plot_hexbin_gridsize":   Optional[int],        # The number of hexagons across the x-axis when gridsize is not set
-    },
-    title: Optional[str],                               # The title of the chart
-    xlabel: Optional[str],                              # The x-axis label
-    ylabel: Optional[str],                              # The y-axis label
-    subtitle: Optional[Union[str, List[str]]],          # The subtitle(s) of the charts
-    figsize: Optional[Tuple[float, float]],             # The size of the figure
-    xmin: Optional[Union[int, float]],                  # The minimum x-axis value
-    xmax: Optional[Union[int, float]],                  # The maximum x-axis value
-    ymin: Optional[Union[int, float]],                  # The minimum y-axis value
-    ymax: Optional[Union[int, float]],                  # The maximum y-axis value
-    show_grid: Optional[str],                           # Which grid lines to show ("both", "x", "y"); off by default
-    show_colorbars: Optional[bool],                     # Whether to show the colorbar(s); on by default
-    aspect_ratio: Optional[str],                        # The aspect ratio of the axes ("auto", "equal")
-    scalex: Optional[str],                              # The x-axis scale ("linear", "log", ...)
-    scaley: Optional[str],                              # The y-axis scale ("linear", "log", ...)
-    subplots: Optional[bool],                           # Whether to create a separate subplot for each chart
-    max_cols: Optional[int],                            # The maximum number of columns in the subplots
-    sharex: Optional[bool],                             # Whether to share the x-axis across the subplots
-    sharey: Optional[bool],                             # Whether to share the y-axis across the subplots
-    gridsize: Optional[Union[int, List[int]]],          # The number of hexagons across the x-axis (30 by default)
-    reduce: Optional[Union[str, List[str]]],            # How the c values in a hexagon collapse into its color ("mean", "sum", "median", "min", "max")
-    mincnt: Optional[Union[int, List[int]]],            # The point count below which a hexagon stays blank
-    norm: Optional[Union[str, List[str]]],              # The value normalization of the colormap
-    vmin: Optional[Union[float, List[float]]],          # The minimum value of the colormap range
-    vmax: Optional[Union[float, List[float]]],          # The maximum value of the colormap range
-    valfmt: Optional[Union[str, List[str]]],            # The format of the colorbar tick labels (e.g. "{x:.0f}")
-    xticks: Optional[List[Union[int, float]]],          # The x-axis tick positions
-    xticklabels: Optional[List[str]],                   # The x-axis tick labels
-    xtickrotate: Optional[int],                         # The rotation of the x-axis tick labels
-    yticks: Optional[List[Union[int, float]]],          # The y-axis tick positions
-    yticklabels: Optional[List[str]],                   # The y-axis tick labels
-    ytickrotate: Optional[int],                         # The rotation of the y-axis tick labels
-    vlines: Optional[Union[dict, List[dict]]],          # The vertical reference lines
-    hlines: Optional[Union[dict, List[dict]]],          # The horizontal reference lines
-    vspans: Optional[Union[dict, List[dict]]],          # The vertical reference bands
-    hspans: Optional[Union[dict, List[dict]]],          # The horizontal reference bands
-    colorbar: Optional[Union[dict, List[dict]]],        # The colorbar configuration(s) ({"orientation": ...})
-    texts: Optional[Union[dict, List[dict]]],           # The text annotations
-)
-```
-
-For more details, see the [datachart.charts.HexbinChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.HexbinChart) function.
 
 ## Basics
 
-The examples in this guide share one dataset: 8,000 apartment listings of a mid-sized city — the floor area of each apartment, its monthly rent, and the number of days it stayed on the market. The listings are simulated in the hidden cell below from the shape real rental markets have: floor areas cluster around 60 m² with a long tail of large apartments, the rent grows with the area at a rate that varies by district, and small, cheap apartments go fastest. Eight thousand points are far too many for a scatter chart to show anything but a blob; the hexbin chart bins them.
+The examples in this guide share one dataset: 8,000 apartment listings of a mid-sized city. The listings are illustrative, generated with a seeded random generator in the hidden cell below, but they follow the shape of real rental markets: floor areas cluster around 60 m² with a long tail of large apartments, the rent grows with the area at a rate set by the district, and overpriced apartments stay on the market longer. `listings` holds three columns: `x` is the floor area of each listing (m²), `y` its monthly rent (€), and `c` the number of days it stayed on the market. `points` holds the `x` and `y` columns alone, for the charts that count listings, and `district` holds the district of each listing (0 for the outskirts, 1 for midtown, 2 for the center).
 
-The data is a dictionary of columns: `x` holds the floor area of every listing, `y` its rent, and `c` its days on the market — one value per listing in each column. A `c` column switches the hexagons from counting the points to aggregating its values, so the hidden cell also keeps `points`, the `x` and `y` columns alone, for the charts that count:
+The data is a dictionary of columns, one value per listing in each column:
 
 ```
 {key: values[:5] for key, values in listings.items()}
 ```
 
-**Basic example.** Only the `data` argument is required to draw the hexbin chart. The plane is tiled with hexagons and every hexagon is colored by the number of listings falling in it, with a colorbar mapping the colors back to counts. Every hexagon of the tiling is drawn, the empty ones at the lowest color, so a single far-off listing — one large, expensive apartment here — stretches the tiling over a lot of blank plane; the [Minimum count](#minimum-count) section trims it.
+**The problem.** Plotted as a scatter chart, the 8,000 listings merge into one dark smear. The chart shows where the listings are, but not where most of them are: a region with ten listings and a region with three hundred look the same.
+
+```
+ScatterChart(
+    # one record per listing
+    data=[{"x": x, "y": y} for x, y in zip(points["x"], points["y"])],
+).show()
+```
+
+**Basic example.** A hexbin chart of the same points needs only the `data` argument. Every hexagon is colored by the number of listings in it, and the colorbar maps the colors back to counts. The dense core around 50 m² and 1,000 € now stands out from the thin tail of large apartments. Every hexagon of the tiling is drawn, the empty ones in the lowest color, so a few large, expensive apartments stretch the tiling over a lot of empty plane; the [Minimum count](#minimum-count) section trims it.
 
 ```
 HexbinChart(
@@ -94,29 +40,56 @@ HexbinChart(
 
 Every customization is either a keyword argument of `HexbinChart` or a `plot_hexbin_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                                 | Use                                                              | See                                               |
-| ------------------------------------------ | ---------------------------------------------------------------- | ------------------------------------------------- |
-| add a title and axis labels                | `title`, `xlabel`, `ylabel`                                      | [Title and axis labels](#title-and-axis-labels)   |
-| resize the figure                          | `figsize`                                                        | [Figure size and grid](#figure-size-and-grid)     |
-| show the grid lines                        | `show_grid`                                                      | [Figure size and grid](#figure-size-and-grid)     |
-| hide or reorient the colorbar              | `show_colorbars=False`, `colorbar={"orientation": ...}`          | [Colorbar](#colorbar)                             |
-| make the hexagons larger or smaller        | `gridsize`                                                       | [Grid size](#grid-size)                           |
-| leave the sparse hexagons blank            | `mincnt`                                                         | [Minimum count](#minimum-count)                   |
-| spread heavy-tailed counts over the colors | `norm`, `vmin`, `vmax`                                           | [Normalization](#normalization)                   |
-| color the hexagons by a value              | `data={"c": ...}`, `reduce`                                      | [Aggregating a value](#aggregating-a-value)       |
-| change the colormap or draw hexagon edges  | `style={"plot_hexbin_cmap": ..., "plot_hexbin_edge_width": ...}` | [Hexagon style](#hexagon-style)                   |
-| draw each dataset in its own subplot       | `subplots=True`, `max_cols`, `sharex`, `sharey`                  | [Multiple Hexbin Charts](#multiple-hexbin-charts) |
-| draw points or lines over the hexagons     | `Panel`                                                          | [Composing hexbins](#composing-hexbins)           |
-| keep one unit equal on both axes           | `aspect_ratio`                                                   | [Aspect ratio](#aspect-ratio)                     |
-| mark a position with a reference line      | `vlines`, `hlines`                                               | [Reference lines](#reference-lines)               |
-| shade a region of the plane                | `hspans`, `vspans`                                               | [Reference bands](#reference-bands)               |
-| render the chart in another theme          | `config.set_theme`                                               | [Themes](#themes)                                 |
+| I want to…                                 | Use                                                              | See                                                                                                     |
+| ------------------------------------------ | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| add a title and axis labels                | `title`, `xlabel`, `ylabel`                                      | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| fix the axis range or the ticks            | `xmin`, `xmax`, `ymin`, `ymax`, `xticks`, `yticks`               | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| format or rotate the tick labels           | `xticks_format`, `yticks_format`, `xticklabels`, `xtickrotate`   | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| resize the figure                          | `figsize`                                                        | [Figure size and grid](#figure-size-and-grid)                                                           |
+| show the grid lines                        | `show_grid`                                                      | [Figure size and grid](#figure-size-and-grid)                                                           |
+| caption, move, or hide the colorbar        | `colorbar`, `valfmt`, `show_colorbars`                           | [Colorbar](#colorbar)                                                                                   |
+| make the hexagons larger or smaller        | `gridsize`                                                       | [Grid size](#grid-size)                                                                                 |
+| leave the sparse hexagons blank            | `mincnt`                                                         | [Minimum count](#minimum-count)                                                                         |
+| spread heavy-tailed counts over the colors | `norm`, `vmin`, `vmax`                                           | [Normalization](#normalization)                                                                         |
+| color the hexagons by a value              | `c` in `data`, `reduce`                                          | [Aggregating a value](#aggregating-a-value)                                                             |
+| change the colormap or draw hexagon edges  | `style={"plot_hexbin_cmap": ..., "plot_hexbin_edge_width": ...}` | [Hexagon style](#hexagon-style)                                                                         |
+| highlight the densest hexagons             | `emphasis_rule`                                                  | [Emphasis](#emphasis)                                                                                   |
+| mark a value or shade a range              | `vlines`, `hlines`, `vspans`, `hspans`                           | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| put a note on the chart                    | `texts`                                                          | [Text annotations](#text-annotations)                                                                   |
+| draw each dataset in its own subplot       | `data` as a list, `subplots`, `max_cols`, `sharex`, `sharey`     | [Multiple Hexbin Charts](#multiple-hexbin-charts)                                                       |
+| draw points or a trend over the hexagons   | `Panel`                                                          | [Composing with Panel](#composing-with-panel)                                                           |
+| add a legend                               | `Panel` with `show_legend`, `legend`                             | [Composing with Panel](#composing-with-panel)                                                           |
+| place the chart next to other charts       | `Grid`                                                           | [Composing with Grid](#composing-with-grid)                                                             |
+| keep one unit equal on both axes           | `aspect_ratio`                                                   | [Aspect ratio](#aspect-ratio)                                                                           |
+| bin the points along a time axis           | `date` objects as `x`, `xticks_format`                           | [Datetime axis](#datetime-axis)                                                                         |
+| render the chart in another theme          | `config.set_theme`                                               | [Themes](#themes)                                                                                       |
+| save the chart to a file                   | `save_figure`                                                    | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
-### Title and axis labels
+The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
 
-To add the chart title and axis labels, add the `title`, `xlabel` and `ylabel` attributes.
+| Parameter                                                       | Constant                                                                                                                                                                                                                                                                                                                                                           |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `reduce`                                                        | [`HEXBIN_REDUCE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HEXBIN_REDUCE)                                                                                                                                                                                                                                               |
+| `figsize`                                                       | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                                                                                                                                         |
+| `show_grid`                                                     | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                                                                                                                                       |
+| `aspect_ratio`                                                  | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                                                                                                                                                 |
+| `scalex`                                                        | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                                                                                                                                               |
+| `scaley`                                                        | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                                                                                                                                               |
+| `norm`                                                          | [`NORMALIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE)                                                                                                                                                                                                                                                       |
+| `valfmt`                                                        | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                 |
+| `xticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
+| `yticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
+| `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) |
+
+The full list of style attributes is in the [datachart.typings.HexbinStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.typings.HexbinStyleAttrs) type; the full list of parameters is in the [datachart.charts.HexbinChart](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.charts.HexbinChart) reference.
+
+### Title, axis labels and ticks
+
+A hexbin chart shows two quantities at once, and without axis labels the reader cannot tell which is which; `title`, `xlabel` and `ylabel` say it. `xmin`, `xmax`, `ymin` and `ymax` fix the axis range, which here cuts off the thin tail of apartments above 160 m² so the dense part gets the room. `xticks` and `yticks` place the ticks, and `yticks_format` formats their labels with a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or any `"{x:.1f}"` style string, so the rent axis reads in thousands with a separator. `xticklabels`, `xtickrotate` and their `y` counterparts replace or tilt the labels when they need it.
 
 ```
+from datachart.constants import VALUE_FORMAT
+
 HexbinChart(
     data=points,
     # add the title
@@ -124,44 +97,52 @@ HexbinChart(
     # add the x and y axis labels
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
+    # focus on the apartments up to 160 m²
+    xmin=15,
+    xmax=160,
+    ymin=0,
+    ymax=3500,
+    # one tick every 20 m², rents with a thousands separator
+    xticks=[20, 40, 60, 80, 100, 120, 140, 160],
+    yticks_format=VALUE_FORMAT.THOUSANDS,
 ).show()
 ```
 
 ### Figure size and grid
 
-To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains predefined figure sizes. The grid is off by default, as the hexagons would cover it; to show it anyway, add the `show_grid` attribute, which supports the values of the [datachart.constants.SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) constant — the grid lines draw over the hexagons.
+The default figure is nearly square, while a chart in a report usually spans the page width. `figsize` takes a `(width, height)` tuple in inches or one of the presets in [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE). The grid is off by default, because the hexagons would cover it; `show_grid` with a [SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) member draws it over the hexagons, which helps to read off the rent of the dense core.
 
 ```
 from datachart.constants import FIG_SIZE, SHOW_GRID
-```
 
-```
 HexbinChart(
     data=points,
     title="Apartment listings",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
-    # add to determine the figure size
+    # a wide, short figure
     figsize=FIG_SIZE.FULL_SHORT,
-    # add to show the grid lines on both axes
-    show_grid=SHOW_GRID.BOTH,
+    # grid lines along the rent axis
+    show_grid=SHOW_GRID.Y,
 ).show()
 ```
 
 ### Colorbar
 
-The colorbar maps the hexagon colors back to their values and is drawn to the right of the chart by default. To hide it, set the `show_colorbars` attribute to `False`; to caption it or move it, add the `colorbar` attribute with the [datachart.typings.ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs) typing: `label` names the quantity, `location` takes a value of the [datachart.constants.COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) constant, and `orientation` alone still takes a value of the [datachart.constants.ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) constant. The `valfmt` attribute formats its tick labels with a format string with the value named `x`; the [datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant holds the common ones.
+The colorbar is the legend of a hexbin chart: without a caption, the reader does not know that the colors count listings. `colorbar` takes a [ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs) dictionary: `label` captions the bar, `location` moves it to any edge with a [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) member, `ticks` places its ticks, and `format` formats their labels (the `valfmt` parameter does the same when `format` is not set). A bar above a wide chart takes less width from the hexagons than one beside it. `show_colorbars=False` hides the bar, which suits a chart whose colors are explained elsewhere, as in the [Composing with Panel](#composing-with-panel) section.
 
 ```
-from datachart.constants import ORIENTATION, VALUE_FORMAT
-```
+from datachart.constants import COLORBAR_LOCATION
 
-```
 HexbinChart(
     data=points,
-    # draw the colorbar above the chart, with integer ticks
-    colorbar={"orientation": ORIENTATION.HORIZONTAL},
-    valfmt=VALUE_FORMAT.INTEGER,
+    # a captioned colorbar above the chart, with integer ticks
+    colorbar={
+        "label": "Listings per hexagon",
+        "location": COLORBAR_LOCATION.TOP,
+        "ticks": [0, 50, 100, 150, 200],
+        "format": VALUE_FORMAT.INTEGER,
+    },
     title="Apartment listings",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -171,28 +152,29 @@ HexbinChart(
 
 ### Grid size
 
-The `gridsize` attribute sets how many hexagons tile the x-axis — 30 by default, from the `plot_hexbin_gridsize` config value. Fewer hexagons are larger and hold more points each, so the colors are smoother but the shape coarser; more hexagons resolve finer structure until they hold too few points to color reliably.
+The hexagon size decides what the chart can show. Large hexagons hold many points each, so the colors are smooth but the shape is coarse; small hexagons resolve finer structure until each holds too few points to color reliably. `gridsize` sets the number of hexagons across the x-axis (30 by default, from the `plot_hexbin_gridsize` style attribute). With 12 hexagons the listings reduce to a rough diagonal; with 60 the core shows its finer shape, at the price of a noisier color.
 
 ```
-HexbinChart(
-    data=points,
-    # twelve large hexagons across the x-axis
-    gridsize=12,
-    title="Apartment listings",
-    xlabel="Floor area (m²)",
-    ylabel="Rent (€/month)",
-    figsize=FIG_SIZE.FULL_SHORT,
-).show()
+for gridsize in [12, 60]:
+    HexbinChart(
+        data=points,
+        # the number of hexagons across the x-axis
+        gridsize=gridsize,
+        title=f"Apartment listings, {gridsize} hexagons across",
+        xlabel="Floor area (m²)",
+        ylabel="Rent (€/month)",
+        figsize=FIG_SIZE.FULL_SHORT,
+    ).show()
 ```
 
 ### Minimum count
 
-Every hexagon of the tiling is drawn by default, including the empty ones at the lowest color, so the tiling fills the bounding box of the points. To leave the sparse hexagons blank, add the `mincnt` attribute: a hexagon is drawn only when at least that many points fall in it, which trims the tiling down to where the listings actually are.
+Every hexagon of the tiling is drawn by default, so the tiling fills the whole bounding box of the points and empty plane looks like a region with few listings. `mincnt` leaves a hexagon blank unless at least that many points fall in it. `mincnt=1` draws only the hexagons that hold a listing, which shows the real outline of the data; a higher value also hides the hexagons with too few listings to trust.
 
 ```
 HexbinChart(
     data=points,
-    # blank hexagons with fewer than five listings
+    # blank the hexagons with fewer than five listings
     mincnt=5,
     title="Apartment listings",
     xlabel="Floor area (m²)",
@@ -203,18 +185,20 @@ HexbinChart(
 
 ### Normalization
 
-The colors come from a two-step mapping: the hexagon values are first normalized to the 0–1 range, then each normalized value picks its color from the colormap. Counts are heavy-tailed — a few hexagons in the densest cluster hold dozens of listings while most hold a handful — so on the linear default nearly every hexagon draws in the palest shades. The `norm` attribute changes the normalization; the [datachart.constants.NORMALIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE) constant holds the supported values, and `NORMALIZE.LOG` spreads the counts so the tail of the distribution is visible. A log scale needs positive values, so pair it with `mincnt=1` to leave the empty hexagons out. The `vmin` and `vmax` attributes pin the range instead of taking it from the data.
+Counts are heavy-tailed: a few hexagons in the core hold hundreds of listings while most hold a handful, so on a linear color scale nearly every hexagon draws in the palest shade. `norm` changes how the values map to colors with a [NORMALIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE) member; `NORMALIZE.LOG` spreads the counts, so the tail of the distribution becomes visible. A log scale needs positive values, so pair it with `mincnt=1`. `vmin` and `vmax` pin the color range instead of taking it from the data, which keeps the colors of several charts comparable.
 
 ```
 from datachart.constants import NORMALIZE
-```
 
-```
 HexbinChart(
     data=points,
     # log-scaled counts, so the sparse tail stays visible
     norm=NORMALIZE.LOG,
     mincnt=1,
+    # the color range, from one listing to 300
+    vmin=1,
+    vmax=300,
+    colorbar={"label": "Listings (log scale)"},
     title="Apartment listings",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -224,28 +208,27 @@ HexbinChart(
 
 ### Aggregating a value
 
-With a `c` column in the data, the hexagons show an aggregate of the `c` values of their points instead of the point count. The `reduce` attribute picks the aggregate with a value of the [datachart.constants.HEXBIN_REDUCE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HEXBIN_REDUCE) constant — the mean by default, or the sum, median, minimum, or maximum. Only the hexagons holding at least one point are drawn, as an empty hexagon has nothing to aggregate. Here `c` is the number of days a listing stayed on the market, so the chart below shows how long the apartments of every size and price took to rent: the mean rises with the floor area and, at every area, with the rent. A diverging colormap suits a value with a natural middle; the [Hexagon style](#hexagon-style) section shows how to set it.
+Density is one question; the other is how a third value varies across the plane. With a `c` column in the data, each hexagon shows an aggregate of the `c` values of its points instead of the count. `reduce` picks the aggregate with a [HEXBIN_REDUCE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HEXBIN_REDUCE) member: the mean by default, or the sum, median, minimum, or maximum. Only the hexagons holding a point are drawn, since an empty hexagon has nothing to aggregate, and an aggregate of one or two points is noisy, so `mincnt` hides those. Here `c` is the number of days a listing stayed on the market: the mean rises with the floor area and, at every area, with the rent.
 
 ```
 from datachart.constants import HEXBIN_REDUCE
-```
 
-```
 HexbinChart(
     # x, y, and the per-point c to aggregate
     data=listings,
     # the mean of the c values in every hexagon
     reduce=HEXBIN_REDUCE.MEAN,
-    # aggregates of a few points are noisy; blank the sparse hexagons
+    # blank the hexagons with fewer than three listings
     mincnt=3,
-    title="Days on the market",
+    colorbar={"label": "Mean days on the market"},
+    title="How long apartments take to rent",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
     figsize=FIG_SIZE.FULL_SHORT,
 ).show()
 ```
 
-The other aggregates answer other questions. The maximum finds the listings that stayed longest — the outliers — where the mean smooths them away:
+The other aggregates answer other questions. The median resists the few listings that stayed on the market for months; the maximum finds exactly those listings, which the mean smooths away:
 
 ```
 HexbinChart(
@@ -253,7 +236,8 @@ HexbinChart(
     # the longest-listed apartment in every hexagon
     reduce=HEXBIN_REDUCE.MAX,
     mincnt=3,
-    title="Longest time on the market",
+    colorbar={"label": "Longest time on the market (days)"},
+    title="The slowest listings",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
     figsize=FIG_SIZE.FULL_SHORT,
@@ -262,98 +246,191 @@ HexbinChart(
 
 ### Hexagon style
 
-To change the hexagon style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.HexbinStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HexbinStyleAttrs) typing. The `plot_hexbin_cmap` attribute sets the colormap — the heatmap colormap by default — from the [datachart.constants.COLORS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORS) constant or a list of colors; `plot_hexbin_edge_width` and `plot_hexbin_edge_color` draw an edge around every hexagon, which separates the tiles where the colors run together.
+The colormap sets the tone of the chart: a sequential one for counts and other values that only grow, a diverging one for values with a meaningful middle. `plot_hexbin_cmap` takes a [COLORS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORS) member, a matplotlib colormap name, or a list of colors (the [Colormaps](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/colormaps/index.md) guide shows them all). Where neighboring hexagons have similar colors, they run together into a blur; `plot_hexbin_edge_width` and `plot_hexbin_edge_color` draw a thin edge that separates the tiles, and `plot_hexbin_alpha` makes the hexagons translucent. The attributes are listed in [HexbinStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.typings.HexbinStyleAttrs).
 
 ```
 from datachart.constants import COLORS
-```
 
-```
 HexbinChart(
     data=listings,
     reduce=HEXBIN_REDUCE.MEAN,
     mincnt=3,
-    # define the style of the hexagons
+    # a warm colormap and white edges between the hexagons
     style={
-        "plot_hexbin_cmap": COLORS.RdBu,
+        "plot_hexbin_cmap": COLORS.YlOrRd,
         "plot_hexbin_edge_width": 0.6,
         "plot_hexbin_edge_color": "#FFFFFF",
     },
     gridsize=20,
-    title="Days on the market",
+    colorbar={"label": "Mean days on the market"},
+    title="How long apartments take to rent",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
     figsize=FIG_SIZE.FULL_SHORT,
 ).show()
 ```
 
-!!! note "Emphasis by rule"
+### Emphasis
+
+Sometimes the question is not the whole distribution but a part of it: where most listings are, or which sizes and prices rent slowest. `emphasis_rule` outlines the hexagons whose value (the count, or the aggregate of `c`) matches a one-key rule and fades the rest: `{"top": n}` or `{"bottom": n}` by rank, `{"above": v}` or `{"below": v}` (strict), or `{"between": (lo, hi)}` (inclusive). A hexbin chart is one colormapped layer, so it does not take the per-series `emphasis` parameter of other charts. The [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide covers the rule on every chart. The chart below outlines the hexagons where the mean wait is above 40 days: the overpriced apartments.
 
 ```
-A hexbin chart is a single colormapped layer, so it does not take the `emphasis` attribute of the series charts, and its bins exist only once drawn, so they cannot carry roles of their own. `emphasis_rule` works on the bins: a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — highlights every bin whose aggregated value (its count, or `c` reduced by `reduce`) matches with an outline, and fades the rest to the theme's `muted_alpha`. See the [Highlighting](../../styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
+HexbinChart(
+    data=listings,
+    mincnt=3,
+    # outline the hexagons with a mean wait above 40 days, fade the rest
+    emphasis_rule={"above": 40},
+    colorbar={"label": "Mean days on the market"},
+    title="Where apartments wait longest",
+    xlabel="Floor area (m²)",
+    ylabel="Rent (€/month)",
+    figsize=FIG_SIZE.FULL_SHORT,
+).show()
+```
+
+### Reference lines and bands
+
+Reference lines and bands give the hexagons a frame to be read against. `vlines` and `hlines` draw a line at an x or y value, such as the median area and rent, which split the listings into four quadrants; `vspans` and `hspans` shade a range, such as a renter's budget. Each takes a dictionary or a list of them, with the position, an optional `label` and a `style`; the keys are listed in [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) and [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs). A band needs at least one bound; an omitted bound runs to the edge of the axes. The chart below crosses the medians with dashed lines and shades a budget of 800 to 1,200 €, which shows how much of the market around the median a renter on that budget can reach.
+
+```
+from datachart.constants import LINE_STYLE
+
+# a translucent band drawn over the hexagons
+BUDGET_STYLE = {"plot_hspan_color": "#2a9d8f", "plot_hspan_alpha": 0.25, "plot_hspan_zorder": 3}
+
+HexbinChart(
+    data=points,
+    # the median area and rent, as dashed cross-hairs
+    vlines={
+        "x": float(np.median(points["x"])),
+        "style": {"plot_vline_style": LINE_STYLE.DASHED, "plot_vline_color": "#333333"},
+    },
+    hlines={
+        "y": float(np.median(points["y"])),
+        "style": {"plot_hline_style": LINE_STYLE.DASHED, "plot_hline_color": "#333333"},
+    },
+    # a rent budget of 800 to 1,200 €
+    hspans={"ymin": 800, "ymax": 1200, "style": BUDGET_STYLE},
+    mincnt=1,
+    title="Apartment listings against a rent budget",
+    xlabel="Floor area (m²)",
+    ylabel="Rent (€/month)",
+    figsize=FIG_SIZE.FULL_SHORT,
+).show()
+```
+
+A standalone hexbin chart has no legend, so a line's `label` only shows when the chart is composed in a `Panel` with a legend (see [Composing with Panel](#composing-with-panel)); on its own, a note from the next section names a line better.
+
+### Text annotations
+
+A note on the chart says what the reader should see. `texts` places text at a position in data coordinates (or in axes fractions with `"coords": "axes"`), and an optional `target` draws a connector to a point; the [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement and styling. The note below points at the thin tail of large, expensive apartments, which is easy to overlook.
+
+```
+HexbinChart(
+    data=points,
+    mincnt=1,
+    norm=NORMALIZE.LOG,
+    # a note in the empty corner, pointing at the tail
+    texts={
+        "text": "a few large, expensive\napartments",
+        "x": 0.62,
+        "y": 0.2,
+        "coords": "axes",
+        "target": (160, 2800),
+    },
+    title="Apartment listings",
+    xlabel="Floor area (m²)",
+    ylabel="Rent (€/month)",
+    figsize=FIG_SIZE.FULL_SHORT,
+).show()
 ```
 
 ## Multiple Hexbin Charts
 
-To create multiple hexbin charts, pass a list of datasets to the `data` argument and add the `subplots` attribute to draw each in its own subplot. Hexagons are opaque, so several datasets on one axes would hide each other; subplots keep them comparable. The `subtitle` becomes the subplot title and the `title`, `xlabel` and `ylabel` are positioned to be global for all charts. The `max_cols` attribute limits the number of columns, and `sharex` and `sharey` share an axis across the subplots; a shared axis is labeled once, on the outer subplots only. Per-chart attributes like `subtitle`, `style`, `gridsize`, `reduce`, `mincnt`, `norm`, `vmin`, `vmax`, `valfmt` and `colorbar` can be passed as lists, where each element corresponds to a chart; a single value applies to every chart.
-
-The listings split by district in the hidden cell, as `by_district` (with `c`) and `points_by_district` (without): the three per-m² rates of the simulation stand in for a cheap, a mid-priced, and an expensive district.
+To compare several groups of points, pass a list of datasets to `data` and set `subplots=True`. Hexagons are opaque, so several datasets on one axes would cover each other; subplots keep each group visible. `subtitle` titles the subplots, while `title`, `xlabel` and `ylabel` stay global; `max_cols` limits the subplots per row, and `sharex` and `sharey` put the subplots on one axis range. The per-chart parameters (`subtitle`, `style`, `gridsize`, `reduce`, `mincnt`, `norm`, `vmin`, `vmax`, `valfmt`, `colorbar`) take either one value for every chart or a list with one value per chart. Each subplot scales its colors to its own data, so the same `vmin` and `vmax` on every subplot are what makes the shades comparable. `points_by_district`, defined in a hidden cell, splits the listings by district: the center has fewer listings, and they sit higher on the rent axis.
 
 ```
 HexbinChart(
-    # use a list of datasets to define multiple hexbin charts
+    # one dataset per district
     data=points_by_district,
     # one subplot title per chart
     subtitle=DISTRICTS,
+    # one subplot per district, in one column
     subplots=True,
-    max_cols=3,
+    max_cols=1,
     # the same axes for every district
     sharex=True,
     sharey=True,
-    # the same color range on every chart, so the shades are comparable
-    vmin=0,
+    # the same color range for every district
+    vmin=1,
     vmax=60,
     mincnt=1,
-    gridsize=20,
+    gridsize=40,
     title="Apartment listings by district",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
-    figsize=(12, 4),
+    xmax=160,
+    ymax=3500,
+    figsize=FIG_SIZE.FULL_TALL,
 ).show()
 ```
 
-## Composing hexbins
+### Composing with Panel
 
-A hexbin figure composes like any other chart. [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays it with other charts on shared axes — the natural pairing is a [datachart.charts.ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.ScatterChart) of a few points of interest drawn over the density of all of them, or a [datachart.charts.LineChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.LineChart) of a fitted trend. Here a random sample of 60 listings sits on the hexagons, with white edges so the tiles read under the points; the hexbin's colorbar is left off, as the panel's legend labels the points.
+A hexbin chart shows the crowd; a few points or a line on top of it show where individuals or a model sit in that crowd. [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays figures on shared axes, and the [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) guide covers it in full. Here a [ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.charts.ScatterChart) of five listings a renter has shortlisted sits on the hexagons, which shows whether they are typical or overpriced; the shortlist spans a much smaller rent range than the market, so a `"y_axis"` on both figures pins them to one left axis instead of giving the shortlist a second one. The hexbin figure hides its colorbar, and the panel's `show_legend` and `legend` label the shortlist and the rent budget, which a standalone hexbin chart cannot do.
 
 ```
-from datachart.charts import ScatterChart
+from datachart.constants import LEGEND_LOCATION
 from datachart.utils import Panel
 
-sample = rng.choice(N_LISTINGS, 60, replace=False)
+shortlist = [
+    {"x": 48, "y": 820},
+    {"x": 55, "y": 1150},
+    {"x": 62, "y": 990},
+    {"x": 70, "y": 1550},
+    {"x": 85, "y": 1380},
+]
 
 Panel(
     [
-        HexbinChart(
-            data=points,
-            style={"plot_hexbin_edge_width": 0.5, "plot_hexbin_edge_color": "#FFFFFF"},
-            show_colorbars=False,
-        ),
-        # a sample of the listings, as points over the hexagons
-        ScatterChart(
-            data=[{"x": listings["x"][i], "y": listings["y"][i]} for i in sample],
-            subtitle="Sampled listings",
-        ),
+        {
+            "figure": HexbinChart(
+                data=points,
+                mincnt=1,
+                norm=NORMALIZE.LOG,
+                # the budget band, labeled in the panel legend
+                hspans={"ymin": 800, "ymax": 1200, "label": "Budget", "style": BUDGET_STYLE},
+                style={"plot_hexbin_cmap": COLORS.Greys},
+                show_colorbars=False,
+            ),
+            "y_axis": "left",
+        },
+        # the shortlisted listings, as points over the hexagons
+        {
+            "figure": ScatterChart(
+                data=shortlist,
+                subtitle="Shortlisted",
+                style={"plot_scatter_size": 60, "plot_scatter_color": "#d62828"},
+            ),
+            # the same rent axis for both figures
+            "y_axis": "left",
+        },
     ],
-    title="Apartment listings",
+    title="A shortlist against the market",
     xlabel="Floor area (m²)",
     ylabel_left="Rent (€/month)",
+    xmax=160,
+    ymax=3500,
+    # a legend for the band and the points
     show_legend=True,
-    figsize=FIG_SIZE.FULL_MEDIUM,
+    legend={"location": LEGEND_LOCATION.UPPER_LEFT},
+    figsize=FIG_SIZE.FULL_SHORT,
 ).show()
 ```
 
-[datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) arranges hexbin figures next to other figures. The count of the listings spans the top row; the days on the market and a histogram of the rents share the bottom one.
+### Composing with Grid
+
+A hexbin chart answers a question about two variables together, and a histogram of one of them often belongs beside it. [datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) arranges figures in rows, each keeping its own axes; the [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) guide covers layouts. The counts span the top row, and the days on the market and a histogram of the rents share the bottom one.
 
 ```
 from datachart.charts import Histogram
@@ -361,21 +438,34 @@ from datachart.utils import Grid
 
 Grid(
     [
-        [HexbinChart(data=points, mincnt=1, norm=NORMALIZE.LOG, title="Listings")],
+        [
+            HexbinChart(
+                data=points,
+                mincnt=1,
+                norm=NORMALIZE.LOG,
+                title="Listings",
+                xlabel="Floor area (m²)",
+                ylabel="Rent (€/month)",
+            )
+        ],
         [
             HexbinChart(
                 data=listings,
-                reduce=HEXBIN_REDUCE.MEAN,
                 mincnt=3,
-                title="Days on the market",
+                colorbar={"location": COLORBAR_LOCATION.BOTTOM},
+                title="Mean days on the market",
+                xlabel="Floor area (m²)",
+                ylabel="Rent (€/month)",
             ),
             Histogram(
                 data=[{"x": value} for value in listings["y"]],
-                title="Rent (€/month)",
+                title="Rents",
+                xlabel="Rent (€/month)",
+                ylabel="Listings",
             ),
         ],
     ],
-    figsize=(10, 7),
+    figsize=FIG_SIZE.FULL_TALL,
 ).show()
 ```
 
@@ -383,93 +473,44 @@ Grid(
 
 ### Aspect ratio
 
-By default the axes stretch to fill the figure, so the hexagons are regular on the screen but the two axes have different scales. When both axes share a unit — two coordinates, two scores on the same scale — add the `aspect_ratio` attribute with a value of the [datachart.constants.ASPECT_RATIO](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO) constant to keep one unit equal on both. The hidden cell scales the listings to z-scores, so both axes read in standard deviations.
+By default the axes stretch to fill the figure, so one unit on the x-axis can be longer than one unit on the y-axis. For two variables in different units that is fine; for a map it distorts the city. `aspect_ratio` with [ASPECT_RATIO.EQUAL](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO) keeps one unit equal on both axes. `locations`, defined in a hidden cell, holds the illustrative position of every listing in kilometers east and north of the city center, with the listings bunched in the old town and two other neighborhoods.
 
 ```
 from datachart.constants import ASPECT_RATIO
-```
 
-```
 HexbinChart(
-    data=standardized,
-    # keep one unit equal on both axes
+    data=locations,
+    # one kilometer is as long on both axes
     aspect_ratio=ASPECT_RATIO.EQUAL,
     mincnt=1,
-    title="Apartment listings (standardized)",
-    xlabel="Floor area (z-score)",
-    ylabel="Rent (z-score)",
+    xmin=-10,
+    xmax=10,
+    ymin=-8,
+    ymax=8,
+    title="Where the listings are",
+    xlabel="km east of the center",
+    ylabel="km north of the center",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
 ### Datetime axis
 
-An `x` column of real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp` — bins the points along a time axis. Points sit at their elapsed time and the ticks pick concise, non-repeating labels for the visible span; date strings are not parsed and draw as categories. `xticks_format` takes a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern, and explicit `xticks`, `xmin` / `xmax`, reference lines, and reference bands take datetimes as well. Here the listings are keyed by the day they were posted (a hidden cell adds the dates and a seasonal swing to the rents).
+Points spread over time are often too many for a scatter chart too: every listing of a year, every transaction of a quarter. An `x` column of real temporal objects (`datetime`, `date`, `numpy.datetime64` or a pandas `Timestamp`) bins the points along a time axis. `xticks_format` formats the ticks with a [DATE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern, and `xticks`, `xmin`, `xmax`, reference lines and bands take dates as well; date strings are not parsed and draw as categories. `rents_by_date`, defined in a hidden cell, dates every listing to the day it was posted in 2024, with an illustrative seasonal pattern: many listings go up in late summer, ahead of the academic year that starts on 1 October. The hexagons show the rush as a dense block of listings in September, at the usual rents.
 
 ```
-from datachart.constants import DATE_FORMAT
-
 HexbinChart(
-    data=listings_by_date,
-    title="Rents by the day the listing was posted",
+    data=rents_by_date,
+    mincnt=1,
+    gridsize=24,
+    # one tick per quarter, labeled with the month name
+    xticks=[date(2024, month, 1) for month in (1, 4, 7, 10)] + [date(2025, 1, 1)],
+    xticks_format="%b",
+    # the start of the academic year
+    vlines={"x": date(2024, 10, 1), "style": {"plot_vline_style": LINE_STYLE.DASHED, "plot_vline_color": "#333333"}},
+    ymax=2500,
+    title="Rents by the day the listing was posted, 2024",
     xlabel="Posted",
-    ylabel="Rent (€/month)",
-    gridsize=(24, 18),
-    # one tick per quarter, labelled year-month
-    xticks=[date(2024, month, 1) for month in (1, 4, 7, 10)],
-    xticks_format=DATE_FORMAT.YEAR_MONTH,
-    figsize=FIG_SIZE.FULL_MEDIUM,
-).show()
-```
-
-### Reference lines
-
-A reference line marks a position on the plane. To add vertical lines, add the `vlines` attribute with the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) typing; for horizontal lines, add the `hlines` attribute with the [datachart.typings.HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) typing. The lines below mark the median floor area and rent, which split the listings into four quadrants.
-
-```
-from datachart.constants import LINE_STYLE
-```
-
-```
-HexbinChart(
-    data=points,
-    # the median area and rent, as dashed cross-hairs
-    vlines={
-        "x": float(np.median(listings["x"])),
-        "label": "Median area",
-        "style": {"plot_vline_style": LINE_STYLE.DASHED},
-    },
-    hlines={
-        "y": float(np.median(listings["y"])),
-        "label": "Median rent",
-        "style": {"plot_hline_style": LINE_STYLE.DASHED},
-    },
-    mincnt=1,
-    title="Apartment listings",
-    xlabel="Floor area (m²)",
-    ylabel="Rent (€/month)",
-    figsize=FIG_SIZE.FULL_SHORT,
-).show()
-```
-
-### Reference bands
-
-A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
-
-The bands below shade the interquartile rent range and the apartments under 40 m²; the second band has no lower bound, so it runs to the left edge.
-
-```
-rent_low, rent_high = np.percentile(listings["y"], [25, 75])
-
-HexbinChart(
-    data=points,
-    # the interquartile rent range
-    hspans={"ymin": float(rent_low), "ymax": float(rent_high)},
-    # the apartments under 40 m²: no lower bound, so the band runs to the left edge
-    vspans={"xmax": 40},
-    mincnt=1,
-    title="Apartment listings",
-    xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
     figsize=FIG_SIZE.FULL_SHORT,
 ).show()
@@ -477,7 +518,7 @@ HexbinChart(
 
 ### Themes
 
-A theme sets the colormap and the furniture of every chart at once; see the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery.ipynb) for the whole suite under each. Apply one with [datachart.config.Config.set_theme](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) from the [datachart.constants.THEME](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) constant, and reset the configuration afterwards so the following charts draw in the default.
+A theme sets the colormap and the furniture of every chart at once; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each. Apply one with [datachart.config.Config.set_theme](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) and a [THEME](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) member, and reset the configuration afterwards so the following charts draw in the default. Style is read when the chart is built, so the figure keeps the theme after the reset.
 
 ```
 from datachart.config import config
@@ -488,6 +529,7 @@ config.set_theme(THEME.INK)
 figure = HexbinChart(
     data=points,
     mincnt=1,
+    norm=NORMALIZE.LOG,
     title="Apartment listings",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -498,34 +540,13 @@ config.reset_config()
 figure.show()
 ```
 
-## Saving the Chart as an Image
-
-To save the chart as an image, use the [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.save_figure) function.
-
-```
-from datachart.utils import save_figure
-
-figure = HexbinChart(
-    data=points,
-    mincnt=1,
-    norm=NORMALIZE.LOG,
-    title="Apartment listings",
-    xlabel="Floor area (m²)",
-    ylabel="Rent (€/month)",
-    figsize=FIG_SIZE.FULL_MEDIUM,
-)
-save_figure(figure, "./fig_hexbin_chart.png", dpi=300)
-```
-
-The figure should be saved in the current working directory.
-
 ## Real-World Examples
 
-The following examples put the features above to work on realistic data. Each one states what its data is and where it comes from; the data itself lives in a hidden cell.
+The examples below put the features above to work, each one answering a question about the rental market. The data is the illustrative, seeded listings of this guide, with the extra columns each example needs derived in a hidden cell.
 
-### Example 1: Price per Square Meter Across the City (Aggregation, Diverging Colors, and a Trend)
+### Example 1: Where Renting Is Cheap per Square Meter (Aggregation, a Diverging Colormap, and a Trend)
 
-`listings` from the sections above holds the area, rent, and days on the market of 8,000 apartments. The hidden cell derives the rent per square meter of every listing — the number a renter compares across sizes — and a linear fit of the rent on the area. Colored by the mean rent per square meter, the hexagons show what the counts hide: at every floor area the listings stack into three bands, one per district rate, and the expensive band grows thinner toward the large apartments. A diverging colormap centered on the city-wide mean by `vmin` and `vmax` splits the plane into the cheaper-than-average blues and the pricier reds, and the `Panel` lays the fitted rent over the tiles, pinned to the primary axis with `y_axis`.
+Renters compare apartments of different sizes by the rent per square meter. The hidden cell derives it for every listing as `per_m2`, the city-wide mean as `CITY_MEAN`, and a straight-line fit of the rent on the floor area as `fit`. Colored by the mean rent per square meter, the hexagons show what the counts hide: small apartments cost the most per square meter, and at every size the pricier listings sit above the fitted line. A diverging colormap centered on the city-wide mean by `vmin` and `vmax` splits the plane into the cheaper-than-average blues and the pricier reds, and a `Panel` lays the fitted rent over the hexagons, with a legend that labels it.
 
 ```
 from datachart.charts import LineChart
@@ -536,74 +557,101 @@ Panel(
             data={"x": listings["x"], "y": listings["y"], "c": per_m2},
             reduce=HEXBIN_REDUCE.MEAN,
             mincnt=3,
-            # a diverging colormap centered on the city-wide mean; the "_r"
-            # suffix reverses it, so the cheap side is blue
+            gridsize=40,
+            # a diverging colormap centered on the city-wide mean;
+            # the "_r" suffix reverses it, so the cheap side is blue
             style={"plot_hexbin_cmap": "RdBu_r"},
-            vmin=CITY_MEAN - 5,
-            vmax=CITY_MEAN + 5,
-            valfmt="{x:.0f} €/m²",
-            gridsize=24,
+            vmin=CITY_MEAN - 6,
+            vmax=CITY_MEAN + 6,
+            colorbar={"label": "Mean rent (€/m²)", "format": VALUE_FORMAT.INTEGER},
         ),
-        {
-            "figure": LineChart(
-                data=fit,
-                subtitle=f"Fitted rent ({slope:.1f} €/m² + {intercept:.0f} €)",
-                style={"plot_line_color": "#1F1F1F", "plot_line_style": LINE_STYLE.DASHED},
-            ),
-            # the fit shares the hexbin's axes
-            "y_axis": "left",
-        },
+        LineChart(
+            data=fit,
+            subtitle=f"Fitted rent ({slope:.1f} €/m² + {intercept:.0f} €)",
+            style={"plot_line_color": "#1F1F1F", "plot_line_style": LINE_STYLE.DASHED},
+        ),
     ],
     title="Rent per square meter",
     xlabel="Floor area (m²)",
     ylabel_left="Rent (€/month)",
+    xmin=15,
+    xmax=160,
+    ymin=0,
+    ymax=3500,
     show_legend=True,
+    legend={"location": LEGEND_LOCATION.UPPER_LEFT},
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
-### Example 2: Which Apartments Rent Fastest, by District (Subplots, Shared Range, and Log Counts)
+### Example 2: Where the Listings Cluster (Equal Aspect, Log Counts, Emphasis, and Notes)
 
-`by_district` from the multiple-charts section splits the listings into the three districts. The top row counts the listings of every district on a log scale, so the sparse edges of the cheaper districts stay visible next to their dense cores; the bottom row shows the mean days on the market under one shared `vmin`/`vmax`, so the same shade means the same wait in every district. Read down a column: the center's apartments are fewer, pricier, and slower to rent at every size, while the outskirts turn over their small apartments within a couple of weeks. The two `HexbinChart` figures, each a row of subplots, stack as the two rows of a `Grid`.
+`locations` from the [Aspect ratio](#aspect-ratio) section places every listing on an illustrative map of the city, and a renter looking for a flat wants to know where the offer is. Log counts keep the thin suburbs visible next to the busy neighborhoods, the equal aspect ratio keeps the map undistorted, `emphasis_rule` outlines the 25 fullest hexagons, and a note names each neighborhood, placed in empty space at `LABEL_AT` and pointing at the center stored in `NEIGHBORHOODS`.
 
 ```
-Grid(
-    [
-        [
-            HexbinChart(
-                data=points_by_district,
-                subtitle=DISTRICTS,
-                subplots=True,
-                max_cols=3,
-                sharex=True,
-                sharey=True,
-                norm=NORMALIZE.LOG,
-                mincnt=1,
-                gridsize=18,
-                title="Listings (log count)",
-            )
-        ],
-        [
-            HexbinChart(
-                data=by_district,
-                subtitle=DISTRICTS,
-                subplots=True,
-                max_cols=3,
-                sharex=True,
-                sharey=True,
-                reduce=HEXBIN_REDUCE.MEAN,
-                mincnt=3,
-                # the same range on every chart, so the shades are comparable
-                vmin=10,
-                vmax=50,
-                gridsize=18,
-                style={"plot_hexbin_cmap": COLORS.YlOrRd},
-                title="Days on the market (mean)",
-            )
-        ],
+HexbinChart(
+    data=locations,
+    mincnt=1,
+    gridsize=40,
+    norm=NORMALIZE.LOG,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
+    # outline the 25 fullest hexagons
+    emphasis_rule={"top": 25},
+    # one note per neighborhood, pointing at its center
+    texts=[
+        {"text": name, "x": x, "y": y, "target": NEIGHBORHOODS[name][0]}
+        for name, (x, y) in LABEL_AT.items()
     ],
+    colorbar={"label": "Listings (log scale)"},
+    xmin=-10,
+    xmax=10,
+    ymin=-8,
+    ymax=8,
+    title="Where the listings cluster",
+    xlabel="km east of the center",
+    ylabel="km north of the center",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Example 3: Which Apartments Rent Fastest, by District (Log Counts, a Shared Color Range, and a Grid)
+
+`by_district` from the [Multiple Hexbin Charts](#multiple-hexbin-charts) section splits the listings into the three districts, with the days on the market as `c`. Each row of the figure is one district. The left chart counts its listings on a log scale, so the sparse edges stay visible next to the dense core; the right chart shows the median days on the market, under one `vmin` and `vmax` for every district, so the same shade means the same wait everywhere. Read down the right column: the center's apartments are fewer, pricier, and slower to rent at every size, while the outskirts rent their small apartments fastest. A `Grid` lays out the six charts, and its `sharex`, `sharey`, `xlabel` and `ylabel` give them one frame.
+
+```
+def district_row(name, data):
+    # the listings and the median wait of one district, on the same axes
+    frame = dict(gridsize=18, xmin=15, xmax=160, ymin=0, ymax=3500)
+    count = HexbinChart(
+        data={"x": data["x"], "y": data["y"]},
+        norm=NORMALIZE.LOG,
+        mincnt=1,
+        vmin=1,
+        vmax=300,
+        title=f"{name}: listings",
+        **frame,
+    )
+    wait = HexbinChart(
+        data=data,
+        reduce=HEXBIN_REDUCE.MEDIAN,
+        mincnt=3,
+        # the same range in every district, so the shades compare
+        vmin=5,
+        vmax=45,
+        style={"plot_hexbin_cmap": COLORS.YlOrRd},
+        title=f"{name}: median days on the market",
+        **frame,
+    )
+    return [count, wait]
+
+
+Grid(
+    [district_row(name, data) for name, data in zip(DISTRICTS, by_district)],
+    title="Which apartments rent fastest",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
-    figsize=(12, 8),
+    sharex=True,
+    sharey=True,
+    figsize=FIG_SIZE.FULL_TALL,
 ).show()
 ```

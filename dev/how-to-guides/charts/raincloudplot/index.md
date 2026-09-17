@@ -1,79 +1,24 @@
 # Raincloud Plot
 
-This section showcases the raincloud plot. It contains examples of how to create raincloud plots using the [datachart.charts.RaincloudPlot](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.RaincloudPlot) function.
+A raincloud plot shows a distribution three ways at once: the **cloud** (a half violin) gives its shape, the **rain** (one point per observation) shows every value, and the **box** sums it up with the median and quartiles. The reader gets all three without the author having to choose one. This guide shows how to create raincloud plots with the [datachart.charts.RaincloudPlot](https://eriknovak.github.io/datachart/dev/references/charts/raincloudplot/#datachart.charts.RaincloudPlot) function, starting with the basics and building up to worked examples on real data.
 
 Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-raincloud-plot), which maps common tasks to the parameter or style attribute that does the job.
-
-As mentioned above, the raincloud plots are created using the `RaincloudPlot` function found in the [datachart.charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md) module. Let's import it:
 
 ```
 from datachart.charts import RaincloudPlot
 ```
 
-## Raincloud Plot Input Attributes
-
-The `RaincloudPlot` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the data points. For a single raincloud plot, `data` is a list of dictionaries; the points that share a `label` form one group. For multiple raincloud plots, `data` is a list of lists, and each chart draws in its own subplot.
-
-```
-RaincloudPlot(
-    data=[{                                             # A list of data points (or list of lists for multiple charts)
-        "label": str,                                   # The category label
-        "value": Union[int, float],                     # The numeric value
-    }],
-    style={                                             # The style of the cloud, the rain, and the box (optional)
-        "plot_violin_color":        Union[str, None],       # The cloud fill color
-        "plot_violin_alpha":        Union[float, None],     # The alpha of the cloud
-        "plot_violin_width":        Union[int, float, None], # The maximum width of the cloud
-        "plot_swarm_color":         Union[str, None],       # The rain point color
-        "plot_swarm_size":          Union[int, float, None], # The rain point size
-        "plot_swarm_alpha":         Union[float, None],     # The alpha of the rain points
-        "plot_box_linewidth":       Union[int, float, None], # The line width of the box
-        "plot_box_edgecolor":       Union[str, None],       # The edge color of the box
-        "plot_box_outlier_size":    Union[int, float, None], # The outlier marker size
-    },
-    title: Union[str, None],                            # The chart title (optional)
-    xlabel: Union[str, None],                           # The x-axis label (optional)
-    ylabel: Union[str, None],                           # The y-axis label (optional)
-    subtitle: Union[str, List[str], None],              # The subtitle(s), used as subplot titles (optional)
-    emphasis: Union[str, List[str], None],              # The emphasis role(s), aligned with the group labels (optional)
-    emphasis_rule=Optional[dict],                       # One-key rule on a per-group summary; optional "by": median, mean, min, max, sum
-    mode: Union[str, None],                             # "swarm" (the default) or "strip" for the rain (optional)
-    jitter: Union[float, None],                         # The strip jitter width, a fraction of the category width (optional)
-    bandwidth: Union[str, float, None],                 # The cloud's KDE bandwidth rule or factor (optional)
-    show_outliers: Union[bool, None],                   # Whether the box shows outliers (optional)
-    show_values: Union[bool, None],                     # Whether to print each group's median, min and max (optional)
-    value_format: Union[str, None],                     # The format of the value labels (optional)
-    orientation: Union[str, None],                      # "vertical" (the default) or "horizontal" (optional)
-    scaley: Union[str, None],                           # The value axis scale (optional)
-    figsize: Union[Tuple[float, float], None],          # The figure size (optional)
-    show_legend: Union[bool, None],                     # Whether to show the legend, one entry per group (optional)
-    show_grid: Union[str, None],                        # Which grid lines to show (optional)
-    subplots: Union[bool, None],                        # Whether to draw each chart in its own subplot (optional)
-    max_cols: Union[int, None],                         # The maximum number of subplot columns (optional)
-    sharex: Union[bool, None],                          # Whether the subplots share the x-axis (optional)
-    sharey: Union[bool, None],                          # Whether the subplots share the y-axis (optional)
-    hlines: Union[dict, List[dict], None],              # The horizontal reference lines (optional)
-    vlines: Union[dict, List[dict], None],              # The vertical reference lines (optional)
-    vspans: Union[dict, List[dict], None],              # The vertical reference bands (optional)
-    hspans: Union[dict, List[dict], None],              # The horizontal reference bands (optional)
-    label: Union[str, None],                            # The key name in `data` holding the label (optional)
-    value: Union[str, None],                            # The key name in `data` holding the value (optional)
-)
-```
-
-For more details, see the [datachart.charts.RaincloudPlot](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.RaincloudPlot) function.
-
 ## Basics
 
-The examples in this guide share one dataset: the body mass of the 342 penguins of the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0), three species measured on the islands of the Palmer Archipelago in Antarctica. The data is hard-coded in a hidden cell, which keeps the sex and the flipper length of every penguin alongside its species — the later sections reuse them. `chart_data` holds the body mass (in g) of every penguin, labeled with its species.
+The examples in this guide share one dataset: the body mass of the 342 penguins with a recorded mass in the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0), three species measured on the islands of the Palmer Archipelago in Antarctica. The data lives in a hidden cell. `chart_data` holds the body mass (in g) of every penguin, labeled with its species; `flipper_data` holds the flipper length (in mm) the same way; `PENGUINS` keeps the sex of every penguin, which the later sections reuse. The data has a story a single summary would hide: Gentoo penguins are far heavier than the other two species, and within each species the males are heavier than the females, so each distribution is really two.
 
-The data is a flat list of dictionaries, one per data point, each with a `label` and a `value`. The points that share a `label` are grouped into one raincloud, so three species give three rainclouds:
+Each data point is a dictionary with a `label` (the group) and a `value`. The points that share a `label` form one raincloud, so three species give three rainclouds:
 
 ```
 chart_data[:3]
 ```
 
-**Basic example.** Only the `data` argument is required to draw the raincloud plot. Every group draws three parts at its position: the **cloud** on the right, a half violin showing the density of the values; the **box** just left of it, the quartile summary with its outliers; and the **rain** further left, every penguin as one point, packed outward from the box. Each species takes its own color, shared by all three parts, so they read as one group.
+**Basic example.** Only the `data` argument is required. Each group draws its three parts side by side at one category position: the rain on the left, packed outward so no two penguins overlap, the box next to it, and the cloud on the right. The groups follow the order in which their labels first appear in the data (there is no sorting parameter, so reorder the data to reorder the groups), and each group takes one palette color for all three parts.
 
 ```
 RaincloudPlot(
@@ -86,32 +31,51 @@ RaincloudPlot(
 
 Every customization is either a keyword argument of `RaincloudPlot` or an attribute of its `style` dictionary: the `plot_violin_*` attributes style the cloud, the `plot_swarm_*` attributes the rain, and the `plot_box_*` attributes the box. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                              | Use                                                                                   | See                                                           |
-| --------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| add a title and axis labels             | `title`, `xlabel`, `ylabel`                                                           | [Title and axis labels](#title-and-axis-labels)               |
-| resize the figure                       | `figsize`                                                                             | [Figure size and grid](#figure-size-and-grid)                 |
-| show the grid lines                     | `show_grid`                                                                           | [Figure size and grid](#figure-size-and-grid)                 |
-| list the groups in a legend             | `show_legend`                                                                         | [Figure size and grid](#figure-size-and-grid)                 |
-| change the cloud, rain, or box style    | `style={"plot_violin_alpha": ..., "plot_swarm_size": ..., "plot_box_linewidth": ...}` | [Cloud, rain, and box style](#cloud-rain-and-box-style)       |
-| smooth or sharpen the cloud             | `bandwidth`                                                                           | [Cloud bandwidth](#cloud-bandwidth)                           |
-| jitter the rain instead of packing it   | `mode`, `jitter`                                                                      | [Rain modes](#rain-modes)                                     |
-| hide the box outliers                   | `show_outliers`                                                                       | [Box outliers](#box-outliers)                                 |
-| print each group's median, min and max  | `show_values`, `value_format`                                                         | [Value labels](#value-labels)                                 |
-| draw the rainclouds horizontally        | `orientation`                                                                         | [Raincloud orientation](#raincloud-orientation)               |
-| highlight one group, mute the rest      | `emphasis`                                                                            | [Emphasis](#emphasis)                                         |
-| highlight the groups that match a rule  | `emphasis_rule`                                                                       | [Emphasis](#emphasis)                                         |
-| draw a threshold or reference line      | `hlines`, `vlines`                                                                    | [Reference lines](#reference-lines)                           |
-| shade a range next to the rainclouds    | `hspans`, `vspans`                                                                    | [Reference bands](#reference-bands)                           |
-| draw each dataset in its own subplot    | `data` as a list of lists, `subplots`, `sharex`, `sharey`                             | [Multiple Raincloud Plots](#multiple-raincloud-plots)         |
-| compose the raincloud with other charts | `Panel`, `Grid`                                                                       | [Composing rainclouds](#composing-rainclouds)                 |
-| use a logarithmic value axis            | `scaley`                                                                              | [Logarithmic scale](#logarithmic-scale)                       |
-| save the chart to a file                | `save_figure`                                                                         | [Saving the Chart as an Image](#saving-the-chart-as-an-image) |
+| I want to…                                         | Use                                                                                   | See                                                                                                     |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| add a title and axis labels                        | `title`, `xlabel`, `ylabel`                                                           | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| fix the axis range or format the ticks             | `ymin`, `ymax`, `yticks`, `yticks_format`                                             | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| resize the figure                                  | `figsize`                                                                             | [Figure size and grid](#figure-size-and-grid)                                                           |
+| show grid lines                                    | `show_grid`                                                                           | [Figure size and grid](#figure-size-and-grid)                                                           |
+| change the cloud, rain, or box style               | `style={"plot_violin_alpha": ..., "plot_swarm_size": ..., "plot_box_linewidth": ...}` | [Cloud, rain and box style](#cloud-rain-and-box-style)                                                  |
+| smooth or sharpen the cloud                        | `bandwidth`                                                                           | [Cloud bandwidth](#cloud-bandwidth)                                                                     |
+| jitter the rain instead of packing it              | `mode`, `jitter`                                                                      | [Rain modes](#rain-modes)                                                                               |
+| hide the box outliers                              | `show_outliers`                                                                       | [Box outliers](#box-outliers)                                                                           |
+| print each group's median, min and max             | `show_values`, `value_format`                                                         | [Value labels](#value-labels)                                                                           |
+| draw the rainclouds horizontally                   | `orientation`                                                                         | [Horizontal rainclouds](#horizontal-rainclouds)                                                         |
+| highlight some groups, mute the rest               | `emphasis`, `emphasis_rule`                                                           | [Emphasis](#emphasis)                                                                                   |
+| mark a threshold or shade a range                  | `hlines`, `vlines`, `hspans`, `vspans`                                                | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| put a note on the chart                            | `texts`                                                                               | [Text annotations](#text-annotations)                                                                   |
+| use dates as group labels                          | `date` objects as `label`, `xticks_format`                                            | [Date labels](#date-labels)                                                                             |
+| list the groups in a titled legend                 | `show_legend`, `legend`                                                               | [Legend](#legend)                                                                                       |
+| draw several datasets side by side                 | `data` as a list of lists, `subtitle`, `sharey`, `max_cols`                           | [Multiple Raincloud Plots](#multiple-raincloud-plots)                                                   |
+| overlay or arrange the raincloud with other charts | `Panel`, `Grid`                                                                       | [Composing with Panel and Grid](#composing-with-panel-and-grid)                                         |
+| use a logarithmic value axis                       | `scaley`                                                                              | [Logarithmic scale](#logarithmic-scale)                                                                 |
+| plot data with other key names                     | `label`, `value`                                                                      | [Custom data keys](#custom-data-keys)                                                                   |
+| save the chart to a file                           | `save_figure`                                                                         | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
-The full list of style attributes is in the [datachart.typings.RaincloudStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.RaincloudStyleAttrs) type; the full list of parameters is in the [datachart.charts.RaincloudPlot](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.RaincloudPlot) reference.
+The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
 
-### Title and axis labels
+| Parameter                                    | Constant                                                                                                                                                                                                                                     |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
+| `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
+| `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
+| `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
+| `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
+| `mode`                                       | [`SWARM_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE)                                                                                                                               |
+| `bandwidth`                                  | [`BANDWIDTH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH)                                                                                                                                 |
+| `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
+| `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
+| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
+| `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 
-To add the chart title and axis labels, add the `title`, `xlabel` and `ylabel` attributes.
+The full list of style attributes is in the [datachart.typings.RaincloudStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/raincloudplot/#datachart.typings.RaincloudStyleAttrs) type; the full list of parameters is in the [datachart.charts.RaincloudPlot](https://eriknovak.github.io/datachart/dev/references/charts/raincloudplot/#datachart.charts.RaincloudPlot) reference.
+
+### Title, axis labels and ticks
+
+Without a title and axis labels the reader cannot tell what the rainclouds measure or in which unit; `title`, `xlabel` and `ylabel` say it. `ymin` and `ymax` fix the value axis, which matters when several charts must be read against each other, and `yticks` with `yticks_format` place and format the ticks: a thousands separator makes gram values easier to read.
 
 ```
 RaincloudPlot(
@@ -121,60 +85,50 @@ RaincloudPlot(
     # add the x and y axis labels
     xlabel="Species",
     ylabel="Body mass (g)",
+    # fix the value axis and format its ticks
+    ymin=2500,
+    ymax=6500,
+    yticks=[2500, 3500, 4500, 5500, 6500],
+    yticks_format="{x:,.0f}",
 ).show()
 ```
 
 ### Figure size and grid
 
-To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains predefined figure sizes. To show the grid lines, add the `show_grid` attribute, which supports the values of the [datachart.constants.SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) constant. To list the groups and their colors, add the `show_legend` attribute.
+A few groups side by side read best in a wide, short figure. `figsize` takes a `(width, height)` tuple in inches or one of the presets in [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE), sized for a full or half page width. Grid lines let the eye carry a median across to the axis; `show_grid` draws them with a [SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) member, and `SHOW_GRID.Y` keeps them on the value axis, where they help. `aspect_ratio` ([ASPECT_RATIO](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)) fixes the ratio of the axes; a raincloud rarely needs it.
 
 ```
 from datachart.constants import FIG_SIZE, SHOW_GRID
-```
 
-```
 RaincloudPlot(
     data=chart_data,
     title="Body mass of Palmer penguins",
     xlabel="Species",
     ylabel="Body mass (g)",
-    # add to determine the figure size
+    # a wide, short figure
     figsize=FIG_SIZE.FULL_SHORT,
-    # add to show the grid lines
+    # grid lines along the value axis only
     show_grid=SHOW_GRID.Y,
-    # one legend entry per group
-    show_legend=True,
 ).show()
 ```
 
-### Cloud, rain, and box style
+### Cloud, rain and box style
 
-To change the style of the parts, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.RaincloudStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.RaincloudStyleAttrs) type: the cloud takes the [datachart.typings.ViolinStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ViolinStyleAttrs) body attributes, the rain the [datachart.typings.SwarmStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.SwarmStyleAttrs) attributes, and the box the [datachart.typings.BoxStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BoxStyleAttrs) attributes. The most common ones are:
-
-| Attribute               | Description                                                                                  |
-| ----------------------- | -------------------------------------------------------------------------------------------- |
-| `plot_violin_color`     | The cloud fill color; one color for every group instead of the palette.                      |
-| `plot_violin_alpha`     | The alpha of the cloud.                                                                      |
-| `plot_violin_width`     | The maximum width of the cloud, as a fraction of the category width.                         |
-| `plot_swarm_color`      | The rain point color; one color for every group instead of the palette.                      |
-| `plot_swarm_size`       | The rain point size, in points squared (6 by default, smaller than a standalone swarm's).    |
-| `plot_swarm_alpha`      | The alpha of the rain points.                                                                |
-| `plot_box_linewidth`    | The line width of the box.                                                                   |
-| `plot_box_edgecolor`    | The edge color of the box; the median, whiskers, and caps have their own `plot_box_*_color`. |
-| `plot_box_outlier_size` | The outlier marker size.                                                                     |
-
-The box takes the group color as its fill and the theme's font color for its edges, median, whiskers, and caps.
+Three parts in one color can compete for attention. The `style` dictionary tunes each part: the `plot_violin_*` attributes the cloud ([ViolinStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/violinplot/#datachart.typings.ViolinStyleAttrs)), the `plot_swarm_*` attributes the rain ([SwarmStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/swarmplot/#datachart.typings.SwarmStyleAttrs)), and the `plot_box_*` attributes the box ([BoxStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.typings.BoxStyleAttrs)); any attribute left out keeps the value of the active theme. A lighter cloud, smaller and fainter rain, and a bolder box put the summary in front and leave the shape and the raw values as context. The box takes the group color as its fill and the theme's font color for its edges, median, whiskers and caps.
 
 ```
 RaincloudPlot(
     data=chart_data,
-    # define the style of the cloud, the rain, and the box
     style={
+        # a lighter, wider cloud
         "plot_violin_alpha": 0.4,
         "plot_violin_width": 0.9,
-        "plot_swarm_size": 10,
+        # smaller, fainter rain
+        "plot_swarm_size": 4,
         "plot_swarm_alpha": 0.5,
+        # a bolder box
         "plot_box_linewidth": 1.5,
+        "plot_box_median_linewidth": 2.5,
     },
     title="Body mass of Palmer penguins",
     xlabel="Species",
@@ -186,14 +140,14 @@ RaincloudPlot(
 
 ### Cloud bandwidth
 
-The cloud is a kernel density estimate of the values. The `bandwidth` attribute sets how much the estimate smooths: a rule of the [datachart.constants.BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) constant (`"scott"`, the default, or `"silverman"`) or a scalar factor, where smaller values follow the data more closely and larger ones smooth it more.
+The cloud is a kernel density estimate, and its smoothing decides what shape the reader sees: too smooth, and a distribution with two peaks looks like one. `bandwidth` takes a rule from [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) (`BANDWIDTH.SCOTT`, the default, or `BANDWIDTH.SILVERMAN`) or a scalar factor, where smaller values follow the data more closely. Each species mixes lighter females and heavier males, and a narrow bandwidth shows it: the Gentoo cloud splits into two humps.
 
 ```
 RaincloudPlot(
     data=chart_data,
     # a narrow bandwidth follows the data closely
-    bandwidth=0.2,
-    title="Body mass of Palmer penguins",
+    bandwidth=0.3,
+    title="Body mass of Palmer penguins, a narrow bandwidth",
     xlabel="Species",
     ylabel="Body mass (g)",
     figsize=FIG_SIZE.FULL_SHORT,
@@ -203,27 +157,18 @@ RaincloudPlot(
 
 ### Rain modes
 
-The `mode` attribute chooses how the rain spreads across its width. It supports the values of the [datachart.constants.SWARM_MODE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE) constant:
-
-| Value     | Description                                                                                                                                                                                                                                                                                            |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `"swarm"` | The points are packed outward from the box so none overlap, from the point size at the moment the chart is drawn (the default).                                                                                                                                                                        |
-| `"strip"` | The points are jittered uniformly across the rain width; `jitter` sets the width of the band as a fraction of the category width, like `SwarmPlot`, scaled down to the rain's narrower cell (0.4 by default, which fills the rain width). The jitter is seeded, so the same data draws the same chart. |
-
-The strip mode is the faster choice for many thousands of points, where a swarm would fill its whole width anyway.
+A swarm packs the rain so no two points overlap, which is exact but costs width and time as the groups grow. `mode` chooses how the rain spreads, with a [SWARM_MODE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE) member: `SWARM_MODE.SWARM` (the default) packs the points outward from the box, `SWARM_MODE.STRIP` scatters them at random across the rain's width. `jitter` sets the width of that band as a fraction of the category width (0.4, the default, fills the rain's cell); the jitter is seeded, so the same data draws the same chart. The strip mode suits many thousands of points, where a swarm would fill its whole width anyway.
 
 ```
 from datachart.constants import SWARM_MODE
-```
 
-```
 RaincloudPlot(
     data=chart_data,
-    # jitter the rain instead of packing it
+    # scatter the rain instead of packing it
     mode=SWARM_MODE.STRIP,
-    # narrow the jitter band to half of the rain width
+    # in a band half as wide as the rain's cell
     jitter=0.2,
-    title="Body mass of Palmer penguins",
+    title="Body mass of Palmer penguins, strip rain",
     xlabel="Species",
     ylabel="Body mass (g)",
     figsize=FIG_SIZE.FULL_SHORT,
@@ -233,7 +178,7 @@ RaincloudPlot(
 
 ### Box outliers
 
-The box shows the values beyond 1.5 times the interquartile range as outlier markers. They are already in the rain, so hide them with `show_outliers=False` when the box should stay a plain summary.
+The box marks the values beyond 1.5 times the interquartile range as outliers, but in a raincloud those penguins are already in the rain, so the markers repeat them (the two Chinstrap circles above). `show_outliers=False` hides them and keeps the box a plain summary.
 
 ```
 RaincloudPlot(
@@ -250,7 +195,7 @@ RaincloudPlot(
 
 ### Value labels
 
-To print each group's median, minimum and maximum, add the `show_values` attribute; `value_format` controls the formatting ([datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)). The box prints the median beside its median line, and the rain prints the minimum and maximum beside the points holding them. The cloud carries no labels.
+When the numbers matter, `show_values` prints each group's median beside its box, and its minimum and maximum beside the rain points holding them; the cloud carries no labels. `value_format` formats them with a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or any `"{x:.1f}"` style string, and the `plot_value_*` style attributes ([ValueLabelStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)) set their font. The labels show that the heaviest Adelie and Chinstrap penguins weigh about as much as a typical Gentoo.
 
 ```
 from datachart.constants import VALUE_FORMAT
@@ -259,7 +204,121 @@ RaincloudPlot(
     data=chart_data,
     # print the median, min and max of every group
     show_values=True,
-    value_format=VALUE_FORMAT.INTEGER,
+    value_format=VALUE_FORMAT.THOUSANDS,
+    style={"plot_value_fontsize": 8},
+    title="Body mass of Palmer penguins",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.Y,
+    show_outliers=False,
+).show()
+```
+
+### Horizontal rainclouds
+
+Long group names and a value axis that reads left to right both call for horizontal rainclouds. `orientation=ORIENTATION.HORIZONTAL` ([ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)) puts the groups on the y-axis, with the cloud above and the box and rain below it; the axis labels and the grid swap with the orientation, and the first group sits at the bottom.
+
+```
+from datachart.constants import ORIENTATION
+
+RaincloudPlot(
+    data=chart_data,
+    # draw the rainclouds horizontally
+    orientation=ORIENTATION.HORIZONTAL,
+    title="Body mass of Palmer penguins",
+    # the axis labels swap with the orientation
+    xlabel="Body mass (g)",
+    ylabel="Species",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    # and so does the grid
+    show_grid=SHOW_GRID.X,
+).show()
+```
+
+### Emphasis
+
+A chart usually makes one point, and emphasis makes it visible. `emphasis` takes one role per group, aligned with the group labels in the order they first appear (here Adelie, Chinstrap, Gentoo), and applies to the cloud, the rain and the box together: `"highlight"` bolds the edges, `"background"` mutes the group, `None` leaves it as it is, and a single value applies to every group. The roles are the [EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants; the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis across chart types and themes. Asking only about Gentoo penguins turns the other two species into context:
+
+```
+from datachart.constants import EMPHASIS
+
+RaincloudPlot(
+    data=chart_data,
+    # one role per group label: Adelie, Chinstrap, Gentoo
+    emphasis=[EMPHASIS.BACKGROUND, EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT],
+    title="Gentoo penguins against the rest",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+).show()
+```
+
+`emphasis_rule` picks the groups from the data instead. It is a one-key rule, `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}`, read against a summary of each group: the median by default, the line the box already draws, or the `"mean"`, `"min"`, `"max"` or `"sum"` with a `"by"` key. An explicit `emphasis` role wins over the rule. Which species have penguins lighter than 3 kg? Reading the rule against each group's minimum answers it: Adelie and Chinstrap do, Gentoo does not.
+
+```
+RaincloudPlot(
+    data=chart_data,
+    # highlight the groups whose lightest penguin is under 3,000 g
+    emphasis_rule={"below": 3000, "by": "min"},
+    title="Species with a penguin under 3 kg",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+).show()
+```
+
+### Reference lines and bands
+
+Reference lines and bands put the rainclouds in context. `hlines` draws a horizontal line at a value, such as the mean of all penguins, and `vlines` a vertical one; group positions along the category axis start at `1`, so a half-integer sits between two groups. `hspans` and `vspans` shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). A band of one standard deviation around the overall mean shows that a typical Adelie or Chinstrap penguin falls inside it, while most Gentoo penguins sit above it.
+
+```
+from datachart.constants import LINE_STYLE
+
+masses = [point["value"] for point in chart_data]
+mean_mass = sum(masses) / len(masses)
+std_mass = (sum((mass - mean_mass) ** 2 for mass in masses) / len(masses)) ** 0.5
+
+RaincloudPlot(
+    data=chart_data,
+    # shade one standard deviation around the mean of all penguins
+    hspans={
+        "ymin": mean_mass - std_mass,
+        "ymax": mean_mass + std_mass,
+        "style": {"plot_hspan_color": "#d62728"},
+    },
+    # and mark the mean itself
+    hlines={
+        "y": mean_mass,
+        "style": {"plot_hline_color": "#d62728", "plot_hline_style": LINE_STYLE.DASHED},
+    },
+    title="Body mass against the overall mean (dashed) ± 1 SD (band)",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+).show()
+```
+
+### Text annotations
+
+Where a reference line marks a value, a note explains it. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (group position, value) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The note below points at the heaviest penguin of the dataset, a 6.3 kg Gentoo male, whose rain point sits just left of the Gentoo position `3`.
+
+```
+heaviest = max(point["value"] for point in chart_data)
+
+RaincloudPlot(
+    data=chart_data,
+    # a note pinned to the axes, pointing at the heaviest penguin
+    texts={
+        "text": f"heaviest penguin: {heaviest:,} g",
+        "x": 0.36,
+        "y": 0.93,
+        "coords": "axes",
+        "target": (2.87, heaviest),
+    },
     title="Body mass of Palmer penguins",
     xlabel="Species",
     ylabel="Body mass (g)",
@@ -268,162 +327,57 @@ RaincloudPlot(
 ).show()
 ```
 
-### Raincloud orientation
-
-To change the orientation of the rainclouds, add the `orientation` attribute, which supports the following values:
-
-| Value          | Description                                                                                                                             |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `"vertical"`   | The rainclouds are vertical, one per category along the x-axis, the cloud on the right, the box and the rain on its left (the default). |
-| `"horizontal"` | The rainclouds are horizontal, one per category along the y-axis, the cloud above, the box and the rain below it.                       |
-
-The `datachart` package provides the [datachart.constants.ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) constant with these values.
-
-```
-from datachart.constants import ORIENTATION
-```
-
-```
-RaincloudPlot(
-    data=chart_data,
-    # change the orientation of the rainclouds
-    orientation=ORIENTATION.HORIZONTAL,
-    title="Body mass of Palmer penguins",
-    # swap the axis labels to match the orientation
-    xlabel="Body mass (g)",
-    ylabel="Species",
-    # a taller figure gives the horizontal rainclouds room
-    figsize=FIG_SIZE.FULL_MEDIUM,
-    # the value axis is now the x-axis
-    show_grid=SHOW_GRID.X,
-).show()
-```
-
 ### Date labels
 
-Group labels may be real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp`. Group labels that are real temporal objects print through `DATE_FORMAT`; the groups keep their categorical positions, and `{axis}ticks_format` picks the pattern (a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern). Here twenty daily temperatures per month are grouped by the first day of the month (the data is drawn in a hidden cell).
+Groups are often periods: months, weeks, editions of a survey. A `label` that is a real temporal object (`datetime`, `date`, `numpy.datetime64` or a pandas `Timestamp`) keeps its categorical position but prints through `xticks_format`, a [DATE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern. `daily_temperatures`, defined in a hidden cell, holds twenty illustrative daily mean temperatures per month, drawn around the 1991-2020 monthly normals of Ljubljana and labeled by the first day of each month. The rainclouds show the seasonal cycle and that winter days vary more than summer days.
 
 ```
 from datachart.constants import DATE_FORMAT
 
 RaincloudPlot(
     data=daily_temperatures,
-    title="Daily mean temperature in Ljubljana",
+    title="Daily mean temperature by month, Ljubljana (illustrative)",
     xlabel="Month",
     ylabel="Temperature (°C)",
+    # print the date labels as year and month
     xticks_format=DATE_FORMAT.YEAR_MONTH,
     xtickrotate=45,
     figsize=FIG_SIZE.FULL_MEDIUM,
-).show()
-```
-
-### Emphasis
-
-To draw attention to one group, add the `emphasis` attribute. The `emphasis` list aligns with the group **labels** of one call, in the order the labels first appear in the data — here Adelie, Chinstrap, Gentoo — and applies to the cloud, the rain, and the box of the group together. Each entry is one of the following roles:
-
-| Role           | Description                                             |
-| -------------- | ------------------------------------------------------- |
-| `"background"` | Mutes the group into the theme's muted color and alpha. |
-| `"highlight"`  | Bolds the edges of the cloud, the rain, and the box.    |
-| `None`         | Leaves the group unchanged.                             |
-
-A single value applies to every group. The [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constant holds the roles; the [highlighting guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting.ipynb) covers emphasis across chart types and themes.
-
-To pick the groups from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every group whose summary matches and mutes the rest. The summary is the median of each group's values by default, what a box already draws; a `"by"` key picks `"mean"`, `"min"`, `"max"`, or `"sum"` instead, as in `{"above": 4000, "by": "mean"}`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
-
-```
-from datachart.constants import EMPHASIS
-```
-
-```
-RaincloudPlot(
-    data=chart_data,
-    # one role per group label: Adelie, Chinstrap, Gentoo
-    emphasis=[EMPHASIS.BACKGROUND, EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT],
-    title="Body mass of Palmer penguins",
-    xlabel="Species",
-    ylabel="Body mass (g)",
-    figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
+    show_outliers=False,
 ).show()
 ```
 
-### Reference lines
+### Legend
 
-A reference line puts a threshold or a summary value next to the rainclouds. To add horizontal lines, add the `hlines` attribute with the [datachart.typings.HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) typing, which is either a `dict` or a `List[dict]`; vertical lines use `vlines` and the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) typing.
-
-```
-from datachart.constants import LINE_STYLE
-```
+The category axis already names the groups, so a legend is mostly for reference marks or for charts whose tick labels are hidden. `show_legend` lists the groups; `legend` says where and how, with a `title`, a `location` from [LEGEND_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), the number of columns `ncols`, and the `alignment` of the entries from [LEGEND_ALIGN](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN); a field left out falls back to the theme ([LegendSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendSettingAttrs)). The Adelie and Chinstrap rainclouds fill the lower half of the axes, so a titled legend goes above the plot, in one row.
 
 ```
-mean_mass = sum(penguin["value"] for penguin in chart_data) / len(chart_data)
+from datachart.constants import LEGEND_LOCATION
 
 RaincloudPlot(
     data=chart_data,
-    # add a horizontal line at the mean body mass of all penguins
-    hlines={
-        "y": mean_mass,
-        "style": {
-            "plot_hline_color": "#d62728",
-            "plot_hline_style": LINE_STYLE.DASHED,
-            "plot_hline_width": 1.5,
-            "plot_hline_alpha": 0.8,
-        },
-    },
     title="Body mass of Palmer penguins",
     xlabel="Species",
     ylabel="Body mass (g)",
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.Y,
-).show()
-```
-
-### Reference bands
-
-A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
-
-The example shades one standard deviation around the mean body mass of all penguins and keeps the mean itself as a line: the Adelie and Chinstrap rainclouds sit inside the band, the Gentoo raincloud above it.
-
-```
-masses = [penguin["value"] for penguin in chart_data]
-mean_mass = sum(masses) / len(masses)
-std_mass = (sum((mass - mean_mass) ** 2 for mass in masses) / len(masses)) ** 0.5
-
-RaincloudPlot(
-    data=chart_data,
-    # shade one standard deviation around the mean body mass of all penguins
-    hspans={
-        "ymin": mean_mass - std_mass,
-        "ymax": mean_mass + std_mass,
-        "label": "mean ± 1 SD",
-        "style": {"plot_hspan_color": "#d62728"},
-    },
-    # keep the mean itself as a line
-    hlines={
-        "y": mean_mass,
-        "label": "mean",
-        "style": {"plot_hline_color": "#d62728", "plot_hline_style": LINE_STYLE.DASHED},
-    },
-    title="Body mass of Palmer penguins",
-    xlabel="Species",
-    ylabel="Body mass (g)",
-    figsize=FIG_SIZE.FULL_SHORT,
+    figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
+    # a titled, one-row legend above the axes
+    legend={"title": "Species", "location": LEGEND_LOCATION.OUTSIDE_TOP, "ncols": 3},
 ).show()
 ```
 
 ## Multiple Raincloud Plots
 
-To create multiple raincloud plots, pass a list of lists to the `data` argument. Each inner list holds the data points of one chart, and every chart draws in its own subplot — three parts per group leave no room to overlay a second dataset at the same positions. The `subtitle` becomes the subplot title and the `title`, `xlabel` and `ylabel` are positioned to be global for all charts. The `max_cols` attribute limits the number of columns, and `sharex` and `sharey` share an axis across the subplots; a shared axis is labeled once, on the outer subplots only.
+Three parts per group leave no room to overlay a second dataset at the same positions, so a list of lists in `data` draws each inner list in its own subplot. `subtitle` titles the subplots; `title`, `xlabel` and `ylabel` stay global; `max_cols` limits the subplots per row. `sharey=True` puts the subplots on one value axis, so a raincloud in one can be read against a raincloud in the next, and `sharex=True` does the same for the category axis. A per-chart attribute (`style`, `emphasis`, `hlines`, …) can be a list aligned with `data`.
 
-`body_mass_by_sex` splits the penguins of the hidden cell into the 165 female and the 168 male penguins (the 9 penguins without a recorded sex are left out), one list of data points per sex.
+Splitting the penguins by sex answers the question the [bandwidth](#cloud-bandwidth) example raised: each species' two humps are its females and its males. `body_mass_by_sex` holds the 165 female and the 168 male penguins, one list per sex (the 9 penguins without a recorded sex are left out).
 
 ```
 SEXES = ["Female", "Male"]
 
-# one list of data points per sex; the penguins without a recorded sex are left out
+# one list of data points per sex
 body_mass_by_sex = [
     [
         {"label": penguin["species"], "value": mass}
@@ -437,7 +391,7 @@ body_mass_by_sex = [
 
 ```
 RaincloudPlot(
-    # use a list of lists to define multiple raincloud plots
+    # one chart per sex
     data=body_mass_by_sex,
     # one subplot title per chart
     subtitle=SEXES,
@@ -446,36 +400,64 @@ RaincloudPlot(
     ylabel="Body mass (g)",
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
-    # the same mass axis for both charts
+    show_outliers=False,
+    # the same mass axis for both charts, with room for the heaviest males
     sharey=True,
+    ymin=2500,
+    ymax=6500,
 ).show()
 ```
 
-## Composing rainclouds
+Each sex now has a single-humped cloud, and a shared axis shows that a male of one species is heavier than a female of the same species. A single value of `emphasis` applies to every group of every chart, and a list of lists gives each chart its own roles; the example keeps the Gentoo groups in front in both subplots, and stacks the subplots in a column with `max_cols=1`:
 
-A raincloud figure composes like any other chart. [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays it with other charts on shared axes: the groups keep their positions, so a reference chart of the same categories lines up with them. Here a [datachart.charts.LineChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.LineChart) traces the mean body mass across the species, one point per category position.
+```
+RaincloudPlot(
+    data=body_mass_by_sex,
+    subtitle=SEXES,
+    # the same roles in both charts: Adelie, Chinstrap, Gentoo
+    emphasis=[
+        [EMPHASIS.BACKGROUND, EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT],
+        [EMPHASIS.BACKGROUND, EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT],
+    ],
+    title="Gentoo penguins by sex",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_TALL,
+    show_grid=SHOW_GRID.Y,
+    show_outliers=False,
+    # one chart per row, on one mass axis
+    max_cols=1,
+    sharex=True,
+    sharey=True,
+    ymin=2500,
+    ymax=6500,
+).show()
+```
+
+### Composing with Panel and Grid
+
+[Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) overlays figures on shared axes, one raincloud dataset per panel. The groups keep their positions (`1`, `2`, `3`, …), so a chart drawn on the same numeric positions lines up with them. A [LineChart](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.charts.LineChart) of the mean body mass per species traces the step from the small species to the large one, and shows where the mean sits against the median line of each box.
 
 ```
 from datachart.charts import LineChart
 from datachart.utils import Panel
 
-SPECIES = ["Adelie", "Chinstrap", "Gentoo"]
 mean_by_species = [
     {
-        "x": i + 1,
+        # group positions start at 1
+        "x": position,
         "y": sum(p["value"] for p in chart_data if p["label"] == species)
         / sum(1 for p in chart_data if p["label"] == species),
     }
-    for i, species in enumerate(SPECIES)
+    for position, species in enumerate(SPECIES, start=1)
 ]
 
 Panel(
     [
-        RaincloudPlot(data=chart_data),
-        # the means, one per category position
-        LineChart(data=mean_by_species, style={"plot_line_marker": "o"}),
+        RaincloudPlot(data=chart_data, show_outliers=False),
+        # the means, one per group position
+        LineChart(data=mean_by_species, style={"plot_line_color": "#333333"}),
     ],
-    title="Body mass of Palmer penguins",
+    title="Body mass of Palmer penguins, with the species means",
     xlabel="Species",
     ylabel_left="Body mass (g)",
     figsize=FIG_SIZE.FULL_SHORT,
@@ -483,15 +465,15 @@ Panel(
 ).show()
 ```
 
-[datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) arranges rainclouds next to other figures. A raincloud of the flipper lengths (`flipper_data` from the hidden cell) sits beside the body mass one.
+[Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) arranges figures side by side, each in its own cell. Is the size gap between the species a matter of weight alone? A raincloud of the flipper lengths next to the body mass one says no: Gentoo penguins have longer flippers too, and the Chinstrap flippers sit between the other two species, a difference the body mass hides.
 
 ```
 from datachart.utils import Grid
 
 Grid(
     [
-        RaincloudPlot(data=chart_data, title="Body mass (g)"),
-        RaincloudPlot(data=flipper_data, title="Flipper length (mm)"),
+        RaincloudPlot(data=chart_data, title="Body mass (g)", show_grid=SHOW_GRID.Y),
+        RaincloudPlot(data=flipper_data, title="Flipper length (mm)", show_grid=SHOW_GRID.Y),
     ],
     title="Palmer penguins by species",
     figsize=FIG_SIZE.FULL_SHORT,
@@ -502,36 +484,39 @@ Grid(
 
 ### Logarithmic scale
 
-To draw the value axis on a logarithmic scale, add the `scaley` attribute with a value of the [datachart.constants.SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) constant. The cloud, the rain, and the box all follow the scaled axis.
+Some measurements are strongly right-skewed: most values are small and a few are many times larger, so on a linear axis the bulk of each group is squeezed against the bottom. `scaley` takes a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member, and on `SCALE.LOG` the cloud, the rain and the box all follow the scaled axis. Penguin masses are not skewed, so this example switches dataset: `load_times`, defined in a hidden cell, holds 150 illustrative page load times (in ms) for each of three page types, drawn from log-normal distributions. On the log scale the three clouds become symmetric and readable, and the tails stay in view.
 
 ```
 from datachart.constants import SCALE
-```
 
-```
-RaincloudPlot(
-    data=chart_data,
-    # draw the value axis on a logarithmic scale
-    scaley=SCALE.LOG,
-    title="Body mass of Palmer penguins",
-    xlabel="Species",
-    ylabel="Body mass (g)",
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.Y,
-).show()
+for scale in [SCALE.LINEAR, SCALE.LOG]:
+    RaincloudPlot(
+        data=load_times,
+        title=f"Page load time on the '{scale}' scale",
+        xlabel="Page type",
+        ylabel="Load time (ms)",
+        figsize=FIG_SIZE.FULL_SHORT,
+        show_grid=SHOW_GRID.Y,
+        show_outliers=False,
+        # the scale of the value axis
+        scaley=scale,
+    ).show()
 ```
 
 ### Custom data keys
 
-If the data points hold the label and the value under other keys, add the `label` and `value` attributes with the key names, so the data need not be reshaped.
+Data that comes from a file or an API rarely uses the `label` and `value` keys, and renaming every record just to plot it is a chore. Instead, tell `RaincloudPlot` which keys to read with the `label` and `value` arguments. `flipper_records` stores the flipper lengths the way a CSV export would, one record per penguin with a `species` and a `flipper_mm` key:
 
 ```
 flipper_records = [
-    {"species": penguin["species"], "flipper_mm": length}
+    {"species": penguin["species"], "sex": penguin["sex"], "flipper_mm": length}
     for penguin in PENGUINS
     for length in penguin["flipper_length"]
 ]
+flipper_records[:2]
+```
 
+```
 RaincloudPlot(
     data=flipper_records,
     # the keys holding the label and the value
@@ -545,22 +530,123 @@ RaincloudPlot(
 ).show()
 ```
 
-## Saving the Chart as an Image
+## Real-World Examples
 
-To save the chart as an image, use the [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.save_figure) function.
+The examples below put the features above to work on realistic data, each one answering a question. The data lives in hidden cells; each example says what its data is and where it comes from.
+
+### Example 1: Does Conflict Slow People Down? (Strip Rain, a Log Scale, Median Labels, and a Baseline)
+
+The raincloud plot was made for experimental results like these. `stroop_trials` holds illustrative reaction times (in ms) from a Stroop task, 300 trials per condition: the colour word matches its ink (*congruent*), is a neutral string (*neutral*), or names another colour (*incongruent*). The times are drawn from an ex-Gaussian distribution, the usual model of reaction times: a normal bulk plus an exponential tail of slow responses. With 300 trials per group the rain is drawn as a strip, the skewed times go on a log axis, the median labels give each condition's typical time, and a dashed line at the congruent median is the baseline the other two conditions are read against. The incongruent median sits about 150 ms above it, and its tail of slow responses is the longest.
 
 ```
-from datachart.utils import save_figure
+RaincloudPlot(
+    data=stroop_trials,
+    style={"plot_swarm_size": 3, "plot_swarm_alpha": 0.5, "plot_value_fontsize": 8},
+    # 300 trials per condition: scatter instead of packing
+    mode=SWARM_MODE.STRIP,
+    # reaction times are right-skewed
+    scaley=SCALE.LOG,
+    yticks=[400, 600, 800, 1000, 1500],
+    yticks_format=VALUE_FORMAT.INTEGER,
+    # print the median, min and max
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
+    show_outliers=False,
+    # the congruent median as the baseline
+    hlines={
+        "y": CONGRUENT_MEDIAN,
+        "style": {"plot_hline_color": "#555555", "plot_hline_style": LINE_STYLE.DASHED},
+    },
+    title="Stroop task reaction times (illustrative)",
+    xlabel="Condition",
+    ylabel="Reaction time (ms)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.Y,
+).show()
+```
 
-figure = RaincloudPlot(
-    data=chart_data,
-    title="Body mass of Palmer penguins",
-    xlabel="Species",
-    ylabel="Body mass (g)",
+### Example 2: Did the Course Lift the Scores? (Subplots, a Pass Band, Custom Keys, and a Rule)
+
+`course_scores` holds illustrative test scores (0 to 100) of two sections of the same statistics course, 60 students each, before and after the course. The records use the keys a gradebook export would, `test` and `score`, so the `label` and `value` arguments read them directly. The pass mark is 50: a band shades the failing range, and `emphasis_rule` highlights the tests whose median passes. The shared axis shows that both sections improved, and the rain shows what the medians hide: the evening section still leaves a group of students below the pass mark.
+
+```
+RaincloudPlot(
+    data=course_scores,
+    # the gradebook's key names
+    label="test",
+    value="score",
+    subtitle=[f"{section} section" for section in SECTIONS],
+    # shade the failing range in both charts
+    hspans={"ymin": 0, "ymax": PASS_MARK, "label": "fail", "style": {"plot_hspan_color": "#d62728"}},
+    # the tests whose median passes
+    emphasis_rule={"above": PASS_MARK},
+    show_outliers=False,
+    title="Test scores before and after the course (illustrative)",
+    xlabel="Test",
+    ylabel="Score",
+    # headroom for the perfect scores
+    ymin=0,
+    ymax=105,
+    yticks=[0, 25, 50, 75, 100],
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
-)
-save_figure(figure, "./fig_raincloud_plot.png", dpi=300)
+    sharey=True,
+).show()
 ```
 
-The figure should be saved in the current working directory.
+### Example 3: Which Courier Keeps the 48-Hour Promise? (Horizontal Rainclouds, a Promise Line, a Note, and a Grid)
+
+An online shop promises delivery within 48 hours and uses four couriers. `delivery_hours` holds illustrative delivery times (in hours) of 120 parcels per courier, and `late_share` the share of each courier's parcels that missed the promise. Horizontal rainclouds give the hours a left-to-right axis, a line marks the promise, and a note points at the courier with the longest tail. The median alone would rank the couriers wrongly: Swift has the fastest typical delivery but the most late parcels. [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) sets a bar chart of the late share beside the rainclouds, in the same order, so the two views of each courier sit on one row.
+
+```
+from datachart.charts import BarChart
+
+rainclouds = RaincloudPlot(
+    data=delivery_hours,
+    orientation=ORIENTATION.HORIZONTAL,
+    style={"plot_swarm_size": 4},
+    show_outliers=False,
+    # the delivery promise
+    vlines={
+        "x": PROMISE,
+        "style": {"plot_vline_color": "#d62728", "plot_vline_style": LINE_STYLE.DASHED},
+    },
+    texts=[
+        # name the promise line
+        {"text": "promise", "x": 0.36, "y": 0.97, "coords": "axes"},
+        # point at Swift's long tail
+        {
+            "text": "Swift: fastest median,\nlongest tail",
+            "x": 0.62,
+            "y": 0.72,
+            "coords": "axes",
+            "target": (80, 3),
+        },
+    ],
+    title="Delivery time",
+    xlabel="Hours",
+    xmin=0,
+    show_grid=SHOW_GRID.X,
+)
+
+late = BarChart(
+    data=late_share,
+    orientation=ORIENTATION.HORIZONTAL,
+    # Swift, the courier the note is about
+    emphasis_rule={"top": 1},
+    show_values=True,
+    value_format=VALUE_FORMAT.PERCENT_INT,
+    title="Parcels late",
+    xlabel="Share of parcels",
+    xmin=0,
+    xmax=0.2,
+    xticks_format=VALUE_FORMAT.PERCENT_INT,
+    show_grid=SHOW_GRID.X,
+)
+
+Grid(
+    [[rainclouds, late]],
+    title="Couriers against the 48-hour promise (illustrative)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```

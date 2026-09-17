@@ -1,259 +1,192 @@
 # Themes
 
-This section showcases the themes found in the [datachart.themes](https://eriknovak.github.io/datachart/dev/references/themes/index.md) module and how to customize them. Eight predefined themes are available: `DEFAULT`, `GREYSCALE`, `MINIMAL`, `MATERIAL`, `INK`, `HATCH`, `SKETCH`, and `QUILL` — each named for its visual trait — see the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) for every theme rendered across the full range of chart types.
+A theme is the complete set of style attributes the charts read when they are built: the palettes, the fonts, the axes furniture, and the per-chart defaults, one value per key of [StyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs). The package ships eight predefined themes, each named for its visual trait; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows their color swatches and signature charts, grouped by use. Themes are applied and built through the global [config](https://eriknovak.github.io/datachart/dev/references/config/index.md) instance:
 
-Themes may also carry defaults for chart settings ([ThemeDefaultAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ThemeDefaultAttrs)): `chart_default_show_grid` supplies the grid when a chart call leaves `show_grid` unset (every predefined theme but `SKETCH` and `QUILL` ships a muted `"y"` grid), `chart_default_show_values` does the same for the value labels of every chart that takes `show_values` (no predefined theme turns them on), and `plot_hatch_cycle` assigns hatch patterns per bar/histogram series (`HATCH` and `QUILL` ship one), beside `plot_linestyle_cycle` and `plot_marker_cycle` for line and scatter series (only `QUILL` ships them). An explicit chart setting always wins over the theme default.
-
-`SKETCH` is the hand-drawn look: its path wobble and white halo are sketch attributes ([SketchStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.SketchStyleAttrs)) applied at render time without touching matplotlib's global settings: the panel wobbles every path, and the line, radial and regression layers stroke the halo under their series lines. It ships the Comic Neue font, so the look is the same on every machine.
-
-`QUILL` is black ink on white paper, built from ink attributes ([InkStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.InkStyleAttrs)): series lines are drawn as broad-nib pen strokes, hatched fills are etched by hand over a faint wash, and a value scale is drawn as steps of wash and etch density. It ships the IM Fell English font.
-
-Let's start by importing the necessary functions to help us work with the `datachart.themes` module.
-
-```
-import random
-import numpy as np
-from datachart.charts import (
-    BarChart,
-    LineChart,
-    ScatterChart,
-)
-from datachart.constants import FIG_SIZE, LINE_STYLE, SHOW_GRID
-```
+| Task                                     | Method                                     | Section                                             |
+| ---------------------------------------- | ------------------------------------------ | --------------------------------------------------- |
+| Switch the look of every chart           | `set_theme`, `list_themes`                 | [Applying a Theme](#applying-a-theme)               |
+| Switch it for one block only             | `using_theme`                              | [Applying a Theme](#applying-a-theme)               |
+| Read and change single attributes        | `config[...]`, `update_config`, `override` | [What a Theme Controls](#what-a-theme-controls)     |
+| Make your own theme switchable by name   | `register_theme`                           | [Building Your Own Theme](#building-your-own-theme) |
+| Share a theme as a file and load it back | `save_theme`, `load_theme`                 | [Sharing a Theme](#sharing-a-theme)                 |
+| Return to the default theme              | `reset_config`                             | [Applying a Theme](#applying-a-theme)               |
 
 ```
 from datachart.config import config
+from datachart.constants import FONT_WEIGHT, THEME
 ```
 
-To get the supported themes, you have to load them from the `datachart.themes` module.
-
-```
-from datachart.constants import THEME
-```
-
-The [datachart.constants.THEME](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) module contains all the predefined themes.
+The examples render one figure throughout, a grouped bar chart beside a line chart, so the theme is the only thing that changes between renders. The chart code is left out of this page; see the [chart guides](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md) for it.
 
 ## Applying a Theme
 
-Applying a theme replaces the whole global configuration, so set it before building the charts it should style:
+`list_themes` returns every name `set_theme` accepts: the predefined themes from [THEME](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) plus any theme registered in this process.
+
+```
+config.list_themes()
+```
+
+Applying a theme replaces the whole configuration. Charts read the configuration when they are built, so set the theme before building the charts it should style; the active theme's name is in `config.theme`.
 
 ```
 config.set_theme(THEME.MINIMAL)
-
-BarChart(
-    data=[{"label": f"cat{idx}", "y": 10 + 5 * idx} for idx in range(5)],
-    title="Bar chart under THEME.MINIMAL",
-    figsize=FIG_SIZE.FULL_SHORT,
-).show()
+demo().show()
 ```
 
-To return to the default theme, reset the configuration:
+`using_theme` applies a theme for one `with` block and restores the configuration that entered the block when it ends, also when the block raises. The scopes are plain save-and-restore on the global configuration, so they are neither thread-safe nor async-safe.
+
+```
+with config.using_theme(THEME.INK):
+    demo().show()
+
+config.theme
+```
+
+`reset_config` returns to the default theme, discarding every change made since:
 
 ```
 config.reset_config()
+config.theme
 ```
 
-See the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) for every predefined theme rendered across the full range of chart types.
+Beyond style, a theme carries defaults for chart settings ([ThemeDefaultAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ThemeDefaultAttrs)): `chart_default_show_grid` supplies the grid when a chart call leaves `show_grid` unset (every predefined theme but [`SKETCH`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#sketch) and [`QUILL`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#quill) ships a muted `"y"` grid), `chart_default_show_values` does the same for value labels (no predefined theme turns them on), and the `plot_hatch_cycle`, `plot_linestyle_cycle`, and `plot_marker_cycle` attributes tell series apart by pattern where a theme ships them ([`HATCH`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#hatch) and [`QUILL`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#quill)). A setting given in the chart call always wins over the theme default.
 
-## Creating Your Own Theme
+## What a Theme Controls
 
-Adding the theme to the `datachart` package
+The attribute names are the keys of the live configuration, grouped by prefix; the [typings reference](https://eriknovak.github.io/datachart/dev/references/typings/index.md) documents each one.
 
-If you think the theme would be useful and would like it to be added to the `datachart` package, please create a pull request to add it.
+| Prefix                                                        | Controls                                                                                                                                                        | Reference                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `color_*`, `muted_*`                                          | The palettes: `multiple` for series sharing one axes, `singular` for subplot series and value scales; the muted color of de-emphasized series                   | [ColorStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                     |
+| `font_*`                                                      | The font family and its stacks, and the size, color, style, and weight of each text role: general, title, subtitle, axis labels                                 | [FontStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.FontStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                       |
+| `axes_*`, `figure_*`                                          | The spines, the ticks, and the face colors of the figure and the axes                                                                                           | [AxesStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.AxesStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                       |
+| `plot_grid_*`, `plot_legend_*`, `plot_text_*`, `plot_value_*` | The furniture every chart shares: grid lines, legend, annotations, value labels                                                                                 | [GridStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.GridStyleAttrs), [LegendStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendStyleAttrs), [TextStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs), [ValueLabelStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs) |
+| `plot_<chart>_*`                                              | One group per chart type: `plot_line_*`, `plot_bar_*`, `plot_heatmap_*`, and so on                                                                              | The chart's guide, under "Customize"                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `overlay_*`                                                   | How a [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) combines charts: the twin-axis threshold, drawing order, bar mode | [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/#panel-configuration)                                                                                                                                                                                                                                                                                                                                                                                    |
+| `chart_default_*`, `plot_*_cycle`                             | The chart-setting defaults above                                                                                                                                | [ThemeDefaultAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ThemeDefaultAttrs)                                                                                                                                                                                                                                                                                                                                                                 |
 
-The user can create their own theme by defining a new dictionary that has the same structure as the [StyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs) type.
+Two themes add groups of their own: [`SKETCH`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#sketch) the path wobble and halo of its hand-drawn look ([SketchStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.SketchStyleAttrs)), [`QUILL`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#quill) the pen strokes and etched fills of its ink look ([InkStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.InkStyleAttrs)).
 
-For instance, one can copy the bellow definition of the default theme and modify the values to customize the theme.
+Read an attribute by indexing `config` or with `config.get`; the live dictionary is `config.config`, so a prefix lists a whole group:
 
 ```
-from datachart.typings import StyleAttrs
-from datachart.constants import COLORS, FONT_STYLE, FONT_WEIGHT, LINE_DRAW_STYLE
+config["color_general_multiple"], config.get("font_general_family")
 ```
 
 ```
-CUSTOM_THEME: StyleAttrs = {
-    "color_general_singular": COLORS.Blues,
-    "color_general_multiple": COLORS.Spectral,
-    "font_general_family": "sans-serif",
-    "font_general_sansserif": ["Helvetica", "Arial"],
-    "font_general_color": "#000000",
-    "font_general_size": 11,
-    "font_general_style": FONT_STYLE.NORMAL,
-    "font_general_weight": FONT_WEIGHT.NORMAL,
-    "font_title_size": 12,
-    "font_title_color": "#000000",
-    "font_title_style": FONT_STYLE.NORMAL,
-    "font_title_weight": FONT_WEIGHT.NORMAL,
-    "font_subtitle_size": 11,
-    "font_subtitle_color": "#000000",
-    "font_subtitle_style": FONT_STYLE.NORMAL,
-    "font_subtitle_weight": FONT_WEIGHT.NORMAL,
-    "font_xlabel_size": 10,
-    "font_xlabel_color": "#000000",
-    "font_xlabel_style": FONT_STYLE.NORMAL,
-    "font_xlabel_weight": FONT_WEIGHT.NORMAL,
-    "font_ylabel_size": 10,
-    "font_ylabel_color": "#000000",
-    "font_ylabel_style": FONT_STYLE.NORMAL,
-    "font_ylabel_weight": FONT_WEIGHT.NORMAL,
-    "axes_spines_top_visible": True,
-    "axes_spines_right_visible": True,
-    "axes_spines_bottom_visible": True,
-    "axes_spines_left_visible": True,
-    "axes_spines_width": 0.5,
-    "axes_spines_zorder": 100,
-    "axes_ticks_length": 2,
-    "axes_ticks_label_size": 9,
-    "plot_legend_shadow": False,
-    "plot_legend_frameon": True,
-    "plot_legend_alignment": "left",
-    "plot_legend_font_size": 9,
-    "plot_legend_title_size": 10,
-    "plot_legend_label_color": "#000000",
-    "plot_area_alpha": 0.3,
-    "plot_area_color": None,
-    "plot_area_linewidth": 0,
-    "plot_area_hatch": None,
-    "plot_area_zorder": 3,
-    "plot_grid_alpha": 1,
-    "plot_grid_color": "#E6E6E6",
-    "plot_grid_linewidth": 0.5,
-    "plot_grid_linestyle": LINE_STYLE.SOLID,
-    "plot_grid_zorder": 0,
-    "plot_line_color": None,
-    "plot_line_style": LINE_STYLE.SOLID,
-    "plot_line_marker": None,
-    "plot_line_width": 1,
-    "plot_line_alpha": 1.0,
-    "plot_line_drawstyle": LINE_DRAW_STYLE.DEFAULT,
-    "plot_line_zorder": 3,
-    "plot_bar_color": None,
-    "plot_bar_alpha": 1.0,
-    "plot_bar_width": 0.8,
-    "plot_bar_zorder": 3,
-    "plot_bar_hatch": None,
-    "plot_bar_edge_width": 0.5,
-    "plot_bar_edge_color": "#000000",
-    "plot_bar_error_color": "#000000",
-    "plot_hist_color": None,
-    "plot_hist_alpha": 1.0,
-    "plot_hist_zorder": 3,
-    "plot_hist_fill": None,
-    "plot_hist_hatch": None,
-    "plot_hist_type": "bar",
-    "plot_hist_align": "mid",
-    "plot_hist_edge_width": 0.5,
-    "plot_hist_edge_color": "#000000",
-    "plot_vline_color": None,
-    "plot_vline_style": LINE_STYLE.SOLID,
-    "plot_vline_width": 1,
-    "plot_vline_alpha": 1.0,
-    "plot_hline_color": None,
-    "plot_hline_style": LINE_STYLE.SOLID,
-    "plot_hline_width": 1,
-    "plot_hline_alpha": 1.0,
-    "plot_heatmap_cmap": COLORS.Blues,
-    "plot_heatmap_alpha": 1.0,
-    "plot_heatmap_font_size": 9,
-    "plot_heatmap_font_color": "#000000",
-    "plot_heatmap_font_style": FONT_STYLE.NORMAL,
-    "plot_heatmap_font_weight": FONT_WEIGHT.NORMAL,
+{key: value for key, value in config.config.items() if key.startswith("axes_")}
+```
+
+`update_config` changes attributes on top of the active theme; the change persists until the next `set_theme` or `reset_config`, and unknown attribute names are skipped with a warning. `override` does the same for one `with` block, taking a dictionary or keyword arguments. Palette attributes also accept a single color, used for every series that asks for one.
+
+```
+config.update_config({"font_general_family": "serif", "plot_line_width": 3})
+demo().show()
+```
+
+```
+with config.override(color_general_multiple=["#0B3954", "#FF6663", "#E0FF4F"]):
+    demo().show()
+
+config.reset_config()
+```
+
+## Building Your Own Theme
+
+A custom theme is a dictionary of the attributes that differ from the default theme. `register_theme` fills the rest from the default theme and rejects unknown names, so a theme can be as short as one palette. To build on another predefined theme instead, spread it first: `{**MINIMAL_THEME, ...}` with the dictionaries of the [themes](https://eriknovak.github.io/datachart/dev/references/themes/index.md) module.
+
+The theme built here is a neon noir look: a near-black ground, a cyan, magenta, and amber palette, monospaced type, and the furniture dimmed so the series carry the light. It starts with the palette:
+
+```
+NEON_COLORS = ["#00E5FF", "#FF2D95", "#FFB000", "#7DFF5A", "#B26BFF"]
+swatches(NEON_COLORS)
+```
+
+The rest of the dictionary sets the ground, the type, and the furniture. `font_general_family` takes `serif` or `sans-serif` to use the theme's font stacks, or any family matplotlib resolves, here the generic `monospace`; a `None` in a color attribute keeps matplotlib's own color, so every color a dark ground needs is set explicitly:
+
+```
+NEON = {
+    # ground
+    "figure_facecolor": "#0B0F19",
+    "axes_facecolor": "#0B0F19",
+    # palettes: the series colors, and a two-stop ramp for value scales
+    "color_general_multiple": NEON_COLORS,
+    "color_general_singular": ["#1B2A4A", "#00E5FF"],
+    "muted_color": "#3A4656",
+    # type
+    "font_general_family": "monospace",
+    "font_general_color": "#E6EDF3",
+    "font_title_color": "#00E5FF",
+    "font_title_weight": FONT_WEIGHT.BOLD,
+    "font_subtitle_color": "#9AA5B1",
+    "font_xlabel_color": "#9AA5B1",
+    "font_ylabel_color": "#9AA5B1",
+    # furniture: open top and right, dim spines, dotted grid, dark legend
+    "axes_spines_top_visible": False,
+    "axes_spines_right_visible": False,
+    "axes_spines_color": "#2A3548",
+    "axes_ticks_color": "#9AA5B1",
+    "plot_grid_color": "#222D40",
+    "plot_grid_alpha": 1.0,
+    "plot_grid_linestyle": ":",
+    "plot_legend_face_color": "#111827",
+    "plot_legend_edge_color": "#2A3548",
+    "plot_legend_label_color": "#E6EDF3",
+    "plot_value_color": "#E6EDF3",
+    # marks: heavier strokes, no bar outlines
+    "plot_line_width": 2.2,
+    "plot_bar_edge_width": 0,
 }
 ```
 
-Once you define the theme, you can use it by updating the `config` module in the following way:
+Try it before registering: `override` renders the figure under the dictionary and leaves the configuration untouched.
 
 ```
-from datachart.config import config
+with config.override(NEON):
+    demo().show()
+
+config.theme
 ```
 
-```
-config.update_config(CUSTOM_THEME)
-```
-
-Once you do this, all the plots will use the custom theme.
-
-**Bar Chart**
+Register the dictionary under a name and it behaves like a predefined theme: it appears in `list_themes`, `set_theme` and `using_theme` apply it, and `update_config` tweaks on top of it, here lifting the axes off the ground with a lighter face:
 
 ```
-BarChart(
-    data=[
-        {"label": f"xx{id}", "y": 100 * (id + 1) * random.random()}
-        for id in range(10)
-    ],
-    vlines=[{"x": 2 * i} for i in range(1, 4)],
-    hlines={"y": 400},
-    title="Title",
-    xlabel="the global x-axis label",
-    ylabel="the global y-axis label",
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.BOTH,
-    xmin=-0.5,
-    xmax=9.5,
-).show()
-```
-
-**Line Chart**
-
-```
-LineChart(
-    data=[
-        [{"x": x / 10, "y": np.cos(x / 2)} for x in range(21)],
-        [{"x": x / 10, "y": np.sin(x / 2)} for x in range(21)],
-    ],
-    subtitle=["cosine", "sine"],
-    title="Title",
-    xlabel="the global x-axis label",
-    ylabel="the global y-axis label",
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.BOTH,
-    show_legend=True,
-).show()
-```
-
-**Scatter Chart**
-
-```
-chart_data_bubble_hue = [
-    {
-        "x": random.uniform(0, 10),
-        "y": random.uniform(0, 10),
-        "population": random.uniform(100, 1000),
-        "region": random.choice(["North", "South", "East", "West"])
-    }
-    for _ in range(50)
-]
+config.register_theme("neon", NEON)
+config.set_theme("neon")
+config.list_themes()
 ```
 
 ```
-ScatterChart(
-    data=chart_data_bubble_hue,
-    size="population",
-    hue="region",
-    size_range=(30, 250),
-    title="Title",
-    xlabel="the global x-axis label",
-    ylabel="the global y-axis label",
-    figsize=FIG_SIZE.FULL_SHORT,
-    show_grid=SHOW_GRID.BOTH,
-    show_legend=True,
-).show()
+config.update_config({"axes_facecolor": "#131A2A"})
+demo().show()
 ```
 
-## Registering a Theme
+Adding the theme to the `datachart` package
 
-To make a custom theme switchable by name — like the predefined ones — register it with `config.register_theme`. Missing attributes are filled from the default theme, so a partial override works too:
+If you think the theme would be useful to others, open a pull request that adds it to the `datachart.themes` module.
 
-```
-config.register_theme("custom", CUSTOM_THEME)
-config.set_theme("custom")
-```
+## Sharing a Theme
 
-This is also how a private companion package can ship its own themes: register them on import and users apply them with `config.set_theme("<name>")`.
+`save_theme` writes a theme file: a JSON document carrying a name, a format version, and only the attributes that differ from the default theme, so the file stays short and reviewable. A registered theme is saved by name; with no name the live configuration is saved, so a look assembled with `update_config` leaves the process too.
 
 ```
-config.reset_config()
+import tempfile
+from pathlib import Path
+
+folder = Path(tempfile.mkdtemp())
+config.save_theme(folder / "neon.json", name="neon")
+print((folder / "neon.json").read_text())
 ```
+
+`load_theme` registers the theme in a file and returns the name it registered under: the `name` argument, else the name in the file, else the file's stem. Loading only registers; apply the theme with `set_theme` or `using_theme`. The file is validated the way `register_theme` validates a dictionary, so a hand-edited file cannot register a broken theme.
+
+```
+name = config.load_theme(folder / "neon.json", name="neon-shared")
+config.set_theme(name)
+config.theme
+```
+
+A companion package ships its themes the same way: it registers or loads them on import, and its users apply them with `config.set_theme("<name>")`.
 
 Finally, reset the configuration back to the default theme:
 

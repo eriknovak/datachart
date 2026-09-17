@@ -4,40 +4,30 @@
 
 The module containing the `stats` methods.
 
-The `stats` module provides methods for calculating statistics.
+The `stats` module provides the statistics behind the charts: centers and spreads, shape, correlation, a linear fit, bootstrap intervals, histogram bins, smoothers, and density estimates. Every function takes plain Python lists.
 
-| FUNCTION       | DESCRIPTION                                                       |
-| -------------- | ----------------------------------------------------------------- |
-| `count`        | Counts the number of elements in the list.                        |
-| `sum_values`   | Calculates the sum of the values.                                 |
-| `mean`         | Calculates the mean of the values.                                |
-| `median`       | Calculates the median of the values.                              |
-| `stdev`        | Calculates the standard deviation of the values.                  |
-| `variance`     | Calculates the variance of the values.                            |
-| `quantile`     | Calculates the quantile of the values.                            |
-| `iqr`          | Calculates the interquartile range (Q3 - Q1).                     |
-| `minimum`      | Gets the minimum of the values.                                   |
-| `maximum`      | Gets the maximum of the values.                                   |
-| `correlation`  | Calculates the Pearson correlation coefficient between two lists. |
-| `spearman`     | Calculates the Spearman rank correlation between two lists.       |
-| `mode`         | Gets the most frequent value.                                     |
-| `skewness`     | Calculates the skewness of the values.                            |
-| `kurtosis`     | Calculates the excess kurtosis of the values.                     |
-| `linear_fit`   | Fits a straight line to the (x, y) points.                        |
-| `bootstrap_ci` | Estimates a confidence interval of a statistic by bootstrapping.  |
-| `histogram`    | Bins the values into histogram counts and edges.                  |
-| `rolling_mean` | Smooths the values with a trailing moving average.                |
-| `ewma`         | Smooths the values with an exponentially weighted moving average. |
-| `loess`        | Smooths the (x, y) points with a locally weighted linear fit.     |
-| `kde1d`        | Estimates the density of the values as a curve.                   |
-| `kde2d`        | Estimates the density of the (x, y) points as a gridded surface.  |
+## Choosing a Function
 
-## Functions
+Every function takes plain Python lists and returns a number, a pair, or lists ready to feed back into a chart. The groups below match the [Statistics guide](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md), which shows each one on a chart.
+
+| I want to…                      | Use                                                                                                                                                                                                                                                                  |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| a center, count, or total       | [`mean`](#datachart.utils.stats.mean), [`median`](#datachart.utils.stats.median), [`mode`](#datachart.utils.stats.mode), [`count`](#datachart.utils.stats.count), [`sum_values`](#datachart.utils.stats.sum_values)                                                  |
+| how far the values spread       | [`stdev`](#datachart.utils.stats.stdev), [`variance`](#datachart.utils.stats.variance), [`quantile`](#datachart.utils.stats.quantile), [`iqr`](#datachart.utils.stats.iqr), [`minimum`](#datachart.utils.stats.minimum), [`maximum`](#datachart.utils.stats.maximum) |
+| the shape of a distribution     | [`skewness`](#datachart.utils.stats.skewness), [`kurtosis`](#datachart.utils.stats.kurtosis)                                                                                                                                                                         |
+| how two variables move together | [`correlation`](#datachart.utils.stats.correlation), [`spearman`](#datachart.utils.stats.spearman)                                                                                                                                                                   |
+| a trend line                    | [`linear_fit`](#datachart.utils.stats.linear_fit)                                                                                                                                                                                                                    |
+| an interval around a statistic  | [`bootstrap_ci`](#datachart.utils.stats.bootstrap_ci)                                                                                                                                                                                                                |
+| bins for a histogram            | [`histogram`](#datachart.utils.stats.histogram)                                                                                                                                                                                                                      |
+| a smoothed series               | [`rolling_mean`](#datachart.utils.stats.rolling_mean), [`ewma`](#datachart.utils.stats.ewma), [`loess`](#datachart.utils.stats.loess)                                                                                                                                |
+| a density curve or surface      | [`kde1d`](#datachart.utils.stats.kde1d), [`kde2d`](#datachart.utils.stats.kde2d)                                                                                                                                                                                     |
+
+## Center
 
 ### datachart.utils.stats.count
 
 ```
-count(values: List[Union[int, float]]) -> int
+count(values: list[int | float]) -> int
 ```
 
 Counts the number of elements in a list.
@@ -50,9 +40,9 @@ Examples:
 5
 ```
 
-| PARAMETER | DESCRIPTION                                             |
-| --------- | ------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]` |
+| PARAMETER | DESCRIPTION                               |
+| --------- | ----------------------------------------- |
+| `values`  | The list of values. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION                         |
 | ------- | ----------------------------------- |
@@ -61,7 +51,7 @@ Examples:
 ### datachart.utils.stats.sum_values
 
 ```
-sum_values(values: List[Union[int, float]]) -> float
+sum_values(values: list[int | float]) -> float
 ```
 
 Calculates the sum of all values.
@@ -76,9 +66,9 @@ Examples:
 15.0
 ```
 
-| PARAMETER | DESCRIPTION                                             |
-| --------- | ------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]` |
+| PARAMETER | DESCRIPTION                               |
+| --------- | ----------------------------------------- |
+| `values`  | The list of values. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION            |
 | ------- | ---------------------- |
@@ -87,7 +77,7 @@ Examples:
 ### datachart.utils.stats.mean
 
 ```
-mean(values: List[Union[int, float]]) -> float
+mean(values: list[int | float]) -> float
 ```
 
 Calculates the mean of the values.
@@ -100,9 +90,9 @@ Examples:
 3.0
 ```
 
-| PARAMETER | DESCRIPTION                                             |
-| --------- | ------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]` |
+| PARAMETER | DESCRIPTION                               |
+| --------- | ----------------------------------------- |
+| `values`  | The list of values. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION             |
 | ------- | ----------------------- |
@@ -111,7 +101,7 @@ Examples:
 ### datachart.utils.stats.median
 
 ```
-median(values: List[Union[int, float]]) -> float
+median(values: list[int | float]) -> float
 ```
 
 Calculates the median of the values.
@@ -124,18 +114,52 @@ Examples:
 3.0
 ```
 
-| PARAMETER | DESCRIPTION                                             |
-| --------- | ------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]` |
+| PARAMETER | DESCRIPTION                               |
+| --------- | ----------------------------------------- |
+| `values`  | The list of values. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION               |
 | ------- | ------------------------- |
 | `float` | The median of the values. |
 
+### datachart.utils.stats.mode
+
+```
+mode(values: list[int | float]) -> float
+```
+
+Gets the most frequent value.
+
+Meant for discrete data, where values repeat; on continuous data every value tends to be unique and the mode is just the smallest one. Ties are broken by taking the smallest of the most frequent values.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.utils.stats import mode
+>>> mode([3, 1, 2, 3, 1])
+1.0
+```
+
+| PARAMETER | DESCRIPTION                               |
+| --------- | ----------------------------------------- |
+| `values`  | The list of values. **TYPE:** \`list\[int |
+
+| RETURNS | DESCRIPTION                                              |
+| ------- | -------------------------------------------------------- |
+| `float` | The smallest most frequent value; nan for an empty list. |
+
+| RAISES      | DESCRIPTION                             |
+| ----------- | --------------------------------------- |
+| `TypeError` | If values is not a list or numpy array. |
+
+## Spread
+
 ### datachart.utils.stats.stdev
 
 ```
-stdev(values: List[Union[int, float]]) -> float
+stdev(values: list[int | float]) -> float
 ```
 
 Calculates the standard deviation of the values.
@@ -148,9 +172,9 @@ Examples:
 1.4142135623730951
 ```
 
-| PARAMETER | DESCRIPTION                                             |
-| --------- | ------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]` |
+| PARAMETER | DESCRIPTION                               |
+| --------- | ----------------------------------------- |
+| `values`  | The list of values. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION                           |
 | ------- | ------------------------------------- |
@@ -159,7 +183,7 @@ Examples:
 ### datachart.utils.stats.variance
 
 ```
-variance(values: List[Union[int, float]]) -> float
+variance(values: list[int | float]) -> float
 ```
 
 Calculates the variance of the values.
@@ -174,9 +198,9 @@ Examples:
 2.0
 ```
 
-| PARAMETER | DESCRIPTION                                             |
-| --------- | ------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]` |
+| PARAMETER | DESCRIPTION                               |
+| --------- | ----------------------------------------- |
+| `values`  | The list of values. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION                 |
 | ------- | --------------------------- |
@@ -185,9 +209,7 @@ Examples:
 ### datachart.utils.stats.quantile
 
 ```
-quantile(
-    values: List[Union[int, float]], q: float
-) -> float
+quantile(values: list[int | float], q: float) -> float
 ```
 
 Calculates the quantile of the values.
@@ -200,10 +222,10 @@ Examples:
 2.0
 ```
 
-| PARAMETER | DESCRIPTION                                             |
-| --------- | ------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]` |
-| `q`       | The quantile to calculate (0-100). **TYPE:** `float`    |
+| PARAMETER | DESCRIPTION                                          |
+| --------- | ---------------------------------------------------- |
+| `values`  | The list of values. **TYPE:** \`list\[int            |
+| `q`       | The quantile to calculate (0-100). **TYPE:** `float` |
 
 | RETURNS | DESCRIPTION                 |
 | ------- | --------------------------- |
@@ -212,7 +234,7 @@ Examples:
 ### datachart.utils.stats.iqr
 
 ```
-iqr(values: List[Union[int, float]]) -> float
+iqr(values: list[int | float]) -> float
 ```
 
 Calculates the interquartile range (Q3 - Q1).
@@ -229,9 +251,9 @@ Examples:
 4.5
 ```
 
-| PARAMETER | DESCRIPTION                                             |
-| --------- | ------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]` |
+| PARAMETER | DESCRIPTION                               |
+| --------- | ----------------------------------------- |
+| `values`  | The list of values. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION                            |
 | ------- | -------------------------------------- |
@@ -240,7 +262,7 @@ Examples:
 ### datachart.utils.stats.minimum
 
 ```
-minimum(values: List[Any]) -> Any
+minimum(values: list[Any]) -> Any
 ```
 
 Gets the minimum of the values.
@@ -261,7 +283,7 @@ Examples:
 
 | PARAMETER | DESCRIPTION                               |
 | --------- | ----------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Any]` |
+| `values`  | The list of values. **TYPE:** `list[Any]` |
 
 | RETURNS | DESCRIPTION                                                            |
 | ------- | ---------------------------------------------------------------------- |
@@ -270,7 +292,7 @@ Examples:
 ### datachart.utils.stats.maximum
 
 ```
-maximum(values: List[Any]) -> Any
+maximum(values: list[Any]) -> Any
 ```
 
 Gets the maximum of the values.
@@ -291,17 +313,89 @@ Examples:
 
 | PARAMETER | DESCRIPTION                               |
 | --------- | ----------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Any]` |
+| `values`  | The list of values. **TYPE:** `list[Any]` |
 
 | RETURNS | DESCRIPTION                                                            |
 | ------- | ---------------------------------------------------------------------- |
 | `Any`   | The maximum of the values: a float for numbers, else the value itself. |
 
+## Shape
+
+### datachart.utils.stats.skewness
+
+```
+skewness(values: list[int | float]) -> float
+```
+
+Calculates the skewness of the values.
+
+Skewness measures the asymmetry of the distribution: positive when the tail extends to the right of the bulk, negative when it extends to the left, and zero for a symmetric distribution.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.utils.stats import skewness
+>>> skewness([1, 2, 3, 4, 5])
+0.0
+>>> round(skewness([1, 1, 1, 2, 10]), 3)
+1.457
+```
+
+| PARAMETER | DESCRIPTION                               |
+| --------- | ----------------------------------------- |
+| `values`  | The list of values. **TYPE:** \`list\[int |
+
+| RETURNS | DESCRIPTION                                                    |
+| ------- | -------------------------------------------------------------- |
+| `float` | The skewness of the values; nan for fewer than two values or a |
+| `float` | constant list.                                                 |
+
+| RAISES      | DESCRIPTION                             |
+| ----------- | --------------------------------------- |
+| `TypeError` | If values is not a list or numpy array. |
+
+### datachart.utils.stats.kurtosis
+
+```
+kurtosis(values: list[int | float]) -> float
+```
+
+Calculates the excess kurtosis of the values.
+
+Kurtosis measures how heavy the tails of the distribution are compared to a normal distribution, which scores zero: positive for heavier tails and sharper peaks, negative for lighter tails and flatter shapes.
+
+Added in Unreleased
+
+Examples:
+
+```
+>>> from datachart.utils.stats import kurtosis
+>>> kurtosis([1, 2, 3, 4, 5])
+-1.3
+```
+
+| PARAMETER | DESCRIPTION                               |
+| --------- | ----------------------------------------- |
+| `values`  | The list of values. **TYPE:** \`list\[int |
+
+| RETURNS | DESCRIPTION                                                         |
+| ------- | ------------------------------------------------------------------- |
+| `float` | The excess kurtosis of the values; nan for fewer than two values or |
+| `float` | a constant list.                                                    |
+
+| RAISES      | DESCRIPTION                             |
+| ----------- | --------------------------------------- |
+| `TypeError` | If values is not a list or numpy array. |
+
+## Association
+
 ### datachart.utils.stats.correlation
 
 ```
 correlation(
-    x: List[Union[int, float]], y: List[Union[int, float]]
+    x: list[int | float], y: list[int | float]
 ) -> float
 ```
 
@@ -321,10 +415,10 @@ Examples:
 -1.0
 ```
 
-| PARAMETER | DESCRIPTION                                                                        |
-| --------- | ---------------------------------------------------------------------------------- |
-| `x`       | The first list of values, numeric or temporal. **TYPE:** `List[Union[int, float]]` |
-| `y`       | The second list of values. **TYPE:** `List[Union[int, float]]`                     |
+| PARAMETER | DESCRIPTION                                                          |
+| --------- | -------------------------------------------------------------------- |
+| `x`       | The first list of values, numeric or temporal. **TYPE:** \`list\[int |
+| `y`       | The second list of values. **TYPE:** \`list\[int                     |
 
 | RETURNS | DESCRIPTION                          |
 | ------- | ------------------------------------ |
@@ -339,7 +433,7 @@ Examples:
 
 ```
 spearman(
-    x: List[Union[int, float]], y: List[Union[int, float]]
+    x: list[int | float], y: list[int | float]
 ) -> float
 ```
 
@@ -359,10 +453,10 @@ Examples:
 -1.0
 ```
 
-| PARAMETER | DESCRIPTION                                                                        |
-| --------- | ---------------------------------------------------------------------------------- |
-| `x`       | The first list of values, numeric or temporal. **TYPE:** `List[Union[int, float]]` |
-| `y`       | The second list of values. **TYPE:** `List[Union[int, float]]`                     |
+| PARAMETER | DESCRIPTION                                                          |
+| --------- | -------------------------------------------------------------------- |
+| `x`       | The first list of values, numeric or temporal. **TYPE:** \`list\[int |
+| `y`       | The second list of values. **TYPE:** \`list\[int                     |
 
 | RETURNS | DESCRIPTION                                                       |
 | ------- | ----------------------------------------------------------------- |
@@ -374,112 +468,14 @@ Examples:
 | `TypeError`  | If x or y is not a list or numpy array, or x mixes temporal and numeric values. |
 | `ValueError` | If x and y have different lengths.                                              |
 
-### datachart.utils.stats.mode
-
-```
-mode(values: List[Union[int, float]]) -> float
-```
-
-Gets the most frequent value.
-
-Meant for discrete data, where values repeat; on continuous data every value tends to be unique and the mode is just the smallest one. Ties are broken by taking the smallest of the most frequent values.
-
-Added in Unreleased
-
-Examples:
-
-```
->>> from datachart.utils.stats import mode
->>> mode([3, 1, 2, 3, 1])
-1.0
-```
-
-| PARAMETER | DESCRIPTION                                             |
-| --------- | ------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]` |
-
-| RETURNS | DESCRIPTION                                              |
-| ------- | -------------------------------------------------------- |
-| `float` | The smallest most frequent value; nan for an empty list. |
-
-| RAISES      | DESCRIPTION                             |
-| ----------- | --------------------------------------- |
-| `TypeError` | If values is not a list or numpy array. |
-
-### datachart.utils.stats.skewness
-
-```
-skewness(values: List[Union[int, float]]) -> float
-```
-
-Calculates the skewness of the values.
-
-Skewness measures the asymmetry of the distribution: positive when the tail extends to the right of the bulk, negative when it extends to the left, and zero for a symmetric distribution.
-
-Added in Unreleased
-
-Examples:
-
-```
->>> from datachart.utils.stats import skewness
->>> skewness([1, 2, 3, 4, 5])
-0.0
->>> round(skewness([1, 1, 1, 2, 10]), 3)
-1.457
-```
-
-| PARAMETER | DESCRIPTION                                             |
-| --------- | ------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]` |
-
-| RETURNS | DESCRIPTION                                                    |
-| ------- | -------------------------------------------------------------- |
-| `float` | The skewness of the values; nan for fewer than two values or a |
-| `float` | constant list.                                                 |
-
-| RAISES      | DESCRIPTION                             |
-| ----------- | --------------------------------------- |
-| `TypeError` | If values is not a list or numpy array. |
-
-### datachart.utils.stats.kurtosis
-
-```
-kurtosis(values: List[Union[int, float]]) -> float
-```
-
-Calculates the excess kurtosis of the values.
-
-Kurtosis measures how heavy the tails of the distribution are compared to a normal distribution, which scores zero: positive for heavier tails and sharper peaks, negative for lighter tails and flatter shapes.
-
-Added in Unreleased
-
-Examples:
-
-```
->>> from datachart.utils.stats import kurtosis
->>> kurtosis([1, 2, 3, 4, 5])
--1.3
-```
-
-| PARAMETER | DESCRIPTION                                             |
-| --------- | ------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]` |
-
-| RETURNS | DESCRIPTION                                                         |
-| ------- | ------------------------------------------------------------------- |
-| `float` | The excess kurtosis of the values; nan for fewer than two values or |
-| `float` | a constant list.                                                    |
-
-| RAISES      | DESCRIPTION                             |
-| ----------- | --------------------------------------- |
-| `TypeError` | If values is not a list or numpy array. |
+## Trend Line
 
 ### datachart.utils.stats.linear_fit
 
 ```
 linear_fit(
-    x: List[Union[int, float]], y: List[Union[int, float]]
-) -> Tuple[float, float, float]
+    x: list[int | float], y: list[int | float]
+) -> tuple[float, float, float]
 ```
 
 Fits a straight line to the (x, y) points.
@@ -497,35 +493,37 @@ Examples:
 (2.0, 1.0, 1.0)
 ```
 
-| PARAMETER | DESCRIPTION                                                                          |
-| --------- | ------------------------------------------------------------------------------------ |
-| `x`       | The x values of the points, numeric or temporal. **TYPE:** `List[Union[int, float]]` |
-| `y`       | The y values of the points, one per x value. **TYPE:** `List[Union[int, float]]`     |
+| PARAMETER | DESCRIPTION                                                            |
+| --------- | ---------------------------------------------------------------------- |
+| `x`       | The x values of the points, numeric or temporal. **TYPE:** \`list\[int |
+| `y`       | The y values of the points, one per x value. **TYPE:** \`list\[int     |
 
 | RETURNS                      | DESCRIPTION                                                       |
 | ---------------------------- | ----------------------------------------------------------------- |
 | `float`                      | The (slope, intercept, r2) of the fitted line, the slope per day  |
 | `float`                      | for a temporal x; all nan for fewer than two points or a constant |
 | `float`                      | x, and r2 alone nan for a constant y, which leaves no             |
-| `Tuple[float, float, float]` | variation to explain.                                             |
+| `tuple[float, float, float]` | variation to explain.                                             |
 
 | RAISES       | DESCRIPTION                                                                     |
 | ------------ | ------------------------------------------------------------------------------- |
 | `TypeError`  | If x or y is not a list or numpy array, or x mixes temporal and numeric values. |
 | `ValueError` | If x and y have different lengths.                                              |
 
+## Confidence Intervals
+
 ### datachart.utils.stats.bootstrap_ci
 
 ```
 bootstrap_ci(
-    values: List[Union[int, float]],
+    values: list[int | float],
     statistic: Callable[
         [List[Union[int, float]]], float
     ] = mean,
     level: float = 0.95,
     n_resamples: int = 1000,
-    seed: Optional[Union[int, np.random.Generator]] = None,
-) -> Tuple[float, float]
+    seed: int | np.random.Generator | None = None,
+) -> tuple[float, float]
 ```
 
 Estimates a confidence interval of a statistic by bootstrapping.
@@ -545,13 +543,13 @@ True
 True
 ```
 
-| PARAMETER     | DESCRIPTION                                                                                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `values`      | The list of values. **TYPE:** `List[Union[int, float]]`                                                                                               |
-| `statistic`   | The function of the values to estimate, mean by default. **TYPE:** `Callable[[List[Union[int, float]]], float]` **DEFAULT:** `mean`                   |
-| `level`       | The confidence level, strictly between 0 and 1. **TYPE:** `float` **DEFAULT:** `0.95`                                                                 |
-| `n_resamples` | The number of resamples to draw. **TYPE:** `int` **DEFAULT:** `1000`                                                                                  |
-| `seed`        | An integer or numpy.random.Generator that makes the resamples reproducible. **TYPE:** `Optional[Union[int, np.random.Generator]]` **DEFAULT:** `None` |
+| PARAMETER     | DESCRIPTION                                                                                                                         |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `values`      | The list of values. **TYPE:** \`list\[int                                                                                           |
+| `statistic`   | The function of the values to estimate, mean by default. **TYPE:** `Callable[[List[Union[int, float]]], float]` **DEFAULT:** `mean` |
+| `level`       | The confidence level, strictly between 0 and 1. **TYPE:** `float` **DEFAULT:** `0.95`                                               |
+| `n_resamples` | The number of resamples to draw. **TYPE:** `int` **DEFAULT:** `1000`                                                                |
+| `seed`        | An integer or numpy.random.Generator that makes the resamples reproducible. **TYPE:** \`int                                         |
 
 | RETURNS | DESCRIPTION                                                     |
 | ------- | --------------------------------------------------------------- |
@@ -563,13 +561,15 @@ True
 | `TypeError`  | If values is not a list or numpy array.                         |
 | `ValueError` | If level is not between 0 and 1 or n_resamples is not positive. |
 
+## Binning
+
 ### datachart.utils.stats.histogram
 
 ```
 histogram(
-    values: List[Union[int, float]],
-    bins: Union[str, int, List[Union[int, float]]] = "auto",
-) -> Tuple[List[int], List[float]]
+    values: list[int | float],
+    bins: str | int | list[int | float] = "auto",
+) -> tuple[list[int], list[float]]
 ```
 
 Bins the values into histogram counts and edges.
@@ -586,27 +586,29 @@ Examples:
 ([1, 2, 4], [1.0, 2.0, 3.0, 4.0])
 ```
 
-| PARAMETER | DESCRIPTION                                                                                                                           |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]`                                                                               |
-| `bins`    | A bin rule name, a number of bins, or a list of bin edges. **TYPE:** `Union[str, int, List[Union[int, float]]]` **DEFAULT:** `'auto'` |
+| PARAMETER | DESCRIPTION                                                                |
+| --------- | -------------------------------------------------------------------------- |
+| `values`  | The list of values. **TYPE:** \`list\[int                                  |
+| `bins`    | A bin rule name, a number of bins, or a list of bin edges. **TYPE:** \`str |
 
 | RETURNS       | DESCRIPTION                                                     |
 | ------------- | --------------------------------------------------------------- |
-| `List[int]`   | The (counts, edges) lists, with one more edge than counts; both |
-| `List[float]` | empty for an empty list.                                        |
+| `list[int]`   | The (counts, edges) lists, with one more edge than counts; both |
+| `list[float]` | empty for an empty list.                                        |
 
 | RAISES       | DESCRIPTION                             |
 | ------------ | --------------------------------------- |
 | `TypeError`  | If values is not a list or numpy array. |
 | `ValueError` | If the bin rule is unknown.             |
 
+## Smoothing
+
 ### datachart.utils.stats.rolling_mean
 
 ```
 rolling_mean(
-    values: List[Union[int, float]], window: int
-) -> List[float]
+    values: list[int | float], window: int
+) -> list[float]
 ```
 
 Smooths the values with a trailing moving average.
@@ -625,12 +627,12 @@ Examples:
 
 | PARAMETER | DESCRIPTION                                                |
 | --------- | ---------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]`    |
+| `values`  | The list of values. **TYPE:** \`list\[int                  |
 | `window`  | The number of values averaged, at least 1. **TYPE:** `int` |
 
 | RETURNS       | DESCRIPTION                               |
 | ------------- | ----------------------------------------- |
-| `List[float]` | The smoothed values, one per input value. |
+| `list[float]` | The smoothed values, one per input value. |
 
 | RAISES       | DESCRIPTION                                                              |
 | ------------ | ------------------------------------------------------------------------ |
@@ -641,8 +643,8 @@ Examples:
 
 ```
 ewma(
-    values: List[Union[int, float]], alpha: float
-) -> List[float]
+    values: list[int | float], alpha: float
+) -> list[float]
 ```
 
 Smooths the values with an exponentially weighted moving average.
@@ -661,12 +663,12 @@ Examples:
 
 | PARAMETER | DESCRIPTION                                                    |
 | --------- | -------------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** `List[Union[int, float]]`        |
+| `values`  | The list of values. **TYPE:** \`list\[int                      |
 | `alpha`   | The weight of the current value, in (0, 1\]. **TYPE:** `float` |
 
 | RETURNS       | DESCRIPTION                               |
 | ------------- | ----------------------------------------- |
-| `List[float]` | The smoothed values, one per input value. |
+| `list[float]` | The smoothed values, one per input value. |
 
 | RAISES       | DESCRIPTION                             |
 | ------------ | --------------------------------------- |
@@ -677,10 +679,10 @@ Examples:
 
 ```
 loess(
-    x: List[Union[int, float]],
-    y: List[Union[int, float]],
+    x: list[int | float],
+    y: list[int | float],
     frac: float = 0.3,
-) -> List[Dict[str, float]]
+) -> list[dict[str, float]]
 ```
 
 Smooths the (x, y) points with a locally weighted linear fit.
@@ -700,40 +702,40 @@ Examples:
 
 | PARAMETER | DESCRIPTION                                                                                   |
 | --------- | --------------------------------------------------------------------------------------------- |
-| `x`       | The x values of the points, numeric or temporal. **TYPE:** `List[Union[int, float]]`          |
-| `y`       | The y values of the points, one per x value. **TYPE:** `List[Union[int, float]]`              |
+| `x`       | The x values of the points, numeric or temporal. **TYPE:** \`list\[int                        |
+| `y`       | The y values of the points, one per x value. **TYPE:** \`list\[int                            |
 | `frac`    | The share of the points each local fit uses, in (0, 1\]. **TYPE:** `float` **DEFAULT:** `0.3` |
 
 | RETURNS                  | DESCRIPTION                                                    |
 | ------------------------ | -------------------------------------------------------------- |
-| `List[Dict[str, float]]` | The {x, y} points of the smoothed curve, sorted by x; the y is |
-| `List[Dict[str, float]]` | nan for fewer than two points.                                 |
+| `list[dict[str, float]]` | The {x, y} points of the smoothed curve, sorted by x; the y is |
+| `list[dict[str, float]]` | nan for fewer than two points.                                 |
 
 | RAISES       | DESCRIPTION                                                                     |
 | ------------ | ------------------------------------------------------------------------------- |
 | `TypeError`  | If x or y is not a list or numpy array, or x mixes temporal and numeric values. |
 | `ValueError` | If x and y have different lengths or frac is not in (0, 1\].                    |
 
+## Density Estimates
+
 ### datachart.utils.stats.kde1d
 
 ```
 kde1d(
-    values: List[Union[int, float]],
+    values: list[int | float],
     *,
-    bandwidth: Optional[
-        Union[BANDWIDTH, str, float]
-    ] = None,
+    bandwidth: BANDWIDTH | str | float | None = None,
     gridsize: int = 100,
     cut: float = 3,
-    xlim: Optional[Tuple[float, float]] = None
-) -> List[Dict[str, float]]
+    xlim: tuple[float, float] | None = None
+) -> list[dict[str, float]]
 ```
 
 Estimates the density of the values as a curve.
 
 A Gaussian kernel density estimate evaluated on `gridsize` evenly spaced points over the range of the values, extended by `cut` bandwidths on each side so the curve tails off instead of being clipped at the extremes, or over an explicit `xlim` so several curves share one grid. The result is a list of `{x, y}` points ready for `LineChart`; the curve integrates to 1, so it overlays a density `Histogram` of the same values.
 
-Added in 0.9.0
+Added in v0.9.0
 
 Examples:
 
@@ -746,17 +748,17 @@ Examples:
 0.94
 ```
 
-| PARAMETER   | DESCRIPTION                                                                                                                                                                  |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `values`    | The values to estimate the density of. **TYPE:** `List[Union[int, float]]`                                                                                                   |
-| `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** `Optional[Union[BANDWIDTH, str, float]]` **DEFAULT:** `None` |
-| `gridsize`  | The number of points the curve is evaluated on. **TYPE:** `int` **DEFAULT:** `100`                                                                                           |
-| `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                                                                 |
-| `xlim`      | The (min, max) range of the grid; overrides the padded range. **TYPE:** `Optional[Tuple[float, float]]` **DEFAULT:** `None`                                                  |
+| PARAMETER   | DESCRIPTION                                                                                                                 |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `values`    | The values to estimate the density of. **TYPE:** \`list\[int                                                                |
+| `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH |
+| `gridsize`  | The number of points the curve is evaluated on. **TYPE:** `int` **DEFAULT:** `100`                                          |
+| `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                |
+| `xlim`      | The (min, max) range of the grid; overrides the padded range. **TYPE:** \`tuple[float, float]                               |
 
 | RETURNS                  | DESCRIPTION                             |
 | ------------------------ | --------------------------------------- |
-| `List[Dict[str, float]]` | The {x, y} points of the density curve. |
+| `list[dict[str, float]]` | The {x, y} points of the density curve. |
 
 | RAISES       | DESCRIPTION                                                                             |
 | ------------ | --------------------------------------------------------------------------------------- |
@@ -766,24 +768,22 @@ Examples:
 
 ```
 kde2d(
-    x: List[Union[int, float]],
-    y: List[Union[int, float]],
+    x: list[int | float],
+    y: list[int | float],
     *,
-    bandwidth: Optional[
-        Union[BANDWIDTH, str, float]
-    ] = None,
-    gridsize: Union[int, Tuple[int, int]] = 100,
+    bandwidth: BANDWIDTH | str | float | None = None,
+    gridsize: int | tuple[int, int] = 100,
     cut: float = 3,
-    xlim: Optional[Tuple[Any, Any]] = None,
-    ylim: Optional[Tuple[float, float]] = None
-) -> Dict[str, List]
+    xlim: tuple[Any, Any] | None = None,
+    ylim: tuple[float, float] | None = None
+) -> dict[str, list]
 ```
 
 Estimates the density of the (x, y) points as a gridded surface.
 
 A Gaussian kernel density estimate evaluated on a `gridsize` × `gridsize` grid over the range of the points, extended by `cut` bandwidths on each side so the outer contours close instead of being clipped, or over explicit `xlim`/`ylim` so several surfaces share one grid. The result is an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of a scattered dataset is `ContourChart(kde2d(x, y))`. A temporal `x` (dates, datetimes, or `datetime64`) gives a grid of datetime `x` values, in the input's zone, and `xlim` may then be a pair of datetimes.
 
-Added in 0.9.0
+Added in v0.9.0
 
 Examples:
 
@@ -796,19 +796,19 @@ Examples:
 [[0.075, 0.038, 0.001], [0.001, 0.038, 0.075]]
 ```
 
-| PARAMETER   | DESCRIPTION                                                                                                                                                                  |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `x`         | The x values of the points, numeric or temporal. **TYPE:** `List[Union[int, float]]`                                                                                         |
-| `y`         | The y values of the points, one per x value. **TYPE:** `List[Union[int, float]]`                                                                                             |
-| `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** `Optional[Union[BANDWIDTH, str, float]]` **DEFAULT:** `None` |
-| `gridsize`  | The number of grid columns and rows, as one number or an (x, y) pair. **TYPE:** `Union[int, Tuple[int, int]]` **DEFAULT:** `100`                                             |
-| `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                                                                 |
-| `xlim`      | The (min, max) x range of the grid; overrides the padded range. **TYPE:** `Optional[Tuple[Any, Any]]` **DEFAULT:** `None`                                                    |
-| `ylim`      | The (min, max) y range of the grid; overrides the padded range. **TYPE:** `Optional[Tuple[float, float]]` **DEFAULT:** `None`                                                |
+| PARAMETER   | DESCRIPTION                                                                                                                 |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `x`         | The x values of the points, numeric or temporal. **TYPE:** \`list\[int                                                      |
+| `y`         | The y values of the points, one per x value. **TYPE:** \`list\[int                                                          |
+| `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH |
+| `gridsize`  | The number of grid columns and rows, as one number or an (x, y) pair. **TYPE:** \`int                                       |
+| `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                |
+| `xlim`      | The (min, max) x range of the grid; overrides the padded range. **TYPE:** \`tuple[Any, Any]                                 |
+| `ylim`      | The (min, max) y range of the grid; overrides the padded range. **TYPE:** \`tuple[float, float]                             |
 
 | RETURNS           | DESCRIPTION                                      |
 | ----------------- | ------------------------------------------------ |
-| `Dict[str, List]` | The {x, y, z} chart dict of the density surface. |
+| `dict[str, list]` | The {x, y, z} chart dict of the density surface. |
 
 | RAISES       | DESCRIPTION                                                                                                       |
 | ------------ | ----------------------------------------------------------------------------------------------------------------- |

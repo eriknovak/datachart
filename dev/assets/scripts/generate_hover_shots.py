@@ -12,6 +12,7 @@ Run from the repo root: python docs/assets/scripts/generate_hover_shots.py
 import pathlib
 import sys
 import warnings
+from datetime import date, timedelta
 
 import matplotlib
 
@@ -24,7 +25,11 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
 from datachart.charts import (
     BarChart,
     BoxPlot,
+    BumpChart,
+    CalendarHeatmap,
     ContourChart,
+    DumbbellChart,
+    GanttChart,
     Heatmap,
     HexbinChart,
     Histogram,
@@ -34,8 +39,10 @@ from datachart.charts import (
     PyramidChart,
     RadialChart,
     RaincloudPlot,
+    RidgelinePlot,
     SankeyChart,
     ScatterChart,
+    ScatterMatrix,
     StackedAreaChart,
     SwarmPlot,
     Treemap,
@@ -379,24 +386,127 @@ def treemap():
     _save(figure, "treemap")
 
 
+def bump():
+    years = [2022, 2023, 2024]
+    figure = BumpChart(
+        data=[
+            [{"x": y, "y": v} for y, v in zip(years, [71, 64, 80])],
+            [{"x": y, "y": v} for y, v in zip(years, [68, 75, 77])],
+            [{"x": y, "y": v} for y, v in zip(years, [59, 70, 62])],
+        ],
+        subtitle=["Ljubljana", "Maribor", "Celje"],
+        xlabel="Season",
+        ylabel="Rank",
+        figsize=FIGSIZE,
+    )
+    _hover(figure, figure.axes[0], 2023, 1)
+    _save(figure, "bump")
+
+
+def gantt():
+    figure = GanttChart(
+        data=[
+            {"task": "Design", "start": date(2024, 1, 1), "end": date(2024, 1, 12)},
+            {
+                "task": "Build",
+                "start": date(2024, 1, 10),
+                "end": date(2024, 2, 9),
+                "progress": 0.4,
+            },
+            {"task": "Test", "start": date(2024, 2, 5), "end": date(2024, 2, 23)},
+        ],
+        subtitle="Release plan",
+        figsize=FIGSIZE,
+    )
+    bars, _ = _target(figure, matplotlib.container.BarContainer)
+    bar = bars.patches[1]
+    _hover(
+        figure,
+        figure.axes[0],
+        bar.get_x() + bar.get_width() / 2,
+        bar.get_y() + bar.get_height() / 2,
+    )
+    _save(figure, "gantt")
+
+
+def dumbbell():
+    figure = DumbbellChart(
+        data=[
+            {"label": "Norway", "start": 79.8, "end": 83.2},
+            {"label": "Chile", "start": 77.1, "end": 81.2},
+            {"label": "India", "start": 62.5, "end": 70.9},
+        ],
+        start_name="2000",
+        end_name="2019",
+        xlabel="Life expectancy",
+        ylabel="Country",
+        figsize=FIGSIZE,
+    )
+    points, _ = _target(figure, matplotlib.collections.PathCollection)
+    _hover(figure, figure.axes[0], *points.get_offsets()[1])
+    _save(figure, "dumbbell")
+
+
+def scattermatrix():
+    figure = ScatterMatrix(
+        data={
+            "length": rng.uniform(4, 7, 30).round(1).tolist(),
+            "width": rng.uniform(2, 4, 30).round(1).tolist(),
+            "petal": rng.uniform(1, 6, 30).round(1).tolist(),
+            "species": [["a", "b"][i % 2] for i in range(30)],
+        },
+        hue="species",
+        figsize=FIGSIZE,
+    )
+    points, _ = _target(figure, matplotlib.collections.PathCollection)
+    _hover(figure, points.axes, *points.get_offsets()[4])
+    _save(figure, "scattermatrix")
+
+
+def ridgeline():
+    figure = RidgelinePlot(
+        data=GROUP_DATA, xlabel="Score", ylabel="Group", figsize=FIGSIZE
+    )
+    body, _ = _target(figure, matplotlib.collections.PolyCollection)
+    _hover(figure, figure.axes[0], float(np.median(GROUPS["Control"])), 0.05)
+    _save(figure, "ridgeline")
+
+
+def calendarheatmap():
+    days = [date(2024, 1, 1) + timedelta(days=i) for i in range(91)]
+    figure = CalendarHeatmap(
+        data={"date": days, "value": rng.integers(0, 12, 91).tolist()},
+        subtitle="Commits",
+        figsize=FIGSIZE,
+    )
+    _hover(figure, figure.axes[0], 6, 2)
+    _save(figure, "calendarheatmap")
+
+
 def main():
     for shot in (
         line,
         stackedarea,
+        bump,
         bar,
         pyramid,
+        gantt,
+        dumbbell,
         radial,
         histogram,
         box,
         violin,
         swarm,
         raincloud,
+        ridgeline,
         scatter,
         heatmap,
+        calendarheatmap,
         contour,
         hexbin,
         parallelcoords,
         network,
+        scattermatrix,
         sankey,
         treemap,
     ):

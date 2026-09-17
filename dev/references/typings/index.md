@@ -4,104 +4,75 @@
 
 Module containing the `typings`.
 
-The `typings` module contains the typings for all chart components. The module is intended to contain the typings for easier input value format checkup.
+The `typings` module holds the dictionary contracts of the package: the records a chart's `data` takes, the settings passed beside it (reference lines and bands, texts, legend, emphasis rule, colorbar), and the style keys a chart's `style` and the theme accept. A per-chart contract is documented on that chart's reference page; the shared ones on the typings page.
 
-| CLASS                             | DESCRIPTION                                                     |
-| --------------------------------- | --------------------------------------------------------------- |
-| `VLineSettingAttrs`               | The per-figure vertical reference line setting.                 |
-| `HLineSettingAttrs`               | The per-figure horizontal reference line setting.               |
-| `VSpanSettingAttrs`               | The per-figure vertical reference band setting.                 |
-| `HSpanSettingAttrs`               | The per-figure horizontal reference band setting.               |
-| `TextSettingAttrs`                | The per-figure text annotation setting.                         |
-| `LineSingleChartAttrs`            | The single chart attributes for the line chart.                 |
-| `LineDataPointAttrs`              | The data point attributes for the line chart.                   |
-| `StackedAreaSingleChartAttrs`     | The single chart attributes for the stacked area chart.         |
-| `BumpSingleChartAttrs`            | The single chart attributes for the bump chart.                 |
-| `SankeySingleChartAttrs`          | The single chart attributes for the Sankey chart.               |
-| `SankeyLinkAttrs`                 | The link record attributes for the Sankey chart.                |
-| `TreemapSingleChartAttrs`         | The single chart attributes for the treemap.                    |
-| `TreemapRecordAttrs`              | The record attributes for the treemap.                          |
-| `NetworkSingleChartAttrs`         | The single chart attributes for the network chart.              |
-| `NetworkNodeAttrs`                | The node record attributes for the network chart.               |
-| `NetworkEdgeAttrs`                | The edge record attributes for the network chart.               |
-| `BarSingleChartAttrs`             | The single chart attributes for the bar chart.                  |
-| `BarDataPointAttrs`               | The data point attributes for the bar chart.                    |
-| `HistogramSingleChartAttrs`       | The single chart attributes for the histogram chart.            |
-| `HistDataPointAttrs`              | The data point attributes for the histogram chart.              |
-| `HeatmapSingleChartAttrs`         | The single chart attributes for the heatmap chart.              |
-| `HeatmapDataAttrs`                | The data attributes for the heatmap chart.                      |
-| `ColorbarSettingAttrs`            | The per-figure colorbar setting.                                |
-| `CalendarHeatmapSingleChartAttrs` | The single chart attributes for the calendar heatmap.           |
-| `CalendarHeatmapDataAttrs`        | The data attributes for the calendar heatmap.                   |
-| `GanttSingleChartAttrs`           | The single chart attributes for the gantt chart.                |
-| `GanttTaskAttrs`                  | The task record attributes for the gantt chart.                 |
-| `DumbbellSingleChartAttrs`        | The single chart attributes for the dumbbell chart.             |
-| `DumbbellRecordAttrs`             | The record attributes for the dumbbell chart.                   |
-| `ContourSingleChartAttrs`         | The single chart attributes for the contour chart.              |
-| `ContourDataAttrs`                | The data attributes for the contour chart.                      |
-| `HexbinSingleChartAttrs`          | The single chart attributes for the hexbin chart.               |
-| `HexbinDataAttrs`                 | The data attributes for the hexbin chart.                       |
-| `ScatterSingleChartAttrs`         | The single chart attributes for the scatter chart.              |
-| `ScatterDataPointAttrs`           | The data point attributes for the scatter chart.                |
-| `BoxSingleChartAttrs`             | The single chart attributes for the box plot.                   |
-| `BoxDataPointAttrs`               | The data point attributes for the box plot.                     |
-| `SwarmSingleChartAttrs`           | The single chart attributes for the swarm plot.                 |
-| `SwarmDataPointAttrs`             | The data point attributes for the swarm plot.                   |
-| `ViolinSingleChartAttrs`          | The single chart attributes for the violin plot.                |
-| `ViolinDataPointAttrs`            | The data point attributes for the violin plot.                  |
-| `RaincloudSingleChartAttrs`       | The single chart attributes for the raincloud plot.             |
-| `RaincloudDataPointAttrs`         | The data point attributes for the raincloud plot.               |
-| `RidgelineSingleChartAttrs`       | The single chart attributes for the ridgeline plot.             |
-| `RidgelineDataPointAttrs`         | The data point attributes for the ridgeline plot.               |
-| `ParallelCoordsSingleChartAttrs`  | The single chart attributes for the parallel coordinates chart. |
-| `ParallelCoordsDataPointAttrs`    | The data point attributes for the parallel coordinates chart.   |
-| `ScatterMatrixDataPointAttrs`     | The record attributes for the scatter matrix.                   |
-| `RadialSingleChartAttrs`          | The single chart attributes for the radial chart.               |
-| `RadialDataPointAttrs`            | The data point attributes for the radial chart.                 |
-| `StyleAttrs`                      | The style typing.                                               |
-| `ColorStyleAttrs`                 | The typing for the general color style.                         |
-| `FontStyleAttrs`                  | The typing for the font style.                                  |
-| `AxesStyleAttrs`                  | The typing for the axes style.                                  |
-| `LegendStyleAttrs`                | The typing for the legend style.                                |
-| `LegendSettingAttrs`              | The per-figure legend setting.                                  |
-| `EmphasisRuleAttrs`               | The emphasis rule setting.                                      |
-| `AreaStyleAttrs`                  | The typing for the area style.                                  |
-| `GridStyleAttrs`                  | The typing for the grid style.                                  |
-| `LineStyleAttrs`                  | The typing for the line style.                                  |
-| `StackedAreaStyleAttrs`           | The typing for the stacked area chart style.                    |
-| `BumpStyleAttrs`                  | The typing for the bump chart style.                            |
-| `SankeyStyleAttrs`                | The typing for the Sankey chart style.                          |
-| `TreemapStyleAttrs`               | The typing for the treemap style.                               |
-| `NetworkStyleAttrs`               | The typing for the network chart style.                         |
-| `BarStyleAttrs`                   | The typing for the bar style.                                   |
-| `HistStyleAttrs`                  | The typing for the histogram style.                             |
-| `VLineStyleAttrs`                 | The typing for the vertical line style.                         |
-| `HLineStyleAttrs`                 | The typing for the horizontal line style.                       |
-| `VSpanStyleAttrs`                 | The typing for the vertical reference band style.               |
-| `HSpanStyleAttrs`                 | The typing for the horizontal reference band style.             |
-| `TextStyleAttrs`                  | The typing for the text annotation style.                       |
-| `HeatmapStyleAttrs`               | The typing for the heatmap style.                               |
-| `CalendarHeatmapStyleAttrs`       | The typing for the calendar heatmap style.                      |
-| `GanttStyleAttrs`                 | The typing for the gantt chart style.                           |
-| `DumbbellStyleAttrs`              | The typing for the dumbbell chart style.                        |
-| `ContourStyleAttrs`               | The typing for the contour chart style.                         |
-| `HexbinStyleAttrs`                | The typing for the hexbin chart style.                          |
-| `ScatterStyleAttrs`               | The typing for the scatter chart style.                         |
-| `RegressionStyleAttrs`            | The typing for the regression line style.                       |
-| `BoxStyleAttrs`                   | The typing for the box plot style.                              |
-| `SwarmStyleAttrs`                 | The typing for the swarm plot style.                            |
-| `ViolinStyleAttrs`                | The typing for the violin plot style.                           |
-| `RaincloudStyleAttrs`             | The typing for the raincloud plot style.                        |
-| `RidgelineStyleAttrs`             | The typing for the ridgeline plot style.                        |
-| `ParallelCoordsStyleAttrs`        | The typing for the parallel coordinates chart style.            |
-| `ScatterMatrixStyleAttrs`         | The typing for the scatter matrix style.                        |
-| `ThemeDefaultAttrs`               | The typing for theme-driven defaults and cycles.                |
+## Typings by Chart
 
-## Chart Typings
+The records a chart's `data` takes and the keys its `style` accepts are documented on the chart's own reference page, next to the function that reads them.
 
-### Common Chart Typings
+### Trends and Comparisons
 
-#### datachart.typings.VLineSettingAttrs
+| Chart                                                                                                     | Shows                                                                    | Data                                                                                                                                                  | Style                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [LineChart](https://eriknovak.github.io/datachart/dev/references/charts/linechart/index.md)               | A value along an ordered axis, one line per series.                      | [`LineDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineDataPointAttrs)                   | [`LineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                                              |
+| [StackedAreaChart](https://eriknovak.github.io/datachart/dev/references/charts/stackedareachart/index.md) | Parts of a total along an ordered axis, filled on top of each other.     | [`LineDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineDataPointAttrs)                   | [`StackedAreaStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/stackedareachart/#datachart.typings.StackedAreaStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                         |
+| [BumpChart](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/index.md)               | Rank over time, one line per series.                                     | [`LineDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineDataPointAttrs)                   | [`BumpStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/#datachart.typings.BumpStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                                              |
+| [BarChart](https://eriknovak.github.io/datachart/dev/references/charts/barchart/index.md)                 | A value per category as bars; series grouped, stacked, or overlaid.      | [`BarDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarDataPointAttrs)                      | [`BarStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                                                 |
+| [PyramidChart](https://eriknovak.github.io/datachart/dev/references/charts/pyramidchart/index.md)         | Two series as horizontal bars mirrored around a shared category axis.    | [`BarDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarDataPointAttrs)                      | [`BarStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                                                 |
+| [RadialChart](https://eriknovak.github.io/datachart/dev/references/charts/radialchart/index.md)           | Series on polar axes, as a radar line, an area, bars, or a histogram.    | [`RadialDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/radialchart/#datachart.typings.RadialDataPointAttrs)             | [`LineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineStyleAttrs), [`BarStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarStyleAttrs), [`HistStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/histogram/#datachart.typings.HistStyleAttrs), [`ScatterStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterStyleAttrs) |
+| [CalendarHeatmap](https://eriknovak.github.io/datachart/dev/references/charts/calendarheatmap/index.md)   | One colored cell per day, weeks as columns and weekdays as rows.         | [`CalendarHeatmapDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/calendarheatmap/#datachart.typings.CalendarHeatmapDataAttrs) | [`CalendarHeatmapStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/calendarheatmap/#datachart.typings.CalendarHeatmapStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                  |
+| [GanttChart](https://eriknovak.github.io/datachart/dev/references/charts/ganttchart/index.md)             | A schedule: one bar per task from its start to its end over a date axis. | [`GanttTaskAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/ganttchart/#datachart.typings.GanttTaskAttrs)                          | [`GanttStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/ganttchart/#datachart.typings.GanttStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                                           |
+| [DumbbellChart](https://eriknovak.github.io/datachart/dev/references/charts/dumbbellchart/index.md)       | Two values per category, a dot at each and a connector between them.     | [`DumbbellRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/dumbbellchart/#datachart.typings.DumbbellRecordAttrs)             | [`DumbbellStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/dumbbellchart/#datachart.typings.DumbbellStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                                  |
+
+### Distributions
+
+| Chart                                                                                               | Shows                                                        | Data                                                                                                                                              | Style                                                                                                                                     |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| [Histogram](https://eriknovak.github.io/datachart/dev/references/charts/histogram/index.md)         | The distribution of one numeric variable, binned.            | [`HistDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/histogram/#datachart.typings.HistDataPointAttrs)               | [`HistStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/histogram/#datachart.typings.HistStyleAttrs)               |
+| [BoxPlot](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/index.md)             | Median, quartiles, whiskers, and outliers per group.         | [`BoxDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.typings.BoxDataPointAttrs)                   | [`BoxStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.typings.BoxStyleAttrs)                   |
+| [ViolinPlot](https://eriknovak.github.io/datachart/dev/references/charts/violinplot/index.md)       | The density profile of each group's distribution.            | [`ViolinDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/violinplot/#datachart.typings.ViolinDataPointAttrs)          | [`ViolinStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/violinplot/#datachart.typings.ViolinStyleAttrs)          |
+| [SwarmPlot](https://eriknovak.github.io/datachart/dev/references/charts/swarmplot/index.md)         | Every observation as a point, spread within its group.       | [`SwarmDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/swarmplot/#datachart.typings.SwarmDataPointAttrs)             | [`SwarmStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/swarmplot/#datachart.typings.SwarmStyleAttrs)             |
+| [RaincloudPlot](https://eriknovak.github.io/datachart/dev/references/charts/raincloudplot/index.md) | A half violin, the raw points, and a box per group.          | [`RaincloudDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/raincloudplot/#datachart.typings.RaincloudDataPointAttrs) | [`RaincloudStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/raincloudplot/#datachart.typings.RaincloudStyleAttrs) |
+| [RidgelinePlot](https://eriknovak.github.io/datachart/dev/references/charts/ridgelineplot/index.md) | One density ridge per group, stacked and partly overlapping. | [`RidgelineDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/ridgelineplot/#datachart.typings.RidgelineDataPointAttrs) | [`RidgelineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/ridgelineplot/#datachart.typings.RidgelineStyleAttrs) |
+
+### Relationships
+
+| Chart                                                                                                 | Shows                                                                        | Data                                                                                                                                                         | Style                                                                                                                                                |
+| ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/index.md)     | One point per observation, placed by two numeric variables.                  | [`ScatterDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterDataPointAttrs)                 | [`ScatterStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterStyleAttrs)                 |
+| [Heatmap](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/index.md)               | A two-dimensional matrix as colored cells.                                   | [`HeatmapDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/#datachart.typings.HeatmapDataAttrs)                                | [`HeatmapStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/#datachart.typings.HeatmapStyleAttrs)                      |
+| [ContourChart](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/index.md)     | A surface sampled on a grid, as iso-lines or filled bands.                   | [`ContourDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/#datachart.typings.ContourDataAttrs)                           | [`ContourStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/#datachart.typings.ContourStyleAttrs)                 |
+| [HexbinChart](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/index.md)       | Point density on the plane, as colored hexagons.                             | [`HexbinDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.typings.HexbinDataAttrs)                              | [`HexbinStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.typings.HexbinStyleAttrs)                    |
+| [ParallelCoords](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/index.md) | Each record as a polyline across one axis per dimension.                     | [`ParallelCoordsDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.typings.ParallelCoordsDataPointAttrs) | [`ParallelCoordsStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.typings.ParallelCoordsStyleAttrs) |
+| [NetworkChart](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/index.md)     | Nodes joined by edges, placed by a layout.                                   | [`NetworkSingleChartAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/#datachart.typings.NetworkSingleChartAttrs)             | [`NetworkStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/#datachart.typings.NetworkStyleAttrs)                 |
+| [ScatterMatrix](https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/index.md)   | A scatter chart for every pair of dimensions, distributions on the diagonal. | [`ScatterMatrixDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/#datachart.typings.ScatterMatrixDataPointAttrs)    | [`StyleAttrs`](#datachart.typings.StyleAttrs)                                                                                                        |
+
+### Flows
+
+| Chart                                                                                           | Shows                                                               | Data                                                                                                                                          | Style                                                                                                                             |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| [SankeyChart](https://eriknovak.github.io/datachart/dev/references/charts/sankeychart/index.md) | Weighted flows between categories, as ribbons between node columns. | [`SankeySingleChartAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/sankeychart/#datachart.typings.SankeySingleChartAttrs) | [`SankeyStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/sankeychart/#datachart.typings.SankeyStyleAttrs) |
+
+### Part of a Whole
+
+| Chart                                                                                   | Shows                                                   | Data                                                                                                                                        | Style                                                                                                                           |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| [Treemap](https://eriknovak.github.io/datachart/dev/references/charts/treemap/index.md) | Part-of-whole data as nested rectangles sized by value. | [`TreemapSingleChartAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/treemap/#datachart.typings.TreemapSingleChartAttrs) | [`TreemapStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/treemap/#datachart.typings.TreemapStyleAttrs) |
+
+## Settings
+
+The dictionaries a chart takes beside its data: reference lines and bands, text annotations, the legend, the emphasis rule, and the colorbar. Each is a parameter of the chart function, and a field left out or set to `None` falls back to the theme.
+
+| I want to…                                    | Pass               | As                                                                                                                       |
+| --------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| mark a value on the x or y axis               | `vlines`, `hlines` | [`VLineSettingAttrs`](#datachart.typings.VLineSettingAttrs), [`HLineSettingAttrs`](#datachart.typings.HLineSettingAttrs) |
+| shade a range of the x or y axis              | `vspans`, `hspans` | [`VSpanSettingAttrs`](#datachart.typings.VSpanSettingAttrs), [`HSpanSettingAttrs`](#datachart.typings.HSpanSettingAttrs) |
+| write a note on the chart                     | `texts`            | [`TextSettingAttrs`](#datachart.typings.TextSettingAttrs)                                                                |
+| title, place, or lay out the legend           | `legend`           | [`LegendSettingAttrs`](#datachart.typings.LegendSettingAttrs)                                                            |
+| highlight the series or marks matching a rule | `emphasis_rule`    | [`EmphasisRuleAttrs`](#datachart.typings.EmphasisRuleAttrs)                                                              |
+| place or format the colorbar                  | `colorbar`         | [`ColorbarSettingAttrs`](#datachart.typings.ColorbarSettingAttrs)                                                        |
+
+### datachart.typings.VLineSettingAttrs
 
 Bases: `TypedDict`
 
@@ -111,15 +82,15 @@ Added in Unreleased
 
 The name `VLineSettingAttrs`; `VLinePlotAttrs` is deprecated.
 
-| ATTRIBUTE | DESCRIPTION                                                                  |
-| --------- | ---------------------------------------------------------------------------- |
-| `x`       | The x-axis position of the line. **TYPE:** `Union[int, float]`               |
-| `ymin`    | The minimum y-axis position value. **TYPE:** `Union[int, float, None]`       |
-| `ymax`    | The maximum y-axis position value. **TYPE:** `Union[int, float, None]`       |
-| `style`   | The vertical line style attributes. **TYPE:** `Union[VLineStyleAttrs, None]` |
-| `label`   | The label of the vertical line. **TYPE:** `Union[str, None]`                 |
+| ATTRIBUTE | DESCRIPTION                                                     |
+| --------- | --------------------------------------------------------------- |
+| `x`       | The x-axis position of the line. **TYPE:** \`int                |
+| `ymin`    | The minimum y-axis position value. **TYPE:** \`int              |
+| `ymax`    | The maximum y-axis position value. **TYPE:** \`int              |
+| `style`   | The vertical line style attributes. **TYPE:** \`VLineStyleAttrs |
+| `label`   | The label of the vertical line. **TYPE:** \`str                 |
 
-#### datachart.typings.HLineSettingAttrs
+### datachart.typings.HLineSettingAttrs
 
 Bases: `TypedDict`
 
@@ -129,15 +100,15 @@ Added in Unreleased
 
 The name `HLineSettingAttrs`; `HLinePlotAttrs` is deprecated.
 
-| ATTRIBUTE | DESCRIPTION                                                                    |
-| --------- | ------------------------------------------------------------------------------ |
-| `y`       | The x-axis position of the line. **TYPE:** `Union[int, float]`                 |
-| `xmin`    | The minimum y-axis position value. **TYPE:** `Union[int, float, None]`         |
-| `xmax`    | The maximum y-axis position value. **TYPE:** `Union[int, float, None]`         |
-| `style`   | The horizontal line style attributes. **TYPE:** `Union[HLineStyleAttrs, None]` |
-| `label`   | The label of the horizontal line. **TYPE:** `Union[str, None]`                 |
+| ATTRIBUTE | DESCRIPTION                                                       |
+| --------- | ----------------------------------------------------------------- |
+| `y`       | The x-axis position of the line. **TYPE:** \`int                  |
+| `xmin`    | The minimum y-axis position value. **TYPE:** \`int                |
+| `xmax`    | The maximum y-axis position value. **TYPE:** \`int                |
+| `style`   | The horizontal line style attributes. **TYPE:** \`HLineStyleAttrs |
+| `label`   | The label of the horizontal line. **TYPE:** \`str                 |
 
-#### datachart.typings.VSpanSettingAttrs
+### datachart.typings.VSpanSettingAttrs
 
 Bases: `TypedDict`
 
@@ -147,14 +118,14 @@ A vertical band shades the region between two x-axis positions over the full hei
 
 Added in Unreleased
 
-| ATTRIBUTE | DESCRIPTION                                                                               |
-| --------- | ----------------------------------------------------------------------------------------- |
-| `xmin`    | The lower x-axis bound. Defaults to the axis minimum. **TYPE:** `Union[int, float, None]` |
-| `xmax`    | The upper x-axis bound. Defaults to the axis maximum. **TYPE:** `Union[int, float, None]` |
-| `style`   | The vertical band style attributes. **TYPE:** `Union[VSpanStyleAttrs, None]`              |
-| `label`   | The label of the band (shown in the legend). **TYPE:** `Union[str, None]`                 |
+| ATTRIBUTE | DESCRIPTION                                                           |
+| --------- | --------------------------------------------------------------------- |
+| `xmin`    | The lower x-axis bound. Defaults to the axis minimum. **TYPE:** \`int |
+| `xmax`    | The upper x-axis bound. Defaults to the axis maximum. **TYPE:** \`int |
+| `style`   | The vertical band style attributes. **TYPE:** \`VSpanStyleAttrs       |
+| `label`   | The label of the band (shown in the legend). **TYPE:** \`str          |
 
-#### datachart.typings.HSpanSettingAttrs
+### datachart.typings.HSpanSettingAttrs
 
 Bases: `TypedDict`
 
@@ -164,14 +135,14 @@ A horizontal band shades the region between two y-axis positions over the full w
 
 Added in Unreleased
 
-| ATTRIBUTE | DESCRIPTION                                                                               |
-| --------- | ----------------------------------------------------------------------------------------- |
-| `ymin`    | The lower y-axis bound. Defaults to the axis minimum. **TYPE:** `Union[int, float, None]` |
-| `ymax`    | The upper y-axis bound. Defaults to the axis maximum. **TYPE:** `Union[int, float, None]` |
-| `style`   | The horizontal band style attributes. **TYPE:** `Union[HSpanStyleAttrs, None]`            |
-| `label`   | The label of the band (shown in the legend). **TYPE:** `Union[str, None]`                 |
+| ATTRIBUTE | DESCRIPTION                                                           |
+| --------- | --------------------------------------------------------------------- |
+| `ymin`    | The lower y-axis bound. Defaults to the axis minimum. **TYPE:** \`int |
+| `ymax`    | The upper y-axis bound. Defaults to the axis maximum. **TYPE:** \`int |
+| `style`   | The horizontal band style attributes. **TYPE:** \`HSpanStyleAttrs     |
+| `label`   | The label of the band (shown in the legend). **TYPE:** \`str          |
 
-#### datachart.typings.TextSettingAttrs
+### datachart.typings.TextSettingAttrs
 
 Bases: `TypedDict`
 
@@ -181,21 +152,21 @@ Added in Unreleased
 
 The name `TextSettingAttrs`; `TextAttrs` is deprecated.
 
-| ATTRIBUTE | DESCRIPTION                                                                                                                                                                                                                                    |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `text`    | The annotation text. **TYPE:** `str`                                                                                                                                                                                                           |
-| `x`       | The x-axis position of the text. **TYPE:** `Union[int, float]`                                                                                                                                                                                 |
-| `y`       | The y-axis position of the text. **TYPE:** `Union[int, float]`                                                                                                                                                                                 |
-| `coords`  | The coordinate system of the text position: "data" (default) or "axes" (axes fraction, 0–1). **TYPE:** `Union[str, None]`                                                                                                                      |
-| `target`  | The data point the connector points to, always in data coordinates. When present, a connector is drawn from the text to the target. **TYPE:** `Union[Tuple[Union[int, float], Union[int, float]], None]`                                       |
-| `style`   | The per-text style attributes. **TYPE:** `Union[TextStyleAttrs, None]`                                                                                                                                                                         |
-| `subplot` | The 0-based index, in render order, of the subplot the text lands in. Read only by Annotate on a multi-subplot figure, where every text must name one; chart fronts target subplots with a list of lists instead. **TYPE:** `Union[int, None]` |
+| ATTRIBUTE | DESCRIPTION                                                                                                                                                                                                                       |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `text`    | The annotation text. **TYPE:** `str`                                                                                                                                                                                              |
+| `x`       | The x-axis position of the text. **TYPE:** \`int                                                                                                                                                                                  |
+| `y`       | The y-axis position of the text. **TYPE:** \`int                                                                                                                                                                                  |
+| `coords`  | The coordinate system of the text position: "data" (default) or "axes" (axes fraction, 0–1). **TYPE:** \`str                                                                                                                      |
+| `target`  | The data point the connector points to, always in data coordinates. When present, a connector is drawn from the text to the target. **TYPE:** \`tuple\[int                                                                        |
+| `style`   | The per-text style attributes. **TYPE:** \`TextStyleAttrs                                                                                                                                                                         |
+| `subplot` | The 0-based index, in render order, of the subplot the text lands in. Read only by Annotate on a multi-subplot figure, where every text must name one; chart fronts target subplots with a list of lists instead. **TYPE:** \`int |
 
 Added in Unreleased
 
 The `subplot` attribute.
 
-#### datachart.typings.LegendSettingAttrs
+### datachart.typings.LegendSettingAttrs
 
 Bases: `TypedDict`
 
@@ -205,14 +176,14 @@ Every field is optional; a `None` field falls back to the theme's `plot_legend_*
 
 Added in Unreleased
 
-| ATTRIBUTE   | DESCRIPTION                                                                                                             |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `title`     | The legend title; an empty string draws none. **TYPE:** `Union[str, None]`                                              |
-| `location`  | The legend location. An outside member places the legend beside the axes. **TYPE:** `Union[LEGEND_LOCATION, str, None]` |
-| `ncols`     | The number of legend columns. **TYPE:** `Union[int, None]`                                                              |
-| `alignment` | The legend alignment. **TYPE:** `Union[LEGEND_ALIGN, str, None]`                                                        |
+| ATTRIBUTE   | DESCRIPTION                                                                                           |
+| ----------- | ----------------------------------------------------------------------------------------------------- |
+| `title`     | The legend title; an empty string draws none. **TYPE:** \`str                                         |
+| `location`  | The legend location. An outside member places the legend beside the axes. **TYPE:** \`LEGEND_LOCATION |
+| `ncols`     | The number of legend columns. **TYPE:** \`int                                                         |
+| `alignment` | The legend alignment. **TYPE:** \`LEGEND_ALIGN                                                        |
 
-#### datachart.typings.EmphasisRuleAttrs
+### datachart.typings.EmphasisRuleAttrs
 
 Bases: `TypedDict`
 
@@ -224,203 +195,14 @@ Added in Unreleased
 
 | ATTRIBUTE | DESCRIPTION                                                                                                                                                                                       |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `above`   | Highlight values strictly above this. **TYPE:** `Union[int, float]`                                                                                                                               |
-| `below`   | Highlight values strictly below this. **TYPE:** `Union[int, float]`                                                                                                                               |
-| `between` | Highlight values within (lo, hi), both bounds inclusive. **TYPE:** `Tuple[Union[int, float], Union[int, float]]`                                                                                  |
+| `above`   | Highlight values strictly above this. **TYPE:** \`int                                                                                                                                             |
+| `below`   | Highlight values strictly below this. **TYPE:** \`int                                                                                                                                             |
+| `between` | Highlight values within (lo, hi), both bounds inclusive. **TYPE:** \`tuple\[int                                                                                                                   |
 | `top`     | Highlight the n largest values; ties keep input order. **TYPE:** `int`                                                                                                                            |
 | `bottom`  | Highlight the n smallest values; ties keep input order. **TYPE:** `int`                                                                                                                           |
 | `by`      | The summary a group or series is read by. Groups default to "median", series to "mean"; a front reading one value per unit rejects it. **TYPE:** `Literal['mean', 'median', 'min', 'max', 'sum']` |
 
-### Line Chart Typings
-
-#### datachart.typings.LineSingleChartAttrs
-
-Bases: `TypedDict`
-
-The single chart attributes for the line chart.
-
-| ATTRIBUTE     | DESCRIPTION                                                                                                    |
-| ------------- | -------------------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the line chart. **TYPE:** `List[LineDataPointAttrs]`                          |
-| `subtitle`    | The subtitle of the line chart. Also used as the label in the legend. **TYPE:** `Union[str, None]`             |
-| `xlabel`      | The xlabel of the line chart. **TYPE:** `Union[str, None]`                                                     |
-| `ylabel`      | The ylabel of the line chart. **TYPE:** `Union[str, None]`                                                     |
-| `style`       | The style of the line chart. **TYPE:** `Union[LineStyleAttrs, None]`                                           |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                                  |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `yticks`      | the ytick position list. **TYPE:** `Union[int, float, None]`                                                   |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`             |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLineSettingAttrs, List[HLineSettingAttrs], None]`           |
-| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`   |
-| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]` |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`            |
-| `x`           | The key name in data that contains the x-axis value. Defaults to "x". **TYPE:** `Union[str, None]`             |
-| `y`           | The key name in data that contains the y-axis value. Defaults to "y". **TYPE:** `Union[str, None]`             |
-| `yerr`        | The key name in data that contains the y-axis error value. Defaults to "yerr". **TYPE:** `Union[str, None]`    |
-
-#### datachart.typings.LineDataPointAttrs
-
-Bases: `TypedDict`
-
-The data point attributes for the line chart.
-
-| ATTRIBUTE | DESCRIPTION                                                     |
-| --------- | --------------------------------------------------------------- |
-| `x`       | The x-axis value. **TYPE:** `Union[int, float]`                 |
-| `y`       | The y-axis value. **TYPE:** `Union[int, float]`                 |
-| `yerr`    | The y-axis error value. **TYPE:** `Optional[Union[int, float]]` |
-
-### Bump Chart Typings
-
-#### datachart.typings.BumpSingleChartAttrs
-
-Bases: `TypedDict`
-
-The single chart attributes for the bump chart.
-
-| ATTRIBUTE     | DESCRIPTION                                                                                                                           |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining one series; y is a value ranked per period, or the rank itself. **TYPE:** `List[LineDataPointAttrs]` |
-| `subtitle`    | The subtitle of the series. Also used as its end label and legend label. **TYPE:** `Union[str, None]`                                 |
-| `xlabel`      | The xlabel of the chart. **TYPE:** `Union[str, None]`                                                                                 |
-| `ylabel`      | The ylabel of the chart. **TYPE:** `Union[str, None]`                                                                                 |
-| `style`       | The style of the series. **TYPE:** `Union[BumpStyleAttrs, None]`                                                                      |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                                                         |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                                                  |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                                                |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`                                    |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLineSettingAttrs, List[HLineSettingAttrs], None]`                                  |
-| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`                          |
-| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]`                        |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`                                   |
-| `x`           | The key name in data that contains the x-axis value. Defaults to "x". **TYPE:** `Union[str, None]`                                    |
-| `y`           | The key name in data that contains the y-axis value. Defaults to "y". **TYPE:** `Union[str, None]`                                    |
-
-### Bar Chart Typings
-
-#### datachart.typings.BarSingleChartAttrs
-
-Bases: `TypedDict`
-
-The single chart attributes for the bar chart.
-
-| ATTRIBUTE     | DESCRIPTION                                                                                                    |
-| ------------- | -------------------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the bar chart. **TYPE:** `List[BarDataPointAttrs]`                            |
-| `subtitle`    | The subtitle of the bar chart. Also used as the label in the legend. **TYPE:** `Union[str, None]`              |
-| `xlabel`      | The xlabel of the bar chart. **TYPE:** `Union[str, None]`                                                      |
-| `ylabel`      | The ylabel of the bar chart. **TYPE:** `Union[str, None]`                                                      |
-| `style`       | The style of the bar chart. **TYPE:** `Union[BarStyleAttrs, None]`                                             |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                                  |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `yticks`      | the ytick position list. **TYPE:** `Union[int, float, None]`                                                   |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`             |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLineSettingAttrs, List[HLineSettingAttrs], None]`           |
-| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`   |
-| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]` |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`            |
-| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]`          |
-| `y`           | The key name in data that contains the y-axis value. Defaults to "y". **TYPE:** `Union[str, None]`             |
-| `yerr`        | The key name in data that contains the y-axis error value. Defaults to "yerr". **TYPE:** `Union[str, None]`    |
-
-#### datachart.typings.BarDataPointAttrs
-
-Bases: `TypedDict`
-
-The data point attributes for the bar chart.
-
-| ATTRIBUTE  | DESCRIPTION                                                                                                                                |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `label`    | The label. **TYPE:** `str`                                                                                                                 |
-| `y`        | The y-axis value. **TYPE:** `Union[int, float]`                                                                                            |
-| `yerr`     | The y-axis error value. **TYPE:** `Optional[Union[int, float]]`                                                                            |
-| `emphasis` | The bar's own emphasis role ("background" or "highlight"); wins over the chart's emphasis_rule. **TYPE:** `Optional[Union[EMPHASIS, str]]` |
-
-### Histogram Typings
-
-#### datachart.typings.HistogramSingleChartAttrs
-
-Bases: `TypedDict`
-
-The single chart attributes for the histogram chart.
-
-| ATTRIBUTE     | DESCRIPTION                                                                                                    |
-| ------------- | -------------------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the histogram chart. **TYPE:** `List[HistDataPointAttrs]`                     |
-| `subtitle`    | The subtitle of the histogram chart. Also used as the label in the legend. **TYPE:** `Union[str, None]`        |
-| `xlabel`      | The xlabel of the histogram chart. **TYPE:** `Union[str, None]`                                                |
-| `ylabel`      | The ylabel of the histogram chart. **TYPE:** `Union[str, None]`                                                |
-| `style`       | The style of the histogram chart. **TYPE:** `Union[HistStyleAttrs, None]`                                      |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                                  |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `yticks`      | the ytick position list. **TYPE:** `Union[int, float, None]`                                                   |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`             |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLineSettingAttrs, List[HLineSettingAttrs], None]`           |
-| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`   |
-| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]` |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`            |
-| `x`           | The key name in data that contains the x-axis value. Defaults to "x". **TYPE:** `Union[str, None]`             |
-
-#### datachart.typings.HistDataPointAttrs
-
-Bases: `TypedDict`
-
-The data point attributes for the histogram chart.
-
-| ATTRIBUTE | DESCRIPTION                                     |
-| --------- | ----------------------------------------------- |
-| `x`       | The x-axis value. **TYPE:** `Union[int, float]` |
-
-### Heatmap Typings
-
-#### datachart.typings.HeatmapSingleChartAttrs
-
-Bases: `TypedDict`
-
-The single chart attributes for the heatmap chart.
-
-| ATTRIBUTE     | DESCRIPTION                                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------------------- |
-| `data`        | The labelled grid defining the heatmap chart. **TYPE:** `HeatmapDataAttrs`                            |
-| `subtitle`    | The subtitle of the heatmap chart. Also used as the label in the legend. **TYPE:** `Union[str, None]` |
-| `xlabel`      | The xlabel of the heatmap chart. **TYPE:** `Union[str, None]`                                         |
-| `ylabel`      | The ylabel of the heatmap chart. **TYPE:** `Union[str, None]`                                         |
-| `style`       | The style of the heatmap chart. **TYPE:** `Union[HeatmapStyleAttrs, None]`                            |
-| `norm`        | The value normalization. **TYPE:** `Union[NORMALIZE, str, None]`                                      |
-| `vmin`        | The minimum value to normalize the data points. **TYPE:** `Union[str, None]`                          |
-| `vmax`        | The maximum value to normalize the data points. **TYPE:** `Union[str, None]`                          |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                         |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                  |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                |
-| `yticks`      | the ytick position list. **TYPE:** `Union[int, float, None]`                                          |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                  |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                |
-| `colorbar`    | The colorbar setting of the heatmap. **TYPE:** `Union[ColorbarSettingAttrs, None]`                    |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`   |
-
-#### datachart.typings.HeatmapDataAttrs
-
-Bases: `TypedDict`
-
-The data attributes for the heatmap chart.
-
-| ATTRIBUTE  | DESCRIPTION                                                                                                                                                                     |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `x`        | The column labels, one per column of z. Defaults to the column indices. **TYPE:** `Union[List[Union[str, int, float]], None]`                                                   |
-| `y`        | The row labels, one per row of z. Defaults to the row indices. **TYPE:** `Union[List[Union[str, int, float]], None]`                                                            |
-| `z`        | The 2-D grid of cell values, one row per y and one column per x. **TYPE:** `List[List[Union[int, float, None]]]`                                                                |
-| `emphasis` | The per-cell emphasis roles, aligned with z ("background" or "highlight"); wins over the chart's emphasis_rule. **TYPE:** `Union[List[List[Union[EMPHASIS, str, None]]], None]` |
-
-#### datachart.typings.ColorbarSettingAttrs
+### datachart.typings.ColorbarSettingAttrs
 
 Bases: `TypedDict`
 
@@ -432,457 +214,149 @@ Added in Unreleased
 
 The `label`, `location`, `format`, and `ticks` fields, and the name `ColorbarSettingAttrs`.
 
-| ATTRIBUTE     | DESCRIPTION                                                                                                                                                                          |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `label`       | The caption beside the bar, reading along it; drawn in the font_ylabel\_\* theme font. **TYPE:** `Union[str, None]`                                                                  |
-| `location`    | The chart edge the bar sits on. **TYPE:** `Union[COLORBAR_LOCATION, str, None]`                                                                                                      |
-| `format`      | The format of the bar's tick labels, with the value named x (e.g. "{x:.0f}"). On a hexbin chart, valfmt still applies when this is unset. **TYPE:** `Union[VALUE_FORMAT, str, None]` |
-| `ticks`       | Explicit tick positions on the bar. **TYPE:** `Union[List[Union[int, float]], None]`                                                                                                 |
-| `orientation` | The orientation; derives the edge when location is unset. **TYPE:** `Union[ORIENTATION, str, None]`                                                                                  |
+| ATTRIBUTE     | DESCRIPTION                                                                                                                                                        |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `label`       | The caption beside the bar, reading along it; drawn in the font_ylabel\_\* theme font. **TYPE:** \`str                                                             |
+| `location`    | The chart edge the bar sits on. **TYPE:** \`COLORBAR_LOCATION                                                                                                      |
+| `format`      | The format of the bar's tick labels, with the value named x (e.g. "{x:.0f}"). On a hexbin chart, valfmt still applies when this is unset. **TYPE:** \`VALUE_FORMAT |
+| `ticks`       | Explicit tick positions on the bar. **TYPE:** \`list\[int                                                                                                          |
+| `orientation` | The orientation; derives the edge when location is unset. **TYPE:** \`ORIENTATION                                                                                  |
 
-### Calendar Heatmap Typings
+## Shared Style
 
-#### datachart.typings.CalendarHeatmapSingleChartAttrs
+Style groups several charts read from their `style` dictionary: the value labels `show_values` prints, the area fill, the regression line, reference lines and bands, and text annotations. A chart's reference page says which of them it draws, and every key is also a theme key.
+
+### datachart.typings.ValueLabelStyleAttrs
 
 Bases: `TypedDict`
 
-The single chart attributes for the calendar heatmap.
+The typing for the value labels: the numbers a chart prints beside its marks when `show_values` is on. One style serves every chart that takes `show_values`; the `plot_bar_value_*` keys of `BarStyleAttrs` are aliases.
 
 Added in Unreleased
 
-| ATTRIBUTE  | DESCRIPTION                                                                                              |
-| ---------- | -------------------------------------------------------------------------------------------------------- |
-| `data`     | The dated values defining the calendar. **TYPE:** `CalendarHeatmapDataAttrs`                             |
-| `subtitle` | The subtitle of the calendar; a multi-year calendar appends the year to it. **TYPE:** `Union[str, None]` |
-| `style`    | The style of the calendar. **TYPE:** `Union[CalendarHeatmapStyleAttrs, None]`                            |
-| `norm`     | The value normalization. **TYPE:** `Union[NORMALIZE, str, None]`                                         |
-| `vmin`     | The minimum value to normalize the data points. **TYPE:** `Union[float, None]`                           |
-| `vmax`     | The maximum value to normalize the data points. **TYPE:** `Union[float, None]`                           |
-| `colorbar` | The colorbar setting of the calendar. **TYPE:** `Union[ColorbarSettingAttrs, None]`                      |
-| `texts`    | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`      |
+| ATTRIBUTE               | DESCRIPTION                                                                                                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `plot_value_fontsize`   | The font size of the value labels. **TYPE:** \`int                                                                                                                             |
+| `plot_value_color`      | The color of the value labels. **TYPE:** \`str                                                                                                                                 |
+| `plot_value_padding`    | The gap between a mark and its value label, in points. **TYPE:** \`int                                                                                                         |
+| `plot_value_halo_width` | The width, in points, of the halo, in the axes face color, stroked around the value labels so they stay legible over marks and lines. None or 0 draws no halo. **TYPE:** \`int |
 
-#### datachart.typings.CalendarHeatmapDataAttrs
+### datachart.typings.AreaStyleAttrs
 
 Bases: `TypedDict`
 
-The data attributes for the calendar heatmap.
+The typing for the area style.
+
+| ATTRIBUTE             | DESCRIPTION                                          |
+| --------------------- | ---------------------------------------------------- |
+| `plot_area_alpha`     | The alpha value of the area. **TYPE:** \`float       |
+| `plot_area_color`     | The color of the area. **TYPE:** \`str               |
+| `plot_area_linewidth` | The line width of the area. **TYPE:** \`int          |
+| `plot_area_hatch`     | The hatch style of the area. **TYPE:** \`HATCH_STYLE |
+| `plot_area_zorder`    | The zorder of the area. **TYPE:** \`int              |
+
+### datachart.typings.RegressionStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for regression line style.
+
+| ATTRIBUTE                  | DESCRIPTION                                         |
+| -------------------------- | --------------------------------------------------- |
+| `plot_regression_color`    | The regression line color. **TYPE:** \`str          |
+| `plot_regression_alpha`    | The alpha of the regression line. **TYPE:** \`float |
+| `plot_regression_width`    | The line width. **TYPE:** \`int                     |
+| `plot_regression_style`    | The line style. **TYPE:** \`LINE_STYLE              |
+| `plot_regression_ci_alpha` | Confidence interval alpha. **TYPE:** \`float        |
+
+### datachart.typings.VLineStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the vertical line style.
+
+| ATTRIBUTE          | DESCRIPTION                                             |
+| ------------------ | ------------------------------------------------------- |
+| `plot_vline_color` | The color of the vertical line. **TYPE:** \`str         |
+| `plot_vline_style` | The style of the vertical line. **TYPE:** \`LINE_STYLE  |
+| `plot_vline_width` | The width of the vertical line. **TYPE:** \`int         |
+| `plot_vline_alpha` | The alpha value of the vertical line. **TYPE:** \`float |
+
+### datachart.typings.HLineStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the horizontal line style.
+
+| ATTRIBUTE          | DESCRIPTION                                               |
+| ------------------ | --------------------------------------------------------- |
+| `plot_hline_color` | The color of the horizontal line. **TYPE:** \`str         |
+| `plot_hline_style` | The style of the horizontal line. **TYPE:** \`LINE_STYLE  |
+| `plot_hline_width` | The width of the horizontal line. **TYPE:** \`int         |
+| `plot_hline_alpha` | The alpha value of the horizontal line. **TYPE:** \`float |
+
+### datachart.typings.VSpanStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the vertical reference band style.
 
 Added in Unreleased
 
-| ATTRIBUTE | DESCRIPTION                                                                                                                                                                               |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `date`    | One temporal object per day: a date, datetime, numpy.datetime64, or pandas Timestamp. Date strings are never parsed, and every date appears once. **TYPE:** `List[Union[date, datetime]]` |
-| `value`   | The value of each day, one per date; None leaves the day blank. **TYPE:** `List[Union[int, float, None]]`                                                                                 |
+| ATTRIBUTE               | DESCRIPTION                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------------ |
+| `plot_vspan_color`      | The fill color of the band. Defaults to the theme's muted color. **TYPE:** \`str           |
+| `plot_vspan_alpha`      | The alpha value of the band. **TYPE:** \`float                                             |
+| `plot_vspan_hatch`      | The hatch pattern of the band. **TYPE:** \`HATCH_STYLE                                     |
+| `plot_vspan_edge_color` | The edge color of the band; the hatch draws in it. **TYPE:** \`str                         |
+| `plot_vspan_edge_width` | The edge line width of the band. **TYPE:** \`int                                           |
+| `plot_vspan_zorder`     | The zorder of the band. Defaults to sit over the grid and under the marks. **TYPE:** \`int |
 
-### Gantt Chart Typings
-
-#### datachart.typings.GanttSingleChartAttrs
+### datachart.typings.HSpanStyleAttrs
 
 Bases: `TypedDict`
 
-The single chart attributes for the gantt chart.
+The typing for the horizontal reference band style.
 
 Added in Unreleased
 
-| ATTRIBUTE     | DESCRIPTION                                                                                                  |
-| ------------- | ------------------------------------------------------------------------------------------------------------ |
-| `data`        | The task records defining one schedule. **TYPE:** `List[GanttTaskAttrs]`                                     |
-| `subtitle`    | The subtitle of the schedule. **TYPE:** `Union[str, None]`                                                   |
-| `style`       | The style of the schedule. **TYPE:** `Union[GanttStyleAttrs, None]`                                          |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                       |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                       |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`           |
-| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]` |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`          |
+| ATTRIBUTE               | DESCRIPTION                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------------ |
+| `plot_hspan_color`      | The fill color of the band. Defaults to the theme's muted color. **TYPE:** \`str           |
+| `plot_hspan_alpha`      | The alpha value of the band. **TYPE:** \`float                                             |
+| `plot_hspan_hatch`      | The hatch pattern of the band. **TYPE:** \`HATCH_STYLE                                     |
+| `plot_hspan_edge_color` | The edge color of the band; the hatch draws in it. **TYPE:** \`str                         |
+| `plot_hspan_edge_width` | The edge line width of the band. **TYPE:** \`int                                           |
+| `plot_hspan_zorder`     | The zorder of the band. Defaults to sit over the grid and under the marks. **TYPE:** \`int |
 
-#### datachart.typings.GanttTaskAttrs
+### datachart.typings.TextStyleAttrs
 
 Bases: `TypedDict`
 
-The task record attributes for the gantt chart.
-
-Added in Unreleased
-
-| ATTRIBUTE    | DESCRIPTION                                                                                                                                                           |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `task`       | The task name, unique within the chart; the label of its row. **TYPE:** `str`                                                                                         |
-| `start`      | When the task starts: a date, datetime, numpy.datetime64, or pandas Timestamp. Date strings are never parsed. **TYPE:** `Union[date, datetime]`                       |
-| `end`        | When the task ends, of the same temporal types; never before start. A task ending when it starts is a milestone, drawn as a marker. **TYPE:** `Union[date, datetime]` |
-| `group`      | The task group; tasks of one group share a color and a legend entry. **TYPE:** `Optional[str]`                                                                        |
-| `progress`   | The fraction of the task done, in [0, 1]; drawn as an inner bar. **TYPE:** `Optional[Union[int, float]]`                                                              |
-| `depends_on` | The names of the tasks this task depends on. **TYPE:** `Optional[List[str]]`                                                                                          |
-| `emphasis`   | The task's own emphasis role ("background" or "highlight"); wins over the chart's emphasis_rule. **TYPE:** `Optional[Union[EMPHASIS, str]]`                           |
-
-### Dumbbell Chart Typings
-
-#### datachart.typings.DumbbellSingleChartAttrs
-
-Bases: `TypedDict`
-
-The single chart attributes for the dumbbell chart.
-
-Added in Unreleased
-
-| ATTRIBUTE     | DESCRIPTION                                                                                                    |
-| ------------- | -------------------------------------------------------------------------------------------------------------- |
-| `data`        | The records defining one set of dumbbells. **TYPE:** `List[DumbbellRecordAttrs]`                               |
-| `subtitle`    | The subtitle of the set. **TYPE:** `Union[str, None]`                                                          |
-| `style`       | The style of the set. **TYPE:** `Union[DumbbellStyleAttrs, None]`                                              |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`             |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLineSettingAttrs, List[HLineSettingAttrs], None]`           |
-| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`   |
-| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]` |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`            |
-
-#### datachart.typings.DumbbellRecordAttrs
-
-Bases: `TypedDict`
-
-The record attributes for the dumbbell chart.
-
-Added in Unreleased
-
-| ATTRIBUTE  | DESCRIPTION                                                                                                                                   |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `label`    | The category, unique within the chart; the label of its row (or column). **TYPE:** `str`                                                      |
-| `start`    | The value of the start endpoint. **TYPE:** `Union[int, float]`                                                                                |
-| `end`      | The value of the end endpoint. **TYPE:** `Union[int, float]`                                                                                  |
-| `emphasis` | The record's own emphasis role ("background" or "highlight"); wins over the chart's emphasis_rule. **TYPE:** `Optional[Union[EMPHASIS, str]]` |
-
-### Scatter Chart Typings
-
-#### datachart.typings.ScatterSingleChartAttrs
-
-Bases: `TypedDict`
-
-The single chart attributes for the scatter chart.
-
-| ATTRIBUTE     | DESCRIPTION                                                                                                    |
-| ------------- | -------------------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the scatter chart. **TYPE:** `List[ScatterDataPointAttrs]`                    |
-| `subtitle`    | The subtitle of the scatter chart. Also used as the label in the legend. **TYPE:** `Union[str, None]`          |
-| `xlabel`      | The xlabel of the scatter chart. **TYPE:** `Union[str, None]`                                                  |
-| `ylabel`      | The ylabel of the scatter chart. **TYPE:** `Union[str, None]`                                                  |
-| `style`       | The style of the scatter chart. **TYPE:** `Union[ScatterStyleAttrs, None]`                                     |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                                  |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                                   |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`             |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLineSettingAttrs, List[HLineSettingAttrs], None]`           |
-| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`   |
-| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]` |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`            |
-| `x`           | The key name in data that contains the x-axis value. Defaults to "x". **TYPE:** `Union[str, None]`             |
-| `y`           | The key name in data that contains the y-axis value. Defaults to "y". **TYPE:** `Union[str, None]`             |
-| `size`        | The key name in data that contains the marker size value. **TYPE:** `Union[str, None]`                         |
-| `hue`         | The key name in data that contains the hue/category value. **TYPE:** `Union[str, None]`                        |
-| `label`       | The key name in data that contains the point label. **TYPE:** `Union[str, None]`                               |
-
-#### datachart.typings.ScatterDataPointAttrs
-
-Bases: `TypedDict`
-
-The data point attributes for the scatter chart.
-
-| ATTRIBUTE | DESCRIPTION                                                                  |
-| --------- | ---------------------------------------------------------------------------- |
-| `x`       | The x-axis value. **TYPE:** `Union[int, float]`                              |
-| `y`       | The y-axis value. **TYPE:** `Union[int, float]`                              |
-| `size`    | The marker size (for bubble charts). **TYPE:** `Optional[Union[int, float]]` |
-| `hue`     | The category for color grouping. **TYPE:** `Optional[str]`                   |
-| `label`   | The label drawn beside the point. **TYPE:** `Optional[str]`                  |
-
-### Box Chart (Box Plot) Typings
-
-#### datachart.typings.BoxSingleChartAttrs
-
-Bases: `TypedDict`
-
-The single chart attributes for the box plot.
-
-| ATTRIBUTE     | DESCRIPTION                                                                                                    |
-| ------------- | -------------------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the box plot. **TYPE:** `List[BoxDataPointAttrs]`                             |
-| `subtitle`    | The subtitle of the box plot. Also used as the label in the legend. **TYPE:** `Union[str, None]`               |
-| `xlabel`      | The xlabel of the box plot. **TYPE:** `Union[str, None]`                                                       |
-| `ylabel`      | The ylabel of the box plot. **TYPE:** `Union[str, None]`                                                       |
-| `style`       | The style of the box plot. **TYPE:** `Union[BoxStyleAttrs, None]`                                              |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                                  |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                                   |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`             |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLineSettingAttrs, List[HLineSettingAttrs], None]`           |
-| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`   |
-| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]` |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`            |
-| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]`          |
-| `value`       | The key name in data that contains the value. Defaults to "value". **TYPE:** `Union[str, None]`                |
-
-#### datachart.typings.BoxDataPointAttrs
-
-Bases: `TypedDict`
-
-The data point attributes for the box plot.
-
-| ATTRIBUTE | DESCRIPTION                                      |
-| --------- | ------------------------------------------------ |
-| `label`   | The category label. **TYPE:** `str`              |
-| `value`   | The numeric value. **TYPE:** `Union[int, float]` |
-
-### Swarm Plot Typings
-
-#### datachart.typings.SwarmSingleChartAttrs
-
-Bases: `TypedDict`
-
-The single chart attributes for the swarm plot.
-
-| ATTRIBUTE     | DESCRIPTION                                                                                                    |
-| ------------- | -------------------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the swarm plot. **TYPE:** `List[SwarmDataPointAttrs]`                         |
-| `subtitle`    | The subtitle of the swarm plot. Also used as the label in the legend. **TYPE:** `Union[str, None]`             |
-| `xlabel`      | The xlabel of the swarm plot. **TYPE:** `Union[str, None]`                                                     |
-| `ylabel`      | The ylabel of the swarm plot. **TYPE:** `Union[str, None]`                                                     |
-| `style`       | The style of the swarm plot. **TYPE:** `Union[SwarmStyleAttrs, None]`                                          |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                                  |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                                   |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`             |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLineSettingAttrs, List[HLineSettingAttrs], None]`           |
-| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`   |
-| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]` |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`            |
-| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]`          |
-| `value`       | The key name in data that contains the value. Defaults to "value". **TYPE:** `Union[str, None]`                |
-
-### datachart.typings.SwarmDataPointAttrs
-
-Bases: `TypedDict`
-
-The data point attributes for the swarm plot.
-
-| ATTRIBUTE | DESCRIPTION                                      |
-| --------- | ------------------------------------------------ |
-| `label`   | The category label. **TYPE:** `str`              |
-| `value`   | The numeric value. **TYPE:** `Union[int, float]` |
-
-### Violin Plot Typings
-
-#### datachart.typings.ViolinSingleChartAttrs
-
-Bases: `TypedDict`
-
-The single chart attributes for the violin plot.
-
-| ATTRIBUTE     | DESCRIPTION                                                                                                    |
-| ------------- | -------------------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the violin plot. **TYPE:** `List[ViolinDataPointAttrs]`                       |
-| `subtitle`    | The subtitle of the violin plot. Also used as the label in the legend. **TYPE:** `Union[str, None]`            |
-| `xlabel`      | The xlabel of the violin plot. **TYPE:** `Union[str, None]`                                                    |
-| `ylabel`      | The ylabel of the violin plot. **TYPE:** `Union[str, None]`                                                    |
-| `style`       | The style of the violin plot. **TYPE:** `Union[ViolinStyleAttrs, None]`                                        |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                                  |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                                   |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`             |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLineSettingAttrs, List[HLineSettingAttrs], None]`           |
-| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`   |
-| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]` |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`            |
-| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]`          |
-| `value`       | The key name in data that contains the value. Defaults to "value". **TYPE:** `Union[str, None]`                |
-
-#### datachart.typings.ViolinDataPointAttrs
-
-Bases: `TypedDict`
-
-The data point attributes for the violin plot.
-
-| ATTRIBUTE | DESCRIPTION                                      |
-| --------- | ------------------------------------------------ |
-| `label`   | The category label. **TYPE:** `str`              |
-| `value`   | The numeric value. **TYPE:** `Union[int, float]` |
-
-### Raincloud Plot Typings
-
-#### datachart.typings.RaincloudSingleChartAttrs
-
-Bases: `TypedDict`
-
-The single chart attributes for the raincloud plot.
-
-| ATTRIBUTE     | DESCRIPTION                                                                                                    |
-| ------------- | -------------------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the raincloud plot. **TYPE:** `List[RaincloudDataPointAttrs]`                 |
-| `subtitle`    | The subtitle of the raincloud plot. **TYPE:** `Union[str, None]`                                               |
-| `xlabel`      | The xlabel of the raincloud plot. **TYPE:** `Union[str, None]`                                                 |
-| `ylabel`      | The ylabel of the raincloud plot. **TYPE:** `Union[str, None]`                                                 |
-| `style`       | The style of the raincloud plot. **TYPE:** `Union[RaincloudStyleAttrs, None]`                                  |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                                  |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                                   |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`             |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLineSettingAttrs, List[HLineSettingAttrs], None]`           |
-| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`   |
-| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]` |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`            |
-| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]`          |
-| `value`       | The key name in data that contains the value. Defaults to "value". **TYPE:** `Union[str, None]`                |
-
-#### datachart.typings.RaincloudDataPointAttrs
-
-Bases: `TypedDict`
-
-The data point attributes for the raincloud plot.
-
-| ATTRIBUTE | DESCRIPTION                                      |
-| --------- | ------------------------------------------------ |
-| `label`   | The category label. **TYPE:** `str`              |
-| `value`   | The numeric value. **TYPE:** `Union[int, float]` |
-
-### Ridgeline Plot Typings
-
-#### datachart.typings.RidgelineSingleChartAttrs
-
-Bases: `TypedDict`
-
-The single chart attributes for the ridgeline plot.
-
-| ATTRIBUTE     | DESCRIPTION                                                                                                    |
-| ------------- | -------------------------------------------------------------------------------------------------------------- |
-| `data`        | The list of data points defining the ridgeline plot. **TYPE:** `List[RidgelineDataPointAttrs]`                 |
-| `subtitle`    | The subtitle of the ridgeline plot. **TYPE:** `Union[str, None]`                                               |
-| `xlabel`      | The xlabel of the ridgeline plot. **TYPE:** `Union[str, None]`                                                 |
-| `ylabel`      | The ylabel of the ridgeline plot. **TYPE:** `Union[str, None]`                                                 |
-| `style`       | The style of the ridgeline plot. **TYPE:** `Union[RidgelineStyleAttrs, None]`                                  |
-| `xticks`      | The xtick positions list. **TYPE:** `Union[int, float, None]`                                                  |
-| `xticklabels` | The xtick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `xtickrotate` | The xtick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `yticks`      | The ytick position list. **TYPE:** `Union[int, float, None]`                                                   |
-| `yticklabels` | The ytick labels. **TYPE:** `Union[List[str], None]`                                                           |
-| `ytickrotate` | The ytick rotation value. **TYPE:** `Union[int, None]`                                                         |
-| `vlines`      | The vertical lines to be plot. **TYPE:** `Union[VLineSettingAttrs, List[VLineSettingAttrs], None]`             |
-| `hlines`      | The horizontal lines to be plot. **TYPE:** `Union[HLineSettingAttrs, List[HLineSettingAttrs], None]`           |
-| `vspans`      | The vertical reference bands to be plot. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`   |
-| `hspans`      | The horizontal reference bands to be plot. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]` |
-| `texts`       | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`            |
-| `label`       | The key name in data that contains the label value. Defaults to "label". **TYPE:** `Union[str, None]`          |
-| `value`       | The key name in data that contains the value. Defaults to "value". **TYPE:** `Union[str, None]`                |
-
-#### datachart.typings.RidgelineDataPointAttrs
-
-Bases: `TypedDict`
-
-The data point attributes for the ridgeline plot.
-
-| ATTRIBUTE | DESCRIPTION                                              |
-| --------- | -------------------------------------------------------- |
-| `label`   | The category label; one ridge per label. **TYPE:** `str` |
-| `value`   | The numeric value. **TYPE:** `Union[int, float]`         |
-
-### Parallel Coordinates Plot Typings
-
-#### datachart.typings.ParallelCoordsSingleChartAttrs
-
-Bases: `TypedDict`
-
-The single chart attributes for the parallel coordinates chart.
-
-| ATTRIBUTE         | DESCRIPTION                                                                                         |
-| ----------------- | --------------------------------------------------------------------------------------------------- |
-| `data`            | The list of data points. **TYPE:** `List[ParallelCoordsDataPointAttrs]`                             |
-| `subtitle`        | The subtitle of the chart. **TYPE:** `Union[str, None]`                                             |
-| `xlabel`          | The xlabel of the chart. **TYPE:** `Union[str, None]`                                               |
-| `ylabel`          | The ylabel of the chart. **TYPE:** `Union[str, None]`                                               |
-| `style`           | The style of the chart. **TYPE:** `Union[ParallelCoordsStyleAttrs, None]`                           |
-| `dimensions`      | The dimensions to include and their order. **TYPE:** `Union[List[str], None]`                       |
-| `hue`             | The key name in data for categorical coloring. **TYPE:** `Union[str, None]`                         |
-| `category_orders` | Custom order for categorical dimensions. **TYPE:** `Union[Dict[str, List[str]], None]`              |
-| `texts`           | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]` |
-
-#### datachart.typings.ParallelCoordsDataPointAttrs
-
-Bases: `TypedDict`
-
-The data point attributes for the parallel coordinates chart.
-
-A dictionary where keys are dimension names and values are numeric values. Can optionally include a 'hue' key for categorical coloring.
-
-| ATTRIBUTE | DESCRIPTION                                                |
-| --------- | ---------------------------------------------------------- |
-| `hue`     | The category for color grouping. **TYPE:** `Optional[str]` |
-
-### Scatter Matrix Typings
-
-#### datachart.typings.ScatterMatrixDataPointAttrs
-
-Bases: `TypedDict`
-
-The record attributes for the scatter matrix.
-
-A dictionary where keys are column names: numeric columns become dimensions, and one categorical column may be named as the `hue`. The same columns can be passed as one dictionary of lists instead.
-
-Added in Unreleased
-
-| ATTRIBUTE | DESCRIPTION                                                                                             |
-| --------- | ------------------------------------------------------------------------------------------------------- |
-| `hue`     | The category for color grouping, under the column name the hue setting names. **TYPE:** `Optional[str]` |
-
-### Radial Chart Typings
-
-#### datachart.typings.RadialSingleChartAttrs
-
-Bases: `TypedDict`
-
-The single chart attributes for the radial chart.
-
-| ATTRIBUTE  | DESCRIPTION                                                                                                                                   |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`     | The list of data points defining the radial chart. **TYPE:** `List[RadialDataPointAttrs]`                                                     |
-| `subtitle` | The subtitle of the radial chart. Also used as the label in the legend. **TYPE:** `Union[str, None]`                                          |
-| `style`    | The style of the radial chart, matching its visual. **TYPE:** `Union[LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs, None]` |
-| `texts`    | The text annotations to be drawn. **TYPE:** `Union[TextSettingAttrs, List[TextSettingAttrs], None]`                                           |
-| `vspans`   | The angular wedges to be plot, bounded in degrees. **TYPE:** `Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]`                        |
-| `hspans`   | The annuli to be plot, bounded in radius. **TYPE:** `Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]`                                 |
-| `label`    | The key name in data that contains the category label. Defaults to "label". **TYPE:** `Union[str, None]`                                      |
-| `x`        | The key name in data that contains the angular observation. Defaults to "x". **TYPE:** `Union[str, None]`                                     |
-| `y`        | The key name in data that contains the radial value. Defaults to "y". **TYPE:** `Union[str, None]`                                            |
-| `yerr`     | The key name in data that contains the radial error value. Defaults to "yerr". **TYPE:** `Union[str, None]`                                   |
-
-#### datachart.typings.RadialDataPointAttrs
-
-Bases: `TypedDict`
-
-The data point attributes for the radial chart.
-
-The line, bar, and scatter visuals take `label`/`y` points whose labels are placed evenly around the circle; the histogram visual takes numeric `x` observations in degrees.
-
-| ATTRIBUTE  | DESCRIPTION                                                                                                                                             |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `label`    | The category label (line, bar, and scatter visuals). **TYPE:** `str`                                                                                    |
-| `y`        | The radial value (line, bar, and scatter visuals). **TYPE:** `Union[int, float]`                                                                        |
-| `yerr`     | The radial error value. **TYPE:** `Optional[Union[int, float]]`                                                                                         |
-| `x`        | The angular observation in degrees (histogram visual). **TYPE:** `Optional[Union[int, float]]`                                                          |
-| `emphasis` | The bar's own emphasis role ("background" or "highlight"); wins over the chart's emphasis_rule (bar visual). **TYPE:** `Optional[Union[EMPHASIS, str]]` |
-
-## Style Typings
+The typing for the text annotation style.
+
+| ATTRIBUTE                  | DESCRIPTION                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------- |
+| `plot_text_color`          | The text color; falls back to the general font color. **TYPE:** \`str                         |
+| `plot_text_size`           | The text font size. **TYPE:** \`int                                                           |
+| `plot_text_weight`         | The text font weight. **TYPE:** \`FONT_WEIGHT                                                 |
+| `plot_text_halign`         | The horizontal alignment of the text. **TYPE:** \`str                                         |
+| `plot_text_valign`         | The vertical alignment of the text. **TYPE:** \`str                                           |
+| `plot_text_alpha`          | The alpha value of the text. **TYPE:** \`float                                                |
+| `plot_text_box_visible`    | Whether to draw the background box. **TYPE:** \`bool                                          |
+| `plot_text_box_style`      | The matplotlib box style (e.g. "round,pad=0.4"). **TYPE:** \`str                              |
+| `plot_text_box_facecolor`  | The face color of the box. **TYPE:** \`str                                                    |
+| `plot_text_box_edgecolor`  | The edge color of the box. **TYPE:** \`str                                                    |
+| `plot_text_box_edge_width` | The edge width of the box. **TYPE:** \`int                                                    |
+| `plot_text_box_alpha`      | The alpha value of the box. **TYPE:** \`float                                                 |
+| `plot_text_arrow_style`    | The connector look (see ARROW_STYLE) or a raw matplotlib arrow style. **TYPE:** \`ARROW_STYLE |
+| `plot_text_arrow_curve`    | The connector curvature; overrides the look's own. **TYPE:** \`float                          |
+| `plot_text_arrow_color`    | The connector color. **TYPE:** \`str                                                          |
+| `plot_text_arrow_width`    | The connector line width. **TYPE:** \`int                                                     |
+
+## Theme Style
+
+The keys a theme defines and [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md) holds: colors, fonts, axes, legend, grid, the theme-driven defaults, and the sketch and ink looks. `StyleAttrs` is their union together with every chart's own style keys; the [config methods](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config) and [`register_theme`](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.register_theme) take it, and the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) shows how a theme is built from it.
 
 ### datachart.typings.StyleAttrs
 
@@ -896,14 +370,14 @@ Bases: `TypedDict`
 
 The typing for the general color style.
 
-| ATTRIBUTE                       | DESCRIPTION                                                                                                                                                                                             |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `color_general_singular`        | The colors used when each dataset gets its own subplot, i.e. subplots=True (palette name, single color, or list of hex colors). **TYPE:** `Union[COLORS, str, List[str], None]`                         |
-| `color_general_multiple`        | The colors used when the datasets share one coordinate space, which is the default for every chart (palette name, single color, or list of hex colors). **TYPE:** `Union[COLORS, str, List[str], None]` |
-| `color_parallel_hue`            | The color palette for parallel coords hue categories (palette name, single color, or list of hex colors). **TYPE:** `Union[COLORS, str, List[str], None]`                                               |
-| `color_parallel_hue_continuous` | The sequential ramp for parallel coords numeric hue columns (palette name, single color, or list of hex colors). **TYPE:** `Union[COLORS, str, List[str], None]`                                        |
-| `muted_color`                   | The color applied to background-emphasis layers. **TYPE:** `Union[str, None]`                                                                                                                           |
-| `muted_alpha`                   | The alpha applied to background-emphasis layers. **TYPE:** `Union[float, None]`                                                                                                                         |
+| ATTRIBUTE                       | DESCRIPTION                                                                                                                                                                |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `color_general_singular`        | The colors used when each dataset gets its own subplot, i.e. subplots=True (palette name, single color, or list of hex colors). **TYPE:** \`COLORS                         |
+| `color_general_multiple`        | The colors used when the datasets share one coordinate space, which is the default for every chart (palette name, single color, or list of hex colors). **TYPE:** \`COLORS |
+| `color_parallel_hue`            | The color palette for parallel coords hue categories (palette name, single color, or list of hex colors). **TYPE:** \`COLORS                                               |
+| `color_parallel_hue_continuous` | The sequential ramp for parallel coords numeric hue columns (palette name, single color, or list of hex colors). **TYPE:** \`COLORS                                        |
+| `muted_color`                   | The color applied to background-emphasis layers. **TYPE:** \`str                                                                                                           |
+| `muted_alpha`                   | The alpha applied to background-emphasis layers. **TYPE:** \`float                                                                                                         |
 
 ### datachart.typings.FontStyleAttrs
 
@@ -911,31 +385,31 @@ Bases: `TypedDict`
 
 The typing for the font style.
 
-| ATTRIBUTE                | DESCRIPTION                                                                                       |
-| ------------------------ | ------------------------------------------------------------------------------------------------- |
-| `font_general_family`    | The general font family. **TYPE:** `Union[str, None]`                                             |
-| `font_general_sansserif` | The general sans-serif font. **TYPE:** `Union[List[str], None]`                                   |
-| `font_general_serif`     | The general serif font stack, used when the family is "serif". **TYPE:** `Union[List[str], None]` |
-| `font_general_color`     | The general font color. **TYPE:** `Union[str, None]`                                              |
-| `font_general_size`      | The general font size. **TYPE:** `Union[int, float, str, None]`                                   |
-| `font_general_style`     | The general font style. **TYPE:** `Union[FONT_STYLE, str, None]`                                  |
-| `font_general_weight`    | The general font weight. **TYPE:** `Union[FONT_WEIGHT, str, None]`                                |
-| `font_title_size`        | The title font size. **TYPE:** `Union[int, float, str, None]`                                     |
-| `font_title_color`       | The title font color. **TYPE:** `Union[str, None]`                                                |
-| `font_title_style`       | The title font style. **TYPE:** `Union[FONT_STYLE, str, None]`                                    |
-| `font_title_weight`      | The title font weight. **TYPE:** `Union[FONT_WEIGHT, str, None]`                                  |
-| `font_subtitle_size`     | The subtitle font size. **TYPE:** `Union[int, float, str, None]`                                  |
-| `font_subtitle_color`    | The subtitle font color. **TYPE:** `Union[str, None]`                                             |
-| `font_subtitle_style`    | The subtitle font style. **TYPE:** `Union[FONT_STYLE, None]`                                      |
-| `font_subtitle_weight`   | The subtitle font weight. **TYPE:** `Union[FONT_WEIGHT, None]`                                    |
-| `font_xlabel_size`       | The xlabel font size. **TYPE:** `Union[int, float, str, None]`                                    |
-| `font_xlabel_color`      | The xlabel font color. **TYPE:** `Union[str, None]`                                               |
-| `font_xlabel_style`      | The xlabel font style. **TYPE:** `Union[FONT_STYLE, str, None]`                                   |
-| `font_xlabel_weight`     | The xlabel font weight. **TYPE:** `Union[FONT_WEIGHT, str, None]`                                 |
-| `font_ylabel_size`       | The ylabel font size. **TYPE:** `Union[int, float, str, None]`                                    |
-| `font_ylabel_color`      | The ylabel font color. **TYPE:** `Union[str, None]`                                               |
-| `font_ylabel_style`      | The ylabel font style. **TYPE:** `Union[FONT_STYLE, str, None]`                                   |
-| `font_ylabel_weight`     | The ylabel font weight. **TYPE:** `Union[FONT_WEIGHT, str, None]`                                 |
+| ATTRIBUTE                | DESCRIPTION                                                                          |
+| ------------------------ | ------------------------------------------------------------------------------------ |
+| `font_general_family`    | The general font family. **TYPE:** \`str                                             |
+| `font_general_sansserif` | The general sans-serif font. **TYPE:** \`list[str]                                   |
+| `font_general_serif`     | The general serif font stack, used when the family is "serif". **TYPE:** \`list[str] |
+| `font_general_color`     | The general font color. **TYPE:** \`str                                              |
+| `font_general_size`      | The general font size. **TYPE:** \`int                                               |
+| `font_general_style`     | The general font style. **TYPE:** \`FONT_STYLE                                       |
+| `font_general_weight`    | The general font weight. **TYPE:** \`FONT_WEIGHT                                     |
+| `font_title_size`        | The title font size. **TYPE:** \`int                                                 |
+| `font_title_color`       | The title font color. **TYPE:** \`str                                                |
+| `font_title_style`       | The title font style. **TYPE:** \`FONT_STYLE                                         |
+| `font_title_weight`      | The title font weight. **TYPE:** \`FONT_WEIGHT                                       |
+| `font_subtitle_size`     | The subtitle font size. **TYPE:** \`int                                              |
+| `font_subtitle_color`    | The subtitle font color. **TYPE:** \`str                                             |
+| `font_subtitle_style`    | The subtitle font style. **TYPE:** \`FONT_STYLE                                      |
+| `font_subtitle_weight`   | The subtitle font weight. **TYPE:** \`FONT_WEIGHT                                    |
+| `font_xlabel_size`       | The xlabel font size. **TYPE:** \`int                                                |
+| `font_xlabel_color`      | The xlabel font color. **TYPE:** \`str                                               |
+| `font_xlabel_style`      | The xlabel font style. **TYPE:** \`FONT_STYLE                                        |
+| `font_xlabel_weight`     | The xlabel font weight. **TYPE:** \`FONT_WEIGHT                                      |
+| `font_ylabel_size`       | The ylabel font size. **TYPE:** \`int                                                |
+| `font_ylabel_color`      | The ylabel font color. **TYPE:** \`str                                               |
+| `font_ylabel_style`      | The ylabel font style. **TYPE:** \`FONT_STYLE                                        |
+| `font_ylabel_weight`     | The ylabel font weight. **TYPE:** \`FONT_WEIGHT                                      |
 
 ### datachart.typings.AxesStyleAttrs
 
@@ -943,20 +417,20 @@ Bases: `TypedDict`
 
 The typing for the axes style.
 
-| ATTRIBUTE                    | DESCRIPTION                                                                                                              |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `axes_spines_top_visible`    | Make the top plot spine visible. **TYPE:** `Union[bool, None]`                                                           |
-| `axes_spines_right_visible`  | Make the right plot spine visible. **TYPE:** `Union[bool, None]`                                                         |
-| `axes_spines_bottom_visible` | Make the bottom plot spine visible. **TYPE:** `Union[bool, None]`                                                        |
-| `axes_spines_left_visible`   | Make the left plot spine visible. **TYPE:** `Union[bool, None]`                                                          |
-| `axes_spines_width`          | The width of the spines. **TYPE:** `Union[int, float, None]`                                                             |
-| `axes_spines_zorder`         | The zorder of the spines. **TYPE:** `Union[int, None]`                                                                   |
-| `axes_ticks_length`          | The length of the ticks. **TYPE:** `Union[int, float, None]`                                                             |
-| `axes_ticks_label_size`      | The size of the tick labels. **TYPE:** `Union[int, float, None]`                                                         |
-| `figure_facecolor`           | The color of the figure ground. None keeps matplotlib's. **TYPE:** `Union[str, None]`                                    |
-| `axes_facecolor`             | The color of the axes ground; label halos and etch washes take it. None keeps matplotlib's. **TYPE:** `Union[str, None]` |
-| `axes_spines_color`          | The color of the spines. None keeps matplotlib's. **TYPE:** `Union[str, None]`                                           |
-| `axes_ticks_color`           | The color of the tick marks. None keeps matplotlib's. **TYPE:** `Union[str, None]`                                       |
+| ATTRIBUTE                    | DESCRIPTION                                                                                                 |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `axes_spines_top_visible`    | Make the top plot spine visible. **TYPE:** \`bool                                                           |
+| `axes_spines_right_visible`  | Make the right plot spine visible. **TYPE:** \`bool                                                         |
+| `axes_spines_bottom_visible` | Make the bottom plot spine visible. **TYPE:** \`bool                                                        |
+| `axes_spines_left_visible`   | Make the left plot spine visible. **TYPE:** \`bool                                                          |
+| `axes_spines_width`          | The width of the spines. **TYPE:** \`int                                                                    |
+| `axes_spines_zorder`         | The zorder of the spines. **TYPE:** \`int                                                                   |
+| `axes_ticks_length`          | The length of the ticks. **TYPE:** \`int                                                                    |
+| `axes_ticks_label_size`      | The size of the tick labels. **TYPE:** \`int                                                                |
+| `figure_facecolor`           | The color of the figure ground. None keeps matplotlib's. **TYPE:** \`str                                    |
+| `axes_facecolor`             | The color of the axes ground; label halos and etch washes take it. None keeps matplotlib's. **TYPE:** \`str |
+| `axes_spines_color`          | The color of the spines. None keeps matplotlib's. **TYPE:** \`str                                           |
+| `axes_ticks_color`           | The color of the tick marks. None keeps matplotlib's. **TYPE:** \`str                                       |
 
 Added in Unreleased
 
@@ -968,37 +442,23 @@ Bases: `TypedDict`
 
 The typing for the legend style.
 
-| ATTRIBUTE                 | DESCRIPTION                                                                        |
-| ------------------------- | ---------------------------------------------------------------------------------- |
-| `plot_legend_shadow`      | Show the legends shadow. **TYPE:** `Union[bool, None]`                             |
-| `plot_legend_frameon`     | Show the legends frame. **TYPE:** `Union[bool, None]`                              |
-| `plot_legend_alignment`   | The legend alignment. **TYPE:** `Union[LEGEND_ALIGN, str, None]`                   |
-| `plot_legend_location`    | The legend location. **TYPE:** `Union[LEGEND_LOCATION, str, None]`                 |
-| `plot_legend_font_size`   | The font size within the legend. **TYPE:** `Union[int, float, str, None]`          |
-| `plot_legend_title_size`  | The title size of the legend. **TYPE:** `Union[int, float, str, None]`             |
-| `plot_legend_label_color` | The label color of the legend. **TYPE:** `Union[str, None]`                        |
-| `plot_legend_title`       | The legend title; an empty string draws none. **TYPE:** `Union[str, None]`         |
-| `plot_legend_ncols`       | The number of legend columns. **TYPE:** `Union[int, None]`                         |
-| `plot_legend_edge_color`  | The legend frame color. None keeps matplotlib's. **TYPE:** `Union[str, None]`      |
-| `plot_legend_face_color`  | The legend background color. None keeps matplotlib's. **TYPE:** `Union[str, None]` |
+| ATTRIBUTE                 | DESCRIPTION                                                           |
+| ------------------------- | --------------------------------------------------------------------- |
+| `plot_legend_shadow`      | Show the legends shadow. **TYPE:** \`bool                             |
+| `plot_legend_frameon`     | Show the legends frame. **TYPE:** \`bool                              |
+| `plot_legend_alignment`   | The legend alignment. **TYPE:** \`LEGEND_ALIGN                        |
+| `plot_legend_location`    | The legend location. **TYPE:** \`LEGEND_LOCATION                      |
+| `plot_legend_font_size`   | The font size within the legend. **TYPE:** \`int                      |
+| `plot_legend_title_size`  | The title size of the legend. **TYPE:** \`int                         |
+| `plot_legend_label_color` | The label color of the legend. **TYPE:** \`str                        |
+| `plot_legend_title`       | The legend title; an empty string draws none. **TYPE:** \`str         |
+| `plot_legend_ncols`       | The number of legend columns. **TYPE:** \`int                         |
+| `plot_legend_edge_color`  | The legend frame color. None keeps matplotlib's. **TYPE:** \`str      |
+| `plot_legend_face_color`  | The legend background color. None keeps matplotlib's. **TYPE:** \`str |
 
 Added in Unreleased
 
 The `plot_legend_title`, `plot_legend_ncols`, `plot_legend_edge_color` and `plot_legend_face_color` attributes.
-
-### datachart.typings.AreaStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the area style.
-
-| ATTRIBUTE             | DESCRIPTION                                                            |
-| --------------------- | ---------------------------------------------------------------------- |
-| `plot_area_alpha`     | The alpha value of the area. **TYPE:** `Union[float, None]`            |
-| `plot_area_color`     | The color of the area. **TYPE:** `Union[str, None]`                    |
-| `plot_area_linewidth` | The line width of the area. **TYPE:** `Union[int, float, None]`        |
-| `plot_area_hatch`     | The hatch style of the area. **TYPE:** `Union[HATCH_STYLE, str, None]` |
-| `plot_area_zorder`    | The zorder of the area. **TYPE:** `Union[int, None]`                   |
 
 ### datachart.typings.GridStyleAttrs
 
@@ -1006,464 +466,13 @@ Bases: `TypedDict`
 
 The typing for the grid style.
 
-| ATTRIBUTE             | DESCRIPTION                                                          |
-| --------------------- | -------------------------------------------------------------------- |
-| `plot_grid_alpha`     | The alpha value of the grid. **TYPE:** `Union[float, None]`          |
-| `plot_grid_color`     | The color of the grid. **TYPE:** `Union[str, None]`                  |
-| `plot_grid_linewidth` | The line width of the grid. **TYPE:** `Union[int, float, None]`      |
-| `plot_grid_linestyle` | The line style of the grid. **TYPE:** `Union[LINE_STYLE, str, None]` |
-| `plot_grid_zorder`    | The zorder of the grid. **TYPE:** `Union[int, None]`                 |
-
-### datachart.typings.LineStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the line chart style.
-
-| ATTRIBUTE                  | DESCRIPTION                                                                             |
-| -------------------------- | --------------------------------------------------------------------------------------- |
-| `plot_line_color`          | The line color. **TYPE:** `Union[str, None]`                                            |
-| `plot_line_alpha`          | The alpha value of the line. **TYPE:** `Union[float, None]`                             |
-| `plot_line_style`          | The line style. **TYPE:** `Union[LINE_STYLE, str, None]`                                |
-| `plot_line_marker`         | The line marker. **TYPE:** `Union[LINE_MARKER, str, None]`                              |
-| `plot_line_width`          | The line width. **TYPE:** `Union[int, float, None]`                                     |
-| `plot_line_drawstyle`      | The line draw style. **TYPE:** `Union[LINE_DRAW_STYLE, str, None]`                      |
-| `plot_line_zorder`         | The zorder of the line. **TYPE:** `Union[int, float, None]`                             |
-| `plot_xticks_label_rotate` | The label rotation of the xticks in the line chart. **TYPE:** `Union[int, float, None]` |
-| `plot_yticks_label_rotate` | The label rotation of the yticks in the line chart. **TYPE:** `Union[int, float, None]` |
-
-### datachart.typings.BumpStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the bump chart style.
-
-The line takes the `plot_line_*` keys (color, alpha, style, zorder); these keys set what is specific to a bump chart.
-
-| ATTRIBUTE                 | DESCRIPTION                                                                                  |
-| ------------------------- | -------------------------------------------------------------------------------------------- |
-| `plot_bump_line_width`    | The line width. **TYPE:** `Union[int, float, None]`                                          |
-| `plot_bump_marker`        | The marker at every period. **TYPE:** `Union[LINE_MARKER, str, None]`                        |
-| `plot_bump_marker_size`   | The marker size. **TYPE:** `Union[int, float, None]`                                         |
-| `plot_bump_label_padding` | The gap between a line end and its end label, in points. **TYPE:** `Union[int, float, None]` |
-
-### datachart.typings.BarStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the bar chart style.
-
-| ATTRIBUTE                  | DESCRIPTION                                                                            |
-| -------------------------- | -------------------------------------------------------------------------------------- |
-| `plot_bar_color`           | The bar color. **TYPE:** `Union[str, None]`                                            |
-| `plot_bar_alpha`           | The alpha value of the bar. **TYPE:** `Union[float, None]`                             |
-| `plot_bar_width`           | The width of the bar. **TYPE:** `Union[int, float, None]`                              |
-| `plot_bar_zorder`          | The zorder of the bar. **TYPE:** `Union[int, float, None]`                             |
-| `plot_bar_hatch`           | The hatch style of the bar. **TYPE:** `Union[HATCH_STYLE, str, None]`                  |
-| `plot_bar_edge_width`      | The edge width of the bar. **TYPE:** `Union[int, float, None]`                         |
-| `plot_bar_edge_color`      | The edge color of the bar. **TYPE:** `Union[str, None]`                                |
-| `plot_bar_error_color`     | The color of the error line of the bar. **TYPE:** `Union[str, None]`                   |
-| `plot_bar_value_fontsize`  | Alias of plot_value_fontsize. **TYPE:** `Union[int, float, None]`                      |
-| `plot_bar_value_color`     | Alias of plot_value_color. **TYPE:** `Union[str, None]`                                |
-| `plot_bar_value_padding`   | Alias of plot_value_padding. **TYPE:** `Union[int, float, None]`                       |
-| `plot_xticks_label_rotate` | The label rotation of the xticks in the bar chart. **TYPE:** `Union[int, float, None]` |
-| `plot_yticks_label_rotate` | The label rotation of the yticks in the bar chart. **TYPE:** `Union[int, float, None]` |
-
-### datachart.typings.ValueLabelStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the value labels: the numbers a chart prints beside its marks when `show_values` is on. One style serves every chart that takes `show_values`; the `plot_bar_value_*` keys of `BarStyleAttrs` are aliases.
-
-Added in Unreleased
-
-| ATTRIBUTE               | DESCRIPTION                                                                                                                                                                                        |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plot_value_fontsize`   | The font size of the value labels. **TYPE:** `Union[int, float, None]`                                                                                                                             |
-| `plot_value_color`      | The color of the value labels. **TYPE:** `Union[str, None]`                                                                                                                                        |
-| `plot_value_padding`    | The gap between a mark and its value label, in points. **TYPE:** `Union[int, float, None]`                                                                                                         |
-| `plot_value_halo_width` | The width, in points, of the halo, in the axes face color, stroked around the value labels so they stay legible over marks and lines. None or 0 draws no halo. **TYPE:** `Union[int, float, None]` |
-
-### datachart.typings.HistStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the histogram chart style.
-
-| ATTRIBUTE                  | DESCRIPTION                                                                                  |
-| -------------------------- | -------------------------------------------------------------------------------------------- |
-| `plot_hist_color`          | The color of the histogram. **TYPE:** `Union[str, None]`                                     |
-| `plot_hist_alpha`          | The alpha value of the histogram. **TYPE:** `Union[float, None]`                             |
-| `plot_hist_zorder`         | The zorder of the histogram. **TYPE:** `Union[int, float, None]`                             |
-| `plot_hist_fill`           | The fill of the histogram. **TYPE:** `Union[str, None]`                                      |
-| `plot_hist_hatch`          | The hatch style in the histogram. **TYPE:** `Union[HATCH_STYLE, str, None]`                  |
-| `plot_hist_type`           | The type of the histogram. **TYPE:** `Union[HISTOGRAM_TYPE, str, None]`                      |
-| `plot_hist_align`          | The alignment of the histogram. **TYPE:** `Union[str, None]`                                 |
-| `plot_hist_edge_width`     | The edge width of the histogram. **TYPE:** `Union[int, float, None]`                         |
-| `plot_hist_edge_color`     | The edge color of the histogram. **TYPE:** `Union[str, None]`                                |
-| `plot_xticks_label_rotate` | The label rotation of the xticks in the histogram chart. **TYPE:** `Union[int, float, None]` |
-| `plot_yticks_label_rotate` | The label rotation of the yticks in the histogram chart. **TYPE:** `Union[int, float, None]` |
-
-### datachart.typings.VLineStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the vertical line style.
-
-| ATTRIBUTE          | DESCRIPTION                                                              |
-| ------------------ | ------------------------------------------------------------------------ |
-| `plot_vline_color` | The color of the vertical line. **TYPE:** `Union[str, None]`             |
-| `plot_vline_style` | The style of the vertical line. **TYPE:** `Union[LINE_STYLE, str, None]` |
-| `plot_vline_width` | The width of the vertical line. **TYPE:** `Union[int, float, None]`      |
-| `plot_vline_alpha` | The alpha value of the vertical line. **TYPE:** `Union[float, None]`     |
-
-### datachart.typings.HLineStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the horizontal line style.
-
-| ATTRIBUTE          | DESCRIPTION                                                                |
-| ------------------ | -------------------------------------------------------------------------- |
-| `plot_hline_color` | The color of the horizontal line. **TYPE:** `Union[str, None]`             |
-| `plot_hline_style` | The style of the horizontal line. **TYPE:** `Union[LINE_STYLE, str, None]` |
-| `plot_hline_width` | The width of the horizontal line. **TYPE:** `Union[int, float, None]`      |
-| `plot_hline_alpha` | The alpha value of the horizontal line. **TYPE:** `Union[float, None]`     |
-
-### datachart.typings.VSpanStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the vertical reference band style.
-
-Added in Unreleased
-
-| ATTRIBUTE               | DESCRIPTION                                                                                                    |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `plot_vspan_color`      | The fill color of the band. Defaults to the theme's muted color. **TYPE:** `Union[str, None]`                  |
-| `plot_vspan_alpha`      | The alpha value of the band. **TYPE:** `Union[float, None]`                                                    |
-| `plot_vspan_hatch`      | The hatch pattern of the band. **TYPE:** `Union[HATCH_STYLE, str, None]`                                       |
-| `plot_vspan_edge_color` | The edge color of the band; the hatch draws in it. **TYPE:** `Union[str, None]`                                |
-| `plot_vspan_edge_width` | The edge line width of the band. **TYPE:** `Union[int, float, None]`                                           |
-| `plot_vspan_zorder`     | The zorder of the band. Defaults to sit over the grid and under the marks. **TYPE:** `Union[int, float, None]` |
-
-### datachart.typings.HSpanStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the horizontal reference band style.
-
-Added in Unreleased
-
-| ATTRIBUTE               | DESCRIPTION                                                                                                    |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `plot_hspan_color`      | The fill color of the band. Defaults to the theme's muted color. **TYPE:** `Union[str, None]`                  |
-| `plot_hspan_alpha`      | The alpha value of the band. **TYPE:** `Union[float, None]`                                                    |
-| `plot_hspan_hatch`      | The hatch pattern of the band. **TYPE:** `Union[HATCH_STYLE, str, None]`                                       |
-| `plot_hspan_edge_color` | The edge color of the band; the hatch draws in it. **TYPE:** `Union[str, None]`                                |
-| `plot_hspan_edge_width` | The edge line width of the band. **TYPE:** `Union[int, float, None]`                                           |
-| `plot_hspan_zorder`     | The zorder of the band. Defaults to sit over the grid and under the marks. **TYPE:** `Union[int, float, None]` |
-
-### datachart.typings.TextStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the text annotation style.
-
-| ATTRIBUTE                  | DESCRIPTION                                                                                                     |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `plot_text_color`          | The text color; falls back to the general font color. **TYPE:** `Union[str, None]`                              |
-| `plot_text_size`           | The text font size. **TYPE:** `Union[int, float, str, None]`                                                    |
-| `plot_text_weight`         | The text font weight. **TYPE:** `Union[FONT_WEIGHT, str, None]`                                                 |
-| `plot_text_halign`         | The horizontal alignment of the text. **TYPE:** `Union[str, None]`                                              |
-| `plot_text_valign`         | The vertical alignment of the text. **TYPE:** `Union[str, None]`                                                |
-| `plot_text_alpha`          | The alpha value of the text. **TYPE:** `Union[float, None]`                                                     |
-| `plot_text_box_visible`    | Whether to draw the background box. **TYPE:** `Union[bool, None]`                                               |
-| `plot_text_box_style`      | The matplotlib box style (e.g. "round,pad=0.4"). **TYPE:** `Union[str, None]`                                   |
-| `plot_text_box_facecolor`  | The face color of the box. **TYPE:** `Union[str, None]`                                                         |
-| `plot_text_box_edgecolor`  | The edge color of the box. **TYPE:** `Union[str, None]`                                                         |
-| `plot_text_box_edge_width` | The edge width of the box. **TYPE:** `Union[int, float, None]`                                                  |
-| `plot_text_box_alpha`      | The alpha value of the box. **TYPE:** `Union[float, None]`                                                      |
-| `plot_text_arrow_style`    | The connector look (see ARROW_STYLE) or a raw matplotlib arrow style. **TYPE:** `Union[ARROW_STYLE, str, None]` |
-| `plot_text_arrow_curve`    | The connector curvature; overrides the look's own. **TYPE:** `Union[float, None]`                               |
-| `plot_text_arrow_color`    | The connector color. **TYPE:** `Union[str, None]`                                                               |
-| `plot_text_arrow_width`    | The connector line width. **TYPE:** `Union[int, float, None]`                                                   |
-
-### datachart.typings.HeatmapStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the heatmap chart style.
-
-| ATTRIBUTE                  | DESCRIPTION                                                                                                                                                         |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plot_heatmap_cmap`        | The color map of the heatmap (palette name, single color, list of hex colors, or colormap). **TYPE:** `Union[str, List[str], colors.LinearSegmentedColormap, None]` |
-| `plot_heatmap_alpha`       | The alpha value of the heatmap. **TYPE:** `Union[float, None]`                                                                                                      |
-| `plot_heatmap_font_size`   | The font size of the heatmap. **TYPE:** `Union[int, float, str, None]`                                                                                              |
-| `plot_heatmap_font_color`  | The font color of the heatmap. **TYPE:** `Union[str, None]`                                                                                                         |
-| `plot_heatmap_font_style`  | The font style of the heatmap. **TYPE:** `Union[FONT_STYLE, str, None]`                                                                                             |
-| `plot_heatmap_font_weight` | The font weight of the heatmap. **TYPE:** `Union[FONT_WEIGHT, str, None]`                                                                                           |
-| `plot_heatmap_frame_color` | The color of the frame always drawn around heatmap axes. **TYPE:** `Union[str, None]`                                                                               |
-| `plot_heatmap_edge_width`  | The width of the borders drawn between the cells (0 draws none). **TYPE:** `Union[int, float, None]`                                                                |
-| `plot_heatmap_edge_color`  | The color of the borders drawn between the cells. **TYPE:** `Union[str, None]`                                                                                      |
-
-### datachart.typings.CalendarHeatmapStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the calendar heatmap style.
-
-Added in Unreleased
-
-| ATTRIBUTE                                | DESCRIPTION                                                                                                                                                                                           |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plot_calendar_heatmap_cmap`             | The colormap of the day cells (palette name, single color, list of hex colors, or colormap); None takes the heatmap colormap. **TYPE:** `Union[str, List[str], colors.LinearSegmentedColormap, None]` |
-| `plot_calendar_heatmap_alpha`            | The alpha value of the day cells. **TYPE:** `Union[float, None]`                                                                                                                                      |
-| `plot_calendar_heatmap_font_size`        | The font size of the cell values. **TYPE:** `Union[int, float, str, None]`                                                                                                                            |
-| `plot_calendar_heatmap_font_color`       | The font color of the cell values. **TYPE:** `Union[str, None]`                                                                                                                                       |
-| `plot_calendar_heatmap_font_style`       | The font style of the cell values. **TYPE:** `Union[FONT_STYLE, str, None]`                                                                                                                           |
-| `plot_calendar_heatmap_font_weight`      | The font weight of the cell values. **TYPE:** `Union[FONT_WEIGHT, str, None]`                                                                                                                         |
-| `plot_calendar_heatmap_edge_width`       | The width of the borders drawn between the day cells (0 draws none). **TYPE:** `Union[int, float, None]`                                                                                              |
-| `plot_calendar_heatmap_edge_color`       | The color of the borders drawn between the day cells. **TYPE:** `Union[str, None]`                                                                                                                    |
-| `plot_calendar_heatmap_month_line_width` | The width of the separators drawn between months (0 draws none). **TYPE:** `Union[int, float, None]`                                                                                                  |
-| `plot_calendar_heatmap_month_line_color` | The color of the separators drawn between months; None takes the heatmap frame color. **TYPE:** `Union[str, None]`                                                                                    |
-| `plot_calendar_heatmap_week_start`       | The weekday in the top row of every week, the default of week_start. **TYPE:** `Union[WEEKDAY, str, None]`                                                                                            |
-
-### datachart.typings.GanttStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the gantt chart style.
-
-The range bars take the `plot_bar_*` keys (color, alpha, edge, hatch, zorder); these keys set what is specific to a gantt chart.
-
-Added in Unreleased
-
-| ATTRIBUTE                      | DESCRIPTION                                                                                                                 |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `plot_gantt_bar_height`        | The height of a task bar, as a fraction of its row. **TYPE:** `Union[int, float, None]`                                     |
-| `plot_gantt_progress_color`    | The color of the progress bar; None darkens the task bar's color. **TYPE:** `Union[str, None]`                              |
-| `plot_gantt_progress_alpha`    | The alpha value of the progress bar. **TYPE:** `Union[float, None]`                                                         |
-| `plot_gantt_progress_height`   | The height of the progress bar, as a fraction of the task bar. **TYPE:** `Union[int, float, None]`                          |
-| `plot_gantt_dependency_color`  | The color of the dependency arrows. **TYPE:** `Union[str, None]`                                                            |
-| `plot_gantt_dependency_width`  | The line width of the dependency arrows. **TYPE:** `Union[int, float, None]`                                                |
-| `plot_gantt_dependency_style`  | The arrow head of the dependency arrows, as a matplotlib arrow style. **TYPE:** `Union[str, None]`                          |
-| `plot_gantt_dependency_zorder` | The zorder of the dependency arrows. **TYPE:** `Union[int, float, None]`                                                    |
-| `plot_gantt_dependency_entry`  | The side of the dependent task a dependency arrow enters ("top" or "left"). **TYPE:** `Union[GANTT_ARROW_ENTRY, str, None]` |
-| `plot_gantt_summary_height`    | The height of a group's summary bar under show_group_headers, as a fraction of its row. **TYPE:** `Union[int, float, None]` |
-| `plot_gantt_summary_color`     | The color of the summary bars; None takes each group's color. **TYPE:** `Union[str, None]`                                  |
-| `plot_gantt_group_gap`         | The empty space before each group header, in rows. **TYPE:** `Union[int, float, None]`                                      |
-| `plot_gantt_milestone_marker`  | The marker of a milestone, a task whose start equals its end. **TYPE:** `Union[LINE_MARKER, str, None]`                     |
-| `plot_gantt_milestone_size`    | The size of the milestone marker, in points. **TYPE:** `Union[int, float, None]`                                            |
-| `plot_gantt_today_color`       | The color of the today line. **TYPE:** `Union[str, None]`                                                                   |
-| `plot_gantt_today_style`       | The line style of the today line. **TYPE:** `Union[LINE_STYLE, str, None]`                                                  |
-| `plot_gantt_today_width`       | The line width of the today line. **TYPE:** `Union[int, float, None]`                                                       |
-| `plot_gantt_today_alpha`       | The alpha value of the today line. **TYPE:** `Union[float, None]`                                                           |
-
-### datachart.typings.DumbbellStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the dumbbell chart style.
-
-The value labels take the shared `plot_value_*` keys.
-
-Added in Unreleased
-
-| ATTRIBUTE                        | DESCRIPTION                                                                                                                                                        |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `plot_dumbbell_start_color`      | The color of the start dots; None takes the first color of the PaperAccent pair. **TYPE:** `Union[str, None]`                                                      |
-| `plot_dumbbell_end_color`        | The color of the end dots; None takes the second color of the PaperAccent pair. **TYPE:** `Union[str, None]`                                                       |
-| `plot_dumbbell_alpha`            | The alpha value of the dots. **TYPE:** `Union[float, None]`                                                                                                        |
-| `plot_dumbbell_size`             | The size of the dots, in points squared. **TYPE:** `Union[int, float, None]`                                                                                       |
-| `plot_dumbbell_start_marker`     | The marker of the start dots. **TYPE:** `Union[LINE_MARKER, str, None]`                                                                                            |
-| `plot_dumbbell_end_marker`       | The marker of the end dots. **TYPE:** `Union[LINE_MARKER, str, None]`                                                                                              |
-| `plot_dumbbell_edge_width`       | The edge width of the dots. **TYPE:** `Union[int, float, None]`                                                                                                    |
-| `plot_dumbbell_edge_color`       | The edge color of the dots. **TYPE:** `Union[str, None]`                                                                                                           |
-| `plot_dumbbell_zorder`           | The zorder of the dots. **TYPE:** `Union[int, float, None]`                                                                                                        |
-| `plot_dumbbell_connector_color`  | The color of the connectors. **TYPE:** `Union[str, None]`                                                                                                          |
-| `plot_dumbbell_connector_width`  | The line width of the connectors. **TYPE:** `Union[int, float, None]`                                                                                              |
-| `plot_dumbbell_connector_style`  | The line style of the connectors. **TYPE:** `Union[LINE_STYLE, str, None]`                                                                                         |
-| `plot_dumbbell_connector_zorder` | The zorder of the connectors; below the dots by default. **TYPE:** `Union[int, float, None]`                                                                       |
-| `plot_dumbbell_arrow_color`      | The color of the direction arrows under show_direction. **TYPE:** `Union[str, None]`                                                                               |
-| `plot_dumbbell_arrow_width`      | The line width of the direction arrows. **TYPE:** `Union[int, float, None]`                                                                                        |
-| `plot_dumbbell_arrow_style`      | The direction arrow head, as a matplotlib arrow style. **TYPE:** `Union[str, None]`                                                                                |
-| `plot_dumbbell_arrow_gap`        | The space between a dot's edge and its direction arrow, in points. **TYPE:** `Union[int, float, None]`                                                             |
-| `plot_dumbbell_grid_minor`       | The parts each step between labelled values splits into with fainter gridlines, on a gridded linear value axis; 0 or None draws none. **TYPE:** `Union[int, None]` |
-
-### datachart.typings.ScatterStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the scatter chart style.
-
-| ATTRIBUTE                 | DESCRIPTION                                                    |
-| ------------------------- | -------------------------------------------------------------- |
-| `plot_scatter_color`      | The scatter marker color. **TYPE:** `Union[str, None]`         |
-| `plot_scatter_alpha`      | The alpha value of the markers. **TYPE:** `Union[float, None]` |
-| `plot_scatter_size`       | The marker size. **TYPE:** `Union[int, float, None]`           |
-| `plot_scatter_marker`     | The marker shape. **TYPE:** `Union[LINE_MARKER, str, None]`    |
-| `plot_scatter_zorder`     | The zorder of the scatter. **TYPE:** `Union[int, float, None]` |
-| `plot_scatter_edge_width` | The edge width of markers. **TYPE:** `Union[int, float, None]` |
-| `plot_scatter_edge_color` | The edge color of markers. **TYPE:** `Union[str, None]`        |
-
-### datachart.typings.RegressionStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for regression line style.
-
-| ATTRIBUTE                  | DESCRIPTION                                                      |
-| -------------------------- | ---------------------------------------------------------------- |
-| `plot_regression_color`    | The regression line color. **TYPE:** `Union[str, None]`          |
-| `plot_regression_alpha`    | The alpha of the regression line. **TYPE:** `Union[float, None]` |
-| `plot_regression_width`    | The line width. **TYPE:** `Union[int, float, None]`              |
-| `plot_regression_style`    | The line style. **TYPE:** `Union[LINE_STYLE, str, None]`         |
-| `plot_regression_ci_alpha` | Confidence interval alpha. **TYPE:** `Union[float, None]`        |
-
-### datachart.typings.BoxStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the box plot style.
-
-| ATTRIBUTE                     | DESCRIPTION                                                             |
-| ----------------------------- | ----------------------------------------------------------------------- |
-| `plot_box_color`              | The box fill color. **TYPE:** `Union[str, None]`                        |
-| `plot_box_alpha`              | The alpha value of the box. **TYPE:** `Union[float, None]`              |
-| `plot_box_linewidth`          | The line width of the box. **TYPE:** `Union[int, float, None]`          |
-| `plot_box_edgecolor`          | The edge color of the box. **TYPE:** `Union[str, None]`                 |
-| `plot_box_outlier_marker`     | The outlier marker style. **TYPE:** `Union[LINE_MARKER, str, None]`     |
-| `plot_box_outlier_size`       | The outlier marker size. **TYPE:** `Union[int, float, None]`            |
-| `plot_box_outlier_color`      | The outlier marker color. **TYPE:** `Union[str, None]`                  |
-| `plot_box_outlier_edge_color` | The outlier marker edge color. **TYPE:** `Union[str, None]`             |
-| `plot_box_median_color`       | The median line color. **TYPE:** `Union[str, None]`                     |
-| `plot_box_median_linewidth`   | The median line width. **TYPE:** `Union[int, float, None]`              |
-| `plot_box_whisker_color`      | The whisker line color. **TYPE:** `Union[str, None]`                    |
-| `plot_box_whisker_linewidth`  | The whisker line width. **TYPE:** `Union[int, float, None]`             |
-| `plot_box_cap_color`          | The cap line color. **TYPE:** `Union[str, None]`                        |
-| `plot_box_cap_linewidth`      | The cap line width. **TYPE:** `Union[int, float, None]`                 |
-| `plot_xticks_label_rotate`    | The label rotation of the xticks. **TYPE:** `Union[int, float, None]`   |
-| `plot_yticks_label_rotate`    | The label rotation of the yticks. **TYPE:** `Union[int, float, None]`   |
-| `plot_box_hatch`              | The hatch pattern of the box. **TYPE:** `Union[HATCH_STYLE, str, None]` |
-
-Added in Unreleased
-
-The `plot_box_hatch` attribute.
-
-### datachart.typings.SwarmStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the swarm plot style.
-
-| ATTRIBUTE               | DESCRIPTION                                                       |
-| ----------------------- | ----------------------------------------------------------------- |
-| `plot_swarm_color`      | The point color. **TYPE:** `Union[str, None]`                     |
-| `plot_swarm_alpha`      | The alpha value of the points. **TYPE:** `Union[float, None]`     |
-| `plot_swarm_size`       | The point size. **TYPE:** `Union[int, float, None]`               |
-| `plot_swarm_marker`     | The point marker shape. **TYPE:** `Union[LINE_MARKER, str, None]` |
-| `plot_swarm_zorder`     | The zorder of the points. **TYPE:** `Union[int, float, None]`     |
-| `plot_swarm_edge_width` | The edge width of the points. **TYPE:** `Union[int, float, None]` |
-| `plot_swarm_edge_color` | The edge color of the points. **TYPE:** `Union[str, None]`        |
-
-### datachart.typings.ViolinStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the violin plot style.
-
-| ATTRIBUTE                     | DESCRIPTION                                                                            |
-| ----------------------------- | -------------------------------------------------------------------------------------- |
-| `plot_violin_color`           | The violin fill color. **TYPE:** `Union[str, None]`                                    |
-| `plot_violin_alpha`           | The alpha value of the violin body. **TYPE:** `Union[float, None]`                     |
-| `plot_violin_linewidth`       | The line width of the body edge. **TYPE:** `Union[int, float, None]`                   |
-| `plot_violin_edgecolor`       | The edge color of the body; defaults to the fill. **TYPE:** `Union[str, None]`         |
-| `plot_violin_width`           | The maximum width of the body. **TYPE:** `Union[int, float, None]`                     |
-| `plot_violin_inner_color`     | The color of the inner marks; defaults to the font color. **TYPE:** `Union[str, None]` |
-| `plot_violin_inner_linewidth` | The line width of the inner marks. **TYPE:** `Union[int, float, None]`                 |
-| `plot_violin_median_color`    | The color of the median dot. **TYPE:** `Union[str, None]`                              |
-| `plot_violin_median_size`     | The size of the median dot. **TYPE:** `Union[int, float, None]`                        |
-| `plot_violin_hatch`           | The hatch pattern of the body. **TYPE:** `Union[HATCH_STYLE, str, None]`               |
-
-Added in Unreleased
-
-The `plot_violin_hatch` attribute.
-
-### datachart.typings.RaincloudStyleAttrs
-
-Bases: `ViolinStyleAttrs`, `SwarmStyleAttrs`, `BoxStyleAttrs`
-
-The typing for the raincloud plot style.
-
-The union of the violin (cloud), swarm (rain), and box style keys; each key styles its own part of the raincloud.
-
-### datachart.typings.RidgelineStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the ridgeline plot style.
-
-| ATTRIBUTE                        | DESCRIPTION                                                                            |
-| -------------------------------- | -------------------------------------------------------------------------------------- |
-| `plot_ridgeline_color`           | The ridge fill color; defaults to the palette color. **TYPE:** `Union[str, None]`      |
-| `plot_ridgeline_alpha`           | The alpha value of the ridge fill. **TYPE:** `Union[float, None]`                      |
-| `plot_ridgeline_linewidth`       | The line width of the ridge outline. **TYPE:** `Union[int, float, None]`               |
-| `plot_ridgeline_edgecolor`       | The color of the ridge outline; defaults to the fill. **TYPE:** `Union[str, None]`     |
-| `plot_ridgeline_overlap`         | How far a peak rises into the row above, in [0, 1]. **TYPE:** `Union[float, None]`     |
-| `plot_ridgeline_inner_color`     | The color of the inner marks; defaults to the font color. **TYPE:** `Union[str, None]` |
-| `plot_ridgeline_inner_linewidth` | The line width of the inner marks. **TYPE:** `Union[int, float, None]`                 |
-| `plot_ridgeline_hatch`           | The hatch pattern of the ridge fill. **TYPE:** `Union[HATCH_STYLE, str, None]`         |
-
-### datachart.typings.ParallelCoordsStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the parallel coordinates chart style.
-
-| ATTRIBUTE                           | DESCRIPTION                                                                                                                        |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `plot_parallel_color`               | The line color. **TYPE:** `Union[str, None]`                                                                                       |
-| `plot_parallel_alpha`               | The alpha value of the lines. **TYPE:** `Union[float, None]`                                                                       |
-| `plot_parallel_width`               | The line width. **TYPE:** `Union[int, float, None]`                                                                                |
-| `plot_parallel_style`               | The line style. **TYPE:** `Union[LINE_STYLE, str, None]`                                                                           |
-| `plot_parallel_marker`              | The marker style for data points. **TYPE:** `Union[LINE_MARKER, str, None]`                                                        |
-| `plot_parallel_zorder`              | The draw order of data lines. **TYPE:** `Union[int, None]`                                                                         |
-| `plot_parallel_axis_color`          | The vertical axis line color. **TYPE:** `Union[str, None]`                                                                         |
-| `plot_parallel_axis_width`          | The vertical axis line width. **TYPE:** `Union[int, float, None]`                                                                  |
-| `plot_parallel_axis_zorder`         | The vertical axis line draw order. **TYPE:** `Union[int, None]`                                                                    |
-| `plot_parallel_tick_color`          | The tick mark color. **TYPE:** `Union[str, None]`                                                                                  |
-| `plot_parallel_tick_width`          | The tick mark line width. **TYPE:** `Union[int, float, None]`                                                                      |
-| `plot_parallel_tick_length`         | The tick mark length. **TYPE:** `Union[float, None]`                                                                               |
-| `plot_parallel_tick_label_size`     | The tick label font size. **TYPE:** `Union[int, float, None]`                                                                      |
-| `plot_parallel_tick_label_color`    | The tick label font color. **TYPE:** `Union[str, None]`                                                                            |
-| `plot_parallel_tick_label_bg_color` | The tick label background color; None draws no box and strokes the label with the value halo instead. **TYPE:** `Union[str, None]` |
-| `plot_parallel_tick_label_bg_alpha` | The tick label background alpha. **TYPE:** `Union[float, None]`                                                                    |
-| `plot_parallel_dim_label_size`      | The dimension label font size. **TYPE:** `Union[int, float, None]`                                                                 |
-| `plot_parallel_dim_label_color`     | The dimension label font color. **TYPE:** `Union[str, None]`                                                                       |
-| `plot_parallel_dim_label_rotation`  | The dimension label rotation. **TYPE:** `Union[int, float, None]`                                                                  |
-| `plot_parallel_dim_label_pad`       | The dimension label padding from axis. **TYPE:** `Union[int, float, None]`                                                         |
-
-### datachart.typings.ScatterMatrixStyleAttrs
-
-Bases: `TypedDict`
-
-The typing for the scatter matrix style.
-
-The cells take the scatter, histogram and plot text keys; these keys style what the matrix adds on top of them.
-
-Added in Unreleased
-
-| ATTRIBUTE                                | DESCRIPTION                                                                                                              |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `plot_scatter_matrix_regression_color`   | The color of the regression lines under show_regression; None takes each hue group's color. **TYPE:** `Union[str, None]` |
-| `plot_scatter_matrix_regression_width`   | The line width of the regression lines. **TYPE:** `Union[int, float, None]`                                              |
-| `plot_scatter_matrix_regression_style`   | The line style of the regression lines. **TYPE:** `Union[LINE_STYLE, str, None]`                                         |
-| `plot_scatter_matrix_correlation_size`   | The font size of the correlation text under show_correlation. **TYPE:** `Union[int, float, None]`                        |
-| `plot_scatter_matrix_correlation_weight` | The font weight of the correlation text. **TYPE:** `Union[FONT_WEIGHT, str, None]`                                       |
-| `plot_scatter_matrix_kde_width`          | The line width of the diagonal density curves. **TYPE:** `Union[int, float, None]`                                       |
-| `plot_scatter_matrix_kde_alpha`          | The alpha value of the fill under the diagonal density curves; 0 draws no fill. **TYPE:** `Union[float, None]`           |
-| `plot_scatter_matrix_diagonal_alpha`     | The alpha value of the diagonal histograms, overlaid per hue group. **TYPE:** `Union[float, None]`                       |
+| ATTRIBUTE             | DESCRIPTION                                        |
+| --------------------- | -------------------------------------------------- |
+| `plot_grid_alpha`     | The alpha value of the grid. **TYPE:** \`float     |
+| `plot_grid_color`     | The color of the grid. **TYPE:** \`str             |
+| `plot_grid_linewidth` | The line width of the grid. **TYPE:** \`int        |
+| `plot_grid_linestyle` | The line style of the grid. **TYPE:** \`LINE_STYLE |
+| `plot_grid_zorder`    | The zorder of the grid. **TYPE:** \`int            |
 
 ### datachart.typings.ThemeDefaultAttrs
 
@@ -1471,14 +480,14 @@ Bases: `TypedDict`
 
 The typing for theme-driven defaults and cycles.
 
-| ATTRIBUTE                           | DESCRIPTION                                                                                                                                                                                                                                                                                                                                 |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `chart_default_show_grid`           | The theme default for show_grid, applied when a chart call leaves it unset. Never applies to heatmaps. None means the theme has no opinion. **TYPE:** `Union[SHOW_GRID, str, None]`                                                                                                                                                         |
-| `chart_default_show_values`         | The theme default for show_values, applied to every chart that takes it when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** `Union[bool, None]`                                                                                                                                                             |
-| `chart_default_node_label_position` | The theme default for the network chart's label_position, applied when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** `Union[NODE_LABEL_POSITION, str, None]`                                                                                                                                               |
-| `plot_hatch_cycle`                  | The hatch patterns assigned per bar/histogram series, parallel to the color cycle; with plot_etch on, line area fills and stacked areas take them too. An explicit per-chart hatch style wins. None disables the cycle. **TYPE:** `Union[List[str], None]`                                                                                  |
-| `plot_linestyle_cycle`              | The line styles assigned per line, bump and radial line series, parallel to the color cycle. An explicit per-chart line style wins. None disables the cycle. **TYPE:** `Union[List[Union[LINE_STYLE, str]], None]`                                                                                                                          |
-| `plot_marker_cycle`                 | The markers assigned per scatter and radial scatter series, parallel to the color cycle, and per network node group: a marker, or {"marker": ..., "hollow": True} to draw it as an outline. An explicit per-chart marker wins. None disables the cycle. **TYPE:** `Union[List[Union[LINE_MARKER, str, Dict[str, Union[str, bool]]]], None]` |
+| ATTRIBUTE                           | DESCRIPTION                                                                                                                                                                                                                                                                           |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `chart_default_show_grid`           | The theme default for show_grid, applied when a chart call leaves it unset. Never applies to heatmaps. None means the theme has no opinion. **TYPE:** \`SHOW_GRID                                                                                                                     |
+| `chart_default_show_values`         | The theme default for show_values, applied to every chart that takes it when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** \`bool                                                                                                                    |
+| `chart_default_node_label_position` | The theme default for the network chart's label_position, applied when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** \`NETWORK_LABEL_POSITION                                                                                                        |
+| `plot_hatch_cycle`                  | The hatch patterns assigned per bar/histogram series, parallel to the color cycle; with plot_etch on, line area fills and stacked areas take them too. An explicit per-chart hatch style wins. None disables the cycle. **TYPE:** \`list[str]                                         |
+| `plot_linestyle_cycle`              | The line styles assigned per line, bump and radial line series, parallel to the color cycle. An explicit per-chart line style wins. None disables the cycle. **TYPE:** \`list\[LINE_STYLE                                                                                             |
+| `plot_marker_cycle`                 | The markers assigned per scatter and radial scatter series, parallel to the color cycle, and per network node group: a marker, or {"marker": ..., "hollow": True} to draw it as an outline. An explicit per-chart marker wins. None disables the cycle. **TYPE:** \`list\[LINE_MARKER |
 
 Added in Unreleased
 
@@ -1492,10 +501,10 @@ The typing for the sketch attributes: the theme's render-scoped rc-level look (p
 
 Added in v0.9.1
 
-| ATTRIBUTE                | DESCRIPTION                                                                                                                                                                                                                                                           |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plot_sketch_params`     | The path wobble as matplotlib sketch parameters [scale, length, randomness]; plt.xkcd() uses [1, 100, 2]. None draws clean paths. **TYPE:** `Union[List[float], None]`                                                                                                |
-| `plot_sketch_halo_width` | The extra width, added to the line width, of the halo (in the axes face color) stroked under series lines (line, radial, regression), so crossing lines read as cut-outs; marks, text and patches stay clean. None or 0 draws no halo. **TYPE:** `Union[float, None]` |
+| ATTRIBUTE                | DESCRIPTION                                                                                                                                                                                                                                              |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_sketch_params`     | The path wobble as matplotlib sketch parameters [scale, length, randomness]; plt.xkcd() uses [1, 100, 2]. None draws clean paths. **TYPE:** \`list[float]                                                                                                |
+| `plot_sketch_halo_width` | The extra width, added to the line width, of the halo (in the axes face color) stroked under series lines (line, radial, regression), so crossing lines read as cut-outs; marks, text and patches stay clean. None or 0 draws no halo. **TYPE:** \`float |
 
 ### datachart.typings.InkStyleAttrs
 
@@ -1505,8 +514,8 @@ The typing for the ink attributes: marks drawn as a quill and an etching needle 
 
 Added in Unreleased
 
-| ATTRIBUTE         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plot_ink_stroke` | The broad-nib pen the series lines (line, bump, radial, regression) are drawn with, as a filled ribbon whose width varies along the line. Keys: width_scale (the nib width over the line width), nib_angle (degrees), nib_floor (the hairline width as a share of the nib), wobble (the ink wobble amplitude), taper (the end taper, in pixels). None draws plain lines. **TYPE:** `Union[Dict[str, float], None]`                                                                                                          |
-| `plot_etch`       | The etching that replaces the hatch tile of a hatched fill with hand-drawn lines clipped to its outline; the hatch pattern still picks the lines and . stipples. Keys: spacing (points between lines), jitter (the spacing jitter as a share of it), angle_jitter (degrees), line_width (points), wash (the share of the face color laid over the axes face under the lines; fills under lines take none), color (the etch ink). None keeps matplotlib's hatch. **TYPE:** `Union[Dict[str, Union[float, str, None]], None]` |
-| `plot_value_etch` | The steps a value scale draws in when plot_etch is on: washes (one fill color per step, lightest first) and hatches (one pattern per step, sparsest first). Heatmap, calendar heatmap and hexbin cells and filled contour bands take the step their value falls in, a filled contour draws its level lines and labels over the bands, and a legend of the steps replaces the colorbar. None keeps the colormap. **TYPE:** `Union[Dict[str, List[str]], None]`                                                               |
+| ATTRIBUTE         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_ink_stroke` | The broad-nib pen the series lines (line, bump, radial, regression) are drawn with, as a filled ribbon whose width varies along the line. Keys: width_scale (the nib width over the line width), nib_angle (degrees), nib_floor (the hairline width as a share of the nib), wobble (the ink wobble amplitude), taper (the end taper, in pixels). None draws plain lines. **TYPE:** \`dict[str, float]                                                                                        |
+| `plot_etch`       | The etching that replaces the hatch tile of a hatched fill with hand-drawn lines clipped to its outline; the hatch pattern still picks the lines and . stipples. Keys: spacing (points between lines), jitter (the spacing jitter as a share of it), angle_jitter (degrees), line_width (points), wash (the share of the face color laid over the axes face under the lines; fills under lines take none), color (the etch ink). None keeps matplotlib's hatch. **TYPE:** \`dict\[str, float |
+| `plot_value_etch` | The steps a value scale draws in when plot_etch is on: washes (one fill color per step, lightest first) and hatches (one pattern per step, sparsest first). Heatmap, calendar heatmap and hexbin cells and filled contour bands take the step their value falls in, a filled contour draws its level lines and labels over the bands, and a legend of the steps replaces the colorbar. None keeps the colormap. **TYPE:** \`dict\[str, list[str]\]                                           |

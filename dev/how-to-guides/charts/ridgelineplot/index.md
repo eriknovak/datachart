@@ -1,168 +1,126 @@
 # Ridgeline Plot
 
-This section showcases the ridgeline plot. It contains examples of how to create ridgeline plots using the [datachart.charts.RidgelinePlot](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.RidgelinePlot) function.
+A ridgeline plot stacks many distributions in rows, one ridge per group, so the eye can follow how a shape shifts across an ordered variable: months, hours, releases, epochs. It answers *where do the values sit, how spread are they, and how does that change from row to row*, for more groups than a grid of histograms could hold. This guide shows how to create ridgeline plots with the [datachart.charts.RidgelinePlot](https://eriknovak.github.io/datachart/dev/references/charts/ridgelineplot/#datachart.charts.RidgelinePlot) function, starting with the basics and building up to worked examples on real data.
 
 Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-ridgeline-plot), which maps common tasks to the parameter or style attribute that does the job.
-
-As mentioned above, the ridgeline plots are created using the `RidgelinePlot` function found in the [datachart.charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md) module. Let's import it:
 
 ```
 from datachart.charts import RidgelinePlot
 ```
 
-## Ridgeline Plot Input Attributes
-
-The `RidgelinePlot` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the data points. For a single ridgeline plot, `data` is a list of dictionaries; the points that share a `label` form one row. For multiple ridgeline plots, `data` is a list of lists, and each chart draws in its own subplot.
-
-```
-RidgelinePlot(
-    data=[{                                             # A list of data points (or list of lists for multiple charts)
-        "label": str,                                   # The row label
-        "value": Union[int, float],                     # The numeric value
-    }],
-    style={                                             # The style of the ridges (optional)
-        "plot_ridgeline_color":           Union[str, None],         # The ridge fill color
-        "plot_ridgeline_alpha":           Union[float, None],       # The alpha of the ridge fill
-        "plot_ridgeline_linewidth":       Union[int, float, None],  # The line width of the outline
-        "plot_ridgeline_edgecolor":       Union[str, None],         # The outline color
-        "plot_ridgeline_overlap":         Union[float, None],       # The default row overlap
-        "plot_ridgeline_inner_color":     Union[str, None],         # The color of the inner marks
-        "plot_ridgeline_inner_linewidth": Union[int, float, None],  # The line width of the inner marks
-    },
-    title: Union[str, None],                            # The chart title (optional)
-    xlabel: Union[str, None],                           # The x-axis label (optional)
-    ylabel: Union[str, None],                           # The y-axis label (optional)
-    subtitle: Union[str, List[str], None],              # The subtitle(s), used as subplot titles (optional)
-    emphasis: Union[str, List[str], None],              # The emphasis role(s), aligned with the row labels (optional)
-    emphasis_rule=Optional[dict],                       # One-key rule on a per-row summary; optional "by": median, mean, min, max, sum
-    overlap: Union[float, None],                        # How far a peak rises into the row above, in [0, 1] (optional)
-    normalize: Union[str, None],                        # "per_row" (the default) or "common" (optional)
-    inner: Union[str, None],                            # "median", "quartiles", or None (the default) (optional)
-    fill: bool,                                         # Whether to fill the ridges (optional)
-    show_outline: bool,                                 # Whether to stroke the ridge curves (optional)
-    sort: Union[str, None],                             # None, "ascending", or "descending" by median (optional)
-    bandwidth: Union[str, float, None],                 # The KDE bandwidth rule or factor (optional)
-    orientation: Union[str, None],                      # "horizontal" (the default) or "vertical" (optional)
-    scaley: Union[str, None],                           # The value axis scale (optional)
-    figsize: Union[Tuple[float, float], None],          # The figure size (optional)
-    show_grid: Union[str, None],                        # Which grid lines to show (optional)
-    xmin: Union[int, float, None],                      # The minimum x-axis value; bounds the density grid (optional)
-    xmax: Union[int, float, None],                      # The maximum x-axis value; bounds the density grid (optional)
-    subplots: Union[bool, None],                        # Whether to draw each chart in its own subplot (optional)
-    max_cols: Union[int, None],                         # The maximum number of subplot columns (optional)
-    sharex: Union[bool, None],                          # Whether the subplots share the x-axis (optional)
-    sharey: Union[bool, None],                          # Whether the subplots share the y-axis (optional)
-    hlines: Union[dict, List[dict], None],              # The horizontal reference lines (optional)
-    vlines: Union[dict, List[dict], None],              # The vertical reference lines (optional)
-    vspans: Union[dict, List[dict], None],              # The vertical reference bands (optional)
-    hspans: Union[dict, List[dict], None],              # The horizontal reference bands (optional)
-    label: Union[str, None],                            # The key name in `data` holding the label (optional)
-    value: Union[str, None],                            # The key name in `data` holding the value (optional)
-)
-```
-
-For more details, see the [datachart.charts.RidgelinePlot](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.RidgelinePlot) function.
-
 ## Basics
 
-The examples in this guide share one dataset: a year of daily mean temperatures in Ljubljana. Each month's thirty days are drawn around that month's 1991–2020 climate normal, with the day-to-day spread wider in winter than in summer; the data is computed in a hidden cell with a fixed seed. `chart_data` holds one data point per day, labeled with its month, so the twelve months give twelve ridges.
+The examples in this guide share one dataset: a year of daily mean temperatures in Ljubljana. The monthly means are the station's published 1991–2020 climate normals, rounded; the thirty daily values of each month are illustrative, drawn with a fixed seed around that month's normal, with a wider day-to-day spread in winter than in summer. The data lives in a hidden cell. `temperatures` holds one data point per day, labeled with its month, so the twelve months give twelve ridges. The year has a story in it: a warm, settled summer, and winters where one day can be mild and the next freezing.
 
-The data is a flat list of dictionaries, one per data point, each with a `label` and a `value`. The points that share a `label` form one row:
+Each data point is a dictionary with a `label` (the row) and a numeric `value`; the points that share a label form one ridge:
 
 ```
-chart_data[:3]
+temperatures[:3]
 ```
 
-**Basic example.** Only the `data` argument is required to draw the ridgeline plot. Every label draws one **ridge**, the density of its values, on its own row: the rows follow the order the labels first appear in the data, the first at the top, and each ridge rises from its row's tick into the row above it. Later rows draw over earlier ones, so the overlap reads as depth.
+**Basic example.** Only the `data` argument is required. Every label draws one ridge, the smoothed density of its values, on its own row. The rows follow the order the labels first appear in the data, the first at the top, and each ridge rises from its row's tick into the row above it, so the year reads top to bottom and the summer bulge shows at a glance:
 
 ```
 RidgelinePlot(
     # add the data to the chart
-    data=chart_data
+    data=temperatures
 ).show()
 ```
 
 ## Customizing the Ridgeline Plot
 
-Every customization is either a keyword argument of `RidgelinePlot` or an attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
+Every customization is either a keyword argument of `RidgelinePlot` or a `plot_ridgeline_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                                 | Use                                             | See                                                           |
-| ------------------------------------------ | ----------------------------------------------- | ------------------------------------------------------------- |
-| add a title and axis labels                | `title`, `xlabel`, `ylabel`                     | [Title and axis labels](#title-and-axis-labels)               |
-| resize the figure or show the grid         | `figsize`, `show_grid`                          | [Figure size and grid](#figure-size-and-grid)                 |
-| change the ridge fill, outline, or alpha   | `style={"plot_ridgeline_color": ...}`           | [Ridge style](#ridge-style)                                   |
-| make the rows overlap more or less         | `overlap`                                       | [Row overlap](#row-overlap)                                   |
-| compare the ridge heights, not only shapes | `normalize`                                     | [Ridge scale](#ridge-scale)                                   |
-| mark the median or the quartiles           | `inner`                                         | [Inner marks](#inner-marks)                                   |
-| draw only the outlines or only the fills   | `fill`, `show_outline`                          | [Fill and outline](#fill-and-outline)                         |
-| order the rows by their median             | `sort`                                          | [Row order](#row-order)                                       |
-| smooth or sharpen the ridges               | `bandwidth`                                     | [Bandwidth](#bandwidth)                                       |
-| fix the value range of the ridges          | `xmin`, `xmax`                                  | [Value range](#value-range)                                   |
-| stack the rows along the x-axis            | `orientation`                                   | [Orientation](#orientation)                                   |
-| highlight one row, mute the rest           | `emphasis`, `emphasis_rule`                     | [Emphasis](#emphasis)                                         |
-| draw a threshold or reference line         | `vlines`, `vspans`                              | [Reference lines](#reference-lines)                           |
-| draw each dataset in its own subplot       | `data` as a list of lists, `subplots`, `sharex` | [Multiple Ridgeline Plots](#multiple-ridgeline-plots)         |
-| compose the ridgeline with other charts    | `Panel`, `Grid`                                 | [Composing ridgelines](#composing-ridgelines)                 |
-| save the chart to a file                   | `save_figure`                                   | [Saving the Chart as an Image](#saving-the-chart-as-an-image) |
+| I want to…                                 | Use                                                         | See                                                                                                     |
+| ------------------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| add a title and axis labels                | `title`, `xlabel`, `ylabel`                                 | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| place and format the value ticks           | `xticks`, `xticks_format`                                   | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| resize the figure or show the grid         | `figsize`, `show_grid`                                      | [Figure size and grid](#figure-size-and-grid)                                                           |
+| change the ridge fill, outline, or alpha   | `style={"plot_ridgeline_color": ...}`                       | [Ridge style](#ridge-style)                                                                             |
+| make the rows overlap more or less         | `overlap`                                                   | [Row overlap](#row-overlap)                                                                             |
+| compare the ridge heights, not only shapes | `normalize`                                                 | [Ridge scale](#ridge-scale)                                                                             |
+| mark the median or the quartiles           | `inner`                                                     | [Inner marks](#inner-marks)                                                                             |
+| draw only the outlines or only the fills   | `fill`, `show_outline`                                      | [Fill and outline](#fill-and-outline)                                                                   |
+| order the rows by their median             | `sort`                                                      | [Row order](#row-order)                                                                                 |
+| smooth or sharpen the ridges               | `bandwidth`                                                 | [Bandwidth](#bandwidth)                                                                                 |
+| fix the value range of the ridges          | `xmin`, `xmax`                                              | [Value range](#value-range)                                                                             |
+| stack the rows along the x-axis            | `orientation`                                               | [Orientation](#orientation)                                                                             |
+| highlight some rows, mute the rest         | `emphasis`, `emphasis_rule`                                 | [Emphasis](#emphasis)                                                                                   |
+| mark a threshold or shade a range          | `vlines`, `vspans`, `hlines`, `hspans`                      | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| title and place the legend                 | `show_legend`, `legend`                                     | [Legend](#legend)                                                                                       |
+| put a note on the chart                    | `texts`                                                     | [Text annotations](#text-annotations)                                                                   |
+| draw several ridgelines side by side       | `data` as a list of lists, `subtitle`, `sharex`, `max_cols` | [Multiple Ridgeline Plots](#multiple-ridgeline-plots)                                                   |
+| overlay the ridges with another chart      | `Panel`                                                     | [Composing with Panel and Grid](#composing-with-panel-and-grid)                                         |
+| put the ridgeline next to other charts     | `Grid`                                                      | [Composing with Panel and Grid](#composing-with-panel-and-grid)                                         |
+| show values that span orders of magnitude  | `scaley`, `xticks`, `xticklabels`                           | [Axis scales](#axis-scales)                                                                             |
+| plot data with other key names             | `label`, `value`                                            | [Custom data keys](#custom-data-keys)                                                                   |
+| save the chart to a file                   | `save_figure`                                               | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
-The full list of style attributes is in the [datachart.typings.RidgelineStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.RidgelineStyleAttrs) type; the full list of parameters is in the [datachart.charts.RidgelinePlot](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.RidgelinePlot) reference.
+The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
 
-### Title and axis labels
+| Parameter                                    | Constant                                                                                                                                                                                                                                     |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `normalize`                                  | [`RIDGELINE_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RIDGELINE_SCALE)                                                                                                                     |
+| `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
+| `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
+| `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
+| `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
+| `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
+| `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
+| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
+| `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
+| `bandwidth`                                  | [`BANDWIDTH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH)                                                                                                                                 |
+| `inner`                                      | [`VIOLIN_INNER`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VIOLIN_INNER)                                                                                                                           |
+| `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
 
-To add the chart title and axis labels, add the `title`, `xlabel` and `ylabel` attributes. The value axis is the x-axis and the rows stack along the y-axis.
+The full list of style attributes is in the [datachart.typings.RidgelineStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/ridgelineplot/#datachart.typings.RidgelineStyleAttrs) type; the full list of parameters is in the [datachart.charts.RidgelinePlot](https://eriknovak.github.io/datachart/dev/references/charts/ridgelineplot/#datachart.charts.RidgelinePlot) reference.
+
+### Title, axis labels and ticks
+
+Without a title and axis labels the reader cannot tell that the ridges are temperatures, or that the rows are months; `title`, `xlabel` and `ylabel` say it. With the default orientation the value axis is the x-axis and the rows stack along the y-axis. `xticks` places the value ticks where a reader expects them (every 10 °C here), and `xticks_format` formats their labels with any `"{x:.0f}"` style string, so the unit can travel with the numbers.
 
 ```
 RidgelinePlot(
-    data=chart_data,
+    data=temperatures,
     # add the title
     title="Daily mean temperature in Ljubljana",
     # add the x and y axis labels
-    xlabel="Temperature (°C)",
+    xlabel="Temperature",
     ylabel="Month",
+    # value ticks every 10 °C, with the unit on each
+    xticks=[-20, -10, 0, 10, 20, 30, 40],
+    xticks_format="{x:.0f} °C",
 ).show()
 ```
 
 ### Figure size and grid
 
-To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains predefined figure sizes. To show the grid lines, add the `show_grid` attribute, which supports the values of the [datachart.constants.SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) constant. The ridges carry no legend entries: their labels are already on the row axis.
+Twelve rows need height, and a ridgeline reads best on a figure taller than it is by default. `figsize` takes a `(width, height)` tuple in inches or one of the presets in [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE), sized for a full or half page width. Vertical grid lines let the eye carry a ridge's peak down to the value axis; `show_grid=SHOW_GRID.X` ([SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)) draws them along the value axis only, since the rows already have their baselines.
 
 ```
 from datachart.constants import FIG_SIZE, SHOW_GRID
-```
 
-```
 RidgelinePlot(
-    data=chart_data,
+    data=temperatures,
     title="Daily mean temperature in Ljubljana",
     xlabel="Temperature (°C)",
     ylabel="Month",
-    # add to determine the figure size
+    # a full-width, medium-height figure
     figsize=FIG_SIZE.FULL_MEDIUM,
-    # add to show the grid lines along the value axis
+    # grid lines along the value axis only
     show_grid=SHOW_GRID.X,
 ).show()
 ```
 
 ### Ridge style
 
-To change the style of the ridges, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.RidgelineStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.RidgelineStyleAttrs) type:
-
-| Attribute                        | Description                                                      |
-| -------------------------------- | ---------------------------------------------------------------- |
-| `plot_ridgeline_color`           | The ridge fill color; the palette color by default.              |
-| `plot_ridgeline_alpha`           | The alpha of the fill; the outline stays opaque.                 |
-| `plot_ridgeline_linewidth`       | The line width of the outline.                                   |
-| `plot_ridgeline_edgecolor`       | The outline color; the fill color by default.                    |
-| `plot_ridgeline_overlap`         | The row overlap used when `overlap` is not passed.               |
-| `plot_ridgeline_inner_color`     | The color of the inner marks; the theme's font color by default. |
-| `plot_ridgeline_inner_linewidth` | The line width of the inner marks.                               |
-
-A white outline over an opaque fill is the classic joy plot look: every ridge cuts cleanly into the row behind it.
+The default look, a translucent fill with an outline of the same color, lets the rows behind show through. The `style` dictionary changes it: the fill color and alpha, the outline color and width, the default overlap, and the color and width of the inner marks; the attributes are listed in [datachart.typings.RidgelineStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/ridgelineplot/#datachart.typings.RidgelineStyleAttrs), and any attribute left out keeps the value of the active theme. An opaque fill with a white outline is the classic *joy plot* look: every ridge cuts cleanly into the row behind it, which suits many rows that overlap a lot.
 
 ```
 RidgelinePlot(
-    data=chart_data,
-    # define the style of the ridges
+    data=temperatures,
+    # the classic look: an opaque fill cut by a white outline
     style={
         "plot_ridgeline_color": "#2E86AB",
         "plot_ridgeline_alpha": 1.0,
@@ -177,41 +135,35 @@ RidgelinePlot(
 
 ### Row overlap
 
-The `overlap` attribute sets how far each ridge rises into the row above it, as a number between 0 and 1: each ridge rises from its row's tick, and its peak stands `1 + overlap` rows above it. `0` makes the peaks just touch the next row, `1` sends them a whole row further. Without it the theme's `plot_ridgeline_overlap` applies (`0.5` in the predefined themes). Values outside `[0, 1]` raise a `ValueError`.
+Ridges that overlap save space and make the shift from row to row easy to follow; too much overlap hides the rows behind. `overlap` sets how far each ridge rises into the row above, between 0 and 1: a ridge's peak stands `1 + overlap` rows above its tick, so `0` makes the peaks just touch the next row and `1` sends them a whole row further. Without it the theme's `plot_ridgeline_overlap` applies (`0.5` in the predefined themes); values outside `[0, 1]` raise a `ValueError`. Side by side, the flat version is easier to read row by row, and the overlapping one shows the seasonal sweep better.
 
 ```
 from datachart.utils import Grid
 
 Grid(
     [
-        RidgelinePlot(data=chart_data, overlap=0.0, title="overlap=0"),
-        RidgelinePlot(data=chart_data, overlap=1.0, title="overlap=1"),
+        # the peaks just touch the next row
+        RidgelinePlot(data=temperatures, overlap=0.0, title="overlap=0"),
+        # the peaks rise a whole row further
+        RidgelinePlot(data=temperatures, overlap=1.0, title="overlap=1"),
     ],
+    title="Daily mean temperature in Ljubljana",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
 ### Ridge scale
 
-The `normalize` attribute chooses how the ridges are scaled. It supports the values of the [datachart.constants.RIDGELINE_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RIDGELINE_SCALE) constant:
-
-| Value       | Description                                                                                                                                                                  |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `"per_row"` | Every ridge reaches the same peak height, so the shapes compare (the default).                                                                                               |
-| `"common"`  | All ridges share one density scale: the tallest ridge reaches the peak height and the others stay in proportion, so a wide, flat distribution draws lower than a narrow one. |
-
-With a common scale the narrow summer months stand out as tall ridges and the variable winter months flatten.
+Summer days in Ljubljana vary less than winter days, so a summer month's values are packed more tightly. The default scale hides that: every ridge is stretched to the same peak height, so the chart compares shapes and positions, the honest choice when the question is *where* each row sits. `normalize` picks the scale from [RIDGELINE_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RIDGELINE_SCALE): `RIDGELINE_SCALE.PER_ROW` (the default) or `RIDGELINE_SCALE.COMMON`, where every ridge shares one density scale, the tallest reaches the peak height and the rest stay in proportion. The common scale is the honest choice when the question is *how concentrated* each row is: the narrow summer months stand tall and the variable winter months flatten. Neither scale shows how many values a row holds, since every ridge is a density with the same area; when the row sizes differ a lot, say so in the labels.
 
 ```
 from datachart.constants import RIDGELINE_SCALE
-```
 
-```
 RidgelinePlot(
-    data=chart_data,
+    data=temperatures,
     # one density scale for every ridge
     normalize=RIDGELINE_SCALE.COMMON,
-    title="Daily mean temperature in Ljubljana",
+    title="Daily mean temperature in Ljubljana, on a common scale",
     xlabel="Temperature (°C)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
@@ -219,24 +171,16 @@ RidgelinePlot(
 
 ### Inner marks
 
-The `inner` attribute draws marks inside each ridge, from its baseline up to the ridge height at that value. It takes the values of the [datachart.constants.VIOLIN_INNER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VIOLIN_INNER) constant, without `"box"`:
-
-| Value         | Description                                                     |
-| ------------- | --------------------------------------------------------------- |
-| `"median"`    | One solid line at the median.                                   |
-| `"quartiles"` | A dashed median line and dotted first and third quartile lines. |
-| `None`        | No marks (the default).                                         |
+A ridge's peak is not its median, and a skewed row can mislead the eye. `inner` draws summary marks inside each ridge, from its baseline up to the curve: `VIOLIN_INNER.MEDIAN` draws one solid line at the median, `VIOLIN_INNER.QUARTILES` a dashed median and dotted first and third quartiles, and `None` (the default) no marks ([VIOLIN_INNER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VIOLIN_INNER); `"box"` is not supported and raises a `ValueError`). The quartiles show the middle half of each month's days, wide in winter and narrow in summer. `plot_ridgeline_inner_color` and `plot_ridgeline_inner_linewidth` style the marks.
 
 ```
 from datachart.constants import VIOLIN_INNER
-```
 
-```
 RidgelinePlot(
-    data=chart_data,
-    # mark the quartiles of every month
+    data=temperatures,
+    # mark the median and quartiles of every month
     inner=VIOLIN_INNER.QUARTILES,
-    title="Daily mean temperature in Ljubljana",
+    title="Daily mean temperature in Ljubljana, with quartiles",
     xlabel="Temperature (°C)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
@@ -244,14 +188,15 @@ RidgelinePlot(
 
 ### Fill and outline
 
-The `fill` and `show_outline` attributes turn the ridge fill and the density curve on and off independently; both are on by default. Outlines alone keep every row visible through the overlap. Turning both off raises a `ValueError`, since nothing would be drawn.
+Filled ridges hide part of the rows behind them, and with a high overlap that can hide the very shift the chart is about. `fill` and `show_outline` turn the fill and the density curve on and off independently; both are on by default. Outlines alone keep every row visible through the overlap, like a stack of contour lines; turning both off raises a `ValueError`, since nothing would be drawn.
 
 ```
 RidgelinePlot(
-    data=chart_data,
+    data=temperatures,
     # draw only the density curves
     fill=False,
-    title="Daily mean temperature in Ljubljana",
+    overlap=1.0,
+    title="Daily mean temperature in Ljubljana, outlines only",
     xlabel="Temperature (°C)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
@@ -259,16 +204,14 @@ RidgelinePlot(
 
 ### Row order
 
-The rows follow the order the labels first appear in the data. The `sort` attribute orders them by their median instead, with the values of the [datachart.constants.SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT) constant: `"ascending"` puts the smallest median at the top, `"descending"` the largest. Rows with the same median keep their input order.
+When the rows have a natural order, like months, keep it: the ridgeline is about the shift along that order. When they do not, or when the question is a ranking, `sort` orders the rows by their median ([SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)): `SORT.ASCENDING` puts the smallest median at the top, `SORT.DESCENDING` the largest, and `None` keeps the input order; rows with the same median keep their input order. Sorted from warmest to coldest, the months fall into pairs on either side of midsummer.
 
 ```
 from datachart.constants import SORT
-```
 
-```
 RidgelinePlot(
-    data=chart_data,
-    # the warmest month at the top
+    data=temperatures,
+    # the warmest median at the top
     sort=SORT.DESCENDING,
     inner=VIOLIN_INNER.MEDIAN,
     title="Months from warmest to coldest",
@@ -279,26 +222,30 @@ RidgelinePlot(
 
 ### Bandwidth
 
-Each ridge is a kernel density estimate of its values. The `bandwidth` attribute sets how much the estimate smooths: a rule of the [datachart.constants.BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) constant (`"scott"`, the default, or `"silverman"`) or a scalar factor, where smaller values follow the data more closely and larger ones smooth it more.
+Each ridge is a kernel density estimate, a smoothed version of the values, and how much it smooths decides what the reader sees: too little and thirty days turn into noise, too much and a real second peak disappears. `bandwidth` takes a rule from [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) (`BANDWIDTH.SCOTT`, the default, or `BANDWIDTH.SILVERMAN`) or a scalar factor, where smaller values follow the data more closely and larger ones smooth it more. With only thirty values per row, a narrow bandwidth shows bumps that are sampling noise, not weather; the rules are the safer choice.
 
 ```
-RidgelinePlot(
-    data=chart_data,
-    # a narrow bandwidth follows the thirty days closely
-    bandwidth=0.25,
+from datachart.constants import BANDWIDTH
+
+Grid(
+    [
+        # a narrow bandwidth follows every day
+        RidgelinePlot(data=temperatures, bandwidth=0.25, title="bandwidth=0.25"),
+        # Silverman's rule
+        RidgelinePlot(data=temperatures, bandwidth=BANDWIDTH.SILVERMAN, title="bandwidth=SILVERMAN"),
+    ],
     title="Daily mean temperature in Ljubljana",
-    xlabel="Temperature (°C)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
 ### Value range
 
-All ridges are evaluated on one shared grid, so the curves line up point for point. By default the grid spans every row's values, extended a little past the extremes so the tails fade out. On the value axis, `xmin` and `xmax` (`ymin` and `ymax` when the rows run vertically) also bound that grid, so the ridges stop exactly at the axis limits.
+All ridges are evaluated on one shared grid of values, so the curves line up point for point. By default the grid spans every row's values, extended a little past the extremes so the tails fade out. When a chart must match another one, or a range has a meaning of its own, `xmin` and `xmax` (`ymin` and `ymax` when the rows run vertically) fix both the axis and the grid, so the ridges stop exactly at the axis limits. Every day of the year lies between -10 and 30 °C, a round frame for a temperate climate; the smoothing spreads the winter ridges a little past the coldest day, and the limit cuts those tails.
 
 ```
 RidgelinePlot(
-    data=chart_data,
+    data=temperatures,
     # the ridges and the axis both span -10 to 30 °C
     xmin=-10,
     xmax=30,
@@ -310,23 +257,17 @@ RidgelinePlot(
 
 ### Orientation
 
-To change the orientation, add the `orientation` attribute with a value of the [datachart.constants.ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) constant:
-
-| Value          | Description                                                                                                                               |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `"horizontal"` | The value axis is the x-axis and the rows stack along the y-axis, the first at the top, each ridge rising up from its tick (the default). |
-| `"vertical"`   | The value axis is the y-axis and the rows run along the x-axis, the first on the left, each ridge rising to the right from its tick.      |
+Temperature is a height on a thermometer, and some readers expect it on a vertical axis. `orientation=ORIENTATION.VERTICAL` ([ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)) puts the values on the y-axis and runs the rows along the x-axis, the first on the left, each ridge rising to the right from its tick; the axis labels swap with it. `ORIENTATION.HORIZONTAL` is the default. The vertical layout suits a wide figure with short row labels; with long labels, stay horizontal.
 
 ```
 from datachart.constants import ORIENTATION
-```
 
-```
 RidgelinePlot(
-    data=chart_data,
-    # transpose the chart
+    data=temperatures,
+    # the rows run left to right
     orientation=ORIENTATION.VERTICAL,
     title="Daily mean temperature in Ljubljana",
+    # the axis labels swap with the orientation
     xlabel="Month",
     ylabel="Temperature (°C)",
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -335,42 +276,97 @@ RidgelinePlot(
 
 ### Emphasis
 
-To draw attention to some rows, add the `emphasis` attribute. The `emphasis` list aligns with the row **labels** of one call, in the order the labels first appear in the data — here January to December — whatever the `sort`. Each entry is one of the following roles:
-
-| Role           | Description                                                                 |
-| -------------- | --------------------------------------------------------------------------- |
-| `"background"` | Mutes the ridge and its inner marks into the theme's muted color and alpha. |
-| `"highlight"`  | Bolds the ridge outline.                                                    |
-| `None`         | Leaves the row unchanged.                                                   |
-
-A single value applies to every row. The [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constant holds the roles; the [highlighting guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting.ipynb) covers emphasis across chart types and themes.
-
-To pick the rows from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every row whose summary matches and mutes the rest. The summary is the median of each row's values by default; a `"by"` key picks `"mean"`, `"min"`, `"max"`, or `"sum"` instead. An explicit `emphasis` role wins over the rule.
+A chart usually makes one point, and emphasis makes it visible. `emphasis` takes one role per row, aligned with the row labels in the order they first appear in the data (here January to December), whatever the `sort`: `"highlight"` bolds a ridge's outline, `"background"` mutes the ridge and its inner marks into the theme's muted color, and `None` leaves it as it is; a single value applies to every row. The roles are also available as the [EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants, and the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis across chart types and themes. Muting every month but July points at the warmest month:
 
 ```
+from datachart.constants import EMPHASIS
+
 RidgelinePlot(
-    data=chart_data,
-    # highlight the three months with the warmest median, mute the rest
-    emphasis_rule={"top": 3},
-    title="The three warmest months",
+    data=temperatures,
+    # one role per month, January first
+    emphasis=[EMPHASIS.BACKGROUND] * 6 + [EMPHASIS.HIGHLIGHT] + [EMPHASIS.BACKGROUND] * 5,
+    inner=VIOLIN_INNER.MEDIAN,
+    title="July, the warmest month",
     xlabel="Temperature (°C)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
-### Reference lines
+`emphasis_rule` picks the rows from the data instead of listing them by hand. It is a one-key rule: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}`, read against a summary of each row, the median by default; a `"by"` key picks `"mean"`, `"min"`, `"max"` or `"sum"` instead. The rows that match are highlighted and the rest muted, and an explicit `emphasis` role wins over the rule. Reading the rule against each month's coldest day (`"by": "min"`) picks out every month with at least one freezing day:
 
-A reference line puts a threshold next to the ridges. With the default orientation the value axis is the x-axis, so add vertical lines with the `vlines` attribute and the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) typing, and vertical bands with `vspans` and the [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) typing.
+```
+RidgelinePlot(
+    data=temperatures,
+    # highlight the months whose coldest day was below freezing
+    emphasis_rule={"below": 0, "by": "min"},
+    title="Months with at least one freezing day",
+    xlabel="Temperature (°C)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Reference lines and bands
+
+A threshold turns a distribution into an answer: how much of each month lies below freezing, or inside a comfortable range. With the default orientation the value axis is the x-axis, so `vlines` draws a vertical line at a value and `vspans` shades a range of values; `hlines` and `hspans` work along the row axis, where the rows sit at positions `1`, `2`, `3`, … from the top. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) and [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs). The example marks the freezing point with a dashed line and shades 18 to 24 °C, a comfortable range for a day outdoors.
 
 ```
 from datachart.constants import LINE_STYLE
 
 RidgelinePlot(
-    data=chart_data,
-    # mark the freezing point
+    data=temperatures,
+    # a dashed line at the freezing point
     vlines={
         "x": 0,
-        "style": {"plot_vline_color": "#d62728", "plot_vline_style": LINE_STYLE.DASHED},
+        "label": "freezing",
+        "style": {"plot_vline_color": "#c1121f", "plot_vline_style": LINE_STYLE.DASHED},
+    },
+    # shade the comfortable range
+    vspans={"xmin": 18, "xmax": 24, "label": "comfortable"},
+    title="Daily mean temperature in Ljubljana",
+    xlabel="Temperature (°C)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Legend
+
+The ridges add no legend entries, since their labels already sit on the row axis; the legend is for the reference lines and bands. `show_legend` lists them, and `legend` says where and how, with a `title`, a `location` from [LEGEND_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), the number of columns `ncols` and the `alignment` of the entries from [LEGEND_ALIGN](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN); a field left out falls back to the theme ([LegendSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendSettingAttrs)). The ridges fill the plot area, so the legend goes outside it, to the right.
+
+```
+from datachart.constants import LEGEND_LOCATION
+
+RidgelinePlot(
+    data=temperatures,
+    vlines={
+        "x": 0,
+        "label": "freezing",
+        "style": {"plot_vline_color": "#c1121f", "plot_vline_style": LINE_STYLE.DASHED},
+    },
+    vspans={"xmin": 18, "xmax": 24, "label": "comfortable"},
+    title="Daily mean temperature in Ljubljana",
+    xlabel="Temperature (°C)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    # list the reference line and band
+    show_legend=True,
+    # a titled legend outside the axes
+    legend={"title": "Reference", "location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+).show()
+```
+
+### Text annotations
+
+Where a reference line marks a value, a note explains a row. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (value, row position) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. Rows sit at positions `1`, `2`, `3`, … from the top, and a ridge rises toward smaller positions: `(4, 0.6)` is a point inside January's ridge, just above its baseline. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling.
+
+```
+RidgelinePlot(
+    data=temperatures,
+    # a note pinned to the axes, pointing into January's ridge
+    texts={
+        "text": "January: the coldest month,\nand the widest day-to-day swing",
+        "x": 0.62,
+        "y": 0.9,
+        "coords": "axes",
+        "target": (4, 0.6),
     },
     title="Daily mean temperature in Ljubljana",
     xlabel="Temperature (°C)",
@@ -380,33 +376,37 @@ RidgelinePlot(
 
 ## Multiple Ridgeline Plots
 
-To create multiple ridgeline plots, pass a list of lists to the `data` argument. Each inner list holds the data points of one chart, and every chart draws in its own subplot. The `subtitle` becomes the subplot title and the `title`, `xlabel` and `ylabel` are positioned to be global for all charts; `sharex` shares the value axis across the subplots. The ridges of every subplot are evaluated over one shared value range, so they span the same stretch of the axis.
-
-Here the year is split into the cold half (October to March) and the warm half (April to September).
+To compare two sets of rows, pass a list of lists to `data`: each inner list is one ridgeline, drawn in its own subplot, and the per-chart attributes (`subtitle`, `style`, `emphasis`, `vlines`, …) become lists aligned with it. `subtitle` titles the subplots, while `title`, `xlabel` and `ylabel` stay global; `max_cols` limits the subplots per row. `sharex=True` puts every subplot on one value axis, so a ridge in one subplot compares with a ridge in the next (`sharey` shares the row axis, which only makes sense when the subplots have the same rows); the ridges of every subplot are evaluated over one shared value range either way. Here the year is split into its cold half (October to March) and its warm half (April to September), each in its own color.
 
 ```
 COLD = ["Oct", "Nov", "Dec", "Jan", "Feb", "Mar"]
 
+WARM = ["Apr", "May", "Jun", "Jul", "Aug", "Sep"]
+
+# each half in its own month order, the rows follow it
 halves = [
-    [point for point in chart_data if point["label"] in COLD],
-    [point for point in chart_data if point["label"] not in COLD],
+    [point for month in half for point in temperatures if point["label"] == month]
+    for half in (COLD, WARM)
 ]
 
 RidgelinePlot(
-    # use a list of lists to define multiple ridgeline plots
+    # one ridgeline per half of the year
     data=halves,
+    # a title and a color per subplot
     subtitle=["Cold half", "Warm half"],
+    style=[{"plot_ridgeline_color": "#457b9d"}, {"plot_ridgeline_color": "#e76f51"}],
     title="Daily mean temperature in Ljubljana",
     xlabel="Temperature (°C)",
     figsize=FIG_SIZE.FULL_SHORT,
-    # the same temperature axis for both charts
+    # side by side, on one temperature axis
+    max_cols=2,
     sharex=True,
 ).show()
 ```
 
-## Composing ridgelines
+### Composing with Panel and Grid
 
-Each ridge sits on its row's category position, so a ridgeline figure composes like any group chart. [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays it with a [datachart.charts.SwarmPlot](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.SwarmPlot) of the same labels to show every day under its month's ridge: over ridges the panel packs the swarm on the side the ridges rise to, so every day sits inside the ridge of its month. The swarm must share the horizontal orientation; a dark, small point keeps the days readable over the ridge fill. The panel keeps the first row at the top for every chart in it, and labels its axes by role: `xlabel` names the category axis and `ylabel_left` the value axis, wherever they are drawn.
+A ridgeline says where a row's values sit; it does not show the values themselves. [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays figures in one coordinate space, with one ridgeline per panel, and a [SwarmPlot](https://eriknovak.github.io/datachart/dev/references/charts/swarmplot/#datachart.charts.SwarmPlot) of the same data puts every day under its month's ridge: over ridges, the panel packs the swarm on the side the ridges rise to, so each day sits inside its month's ridge. The swarm must share the horizontal orientation, and a small, dark point keeps the days readable over the fill. The panel keeps the first row at the top for every chart in it, and labels its axes by role: `xlabel` names the category axis and `ylabel_left` the value axis, wherever they are drawn. The [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) guide covers the rest.
 
 ```
 from datachart.charts import SwarmPlot
@@ -414,10 +414,10 @@ from datachart.utils import Panel
 
 Panel(
     [
-        RidgelinePlot(data=chart_data, overlap=0.2),
+        RidgelinePlot(data=temperatures, overlap=0.2),
         # one point per day, on its month's row
         SwarmPlot(
-            data=chart_data,
+            data=temperatures,
             orientation=ORIENTATION.HORIZONTAL,
             style={"plot_swarm_color": "#2C3E50", "plot_swarm_size": 8},
         ),
@@ -430,15 +430,15 @@ Panel(
 ).show()
 ```
 
-[datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) arranges a ridgeline next to other figures, here a horizontal [datachart.charts.BoxPlot](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.BoxPlot) of the same months. With `sharex` and `sharey` the two charts share both axes: the months line up row for row, and the box plot follows the ridgeline's first-row-at-the-top order.
+[datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) puts a ridgeline next to other figures, each in a cell of its own; here a horizontal [BoxPlot](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.charts.BoxPlot) of the same months sits beside it, so the reader sees the shape and the summary together. With `sharex` and `sharey` the two charts share both axes: the months line up row for row, and the box plot follows the ridgeline's first-row-at-the-top order. The [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) guide covers layouts.
 
 ```
 from datachart.charts import BoxPlot
 
 Grid(
     [
-        RidgelinePlot(data=chart_data, title="Ridgeline"),
-        BoxPlot(data=chart_data, orientation=ORIENTATION.HORIZONTAL, title="Box plot"),
+        RidgelinePlot(data=temperatures, title="Ridgeline"),
+        BoxPlot(data=temperatures, orientation=ORIENTATION.HORIZONTAL, title="Box plot"),
     ],
     title="Daily mean temperature in Ljubljana",
     # one temperature axis and one month axis for both charts
@@ -450,16 +450,40 @@ Grid(
 
 ## Additional Features
 
-### Custom data keys
+### Axis scales
 
-If the data points hold the label and the value under other keys, add the `label` and `value` attributes with the key names, so the data need not be reshaped.
+Some values span orders of magnitude, and on a linear axis the small ones collapse into a spike at zero. `scaley` sets the scale of the value axis, whichever direction it runs, with a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member. The ridges, though, are estimated at evenly spaced values, so on a log axis the rows with small values get only a few of them and turn jagged. For data that spans orders of magnitude, estimate the ridges on the logarithm of the values instead, and label the ticks in the original unit with `xticks` and `xticklabels`. `response_times`, defined in a hidden cell, holds illustrative response times of three API endpoints, from a health check of a few milliseconds to a report that takes over a second; on the log scale all three ridges are readable, and the right-skewed response times turn into symmetric bumps.
 
 ```
-records = [{"month": point["label"], "celsius": point["value"]} for point in chart_data]
+# the ridges are estimated on the log of each value
+log_response_times = [
+    {"label": point["label"], "value": np.log10(point["value"])} for point in response_times
+]
 
 RidgelinePlot(
+    data=log_response_times,
+    # ticks at the powers of ten, labeled in milliseconds
+    xticks=[0, 1, 2, 3, 4],
+    xticklabels=["1", "10", "100", "1,000", "10,000"],
+    title="Response time by endpoint",
+    xlabel="Response time (ms, log scale)",
+    figsize=FIG_SIZE.FULL_SHORT,
+).show()
+```
+
+### Custom data keys
+
+Data that comes from a file or an API rarely uses the `label` and `value` keys, and renaming every record just to plot it is a chore. Instead, tell `RidgelinePlot` which keys to read with the `label` and `value` arguments. `records` stores the days the way a weather export would, with a `month` and a `celsius` key:
+
+```
+records = [{"month": point["label"], "celsius": point["value"]} for point in temperatures]
+records[:2]
+```
+
+```
+RidgelinePlot(
     data=records,
-    # the keys holding the label and the value
+    # the keys that hold the row and the value
     label="month",
     value="celsius",
     title="Daily mean temperature in Ljubljana",
@@ -468,46 +492,15 @@ RidgelinePlot(
 ).show()
 ```
 
-## Saving the Chart as an Image
-
-To save the chart as an image, use the [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.save_figure) function.
-
-```
-from datachart.utils import save_figure
-
-figure = RidgelinePlot(
-    data=chart_data,
-    title="Daily mean temperature in Ljubljana",
-    xlabel="Temperature (°C)",
-    figsize=FIG_SIZE.FULL_MEDIUM,
-)
-save_figure(figure, "./fig_ridgeline_plot.png", dpi=300)
-```
-
-The figure should be saved in the current working directory.
-
 ## Real-World Examples
 
-The examples below put the ridgeline plot to work on typical questions. Their data is illustrative: drawn with a fixed seed around realistic values, so every run draws the same chart.
+The examples below put the features above to work, each one answering a question. Their data is illustrative: drawn with a fixed seed around realistic values, so every run draws the same chart. The data lives in hidden cells; each example says what its data is.
 
-### API latency across releases
+### Example 1: Which Releases Slowed the Service Down? (Median Marks, an Emphasis Rule, and a Target Line)
 
-A service team compares the response times of eight releases against a 300 ms target. The rows stay in release order, so a shift in the distribution reads as a change over time; the median marks and the rule-based emphasis point out the releases whose median crossed 200 ms, and the dashed line shows the target.
+A service team tracks the response times of eight releases against a 300 ms target. `latency` holds 400 illustrative response times per release, skewed to the right like real latencies: release 2.3 regressed, 2.4 fixed it, and 2.6 slipped again. The rows stay in release order, so a shift reads as a change over time. The median marks show where each release typically lands, `emphasis_rule={"above": 200}` highlights the releases whose median crossed 200 ms, and the dashed line shows the target, named in a legend outside the axes. `xmin` and `xmax` cut the long tail at 600 ms so the bulk of each ridge stays readable.
 
 ```
-import numpy as np
-
-from datachart.constants import EMPHASIS, LINE_STYLE, ORIENTATION, SORT, VIOLIN_INNER
-
-rng = np.random.RandomState(7)
-# median response time (ms) of each release; 2.3 regressed, 2.4 fixed it
-RELEASES = {"2.0": 150, "2.1": 145, "2.2": 170, "2.3": 240, "2.4": 160, "2.5": 150, "2.6": 210, "2.7": 135}
-latency = [
-    {"label": f"v{release}", "value": round(float(ms), 1)}
-    for release, median in RELEASES.items()
-    for ms in rng.lognormal(np.log(median), 0.3, 400)
-]
-
 RidgelinePlot(
     data=latency,
     inner=VIOLIN_INNER.MEDIAN,
@@ -516,8 +509,10 @@ RidgelinePlot(
     vlines={
         "x": 300,
         "label": "target",
-        "style": {"plot_vline_color": "#d62728", "plot_vline_style": LINE_STYLE.DASHED},
+        "style": {"plot_vline_color": "#c1121f", "plot_vline_style": LINE_STYLE.DASHED},
     },
+    show_legend=True,
+    legend={"title": "", "location": LEGEND_LOCATION.OUTSIDE_RIGHT},
     xmin=0,
     xmax=600,
     title="Response time by release",
@@ -527,58 +522,18 @@ RidgelinePlot(
 ).show()
 ```
 
-### Taxi trip duration by hour of day
+### Example 2: Does Training Make the Model More Confident? (Common Density Scale, Outlines, and Quartiles)
 
-Twenty-four hours in the height of one chart: the classic joy plot look, with an opaque fill, a white outline, and full overlap. The two rush hours stand out as the ridges pushed to the right, and the quiet night hours as the narrow ones on the left.
-
-```
-rng = np.random.RandomState(3)
-trips = []
-for hour in range(24):
-    # longer, more variable trips in the morning and evening rush
-    rush = np.exp(-((hour - 8) ** 2) / 4) + np.exp(-((hour - 17.5) ** 2) / 5)
-    median = 11 + 14 * rush
-    trips += [
-        {"label": f"{hour:02d}:00", "value": round(float(minutes), 1)}
-        for minutes in rng.gamma(6, median / 6, 120)
-    ]
-
-RidgelinePlot(
-    data=trips,
-    overlap=1.0,
-    style={
-        "plot_ridgeline_color": "#355C7D",
-        "plot_ridgeline_alpha": 1.0,
-        "plot_ridgeline_edgecolor": "#FFFFFF",
-        "plot_ridgeline_linewidth": 1.2,
-    },
-    xmin=0,
-    xmax=70,
-    title="Taxi trip duration by hour of day",
-    xlabel="Trip duration (min)",
-    figsize=FIG_SIZE.FULL_TALL,
-).show()
-```
-
-### Model confidence over training
-
-A research figure tracks how confident a classifier's predictions are on a validation set after each epoch. With `normalize="common"` the ridges share one density scale, so the distribution visibly narrows and grows taller as training sharpens it — a per-row scale would draw every epoch at the same height and hide exactly that. The outlines alone keep the later epochs visible through the overlap.
+A research figure tracks how confident a classifier is on its validation set after each epoch. `confidence` holds 500 illustrative predicted probabilities of the true class per epoch, drawn from beta distributions that move toward 1 as training goes on. With `normalize=RIDGELINE_SCALE.COMMON` the ridges share one density scale, so the distribution visibly narrows and grows taller as training sharpens it; a per-row scale would draw every epoch at the same height and hide exactly that. Outlines alone keep the later epochs visible through the overlap, the quartile marks show the middle half of each epoch moving right, and `xmin` and `xmax` bound the ridges to the valid range of a probability.
 
 ```
-from datachart.constants import RIDGELINE_SCALE
-
-rng = np.random.RandomState(5)
-confidence = [
-    {"label": f"Epoch {epoch}", "value": round(float(p), 3)}
-    for epoch, (a, b) in enumerate([(2, 2), (3, 2), (5, 2.2), (8, 2.2), (14, 2.5), (22, 2.6)], start=1)
-    for p in rng.beta(a, b, 500)
-]
-
 RidgelinePlot(
     data=confidence,
+    # one density scale, so the heights compare
     normalize=RIDGELINE_SCALE.COMMON,
     fill=False,
     inner=VIOLIN_INNER.QUARTILES,
+    # a probability lives between 0 and 1
     xmin=0,
     xmax=1,
     title="Prediction confidence on the validation set",
@@ -587,26 +542,32 @@ RidgelinePlot(
 ).show()
 ```
 
-### Exam scores by school, with every student
+### Example 3: How Do Schools Compare, Student by Student? (Sorted Rows, a Pass Mark, and a Strip in a Panel)
 
-An education report ranks eight schools by their median exam score and shows every student under their school's ridge. The rows are sorted by median, the lowest-performing school at the bottom; a strip of small points keeps several hundred students readable, and `Panel` lays the strip on the same rows.
+An education report ranks eight schools by their median exam score and shows every student. `scores` holds 60 illustrative scores (0 to 100) per school. The ridgeline sorts the schools by median, the best at the top, and `emphasis_rule={"bottom": 1}` highlights the school with the lowest median, the one the report is about; a dashed line marks a pass mark of 50. [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) lays a [SwarmPlot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/swarmplot/index.md) in strip mode over the same rows, so the reader sees how many students each ridge stands for and how many fall below the line; small, translucent points keep 480 students readable.
 
 ```
-from datachart.charts import SwarmPlot
 from datachart.constants import SWARM_MODE
-from datachart.utils import Panel
-
-rng = np.random.RandomState(12)
-SCHOOLS = {"Northgate": 71, "Riverside": 64, "Hillcrest": 78, "Lakeview": 58, "Oakwood": 69, "Westfield": 74, "Brookside": 61, "Elmhurst": 66}
-scores = [
-    {"label": school, "value": round(float(np.clip(score, 0, 100)))}
-    for school, mean in SCHOOLS.items()
-    for score in rng.normal(mean, 11, 60)
-]
 
 Panel(
     [
-        RidgelinePlot(data=scores, sort=SORT.DESCENDING, overlap=0.3),
+        RidgelinePlot(
+            data=scores,
+            # the best median at the top
+            sort=SORT.DESCENDING,
+            overlap=0.3,
+            # a score lives between 0 and 100
+            xmin=0,
+            xmax=100,
+            # the school with the lowest median
+            emphasis_rule={"bottom": 1},
+            # the pass mark
+            vlines={
+                "x": 50,
+                "style": {"plot_vline_color": "#c1121f", "plot_vline_style": LINE_STYLE.DASHED},
+            },
+        ),
+        # every student, on their school's row
         SwarmPlot(
             data=scores,
             orientation=ORIENTATION.HORIZONTAL,
@@ -615,7 +576,7 @@ Panel(
             style={"plot_swarm_color": "#2C3E50", "plot_swarm_size": 6, "plot_swarm_alpha": 0.6},
         ),
     ],
-    title="Exam scores by school",
+    title="Exam scores by school, with the pass mark",
     xlabel="School",
     ylabel_left="Score",
     figsize=FIG_SIZE.FULL_MEDIUM,

@@ -1,108 +1,29 @@
 # Contour Chart
 
-This section showcases the contour chart. It contains examples of how to create contour charts using the [datachart.charts.ContourChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.ContourChart) function.
+A contour chart shows a surface over two continuous variables, such as the elevation of a landscape, the loss of a model over two parameters, or the density of scattered points, through lines of equal value (or the bands between them). The lines answer *where are the peaks and the valleys, and how steep is the way between them*. This guide shows how to create contour charts with the [datachart.charts.ContourChart](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/#datachart.charts.ContourChart) function, starting with the basics and building up to worked examples on real data.
 
 Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-contour-chart), which maps common tasks to the parameter or style attribute that does the job.
-
-As mentioned above, the contour charts are created using the `ContourChart` function found in the [datachart.charts](https://eriknovak.github.io/datachart/dev/references/charts/index.md) module. Let's import it:
 
 ```
 from datachart.charts import ContourChart
 ```
 
-## Contour Chart Input Attributes
-
-The `ContourChart` function accepts keyword arguments for chart configuration. The main argument is `data`, which contains the gridded surface. For a single contour chart, `data` is a dictionary with the 2-D `z` grid and the optional `x` and `y` axis values; for multiple contour charts, `data` is a list of such dictionaries.
-
-```
-ContourChart(
-    data={                                              # The gridded surface (or list of surfaces for multiple charts)
-        "x": Union[List[Union[int, float]], None],      # The x-axis values, one per column of z (the column indices by default)
-        "y": Union[List[Union[int, float]], None],      # The y-axis values, one per row of z (the row indices by default)
-        "z": List[List[Union[int, float]]],             # The 2-D grid of surface values, one row per y and one column per x
-    },
-    style={                                             # The style of the contour chart (optional)
-        "plot_contour_color":           Optional[str],  # The iso-line color (the panel's color cycle by default)
-        "plot_contour_cmap":            Optional[Union[str, List[str]]], # The colormap of the filled bands (the heatmap colormap by default)
-        "plot_contour_line_width":      Optional[Union[int, float]], # The iso-line width (the line chart width by default)
-        "plot_contour_line_style":      Optional[str],  # The iso-line style
-        "plot_contour_alpha":           Optional[float], # The alpha of the contour
-        "plot_contour_zorder":          Optional[Union[int, float]], # The z-order of the contour
-        "plot_contour_label_font_size": Optional[Union[int, float]], # The font size of the inline level labels
-        "plot_contour_label_font_color": Optional[str], # The color of the inline level labels (the line color by default)
-    },
-    title: Optional[str],                               # The title of the chart
-    xlabel: Optional[str],                              # The x-axis label
-    ylabel: Optional[str],                              # The y-axis label
-    subtitle: Optional[Union[str, List[str]]],          # The subtitle(s), also used as legend labels
-    emphasis: Optional[Union[str, List[Optional[str]]]], # The emphasis role(s) of the iso-lines ("background", "highlight", None)
-    emphasis_rule=Optional[dict],                        # One-key rule on a per-series summary; optional "by": mean, median, min, max, sum
-    figsize: Optional[Tuple[float, float]],             # The size of the figure
-    xmin: Optional[Union[int, float]],                  # The minimum x-axis value
-    xmax: Optional[Union[int, float]],                  # The maximum x-axis value
-    ymin: Optional[Union[int, float]],                  # The minimum y-axis value
-    ymax: Optional[Union[int, float]],                  # The maximum y-axis value
-    show_legend: Optional[bool],                        # Whether to show the legend
-    show_grid: Optional[str],                           # Which grid lines to show ("both", "x", "y"); off by default for filled contours
-    filled: Optional[bool],                             # Whether to fill the bands between the levels instead of drawing iso-lines
-    levels: Optional[Union[str, int, List[float]]],     # The level rule ("auto", "rice", "fd"), a target count, or explicit level values
-    show_labels: Optional[bool],                        # Whether to write the level values along the iso-lines
-    show_colorbars: Optional[bool],                     # Whether to show the colorbar of filled contours
-    aspect_ratio: Optional[str],                        # The aspect ratio of the axes ("auto", "equal")
-    scalex: Optional[str],                              # The x-axis scale ("linear", "log", ...)
-    scaley: Optional[str],                              # The y-axis scale ("linear", "log", ...)
-    subplots: Optional[bool],                           # Whether to create a separate subplot for each chart
-    max_cols: Optional[int],                            # The maximum number of columns in the subplots
-    sharex: Optional[bool],                             # Whether to share the x-axis across the subplots
-    sharey: Optional[bool],                             # Whether to share the y-axis across the subplots
-    norm: Optional[Union[str, List[str]]],              # The value normalization of the colormap
-    vmin: Optional[Union[float, List[float]]],          # The minimum value of the colormap range
-    vmax: Optional[Union[float, List[float]]],          # The maximum value of the colormap range
-    valfmt: Optional[Union[str, List[str]]],            # The format of the inline level labels (e.g. "{x:.1f}")
-    xticks: Optional[List[Union[int, float]]],          # The x-axis tick positions
-    xticklabels: Optional[List[str]],                   # The x-axis tick labels
-    xtickrotate: Optional[int],                         # The rotation of the x-axis tick labels
-    yticks: Optional[List[Union[int, float]]],          # The y-axis tick positions
-    yticklabels: Optional[List[str]],                   # The y-axis tick labels
-    ytickrotate: Optional[int],                         # The rotation of the y-axis tick labels
-    vlines: Optional[Union[dict, List[dict]]],          # The vertical reference lines
-    hlines: Optional[Union[dict, List[dict]]],          # The horizontal reference lines
-    vspans: Optional[Union[dict, List[dict]]],          # The vertical reference bands
-    hspans: Optional[Union[dict, List[dict]]],          # The horizontal reference bands
-    colorbar: Optional[Union[dict, List[dict]]],        # The colorbar configuration(s) ({"orientation": ...})
-    texts: Optional[Union[dict, List[dict]]],           # The text annotations
-)
-```
-
-For more details, see the [datachart.charts.ContourChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.ContourChart) function.
-
 ## Basics
 
-The examples in this guide share one surface: the [Himmelblau function](https://en.wikipedia.org/wiki/Himmelblau%27s_function), a classic test surface for optimization algorithms with four minima of equal depth and one local maximum between them. `chart_data` samples it on a 120×120 grid over the −5 … 5 square: `x` and `y` hold the grid coordinates and `z` the function value at every grid point, one row per `y` and one column per `x`.
+The examples in this guide share one surface: an illustrative hill, 10 km from west to east and 8 km from south to north, the way a hiking map would show it. It has two peaks, a higher West Peak (1738 m) and a lower East Peak (1386 m), joined by a saddle (the lowest point of the ridge between them, 1075 m), and the valley floor rises gently to the north. The values come from a formula (two smooth bumps on a tilted plane), defined in a hidden cell. `terrain` holds the surface: `x` is the distance east in km, `y` the distance north in km, and `z` the elevation in m, one row per `y` value and one column per `x` value. `WEST_PEAK`, `EAST_PEAK` and `SADDLE` hold the (east, north) position of the three landmarks.
+
+The data is one dictionary. `z` is a list of rows, so its length matches `y` and the length of each row matches `x`:
 
 ```
-import numpy as np
-
-GRID = np.linspace(-5, 5, 120)
-X, Y = np.meshgrid(GRID, GRID)
-# the Himmelblau function, sampled on the grid
-himmelblau = (X**2 + Y - 11) ** 2 + (X + Y**2 - 7) ** 2
-
-chart_data = {"x": GRID.tolist(), "y": GRID.tolist(), "z": himmelblau.tolist()}
+len(terrain["x"]), len(terrain["y"]), len(terrain["z"]), len(terrain["z"][0])
 ```
 
-The data is a dictionary with the grid coordinates and the surface. The `z` grid is a list of rows, one per `y` value, and each row holds one value per `x` value; `x` and `y` are optional — without them the grid is drawn over its cell indices:
-
-```
-[len(chart_data["x"]), len(chart_data["y"]), len(chart_data["z"]), len(chart_data["z"][0])]
-```
-
-**Basic example.** Only the `data` argument is required to draw the contour chart. The surface is cut at a handful of round values and every cut is drawn as an iso-line — a line of equal value, like the elevation lines of a map. The lines take the chart's color, so a lone contour chart matches a lone line chart; closed loops mark the minima and maxima of the surface.
+**Basic example.** Only the `data` argument is required. The surface is cut at a handful of round elevations and each cut is drawn as an iso-line, a line of equal value like the elevation lines of a map. The small closed loops mark the two peaks; the line that wraps around both of them passes just below the saddle:
 
 ```
 ContourChart(
     # add the data to the chart
-    data=chart_data
+    data=terrain
 ).show()
 ```
 
@@ -110,564 +31,666 @@ ContourChart(
 
 Every customization is either a keyword argument of `ContourChart` or a `plot_contour_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                               | Use                                                                 | See                                                           |
-| ---------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------- |
-| add a title and axis labels              | `title`, `xlabel`, `ylabel`                                         | [Title and axis labels](#title-and-axis-labels)               |
-| resize the figure                        | `figsize`                                                           | [Figure size and grid](#figure-size-and-grid)                 |
-| show or hide the grid lines              | `show_grid`                                                         | [Figure size and grid](#figure-size-and-grid)                 |
-| fill the bands between the levels        | `filled=True`                                                       | [Filled contours and colorbar](#filled-contours-and-colorbar) |
-| add a colorbar                           | `show_colorbars=True`, `colorbar={"orientation": ...}`              | [Filled contours and colorbar](#filled-contours-and-colorbar) |
-| write the level values on the lines      | `show_labels=True`, `valfmt`                                        | [Inline labels](#inline-labels)                               |
-| choose how many levels cut the surface   | `levels`                                                            | [Levels](#levels)                                             |
-| change the line color, width, or style   | `style={"plot_contour_color": ..., "plot_contour_line_width": ...}` | [Contour style](#contour-style)                               |
-| change the colormap of the fills         | `style={"plot_contour_cmap": ...}`                                  | [Contour style](#contour-style)                               |
-| pin or rescale the colormap range        | `vmin`, `vmax`, `norm`                                              | [Normalization](#normalization)                               |
-| overlay several surfaces                 | `data=[...]`, `subtitle`, `show_legend`                             | [Multiple Contour Charts](#multiple-contour-charts)           |
-| draw each surface in its own subplot     | `subplots=True`, `max_cols`, `sharex`, `sharey`                     | [Subplots and shared axes](#subplots-and-shared-axes)         |
-| highlight one surface among several      | `emphasis`                                                          | [Emphasis](#emphasis)                                         |
-| highlight the series that match a rule   | `emphasis_rule`                                                     | [Emphasis](#emphasis)                                         |
-| draw the contours over a scatter chart   | `Panel`                                                             | [Composing contours](#composing-contours)                     |
-| keep one unit equal on both axes         | `aspect_ratio`                                                      | [Aspect ratio](#aspect-ratio)                                 |
-| mark a position with a reference line    | `vlines`, `hlines`                                                  | [Reference lines](#reference-lines)                           |
-| shade a region of the plane              | `hspans`, `vspans`                                                  | [Reference bands](#reference-bands)                           |
-| estimate the density of scattered points | `stats.kde2d`, `bandwidth`                                          | [Density of scattered points](#density-of-scattered-points)   |
+| I want to…                               | Use                                                                 | See                                                                                                     |
+| ---------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| add a title and axis labels              | `title`, `xlabel`, `ylabel`                                         | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| set or format the ticks                  | `xticks`, `yticks`, `xticks_format`, `yticks_format`                | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
+| resize the figure                        | `figsize`                                                           | [Figure size, grid and aspect ratio](#figure-size-grid-and-aspect-ratio)                                |
+| show grid lines                          | `show_grid`                                                         | [Figure size, grid and aspect ratio](#figure-size-grid-and-aspect-ratio)                                |
+| keep one unit equal on both axes         | `aspect_ratio`                                                      | [Figure size, grid and aspect ratio](#figure-size-grid-and-aspect-ratio)                                |
+| fill the bands between the levels        | `filled`                                                            | [Filled contours and colorbar](#filled-contours-and-colorbar)                                           |
+| add and caption a colorbar               | `show_colorbars`, `colorbar`                                        | [Filled contours and colorbar](#filled-contours-and-colorbar)                                           |
+| write the level values on the lines      | `show_labels`, `valfmt`                                             | [Inline labels](#inline-labels)                                                                         |
+| choose the values that cut the surface   | `levels`                                                            | [Levels](#levels)                                                                                       |
+| change the line color, width, or style   | `style={"plot_contour_color": ..., "plot_contour_line_width": ...}` | [Contour style](#contour-style)                                                                         |
+| color the lines or bands with a colormap | `style={"plot_contour_cmap": ...}`                                  | [Contour style](#contour-style)                                                                         |
+| pin or rescale the colormap range        | `vmin`, `vmax`, `norm`                                              | [Normalization](#normalization)                                                                         |
+| mark a position or shade a region        | `vlines`, `hlines`, `vspans`, `hspans`                              | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| put a note on the chart                  | `texts`                                                             | [Text annotations](#text-annotations)                                                                   |
+| overlay several surfaces                 | `data` as a list, `subtitle`, `show_legend`                         | [Multiple Contour Charts](#multiple-contour-charts)                                                     |
+| title and place the legend               | `legend`                                                            | [Legend](#legend)                                                                                       |
+| highlight one surface, mute the rest     | `emphasis`, `emphasis_rule`                                         | [Emphasis](#emphasis)                                                                                   |
+| draw each surface in its own subplot     | `subplots`, `max_cols`, `sharex`, `sharey`                          | [Subplots and shared axes](#subplots-and-shared-axes)                                                   |
+| draw a path or points over a surface     | `Panel`, `Grid`                                                     | [Composing with Panel and Grid](#composing-with-panel-and-grid)                                         |
+| draw the density of scattered points     | `stats.kde2d`, `bandwidth`                                          | [Density of scattered points](#density-of-scattered-points)                                             |
+| use a logarithmic axis                   | `scalex`, `scaley`                                                  | [Axis scales](#axis-scales)                                                                             |
+| draw a surface over time                 | temporal `x` values, `xticks_format`                                | [Datetime axis](#datetime-axis)                                                                         |
+| save the chart to a file                 | `save_figure`                                                       | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
-### Title and axis labels
+The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
 
-To add the chart title and axis labels, add the `title`, `xlabel` and `ylabel` attributes.
+| Parameter                                                       | Constant                                                                                                                                                                                                                                                                                                                                                           |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `levels`                                                        | [`CONTOUR_LEVELS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.CONTOUR_LEVELS)                                                                                                                                                                                                                                             |
+| `emphasis`                                                      | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                                                                                                                                         |
+| `figsize`                                                       | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                                                                                                                                         |
+| `legend={"location": ..., "alignment": ...}`                    | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN)                                                                                                                       |
+| `show_grid`                                                     | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                                                                                                                                       |
+| `aspect_ratio`                                                  | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                                                                                                                                                 |
+| `scalex`                                                        | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                                                                                                                                               |
+| `scaley`                                                        | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                                                                                                                                               |
+| `norm`                                                          | [`NORMALIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE)                                                                                                                                                                                                                                                       |
+| `valfmt`                                                        | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                 |
+| `xticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
+| `yticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
+| `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) |
+
+The full list of style attributes is in the [datachart.typings.ContourStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/#datachart.typings.ContourStyleAttrs) type; the full list of parameters is in the [datachart.charts.ContourChart](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/#datachart.charts.ContourChart) reference.
+
+### Title, axis labels and ticks
+
+A contour chart without axis labels leaves the reader guessing what the axes and the lines measure; `title`, `xlabel` and `ylabel` say it. `xticks` and `yticks` place the ticks, here one every 2 km, and `xticks_format` and `yticks_format` format them: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or any `"{x:.1f}"` style string, so the unit can travel with the numbers. `xtickrotate` and `ytickrotate` tilt the labels when they crowd, and `xmin`, `xmax`, `ymin` and `ymax` crop the view; this map needs neither.
 
 ```
 ContourChart(
-    data=chart_data,
+    data=terrain,
     # add the title
-    title="Himmelblau function",
+    title="Elevation of the hill",
     # add the x and y axis labels
-    xlabel="x",
-    ylabel="y",
+    xlabel="Distance east",
+    ylabel="Distance north",
+    # one tick every 2 km, with the unit
+    xticks=[0, 2, 4, 6, 8, 10],
+    yticks=[0, 2, 4, 6, 8],
+    xticks_format="{x:.0f} km",
+    yticks_format="{x:.0f} km",
 ).show()
 ```
 
-### Figure size and grid
+### Figure size, grid and aspect ratio
 
-To change the figure size, add the `figsize` attribute. The `figsize` attribute can be a tuple (width, height), values are in inches. The `datachart` package provides a [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) constant, which contains predefined figure sizes. To change which grid lines are shown, add the `show_grid` attribute, which supports the values of the [datachart.constants.SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID) constant — iso-lines draw over the theme's default grid, so both axes can be gridded to read positions off the lines.
+`figsize` takes a `(width, height)` tuple in inches or one of the presets in [datachart.constants.FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE), sized for a full or half page width. `show_grid` draws grid lines ([SHOW_GRID](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)); on a map they help read a position off an iso-line, so both axes get them.
 
-```
-from datachart.constants import FIG_SIZE, SHOW_GRID
-```
+A map has the same unit on both axes, and a stretched map misrepresents the shape of the land: by default the axes fill the figure, so 1 km east and 1 km north are drawn at different lengths. `aspect_ratio=ASPECT_RATIO.EQUAL` ([ASPECT_RATIO](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)) draws them at the same length, and the slopes keep their true shape. Keep the default `ASPECT_RATIO.AUTO` when the two axes measure different things.
 
 ```
+from datachart.constants import ASPECT_RATIO, FIG_SIZE, SHOW_GRID
+
 ContourChart(
-    data=chart_data,
-    title="Himmelblau function",
-    xlabel="x",
-    ylabel="y",
-    # add to determine the figure size
-    figsize=FIG_SIZE.FULL_SHORT,
-    # add to show the grid lines on both axes
+    data=terrain,
+    title="Elevation of the hill",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
+    # a full-width figure
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    # grid lines on both axes
     show_grid=SHOW_GRID.BOTH,
+    # 1 km is the same length on both axes
+    aspect_ratio=ASPECT_RATIO.EQUAL,
 ).show()
 ```
 
 ### Filled contours and colorbar
 
-To fill the bands between the levels instead of drawing iso-lines, add the `filled` attribute. A filled contour colors every band by its value with the colormap — the heatmap colormap by default — so the low and the high regions of the surface read at a glance; the grid is left off, as the bands would cover it. To map the colors back to values, add the `show_colorbars` attribute, which draws the colorbar to the right of the chart; to caption it or move it, add the `colorbar` attribute with the [datachart.typings.ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs) typing: `label` names the quantity, `location` takes a value of the [datachart.constants.COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) constant, and `orientation` alone still takes a value of the [datachart.constants.ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) constant.
+Iso-lines show the shape of the surface, but the eye has to count lines to tell high from low. `filled=True` colors the bands between the levels by their value instead (with the heatmap colormap by default), so the high ground reads at a glance; grid lines are off by default, as the bands would cover them. `show_colorbars=True` adds a colorbar that maps the shades back to values, and `colorbar` configures it ([ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs)): `label` names the quantity, `location` places it with a [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) member, `format` formats its ticks and `ticks` places them. An `orientation` ([ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)) on its own also works.
 
 ```
-from datachart.constants import ORIENTATION
-```
+from datachart.constants import COLORBAR_LOCATION
 
-```
 ContourChart(
-    data=chart_data,
+    data=terrain,
     # fill the bands between the levels
     filled=True,
-    # add the colorbar, drawn above the chart
+    # a captioned colorbar on the right, one tick every 400 m
     show_colorbars=True,
-    colorbar={"orientation": ORIENTATION.HORIZONTAL},
-    title="Himmelblau function",
-    xlabel="x",
-    ylabel="y",
+    colorbar={
+        "label": "Elevation (m)",
+        "location": COLORBAR_LOCATION.RIGHT,
+        "format": "{x:.0f}",
+        "ticks": [400, 800, 1200, 1600],
+    },
+    title="Elevation of the hill",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
     figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
 ).show()
 ```
 
 ### Inline labels
 
-To write the value of every level along its iso-line, add the `show_labels` attribute. The labels are formatted by the `valfmt` attribute, a format string with the value named `x` (e.g. `"{x:.1f}"`); the [datachart.constants.VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant holds the common ones. The labels take the line color and a font two points smaller than the general font, which the `plot_contour_label_font_size` and `plot_contour_label_font_color` style attributes override.
-
-```
-from datachart.constants import VALUE_FORMAT
-```
+A reader of a map wants the elevation of a line without looking it up. `show_labels=True` writes the value of each level along its iso-line, and `valfmt` formats it: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or any `"{x:.1f}"` style string with the value named `x`. The labels take the line color and a font smaller than the general font; the `plot_contour_label_font_size` and `plot_contour_label_font_color` style attributes change them (see [Contour style](#contour-style)).
 
 ```
 ContourChart(
-    data=chart_data,
-    # write the level values along the lines, as integers
+    data=terrain,
+    # write the elevation along each line, with its unit
     show_labels=True,
-    valfmt=VALUE_FORMAT.INTEGER,
-    title="Himmelblau function",
-    xlabel="x",
-    ylabel="y",
+    valfmt="{x:.0f} m",
+    title="Elevation of the hill",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
     figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
 ).show()
 ```
 
 ### Levels
 
-The `levels` attribute chooses which values cut the surface. It takes one of the following:
+The levels decide what a contour chart can show: a feature that falls between two levels is invisible. `levels` takes one of the following:
 
-| Value      | Description                                                                                                                    |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `"auto"`   | Matplotlib's own choice: about eight round values across the range of the surface (the default).                               |
-| `"rice"`   | The Rice rule: `2 * n ** (1/3)` levels, where `n` is the per-axis resolution of the grid — about ten levels on a 120×120 grid. |
-| `"fd"`     | The Freedman–Diaconis rule: the value range over `2 * IQR * n ** (-1/3)` — about twice as dense as Rice on the same grid.      |
-| an integer | A target number of levels, snapped to round values.                                                                            |
-| a list     | The exact level values to draw.                                                                                                |
+| Value                 | Description                                                                                         |
+| --------------------- | --------------------------------------------------------------------------------------------------- |
+| `CONTOUR_LEVELS.AUTO` | Matplotlib's own choice: about eight round values across the range of the surface (the default).    |
+| `CONTOUR_LEVELS.RICE` | The Rice rule: `2 * n ** (1/3)` levels, where `n` is the number of grid points along an axis.       |
+| `CONTOUR_LEVELS.FD`   | The Freedman-Diaconis rule: the value range over `2 * IQR * n ** (-1/3)`, usually denser than Rice. |
+| an integer            | A target number of levels, snapped to round values.                                                 |
+| a list                | The exact level values to draw.                                                                     |
 
-The `datachart` package provides the [datachart.constants.CONTOUR_LEVELS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.CONTOUR_LEVELS) constant with the rules. The rules follow the grid resolution rather than the surface, so they are opt-ins; for a surface whose range spans orders of magnitude, an explicit list of levels is usually the best choice.
+The rules live in [datachart.constants.CONTOUR_LEVELS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.CONTOUR_LEVELS). They follow the grid resolution rather than the surface, so they are opt-ins. An integer is the quick way to ask for more detail: twenty levels show the gentle rise of the valley floor that the default hides.
 
 ```
 from datachart.constants import CONTOUR_LEVELS
-```
 
-```
 ContourChart(
-    data=chart_data,
-    # cut the surface by the Rice rule
-    levels=CONTOUR_LEVELS.RICE,
-    show_labels=True,
-    valfmt=VALUE_FORMAT.INTEGER,
-    title="Himmelblau function",
-    xlabel="x",
-    ylabel="y",
+    data=terrain,
+    # about twenty round levels
+    levels=20,
+    title="Elevation of the hill, about twenty levels",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
     figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
 ).show()
 ```
 
-The Himmelblau function is flat around its minima and steep at the corners, so evenly spaced levels crowd the corners and leave the middle empty. A list of hand-picked levels, dense near zero and sparse further up, follows the shape of the surface instead:
+An explicit list says exactly which elevations matter. The saddle sits at 1075 m, so a level at 1000 m still wraps around both peaks as one ridge, while a level at 1150 m splits into two separate hills. Levels every 150 m from 700 m, which include both (plus one at 400 m for the valley floor), put the saddle between two lines where the reader can find it; `SADDLE_LEVELS` keeps the list for the charts below:
+
+```
+# 1000 m wraps both peaks, 1150 m splits them
+SADDLE_LEVELS = [400, 700, 850, 1000, 1150, 1300, 1450, 1600]
+
+ContourChart(
+    data=terrain,
+    levels=SADDLE_LEVELS,
+    show_labels=True,
+    valfmt="{x:.0f} m",
+    title="The saddle lies between 1000 m and 1150 m",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
+).show()
+```
+
+The rules are handy when the surface is unfamiliar and the right spacing is not obvious. On this 101 by 81 grid the Rice rule gives about ten levels:
 
 ```
 ContourChart(
-    data=chart_data,
-    # explicit levels: dense near the minima, sparse up the slopes
-    levels=[2, 10, 30, 60, 100, 150, 250, 400, 600],
+    data=terrain,
+    # the number of levels follows the grid resolution
+    levels=CONTOUR_LEVELS.RICE,
     show_labels=True,
-    valfmt=VALUE_FORMAT.INTEGER,
-    title="Himmelblau function",
-    xlabel="x",
-    ylabel="y",
+    valfmt="{x:.0f}",
+    title="Elevation of the hill, Rice rule",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
     figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
 ).show()
 ```
 
 ### Contour style
 
-To change the contour style, add the `style` attribute with the corresponding attributes. The supported attributes are shown in the [datachart.typings.ContourStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ContourStyleAttrs) type, which contains the following attributes:
-
-| Attribute                         | Description                                                                                                                                                                               |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `"plot_contour_color"`            | The color of the iso-lines; the panel's color cycle by default.                                                                                                                           |
-| `"plot_contour_cmap"`             | The colormap of the filled bands (a palette name or a list of hex colors); the heatmap colormap by default. Iso-lines take it only when it is set, colored by level from its darker part. |
-| `"plot_contour_line_width"`       | The width of the iso-lines; the line chart width by default.                                                                                                                              |
-| `"plot_contour_line_style"`       | The style of the iso-lines (solid, dashed, ...).                                                                                                                                          |
-| `"plot_contour_alpha"`            | The alpha of the contour (how visible it is).                                                                                                                                             |
-| `"plot_contour_zorder"`           | The z-order of the contour among the other layers.                                                                                                                                        |
-| `"plot_contour_label_font_size"`  | The font size of the inline level labels.                                                                                                                                                 |
-| `"plot_contour_label_font_color"` | The color of the inline level labels; the line color by default.                                                                                                                          |
-
-The `datachart` package provides the [datachart.constants.LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE) constant with the line styles and the [datachart.constants.COLORS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORS) constant with the colormaps.
+The `style` dictionary sets the look of the contour: the line color, width and style, the colormap, the alpha, the z-order among other layers, and the font of the inline labels. The attributes are listed in [datachart.typings.ContourStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/#datachart.typings.ContourStyleAttrs), and any attribute left out keeps the value of the active theme. A topographic map traditionally draws its elevation lines thin and brown, with the labels in the same color; the line styles are in [LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE).
 
 ```
-from datachart.constants import COLORS, LINE_STYLE
-```
+from datachart.constants import LINE_STYLE
 
-```
 ContourChart(
-    data=chart_data,
-    # define the style of the contour
+    data=terrain,
+    # thin brown lines, as on a topographic map
     style={
-        "plot_contour_color": "#d62728",
-        "plot_contour_line_width": 1.0,
-        "plot_contour_line_style": LINE_STYLE.DASHED,
+        "plot_contour_color": "#8c5a2b",
+        "plot_contour_line_width": 0.8,
+        "plot_contour_line_style": LINE_STYLE.SOLID,
         "plot_contour_label_font_size": 7,
-        "plot_contour_label_font_color": "#333333",
+        "plot_contour_label_font_color": "#8c5a2b",
     },
-    levels=[2, 10, 30, 60, 100, 150, 250, 400, 600],
+    levels=list(range(400, 1800, 100)),
     show_labels=True,
-    valfmt=VALUE_FORMAT.INTEGER,
-    title="Himmelblau function",
-    xlabel="x",
-    ylabel="y",
+    valfmt="{x:.0f}",
+    title="Elevation of the hill",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
     figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
 ).show()
 ```
 
-With a colormap set, the iso-lines are colored by their level instead of drawing in one color — the low levels in the lighter shades, the high ones in the darker. The colormap is sampled from its darker part, since the lightest shades of a sequential colormap would vanish on the white background:
+With `plot_contour_cmap` set, iso-lines are colored by their level instead of in one color, which tells low from high without filling the chart. The colormap is a name from [COLORS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORS) or a list of colors; lines are colored from its darker part, since the lightest shades would vanish on a white background. For filled contours it sets the colors of the bands, and a colormap from a green valley to brown summits reads like terrain:
 
 ```
+from datachart.constants import COLORS
+
 ContourChart(
-    data=chart_data,
-    # color the iso-lines by level
+    data=terrain,
+    # color each line by its elevation
     style={"plot_contour_cmap": COLORS.Viridis},
-    levels=[2, 10, 30, 60, 100, 150, 250, 400, 600],
-    title="Himmelblau function",
-    xlabel="x",
-    ylabel="y",
+    levels=list(range(400, 1800, 100)),
+    title="Elevation of the hill",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
     figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
+).show()
+
+TERRAIN_COLORS = ["#d9f0d3", "#a6d96a", "#e6c587", "#a6611a", "#5c3310"]
+
+ContourChart(
+    data=terrain,
+    filled=True,
+    show_colorbars=True,
+    colorbar={"label": "Elevation (m)"},
+    # a custom colormap, from a green valley to brown summits
+    style={"plot_contour_cmap": TERRAIN_COLORS},
+    levels=list(range(300, 1900, 100)),
+    title="Elevation of the hill",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
 ).show()
 ```
 
 ### Normalization
 
-The colors of a filled contour come from a two-step mapping: the level values are first normalized to the 0–1 range, then each normalized value picks its color from the colormap. Both steps can be adjusted.
-
-**Value range.** By default the lowest level maps to the first color and the highest to the last. The `vmin` and `vmax` attributes pin those endpoints instead, which keeps the shades comparable across charts of the same quantity.
-
-**Normalization.** The `norm` attribute changes how the values are spread over the 0–1 range; the options are the values of the [datachart.constants.NORMALIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE) constant (`"linear"`, `"log"`, `"symlog"`, `"asinh"`, `"logit"`). The Himmelblau function ranges from 0 to about 900 while its interesting part sits below 50: with log-spaced levels and the log normalization every band takes an equally distinct shade, where the linear normalization would spend most of the colormap on the empty corners.
-
-```
-from datachart.constants import NORMALIZE
-```
+The colors of a filled contour come from two steps: each level is normalized to the 0 to 1 range, then picks its color from the colormap. By default the lowest level gets the first color and the highest the last, so two maps of different hills each use the full colormap, and the same shade means different elevations on each. `vmin` and `vmax` pin the range instead. Pinned to the 0 to 3000 m of a mountain region, the same hill looks as modest as it is:
 
 ```
 ContourChart(
-    data=chart_data,
+    data=terrain,
     filled=True,
     show_colorbars=True,
-    # log-spaced levels, spread evenly over the colormap
-    levels=[1, 3, 10, 30, 100, 300, 1000],
-    norm=NORMALIZE.LOG,
-    title="Himmelblau function",
-    xlabel="x",
-    ylabel="y",
+    colorbar={"label": "Elevation (m)"},
+    levels=list(range(300, 1900, 100)),
+    # the color range of the whole region, not of this hill
+    vmin=0,
+    vmax=3000,
+    title="Elevation of the hill, on the regional color scale",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
     figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
+).show()
+```
+
+`norm` changes how the values spread over the 0 to 1 range, with a [NORMALIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE) member (`LINEAR`, `LOG`, `SYMLOG`, `ASINH`, `LOGIT`), and a surface that spans orders of magnitude needs it. `sighting_density`, computed in a hidden cell, is the density of illustrative chamois sightings on the hill, in sightings per km² (the [Multiple Contour Charts](#multiple-contour-charts) section introduces the data). The sightings cluster in a few places, and the density falls a thousandfold towards the edges of the map. With log-spaced levels and `NORMALIZE.LOG`, every tenfold step gets an equally distinct shade, where a linear normalization would spend the colormap on the busy centers and paint the faint outskirts all one color.
+
+```
+from datachart.constants import NORMALIZE
+
+ContourChart(
+    data=sighting_density,
+    filled=True,
+    show_colorbars=True,
+    colorbar={"label": "Sightings per km²", "ticks": [0.01, 0.1, 1, 10], "format": "{x:g}"},
+    # log-spaced levels, one shade per step
+    levels=[0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100],
+    norm=NORMALIZE.LOG,
+    title="Density of chamois sightings",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
+).show()
+```
+
+### Reference lines and bands
+
+Reference lines and bands put the surface in context. `vlines` and `hlines` draw a line at an x or a y position, and a pair of them crosses at a point, here the saddle, the natural pass between the peaks. `vspans` and `hspans` shade a range of x or y, here the nature reserve that covers the land north of 6 km. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) and [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs). The legend goes outside the axes (see [Legend](#legend)), so it covers no part of the map.
+
+```
+from datachart.constants import LEGEND_LOCATION
+
+ContourChart(
+    data=terrain,
+    # cross-hairs on the saddle
+    vlines={"x": SADDLE[0], "label": "saddle", "style": {"plot_vline_style": LINE_STYLE.DASHED}},
+    hlines={"y": SADDLE[1], "style": {"plot_hline_style": LINE_STYLE.DASHED}},
+    # the reserve covers everything north of 6 km
+    hspans={"ymin": 6, "label": "nature reserve", "style": {"plot_hspan_color": "#2a9d8f"}},
+    levels=SADDLE_LEVELS,
+    title="The saddle and the nature reserve",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
+    show_legend=True,
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+).show()
+```
+
+### Text annotations
+
+A map names its landmarks. `texts` places text on the chart, with an optional `target` that draws a connector to a point; the position is in data coordinates by default (here km east and north) or in axes fractions with `"coords": "axes"`. A list places several notes at once. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connectors and styling.
+
+```
+ContourChart(
+    data=terrain,
+    # one note per landmark, each pointing at it
+    texts=[
+        {"text": "West Peak, 1738 m", "x": 0.6, "y": 7.3, "target": WEST_PEAK},
+        {"text": "East Peak, 1386 m", "x": 7.4, "y": 6.8, "target": EAST_PEAK},
+        {"text": "saddle, 1075 m", "x": 5.8, "y": 0.8, "target": SADDLE},
+    ],
+    levels=SADDLE_LEVELS,
+    title="Landmarks of the hill",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
 ).show()
 ```
 
 ## Multiple Contour Charts
 
-To create multiple contour charts, pass a list of surfaces to the `data` argument. Each surface is drawn as its own set of iso-lines on the same axes, in its own color, and the `subtitle` of each chart becomes its legend label; `subplots=True` draws each surface in its own subplot instead. Several filled contours would cover each other, so fills are best kept to subplots.
+To compare several surfaces on one map, pass a list of them to `data`: each is drawn as its own set of iso-lines in its own color, and the per-chart attributes (`subtitle`, `style`, `emphasis`, `valfmt`, `norm`, `vmin`, `vmax`, `colorbar`) become lists aligned with it. `subtitle` names each surface in the legend that `show_legend` draws. Filled surfaces would cover each other, so fills belong in [subplots](#subplots-and-shared-axes).
 
-`species_density` holds three surfaces from the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0): the density of the 342 penguins of each species over their flipper length and body mass. The measurements are hard-coded in a hidden cell as `PENGUINS`; the cell below turns them into surfaces with [datachart.utils.stats.kde2d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde2d) — this is how a KDE chart is built from raw points (see [Density of scattered points](#density-of-scattered-points)). Every species is evaluated on one shared 80×80 grid, the range of all penguins padded by 10%, so the surfaces line up in subplots; the density is scaled to penguins per mm of flipper length and kg of body mass. The cell also keeps every penguin as a point in `penguin_points` for the later sections.
-
-```
-from datachart.utils.stats import kde2d, minimum, maximum
-
-SPECIES = ["Adelie", "Chinstrap", "Gentoo"]
-
-# one grid shared by every species: the range of all penguins, padded by 10%
-ALL_LENGTHS = [length for record in PENGUINS for length in record["flipper_length"]]
-ALL_MASSES = [mass for record in PENGUINS for mass in record["body_mass"]]
-
-
-def padded_range(values, padding=0.1):
-    lo, hi = minimum(values), maximum(values)
-    return lo - padding * (hi - lo), hi + padding * (hi - lo)
-
-
-def density(records):
-    # a Gaussian kernel density of the (flipper length, body mass) points
-    surface = kde2d(
-        [length for record in records for length in record["flipper_length"]],
-        [mass for record in records for mass in record["body_mass"]],
-        gridsize=80,
-        xlim=padded_range(ALL_LENGTHS),
-        ylim=padded_range(ALL_MASSES),
-    )
-    # per mm of flipper length and kg of body mass
-    surface["z"] = (np.array(surface["z"]) * 1000).tolist()
-    return surface
-
-
-# one surface per species: what a KDE chart draws
-species_density = [
-    density([p for p in PENGUINS if p["species"] == species]) for species in SPECIES
-]
-# every penguin as a point
-penguin_points = [
-    {"x": length, "y": mass}
-    for record in PENGUINS
-    for length, mass in zip(record["flipper_length"], record["body_mass"])
-]
-```
+The surfaces here come from an illustrative survey of chamois (a mountain goat-antelope) on the hill: `sightings` holds the GPS position of every sighting by season (`SEASONS`), and `season_density` one density surface per season, estimated with [datachart.utils.stats.kde2d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde2d) (see [Density of scattered points](#density-of-scattered-points)) on the extent of the map, so the surfaces line up. The story is a seasonal migration: the herd grazes near the West Peak in summer, splits over both peaks in autumn, and moves down to the southern slopes in winter.
 
 ```
 ContourChart(
-    # use a list of surfaces to define multiple contour charts
-    data=species_density,
-    # one legend label per chart
-    subtitle=SPECIES,
+    # one surface per season
+    data=season_density,
+    # named for the legend
+    subtitle=SEASONS,
     show_legend=True,
-    # the same number of levels on every surface
-    levels=5,
-    title="Palmer penguins by species",
-    xlabel="Flipper length (mm)",
-    ylabel="Body mass (g)",
+    # the same levels on every surface
+    levels=[0.5, 2, 8, 32],
+    title="Where the chamois are seen, by season",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
     figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
 ).show()
 ```
 
-### Subplots and shared axes
+### Legend
 
-To draw each surface in its own subplot, add the `subplots` attribute. The `subtitle` becomes the subplot title and the `title`, `xlabel` and `ylabel` are positioned to be global for all charts. The `max_cols` attribute limits the number of columns, and `sharex` and `sharey` share an axis across the subplots; a shared axis is labeled once, on the outer subplots only. Per-chart attributes like `subtitle`, `style`, `valfmt`, `norm`, `vmin`, `vmax` and `colorbar` can be passed as lists, where each element corresponds to a chart; a single value applies to every chart.
+`show_legend` lists the surfaces; `legend` says where and how, with a `title`, a `location` from [LEGEND_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), the number of columns `ncols`, and the `alignment` of the entries from [LEGEND_ALIGN](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN); a field left out falls back to the theme ([LegendSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendSettingAttrs)). Iso-lines can reach any corner of a map, and a legend outside the axes never hides one.
 
 ```
 ContourChart(
-    data=species_density,
-    subtitle=SPECIES,
-    # one filled subplot per species
-    filled=True,
-    subplots=True,
-    max_cols=3,
-    # the same axes for every species
-    sharex=True,
-    sharey=True,
-    title="Palmer penguins by species",
-    xlabel="Flipper length (mm)",
-    ylabel="Body mass (g)",
-    figsize=FIG_SIZE.FULL_SHORT,
+    data=season_density,
+    subtitle=SEASONS,
+    show_legend=True,
+    # a titled legend outside the axes, to the right
+    legend={"title": "Season", "location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+    levels=[0.5, 2, 8, 32],
+    title="Where the chamois are seen, by season",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
 ).show()
 ```
 
 ### Emphasis
 
-To draw attention to one surface among several, add the `emphasis` attribute. The `emphasis` list aligns with the charts of one call, and each entry is one of the following roles:
-
-| Role           | Description                                                                                            |
-| -------------- | ------------------------------------------------------------------------------------------------------ |
-| `"background"` | Mutes the iso-lines into the theme's muted color and alpha, behind the others, without a legend entry. |
-| `"highlight"`  | Bolds the iso-lines and brings them to the front.                                                      |
-| `None`         | Leaves the chart unchanged.                                                                            |
-
-A single value applies to every chart. Emphasis mutes and bolds lines, so it applies to iso-lines only; a filled contour takes the colormap and raises a `ValueError` when `emphasis` is passed. The [datachart.constants.EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constant holds the roles; the [highlighting guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting.ipynb) covers emphasis across chart types and themes.
-
-To pick the surfaces from the data instead, pass `emphasis_rule`, a one-key rule — `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}` — that highlights every surface whose summary matches and mutes the rest. The summary is the mean of each surface's own `z` values (line contours only; filled contours raise) by default; a `"by"` key picks `"median"`, `"min"`, `"max"`, or `"sum"` instead, as in `{"top": 1, "by": "max"}`. An explicit `emphasis` role wins over the rule. See the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/#emphasis-picked-by-a-rule) guide for the rule on every chart.
+A chart usually makes one point, and emphasis makes it visible. `emphasis` takes one role per surface, aligned with `data`: `"highlight"` bolds the iso-lines and brings them to the front, `"background"` mutes them into the theme's muted color and drops them from the legend, and `None` leaves them as they are. The roles are also the [EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants, and the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis across every chart type. Emphasis bolds and mutes lines, so it applies to iso-lines only: with `filled=True` it raises a `ValueError`. Asking where the herd spends the winter turns the other seasons into context:
 
 ```
 from datachart.constants import EMPHASIS
-```
 
-```
 ContourChart(
-    data=species_density,
-    subtitle=SPECIES,
-    # one role per chart: Adelie, Chinstrap, Gentoo
+    data=season_density,
+    subtitle=SEASONS,
+    # winter is the question, summer and autumn the context
     emphasis=[EMPHASIS.BACKGROUND, EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT],
     show_legend=True,
-    levels=5,
-    title="Palmer penguins by species",
-    xlabel="Flipper length (mm)",
-    ylabel="Body mass (g)",
+    levels=[0.5, 2, 8, 32],
+    title="Where the chamois spend the winter",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
     figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
 ).show()
 ```
 
-## Composing contours
-
-A contour figure composes like any other chart. [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays it with other charts on shared axes — the natural pairing is a [datachart.charts.ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/#datachart.charts.ScatterChart) of the points behind a density, so the iso-lines show where the points concentrate. Every contour takes the next color of the panel's cycle, so the species stay distinct from the points.
+`emphasis_rule` picks the surfaces from the data instead. It is a one-key rule, `{"top": n}` or `{"bottom": n}` by rank, `{"above": v}` or `{"below": v}` (strict), or `{"between": (lo, hi)}` (inclusive), read against a summary of each surface's own `z` values: the mean by default, or the `"median"`, `"min"`, `"max"` or `"sum"` named by a `"by"` key. The surfaces that match are highlighted and the rest muted; an explicit `emphasis` role wins over the rule. The season with the highest peak density is the one where the herd is most concentrated:
 
 ```
-from datachart.charts import ScatterChart
+ContourChart(
+    data=season_density,
+    subtitle=SEASONS,
+    # the surface with the highest maximum
+    emphasis_rule={"top": 1, "by": "max"},
+    show_legend=True,
+    levels=[0.5, 2, 8, 32],
+    title="The season with the most concentrated herd",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
+).show()
+```
+
+### Subplots and shared axes
+
+Overlaid iso-lines get busy when the surfaces overlap, and filled surfaces cannot overlap at all. `subplots=True` draws each surface in its own panel: `subtitle` titles the panels, `title`, `xlabel` and `ylabel` stay global, and `max_cols` limits the panels per row. `sharex` and `sharey` put the panels on the same axes, labeled once on the outer panels. One `levels` list for all panels means the same shade is the same density in every season, and the log normalization (see [Normalization](#normalization)) keeps the sparse autumn and winter herds visible next to the dense summer one.
+
+```
+ContourChart(
+    data=season_density,
+    subtitle=SEASONS,
+    # one filled panel per season, side by side
+    filled=True,
+    subplots=True,
+    max_cols=3,
+    # the same axes for every season
+    sharex=True,
+    sharey=True,
+    # the same levels, so the shades compare across panels
+    levels=[0.25, 0.5, 1, 2, 4, 8, 16, 32, 64],
+    norm=NORMALIZE.LOG,
+    style={"plot_contour_cmap": COLORS.YlGnBu},
+    title="Density of chamois sightings by season",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
+).show()
+```
+
+### Composing with Panel and Grid
+
+A surface is often the background for something else: a path across it, or the points it was estimated from. [Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays figures in one coordinate space. `trail`, defined in a hidden cell, is an illustrative hiking trail from the southwest corner over the saddle to the northeast; a [LineChart](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.charts.LineChart) draws it and a [ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.charts.ScatterChart) draws the winter sightings, both over the filled terrain. Two per-figure options matter here: `"y_axis": "left"` keeps the trail and the points on the map's own axis (the panel would otherwise move a figure with a much narrower value span to a second axis), and `"z_order"` keeps the filled terrain below them. The [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) guide covers the options.
+
+```
+from datachart.charts import LineChart, ScatterChart
 from datachart.utils import Panel
 
 Panel(
     [
-        ScatterChart(data=penguin_points, subtitle="Penguins"),
-        # the species densities, as iso-lines over the points
-        ContourChart(data=species_density, subtitle=SPECIES, levels=4),
+        # the terrain at the bottom
+        {
+            "figure": ContourChart(
+                data=terrain,
+                filled=True,
+                levels=list(range(300, 1900, 100)),
+                style={"plot_contour_cmap": TERRAIN_COLORS},
+            ),
+            "z_order": 1,
+        },
+        # the trail and the sightings on top, on the map's own axis
+        {
+            "figure": LineChart(data=trail, subtitle="trail", style={"plot_line_color": "#c1121f"}),
+            "y_axis": "left",
+            "z_order": 2,
+        },
+        {
+            "figure": ScatterChart(
+                data=sightings["Winter"],
+                subtitle="winter sightings",
+                style={"plot_scatter_color": "#1d3557"},
+            ),
+            "y_axis": "left",
+            "z_order": 3,
+        },
     ],
-    title="Palmer penguins",
-    xlabel="Flipper length (mm)",
-    ylabel_left="Body mass (g)",
+    title="The trail over the saddle, and where to look in winter",
+    xlabel="Distance east (km)",
+    ylabel_left="Distance north (km)",
     show_legend=True,
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
-[datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) arranges contour figures next to other figures. A filled contour of the Himmelblau function spans the top row; the species densities sit below it, next to the labeled iso-lines of the same function.
+[Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) puts figures side by side instead, each in its own coordinate space. The labeled map sits next to the density of all sightings, so the reader can match the herd's favorite places to the landmarks. The [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) guide covers layouts.
 
 ```
 from datachart.utils import Grid
 
 Grid(
     [
-        [ContourChart(data=chart_data, filled=True, show_colorbars=True, title="Himmelblau function")],
         [
-            ContourChart(data=species_density, subtitle=SPECIES, levels=5, show_legend=True, title="Palmer penguins"),
-            ContourChart(data=chart_data, show_labels=True, valfmt=VALUE_FORMAT.INTEGER, title="Himmelblau levels"),
-        ],
+            ContourChart(
+                data=terrain,
+                levels=[400, 600, 800, 1000, 1200, 1400, 1600],
+                show_labels=True,
+                valfmt="{x:.0f}",
+                title="Elevation (m)",
+                aspect_ratio=ASPECT_RATIO.EQUAL,
+            ),
+            ContourChart(
+                data=sighting_density,
+                filled=True,
+                levels=[0.5, 1, 2, 4, 8, 16, 32, 64],
+                norm=NORMALIZE.LOG,
+                style={"plot_contour_cmap": COLORS.YlGnBu},
+                title="Chamois sightings per km²",
+                aspect_ratio=ASPECT_RATIO.EQUAL,
+            ),
+        ]
     ],
-    figsize=FIG_SIZE.FULL_TALL,
+    title="The hill and its chamois",
+    figsize=FIG_SIZE.FULL_SHORT,
 ).show()
 ```
 
 ## Additional Features
 
-### Aspect ratio
+### Density of scattered points
 
-By default the axes stretch to fill the figure, so a square grid may draw as a rectangle. To keep one unit equal on both axes, add the `aspect_ratio` attribute with a value of the [datachart.constants.ASPECT_RATIO](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO) constant — on a surface whose axes share a unit, like the Himmelblau function, the loops around the minima then keep their true shape.
+A contour of a density is the two-dimensional counterpart of a histogram: it shows where scattered points concentrate, without the overplotting of a crowded scatter chart. [datachart.utils.stats.kde2d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde2d) estimates the density with a Gaussian kernel and returns the `{x, y, z}` surface that `ContourChart` takes, so `ContourChart(data=kde2d(x, y))` is a density chart. Its options:
+
+- `bandwidth` sets how smooth the estimate is: a [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) rule (Scott's by default, or Silverman's) or a number that replaces the rule's factor, where smaller values follow the points more closely.
+- `gridsize` sets the resolution of the surface.
+- `cut` extends the grid past the points by that many bandwidths, so the outer contours close instead of being clipped; `xlim` and `ylim` fix the grid instead, so several surfaces share one (as `season_density` does).
+
+The result is a probability density (it integrates to 1); multiplied by the number of points, it reads as points per unit area. The autumn sightings come from two groups: Scott's rule shows both, while a wide bandwidth (`2.0`) smooths them into one blob, the classic way a density estimate hides structure.
 
 ```
-from datachart.constants import ASPECT_RATIO
+from datachart.constants import BANDWIDTH
+from datachart.utils.stats import kde2d
+
+autumn_east = [p["x"] for p in sightings["Autumn"]]
+autumn_north = [p["y"] for p in sightings["Autumn"]]
+
+Grid(
+    [
+        [
+            ContourChart(
+                # Scott's rule: two groups
+                data=kde2d(autumn_east, autumn_north, bandwidth=BANDWIDTH.SCOTT, xlim=(0, 10), ylim=(0, 8)),
+                filled=True,
+                title="Scott's rule",
+                aspect_ratio=ASPECT_RATIO.EQUAL,
+            ),
+            ContourChart(
+                # a wide kernel: one blob, on the same map extent
+                data=kde2d(autumn_east, autumn_north, bandwidth=2.0, xlim=(0, 10), ylim=(0, 8)),
+                filled=True,
+                title="bandwidth=2.0",
+                aspect_ratio=ASPECT_RATIO.EQUAL,
+            ),
+        ]
+    ],
+    title="Autumn sightings, two bandwidths",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
+    figsize=FIG_SIZE.FULL_SHORT,
+).show()
 ```
 
+### Axis scales
+
+Some surfaces are sampled over values that span orders of magnitude, and a linear axis crams the interesting part into a corner. `scalex` and `scaley` take a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member. `sweep`, defined in a hidden cell, holds the illustrative validation loss of a model trained over a grid of learning rates (1e-5 to 1e-1) and weight decays (1e-6 to 1e-1), both sampled evenly on a log scale, the way hyperparameter searches are. On log axes the valley of good settings is a clear oval; on linear axes it would be squeezed against the left and bottom edges.
+
 ```
+from datachart.constants import SCALE
+
 ContourChart(
-    data=chart_data,
-    # keep one unit equal on both axes
-    aspect_ratio=ASPECT_RATIO.EQUAL,
-    levels=[2, 10, 30, 60, 100, 150, 250, 400, 600],
-    title="Himmelblau function",
-    xlabel="x",
-    ylabel="y",
+    data=sweep,
+    # both hyperparameters on a log scale
+    scalex=SCALE.LOG,
+    scaley=SCALE.LOG,
+    filled=True,
+    show_colorbars=True,
+    colorbar={"label": "Validation loss"},
+    levels=[0.32, 0.35, 0.4, 0.5, 0.6, 0.8, 1.0, 1.4, 2.0],
+    style={"plot_contour_cmap": COLORS.YlGnBu},
+    title="Validation loss over the hyperparameter grid",
+    xlabel="Learning rate",
+    ylabel="Weight decay",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
 
 ### Datetime axis
 
-The `x` coordinates may be real temporal objects — `datetime`, `date`, `numpy.datetime64`, or pandas `Timestamp` — so a surface sampled over time draws on a time axis. Points sit at their elapsed time and the ticks pick concise, non-repeating labels for the visible span; date strings are not parsed and draw as categories. `xticks_format` takes a [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern, and explicit `xticks`, `xmin` / `xmax`, reference lines, and reference bands take datetimes as well. Here the surface is the temperature by month and hour of the day.
+A surface sampled over time, such as a measurement by date and depth or by date and elevation, belongs on a time axis. The `x` values may be real temporal objects (`datetime`, `date`, `numpy.datetime64` or a pandas `Timestamp`); they are placed at their elapsed time and the ticks pick readable labels for the span, while date strings are not parsed. `xticks_format` takes a [DATE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT) member or any `strftime` pattern, and `xticks`, `xmin`, `xmax`, reference lines and bands take datetimes as well. `snow`, defined in a hidden cell, holds the illustrative snow depth on the hill over one winter, by day and elevation: the snow line comes down through December and January, the pack is deepest in mid-February, and the lower slopes melt out first.
 
 ```
-from datetime import date
-
 from datachart.constants import DATE_FORMAT
 
-# mean monthly temperature in °C (1991-2020 normals of Ljubljana) and the daily swing
-MONTHLY_MEAN = [0.8, 2.4, 6.8, 11.5, 16.2, 20.1, 22.0, 21.4, 16.6, 11.5, 5.9, 1.3]
-DAILY_SWING = [3.0, 3.5, 4.5, 5.0, 5.5, 5.5, 6.0, 6.0, 5.5, 4.5, 3.5, 3.0]
-
-months = [date(2024, month, 1) for month in range(1, 13)]
-hours = list(range(24))
-# the day is coldest around 05:00 and warmest around 15:00
-temperature = [
-    [mean + swing * np.sin((hour - 9) / 24 * 2 * np.pi) for mean, swing in zip(MONTHLY_MEAN, DAILY_SWING)]
-    for hour in hours
-]
-
 ContourChart(
-    data={"x": months, "y": hours, "z": temperature},
-    title="Temperature by month and hour of the day",
-    ylabel="Hour of the day",
+    # dates on the x-axis
+    data=snow,
     filled=True,
     show_colorbars=True,
+    colorbar={"label": "Snow depth (cm)"},
+    levels=[1, 20, 40, 60, 80, 100, 120, 140, 160],
+    style={"plot_contour_cmap": COLORS.Blues},
+    # the month of each tick
     xticks_format=DATE_FORMAT.YEAR_MONTH,
+    title="Snow depth on the hill, winter 2024/25",
+    ylabel="Elevation (m)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
-
-### Reference lines
-
-A reference line marks a position on the surface. To add vertical lines, add the `vlines` attribute with the [datachart.typings.VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs) typing, which is either a `dict` or a `List[dict]`; horizontal lines use `hlines` and the [datachart.typings.HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) typing. Here the lines cross at the minimum of the Himmelblau function at (3, 2).
-
-```
-ContourChart(
-    data=chart_data,
-    # cross-hairs on the minimum at (3, 2)
-    vlines={"x": 3, "style": {"plot_vline_style": LINE_STYLE.DASHED}},
-    hlines={"y": 2, "style": {"plot_hline_style": LINE_STYLE.DASHED}},
-    levels=[2, 10, 30, 60, 100, 150, 250, 400, 600],
-    title="Himmelblau function",
-    xlabel="x",
-    ylabel="y",
-    figsize=FIG_SIZE.FULL_MEDIUM,
-).show()
-```
-
-### Reference bands
-
-A reference band shades a region — an acceptable range, a period, a tolerance around a value — over the grid lines and under the marks. To add horizontal bands, add the `hspans` attribute with the [datachart.typings.HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) typing, which is either a `dict` or a `List[dict]` where each dictionary sets `ymin` and/or `ymax`, an optional `label` for the legend, and an optional `style` with the `plot_hspan_*` attributes (color, alpha, hatch, edge color and width, zorder). Vertical bands work the same way through the `vspans` attribute and the [datachart.typings.VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) typing, with `xmin`, `xmax` and `plot_vspan_*` attributes. At least one bound is required; an omitted bound runs to the axis edge. The [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/#reference-bands) guide lists every attribute of a band.
-
-The bands below cross in a window around the minimum at (3, 2); where they overlap the tint doubles.
-
-```
-ContourChart(
-    data=chart_data,
-    # a search window around the minimum at (3, 2)
-    vspans={"xmin": 2.5, "xmax": 3.5, "label": "search window"},
-    hspans={"ymin": 1.5, "ymax": 2.5},
-    levels=[2, 10, 30, 60, 100, 150, 250, 400, 600],
-    title="Himmelblau function",
-    xlabel="x",
-    ylabel="y",
-    figsize=FIG_SIZE.FULL_MEDIUM,
-    show_legend=True,
-).show()
-```
-
-### Density of scattered points
-
-A contour chart of a density is the two-dimensional counterpart of a histogram: it shows where scattered points concentrate. [datachart.utils.stats.kde2d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde2d) estimates that density with a Gaussian kernel and returns the `{x, y, z}` surface `ContourChart` takes, so there is no separate density chart — `ContourChart(kde2d(x, y))` is it. The `bandwidth` sets how smooth the estimate is: a [datachart.constants.BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) rule (Scott's by default) or a scalar factor that replaces the rule, where smaller values follow the points more closely. The grid extends past the points by `cut` bandwidths, so the outer contours close instead of being clipped; `xlim` and `ylim` fix the grid instead, so several surfaces share one — the per-species densities of this guide are all evaluated over the range of every penguin, padded by 10%, so they line up in subplots.
-
-Here the density of all 342 penguins over their flipper length and body mass is drawn as filled bands, with a colorbar for the density; the [Composing contours](#composing-contours) section overlays the per-species densities on the points themselves.
-
-```
-from datachart.utils.stats import kde2d
-```
-
-```
-ContourChart(
-    # the density of the penguins over flipper length and body mass
-    data=kde2d(
-        [point["x"] for point in penguin_points],
-        [point["y"] for point in penguin_points],
-    ),
-    filled=True,
-    show_colorbars=True,
-    levels=8,
-    title="Density of the Palmer penguins",
-    xlabel="Flipper length (mm)",
-    ylabel="Body mass (g)",
-    figsize=FIG_SIZE.FULL_MEDIUM,
-).show()
-```
-
-## Saving the Chart as an Image
-
-To save the chart as an image, use the [datachart.utils.save_figure](https://eriknovak.github.io/datachart/dev/references/utils#datachart.utils.save_figure) function.
-
-```
-from datachart.utils import save_figure
-
-figure = ContourChart(
-    data=chart_data,
-    filled=True,
-    show_colorbars=True,
-    title="Himmelblau function",
-    xlabel="x",
-    ylabel="y",
-    figsize=FIG_SIZE.FULL_MEDIUM,
-)
-save_figure(figure, "./fig_contour_chart.png", dpi=300)
-```
-
-The figure should be saved in the current working directory.
 
 ## Real-World Examples
 
-The following examples put the features above to work on real or realistic data. Each one states what its data is and where it comes from; the data itself lives in a hidden cell.
+The examples below put the features above to work, each one answering a question. The data lives in hidden cells; each example says what its data is and where it comes from.
 
-### Example 1: Optimizer Path on a Loss Landscape (Log Surface, Labels, and Panel)
+### Example 1: Why Does Gradient Descent Crawl? (Log Surface, Level Rule, Labels, and a Panel)
 
-`rosenbrock` samples the [Rosenbrock function](https://en.wikipedia.org/wiki/Rosenbrock_function), the standard test surface for optimizers: a long, curved, flat-bottomed valley with the minimum at (1, 1), which gradient methods find easily but converge along slowly. Its values span six orders of magnitude, so the surface is drawn as `log(1 + z)` — the log keeps the valley floor visible where the raw values would flatten everything but the rim. `descent` traces 2,000 steps of plain gradient descent from (−1.5, 2.5), computed in the hidden cell, every 40th step kept as a point: the path drops into the valley within a few steps, then crawls along its floor toward the minimum. A `Panel` overlays the path, a `LineChart` with markers, on the labeled iso-lines — pinned to the primary axis with `y_axis`, as the panel would otherwise put the narrow path on a secondary value axis; the levels follow the Freedman–Diaconis rule, denser than the default, so the narrow valley gets its own lines.
+The [Rosenbrock function](https://en.wikipedia.org/wiki/Rosenbrock_function), `(1 - x)² + 100 (y - x²)²`, is the standard test surface for optimizers: a long, curved, flat-bottomed valley with the minimum at (1, 1), which gradient methods reach quickly but follow slowly. `rosenbrock` samples it on the square from -2 to 2 in x and -1 to 3 in y. Its values span six orders of magnitude, so the surface is drawn as `log(1 + z)`, which keeps the valley floor visible. `descent` traces 2000 steps of plain gradient descent (step size 0.001) from (-1.5, 2.5), computed in the hidden cell, with every 40th step kept. The Freedman-Diaconis rule cuts the surface densely enough for the narrow valley to get its own lines, and a `Panel` draws the path over the labeled iso-lines: the path drops into the valley within a few steps, then crawls along its floor towards the minimum.
 
 ```
-from datachart.charts import LineChart
+from datachart.constants import LINE_MARKER, VALUE_FORMAT
 
 Panel(
     [
         ContourChart(
             data=rosenbrock,
             subtitle="log(1 + Rosenbrock)",
+            # dense levels, so the narrow valley gets its own lines
             levels=CONTOUR_LEVELS.FD,
             show_labels=True,
             valfmt=VALUE_FORMAT.DECIMAL,
+            style={"plot_contour_cmap": COLORS.Viridis, "plot_contour_line_width": 0.8},
+            # point at the minimum
+            texts={"text": "minimum (1, 1)", "x": 1.0, "y": -0.6, "target": (1, 1)},
         ),
         {
             "figure": LineChart(
                 data=descent,
-                subtitle="Gradient descent",
-                style={"plot_line_marker": "o", "plot_line_width": 1.2},
+                subtitle="gradient descent",
+                style={"plot_line_color": "#c1121f", "plot_line_marker": LINE_MARKER.CIRCLE, "plot_line_width": 1.2},
             ),
             # the path shares the surface's axes
             "y_axis": "left",
@@ -681,26 +704,84 @@ Panel(
 ).show()
 ```
 
-### Example 2: Where the Species Overlap (Filled Subplots, Shared Levels, and Colorbars)
+### Example 2: How Cold Does the Wind Make It Feel? (Explicit Levels, Emphasis, Labels, and a Panel)
 
-`species_density` from the multiple-charts section holds the density of each penguin species over flipper length and body mass. Drawn as filled subplots that share one explicit `levels` list — every chart is cut at the same values, so the same shade means the same density — the species are comparable: Gentoo penguins are heavier and longer-flippered than the other two, whose densities overlap almost entirely. A colorbar on each chart maps the shades back to the density, and `sharex` and `sharey` label the shared axes once.
+The wind chill index, used by Environment Canada and the US National Weather Service since 2001, gives the temperature that feels the same on exposed skin in calm air: `13.12 + 0.6215 T - 11.37 V^0.16 + 0.3965 T V^0.16`, for the air temperature `T` in °C (up to 10 °C) and the wind speed `V` in km/h (from 5 km/h). `wind_chill` evaluates the formula on a grid of temperatures from -40 °C to 10 °C and wind speeds from 5 to 80 km/h. Environment Canada ties the risk of frostbite to the index: the risk is high from -28, very high from -40 and severe from -48, when exposed skin can freeze within minutes. A `Panel` draws the index twice: faint iso-lines every 5 degrees as the background, and the three thresholds highlighted and labeled. A note reads one point off the chart: -20 °C in a 40 km/h wind feels like about -34 °C.
 
 ```
-ContourChart(
-    data=species_density,
-    subtitle=SPECIES,
-    filled=True,
-    subplots=True,
-    max_cols=3,
-    sharex=True,
-    sharey=True,
-    # the same levels on every chart, so the shades are comparable
-    levels=[0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08],
-    show_colorbars=True,
-    style={"plot_contour_cmap": COLORS.YlGnBu},
-    title="Density of the Palmer penguins by species",
+background = ContourChart(
+    data=wind_chill,
+    subtitle="wind chill, every 5 °C",
+    levels=list(range(-65, 15, 5)),
+    emphasis=EMPHASIS.BACKGROUND,
+)
+thresholds = ContourChart(
+    data=wind_chill,
+    subtitle="frostbite risk thresholds",
+    # only the three thresholds, bold and labeled
+    levels=FROSTBITE,
+    emphasis=EMPHASIS.HIGHLIGHT,
+    show_labels=True,
+    valfmt="{x:.0f} °C",
+    style={"plot_contour_color": "#1d3557"},
+    texts={"text": "-20 °C at 40 km/h\nfeels like -34 °C", "x": -8, "y": 70, "target": (-20, 40)},
+)
+
+Panel(
+    [background, thresholds],
+    title="Wind chill and the risk of frostbite",
+    xlabel="Air temperature (°C)",
+    ylabel_left="Wind speed (km/h)",
+    show_legend=True,
+    legend={"location": LEGEND_LOCATION.LOWER_RIGHT},
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+### Example 3: Where Do the Penguin Species Overlap? (Densities over Points, Shared Levels, Panel and Grid)
+
+The [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (Gorman, Williams and Fraser, 2014; CC0) records the flipper length and body mass of 342 penguins of three species on the Palmer Archipelago, Antarctica. `penguins` holds every penguin as a point (flipper length in mm, body mass in g), and `species_density` one density surface per species, estimated with `kde2d` on one shared grid (the range of all penguins, padded by 10%) and scaled to penguins per mm per kg. The question is which species these two measurements tell apart. The top row overlays two density outlines per species on the points with a `Panel`; the bottom row draws each species as a filled density with one shared `levels` list, so the same shade means the same density, in a `Grid`. Gentoo penguins stand apart, heavier and longer-flippered, while the Adelie and Chinstrap densities cover the same ground.
+
+```
+SPECIES_STYLE = [{"plot_contour_color": color} for color in ["#e76f51", "#8338ec", "#2a9d8f"]]
+DENSITY_LEVELS = [0.5, 1, 2, 3, 4, 5, 6, 7, 8]
+
+overlap = Panel(
+    [
+        ScatterChart(data=penguins, subtitle="penguins", style={"plot_scatter_color": "#adb5bd"}),
+        {
+            # an outer and an inner outline per species
+            "figure": ContourChart(data=species_density, subtitle=SPECIES, style=SPECIES_STYLE, levels=[0.5, 3]),
+            "y_axis": "left",
+        },
+    ],
+    title="Density outlines over the penguins",
     xlabel="Flipper length (mm)",
-    ylabel="Body mass (g)",
-    figsize=FIG_SIZE.FULL_SHORT,
+    ylabel_left="Body mass (g)",
+    show_legend=True,
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+)
+
+
+def species_panel(index):
+    # one species as a filled density, on the shared levels
+    return ContourChart(
+        data=species_density[index],
+        filled=True,
+        levels=DENSITY_LEVELS,
+        style={"plot_contour_cmap": COLORS.YlGnBu},
+        title=SPECIES[index],
+        xlabel="Flipper length (mm)",
+        ylabel="Body mass (g)" if index == 0 else None,
+    )
+
+
+Grid(
+    [
+        [overlap],
+        [species_panel(0), species_panel(1), species_panel(2)],
+    ],
+    title="Where the penguin species overlap",
+    figsize=FIG_SIZE.FULL_TALL,
 ).show()
 ```
