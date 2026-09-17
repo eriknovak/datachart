@@ -3813,6 +3813,22 @@ class GanttLayer(BarLayer):
         return resolve
 
 
+def _open_step_outline(outline, axis: int, cumulative: bool) -> None:
+    """Strip a step histogram's outline of the drop to zero that states nothing.
+
+    `ax.hist(histtype="step")` returns one open polygon running from zero up
+    over the bins and back down to zero. A cumulative total never falls back,
+    so its closing drop misreads as a collapse to none (issue #198); a plain
+    histogram's drop is a true count and stays. `axis` is the value
+    coordinate: 1 for a vertical histogram, 0 for a horizontal one.
+    """
+
+    vertices = np.array(outline.get_xy(), dtype=float)
+    if cumulative:
+        vertices = vertices[:-1]
+    outline.set_xy(vertices)
+
+
 class HistogramLayer(Layer):
     kind = "histogram"
     labels_past_mark = True
@@ -3893,6 +3909,12 @@ class HistogramLayer(Layer):
                 orientation=self.orientation,
                 **hist_style,
             )
+            if hist_style.get("histtype") == HISTOGRAM_TYPE.STEP:
+                _open_step_outline(
+                    bars[0],
+                    0 if self.is_horizontal else 1,
+                    bool(self.show_cumulative),
+                )
         self._etch(bars.patches if isinstance(bars, BarContainer) else bars)
         self._register_bins(ax, ctx, bars, edges, counts)
         if self.show_values and ctx.emphasis != EMPHASIS_BACKGROUND:

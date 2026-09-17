@@ -4,9 +4,11 @@ import unittest
 
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 
 from datachart.charts import Histogram
 from datachart.config import config
+from datachart.constants import HISTOGRAM_TYPE, ORIENTATION, SCALE
 from datachart.utils import Panel
 from datachart.utils._internal.layers import build_chart_panel_settings
 
@@ -18,6 +20,10 @@ HIST_B = [{"x": v} for v in [0.5] * 1 + [2.5] * 3]
 
 def container_bottoms(figure, index):
     return [p.get_y() for p in figure.axes[0].containers[index].patches]
+
+
+def outline_vertices(figure, index=0):
+    return np.asarray(figure.axes[index].patches[0].get_xy(), dtype=float)
 
 
 class TestHistogramBarMode(unittest.TestCase):
@@ -155,6 +161,74 @@ class TestStepEdgeDefaults(unittest.TestCase):
         self.assertTrue(all(not p.get_fill() for p in patches))
         edges = {matplotlib.colors.to_hex(p.get_edgecolor()) for p in patches}
         self.assertEqual(len(edges), 2)
+
+
+class TestCumulativeStepEnd(unittest.TestCase):
+    """A cumulative step outline ends at its total, with no drop back to zero."""
+
+    def setUp(self):
+        config.reset_config()
+
+    def tearDown(self):
+        config.reset_config()
+        plt.close("all")
+
+    def test_cumulative_step_ends_at_its_total(self):
+        figure = Histogram(
+            HIST_A,
+            num_bins=3,
+            show_cumulative=True,
+            style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
+        )
+        vertices = outline_vertices(figure)
+        self.assertEqual(vertices[-1][1], 6)
+        # only the closing drop goes: the initial rise from zero stays
+        self.assertEqual(vertices[0][1], 0)
+        self.assertEqual(len(vertices), 2 * 3 + 1)
+
+    def test_horizontal_cumulative_step_ends_at_its_total(self):
+        figure = Histogram(
+            HIST_A,
+            num_bins=3,
+            show_cumulative=True,
+            orientation=ORIENTATION.HORIZONTAL,
+            style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
+        )
+        vertices = outline_vertices(figure)
+        self.assertEqual(vertices[-1][0], 6)
+        self.assertEqual(vertices[0][0], 0)
+
+    def test_plain_step_keeps_its_closing_drop(self):
+        figure = Histogram(
+            HIST_A, num_bins=3, style={"plot_hist_type": HISTOGRAM_TYPE.STEP}
+        )
+        vertices = outline_vertices(figure)
+        # a plain histogram's fall to zero is a true count
+        self.assertEqual(vertices[-1][1], 0)
+        self.assertEqual(len(vertices), 2 * 3 + 2)
+
+    def test_cumulative_step_filled_keeps_its_closing_drop(self):
+        figure = Histogram(
+            HIST_A,
+            num_bins=3,
+            show_cumulative=True,
+            style={"plot_hist_type": HISTOGRAM_TYPE.STEP_FILLED},
+        )
+        vertices = outline_vertices(figure)
+        # a filled step is an area: it needs the closing edge
+        self.assertEqual(vertices[-1][1], 0)
+
+    def test_stacked_cumulative_step_keeps_its_closing_drop(self):
+        figure = Histogram(
+            [HIST_A, HIST_B],
+            num_bins=3,
+            show_cumulative=True,
+            style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
+        )
+        for patch in figure.axes[0].patches:
+            # a stacked slot draws as a filled step: it closes on its bottom
+            vertices = np.asarray(patch.get_xy(), dtype=float)
+            self.assertEqual(vertices[-1].tolist(), vertices[0].tolist())
 
 
 if __name__ == "__main__":
