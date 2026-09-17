@@ -1630,7 +1630,9 @@ def _marks_reach(slot, dim, bboxes, lines, offsets):
     return max(reach) if reach else None
 
 
-def _fit_legend(legend: Legend, axes: list, dim: int, renderer) -> None:
+def _fit_legend(
+    legend: Legend, axes: list, dim: int, renderer, mirror: bool = False
+) -> None:
     """Give a best-placed legend a clear slot at the end of the value axis.
 
     matplotlib picks the least-covered slot, which still hides marks when they
@@ -1639,7 +1641,8 @@ def _fit_legend(legend: Legend, axes: list, dim: int, renderer) -> None:
     least far, and every axes extends its value range so those marks end below
     the legend. Runs at draw time, once constrained layout has sized the axes.
     A fit that would squeeze the marks past LEGEND_HEADROOM_MAX keeps
-    matplotlib's slot; the translucent frame still shows what it covers.
+    matplotlib's slot; the translucent frame still shows what it covers. A
+    `mirror` axis, symmetric around zero, extends both of its halves.
     """
 
     if legend._loc != 0:
@@ -1658,6 +1661,8 @@ def _fit_legend(legend: Legend, axes: list, dim: int, renderer) -> None:
         else ("upper right", "lower right", "center right")
     )
     a0, a1 = legend.axes.bbox.get_points()[:, dim]
+    # the value that stays put as the range scales: its low end, or a mirror's zero
+    origin = axes[0].transData.transform((0, 0))[dim] if mirror else a0
     best = None
     for name in names:
         code = Legend.codes[name]
@@ -1666,10 +1671,10 @@ def _fit_legend(legend: Legend, axes: list, dim: int, renderer) -> None:
         reach = _marks_reach(slot, dim, bboxes, lines, offsets)
         reach = a0 if reach is None else min(reach, a1)
         floor = slot.get_points()[0, dim] - pad
-        if floor <= a0:
+        if floor <= origin:
             continue
         # scale the value range so the marks' reach maps just below the legend
-        factor = max(1.0, (reach - a0) / (floor - a0))
+        factor = max(1.0, (reach - origin) / (floor - origin))
         if best is None or factor < best[0]:
             best = (factor, code)
     if best is None or best[0] - 1 > LEGEND_HEADROOM_MAX:
@@ -1678,8 +1683,12 @@ def _fit_legend(legend: Legend, axes: list, dim: int, renderer) -> None:
     for a in axes:
         axis = a.yaxis if dim == 1 else a.xaxis
         trans = axis.get_transform()
-        lo, hi = trans.transform(a.get_ylim() if dim == 1 else a.get_xlim())
-        lo, hi = trans.inverted().transform([lo, lo + (hi - lo) * factor])
+        lo, hi = a.get_ylim() if dim == 1 else a.get_xlim()
+        if mirror:
+            lo, hi = -hi * factor, hi * factor
+        else:
+            lo, hi = trans.transform([lo, hi])
+            lo, hi = trans.inverted().transform([lo, lo + (hi - lo) * factor])
         (a.set_ylim if dim == 1 else a.set_xlim)(lo, hi)
     legend._set_loc(code)
 
@@ -11555,7 +11564,10 @@ class Panel:
             # has sized the axes; an explicit value-axis limit, or a stack
             # filling its frame, stays as set
             value_axis = "x" if horizontal else "y"
+            # a pyramid keeps its value max aside for the mirror
             value_max = s.get(f"{value_axis}max")
+            if value_max is None and s.get("pyramid"):
+                value_max = s.get("pyramid_xmax")
             if (
                 value_max is None
                 and value_axis not in pinned
@@ -11563,8 +11575,10 @@ class Panel:
             ):
                 axes = [ax] + ([ax_right] if ax_right is not None else [])
                 dim = 0 if horizontal else 1
+                mirror = bool(s.get("pyramid"))
                 _defer_legend_fit(
-                    top_ax, lambda renderer: _fit_legend(legend, axes, dim, renderer)
+                    top_ax,
+                    lambda renderer: _fit_legend(legend, axes, dim, renderer, mirror),
                 )
 
         # tick labels and legend text cannot take the font family through
