@@ -6384,6 +6384,9 @@ class HexbinLayer(Layer):
             self.y,
             C=self.c,
             gridsize=self.gridsize,
+            # hexagons bin in the axes' scale; a later log scale would warp them
+            xscale="log" if ctx.category_scale == SCALE.LOG else "linear",
+            yscale="log" if ctx.value_scale == SCALE.LOG else "linear",
             reduce_C_function=self.reduce,
             mincnt=self.mincnt,
             norm=self.chart.get("norm", None),
