@@ -413,6 +413,9 @@ def Panel(
             "line": config.get("overlay_default_zorder_line", 2),
             "scatter": config.get("overlay_default_zorder_scatter", 2),
             "histogram": config.get("overlay_default_zorder_hist", 1),
+            # a filled surface is background, contour lines draw with lines
+            "surface": 1,
+            "contour": 2,
         },
         "show_grid": show_grid,
         "grid_style": get_grid_style({}),

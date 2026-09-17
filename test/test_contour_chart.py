@@ -7,6 +7,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.collections import PathCollection
 from matplotlib.contour import ContourSet
 from matplotlib.lines import Line2D
 
@@ -303,7 +304,30 @@ class TestContourCompose(unittest.TestCase):
             ],
         )
         ax = panel.axes[0]
-        self.assertTrue(_contour_sets(ax)[0].filled)
+        (bands,) = _contour_sets(ax)
+        self.assertTrue(bands.filled)
+        (scatter,) = [c for c in ax.collections if type(c) is PathCollection]
+        self.assertLess(bands.get_zorder(), scatter.get_zorder())
+
+    def test_panel_contour_lines_keep_the_line_zorder(self):
+        panel = Panel(
+            [
+                ContourChart(data=bump(0, 0)),
+                LineChart(data=[{"x": i, "y": i} for i in range(-4, 5)]),
+            ],
+        )
+        ax = panel.axes[0]
+        (lines,) = _contour_sets(ax)
+        self.assertEqual(lines.get_zorder(), ax.lines[0].get_zorder())
+        self.assertEqual(lines.get_zorder(), 2)
+
+    def test_reference_line_draws_over_filled_contour(self):
+        figure = ContourChart(
+            data=bump(0, 0), filled=True, hlines={"y": 0, "label": "ref"}
+        )
+        ax = figure.axes[0]
+        (line,) = [c for c in ax.collections if c.get_label() == "ref"]
+        self.assertLess(_contour_sets(ax)[0].get_zorder(), line.get_zorder())
 
     def test_grid_nesting(self):
         fig = Grid(

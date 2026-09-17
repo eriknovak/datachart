@@ -200,6 +200,16 @@ class TestStackedAreaChart(unittest.TestCase):
         self.assertEqual(len(_bands(ax)), 3)
         self.assertEqual(len(ax.lines), 1)
         self.assertEqual(fig._chart_metadata["panel"].settings["baseline"], "sym")
+        # the bands are a background surface under the overlaid line
+        for band in _bands(ax):
+            self.assertLess(band.get_zorder(), ax.lines[0].get_zorder())
+
+    def test_reference_line_draws_over_the_bands(self):
+        fig = StackedAreaChart(data=DATA, hlines={"y": 1, "label": "ref"})
+        ax = fig.axes[0]
+        (line,) = [c for c in ax.collections if c.get_label() == "ref"]
+        for band in _bands(ax):
+            self.assertLess(band.get_zorder(), line.get_zorder())
 
     def test_panel_of_line_layers_tightens_x(self):
         fig = Panel([StackedAreaChart(data=DATA), LineChart(data=DATA[0])])

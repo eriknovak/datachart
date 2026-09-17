@@ -1131,6 +1131,8 @@ def _span_bounds(span: dict, key: str, limits: tuple) -> tuple:
 TEXT_COORDS = ("data", "axes")
 # annotations sit above the data marks (zorder 3), below the panel furniture
 TEXT_ANNOTATION_ZORDER = 5
+# reference lines sit above every mark (zorder 3), below annotations (ADR 0054)
+REF_LINE_ZORDER = 3.5
 # connector placement (ADR 0018): the bow side and depth are chosen at draw
 # time against the panel's data, unless plot_text_arrow_curve pins them
 TEXT_BOW_CANDIDATES = (0.2, -0.2, 0.35, -0.35, 0.5, -0.5)
@@ -1364,7 +1366,7 @@ def _draw_ref_lines(ax: plt.Axes, vlines: List[tuple], hlines: List[tuple]) -> N
             ymin=vline.get("ymin", default_ymin),
             ymax=vline.get("ymax", default_ymax),
             label=vline.get("label", ""),
-            **style,
+            **{"zorder": REF_LINE_ZORDER, **style},
         )
     # a line running to the limits must not widen them under autoscale
     if any(v.get("ymin") is None or v.get("ymax") is None for v, _ in vlines):
@@ -1383,7 +1385,7 @@ def _draw_ref_lines(ax: plt.Axes, vlines: List[tuple], hlines: List[tuple]) -> N
             xmin=hline.get("xmin", default_xmin),
             xmax=hline.get("xmax", default_xmax),
             label=hline.get("label", ""),
-            **style,
+            **{"zorder": REF_LINE_ZORDER, **style},
         )
     if any(h.get("xmin") is None or h.get("xmax") is None for h, _ in hlines):
         ax.set_xlim(default_xmin, default_xmax)
@@ -1794,6 +1796,8 @@ class Layer:
     record_roles: list = ()
     # the zone of a temporal x column a layer draws as date numbers
     x_tz: Optional[tzinfo] = None
+    # a filled background layer; a Panel overlay draws it under marks (ADR 0054)
+    surface: bool = False
 
     def __init__(self, chart: dict, settings: dict):
         self.chart = chart
@@ -2805,6 +2809,7 @@ class StackedAreaLayer(Layer):
     """One series of a stack; the panel computes its band (ADR 0025)."""
 
     kind = "stackedarea"
+    surface = True
     # the stack fills its frame: both axes end on the data, not on a tick
     ticks_at_axis_ends = False
 
@@ -6090,6 +6095,7 @@ class ContourLayer(Layer):
 
     def _resolve_style(self):
         self.filled = bool(self.settings.get("filled"))
+        self.surface = self.filled
         self.show_labels = self.settings.get("show_labels")
         self.show_colorbars = self.settings.get("show_colorbars")
         self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
@@ -6301,6 +6307,7 @@ class HexbinLayer(Layer):
     ticks_at_axis_ends = False
 
     kind = "hexbin"
+    surface = True
 
     def _resolve_style(self):
         self.show_colorbars = self.settings.get("show_colorbars")
@@ -10387,7 +10394,9 @@ class Panel:
             for layer in group.layers:
                 z_order = group.z_order
                 if z_order is None:
-                    z_order = zorder_defaults.get(layer.kind)
+                    z_order = zorder_defaults.get(
+                        "surface" if layer.surface else layer.kind
+                    )
 
                 role = group.layer_role(layer)
 
