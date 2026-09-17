@@ -11235,6 +11235,17 @@ class Panel:
                             axis.parameter, axis.role, axis.scale, values, hint
                         )
 
+    def _apply_polar_grid_selection(self, ax, show_grid) -> None:
+        """Draw only the polar grid set the user named (ADR 0015).
+
+        Matplotlib's polar axes draw spokes and rings whatever `ax.grid`
+        restyles, so the set left out is switched off by hand. Unset,
+        `show_grid` never reaches here and both sets stay.
+        """
+
+        ax.xaxis.grid(show_grid in ("x", "both"))
+        ax.yaxis.grid(show_grid in ("y", "both"))
+
     def _apply_minor_value_grid(self, ax, horizontal: bool, value_scale) -> None:
         """Fainter gridlines between a dumbbell's labelled values (ADR 0050).
 
@@ -11288,6 +11299,8 @@ class Panel:
             ax.grid(axis=s["show_grid"], **s.get("grid_style", {}))
             ax.set_axisbelow(True)
             self._apply_minor_value_grid(ax, horizontal, value_scale)
+        if polar and not bare and s.get("show_grid_explicit"):
+            self._apply_polar_grid_selection(ax, s.get("show_grid"))
         if s.get("date_period") and self.temporal_axis and not bare:
             # period edges are the minor ticks; the labelled centres draw no line
             axis = getattr(ax, f"{self.temporal_axis}axis")
@@ -12184,6 +12197,8 @@ def build_chart_panel_settings(
     """
 
     show_grid = settings.get("show_grid")
+    # a polar panel draws only the set an explicit value names (ADR 0015)
+    show_grid_explicit = show_grid is not None
     # rasters (a heatmap, hexagons, filled contour bands) cover the grid, and a
     # bump chart's ranks read from the lines and labels: no grid unless asked
     gridless = chart_type in (
@@ -12215,6 +12230,7 @@ def build_chart_panel_settings(
         # horizontal bars and histograms take their scale keys literally
         "literal_scale_keys": chart_type not in GROUP_CHART_TYPES,
         "show_grid": show_grid,
+        "show_grid_explicit": show_grid_explicit,
         "grid_style": get_grid_style(first_style),
         "hatch_cycle": config.get("plot_hatch_cycle"),
         "linestyle_cycle": config.get("plot_linestyle_cycle"),

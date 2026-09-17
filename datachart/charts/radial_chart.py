@@ -160,7 +160,9 @@ def RadialChart(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_grid: Which grid lines to draw: "x" the spokes, "y" the rings,
+            "both" both, `False` neither. Unset, both are drawn and the
+            theme default takes the soft grid style.
         show_yerr: Whether to show the radial error band (line visual).
         show_area: Whether to fill the area inside the line (line visual).
         show_values: Whether to write each mark's value at its tip, rotated

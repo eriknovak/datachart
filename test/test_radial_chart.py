@@ -11,6 +11,7 @@ import pytest
 
 from datachart.charts import RadialChart
 from datachart.constants import RADIAL_DIRECTION, RADIAL_TYPE
+from datachart.utils import Grid
 
 WIND = [
     {"label": d, "y": v}
@@ -159,6 +160,53 @@ class TestAngularPlacement:
         # observations fall in their degree quadrants: [10,20]-> q1, [100,110]-> q2, ...
         counts = [p.get_height() for p in sorted(patches, key=lambda p: p.get_x())]
         assert counts == [2, 2, 1, 3]
+
+
+def gridlines(ax) -> tuple:
+    """The visible spoke and ring counts of a polar axes."""
+
+    return (
+        sum(1 for line in ax.xaxis.get_gridlines() if line.get_visible()),
+        sum(1 for line in ax.yaxis.get_gridlines() if line.get_visible()),
+    )
+
+
+class TestPolarGrid:
+    def test_unset_keeps_both_sets(self):
+        spokes, rings = gridlines(RadialChart(data=WIND).axes[0])
+        assert spokes and rings
+
+    def test_x_draws_spokes_only(self):
+        spokes, rings = gridlines(RadialChart(data=WIND, show_grid="x").axes[0])
+        assert spokes and not rings
+
+    def test_y_draws_rings_only(self):
+        spokes, rings = gridlines(RadialChart(data=WIND, show_grid="y").axes[0])
+        assert rings and not spokes
+
+    def test_both_draws_both_sets(self):
+        spokes, rings = gridlines(RadialChart(data=WIND, show_grid="both").axes[0])
+        assert spokes and rings
+
+    def test_false_draws_neither_set(self):
+        spokes, rings = gridlines(RadialChart(data=WIND, show_grid=False).axes[0])
+        assert not spokes and not rings
+
+    def test_the_selected_set_takes_the_grid_style(self):
+        style = {"plot_grid_linewidth": 4.0}
+        ax = RadialChart(data=WIND, show_grid="x", style=style).axes[0]
+        assert ax.xaxis.get_gridlines()[0].get_linewidth() == pytest.approx(4.0)
+
+    def test_a_grid_cell_keeps_the_figures_choice(self):
+        cell = Grid([RadialChart(data=WIND, show_grid="y")]).axes[0]
+        spokes, rings = gridlines(cell)
+        assert rings and not spokes
+
+    def test_subplots_apply_the_choice_to_every_axes(self):
+        figure = RadialChart(data=[WIND, WIND2], subplots=True, show_grid="x")
+        for ax in figure.axes:
+            spokes, rings = gridlines(ax)
+            assert spokes and not rings
 
 
 class TestValueLabelEmphasis:
