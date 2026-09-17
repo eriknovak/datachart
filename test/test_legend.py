@@ -177,3 +177,74 @@ class TestLegendSetting(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestReferenceEntriesBesideCustomHandles(unittest.TestCase):
+    """Labelled references join a chart's own legend handles (issue #173)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def labels(self, figure):
+        return [t.get_text() for t in legend_of(figure).get_texts()]
+
+    def test_gantt_keeps_groups_and_adds_references(self):
+        from datetime import date
+
+        from datachart.charts import GanttChart
+
+        figure = GanttChart(
+            data=[
+                {
+                    "task": "a",
+                    "start": date(2024, 1, 1),
+                    "end": date(2024, 1, 5),
+                    "group": "G1",
+                },
+                {
+                    "task": "b",
+                    "start": date(2024, 1, 3),
+                    "end": date(2024, 1, 9),
+                    "group": "G2",
+                },
+            ],
+            vlines={"x": date(2024, 1, 4), "label": "today"},
+            vspans={
+                "xmin": date(2024, 1, 2),
+                "xmax": date(2024, 1, 3),
+                "label": "freeze",
+            },
+            show_legend=True,
+        )
+        labels = self.labels(figure)
+        self.assertEqual(labels[:2], ["G1", "G2"])
+        self.assertIn("today", labels)
+        self.assertIn("freeze", labels)
+
+    def test_raincloud_adds_references(self):
+        from datachart.charts import RaincloudPlot
+
+        data = [{"label": g, "value": float(v)} for g in "AB" for v in range(6)]
+        figure = RaincloudPlot(
+            data=data,
+            hlines={"y": 2, "label": "target"},
+            hspans={"ymin": 1, "ymax": 3, "label": "range"},
+            show_legend=True,
+        )
+        labels = self.labels(figure)
+        self.assertEqual(labels[:2], ["A", "B"])
+        self.assertIn("target", labels)
+        self.assertIn("range", labels)
+
+    def test_hexbin_takes_legend_settings(self):
+        from datachart.charts import HexbinChart
+
+        figure = HexbinChart(
+            data={"x": [0, 1, 2, 3], "y": [1, 0, 2, 3]},
+            hlines={"y": 1.5, "label": "cut"},
+            show_legend=True,
+            legend={"title": "Refs"},
+        )
+        legend = legend_of(figure)
+        self.assertEqual([t.get_text() for t in legend.get_texts()], ["cut"])
+        self.assertEqual(legend.get_title().get_text(), "Refs")

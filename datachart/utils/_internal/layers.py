@@ -10804,6 +10804,11 @@ class Panel:
                     legend_style.update(
                         expand_legend_location(LEGEND_LOCATION.OUTSIDE_RIGHT)
                     )
+                # the layers' own keys first, then every labelled artist:
+                # references and the marks of composed figures
+                for target in (ax, ax_right):
+                    if target is not None:
+                        custom_handles += target.get_legend_handles_labels()[0]
                 _draw_legend(ax, ax_right, legend_style, custom_handles)
             elif s.get("legend_mode") == "combined":
                 handles, labels = self._combined_legend_entries(
