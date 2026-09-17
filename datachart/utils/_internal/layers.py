@@ -1851,6 +1851,8 @@ class Layer:
     x_tz: Optional[tzinfo] = None
     # a filled background layer; a Panel overlay draws it under marks (ADR 0054)
     surface: bool = False
+    # the edge the layer's drawn colorbar takes; None when it draws none
+    colorbar_edge: Optional[str] = None
 
     def __init__(self, chart: dict, settings: dict):
         self.chart = chart
@@ -1896,6 +1898,12 @@ class Layer:
 
     def _resolve_emphasis(self, value):
         return validate_emphasis(value)
+
+    def _colorbar_edge(self, shown) -> Optional[str]:
+        """The resolved colorbar's edge, when shown; etched steps draw none."""
+        if shown and not self.value_etch_steps:
+            return self.colorbar["location"]
+        return None
 
     def _resolve_style(self) -> None:
         """Collapse config → theme → chart style into concrete style dicts."""
@@ -5922,6 +5930,7 @@ class HeatmapLayer(Layer):
     def _resolve_style(self):
         self.show_colorbars = self.settings.get("show_colorbars")
         self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
+        self.colorbar_edge = self._colorbar_edge(self.show_colorbars)
         heatmap_style = get_heatmap_style(self.style, self.style_prefix)
         heatmap_style["cmap"] = get_colormap(heatmap_style["cmap"])
         self.heatmap_style = heatmap_style
@@ -6388,6 +6397,7 @@ class ContourLayer(Layer):
         self.show_labels = self.settings.get("show_labels")
         self.show_colorbars = self.settings.get("show_colorbars")
         self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
+        self.colorbar_edge = self._colorbar_edge(self.filled and self.show_colorbars)
         style = get_contour_style(self.style)
         self.cmap = get_colormap(style.pop("cmap"))
         # lines take a pinned contour cmap only, past its washed-out low end
@@ -6629,6 +6639,7 @@ class HexbinLayer(Layer):
         self.colorbar = get_colorbar_setting(
             self.chart.get("colorbar"), self.chart.get("valfmt")
         )
+        self.colorbar_edge = self._colorbar_edge(self.show_colorbars)
         style = get_hexbin_style(self.style)
         style["cmap"] = get_colormap(style["cmap"])
         self.hexbin_style = style

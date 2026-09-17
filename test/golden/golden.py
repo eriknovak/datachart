@@ -319,6 +319,7 @@ EXPECTED_CHANGES = {
     "network_spring_components",
     # colorbar fixes: tight-bbox locked bar, axis label beside its ticks
     "calendar_narrow_colorbar",
+    "hexbin_bottom_bar_xlabel",
 }
 
 
@@ -1887,6 +1888,16 @@ def hexbin_grid():
     data["c"] = [x + y for x, y in zip(data["x"], data["y"])]
     right = HexbinChart(data=data, reduce=HEXBIN_REDUCE.MAX, title="max c")
     return Grid([[top], [line, right]], figsize=(10, 7))
+
+
+@case
+def hexbin_bottom_bar_xlabel():
+    return HexbinChart(
+        data=hexbin_points(),
+        xlabel="Area (m2)",
+        ylabel="Rent",
+        colorbar={"label": "count", "location": COLORBAR_LOCATION.BOTTOM},
+    )
 
 
 @case

@@ -10,6 +10,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
+from matplotlib.transforms import Bbox
 
 from datachart.charts import CalendarHeatmap, ContourChart, Heatmap, HexbinChart
 from datachart.config import config
@@ -298,6 +299,65 @@ class TestColorbarRendering(unittest.TestCase):
                     self.assertTrue(saved.contains(bar.x0, bar.y0), (bar, saved))
                     self.assertTrue(saved.contains(bar.x1, bar.y1), (bar, saved))
                     plt.close("all")
+
+    def test_axis_label_sits_between_ticks_and_a_left_or_bottom_bar(self):
+        fronts = {
+            **FRONTS,
+            "heatmap_locked": lambda **kw: FRONTS["heatmap"](
+                aspect_ratio="equal", **kw
+            ),
+        }
+        for name, front in fronts.items():
+            for location, axis in [("bottom", "xaxis"), ("left", "yaxis")]:
+                with self.subTest(front=name, location=location):
+                    figure = front(
+                        colorbar={"location": location}, xlabel="X", ylabel="Y"
+                    )
+                    colorbar = colorbar_of(figure)
+                    renderer = figure.canvas.get_renderer()
+                    chart_axis = getattr(figure.axes[0], axis)
+                    label = chart_axis.label.get_window_extent(renderer)
+                    ticks = Bbox.union(
+                        [
+                            t.get_window_extent(renderer)
+                            for t in chart_axis.get_ticklabels()
+                            if t.get_visible() and t.get_text()
+                        ]
+                    )
+                    bar = colorbar.ax.get_tightbbox(renderer)
+                    if location == "bottom":
+                        self.assertFalse(figure.get_supxlabel())
+                        self.assertEqual(figure.get_supylabel(), "Y")
+                        self.assertLessEqual(label.y1, ticks.y0)
+                        self.assertGreaterEqual(label.y0, bar.y1)
+                    else:
+                        self.assertFalse(figure.get_supylabel())
+                        self.assertEqual(figure.get_supxlabel(), "X")
+                        self.assertLessEqual(label.x1, ticks.x0)
+                        self.assertGreaterEqual(label.x0, bar.x1)
+                    plt.close(figure)
+
+    def test_axis_labels_stay_on_the_figure_beside_a_right_or_top_bar(self):
+        for name, front in FRONTS.items():
+            for location in ("right", "top"):
+                with self.subTest(front=name, location=location):
+                    figure = front(
+                        colorbar={"location": location}, xlabel="X", ylabel="Y"
+                    )
+                    self.assertEqual(figure.get_supxlabel(), "X")
+                    self.assertEqual(figure.get_supylabel(), "Y")
+                    self.assertEqual(figure.axes[0].get_xlabel(), "")
+                    plt.close(figure)
+
+    def test_subplots_keep_the_figure_axis_labels(self):
+        figure = HexbinChart(
+            data=[points(seed=1), points(seed=2)],
+            subplots=True,
+            gridsize=8,
+            colorbar={"location": "bottom"},
+            xlabel="X",
+        )
+        self.assertEqual(figure.get_supxlabel(), "X")
 
     def test_grid_cell_keeps_label_and_edge(self):
         source = FRONTS["heatmap"](

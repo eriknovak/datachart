@@ -23,7 +23,7 @@ from .layers import (
     layers_per_chart,
     build_chart_panel_settings,
 )
-from ...constants import FIG_SIZE, ORIENTATION
+from ...constants import COLORBAR_LOCATION, FIG_SIZE, ORIENTATION
 
 # ================================================
 # Chart Rendering
@@ -31,6 +31,26 @@ from ...constants import FIG_SIZE, ORIENTATION
 
 # the figure-level settings a subplots figure carries into a grid cell
 SUBPLOT_FURNITURE_KEYS = ("title", "xlabel", "ylabel", "sharex", "sharey")
+
+
+def single_plot_axes_labels(chart_type: str, layers: List[Layer]) -> tuple:
+    """The axis labels a single plot carries on its axes, not the figure.
+
+    A figure-level label sits at the figure edge: far from a polar circle,
+    and past a left or bottom colorbar, where it reads as the bar's caption.
+    """
+
+    if chart_type == "radialchart":
+        return ("xlabel", "ylabel")
+    edges = {layer.colorbar_edge for layer in layers}
+    return tuple(
+        key
+        for key, edge in [
+            ("xlabel", COLORBAR_LOCATION.BOTTOM),
+            ("ylabel", COLORBAR_LOCATION.LEFT),
+        ]
+        if edge in edges
+    )
 
 
 def composition_panel(
@@ -140,12 +160,10 @@ def render_chart(
         panel_settings = build_chart_panel_settings(
             chart_type, settings, "single", first_style
         )
-        if chart_type == "radialchart":
-            # sup-labels sit at the figure edge, far from the circle; polar
-            # axis labels attach to the axes instead
-            panel_settings["xlabel"] = settings.get("xlabel")
-            panel_settings["ylabel"] = settings.get("ylabel")
-            panel_settings["label_styles"] = Panel.snapshot_label_styles()
+        axes_labels = single_plot_axes_labels(chart_type, layers)
+        for key in axes_labels:
+            panel_settings[key] = settings.get(key)
+        panel_settings["label_styles"] = Panel.snapshot_label_styles()
         panel = Panel(
             [group_from_chart(layers, settings, mode="multiple")], panel_settings
         )
@@ -193,15 +211,14 @@ def render_chart(
             )
             panel.render(ax)
 
-    # global figure labels; a single polar plot carries its axis labels on
-    # the axes, so only the title stays at the figure level
+    # global figure labels, less those a single plot carries on its axes
     figure_labels = [
         ("title", figure.suptitle),
         ("xlabel", figure.supxlabel),
         ("ylabel", figure.supylabel),
     ]
-    if chart_type == "radialchart" and is_single_plot:
-        figure_labels = figure_labels[:1]
+    if is_single_plot:
+        figure_labels = [(k, a) for k, a in figure_labels if k not in axes_labels]
     configure_labels(settings, figure_labels)
 
     # metadata transport: the layers and panel settings compositions consume
