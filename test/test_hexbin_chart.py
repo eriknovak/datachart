@@ -300,3 +300,18 @@ class TestHexbinCompose(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_reference_lines_span_the_axes():
+    """Reference lines reach the axes edges and leave the limits alone (#214)."""
+    rng = np.random.default_rng(0)
+    data = {"x": rng.normal(size=200).tolist(), "y": rng.normal(size=200).tolist()}
+    plain = HexbinChart(data=data)
+    figure = HexbinChart(data=data, hlines={"y": 0, "label": "h"})
+    ax = figure.axes[0]
+    figure.canvas.draw()
+    plain.canvas.draw()
+    assert ax.get_xlim() == plain.axes[0].get_xlim()
+    (line,) = [c for c in ax.collections if c.get_label() == "h"]
+    np.testing.assert_allclose(line.get_segments()[0][:, 0], ax.get_xlim())
+    plt.close("all")
