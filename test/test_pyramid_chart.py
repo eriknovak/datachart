@@ -4,7 +4,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import numpy
+import numpy as np
 import pytest
 
 from datachart.charts import BarChart, PyramidChart
@@ -93,7 +93,7 @@ class TestMirroredDrawing:
     def test_automatic_ticks_stay_automatic_under_xmax(self):
         def tick_step(figure):
             ticks = sorted(figure.axes[0].get_xticks())
-            return min(numpy.diff(ticks))
+            return min(np.diff(ticks))
 
         pinned = PyramidChart(data=[LEFT, RIGHT], xmax=27)
         assert 27 not in pinned.axes[0].get_xticks()

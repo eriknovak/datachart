@@ -441,7 +441,8 @@ def Panel(
             "contour": 2,
         },
         "show_grid": show_grid,
-        # a polar panel draws only the set an explicit value names (ADR 0015)
+        # the caller's own value, unresolved: a polar panel draws only the
+        # set it names (ADR 0015)
         "show_grid_explicit": not theme_grid,
         "grid_style": get_grid_style({}),
         "hatch_cycle": config.get("plot_hatch_cycle"),
