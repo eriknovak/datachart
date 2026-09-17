@@ -16,6 +16,7 @@ from datachart.charts import (
     Histogram,
     LineChart,
     ParallelCoords,
+    RaincloudPlot,
     ScatterChart,
     SwarmPlot,
 )
@@ -383,6 +384,19 @@ class TestMarkerRecordEmphasis(unittest.TestCase):
         ax = ScatterChart(data, emphasis="background").axes[0]
         self.assert_not_muted(collection_with(ax, 2.0))
         self.assert_muted(collection_with(ax, 3.0))
+
+    def test_highlighted_point_in_a_muted_series_prints_its_value(self):
+        data = [dict(p) for p in SCAT1]
+        data[3]["emphasis"] = "highlight"
+        ax = ScatterChart(data, emphasis="background", show_values=True).axes[0]
+        self.assertEqual([t.get_text() for t in ax.texts], ["3"])
+
+    def test_raincloud_legend_keeps_a_group_with_an_unmuted_point(self):
+        rows = [{"label": label, "value": float(v)} for label in "AB" for v in range(5)]
+        rows[7]["emphasis"] = "highlight"
+        figure = RaincloudPlot(rows, emphasis=[None, "background"], show_legend=True)
+        legend = figure.axes[0].get_legend()
+        self.assertEqual([t.get_text() for t in legend.get_texts()], ["A", "B"])
 
     def test_invalid_record_role_raises(self):
         data = [dict(p) for p in SCAT1]

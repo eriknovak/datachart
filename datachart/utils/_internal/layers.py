@@ -2273,28 +2273,31 @@ class Layer:
 
 
 def _is_bar_record(record, y_key: str) -> bool:
-    """Whether a data entry draws a bar: a dict carrying the `y` column."""
+    """Whether a data entry is a dict carrying the `y_key` column, as a bar is."""
 
     return isinstance(record, dict) and y_key in record
+
+
+def _keyed_records(chart: dict, column: str) -> list:
+    """The chart's records carrying the `column` key; empty for columnar data."""
+
+    key = get_attr_value(column, chart, column)
+    data = chart.get("data")
+    if not isinstance(data, list):
+        return []
+    return [record for record in data if _is_bar_record(record, key)]
 
 
 def _bar_records(chart: dict) -> list:
     """The chart's drawn bar records; empty for columnar data."""
 
-    y_key = get_attr_value("y", chart, "y")
-    data = chart.get("data")
-    if not isinstance(data, list):
-        return []
-    return [record for record in data if _is_bar_record(record, y_key)]
+    return _keyed_records(chart, "y")
 
 
 def _record_emphasis(chart: dict) -> list:
     """The validated per-record emphasis roles of a bar chart, one per drawn bar."""
 
-    return [
-        validate_emphasis(record.get("emphasis"), f"bar record {i} `emphasis`")
-        for i, record in enumerate(_bar_records(chart))
-    ]
+    return _validated_record_roles(_bar_records(chart), "bar")
 
 
 def _validated_record_roles(records: list, kind: str) -> list:
@@ -3941,7 +3944,9 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
 
     def _resolve_style(self):
         self.scatter_style = get_scatter_style(self.style)
-        self.record_roles = _validated_record_roles(self._records(), self.kind)
+        self.record_roles = _validated_record_roles(
+            _keyed_records(self.chart, "x"), self.kind
+        )
         self._resolve_value_labels()
         self._init_point_labels()
         # an explicit `show_values` outranks point labels found under the
@@ -3998,37 +4003,31 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
                 "s", self.default_size
             )
 
-    def _records(self) -> list:
-        """The drawn point records; empty for columnar data."""
-
-        x_attr = get_attr_value("x", self.chart, "x")
-        data = self.chart.get("data")
-        if not isinstance(data, list):
-            return []
-        return [d for d in data if x_attr in d]
-
     def _point_labels(self, x_data) -> Optional[np.ndarray]:
         """One label per drawn point (None where the key is absent), or None."""
 
-        if not isinstance(self.chart.get("data"), list):
-            return None
         label_attr = get_attr_value("label", self.chart, "label")
-        labels = [d.get(label_attr) for d in self._records()]
+        labels = [d.get(label_attr) for d in _keyed_records(self.chart, "x")]
         if len(labels) != len(x_data) or all(l is None for l in labels):
             return None
         return np.array([None if l is None else str(l) for l in labels], dtype=object)
 
-    def _mark_labels(self, ax, ctx, x_data, y_data) -> tuple:
-        """The (labels, font, pad) each point carries: its value, or its point label."""
+    def _mark_labels(self, ax, ctx, x_data, y_data, roles) -> tuple:
+        """The (labels, font, pad) each point carries: its value, or its point label.
+
+        A muted point prints no value; a fully muted series keeps its point labels.
+        """
 
         labels = self._point_labels(x_data)
+        muted = roles == EMPHASIS_BACKGROUND
         if (
             self.show_values
             and (labels is None or self.show_values_explicit)
-            and ctx.emphasis != EMPHASIS_BACKGROUND
+            and not muted.all()
         ):
+            values = self._value_texts(ax, y_data, ctx.transpose)
             return (
-                self._value_texts(ax, y_data, ctx.transpose),
+                np.where(muted, None, values),
                 self.value_font,
                 self.value_padding,
             )
@@ -4109,13 +4108,10 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
 
         if x_data is None or y_data is None:
             return
-        labels, font, pad = self._mark_labels(ax, ctx, x_data, y_data)
         roles = np.array(
             self._marker_roles([ctx.emphasis] * len(x_data), ctx), dtype=object
         )
-        if labels is not None and font is self.value_font:
-            # a muted point prints no value, as a muted series prints none
-            labels = np.where(roles == EMPHASIS_BACKGROUND, None, labels)
+        labels, font, pad = self._mark_labels(ax, ctx, x_data, y_data, roles)
 
         scatter_style = dict(self.scatter_style)
         if ctx.z_order is not None:
@@ -4132,14 +4128,10 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
                 for i, hue_val in enumerate(np.unique(hue_data))
             ]
         else:
-            color = scatter_style.get("c")
-            units = [
-                (
-                    np.ones(len(x_data), dtype=bool),
-                    ctx.color if color is None else color,
-                    self.label(ctx),
-                )
-            ]
+            series_color = scatter_style.get("c")
+            if series_color is None:
+                series_color = ctx.color
+            units = [(np.ones(len(x_data), dtype=bool), series_color, self.label(ctx))]
         for mask, color, label in units:
             sizes = self._sizes(
                 size_data[mask] if size_data is not None else None, ctx.size_extent
@@ -4153,8 +4145,8 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
                 y_data[mask],
                 sizes,
                 roles[mask],
-                color,
-                label,
+                color=color,
+                label=label,
                 size_data=size_data,
                 labels=labels[mask] if labels is not None else None,
                 font=font,
@@ -4168,23 +4160,37 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
             if self.show_regression:
                 self._draw_regression(ax, ctx, x_fit, y_data, color=None)
             return
-        color = self.muted_color if ctx.emphasis == EMPHASIS_BACKGROUND else color
+        color = (
+            self.muted_color if ctx.emphasis == EMPHASIS_BACKGROUND else series_color
+        )
         if self.show_regression:
             self._draw_regression(ax, ctx, x_fit, y_data, color=color)
         if self.show_correlation:
             self._draw_correlation(ax, x_data, y_data, color=color)
 
     def _draw_unit(
-        self, ax, ctx, scatter, base_style, x, y, sizes, roles, color, label, **marks
+        self,
+        ax,
+        ctx,
+        scatter,
+        base_style,
+        x,
+        y,
+        sizes,
+        roles,
+        *,
+        color,
+        label,
+        size_data,
+        labels,
+        font,
+        pad,
     ) -> None:
         """Draw one hue group or series: one collection per emphasis role.
 
-        `marks` carries `size_data` and the point `labels`, `font`, and `pad`.
         The first unmuted collection carries the legend entry.
         """
 
-        size_data, labels = marks["size_data"], marks["labels"]
-        font, pad = marks["font"], marks["pad"]
         legend_label = label
         for role in MARKER_ROLE_ORDER:
             picked = roles == role
@@ -4273,6 +4279,19 @@ class GroupLayer(Layer):
             if self.color_by_group
             else None
         )
+        if self.color_by_group:
+            # a raincloud keeps the colors and legend of a muted group whose
+            # rain holds an unmuted point, as its swarm draws it
+            self._take_record_roles()
+
+    def _take_record_roles(self) -> None:
+        """Let the records' own roles outrank the group roles, in drawing order."""
+
+        self.record_roles_beat_layer = True
+        self.record_roles = _validated_record_roles(
+            [d for group in grouped_records(self.chart).values() for d in group],
+            self.kind,
+        )
 
     def group_color(self, index: int, ctx_color: Optional[str]) -> Optional[str]:
         """The color of the group at `index`: its own palette slot, or the layer's."""
@@ -4286,10 +4305,15 @@ class GroupLayer(Layer):
 
         if self.group_colors is None:
             return None
+        records = grouped_records(self.chart)
         return [
             Patch(facecolor=self.group_colors[i]["color"], label=str(label))
             for i, (label, role) in enumerate(zip(self.labels(), roles))
             if role != EMPHASIS_BACKGROUND
+            or any(
+                r.get("emphasis") not in (None, EMPHASIS_BACKGROUND)
+                for r in records[label]
+            )
         ]
 
     def grouped_values(self) -> dict:
@@ -4558,15 +4582,10 @@ def strip_offsets(n: int, jitter: float) -> np.ndarray:
 
 class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
     kind = "swarm"
-    record_roles_beat_layer = True
 
     def _resolve_style(self):
         super()._resolve_style()
-        # record order within each group, as the groups draw
-        self.record_roles = _validated_record_roles(
-            [d for records in grouped_records(self.chart).values() for d in records],
-            self.kind,
-        )
+        self._take_record_roles()
         self._resolve_value_labels()
         self._init_point_labels()
         # a raincloud's box prints the median, so its rain labels the extremes
@@ -4610,7 +4629,7 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
             size = self.default_size
         return np.sqrt(size) / 72 * ax.figure.dpi
 
-    def strip_offsets(self, values: np.ndarray, side: int) -> np.ndarray:
+    def jitter_offsets(self, values: np.ndarray, side: int) -> np.ndarray:
         """Per-point jitter from the category center, in data units.
 
         A nonzero `side` jitters on one side only: -1 toward lower category
@@ -4795,14 +4814,20 @@ def pack_swarms(ax, layers: list, side: int = 0) -> None:
         layer_side = layer.side or side
         for j, (position, values) in enumerate(groups):
             if layer.mode == SWARM_MODE.STRIP:
-                offsets[i, j] = layer.strip_offsets(values, layer_side)
+                offsets[i, j] = layer.jitter_offsets(values, layer_side)
             else:
                 key = (position, layer_side, layer.is_horizontal)
                 clouds[key].append((i, j))
 
+    def member(i, j) -> tuple:
+        """The layer and values of group `j` in pending entry `i`."""
+
+        layer, _, groups, _ = entries[i]
+        return layer, groups[j][1]
+
     for (position, cloud_side, horizontal), members in clouds.items():
-        values = [entries[i][2][j][1] for i, j in members]
-        diameter = max(entries[i][0].diameter_px(ax) for i, _ in members)
+        values = [member(i, j)[1] for i, j in members]
+        diameter = max(member(i, j)[0].diameter_px(ax) for i, j in members)
         units = _beeswarm_units(
             ax,
             position,
@@ -4813,7 +4838,7 @@ def pack_swarms(ax, layers: list, side: int = 0) -> None:
         )
         start = 0
         for (i, j), part in zip(members, values):
-            spread = entries[i][0].max_offset
+            spread = member(i, j)[0].max_offset
             placed = np.clip(units[start : start + len(part)], -spread, spread)
             offsets[i, j] = placed * cloud_side if cloud_side else placed
             start += len(part)
