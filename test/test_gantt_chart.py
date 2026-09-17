@@ -628,3 +628,23 @@ class TestValueAxisKind(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestMarksOutsideUserLimits(unittest.TestCase):
+    """A milestone outside the date window is skipped (issue #174)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_milestone_past_xmax_is_hidden(self):
+        records = schedule() + [task("Release", 49, 0, group="Make")]
+        ax = GanttChart(
+            records, xmax=D0 + timedelta(days=30), show_values=GANTT_VALUE.DURATION
+        ).axes[0]
+        markers = [
+            l
+            for l in ax.lines
+            if l.get_marker() == config["plot_gantt_milestone_marker"]
+        ]
+        self.assertEqual([m.get_visible() for m in markers], [False])
+        self.assertNotIn("19 Feb", [t.get_text() for t in ax.texts if t.get_visible()])

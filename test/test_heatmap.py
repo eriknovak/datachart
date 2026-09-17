@@ -119,3 +119,15 @@ class TestHeatmapLabels(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestMarksOutsideUserLimits(unittest.TestCase):
+    """A cropped cell's value is skipped (issue #174)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_cell_values_past_xmax_are_hidden(self):
+        figure = Heatmap({"z": Z}, show_heatmap_values=True, xmax=0.5)
+        shown = [t.get_text() for t in figure.axes[0].texts if t.get_visible()]
+        self.assertEqual(sorted(shown), ["1", "4"])

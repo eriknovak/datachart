@@ -1374,6 +1374,23 @@ def _draw_ref_spans(
             (data_ax.set_xlim if along_x else data_ax.set_ylim)(limits)
 
 
+def _hide_marks_past_limits(ax: plt.Axes, limits: dict, marks: list) -> None:
+    """Hide the unclipped marks anchored past a limit the user set.
+
+    Auto limits keep a mark overflowing the axes edge on purpose; a user
+    limit crops the data, and a mark left beside the axes names nothing.
+    """
+
+    ends = {"x": sorted(ax.get_xlim()), "y": sorted(ax.get_ylim())}
+    for artist, anchor in marks:
+        for name, value in zip("xy", anchor):
+            lo, hi = ends[name]
+            if (limits[f"{name}min"] is not None and value < lo) or (
+                limits[f"{name}max"] is not None and value > hi
+            ):
+                artist.set_visible(False)
+
+
 def _draw_legend(
     ax: plt.Axes,
     ax_right: Optional[plt.Axes],
@@ -1702,6 +1719,8 @@ class Layer:
         self.chart = chart
         # (artist, resolver) pairs registered by the draw in progress (ADR 0031)
         self._hover_targets = []
+        # (artist, (x, y)) marks drawn past the axes, hidden past a user limit
+        self._limit_marks = []
         self.settings = settings
         self.subtitle = chart.get("subtitle", None)
         self.style = chart.get("style", {}) or {}
@@ -1835,6 +1854,17 @@ class Layer:
         self.register_hover(
             BarContainer([patch for patch, _ in marks]), lambda i: marks[i][1]
         )
+
+    def register_limit_mark(self, artist, x, y) -> None:
+        """Hide an unclipped mark whose data anchor lies past a user limit."""
+
+        self._limit_marks.append((artist, (x, y)))
+
+    def take_limit_marks(self) -> list:
+        """Hand over the marks registered by the last draw and forget them."""
+
+        marks, self._limit_marks = self._limit_marks, []
+        return marks
 
     def take_hover_targets(self) -> list:
         """Hand over the pairs registered by the last draw and forget them."""
@@ -2676,7 +2706,7 @@ class BumpLayer(LineLayer):
         for i, side in ends:
             xy = (ranks[i], x[i]) if ctx.transpose else (x[i], ranks[i])
             offset = (0, -side * gap) if ctx.transpose else (side * gap, 0)
-            ax.annotate(
+            label = ax.annotate(
                 self.subtitle,
                 xy=xy,
                 xytext=offset,
@@ -2688,6 +2718,7 @@ class BumpLayer(LineLayer):
                 zorder=TEXT_ANNOTATION_ZORDER,
                 **font,
             )
+            self.register_limit_mark(label, *xy)
 
 
 class StackedAreaLayer(Layer):
@@ -3387,7 +3418,8 @@ class GanttLayer(BarLayer):
         size = style.get("milestone_size")
         for i in np.flatnonzero(self.milestones):
             muted = roles[i] == EMPHASIS_BACKGROUND
-            ax.plot(
+            anchor = (self.starts[i], rows[i])
+            (marker,) = ax.plot(
                 [self.starts[i]],
                 [rows[i]],
                 linestyle="none",
@@ -3402,10 +3434,11 @@ class GanttLayer(BarLayer):
                 # a milestone on the view's edge shows whole, over the spine
                 clip_on=False,
             )
+            self.register_limit_mark(marker, *anchor)
             if self.show_values and not muted:
-                ax.annotate(
+                label = ax.annotate(
                     date_labels([self.tasks[i]["start"]], self.milestone_format)[0],
-                    (self.starts[i], rows[i]),
+                    anchor,
                     xytext=(size / 2 + self.value_padding, 0),
                     textcoords="offset points",
                     ha="left",
@@ -3413,6 +3446,7 @@ class GanttLayer(BarLayer):
                     zorder=TEXT_ANNOTATION_ZORDER,
                     **self.value_font,
                 )
+                self.register_limit_mark(label, *anchor)
 
     def _draw_dependencies(self, ax, rows, height, ctx) -> None:
         """An elbow arrow from each dependency's end to the dependent's start.
@@ -5646,9 +5680,10 @@ class HeatmapLayer(Layer):
                     # a value over the etching reads through a halo of the ground
                     font_style["color"] = self.font_style.get("color")
                     font_style["path_effects"] = self.value_halo
-                ax.text(
+                text = ax.text(
                     j, i, self.cell_text(value), ha="center", va="center", **font_style
                 )
+                self.register_limit_mark(text, j, i)
 
     def _cell_style(self) -> dict:
         """The image style; background cells fade to the muted alpha (ADR 0045).
@@ -10237,6 +10272,8 @@ class Panel:
         scales = self._resolve_scales(ax_right, group_axes)
         self._validate_log_scales(scales, group_axes, ax_right)
         scalex, scaley, scale_right = scales
+        # the host's limit keys are the user's; a twin keeps its marks whole
+        limit_marks = []
         for group, target_ax in zip(self.groups, group_axes):
             cycle = cycles[palette_key(group)]
             on_twin = ax_right is not None and target_ax is ax_right
@@ -10307,11 +10344,16 @@ class Panel:
                 )
                 layer.draw(target_ax, ctx)
                 hover_targets.extend(layer.take_hover_targets())
+                marks = layer.take_limit_marks()
+                if target_ax is ax:
+                    limit_marks.extend(marks)
 
         if category_index:
             self._apply_category_ticks(ax, category_index, group_layers, horizontal)
 
-        self._finalize(ax, ax_right, bar_layers, horizontal, scales, group_axes)
+        self._finalize(
+            ax, ax_right, bar_layers, horizontal, scales, group_axes, limit_marks
+        )
 
     @staticmethod
     def category_index(layers: List[Layer]) -> Optional[dict]:
@@ -10511,7 +10553,7 @@ class Panel:
         ax.grid(axis=name, which="minor", **style)
 
     def _finalize(
-        self, ax, ax_right, bar_layers, horizontal, scales, group_axes
+        self, ax, ax_right, bar_layers, horizontal, scales, group_axes, limit_marks
     ) -> None:
         """Apply the furniture; x/y keys are literal, `*_right` keys hit the twin."""
 
@@ -10685,6 +10727,7 @@ class Panel:
         limits = {k: s.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
         if not bare:
             configure_axis_limits(ax, limits)
+            _hide_marks_past_limits(ax, limits, limit_marks)
         # rank 1 sits at the top, inverted after any user limits apply
         if rank_axis and not ax.yaxis_inverted():
             ax.invert_yaxis()
