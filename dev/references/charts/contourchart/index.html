@@ -4440,7 +4440,8 @@ colormap) instead of drawing iso-lines (in the chart's color).</p>
                 <p>Which levels cut the surface: a rule of
 <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.CONTOUR_LEVELS&lt;/span&gt;" href="../../constants/#datachart.constants.CONTOUR_LEVELS"><code>CONTOUR_LEVELS</code></a> (<code>"auto"</code>, the
 default, leaves the choice to matplotlib), a target level count, or an
-explicit list of level values.</p>
+explicit list of level values. Filled values beyond a list's ends
+take the end colors, and the colorbar marks the overflow.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
