@@ -421,6 +421,20 @@ class TestGanttPeriods(unittest.TestCase):
         )
         self.assertTrue(all(t.month in (1, 4, 7, 10) for t in quarters[1:-1]))
 
+    def test_month_step_labels_name_months_and_years(self):
+        figure = GanttChart(self.span(date(2024, 2, 3), date(2031, 12, 20)))
+        figure.canvas.draw()
+        axis = figure.axes[0].xaxis
+        labels = [t.get_text() for t in axis.get_ticklabels()]
+        self.assertEqual(labels[1:-1], [str(y) for y in range(2025, 2032)])
+        self.assertEqual(axis.get_major_formatter().get_offset(), "")
+        figure = GanttChart(self.span(date(2024, 1, 3), date(2024, 9, 20)))
+        figure.canvas.draw()
+        axis = figure.axes[0].xaxis
+        labels = [t.get_text() for t in axis.get_ticklabels()]
+        self.assertEqual(labels[1:-1], ["Mar", "May", "Jul"])
+        self.assertEqual(axis.get_major_formatter().get_offset(), "2024")
+
     def test_short_and_hour_filled_schedules_keep_their_ticks(self):
         tiny = self.ticks(
             GanttChart(

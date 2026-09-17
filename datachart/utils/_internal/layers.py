@@ -591,6 +591,8 @@ def _tick_formatter(fmt, temporal: bool, locator=None, tz=None):
 
     if temporal:
         if _auto_format(fmt):
+            if isinstance(locator, ScheduleTicks):
+                return ScheduleDateFormatter(locator, tz=tz)
             return mdates.ConciseDateFormatter(locator, tz=tz)
         return mdates.DateFormatter(fmt, tz=tz)
     if _auto_format(fmt):
@@ -696,6 +698,8 @@ class ScheduleTicks(mticker.Locator):
 
     def __init__(self, start: float, end: float, tz=None, timed: bool = False):
         self.start, self.end, self.tz, self.timed = start, end, tz, timed
+        # the month step of the last ticks; None when they step in days or less
+        self.months = None
 
     def tick_values(self, vmin, vmax):
         span = self.end - self.start
@@ -707,6 +711,7 @@ class ScheduleTicks(mticker.Locator):
         fitting = [d for d in steps if span / d <= SCHEDULE_TICKS_MAX]
         even = [d for d in fitting if np.isclose(span / d, round(span / d))]
         step = (even or fitting or [None])[0]
+        self.months = None
         if step is not None:
             regular = (self.start + k * step for k in range(1, round(span / step)))
         else:
@@ -718,7 +723,7 @@ class ScheduleTicks(mticker.Locator):
                 ),
                 SCHEDULE_TICK_MONTHS[-1],
             )
-            step = months * 30.4
+            self.months, step = months, months * 30.4
             regular = self._month_starts(months)
         ticks = [self.start]
         for tick in regular:
@@ -751,6 +756,38 @@ class ScheduleTicks(mticker.Locator):
 
     def __call__(self):
         return self.tick_values(*sorted(self.axis.get_view_interval()))
+
+
+class ScheduleDateFormatter(mdates.ConciseDateFormatter):
+    """Concise schedule labels where month-step ticks on January 1 read the year.
+
+    The concise formatter labels at the level the first start and last end
+    differ in (days), so it would print every January as "Jan"; the offset
+    then names one year only when all ticks fall in it.
+    """
+
+    def __init__(self, locator: ScheduleTicks, tz=None):
+        super().__init__(locator, tz=tz)
+        self.schedule = locator
+        self.year_offset = None
+
+    def format_ticks(self, values):
+        labels = super().format_ticks(values)
+        self.year_offset = None
+        if self.schedule.months is None or len(values) < 3:
+            return labels
+        dates = mdates.num2date(values, tz=self._tz)
+        for i in range(1, len(dates) - 1):
+            if (dates[i].month, dates[i].day) == (1, 1):
+                labels[i] = str(dates[i].year)
+        years = {d.year for d in dates}
+        self.year_offset = "" if len(years) > 1 else str(dates[0].year)
+        return labels
+
+    def get_offset(self):
+        if self.year_offset is None:
+            return super().get_offset()
+        return self.year_offset
 
 
 def _period_edges(period: str, tz=None, origin=None) -> mticker.Locator:
