@@ -663,12 +663,7 @@ def _annotate_subplots(
         fig, figure.get_suptitle(), figure.get_supxlabel(), figure.get_supylabel()
     )
 
-    fig._chart_metadata = {
-        "type": metadata["type"],
-        "panel": metadata["panel"],
-        "panels": new_panels,
-        "shape": shape,
-    }
+    fig._chart_metadata = {**metadata, "panels": new_panels}
     return fig
 
 

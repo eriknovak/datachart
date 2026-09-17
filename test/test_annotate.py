@@ -341,10 +341,17 @@ class TestAnnotateSubplots(unittest.TestCase):
         annotated = Annotate(self.figure, {**NOTE, "subplot": 2})
         grid = Grid([annotated, LineChart(LINE2)])
         # the cell rebuilds the three sub-axes plus one for the plain figure
-        self.assertEqual(len(grid.axes), 4)
+        data_axes = [ax for ax in grid.axes if ax.lines]
+        self.assertEqual(len(data_axes), 4)
         (host,) = [ax for ax in grid.axes if annotation_texts_on(ax, "note")]
-        # the third sub-axes of the 1x3 subgrid
-        self.assertEqual(host.get_subplotspec().get_geometry(), (1, 3, 2, 2))
+        # the third sub-axes of the cell draws the third series
+        self.assertEqual(
+            list(host.lines[0].get_ydata()), [point["y"] for point in LINE3]
+        )
+        # the source's title and axis labels frame the rebuilt subplots
+        texts = [t.get_text() for ax in grid.axes for t in ax.texts]
+        for label in ("Three", "x", "y"):
+            self.assertIn(label, texts)
 
     def test_missing_subplot_raises(self):
         with self.assertRaisesRegex(ValueError, "subplot"):

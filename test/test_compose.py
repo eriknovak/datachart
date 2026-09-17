@@ -560,3 +560,44 @@ class TestBarValueFormat:
     def test_positional_and_percent_styles(self):
         assert self._labels("{:.1f}%") == ["1234.5%", "0.2%"]
         assert self._labels("%g") == ["1234.5", "0.25"]
+
+
+class TestSubplotFigureInGrid:
+    """A subplots figure keeps its figure-level furniture in a cell (#181)."""
+
+    def teardown_method(self):
+        plt.close("all")
+
+    @staticmethod
+    def _texts(figure):
+        return [t.get_text() for ax in figure.axes for t in ax.texts]
+
+    def test_title_and_axis_labels_survive(self):
+        series = [[{"x": i, "y": i * k} for i in range(4)] for k in (1, 2)]
+        source = LineChart(
+            data=series, subplots=True, title="Growth", xlabel="Day", ylabel="Count"
+        )
+        figure = Grid([source, _line_fig()])
+        texts = self._texts(figure)
+        for label in ("Growth", "Day", "Count"):
+            assert label in texts
+
+    def test_sharey_survives(self):
+        from datachart.charts import Heatmap
+
+        source = Heatmap(
+            [{"z": [[1, 2], [3, 4]]}, {"z": [[5, 6], [7, 8]]}],
+            subplots=True,
+            sharey=True,
+        )
+        figure = Grid([source])
+        cells = [ax for ax in figure.axes if ax.images]
+        assert len(cells) == 2
+        assert cells[0].get_shared_y_axes().joined(cells[0], cells[1])
+
+    def test_multi_series_takes_no_subtitle_as_title(self):
+        bars = [[{"label": c, "y": v} for c, v in zip("AB", [1, 2])]] * 2
+        multi = BarChart(data=bars, subtitle=["first", "second"])
+        assert multi._chart_metadata["panel"].settings["title"] is None
+        single = BarChart(data=bars[0], subtitle="only")
+        assert single._chart_metadata["panel"].settings["title"] == "only"
