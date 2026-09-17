@@ -4665,7 +4665,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <td style="text-align:left">Categorical</td>
 </tr>
 <tr>
-<td style="text-align:left">Subplot series and single-series charts</td>
+<td style="text-align:left">Single-color roles (network nodes, parallel ramp)</td>
 <td style="text-align:left"><code>color_general_singular</code></td>
 <td style="text-align:left">Sequential</td>
 </tr>
@@ -4681,7 +4681,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 </tbody>
 </table>
-<p>A single series takes the palette's last color, so a sequential palette gives one strong color for a chart with one series and a graded set for subplots. The calendar heatmap, hexbin, and contour colormaps follow the heatmap's unless set. See the <a href="../themes/">Themes</a> guide for setting these attributes and building a theme around them.</p>
+<p>A palette asked for one color gives its last one, so a sequential palette yields one strong color and a graded set when several are asked for. The calendar heatmap, hexbin, and contour colormaps follow the heatmap's unless set. See the <a href="../themes/">Themes</a> guide for setting these attributes and building a theme around them.</p>
 <p>Each palette below is shown as a continuous strip and as the six colors a chart with six series receives; hover a swatch for its hex code. A palette is passed as its <code>COLORS</code> value, or as the plain name string. A chip names a predefined theme that uses the palette and the role it plays there, and links to the theme's card in the <a href="../theme-gallery/">Theme Gallery</a>.</p>
 </div>
 </div>
@@ -4724,7 +4724,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="sequential-single-hue">Sequential, Single Hue<a class="anchor-link" href="#sequential-single-hue">¶</a></h2><p>One hue from light to dark, ordered by magnitude. The natural <code>color_general_singular</code> palette: one series takes the dark end, subplots get graded tints. Also the safest heatmap colormap.</p>
+<h2 id="sequential-single-hue">Sequential, Single Hue<a class="anchor-link" href="#sequential-single-hue">¶</a></h2><p>One hue from light to dark, ordered by magnitude. The natural <code>color_general_singular</code> palette: a role that needs one color takes the dark end. Also the safest heatmap colormap.</p>
 </div>
 </div>
 </div>

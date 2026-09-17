@@ -3923,17 +3923,18 @@ panel their <code>x</code> runs along the category axis and their <code>y</code>
 value axis, so the same <code>LineChart</code> overlays vertical and horizontal bars.</p>
 <p>Each axis keeps the scale its figures were built with: a figure drawn
 with <code>scaley="log"</code> stays log in the panel, on whichever value axis it
-lands. The panel's own <code>scalex</code>, <code>scaley</code> and <code>scaley_right</code> override
-that per axis; where the figures on one axis disagree, the first one wins
-and the panel warns (<code>overlay_warn_scale_conflict</code> in the config). The
-two value axes scale independently, so linear bars on the primary axis
-against a log line on the secondary one is one panel.</p>
+lands. A figure that set no scale takes the one its axis resolves to. The
+panel's own <code>scalex</code>, <code>scaley</code> and <code>scaley_right</code> override that per
+axis; where two figures on one axis each set a different scale, the first
+one wins and the panel warns (<code>overlay_warn_scale_conflict</code> in the
+config). The two value axes scale independently, so linear bars on the
+primary axis against a log line on the secondary one is one panel.</p>
 <p>Panel figures nest: <code>Panel([Panel([f1, f2]), f3])</code> is equivalent to
 <code>Panel([f1, f2, f3])</code>, to any depth. A nested panel contributes its
-figures with their per-figure options and axis scales intact, while the
-other panel-level settings (title, labels, limits, ...) always come from
-the outermost call. Dict options on a nested panel override its
-per-figure options only when explicitly given.</p>
+figures with their per-figure options, axis scales and <code>bar_mode</code>
+intact, while the other panel-level settings (title, labels, limits, ...)
+always come from the outermost call. Dict options on a nested panel
+override its per-figure options only when explicitly given.</p>
 <div class="admonition info">
 <p class="admonition-title">Added in v0.8.0</p>
 </div>
@@ -4340,8 +4341,8 @@ Default is taken from config (overlay_auto_threshold, default 3.0).</p>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>The category-axis scale ("linear", "log", "symlog", "asinh").
-Default: the scale the first figure was built with. See
-    <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SCALE&lt;/span&gt;" href="../constants/#datachart.constants.SCALE"><code>SCALE</code></a>.</p>
+Default: the scale of the first figure that was built with one.
+    See <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SCALE&lt;/span&gt;" href="../constants/#datachart.constants.SCALE"><code>SCALE</code></a>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -4361,8 +4362,8 @@ Default: the scale the first figure was built with. See
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The primary value-axis scale. Default: the scale the first
-figure on that axis was built with.</p>
+                <p>The primary value-axis scale. Default: the scale of the first
+figure on that axis that was built with one.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -4382,9 +4383,9 @@ figure on that axis was built with.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The secondary value-axis scale. Default: the scale the
-first figure on that axis was built with. Inert on a polar panel,
-which has no secondary axis.</p>
+                <p>The secondary value-axis scale. Default: the scale of
+the first figure on that axis that was built with one. Inert on a
+polar panel, which has no secondary axis.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -4406,7 +4407,8 @@ which has no secondary axis.</p>
               <div class="doc-md-description">
                 <p>How bar and histogram series share the axis: "group" (side-by-side
 bars; histograms overlay), "stack" (stacked), or "overlay" (overlapping).
-Default is taken from config (overlay_bar_mode, default "group"). See
+Default: the mode of the first figure that was built with one, then
+the config (overlay_bar_mode, default "group"). See
 <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.BAR_MODE&lt;/span&gt;" href="../constants/#datachart.constants.BAR_MODE"><code>BAR_MODE</code></a>.</p>
               </div>
               <p>

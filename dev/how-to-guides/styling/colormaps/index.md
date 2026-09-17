@@ -2,14 +2,14 @@
 
 A palette is named wherever a theme asks for colors: the two general palettes, the heatmap colormap, and the parallel-coordinates hues. The name is resolved through [pypalettes](https://y-sunflower.github.io/pypalettes/), which gives access to over 2500 palettes; the [COLORS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORS) constant is a curated selection of them, rendered on this page. Which kind of palette a role wants:
 
-| Role                                    | Attribute                                             | Kind                    |
-| --------------------------------------- | ----------------------------------------------------- | ----------------------- |
-| Series sharing one axes                 | `color_general_multiple`                              | Categorical             |
-| Subplot series and single-series charts | `color_general_singular`                              | Sequential              |
-| Heatmap cells                           | `plot_heatmap_cmap`                                   | Sequential or diverging |
-| Parallel-coordinates hue                | `color_parallel_hue`, `color_parallel_hue_continuous` | Categorical, sequential |
+| Role                                              | Attribute                                             | Kind                    |
+| ------------------------------------------------- | ----------------------------------------------------- | ----------------------- |
+| Series sharing one axes                           | `color_general_multiple`                              | Categorical             |
+| Single-color roles (network nodes, parallel ramp) | `color_general_singular`                              | Sequential              |
+| Heatmap cells                                     | `plot_heatmap_cmap`                                   | Sequential or diverging |
+| Parallel-coordinates hue                          | `color_parallel_hue`, `color_parallel_hue_continuous` | Categorical, sequential |
 
-A single series takes the palette's last color, so a sequential palette gives one strong color for a chart with one series and a graded set for subplots. The calendar heatmap, hexbin, and contour colormaps follow the heatmap's unless set. See the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for setting these attributes and building a theme around them.
+A palette asked for one color gives its last one, so a sequential palette yields one strong color and a graded set when several are asked for. The calendar heatmap, hexbin, and contour colormaps follow the heatmap's unless set. See the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for setting these attributes and building a theme around them.
 
 Each palette below is shown as a continuous strip and as the six colors a chart with six series receives; hover a swatch for its hex code. A palette is passed as its `COLORS` value, or as the plain name string. A chip names a predefined theme that uses the palette and the role it plays there, and links to the theme's card in the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md).
 
@@ -19,7 +19,7 @@ from datachart.constants import COLORS
 
 ## Sequential, Single Hue
 
-One hue from light to dark, ordered by magnitude. The natural `color_general_singular` palette: one series takes the dark end, subplots get graded tints. Also the safest heatmap colormap.
+One hue from light to dark, ordered by magnitude. The natural `color_general_singular` palette: a role that needs one color takes the dark end. Also the safest heatmap colormap.
 
 ## Sequential, Multiple Hues
 
