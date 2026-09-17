@@ -2,7 +2,15 @@
 
 import unittest
 
-from datachart.charts import BumpChart, LineChart, ScatterChart
+from matplotlib.collections import PathCollection
+
+from datachart.charts import (
+    BumpChart,
+    DumbbellChart,
+    LineChart,
+    ScatterChart,
+    SwarmPlot,
+)
 from datachart.utils import Panel
 from datachart.utils._internal.layers import MarkClipBox
 
@@ -40,6 +48,27 @@ class TestAxisEndsOnData(unittest.TestCase):
         box = fig.axes[0].collections[0].get_clip_box()
         self.assertIsInstance(box, MarkClipBox)
         self.assertEqual(box._dims, ("y",))
+
+    def test_dumbbell_dots_on_the_data_end_draw_whole(self):
+        """A value axis that stops on the last dot leaves the dots unclipped."""
+        rows = [
+            {"label": "A", "start": 30, "end": 40},
+            {"label": "B", "start": 45, "end": 60},
+        ]
+        fig = DumbbellChart(data=rows)
+        fig.canvas.draw()
+        self.assertEqual(fig.axes[0].get_xlim(), (30.0, 60.0))
+        dots = [c for c in fig.axes[0].collections if isinstance(c, PathCollection)]
+        self.assertEqual(len(dots), 2)
+        for collection in dots:
+            self.assertIsInstance(collection.get_clip_box(), MarkClipBox)
+
+    def test_swarm_points_on_the_data_end_draw_whole(self):
+        points = [{"label": "A", "value": v} for v in (0, 25, 50, 75, 100)]
+        fig = SwarmPlot(data=points)
+        fig.canvas.draw()
+        self.assertEqual(fig.axes[0].get_ylim(), (0.0, 100.0))
+        self.assertIsInstance(fig.axes[0].collections[0].get_clip_box(), MarkClipBox)
 
     def test_bump_end_markers_draw_whole_under_rank_limits(self):
         """Limits on the rank axis leave the period ends unclipped."""

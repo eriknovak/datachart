@@ -3676,24 +3676,28 @@ class KdeLayer(Layer):
         self.register_hover(line, _point_resolver(self.label(ctx), x, y, ctx.transpose))
 
 
-class ScatterLayer(PointLabelMixin, Layer):
-    kind = "scatter"
+class UnclippedMarksMixin:
+    """A layer whose scatter marks may draw whole over an axis end on the data."""
 
-    def __init__(self, chart: dict, settings: dict):
-        # the mark collections drawn per axes, so the panel can unclip them
-        self._marks = {}
-        super().__init__(chart, settings)
+    def register_marks(self, ax, collection) -> None:
+        """Remember a mark collection drawn into `ax`, so the panel can unclip it."""
+
+        self.__dict__.setdefault("_marks", {}).setdefault(id(ax), []).append(collection)
 
     def unclip_marks(self, ax, dims=("x", "y")) -> None:
         """Let the markers on the `dims` edges draw whole, past the frame."""
 
-        for collection in self._marks.get(id(ax), ()):
+        for collection in getattr(self, "_marks", {}).get(id(ax), ()):
             sizes = np.asarray(collection.get_sizes(), dtype=float)
             radius = float(np.sqrt(sizes.max()) / 2) if sizes.size else 0.0
             widths = np.asarray(collection.get_linewidths(), dtype=float)
             pad = radius + (float(widths.max()) if widths.size else 0.0)
             collection.set_clip_path(None)
             collection.set_clip_box(MarkClipBox(ax, pad, dims))
+
+
+class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
+    kind = "scatter"
 
     def _resolve_style(self):
         self.scatter_style = get_scatter_style(self.style)
@@ -3885,7 +3889,7 @@ class ScatterLayer(PointLabelMixin, Layer):
                     label,
                     ctx.emphasis == EMPHASIS_HIGHLIGHT,
                 )
-                self._marks.setdefault(id(ax), []).append(collection)
+                self.register_marks(ax, collection)
                 self._mark_legend_size(collection, size_data)
                 self.register_hover(
                     collection,
@@ -3925,7 +3929,7 @@ class ScatterLayer(PointLabelMixin, Layer):
                 self.label(ctx),
                 ctx.emphasis == EMPHASIS_HIGHLIGHT,
             )
-            self._marks.setdefault(id(ax), []).append(collection)
+            self.register_marks(ax, collection)
             self._mark_legend_size(collection, size_data)
             self.register_hover(
                 collection,
@@ -4262,7 +4266,7 @@ def strip_offsets(n: int, jitter: float) -> np.ndarray:
     return np.random.default_rng(0).uniform(-jitter / 2, jitter / 2, n)
 
 
-class SwarmLayer(PointLabelMixin, GroupLayer):
+class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
     kind = "swarm"
 
     def _resolve_style(self):
@@ -4396,6 +4400,7 @@ class SwarmLayer(PointLabelMixin, GroupLayer):
             values = np.concatenate([v for _, v in groups])
             x, y = (values, centers) if self.is_horizontal else (centers, values)
             collection = ax.scatter(x, y, label=label, **style)
+            self.register_marks(ax, collection)
             positions = np.concatenate(
                 [np.full(len(v), index[lbl]) for lbl, (_, v) in zip(members, groups)]
             )
@@ -4535,7 +4540,7 @@ MINOR_GRID_ALPHA_SCALE = 0.6
 DUMBBELL_CONNECTOR_Z_BELOW = 0.5
 
 
-class DumbbellLayer(GroupLayer):
+class DumbbellLayer(UnclippedMarksMixin, GroupLayer):
     """Two dots per category joined by a connector, on the category index (ADR 0050).
 
     The dots draw through the scatter marks; one role batch at a time, each
@@ -4687,6 +4692,7 @@ class DumbbellLayer(GroupLayer):
                     label,
                     role == EMPHASIS_HIGHLIGHT,
                 )
+                self.register_marks(ax, collection)
                 self.register_hover(
                     collection,
                     _point_resolver(
@@ -10666,7 +10672,7 @@ class Panel:
             if not dims:
                 continue
             for layer in layers:
-                if isinstance(layer, (LineLayer, ScatterLayer)):
+                if isinstance(layer, (LineLayer, UnclippedMarksMixin)):
                     layer.unclip_marks(axes, sorted(dims))
 
         # radial furniture reads the final r limits, so it follows them
