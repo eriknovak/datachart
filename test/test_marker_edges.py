@@ -12,9 +12,12 @@ from datachart.charts import NetworkChart, RadialChart, ScatterChart, SwarmPlot
 from datachart.config import config
 from datachart.constants import EMPHASIS, RADIAL_TYPE
 from datachart.utils._internal.layers import (
+    HOLLOW_MARKER_EDGE_WIDTH,
     MARKER_EDGE_MAX_SHARE,
+    RAINCLOUD_RAIN_SIZE,
     _marker_edge_widths,
 )
+from matplotlib.colors import to_rgba
 
 POINTS = [{"x": i, "y": i} for i in range(4)]
 GROUPS = [{"label": "a", "value": float(i)} for i in range(4)]
@@ -85,6 +88,54 @@ class TestMarkerEdgeWidths(unittest.TestCase):
         small, large = nodes.get_linewidths()
         self.assertEqual(small, 0.0)
         self.assertEqual(large, config["plot_network_node_edge_width"])
+
+
+class TestUnfilledMarkers(unittest.TestCase):
+    """An unfilled marker is all stroke: it draws in the series color."""
+
+    def tearDown(self):
+        plt.close("all")
+        config.reset_config()
+
+    def _assert_stroked(self, collection, color):
+        widths = collection.get_linewidths()
+        self.assertTrue(all(w >= HOLLOW_MARKER_EDGE_WIDTH for w in widths))
+        np.testing.assert_allclose(
+            collection.get_edgecolors()[0][:3], to_rgba(color)[:3]
+        )
+
+    def test_swarm_x_marker_at_rain_size_is_stroked(self):
+        fig = SwarmPlot(
+            GROUPS,
+            style={
+                "plot_swarm_marker": "x",
+                "plot_swarm_size": RAINCLOUD_RAIN_SIZE,
+                "plot_swarm_color": "#ff0000",
+            },
+        )
+        self._assert_stroked(_points(fig.axes[0])[0], "#ff0000")
+
+    def test_swarm_x_marker_takes_the_cycle_color(self):
+        filled = _points(SwarmPlot(GROUPS).axes[0])[0].get_facecolors()[0]
+        fig = SwarmPlot(GROUPS, style={"plot_swarm_marker": "x"})
+        self._assert_stroked(_points(fig.axes[0])[0], filled)
+
+    def test_scatter_plus_marker_is_stroked(self):
+        fig = ScatterChart(
+            POINTS,
+            style={
+                "plot_scatter_marker": "+",
+                "plot_scatter_size": TINY,
+                "plot_scatter_color": "#00ff00",
+            },
+        )
+        self._assert_stroked(_points(fig.axes[0])[0], "#00ff00")
+
+    def test_filled_marker_keeps_its_theme_edge_color(self):
+        fig = SwarmPlot(GROUPS, style={"plot_swarm_edge_color": "#0000ff"})
+        np.testing.assert_allclose(
+            _points(fig.axes[0])[0].get_edgecolors()[0][:3], to_rgba("#0000ff")[:3]
+        )
 
 
 if __name__ == "__main__":

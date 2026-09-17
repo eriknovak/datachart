@@ -40,6 +40,7 @@ from matplotlib.colors import (
 )
 from matplotlib.mlab import GaussianKDE
 from matplotlib.lines import Line2D
+from matplotlib.markers import MarkerStyle
 from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
 from matplotlib.path import Path
 from matplotlib.text import Text
@@ -396,10 +397,21 @@ def _hollow_marker(style: dict) -> dict:
 
 
 def _draw_scatter_marks(scatter, x, y, sizes, style: dict, label, highlighted: bool):
-    """One marker collection; the edge fits its markers unless it is the highlight cue."""
+    """One marker collection; the edge fits its markers unless it is the highlight cue.
+
+    An unfilled marker (`"x"`, `"+"`) is all stroke: matplotlib strokes it in
+    the face color, so it keeps the series color and a visible width.
+    """
 
     style = dict(style)
-    if not highlighted:
+    marker = style.get("marker") or mpl.rcParams["scatter.marker"]
+    if not MarkerStyle(marker).is_filled():
+        style.pop("hollow", None)
+        # matplotlib ignores, with a warning, an edge color on these markers
+        style.pop("edgecolors", None)
+        width = np.max(style.get("linewidths") or 0)
+        style["linewidths"] = max(float(width), HOLLOW_MARKER_EDGE_WIDTH)
+    elif not highlighted:
         style["linewidths"] = _marker_edge_widths(style.get("linewidths"), sizes)
     return scatter(x, y, s=sizes, label=label, **_hollow_marker(style))
 
@@ -4556,10 +4568,6 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
             self._apply_emphasis(style, role, width_key="linewidths", color_key="c")
             if role == EMPHASIS_HIGHLIGHT:
                 style["edgecolors"] = self.highlight_edge_color
-            else:
-                style["linewidths"] = _marker_edge_widths(
-                    style.get("linewidths"), style.get("s")
-                )
             label = NO_LEGEND
             if role != EMPHASIS_BACKGROUND and not legend_taken:
                 label = self.label(ctx)
@@ -4571,7 +4579,10 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
             centers = np.concatenate([np.full(len(v), pos) for pos, v in groups])
             values = np.concatenate([v for _, v in groups])
             x, y = (values, centers) if self.is_horizontal else (centers, values)
-            collection = ax.scatter(x, y, label=label, **style)
+            sizes = style.pop("s")
+            collection = _draw_scatter_marks(
+                ax.scatter, x, y, sizes, style, label, role == EMPHASIS_HIGHLIGHT
+            )
             self.register_marks(ax, collection)
             positions = np.concatenate(
                 [np.full(len(v), index[lbl]) for lbl, (_, v) in zip(members, groups)]
