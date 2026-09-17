@@ -111,6 +111,8 @@ plugins:
             separate_signature: true
             annotations_path: source
             docstring_section_style: spacy
+            modernize_annotations: true
+            signature_crossrefs: true
   # generates llms.txt, llms-full.txt, and per-page .md endpoints (ADR 0016)
   - llmstxt:
       full_output: llms-full.txt
@@ -177,14 +179,38 @@ plugins:
           - how-to-guides/utility/saving.md: "Saving figures with save_figure: vector or raster formats and dpi, transparent backgrounds, several formats in one call, embedding SVG or PNG in web pages, and worked examples for a manuscript, a slide, and a documentation page."
           - how-to-guides/utility/interactive.md: "Zooming, panning, and hovering over marks with show(interactive=True): the interactive extra, notebook and script behavior, what the hover annotation of every chart type shows, and worked examples for finding an outlier, reading a two-axis panel, and checking a grid."
         API Reference:
-          - references/index.md: Top-level module reference.
-          - references/charts.md: Chart function signatures and parameters.
-          - references/utils/index.md: Panel, Grid, Annotate, and save_figure signatures.
-          - references/utils/stats.md: Statistical function signatures.
-          - references/config.md: The Config class and the global config instance.
-          - references/themes.md: The predefined theme dictionaries.
+          - references/index.md: Top-level module reference, with a where-to-look table over the reference pages.
+          - references/charts/index.md: Map of the chart reference pages by family, with each chart's data record, style typing, and guide.
+          - references/charts/linechart.md: The LineChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/stackedareachart.md: The StackedAreaChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/bumpchart.md: The BumpChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/barchart.md: The BarChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/pyramidchart.md: The PyramidChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/radialchart.md: The RadialChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/calendarheatmap.md: The CalendarHeatmap function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/ganttchart.md: The GanttChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/dumbbellchart.md: The DumbbellChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/histogram.md: The Histogram function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/boxplot.md: The BoxPlot function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/violinplot.md: The ViolinPlot function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/swarmplot.md: The SwarmPlot function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/raincloudplot.md: The RaincloudPlot function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/ridgelineplot.md: The RidgelinePlot function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/scatterchart.md: The ScatterChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/heatmap.md: The Heatmap function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/contourchart.md: The ContourChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/hexbinchart.md: The HexbinChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/parallelcoords.md: The ParallelCoords function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/networkchart.md: The NetworkChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/scattermatrix.md: The ScatterMatrix function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/sankeychart.md: The SankeyChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/treemap.md: The Treemap function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/utils/index.md: Panel, Grid, Annotate, and save_figure signatures, with a table of which utility fits which task.
+          - references/utils/stats.md: Statistical function signatures, grouped by center, spread, shape, association, trend line, intervals, binning, smoothing, and density.
+          - references/config.md: The Config class and the global config instance, with a table of which method fits which task.
+          - references/themes.md: The predefined theme dictionaries, with a table of each theme's look and its THEME member.
           - references/constants.md: Enums and constants (THEME, FIG_SIZE, ORIENTATION, COLORS, ...).
-          - references/typings.md: TypedDict definitions for chart data and style attributes.
+          - references/typings.md: The shared TypedDict contracts, per-figure settings, shared style groups, and theme style, with a table pointing to each chart's own typings.
 
 markdown_extensions:
   - admonition
@@ -264,7 +290,37 @@ nav:
 
   - API Reference:
     - references/index.md
-    - charts: references/charts.md
+    - charts:
+      - references/charts/index.md
+      - Trends and Comparisons:
+        - LineChart: references/charts/linechart.md
+        - StackedAreaChart: references/charts/stackedareachart.md
+        - BumpChart: references/charts/bumpchart.md
+        - BarChart: references/charts/barchart.md
+        - PyramidChart: references/charts/pyramidchart.md
+        - RadialChart: references/charts/radialchart.md
+        - CalendarHeatmap: references/charts/calendarheatmap.md
+        - GanttChart: references/charts/ganttchart.md
+        - DumbbellChart: references/charts/dumbbellchart.md
+      - Distributions:
+        - Histogram: references/charts/histogram.md
+        - BoxPlot: references/charts/boxplot.md
+        - ViolinPlot: references/charts/violinplot.md
+        - SwarmPlot: references/charts/swarmplot.md
+        - RaincloudPlot: references/charts/raincloudplot.md
+        - RidgelinePlot: references/charts/ridgelineplot.md
+      - Relationships:
+        - ScatterChart: references/charts/scatterchart.md
+        - Heatmap: references/charts/heatmap.md
+        - ContourChart: references/charts/contourchart.md
+        - HexbinChart: references/charts/hexbinchart.md
+        - ParallelCoords: references/charts/parallelcoords.md
+        - NetworkChart: references/charts/networkchart.md
+        - ScatterMatrix: references/charts/scattermatrix.md
+      - Flows:
+        - SankeyChart: references/charts/sankeychart.md
+      - Part of a Whole:
+        - Treemap: references/charts/treemap.md
     - utils:
       - references/utils/index.md
       - stats: references/utils/stats.md

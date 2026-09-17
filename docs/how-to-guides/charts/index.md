@@ -4,7 +4,7 @@ title: Charts
 
 # Charts
 
-The [datachart.charts](../../references/charts.md) module of the `datachart` package provides various chart types to create data visualizations. The module is designed to be highly customizable and easy to use.
+The [datachart.charts](../../references/charts/index.md) module of the `datachart` package provides various chart types to create data visualizations. The module is designed to be highly customizable and easy to use.
 
 The charts are grouped by the question they answer. Each card names a chart, says what it is for, and links to its how-to guide. The chips under the name say how the chart composes with the other charts through the [composition](../composition/index.md) functions:
 
