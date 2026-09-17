@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.collections import PathCollection, PolyCollection
-from matplotlib.patches import PathPatch
+from matplotlib.patches import PathPatch, Rectangle
 
 from datachart.charts import RaincloudPlot, LineChart
 from datachart.config import config
@@ -197,3 +197,19 @@ class TestRaincloudReferences(unittest.TestCase):
         fig = RaincloudPlot(data=group_data(), hlines={"y": 12, "label": "ref"})
         refs = [c for c in fig.axes[0].collections if c.get_label() == "ref"]
         self.assertEqual(len(refs), 1)
+
+
+class TestRaincloudBandStacking(unittest.TestCase):
+    """A reference band stays under the cloud, rain, and box (#203)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_hspan_draws_under_every_raincloud_part(self):
+        figure = RaincloudPlot(data=group_data(), hspans={"ymin": 9, "ymax": 13})
+        ax = figure.axes[0]
+        (band,) = [p for p in ax.patches if isinstance(p, Rectangle)]
+        parts = _violin_bodies(ax) + _swarm_collections(ax) + _box_patches(ax)
+        self.assertEqual(len(parts), 9)
+        for part in parts:
+            self.assertGreater(part.get_zorder(), band.get_zorder())
