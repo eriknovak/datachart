@@ -5206,7 +5206,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">draw several sets of records on one chart</td>
-<td style="text-align:left"><code>data</code> as a list of lists, <code>style</code> and <code>hue</code> as lists</td>
+<td style="text-align:left"><code>data</code> as a list of lists; <code>style</code>, <code>hue</code> per set; <code>dimensions</code></td>
 <td style="text-align:left"><a href="#multiple-parallel-coordinates-charts">Multiple Parallel Coordinates Charts</a></td>
 </tr>
 <tr>
@@ -6274,8 +6274,8 @@ ParallelCoords(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="multiple-parallel-coordinates-charts">Multiple Parallel Coordinates Charts<a class="anchor-link" href="#multiple-parallel-coordinates-charts">¶</a></h2><p>To draw several sets of records on one chart, pass a list of lists to <code>data</code>. The sets share the axes: the axes are the union of their keys, and every axis spans the values of all sets together, so a value lands at the same height whichever set it is in. The per-set attributes <code>style</code> and <code>hue</code> take lists aligned with <code>data</code> (a single value applies to every set), so one set can be a grey context while another is colored. <code>subtitle</code> is accepted for consistency with the other charts, but the chart has no per-set heading to draw it in: the sets are told apart by their style or by the hue legend.</p>
-<p>The axes come from the keys, so each set is reduced to the keys it should be drawn on. The example draws the Adelie and Chinstrap as a grey context and the Gentoo in a bold color over them.</p>
+<h2 id="multiple-parallel-coordinates-charts">Multiple Parallel Coordinates Charts<a class="anchor-link" href="#multiple-parallel-coordinates-charts">¶</a></h2><p>To draw several sets of records on one chart, pass a list of lists to <code>data</code>. The sets share the axes: every axis spans the values of all sets together, so a value lands at the same height whichever set it is in. The per-set attributes <code>dimensions</code>, <code>style</code> and <code>hue</code> take lists aligned with <code>data</code>, and a single value applies to every set; for <code>dimensions</code> a flat list of names is that single value. The sets share one row of axes, so per-set <code>dimensions</code> lists must be equal. <code>subtitle</code> is accepted for consistency with the other charts, but the chart has no per-set heading to draw it in: the sets are told apart by their style or by the hue legend.</p>
+<p>The example draws the Adelie and Chinstrap as a grey context and the Gentoo in a bold color over them, on the four measurements.</p>
 </div>
 </div>
 </div>
@@ -6298,13 +6298,14 @@ ParallelCoords(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># keep only the measurements: the keys are the axes</span>
-<span class="n">gentoo</span> <span class="o">=</span> <span class="p">[{</span><span class="n">k</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">MEASUREMENTS</span><span class="p">}</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">penguins</span> <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s2">"species"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"Gentoo"</span><span class="p">]</span>
-<span class="n">others</span> <span class="o">=</span> <span class="p">[{</span><span class="n">k</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">MEASUREMENTS</span><span class="p">}</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">penguins</span> <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s2">"species"</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"Gentoo"</span><span class="p">]</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">gentoo</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">penguins</span> <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s2">"species"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"Gentoo"</span><span class="p">]</span>
+<span class="n">others</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">penguins</span> <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s2">"species"</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"Gentoo"</span><span class="p">]</span>
 
 <span class="n">ParallelCoords</span><span class="p">(</span>
     <span class="c1"># one list per set of records</span>
     <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">others</span><span class="p">,</span> <span class="n">gentoo</span><span class="p">],</span>
+    <span class="c1"># one list of axes for every set</span>
+    <span class="n">dimensions</span><span class="o">=</span><span class="n">MEASUREMENTS</span><span class="p">,</span>
     <span class="c1"># one style per set: grey context, bold foreground</span>
     <span class="n">style</span><span class="o">=</span><span class="p">[</span>
         <span class="p">{</span><span class="s2">"plot_parallel_color"</span><span class="p">:</span> <span class="s2">"#c0c0c0"</span><span class="p">,</span> <span class="s2">"plot_parallel_alpha"</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">},</span>
@@ -6314,13 +6315,14 @@ ParallelCoords(
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-18"># keep only the measurements: the keys are the axes
-gentoo = [{k: p[k] for k in MEASUREMENTS} for p in penguins if p["species"] == "Gentoo"]
-others = [{k: p[k] for k in MEASUREMENTS} for p in penguins if p["species"] != "Gentoo"]
+<div class="clipboard-copy-txt" id="cell-18">gentoo = [p for p in penguins if p["species"] == "Gentoo"]
+others = [p for p in penguins if p["species"] != "Gentoo"]
 
 ParallelCoords(
     # one list per set of records
     data=[others, gentoo],
+    # one list of axes for every set
+    dimensions=MEASUREMENTS,
     # one style per set: grey context, bold foreground
     style=[
         {"plot_parallel_color": "#c0c0c0", "plot_parallel_alpha": 0.8},
@@ -6353,7 +6355,7 @@ ParallelCoords(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>With <code>hue</code> as a list, each set is colored by its own key, or not at all. Keeping the sex in the Gentoo records and coloring only that set by it shows that, within the Gentoo, the males are the heavier half, while the other species stay a grey context. A hue key is not an axis, so the axes are still the four measurements.</p>
+<p>With <code>hue</code> as a list, each set is colored by its own key, or not at all. Coloring only the Gentoo by their sex shows that, within the Gentoo, the males are the heavier half, while the other species stay a grey context. A hue key is not an axis, so the axes are still the four measurements.</p>
 </div>
 </div>
 </div>
@@ -6376,14 +6378,9 @@ ParallelCoords(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">gentoo_by_sex</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">MEASUREMENTS</span><span class="p">},</span> <span class="s2">"sex"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"sex"</span><span class="p">]}</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">penguins</span>
-    <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s2">"species"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"Gentoo"</span>
-<span class="p">]</span>
-
-<span class="n">ParallelCoords</span><span class="p">(</span>
-    <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">others</span><span class="p">,</span> <span class="n">gentoo_by_sex</span><span class="p">],</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ParallelCoords</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">others</span><span class="p">,</span> <span class="n">gentoo</span><span class="p">],</span>
+    <span class="n">dimensions</span><span class="o">=</span><span class="n">MEASUREMENTS</span><span class="p">,</span>
     <span class="n">style</span><span class="o">=</span><span class="p">[{</span><span class="s2">"plot_parallel_color"</span><span class="p">:</span> <span class="s2">"#c0c0c0"</span><span class="p">,</span> <span class="s2">"plot_parallel_alpha"</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">},</span> <span class="kc">None</span><span class="p">],</span>
     <span class="c1"># no hue for the context, the sex for the Gentoo</span>
     <span class="n">hue</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"sex"</span><span class="p">],</span>
@@ -6392,14 +6389,9 @@ ParallelCoords(
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-19">gentoo_by_sex = [
-    {**{k: p[k] for k in MEASUREMENTS}, "sex": p["sex"]}
-    for p in penguins
-    if p["species"] == "Gentoo"
-]
-
-ParallelCoords(
-    data=[others, gentoo_by_sex],
+<div class="clipboard-copy-txt" id="cell-19">ParallelCoords(
+    data=[others, gentoo],
+    dimensions=MEASUREMENTS,
     style=[{"plot_parallel_color": "#c0c0c0", "plot_parallel_alpha": 0.8}, None],
     # no hue for the context, the sex for the Gentoo
     hue=[None, "sex"],

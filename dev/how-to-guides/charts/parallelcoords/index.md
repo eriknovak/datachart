@@ -45,7 +45,7 @@ Every customization is either a keyword argument of `ParallelCoords` or a `plot_
 | style or rotate the axis names              | `style={"plot_parallel_dim_label_size": ..., "plot_parallel_dim_label_rotation": ...}` | [Dimension labels](#dimension-labels)                                                                   |
 | highlight some records, mute the rest       | `emphasis`, `emphasis_rule`                                                            | [Emphasis](#emphasis)                                                                                   |
 | put a note on the chart                     | `texts`                                                                                | [Text annotations](#text-annotations)                                                                   |
-| draw several sets of records on one chart   | `data` as a list of lists, `style` and `hue` as lists                                  | [Multiple Parallel Coordinates Charts](#multiple-parallel-coordinates-charts)                           |
+| draw several sets of records on one chart   | `data` as a list of lists; `style`, `hue` per set; `dimensions`                        | [Multiple Parallel Coordinates Charts](#multiple-parallel-coordinates-charts)                           |
 | use dates as an axis                        | `date` values in `data`                                                                | [Date dimensions](#date-dimensions)                                                                     |
 | save the chart to a file                    | `save_figure`                                                                          | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
@@ -328,18 +328,19 @@ ParallelCoords(
 
 ## Multiple Parallel Coordinates Charts
 
-To draw several sets of records on one chart, pass a list of lists to `data`. The sets share the axes: the axes are the union of their keys, and every axis spans the values of all sets together, so a value lands at the same height whichever set it is in. The per-set attributes `style` and `hue` take lists aligned with `data` (a single value applies to every set), so one set can be a grey context while another is colored. `subtitle` is accepted for consistency with the other charts, but the chart has no per-set heading to draw it in: the sets are told apart by their style or by the hue legend.
+To draw several sets of records on one chart, pass a list of lists to `data`. The sets share the axes: every axis spans the values of all sets together, so a value lands at the same height whichever set it is in. The per-set attributes `dimensions`, `style` and `hue` take lists aligned with `data`, and a single value applies to every set; for `dimensions` a flat list of names is that single value. The sets share one row of axes, so per-set `dimensions` lists must be equal. `subtitle` is accepted for consistency with the other charts, but the chart has no per-set heading to draw it in: the sets are told apart by their style or by the hue legend.
 
-The axes come from the keys, so each set is reduced to the keys it should be drawn on. The example draws the Adelie and Chinstrap as a grey context and the Gentoo in a bold color over them.
+The example draws the Adelie and Chinstrap as a grey context and the Gentoo in a bold color over them, on the four measurements.
 
 ```
-# keep only the measurements: the keys are the axes
-gentoo = [{k: p[k] for k in MEASUREMENTS} for p in penguins if p["species"] == "Gentoo"]
-others = [{k: p[k] for k in MEASUREMENTS} for p in penguins if p["species"] != "Gentoo"]
+gentoo = [p for p in penguins if p["species"] == "Gentoo"]
+others = [p for p in penguins if p["species"] != "Gentoo"]
 
 ParallelCoords(
     # one list per set of records
     data=[others, gentoo],
+    # one list of axes for every set
+    dimensions=MEASUREMENTS,
     # one style per set: grey context, bold foreground
     style=[
         {"plot_parallel_color": "#c0c0c0", "plot_parallel_alpha": 0.8},
@@ -350,17 +351,12 @@ ParallelCoords(
 ).show()
 ```
 
-With `hue` as a list, each set is colored by its own key, or not at all. Keeping the sex in the Gentoo records and coloring only that set by it shows that, within the Gentoo, the males are the heavier half, while the other species stay a grey context. A hue key is not an axis, so the axes are still the four measurements.
+With `hue` as a list, each set is colored by its own key, or not at all. Coloring only the Gentoo by their sex shows that, within the Gentoo, the males are the heavier half, while the other species stay a grey context. A hue key is not an axis, so the axes are still the four measurements.
 
 ```
-gentoo_by_sex = [
-    {**{k: p[k] for k in MEASUREMENTS}, "sex": p["sex"]}
-    for p in penguins
-    if p["species"] == "Gentoo"
-]
-
 ParallelCoords(
-    data=[others, gentoo_by_sex],
+    data=[others, gentoo],
+    dimensions=MEASUREMENTS,
     style=[{"plot_parallel_color": "#c0c0c0", "plot_parallel_alpha": 0.8}, None],
     # no hue for the context, the sex for the Gentoo
     hue=[None, "sex"],

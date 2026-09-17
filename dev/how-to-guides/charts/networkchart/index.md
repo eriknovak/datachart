@@ -145,7 +145,7 @@ ROWS = [
 levels = {
     "nodes": [
         # every other family a little lower, so the names do not collide
-        {"id": family, "x": (i + 0.5) / len(row), "y": 0.8 - 0.22 * step - 0.06 * (i % 2)}
+        {"id": family, "x": (i + 0.5) / len(row), "y": 1 - 0.3 * step - 0.1 * (i % 2)}
         for step, row in enumerate(ROWS)
         for i, family in enumerate(row)
     ],
