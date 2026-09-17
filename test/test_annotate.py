@@ -1,13 +1,21 @@
 """Tests for text annotations and the Annotate front (ADR 0018)."""
 
 import unittest
+from datetime import date, timedelta
 
 import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from datachart.charts import BarChart, Heatmap, LineChart, RadialChart, ScatterChart
+from datachart.charts import (
+    BarChart,
+    CalendarHeatmap,
+    Heatmap,
+    LineChart,
+    RadialChart,
+    ScatterChart,
+)
 from datachart.config import config
 from datachart.constants import THEME
 from datachart.utils import Annotate, Grid, Panel
@@ -390,10 +398,6 @@ class TestAnnotateSubplots(unittest.TestCase):
                     Annotate(self.figure, {**NOTE, "subplot": index})
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestConnectorTargetGap(unittest.TestCase):
     """The connector stops short of its target, but never off the mark (#184)."""
 
@@ -431,6 +435,17 @@ class TestConnectorTargetGap(unittest.TestCase):
         (text,) = annotation_texts(figure, "note")
         self.assertEqual(text.arrowprops["shrinkB"], TEXT_ARROW_TARGET_GAP)
 
+    def test_gap_stays_inside_a_calendar_cell(self):
+        days = [date(2024, 1, 1) + timedelta(days=i) for i in range(366)]
+        figure = CalendarHeatmap(
+            {"date": days, "value": [i % 9 for i in range(366)]},
+            year=2024,
+            texts={"text": "n", "x": 5, "y": -1.6, "target": (30, 3)},
+        )
+        x, y = self.tip_in_data(figure, "n")
+        self.assertLessEqual(abs(x - 30), 0.5)
+        self.assertLessEqual(abs(y - 3), 0.5)
+
     def test_gap_stops_on_the_scatter_marker_it_names(self):
         data = [{"x": i, "y": i % 5} for i in range(10)]
         figure = ScatterChart(
@@ -441,3 +456,7 @@ class TestConnectorTargetGap(unittest.TestCase):
         (text,) = annotation_texts(figure, "n")
         # a 16 pt² marker is 2 pt across its radius, under the 5 pt gap
         self.assertEqual(text.arrowprops["shrinkB"], 2.0)
+
+
+if __name__ == "__main__":
+    unittest.main()

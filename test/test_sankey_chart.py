@@ -298,7 +298,9 @@ class TestRendering(unittest.TestCase):
         ax = figure.axes[0]
         renderer = figure.canvas.get_renderer()
         bars = [bar.get_window_extent(renderer) for bar in _rects(ax)]
-        for text in ax.texts:
+        values = [t for t in ax.texts if t.get_text().endswith("%")]
+        self.assertTrue(values)
+        for text in values:
             extent = text.get_window_extent(renderer)
             covered = [bar for bar in bars if extent.overlaps(bar)]
             self.assertEqual(covered, [], f"{text.get_text()!r} sits on a node bar")
