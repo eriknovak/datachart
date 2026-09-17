@@ -1190,9 +1190,10 @@ TEXT_BOW_BODY = 0.75
 # approximate half-extent of the text box (px), for connector-length checks
 TEXT_BOX_PAD = 18.0
 # short connectors (px past the box) straighten with tiny gaps, then vanish
+# once the two gaps leave nothing of the line to draw
 TEXT_SHORT_STRAIGHT = 40.0
-TEXT_SHORT_NONE = 14.0
 TEXT_SHORT_GAP = 1.5
+TEXT_SHORT_NONE = 2 * TEXT_SHORT_GAP
 
 
 def _facing_relpos(start: np.ndarray, target: np.ndarray) -> tuple:
@@ -1364,7 +1365,7 @@ def _draw_texts(
         end = np.asarray(data_ax.transData.transform(target), dtype=float)
         length = np.hypot(*(end - start)) - TEXT_BOX_PAD
 
-        # a connector shorter than the gaps that frame it is pure noise
+        # nothing shows once the two gaps that frame it eat the whole line
         if length < TEXT_SHORT_NONE:
             ax.annotate(content, xy=(x, y), xycoords=textcoords, **kwargs)
             continue

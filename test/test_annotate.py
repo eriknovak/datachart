@@ -157,6 +157,23 @@ class TestTextsParameter(unittest.TestCase):
         (text,) = annotation_texts(figure, "n")
         self.assertIsNone(text.arrow_patch)
 
+    def test_close_target_keeps_a_straight_stub(self):
+        """A target just past the text box still gets a short straight line."""
+        figure = LineChart(
+            LINE1, texts={"text": "n", "x": 5, "y": 25, "target": (5, 31.5)}
+        )
+        (text,) = annotation_texts(figure, "n")
+        self.assertIsNotNone(text.arrow_patch)
+        self.assertEqual(text.arrow_patch.get_connectionstyle().rad, 0.0)
+
+    def test_target_inside_the_box_draws_no_connector(self):
+        """A target the text box already covers leaves no room for a line."""
+        figure = LineChart(
+            LINE1, texts={"text": "n", "x": 5, "y": 25, "target": (5, 30)}
+        )
+        (text,) = annotation_texts(figure, "n")
+        self.assertIsNone(text.arrow_patch)
+
     def test_texts_render_on_the_topmost_axes(self):
         """In a twin-axis panel, texts land on the twin so nothing covers them."""
         left = LineChart(
