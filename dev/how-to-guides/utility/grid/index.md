@@ -202,8 +202,9 @@ climograph = Panel(
         {"figure": precipitation, "y_axis": "left", "legend_label": "Precipitation (mm)"},
         {"figure": temperature, "y_axis": "right", "legend_label": "Temperature (°C)"},
     ],
+    title="Ljubljana (mm, °C)",
     show_legend=True,
-    # the legend above the axes, clear of the bars
+    # the legend between the title and the axes, clear of the bars
     legend={"location": LEGEND_LOCATION.OUTSIDE_TOP},
 )
 

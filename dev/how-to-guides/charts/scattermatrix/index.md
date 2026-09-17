@@ -18,13 +18,12 @@ Each record is one penguin:
 penguins[:3]
 ```
 
-**Basic example.** Only the `data` argument is required; `figsize` here fits the matrix to the page width, since by default every cell gets about two inches. Every numeric column becomes a dimension, in the order the columns first appear, so the four measurements make a four-by-four matrix and the text columns are left out. Each cell below the diagonal plots the variable of its row (y-axis) against the variable of its column (x-axis), the diagonal shows a histogram of each variable, and the cells above the diagonal mirror the ones below. Flipper length and body mass rise together almost on a line; the other pairs form clumps, a first hint that the table mixes groups.
+**Basic example.** Only the `data` argument is required. Every numeric column becomes a dimension, in the order the columns first appear, so the four measurements make a four-by-four matrix and the text columns are left out. Each cell below the diagonal plots the variable of its row (y-axis) against the variable of its column (x-axis), the diagonal shows a histogram of each variable, and the cells above the diagonal mirror the ones below. Flipper length and body mass rise together almost on a line; the other pairs form clumps, a first hint that the table mixes groups.
 
 ```
 ScatterMatrix(
     # add the data to the chart
     data=penguins,
-    figsize=(6.3, 6.3),
 ).show()
 ```
 
@@ -62,7 +61,7 @@ The full list of style attributes is in the [datachart.typings.ScatterMatrixStyl
 
 ### Title and figure size
 
-A matrix of sixteen cells needs a title to say what table it shows, and `title` adds one above the whole figure. The default size gives every cell about 2.2 inches a side, which makes a four-by-four matrix almost nine inches wide; `figsize` takes a `(width, height)` tuple in inches for the whole figure instead, and the cells stay square inside it. The title is also the place for the units, since the axis labels are the column names.
+A matrix of sixteen cells needs a title to say what table it shows, and `title` adds one above the whole figure. By default every cell gets 2.2 inches a side, shrunk so the whole figure fits a page width of 6.3 inches; a four-by-four matrix gets cells of about 1.6 inches. `figsize` takes a `(width, height)` tuple in inches for the whole figure instead, and the cells stay square inside it; here it adds height for the title. The title is also the place for the units, since the axis labels are the column names.
 
 ```
 ScatterMatrix(
@@ -84,7 +83,6 @@ columns = {name: [penguin[name] for penguin in penguins] for name in MEASUREMENT
 ScatterMatrix(
     # one list per column instead of one dictionary per penguin
     data=columns,
-    figsize=(6.3, 6.3),
 ).show()
 ```
 
@@ -99,7 +97,6 @@ ScatterMatrix(
     data=penguins,
     # three measurements, bills first
     dimensions=BILL_AND_MASS,
-    figsize=(6.3, 6.3),
 ).show()
 ```
 
@@ -113,7 +110,6 @@ ScatterMatrix(
     dimensions=BILL_AND_MASS,
     # one color per species, one legend for the figure
     hue="species",
-    figsize=(6.3, 5.4),
 ).show()
 ```
 
@@ -130,7 +126,6 @@ ScatterMatrix(
     hue="species",
     # one density curve per species
     diagonal=SCATTER_MATRIX_DIAGONAL.KDE,
-    figsize=(6.3, 5.4),
 ).show()
 ```
 
@@ -143,7 +138,6 @@ ScatterMatrix(
     hue="species",
     # nothing on the diagonal
     diagonal=SCATTER_MATRIX_DIAGONAL.NONE,
-    figsize=(6.3, 5.4),
 ).show()
 ```
 
@@ -157,7 +151,6 @@ ScatterMatrix(
     hue="species",
     # draw only the cells below the diagonal
     lower_only=True,
-    figsize=(6.3, 5.6),
 ).show()
 ```
 
@@ -170,7 +163,6 @@ ScatterMatrix(
     lower_only=True,
     # no diagonal: the empty top row and right column go
     diagonal=SCATTER_MATRIX_DIAGONAL.NONE,
-    figsize=(6.3, 5.0),
 ).show()
 ```
 
@@ -184,7 +176,6 @@ ScatterMatrix(
     dimensions=BILL_AND_MASS,
     # print the correlation of each pair above the diagonal
     show_correlation=True,
-    figsize=(6.3, 6.3),
 ).show()
 ```
 
@@ -197,7 +188,6 @@ ScatterMatrix(
     # one coefficient per species
     hue="species",
     show_correlation=True,
-    figsize=(6.3, 5.4),
 ).show()
 ```
 
@@ -213,7 +203,6 @@ ScatterMatrix(
     # a least-squares line per species
     show_regression=True,
     show_correlation=True,
-    figsize=(6.3, 5.4),
 ).show()
 ```
 
@@ -231,7 +220,6 @@ ScatterMatrix(
     # fit every cell to its own data
     sharex=False,
     sharey=False,
-    figsize=(6.3, 6.3),
 ).show()
 ```
 
@@ -248,22 +236,22 @@ ScatterMatrix(
     hue="species",
     # grid lines on both axes of every cell
     show_grid=SHOW_GRID.BOTH,
-    figsize=(6.3, 5.4),
 ).show()
 ```
 
 ### Legend
 
-With a `hue`, one legend to the right of the matrix names the groups, whatever the number of cells. The column name alone is often a poor legend title, and `legend` sets the `title`, the number of columns `ncols` and the `alignment` of the entries ([LEGEND_ALIGN](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN)); the legend always sits to the right, so its `location` has no effect here ([LegendSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendSettingAttrs)). `show_legend=False` hides it, for a figure whose caption already names the colors.
+With a `hue`, one legend beside the matrix names the groups, whatever the number of cells, and the hue column's name titles it. A column name is often a poor legend title, and `legend` sets the `title` (an empty string hides it), the number of columns `ncols` and the `alignment` of the entries ([LEGEND_ALIGN](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN)); see [LegendSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendSettingAttrs). The legend sits outside the cells, so its `location` takes one of the four outside edges of [LEGEND_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION): `OUTSIDE_RIGHT`, the default, `OUTSIDE_LEFT`, `OUTSIDE_TOP` or `OUTSIDE_BOTTOM`; any other location raises an error. Above or below the matrix, the entries sit side by side in one row, which leaves the full page width to the cells. `show_legend=False` hides the legend, for a figure whose caption already names the colors.
 
 ```
+from datachart.constants import LEGEND_LOCATION
+
 ScatterMatrix(
     data=penguins,
     dimensions=BILL_AND_MASS,
     hue="species",
-    # a proper title for the legend
-    legend={"title": "Penguin species"},
-    figsize=(6.3, 5.4),
+    # a proper title, and one row of entries under the matrix
+    legend={"title": "Penguin species", "location": LEGEND_LOCATION.OUTSIDE_BOTTOM},
 ).show()
 ```
 
@@ -299,7 +287,6 @@ ScatterMatrix(
         "plot_scatter_matrix_kde_width": 1.0,
         "plot_scatter_matrix_kde_alpha": 0,
     },
-    figsize=(6.3, 5.4),
 ).show()
 ```
 
@@ -353,7 +340,6 @@ figure = ScatterMatrix(
     data=penguins,
     dimensions=BILL_AND_MASS,
     hue="species",
-    figsize=(6.3, 5.4),
 )
 config.set_theme(THEME.DEFAULT)
 figure.show()
@@ -395,7 +381,6 @@ ScatterMatrix(
     # the trend of each pair
     show_regression=True,
     title="Twenty training runs",
-    figsize=(6.3, 6.3),
 ).show()
 ```
 
