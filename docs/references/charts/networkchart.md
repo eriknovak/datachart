@@ -43,7 +43,7 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | Parameter | Constant |
 | :-- | :-- |
 | `layout` | [`NETWORK_LAYOUT`](../constants.md#datachart.constants.NETWORK_LAYOUT) |
-| `label_position` | [`NODE_LABEL_POSITION`](../constants.md#datachart.constants.NODE_LABEL_POSITION) |
+| `label_position` | [`NETWORK_LABEL_POSITION`](../constants.md#datachart.constants.NETWORK_LABEL_POSITION) |
 | `value_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT) |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](../constants.md#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](../constants.md#datachart.constants.LEGEND_ALIGN) |
 | `figsize` | [`FIG_SIZE`](../constants.md#datachart.constants.FIG_SIZE) |

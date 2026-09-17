@@ -191,7 +191,7 @@ from ...constants import (
     HISTOGRAM_TYPE,
     LEGEND_LOCATION,
     NETWORK_LAYOUT,
-    NODE_LABEL_POSITION,
+    NETWORK_LABEL_POSITION,
     ORIENTATION,
     RADIAL_DIRECTION,
     RADIAL_TYPE,
@@ -8603,7 +8603,7 @@ class NetworkLayer(PointLabelMixin, Layer):
         ax.axis("off")
         effects = _halo_effects(style.get("halo_width"), self.ground)
         muted, highlighted = self.muted, self.highlighted
-        best = self.label_position == NODE_LABEL_POSITION.BEST
+        best = self.label_position == NETWORK_LABEL_POSITION.BEST
         # scatter sizes are the marker's bounding-box diameter squared
         radii = np.sqrt(self.areas) / 2
         curve = (
@@ -8792,7 +8792,7 @@ class NetworkLayer(PointLabelMixin, Layer):
             )
             self.register_hover(points, lambda i, ks=ks: self.node_datums[ks[i]])
 
-        above = self.label_position == NODE_LABEL_POSITION.ABOVE
+        above = self.label_position == NETWORK_LABEL_POSITION.ABOVE
         for k, node in enumerate(self.nodes):
             label = node.get("label")
             label = node["id"] if label is None else label

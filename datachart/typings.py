@@ -34,7 +34,7 @@ from .constants import (
     LINE_MARKER,
     LINE_STYLE,
     NETWORK_LAYOUT,
-    NODE_LABEL_POSITION,
+    NETWORK_LABEL_POSITION,
     ORIENTATION,
     SHOW_GRID,
     VALUE_FORMAT,
@@ -1110,7 +1110,7 @@ class ThemeDefaultAttrs(TypedDict):
         chart_default_show_values (Union[bool, None]): The theme default for
             `show_values`, applied to every chart that takes it when the chart
             call leaves it unset. `None` means the theme has no opinion.
-        chart_default_node_label_position (Union[NODE_LABEL_POSITION, str, None]):
+        chart_default_node_label_position (Union[NETWORK_LABEL_POSITION, str, None]):
             The theme default for the network chart's `label_position`, applied
             when the chart call leaves it unset. `None` means the theme has no
             opinion.
@@ -1138,7 +1138,7 @@ class ThemeDefaultAttrs(TypedDict):
 
     chart_default_show_grid: Union[SHOW_GRID, str, None]
     chart_default_show_values: Union[bool, None]
-    chart_default_node_label_position: Union[NODE_LABEL_POSITION, str, None]
+    chart_default_node_label_position: Union[NETWORK_LABEL_POSITION, str, None]
     plot_hatch_cycle: Union[List[str], None]
     plot_linestyle_cycle: Union[List[Union[LINE_STYLE, str]], None]
     plot_marker_cycle: Union[

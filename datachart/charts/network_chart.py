@@ -15,7 +15,7 @@ from ..typings import (
     TextSettingAttrs,
     LegendSettingAttrs,
 )
-from ..constants import FIG_SIZE, NETWORK_LAYOUT, NODE_LABEL_POSITION, VALUE_FORMAT
+from ..constants import FIG_SIZE, NETWORK_LAYOUT, NETWORK_LABEL_POSITION, VALUE_FORMAT
 
 # ================================================
 # Main Chart Definition
@@ -28,7 +28,7 @@ def NetworkChart(
     layout: Optional[Union[NETWORK_LAYOUT, str]] = None,
     directed: Optional[bool] = None,
     seed: Optional[int] = None,
-    label_position: Optional[Union[NODE_LABEL_POSITION, str]] = None,
+    label_position: Optional[Union[NETWORK_LABEL_POSITION, str]] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     show_legend: Optional[bool] = None,
@@ -116,9 +116,9 @@ def NetworkChart(
         seed: The seed of the spring layouts (default 0); another seed gives
             another arrangement of the same data.
         label_position: Where the node names print: a
-            [`NODE_LABEL_POSITION`][datachart.constants.NODE_LABEL_POSITION] constant
+            [`NETWORK_LABEL_POSITION`][datachart.constants.NETWORK_LABEL_POSITION] constant
             (default
-            [`NODE_LABEL_POSITION.CENTER`][datachart.constants.NODE_LABEL_POSITION], or
+            [`NETWORK_LABEL_POSITION.CENTER`][datachart.constants.NETWORK_LABEL_POSITION], or
             the theme's `chart_default_node_label_position`).
         show_values: Whether to write each edge's weight at its midpoint.
         value_format: The format of the edge values: a

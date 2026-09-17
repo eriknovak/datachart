@@ -74,7 +74,7 @@ Classes:
     CONTOUR_LEVELS:          The supported contour level rules.
     HEXBIN_REDUCE:           The supported hexbin aggregations.
     NETWORK_LAYOUT:          The supported network chart layouts.
-    NODE_LABEL_POSITION:     The supported network node label positions.
+    NETWORK_LABEL_POSITION:     The supported network node label positions.
     SCATTER_MATRIX_DIAGONAL: The supported scatter matrix diagonal cells.
 
 """
@@ -1125,7 +1125,7 @@ class BUMP_LABEL_POSITION:
     BOTH = "both"
 
 
-class NODE_LABEL_POSITION:
+class NETWORK_LABEL_POSITION:
     """The supported node label positions.
 
     Passed as the `label_position` setting of the network chart: where each
@@ -1133,15 +1133,15 @@ class NODE_LABEL_POSITION:
 
     !!! info "Added in Unreleased"
 
-    ![NODE_LABEL_POSITION at a glance](../assets/imgs/const-node-label-position.svg){ width="100%" }
+    ![NETWORK_LABEL_POSITION at a glance](../assets/imgs/const-network-label-position.svg){ width="100%" }
 
     Examples:
-        >>> from datachart.constants import NODE_LABEL_POSITION
-        >>> NODE_LABEL_POSITION.DEFAULT
+        >>> from datachart.constants import NETWORK_LABEL_POSITION
+        >>> NETWORK_LABEL_POSITION.DEFAULT
         "center"
 
     Attributes:
-        DEFAULT (str): The default position. Same as `NODE_LABEL_POSITION.CENTER`.
+        DEFAULT (str): The default position. Same as `NETWORK_LABEL_POSITION.CENTER`.
         CENTER (str): On the marker. Equals to `"center"`.
         ABOVE (str): Above the marker, clear of it, like a place name on a map.
             Equals to `"above"`.

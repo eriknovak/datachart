@@ -71,7 +71,7 @@ from datachart.constants import (
     LINE_MARKER,
     LINE_STYLE,
     NETWORK_LAYOUT,
-    NODE_LABEL_POSITION,
+    NETWORK_LABEL_POSITION,
     NORMALIZE,
     ORIENTATION,
     RADIAL_DIRECTION,
@@ -1222,11 +1222,11 @@ def label_position():
     chart_grid(figs, "const-label-position.svg", 4.4, cols=2)
 
 
-def node_label_position():
+def network_label_position():
     members = [
-        ("CENTER", NODE_LABEL_POSITION.CENTER),
-        ("ABOVE", NODE_LABEL_POSITION.ABOVE),
-        ("BEST", NODE_LABEL_POSITION.BEST),
+        ("CENTER", NETWORK_LABEL_POSITION.CENTER),
+        ("ABOVE", NETWORK_LABEL_POSITION.ABOVE),
+        ("BEST", NETWORK_LABEL_POSITION.BEST),
     ]
     data = {
         "nodes": [{"id": n} for n in ("core", "utils", "cli", "api", "web")],
@@ -1245,13 +1245,13 @@ def node_label_position():
             data=data,
             layout=NETWORK_LAYOUT.CIRCULAR,
             label_position=value,
-            title=f"NODE_LABEL_POSITION.{label}",
+            title=f"NETWORK_LABEL_POSITION.{label}",
         )
         for label, value in members
     ]
     chart_grid(
         figs,
-        "const-node-label-position.svg",
+        "const-network-label-position.svg",
         2.6,
         footnote="BEST tries the spots around each marker in turn and keeps the "
         "one clear of nodes, edges, and other labels.",
@@ -1514,7 +1514,7 @@ def main():
     ridgeline_scale()
     rank()
     label_position()
-    node_label_position()
+    network_label_position()
     gantt_value()
     gantt_sort_key()
     gantt_arrow_entry()

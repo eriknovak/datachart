@@ -29,7 +29,7 @@ from ...constants import (
     GANTT_SORT_KEY,
     GANTT_VALUE,
     NETWORK_LAYOUT,
-    NODE_LABEL_POSITION,
+    NETWORK_LABEL_POSITION,
     RIDGELINE_SCALE,
     SCALE,
     SCATTER_MATRIX_DIAGONAL,
@@ -55,10 +55,10 @@ LABEL_POSITIONS = (
     BUMP_LABEL_POSITION.END,
     BUMP_LABEL_POSITION.BOTH,
 )
-NODE_LABEL_POSITIONS = (
-    NODE_LABEL_POSITION.CENTER,
-    NODE_LABEL_POSITION.ABOVE,
-    NODE_LABEL_POSITION.BEST,
+NETWORK_LABEL_POSITIONS = (
+    NETWORK_LABEL_POSITION.CENTER,
+    NETWORK_LABEL_POSITION.ABOVE,
+    NETWORK_LABEL_POSITION.BEST,
 )
 STACK_BASELINES = (
     STACKED_AREA_BASELINE.ZERO,
@@ -217,11 +217,11 @@ def validate_node_label_position(position):
     """Validate a node label position; None means on the marker."""
 
     if position is None:
-        return NODE_LABEL_POSITION.DEFAULT
-    if position not in NODE_LABEL_POSITIONS:
+        return NETWORK_LABEL_POSITION.DEFAULT
+    if position not in NETWORK_LABEL_POSITIONS:
         raise ValueError(
             f"Invalid `label_position` value {position!r}. "
-            f"Must be one of {NODE_LABEL_POSITIONS} or None."
+            f"Must be one of {NETWORK_LABEL_POSITIONS} or None."
         )
     return position
 

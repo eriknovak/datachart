@@ -127,11 +127,26 @@ SHARED = {
 # shared style groups a chart's `style` reads, keyed by the parameter that
 # switches the feature on; heatmaps print cell values through their own font
 STYLE_GROUPS = [
-    (("show_values",), "value labels", ["ValueLabelStyleAttrs"], {"Heatmap", "CalendarHeatmap"}),
+    (
+        ("show_values",),
+        "value labels",
+        ["ValueLabelStyleAttrs"],
+        {"Heatmap", "CalendarHeatmap"},
+    ),
     (("show_area",), "the area fill", ["AreaStyleAttrs"], set()),
     (("show_regression",), "the regression line", ["RegressionStyleAttrs"], set()),
-    (("vlines", "hlines"), "reference lines", ["VLineStyleAttrs", "HLineStyleAttrs"], set()),
-    (("vspans", "hspans"), "reference bands", ["VSpanStyleAttrs", "HSpanStyleAttrs"], set()),
+    (
+        ("vlines", "hlines"),
+        "reference lines",
+        ["VLineStyleAttrs", "HLineStyleAttrs"],
+        set(),
+    ),
+    (
+        ("vspans", "hspans"),
+        "reference bands",
+        ["VSpanStyleAttrs", "HSpanStyleAttrs"],
+        set(),
+    ),
     (("texts",), "text annotations", ["TextStyleAttrs"], set()),
 ]
 # constants a parameter takes inside its payload, keyed by the parameter
@@ -240,7 +255,11 @@ def owner(name):
 
 SIGS = {n: inspect.signature(getattr(ch, n)) for n in ORDER}
 DATA = {
-    n: [t for t in typings_in(SIGS[n].parameters["data"].annotation, []) if t not in SHARED]
+    n: [
+        t
+        for t in typings_in(SIGS[n].parameters["data"].annotation, [])
+        if t not in SHARED
+    ]
     for n in ORDER
 }
 STYLE = {n: typings_in(SIGS[n].parameters["style"].annotation, []) for n in ORDER}
@@ -303,7 +322,9 @@ def data_section(n):
     lines = ["## Data", ""]
     if top[0].endswith("SingleChartAttrs"):
         inner = nested(top[0], [])
-        with_inner = f", with {join([tlink(t, page) for t in inner])} inside" if inner else ""
+        with_inner = (
+            f", with {join([tlink(t, page) for t in inner])} inside" if inner else ""
+        )
         lines.append(
             f"`data` is one {tlink(top[0], page)}, or a list of them for subplots{with_inner}."
         )
@@ -391,7 +412,9 @@ def chart_page(n):
         "## Function\n\n"
         + block(f"datachart.charts.{n}")
         + "\n\n"
-        + "\n".join(s for s in (data_section(n), style_section(n), constants_section(n)) if s)
+        + "\n".join(
+            s for s in (data_section(n), style_section(n), constants_section(n)) if s
+        )
     )
 
 
@@ -424,7 +447,9 @@ def chart_rows(page, guide):
             style = ", ".join(tlink(t, page) for t in STYLE[n])
             row = f"| [{n}]({'' if page == 'index' else 'charts/'}{slug(n)}.md) | {SHOWS[n]} | {data} | {style} |"
             if guide:
-                row += f" [{guide_title(n)}](../../how-to-guides/charts/{slug(n)}.ipynb) |"
+                row += (
+                    f" [{guide_title(n)}](../../how-to-guides/charts/{slug(n)}.ipynb) |"
+                )
             yield row
 
 
@@ -445,8 +470,7 @@ s = TYPINGS_MD.read_text()
 head, _, rest = s.partition("## Typings by Chart")
 tail = rest.split("\n## ", 1)[1]
 TYPINGS_MD.write_text(
-    head
-    + "## Typings by Chart\n\n"
+    head + "## Typings by Chart\n\n"
     "The records a chart's `data` takes and the keys its `style` accepts are documented on the "
     "chart's own reference page, next to the function that reads them.\n"
     + "\n".join(chart_rows("", guide=False))
