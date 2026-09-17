@@ -210,6 +210,15 @@ class TestContourDraw(unittest.TestCase):
                 figure = ContourChart(data={"z": z}, filled=True, levels=levels)
                 self.assertEqual(_contour_sets(figure.axes[0])[0].extend, extend)
 
+    def test_filled_contour_needs_two_levels(self):
+        z = [[0.0, 5.0], [10.0, 15.0]]
+        for levels in ([7], [7, 7.0]):
+            with self.subTest(levels=levels):
+                with self.assertRaisesRegex(ValueError, "at least two distinct levels"):
+                    ContourChart(data={"z": z}, filled=True, levels=levels)
+        lines = ContourChart(data={"z": z}, levels=[7])
+        self.assertEqual(len(_contour_sets(lines.axes[0])), 1)
+
     def test_auto_and_count_levels_do_not_extend(self):
         for levels in (None, 4, CONTOUR_LEVELS.RICE):
             with self.subTest(levels=levels):

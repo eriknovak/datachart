@@ -177,6 +177,16 @@ def validate_contour_levels(levels) -> List[float]:
     return sorted({float(v) for v in values})
 
 
+def validate_filled_levels(levels) -> None:
+    """Raise unless explicit filled-contour levels hold at least two values."""
+
+    if isinstance(levels, list) and len(levels) < 2:
+        raise ValueError(
+            f"Invalid contour `levels` {levels!r} for a filled contour. "
+            "Bands need at least two distinct levels; add a level or pass a count."
+        )
+
+
 def validate_baseline(baseline):
     """Validate a stacked area baseline; None means the zero baseline."""
 

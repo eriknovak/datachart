@@ -78,6 +78,7 @@ from .validate import (
     treemap_record_total,
     validate_baseline,
     validate_contour_levels,
+    validate_filled_levels,
     validate_emphasis,
     validate_given_ranks,
     validate_label_position,
@@ -6122,6 +6123,8 @@ class ContourLayer(Layer):
         self.label_family = resolve_font_family()
         self.x, self.y, self.z = self._grid()
         self.levels = contour_levels(self.z, self.settings.get("levels"))
+        if self.filled:
+            validate_filled_levels(self.levels)
         self.extend, self.band_edges = self._coverage()
 
     def _coverage(self) -> tuple:
