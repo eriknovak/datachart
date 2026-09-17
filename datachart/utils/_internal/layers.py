@@ -477,8 +477,8 @@ STEP_LEGEND_EDGE_WIDTH = 0.8
 # ================================================
 
 
-def get_chart_data(attr: str, chart: dict) -> Optional[np.ndarray]:
-    """Extract a data column from a chart dictionary as a numpy array."""
+def _chart_column(attr: str, chart: dict):
+    """A data column's raw values: the dict form's sequence, else one per point."""
 
     attr_label = get_attr_value(attr, chart, attr)
 
@@ -487,11 +487,36 @@ def get_chart_data(attr: str, chart: dict) -> Optional[np.ndarray]:
 
     if isinstance(chart["data"], list):
         filtered = [d[attr_label] for d in chart["data"] if attr_label in d]
-        if not filtered:
-            return None
-        return np.array(filtered)
+        return filtered or None
 
     return None
+
+
+def get_chart_data(attr: str, chart: dict) -> Optional[np.ndarray]:
+    """Extract a data column from a chart dictionary as a numpy array."""
+
+    values = _chart_column(attr, chart)
+    if values is None or isinstance(chart["data"], dict):
+        return values
+    return np.array(values)
+
+
+def get_chart_observations(attr: str, chart: dict) -> Optional[np.ndarray]:
+    """A data column as one flat pool of observations.
+
+    A point carries a single observation or a list of them, and the charts
+    that bin or estimate over a sample read the lot as one series. Records
+    are concatenated, so lists of unequal length never have to square into
+    a grid (issue #233).
+    """
+
+    values = _chart_column(attr, chart)
+    if values is None:
+        return None
+    if isinstance(chart["data"], dict):
+        return np.ravel(values)
+    flat = [np.ravel(value) for value in values]
+    return np.concatenate(flat) if flat else None
 
 
 def get_chart_grid(chart: dict, kind: str, dtype=float) -> tuple:
@@ -3832,7 +3857,7 @@ class HistogramLayer(Layer):
         self._resolve_value_labels()
 
     def x_values(self) -> Optional[np.ndarray]:
-        return get_chart_data("x", self.chart)
+        return get_chart_observations("x", self.chart)
 
     def y_range(self):
         x = self.x_values()
@@ -3986,7 +4011,7 @@ class KdeLayer(Layer):
         self.xlim = self.settings.get("kde_xlim")
 
     def x_values(self) -> Optional[np.ndarray]:
-        return get_chart_data("x", self.chart)
+        return get_chart_observations("x", self.chart)
 
     def curve(self) -> Optional[tuple]:
         """The (x, density) samples; None when the values have no spread."""
@@ -7613,7 +7638,7 @@ class RadialHistogramLayer(RadialLayer):
         self.num_bins = self.settings.get("num_bins") or DEFAULT_NUM_BINS
 
     def x_values(self) -> Optional[np.ndarray]:
-        return get_chart_data("x", self.chart)
+        return get_chart_observations("x", self.chart)
 
     def value_data(self):
         return None

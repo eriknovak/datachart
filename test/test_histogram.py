@@ -312,3 +312,45 @@ class TestLogStepGaps(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestListValuedPoints(unittest.TestCase):
+    """A point may carry one observation or a list of them (issue #233)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def bin_counts(self, figure, index=0):
+        return [p.get_height() for p in figure.axes[0].containers[index].patches]
+
+    def test_one_point_holding_every_observation(self):
+        values = [v["x"] for v in HIST_A]
+        listed = Histogram([{"x": values}], num_bins=3)
+        scalars = Histogram(HIST_A, num_bins=3)
+        self.assertEqual(self.bin_counts(listed), self.bin_counts(scalars))
+
+    def test_several_points_pool_their_observations(self):
+        split = [{"x": [0.5] * 4}, {"x": [1.5] * 2}]
+        self.assertEqual(
+            self.bin_counts(Histogram(split, num_bins=3)),
+            self.bin_counts(Histogram(HIST_A, num_bins=3)),
+        )
+
+    def test_points_of_unequal_length_pool_too(self):
+        ragged = [{"x": [0.5, 0.5, 0.5]}, {"x": [0.5, 1.5]}, {"x": [1.5]}]
+        self.assertEqual(
+            self.bin_counts(Histogram(ragged, num_bins=3)),
+            self.bin_counts(Histogram(HIST_A, num_bins=3)),
+        )
+
+    def test_a_step_histogram_draws_one_outline(self):
+        figure = Histogram(
+            [{"x": [v["x"] for v in HIST_A]}],
+            num_bins=3,
+            style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
+        )
+        self.assertEqual(len(figure.axes[0].patches), 1)
+
+    def test_a_mixed_series_keeps_its_own_bins(self):
+        figure = Histogram([[{"x": [v["x"] for v in HIST_A]}], HIST_B], num_bins=3)
+        self.assertEqual(len(figure.axes[0].containers), 2)
