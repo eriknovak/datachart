@@ -10721,13 +10721,13 @@ class Panel:
 
     @staticmethod
     def category_index(layers: List[Layer]) -> Optional[dict]:
-        """Label -> position (1..n), the first-seen union across group layers."""
+        """Label -> position (0..n-1), the first-seen union across group layers."""
 
         index = {}
         for layer in layers:
             if isinstance(layer, GroupLayer):
                 for label in layer.labels():
-                    index.setdefault(label, len(index) + 1)
+                    index.setdefault(label, len(index))
         return index or None
 
     def _category_labels(self, labels, axis: str) -> list:

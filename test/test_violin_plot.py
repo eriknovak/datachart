@@ -42,7 +42,7 @@ class TestViolinPlot(unittest.TestCase):
         ax = figure.axes[0]
         self.assertEqual(len(bodies(ax)), 3)
         self.assertEqual([t.get_text() for t in ax.get_xticklabels()], list("CAB"))
-        self.assertEqual(list(ax.get_xticks()), [1, 2, 3])
+        self.assertEqual(list(ax.get_xticks()), [0, 1, 2])
 
     def test_inner_modes_draw_expected_marks(self):
         base = len(ViolinPlot(violin_data(), inner=None).axes[0].lines)
@@ -78,8 +78,8 @@ class TestViolinPlot(unittest.TestCase):
         self.assertEqual(len(halves), 6)
         # left halves never cross the centre, right halves never go left of it
         left, right = halves[0], halves[1]
-        self.assertLessEqual(left.get_paths()[0].vertices[:, 0].max(), 1.0 + 1e-9)
-        self.assertGreaterEqual(right.get_paths()[0].vertices[:, 0].min(), 1.0 - 1e-9)
+        self.assertLessEqual(left.get_paths()[0].vertices[:, 0].max(), 1e-9)
+        self.assertGreaterEqual(right.get_paths()[0].vertices[:, 0].min(), -1e-9)
         self.assertNotEqual(
             tuple(left.get_facecolor()[0]), tuple(right.get_facecolor()[0])
         )
@@ -92,8 +92,8 @@ class TestViolinPlot(unittest.TestCase):
         wide = bodies(ViolinPlot(data, bandwidth=1.0).axes[0])[0]
         # a wider kernel spreads the density: the peak half-width shrinks
         self.assertGreater(
-            np.abs(narrow.get_paths()[0].vertices[:, 0] - 1).max(),
-            np.abs(wide.get_paths()[0].vertices[:, 0] - 1).max() * 0.99,
+            np.abs(narrow.get_paths()[0].vertices[:, 0]).max(),
+            np.abs(wide.get_paths()[0].vertices[:, 0]).max() * 0.99,
         )
         with self.assertRaises(ValueError):
             ViolinPlot(data, bandwidth="gaussian")

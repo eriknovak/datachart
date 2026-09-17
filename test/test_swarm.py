@@ -72,17 +72,17 @@ class TestSwarmPlot(unittest.TestCase):
     def test_category_ticks_and_limits(self):
         figure = SwarmPlot(group_data())
         ax = figure.axes[0]
-        np.testing.assert_array_equal(ax.get_xticks(), [1, 2, 3])
+        np.testing.assert_array_equal(ax.get_xticks(), [0, 1, 2])
         self.assertEqual([t.get_text() for t in ax.get_xticklabels()], ["A", "B", "C"])
-        self.assertEqual(ax.get_xlim(), (0.5, 3.5))
+        self.assertEqual(ax.get_xlim(), (-0.5, 2.5))
 
     def test_swarm_clamps_to_category_width(self):
         # 400 identical values pack into one row wider than the category
         data = [{"label": "A", "value": 1.0} for _ in range(400)]
         ax = SwarmPlot(data).axes[0]
         xs = np.concatenate([c.get_offsets()[:, 0] for c in _swarm_collections(ax)])
-        self.assertLessEqual(np.abs(xs - 1).max(), SWARM_MAX_OFFSET + 1e-9)
-        self.assertGreater(np.abs(xs - 1).max(), SWARM_MAX_OFFSET * 0.9)
+        self.assertLessEqual(np.abs(xs).max(), SWARM_MAX_OFFSET + 1e-9)
+        self.assertGreater(np.abs(xs).max(), SWARM_MAX_OFFSET * 0.9)
 
     def test_swarm_points_do_not_overlap_in_pixels(self):
         figure = SwarmPlot(group_data(n=60))
@@ -91,7 +91,7 @@ class TestSwarmPlot(unittest.TestCase):
         diameter = np.sqrt(size) / 72 * figure.dpi
         for collection in _swarm_collections(ax):
             xy = np.asarray(collection.get_offsets())
-            for pos in (1, 2, 3):
+            for pos in (0, 1, 2):
                 group = xy[np.abs(xy[:, 0] - pos) <= 0.5]
                 px = ax.transData.transform(group)
                 dist = np.sqrt(((px[:, None, :] - px[None, :, :]) ** 2).sum(-1))
@@ -117,8 +117,8 @@ class TestSwarmPlot(unittest.TestCase):
 
     def test_horizontal_orientation(self):
         ax = SwarmPlot(group_data(), orientation="horizontal").axes[0]
-        np.testing.assert_array_equal(ax.get_yticks(), [1, 2, 3])
-        self.assertEqual(ax.get_ylim(), (0.5, 3.5))
+        np.testing.assert_array_equal(ax.get_yticks(), [0, 1, 2])
+        self.assertEqual(ax.get_ylim(), (-0.5, 2.5))
 
     def test_log_scale_packs_in_display_space(self):
         data = [{"label": "A", "value": float(v)} for v in np.logspace(0, 3, 120)]
@@ -168,12 +168,12 @@ class TestSwarmPlot(unittest.TestCase):
         first = group_data(seed=1)
         second = [{"label": "D", "value": 1.0}, {"label": "A", "value": 2.0}]
         ax = SwarmPlot([first, second], subtitle=["one", "two"]).axes[0]
-        np.testing.assert_array_equal(ax.get_xticks(), [1, 2, 3, 4])
+        np.testing.assert_array_equal(ax.get_xticks(), [0, 1, 2, 3])
         self.assertEqual(
             [t.get_text() for t in ax.get_xticklabels()], ["A", "B", "C", "D"]
         )
         xs = _swarm_collections(ax)[1].get_offsets()[:, 0]
-        np.testing.assert_allclose(np.round(xs), [4, 1])
+        np.testing.assert_allclose(np.round(xs), [3, 0])
 
     def _assert_no_overlap(self, figure, positions):
         ax = figure.axes[0]
@@ -188,17 +188,17 @@ class TestSwarmPlot(unittest.TestCase):
     def test_composed_swarms_pack_as_one_cloud(self):
         first = SwarmPlot(group_data(seed=1, n=30))
         second = SwarmPlot(group_data(seed=2, n=30))
-        self._assert_no_overlap(Panel([first, second]), (1, 2, 3))
+        self._assert_no_overlap(Panel([first, second]), (0, 1, 2))
 
     def test_series_of_one_chart_pack_as_one_cloud(self):
         figure = SwarmPlot([group_data(seed=1, n=30), group_data(seed=2, n=30)])
-        self._assert_no_overlap(figure, (1, 2, 3))
+        self._assert_no_overlap(figure, (0, 1, 2))
 
     def test_emphasis_split_packs_as_one_cloud(self):
         data = group_data(n=40)
         for row in data[::3]:
             row["emphasis"] = "background"
-        self._assert_no_overlap(SwarmPlot(data), (1, 2, 3))
+        self._assert_no_overlap(SwarmPlot(data), (0, 1, 2))
 
     def test_subplots(self):
         figure = SwarmPlot([group_data(), group_data(seed=5)], subplots=True)
@@ -219,7 +219,7 @@ class TestCategoryIndex(unittest.TestCase):
             for l in g.layers
         ]
         self.assertEqual(
-            _Panel.category_index(layers), {"B": 1, "A": 2, "C": 3, "D": 4}
+            _Panel.category_index(layers), {"B": 0, "A": 1, "C": 2, "D": 3}
         )
 
     def test_box_swarm_overlay_shares_positions(self):
@@ -228,13 +228,13 @@ class TestCategoryIndex(unittest.TestCase):
             warnings.simplefilter("error")
             figure = Panel([BoxPlot(data), SwarmPlot(data)], show_legend=True)
         ax = figure.axes[0]
-        np.testing.assert_array_equal(ax.get_xticks(), [1, 2, 3])
+        np.testing.assert_array_equal(ax.get_xticks(), [0, 1, 2])
         self.assertEqual([t.get_text() for t in ax.get_xticklabels()], ["A", "B", "C"])
         boxes = [p for p in ax.patches if hasattr(p, "get_path")]
         centers = [np.mean(b.get_path().vertices[:4, 0]) for b in boxes]
-        np.testing.assert_allclose(centers, [1, 2, 3])
+        np.testing.assert_allclose(centers, [0, 1, 2])
         xs = _swarm_collections(ax)[0].get_offsets()[:, 0]
-        np.testing.assert_allclose(np.round(xs), np.repeat([1, 2, 3], 40))
+        np.testing.assert_allclose(np.round(xs), np.repeat([0, 1, 2], 40))
         self.assertLessEqual(np.abs(xs - np.round(xs)).max(), SWARM_MAX_OFFSET + 1e-9)
 
     def test_overlay_horizontal(self):
@@ -246,7 +246,7 @@ class TestCategoryIndex(unittest.TestCase):
             ]
         )
         ax = figure.axes[0]
-        np.testing.assert_array_equal(ax.get_yticks(), [1, 2, 3])
+        np.testing.assert_array_equal(ax.get_yticks(), [0, 1, 2])
 
     def test_packing_reads_panel_limits_and_later_layers(self):
         data = group_data(n=60)
@@ -255,7 +255,7 @@ class TestCategoryIndex(unittest.TestCase):
         self.assertEqual(ax.get_ylim(), (0.0, 40.0))
         diameter = np.sqrt(config["plot_swarm_size"]) / 72 * figure.dpi
         xy = np.asarray(_swarm_collections(ax)[0].get_offsets())
-        for pos in (1, 2, 3):
+        for pos in (0, 1, 2):
             px = ax.transData.transform(xy[np.abs(xy[:, 0] - pos) <= 0.5])
             dist = np.sqrt(((px[:, None, :] - px[None, :, :]) ** 2).sum(-1))
             dist[np.diag_indices_from(dist)] = np.inf
@@ -283,7 +283,7 @@ class TestCategoryIndex(unittest.TestCase):
 
     def test_box_alone_unchanged(self):
         ax = BoxPlot(group_data()).axes[0]
-        np.testing.assert_array_equal(ax.get_xticks(), [1, 2, 3])
+        np.testing.assert_array_equal(ax.get_xticks(), [0, 1, 2])
         self.assertEqual([t.get_text() for t in ax.get_xticklabels()], ["A", "B", "C"])
 
 
