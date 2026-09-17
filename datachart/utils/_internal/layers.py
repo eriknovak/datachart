@@ -3813,27 +3813,6 @@ class GanttLayer(BarLayer):
         return resolve
 
 
-def _open_step_outline(outline, axis: int, cumulative: bool, log: bool) -> None:
-    """Strip a step histogram's outline of the drops to zero that state nothing.
-
-    `ax.hist(histtype="step")` returns one open polygon running from zero up
-    over the bins and back down to zero. A cumulative total never falls back,
-    so its closing drop misreads as a collapse to none (issue #198); a plain
-    histogram's drop is a true count and stays. A log value axis has no zero
-    at all, so every vertex on it — the empty bins and the ends — would spike
-    down to the axis floor (issue #199); NaN breaks the outline there instead,
-    which the renderer draws as separate runs. `axis` is the value coordinate:
-    1 for a vertical histogram, 0 for a horizontal one.
-    """
-
-    vertices = np.array(outline.get_xy(), dtype=float)
-    if cumulative:
-        vertices = vertices[:-1]
-    if log:
-        vertices[vertices[:, axis] == 0, axis] = np.nan
-    outline.set_xy(vertices)
-
-
 class HistogramLayer(Layer):
     kind = "histogram"
     labels_past_mark = True
@@ -3873,7 +3852,8 @@ class HistogramLayer(Layer):
             return
 
         hist_style = self._merge_color("color", ctx.color, self.hist_style)
-        if hist_style.get("histtype") == HISTOGRAM_TYPE.STEP:
+        is_step = hist_style.get("histtype") == HISTOGRAM_TYPE.STEP
+        if is_step:
             if ctx.hist_slot is not None:
                 # a stack needs area: step stacks as its filled equivalent (ADR 0014)
                 hist_style["histtype"] = HISTOGRAM_TYPE.STEP_FILLED
@@ -3914,17 +3894,31 @@ class HistogramLayer(Layer):
                 orientation=self.orientation,
                 **hist_style,
             )
-            if hist_style.get("histtype") == HISTOGRAM_TYPE.STEP:
-                _open_step_outline(
-                    bars[0],
-                    0 if self.is_horizontal else 1,
-                    bool(self.show_cumulative),
-                    ctx.value_scale == SCALE.LOG,
-                )
+            if is_step:
+                self._trim_step_outline(bars[0], ctx)
         self._etch(bars.patches if isinstance(bars, BarContainer) else bars)
         self._register_bins(ax, ctx, bars, edges, counts)
         if self.show_values and ctx.emphasis != EMPHASIS_BACKGROUND:
             self._label_bins(ax, bars, edges, counts, ctx.hist_slot is not None)
+
+    def _trim_step_outline(self, outline, ctx) -> None:
+        """Cut the outline's drops to zero that no bin reports (ADR 0014).
+
+        `ax.hist(histtype="step")` draws one open polygon from zero, over the
+        bins, and back down to zero. A cumulative total never falls back, so
+        its closing drop goes (issue #198); on a log value axis, which has no
+        zero, every remaining vertex at zero becomes NaN, and the renderer
+        breaks the outline there rather than spiking to the axis floor
+        (issue #199).
+        """
+
+        value_axis = 0 if self.is_horizontal else 1
+        vertices = np.array(outline.get_xy(), dtype=float)
+        if self.show_cumulative:
+            vertices = vertices[:-1]
+        if ctx.value_scale == SCALE.LOG:
+            vertices[vertices[:, value_axis] == 0, value_axis] = np.nan
+        outline.set_xy(vertices)
 
     def _label_bins(self, ax, bars, edges, counts, stacked: bool) -> None:
         """Print each bin's height at its top; an empty bin stays bare."""

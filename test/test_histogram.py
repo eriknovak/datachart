@@ -24,8 +24,8 @@ def container_bottoms(figure, index):
     return [p.get_y() for p in figure.axes[0].containers[index].patches]
 
 
-def outline_vertices(figure, index=0):
-    return np.asarray(figure.axes[index].patches[0].get_xy(), dtype=float)
+def outline_vertices(figure):
+    return np.asarray(figure.axes[0].patches[0].get_xy(), dtype=float)
 
 
 class TestHistogramBarMode(unittest.TestCase):
@@ -243,10 +243,10 @@ class TestLogStepGaps(unittest.TestCase):
         config.reset_config()
         plt.close("all")
 
-    def step(self, data=HIST_GAP, index=0, **kwargs):
+    def step(self, data=HIST_GAP, **kwargs):
         kwargs.setdefault("num_bins", 3)
         kwargs.setdefault("style", {"plot_hist_type": HISTOGRAM_TYPE.STEP})
-        return outline_vertices(Histogram(data, **kwargs), index)
+        return outline_vertices(Histogram(data, **kwargs))
 
     def test_log_step_breaks_over_an_empty_bin(self):
         values = self.step(scaley=SCALE.LOG)[:, 1]
@@ -291,20 +291,23 @@ class TestLogStepGaps(unittest.TestCase):
         self.assertFalse(np.isnan(values).any())
 
     def test_log_step_draws_no_spike_into_the_gap(self):
-        figure = Histogram(
-            HIST_GAP,
-            num_bins=3,
-            scaley=SCALE.LOG,
-            style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
-        )
-        ax = figure.axes[0]
-        figure.canvas.draw()
-        image = np.asarray(figure.canvas.buffer_rgba())[:, :, :3]
-        ink = (image != image[0, 0]).any(axis=2)
-        edge = outline_vertices(figure)[3][0]
-        column = int(round(ax.transData.transform((edge, 1))[0]))
-        # the renderer breaks the path: the empty bin's edge carries no drop
-        self.assertLess(int(ink[:, column].sum()), 20)
+        def inked_rows(scale):
+            figure = Histogram(
+                HIST_GAP,
+                num_bins=3,
+                scaley=scale,
+                style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
+            )
+            figure.canvas.draw()
+            image = np.asarray(figure.canvas.buffer_rgba())[:, :, :3]
+            ink = (image != image[0, 0]).any(axis=2)
+            # the column where the outline falls into the empty bin
+            edge = outline_vertices(figure)[3][0]
+            column = int(round(figure.axes[0].transData.transform((edge, 1))[0]))
+            return int(ink[:, column].sum())
+
+        # the renderer breaks the path where the linear outline drops
+        self.assertLess(inked_rows(SCALE.LOG) * 5, inked_rows(SCALE.LINEAR))
 
 
 if __name__ == "__main__":

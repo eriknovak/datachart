@@ -168,10 +168,6 @@ EXPECTED_CHANGES = {
     # new kernel density cases (ADR 0022)
     "contour_kde2d",
     "hist_kde1d",
-    # new step outline cases: the drops to zero that state nothing are gone
-    # (ADR 0014)
-    "hist_step_log",
-    "hist_step_cumulative",
     # new hexbin cases (ADR 0024)
     "hexbin_counts",
     "hexbin_log",
@@ -334,6 +330,10 @@ EXPECTED_CHANGES = {
     "hist_multi_subplots",
     "scatter_multi_subplots",
     "stackedarea_subplots",
+    # new step outline cases: the drops to zero that state nothing are gone
+    # (#199, #198)
+    "hist_step_log",
+    "hist_step_cumulative",
 }
 
 
@@ -560,12 +560,13 @@ def hist_horizontal_density():
 
 @case
 def hist_step_log():
-    # the tail leaves empty bins: on a log count axis the outline breaks there
-    rng = np.random.RandomState(7)
-    data = [{"x": float(2.5 + v)} for v in rng.exponential(1 / np.log(10), 2000)]
+    # Gutenberg-Richter magnitudes: the tail leaves empty bins, and on a log
+    # count axis the outline breaks over them instead of spiking to the floor
+    rng = np.random.RandomState(42)
+    data = [{"x": float(2.5 + m)} for m in rng.exponential(1 / np.log(10), 5000)]
     return Histogram(
         data=data,
-        num_bins=30,
+        num_bins=40,
         scaley=SCALE.LOG,
         style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
     )
