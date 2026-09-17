@@ -73,6 +73,7 @@ from .validate import (
     AXIS_NUMERIC,
     AXIS_TEMPORAL,
     infer_network_nodes,
+    first_seen_nodes,
     infer_sankey_columns,
     treemap_record_total,
     validate_baseline,
@@ -3064,8 +3065,25 @@ def sort_gantt_charts(charts: List[dict], settings: dict) -> List[dict]:
             order = [i for cluster in clusters.values() for i in cluster]
         else:
             order = sorted(range(len(tasks)), key=lambda i: sign * starts[i])
-        sorted_charts.append({**chart, "data": [tasks[i] for i in order]})
+        sorted_charts.append(
+            {
+                **chart,
+                "data": [tasks[i] for i in order],
+                # colors follow the input order, so a sort never recolors
+                "group_order": gantt_groups(tasks),
+            }
+        )
     return sorted_charts
+
+
+def gantt_groups(tasks: list) -> list:
+    """The task groups in first-seen order; ungrouped tasks name none."""
+
+    groups = []
+    for task in tasks:
+        if task.get("group") is not None and task["group"] not in groups:
+            groups.append(task["group"])
+    return groups
 
 
 class GanttLayer(BarLayer):
@@ -3124,12 +3142,10 @@ class GanttLayer(BarLayer):
         # the bars of the last draw stand for their groups in the legend
         self._task_patches = []
 
-        # one color and hatch per task group, in first-seen order
-        groups = []
-        for task in tasks:
-            if task.get("group") is not None and task["group"] not in groups:
-                groups.append(task["group"])
-        self.groups = groups
+        # the legend lists the groups in row order; one color and hatch per
+        # group in input order, so sorting the rows never recolors a group
+        self.groups = gantt_groups(tasks)
+        groups = self.chart.get("group_order") or self.groups
         cycle = (
             create_color_cycle(config["color_general_multiple"], len(groups))
             if groups
@@ -7703,8 +7719,10 @@ class SankeyLayer(Layer):
         self._resolve_bare_labels()
         # column headings read as per-column subtitles
         self.column_label_style = get_text_style("subtitle")
-        # one color per node in column-then-row order, keyed by name
-        names = [node for column in self.columns for node in column]
+        # one color per node in first appearance across the links, so the
+        # column order never recolors a node; unlinked nodes follow
+        names = first_seen_nodes(self.links)
+        names += [n for column in self.columns for n in column if n not in names]
         cycle = create_color_cycle(config["color_general_multiple"], len(names))
         self.node_colors = {name: cycle[i]["color"] for i, name in enumerate(names)}
 
@@ -8051,11 +8069,12 @@ class TreemapLayer(Layer):
         # a group's header band reads as its subtitle
         self.band_style = get_text_style("subtitle")
         self.highlight_color = config["font_general_color"]
-        # top-level records largest first; one palette color each, by label
+        # top-level records largest first; one palette color each, keyed by
+        # label in input order, so a change in size never recolors a group
         self.groups = sorted(self.records, key=treemap_record_total, reverse=True)
         cycle = create_color_cycle(config["color_general_multiple"], len(self.groups))
         self.group_colors = {
-            record["label"]: cycle[i]["color"] for i, record in enumerate(self.groups)
+            record["label"]: cycle[i]["color"] for i, record in enumerate(self.records)
         }
         # etching by depth in the group's pattern (ADR 0048); None keeps colors
         density = self.treemap_style.get("etch_density")
@@ -8064,7 +8083,7 @@ class TreemapLayer(Layer):
         if density and patterns and self.etch is not None:
             self.group_hatches = {
                 record["label"]: patterns[i % len(patterns)]
-                for i, record in enumerate(self.groups)
+                for i, record in enumerate(self.records)
             }
 
     def legend_handles(self):

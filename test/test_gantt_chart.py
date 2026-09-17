@@ -648,3 +648,18 @@ class TestMarksOutsideUserLimits(unittest.TestCase):
         ]
         self.assertEqual([m.get_visible() for m in markers], [False])
         self.assertNotIn("19 Feb", [t.get_text() for t in ax.texts if t.get_visible()])
+
+
+class TestStableGroupColors(unittest.TestCase):
+    """A group keeps its color whatever the row order (issue #172)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_sorting_keeps_group_colors(self):
+        def colors(figure):
+            return figure._chart_metadata["panel"].layers[0].group_colors
+
+        plain = GanttChart(schedule())
+        flipped = GanttChart(schedule(), sort=SORT.DESCENDING)
+        self.assertEqual(colors(plain), colors(flipped))

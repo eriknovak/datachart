@@ -890,3 +890,19 @@ class TestComposition(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestStableGroupColors(unittest.TestCase):
+    """A group keeps its color when the sizes reorder (issue #172)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_size_order_does_not_move_colors(self):
+        def colors(records):
+            figure = Treemap({"data": records})
+            return figure._chart_metadata["panel"].layers[0].group_colors
+
+        first = colors([rec("A", 40), rec("B", 10)])
+        second = colors([rec("A", 10), rec("B", 40)])
+        self.assertEqual(first, second)
