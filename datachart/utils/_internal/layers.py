@@ -1087,6 +1087,23 @@ def _snap_limits_to_ticks(
     return on_data
 
 
+def _widen_to_ticks(ticks: np.ndarray, lo: float, hi: float) -> Tuple[float, float]:
+    """A range widened outward to the ticks enclosing it.
+
+    An end with no tick beyond it keeps its own value. Every axis that must
+    start and end on a labelled value shares this shape.
+    """
+
+    if len(ticks) < 2:
+        return lo, hi
+    tol = float(np.min(np.diff(ticks))) * 1e-6
+    below, above = ticks[ticks <= lo + tol], ticks[ticks >= hi - tol]
+    return (
+        float(below.max()) if len(below) else lo,
+        float(above.min()) if len(above) else hi,
+    )
+
+
 def _snap_to_periods(ax, axis_name, period, tz, origin, bounds) -> None:
     """Extend the free view ends to the period edges enclosing the schedule."""
 
@@ -5788,11 +5805,7 @@ class RidgelineLayer(GroupLayer):
         lo, hi = self.shared_range or self.padded_range(log)
         locator = mticker.LogLocator() if log else mticker.AutoLocator()
         ticks = np.asarray(locator.tick_values(lo, hi), dtype=float)
-        if len(ticks) > 1:
-            tol = float(np.min(np.diff(ticks))) * 1e-6
-            below, above = ticks[ticks <= lo + tol], ticks[ticks >= hi - tol]
-            lo = float(below.max()) if len(below) else lo
-            hi = float(above.min()) if len(above) else hi
+        lo, hi = _widen_to_ticks(ticks, lo, hi)
         axis = "x" if self.is_horizontal else "y"
         low, high = self.settings.get(f"{axis}min"), self.settings.get(f"{axis}max")
         return (lo if low is None else low, hi if high is None else high)
@@ -7087,7 +7100,7 @@ class ParallelCoordsLayer(Layer):
                 if isinstance(ramp, list)
                 else get_colormap(ramp)
             )
-            # the ramp spans every record: an emphasis rule mutes, it never rescales
+            # the ramp spans every record: a rule mutes, it never rescales
             self.hue_min = float(min(non_null_hues))
             self.hue_max = float(max(non_null_hues))
             self.hue_colors = {}
@@ -7249,53 +7262,41 @@ class ParallelCoordsLayer(Layer):
                     if axis_kind(categories) == AXIS_TEMPORAL
                     else [str(cat) for cat in categories]
                 )
-                for cat, text in zip(categories, texts):
-                    tick_pos = dim_category_map[dim][cat]
-                    ax.plot(
-                        [tick_start, tick_end],
-                        [tick_pos, tick_pos],
-                        zorder=tick_zorder,
-                        **self.tick_style,
-                    )
-                    ax.text(
-                        i + label_x_offset,
-                        tick_pos,
-                        text,
-                        ha=label_ha,
-                        va="center",
-                        bbox=self.tick_label_bbox,
-                        path_effects=self.tick_label_halo,
-                        zorder=tick_zorder + 1,
-                        **self.tick_label_style,
-                    )
+                ticks = [
+                    (dim_category_map[dim][cat], text)
+                    for cat, text in zip(categories, texts)
+                ]
             else:
                 dim_range = dim_max[dim] - dim_min[dim]
+                values = stats["dim_ticks"].get(dim, []) if dim_range else []
                 # a dimension holding one value keeps a single mid-axis tick
-                ticks = stats["dim_ticks"].get(dim, []) if dim_range else []
-                positions = (
-                    [(tick - dim_min[dim]) / dim_range for tick in ticks]
-                    if ticks
-                    else [0.5]
+                ticks = (
+                    [
+                        ((value - dim_min[dim]) / dim_range, format_number(value))
+                        for value in values
+                    ]
+                    if values
+                    else [(0.5, format_number(dim_min[dim]))]
                 )
-                values = ticks if ticks else [dim_min[dim]]
-                for tick_pos, actual in zip(positions, values):
-                    ax.plot(
-                        [tick_start, tick_end],
-                        [tick_pos, tick_pos],
-                        zorder=tick_zorder,
-                        **self.tick_style,
-                    )
-                    ax.text(
-                        i + label_x_offset,
-                        tick_pos,
-                        format_number(actual),
-                        ha=label_ha,
-                        va="center",
-                        bbox=self.tick_label_bbox,
-                        path_effects=self.tick_label_halo,
-                        zorder=tick_zorder + 1,
-                        **self.tick_label_style,
-                    )
+
+            for tick_pos, text in ticks:
+                ax.plot(
+                    [tick_start, tick_end],
+                    [tick_pos, tick_pos],
+                    zorder=tick_zorder,
+                    **self.tick_style,
+                )
+                ax.text(
+                    i + label_x_offset,
+                    tick_pos,
+                    text,
+                    ha=label_ha,
+                    va="center",
+                    bbox=self.tick_label_bbox,
+                    path_effects=self.tick_label_halo,
+                    zorder=tick_zorder + 1,
+                    **self.tick_label_style,
+                )
 
 
 def _row_resolver(label, dimensions: list, row: dict) -> Callable[[int], dict]:
@@ -7308,34 +7309,21 @@ def _row_resolver(label, dimensions: list, row: dict) -> Callable[[int], dict]:
     return resolve
 
 
-def _nice_dim_span(vmin: float, vmax: float) -> Tuple[float, float, List[float]]:
-    """A numeric dimension's nice ticks, and the span they enclose its data with.
+def _nice_dim_ticks(vmin: float, vmax: float) -> Tuple[float, float, List[float]]:
+    """A numeric dimension's round tick values, and the span they enclose it with.
 
     The axis then starts and ends on a labelled round value, as a continuous
-    cartesian axis does under the tick snap. A parallel axis carries no
-    matplotlib axis of its own, so the ticks come straight from the locator.
+    cartesian axis does. A parallel axis carries no matplotlib axis of its own,
+    so the ticks come straight from the locator. A locator that offers nothing
+    to snap to leaves the axis on its data, labelled at both ends.
     """
 
     locator = MaxNLocator(nbins=5, steps=[1, 2, 2.5, 5, 10])
     ticks = np.asarray(locator.tick_values(vmin, vmax), dtype=float)
-    if len(ticks) < 2 or not np.isfinite(ticks).all():
-        return vmin, vmax, []
-    step = float(np.min(np.diff(ticks)))
-    if step <= 0:
-        return vmin, vmax, []
-    tol = step * 1e-6
-    below, above = ticks[ticks <= vmin + tol], ticks[ticks >= vmax - tol]
-    lo = (
-        float(below.max())
-        if len(below)
-        else float(ticks[0] - step * math.ceil((ticks[0] - vmin - tol) / step))
-    )
-    hi = (
-        float(above.min())
-        if len(above)
-        else float(ticks[-1] + step * math.ceil((vmax - ticks[-1] - tol) / step))
-    )
-    return lo, hi, list(np.linspace(lo, hi, int(round((hi - lo) / step)) + 1))
+    if len(ticks) < 2:
+        return vmin, vmax, [vmin, vmax]
+    lo, hi = _widen_to_ticks(ticks, vmin, vmax)
+    return lo, hi, [float(t) for t in ticks if lo <= t <= hi]
 
 
 def compute_parallel_stats(layers: List["ParallelCoordsLayer"]) -> Optional[dict]:
@@ -7428,7 +7416,7 @@ def compute_parallel_stats(layers: List["ParallelCoordsLayer"]) -> Optional[dict
         if data_min == data_max or not np.isfinite([data_min, data_max]).all():
             dim_min[dim], dim_max[dim], dim_ticks[dim] = data_min, data_max, []
         else:
-            dim_min[dim], dim_max[dim], dim_ticks[dim] = _nice_dim_span(
+            dim_min[dim], dim_max[dim], dim_ticks[dim] = _nice_dim_ticks(
                 float(data_min), float(data_max)
             )
 
