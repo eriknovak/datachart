@@ -363,6 +363,13 @@ class TestGanttPeriods(unittest.TestCase):
     def span(self, start, end):
         return [{"task": "A", "start": start, "end": end}]
 
+    def ticks(self, figure):
+        figure.canvas.draw()
+        return [
+            mdates.num2date(t).replace(tzinfo=None)
+            for t in figure.axes[0].xaxis.get_majorticklocs()
+        ]
+
     def test_date_ticks_run_from_the_first_start_to_the_last_end(self):
         figure = GanttChart(self.span(date(2024, 3, 4), date(2024, 3, 24)))
         figure.canvas.draw()
@@ -379,7 +386,82 @@ class TestGanttPeriods(unittest.TestCase):
         ]
         self.assertEqual(ticks[0], date(2024, 1, 15))
         self.assertEqual(ticks[-1], date(2026, 1, 15))
-        self.assertTrue(all(t.day == 15 for t in ticks))
+        self.assertTrue(all(t.day == 1 for t in ticks[1:-1]))
+
+    def test_month_ticks_fall_on_the_first_of_the_month(self):
+        ticks = self.ticks(GanttChart(self.span(date(2024, 1, 3), date(2024, 9, 20))))
+        self.assertEqual(ticks[0], datetime(2024, 1, 3))
+        self.assertEqual(ticks[-1], datetime(2024, 9, 20))
+        interior = ticks[1:-1]
+        self.assertGreater(len(interior), 1)
+        self.assertTrue(all(t.day == 1 for t in interior), interior)
+        self.assertEqual(len({t.month for t in interior}), len(interior))
+
+    def test_sub_day_schedule_ticks_hourly(self):
+        ticks = self.ticks(
+            GanttChart(self.span(datetime(2024, 3, 4, 9), datetime(2024, 3, 4, 17)))
+        )
+        self.assertEqual(ticks, [datetime(2024, 3, 4, h) for h in range(9, 18)])
+        minutes = self.ticks(
+            GanttChart(self.span(datetime(2024, 3, 4, 9), datetime(2024, 3, 4, 10)))
+        )
+        self.assertEqual(minutes[0], datetime(2024, 3, 4, 9))
+        self.assertEqual(minutes[-1], datetime(2024, 3, 4, 10))
+        self.assertGreater(len(minutes), 2)
+        self.assertEqual(
+            {round((b - a).total_seconds()) for a, b in zip(minutes, minutes[1:])},
+            {600},
+        )
+
+    def test_long_month_steps_fall_on_calendar_quarters_and_years(self):
+        years = self.ticks(GanttChart(self.span(date(2024, 2, 3), date(2031, 12, 20))))
+        self.assertTrue(all((t.month, t.day) == (1, 1) for t in years[1:-1]), years)
+        quarters = self.ticks(
+            GanttChart(self.span(date(2024, 2, 3), date(2025, 12, 20)))
+        )
+        self.assertTrue(all(t.month in (1, 4, 7, 10) for t in quarters[1:-1]))
+
+    def test_month_step_labels_name_months_and_years(self):
+        figure = GanttChart(self.span(date(2024, 2, 3), date(2031, 12, 20)))
+        figure.canvas.draw()
+        axis = figure.axes[0].xaxis
+        labels = [t.get_text() for t in axis.get_ticklabels()]
+        self.assertEqual(labels[1:-1], [str(y) for y in range(2025, 2032)])
+        self.assertEqual(axis.get_major_formatter().get_offset(), "")
+        figure = GanttChart(self.span(date(2024, 1, 3), date(2024, 9, 20)))
+        figure.canvas.draw()
+        axis = figure.axes[0].xaxis
+        labels = [t.get_text() for t in axis.get_ticklabels()]
+        self.assertEqual(labels[1:-1], ["Mar", "May", "Jul"])
+        self.assertEqual(axis.get_major_formatter().get_offset(), "2024")
+
+    def test_short_and_hour_filled_schedules_keep_their_ticks(self):
+        tiny = self.ticks(
+            GanttChart(
+                self.span(datetime(2024, 3, 4, 9), datetime(2024, 3, 4, 9, 0, 20))
+            )
+        )
+        self.assertEqual(tiny[0], datetime(2024, 3, 4, 9))
+        self.assertEqual(len(tiny), 2)
+        tasks = [
+            {
+                "task": "A",
+                "start": datetime(2024, 3, 4),
+                "end": datetime(2024, 3, 4, 9),
+            },
+            {
+                "task": "B",
+                "start": datetime(2024, 3, 4, 9),
+                "end": datetime(2024, 3, 5),
+            },
+        ]
+        self.assertGreater(len(self.ticks(GanttChart(tasks))), 2)
+
+    def test_date_only_schedules_keep_day_steps(self):
+        ticks = self.ticks(GanttChart(self.span(date(2024, 3, 4), date(2024, 3, 6))))
+        self.assertEqual(
+            ticks, [datetime(2024, 3, 4), datetime(2024, 3, 5), datetime(2024, 3, 6)]
+        )
 
     def test_period_view_covers_whole_periods(self):
         ax = GanttChart(

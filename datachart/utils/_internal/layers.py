@@ -14,7 +14,7 @@ import json
 import math
 import warnings
 from collections import defaultdict
-from datetime import date, datetime, timedelta, tzinfo
+from datetime import date, datetime, time, timedelta, tzinfo
 from numbers import Real
 from dataclasses import dataclass
 from itertools import cycle as iter_cycle
@@ -591,6 +591,8 @@ def _tick_formatter(fmt, temporal: bool, locator=None, tz=None):
 
     if temporal:
         if _auto_format(fmt):
+            if isinstance(locator, ScheduleTicks):
+                return ScheduleDateFormatter(locator, tz=tz)
             return mdates.ConciseDateFormatter(locator, tz=tz)
         return mdates.DateFormatter(fmt, tz=tz)
     if _auto_format(fmt):
@@ -676,6 +678,10 @@ class ProjectPeriodEdges(mticker.Locator):
 
 # a schedule's date ticks: at most this many regular steps from the first start
 SCHEDULE_TICKS_MAX = 8
+# sub-day steps in days: 1, 2, 5, 10, 15, 30 minutes; 1, 2, 3, 4, 6, 12 hours
+SCHEDULE_TICK_SUBDAY = tuple(m / 1440 for m in (1, 2, 5, 10, 15, 30)) + tuple(
+    h / 24 for h in (1, 2, 3, 4, 6, 12)
+)
 SCHEDULE_TICK_DAYS = (1, 2, 3, 4, 5, 7, 14, 21, 28)
 SCHEDULE_TICK_MONTHS = (1, 2, 3, 4, 6, 12, 24, 60)
 
@@ -683,25 +689,31 @@ SCHEDULE_TICK_MONTHS = (1, 2, 3, 4, 6, 12, 24, 60)
 class ScheduleTicks(mticker.Locator):
     """Date ticks from a schedule's first start to its last end (ADR 0049).
 
-    The ticks step regularly from the first start, in whole days or months,
-    and the last end is always a tick; a regular tick within half a step of
-    it gives way, so the two never crowd.
+    Minute, hour, and day steps run regularly from the first start; minutes
+    and hours only when the schedule carries times. Month steps fall on the
+    first of the calendar months the step divides (quarters, years). The
+    first start and the last end are always ticks; a regular tick within
+    half a step of either gives way, so they never crowd.
     """
 
-    def __init__(self, start: float, end: float, tz=None):
-        self.start, self.end, self.tz = start, end, tz
+    def __init__(self, start: float, end: float, tz=None, timed: bool = False):
+        self.start, self.end, self.tz, self.timed = start, end, tz, timed
+        # the month step of the last ticks; None when they step in days or less
+        self.months = None
 
     def tick_values(self, vmin, vmax):
         span = self.end - self.start
         if span <= 0:
             return [self.start]
-        # the finest day step that keeps the count, preferring one that
-        # divides the span so the last interval is no shorter than the rest
-        fitting = [d for d in SCHEDULE_TICK_DAYS if span / d <= SCHEDULE_TICKS_MAX]
-        even = [d for d in fitting if span % d == 0]
+        steps = (SCHEDULE_TICK_SUBDAY if self.timed else ()) + SCHEDULE_TICK_DAYS
+        # the finest step that keeps the count, preferring one that divides
+        # the span so the last interval is no shorter than the rest
+        fitting = [d for d in steps if span / d <= SCHEDULE_TICKS_MAX]
+        even = [d for d in fitting if np.isclose(span / d, round(span / d))]
         step = (even or fitting or [None])[0]
+        self.months = None
         if step is not None:
-            ticks = list(np.arange(self.start, self.end, step))
+            regular = (self.start + k * step for k in range(1, round(span / step)))
         else:
             months = next(
                 (
@@ -711,20 +723,71 @@ class ScheduleTicks(mticker.Locator):
                 ),
                 SCHEDULE_TICK_MONTHS[-1],
             )
-            step = months * 30.4
-            origin = mdates.num2date(self.start, tz=self.tz)
-            ticks, k = [], 0
-            while (
-                tick := mdates.date2num(origin + relativedelta(months=months * k))
-            ) < self.end:
+            self.months, step = months, months * 30.4
+            regular = self._month_starts(months)
+        ticks = [self.start]
+        for tick in regular:
+            if tick >= self.end - step / 2:
+                break
+            if tick - self.start >= step / 2:
                 ticks.append(tick)
-                k += 1
-        if ticks and self.end - ticks[-1] < step / 2:
-            ticks.pop()
         return ticks + [self.end]
+
+    def _month_starts(self, months: int):
+        """The 1sts of every `months`-th calendar month from the start's on."""
+
+        start = mdates.num2date(self.start, tz=self.tz)
+        # counted from year 0, so 3 months lands on quarters and 12 on Januaries
+        index = -(-(start.year * 12 + start.month - 1) // months) * months
+        while True:
+            year, month = divmod(index, 12)
+            yield mdates.date2num(
+                start.replace(
+                    year=year,
+                    month=month + 1,
+                    day=1,
+                    hour=0,
+                    minute=0,
+                    second=0,
+                    microsecond=0,
+                )
+            )
+            index += months
 
     def __call__(self):
         return self.tick_values(*sorted(self.axis.get_view_interval()))
+
+
+class ScheduleDateFormatter(mdates.ConciseDateFormatter):
+    """Concise schedule labels where month-step ticks on January 1 read the year.
+
+    The concise formatter labels at the level the first start and last end
+    differ in (days), so it would print every January as "Jan"; the offset
+    then names one year only when all ticks fall in it.
+    """
+
+    def __init__(self, locator: ScheduleTicks, tz=None):
+        super().__init__(locator, tz=tz)
+        self.schedule = locator
+        self.year_offset = None
+
+    def format_ticks(self, values):
+        labels = super().format_ticks(values)
+        self.year_offset = None
+        if self.schedule.months is None or len(values) < 3:
+            return labels
+        dates = mdates.num2date(values, tz=self._tz)
+        for i in range(1, len(dates) - 1):
+            if (dates[i].month, dates[i].day) == (1, 1):
+                labels[i] = str(dates[i].year)
+        years = {d.year for d in dates}
+        self.year_offset = "" if len(years) > 1 else str(dates[0].year)
+        return labels
+
+    def get_offset(self):
+        if self.year_offset is None:
+            return super().get_offset()
+        return self.year_offset
 
 
 def _period_edges(period: str, tz=None, origin=None) -> mticker.Locator:
@@ -1189,6 +1252,19 @@ def _resolve_texts(chart: dict) -> List[tuple]:
     return resolved
 
 
+def _data_point(ax: plt.Axes, point) -> tuple:
+    """A data position in axis units, so dates and categories can transform.
+
+    An axis without units keeps the raw value: converting would install a
+    converter that disagrees with the positions its marks already use.
+    """
+
+    return tuple(
+        axis.convert_units(value) if axis.have_units() else value
+        for axis, value in zip((ax.xaxis, ax.yaxis), point)
+    )
+
+
 def _draw_texts(
     ax: plt.Axes, texts: List[tuple], data_ax: plt.Axes = None, clearance=None
 ) -> None:
@@ -1220,6 +1296,8 @@ def _draw_texts(
         # the host and its twin share the axes rectangle, so axes fractions
         # need no owner transform
         textcoords = data_ax.transData if coords == "data" else "axes fraction"
+        if coords == "data":
+            x, y = _data_point(data_ax, (x, y))
 
         kwargs = dict(style["font"])
         kwargs["zorder"] = TEXT_ANNOTATION_ZORDER
@@ -1230,10 +1308,11 @@ def _draw_texts(
         if target is None:
             ax.annotate(content, xy=(x, y), xycoords=textcoords, **kwargs)
             continue
+        target = _data_point(data_ax, target)
 
         text_tr = data_ax.transData if coords == "data" else ax.transAxes
         start = np.asarray(text_tr.transform((x, y)), dtype=float)
-        end = np.asarray(data_ax.transData.transform(tuple(target)), dtype=float)
+        end = np.asarray(data_ax.transData.transform(target), dtype=float)
         length = np.hypot(*(end - start)) - TEXT_BOX_PAD
 
         # a connector shorter than the gaps that frame it is pure noise
@@ -1260,7 +1339,7 @@ def _draw_texts(
         # box border (flush at gap 0, the TOUCHING look)
         ax.annotate(
             content,
-            xy=tuple(target),
+            xy=target,
             xycoords=data_ax.transData,
             xytext=(x, y),
             textcoords=textcoords,
@@ -10769,15 +10848,16 @@ class Panel:
             )
 
         # bump periods are discrete: one tick per period, none between, when
-        # the user gave no ticks and the periods are numbers (dates keep theirs)
+        # the user gave no ticks and the periods are numbers or categories
+        # (dates keep theirs)
         if (
             layers
             and all(isinstance(l, BumpLayer) for l in layers)
             and self.temporal_axis is None
             and all(l.chart.get("xticks") is None for l in layers)
         ):
-            periods = np.unique(
-                np.concatenate([np.asarray(l.x_values(), float) for l in layers])
+            periods = np.concatenate(
+                [_axis_numbers(ax, horizontal, l.x_values()) for l in layers]
             )
             (ax.yaxis if horizontal else ax.xaxis).set_major_locator(
                 PeriodTicks(periods)
@@ -11152,7 +11232,13 @@ class Panel:
         """A gantt panel's date ticks: first start to last end, regular between."""
 
         bounds = self._schedule_bounds()
-        return None if bounds is None else ScheduleTicks(*bounds, tz)
+        if bounds is None:
+            return None
+        ends = np.concatenate(
+            [np.concatenate([l.starts, l.starts + l.durations]) for l in self.layers]
+        )
+        timed = any(d.time() != time() for d in mdates.num2date(ends, tz=tz))
+        return ScheduleTicks(*bounds, tz, timed)
 
     def _project_origin(self, tz):
         """The project start: `xmin` when given, else the earliest task start."""

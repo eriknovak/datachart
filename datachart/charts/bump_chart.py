@@ -117,9 +117,11 @@ def BumpChart(
     A bump chart shows rank over time: one line per series, rank 1 at the top,
     a marker at every period, and the series named at the line's end in place
     of a y-axis. Use it for league tables, popularity, or market-share rankings,
-    where the order matters more than the gaps between values. For the values
-    themselves use [`LineChart`][datachart.charts.LineChart]; for a single
-    period's order use [`BarChart`][datachart.charts.BarChart] with `sort`.
+    where the order matters more than the gaps between values. Periods may be
+    numbers, dates, or strings; strings draw as categories in first-seen order.
+    For the values themselves use [`LineChart`][datachart.charts.LineChart];
+    for a single period's order use [`BarChart`][datachart.charts.BarChart]
+    with `sort`.
 
     !!! info "Added in Unreleased"
 
