@@ -502,3 +502,31 @@ class TestDumbbellComposition(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestSharedSortOrder(unittest.TestCase):
+    """Subplots sharing the category axis take the first one's order (#187)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_sharey_sort_follows_the_first_subplot(self):
+        second = [
+            {"label": "A", "start": 0.0, "end": 1.0},
+            {"label": "B", "start": 0.0, "end": 9.0},
+            {"label": "C", "start": 0.0, "end": 5.0},
+        ]
+        figure = DumbbellChart(
+            data=[records(), second],
+            subplots=True,
+            sharey=True,
+            sort="descending",
+            sort_by="end",
+        )
+        figure.canvas.draw()
+        # the first subplot sorts C (9), A (7), B (4); the shared labels are its
+        self.assertEqual(category_labels(figure.axes[0]), ["C", "A", "B"])
+        # the second subplot draws its rows in that order: C, A, B
+        offsets = dots(figure.axes[1])[-1].get_offsets()
+        self.assertEqual(offsets[:, 0].tolist(), [5.0, 1.0, 9.0])
+        self.assertEqual(offsets[:, 1].tolist(), [1.0, 2.0, 3.0])

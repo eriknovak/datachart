@@ -4550,8 +4550,9 @@ DUMBBELL_SORT_KEYS = {
 def sort_dumbbell_charts(charts: List[dict], settings: dict) -> List[dict]:
     """The charts with their records in `sort` order by `sort_by` (ADR 0050).
 
-    Each chart sorts on its own; overlaid charts share the first one's rows.
-    Ties keep input order.
+    Each chart sorts on its own; overlaid charts share the first one's rows,
+    and so do subplots sharing the category axis, whose one set of tick
+    labels must name every subplot's rows. Ties keep input order.
     """
 
     sort = validate_sort(settings.get("sort"))
@@ -4559,13 +4560,22 @@ def sort_dumbbell_charts(charts: List[dict], settings: dict) -> List[dict]:
     if sort is None:
         return charts
     sign = -1 if sort == SORT.DESCENDING else 1
-    return [
-        {
-            **chart,
-            "data": sorted(dumbbell_records(chart), key=lambda r: sign * key(r)),
-        }
-        for chart in charts
+    ranked = [
+        sorted(dumbbell_records(chart), key=lambda r: sign * key(r)) for chart in charts
     ]
+    horizontal = (
+        settings.get("orientation") or DEFAULT_ORIENTATION
+    ) == ORIENTATION.HORIZONTAL
+    if settings.get("subplots") and settings.get("sharey" if horizontal else "sharex"):
+        order = {}
+        for records in ranked:
+            for record in records:
+                order.setdefault(record["label"], len(order))
+        # a stable sort: a label the first chart lacks keeps its own rank
+        ranked = [
+            sorted(records, key=lambda r: order[r["label"]]) for records in ranked
+        ]
+    return [{**chart, "data": records} for chart, records in zip(charts, ranked)]
 
 
 # how far a composed dumbbell's start dot fades toward white from its end dot
