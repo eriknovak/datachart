@@ -12112,6 +12112,8 @@ def build_chart_panel_settings(
         # histograms stack by default; bars group (ADR 0014)
         "bar_mode": settings.get("bar_mode")
         or ("stack" if chart_type == "histogram" else "group"),
+        # the caller's own mode, unresolved, for a panel to adopt (ADR 0005)
+        "source_bar_mode": settings.get("bar_mode"),
         "tighten_xlim": chart_type in ("linechart", "stackedareachart", "bumpchart"),
         # validated here so a bad value fails at the front, like the emphasis roles
         "baseline": validate_baseline(settings.get("baseline")),

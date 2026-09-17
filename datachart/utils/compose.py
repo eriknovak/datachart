@@ -240,10 +240,10 @@ def Panel(
 
     Panel figures nest: ``Panel([Panel([f1, f2]), f3])`` is equivalent to
     ``Panel([f1, f2, f3])``, to any depth. A nested panel contributes its
-    figures with their per-figure options and axis scales intact, while the
-    other panel-level settings (title, labels, limits, ...) always come from
-    the outermost call. Dict options on a nested panel override its
-    per-figure options only when explicitly given.
+    figures with their per-figure options, axis scales and ``bar_mode``
+    intact, while the other panel-level settings (title, labels, limits, ...)
+    always come from the outermost call. Dict options on a nested panel
+    override its per-figure options only when explicitly given.
 
     !!! info "Added in v0.8.0"
 
@@ -342,7 +342,8 @@ def Panel(
             polar panel, which has no secondary axis.
         bar_mode: How bar and histogram series share the axis: "group" (side-by-side
             bars; histograms overlay), "stack" (stacked), or "overlay" (overlapping).
-            Default is taken from config (overlay_bar_mode, default "group"). See
+            Default: the mode of the first figure that was built with one, then
+            the config (overlay_bar_mode, default "group"). See
             [`BAR_MODE`][datachart.constants.BAR_MODE].
 
     Returns:
@@ -369,8 +370,6 @@ def Panel(
 
     if auto_secondary_axis is None:
         auto_secondary_axis = config.get("overlay_auto_threshold", 3.0)
-    if bar_mode is None:
-        bar_mode = config.get("overlay_bar_mode", "group")
     theme_grid = show_grid is None
     if theme_grid:
         show_grid = config.get("chart_default_show_grid")
@@ -393,6 +392,20 @@ def Panel(
                 )
             )
 
+    source_settings = [
+        item["figure"]._chart_metadata["panel"].settings for item in items
+    ]
+    # the first source figure that set a bar mode of its own lends it to the
+    # panel; the caller's own `bar_mode` still wins, the config is the floor
+    source_bar_mode = next(
+        (s.get("source_bar_mode") for s in source_settings if s.get("source_bar_mode")),
+        None,
+    )
+    # what this panel lends on in turn: what was chosen, never the config floor
+    chosen_bar_mode = bar_mode or source_bar_mode
+    if bar_mode is None:
+        bar_mode = source_bar_mode or config.get("overlay_bar_mode", "group")
+
     # the panel takes literal x/y keys; the orientation (raises on a mix) maps
     # them, and the projection (also raising on a mix) picks the axes kind
     probe = _PanelSeam(groups)
@@ -413,6 +426,8 @@ def Panel(
         "warn_thin_bars": config.get("overlay_warn_thin_bars", True),
         "warn_scale_conflict": config.get("overlay_warn_scale_conflict", True),
         "bar_mode": bar_mode,
+        # a nested panel lends the mode it was given, not the config floor
+        "source_bar_mode": chosen_bar_mode,
         "bar_ticks": "group",
         "bar_width": config.get("plot_bar_width", 0.8),
         "bar_overlay_alpha": config.get("overlay_bar_alpha", 0.7),
@@ -450,9 +465,6 @@ def Panel(
         "scaley_right": scaley_right,
     }
 
-    source_settings = [
-        item["figure"]._chart_metadata["panel"].settings for item in items
-    ]
     # the x-axis hugs the data only when every source figure hugs it too
     panel_settings["tighten_xlim"] = all(s.get("tighten_xlim") for s in source_settings)
     # the first source figure that formats an axis' ticks formats the panel's
