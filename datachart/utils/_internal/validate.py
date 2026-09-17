@@ -165,14 +165,14 @@ def validate_value_step(step):
 def validate_contour_levels(levels) -> List[float]:
     """Validate an explicit contour level list; returns it sorted and deduplicated."""
 
-    values = list(levels)
+    values = list(levels) if np.iterable(levels) else []
     if not values or not all(
         isinstance(v, Real) and not isinstance(v, bool) and math.isfinite(v)
         for v in values
     ):
         raise ValueError(
             f"Invalid contour `levels` list {levels!r}. "
-            "Must hold at least one finite number."
+            "Must be a list holding at least one finite number."
         )
     return sorted({float(v) for v in values})
 

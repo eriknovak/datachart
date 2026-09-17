@@ -44,11 +44,10 @@ next layer lands on a known rung.
   line marks a threshold on top of the data, so it sits above every mark
   default (3) and below annotations (5). ADR 0036 made the band zorder a
   theme key because moving a band in front of the data is a real need; no
-  such need exists for a line, which is already on top. A per-line `zorder`
-  in its style still wins.
+  such need exists for a line, which is already on top.
 - **Standalone defaults stay.** `plot_area_zorder` and `plot_contour_zorder`
   stay 3; outside an overlay nothing else competes with them except the
-  reference lines, which now sit above them. An explicit `z_order` per figure
+  reference lines, which sit above them. An explicit `z_order` per figure
   in `Panel` still beats the table.
 
 ## Considered options

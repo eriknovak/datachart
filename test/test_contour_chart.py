@@ -418,10 +418,11 @@ class TestContourLevels(unittest.TestCase):
 
     def test_contour_levels_sorts_and_dedupes_a_list(self):
         self.assertEqual(contour_levels(self._surface(), [20, 5, 20, 10]), [5, 10, 20])
+        self.assertEqual(contour_levels(self._surface(), np.array([2, 1])), [1, 2])
         self.assertEqual(contour_levels(self._surface(), 6), 6)
 
     def test_contour_levels_rejects_an_invalid_list(self):
-        for levels in ([], [1, "a"], [1, None], [1, float("nan")]):
+        for levels in ([], [1, "a"], [1, None], [1, float("nan")], 4.0):
             with self.subTest(levels=levels):
                 with self.assertRaisesRegex(ValueError, "contour `levels`"):
                     contour_levels(self._surface(), levels)

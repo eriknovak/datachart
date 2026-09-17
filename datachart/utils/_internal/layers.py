@@ -6064,12 +6064,14 @@ def contour_levels(
         ValueError: If the rule is not one of `CONTOUR_LEVELS`, or the list
             is empty or holds a non-finite or non-numeric value.
     """
-    if rule is None or rule == CONTOUR_LEVELS.AUTO:
+    if rule is None:
         return None
     if isinstance(rule, (int, np.integer)) and not isinstance(rule, bool):
         return rule
     if not isinstance(rule, str):
         return validate_contour_levels(rule)
+    if rule == CONTOUR_LEVELS.AUTO:
+        return None
     if rule not in (CONTOUR_LEVELS.RICE, CONTOUR_LEVELS.FD):
         raise ValueError(
             f"Invalid contour `levels` rule {rule!r}. Must be one of "
@@ -6125,7 +6127,7 @@ class ContourLayer(Layer):
     def _coverage(self) -> tuple:
         """How filled bands reach past explicit levels, and every band's edges.
 
-        A surface beyond the list's ends fills in the end colours; each such
+        A surface beyond the list's ends fills in the end colors; each such
         overflow band spans from the end level to the surface extreme.
         """
 
