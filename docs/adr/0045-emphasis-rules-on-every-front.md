@@ -52,6 +52,11 @@ hexbin, and fixes per family what the rule selects and what number it reads
   one small, closed key rather than a second mechanism.
 - *Scatter emphasis per point.* Rejected: scatter emphasis is per series
   today, and changing its unit would break every existing call.
+  Amended (issues #204, #219): scatter and swarm records gain an optional
+  `emphasis` key, additive to the series or group role — the rule's unit is
+  unchanged. A record's own key wins over its series or group role, whether
+  explicit or filled by the rule; a role set on the figure in `Panel` wins
+  over the record.
 - *Parallel coords reading its first dimension.* Rejected: dimensions have
   unrelated scales and order, so "first" is arbitrary. `hue` is the column
   the caller already chose to colour rows by.
