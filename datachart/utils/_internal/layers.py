@@ -7071,13 +7071,7 @@ class ParallelCoordsLayer(Layer):
             for d in chart.get("data", []):
                 all_hues.append(d.get(hue_attr, None))
 
-        # background rows are muted: they claim no hue color and no legend entry
-        non_bg_hues = [
-            h
-            for h, role in zip(all_hues, self.row_emphasis)
-            if role != EMPHASIS_BACKGROUND
-        ]
-        non_null_hues = [h for h in non_bg_hues if h is not None]
+        non_null_hues = [h for h in all_hues if h is not None]
         self.continuous_hue = bool(non_null_hues) and all(
             isinstance(h, (int, float)) and not isinstance(h, bool)
             for h in non_null_hues
@@ -7093,6 +7087,7 @@ class ParallelCoordsLayer(Layer):
                 if isinstance(ramp, list)
                 else get_colormap(ramp)
             )
+            # the ramp spans every record: an emphasis rule mutes, it never rescales
             self.hue_min = float(min(non_null_hues))
             self.hue_max = float(max(non_null_hues))
             self.hue_colors = {}
@@ -7100,7 +7095,14 @@ class ParallelCoordsLayer(Layer):
             self.unique_hues = []
             return
 
-        unique_hues = sorted(set(non_null_hues))
+        # background rows are muted: they claim no hue color and no legend entry
+        unique_hues = sorted(
+            {
+                h
+                for h, role in zip(all_hues, self.row_emphasis)
+                if h is not None and role != EMPHASIS_BACKGROUND
+            }
+        )
 
         if len(unique_hues) > 0:
             cycle = create_color_cycle(self.hue_palette, len(unique_hues))

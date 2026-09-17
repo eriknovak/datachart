@@ -27,6 +27,10 @@ hexbin, and fixes per family what the rule selects and what number it reads
   | Per group | box, violin, swarm, raincloud | group label | summary of the group's values |
   | Per series | line, scatter, stacked area, histogram, contour (lines) | series | summary of the series' values |
 
+- **A parallel-coords hue scale spans every record.** The continuous ramp
+  reads the whole `hue` column, background rows included; the rule mutes, it
+  does not rescale. A categorical hue still skips background rows in the color
+  assignment and the legend.
 - **Group and series rules take an optional `by` summary**: `"mean"`,
   `"median"`, `"min"`, `"max"`, `"sum"`. Groups default to `"median"`, what a
   box already draws; series default to `"mean"`. This amends ADR 0042's
