@@ -6,7 +6,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pytest
 
-from datachart.charts import BarChart, PyramidChart, RadialChart
+from datachart.charts import BarChart, BoxPlot, PyramidChart, RadialChart, ViolinPlot
 from datachart.config import config
 from datachart.constants import EMPHASIS, RADIAL_TYPE, SORT
 from datachart.utils._internal.layers import emphasis_rule_roles
@@ -15,6 +15,12 @@ from datachart.utils._internal.validate import validate_emphasis_rule, validate_
 BAR1 = [{"label": c, "y": v} for c, v in zip("ABCD", [3.0, 5.0, 4.0, 1.0])]
 BAR2 = [{"label": c, "y": v} for c, v in zip("ABCD", [2.0, 1.0, 6.0, 1.0])]
 TOTALS = {"A": 5.0, "B": 6.0, "C": 10.0, "D": 2.0}
+# group medians: A 3, B 5, C 1, D 5 (B and D tie)
+GROUPS = [
+    {"label": c, "value": m + d}
+    for c, m in zip("ABCD", [3.0, 5.0, 1.0, 5.0])
+    for d in (-1.0, 0.0, 1.0)
+]
 
 
 @pytest.fixture(autouse=True)
@@ -276,6 +282,43 @@ class TestSortBars:
         data = [dict(record) for record in BAR1]
         BarChart(data=data, sort=SORT.ASCENDING, emphasis_rule={"top": 1})
         assert data == BAR1
+
+
+class TestSortGroups:
+    @pytest.fixture(params=[BoxPlot, ViolinPlot], ids=["box", "violin"])
+    def front(self, request):
+        return request.param
+
+    def test_default_is_input_order(self, front):
+        assert tick_labels(front(GROUPS).axes[0]) == list("ABCD")
+
+    def test_ascending(self, front):
+        ax = front(GROUPS, sort=SORT.ASCENDING).axes[0]
+        assert tick_labels(ax) == list("CABD")
+
+    def test_descending_ties_keep_input_order(self, front):
+        ax = front(GROUPS, sort="descending").axes[0]
+        assert tick_labels(ax) == list("BDAC")
+
+    def test_horizontal_sort_reorders_y_ticks(self, front):
+        ax = front(GROUPS, sort=SORT.ASCENDING, orientation="horizontal").axes[0]
+        assert tick_labels(ax, "y") == list("CABD")
+
+    def test_marks_follow_their_labels(self, front):
+        ax = front(GROUPS, sort=SORT.ASCENDING, show_values=True).axes[0]
+        medians = sorted((t.xy[0], t.get_text()) for t in ax.texts)
+        assert [text for _, text in medians] == ["1", "3", "5", "5"]
+
+    def test_emphasis_aligns_with_input_order(self, front):
+        roles = [EMPHASIS.HIGHLIGHT, None, EMPHASIS.BACKGROUND, None]
+        ax = front(GROUPS, sort=SORT.ASCENDING, emphasis=roles, show_values=True)
+        # C is muted and drops its label wherever it is drawn
+        texts = [t.get_text() for t in ax.axes[0].texts]
+        assert sorted(texts) == ["3", "5", "5"]
+
+    def test_invalid_sort_raises(self, front):
+        with pytest.raises(ValueError, match="sort"):
+            front(GROUPS, sort="up")
 
 
 class TestSortPyramidAndRadial:

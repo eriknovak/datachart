@@ -25,6 +25,7 @@ from ..constants import (
     SHOW_GRID,
     ORIENTATION,
     SCALE,
+    SORT,
     VIOLIN_INNER,
     BANDWIDTH,
 )
@@ -57,6 +58,7 @@ def ViolinPlot(
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
+    sort: Optional[Union[SORT, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
@@ -148,6 +150,7 @@ def ViolinPlot(
         The `show_values`, `value_format` and `legend` parameters.
         The `vspans` and `hspans` reference bands.
         The `emphasis_rule` parameter.
+        The `sort` group order.
 
     Args:
         data: The data points for the violin plot(s). Can be a single list of data points
@@ -185,6 +188,11 @@ def ViolinPlot(
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         orientation: The orientation of the violins (vertical or horizontal).
+        sort: The order the groups are drawn in: None (input order),
+            "ascending", or "descending" by each group's median; ties keep
+            input order. One call draws one violin dataset per axes, so there
+            is no second series to key on and no `sort_by`. See
+            [`SORT`][datachart.constants.SORT].
         scaley: The y-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each chart.
         max_cols: Maximum number of columns in subplots (when subplots=True).
@@ -275,6 +283,7 @@ def ViolinPlot(
         "bandwidth": bandwidth,
         "split": split,
         "orientation": orientation,
+        "sort": sort,
         "scaley": scaley,
         "xticks_format": xticks_format,
         "yticks_format": yticks_format,

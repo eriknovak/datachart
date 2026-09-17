@@ -4258,6 +4258,10 @@ def grouped_values(chart: dict) -> dict:
 class GroupLayer(Layer):
     """A layer of labeled groups placed on the panel's category index."""
 
+    # box, violin and ridgeline fronts order their groups by median (ADR 0042)
+    sorts_by_median = False
+    sort = None
+
     def _resolve_emphasis(self, value):
         # group layers never dodge; emphasis aligns with the group labels
         if isinstance(value, list):
@@ -4267,6 +4271,8 @@ class GroupLayer(Layer):
         return validate_emphasis(value)
 
     def _resolve_style(self):
+        if self.sorts_by_median:
+            self.sort = validate_sort(self.settings.get("sort"))
         self.orientation = self.settings.get("orientation") or DEFAULT_ORIENTATION
         self.is_horizontal = self.orientation == ORIENTATION.HORIZONTAL
         # a raincloud colors its groups from the multiple palette (ADR 0021);
@@ -4317,9 +4323,21 @@ class GroupLayer(Layer):
         ]
 
     def grouped_values(self) -> dict:
-        """The layer's values keyed by label, in first-seen label order."""
+        """The layer's values keyed by label: input order, or by median."""
 
-        return grouped_values(self.chart)
+        grouped = grouped_values(self.chart)
+        if self.sort is None:
+            return grouped
+        sign = -1 if self.sort == SORT.DESCENDING else 1
+        # a stable sort: ties keep input order
+        order = sorted(grouped, key=lambda label: sign * np.median(grouped[label]))
+        return {label: grouped[label] for label in order}
+
+    def label_roles(self, panel_role: Optional[str] = None) -> dict:
+        """Label -> emphasis role; a role list aligns with the input order."""
+
+        labels = list(grouped_values(self.chart))
+        return dict(zip(labels, self._group_roles(labels, panel_role)))
 
     def labels(self) -> list:
         return list(self.grouped_values().keys())
@@ -4380,6 +4398,7 @@ class GroupLayer(Layer):
 
 class BoxLayer(GroupLayer):
     kind = "box"
+    sorts_by_median = True
 
     def _resolve_style(self):
         super()._resolve_style()
@@ -4477,7 +4496,8 @@ class BoxLayer(GroupLayer):
         self._etch(bp["boxes"])
         if self.side:
             self._clip_to_side(bp, positions)
-        roles = self._group_roles(labels, ctx.emphasis)
+        label_roles = self.label_roles(ctx.emphasis)
+        roles = [label_roles[lbl] for lbl in labels]
         self._apply_box_emphasis(bp, roles)
         if self.show_values:
             # the median is the number a reader takes from a box (ADR 0033)
@@ -5262,6 +5282,7 @@ class ViolinLayer(GroupLayer):
     """A per-label KDE body with inner marks drawn from the data."""
 
     kind = "violin"
+    sorts_by_median = True
 
     def _resolve_style(self):
         super()._resolve_style()
@@ -5320,7 +5341,7 @@ class ViolinLayer(GroupLayer):
                 f"values, found {len(split_values)}."
             )
         self.split_values = split_values
-        return list(grouped.keys()), grouped
+        return self.labels(), grouped
 
     def draw(self, ax, ctx):
         labels, grouped = self._group()
@@ -5332,7 +5353,8 @@ class ViolinLayer(GroupLayer):
         width = body_style.pop("width")
         if body_style.get("facecolor") is None:
             body_style["facecolor"] = ctx.color
-        roles = self._group_roles(labels, ctx.emphasis)
+        label_roles = self.label_roles(ctx.emphasis)
+        roles = [label_roles[label] for label in labels]
         # (split value, side): -1 draws the low half, +1 the high half, 0 both
         sides = list(zip(self.split_values, (-1, 1))) or [(None, self.side)]
         self._legend_roles = roles
@@ -5498,8 +5520,9 @@ class RidgelineLayer(GroupLayer):
 
     kind = "ridge"
 
+    sorts_by_median = True
+
     def _resolve_style(self):
-        self.sort = validate_sort(self.settings.get("sort"))
         super()._resolve_style()
         if self.settings.get("orientation") is None:
             self.orientation = ORIENTATION.HORIZONTAL
@@ -5518,17 +5541,6 @@ class RidgelineLayer(GroupLayer):
         self.show_values = False
         # subplots share one value range, set once every layer is built
         self.shared_range = None
-
-    def grouped_values(self) -> dict:
-        """The values per label, in row order: input order or by median."""
-
-        grouped = super().grouped_values()
-        if self.sort is None:
-            return grouped
-        sign = -1 if self.sort == SORT.DESCENDING else 1
-        # a stable sort: ties keep input order
-        order = sorted(grouped, key=lambda label: sign * np.median(grouped[label]))
-        return {label: grouped[label] for label in order}
 
     def padded_range(self, log: Optional[bool] = None) -> Optional[tuple]:
         """The union of the rows' padded density ranges; None without a density.
@@ -5587,9 +5599,7 @@ class RidgelineLayer(GroupLayer):
                     f"Ridge {label!r} needs at least two values to estimate a density."
                 )
 
-        # emphasis aligns with the labels in input order, whatever the sort
-        input_labels = list(super().grouped_values())
-        roles = dict(zip(input_labels, self._group_roles(input_labels, ctx.emphasis)))
+        roles = self.label_roles(ctx.emphasis)
 
         # on a log value axis the densities are estimated on log10 values
         log = ctx.value_scale == SCALE.LOG
