@@ -292,7 +292,5 @@ def ViolinPlot(
         "yticks_format": yticks_format,
     }
 
-    validate_single_dataset(
-        len(charts) if isinstance(charts, list) else 1, subplots, "violin plot"
-    )
+    validate_single_dataset(charts, "violin plot", subplots)
     return render_chart("violinplot", charts, settings)

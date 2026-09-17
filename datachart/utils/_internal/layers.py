@@ -4262,7 +4262,7 @@ class GroupLayer(Layer):
     # box, violin and ridgeline fronts order their groups by median (ADR 0042)
     sorts_by_median = False
     sort = None
-    # the drawn body a subtitle legend key copies, and the subtitle
+    # the first unmuted body and the subtitle, kept for the legend key
     legend_body = None
     legend_label = None
 
@@ -5563,7 +5563,6 @@ class RidgelineLayer(GroupLayer):
     """Per-label density ridges stacked on the category index (ADR 0047)."""
 
     kind = "ridge"
-
     sorts_by_median = True
 
     def _resolve_style(self):
@@ -10468,8 +10467,7 @@ class Panel:
             ("violin", "violin plot"),
             ("ridge", "ridgeline plot"),
         ):
-            count = sum(1 for l in self.layers if l.kind == kind)
-            validate_single_dataset(count, False, name)
+            validate_single_dataset([l for l in self.layers if l.kind == kind], name)
 
         horizontal = self.horizontal
         polar = self.projection == "polar"

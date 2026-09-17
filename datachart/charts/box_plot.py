@@ -275,7 +275,5 @@ def BoxPlot(
         "yticks_format": yticks_format,
     }
 
-    validate_single_dataset(
-        len(charts) if isinstance(charts, list) else 1, subplots, "box plot"
-    )
+    validate_single_dataset(charts, "box plot", subplots)
     return render_chart("boxplot", charts, settings)
