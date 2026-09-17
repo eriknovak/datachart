@@ -1083,14 +1083,38 @@ def _snap_to_periods(ax, axis_name, period, tz, origin, bounds) -> None:
     (ax.set_xlim if axis_name == "x" else ax.set_ylim)(lo, hi)
 
 
-def _normalize_sizes(sizes: np.ndarray, size_range: tuple) -> np.ndarray:
-    """Normalize size values to the specified (min, max) range."""
+def _normalize_sizes(
+    sizes: np.ndarray, size_range: tuple, extent: Optional[tuple] = None
+) -> np.ndarray:
+    """Map size values from `extent` (default: their own) onto the (min, max) range."""
 
     min_size, max_size = size_range
-    if sizes.max() == sizes.min():
+    lo, hi = extent if extent is not None else (sizes.min(), sizes.max())
+    if hi == lo:
         return np.full_like(sizes, (min_size + max_size) / 2, dtype=float)
-    normalized = (sizes - sizes.min()) / (sizes.max() - sizes.min())
+    normalized = (sizes - lo) / (hi - lo)
     return normalized * (max_size - min_size) + min_size
+
+
+def _size_extents(layers_on_axes) -> dict:
+    """The (min, max) of every scatter layer's size data, pooled per axes.
+
+    One bubble scale per axes, so an equal size draws equal in every hue
+    group and every composed figure.
+    """
+
+    extents = {}
+    for layer, owner_ax in layers_on_axes:
+        if not isinstance(layer, ScatterLayer):
+            continue
+        sizes = get_chart_data("size", layer.chart)
+        if sizes is None or len(sizes) == 0:
+            continue
+        lo, hi = float(np.min(sizes)), float(np.max(sizes))
+        if owner_ax in extents:
+            lo, hi = min(lo, extents[owner_ax][0]), max(hi, extents[owner_ax][1])
+        extents[owner_ax] = (lo, hi)
+    return extents
 
 
 def _resolve_ref_lines(chart: dict, key: str) -> List[tuple]:
@@ -1766,6 +1790,8 @@ class DrawContext:
     # the resolved scales of the axes the layer draws on (ADR 0041)
     value_scale: Optional[str] = None
     category_scale: Optional[str] = None
+    # the (min, max) size data every bubble on the axes maps from
+    size_extent: Optional[tuple] = None
 
 
 # ================================================
@@ -3961,9 +3987,9 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
     def value_data(self):
         return get_chart_data("y", self.chart)
 
-    def _sizes(self, size_data):
+    def _sizes(self, size_data, extent: Optional[tuple] = None):
         if size_data is not None:
-            return _normalize_sizes(size_data, self.size_range)
+            return _normalize_sizes(size_data, self.size_range, extent)
         return self.scatter_style.get("s", self.default_size)
 
     def _mark_legend_size(self, collection, size_data):
@@ -4115,8 +4141,9 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
                 )
             ]
         for mask, color, label in units:
-            # sizes normalize within each hue group
-            sizes = self._sizes(size_data[mask] if size_data is not None else None)
+            sizes = self._sizes(
+                size_data[mask] if size_data is not None else None, ctx.size_extent
+            )
             self._draw_unit(
                 ax,
                 ctx,
@@ -10533,6 +10560,11 @@ class Panel:
             figure._hover_style = self.snapshot_hover_style()
         hover_targets = figure._hover_targets
         group_axes = [ax_right if a == "right" else ax for a in assignments]
+        size_extents = _size_extents(
+            (layer, target_ax)
+            for group, target_ax in zip(self.groups, group_axes)
+            for layer in group.layers
+        )
         # scales resolve before drawing: a log axis rejects its data up front
         scales = self._resolve_scales(ax_right, group_axes)
         self._validate_log_scales(scales, group_axes, ax_right)
@@ -10608,6 +10640,7 @@ class Panel:
                     aspect_locked=aspect_locked,
                     value_scale=value_scale,
                     category_scale=category_scale,
+                    size_extent=size_extents.get(target_ax),
                 )
                 layer.draw(target_ax, ctx)
                 hover_targets.extend(layer.take_hover_targets())
