@@ -306,6 +306,12 @@ EXPECTED_CHANGES = {
     "matrix_lower_only",
     "matrix_kde_correlation_regression",
     "matrix_blank_diagonal_grid",
+    # reference lines draw over the marks (ADR 0054)
+    "line_vlines_hlines",
+    # new filled-surface cases: log hexbin, level overflow, surface order
+    "hexbin_log_scales",
+    "contour_levels_overflow",
+    "contour_filled_panel_line_ref",
 }
 
 
@@ -1857,6 +1863,32 @@ def hexbin_grid():
     data["c"] = [x + y for x, y in zip(data["x"], data["y"])]
     right = HexbinChart(data=data, reduce=HEXBIN_REDUCE.MAX, title="max c")
     return Grid([[top], [line, right]], figsize=(10, 7))
+
+
+@case
+def hexbin_log_scales():
+    rng = np.random.RandomState(4)
+    xy = np.exp(rng.normal(0, 1, (3000, 2)))
+    data = {"x": xy[:, 0].tolist(), "y": xy[:, 1].tolist()}
+    return HexbinChart(data=data, scalex="log", scaley="log", gridsize=20)
+
+
+def contour_bowl(n=40):
+    x = np.linspace(-3, 3, n)
+    X, Y = np.meshgrid(x, x)
+    return {"x": x.tolist(), "y": x.tolist(), "z": (X**2 + Y**2).tolist()}
+
+
+@case
+def contour_levels_overflow():
+    return ContourChart(data=contour_bowl(), filled=True, levels=[2, 4, 6, 8])
+
+
+@case
+def contour_filled_panel_line_ref():
+    bowl = ContourChart(data=contour_bowl(), filled=True, hlines={"y": 1})
+    line = LineChart(data=[{"x": x, "y": x / 2} for x in np.linspace(-3, 3, 13)])
+    return Panel([bowl, line], title="surface under the line")
 
 
 def stack_series(seed=3, n=12, k=3):
