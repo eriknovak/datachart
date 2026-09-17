@@ -283,3 +283,19 @@ class TestComposition(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestStableNodeColors(unittest.TestCase):
+    """A node keeps its color whatever the column order (issue #172)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_node_order_does_not_move_colors(self):
+        def colors(nodes):
+            figure = SankeyChart(
+                {"links": CHAIN[:1] + [link("a", "c", 1)]}, nodes=nodes
+            )
+            return figure._chart_metadata["panel"].layers[0].node_colors
+
+        self.assertEqual(colors([["a"], ["b", "c"]]), colors([["a"], ["c", "b"]]))

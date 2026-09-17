@@ -274,3 +274,31 @@ class TestStackedAreaChart(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestSharedReferences(unittest.TestCase):
+    """One reference dict draws once per axes (issue #171)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_single_hline_is_one_legend_entry(self):
+        fig = StackedAreaChart(
+            data=DATA,
+            subtitle=["a", "b", "c"],
+            hlines={"y": 3, "label": "cap"},
+            texts={"x": 1, "y": 5, "text": "note"},
+            show_legend=True,
+        )
+        ax = fig.axes[0]
+        labels = [t.get_text() for t in ax.get_legend().get_texts()]
+        self.assertEqual(labels.count("cap"), 1)
+        self.assertEqual([t.get_text() for t in ax.texts].count("note"), 1)
+
+    def test_per_series_list_draws_per_series(self):
+        fig = StackedAreaChart(
+            data=DATA,
+            hlines=[{"y": 1, "label": "a"}, {"y": 2, "label": "b"}, {"y": 3}],
+        )
+        lines = [c for c in fig.axes[0].collections if c.get_label() in "ab"]
+        self.assertEqual(len(lines), 2)

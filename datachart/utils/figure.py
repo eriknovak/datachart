@@ -19,6 +19,7 @@ from matplotlib.gridspec import GridSpec, SubplotSpec
 from ..constants import FIG_FORMAT
 from ._internal.config_helpers import configure_labels, get_text_style
 from ._internal.figures import new_figure
+from ._internal.plot_engine import SUBPLOT_FURNITURE_KEYS
 
 # =====================================
 # Helper functions
@@ -48,8 +49,9 @@ def _figure_stem(path: str) -> str:
 def _cell_content(figure: plt.Figure, idx: int) -> Dict[str, Any]:
     """Build one transport cell's content from a figure's metadata.
 
-    Returns one of: `{"grid": node}` for a nested grid figure, `{"panels", "shape"}`
-    for a multi-subplot figure, or `{"panel": Panel}` for everything else.
+    Returns `{"grid": node}` for a nested grid figure or a multi-subplot
+    figure, whose subplots rebuild as a grid node with the figure's title,
+    axis labels, and sharing, or `{"panel": Panel}` for everything else.
     """
     if not hasattr(figure, "_chart_metadata"):
         raise ValueError(
@@ -73,11 +75,27 @@ def _cell_content(figure: plt.Figure, idx: int) -> Dict[str, Any]:
 
     subplot_panels = metadata.get("panels")
     if panel.layers and subplot_panels and len(subplot_panels) > 1:
-        return {
-            "panels": subplot_panels,
-            "shape": metadata.get("shape", (1, len(subplot_panels))),
-        }
+        return {"grid": _subplot_node(metadata, subplot_panels)}
     return {"panel": panel}
+
+
+def _subplot_node(metadata: Dict[str, Any], panels: List[Any]) -> Dict[str, Any]:
+    """A multi-subplot figure's metadata as a grid node, one cell per subplot."""
+    shape = metadata.get("shape", (1, len(panels)))
+    ncols = shape[1]
+    cells = [
+        {
+            "panel": panel,
+            "spec": {"row": i // ncols, "col": i % ncols, "rowspan": 1, "colspan": 1},
+        }
+        for i, panel in enumerate(panels)
+    ]
+    return {
+        "type": "grid",
+        "cells": cells,
+        "shape": shape,
+        **{key: metadata.get(key) for key in SUBPLOT_FURNITURE_KEYS},
+    }
 
 
 def _render_cell(owner: plt.Figure, cell: Dict[str, Any], target_ax: plt.Axes) -> None:
@@ -86,13 +104,6 @@ def _render_cell(owner: plt.Figure, cell: Dict[str, Any], target_ax: plt.Axes) -
         subplot_spec = target_ax.get_subplotspec()
         target_ax.remove()
         _render_grid_node(owner, cell["grid"], subplot_spec)
-        return
-
-    # a multi-subplot figure rebuilds its subplot arrangement in the cell
-    if cell.get("panels"):
-        subplot_spec = target_ax.get_subplotspec()
-        target_ax.remove()
-        _render_subplot_panels(owner, cell["panels"], cell["shape"], subplot_spec)
         return
 
     # each cell's axes carries its panel's projection; polar cells swap
@@ -116,8 +127,8 @@ def _render_subplot_panels(
     """Draw a multi-subplot figure's per-subplot panels into `subplot_spec`.
 
     The panels fill a `shape` subgrid of the spec in render order, each on
-    its own axes with its own projection; `Grid` cells and `Annotate` both
-    rebuild a subplot figure this way.
+    its own axes with its own projection; `Annotate` redraws a subplot
+    figure this way, while a `Grid` cell rebuilds it as a grid node.
     """
     nrows, ncols = shape
     sub_gs = subplot_spec.subgridspec(nrows, ncols)
@@ -228,12 +239,8 @@ def _render_grid_node(
         if "grid" in cell:
             _render_grid_node(owner, cell["grid"], cell_spec)
             continue
-        # a multi-subplot cell's spanning axes is removed during render — it
-        # must neither anchor nor join the share group (dead-axes crash);
-        # polar cells swap their axes and share no cartesian limits either
-        shareable = "panels" not in cell and (
-            not cell["panel"].layers or cell["panel"].projection != "polar"
-        )
+        # polar cells swap their axes and share no cartesian limits
+        shareable = not cell["panel"].layers or cell["panel"].projection != "polar"
         keys = {
             axis: share_key(node[f"share{axis}"], layout) if shareable else None
             for axis in ("x", "y")

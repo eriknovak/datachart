@@ -510,3 +510,25 @@ class TestLogScaleRejectsNonPositive:
     def test_grid_of_a_bad_figure_raises(self):
         with pytest.raises(ValueError, match=r"`scaley` 'log'"):
             Grid([LineChart(data=LINE), LineChart(data=ZERO_LINE, scaley="log")])
+
+
+def test_regression_fits_in_log_space():
+    """A log x axis fits y against log10(x) (issue #175)."""
+    xs = np.logspace(0, 3, 20)
+    data = [{"x": float(x), "y": float(2 + 3 * np.log10(x))} for x in xs]
+    figure = ScatterChart(data=data, show_regression=True, scalex="log")
+    (line,) = figure.axes[0].lines
+    x, y = (np.asarray(v, float) for v in line.get_data())
+    np.testing.assert_allclose(y, 2 + 3 * np.log10(x), atol=1e-9)
+    plt.close("all")
+
+
+def test_hline_spans_the_final_log_axis():
+    """An hline's default span reaches both ends of a log x axis (issue #175)."""
+    data = [{"x": float(x), "y": float(x)} for x in np.logspace(0, 3, 20)]
+    figure = ScatterChart(data=data, scalex="log", hlines={"y": 10, "label": "h"})
+    ax = figure.axes[0]
+    figure.canvas.draw()
+    (line,) = [c for c in ax.collections if c.get_label() == "h"]
+    np.testing.assert_allclose(line.get_segments()[0][:, 0], ax.get_xlim())
+    plt.close("all")

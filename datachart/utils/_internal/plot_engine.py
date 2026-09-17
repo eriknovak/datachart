@@ -29,6 +29,9 @@ from ...constants import FIG_SIZE, ORIENTATION
 # Chart Rendering
 # ================================================
 
+# the figure-level settings a subplots figure carries into a grid cell
+SUBPLOT_FURNITURE_KEYS = ("title", "xlabel", "ylabel", "sharex", "sharey")
+
 
 def composition_panel(
     chart_type: str,
@@ -55,12 +58,12 @@ def composition_panel(
     composition_settings = build_chart_panel_settings(
         chart_type, settings, "composition", first_style
     )
-    # grid cells keep the figure title; single-chart subtitles are the fallback
-    composition_settings["title"] = (
-        settings.get("title")
-        if settings.get("title") is not None
-        else charts[0].get("subtitle", None)
-    )
+    # grid cells keep the figure title; a single chart's subtitle is the
+    # fallback, while several subtitles name series, not the figure
+    title = settings.get("title")
+    if title is None and len(charts) == 1:
+        title = charts[0].get("subtitle", None)
+    composition_settings["title"] = title
     return Panel(
         [group_from_chart(layers, settings, mode="multiple")], composition_settings
     )
@@ -237,5 +240,8 @@ def render_chart(
             subplot_config["nrows"],
             subplot_config["ncols"],
         )
+        # a grid cell rebuilds the figure-level furniture too (ADR 0006)
+        for key in SUBPLOT_FURNITURE_KEYS:
+            figure._chart_metadata[key] = settings.get(key)
 
     return figure

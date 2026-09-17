@@ -10,6 +10,7 @@ from ..typings import (
     HexbinDataAttrs,
     HexbinStyleAttrs,
     ColorbarSettingAttrs,
+    LegendSettingAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
     VSpanSettingAttrs,
@@ -45,6 +46,8 @@ def HexbinChart(
     xmax: Optional[Union[int, float, datetime]] = None,
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
+    show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str]] = None,
     show_colorbars: bool = True,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
@@ -136,6 +139,7 @@ def HexbinChart(
         `colorbar` setting.
         The `vspans` and `hspans` reference bands.
         The `emphasis_rule` parameter.
+        The `show_legend` and `legend` parameters.
 
     Examples:
         >>> from datachart.charts import HexbinChart
@@ -173,6 +177,11 @@ def HexbinChart(
         xmax: The maximum x-axis value.
         ymin: The minimum y-axis value.
         ymax: The maximum y-axis value.
+        show_legend: Whether to show the legend; it lists the labelled reference
+            lines and bands.
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. See
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y"). Off by
             default: the hexagons cover it.
         show_colorbars: Whether to show the colorbar(s).
@@ -268,6 +277,8 @@ def HexbinChart(
         "xmax": xmax,
         "ymin": ymin,
         "ymax": ymax,
+        "show_legend": show_legend,
+        "legend": legend,
         "show_grid": show_grid,
         "aspect_ratio": aspect_ratio,
         "subplots": subplots,

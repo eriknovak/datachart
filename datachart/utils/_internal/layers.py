@@ -26,7 +26,7 @@ import matplotlib as mpl
 import matplotlib.dates as mdates
 from dateutil.relativedelta import relativedelta
 from matplotlib.font_manager import FontProperties
-from matplotlib import rc_context
+from matplotlib import cbook, rc_context
 import matplotlib.ticker as mticker
 from matplotlib.ticker import MaxNLocator
 from matplotlib.collections import LineCollection, PathCollection, PolyCollection
@@ -50,6 +50,7 @@ from matplotlib.transforms import (
     ScaledTranslation,
     TransformedBbox,
     TransformedPath,
+    blended_transform_factory,
 )
 import matplotlib.patheffects as patheffects
 from matplotlib.legend import Legend
@@ -72,6 +73,7 @@ from .validate import (
     AXIS_NUMERIC,
     AXIS_TEMPORAL,
     infer_network_nodes,
+    first_seen_nodes,
     infer_sankey_columns,
     treemap_record_total,
     validate_baseline,
@@ -1027,6 +1029,8 @@ SPAN_SIDES = {
     "vspans": ("xmin", "xmax", get_vspan_style),
     "hspans": ("ymin", "ymax", get_hspan_style),
 }
+# the layer attributes holding pre-resolved references, pooled per axes
+REF_KEYS = ("vlines", "hlines", "vspans", "hspans", "texts")
 # polar wedge outline samples per degree: enough for the chord error to vanish
 SPAN_SAMPLES_PER_DEGREE = 2
 
@@ -1283,6 +1287,9 @@ def _draw_ref_lines(ax: plt.Axes, vlines: List[tuple], hlines: List[tuple]) -> N
             label=vline.get("label", ""),
             **style,
         )
+    # a line running to the limits must not widen them under autoscale
+    if any(v.get("ymin") is None or v.get("ymax") is None for v, _ in vlines):
+        ax.set_ylim(default_ymin, default_ymax)
 
     default_xmin, default_xmax = ax.get_xlim()
     for hline, style in hlines:
@@ -1299,10 +1306,16 @@ def _draw_ref_lines(ax: plt.Axes, vlines: List[tuple], hlines: List[tuple]) -> N
             label=hline.get("label", ""),
             **style,
         )
+    if any(h.get("xmin") is None or h.get("xmax") is None for h, _ in hlines):
+        ax.set_xlim(default_xmin, default_xmax)
 
 
 def _draw_ref_spans(
-    ax: plt.Axes, vspans: List[tuple], hspans: List[tuple], polar: bool
+    ax: plt.Axes,
+    vspans: List[tuple],
+    hspans: List[tuple],
+    polar: bool,
+    value_ax: Optional[plt.Axes] = None,
 ) -> None:
     """Draw the pre-resolved reference bands on the host axes (ADR 0036).
 
@@ -1314,6 +1327,8 @@ def _draw_ref_spans(
     axes edge instead of the autoscale margin pushing the edge away from it.
     The polar r limits are always pinned: the radial furniture already read
     them, so a band never moves the ring the donut hole was cut from.
+    A band of a twin's figure passes the twin as `value_ax`: its bounds are
+    measured there while it still draws on the host, under both axes' marks.
     """
 
     if not (vspans or hspans):
@@ -1336,19 +1351,45 @@ def _draw_ref_spans(
         ax.set_ylim(rlim)
         return
 
-    xlim = ax.get_xlim()
-    for vspan, style in vspans:
-        lo, hi = _span_bounds(vspan, "vspans", xlim)
-        ax.axvspan(lo, hi, label=vspan.get("label", ""), **style)
-    if any(v.get("xmin") is None or v.get("xmax") is None for v, _ in vspans):
-        ax.set_xlim(xlim)
+    data_ax = ax if value_ax is None else value_ax
+    for key, spans in (("vspans", vspans), ("hspans", hspans)):
+        along_x = key == "vspans"
+        lo_key, hi_key, _ = SPAN_SIDES[key]
+        limits = data_ax.get_xlim() if along_x else data_ax.get_ylim()
+        for span, style in spans:
+            lo, hi = _span_bounds(span, key, limits)
+            label = span.get("label", "")
+            if data_ax is ax:
+                (ax.axvspan if along_x else ax.axhspan)(lo, hi, label=label, **style)
+                continue
+            # the band spans the host's frame but is measured on the twin
+            if along_x:
+                trans = blended_transform_factory(data_ax.transData, ax.transAxes)
+                rect = Rectangle((lo, 0), hi - lo, 1, label=label, **style)
+            else:
+                trans = blended_transform_factory(ax.transAxes, data_ax.transData)
+                rect = Rectangle((0, lo), 1, hi - lo, label=label, **style)
+            rect.set_transform(trans)
+            ax.add_patch(rect)
+        if any(sp.get(lo_key) is None or sp.get(hi_key) is None for sp, _ in spans):
+            (data_ax.set_xlim if along_x else data_ax.set_ylim)(limits)
 
-    ylim = ax.get_ylim()
-    for hspan, style in hspans:
-        lo, hi = _span_bounds(hspan, "hspans", ylim)
-        ax.axhspan(lo, hi, label=hspan.get("label", ""), **style)
-    if any(h.get("ymin") is None or h.get("ymax") is None for h, _ in hspans):
-        ax.set_ylim(ylim)
+
+def _hide_marks_past_limits(ax: plt.Axes, limits: dict, marks: list) -> None:
+    """Hide the unclipped marks anchored past a limit the user set.
+
+    Auto limits keep a mark overflowing the axes edge on purpose; a user
+    limit crops the data, and a mark left beside the axes names nothing.
+    """
+
+    ends = {"x": sorted(ax.get_xlim()), "y": sorted(ax.get_ylim())}
+    for artist, anchor in marks:
+        for name, value in zip("xy", anchor):
+            lo, hi = ends[name]
+            if (limits[f"{name}min"] is not None and value < lo) or (
+                limits[f"{name}max"] is not None and value > hi
+            ):
+                artist.set_visible(False)
 
 
 def _draw_legend(
@@ -1621,6 +1662,9 @@ class DrawContext:
     sole_dumbbell: bool = False
     # the panel pins its aspect ratio, so colorbars size to the axes box
     aspect_locked: bool = False
+    # the resolved scales of the axes the layer draws on (ADR 0041)
+    value_scale: Optional[str] = None
+    category_scale: Optional[str] = None
 
 
 # ================================================
@@ -1676,6 +1720,8 @@ class Layer:
         self.chart = chart
         # (artist, resolver) pairs registered by the draw in progress (ADR 0031)
         self._hover_targets = []
+        # (artist, (x, y)) marks drawn past the axes, hidden past a user limit
+        self._limit_marks = []
         self.settings = settings
         self.subtitle = chart.get("subtitle", None)
         self.style = chart.get("style", {}) or {}
@@ -1809,6 +1855,17 @@ class Layer:
         self.register_hover(
             BarContainer([patch for patch, _ in marks]), lambda i: marks[i][1]
         )
+
+    def register_limit_mark(self, artist, x, y) -> None:
+        """Hide an unclipped mark whose data anchor lies past a user limit."""
+
+        self._limit_marks.append((artist, (x, y)))
+
+    def take_limit_marks(self) -> list:
+        """Hand over the marks registered by the last draw and forget them."""
+
+        marks, self._limit_marks = self._limit_marks, []
+        return marks
 
     def take_hover_targets(self) -> list:
         """Hand over the pairs registered by the last draw and forget them."""
@@ -2650,7 +2707,7 @@ class BumpLayer(LineLayer):
         for i, side in ends:
             xy = (ranks[i], x[i]) if ctx.transpose else (x[i], ranks[i])
             offset = (0, -side * gap) if ctx.transpose else (side * gap, 0)
-            ax.annotate(
+            label = ax.annotate(
                 self.subtitle,
                 xy=xy,
                 xytext=offset,
@@ -2662,6 +2719,7 @@ class BumpLayer(LineLayer):
                 zorder=TEXT_ANNOTATION_ZORDER,
                 **font,
             )
+            self.register_limit_mark(label, *xy)
 
 
 class StackedAreaLayer(Layer):
@@ -3007,8 +3065,25 @@ def sort_gantt_charts(charts: List[dict], settings: dict) -> List[dict]:
             order = [i for cluster in clusters.values() for i in cluster]
         else:
             order = sorted(range(len(tasks)), key=lambda i: sign * starts[i])
-        sorted_charts.append({**chart, "data": [tasks[i] for i in order]})
+        sorted_charts.append(
+            {
+                **chart,
+                "data": [tasks[i] for i in order],
+                # colors follow the input order, so a sort never recolors
+                "group_order": gantt_groups(tasks),
+            }
+        )
     return sorted_charts
+
+
+def gantt_groups(tasks: list) -> list:
+    """The task groups in first-seen order; ungrouped tasks name none."""
+
+    groups = []
+    for task in tasks:
+        if task.get("group") is not None and task["group"] not in groups:
+            groups.append(task["group"])
+    return groups
 
 
 class GanttLayer(BarLayer):
@@ -3067,12 +3142,10 @@ class GanttLayer(BarLayer):
         # the bars of the last draw stand for their groups in the legend
         self._task_patches = []
 
-        # one color and hatch per task group, in first-seen order
-        groups = []
-        for task in tasks:
-            if task.get("group") is not None and task["group"] not in groups:
-                groups.append(task["group"])
-        self.groups = groups
+        # the legend lists the groups in row order; one color and hatch per
+        # group in input order, so sorting the rows never recolors a group
+        self.groups = gantt_groups(tasks)
+        groups = self.chart.get("group_order") or self.groups
         cycle = (
             create_color_cycle(config["color_general_multiple"], len(groups))
             if groups
@@ -3361,7 +3434,8 @@ class GanttLayer(BarLayer):
         size = style.get("milestone_size")
         for i in np.flatnonzero(self.milestones):
             muted = roles[i] == EMPHASIS_BACKGROUND
-            ax.plot(
+            anchor = (self.starts[i], rows[i])
+            (marker,) = ax.plot(
                 [self.starts[i]],
                 [rows[i]],
                 linestyle="none",
@@ -3376,10 +3450,11 @@ class GanttLayer(BarLayer):
                 # a milestone on the view's edge shows whole, over the spine
                 clip_on=False,
             )
+            self.register_limit_mark(marker, *anchor)
             if self.show_values and not muted:
-                ax.annotate(
+                label = ax.annotate(
                     date_labels([self.tasks[i]["start"]], self.milestone_format)[0],
-                    (self.starts[i], rows[i]),
+                    anchor,
                     xytext=(size / 2 + self.value_padding, 0),
                     textcoords="offset points",
                     ha="left",
@@ -3387,6 +3462,7 @@ class GanttLayer(BarLayer):
                     zorder=TEXT_ANNOTATION_ZORDER,
                     **self.value_font,
                 )
+                self.register_limit_mark(label, *anchor)
 
     def _draw_dependencies(self, ax, rows, height, ctx) -> None:
         """An elbow arrow from each dependency's end to the dependent's start.
@@ -3794,9 +3870,16 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
 
         plot, fill, _ = _oriented(ax, ctx.transpose)
 
+        # a log axis fits and samples its data as log10 values
+        x_log = ctx.category_scale == SCALE.LOG
+        y_log = ctx.value_scale == SCALE.LOG
+        x = np.log10(x) if x_log else x
+        y = np.log10(y) if y_log else y
         slope, intercept, _, _, _ = scipy_stats.linregress(x, y)
-        x_line = np.linspace(x.min(), x.max(), 100)
-        y_line = slope * x_line + intercept
+        x_fit = np.linspace(x.min(), x.max(), 100)
+        y_fit = slope * x_fit + intercept
+        x_line = np.power(10.0, x_fit) if x_log else x_fit
+        y_line = np.power(10.0, y_fit) if y_log else y_fit
 
         reg_style = dict(self.regression_style)
         if color is not None and not self.regression_color_pinned:
@@ -3815,12 +3898,15 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
             s_err = np.sqrt(np.sum(residuals**2) / (n - 2))
             x_mean = np.mean(x)
             ss_x = np.sum((x - x_mean) ** 2)
-            se_line = s_err * np.sqrt(1 / n + (x_line - x_mean) ** 2 / ss_x)
+            se_line = s_err * np.sqrt(1 / n + (x_fit - x_mean) ** 2 / ss_x)
             ci = t_val * se_line
+            lower, upper = y_fit - ci, y_fit + ci
+            if y_log:
+                lower, upper = np.power(10.0, lower), np.power(10.0, upper)
             fill(
                 x_line,
-                y_line - ci,
-                y_line + ci,
+                lower,
+                upper,
                 alpha=self.regression_ci_alpha,
                 color=color,
             )
@@ -4514,8 +4600,9 @@ DUMBBELL_SORT_KEYS = {
 def sort_dumbbell_charts(charts: List[dict], settings: dict) -> List[dict]:
     """The charts with their records in `sort` order by `sort_by` (ADR 0050).
 
-    Each chart sorts on its own; overlaid charts share the first one's rows.
-    Ties keep input order.
+    Each chart sorts on its own; overlaid charts share the first one's rows,
+    and so do subplots sharing the category axis, whose one set of tick
+    labels must name every subplot's rows. Ties keep input order.
     """
 
     sort = validate_sort(settings.get("sort"))
@@ -4523,13 +4610,22 @@ def sort_dumbbell_charts(charts: List[dict], settings: dict) -> List[dict]:
     if sort is None:
         return charts
     sign = -1 if sort == SORT.DESCENDING else 1
-    return [
-        {
-            **chart,
-            "data": sorted(dumbbell_records(chart), key=lambda r: sign * key(r)),
-        }
-        for chart in charts
+    ranked = [
+        sorted(dumbbell_records(chart), key=lambda r: sign * key(r)) for chart in charts
     ]
+    horizontal = (
+        settings.get("orientation") or DEFAULT_ORIENTATION
+    ) == ORIENTATION.HORIZONTAL
+    if settings.get("subplots") and settings.get("sharey" if horizontal else "sharex"):
+        order = {}
+        for records in ranked:
+            for record in records:
+                order.setdefault(record["label"], len(order))
+        # a stable sort: a label the first chart lacks keeps its own rank
+        ranked = [
+            sorted(records, key=lambda r: order[r["label"]]) for records in ranked
+        ]
+    return [{**chart, "data": records} for chart, records in zip(charts, ranked)]
 
 
 # how far a composed dumbbell's start dot fades toward white from its end dot
@@ -4958,7 +5054,11 @@ class ViolinLayer(GroupLayer):
                     style["facecolor"] = self.split_colors[j]["color"]
                 elif self.color_by_group and self.violin_style.get("facecolor") is None:
                     style["facecolor"] = self.group_color(i, ctx.color)
-                artists = [self._draw_body(ax, values, position, width, style, side)]
+                artists = [
+                    self._draw_body(
+                        ax, values, position, width, style, side, ctx.value_scale
+                    )
+                ]
                 artists += self._draw_inner(ax, values, position, width, side)
                 self._apply_violin_emphasis(artists, roles[i])
                 if self.show_values and roles[i] != EMPHASIS_BACKGROUND:
@@ -4972,17 +5072,19 @@ class ViolinLayer(GroupLayer):
                 )
                 self.register_hover(artists[0], lambda _, datum=datum: datum)
 
-    def _draw_body(self, ax, values, position, width, style, side):
-        parts = ax.violinplot(
-            [values],
+    def _draw_body(self, ax, values, position, width, style, side, scale):
+        options = dict(
             positions=[position],
             widths=width,
             orientation=self.orientation,
-            bw_method=self.bandwidth,
             showextrema=False,
             showmedians=False,
             showmeans=False,
         )
+        if scale == SCALE.LOG:
+            parts = ax.violin([self._log_stats(values)], **options)
+        else:
+            parts = ax.violinplot([values], bw_method=self.bandwidth, **options)
         body = parts["bodies"][0]
         # above the axis gridlines (zorder 1.5), like a box patch
         body.set_zorder(2)
@@ -5004,6 +5106,17 @@ class ViolinLayer(GroupLayer):
             for path in body.get_paths():
                 path.vertices[:, axis] = clip(path.vertices[:, axis], position)
         return body
+
+    def _log_stats(self, values) -> dict:
+        """The body's density estimated on log10 values, mapped back to values."""
+
+        def kde(data, coords):
+            return GaussianKDE(data, self.bandwidth).evaluate(coords)
+
+        (stats,) = cbook.violin_stats([np.log10(values)], kde)
+        for key in ("coords", "mean", "median", "min", "max", "quantiles"):
+            stats[key] = np.power(10.0, stats[key])
+        return stats
 
     def _draw_inner(self, ax, values, position, width, side) -> list:
         if self.inner is None:
@@ -5118,22 +5231,33 @@ class RidgelineLayer(GroupLayer):
         order = sorted(grouped, key=lambda label: sign * np.median(grouped[label]))
         return {label: grouped[label] for label in order}
 
-    def padded_range(self) -> Optional[tuple]:
-        """The union of the rows' padded density ranges; None without a density."""
+    def padded_range(self, log: Optional[bool] = None) -> Optional[tuple]:
+        """The union of the rows' padded density ranges; None without a density.
 
+        On a log value axis the densities, and so their padding, live in
+        log10 space; `log` defaults to the front's own value scale.
+        """
+
+        if log is None:
+            log = self.settings.get("scaley") == SCALE.LOG
         ends = [
             (curve[0]["x"], curve[-1]["x"])
             for curve in (
-                kde1d(values, bandwidth=self.bandwidth, gridsize=2)
+                kde1d(
+                    np.log10(values) if log else values,
+                    bandwidth=self.bandwidth,
+                    gridsize=2,
+                )
                 for values in self.grouped_values().values()
                 if len(values) > 1
             )
         ]
         if not ends:
             return None
-        return min(e[0] for e in ends), max(e[1] for e in ends)
+        lo, hi = min(e[0] for e in ends), max(e[1] for e in ends)
+        return (10.0**lo, 10.0**hi) if log else (lo, hi)
 
-    def _grid_bounds(self) -> tuple:
+    def _grid_bounds(self, log: bool) -> tuple:
         """The shared or own padded range, widened to the ticks enclosing it;
         the value-axis limits win.
 
@@ -5141,8 +5265,9 @@ class RidgelineLayer(GroupLayer):
         the length of their grid, so the grid reaches those ticks too.
         """
 
-        lo, hi = self.shared_range or self.padded_range()
-        ticks = np.asarray(mticker.AutoLocator().tick_values(lo, hi), dtype=float)
+        lo, hi = self.shared_range or self.padded_range(log)
+        locator = mticker.LogLocator() if log else mticker.AutoLocator()
+        ticks = np.asarray(locator.tick_values(lo, hi), dtype=float)
         if len(ticks) > 1:
             tol = float(np.min(np.diff(ticks))) * 1e-6
             below, above = ticks[ticks <= lo + tol], ticks[ticks >= hi - tol]
@@ -5167,14 +5292,23 @@ class RidgelineLayer(GroupLayer):
         input_labels = list(super().grouped_values())
         roles = dict(zip(input_labels, self._group_roles(input_labels, ctx.emphasis)))
 
-        lo, hi = self._grid_bounds()
+        # on a log value axis the densities are estimated on log10 values
+        log = ctx.value_scale == SCALE.LOG
+        lo, hi = self._grid_bounds(log)
+        if log:
+            grouped_fit = {k: np.log10(v) for k, v in grouped.items()}
+            lo, hi = np.log10(lo), np.log10(hi)
+        else:
+            grouped_fit = grouped
         curves = [
             kde1d(
                 values, bandwidth=self.bandwidth, gridsize=RIDGE_GRIDSIZE, xlim=(lo, hi)
             )
-            for values in grouped.values()
+            for values in grouped_fit.values()
         ]
         grid = np.array([point["x"] for point in curves[0]])
+        if log:
+            grid = np.power(10.0, grid)
         densities = [np.array([point["y"] for point in curve]) for curve in curves]
         peak = 1 + self.overlap
         common_max = max(float(d.max()) for d in densities)
@@ -5562,9 +5696,10 @@ class HeatmapLayer(Layer):
                     # a value over the etching reads through a halo of the ground
                     font_style["color"] = self.font_style.get("color")
                     font_style["path_effects"] = self.value_halo
-                ax.text(
+                text = ax.text(
                     j, i, self.cell_text(value), ha="center", va="center", **font_style
                 )
+                self.register_limit_mark(text, j, i)
 
     def _cell_style(self) -> dict:
         """The image style; background cells fade to the muted alpha (ADR 0045).
@@ -7584,8 +7719,10 @@ class SankeyLayer(Layer):
         self._resolve_bare_labels()
         # column headings read as per-column subtitles
         self.column_label_style = get_text_style("subtitle")
-        # one color per node in column-then-row order, keyed by name
-        names = [node for column in self.columns for node in column]
+        # one color per node in first appearance across the links, so the
+        # column order never recolors a node; unlinked nodes follow
+        names = first_seen_nodes(self.links)
+        names += [n for column in self.columns for n in column if n not in names]
         cycle = create_color_cycle(config["color_general_multiple"], len(names))
         self.node_colors = {name: cycle[i]["color"] for i, name in enumerate(names)}
 
@@ -7932,11 +8069,12 @@ class TreemapLayer(Layer):
         # a group's header band reads as its subtitle
         self.band_style = get_text_style("subtitle")
         self.highlight_color = config["font_general_color"]
-        # top-level records largest first; one palette color each, by label
+        # top-level records largest first; one palette color each, keyed by
+        # label in input order, so a change in size never recolors a group
         self.groups = sorted(self.records, key=treemap_record_total, reverse=True)
         cycle = create_color_cycle(config["color_general_multiple"], len(self.groups))
         self.group_colors = {
-            record["label"]: cycle[i]["color"] for i, record in enumerate(self.groups)
+            record["label"]: cycle[i]["color"] for i, record in enumerate(self.records)
         }
         # etching by depth in the group's pattern (ADR 0048); None keeps colors
         density = self.treemap_style.get("etch_density")
@@ -7945,7 +8083,7 @@ class TreemapLayer(Layer):
         if density and patterns and self.etch is not None:
             self.group_hatches = {
                 record["label"]: patterns[i % len(patterns)]
-                for i, record in enumerate(self.groups)
+                for i, record in enumerate(self.records)
             }
 
     def legend_handles(self):
@@ -10152,8 +10290,14 @@ class Panel:
         # scales resolve before drawing: a log axis rejects its data up front
         scales = self._resolve_scales(ax_right, group_axes)
         self._validate_log_scales(scales, group_axes, ax_right)
+        scalex, scaley, scale_right = scales
+        # user limits name the host axes, so only host marks are hidden past them
+        limit_marks = []
         for group, target_ax in zip(self.groups, group_axes):
             cycle = cycles[palette_key(group)]
+            on_twin = ax_right is not None and target_ax is ax_right
+            value_scale = scale_right if on_twin else (scalex if horizontal else scaley)
+            category_scale = scaley if horizontal else scalex
             bins = s.get("hist_bins_override")
             if bins is None:
                 bins = group.hist_bins()
@@ -10214,14 +10358,21 @@ class Panel:
                     category_index=category_index,
                     sole_dumbbell=dumbbell_count == 1,
                     aspect_locked=aspect_locked,
+                    value_scale=value_scale,
+                    category_scale=category_scale,
                 )
                 layer.draw(target_ax, ctx)
                 hover_targets.extend(layer.take_hover_targets())
+                marks = layer.take_limit_marks()
+                if target_ax is ax:
+                    limit_marks.extend(marks)
 
         if category_index:
             self._apply_category_ticks(ax, category_index, group_layers, horizontal)
 
-        self._finalize(ax, ax_right, bar_layers, horizontal, scales, group_axes)
+        self._finalize(
+            ax, ax_right, bar_layers, horizontal, scales, group_axes, limit_marks
+        )
 
     @staticmethod
     def category_index(layers: List[Layer]) -> Optional[dict]:
@@ -10421,7 +10572,7 @@ class Panel:
         ax.grid(axis=name, which="minor", **style)
 
     def _finalize(
-        self, ax, ax_right, bar_layers, horizontal, scales, group_axes
+        self, ax, ax_right, bar_layers, horizontal, scales, group_axes, limit_marks
     ) -> None:
         """Apply the furniture; x/y keys are literal, `*_right` keys hit the twin."""
 
@@ -10595,6 +10746,7 @@ class Panel:
         limits = {k: s.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
         if not bare:
             configure_axis_limits(ax, limits)
+            _hide_marks_past_limits(ax, limits, limit_marks)
         # rank 1 sits at the top, inverted after any user limits apply
         if rank_axis and not ax.yaxis_inverted():
             ax.invert_yaxis()
@@ -10688,29 +10840,44 @@ class Panel:
                 if isinstance(layer, SwarmLayer):
                     layer.pack(owner_ax, swarm_side)
 
+        # one reference declared for every chart of a figure draws once per
+        # axes, so a line or text does not repeat and a band's tint does not
+        # stack with the series count; each is read on its figure's axes
+        pools = {}
+        for group, owner_ax in zip(self.groups, group_axes):
+            pooled = pools.setdefault(owner_ax, {key: [] for key in REF_KEYS})
+            for layer in group.layers:
+                for key in REF_KEYS:
+                    for entry in getattr(layer, key):
+                        if entry not in pooled[key]:
+                            pooled[key].append(entry)
+
         # reference lines and bands, after scales and limits
-        for layer, target_ax in zip(layers, [ax] * len(layers)):
-            _draw_ref_lines(target_ax, layer.vlines, layer.hlines)
-        # one band declared for every chart of a figure draws once, so its
-        # tint does not stack with the series count; the host axes sits under
-        # a twin, so the band lies beneath both axes' marks
-        vspans, hspans = [], []
-        for layer in layers:
-            for pool, spans in ((vspans, layer.vspans), (hspans, layer.hspans)):
-                for span in spans:
-                    if span not in pool:
-                        pool.append(span)
-        _draw_ref_spans(ax, vspans, hspans, polar)
+        for owner_ax, pooled in pools.items():
+            _draw_ref_lines(owner_ax, pooled["vlines"], pooled["hlines"])
+        # the host axes sits under a twin, so every band lies beneath both
+        # axes' marks (ADR 0036)
+        for owner_ax, pooled in pools.items():
+            vspans, hspans = pooled["vspans"], pooled["hspans"]
+            if owner_ax is ax:
+                _draw_ref_spans(ax, vspans, hspans, polar)
+                continue
+            # only the twin's value axis differs from the host's
+            if horizontal:
+                _draw_ref_spans(ax, [], hspans, polar)
+                _draw_ref_spans(ax, vspans, [], polar, value_ax=owner_ax)
+            else:
+                _draw_ref_spans(ax, vspans, [], polar)
+                _draw_ref_spans(ax, [], hspans, polar, value_ax=owner_ax)
 
         # a twin axes renders entirely above its host, so texts live on the
         # topmost axes while data coordinates read the owning layer's axes
         top_ax = ax_right if ax_right is not None else ax
         clearance = None
-        if any(layer.texts for layer in layers):
+        if any(pooled["texts"] for pooled in pools.values()):
             clearance = self._clearance_points(group_axes, horizontal)
-        for group, owner_ax in zip(self.groups, group_axes):
-            for layer in group.layers:
-                _draw_texts(top_ax, layer.texts, owner_ax, clearance)
+        for owner_ax, pooled in pools.items():
+            _draw_texts(top_ax, pooled["texts"], owner_ax, clearance)
 
         # point labels are placed once every marker of the panel is drawn and
         # the limits are final, so the estimate sees the real display space
@@ -10771,7 +10938,25 @@ class Panel:
                     legend_style.update(
                         expand_legend_location(LEGEND_LOCATION.OUTSIDE_RIGHT)
                     )
-                _draw_legend(ax, ax_right, legend_style, custom_handles)
+                # the layers' own keys first, then references and composed marks
+                if s.get("legend_mode") == "combined":
+                    handles, labels = self._combined_legend_entries(
+                        ax, ax_right, horizontal
+                    )
+                else:
+                    handles, labels = ax.get_legend_handles_labels()
+                    if ax_right is not None:
+                        handles_right, labels_right = (
+                            ax_right.get_legend_handles_labels()
+                        )
+                        handles, labels = handles + handles_right, labels + labels_right
+                _draw_legend(
+                    ax,
+                    ax_right,
+                    legend_style,
+                    custom_handles + handles,
+                    [h.get_label() for h in custom_handles] + labels,
+                )
             elif s.get("legend_mode") == "combined":
                 handles, labels = self._combined_legend_entries(
                     ax, ax_right, horizontal

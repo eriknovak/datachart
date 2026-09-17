@@ -374,3 +374,23 @@ class TestBumpChartComposition(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestMarksOutsideUserLimits(unittest.TestCase):
+    """An end label outside a user limit is skipped (issue #174)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_end_labels_past_xmax_are_hidden(self):
+        data = [series([10, 1, 3]), series([5, 7, 2])]
+        figure = BumpChart(
+            data=data, subtitle=["A", "B"], label_position="both", xmax=1
+        )
+        ax = figure.axes[0]
+        shown = [t.xy[0] for t in ax.texts if t.get_visible()]
+        self.assertEqual(sorted(shown), [0, 0])
+
+    def test_auto_limits_keep_every_label(self):
+        figure = BumpChart(data=DATA, subtitle=NAMES, label_position="both")
+        self.assertTrue(all(t.get_visible() for t in figure.axes[0].texts))
