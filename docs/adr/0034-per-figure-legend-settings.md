@@ -41,6 +41,11 @@ matplotlib location string passed straight through.
   layout has sized the axes it moves the legend outward by the furniture's
   overhang on that side, as a fixed offset so the re-layout that makes room
   keeps the gap. Bare panels have no such furniture and keep the plain pin.
+  Amended (issue #182): an axes title — a panel's title inside a `Grid`
+  cell — is not furniture. An outside-top legend sits between the title and
+  the axes, and the title lifts by a fixed offset to clear it, so a cell
+  reads title, legend, axes like a standalone figure whose title is the
+  suptitle.
 - **A user-supplied location wins over the bare-panel pin.** Charts whose marks
   fill the axes — treemap, sankey, network — currently force the legend beside
   the plot. That stays the default and stops being unconditional; a caller who

@@ -320,6 +320,9 @@ EXPECTED_CHANGES = {
     # colorbar fixes: tight-bbox locked bar, axis label beside its ticks
     "calendar_narrow_colorbar",
     "hexbin_bottom_bar_xlabel",
+    # legend fixes: matrix legend edge, grid-cell title over the legend
+    "matrix_legend_bottom",
+    "grid_panel_title_outside_top_legend",
 }
 
 
@@ -3284,6 +3287,29 @@ def matrix_blank_diagonal_grid():
     )
     bar = BarChart(data=[{"label": "a", "y": 3}, {"label": "b", "y": 5}])
     return Grid([[bar, matrix]])
+
+
+@case
+def matrix_legend_bottom():
+    return ScatterMatrix(
+        matrix_records(),
+        hue="species",
+        legend={"location": LEGEND_LOCATION.OUTSIDE_BOTTOM},
+        title="Legend below",
+    )
+
+
+@case
+def grid_panel_title_outside_top_legend():
+    bars = BarChart(data=BAR1, subtitle="bars")
+    line = LineChart(data=LINE1[:5], subtitle="line")
+    panel = Panel(
+        [bars, line],
+        title="Title over the legend",
+        show_legend=True,
+        legend={"location": LEGEND_LOCATION.OUTSIDE_TOP, "ncols": 2},
+    )
+    return Grid([[panel, LineChart(data=LINE2, title="Neighbour")]])
 
 
 if __name__ == "__main__":

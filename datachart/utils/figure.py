@@ -27,6 +27,15 @@ from ._internal.plot_engine import SUBPLOT_FURNITURE_KEYS
 
 # a grid legend column, as a fraction of a cell; layout widens it to fit
 LEGEND_COLUMN_WIDTH = 0.3
+# a thin grid row, roughly one text line, as a fraction of a cell (ADR 0007)
+LABEL_ROW_HEIGHT = 0.12
+# per grid legend edge: the legend's anchor point in its axes and its `loc`
+LEGEND_ANCHORS = {
+    "right": ((0.0, 0.5), "center left"),
+    "left": ((1.0, 0.5), "center right"),
+    "top": ((0.5, 0.0), "lower center"),
+    "bottom": ((0.5, 1.0), "upper center"),
+}
 
 
 _FORMAT_EXTENSIONS: FrozenSet[str] = frozenset(
@@ -172,24 +181,31 @@ def _render_grid_node(
     the axis labels a footer row and a left column; sharing stays local to
     the node, anchored on its first shareable axes — or, for a `"col"` x or
     `"row"` y share, on the first one in the cell's column or row. A node
-    `legend` — the entries of one cell's axes, for the whole grid — takes a
-    right column.
+    `legend` — the entries of one cell's axes, for the whole grid — takes the
+    outermost column or row on its `edge` (default right), inside the title.
     """
     nrows, ncols = node["shape"]
     title, xlabel, ylabel = node.get("title"), node.get("xlabel"), node.get("ylabel")
     legend = node.get("legend")
-    # 0.12: thin label rows and column, roughly one text line each (ADR 0007)
-    heights = ([0.12] if title else []) + [1] * nrows + ([0.12] if xlabel else [])
+    edge = legend.get("edge", "right") if legend else None
+    heights = (
+        ([LABEL_ROW_HEIGHT] if title else [])
+        + ([LABEL_ROW_HEIGHT] if edge == "top" else [])
+        + [1] * nrows
+        + ([LABEL_ROW_HEIGHT] if xlabel else [])
+        + ([LABEL_ROW_HEIGHT] if edge == "bottom" else [])
+    )
     widths = (
-        ([0.12] if ylabel else [])
+        ([LEGEND_COLUMN_WIDTH] if edge == "left" else [])
+        + ([LABEL_ROW_HEIGHT] if ylabel else [])
         + [1] * ncols
-        + ([LEGEND_COLUMN_WIDTH] if legend else [])
+        + ([LEGEND_COLUMN_WIDTH] if edge == "right" else [])
     )
     sub_gs = subplot_spec.subgridspec(
         len(heights), len(widths), height_ratios=heights, width_ratios=widths
     )
-    row_offset = 1 if title else 0
-    col_offset = 1 if ylabel else 0
+    row_offset = (1 if title else 0) + (1 if edge == "top" else 0)
+    col_offset = (1 if edge == "left" else 0) + (1 if ylabel else 0)
     body_rows = slice(row_offset, row_offset + nrows)
     body_cols = slice(col_offset, col_offset + ncols)
     if title:
@@ -204,12 +220,18 @@ def _render_grid_node(
         )
     if xlabel:
         _label_axes(
-            owner, sub_gs[-1, body_cols], xlabel, (0.5, 1.0), "center", "top", "xlabel"
+            owner,
+            sub_gs[row_offset + nrows, body_cols],
+            xlabel,
+            (0.5, 1.0),
+            "center",
+            "top",
+            "xlabel",
         )
     if ylabel:
         _label_axes(
             owner,
-            sub_gs[body_rows, 0],
+            sub_gs[body_rows, col_offset - 1],
             ylabel,
             (1.0, 0.5),
             "right",
@@ -260,7 +282,13 @@ def _render_grid_node(
             legend_ax = ax
 
     if legend_ax is not None:
-        _legend_axes(owner, sub_gs[body_rows, -1], legend_ax, legend)
+        spec = {
+            "right": sub_gs[body_rows, -1],
+            "left": sub_gs[body_rows, 0],
+            "top": sub_gs[row_offset - 1, body_cols],
+            "bottom": sub_gs[-1, body_cols],
+        }[edge]
+        _legend_axes(owner, spec, legend_ax, legend)
 
 
 def _label_axes(
@@ -301,12 +329,9 @@ def _legend_axes(
         return
     ax = owner.add_subplot(spec)
     ax.axis("off")
+    anchor, loc = LEGEND_ANCHORS[legend.get("edge", "right")]
     drawn = ax.legend(
-        handles,
-        labels,
-        **legend["style"],
-        loc="center left",
-        bbox_to_anchor=(0.0, 0.5),
+        handles, labels, **legend["style"], loc=loc, bbox_to_anchor=anchor
     )
     if legend.get("family"):
         for text in drawn.get_texts() + [drawn.get_title()]:

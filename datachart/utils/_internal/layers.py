@@ -1630,7 +1630,9 @@ def _marks_reach(slot, dim, bboxes, lines, offsets):
     return max(reach) if reach else None
 
 
-def _fit_legend(legend: Legend, axes: list, dim: int, renderer) -> None:
+def _fit_legend(
+    legend: Legend, axes: list, dim: int, renderer, mirror: bool = False
+) -> None:
     """Give a best-placed legend a clear slot at the end of the value axis.
 
     matplotlib picks the least-covered slot, which still hides marks when they
@@ -1639,7 +1641,8 @@ def _fit_legend(legend: Legend, axes: list, dim: int, renderer) -> None:
     least far, and every axes extends its value range so those marks end below
     the legend. Runs at draw time, once constrained layout has sized the axes.
     A fit that would squeeze the marks past LEGEND_HEADROOM_MAX keeps
-    matplotlib's slot; the translucent frame still shows what it covers.
+    matplotlib's slot; the translucent frame still shows what it covers. A
+    `mirror` axis, symmetric around zero, extends both of its halves.
     """
 
     if legend._loc != 0:
@@ -1658,6 +1661,8 @@ def _fit_legend(legend: Legend, axes: list, dim: int, renderer) -> None:
         else ("upper right", "lower right", "center right")
     )
     a0, a1 = legend.axes.bbox.get_points()[:, dim]
+    # the fixed point as the range scales: its low end, or a mirror's zero
+    origin = axes[0].transData.transform((0, 0))[dim] if mirror else a0
     best = None
     for name in names:
         code = Legend.codes[name]
@@ -1666,10 +1671,10 @@ def _fit_legend(legend: Legend, axes: list, dim: int, renderer) -> None:
         reach = _marks_reach(slot, dim, bboxes, lines, offsets)
         reach = a0 if reach is None else min(reach, a1)
         floor = slot.get_points()[0, dim] - pad
-        if floor <= a0:
+        if floor <= origin:
             continue
         # scale the value range so the marks' reach maps just below the legend
-        factor = max(1.0, (reach - a0) / (floor - a0))
+        factor = max(1.0, (reach - origin) / (floor - origin))
         if best is None or factor < best[0]:
             best = (factor, code)
     if best is None or best[0] - 1 > LEGEND_HEADROOM_MAX:
@@ -1678,8 +1683,12 @@ def _fit_legend(legend: Legend, axes: list, dim: int, renderer) -> None:
     for a in axes:
         axis = a.yaxis if dim == 1 else a.xaxis
         trans = axis.get_transform()
-        lo, hi = trans.transform(a.get_ylim() if dim == 1 else a.get_xlim())
-        lo, hi = trans.inverted().transform([lo, lo + (hi - lo) * factor])
+        lo, hi = a.get_ylim() if dim == 1 else a.get_xlim()
+        if mirror:
+            lo, hi = -hi * factor, hi * factor
+        else:
+            lo, hi = trans.transform([lo, hi])
+            lo, hi = trans.inverted().transform([lo, lo + (hi - lo) * factor])
         (a.set_ylim if dim == 1 else a.set_xlim)(lo, hi)
     legend._set_loc(code)
 
@@ -1690,36 +1699,62 @@ def _fit_outside_legend(legend: Legend, axes: list, renderer) -> None:
     An outside location anchors to the axes edge, where the axis furniture
     lives. Once layout has sized the axes, the legend shifts outward by the
     furniture's overhang on that side, as a fixed offset in inches so the
-    re-layout that makes room for it keeps the gap.
+    re-layout that makes room for it keeps the gap. Above the axes, an axes
+    title (a panel's title in a grid cell) is not furniture: the legend sits
+    under it, and the title lifts to clear the legend.
     """
 
     box = legend.get_window_extent(renderer)
     ax_box = legend.axes.bbox
+    pad = _legend_pad_px(legend.figure)
+    if box.x0 >= ax_box.x1:
+        side = "right"
+    elif box.x1 <= ax_box.x0:
+        side = "left"
+    elif box.y0 >= ax_box.y1:
+        side = "top"
+    elif box.y1 <= ax_box.y0:
+        side = "bottom"
+    else:
+        return
+    titled = [ax for ax in axes if side == "top" and ax.title.get_text()]
+    # read before hiding: a hidden title's position goes stale
+    bottoms = [ax.title.get_window_extent(renderer).y0 for ax in titled]
     legend.set_in_layout(False)
+    for ax in titled:
+        ax.title.set_visible(False)
     try:
         furniture = Bbox.union([ax.get_tightbbox(renderer) for ax in axes])
     finally:
         legend.set_in_layout(True)
-    if box.x0 >= ax_box.x1:
-        shift, direction = furniture.x1 - ax_box.x1, (1, 0)
-    elif box.x1 <= ax_box.x0:
-        shift, direction = ax_box.x0 - furniture.x0, (-1, 0)
-    elif box.y0 >= ax_box.y1:
-        shift, direction = furniture.y1 - ax_box.y1, (0, 1)
-    elif box.y1 <= ax_box.y0:
-        shift, direction = ax_box.y0 - furniture.y0, (0, -1)
-    else:
-        return
-    if shift <= 0:
-        return
-    inches = (shift + _legend_pad_px(legend.figure)) / legend.figure.dpi
-    offset = ScaledTranslation(
-        direction[0] * inches, direction[1] * inches, legend.figure.dpi_scale_trans
-    )
-    # the anchor reads back in display space; the offset hangs off its
-    # axes-fraction position so the re-layout keeps the gap
-    anchor = legend.axes.transAxes.inverted().transform(legend.get_bbox_to_anchor().p0)
-    legend.set_bbox_to_anchor(tuple(anchor), transform=legend.axes.transAxes + offset)
+        for ax in titled:
+            ax.title.set_visible(True)
+    shift, direction = {
+        "right": (furniture.x1 - ax_box.x1, (1, 0)),
+        "left": (ax_box.x0 - furniture.x0, (-1, 0)),
+        "top": (furniture.y1 - ax_box.y1, (0, 1)),
+        "bottom": (ax_box.y0 - furniture.y0, (0, -1)),
+    }[side]
+    shift = shift + pad if shift > 0 else 0
+    if shift:
+        inches = shift / legend.figure.dpi
+        offset = ScaledTranslation(
+            direction[0] * inches, direction[1] * inches, legend.figure.dpi_scale_trans
+        )
+        # the anchor reads back in display space; the offset hangs off its
+        # axes-fraction position so the re-layout keeps the gap
+        anchor = legend.axes.transAxes.inverted().transform(
+            legend.get_bbox_to_anchor().p0
+        )
+        legend.set_bbox_to_anchor(
+            tuple(anchor), transform=legend.axes.transAxes + offset
+        )
+    for ax, bottom in zip(titled, bottoms):
+        # matplotlib's own title offset, in inches, survives re-layout
+        lift = box.y1 + shift + pad - bottom
+        if lift > 0:
+            points = ax.titleOffsetTrans.get_matrix()[1, 2] * 72 / ax.figure.dpi
+            ax._set_title_offset_trans(points + lift * 72 / ax.figure.dpi)
 
 
 def _legend_pad_px(figure) -> float:
@@ -11529,7 +11564,10 @@ class Panel:
             # has sized the axes; an explicit value-axis limit, or a stack
             # filling its frame, stays as set
             value_axis = "x" if horizontal else "y"
+            # a pyramid keeps its value max aside for the mirror
             value_max = s.get(f"{value_axis}max")
+            if value_max is None and s.get("pyramid"):
+                value_max = s.get("pyramid_xmax")
             if (
                 value_max is None
                 and value_axis not in pinned
@@ -11537,8 +11575,10 @@ class Panel:
             ):
                 axes = [ax] + ([ax_right] if ax_right is not None else [])
                 dim = 0 if horizontal else 1
+                mirror = bool(s.get("pyramid"))
                 _defer_legend_fit(
-                    top_ax, lambda renderer: _fit_legend(legend, axes, dim, renderer)
+                    top_ax,
+                    lambda renderer: _fit_legend(legend, axes, dim, renderer, mirror),
                 )
 
         # tick labels and legend text cannot take the font family through

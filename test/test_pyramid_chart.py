@@ -114,6 +114,29 @@ class TestMirroredDrawing:
         legend = figure.axes[0].get_legend()
         assert [t.get_text() for t in legend.get_texts()] == ["Group A", "Group B"]
 
+    def test_legend_fit_keeps_the_mirror_symmetric(self):
+        # bars filling the rows up to the limit leave the legend no free slot
+        full = [{"label": str(i), "y": 30} for i in range(12)]
+        figure = PyramidChart(data=[full, full], subtitle=["A", "B"], show_legend=True)
+        figure.canvas.draw()
+        ax = figure.axes[0]
+        lo, hi = ax.get_xlim()
+        assert lo == pytest.approx(-hi)
+        assert hi > 30
+        renderer = figure.canvas.get_renderer()
+        box = ax.get_legend().get_window_extent(renderer)
+        for container in ax.containers:
+            for patch in container:
+                assert not box.overlaps(patch.get_window_extent(renderer))
+
+    def test_xmax_pins_the_limits_with_a_legend(self):
+        full = [{"label": str(i), "y": 30} for i in range(12)]
+        figure = PyramidChart(
+            data=[full, full], subtitle=["A", "B"], show_legend=True, xmax=30
+        )
+        figure.canvas.draw()
+        assert figure.axes[0].get_xlim() == pytest.approx((-30, 30))
+
     def test_y_key_remap_negates_the_left_side(self):
         left = [{"label": a, "count": v} for a, v in zip(AGES, [1, 2, 3, 4, 5])]
         right = [{"label": a, "count": v} for a, v in zip(AGES, [5, 4, 3, 2, 1])]

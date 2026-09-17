@@ -298,9 +298,10 @@ _Avoid_: range chart, connected dot plot, Cleveland dot plot (for the chart)
 A relationship view (`ScatterMatrix`): an n × n grid figure with a scatter
 chart for every pair of numeric `dimensions` and each dimension's
 distribution on the diagonal (histogram, KDE curve, or blank), optionally
-coloured by a categorical `hue` with one figure-level legend. Composed from
-scatter and histogram cells through the grid transport, so it nests in
-`Grid` and never in `Panel` (ADR 0051).
+coloured by a categorical `hue` with one figure-level legend on one of the
+four outside edges, titled by the hue column. Composed from scatter and
+histogram cells through the grid transport, so it nests in `Grid` and never
+in `Panel`; by default it is at most a full page width wide (ADR 0051).
 _Avoid_: pair plot, pairs plot, SPLOM (for the chart name)
 
 **Upper triangle**:
@@ -638,7 +639,7 @@ The per-figure legend controls — title, location, column count, alignment —
 passed to a front as `legend` and falling back to the theme's `plot_legend_*`
 attributes field by field. An outside location is not a matplotlib location:
 it expands, once, into a location plus an anchor that no public surface names
-(ADR 0034).
+(ADR 0034). An outside-top legend sits between a title and the axes.
 _Avoid_: legend style (that is the theme-key family), bbox anchor
 
 **Colorbar setting**:

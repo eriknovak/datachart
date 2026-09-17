@@ -12,7 +12,7 @@ from matplotlib.colors import to_hex
 
 from datachart.charts import LineChart, ScatterMatrix
 from datachart.config import config
-from datachart.constants import SCATTER_MATRIX_DIAGONAL, THEME
+from datachart.constants import LEGEND_LOCATION, SCATTER_MATRIX_DIAGONAL, THEME
 from datachart.utils import Grid, Panel
 from datachart.utils._internal.layers import (
     HistogramLayer,
@@ -30,6 +30,14 @@ THEMES = [
     THEME.MATERIAL,
     THEME.SKETCH,
     THEME.QUILL,
+]
+
+
+LEGEND_LOCATION_EDGES = [
+    LEGEND_LOCATION.OUTSIDE_RIGHT,
+    LEGEND_LOCATION.OUTSIDE_LEFT,
+    LEGEND_LOCATION.OUTSIDE_TOP,
+    LEGEND_LOCATION.OUTSIDE_BOTTOM,
 ]
 
 
@@ -362,10 +370,97 @@ class TestScatterMatrixLegend(unittest.TestCase):
         finally:
             config.set_theme(THEME.DEFAULT)
 
+    def test_legend_title_defaults_to_hue_name(self):
+        (legend,) = self.legends(ScatterMatrix(columns(), hue="species"))
+        self.assertEqual(legend.get_title().get_text(), "species")
+        figure = ScatterMatrix(columns(), hue="species", legend={"title": ""})
+        (legend,) = self.legends(figure)
+        self.assertFalse(legend.get_title().get_visible())
+
+    def test_legend_follows_outside_edge(self):
+        def envelope(figure):
+            cells = [
+                ax.get_position()
+                for ax in figure.axes
+                if not ax.get_legend() and ax.axison
+            ]
+            return (
+                min(b.x0 for b in cells),
+                max(b.x1 for b in cells),
+                min(b.y0 for b in cells),
+                max(b.y1 for b in cells),
+            )
+
+        checks = {
+            LEGEND_LOCATION.OUTSIDE_RIGHT: lambda b, e: b.x0 >= e[1],
+            LEGEND_LOCATION.OUTSIDE_LEFT: lambda b, e: b.x1 <= e[0],
+            LEGEND_LOCATION.OUTSIDE_TOP: lambda b, e: b.y0 >= e[3],
+            LEGEND_LOCATION.OUTSIDE_BOTTOM: lambda b, e: b.y1 <= e[2],
+        }
+        for location, check in checks.items():
+            with self.subTest(location=location):
+                figure = ScatterMatrix(
+                    columns(), hue="species", legend={"location": location}
+                )
+                figure.canvas.draw()
+                (legend,) = self.legends(figure)
+                box = legend.get_window_extent().transformed(
+                    figure.transFigure.inverted()
+                )
+                self.assertTrue(check(box, envelope(figure)))
+                if location in (
+                    LEGEND_LOCATION.OUTSIDE_TOP,
+                    LEGEND_LOCATION.OUTSIDE_BOTTOM,
+                ):
+                    # a row lays the entries side by side
+                    self.assertEqual(legend._ncols, 3)
+
+    def test_inside_legend_location_raises(self):
+        with self.assertRaisesRegex(ValueError, "outside"):
+            ScatterMatrix(
+                columns(), hue="species", legend={"location": LEGEND_LOCATION.BEST}
+            )
+
     def test_single_dimension_takes_legend_from_diagonal(self):
         figure = ScatterMatrix(columns(), hue="species", dimensions=["a"])
         (legend,) = self.legends(figure)
         self.assertEqual(len(legend.get_texts()), 3)
+
+
+class TestScatterMatrixSize(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+
+    def wide(self, n):
+        rng = np.random.RandomState(0)
+        data = {f"d{k}": list(rng.randn(20)) for k in range(n)}
+        data["g"] = ["p", "q"] * 10
+        return data
+
+    def test_two_dimensions_keep_full_cells(self):
+        figure = ScatterMatrix(self.wide(2), hue="g")
+        self.assertAlmostEqual(figure.get_figwidth(), 2.2 * 2 + 1.2)
+        self.assertAlmostEqual(figure.get_figheight(), 2.2 * 2)
+
+    def test_many_dimensions_fit_the_page(self):
+        # a column narrows the cells; a row adds its own height
+        heights = {
+            LEGEND_LOCATION.OUTSIDE_RIGHT: 6.3 - 1.2,
+            LEGEND_LOCATION.OUTSIDE_TOP: 6.3 + 0.5,
+        }
+        for location, height in heights.items():
+            with self.subTest(location=location):
+                figure = ScatterMatrix(
+                    self.wide(5), hue="g", legend={"location": location}
+                )
+                self.assertAlmostEqual(figure.get_figwidth(), 6.3)
+                self.assertAlmostEqual(figure.get_figheight(), height)
+        figure = ScatterMatrix(self.wide(5))
+        self.assertEqual(tuple(figure.get_size_inches()), (6.3, 6.3))
+
+    def test_given_figsize_wins(self):
+        figure = ScatterMatrix(self.wide(5), figsize=(9, 9))
+        self.assertEqual(tuple(figure.get_size_inches()), (9, 9))
 
 
 class TestScatterMatrixComposition(unittest.TestCase):
@@ -386,14 +481,22 @@ class TestScatterMatrixComposition(unittest.TestCase):
             Panel([ScatterMatrix(columns())])
 
     def test_nests_in_grid(self):
-        matrix = ScatterMatrix(columns(), hue="species", dimensions=["a", "b"])
         line = LineChart([{"x": 0, "y": 1}, {"x": 1, "y": 2}])
-        figure = Grid([[line, matrix]])
-        # the line, four matrix cells, two diagonal twins, and the legend
-        self.assertEqual(len(figure.axes), 8)
-        self.assertEqual(len([ax for ax in figure.axes if ax.get_legend()]), 1)
-        outer = Grid([[figure]])
-        self.assertEqual(len(outer.axes), 8)
+        for location in LEGEND_LOCATION_EDGES:
+            with self.subTest(location=location):
+                matrix = ScatterMatrix(
+                    columns(),
+                    hue="species",
+                    dimensions=["a", "b"],
+                    legend={"location": location},
+                )
+                figure = Grid([[line, matrix]])
+                # the line, four matrix cells, two diagonal twins, and the legend
+                self.assertEqual(len(figure.axes), 8)
+                self.assertEqual(len([ax for ax in figure.axes if ax.get_legend()]), 1)
+                outer = Grid([[figure]])
+                self.assertEqual(len(outer.axes), 8)
+                outer.canvas.draw()
 
     def test_nested_columns_keep_equal_widths(self):
         matrix = ScatterMatrix(columns(), hue="species", dimensions=["a", "b", "c"])
