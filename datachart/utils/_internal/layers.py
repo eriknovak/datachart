@@ -11491,6 +11491,10 @@ class Panel:
                 fixed = tuple(
                     s.get(f"{axis_name}{end}") is not None for end in ("min", "max")
                 )
+                # a pyramid's `xmax` is mirrored onto both value ends, so it
+                # pins them exactly; ticks may stop short of it
+                if axis_name == "x" and s.get("pyramid_xmax") is not None:
+                    fixed = (True, True)
                 on_data = _snap_limits_to_ticks(
                     ax, axis_name, fixed, data_ends=not polar
                 )

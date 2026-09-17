@@ -4,6 +4,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy
 import pytest
 
 from datachart.charts import BarChart, PyramidChart
@@ -78,6 +79,37 @@ class TestMirroredDrawing:
     def test_xmax_sets_per_side_limit(self):
         figure = PyramidChart(data=[LEFT, RIGHT], xmax=30)
         assert figure.axes[0].get_xlim() == pytest.approx((-30, 30))
+
+    def test_xmax_off_a_tick_is_not_snapped_outward(self):
+        big_left = [
+            {"label": a, "y": v} for a, v in zip(AGES, [120, 180, 220, 150, 90])
+        ]
+        big_right = [
+            {"label": a, "y": v} for a, v in zip(AGES, [110, 190, 240, 160, 400])
+        ]
+        figure = PyramidChart(data=[big_left, big_right], xmax=450)
+        assert figure.axes[0].get_xlim() == pytest.approx((-450, 450))
+
+    def test_automatic_ticks_stay_automatic_under_xmax(self):
+        def tick_step(figure):
+            ticks = sorted(figure.axes[0].get_xticks())
+            return min(numpy.diff(ticks))
+
+        pinned = PyramidChart(data=[LEFT, RIGHT], xmax=27)
+        assert 27 not in pinned.axes[0].get_xticks()
+        assert tick_step(pinned) == pytest.approx(
+            tick_step(PyramidChart([LEFT, RIGHT]))
+        )
+
+    def test_unset_xmax_still_ends_on_a_tick(self):
+        figure = PyramidChart(data=[LEFT, RIGHT])
+        _, hi = figure.axes[0].get_xlim()
+        assert hi in figure.axes[0].get_xticks()
+
+    def test_user_xticks_survive_an_xmax(self):
+        figure = PyramidChart(data=[LEFT, RIGHT], xticks=[0, 10, 20], xmax=25)
+        assert sorted(figure.axes[0].get_xticks()) == [-20, -10, 0, 10, 20]
+        assert figure.axes[0].get_xlim() == pytest.approx((-25, 25))
 
     def test_value_ticks_show_absolute_values(self):
         figure = PyramidChart(data=[LEFT, RIGHT])

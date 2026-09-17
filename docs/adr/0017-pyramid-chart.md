@@ -30,7 +30,9 @@ the mirror a property of the panel's furniture.
   symmetric value limits from the data max and absolute-value tick formatting.
   Amended (issue #189): the legend headroom fit keeps the mirror symmetric —
   a fitted pyramid extends both halves around zero, and a user `xmax` pins
-  the limits against the fit like any value-axis max.
+  the limits against the fit like any value-axis max. Amended (issue #188):
+  a user `xmax` pins the axis exactly; ticks may stop short of it, as on
+  every chart.
 - **Spatial axis spelling, deviating from ADR 0012.** `xlabel`, `xticks`,
   `xmax` address the horizontal (value) axis and `ylabel` the vertical
   (category) axis — what the user sees, not the axis role. The deviation is
