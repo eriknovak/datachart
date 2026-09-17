@@ -19,6 +19,7 @@ from matplotlib.gridspec import GridSpec, SubplotSpec
 from ..constants import FIG_FORMAT
 from ._internal.config_helpers import configure_labels, get_text_style
 from ._internal.figures import new_figure
+from ._internal.plot_engine import SUBPLOT_FURNITURE_KEYS
 
 # =====================================
 # Helper functions
@@ -93,10 +94,7 @@ def _subplot_node(metadata: Dict[str, Any], panels: List[Any]) -> Dict[str, Any]
         "type": "grid",
         "cells": cells,
         "shape": shape,
-        **{
-            key: metadata.get(key)
-            for key in ("title", "xlabel", "ylabel", "sharex", "sharey")
-        },
+        **{key: metadata.get(key) for key in SUBPLOT_FURNITURE_KEYS},
     }
 
 

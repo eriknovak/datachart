@@ -29,6 +29,9 @@ from ...constants import FIG_SIZE, ORIENTATION
 # Chart Rendering
 # ================================================
 
+# the figure-level settings a subplots figure carries into a grid cell
+SUBPLOT_FURNITURE_KEYS = ("title", "xlabel", "ylabel", "sharex", "sharey")
+
 
 def composition_panel(
     chart_type: str,
@@ -238,7 +241,7 @@ def render_chart(
             subplot_config["ncols"],
         )
         # a grid cell rebuilds the figure-level furniture too (ADR 0006)
-        for key in ("title", "xlabel", "ylabel", "sharex", "sharey"):
+        for key in SUBPLOT_FURNITURE_KEYS:
             figure._chart_metadata[key] = settings.get(key)
 
     return figure

@@ -248,3 +248,16 @@ class TestReferenceEntriesBesideCustomHandles(unittest.TestCase):
         legend = legend_of(figure)
         self.assertEqual([t.get_text() for t in legend.get_texts()], ["cut"])
         self.assertEqual(legend.get_title().get_text(), "Refs")
+
+    def test_composed_entries_keep_their_axis_suffix(self):
+        from datachart.charts import RaincloudPlot
+
+        data = [{"label": g, "value": float(v)} for g in "AB" for v in range(6)]
+        rain = RaincloudPlot(data=data, show_legend=True)
+        line = LineChart(data=LINES[0], subtitle="L")
+        figure = Panel(
+            [{"figure": rain}, {"figure": line, "y_axis": "right"}], show_legend=True
+        )
+        labels = self.labels(figure)
+        self.assertEqual(labels[:2], ["A", "B"])
+        self.assertIn("L (R)", labels)

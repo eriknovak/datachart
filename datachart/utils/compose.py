@@ -510,9 +510,9 @@ def Annotate(
     Works on chart figures (including polar ones), `Panel` output, and
     multi-subplot figures (`subplots=True`). On a multi-subplot figure every
     text names its target with a 0-based `subplot` index in render order; the
-    figure is redrawn with the same subplot layout — as in a `Grid` cell,
-    each subplot scales on its own, without the source's `sharex`/`sharey` —
-    and the texts ride the per-subplot panels only, so they show in `Grid`
+    figure is redrawn with the same subplot layout — each subplot scales on
+    its own, without the source's `sharex`/`sharey`, which a `Grid` cell of
+    the result restores — and the texts ride the per-subplot panels only, so they show in `Grid`
     cells but not in a `Panel` overlay of the figure. Grid figures are
     rejected — annotate the sources before composing.
 

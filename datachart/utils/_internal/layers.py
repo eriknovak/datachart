@@ -5072,7 +5072,7 @@ class ViolinLayer(GroupLayer):
                 )
                 self.register_hover(artists[0], lambda _, datum=datum: datum)
 
-    def _draw_body(self, ax, values, position, width, style, side, scale=None):
+    def _draw_body(self, ax, values, position, width, style, side, scale):
         options = dict(
             positions=[position],
             widths=width,
@@ -5257,7 +5257,7 @@ class RidgelineLayer(GroupLayer):
         lo, hi = min(e[0] for e in ends), max(e[1] for e in ends)
         return (10.0**lo, 10.0**hi) if log else (lo, hi)
 
-    def _grid_bounds(self, log: bool = False) -> tuple:
+    def _grid_bounds(self, log: bool) -> tuple:
         """The shared or own padded range, widened to the ticks enclosing it;
         the value-axis limits win.
 
@@ -10291,7 +10291,7 @@ class Panel:
         scales = self._resolve_scales(ax_right, group_axes)
         self._validate_log_scales(scales, group_axes, ax_right)
         scalex, scaley, scale_right = scales
-        # the host's limit keys are the user's; a twin keeps its marks whole
+        # user limits name the host axes, so only host marks are hidden past them
         limit_marks = []
         for group, target_ax in zip(self.groups, group_axes):
             cycle = cycles[palette_key(group)]
@@ -10938,12 +10938,25 @@ class Panel:
                     legend_style.update(
                         expand_legend_location(LEGEND_LOCATION.OUTSIDE_RIGHT)
                     )
-                # the layers' own keys first, then every labelled artist:
-                # references and the marks of composed figures
-                for target in (ax, ax_right):
-                    if target is not None:
-                        custom_handles += target.get_legend_handles_labels()[0]
-                _draw_legend(ax, ax_right, legend_style, custom_handles)
+                # the layers' own keys first, then references and composed marks
+                if s.get("legend_mode") == "combined":
+                    handles, labels = self._combined_legend_entries(
+                        ax, ax_right, horizontal
+                    )
+                else:
+                    handles, labels = ax.get_legend_handles_labels()
+                    if ax_right is not None:
+                        handles_right, labels_right = (
+                            ax_right.get_legend_handles_labels()
+                        )
+                        handles, labels = handles + handles_right, labels + labels_right
+                _draw_legend(
+                    ax,
+                    ax_right,
+                    legend_style,
+                    custom_handles + handles,
+                    [h.get_label() for h in custom_handles] + labels,
+                )
             elif s.get("legend_mode") == "combined":
                 handles, labels = self._combined_legend_entries(
                     ax, ax_right, horizontal
