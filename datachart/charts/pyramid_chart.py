@@ -117,23 +117,26 @@ def PyramidChart(
         xlabel: The label of the horizontal value axis.
         ylabel: The label of the vertical category axis.
         subtitle: The names of the two sides. Used as legend labels.
-        figsize: The size of the figure as (width, height) in inches. See `FIG_SIZE`.
+        figsize: The size of the figure as (width, height) in inches. See
+            [`FIG_SIZE`][datachart.constants.FIG_SIZE].
         xmin: Not supported; the value axis is always symmetric around zero.
             Raises when passed.
         xmax: The maximum per-side value; the value axis spans (-xmax, xmax).
         show_legend: Whether to show the legend.
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
-            `LegendSettingAttrs`.
-        show_grid: Which grid lines to show ("both", "x", "y"). See `SHOW_GRID`.
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
+        show_grid: Which grid lines to show ("both", "x", "y"). See
+            [`SHOW_GRID`][datachart.constants.SHOW_GRID].
         show_yerr: Whether to show error bars on the bars.
         show_values: Whether to show bar value labels at the edge of each bar.
-        value_format: Format string for bar value labels: a `VALUE_FORMAT`
-            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
+        value_format: Format string for bar value labels: a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant or any
+            `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
         sort: The order the categories are drawn in: None (input order),
             "ascending", or "descending" by value. One order serves both
             sides, keyed by the total of the two; ties keep input order.
-            See `SORT`.
+            See [`SORT`][datachart.constants.SORT].
         sort_by: The subtitle of the one side whose values key the sort
             instead of the total. A category that side lacks sorts last.
         emphasis_rule: A one-key dict that highlights the bars matching it
@@ -150,9 +153,11 @@ def PyramidChart(
         yticks: Custom category-axis tick positions.
         yticklabels: Custom category-axis tick labels.
         ytickrotate: Rotation angle for category-axis tick labels.
-        xticks_format: The x-axis tick label format: a `DATE_FORMAT` member
-            or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT`
-            member or `"{x:.1f}"` style string.
+        xticks_format: The x-axis tick label format: a
+            [`DATE_FORMAT`][datachart.constants.DATE_FORMAT] member or `strftime`
+            pattern on a datetime axis, else a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] member or `"{x:.1f}"`
+            style string.
         yticks_format: The y-axis tick label format, as `xticks_format`.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.

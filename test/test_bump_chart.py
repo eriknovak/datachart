@@ -2,6 +2,7 @@
 
 import math
 import unittest
+import warnings
 
 import numpy as np
 import matplotlib
@@ -11,9 +12,9 @@ import matplotlib.pyplot as plt
 
 from datachart.charts import BumpChart
 from datachart.config import config
-from datachart.constants import RANK, LABEL_POSITION, THEME
+from datachart.constants import BUMP_RANK, BUMP_LABEL_POSITION, THEME
 from datachart.utils import Panel, Grid
-from datachart.utils._internal.layers import BumpLayer, rank_series
+from datachart.utils._internal.layers import BumpLayer, MarkClipBox, rank_series
 from datachart.utils._internal.validate import (
     validate_rank_by,
     validate_label_position,
@@ -32,9 +33,19 @@ def _nan_list(values):
 
 
 class TestBumpValidation(unittest.TestCase):
+    def test_no_grid_unless_asked(self):
+        ax = BumpChart(data=DATA).axes[0]
+        ax.figure.canvas.draw()
+        self.assertFalse(
+            any(l.get_visible() for l in ax.get_xgridlines() + ax.get_ygridlines())
+        )
+        ax = BumpChart(data=DATA, show_grid="y").axes[0]
+        ax.figure.canvas.draw()
+        self.assertTrue(any(l.get_visible() for l in ax.get_ygridlines()))
+
     def test_rank_by_defaults_to_descending(self):
-        self.assertEqual(validate_rank_by(None), RANK.VALUE_DESCENDING)
-        for member in (RANK.VALUE_ASCENDING, RANK.GIVEN):
+        self.assertEqual(validate_rank_by(None), BUMP_RANK.VALUE_DESCENDING)
+        for member in (BUMP_RANK.VALUE_ASCENDING, BUMP_RANK.GIVEN):
             self.assertEqual(validate_rank_by(member), member)
 
     def test_rank_by_rejects_unknown(self):
@@ -42,9 +53,9 @@ class TestBumpValidation(unittest.TestCase):
             validate_rank_by("value")
 
     def test_label_position_defaults_to_end(self):
-        self.assertEqual(validate_label_position(None), LABEL_POSITION.END)
+        self.assertEqual(validate_label_position(None), BUMP_LABEL_POSITION.END)
         self.assertEqual(
-            validate_label_position(LABEL_POSITION.BOTH), LABEL_POSITION.BOTH
+            validate_label_position(BUMP_LABEL_POSITION.BOTH), BUMP_LABEL_POSITION.BOTH
         )
 
     def test_label_position_rejects_unknown(self):
@@ -74,17 +85,19 @@ class TestBumpValidation(unittest.TestCase):
 class TestRankSeries(unittest.TestCase):
     def test_descending_ranks_highest_first(self):
         periods, ranks = rank_series(
-            [[1, 2], [1, 2], [1, 2]], [[10, 1], [5, 7], [1, 9]], RANK.VALUE_DESCENDING
+            [[1, 2], [1, 2], [1, 2]],
+            [[10, 1], [5, 7], [1, 9]],
+            BUMP_RANK.VALUE_DESCENDING,
         )
         self.assertEqual(list(periods), [1, 2])
         self.assertEqual([list(r) for r in ranks], [[1, 3], [2, 2], [3, 1]])
 
     def test_ascending_ranks_lowest_first(self):
-        _, ranks = rank_series([[1], [1]], [[10], [5]], RANK.VALUE_ASCENDING)
+        _, ranks = rank_series([[1], [1]], [[10], [5]], BUMP_RANK.VALUE_ASCENDING)
         self.assertEqual([list(r) for r in ranks], [[2], [1]])
 
     def test_ties_keep_input_order(self):
-        for rank_by in (RANK.VALUE_DESCENDING, RANK.VALUE_ASCENDING):
+        for rank_by in (BUMP_RANK.VALUE_DESCENDING, BUMP_RANK.VALUE_ASCENDING):
             with self.subTest(rank_by=rank_by):
                 _, ranks = rank_series([[0], [0], [0]], [[4], [4], [4]], rank_by)
                 self.assertEqual([list(r) for r in ranks], [[1], [2], [3]])
@@ -93,7 +106,7 @@ class TestRankSeries(unittest.TestCase):
         periods, ranks = rank_series(
             [[1, 2, 3], [1, 3], [1, 2, 3]],
             [[1, 5, 1], [9, 9], [2, 3, 2]],
-            RANK.VALUE_DESCENDING,
+            BUMP_RANK.VALUE_DESCENDING,
         )
         self.assertEqual(list(periods), [1, 2, 3])
         self.assertEqual(
@@ -103,31 +116,31 @@ class TestRankSeries(unittest.TestCase):
 
     def test_missing_value_is_a_gap(self):
         _, ranks = rank_series(
-            [[1, 2], [1, 2]], [[1, None], [2, 2]], RANK.VALUE_DESCENDING
+            [[1, 2], [1, 2]], [[1, None], [2, 2]], BUMP_RANK.VALUE_DESCENDING
         )
         self.assertEqual([_nan_list(r) for r in ranks], [[2, None], [1, 1]])
 
     def test_given_ranks_pass_through_with_gaps(self):
-        _, ranks = rank_series([[1, 2], [2]], [[2, 1], [2]], RANK.GIVEN)
+        _, ranks = rank_series([[1, 2], [2]], [[2, 1], [2]], BUMP_RANK.GIVEN)
         self.assertEqual([_nan_list(r) for r in ranks], [[2, 1], [None, 2]])
 
     def test_given_ranks_are_validated(self):
         with self.assertRaisesRegex(ValueError, "positive integer"):
-            rank_series([[1]], [[0.5]], RANK.GIVEN)
+            rank_series([[1]], [[0.5]], BUMP_RANK.GIVEN)
 
     def test_numeric_periods_sort_and_labels_keep_first_seen_order(self):
-        periods, _ = rank_series([[3, 1], [2]], [[1, 1], [1]], RANK.GIVEN)
+        periods, _ = rank_series([[3, 1], [2]], [[1, 1], [1]], BUMP_RANK.GIVEN)
         self.assertEqual(list(periods), [1, 2, 3])
-        periods, _ = rank_series([["b", "a"], ["c"]], [[1, 1], [1]], RANK.GIVEN)
+        periods, _ = rank_series([["b", "a"], ["c"]], [[1, 1], [1]], BUMP_RANK.GIVEN)
         self.assertEqual(list(periods), ["b", "a", "c"])
 
     def test_non_numeric_value_raises(self):
         with self.assertRaisesRegex(ValueError, "non-numeric"):
-            rank_series([[1]], [["high"]], RANK.VALUE_DESCENDING)
+            rank_series([[1]], [["high"]], BUMP_RANK.VALUE_DESCENDING)
 
     def test_repeated_period_in_one_series_raises(self):
         with self.assertRaisesRegex(ValueError, "period"):
-            rank_series([[1, 1]], [[1, 2]], RANK.VALUE_DESCENDING)
+            rank_series([[1, 1]], [[1, 2]], BUMP_RANK.VALUE_DESCENDING)
 
 
 # rank descending: A 1,3  B 2,2  C 3,1
@@ -156,10 +169,15 @@ class TestBumpChartDrawing(unittest.TestCase):
     def test_periods_span_the_x_axis_with_whole_end_markers(self):
         ax = BumpChart(DATA, subtitle=NAMES).axes[0]
         self.assertEqual(ax.get_xlim(), (0, 1))
-        self.assertFalse(ax.get_lines()[0].get_clip_on())
-        for limit in ({"xmax": 0.5}, {"ymax": 2}):
-            cropped = BumpChart(DATA, subtitle=NAMES, **limit).axes[0]
-            self.assertTrue(cropped.get_lines()[0].get_clip_on())
+        box = ax.get_lines()[0].get_clip_box()
+        self.assertIsInstance(box, MarkClipBox)
+        self.assertEqual(box._dims, ("x",))
+        # a period limit may cut a line on purpose: the clip stays
+        cropped = BumpChart(DATA, subtitle=NAMES, xmax=0.5).axes[0]
+        self.assertNotIsInstance(cropped.get_lines()[0].get_clip_box(), MarkClipBox)
+        # a rank limit clips the ranks only: the period ends still draw whole
+        cropped = BumpChart(DATA, subtitle=NAMES, ymax=2).axes[0]
+        self.assertEqual(cropped.get_lines()[0].get_clip_box()._dims, ("x",))
 
     def test_user_rank_limits_keep_rank_one_on_top(self):
         fig = BumpChart(DATA, subtitle=NAMES, ymin=1, ymax=2)
@@ -191,7 +209,7 @@ class TestBumpChartDrawing(unittest.TestCase):
             self.assertEqual(text.get_color(), line.get_color())
 
     def test_label_position_both_labels_each_end(self):
-        fig = BumpChart(DATA, subtitle=NAMES, label_position=LABEL_POSITION.BOTH)
+        fig = BumpChart(DATA, subtitle=NAMES, label_position=BUMP_LABEL_POSITION.BOTH)
         ax = fig.axes[0]
         self.assertEqual(len(ax.texts), 6)
         starts = [t for t in ax.texts if t.get_ha() == "right"]
@@ -259,7 +277,7 @@ class TestBumpChartDrawing(unittest.TestCase):
                     BumpChart(DATA, **kwargs)
 
     def test_rank_given_draws_y_as_rank(self):
-        fig = BumpChart([series([2, 1]), series([1, 2])], rank_by=RANK.GIVEN)
+        fig = BumpChart([series([2, 1]), series([1, 2])], rank_by=BUMP_RANK.GIVEN)
         ranks = [list(l.get_ydata()) for l in fig.axes[0].get_lines()]
         self.assertEqual(ranks, [[2, 1], [1, 2]])
 
@@ -282,6 +300,37 @@ class TestBumpChartDrawing(unittest.TestCase):
                 BumpChart(DATA, subtitle=NAMES, line_curve=0.5).canvas.draw()
 
 
+class TestPeriodTicks(unittest.TestCase):
+    PERIODS = [1980, 1990, 2000, 2010, 2020, 2023]
+
+    def _chart(self, width):
+        data = [
+            [{"x": x, "y": v} for x, v in zip(self.PERIODS, vals)]
+            for vals in ([5, 4, 3, 2, 1, 1], [1, 2, 3, 4, 5, 6])
+        ]
+        fig = BumpChart(data, subtitle=["a", "b"], figsize=(width, 3))
+        fig.canvas.draw()
+        return fig.axes[0]
+
+    def test_every_period_is_a_tick_when_the_labels_fit(self):
+        self.assertEqual(list(self._chart(10).get_xticks()), self.PERIODS)
+
+    def test_colliding_labels_drop_out_but_the_ends_stay(self):
+        ax = self._chart(3)
+        ticks = list(ax.get_xticks())
+        self.assertEqual(ticks[0], 1980)
+        self.assertEqual(ticks[-1], 2023)
+        self.assertNotIn(2020, ticks)
+        boxes = [t.get_window_extent() for t in ax.get_xticklabels() if t.get_visible()]
+        for a, b in zip(boxes, boxes[1:]):
+            self.assertLess(a.x1, b.x0)
+
+    def test_subplots_do_not_warn_about_the_legend(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            BumpChart(data=DATA, subtitle=NAMES, subplots=True, show_labels=False)
+
+
 class TestBumpChartComposition(unittest.TestCase):
     def tearDown(self):
         plt.close("all")
@@ -290,7 +339,7 @@ class TestBumpChartComposition(unittest.TestCase):
         fig = Panel(
             [
                 BumpChart(DATA, subtitle=NAMES),
-                BumpChart([series([3, 2])], subtitle="D", rank_by=RANK.GIVEN),
+                BumpChart([series([3, 2])], subtitle="D", rank_by=BUMP_RANK.GIVEN),
             ]
         )
         ax = fig.axes[0]

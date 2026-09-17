@@ -11,10 +11,11 @@ from matplotlib.collections import PolyCollection
 
 from datachart.charts import StackedAreaChart, LineChart
 from datachart.config import config
-from datachart.constants import BASELINE, THEME
+from datachart.constants import STACKED_AREA_BASELINE, THEME
 from datachart.utils import Panel, Grid
 from datachart.utils._internal.config_helpers import get_stackedarea_style
 from datachart.utils._internal.layers import (
+    MarkClipBox,
     build_layers,
     stack_first_line,
     _stack_slots,
@@ -79,24 +80,28 @@ def _charts(data):
 
 class TestStackOffsets(unittest.TestCase):
     def test_zero_starts_at_zero(self):
-        np.testing.assert_array_equal(stack_first_line(Y, BASELINE.ZERO), 0)
+        np.testing.assert_array_equal(
+            stack_first_line(Y, STACKED_AREA_BASELINE.ZERO), 0
+        )
 
     def test_percent_columns_sum_to_100(self):
         layers = build_layers("stackedareachart", _charts(DATA), {})
-        slots = _stack_slots(layers, BASELINE.PERCENT)
+        slots = _stack_slots(layers, STACKED_AREA_BASELINE.PERCENT)
         top = slots[id(layers[-1])].top
         np.testing.assert_allclose(top, 100.0)
         np.testing.assert_array_equal(slots[id(layers[0])].bottom, 0)
 
     def test_sym_is_symmetric_about_zero(self):
-        first = stack_first_line(Y, BASELINE.SYM)
+        first = stack_first_line(Y, STACKED_AREA_BASELINE.SYM)
         np.testing.assert_allclose(first, -Y.sum(0) / 2)
         np.testing.assert_allclose(first + Y.sum(0), -first)
 
     def test_wiggle_matches_stackplot(self):
         m = Y.shape[0]
         expected = (Y * (m - 0.5 - np.arange(m)[:, None])).sum(0) / -m
-        np.testing.assert_allclose(stack_first_line(Y, BASELINE.WIGGLE), expected)
+        np.testing.assert_allclose(
+            stack_first_line(Y, STACKED_AREA_BASELINE.WIGGLE), expected
+        )
 
     def test_weighted_wiggle_matches_stackplot(self):
         fig, ax = plt.subplots()
@@ -104,13 +109,13 @@ class TestStackOffsets(unittest.TestCase):
         vertices = polys[0].get_paths()[0].vertices
         # the first polygon's lower edge is the baseline
         lower = [vertices[vertices[:, 0] == x, 1].min() for x in range(4)]
-        first = stack_first_line(Y, BASELINE.WEIGHTED_WIGGLE)
+        first = stack_first_line(Y, STACKED_AREA_BASELINE.WEIGHTED_WIGGLE)
         np.testing.assert_allclose(lower, first)
         plt.close(fig)
 
     def test_series_order_is_stack_order(self):
         layers = build_layers("stackedareachart", _charts(DATA), {})
-        slots = _stack_slots(layers, BASELINE.ZERO)
+        slots = _stack_slots(layers, STACKED_AREA_BASELINE.ZERO)
         np.testing.assert_array_equal(slots[id(layers[0])].top, Y[0])
         np.testing.assert_array_equal(slots[id(layers[1])].bottom, Y[0])
         np.testing.assert_array_equal(slots[id(layers[2])].top, Y.sum(0))
@@ -145,15 +150,20 @@ class TestStackedAreaChart(unittest.TestCase):
         self.assertEqual(len(fig.axes[0].lines), 3)
 
     def test_zero_and_percent_pin_the_bottom(self):
-        for baseline in (BASELINE.ZERO, BASELINE.PERCENT):
+        for baseline in (STACKED_AREA_BASELINE.ZERO, STACKED_AREA_BASELINE.PERCENT):
             fig = StackedAreaChart(data=DATA, baseline=baseline)
             self.assertEqual(fig.axes[0].get_ylim()[0], 0.0)
 
-    def test_sym_keeps_the_margin(self):
-        fig = StackedAreaChart(data=DATA, baseline=BASELINE.SYM)
+    def test_sym_ends_on_the_stack(self):
+        fig = StackedAreaChart(data=DATA, baseline=STACKED_AREA_BASELINE.SYM)
         lo, hi = fig.axes[0].get_ylim()
-        self.assertLess(lo, -3.0)
-        self.assertAlmostEqual(lo, -hi)
+        self.assertEqual((lo, hi), (-3.0, 3.0))
+
+    def test_percent_ends_at_one_hundred(self):
+        fig = StackedAreaChart(data=DATA, baseline=STACKED_AREA_BASELINE.PERCENT)
+        lo, hi = fig.axes[0].get_ylim()
+        self.assertEqual(lo, 0.0)
+        self.assertAlmostEqual(hi, 100.0)
 
     def test_x_is_tightened(self):
         fig = StackedAreaChart(data=DATA)
@@ -183,7 +193,7 @@ class TestStackedAreaChart(unittest.TestCase):
         self.assertEqual(band.get_alpha(), config["plot_stackedarea_alpha"])
 
     def test_panel_with_line_keeps_the_stack(self):
-        stack = StackedAreaChart(data=DATA, baseline=BASELINE.SYM)
+        stack = StackedAreaChart(data=DATA, baseline=STACKED_AREA_BASELINE.SYM)
         line = LineChart(data=DATA[0])
         fig = Panel([stack, line])
         ax = fig.axes[0]
@@ -194,6 +204,45 @@ class TestStackedAreaChart(unittest.TestCase):
     def test_panel_of_line_layers_tightens_x(self):
         fig = Panel([StackedAreaChart(data=DATA), LineChart(data=DATA[0])])
         self.assertEqual(fig.axes[0].get_xlim(), (0.0, 3.0))
+
+    def test_tightened_x_never_snaps_to_a_tick(self):
+        """The data range wins over the tick grid: no empty step before 1."""
+        line = LineChart(data=[{"x": x, "y": x} for x in range(1, 17)])
+        self.assertEqual(line.axes[0].get_xlim(), (1.0, 16.0))
+        stack = StackedAreaChart(data=[series([1, 2, 3]) for _ in range(2)])
+        self.assertEqual(stack.axes[0].get_xlim(), (0.0, 2.0))
+
+    def test_line_end_markers_draw_whole(self):
+        """Markers on the pinned x ends clip to the axes grown by their radius."""
+        fig = LineChart(
+            data=[{"x": x, "y": x} for x in range(1, 17)],
+            style={"plot_line_marker": "o"},
+        )
+        fig.canvas.draw()
+        ax = fig.axes[0]
+        line = ax.lines[0]
+        box = line.get_clip_box()
+        self.assertIsInstance(box, MarkClipBox)
+        radius = line.get_markersize() / 2 * fig.dpi / 72
+        self.assertGreaterEqual(box.x0, ax.bbox.x0 - radius - 2)
+        self.assertLess(box.x0, ax.bbox.x0 - radius + 1e-6)
+        self.assertGreater(box.x1, ax.bbox.x1 + radius - 1e-6)
+        # a user limit may cut the line on purpose: the clip stays on that axis
+        cropped = LineChart(data=[{"x": x, "y": x} for x in range(1, 17)], xmax=8)
+        box = cropped.axes[0].lines[0].get_clip_box()
+        self.assertFalse(isinstance(box, MarkClipBox) and "x" in box._dims)
+
+    def test_legend_adds_no_headroom_over_a_pinned_stack(self):
+        fig = StackedAreaChart(
+            data=DATA,
+            baseline=STACKED_AREA_BASELINE.PERCENT,
+            subtitle=list("abc"),
+            show_legend=True,
+        )
+        fig.canvas.draw()
+        lo, hi = fig.axes[0].get_ylim()
+        self.assertEqual(lo, 0.0)
+        self.assertAlmostEqual(hi, 100.0)
 
     def test_log_scale_keeps_its_own_floor(self):
         import warnings

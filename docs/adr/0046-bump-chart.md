@@ -16,7 +16,7 @@ axis, and placing text at the line ends.
   names from `subtitle`. The issue's `{"label", "x": [...], "y": [...]}`
   shape was dropped: a second series shape for one front would split the
   line-family API for no gain.
-- **`rank_by` is a `RANK` member: `VALUE_DESCENDING` (default), `VALUE_ASCENDING`,
+- **`rank_by` is a `BUMP_RANK` member: `VALUE_DESCENDING` (default), `VALUE_ASCENDING`,
   `GIVEN`.** Descending gives rank 1 to the highest value, ascending to the
   lowest (lap times, golf scores); a caller negating data instead would also
   negate the numbers `show_values` prints. There is no bare `VALUE` member:
@@ -32,7 +32,7 @@ axis, and placing text at the line ends.
   line is which. The x spine is hidden too; its ticks stay.
 - **End labels are `show_labels: bool` plus `label_position`.** `show_labels`
   keeps the bool type `ContourChart` already gives it; `label_position` is a
-  `LABEL_POSITION` member (`START`, `END` default, `BOTH`). A label prints
+  `BUMP_LABEL_POSITION` member (`START`, `END` default, `BOTH`). A label prints
   beside the series' first and/or last point in its color; the legend is off
   by default when labels are on. The placement is written so `LineChart` can
   adopt it later, which this ADR does not do.

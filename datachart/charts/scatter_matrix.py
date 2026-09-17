@@ -29,7 +29,7 @@ from ..typings import (
     ScatterMatrixDataPointAttrs,
     StyleAttrs,
 )
-from ..constants import BAR_MODE, DIAGONAL, SHOW_GRID
+from ..constants import BAR_MODE, SCATTER_MATRIX_DIAGONAL, SHOW_GRID
 
 # a matrix cell's side, in inches, when no figsize is given
 CELL_SIZE = 2.2
@@ -169,7 +169,7 @@ def _diagonal_panel(values, groups, diagonal, style, settings) -> Panel:
     charts = build_charts_structure(
         series, subtitle=[label for label, _ in groups], style=style
     )
-    chart_type = "kde" if diagonal == DIAGONAL.KDE else "histogram"
+    chart_type = "kde" if diagonal == SCATTER_MATRIX_DIAGONAL.KDE else "histogram"
     return composition_panel(chart_type, charts, settings)
 
 
@@ -217,7 +217,7 @@ def ScatterMatrix(
     *,
     dimensions: Optional[List[str]] = None,
     hue: Optional[str] = None,
-    diagonal: Optional[Union[DIAGONAL, str]] = None,
+    diagonal: Optional[Union[SCATTER_MATRIX_DIAGONAL, str]] = None,
     lower_only: Optional[bool] = None,
     show_regression: Optional[bool] = None,
     show_correlation: Optional[bool] = None,
@@ -279,9 +279,9 @@ def ScatterMatrix(
         hue: The column whose categories colour the points, one colour per
             category and one legend for the whole figure. A numeric column
             raises.
-        diagonal: What each dimension's own cell shows: a histogram
-            (`"hist"`, default), a density curve (`"kde"`), or nothing
-            (`"none"`). See `DIAGONAL`.
+        diagonal: What each dimension's own cell shows: a histogram (`"hist"`, default),
+            a density curve (`"kde"`), or nothing (`"none"`). See
+            [`SCATTER_MATRIX_DIAGONAL`][datachart.constants.SCATTER_MATRIX_DIAGONAL].
         lower_only: Whether to leave the cells above the diagonal empty.
             Wins over `show_correlation`.
         show_regression: Whether to draw a least-squares line per hue group
@@ -295,16 +295,18 @@ def ScatterMatrix(
             axis shows its row's scale too; its histogram or density curve
             keeps its own, unlabelled height.
         title: The title of the figure.
-        figsize: The size of the figure. Defaults to 2.2 inches per cell.
+        figsize: The size of the figure; the cells stay square inside it.
+            Defaults to 2.2 inches per cell.
         show_legend: Whether to show the legend of the hue groups (default
             `True` when `hue` is set).
-        legend: The legend setting: title, column count and alignment; the
-            legend sits to the right of the matrix. See `LegendSettingAttrs`.
+        legend: The legend setting: title, column count and alignment; the legend sits
+            to the right of the matrix. See
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show in the cells (e.g., "both", "x",
             "y").
         style: Style attributes for every cell: the scatter, histogram,
             plot text and `plot_scatter_matrix_*` keys. See
-            `ScatterMatrixStyleAttrs`.
+            [`ScatterMatrixStyleAttrs`][datachart.typings.ScatterMatrixStyleAttrs].
 
     Returns:
         The figure containing the scatter matrix.
@@ -335,7 +337,8 @@ def ScatterMatrix(
     n = len(dims)
     blank = [
         [
-            (i == j and diagonal == DIAGONAL.NONE) or (i < j and bool(lower_only))
+            (i == j and diagonal == SCATTER_MATRIX_DIAGONAL.NONE)
+            or (i < j and bool(lower_only))
             for j in range(n)
         ]
         for i in range(n)
@@ -347,7 +350,7 @@ def ScatterMatrix(
     ]
     left = [min((j for j in range(n) if drawn[i][j]), default=0) for i in range(n)]
     # a blank diagonal under lower_only leaves the top row and right column empty
-    trim = 1 if lower_only and diagonal == DIAGONAL.NONE and n > 1 else 0
+    trim = 1 if lower_only and diagonal == SCATTER_MATRIX_DIAGONAL.NONE and n > 1 else 0
     cells, kinds = [], []
     for i in range(trim, n):
         for j in range(n - trim):
@@ -432,6 +435,8 @@ def ScatterMatrix(
         "sharex": "col" if sharex else False,
         "sharey": "row" if sharey else False,
         "legend": node_legend,
+        # cells stay square whatever figure or grid cell holds the matrix
+        "box_aspect": 1,
     }
 
     size = n - trim

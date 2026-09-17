@@ -42,7 +42,7 @@ temporal detection (ADR 0037), the heatmap's cells, value labels (ADR
   A fourth-quarter series draws October to December, not nine blank
   months; a full year draws the year. Missing days inside that range are
   the blank cells.
-- **Layout.** `week_start` is a `WEEKDAY` member (`MONDAY` or `SUNDAY`),
+- **Layout.** `week_start` is a `CALENDAR_WEEKDAY` member (`MONDAY` or `SUNDAY`),
   defaulting to the theme's `plot_calendar_heatmap_week_start`. Month
   separators are stepped lines along the left edge of every month but the
   first, in `plot_calendar_heatmap_month_line_*`. Month labels sit over the

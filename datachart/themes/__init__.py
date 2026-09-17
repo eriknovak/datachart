@@ -2,17 +2,8 @@
 
 The `themes` module contains the predefined style themes that are used to visualize
 the plots. Themes are named for their visual trait, never for a use case or
-audience.
-
-Attributes:
-    DEFAULT_THEME (datachart.typings.StyleAttrs): The default theme style.
-    GREYSCALE_THEME (datachart.typings.StyleAttrs): The greyscale theme style.
-    INK_THEME (datachart.typings.StyleAttrs): The ink theme style (dark-ink accents, print-ready).
-    HATCH_THEME (datachart.typings.StyleAttrs): The hatch theme style (hatch cycle, black edges, dotted grid).
-    MINIMAL_THEME (datachart.typings.StyleAttrs): The minimal theme style (accent blue, no spines, flat bars).
-    MATERIAL_THEME (datachart.typings.StyleAttrs): The material theme style (Google palette, light grid).
-    SKETCH_THEME (datachart.typings.StyleAttrs): The sketch theme style (hand-drawn, xkcd-style wobble and halo, Comic Neue font).
-    QUILL_THEME (datachart.typings.StyleAttrs): The quill theme style (black ink on white paper, pen-stroked lines, etched fills, IM Fell English font).
+audience; each is a complete `StyleAttrs` dictionary that `config.set_theme`
+applies.
 
 """
 

@@ -24,6 +24,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.dates as mdates
+from dateutil.relativedelta import relativedelta
 from matplotlib.font_manager import FontProperties
 from matplotlib import rc_context
 import matplotlib.ticker as mticker
@@ -41,11 +42,13 @@ from matplotlib.mlab import GaussianKDE
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
 from matplotlib.path import Path
+from matplotlib.text import Text
 from matplotlib.transforms import (
     offset_copy,
     Bbox,
     IdentityTransform,
     ScaledTranslation,
+    TransformedBbox,
     TransformedPath,
 )
 import matplotlib.patheffects as patheffects
@@ -169,35 +172,35 @@ from ..stats import minimum, maximum, iqr, kde1d
 from ...constants import (
     ARROW_STYLE,
     ASPECT_RATIO,
-    BASELINE,
+    BUMP_LABEL_POSITION,
+    BUMP_RANK,
+    CALENDAR_WEEKDAY,
     COLORBAR_LOCATION,
     COLORS,
+    CONTOUR_LEVELS,
     DATE_FORMAT,
-    DATE_PERIOD,
-    DIRECTION,
     DUMBBELL_SORT_KEY,
     DUMBBELL_VALUE,
-    CONTOUR_LEVELS,
-    HEXBIN_REDUCE,
     EMPHASIS,
     FONT_WEIGHT,
     GANTT_ARROW_ENTRY,
+    GANTT_DATE_PERIOD,
     GANTT_SORT_KEY,
     GANTT_VALUE,
+    HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
     LEGEND_LOCATION,
-    LABEL_POSITION,
     NETWORK_LAYOUT,
-    NODE_LABEL_POSITION,
+    NETWORK_LABEL_POSITION,
     ORIENTATION,
-    RANK,
-    RIDGELINE_SCALE,
-    SWARM_MODE,
+    RADIAL_DIRECTION,
     RADIAL_TYPE,
+    RIDGELINE_SCALE,
     SCALE,
     SORT,
+    STACKED_AREA_BASELINE,
+    SWARM_MODE,
     VALUE_FORMAT,
-    WEEKDAY,
     VIOLIN_INNER,
 )
 from ...config import config
@@ -314,11 +317,13 @@ NETWORK_INKED_HEAD_WIDTH = 0.6
 NETWORK_RING_WIDTH = 0.9
 # the gap between a node's marker and a name printed above it, in points
 NETWORK_LABEL_GAP = 2.0
+# the spacing, in pixels, of the boxes an edge is sampled into for BEST labels
+NETWORK_OBSTACLE_STEP = 6.0
 # matplotlib skips underscore-prefixed labels when assembling the legend
 NO_LEGEND = "_nolegend_"
 # radial furniture defaults: compass and calendar conventions (ADR 0015)
 DEFAULT_STARTANGLE = "N"
-DEFAULT_DIRECTION = DIRECTION.CLOCKWISE
+DEFAULT_DIRECTION = RADIAL_DIRECTION.CLOCKWISE
 COMPASS_LOCATIONS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
 # the polar border circle crosses the plot area, so the r-value labels and
 # the legend stack above the spine zorder, not just above the marks
@@ -332,12 +337,8 @@ RADIAL_YLABEL_PAD = 30
 RADIAL_TIP_VALUE_PAD = 0.03
 RADIAL_TIP_LABEL_PAD = 0.06
 # a soft box keeps polar tip texts legible over the grid spokes and the border
-TEXT_HALO = {
-    "boxstyle": "round,pad=0.15",
-    "facecolor": "#FFFFFF",
-    "edgecolor": "none",
-    "alpha": 0.6,
-}
+# a radius label hangs this many points inside its ring, plus half its height
+RADIAL_RLABEL_INSET = 3.0
 # extra radial room so tip labels stay inside the border circle
 RADIAL_TIP_LABEL_HEADROOM = 0.25
 
@@ -597,27 +598,33 @@ def _tick_formatter(fmt, temporal: bool, locator=None, tz=None):
 
 # a period's labels, and the enclosing period named in the row beneath
 DATE_PERIOD_LABELS = {
-    DATE_PERIOD.DAY: "%d",
-    DATE_PERIOD.WEEK: "W%V",
-    DATE_PERIOD.MONTH: "%b",
-    DATE_PERIOD.QUARTER: None,
-    DATE_PERIOD.YEAR: "%Y",
+    GANTT_DATE_PERIOD.DAY: "%d",
+    GANTT_DATE_PERIOD.WEEK: "W%V",
+    GANTT_DATE_PERIOD.MONTH: "%b",
+    GANTT_DATE_PERIOD.QUARTER: None,
+    GANTT_DATE_PERIOD.YEAR: "%Y",
+    GANTT_DATE_PERIOD.PROJECT_MONTH: None,
 }
+# the project year, the row beneath project months; never a period of its own
+PROJECT_YEAR = "project_year"
 DATE_PERIOD_PARENT = {
-    DATE_PERIOD.DAY: DATE_PERIOD.MONTH,
-    DATE_PERIOD.WEEK: DATE_PERIOD.MONTH,
-    DATE_PERIOD.MONTH: DATE_PERIOD.YEAR,
-    DATE_PERIOD.QUARTER: DATE_PERIOD.YEAR,
-    DATE_PERIOD.YEAR: None,
+    GANTT_DATE_PERIOD.DAY: GANTT_DATE_PERIOD.MONTH,
+    GANTT_DATE_PERIOD.WEEK: GANTT_DATE_PERIOD.MONTH,
+    GANTT_DATE_PERIOD.MONTH: GANTT_DATE_PERIOD.YEAR,
+    GANTT_DATE_PERIOD.QUARTER: GANTT_DATE_PERIOD.YEAR,
+    GANTT_DATE_PERIOD.YEAR: None,
+    GANTT_DATE_PERIOD.PROJECT_MONTH: PROJECT_YEAR,
 }
-DATE_PARENT_LABELS = {DATE_PERIOD.MONTH: "%b %Y", DATE_PERIOD.YEAR: "%Y"}
+DATE_PARENT_LABELS = {GANTT_DATE_PERIOD.MONTH: "%b %Y", GANTT_DATE_PERIOD.YEAR: "%Y"}
 # the longest period of each kind in days, to reach the edges beyond the view
 DATE_PERIOD_SPAN = {
-    DATE_PERIOD.DAY: 1,
-    DATE_PERIOD.WEEK: 7,
-    DATE_PERIOD.MONTH: 31,
-    DATE_PERIOD.QUARTER: 92,
-    DATE_PERIOD.YEAR: 366,
+    GANTT_DATE_PERIOD.DAY: 1,
+    GANTT_DATE_PERIOD.WEEK: 7,
+    GANTT_DATE_PERIOD.MONTH: 31,
+    GANTT_DATE_PERIOD.QUARTER: 92,
+    GANTT_DATE_PERIOD.YEAR: 366,
+    GANTT_DATE_PERIOD.PROJECT_MONTH: 31,
+    PROJECT_YEAR: 366,
 }
 # a period cut to under this share of the widest visible one is unlabelled
 DATE_PERIOD_MIN_SHARE = 0.2
@@ -625,16 +632,113 @@ DATE_PERIOD_MIN_SHARE = 0.2
 DATE_PARENT_ROW_SPACING = 1.6
 
 
-def _period_edges(period: str, tz=None) -> mdates.DateLocator:
+def _months_since(origin, moment) -> int:
+    """The whole months from the project origin to `moment`; negative before it."""
+
+    months = (moment.year - origin.year) * 12 + moment.month - origin.month
+    if (moment.day, moment.hour, moment.minute) < (
+        origin.day,
+        origin.hour,
+        origin.minute,
+    ):
+        months -= 1
+    return months
+
+
+class ProjectPeriodEdges(mticker.Locator):
+    """Edges every `months` months from the project origin, M1 starting there."""
+
+    def __init__(self, origin, months: int):
+        self.origin = origin
+        self.months = months
+
+    def tick_values(self, vmin, vmax):
+        lo, hi = (
+            v if isinstance(v, (int, float)) else mdates.date2num(v)
+            for v in (vmin, vmax)
+        )
+        first = _months_since(self.origin, mdates.num2date(lo, tz=self.origin.tzinfo))
+        # no edge before the origin: the time before M1 is no project period
+        k = max(first // self.months - 1, 0)
+        edges = []
+        while True:
+            edge = mdates.date2num(self.origin + relativedelta(months=self.months * k))
+            if edge > hi:
+                return edges
+            edges.append(edge)
+            k += 1
+
+    def __call__(self):
+        return self.tick_values(*sorted(self.axis.get_view_interval()))
+
+
+# a schedule's date ticks: at most this many regular steps from the first start
+SCHEDULE_TICKS_MAX = 8
+SCHEDULE_TICK_DAYS = (1, 2, 3, 4, 5, 7, 14, 21, 28)
+SCHEDULE_TICK_MONTHS = (1, 2, 3, 4, 6, 12, 24, 60)
+
+
+class ScheduleTicks(mticker.Locator):
+    """Date ticks from a schedule's first start to its last end (ADR 0049).
+
+    The ticks step regularly from the first start, in whole days or months,
+    and the last end is always a tick; a regular tick within half a step of
+    it gives way, so the two never crowd.
+    """
+
+    def __init__(self, start: float, end: float, tz=None):
+        self.start, self.end, self.tz = start, end, tz
+
+    def tick_values(self, vmin, vmax):
+        span = self.end - self.start
+        if span <= 0:
+            return [self.start]
+        # the finest day step that keeps the count, preferring one that
+        # divides the span so the last interval is no shorter than the rest
+        fitting = [d for d in SCHEDULE_TICK_DAYS if span / d <= SCHEDULE_TICKS_MAX]
+        even = [d for d in fitting if span % d == 0]
+        step = (even or fitting or [None])[0]
+        if step is not None:
+            ticks = list(np.arange(self.start, self.end, step))
+        else:
+            months = next(
+                (
+                    m
+                    for m in SCHEDULE_TICK_MONTHS
+                    if span / (m * 30.4) <= SCHEDULE_TICKS_MAX
+                ),
+                SCHEDULE_TICK_MONTHS[-1],
+            )
+            step = months * 30.4
+            origin = mdates.num2date(self.start, tz=self.tz)
+            ticks, k = [], 0
+            while (
+                tick := mdates.date2num(origin + relativedelta(months=months * k))
+            ) < self.end:
+                ticks.append(tick)
+                k += 1
+        if ticks and self.end - ticks[-1] < step / 2:
+            ticks.pop()
+        return ticks + [self.end]
+
+    def __call__(self):
+        return self.tick_values(*sorted(self.axis.get_view_interval()))
+
+
+def _period_edges(period: str, tz=None, origin=None) -> mticker.Locator:
     """The locator of a period's first instants: its edges on the axis."""
 
-    if period == DATE_PERIOD.DAY:
+    if period == GANTT_DATE_PERIOD.PROJECT_MONTH:
+        return ProjectPeriodEdges(origin, 1)
+    if period == PROJECT_YEAR:
+        return ProjectPeriodEdges(origin, 12)
+    if period == GANTT_DATE_PERIOD.DAY:
         return mdates.DayLocator(tz=tz)
-    if period == DATE_PERIOD.WEEK:
+    if period == GANTT_DATE_PERIOD.WEEK:
         return mdates.WeekdayLocator(byweekday=mdates.MO, tz=tz)
-    if period == DATE_PERIOD.MONTH:
+    if period == GANTT_DATE_PERIOD.MONTH:
         return mdates.MonthLocator(tz=tz)
-    if period == DATE_PERIOD.QUARTER:
+    if period == GANTT_DATE_PERIOD.QUARTER:
         return mdates.MonthLocator(bymonth=(1, 4, 7, 10), tz=tz)
     return mdates.YearLocator(tz=tz)
 
@@ -663,35 +767,54 @@ class PeriodCentres(mticker.Locator):
         return list(((edges[:-1] + edges[1:]) / 2)[keep])
 
 
-def _period_formatter(period: str, fmt, tz=None) -> mticker.FuncFormatter:
+def _project_label(period: str, moment, origin) -> str:
+    """M1, M2, … or Y1, Y2, … counted from the project origin."""
+
+    months = _months_since(origin, moment)
+    if period == GANTT_DATE_PERIOD.PROJECT_MONTH:
+        return f"M{months + 1}"
+    return f"Y{months // 12 + 1}"
+
+
+def _period_formatter(period: str, fmt, tz=None, origin=None) -> mticker.FuncFormatter:
     """A period's label at its centre: the format given, else the period's own."""
 
     def label(value, _pos=None):
         moment = mdates.num2date(value, tz=tz)
         if not _auto_format(fmt):
             return moment.strftime(fmt)
-        if period == DATE_PERIOD.QUARTER:
+        if period == GANTT_DATE_PERIOD.QUARTER:
             return f"Q{(moment.month - 1) // 3 + 1}"
+        if period == GANTT_DATE_PERIOD.PROJECT_MONTH:
+            return _project_label(period, moment, origin)
         return moment.strftime(DATE_PERIOD_LABELS[period])
 
     return mticker.FuncFormatter(label)
 
 
-def _apply_date_period(ax, axis_name: str, period: str, fmt, tz=None) -> None:
+def _apply_date_period(
+    ax, axis_name: str, period: str, fmt, tz=None, origin=None, bounds=None
+) -> None:
     """Divide a date axis into calendar periods (ADR 0049).
 
     Minor ticks mark the period edges and carry the grid lines; major ticks
     label each period at its centre. The enclosing period names its span in
-    a row beneath, drawn on a secondary axis offset by one label row.
+    a row beneath, drawn on a secondary axis offset by one label row. Project
+    months count from `origin`, the project start, under their project year.
+    `bounds`, the schedule's (start, end) with a fixed limit as None, snaps
+    the free ends of the view to the enclosing period edges, so every period
+    shows whole and the labels sit evenly.
     """
 
     axis = getattr(ax, f"{axis_name}axis")
-    axis.set_minor_locator(_period_edges(period, tz))
+    if bounds is not None:
+        _snap_to_periods(ax, axis_name, period, tz, origin, bounds)
+    axis.set_minor_locator(_period_edges(period, tz, origin))
     axis.set_minor_formatter(mticker.NullFormatter())
     axis.set_major_locator(
-        PeriodCentres(_period_edges(period, tz), DATE_PERIOD_SPAN[period])
+        PeriodCentres(_period_edges(period, tz, origin), DATE_PERIOD_SPAN[period])
     )
-    axis.set_major_formatter(_period_formatter(period, fmt, tz))
+    axis.set_major_formatter(_period_formatter(period, fmt, tz, origin))
     params = axis.get_tick_params(which="major")
     # the edge marks take the major tick look the furniture gave the axis
     edge_marks = {k: params[k] for k in ("length", "width", "color") if k in params}
@@ -712,15 +835,16 @@ def _apply_date_period(ax, axis_name: str, period: str, fmt, tz=None) -> None:
     )
     other = getattr(secondary, f"{axis_name}axis")
     other.set_major_locator(
-        PeriodCentres(_period_edges(parent, tz), DATE_PERIOD_SPAN[parent])
+        PeriodCentres(_period_edges(parent, tz, origin), DATE_PERIOD_SPAN[parent])
     )
-    other.set_major_formatter(
-        mticker.FuncFormatter(
-            lambda value, _pos=None: mdates.num2date(value, tz=tz).strftime(
-                DATE_PARENT_LABELS[parent]
-            )
-        )
-    )
+
+    def parent_label(value, _pos=None):
+        moment = mdates.num2date(value, tz=tz)
+        if parent == PROJECT_YEAR:
+            return _project_label(parent, moment, origin)
+        return moment.strftime(DATE_PARENT_LABELS[parent])
+
+    other.set_major_formatter(mticker.FuncFormatter(parent_label))
     other.set_tick_params(
         length=0,
         pad=params.get("pad", mpl.rcParams[f"{axis_name}tick.major.pad"])
@@ -730,6 +854,150 @@ def _apply_date_period(ax, axis_name: str, period: str, fmt, tz=None) -> None:
     )
     for spine in secondary.spines.values():
         spine.set_visible(False)
+
+
+def _shared_data_interval(ax, axis_name: str) -> tuple:
+    """The data range of an axis, across every axes that shares it."""
+
+    intervals = [
+        getattr(a.dataLim, f"interval{axis_name}")
+        for a in ax._shared_axes[axis_name].get_siblings(ax)
+    ]
+    intervals = [i for i in intervals if np.isfinite(i).all()]
+    if not intervals:
+        return tuple(sorted(getattr(ax, f"{axis_name}axis").get_data_interval()))
+    return min(min(i) for i in intervals), max(max(i) for i in intervals)
+
+
+def _snap_limits_to_ticks(
+    ax, axis_name: str, fixed=(False, False), data_ends: bool = True
+) -> bool:
+    """Move an axis's free view ends outward to its locator's ticks.
+
+    A continuous axis then starts and ends on a tick. Only an automatic
+    locator on a linear scale qualifies: a fixed tick set (a category axis,
+    user ticks) or a log-family scale keeps its view, as does a user limit.
+    With `data_ends`, an end whose data already sits on a tick and is
+    overshot by the autoscale margin alone stops on that tick: the margin
+    never adds a whole step, while headroom added on purpose still does.
+    Returns whether a free end now lands on the data, so the marks there
+    can draw whole.
+    """
+
+    axis = getattr(ax, f"{axis_name}axis")
+    if all(fixed) or axis.get_scale() != "linear":
+        return False
+    # a polar r axis wraps its locator
+    locator = getattr(axis.get_major_locator(), "base", axis.get_major_locator())
+    if not isinstance(locator, (mticker.MaxNLocator, mdates.AutoDateLocator)):
+        return False
+    lo, hi = sorted(axis.get_view_interval())
+    if not np.isfinite([lo, hi]).all() or hi <= lo:
+        return False
+    dated = isinstance(locator, mdates.AutoDateLocator)
+    data_lo, data_hi = _shared_data_interval(ax, axis_name)
+    # the overshoot the autoscale margin alone accounts for at each end
+    margin = (
+        (ax.get_xmargin() if axis_name == "x" else ax.get_ymargin())
+        * (data_hi - data_lo)
+        * (1 + 1e-6)
+    )
+    lo_by_margin = data_ends and data_lo - lo <= margin
+    hi_by_margin = data_ends and hi - data_hi <= margin
+
+    def tick_values(vmin, vmax):
+        if dated:
+            vmin, vmax = (mdates.num2date(v, tz=locator.tz) for v in (vmin, vmax))
+        return np.asarray(locator.tick_values(vmin, vmax), dtype=float)
+
+    # a number locator's ticks enclose the view; a date locator's stop inside
+    # it, so the grid is stepped outward and the ticks re-read until both
+    # ends land on one
+    new_lo, new_hi = lo, hi
+    for _ in range(3):
+        ticks = tick_values(new_lo, new_hi)
+        if len(ticks) < 2:
+            return False
+        step = float(np.min(np.diff(ticks)))
+        tol = step * 1e-6
+        below, above = ticks[ticks <= new_lo + tol], ticks[ticks >= new_hi - tol]
+        # the tick the data edge itself sits on, when there is one
+        lo_on_data = ticks[np.isclose(ticks, data_lo, rtol=0, atol=tol)]
+        hi_on_data = ticks[np.isclose(ticks, data_hi, rtol=0, atol=tol)]
+        if not lo_by_margin:
+            lo_on_data = lo_on_data[:0]
+        if not hi_by_margin:
+            hi_on_data = hi_on_data[:0]
+        lo_next = (
+            new_lo
+            if fixed[0]
+            else (
+                float(lo_on_data[0])
+                if len(lo_on_data)
+                else (
+                    float(below.max())
+                    if len(below)
+                    else ticks[0] - step * math.ceil((ticks[0] - new_lo - tol) / step)
+                )
+            )
+        )
+        hi_next = (
+            new_hi
+            if fixed[1]
+            else (
+                float(hi_on_data[0])
+                if len(hi_on_data)
+                else (
+                    float(above.min())
+                    if len(above)
+                    else ticks[-1] + step * math.ceil((new_hi - ticks[-1] - tol) / step)
+                )
+            )
+        )
+        if (lo_next, hi_next) == (new_lo, new_hi):
+            break
+        new_lo, new_hi = lo_next, hi_next
+    # the snap never crosses zero when the data does not: a margin dipping
+    # below all-positive values rounds to zero, not a whole step under it
+    if not fixed[0] and new_lo < 0 <= data_lo:
+        new_lo = 0.0
+    if not fixed[1] and new_hi > 0 >= data_hi:
+        new_hi = 0.0
+    on_data = data_ends and (
+        (not fixed[0] and math.isclose(new_lo, data_lo, abs_tol=tol))
+        or (not fixed[1] and math.isclose(new_hi, data_hi, abs_tol=tol))
+    )
+    if (new_lo, new_hi) == (lo, hi):
+        return on_data
+    bounds = (new_hi, new_lo) if axis.get_inverted() else (new_lo, new_hi)
+    (ax.set_xlim if axis_name == "x" else ax.set_ylim)(*bounds)
+    return on_data
+
+
+def _snap_to_periods(ax, axis_name, period, tz, origin, bounds) -> None:
+    """Extend the free view ends to the period edges enclosing the schedule."""
+
+    axis = getattr(ax, f"{axis_name}axis")
+    lo, hi = sorted(axis.get_view_interval())
+    start, end = bounds
+    edges = _period_edges(period, tz, origin)
+    edges.set_axis(axis)
+    span = DATE_PERIOD_SPAN[period]
+    reach = (start if start is not None else lo, end if end is not None else hi)
+    ticks = np.asarray(
+        edges.tick_values(
+            mdates.num2date(reach[0] - span, tz=tz),
+            mdates.num2date(reach[1] + span, tz=tz),
+        ),
+        dtype=float,
+    )
+    if start is not None:
+        below = ticks[ticks <= start]
+        lo = below.max() if len(below) else start
+    if end is not None:
+        above = ticks[ticks >= end]
+        hi = above.min() if len(above) else end
+    (ax.set_xlim if axis_name == "x" else ax.set_ylim)(lo, hi)
 
 
 def _normalize_sizes(sizes: np.ndarray, size_range: tuple) -> np.ndarray:
@@ -1105,6 +1373,9 @@ def _draw_legend(
         else {"handles": handles, "labels": labels}
     )
     legend = top_ax.legend(**entries, **legend_style)
+    # matplotlib leaves the title in rc text.color; the label color covers it
+    if isinstance(legend_style.get("labelcolor"), str):
+        legend.get_title().set_color(legend_style["labelcolor"])
     if ax_right is None:
         return legend
 
@@ -1380,6 +1651,10 @@ def _resolve_show_values(settings: dict) -> bool:
 
 class Layer:
     """One drawable unit; owns its resolved style, knows nothing about siblings."""
+
+    # a continuous axis ends on a tick; a layer filling its whole field
+    # (a heatmap, contour, or hexbin) keeps the axis tight to the field
+    ticks_at_axis_ends = True
 
     kind: str = ""
     # None for layers without an orientation; they follow the panel
@@ -1931,6 +2206,11 @@ class PointLabelMixin:
 
         return self._pending_labels.pop(id(ax), [])
 
+    def label_obstacles(self, ax) -> list:
+        """Display-space boxes of the layer's other marks in `ax` the labels avoid."""
+
+        return []
+
 
 def _apply_cycle_hatch(style: dict, ctx: DrawContext) -> None:
     """Take the panel's cycle hatch unless the resolved style sets one."""
@@ -1952,6 +2232,19 @@ class AreaFillMixin:
         return area_style
 
 
+class MarkClipBox(TransformedBbox):
+    """The axes box grown by `pad` points along `dims`, read live with the layout."""
+
+    def __init__(self, ax, pad: float, dims=("x", "y")):
+        super().__init__(Bbox.unit(), ax.transAxes)
+        self._figure, self._pad, self._dims = ax.figure, pad, tuple(dims)
+
+    def get_points(self):
+        pad = self._pad * self._figure.dpi / 72.0
+        grow = [pad if "x" in self._dims else 0.0, pad if "y" in self._dims else 0.0]
+        return super().get_points() + [[-grow[0], -grow[1]], grow]
+
+
 def _mark_radius(line_style: dict) -> float:
     """Half the marker size of a line's points, or half its stroke when unmarked."""
 
@@ -1964,6 +2257,11 @@ def _mark_radius(line_style: dict) -> float:
 class LineLayer(PointLabelMixin, AreaFillMixin, Layer):
     kind = "line"
     label_spots = POINT_LABEL_SPOTS_VERTICAL
+
+    def __init__(self, chart: dict, settings: dict):
+        # the lines drawn per axes, so the panel can unclip their end markers
+        self._lines = {}
+        super().__init__(chart, settings)
 
     def _resolve_style(self):
         self.line_style = get_line_style(self.style)
@@ -1984,6 +2282,14 @@ class LineLayer(PointLabelMixin, AreaFillMixin, Layer):
 
     def value_data(self):
         return get_chart_data("y", self.chart)
+
+    def unclip_marks(self, ax, dims=("x", "y")) -> None:
+        """Let the markers on the `dims` edges draw whole, past the frame."""
+
+        for line in self._lines.get(id(ax), ()):
+            pad = line.get_markersize() / 2 + line.get_markeredgewidth()
+            line.set_clip_path(None)
+            line.set_clip_box(MarkClipBox(ax, pad, dims))
 
     def draw(self, ax, ctx):
         x = get_chart_data("x", self.chart)
@@ -2011,6 +2317,7 @@ class LineLayer(PointLabelMixin, AreaFillMixin, Layer):
             self._etch([band], wash=False)
 
         (line,) = plot(x, y, **line_style, label=self.label(ctx))
+        self._lines.setdefault(id(ax), []).append(line)
         self.register_hover(line, _point_resolver(self.label(ctx), x, y, ctx.transpose))
 
         if self.show_values and ctx.emphasis != EMPHASIS_BACKGROUND:
@@ -2056,6 +2363,59 @@ class LineLayer(PointLabelMixin, AreaFillMixin, Layer):
 
 # vertices per segment of a curved bump line
 BUMP_CURVE_SAMPLES = 24
+# the least gap between two period tick labels, in font sizes
+PERIOD_LABEL_GAP = 0.5
+
+
+class PeriodTicks(mticker.Locator):
+    """One tick per period, thinned so the labels never touch.
+
+    Every period is a tick when its labels fit along the axis; otherwise
+    the first and last periods stay and a period drops out when its label
+    would run into the previous kept one. Measured from the axis length at
+    draw time, so a narrow subplot keeps fewer ticks than a wide figure.
+    """
+
+    def __init__(self, periods):
+        self.periods = np.unique(np.asarray(periods, dtype=float))
+
+    def __call__(self):
+        return self.tick_values(*self.axis.get_view_interval())
+
+    def tick_values(self, vmin, vmax):
+        periods, axis = self.periods, self.axis
+        span = abs(vmax - vmin)
+        if axis is None or len(periods) < 3 or span <= 0:
+            return periods
+        along_x = axis.axis_name == "x"
+        length = axis.axes.bbox.width if along_x else axis.axes.bbox.height
+        if length <= 0:
+            return periods
+        size = FontProperties(
+            size=axis.get_tick_params(which="major").get(
+                "labelsize", mpl.rcParams[f"{axis.axis_name}tick.labelsize"]
+            )
+        ).get_size_in_points()
+        px = axis.figure.dpi / 72.0
+        labels = axis.get_major_formatter().format_ticks(periods)
+        extents = [
+            _text_size(size, label)[0 if along_x else 1] * px for label in labels
+        ]
+        centres = (periods - min(vmin, vmax)) / span * length
+        gap = PERIOD_LABEL_GAP * size * px
+
+        def fits(i, j):
+            return centres[j] - extents[j] / 2 >= centres[i] + extents[i] / 2 + gap
+
+        kept = [0]
+        for j in range(1, len(periods) - 1):
+            if fits(kept[-1], j):
+                kept.append(j)
+        last = len(periods) - 1
+        while len(kept) > 1 and not fits(kept[-1], last):
+            kept.pop()
+        kept.append(last)
+        return periods[kept]
 
 
 def _series_periods(xs: list) -> list:
@@ -2109,12 +2469,12 @@ def rank_series(xs: list, ys: list, rank_by: str) -> tuple:
     values = [
         _align_to_periods(x, y, periods, i) for i, (x, y) in enumerate(zip(xs, ys))
     ]
-    if rank_by == RANK.GIVEN:
+    if rank_by == BUMP_RANK.GIVEN:
         for column in values:
             validate_given_ranks(column)
         return periods, values
     ranks = [np.full(len(periods), np.nan) for _ in values]
-    sign = -1 if rank_by == RANK.VALUE_DESCENDING else 1
+    sign = -1 if rank_by == BUMP_RANK.VALUE_DESCENDING else 1
     for p in range(len(periods)):
         present = [i for i, column in enumerate(values) if not np.isnan(column[p])]
         for rank, i in enumerate(sorted(present, key=lambda i: sign * values[i][p])):
@@ -2233,10 +2593,9 @@ class BumpLayer(LineLayer):
         plot, _, _ = _oriented(ax, ctx.transpose)
         label = self.label(ctx)
         (line,) = plot(px, py, **line_style, markevery=marks, label=label)
-        # the x-limits end at the first and last period: whole end markers
-        # overhang the spines unless the user crops the axes
-        if all(self.settings.get(k) is None for k in ("xmin", "xmax", "ymin", "ymax")):
-            line.set_clip_on(False)
+        # the period axis ends on the first and last period: the panel lets
+        # the end markers overhang the spines there
+        self._lines.setdefault(id(ax), []).append(line)
 
         def resolve(index: int) -> dict:
             i = _nearest(x, px[index])
@@ -2270,11 +2629,11 @@ class BumpLayer(LineLayer):
             self._draw_end_labels(ax, ctx, x, ranks, present, line_style, color)
 
     def _labels_at(self, end: str) -> bool:
-        """Whether an end label prints at the `LABEL_POSITION.START` or `END`."""
+        """Whether an end label prints at the `BUMP_LABEL_POSITION.START` or `END`."""
 
         return bool(self.show_labels and self.subtitle) and self.label_position in (
             end,
-            LABEL_POSITION.BOTH,
+            BUMP_LABEL_POSITION.BOTH,
         )
 
     def _draw_end_labels(self, ax, ctx, x, ranks, present, line_style, color):
@@ -2282,9 +2641,9 @@ class BumpLayer(LineLayer):
 
         indices = np.flatnonzero(present)
         ends = []
-        if self._labels_at(LABEL_POSITION.START):
+        if self._labels_at(BUMP_LABEL_POSITION.START):
             ends.append((indices[0], -1))
-        if self._labels_at(LABEL_POSITION.END):
+        if self._labels_at(BUMP_LABEL_POSITION.END):
             ends.append((indices[-1], 1))
         gap = _mark_radius(line_style) + self.label_padding
         font = {k: v for k, v in self.label_font.items() if k != "color"}
@@ -2309,6 +2668,8 @@ class StackedAreaLayer(Layer):
     """One series of a stack; the panel computes its band (ADR 0025)."""
 
     kind = "stackedarea"
+    # the stack fills its frame: both axes end on the data, not on a tick
+    ticks_at_axis_ends = False
 
     def _resolve_style(self):
         style = get_stackedarea_style(self.style)
@@ -2410,12 +2771,12 @@ class StackedAreaLayer(Layer):
 def stack_first_line(y: np.ndarray, baseline: str) -> np.ndarray:
     """Where the stack starts at each x; matplotlib's `stackplot` baselines."""
 
-    if baseline in (BASELINE.ZERO, BASELINE.PERCENT):
+    if baseline in (STACKED_AREA_BASELINE.ZERO, STACKED_AREA_BASELINE.PERCENT):
         return np.zeros(y.shape[1])
-    if baseline == BASELINE.SYM:
+    if baseline == STACKED_AREA_BASELINE.SYM:
         return -0.5 * np.sum(y, 0)
     m = y.shape[0]
-    if baseline == BASELINE.WIGGLE:
+    if baseline == STACKED_AREA_BASELINE.WIGGLE:
         return (y * (m - 0.5 - np.arange(m)[:, None])).sum(0) / -m
     validate_baseline(baseline)
     total = np.sum(y, 0)
@@ -2435,7 +2796,7 @@ def _stack_slots(layers: List[StackedAreaLayer], baseline: str) -> dict:
 
     validate_shared_x([l.x_values() for l in layers])
     y = np.vstack([l.y_values() for l in layers])
-    if baseline == BASELINE.PERCENT:
+    if baseline == STACKED_AREA_BASELINE.PERCENT:
         total = y.sum(0)
         y = np.divide(y * 100.0, total, out=np.zeros_like(y), where=total != 0)
     first_line = stack_first_line(y, baseline)
@@ -2888,8 +3249,11 @@ class GanttLayer(BarLayer):
             hatch = self.group_hatches.get(task.get("group"))
             if hatch and "hatch" not in bar_style:
                 patch.set_hatch(hatch)
-            # a milestone is a marker, not a bar
+            # a milestone is a marker, not a bar; a bar's start pins the axis
+            # to it, which would cut a marker at the schedule's end in half
             patch.set_visible(not milestone)
+            if milestone:
+                patch.sticky_edges.x.clear()
         roles = self._record_roles(ctx.emphasis, len(bars))
         self._task_patches = bars.patches
         self._draw_progress(ax, rows, height, colors, bar_style, roles)
@@ -2953,6 +3317,14 @@ class GanttLayer(BarLayer):
             zorder=bar_style.get("zorder", 0) + GANTT_PROGRESS_Z_OFFSET,
             label=NO_LEGEND,
         )
+        # the bar's edge is stroked half inside its outline: the progress
+        # starts and ends half a stroke in, flush with the visible border
+        for patch, i in zip(bars.patches, indices):
+            task = self._task_patches[i]
+            inset = task.get_linewidth() / 2 / 72
+            shift = lambda dx: ScaledTranslation(dx, 0, ax.figure.dpi_scale_trans)
+            patch.set_transform(ax.transData + shift(inset))
+            patch.set_clip_path(task.get_path(), task.get_transform() + shift(-inset))
         self._etch(bars.patches)
         self._apply_patch_emphasis(bars.patches, [roles[i] for i in indices])
 
@@ -3001,6 +3373,8 @@ class GanttLayer(BarLayer):
                 alpha=self.muted_alpha if muted else None,
                 zorder=bar_style.get("zorder", 0) + GANTT_MILESTONE_Z_OFFSET,
                 label=NO_LEGEND,
+                # a milestone on the view's edge shows whole, over the spine
+                clip_on=False,
             )
             if self.show_values and not muted:
                 ax.annotate(
@@ -3302,7 +3676,27 @@ class KdeLayer(Layer):
         self.register_hover(line, _point_resolver(self.label(ctx), x, y, ctx.transpose))
 
 
-class ScatterLayer(PointLabelMixin, Layer):
+class UnclippedMarksMixin:
+    """A layer whose scatter marks may draw whole over an axis end on the data."""
+
+    def register_marks(self, ax, collection) -> None:
+        """Remember a mark collection drawn into `ax`, so the panel can unclip it."""
+
+        self.__dict__.setdefault("_marks", {}).setdefault(id(ax), []).append(collection)
+
+    def unclip_marks(self, ax, dims=("x", "y")) -> None:
+        """Let the markers on the `dims` edges draw whole, past the frame."""
+
+        for collection in getattr(self, "_marks", {}).get(id(ax), ()):
+            sizes = np.asarray(collection.get_sizes(), dtype=float)
+            radius = float(np.sqrt(sizes.max()) / 2) if sizes.size else 0.0
+            widths = np.asarray(collection.get_linewidths(), dtype=float)
+            pad = radius + (float(widths.max()) if widths.size else 0.0)
+            collection.set_clip_path(None)
+            collection.set_clip_box(MarkClipBox(ax, pad, dims))
+
+
+class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
     kind = "scatter"
 
     def _resolve_style(self):
@@ -3495,6 +3889,7 @@ class ScatterLayer(PointLabelMixin, Layer):
                     label,
                     ctx.emphasis == EMPHASIS_HIGHLIGHT,
                 )
+                self.register_marks(ax, collection)
                 self._mark_legend_size(collection, size_data)
                 self.register_hover(
                     collection,
@@ -3534,6 +3929,7 @@ class ScatterLayer(PointLabelMixin, Layer):
                 self.label(ctx),
                 ctx.emphasis == EMPHASIS_HIGHLIGHT,
             )
+            self.register_marks(ax, collection)
             self._mark_legend_size(collection, size_data)
             self.register_hover(
                 collection,
@@ -3870,7 +4266,7 @@ def strip_offsets(n: int, jitter: float) -> np.ndarray:
     return np.random.default_rng(0).uniform(-jitter / 2, jitter / 2, n)
 
 
-class SwarmLayer(PointLabelMixin, GroupLayer):
+class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
     kind = "swarm"
 
     def _resolve_style(self):
@@ -4004,6 +4400,7 @@ class SwarmLayer(PointLabelMixin, GroupLayer):
             values = np.concatenate([v for _, v in groups])
             x, y = (values, centers) if self.is_horizontal else (centers, values)
             collection = ax.scatter(x, y, label=label, **style)
+            self.register_marks(ax, collection)
             positions = np.concatenate(
                 [np.full(len(v), index[lbl]) for lbl, (_, v) in zip(members, groups)]
             )
@@ -4143,7 +4540,7 @@ MINOR_GRID_ALPHA_SCALE = 0.6
 DUMBBELL_CONNECTOR_Z_BELOW = 0.5
 
 
-class DumbbellLayer(GroupLayer):
+class DumbbellLayer(UnclippedMarksMixin, GroupLayer):
     """Two dots per category joined by a connector, on the category index (ADR 0050).
 
     The dots draw through the scatter marks; one role batch at a time, each
@@ -4295,6 +4692,7 @@ class DumbbellLayer(GroupLayer):
                     label,
                     role == EMPHASIS_HIGHLIGHT,
                 )
+                self.register_marks(ax, collection)
                 self.register_hover(
                     collection,
                     _point_resolver(
@@ -4736,9 +5134,20 @@ class RidgelineLayer(GroupLayer):
         return min(e[0] for e in ends), max(e[1] for e in ends)
 
     def _grid_bounds(self) -> tuple:
-        """The shared or own padded range; the value-axis limits win."""
+        """The shared or own padded range, widened to the ticks enclosing it;
+        the value-axis limits win.
+
+        The panel ends the value axis on a tick, and the ridges' baselines run
+        the length of their grid, so the grid reaches those ticks too.
+        """
 
         lo, hi = self.shared_range or self.padded_range()
+        ticks = np.asarray(mticker.AutoLocator().tick_values(lo, hi), dtype=float)
+        if len(ticks) > 1:
+            tol = float(np.min(np.diff(ticks))) * 1e-6
+            below, above = ticks[ticks <= lo + tol], ticks[ticks >= hi - tol]
+            lo = float(below.max()) if len(below) else lo
+            hi = float(above.min()) if len(above) else hi
         axis = "x" if self.is_horizontal else "y"
         low, high = self.settings.get(f"{axis}min"), self.settings.get(f"{axis}max")
         return (lo if low is None else low, hi if high is None else high)
@@ -4813,6 +5222,11 @@ class RidgelineLayer(GroupLayer):
                     zorder=zorder,
                 )
                 self._etch([body])
+                # the grid ends on ticks and the ridge runs its length, so the
+                # axis ends there too, without a margin past it
+                (body.sticky_edges.x if self.is_horizontal else body.sticky_edges.y)[
+                    :
+                ] = [grid[0], grid[-1]]
                 artists.append(("fill", body))
             artists += [
                 ("mark", mark)
@@ -4828,6 +5242,11 @@ class RidgelineLayer(GroupLayer):
                     linewidth=style.get("linewidth"),
                     zorder=zorder + 2 * step / 3,
                 )[0]
+                (
+                    outline.sticky_edges.x
+                    if self.is_horizontal
+                    else outline.sticky_edges.y
+                )[:] = [grid[0], grid[-1]]
                 artists.append(("outline", outline))
             self._apply_ridge_emphasis(artists, roles[label])
             datum = self.summary_datum(self.label(ctx), position, values)
@@ -4994,6 +5413,7 @@ def heatmap_cell_roles(chart: dict, z: list) -> list:
 
 
 class HeatmapLayer(Layer):
+    ticks_at_axis_ends = False
     kind = "heatmap"
     # the theme keys the cells, values, and borders read
     style_prefix = "plot_heatmap"
@@ -5040,11 +5460,15 @@ class HeatmapLayer(Layer):
         return x, y, z
 
     def _label_axes(self, x, y):
-        # x/y default the tick attrs so the panel applies them like explicit ones
+        # x/y default the tick attrs so the panel applies them like explicit
+        # ones; cells are categories, so unnamed ones tick at their index
         chart = dict(self.chart)
-        for axis, labels in (("x", x), ("y", y)):
-            if labels is None or chart.get(f"{axis}ticks") is not None:
+        rows, cols = len(self.z), len(self.z[0]) if self.z else 0
+        for axis, labels, count in (("x", x, cols), ("y", y, rows)):
+            if chart.get(f"{axis}ticks") is not None:
                 continue
+            if labels is None:
+                labels = list(range(count))
             chart[f"{axis}ticks"] = list(range(len(labels)))
             chart[f"{axis}ticklabels"] = chart.get(f"{axis}ticklabels") or (
                 date_labels(labels, self.settings.get(f"{axis}ticks_format"))
@@ -5231,7 +5655,7 @@ CALENDAR_MONTH_LINE_ZORDER = 2
 def week_row(day: date, week_start: str) -> int:
     """The row of a day in a week column: 0 is the week start, 6 the day before it."""
 
-    offset = 6 if week_start == WEEKDAY.SUNDAY else 0
+    offset = 6 if week_start == CALENDAR_WEEKDAY.SUNDAY else 0
     return (day.weekday() - offset) % 7
 
 
@@ -5278,7 +5702,7 @@ class CalendarHeatmapLayer(HeatmapLayer):
             week_start = get_attr_value(
                 "plot_calendar_heatmap_week_start", self.style, config
             )
-        self.week_start = validate_week_start(week_start) or WEEKDAY.MONDAY
+        self.week_start = validate_week_start(week_start) or CALENDAR_WEEKDAY.MONDAY
         self.month_line_style = get_calendar_month_line_style(self.style)
         self.show_month_labels = _resolve_flag(self.settings, "show_month_labels")
         self.show_weekday_labels = _resolve_flag(self.settings, "show_weekday_labels")
@@ -5327,7 +5751,7 @@ class CalendarHeatmapLayer(HeatmapLayer):
             ]
             chart["xticklabels"] = [MONTH_LABELS[month - 1] for month in self.months]
         if self.show_weekday_labels:
-            start = 6 if self.week_start == WEEKDAY.SUNDAY else 0
+            start = 6 if self.week_start == CALENDAR_WEEKDAY.SUNDAY else 0
             chart["yticks"] = list(range(0, 7, WEEKDAY_LABEL_STEP))
             chart["yticklabels"] = [
                 WEEKDAY_LABELS[(start + row) % 7] for row in chart["yticks"]
@@ -5445,6 +5869,8 @@ def contour_levels(
 # one layer for lines and fills, also the 2-D density chart (ADR 0022)
 class ContourLayer(Layer):
     """A gridded surface drawn as iso-lines or filled bands."""
+
+    ticks_at_axis_ends = False
 
     kind = "contour"
 
@@ -5657,6 +6083,8 @@ HEXBIN_REDUCERS = {
 
 class HexbinLayer(Layer):
     """Scattered points binned into hexagons, colored by count or by `c` (ADR 0024)."""
+
+    ticks_at_axis_ends = False
 
     kind = "hexbin"
 
@@ -7521,6 +7949,8 @@ class TreemapLayer(Layer):
             }
 
     def legend_handles(self):
+        # a muted group is context, and like any background mark it has no entry
+        groups = [r for r in self.groups if r.get("emphasis") != EMPHASIS_BACKGROUND]
         if self.group_hatches is not None:
             effect = self._etch_effect(0.0)
             return [
@@ -7531,11 +7961,11 @@ class TreemapLayer(Layer):
                     path_effects=[effect],
                     label=record["label"],
                 )
-                for record in self.groups
+                for record in groups
             ]
         return [
             Patch(facecolor=self.group_colors[record["label"]], label=record["label"])
-            for record in self.groups
+            for record in groups
         ]
 
     def _etch_box(self, patch, group: str, level: int) -> None:
@@ -7995,7 +8425,7 @@ def _linear_map(values: list, low: float, high: float, missing: float) -> np.nda
     return out
 
 
-class NetworkLayer(Layer):
+class NetworkLayer(PointLabelMixin, Layer):
     """One network: every node and edge of a chart as a node-link diagram (ADR 0029).
 
     The layer owns its axes: a fixed 0–1 data space with equal aspect and the
@@ -8015,6 +8445,9 @@ class NetworkLayer(Layer):
         self.directed = bool(settings.get("directed"))
         self.layout = settings.get("layout") or NETWORK_LAYOUT.DEFAULT
         self.seed = 0 if settings.get("seed") is None else settings["seed"]
+        # edges and edge values drawn per axes, the obstacles of BEST labels
+        self._obstacles = {}
+        self._init_point_labels()
         super().__init__(chart, settings)
 
     def _resolve_style(self) -> None:
@@ -8170,6 +8603,7 @@ class NetworkLayer(Layer):
         ax.axis("off")
         effects = _halo_effects(style.get("halo_width"), self.ground)
         muted, highlighted = self.muted, self.highlighted
+        best = self.label_position == NETWORK_LABEL_POSITION.BEST
         # scatter sizes are the marker's bounding-box diameter squared
         radii = np.sqrt(self.areas) / 2
         curve = (
@@ -8271,6 +8705,8 @@ class NetworkLayer(Layer):
                 )
             patch.set_path_effects(pen)
             ax.add_patch(patch)
+            if best:
+                self._obstacles.setdefault(id(ax), []).append(patch)
             datum = {
                 "label": None,
                 "source": record["source"],
@@ -8284,7 +8720,7 @@ class NetworkLayer(Layer):
                 mid = (pos[i] + pos[j]) / 2
                 dx, dy = pos[j] - pos[i]
                 mid = mid + curve / 2 * np.array([dy, -dx])
-                ax.text(
+                value = ax.text(
                     mid[0],
                     mid[1],
                     _format_value(self.value_format, record["weight"]),
@@ -8300,6 +8736,8 @@ class NetworkLayer(Layer):
                         ),
                     },
                 )
+                if best:
+                    self._obstacles.setdefault(id(ax), []).append(value)
 
         face = [
             self.muted_color if muted[k] else color
@@ -8354,11 +8792,32 @@ class NetworkLayer(Layer):
             )
             self.register_hover(points, lambda i, ks=ks: self.node_datums[ks[i]])
 
-        above = self.label_position == NODE_LABEL_POSITION.ABOVE
+        above = self.label_position == NETWORK_LABEL_POSITION.ABOVE
         for k, node in enumerate(self.nodes):
             label = node.get("label")
             label = node["id"] if label is None else label
             if label == "":
+                continue
+            font = {
+                **self.label_style,
+                "color": self.muted_color if muted[k] else self.label_style["color"],
+            }
+            if best:
+                # the panel places it once every mark is drawn, clear of the rest
+                self._record_points(
+                    ax,
+                    ctx,
+                    pos[k : k + 1, 0],
+                    pos[k : k + 1, 1],
+                    self.areas[k : k + 1],
+                    labels=[label],
+                    font={
+                        **font,
+                        "path_effects": effects,
+                        "gid": f"label:{node['id']}",
+                    },
+                    pad=NETWORK_LABEL_GAP,
+                )
                 continue
             # a name above its node sits clear of the marker, like a place name
             lift = (radii[k] + NETWORK_LABEL_GAP) / 72 if above else 0
@@ -8373,13 +8832,42 @@ class NetworkLayer(Layer):
                 zorder=5,
                 path_effects=effects,
                 gid=f"label:{node['id']}",
-                **{
-                    **self.label_style,
-                    "color": (
-                        self.muted_color if muted[k] else self.label_style["color"]
-                    ),
-                },
+                **font,
             )
+
+    def label_obstacles(self, ax) -> list:
+        """The edges and edge values drawn into `ax`, as display-space boxes.
+
+        A text is one box around its anchor; an edge is a chain of small boxes
+        along its flattened path, so a label may sit in the bay between two
+        edges where the path's own bounding box would forbid it.
+        """
+
+        ax.apply_aspect()
+        px_per_pt = ax.figure.dpi / 72.0
+        boxes = []
+        for artist in self._obstacles.pop(id(ax), []):
+            if isinstance(artist, Text):
+                cx, cy = ax.transData.transform(artist.get_position())
+                w, h = (
+                    v * px_per_pt
+                    for v in _text_size(artist.get_fontsize(), artist.get_text())
+                )
+                boxes.append((cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2))
+                continue
+            half = max(artist.get_linewidth() * px_per_pt, 2.0) / 2
+            path = artist.get_transform().transform_path(artist.get_path())
+            previous = None
+            for vertices, code in path.iter_segments(curves=False, simplify=False):
+                point = np.asarray(vertices[-2:], float)
+                if previous is not None and code == Path.LINETO:
+                    span = point - previous
+                    steps = max(int(np.hypot(*span) // NETWORK_OBSTACLE_STEP), 1)
+                    for t in np.linspace(0, 1, steps + 1):
+                        x, y = previous + span * t
+                        boxes.append((x - half, y - half, x + half, y + half))
+                previous = point
+        return boxes
 
 
 LAYER_TYPES = {
@@ -9381,11 +9869,11 @@ class Panel:
             "sketch_params": config.get("plot_sketch_params"),
         }
 
-    def _text_halo(self) -> dict:
-        """The soft box behind polar texts, in the axes ground color."""
+    def _text_halo(self) -> list:
+        """The halo stroking polar texts, in the axes ground color."""
 
         colors = (self.settings.get("furniture") or {}).get("colors") or {}
-        return {**TEXT_HALO, "facecolor": colors.get("axes") or TEXT_HALO["facecolor"]}
+        return _halo_effects(config.get("plot_value_halo_width"), colors.get("axes"))
 
     def _sketch_rc(self) -> dict:
         """The rc override for the path wobble, empty when it is off."""
@@ -9434,6 +9922,11 @@ class Panel:
     # ---------------- rendering ----------------
 
     def render(self, ax: plt.Axes) -> None:
+        # an axes drawn earlier fixed the limits this one shares; autoscale
+        # again, over the data of every axes that shares them
+        for axis_name in ("x", "y"):
+            if len(ax._shared_axes[axis_name].get_siblings(ax)) > 1:
+                getattr(ax, f"set_autoscale{axis_name}_on")(True)
         # every artist created here copies the wobble from the rc context at
         # construction (ADR 0027); nothing global changes
         with rc_context(self._sketch_rc()):
@@ -9967,6 +10460,9 @@ class Panel:
             # _apply_radial_furniture
             ax.set_axisbelow(True)
 
+        # the axes pinned to the data below keep their ends: no tick snap,
+        # no legend headroom
+        pinned = set()
         # line charts pin the category-axis limits to the union of their data ranges
         if s.get("tighten_xlim"):
             ranges = [
@@ -9976,9 +10472,15 @@ class Panel:
             ]
             ranges = [r for r in ranges if r is not None]
             if ranges:
-                (ax.set_ylim if horizontal else ax.set_xlim)(
-                    min(r[0] for r in ranges), max(r[1] for r in ranges)
-                )
+                lo, hi = min(r[0] for r in ranges), max(r[1] for r in ranges)
+                # subplots sharing this axis pin it to all of their data
+                axis_name = "y" if horizontal else "x"
+                siblings = ax._shared_axes[axis_name].get_siblings(ax)
+                if len(siblings) > 1:
+                    shared = _shared_data_interval(ax, axis_name)
+                    lo, hi = min(lo, shared[0]), max(hi, shared[1])
+                (ax.set_ylim if horizontal else ax.set_xlim)(lo, hi)
+                pinned.add(axis_name)
 
         # the y-axis is a rank axis only when every data layer draws ranks;
         # beside other charts it follows the panel as usual (ADR 0046)
@@ -10073,10 +10575,21 @@ class Panel:
         if (
             any(isinstance(l, StackedAreaLayer) for l in layers)
             and validate_baseline(s.get("baseline"))
-            in (BASELINE.ZERO, BASELINE.PERCENT)
+            in (STACKED_AREA_BASELINE.ZERO, STACKED_AREA_BASELINE.PERCENT)
             and value_scale != "log"
         ):
             (ax.set_xlim if horizontal else ax.set_ylim)(0, None)
+        # a stack alone fills its frame: the value axis ends exactly where the
+        # stack does (a percent stack at 100), with no margin above it
+        if (
+            layers
+            and all(isinstance(l, StackedAreaLayer) for l in layers)
+            and value_scale != "log"
+        ):
+            lo, hi = ax.dataLim.intervalx if horizontal else ax.dataLim.intervaly
+            if np.isfinite([lo, hi]).all() and hi > lo:
+                (ax.set_xlim if horizontal else ax.set_ylim)(lo, hi)
+                pinned.add("x" if horizontal else "y")
 
         # axis limits; a bare layer fixed its own
         limits = {k: s.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
@@ -10102,6 +10615,65 @@ class Panel:
             (ax_right.set_xlim if horizontal else ax_right.set_ylim)(
                 s.get("ymin_right"), s.get("ymax_right")
             )
+
+        # bump periods are discrete: one tick per period, none between, when
+        # the user gave no ticks and the periods are numbers (dates keep theirs)
+        if (
+            layers
+            and all(isinstance(l, BumpLayer) for l in layers)
+            and self.temporal_axis is None
+            and all(l.chart.get("xticks") is None for l in layers)
+        ):
+            periods = np.unique(
+                np.concatenate([np.asarray(l.x_values(), float) for l in layers])
+            )
+            (ax.yaxis if horizontal else ax.xaxis).set_major_locator(
+                PeriodTicks(periods)
+            )
+
+        # a continuous axis starts and ends on a tick: each free end of the
+        # view moves outward to the next tick (a polar theta axis excepted),
+        # or stops on the tick the data itself sits on; an axis pinned to
+        # the data ends on the data
+        # the display axes whose ends sit on the data, per axes; a pinned
+        # axis counts only while the user sets no limit on it
+        ends_on_data = {ax: set()}
+        for axis_name in pinned:
+            if all(s.get(f"{axis_name}{end}") is None for end in ("min", "max")):
+                ends_on_data[ax].add(axis_name)
+        if not bare and all(l.ticks_at_axis_ends for l in layers):
+            for axis_name in ("y",) if polar else ("x", "y"):
+                # ranks are whole positions with their own half-unit ends
+                if (rank_axis and axis_name == "y") or axis_name in pinned:
+                    continue
+                # a polar r axis keeps its ring past the data
+                fixed = tuple(
+                    s.get(f"{axis_name}{end}") is not None for end in ("min", "max")
+                )
+                on_data = _snap_limits_to_ticks(
+                    ax, axis_name, fixed, data_ends=not polar
+                )
+                if on_data and not any(fixed):
+                    ends_on_data[ax].add(axis_name)
+            if ax_right is not None:
+                value_axis = "x" if horizontal else "y"
+                fixed = tuple(
+                    s.get(f"y{end}_right") is not None for end in ("min", "max")
+                )
+                if _snap_limits_to_ticks(ax_right, value_axis, fixed) and not any(
+                    fixed
+                ):
+                    ends_on_data[ax_right] = {value_axis}
+
+        # an axis end on the data puts marks on the frame: they draw whole
+        # over it instead of half-clipped by it; an axis the user limits
+        # keeps the clip, since the limit may cut the data on purpose
+        for axes, dims in ends_on_data.items():
+            if not dims:
+                continue
+            for layer in layers:
+                if isinstance(layer, (LineLayer, UnclippedMarksMixin)):
+                    layer.unclip_marks(axes, sorted(dims))
 
         # radial furniture reads the final r limits, so it follows them
         if polar:
@@ -10228,9 +10800,15 @@ class Panel:
             legend.set_zorder(self._spine_zorder() + RADIAL_LEGEND_Z_OVER_SPINE)
         elif legend is not None and not bare:
             # a legend over the marks gets headroom at draw time, once layout
-            # has sized the axes; explicit value-axis limits stay as set
-            value_max = s.get("xmax" if horizontal else "ymax")
-            if value_max is None and (ax_right is None or s.get("ymax_right") is None):
+            # has sized the axes; an explicit value-axis limit, or a stack
+            # filling its frame, stays as set
+            value_axis = "x" if horizontal else "y"
+            value_max = s.get(f"{value_axis}max")
+            if (
+                value_max is None
+                and value_axis not in pinned
+                and (ax_right is None or s.get("ymax_right") is None)
+            ):
                 axes = [ax] + ([ax_right] if ax_right is not None else [])
                 dim = 0 if horizontal else 1
                 _defer_legend_fit(
@@ -10285,6 +10863,7 @@ class Panel:
                             )
                 if layer.show_correlation:
                     obstacles.append(self._correlation_box(top_ax, layer))
+                obstacles.extend(layer.label_obstacles(owner_ax))
         if entries:
             _draw_point_labels(top_ax, entries, obstacles)
 
@@ -10345,12 +10924,21 @@ class Panel:
                     tz = next((l.x_tz for l in self.layers if l.x_tz), None)
                 period = s.get("date_period")
                 if period is not None:
-                    _apply_date_period(ax, axis_name, period, fmt, tz)
+                    origin = None
+                    if period == GANTT_DATE_PERIOD.PROJECT_MONTH:
+                        origin = self._project_origin(tz)
+                    bounds = self._schedule_bounds()
+                    if bounds is not None:
+                        bounds = tuple(
+                            None if s.get(key) is not None else value
+                            for key, value in zip(("xmin", "xmax"), bounds)
+                        )
+                    _apply_date_period(ax, axis_name, period, fmt, tz, origin, bounds)
                     labelers[f"{axis_name}axis"] = lambda ticks, fmt=fmt: date_labels(
                         ticks, fmt
                     )
                     continue
-                locator = mdates.AutoDateLocator(tz=tz)
+                locator = self._schedule_ticks(tz) or mdates.AutoDateLocator(tz=tz)
                 axis.set_major_locator(locator)
             formatter = _tick_formatter(fmt, temporal, locator, tz)
             if formatter is not None:
@@ -10364,6 +10952,37 @@ class Panel:
                     f(tick) for tick in ticks
                 ]
         return labelers
+
+    def _schedule_bounds(self):
+        """A gantt panel's (first start, last end) as date numbers, else None."""
+
+        if not self.layers or any(not isinstance(l, GanttLayer) for l in self.layers):
+            return None
+        ranges = [r for r in (l.y_range() for l in self.layers) if r is not None]
+        if not ranges:
+            return None
+        return (min(r[0] for r in ranges), max(r[1] for r in ranges))
+
+    def _schedule_ticks(self, tz):
+        """A gantt panel's date ticks: first start to last end, regular between."""
+
+        bounds = self._schedule_bounds()
+        return None if bounds is None else ScheduleTicks(*bounds, tz)
+
+    def _project_origin(self, tz):
+        """The project start: `xmin` when given, else the earliest task start."""
+
+        start = self.settings.get("xmin")
+        if start is None:
+            starts = [
+                float(np.min(l.starts))
+                for l in self.layers
+                if isinstance(l, GanttLayer) and len(l.starts)
+            ]
+            start = min(starts) if starts else 0.0
+        if not isinstance(start, (int, float)):
+            start = float(to_date_numbers([start])[0])
+        return mdates.num2date(start, tz=tz)
 
     def _apply_pyramid_mirror(self, ax) -> None:
         """The pyramid's mirror furniture (ADR 0017).
@@ -10460,7 +11079,7 @@ class Panel:
             ax.set_theta_zero_location("N", offset=-float(startangle))
 
         direction = s.get("direction") or DEFAULT_DIRECTION
-        ax.set_theta_direction(-1 if direction == DIRECTION.CLOCKWISE else 1)
+        ax.set_theta_direction(-1 if direction == RADIAL_DIRECTION.CLOCKWISE else 1)
 
         innerradius = s.get("innerradius") or 0.0
         if innerradius:
@@ -10500,18 +11119,27 @@ class Panel:
         furniture = self.settings.get("furniture") or {}
         tick_style = furniture.get("ticks", {})
         theta = np.deg2rad(ax.get_rlabel_position())
+        # each label hangs just inside its ring, so the border circle passes
+        # outside the outermost one instead of through it
+        screen = ax.get_theta_direction() * theta + ax.get_theta_offset()
+        size = FontProperties(size=tick_style.get("labelsize")).get_size_in_points()
+        inset = (size / 2 + RADIAL_RLABEL_INSET) / 72
+        inward = ScaledTranslation(
+            -inset * np.cos(screen), -inset * np.sin(screen), ax.figure.dpi_scale_trans
+        )
         for r, text in zip(ticks, texts):
             ax.text(
                 theta,
                 r,
                 text,
+                transform=ax.transData + inward,
                 ha="center",
                 va="center",
                 fontsize=tick_style.get("labelsize"),
                 fontfamily=furniture.get("font_family"),
                 color="#000000",
                 zorder=self._spine_zorder() + RADIAL_LABEL_Z_OVER_SPINE,
-                bbox=self._text_halo(),
+                path_effects=self._text_halo(),
             )
 
     def _draw_radial_tip_texts(self, ax) -> None:
@@ -10567,7 +11195,6 @@ class Panel:
                     va="center",
                     zorder=z_order,
                     fontfamily=family,
-                    bbox=self._text_halo(),
                     **value_style,
                 )
 
@@ -10606,7 +11233,7 @@ class Panel:
                     fontsize=tick_style.get("labelsize"),
                     color=tick_style.get("labelcolor"),
                     fontfamily=family,
-                    bbox=self._text_halo(),
+                    path_effects=self._text_halo(),
                 )
 
     @staticmethod
@@ -10661,11 +11288,15 @@ def build_chart_panel_settings(
     """
 
     show_grid = settings.get("show_grid")
-    # rasters (a heatmap, hexagons, filled contour bands) cover the grid: off
-    raster = chart_type in ("heatmap", "calendarheatmap", "hexbinchart") or (
-        chart_type == "contourchart" and settings.get("filled")
-    )
-    if show_grid is None and not raster:
+    # rasters (a heatmap, hexagons, filled contour bands) cover the grid, and a
+    # bump chart's ranks read from the lines and labels: no grid unless asked
+    gridless = chart_type in (
+        "heatmap",
+        "calendarheatmap",
+        "hexbinchart",
+        "bumpchart",
+    ) or (chart_type == "contourchart" and settings.get("filled"))
+    if show_grid is None and not gridless:
         show_grid = config.get("chart_default_show_grid")
         if chart_type == "dumbbellchart":
             orientation = settings.get("orientation") or DEFAULT_ORIENTATION

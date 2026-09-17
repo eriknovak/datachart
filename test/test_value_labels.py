@@ -192,9 +192,11 @@ class TestFronts(ValueLabelCase):
         self.assertEqual(tuple(labels(horizontal.axes[0])[1].xy), (20.0, 2.0))
 
     def test_headroom_keeps_labels_inside(self):
-        bare = LineChart(LINE).axes[0].get_ylim()[1]
-        labelled = LineChart(LINE, show_values=True).axes[0].get_ylim()[1]
-        self.assertGreater(labelled, bare)
+        figure = LineChart(LINE, show_values=True)
+        figure.canvas.draw()
+        ax = figure.axes[0]
+        top = max(t.get_window_extent().y1 for t in labels(ax))
+        self.assertLessEqual(top, ax.get_window_extent().y1)
 
     def test_background_emphasis_carries_no_labels(self):
         figure = LineChart(
@@ -265,9 +267,11 @@ class TestSwarm(ValueLabelCase):
             self.assertEqual(f"{label.xy[0]:g}", label.get_text())
 
     def test_headroom_keeps_labels_inside(self):
-        bare = SwarmPlot(GROUPS).axes[0].get_ylim()[1]
-        labelled = SwarmPlot(GROUPS, show_values=True).axes[0].get_ylim()[1]
-        self.assertGreater(labelled, bare)
+        figure = SwarmPlot(GROUPS, show_values=True)
+        figure.canvas.draw()
+        ax = figure.axes[0]
+        top = max(t.get_window_extent().y1 for t in labels(ax))
+        self.assertLessEqual(top, ax.get_window_extent().y1)
 
     def test_background_group_carries_no_labels(self):
         figure = SwarmPlot(GROUPS, show_values=True, emphasis=["background", None])

@@ -1,4 +1,5 @@
 import unittest
+import warnings
 
 from matplotlib.colors import to_hex
 
@@ -67,18 +68,17 @@ class TestColors(unittest.TestCase):
         self.assertTrue(callable(cmap), "Created colormap is not callable.")
 
     def test_various_palettes(self):
-        """Test that various pypalettes palettes can be loaded."""
+        """Test that every COLORS palette resolves without the fallback warning."""
         palettes_to_test = [
-            COLORS.Blues,
-            COLORS.Greens,
-            COLORS.Spectral,
-            COLORS.Viridis,
-            COLORS.Greys,
-            COLORS.Set2,
+            value
+            for name, value in vars(COLORS).items()
+            if isinstance(value, str) and not name.startswith("_")
         ]
 
         for palette_name in palettes_to_test:
-            color_scale = get_color_scale(palette_name)
+            with warnings.catch_warnings():
+                warnings.simplefilter("error")
+                color_scale = get_color_scale(palette_name)
             self.assertIsInstance(
                 color_scale, list, f"Palette {palette_name} did not return a list."
             )

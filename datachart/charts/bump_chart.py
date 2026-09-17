@@ -18,11 +18,11 @@ from ..typings import (
 )
 from ..constants import (
     ASPECT_RATIO,
+    BUMP_LABEL_POSITION,
+    BUMP_RANK,
     DATE_FORMAT,
     EMPHASIS,
     FIG_SIZE,
-    LABEL_POSITION,
-    RANK,
     SCALE,
     SHOW_GRID,
     VALUE_FORMAT,
@@ -36,7 +36,7 @@ from ..constants import (
 def BumpChart(
     data: Union[List[LineDataPointAttrs], List[List[LineDataPointAttrs]]],
     *,
-    rank_by: Optional[Union[RANK, str]] = None,
+    rank_by: Optional[Union[BUMP_RANK, str]] = None,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
@@ -49,7 +49,7 @@ def BumpChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_labels: Optional[bool] = None,
-    label_position: Optional[Union[LABEL_POSITION, str]] = None,
+    label_position: Optional[Union[BUMP_LABEL_POSITION, str]] = None,
     show_markers: Optional[bool] = None,
     line_curve: Optional[float] = None,
     show_legend: Optional[bool] = None,
@@ -140,12 +140,11 @@ def BumpChart(
     Args:
         data: The data points of the series. Can be a single list of data
             points for one series, or a list of lists for several.
-        rank_by: How `y` becomes a rank, a `RANK` member: `VALUE_DESCENDING`
-            (default) ranks the highest value first at each period,
-            `VALUE_ASCENDING` the lowest, and `GIVEN` reads `y` as the rank
-            (a positive integer). Ranking reads the series present at a
-            period; a series without a point there leaves a gap. Ties keep
-            input order.
+        rank_by: How `y` becomes a rank, a [`BUMP_RANK`][datachart.constants.BUMP_RANK]
+            member: `VALUE_DESCENDING` (default) ranks the highest value first at each
+            period, `VALUE_ASCENDING` the lowest, and `GIVEN` reads `y` as the rank (a
+            positive integer). Ranking reads the series present at a period; a series
+            without a point there leaves a gap. Ties keep input order.
         title: The title of the chart.
         xlabel: The x-axis label.
         ylabel: The y-axis label.
@@ -154,12 +153,12 @@ def BumpChart(
         emphasis: The emphasis role(s) for individual series, aligned like
             `style`: "background" mutes a series, "highlight" bolds it and
             brings it to the front, None leaves it unchanged.
-        emphasis_rule: A rule that highlights the series matching it and
-            mutes the rest, read against a summary of each series' ranks,
-            chosen by `by` (`"mean"` by default): `{"top": n}` picks the `n`
-            best-ranked series, `{"bottom": n}` the worst, and `{"above": v}`,
-            `{"below": v}`, `{"between": (lo, hi)}` compare the rank number
-            itself. An explicit `emphasis` role wins. See `EmphasisRuleAttrs`.
+        emphasis_rule: A rule that highlights the series matching it and mutes the rest,
+            read against a summary of each series' ranks, chosen by `by` (`"mean"` by
+            default): `{"top": n}` picks the `n` best-ranked series, `{"bottom": n}` the
+            worst, and `{"above": v}`, `{"below": v}`, `{"between": (lo, hi)}` compare
+            the rank number itself. An explicit `emphasis` role wins. See
+            [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -167,7 +166,8 @@ def BumpChart(
         ymax: The maximum rank shown (the bottom of the axis).
         show_labels: Whether to print each series' subtitle beside its line
             end, in the series color. Defaults to True.
-        label_position: Which line end carries the label, a `LABEL_POSITION`
+        label_position: Which line end carries the label, a
+            [`BUMP_LABEL_POSITION`][datachart.constants.BUMP_LABEL_POSITION]
             member: `START`, `END` (default), or `BOTH`.
         show_markers: Whether to draw a marker at every period. Defaults to True.
         line_curve: How far each segment eases between two periods, in
@@ -177,28 +177,33 @@ def BumpChart(
             `show_labels` is off.
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
-            `LegendSettingAttrs`.
-        show_grid: Which grid lines to show (e.g., "both", "x", "y").
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
+        show_grid: Which grid lines to show (e.g., "both", "x", "y"). A bump
+            chart draws none unless asked: the ranks read from the lines.
         show_values: Whether to print each point's original `y` value beside it.
-        value_format: Format string for the value labels: a `VALUE_FORMAT`
-            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
+        value_format: Format string for the value labels: a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant or any
+            `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
         value_step: Label every Nth point (`1` labels all of them). Defaults
             to the smallest step that keeps neighbouring labels apart.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
-            `ASPECT_RATIO`.
+            [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         scalex: The x-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each series; the
             ranks still read every series.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.
         sharey: Whether to share the y-axis in subplots.
-        style: Style configuration(s) for the series. See `BumpStyleAttrs`.
+        style: Style configuration(s) for the series. See
+            [`BumpStyleAttrs`][datachart.typings.BumpStyleAttrs].
         xticks: Custom x-axis tick positions.
         xticklabels: Custom x-axis tick labels.
         xtickrotate: Rotation angle for x-axis tick labels.
-        xticks_format: The x-axis tick label format: a `DATE_FORMAT` member
-            or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT`
-            member or `"{x:.1f}"` style string.
+        xticks_format: The x-axis tick label format: a
+            [`DATE_FORMAT`][datachart.constants.DATE_FORMAT] member or `strftime`
+            pattern on a datetime axis, else a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] member or `"{x:.1f}"`
+            style string.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot, at rank positions.
         vspans: Vertical reference band(s) to shade, between two x positions.
@@ -228,9 +233,10 @@ def BumpChart(
         y=y,
     )
 
-    # end labels name the lines, so the legend is off unless asked for
+    # end labels name the lines, so the legend is off unless asked for;
+    # subplots have no shared legend to show
     if show_legend is None:
-        show_legend = show_labels is False
+        show_legend = show_labels is False and not subplots
 
     # Figure-level settings; None values resolve to defaults downstream
     settings = {

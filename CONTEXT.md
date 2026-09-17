@@ -228,7 +228,7 @@ _Avoid_: annotation (for this), tag, name label, adjusted text
 
 **Bump chart**:
 Rank over time (`BumpChart`: an `{x, y}` point list per series, one line
-each) drawn with rank 1 at the top of an integer y-axis. `rank_by` (a `RANK`
+each) drawn with rank 1 at the top of an integer y-axis. `rank_by` (a `BUMP_RANK`
 member) says whether `y` is already a rank (`GIVEN`) or a value ranked per
 period (`VALUE_DESCENDING`, the default, highest first; `VALUE_ASCENDING`,
 lowest first). A series absent at a period leaves a gap and is not ranked
@@ -324,7 +324,7 @@ _Avoid_: change, difference, gap
 
 **End label**:
 A series' label (its `subtitle`) printed beside its first and/or last point in the series
-color (`show_labels`, with `label_position` a `LABEL_POSITION` member), so the
+color (`show_labels`, with `label_position` a `BUMP_LABEL_POSITION` member), so the
 line is named where it ends instead of in a legend.
 _Avoid_: direct label (for this), line label, legend label
 
@@ -338,7 +338,7 @@ _Avoid_: matrix plot, image plot, colormesh
 **Calendar heatmap**:
 A daily series (`CalendarHeatmap`: a `{date, value}` dict per dataset,
 temporal dates only, each once) drawn as one cell per day, weeks as
-columns and weekdays as rows from `week_start` (a `WEEKDAY` member), with
+columns and weekdays as rows from `week_start` (a `CALENDAR_WEEKDAY` member), with
 stepped month separators and month/weekday labels. Data spanning several
 years draws one panel per year sharing one value range; `year` keeps one.
 The heatmap's cells, value labels, and colorbar, under
@@ -366,7 +366,7 @@ _Avoid_: hex density plot, hexagonal heatmap, 2-D histogram
 Series filled on top of one another along an ordered axis
 (`StackedAreaChart`: `LineChart`'s multi-series `{x, y}` input, identical
 `x` across series). The stack offsets are a panel concern like bar slotting;
-`baseline` (a `BASELINE` constant: `ZERO`, `PERCENT`, `SYM`, `WIGGLE`,
+`baseline` (a `STACKED_AREA_BASELINE` constant: `ZERO`, `PERCENT`, `SYM`, `WIGGLE`,
 `WEIGHTED_WIGGLE`) picks where the first series starts, with `PERCENT`
 normalising each `x` to 100 %.
 _Avoid_: stackplot, streamgraph (only the wiggle baselines), 100 % chart,

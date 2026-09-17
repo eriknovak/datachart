@@ -131,7 +131,7 @@ def ContourChart(
     [`Heatmap`][datachart.charts.Heatmap]; for the raw points behind a density
     use [`ScatterChart`][datachart.charts.ScatterChart].
 
-    !!! info "Added in 0.9.0"
+    !!! info "Added in v0.9.0"
 
     !!! info "Added in Unreleased"
 
@@ -173,13 +173,13 @@ def ContourChart(
             bolds it and brings it to the front, None leaves it unchanged.
             Not supported for filled contours: passing a value with
             `filled=True` raises `ValueError`.
-        emphasis_rule: A rule that highlights the line contours matching it and
-            mutes the rest: `{"above": v}` or `{"below": v}` (strict),
-            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
-            `{"bottom": n}`, read against a summary of each contour's own `z`
-            values, chosen by `by`: `"mean"` (default), `"median"`, `"min"`,
-            `"max"`, or `"sum"`. An explicit `emphasis` role wins, and a count
-            ranks across every contour. See `EmphasisRuleAttrs`.
+        emphasis_rule: A rule that highlights the line contours matching it and mutes
+            the rest: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}`
+            (inclusive), `{"top": n}` or `{"bottom": n}`, read against a summary of each
+            contour's own `z` values, chosen by `by`: `"mean"` (default), `"median"`,
+            `"min"`, `"max"`, or `"sum"`. An explicit `emphasis` role wins, and a count
+            ranks across every contour. See
+            [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -188,18 +188,19 @@ def ContourChart(
         show_legend: Whether to show the legend.
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
-            `LegendSettingAttrs`.
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y"). Off by
             default for filled contours.
         filled: Whether to fill the bands between the levels (colored by the
             colormap) instead of drawing iso-lines (in the chart's color).
-        levels: Which levels cut the surface: a rule of `CONTOUR_LEVELS`
-            (`"auto"`, the default, leaves the choice to matplotlib), a target
-            level count, or an explicit list of level values.
+        levels: Which levels cut the surface: a rule of
+            [`CONTOUR_LEVELS`][datachart.constants.CONTOUR_LEVELS] (`"auto"`, the
+            default, leaves the choice to matplotlib), a target level count, or an
+            explicit list of level values.
         show_labels: Whether to write the level values along the iso-lines.
         show_colorbars: Whether to show the colorbar(s) of filled contours.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
-            `ASPECT_RATIO`.
+            [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         scalex: The x-axis scale (e.g., "log", "linear").
         scaley: The y-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each chart.
@@ -210,24 +211,27 @@ def ContourChart(
         norm: Value normalization method(s) of the colormap.
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
-        valfmt: Format string(s) for the inline level labels, with the value
-            named `x` (e.g., `"{x:.1f}"`). See `VALUE_FORMAT`.
+        valfmt: Format string(s) for the inline level labels, with the value named `x`
+            (e.g., `"{x:.1f}"`). See [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT].
         xticks: Custom x-axis tick positions.
         xticklabels: Custom x-axis tick labels.
         xtickrotate: Rotation angle for x-axis tick labels.
         yticks: Custom y-axis tick positions.
         yticklabels: Custom y-axis tick labels.
         ytickrotate: Rotation angle for y-axis tick labels.
-        xticks_format: The x-axis tick label format: a `DATE_FORMAT` member
-            or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT`
-            member or `"{x:.1f}"` style string.
+        xticks_format: The x-axis tick label format: a
+            [`DATE_FORMAT`][datachart.constants.DATE_FORMAT] member or `strftime`
+            pattern on a datetime axis, else a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] member or `"{x:.1f}"`
+            style string.
         yticks_format: The y-axis tick label format, as `xticks_format`.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
         vspans: Vertical reference band(s) to shade, between two x positions.
         hspans: Horizontal reference band(s) to shade, between two y positions.
-        colorbar: The colorbar setting(s): label, location, tick format,
-            and tick positions. See `ColorbarSettingAttrs`.
+        colorbar: The colorbar setting(s): label, location, tick format, and tick
+            positions. See
+            [`ColorbarSettingAttrs`][datachart.typings.ColorbarSettingAttrs].
         texts: Text annotation(s) to draw.
 
     Returns:

@@ -127,7 +127,7 @@ def RaincloudPlot(
     experimental results per condition. Vertical rainclouds keep the cloud on
     the left; horizontal ones keep it above.
 
-    !!! info "Added in 0.9.0"
+    !!! info "Added in v0.9.0"
 
     !!! info "Added in Unreleased"
 
@@ -166,13 +166,13 @@ def RaincloudPlot(
             call (a single value applies to every group): "background" mutes
             a group's cloud, rain, and box, "highlight" bolds their edges,
             None leaves them unchanged.
-        emphasis_rule: A rule that highlights the groups matching it and mutes
-            the rest: `{"above": v}` or `{"below": v}` (strict),
-            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
-            `{"bottom": n}`, read against a summary of each group's values,
-            chosen by `by`: `"median"` (default), `"mean"`, `"min"`, `"max"`, or
-            `"sum"`. An explicit `emphasis` role wins, and a count ranks across
-            every group of every chart. See `EmphasisRuleAttrs`.
+        emphasis_rule: A rule that highlights the groups matching it and mutes the rest:
+            `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}`
+            (inclusive), `{"top": n}` or `{"bottom": n}`, read against a summary of each
+            group's values, chosen by `by`: `"median"` (default), `"mean"`, `"min"`,
+            `"max"`, or `"sum"`. An explicit `emphasis` role wins, and a count ranks
+            across every group of every chart. See
+            [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -181,23 +181,25 @@ def RaincloudPlot(
         show_legend: Whether to show the legend; one entry per group.
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
-            `LegendSettingAttrs`.
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_outliers: Whether the box shows outliers.
         show_values: Whether to print each group's median beside its box, and
             its minimum and maximum beside the rain points holding them.
-        value_format: Format string for the value labels: a `VALUE_FORMAT`
-            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
-        mode: How the rain spreads across its width. See `SWARM_MODE`:
-            "swarm" packs the points so none overlap; "strip" jitters them
-            uniformly.
+        value_format: Format string for the value labels: a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant or any
+            `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
+        mode: How the rain spreads across its width. See
+            [`SWARM_MODE`][datachart.constants.SWARM_MODE]: "swarm" packs the points so
+            none overlap; "strip" jitters them uniformly.
         jitter: The strip jitter width, as a fraction of the category width
             like `SwarmPlot`, scaled down to the rain's narrower cell. Only
             used with `mode="strip"`.
         bandwidth: The cloud's KDE bandwidth: None or "scott" (Scott's rule),
-            "silverman" (Silverman's rule), or a scalar factor. See `BANDWIDTH`.
+            "silverman" (Silverman's rule), or a scalar factor. See
+            [`BANDWIDTH`][datachart.constants.BANDWIDTH].
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
-            `ASPECT_RATIO`.
+            [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         orientation: The orientation of the rainclouds (vertical or horizontal).
         scaley: The y-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each chart.
@@ -212,9 +214,11 @@ def RaincloudPlot(
         yticks: Custom y-axis tick positions.
         yticklabels: Custom y-axis tick labels.
         ytickrotate: Rotation angle for y-axis tick labels.
-        xticks_format: The x-axis tick label format: a `DATE_FORMAT` member
-            or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT`
-            member or `"{x:.1f}"` style string.
+        xticks_format: The x-axis tick label format: a
+            [`DATE_FORMAT`][datachart.constants.DATE_FORMAT] member or `strftime`
+            pattern on a datetime axis, else a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] member or `"{x:.1f}"`
+            style string.
         yticks_format: The y-axis tick label format, as `xticks_format`.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.

@@ -35,7 +35,7 @@ of the panel.
   API.
 - **Compass and calendar conventions by default.** `startangle` (compass
   string or degrees, default `"N"`), `direction`
-  (`DIRECTION.CLOCKWISE`/`COUNTERCLOCKWISE`, default clockwise) and
+  (`RADIAL_DIRECTION.CLOCKWISE`/`COUNTERCLOCKWISE`, default clockwise) and
   `innerradius` (fraction 0–1 of the radial extent, default 0) are chart
   settings. Line visuals close their loop.
 - **Impossible settings raise.** `scalex`, `vlines`/`hlines` and anything

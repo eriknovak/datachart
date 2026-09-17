@@ -1,54 +1,9 @@
 """The module containing the `stats` methods.
 
-The `stats` module provides methods for calculating statistics.
+The `stats` module provides the statistics behind the charts: centers and
+spreads, shape, correlation, a linear fit, bootstrap intervals, histogram bins,
+smoothers, and density estimates. Every function takes plain Python lists.
 
-Methods:
-    count(values):
-        Counts the number of elements in the list.
-    sum_values(values):
-        Calculates the sum of the values.
-    mean(values):
-        Calculates the mean of the values.
-    median(values):
-        Calculates the median of the values.
-    stdev(values):
-        Calculates the standard deviation of the values.
-    variance(values):
-        Calculates the variance of the values.
-    quantile(values, q):
-        Calculates the quantile of the values.
-    iqr(values):
-        Calculates the interquartile range (Q3 - Q1).
-    minimum(values):
-        Gets the minimum of the values.
-    maximum(values):
-        Gets the maximum of the values.
-    correlation(x, y):
-        Calculates the Pearson correlation coefficient between two lists.
-    spearman(x, y):
-        Calculates the Spearman rank correlation between two lists.
-    mode(values):
-        Gets the most frequent value.
-    skewness(values):
-        Calculates the skewness of the values.
-    kurtosis(values):
-        Calculates the excess kurtosis of the values.
-    linear_fit(x, y):
-        Fits a straight line to the (x, y) points.
-    bootstrap_ci(values, statistic, level, n_resamples, seed):
-        Estimates a confidence interval of a statistic by bootstrapping.
-    histogram(values, bins):
-        Bins the values into histogram counts and edges.
-    rolling_mean(values, window):
-        Smooths the values with a trailing moving average.
-    ewma(values, alpha):
-        Smooths the values with an exponentially weighted moving average.
-    loess(x, y, frac):
-        Smooths the (x, y) points with a locally weighted linear fit.
-    kde1d(values, bandwidth, gridsize, cut):
-        Estimates the density of the values as a curve.
-    kde2d(x, y, bandwidth, gridsize, cut):
-        Estimates the density of the (x, y) points as a gridded surface.
 """
 
 from datetime import datetime, timezone
@@ -879,7 +834,7 @@ def kde1d(
     result is a list of `{x, y}` points ready for `LineChart`; the curve
     integrates to 1, so it overlays a density `Histogram` of the same values.
 
-    !!! info "Added in 0.9.0"
+    !!! info "Added in v0.9.0"
 
     Examples:
         >>> from datachart.utils.stats import kde1d
@@ -933,7 +888,7 @@ def kde2d(
     (dates, datetimes, or `datetime64`) gives a grid of datetime `x` values,
     in the input's zone, and `xlim` may then be a pair of datetimes.
 
-    !!! info "Added in 0.9.0"
+    !!! info "Added in v0.9.0"
 
     Examples:
         >>> from datachart.utils.stats import kde2d

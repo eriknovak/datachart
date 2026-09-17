@@ -159,8 +159,9 @@ def BarChart(
             `style`: "background" mutes a chart (theme muted color, lowered
             alpha, behind the others, no legend entry), "highlight" bolds
             its edges and brings it to the front, None leaves it unchanged.
-            See `EMPHASIS`.
-        figsize: The size of the figure as (width, height) in inches. See `FIG_SIZE`.
+            See [`EMPHASIS`][datachart.constants.EMPHASIS].
+        figsize: The size of the figure as (width, height) in inches. See
+            [`FIG_SIZE`][datachart.constants.FIG_SIZE].
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
         ymin: The minimum y-axis value.
@@ -168,33 +169,36 @@ def BarChart(
         show_legend: Whether to show the legend.
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
-            `LegendSettingAttrs`.
-        show_grid: Which grid lines to show ("both", "x", "y"). See `SHOW_GRID`.
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
+        show_grid: Which grid lines to show ("both", "x", "y"). See
+            [`SHOW_GRID`][datachart.constants.SHOW_GRID].
         show_yerr: Whether to show y-axis error bars.
         show_values: Whether to show bar value labels at the edge of each bar.
-        value_format: Format string for bar value labels: a `VALUE_FORMAT`
-            constant or any `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
+        value_format: Format string for bar value labels: a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant or any
+            `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
-            `ASPECT_RATIO`.
+            [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         bar_mode: How multiple bar series share the axis: "group" (side-by-side),
-            "stack" (stacked), or "overlay" (overlapping). See `BAR_MODE`.
+            "stack" (stacked), or "overlay" (overlapping). See
+            [`BAR_MODE`][datachart.constants.BAR_MODE].
         sort: The order the categories are drawn in: None (input order),
             "ascending", or "descending" by value. One order serves every
             series, keyed by the total across them; ties keep input order.
-            See `SORT`.
+            See [`SORT`][datachart.constants.SORT].
         sort_by: The subtitle of the one series whose values key the sort
             instead of the total. A category that series lacks sorts last.
-        emphasis_rule: A one-key dict that highlights the bars matching it
-            and mutes the rest: `{"above": v}` or `{"below": v}` (strict),
-            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
-            `{"bottom": n}`. Reads each bar's own value; a record's own
-            `emphasis` key wins over the rule. See `EmphasisRuleAttrs`.
+        emphasis_rule: A one-key dict that highlights the bars matching it and mutes the
+            rest: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}`
+            (inclusive), `{"top": n}` or `{"bottom": n}`. Reads each bar's own value; a
+            record's own `emphasis` key wins over the rule. See
+            [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
         orientation: The orientation of the bars ("vertical" or "horizontal").
-            See `ORIENTATION`.
+            See [`ORIENTATION`][datachart.constants.ORIENTATION].
         scalex: The x-axis scale ("linear", "log", "symlog", "asinh"). Useful
-            for horizontal bars. See `SCALE`.
+            for horizontal bars. See [`SCALE`][datachart.constants.SCALE].
         scaley: The y-axis scale ("linear", "log", "symlog", "asinh"). Useful
-            for vertical bars. See `SCALE`.
+            for vertical bars. See [`SCALE`][datachart.constants.SCALE].
         subplots: Whether to create separate subplots for each chart.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.
@@ -206,9 +210,11 @@ def BarChart(
         yticks: Custom y-axis tick positions.
         yticklabels: Custom y-axis tick labels.
         ytickrotate: Rotation angle for y-axis tick labels.
-        xticks_format: The x-axis tick label format: a `DATE_FORMAT` member
-            or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT`
-            member or `"{x:.1f}"` style string.
+        xticks_format: The x-axis tick label format: a
+            [`DATE_FORMAT`][datachart.constants.DATE_FORMAT] member or `strftime`
+            pattern on a datetime axis, else a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] member or `"{x:.1f}"`
+            style string.
         yticks_format: The y-axis tick label format, as `xticks_format`.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.

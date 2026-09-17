@@ -12,7 +12,7 @@ from matplotlib.colors import to_hex
 
 from datachart.charts import LineChart, ScatterMatrix
 from datachart.config import config
-from datachart.constants import DIAGONAL, THEME
+from datachart.constants import SCATTER_MATRIX_DIAGONAL, THEME
 from datachart.utils import Grid, Panel
 from datachart.utils._internal.layers import (
     HistogramLayer,
@@ -148,16 +148,18 @@ class TestScatterMatrixCells(unittest.TestCase):
 
     def test_diagonal_modes(self):
         for mode, expected in [
-            (DIAGONAL.HIST, {HistogramLayer}),
-            (DIAGONAL.KDE, {KdeLayer}),
-            (DIAGONAL.NONE, set()),
+            (SCATTER_MATRIX_DIAGONAL.HIST, {HistogramLayer}),
+            (SCATTER_MATRIX_DIAGONAL.KDE, {KdeLayer}),
+            (SCATTER_MATRIX_DIAGONAL.NONE, set()),
         ]:
             with self.subTest(mode=mode):
                 kinds = cell_kinds(ScatterMatrix(columns(), diagonal=mode))
                 self.assertEqual(kinds[(1, 1)], expected)
 
     def test_kde_draws_one_curve_per_group(self):
-        figure = ScatterMatrix(columns(), hue="species", diagonal=DIAGONAL.KDE)
+        figure = ScatterMatrix(
+            columns(), hue="species", diagonal=SCATTER_MATRIX_DIAGONAL.KDE
+        )
         host = cell_axes(figure)[(0, 0)]
         (ax,) = [a for a in host._twinned_axes.get_siblings(host) if a is not host]
         self.assertEqual(len(ax.lines), 3)
@@ -174,7 +176,9 @@ class TestScatterMatrixCells(unittest.TestCase):
         self.assertEqual(sum(1 for l in kinds.values() if l), 6)
 
     def test_lower_only_without_diagonal_trims_empty_edges(self):
-        figure = ScatterMatrix(columns(), lower_only=True, diagonal=DIAGONAL.NONE)
+        figure = ScatterMatrix(
+            columns(), lower_only=True, diagonal=SCATTER_MATRIX_DIAGONAL.NONE
+        )
         kinds = cell_kinds(figure)
         self.assertEqual(figure._chart_metadata["shape"], (2, 2))
         self.assertEqual(kinds[(0, 0)], {ScatterLayer})
@@ -294,7 +298,7 @@ class TestScatterMatrixCells(unittest.TestCase):
         self.assertFalse(labelled(axes[(0, 1)], "x"))
 
     def test_blank_diagonal_moves_edge_labels_inward(self):
-        figure = ScatterMatrix(columns(), diagonal=DIAGONAL.NONE)
+        figure = ScatterMatrix(columns(), diagonal=SCATTER_MATRIX_DIAGONAL.NONE)
         axes = cell_axes(figure)
         figure.canvas.draw()
         # row 0 and the last column have a blank outer cell
@@ -349,7 +353,9 @@ class TestScatterMatrixLegend(unittest.TestCase):
     def test_legend_wears_theme_font_with_blank_diagonal(self):
         config.set_theme(THEME.QUILL)
         try:
-            figure = ScatterMatrix(columns(), hue="species", diagonal=DIAGONAL.NONE)
+            figure = ScatterMatrix(
+                columns(), hue="species", diagonal=SCATTER_MATRIX_DIAGONAL.NONE
+            )
             (legend,) = self.legends(figure)
             family = legend.get_texts()[0].get_fontfamily()
             self.assertIn(config["font_general_serif"][0], family)
@@ -392,6 +398,7 @@ class TestScatterMatrixComposition(unittest.TestCase):
     def test_nested_columns_keep_equal_widths(self):
         matrix = ScatterMatrix(columns(), hue="species", dimensions=["a", "b", "c"])
         line = LineChart([{"x": 0, "y": 1}, {"x": 1, "y": 2}])
+
         # a full row above puts outer column edges where a legend-blind
         # split of the matrix would also place one
         def spec(row, col, span=1):
@@ -404,11 +411,7 @@ class TestScatterMatrixComposition(unittest.TestCase):
         ]
         figure = Grid(cells, figsize=(12, 8))
         figure.canvas.draw()
-        bottom = [
-            ax
-            for ax in figure.axes
-            if ax.get_xlabel() in ("a", "b", "c")
-        ]
+        bottom = [ax for ax in figure.axes if ax.get_xlabel() in ("a", "b", "c")]
         widths = [ax.get_position().width for ax in bottom]
         self.assertEqual(len(widths), 3)
         self.assertAlmostEqual(min(widths) / max(widths), 1, delta=0.05)
@@ -420,7 +423,7 @@ class TestScatterMatrixComposition(unittest.TestCase):
                 figure = ScatterMatrix(
                     columns(),
                     hue="species",
-                    diagonal=DIAGONAL.KDE,
+                    diagonal=SCATTER_MATRIX_DIAGONAL.KDE,
                     show_correlation=True,
                     show_regression=True,
                 )

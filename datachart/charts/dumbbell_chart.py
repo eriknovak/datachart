@@ -117,11 +117,11 @@ def DumbbellChart(
         ... )
 
     Args:
-        data: The records of the chart: a list of `{label, start, end}` dicts
-            with an optional `emphasis` key. `label` names the category and is
-            unique within the list; `start` and `end` are finite numbers. A
-            list of such lists overlays several charts, or draws one per
-            subplot with `subplots`. See `DumbbellRecordAttrs`.
+        data: The records of the chart: a list of `{label, start, end}` dicts with an
+            optional `emphasis` key. `label` names the category and is unique within the
+            list; `start` and `end` are finite numbers. A list of such lists overlays
+            several charts, or draws one per subplot with `subplots`. See
+            [`DumbbellRecordAttrs`][datachart.typings.DumbbellRecordAttrs].
         title: The title of the chart.
         xlabel: The label of the horizontal axis.
         ylabel: The label of the vertical axis.
@@ -129,16 +129,18 @@ def DumbbellChart(
             chart.
         start_name: The name of the start endpoint, shown in the legend.
         end_name: The name of the end endpoint, shown in the legend.
-        figsize: The size of the figure as (width, height) in inches. See `FIG_SIZE`.
+        figsize: The size of the figure as (width, height) in inches. See
+            [`FIG_SIZE`][datachart.constants.FIG_SIZE].
         xmin: The minimum value of the x-axis.
         xmax: The maximum value of the x-axis.
         ymin: The minimum value of the y-axis.
         ymax: The maximum value of the y-axis.
         orientation: Which axis the values run along: "horizontal" (default,
             one row per category, the first at the top) or "vertical" (one
-            column per category). See `ORIENTATION`.
-        scaley: The scale of the value axis ("linear", "log", "symlog",
-            "logit"), whichever way it runs, as on the box plot. See `SCALE`.
+            column per category). See [`ORIENTATION`][datachart.constants.ORIENTATION].
+        scaley: The scale of the value axis ("linear", "log", "symlog", "logit"),
+            whichever way it runs, as on the box plot. See
+            [`SCALE`][datachart.constants.SCALE].
         subplots: Whether to draw each data list in its own subplot.
         max_cols: The maximum number of subplot columns.
         sharex: Whether the subplots share the x-axis.
@@ -147,36 +149,39 @@ def DumbbellChart(
             `start_name` or `end_name` is given.
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
-            `LegendSettingAttrs`.
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show ("both", "x", "y"). Unset, the
             theme's grid runs along the value axis, whichever way it points.
-            See `SHOW_GRID`.
+            See [`SHOW_GRID`][datachart.constants.SHOW_GRID].
         show_values: The value labels: None (none), `"endpoints"` (each
             endpoint's value past its dot, away from the connector), or
             `"delta"` (`end - start` at the connector midpoint). See
-            `DUMBBELL_VALUE`.
+            [`DUMBBELL_VALUE`][datachart.constants.DUMBBELL_VALUE].
         show_direction: Whether to draw a thin arrow beside each connector,
             pointing from `start` to `end`: above a horizontal dumbbell, right
             of a vertical one. Records whose endpoints coincide draw none.
-        value_format: Format string for the value labels: a `VALUE_FORMAT`
-            constant or any `"{x:.1f}"`, `"{:+.1f}"`, or `"%g"` style string.
+        value_format: Format string for the value labels: a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant or any
+            `"{x:.1f}"`, `"{:+.1f}"`, or `"%g"` style string.
         sort: The order of the categories: None (input order), "ascending",
             or "descending" by the key `sort_by` names. Ties keep input
-            order. See `SORT`.
-        sort_by: The key `sort` orders by: `"start"` (default), `"end"`, or
-            `"delta"`. Requires `sort`. See `DUMBBELL_SORT_KEY`.
+            order. See [`SORT`][datachart.constants.SORT].
+        sort_by: The key `sort` orders by: `"start"` (default), `"end"`, or `"delta"`.
+            Requires `sort`. See
+            [`DUMBBELL_SORT_KEY`][datachart.constants.DUMBBELL_SORT_KEY].
         marker: The `(start, end)` marker pair of the dots; a chart style
-            sets them per chart. See `LINE_MARKER`.
+            sets them per chart. See [`LINE_MARKER`][datachart.constants.LINE_MARKER].
         connector_style: The line style of the connectors; a chart style
-            sets it per chart. See `LINE_STYLE`.
-        emphasis: The emphasis role of each chart ("background" or
-            "highlight"), or one role per chart. See `EMPHASIS`.
-        emphasis_rule: A one-key dict that highlights the records matching
-            it and mutes the rest: `{"above": v}` or `{"below": v}` (strict),
-            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
-            `{"bottom": n}`. Reads each record's delta; a record's own
-            `emphasis` key wins over the rule. See `EmphasisRuleAttrs`.
-        style: Style configuration(s) for each chart. See `DumbbellStyleAttrs`.
+            sets it per chart. See [`LINE_STYLE`][datachart.constants.LINE_STYLE].
+        emphasis: The emphasis role of each chart ("background" or "highlight"), or one
+            role per chart. See [`EMPHASIS`][datachart.constants.EMPHASIS].
+        emphasis_rule: A one-key dict that highlights the records matching it and mutes
+            the rest: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}`
+            (inclusive), `{"top": n}` or `{"bottom": n}`. Reads each record's delta; a
+            record's own `emphasis` key wins over the rule. See
+            [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
+        style: Style configuration(s) for each chart. See
+            [`DumbbellStyleAttrs`][datachart.typings.DumbbellStyleAttrs].
         xtickrotate: Rotation angle for the x-axis tick labels.
         ytickrotate: Rotation angle for the y-axis tick labels.
         vlines: Vertical line(s) to plot.

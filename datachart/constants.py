@@ -3,51 +3,79 @@
 The `constants` module provides a set of predefined constants used in the package.
 These include figure size, format, style, and other figure manipulation values.
 
+**Figure Constants**
+
 Classes:
-    FIG_SIZE:           The predefined figure sizes.
-    FIG_FORMAT:         The supported figure formats.
-    FONT_STYLE:         The supported font styles.
-    FONT_WEIGHT:        The supported font weights.
-    LINE_MARKER:        The supported line markers.
-    LINE_STYLE:         The supported line styles.
-    ARROW_STYLE:        The supported text annotation connector looks.
-    LINE_DRAW_STYLE:    The supported line draw styles.
-    HATCH_STYLE:        The supported hatch styles.
-    LEGEND_ALIGN:       The supported legend alignments.
-    LEGEND_LOCATION:    The supported legend locations.
-    HISTOGRAM_TYPE:     The supported histogram types.
-    BAR_MODE:           The supported bar modes.
-    COLORS:             The predefined colors.
-    NORMALIZE:          The supported normalization options.
-    ORIENTATION:        The supported orientations.
-    VIOLIN_INNER:       The supported violin inner marks.
-    RIDGELINE_SCALE:    The supported ridgeline density scales.
-    BANDWIDTH:          The supported kernel density bandwidth rules.
-    CONTOUR_LEVELS:     The supported contour level rules.
-    HEXBIN_REDUCE:      The supported hexbin aggregations.
-    BASELINE:           The supported stacked area baselines.
-    RANK:               The supported bump chart ranking rules.
-    LABEL_POSITION:     The supported end label positions.
-    GANTT_VALUE:        The supported gantt chart value labels.
-    GANTT_SORT_KEY:     The supported gantt chart sort keys.
-    GANTT_ARROW_ENTRY:  The supported gantt dependency arrow entries.
-    DUMBBELL_VALUE:     The supported dumbbell chart value labels.
-    DUMBBELL_SORT_KEY:  The supported dumbbell chart sort keys.
-    DIAGONAL:           The supported scatter matrix diagonal cells.
-    DATE_PERIOD:        The supported date axis periods.
-    NODE_LABEL_POSITION: The supported network node label positions.
-    NETWORK_LAYOUT:     The supported network chart layouts.
-    RADIAL_TYPE:        The supported radial chart visuals.
-    SWARM_MODE:         The supported swarm plot modes.
-    DIRECTION:          The supported angular directions.
-    VALUE_FORMAT:       The predefined value formats.
-    DATE_FORMAT:        The predefined date formats.
-    THEME:              The predefined themes.
-    EMPHASIS:           The supported emphasis roles.
-    SHOW_GRID:          The supported show grid options.
-    SCALE:              The supported scale options.
-    ASPECT_RATIO:       The supported aspect ratio options.
-    COLORBAR_LOCATION:  The supported colorbar locations.
+    FIG_SIZE:   The predefined figure sizes.
+    FIG_FORMAT: The supported figure formats.
+
+**Font Constants**
+
+Classes:
+    FONT_STYLE:  The supported font styles.
+    FONT_WEIGHT: The supported font weights.
+
+**Line Constants**
+
+Classes:
+    LINE_MARKER:     The supported line markers.
+    LINE_STYLE:      The supported line styles.
+    LINE_DRAW_STYLE: The supported line draw styles.
+    ARROW_STYLE:     The supported text annotation connector looks.
+
+**Style Constants**
+
+Classes:
+    HATCH_STYLE: The supported hatch styles.
+    COLORS:      The predefined colors.
+    THEME:       The predefined themes.
+    EMPHASIS:    The supported emphasis roles.
+
+**Legend Constants**
+
+Classes:
+    LEGEND_ALIGN:    The supported legend alignments.
+    LEGEND_LOCATION: The supported legend locations.
+
+**Chart Constants**
+
+Classes:
+    BAR_MODE:          The supported bar modes.
+    SORT:              The supported category sort orders.
+    NORMALIZE:         The supported normalization options.
+    ORIENTATION:       The supported orientations.
+    VIOLIN_INNER:      The supported violin inner marks.
+    BANDWIDTH:         The supported kernel density bandwidth rules.
+    SWARM_MODE:        The supported swarm plot modes.
+    VALUE_FORMAT:      The predefined value formats.
+    DATE_FORMAT:       The predefined date formats.
+    SHOW_GRID:         The supported show grid options.
+    SCALE:             The supported scale options.
+    ASPECT_RATIO:      The supported aspect ratio options.
+    COLORBAR_LOCATION: The supported colorbar locations.
+
+**Chart-Specific Constants**
+
+Classes:
+    STACKED_AREA_BASELINE:   The supported stacked area baselines.
+    BUMP_RANK:               The supported bump chart ranking rules.
+    BUMP_LABEL_POSITION:     The supported end label positions.
+    RADIAL_TYPE:             The supported radial chart visuals.
+    RADIAL_DIRECTION:        The supported angular directions.
+    CALENDAR_WEEKDAY:        The supported week start days.
+    GANTT_DATE_PERIOD:       The supported date axis periods.
+    GANTT_VALUE:             The supported gantt chart value labels.
+    GANTT_SORT_KEY:          The supported gantt chart sort keys.
+    GANTT_ARROW_ENTRY:       The supported gantt dependency arrow entries.
+    DUMBBELL_VALUE:          The supported dumbbell chart value labels.
+    DUMBBELL_SORT_KEY:       The supported dumbbell chart sort keys.
+    HISTOGRAM_TYPE:          The supported histogram types.
+    RIDGELINE_SCALE:         The supported ridgeline density scales.
+    CONTOUR_LEVELS:          The supported contour level rules.
+    HEXBIN_REDUCE:           The supported hexbin aggregations.
+    NETWORK_LAYOUT:          The supported network chart layouts.
+    NETWORK_LABEL_POSITION:     The supported network node label positions.
+    SCATTER_MATRIX_DIAGONAL: The supported scatter matrix diagonal cells.
 
 """
 
@@ -548,6 +576,8 @@ class SORT:
 
     !!! info "Added in Unreleased"
 
+    ![SORT at a glance](../assets/imgs/const-sort.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import SORT
         >>> SORT.DEFAULT
@@ -619,10 +649,10 @@ class COLORS:
         Cividis (str): Color-blind friendly (optimized for CVD). Equals to `"Cividis"`.
         Inferno (str): Perceptually uniform, color-blind friendly. Equals to `"Inferno"`.
         Plasma (str): Perceptually uniform, color-blind friendly. Equals to `"Plasma"`.
-        Magma (str): Perceptually uniform, color-blind friendly. Equals to `"Magma"`.
-        Turbo (str): Rainbow-like but perceptually better. Equals to `"Turbo"`.
+        Magma (str): Perceptually uniform, color-blind friendly. Equals to `"magma"`.
+        Turbo (str): Rainbow-like but perceptually better. Equals to `"turbo"`.
         OkabeIto (str): Okabe-Ito categorical palette, color-blind safe. Equals to `"OkabeIto"`.
-        OkabeIto_Black (str): Okabe-Ito palette including black. Equals to `"OkabeIto_Black"`.
+        OkabeIto_Black (str): Okabe-Ito palette including black. Equals to `"OkabeIto_black"`.
         Coolwarm (str): Diverging cool-warm palette. Equals to `"coolwarm"`.
         Tab10 (str): Tableau 10-color categorical palette. Equals to `"tab10"`.
         Tab20 (str): Tableau 20-color categorical palette. Equals to `"tab20"`.
@@ -673,10 +703,10 @@ class COLORS:
     Cividis = "Cividis"
     Inferno = "Inferno"
     Plasma = "Plasma"
-    Magma = "Magma"
-    Turbo = "Turbo"
+    Magma = "magma"
+    Turbo = "turbo"
     OkabeIto = "OkabeIto"
-    OkabeIto_Black = "OkabeIto_Black"
+    OkabeIto_Black = "OkabeIto_black"
 
     # Additional Diverging
     Coolwarm = "coolwarm"
@@ -743,20 +773,20 @@ class ORIENTATION:
     VERTICAL = "vertical"
 
 
-class WEEKDAY:
+class CALENDAR_WEEKDAY:
     """The supported week start days.
 
     Passed as the `week_start` setting of the calendar heatmap: the weekday
     drawn in the top row of every week column. The theme's
     `plot_calendar_heatmap_week_start` supplies the default.
 
-    ![WEEKDAY at a glance](../assets/imgs/const-weekday.svg){ width="100%" }
+    ![CALENDAR_WEEKDAY at a glance](../assets/imgs/const-weekday.svg){ width="100%" }
 
     !!! info "Added in Unreleased"
 
     Examples:
-        >>> from datachart.constants import WEEKDAY
-        >>> WEEKDAY.MONDAY
+        >>> from datachart.constants import CALENDAR_WEEKDAY
+        >>> CALENDAR_WEEKDAY.MONDAY
         "monday"
 
     Attributes:
@@ -828,6 +858,8 @@ class RIDGELINE_SCALE:
     ridges share one density scale, so their heights compare.
 
     !!! info "Added in Unreleased"
+
+    ![RIDGELINE_SCALE at a glance](../assets/imgs/const-ridgeline-scale.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import RIDGELINE_SCALE
@@ -945,21 +977,21 @@ class HEXBIN_REDUCE:
     MAX = "max"
 
 
-class BASELINE:
+class STACKED_AREA_BASELINE:
     """The supported stacked area baselines.
 
     Passed as the `baseline` attribute of stacked area charts: where the
     first series starts, and so how the whole stack sits on the y-axis.
 
-    ![BASELINE at a glance](../assets/imgs/const-baseline.svg){ width="100%" }
+    ![STACKED_AREA_BASELINE at a glance](../assets/imgs/const-baseline.svg){ width="100%" }
 
     Examples:
-        >>> from datachart.constants import BASELINE
-        >>> BASELINE.DEFAULT
+        >>> from datachart.constants import STACKED_AREA_BASELINE
+        >>> STACKED_AREA_BASELINE.DEFAULT
         "zero"
 
     Attributes:
-        DEFAULT (str): The default baseline. Same as `BASELINE.ZERO`.
+        DEFAULT (str): The default baseline. Same as `STACKED_AREA_BASELINE.ZERO`.
         ZERO (str): The stack starts at zero. Equals to `"zero"`.
         PERCENT (str): Each `x` is normalised so the stack spans 0 to 100. Equals to `"percent"`.
         SYM (str): The stack is centred on zero. Equals to `"sym"`.
@@ -1034,7 +1066,7 @@ class NETWORK_LAYOUT:
     FIXED = "fixed"
 
 
-class RANK:
+class BUMP_RANK:
     """The supported bump chart ranking rules.
 
     Passed as the `rank_by` setting of the bump chart: whether each series'
@@ -1043,13 +1075,15 @@ class RANK:
 
     !!! info "Added in Unreleased"
 
+    ![BUMP_RANK at a glance](../assets/imgs/const-rank.svg){ width="100%" }
+
     Examples:
-        >>> from datachart.constants import RANK
-        >>> RANK.DEFAULT
+        >>> from datachart.constants import BUMP_RANK
+        >>> BUMP_RANK.DEFAULT
         "value_descending"
 
     Attributes:
-        DEFAULT (str): The default ranking. Same as `RANK.VALUE_DESCENDING`.
+        DEFAULT (str): The default ranking. Same as `BUMP_RANK.VALUE_DESCENDING`.
         VALUE_DESCENDING (str): The highest value ranks first. Equals to `"value_descending"`.
         VALUE_ASCENDING (str): The lowest value ranks first. Equals to `"value_ascending"`.
         GIVEN (str): `y` is the rank, a positive integer. Equals to `"given"`.
@@ -1062,7 +1096,7 @@ class RANK:
     GIVEN = "given"
 
 
-class LABEL_POSITION:
+class BUMP_LABEL_POSITION:
     """The supported end label positions.
 
     Passed as the `label_position` setting of the bump chart: beside which
@@ -1070,13 +1104,15 @@ class LABEL_POSITION:
 
     !!! info "Added in Unreleased"
 
+    ![BUMP_LABEL_POSITION at a glance](../assets/imgs/const-label-position.svg){ width="100%" }
+
     Examples:
-        >>> from datachart.constants import LABEL_POSITION
-        >>> LABEL_POSITION.DEFAULT
+        >>> from datachart.constants import BUMP_LABEL_POSITION
+        >>> BUMP_LABEL_POSITION.DEFAULT
         "end"
 
     Attributes:
-        DEFAULT (str): The default position. Same as `LABEL_POSITION.END`.
+        DEFAULT (str): The default position. Same as `BUMP_LABEL_POSITION.END`.
         START (str): Beside the first point. Equals to `"start"`.
         END (str): Beside the last point. Equals to `"end"`.
         BOTH (str): Beside the first and the last point. Equals to `"both"`.
@@ -1089,7 +1125,7 @@ class LABEL_POSITION:
     BOTH = "both"
 
 
-class NODE_LABEL_POSITION:
+class NETWORK_LABEL_POSITION:
     """The supported node label positions.
 
     Passed as the `label_position` setting of the network chart: where each
@@ -1097,22 +1133,28 @@ class NODE_LABEL_POSITION:
 
     !!! info "Added in Unreleased"
 
+    ![NETWORK_LABEL_POSITION at a glance](../assets/imgs/const-network-label-position.svg){ width="100%" }
+
     Examples:
-        >>> from datachart.constants import NODE_LABEL_POSITION
-        >>> NODE_LABEL_POSITION.DEFAULT
+        >>> from datachart.constants import NETWORK_LABEL_POSITION
+        >>> NETWORK_LABEL_POSITION.DEFAULT
         "center"
 
     Attributes:
-        DEFAULT (str): The default position. Same as `NODE_LABEL_POSITION.CENTER`.
+        DEFAULT (str): The default position. Same as `NETWORK_LABEL_POSITION.CENTER`.
         CENTER (str): On the marker. Equals to `"center"`.
         ABOVE (str): Above the marker, clear of it, like a place name on a map.
             Equals to `"above"`.
+        BEST (str): Beside the marker, at the spot with the least overlap
+            with other nodes, edges, and labels, as scatter point labels are
+            placed. Equals to `"best"`.
 
     """
 
     DEFAULT = "center"
     CENTER = "center"
     ABOVE = "above"
+    BEST = "best"
 
 
 class GANTT_VALUE:
@@ -1122,6 +1164,8 @@ class GANTT_VALUE:
     prints past its end. None prints nothing.
 
     !!! info "Added in Unreleased"
+
+    ![GANTT_VALUE at a glance](../assets/imgs/const-gantt-value.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import GANTT_VALUE
@@ -1148,6 +1192,8 @@ class GANTT_SORT_KEY:
 
     !!! info "Added in Unreleased"
 
+    ![GANTT_SORT_KEY at a glance](../assets/imgs/const-gantt-sort-key.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import GANTT_SORT_KEY
         >>> GANTT_SORT_KEY.DEFAULT
@@ -1173,6 +1219,8 @@ class GANTT_ARROW_ENTRY:
     chart: which side of the dependent task a dependency arrow enters.
 
     !!! info "Added in Unreleased"
+
+    ![GANTT_ARROW_ENTRY at a glance](../assets/imgs/const-gantt-arrow-entry.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import GANTT_ARROW_ENTRY
@@ -1201,6 +1249,8 @@ class DUMBBELL_VALUE:
 
     !!! info "Added in Unreleased"
 
+    ![DUMBBELL_VALUE at a glance](../assets/imgs/const-dumbbell-value.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import DUMBBELL_VALUE
         >>> DUMBBELL_VALUE.DELTA
@@ -1228,6 +1278,8 @@ class DUMBBELL_SORT_KEY:
 
     !!! info "Added in Unreleased"
 
+    ![DUMBBELL_SORT_KEY at a glance](../assets/imgs/const-dumbbell-sort-key.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import DUMBBELL_SORT_KEY
         >>> DUMBBELL_SORT_KEY.DEFAULT
@@ -1247,7 +1299,7 @@ class DUMBBELL_SORT_KEY:
     DELTA = "delta"
 
 
-class DIAGONAL:
+class SCATTER_MATRIX_DIAGONAL:
     """The supported scatter matrix diagonal cells.
 
     Passed as the `diagonal` setting of the scatter matrix: what each
@@ -1255,13 +1307,15 @@ class DIAGONAL:
 
     !!! info "Added in Unreleased"
 
+    ![SCATTER_MATRIX_DIAGONAL at a glance](../assets/imgs/const-diagonal.svg){ width="100%" }
+
     Examples:
-        >>> from datachart.constants import DIAGONAL
-        >>> DIAGONAL.DEFAULT
+        >>> from datachart.constants import SCATTER_MATRIX_DIAGONAL
+        >>> SCATTER_MATRIX_DIAGONAL.DEFAULT
         "hist"
 
     Attributes:
-        DEFAULT (str): The default diagonal. Same as `DIAGONAL.HIST`.
+        DEFAULT (str): The default diagonal. Same as `SCATTER_MATRIX_DIAGONAL.HIST`.
         HIST (str): A histogram of the dimension, one per hue group.
             Equals to `"hist"`.
         KDE (str): A kernel density curve of the dimension, one per hue
@@ -1276,7 +1330,7 @@ class DIAGONAL:
     NONE = "none"
 
 
-class DATE_PERIOD:
+class GANTT_DATE_PERIOD:
     """The supported date axis periods.
 
     Passed as the `period` setting of the gantt chart: the calendar period
@@ -1285,9 +1339,11 @@ class DATE_PERIOD:
 
     !!! info "Added in Unreleased"
 
+    ![GANTT_DATE_PERIOD at a glance](../assets/imgs/const-date-period.svg){ width="100%" }
+
     Examples:
-        >>> from datachart.constants import DATE_PERIOD
-        >>> DATE_PERIOD.MONTH
+        >>> from datachart.constants import GANTT_DATE_PERIOD
+        >>> GANTT_DATE_PERIOD.MONTH
         "month"
 
     Attributes:
@@ -1297,6 +1353,9 @@ class DATE_PERIOD:
         MONTH (str): Months, under their year. Equals to `"month"`.
         QUARTER (str): Quarters, under their year. Equals to `"quarter"`.
         YEAR (str): Years. Equals to `"year"`.
+        PROJECT_MONTH (str): Months counted from the project start, M1, M2, …,
+            under their project year, Y1, Y2, …. The start is `xmin` when
+            given, else the earliest task start. Equals to `"project_month"`.
 
     """
 
@@ -1306,6 +1365,7 @@ class DATE_PERIOD:
     MONTH = "month"
     QUARTER = "quarter"
     YEAR = "year"
+    PROJECT_MONTH = "project_month"
 
 
 class RADIAL_TYPE:
@@ -1336,17 +1396,17 @@ class RADIAL_TYPE:
     HISTOGRAM = "histogram"
 
 
-class DIRECTION:
+class RADIAL_DIRECTION:
     """The supported angular directions.
 
     Passed as the `direction` setting of radial charts: which way the angles
     increase around the circle.
 
-    ![DIRECTION at a glance](../assets/imgs/const-direction.svg){ width="100%" }
+    ![RADIAL_DIRECTION at a glance](../assets/imgs/const-direction.svg){ width="100%" }
 
     Examples:
-        >>> from datachart.constants import DIRECTION
-        >>> DIRECTION.CLOCKWISE
+        >>> from datachart.constants import RADIAL_DIRECTION
+        >>> RADIAL_DIRECTION.CLOCKWISE
         "clockwise"
 
     Attributes:
@@ -1408,6 +1468,8 @@ class DATE_FORMAT:
     the time when any label carries one.
 
     !!! info "Added in Unreleased"
+
+    ![DATE_FORMAT at a glance](../assets/imgs/const-date-format.svg){ width="100%" }
 
     Examples:
         >>> from datachart.constants import DATE_FORMAT

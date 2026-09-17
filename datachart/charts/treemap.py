@@ -87,24 +87,25 @@ def Treemap(
             to the whole subtree, and a descendant's own role overrides it.
         show_values: Whether to write each tile's value under its label. A
             value that does not fit is dropped before the label.
-        value_format: The format of the tile values: a `VALUE_FORMAT`
-            constant (default `VALUE_FORMAT.DEFAULT`) or any `"{x:.1f}"`,
-            `"{:.1f}%"`, or `"%g"` style string.
+        value_format: The format of the tile values: a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant (default
+            [`VALUE_FORMAT.DEFAULT`][datachart.constants.VALUE_FORMAT]) or any
+            `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
         show_legend: Whether to list the top-level records in a legend; it
             names the groups too short for a header band.
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
-            `LegendSettingAttrs`.
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         title: The title of the chart.
         subtitle: The subtitle(s) for individual charts.
         emphasis: Not supported: emphasis is set per record through its
             `emphasis` key. Passing a value raises `ValueError`.
-        emphasis_rule: A rule that highlights the leaf records matching it and
-            mutes the rest: `{"above": v}` or `{"below": v}` (strict),
-            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
-            `{"bottom": n}`, read against each leaf's `value`. A record's own
-            `emphasis` key wins, and so does a group's, over its whole subtree.
-            The rule takes no `by`. See `EmphasisRuleAttrs`.
+        emphasis_rule: A rule that highlights the leaf records matching it and mutes the
+            rest: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}`
+            (inclusive), `{"top": n}` or `{"bottom": n}`, read against each leaf's
+            `value`. A record's own `emphasis` key wins, and so does a group's, over its
+            whole subtree. The rule takes no `by`. See
+            [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
         figsize: The size of the figure.
         subplots: Whether to show each chart in its own subplot; several
             charts always split into subplots.

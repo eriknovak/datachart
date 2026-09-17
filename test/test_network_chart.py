@@ -562,6 +562,14 @@ class TestEncoding(unittest.TestCase):
         self.assertEqual(curved.get_position()[0], 0.5)
         self.assertNotEqual(curved.get_position()[1], 0.5)
 
+    def test_best_label_position_offsets_each_label_from_its_node(self):
+        ax = NetworkChart(DATA, label_position="best").axes[0]
+        labels = _labels(ax)
+        self.assertEqual(sorted(labels), ["A", "B", "C", "D"])
+        for text in labels.values():
+            self.assertNotEqual(tuple(text.xyann), (0, 0))
+            self.assertTrue(text.get_path_effects())
+
     def test_labels_default_to_id_and_empty_draws_nothing(self):
         nodes = [{"id": "A", "label": "Alpha"}, {"id": "B", "label": ""}, {"id": "C"}]
         ax = NetworkChart({"nodes": nodes, "edges": [edge("A", "B")]}).axes[0]

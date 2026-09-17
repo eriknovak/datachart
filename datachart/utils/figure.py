@@ -247,6 +247,8 @@ def _render_grid_node(
             if key is not None:
                 anchors.setdefault(key, ax)
         _render_cell(owner, cell, ax)
+        if node.get("box_aspect"):
+            ax.set_box_aspect(node["box_aspect"])
         if legend and index == legend["cell"]:
             legend_ax = ax
 
@@ -344,9 +346,9 @@ def _align_axes_columns(figure: plt.Figure) -> None:
     for ax in figure.axes:
         get_ss = getattr(ax, "get_subplotspec", None)
         ss = get_ss() if get_ss is not None else None
-        # fixed-aspect axes (polar, heatmaps) re-inset their box at draw time,
-        # so their edges neither anchor nor follow a column
-        if ss is None or ax.get_aspect() != "auto":
+        # fixed-aspect axes (polar, heatmaps, square matrix cells) re-inset
+        # their box at draw time, so their edges neither anchor nor follow a column
+        if ss is None or ax.get_aspect() != "auto" or ax.get_box_aspect():
             continue
         x0f, x1f = _column_window(ss)
         lefts.setdefault(round(x0f, 6), []).append(ax)
@@ -367,8 +369,61 @@ def _align_axes_columns(figure: plt.Figure) -> None:
             if abs(pos.x1 - target) > 1e-9 and target - pos.x0 > 0.01:
                 ax.set_position([pos.x0, pos.y0, target - pos.x0, pos.height])
                 moved = True
-    if moved:
+    if _pack_square_cells(figure) or moved:
         figure.set_layout_engine("none")
+
+
+def _pack_square_cells(figure: plt.Figure) -> bool:
+    """Close the slack around fixed-aspect cells so a matrix reads as a block.
+
+    A square cell sits centred in its layout slot, and a slot wider than tall
+    leaves its slack as a horizontal gap far wider than the vertical one. The
+    cells of one nested grid are re-laid at the smaller of the two gaps in
+    both directions, centred where the grid was; the layout is then frozen
+    by the caller. Returns whether anything moved.
+    """
+
+    groups: Dict[Any, Dict[Tuple[int, int], List[plt.Axes]]] = {}
+    for ax in figure.axes:
+        get_ss = getattr(ax, "get_subplotspec", None)
+        ss = get_ss() if get_ss is not None else None
+        if ss is None or not ax.get_box_aspect():
+            continue
+        cell = (ss.rowspan.start, ss.colspan.start)
+        groups.setdefault(ss.get_gridspec(), {}).setdefault(cell, []).append(ax)
+
+    moved = False
+    for cells in groups.values():
+        rows = sorted({r for r, _ in cells})
+        cols = sorted({c for _, c in cells})
+        if len(rows) < 2 and len(cols) < 2:
+            continue
+        pos = {cell: axes[0].get_position() for cell, axes in cells.items()}
+        side_w = min(p.width for p in pos.values())
+        side_h = min(p.height for p in pos.values())
+        x0 = {c: min(p.x0 for (_, cc), p in pos.items() if cc == c) for c in cols}
+        y0 = {r: min(p.y0 for (rr, _), p in pos.items() if rr == r) for r in rows}
+        gaps = [x0[b] - x0[a] - side_w for a, b in zip(cols, cols[1:])]
+        gaps += [y0[a] - y0[b] - side_h for a, b in zip(rows, rows[1:])]
+        gap = max(min(gaps), 0.0)
+        # centre the packed block over the grid's current extent
+        left = min(x0.values())
+        right = max(x0.values()) + side_w
+        top = max(y0.values()) + side_h
+        bottom = min(y0.values())
+        width = len(cols) * side_w + (len(cols) - 1) * gap
+        height = len(rows) * side_h + (len(rows) - 1) * gap
+        start_x = left + (right - left - width) / 2
+        start_y = bottom + (top - bottom - height) / 2
+        for (r, c), axes in cells.items():
+            new_x = start_x + cols.index(c) * (side_w + gap)
+            new_y = start_y + (len(rows) - 1 - rows.index(r)) * (side_h + gap)
+            for ax in axes:
+                p = ax.get_position()
+                if abs(p.x0 - new_x) > 1e-9 or abs(p.y0 - new_y) > 1e-9:
+                    ax.set_position([new_x, new_y, side_w, side_h])
+                    moved = True
+    return moved
 
 
 def _figure_grid_layout_impl(

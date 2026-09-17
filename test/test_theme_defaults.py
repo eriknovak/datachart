@@ -87,9 +87,12 @@ class TestThemeDefaults(unittest.TestCase):
 
     def test_value_headroom_expands_axis(self):
         """Value labels expand the value-axis limits so they stay inside."""
-        plain = BarChart(BAR)
-        labeled = BarChart(BAR, show_values=True)
-        self.assertGreater(labeled.axes[0].get_ylim()[1], plain.axes[0].get_ylim()[1])
+        figure = BarChart(BAR, show_values=True)
+        figure.canvas.draw()
+        ax = figure.axes[0]
+        top = max(t.get_window_extent().y1 for t in ax.texts)
+        self.assertLessEqual(top, ax.get_window_extent().y1)
+        self.assertGreater(ax.get_ylim()[1], max(point["y"] for point in BAR))
 
     def test_heatmap_contrast_skips_light_colormaps(self):
         """Light colormaps never flip value text to white."""

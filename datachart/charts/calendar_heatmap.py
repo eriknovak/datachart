@@ -16,7 +16,7 @@ from ..typings import (
     ColorbarSettingAttrs,
     TextSettingAttrs,
 )
-from ..constants import ASPECT_RATIO, FIG_SIZE, VALUE_FORMAT, WEEKDAY
+from ..constants import ASPECT_RATIO, FIG_SIZE, VALUE_FORMAT, CALENDAR_WEEKDAY
 
 # a calendar is wide and short: the default figure keeps the default width
 # and stacks this much height per row of calendars
@@ -34,7 +34,7 @@ def CalendarHeatmap(
     subtitle: Optional[Union[str, List[Optional[str]]]] = None,
     emphasis: None = None,
     year: Optional[int] = None,
-    week_start: Optional[Union[WEEKDAY, str]] = None,
+    week_start: Optional[Union[CALENDAR_WEEKDAY, str]] = None,
     show_month_labels: Optional[bool] = None,
     show_weekday_labels: Optional[bool] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
@@ -99,31 +99,36 @@ def CalendarHeatmap(
             every year the dates span is drawn, one calendar per year in
             year order, sharing one value range so the colors compare
             across years.
-        week_start: The weekday of the top row: `WEEKDAY.MONDAY` or
-            `WEEKDAY.SUNDAY`. Defaults to the theme's
-            `plot_calendar_heatmap_week_start`.
+        week_start: The weekday of the top row:
+            [`CALENDAR_WEEKDAY.MONDAY`][datachart.constants.CALENDAR_WEEKDAY] or
+            [`CALENDAR_WEEKDAY.SUNDAY`][datachart.constants.CALENDAR_WEEKDAY]. Defaults
+            to the theme's `plot_calendar_heatmap_week_start`.
         show_month_labels: Whether to label the months along the top axis.
             Defaults to `True`.
         show_weekday_labels: Whether to label every other weekday along the
             left axis. Defaults to `True`.
         figsize: The size of the figure. Defaults to the default width at a
             short height per row of calendars, the shape a calendar fills.
-        aspect_ratio: The aspect ratio of the cells: `ASPECT_RATIO.EQUAL`
-            (the default) keeps them square, `ASPECT_RATIO.AUTO` stretches
-            them to the figure. See `ASPECT_RATIO`.
+        aspect_ratio: The aspect ratio of the cells:
+            [`ASPECT_RATIO.EQUAL`][datachart.constants.ASPECT_RATIO] (the default) keeps
+            them square, [`ASPECT_RATIO.AUTO`][datachart.constants.ASPECT_RATIO]
+            stretches them to the figure. See
+            [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         max_cols: Maximum number of calendars per row when several are
             drawn. Defaults to `1`, one calendar per row.
         show_colorbars: Whether to show the colorbar(s).
         show_values: Whether to write each day's value into its cell.
-        value_format: The format of the cell values: a `VALUE_FORMAT`
-            constant (default `VALUE_FORMAT.DEFAULT`) or any `"{x:.1f}"`,
-            `"{:.1f}"`, or `"%g"` style string.
+        value_format: The format of the cell values: a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant (default
+            [`VALUE_FORMAT.DEFAULT`][datachart.constants.VALUE_FORMAT]) or any
+            `"{x:.1f}"`, `"{:.1f}"`, or `"%g"` style string.
         style: Style configuration(s) for the calendar(s).
         norm: Value normalization method(s).
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
-        colorbar: The colorbar setting(s): label, location, tick format,
-            and tick positions. See `ColorbarSettingAttrs`.
+        colorbar: The colorbar setting(s): label, location, tick format, and tick
+            positions. See
+            [`ColorbarSettingAttrs`][datachart.typings.ColorbarSettingAttrs].
         texts: Text annotation(s) to draw, on every calendar of their
             dataset. The cells sit at integer positions: the week column
             along x, the weekday row along y, counted from zero at the
@@ -136,7 +141,7 @@ def CalendarHeatmap(
         ValueError: If `emphasis` is given, the data is not a dated-values
             dict, a date is not a temporal object, a date appears twice,
             `year` names a year without data, or `week_start` is not a
-            `WEEKDAY` member.
+            [`CALENDAR_WEEKDAY`][datachart.constants.CALENDAR_WEEKDAY] member.
 
     """
     if emphasis is not None:

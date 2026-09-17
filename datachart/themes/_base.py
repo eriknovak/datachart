@@ -12,14 +12,14 @@ from matplotlib import font_manager
 from ..typings import StyleAttrs
 from ..constants import (
     ARROW_STYLE,
-    LINE_STYLE,
+    CALENDAR_WEEKDAY,
+    COLORS,
     FONT_STYLE,
     FONT_WEIGHT,
-    LINE_DRAW_STYLE,
-    COLORS,
     LEGEND_LOCATION,
+    LINE_DRAW_STYLE,
+    LINE_STYLE,
     SHOW_GRID,
-    WEEKDAY,
 )
 
 # the bar-specific value label keys predate the shared family; they resolve
@@ -327,7 +327,7 @@ BASE_THEME: StyleAttrs = {
     "plot_calendar_heatmap_edge_color": "#FFFFFF",
     "plot_calendar_heatmap_month_line_width": 1.0,
     "plot_calendar_heatmap_month_line_color": "#000000",
-    "plot_calendar_heatmap_week_start": WEEKDAY.MONDAY,
+    "plot_calendar_heatmap_week_start": CALENDAR_WEEKDAY.MONDAY,
     # plot contour style; None derives from the line/heatmap/font keys (ADR 0022)
     "plot_contour_color": None,
     "plot_contour_cmap": None,

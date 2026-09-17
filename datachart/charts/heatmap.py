@@ -122,12 +122,12 @@ def Heatmap(
         emphasis: Not supported: a heatmap has no series to mute or
             highlight; set per-cell roles through the `emphasis` grid of
             `data`. Passing a value raises `ValueError`.
-        emphasis_rule: A rule that highlights the cells matching it and mutes
-            the rest: `{"above": v}` or `{"below": v}` (strict),
-            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or
-            `{"bottom": n}`, read against each cell's value; a blank cell never
-            matches. A cell's role in the `emphasis` grid of `data` wins. The
-            rule takes no `by`. See `EmphasisRuleAttrs`.
+        emphasis_rule: A rule that highlights the cells matching it and mutes the rest:
+            `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}`
+            (inclusive), `{"top": n}` or `{"bottom": n}`, read against each cell's
+            value; a blank cell never matches. A cell's role in the `emphasis` grid of
+            `data` wins. The rule takes no `by`. See
+            [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
         figsize: The size of the figure.
         xmin: The minimum x-axis value.
         xmax: The maximum x-axis value.
@@ -136,12 +136,12 @@ def Heatmap(
         show_legend: Whether to show the legend (not typical for heatmaps).
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
-            `LegendSettingAttrs`.
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y").
         show_colorbars: Whether to show the colorbar(s).
         show_heatmap_values: Whether to show values on the heatmap cells.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
-            `ASPECT_RATIO`.
+            [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         subplots: Whether to create separate subplots for each heatmap.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.
@@ -151,19 +151,22 @@ def Heatmap(
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
         valfmt: Format string(s) for cell values, with the value named `x`
-            (e.g., `"{x:.1f}"`). See `VALUE_FORMAT`.
+            (e.g., `"{x:.1f}"`). See [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT].
         xticks: Custom x-axis tick positions.
         xticklabels: Custom x-axis tick labels.
         xtickrotate: Rotation angle for x-axis tick labels.
         yticks: Custom y-axis tick positions.
         yticklabels: Custom y-axis tick labels.
         ytickrotate: Rotation angle for y-axis tick labels.
-        xticks_format: The x-axis tick label format: a `DATE_FORMAT` member
-            or `strftime` pattern on a datetime axis, else a `VALUE_FORMAT`
-            member or `"{x:.1f}"` style string.
+        xticks_format: The x-axis tick label format: a
+            [`DATE_FORMAT`][datachart.constants.DATE_FORMAT] member or `strftime`
+            pattern on a datetime axis, else a
+            [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] member or `"{x:.1f}"`
+            style string.
         yticks_format: The y-axis tick label format, as `xticks_format`.
-        colorbar: The colorbar setting(s): label, location, tick format,
-            and tick positions. See `ColorbarSettingAttrs`.
+        colorbar: The colorbar setting(s): label, location, tick format, and tick
+            positions. See
+            [`ColorbarSettingAttrs`][datachart.typings.ColorbarSettingAttrs].
         texts: Text annotation(s) to draw.
 
     Returns:

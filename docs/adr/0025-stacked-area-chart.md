@@ -16,7 +16,7 @@ previous one, like matplotlib's `stackplot`.
   series must carry the same `x` values in the same order; ragged input
   raises `ValueError` rather than aligning on a union — stacking over
   silently zero-filled gaps misleads.
-- **`baseline` is the only stacking knob**, a `BASELINE` constant: `ZERO`
+- **`baseline` is the only stacking knob**, a `STACKED_AREA_BASELINE` constant: `ZERO`
   (default), `PERCENT` (each `x` normalised to 100 %), `SYM` (centred on
   zero), `WIGGLE`, `WEIGHTED_WIGGLE`. There is no separate `normalize` flag;
   a fifth baseline value keeps the parameter space one-dimensional.

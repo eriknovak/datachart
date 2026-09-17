@@ -1,98 +1,10 @@
 """Module containing the `typings`.
 
-The `typings` module contains the typings for all chart components. The module
-is intended to contain the typings for easier input value format checkup.
-
-Classes:
-    VLineSettingAttrs: The per-figure vertical reference line setting.
-    HLineSettingAttrs: The per-figure horizontal reference line setting.
-    VSpanSettingAttrs: The per-figure vertical reference band setting.
-    HSpanSettingAttrs: The per-figure horizontal reference band setting.
-    TextSettingAttrs: The per-figure text annotation setting.
-    LineSingleChartAttrs: The single chart attributes for the line chart.
-    LineDataPointAttrs: The data point attributes for the line chart.
-    StackedAreaSingleChartAttrs: The single chart attributes for the stacked area chart.
-    BumpSingleChartAttrs: The single chart attributes for the bump chart.
-    SankeySingleChartAttrs: The single chart attributes for the Sankey chart.
-    SankeyLinkAttrs: The link record attributes for the Sankey chart.
-    TreemapSingleChartAttrs: The single chart attributes for the treemap.
-    TreemapRecordAttrs: The record attributes for the treemap.
-    NetworkSingleChartAttrs: The single chart attributes for the network chart.
-    NetworkNodeAttrs: The node record attributes for the network chart.
-    NetworkEdgeAttrs: The edge record attributes for the network chart.
-    BarSingleChartAttrs: The single chart attributes for the bar chart.
-    BarDataPointAttrs: The data point attributes for the bar chart.
-    HistogramSingleChartAttrs: The single chart attributes for the histogram chart.
-    HistDataPointAttrs: The data point attributes for the histogram chart.
-    HeatmapSingleChartAttrs: The single chart attributes for the heatmap chart.
-    HeatmapDataAttrs: The data attributes for the heatmap chart.
-    ColorbarSettingAttrs: The per-figure colorbar setting.
-    CalendarHeatmapSingleChartAttrs: The single chart attributes for the calendar heatmap.
-    CalendarHeatmapDataAttrs: The data attributes for the calendar heatmap.
-    GanttSingleChartAttrs: The single chart attributes for the gantt chart.
-    GanttTaskAttrs: The task record attributes for the gantt chart.
-    DumbbellSingleChartAttrs: The single chart attributes for the dumbbell chart.
-    DumbbellRecordAttrs: The record attributes for the dumbbell chart.
-    ContourSingleChartAttrs: The single chart attributes for the contour chart.
-    ContourDataAttrs: The data attributes for the contour chart.
-    HexbinSingleChartAttrs: The single chart attributes for the hexbin chart.
-    HexbinDataAttrs: The data attributes for the hexbin chart.
-    ScatterSingleChartAttrs: The single chart attributes for the scatter chart.
-    ScatterDataPointAttrs: The data point attributes for the scatter chart.
-    BoxSingleChartAttrs: The single chart attributes for the box plot.
-    BoxDataPointAttrs: The data point attributes for the box plot.
-    SwarmSingleChartAttrs: The single chart attributes for the swarm plot.
-    SwarmDataPointAttrs: The data point attributes for the swarm plot.
-    ViolinSingleChartAttrs: The single chart attributes for the violin plot.
-    ViolinDataPointAttrs: The data point attributes for the violin plot.
-    RaincloudSingleChartAttrs: The single chart attributes for the raincloud plot.
-    RaincloudDataPointAttrs: The data point attributes for the raincloud plot.
-    RidgelineSingleChartAttrs: The single chart attributes for the ridgeline plot.
-    RidgelineDataPointAttrs: The data point attributes for the ridgeline plot.
-    ParallelCoordsSingleChartAttrs: The single chart attributes for the parallel coordinates chart.
-    ParallelCoordsDataPointAttrs: The data point attributes for the parallel coordinates chart.
-    ScatterMatrixDataPointAttrs: The record attributes for the scatter matrix.
-    RadialSingleChartAttrs: The single chart attributes for the radial chart.
-    RadialDataPointAttrs: The data point attributes for the radial chart.
-
-    StyleAttrs: The style typing.
-    ColorStyleAttrs: The typing for the general color style.
-    FontStyleAttrs: The typing for the font style.
-    AxesStyleAttrs: The typing for the axes style.
-    LegendStyleAttrs: The typing for the legend style.
-    LegendSettingAttrs: The per-figure legend setting.
-    EmphasisRuleAttrs: The emphasis rule setting.
-    AreaStyleAttrs: The typing for the area style.
-    GridStyleAttrs: The typing for the grid style.
-    LineStyleAttrs: The typing for the line style.
-    StackedAreaStyleAttrs: The typing for the stacked area chart style.
-    BumpStyleAttrs: The typing for the bump chart style.
-    SankeyStyleAttrs: The typing for the Sankey chart style.
-    TreemapStyleAttrs: The typing for the treemap style.
-    NetworkStyleAttrs: The typing for the network chart style.
-    BarStyleAttrs: The typing for the bar style.
-    HistStyleAttrs: The typing for the histogram style.
-    VLineStyleAttrs: The typing for the vertical line style.
-    HLineStyleAttrs: The typing for the horizontal line style.
-    VSpanStyleAttrs: The typing for the vertical reference band style.
-    HSpanStyleAttrs: The typing for the horizontal reference band style.
-    TextStyleAttrs: The typing for the text annotation style.
-    HeatmapStyleAttrs: The typing for the heatmap style.
-    CalendarHeatmapStyleAttrs: The typing for the calendar heatmap style.
-    GanttStyleAttrs: The typing for the gantt chart style.
-    DumbbellStyleAttrs: The typing for the dumbbell chart style.
-    ContourStyleAttrs: The typing for the contour chart style.
-    HexbinStyleAttrs: The typing for the hexbin chart style.
-    ScatterStyleAttrs: The typing for the scatter chart style.
-    RegressionStyleAttrs: The typing for the regression line style.
-    BoxStyleAttrs: The typing for the box plot style.
-    SwarmStyleAttrs: The typing for the swarm plot style.
-    ViolinStyleAttrs: The typing for the violin plot style.
-    RaincloudStyleAttrs: The typing for the raincloud plot style.
-    RidgelineStyleAttrs: The typing for the ridgeline plot style.
-    ParallelCoordsStyleAttrs: The typing for the parallel coordinates chart style.
-    ScatterMatrixStyleAttrs: The typing for the scatter matrix style.
-    ThemeDefaultAttrs: The typing for theme-driven defaults and cycles.
+The `typings` module holds the dictionary contracts of the package: the records
+a chart's `data` takes, the settings passed beside it (reference lines and
+bands, texts, legend, emphasis rule, colorbar), and the style keys a chart's
+`style` and the theme accept. A per-chart contract is documented on that
+chart's reference page; the shared ones on the typings page.
 
 """
 
@@ -103,30 +15,29 @@ from typing import TypedDict, Union, Tuple, List, Optional, Dict, Literal
 import matplotlib.colors as colors
 from .constants import (
     ARROW_STYLE,
-    GANTT_ARROW_ENTRY,
-    NETWORK_LAYOUT,
-    NODE_LABEL_POSITION,
+    ASPECT_RATIO,
     BAR_MODE,
+    CALENDAR_WEEKDAY,
+    COLORBAR_LOCATION,
+    COLORS,
+    EMPHASIS,
     FIG_SIZE,
     FONT_STYLE,
     FONT_WEIGHT,
+    GANTT_ARROW_ENTRY,
     HATCH_STYLE,
-    LINE_MARKER,
-    LINE_STYLE,
-    LINE_DRAW_STYLE,
+    HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
     LEGEND_ALIGN,
     LEGEND_LOCATION,
-    COLORBAR_LOCATION,
+    LINE_DRAW_STYLE,
+    LINE_MARKER,
+    LINE_STYLE,
+    NETWORK_LAYOUT,
+    NETWORK_LABEL_POSITION,
     ORIENTATION,
-    BAR_MODE,
-    COLORS,
     SHOW_GRID,
-    HEXBIN_REDUCE,
-    ASPECT_RATIO,
     VALUE_FORMAT,
-    EMPHASIS,
-    WEEKDAY,
 )
 
 # ================================================
@@ -868,7 +779,7 @@ class CalendarHeatmapStyleAttrs(TypedDict):
         plot_calendar_heatmap_edge_color (Union[str, None]): The color of the borders drawn between the day cells.
         plot_calendar_heatmap_month_line_width (Union[int, float, None]): The width of the separators drawn between months (0 draws none).
         plot_calendar_heatmap_month_line_color (Union[str, None]): The color of the separators drawn between months; `None` takes the heatmap frame color.
-        plot_calendar_heatmap_week_start (Union[WEEKDAY, str, None]): The weekday in the top row of every week, the default of `week_start`.
+        plot_calendar_heatmap_week_start (Union[CALENDAR_WEEKDAY, str, None]): The weekday in the top row of every week, the default of `week_start`.
 
     """
 
@@ -884,7 +795,7 @@ class CalendarHeatmapStyleAttrs(TypedDict):
     plot_calendar_heatmap_edge_color: Union[str, None]
     plot_calendar_heatmap_month_line_width: Union[int, float, None]
     plot_calendar_heatmap_month_line_color: Union[str, None]
-    plot_calendar_heatmap_week_start: Union[WEEKDAY, str, None]
+    plot_calendar_heatmap_week_start: Union[CALENDAR_WEEKDAY, str, None]
 
 
 class ContourStyleAttrs(TypedDict):
@@ -1199,7 +1110,7 @@ class ThemeDefaultAttrs(TypedDict):
         chart_default_show_values (Union[bool, None]): The theme default for
             `show_values`, applied to every chart that takes it when the chart
             call leaves it unset. `None` means the theme has no opinion.
-        chart_default_node_label_position (Union[NODE_LABEL_POSITION, str, None]):
+        chart_default_node_label_position (Union[NETWORK_LABEL_POSITION, str, None]):
             The theme default for the network chart's `label_position`, applied
             when the chart call leaves it unset. `None` means the theme has no
             opinion.
@@ -1227,7 +1138,7 @@ class ThemeDefaultAttrs(TypedDict):
 
     chart_default_show_grid: Union[SHOW_GRID, str, None]
     chart_default_show_values: Union[bool, None]
-    chart_default_node_label_position: Union[NODE_LABEL_POSITION, str, None]
+    chart_default_node_label_position: Union[NETWORK_LABEL_POSITION, str, None]
     plot_hatch_cycle: Union[List[str], None]
     plot_linestyle_cycle: Union[List[Union[LINE_STYLE, str]], None]
     plot_marker_cycle: Union[
