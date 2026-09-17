@@ -10,7 +10,7 @@ from matplotlib.patches import PathPatch, Rectangle
 
 from datachart.charts import SankeyChart, LineChart
 from datachart.config import config
-from datachart.constants import THEME
+from datachart.constants import FIG_SIZE, THEME
 from datachart.utils import Panel, Grid
 from datachart.utils._internal.config_helpers import get_sankey_style
 from datachart.utils._internal.validate import (
@@ -52,6 +52,46 @@ FUNNEL = [
     link("Activated", "Free tier", 90),
 ]
 CHAIN = [link("a", "b", 1), link("b", "c", 1), link("c", "d", 1)]
+
+# an energy flow dense enough that a thin ribbon's value has little room
+ENERGY_FLOWS = [
+    ("Solar", "Electricity", 3),
+    ("Wind", "Electricity", 5),
+    ("Hydro", "Electricity", 3),
+    ("Nuclear", "Electricity", 8),
+    ("Natural gas", "Electricity", 13),
+    ("Coal", "Electricity", 9),
+    ("Natural gas", "Residential", 5),
+    ("Natural gas", "Commercial", 4),
+    ("Natural gas", "Industrial", 10),
+    ("Natural gas", "Transport", 1),
+    ("Coal", "Industrial", 1),
+    ("Oil", "Residential", 1),
+    ("Oil", "Commercial", 1),
+    ("Oil", "Industrial", 8),
+    ("Oil", "Transport", 24),
+    ("Biomass", "Industrial", 2),
+    ("Biomass", "Transport", 2),
+    ("Electricity", "Residential", 5),
+    ("Electricity", "Commercial", 4),
+    ("Electricity", "Industrial", 3),
+    ("Electricity", "Rejected energy", 29),
+    ("Residential", "Energy services", 7),
+    ("Residential", "Rejected energy", 4),
+    ("Commercial", "Energy services", 6),
+    ("Commercial", "Rejected energy", 3),
+    ("Industrial", "Energy services", 12),
+    ("Industrial", "Rejected energy", 12),
+    ("Transport", "Energy services", 6),
+    ("Transport", "Rejected energy", 21),
+]
+ENERGY = [link(source, target, value) for source, target, value in ENERGY_FLOWS]
+ENERGY_NODES = [
+    ["Oil", "Natural gas", "Coal", "Nuclear", "Wind", "Biomass", "Hydro", "Solar"],
+    ["Electricity"],
+    ["Transport", "Industrial", "Residential", "Commercial"],
+    ["Energy services", "Rejected energy"],
+]
 
 
 def _rects(ax):
@@ -244,6 +284,35 @@ class TestRendering(unittest.TestCase):
         for i, a in enumerate(boxes):
             for b in boxes[i + 1 :]:
                 self.assertEqual(_overlap_area(a, b), 0.0)
+
+    def test_values_stay_off_the_node_bars(self):
+        figure = SankeyChart(
+            {"links": ENERGY},
+            nodes=ENERGY_NODES,
+            column_labels=["Source", "Conversion", "Sector", "Outcome"],
+            show_values=True,
+            value_format="{:.0f}%",
+            figsize=FIG_SIZE.FULL_MEDIUM,
+        )
+        figure.canvas.draw()
+        ax = figure.axes[0]
+        renderer = figure.canvas.get_renderer()
+        bars = [bar.get_window_extent(renderer) for bar in _rects(ax)]
+        values = [t for t in ax.texts if t.get_text().endswith("%")]
+        self.assertTrue(values)
+        for text in values:
+            extent = text.get_window_extent(renderer)
+            covered = [bar for bar in bars if extent.overlaps(bar)]
+            self.assertEqual(covered, [], f"{text.get_text()!r} sits on a node bar")
+
+    def test_a_value_with_nowhere_clear_is_dropped(self):
+        # every ribbon is a sliver, and every value is wider than its own room
+        links = [link("A", f"t{i}", 1) for i in range(30)]
+        figure = SankeyChart(
+            {"links": links}, show_values=True, value_format="{:.3f} units of energy"
+        )
+        values = [t.get_text() for t in figure.axes[0].texts if "units" in t.get_text()]
+        self.assertLess(len(values), len(links))
 
     def test_subplots(self):
         fig = SankeyChart(

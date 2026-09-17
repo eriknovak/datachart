@@ -68,5 +68,10 @@ attribute on the reference-line seam.
   target; a curved look left on its default tries several bows to either side
   and keeps the flattest arc whose body clears the data (the final approach
   is exempt — the target sits on the data); a connector shorter than its own
-  gaps straightens with minimal gaps, then disappears entirely. An explicit
+  gaps straightens with minimal gaps, and disappears only once those two
+  gaps leave nothing of the line to draw, so a target sitting just outside
+  the text box still gets its stub; the gap the connector leaves at the
+  target is capped to half the extent of the mark under it — the layers
+  that draw marks smaller than the gap report it — so the tip stops inside
+  the cell or marker it names, never on the neighbour. An explicit
   `plot_text_arrow_curve` pins the bow — side and depth — exactly.

@@ -12,7 +12,13 @@ from matplotlib.patches import ArrowStyle, Circle, FancyArrowPatch
 
 from datachart.charts import NetworkChart, LineChart
 from datachart.config import config
-from datachart.constants import THEME, EMPHASIS, ARROW_STYLE, NETWORK_LAYOUT
+from datachart.constants import (
+    THEME,
+    EMPHASIS,
+    ARROW_STYLE,
+    FIG_SIZE,
+    NETWORK_LAYOUT,
+)
 from datachart.themes import DEFAULT_THEME
 from datachart.utils import Panel, Grid
 from datachart.utils._internal.config_helpers import (
@@ -626,6 +632,32 @@ class TestEncoding(unittest.TestCase):
         for text in labels.values():
             self.assertNotEqual(tuple(text.xyann), (0, 0))
             self.assertTrue(text.get_path_effects())
+
+    def test_labels_above_stay_inside_the_axes(self):
+        """The layout margin leaves the top labels room (#218)."""
+        nodes = [{"id": f"n{i}", "label": f"Long label {i}"} for i in range(12)]
+        edges = [edge(f"n{i}", f"n{(i * 5 + 1) % 12}") for i in range(12)]
+        data = {"nodes": nodes, "edges": edges}
+        for figsize in (None, FIG_SIZE.SQUARE):
+            with self.subTest(figsize=figsize):
+                figure = NetworkChart(
+                    data,
+                    layout=NETWORK_LAYOUT.SPRING,
+                    label_position="above",
+                    **({} if figsize is None else {"figsize": figsize}),
+                )
+                figure.canvas.draw()
+                ax = figure.axes[0]
+                renderer = figure.canvas.get_renderer()
+                for name, text in _labels(ax).items():
+                    extent = text.get_window_extent(renderer)
+                    self.assertTrue(
+                        ax.bbox.containsx(extent.x0)
+                        and ax.bbox.containsx(extent.x1)
+                        and ax.bbox.containsy(extent.y0)
+                        and ax.bbox.containsy(extent.y1),
+                        f"label {name!r} crosses the axes box",
+                    )
 
     def test_labels_default_to_id_and_empty_draws_nothing(self):
         nodes = [{"id": "A", "label": "Alpha"}, {"id": "B", "label": ""}, {"id": "C"}]

@@ -1189,10 +1189,37 @@ TEXT_BOW_CLEARANCE_CAP = 14.0
 TEXT_BOW_BODY = 0.75
 # approximate half-extent of the text box (px), for connector-length checks
 TEXT_BOX_PAD = 18.0
-# short connectors (px past the box) straighten with tiny gaps, then vanish
+# short connectors (px past the box) straighten with tiny gaps (points),
+# then vanish once those two gaps leave nothing of the line to draw
 TEXT_SHORT_STRAIGHT = 40.0
-TEXT_SHORT_NONE = 14.0
 TEXT_SHORT_GAP = 1.5
+TEXT_SHORT_NONE = 2 * TEXT_SHORT_GAP
+
+
+def _px_to_points(ax: plt.Axes, pixels: float) -> float:
+    """A display distance in points, the unit the connector's gaps use."""
+
+    return pixels * 72.0 / ax.figure.dpi
+
+
+def _points_to_px(ax: plt.Axes, points: float) -> float:
+    """A distance in points as display pixels."""
+
+    return points * ax.figure.dpi / 72.0
+
+
+def _target_gap(
+    ax: plt.Axes, target: tuple, layers: List["Layer"], gap: float
+) -> float:
+    """The connector's target gap, capped to the mark it points at (ADR 0018).
+
+    A fixed gap overshoots a mark smaller than itself and lands the tip on
+    the neighbour; the smallest half-extent reported under the point wins.
+    """
+
+    extents = [layer.target_extent(ax, target) for layer in layers]
+    extents = [extent for extent in extents if extent is not None]
+    return min([gap, *extents])
 
 
 def _facing_relpos(start: np.ndarray, target: np.ndarray) -> tuple:
@@ -1315,7 +1342,11 @@ def _data_point(ax: plt.Axes, point) -> tuple:
 
 
 def _draw_texts(
-    ax: plt.Axes, texts: List[tuple], data_ax: plt.Axes = None, clearance=None
+    ax: plt.Axes,
+    texts: List[tuple],
+    data_ax: plt.Axes = None,
+    clearance=None,
+    layers: List["Layer"] = (),
 ) -> None:
     """Draw the pre-resolved text annotations.
 
@@ -1323,7 +1354,8 @@ def _draw_texts(
     twin-axis marks — while data coordinates read from `data_ax`, the
     owning layer's axes. `clearance` holds the panel's data in display
     coordinates; a curved connector left on its default bows toward the
-    side with the most open space.
+    side with the most open space. `layers` are the layers drawn on
+    `data_ax`, which size the gap a connector leaves at its target.
     """
 
     data_ax = data_ax if data_ax is not None else ax
@@ -1364,14 +1396,17 @@ def _draw_texts(
         end = np.asarray(data_ax.transData.transform(target), dtype=float)
         length = np.hypot(*(end - start)) - TEXT_BOX_PAD
 
-        # a connector shorter than the gaps that frame it is pure noise
-        if length < TEXT_SHORT_NONE:
+        # nothing shows once the two gaps that frame it eat the whole line
+        if length < _points_to_px(ax, TEXT_SHORT_NONE):
             ax.annotate(content, xy=(x, y), xycoords=textcoords, **kwargs)
             continue
 
         arrowprops = dict(style["arrowprops"])
         curve = arrowprops.pop("curve")
         pinned = arrowprops.pop("curve_pinned")
+        arrowprops["shrinkB"] = _target_gap(
+            data_ax, target, layers, arrowprops["shrinkB"]
+        )
         if length < TEXT_SHORT_STRAIGHT:
             rad = 0.0
             arrowprops["shrinkA"] = min(arrowprops["shrinkA"], TEXT_SHORT_GAP)
@@ -1933,6 +1968,16 @@ class Layer:
 
     def _resolve_emphasis(self, value):
         return validate_emphasis(value)
+
+    def target_extent(self, ax: plt.Axes, point: tuple) -> Optional[float]:
+        """Half the extent (points) of the mark this layer draws under `point`.
+
+        A connector's target gap is capped to it, so the tip stops inside
+        the mark it names. None when the layer has no mark there — most
+        layers draw marks a 5 pt gap cannot overshoot.
+        """
+
+        return None
 
     def _colorbar_edge(self, shown) -> Optional[str]:
         """The resolved colorbar's edge, when shown; etched steps draw none."""
@@ -3969,6 +4014,28 @@ class KdeLayer(Layer):
 class UnclippedMarksMixin:
     """A layer whose scatter marks may draw whole over an axis end on the data."""
 
+    def mark_radius(self, ax, point) -> Optional[float]:
+        """The radius (points) of the mark at `point`; None when it sits on none.
+
+        The collections carry the sizes the panel finally gave them, so a
+        sized series answers for the very marker under the point. The
+        smallest mark covering it wins, as the tightest one to stop inside.
+        """
+
+        target = np.asarray(ax.transData.transform(point), dtype=float)
+        radii = []
+        for collection in getattr(self, "_marks", {}).get(id(ax), ()):
+            offsets = collection.get_offsets()
+            sizes = np.asarray(collection.get_sizes(), dtype=float)
+            if not len(offsets) or not sizes.size:
+                continue
+            drawn = collection.get_offset_transform().transform(offsets)
+            index = int(np.argmin(np.hypot(*(drawn - target).T)))
+            radius = float(np.sqrt(sizes[index % sizes.size]) / 2)
+            if _px_to_points(ax, float(np.hypot(*(drawn[index] - target)))) <= radius:
+                radii.append(radius)
+        return min(radii) if radii else None
+
     def register_marks(self, ax, collection) -> None:
         """Remember a mark collection drawn into `ax`, so the panel can unclip it."""
 
@@ -4147,6 +4214,11 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
             xycoords="axes fraction",
             **font,
         )
+
+    def target_extent(self, ax, point) -> Optional[float]:
+        """The radius of the marker `point` sits on; a connector stops in it."""
+
+        return self.mark_radius(ax, point)
 
     def draw(self, ax, ctx):
         x_data = get_chart_data("x", self.chart)
@@ -6029,6 +6101,27 @@ class HeatmapLayer(Layer):
 
     def date_label_axes(self):
         return self.date_axes
+
+    def target_extent(self, ax, point) -> Optional[float]:
+        """Half the smaller side of the cell holding `point`, in points.
+
+        `imshow` centers cell (row, col) on (col, row), so a point rounds
+        to its cell and the borders sit half a unit out.
+        """
+
+        col, row = round(point[0]), round(point[1])
+        n_rows, n_cols = len(self.z), len(self.z[0]) if self.z else 0
+        if not (0 <= row < n_rows and 0 <= col < n_cols):
+            return None
+        value = self.z[row][col]
+        # a blank cell (off the calendar year, or a gap) draws no mark
+        if value is None or (isinstance(value, float) and math.isnan(value)):
+            return None
+        corners = ax.transData.transform(
+            [(col - 0.5, row - 0.5), (col + 0.5, row + 0.5)]
+        )
+        width, height = np.abs(corners[1] - corners[0])
+        return _px_to_points(ax, min(width, height) / 2)
 
     def draw(self, ax, ctx):
         data = self.z
@@ -8228,7 +8321,8 @@ class SankeyLayer(Layer):
         # the axes limits are fixed before any text so box estimates use them
         ax.set_xlim(-SANKEY_LABEL_MARGIN, 1 + SANKEY_LABEL_MARGIN)
         ax.set_ylim(0, 1 + (SANKEY_COLUMN_LABEL_HEADROOM if self.column_labels else 0))
-        # every label and value placed so far, for the ribbon values to avoid
+        # the node bars, and every label and value placed so far, for the
+        # ribbon values to avoid
         occupied = []
         effects = _halo_effects(halo, self.ground)
 
@@ -8250,6 +8344,7 @@ class SankeyLayer(Layer):
                     label=name,
                 )
                 ax.add_patch(bar)
+                occupied.append((box.x, box.bottom, box.x + node_width, box.top))
                 node_marks.append((bar, {"label": name, "flow": size[name]}))
                 # labels sit left of the first column, right of every other
                 if ci == 0:
@@ -8360,7 +8455,8 @@ class SankeyLayer(Layer):
                 )
 
         # the widest ribbons claim their midpoints first; the rest slide along
-        # their curve to the first spot clear of the labels and earlier values
+        # their curve to the first spot clear of the bars, the labels, and the
+        # earlier values
         for _, line, text in sorted(values, key=lambda v: v[0], reverse=True):
             fontsize = self.value_font["fontsize"]
             x1, y1, x2, y2 = line
@@ -8368,15 +8464,14 @@ class SankeyLayer(Layer):
                 (*_ribbon_centerline(*line, t), "center")
                 for t in SANKEY_VALUE_POSITIONS
             ]
-            best = None
             for x, y, ha in candidates:
                 box = _text_box(ax, x, y, text, fontsize, ha, halo)
-                overlap = sum(_overlap_area(box, other) for other in occupied)
-                if best is None or overlap < best[0]:
-                    best = (overlap, x, y, ha, box)
-                if overlap == 0:
+                if not any(_overlap_area(box, other) for other in occupied):
                     break
-            _, x, y, ha, box = best
+            else:
+                # nothing clear along the ribbon: the value is left out rather
+                # than written over a bar or a neighbour; hover still reads it
+                continue
             occupied.append(box)
             ax.text(
                 x,
@@ -11419,8 +11514,10 @@ class Panel:
         # axes, so a line or text does not repeat and a band's tint does not
         # stack with the series count; each is read on its figure's axes
         pools = {}
+        pooled_layers = defaultdict(list)
         for group, owner_ax in zip(self.groups, group_axes):
             pooled = pools.setdefault(owner_ax, {key: [] for key in REF_KEYS})
+            pooled_layers[owner_ax].extend(group.layers)
             for layer in group.layers:
                 for key in REF_KEYS:
                     for entry in getattr(layer, key):
@@ -11452,7 +11549,9 @@ class Panel:
         if any(pooled["texts"] for pooled in pools.values()):
             clearance = self._clearance_points(group_axes, horizontal)
         for owner_ax, pooled in pools.items():
-            _draw_texts(top_ax, pooled["texts"], owner_ax, clearance)
+            _draw_texts(
+                top_ax, pooled["texts"], owner_ax, clearance, pooled_layers[owner_ax]
+            )
 
         # point labels are placed once every marker of the panel is drawn and
         # the limits are final, so the estimate sees the real display space
