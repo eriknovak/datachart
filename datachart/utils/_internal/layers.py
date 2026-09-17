@@ -3813,19 +3813,24 @@ class GanttLayer(BarLayer):
         return resolve
 
 
-def _open_step_outline(outline, axis: int, cumulative: bool) -> None:
-    """Strip a step histogram's outline of the drop to zero that states nothing.
+def _open_step_outline(outline, axis: int, cumulative: bool, log: bool) -> None:
+    """Strip a step histogram's outline of the drops to zero that state nothing.
 
     `ax.hist(histtype="step")` returns one open polygon running from zero up
     over the bins and back down to zero. A cumulative total never falls back,
     so its closing drop misreads as a collapse to none (issue #198); a plain
-    histogram's drop is a true count and stays. `axis` is the value
-    coordinate: 1 for a vertical histogram, 0 for a horizontal one.
+    histogram's drop is a true count and stays. A log value axis has no zero
+    at all, so every vertex on it — the empty bins and the ends — would spike
+    down to the axis floor (issue #199); NaN breaks the outline there instead,
+    which the renderer draws as separate runs. `axis` is the value coordinate:
+    1 for a vertical histogram, 0 for a horizontal one.
     """
 
     vertices = np.array(outline.get_xy(), dtype=float)
     if cumulative:
         vertices = vertices[:-1]
+    if log:
+        vertices[vertices[:, axis] == 0, axis] = np.nan
     outline.set_xy(vertices)
 
 
@@ -3914,6 +3919,7 @@ class HistogramLayer(Layer):
                     bars[0],
                     0 if self.is_horizontal else 1,
                     bool(self.show_cumulative),
+                    ctx.value_scale == SCALE.LOG,
                 )
         self._etch(bars.patches if isinstance(bars, BarContainer) else bars)
         self._register_bins(ax, ctx, bars, edges, counts)
