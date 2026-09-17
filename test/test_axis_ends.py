@@ -2,7 +2,7 @@
 
 import unittest
 
-from datachart.charts import LineChart, ScatterChart
+from datachart.charts import BumpChart, LineChart, ScatterChart
 from datachart.utils import Panel
 from datachart.utils._internal.layers import MarkClipBox
 
@@ -33,11 +33,24 @@ class TestAxisEndsOnData(unittest.TestCase):
         fig.canvas.draw()
         self.assertIsInstance(fig.axes[0].collections[0].get_clip_box(), MarkClipBox)
 
-    def test_user_limit_keeps_the_clip(self):
-        """A user limit may cut the data on purpose."""
+    def test_user_limit_keeps_the_clip_on_its_axis(self):
+        """A user limit may cut the data on purpose; the other axis still unclips."""
         fig = ScatterChart(data=POINTS, xmax=100)
         fig.canvas.draw()
-        self.assertNotIsInstance(fig.axes[0].collections[0].get_clip_box(), MarkClipBox)
+        box = fig.axes[0].collections[0].get_clip_box()
+        self.assertIsInstance(box, MarkClipBox)
+        self.assertEqual(box._dims, ("y",))
+
+    def test_bump_end_markers_draw_whole_under_rank_limits(self):
+        """Limits on the rank axis leave the period ends unclipped."""
+        ranks = ([1, 2, 3], [2, 1, 1], [3, 3, 2])
+        data = [[{"x": 2016 + i, "y": r} for i, r in enumerate(rs)] for rs in ranks]
+        fig = BumpChart(data=data, ymin=0.5, ymax=5.5)
+        fig.canvas.draw()
+        box = fig.axes[0].lines[0].get_clip_box()
+        self.assertIsInstance(box, MarkClipBox)
+        self.assertIn("x", box._dims)
+        self.assertNotIn("y", box._dims)
 
 
 if __name__ == "__main__":

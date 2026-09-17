@@ -227,9 +227,10 @@ class TestStackedAreaChart(unittest.TestCase):
         self.assertGreaterEqual(box.x0, ax.bbox.x0 - radius - 2)
         self.assertLess(box.x0, ax.bbox.x0 - radius + 1e-6)
         self.assertGreater(box.x1, ax.bbox.x1 + radius - 1e-6)
-        # a user limit may cut the line on purpose: the axes clip stays
+        # a user limit may cut the line on purpose: the clip stays on that axis
         cropped = LineChart(data=[{"x": x, "y": x} for x in range(1, 17)], xmax=8)
-        self.assertNotIsInstance(cropped.axes[0].lines[0].get_clip_box(), MarkClipBox)
+        box = cropped.axes[0].lines[0].get_clip_box()
+        self.assertFalse(isinstance(box, MarkClipBox) and "x" in box._dims)
 
     def test_legend_adds_no_headroom_over_a_pinned_stack(self):
         fig = StackedAreaChart(

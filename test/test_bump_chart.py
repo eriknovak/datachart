@@ -14,7 +14,7 @@ from datachart.charts import BumpChart
 from datachart.config import config
 from datachart.constants import BUMP_RANK, BUMP_LABEL_POSITION, THEME
 from datachart.utils import Panel, Grid
-from datachart.utils._internal.layers import BumpLayer, rank_series
+from datachart.utils._internal.layers import BumpLayer, MarkClipBox, rank_series
 from datachart.utils._internal.validate import (
     validate_rank_by,
     validate_label_position,
@@ -169,10 +169,15 @@ class TestBumpChartDrawing(unittest.TestCase):
     def test_periods_span_the_x_axis_with_whole_end_markers(self):
         ax = BumpChart(DATA, subtitle=NAMES).axes[0]
         self.assertEqual(ax.get_xlim(), (0, 1))
-        self.assertFalse(ax.get_lines()[0].get_clip_on())
-        for limit in ({"xmax": 0.5}, {"ymax": 2}):
-            cropped = BumpChart(DATA, subtitle=NAMES, **limit).axes[0]
-            self.assertTrue(cropped.get_lines()[0].get_clip_on())
+        box = ax.get_lines()[0].get_clip_box()
+        self.assertIsInstance(box, MarkClipBox)
+        self.assertEqual(box._dims, ("x",))
+        # a period limit may cut a line on purpose: the clip stays
+        cropped = BumpChart(DATA, subtitle=NAMES, xmax=0.5).axes[0]
+        self.assertNotIsInstance(cropped.get_lines()[0].get_clip_box(), MarkClipBox)
+        # a rank limit clips the ranks only: the period ends still draw whole
+        cropped = BumpChart(DATA, subtitle=NAMES, ymax=2).axes[0]
+        self.assertEqual(cropped.get_lines()[0].get_clip_box()._dims, ("x",))
 
     def test_user_rank_limits_keep_rank_one_on_top(self):
         fig = BumpChart(DATA, subtitle=NAMES, ymin=1, ymax=2)

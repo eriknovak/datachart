@@ -2233,15 +2233,16 @@ class AreaFillMixin:
 
 
 class MarkClipBox(TransformedBbox):
-    """The axes box grown by `pad` points, read live so it follows the layout."""
+    """The axes box grown by `pad` points along `dims`, read live with the layout."""
 
-    def __init__(self, ax, pad: float):
+    def __init__(self, ax, pad: float, dims=("x", "y")):
         super().__init__(Bbox.unit(), ax.transAxes)
-        self._figure, self._pad = ax.figure, pad
+        self._figure, self._pad, self._dims = ax.figure, pad, tuple(dims)
 
     def get_points(self):
         pad = self._pad * self._figure.dpi / 72.0
-        return super().get_points() + [[-pad, -pad], [pad, pad]]
+        grow = [pad if "x" in self._dims else 0.0, pad if "y" in self._dims else 0.0]
+        return super().get_points() + [[-grow[0], -grow[1]], grow]
 
 
 def _mark_radius(line_style: dict) -> float:
@@ -2282,13 +2283,13 @@ class LineLayer(PointLabelMixin, AreaFillMixin, Layer):
     def value_data(self):
         return get_chart_data("y", self.chart)
 
-    def unclip_marks(self, ax) -> None:
-        """Let the markers on the axes edge draw whole, past the frame."""
+    def unclip_marks(self, ax, dims=("x", "y")) -> None:
+        """Let the markers on the `dims` edges draw whole, past the frame."""
 
         for line in self._lines.get(id(ax), ()):
             pad = line.get_markersize() / 2 + line.get_markeredgewidth()
             line.set_clip_path(None)
-            line.set_clip_box(MarkClipBox(ax, pad))
+            line.set_clip_box(MarkClipBox(ax, pad, dims))
 
     def draw(self, ax, ctx):
         x = get_chart_data("x", self.chart)
@@ -2592,10 +2593,9 @@ class BumpLayer(LineLayer):
         plot, _, _ = _oriented(ax, ctx.transpose)
         label = self.label(ctx)
         (line,) = plot(px, py, **line_style, markevery=marks, label=label)
-        # the x-limits end at the first and last period: whole end markers
-        # overhang the spines unless the user crops the axes
-        if all(self.settings.get(k) is None for k in ("xmin", "xmax", "ymin", "ymax")):
-            line.set_clip_on(False)
+        # the period axis ends on the first and last period: the panel lets
+        # the end markers overhang the spines there
+        self._lines.setdefault(id(ax), []).append(line)
 
         def resolve(index: int) -> dict:
             i = _nearest(x, px[index])
@@ -3684,8 +3684,8 @@ class ScatterLayer(PointLabelMixin, Layer):
         self._marks = {}
         super().__init__(chart, settings)
 
-    def unclip_marks(self, ax) -> None:
-        """Let the markers on the axes edge draw whole, past the frame."""
+    def unclip_marks(self, ax, dims=("x", "y")) -> None:
+        """Let the markers on the `dims` edges draw whole, past the frame."""
 
         for collection in self._marks.get(id(ax), ()):
             sizes = np.asarray(collection.get_sizes(), dtype=float)
@@ -3693,7 +3693,7 @@ class ScatterLayer(PointLabelMixin, Layer):
             widths = np.asarray(collection.get_linewidths(), dtype=float)
             pad = radius + (float(widths.max()) if widths.size else 0.0)
             collection.set_clip_path(None)
-            collection.set_clip_box(MarkClipBox(ax, pad))
+            collection.set_clip_box(MarkClipBox(ax, pad, dims))
 
     def _resolve_style(self):
         self.scatter_style = get_scatter_style(self.style)
@@ -10629,38 +10629,45 @@ class Panel:
         # view moves outward to the next tick (a polar theta axis excepted),
         # or stops on the tick the data itself sits on; an axis pinned to
         # the data ends on the data
-        ends_on_data = {ax: ("y" if horizontal else "x") in pinned}
+        # the display axes whose ends sit on the data, per axes; a pinned
+        # axis counts only while the user sets no limit on it
+        ends_on_data = {ax: set()}
+        for axis_name in pinned:
+            if all(s.get(f"{axis_name}{end}") is None for end in ("min", "max")):
+                ends_on_data[ax].add(axis_name)
         if not bare and all(l.ticks_at_axis_ends for l in layers):
             for axis_name in ("y",) if polar else ("x", "y"):
                 # ranks are whole positions with their own half-unit ends
                 if (rank_axis and axis_name == "y") or axis_name in pinned:
                     continue
                 # a polar r axis keeps its ring past the data
-                ends_on_data[ax] |= _snap_limits_to_ticks(
-                    ax,
-                    axis_name,
-                    tuple(
-                        s.get(f"{axis_name}{end}") is not None for end in ("min", "max")
-                    ),
-                    data_ends=not polar,
+                fixed = tuple(
+                    s.get(f"{axis_name}{end}") is not None for end in ("min", "max")
                 )
+                on_data = _snap_limits_to_ticks(
+                    ax, axis_name, fixed, data_ends=not polar
+                )
+                if on_data and not any(fixed):
+                    ends_on_data[ax].add(axis_name)
             if ax_right is not None:
-                ends_on_data[ax_right] = _snap_limits_to_ticks(
-                    ax_right,
-                    "x" if horizontal else "y",
-                    tuple(s.get(f"y{end}_right") is not None for end in ("min", "max")),
+                value_axis = "x" if horizontal else "y"
+                fixed = tuple(
+                    s.get(f"y{end}_right") is not None for end in ("min", "max")
                 )
+                if _snap_limits_to_ticks(ax_right, value_axis, fixed) and not any(
+                    fixed
+                ):
+                    ends_on_data[ax_right] = {value_axis}
 
         # an axis end on the data puts marks on the frame: they draw whole
-        # over it instead of half-clipped by it; a user limit keeps the
-        # clip, since it may cut the data on purpose
-        if not any(limits.values()):
-            for axes, on_data in ends_on_data.items():
-                if not on_data:
-                    continue
-                for layer in layers:
-                    if isinstance(layer, (LineLayer, ScatterLayer)):
-                        layer.unclip_marks(axes)
+        # over it instead of half-clipped by it; an axis the user limits
+        # keeps the clip, since the limit may cut the data on purpose
+        for axes, dims in ends_on_data.items():
+            if not dims:
+                continue
+            for layer in layers:
+                if isinstance(layer, (LineLayer, ScatterLayer)):
+                    layer.unclip_marks(axes, sorted(dims))
 
         # radial furniture reads the final r limits, so it follows them
         if polar:
