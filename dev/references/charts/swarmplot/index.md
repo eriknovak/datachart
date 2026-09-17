@@ -124,7 +124,7 @@ Added in v0.9.0
 
 Added in Unreleased
 
-The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The `show_values` and `value_format` parameters.
+The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The per-point `emphasis` key. The `show_values` and `value_format` parameters.
 
 Examples:
 
@@ -147,7 +147,7 @@ Examples:
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`          | The data points for the swarm plot(s). Can be a single list of data points for one chart, or a list of lists for multiple charts. Each data point should have a label (category) and value (numeric). **TYPE:** \`list[SwarmDataPointAttrs]                                                                                                                                                                                         |
+| `data`          | The data points for the swarm plot(s). Can be a single list of data points for one chart, or a list of lists for multiple charts. Each data point should have a label (category) and value (numeric), and may carry its own emphasis role, which wins over its group's. **TYPE:** \`list[SwarmDataPointAttrs]                                                                                                                       |
 | `title`         | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                             |
 | `xlabel`        | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `ylabel`        | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -204,10 +204,11 @@ Bases: `TypedDict`
 
 The data point attributes for the swarm plot.
 
-| ATTRIBUTE | DESCRIPTION                         |
-| --------- | ----------------------------------- |
-| `label`   | The category label. **TYPE:** `str` |
-| `value`   | The numeric value. **TYPE:** \`int  |
+| ATTRIBUTE  | DESCRIPTION                                                                                                                                     |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`    | The category label. **TYPE:** `str`                                                                                                             |
+| `value`    | The numeric value. **TYPE:** \`int                                                                                                              |
+| `emphasis` | The point's own emphasis role ("background" or "highlight"); wins over its group's emphasis and the chart's emphasis_rule. **TYPE:** \`EMPHASIS |
 
 ## Style
 

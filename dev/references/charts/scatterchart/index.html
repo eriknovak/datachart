@@ -4122,7 +4122,8 @@ use <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol
 <p>The <code>xticks_format</code> and <code>yticks_format</code> tick formats.
 The <code>show_values</code>, <code>value_format</code>, <code>value_step</code> and <code>legend</code> parameters.
 The <code>vspans</code> and <code>hspans</code> reference bands.
-The <code>emphasis_rule</code> parameter.</p>
+The <code>emphasis_rule</code> parameter.
+The per-point <code>emphasis</code> key.</p>
 </div>
 
 
@@ -4141,7 +4142,8 @@ The <code>emphasis_rule</code> parameter.</p>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>The data points for the scatter chart(s). Can be a single list of data points
-for one chart, or a list of lists for multiple charts/subplots.</p>
+for one chart, or a list of lists for multiple charts/subplots. A point
+may carry its own <code>emphasis</code> role, which wins over its chart's.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -5265,6 +5267,22 @@ unlabelled.</p>
                   <span class="doc-attribute-annotation">
                     <b>TYPE:</b>
                       <code><span title="str">str</span> | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.ScatterDataPointAttrs.emphasis">emphasis</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The point's own emphasis role
+("background" or "highlight"); wins over the chart's <code>emphasis</code> and
+<code>emphasis_rule</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.EMPHASIS&lt;/span&gt;" href="../../constants/#datachart.constants.EMPHASIS">EMPHASIS</a> | <span title="str">str</span> | None</code>
                   </span>
               </p>
             </td>

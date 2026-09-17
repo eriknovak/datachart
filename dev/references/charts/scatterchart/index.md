@@ -193,11 +193,11 @@ Examples:
 
 Added in Unreleased
 
-The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format`, `value_step` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter.
+The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format`, `value_step` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The per-point `emphasis` key.
 
 | PARAMETER          | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`             | The data points for the scatter chart(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** \`list[ScatterDataPointAttrs]                                                                                                                                                                                                                                        |
+| `data`             | The data points for the scatter chart(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. A point may carry its own emphasis role, which wins over its chart's. **TYPE:** \`list[ScatterDataPointAttrs]                                                                                                                                                                  |
 | `title`            | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                      |
 | `xlabel`           | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                            |
 | `ylabel`           | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -261,13 +261,14 @@ Bases: `TypedDict`
 
 The data point attributes for the scatter chart.
 
-| ATTRIBUTE | DESCRIPTION                                          |
-| --------- | ---------------------------------------------------- |
-| `x`       | The x-axis value. **TYPE:** \`int                    |
-| `y`       | The y-axis value. **TYPE:** \`int                    |
-| `size`    | The marker size (for bubble charts). **TYPE:** \`int |
-| `hue`     | The category for color grouping. **TYPE:** \`str     |
-| `label`   | The label drawn beside the point. **TYPE:** \`str    |
+| ATTRIBUTE  | DESCRIPTION                                                                                                                         |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `x`        | The x-axis value. **TYPE:** \`int                                                                                                   |
+| `y`        | The y-axis value. **TYPE:** \`int                                                                                                   |
+| `size`     | The marker size (for bubble charts). **TYPE:** \`int                                                                                |
+| `hue`      | The category for color grouping. **TYPE:** \`str                                                                                    |
+| `label`    | The label drawn beside the point. **TYPE:** \`str                                                                                   |
+| `emphasis` | The point's own emphasis role ("background" or "highlight"); wins over the chart's emphasis and emphasis_rule. **TYPE:** \`EMPHASIS |
 
 ## Style
 

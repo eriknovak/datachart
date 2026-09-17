@@ -4057,6 +4057,7 @@ positions). For large samples prefer
 The <code>legend</code> parameter.
 The <code>vspans</code> and <code>hspans</code> reference bands.
 The <code>emphasis_rule</code> parameter.
+The per-point <code>emphasis</code> key.
 The <code>show_values</code> and <code>value_format</code> parameters.</p>
 </div>
 
@@ -4095,7 +4096,8 @@ The <code>show_values</code> and <code>value_format</code> parameters.</p>
               <div class="doc-md-description">
                 <p>The data points for the swarm plot(s). Can be a single list of data
 points for one chart, or a list of lists for multiple charts.
-Each data point should have a <code>label</code> (category) and <code>value</code> (numeric).</p>
+Each data point should have a <code>label</code> (category) and <code>value</code> (numeric),
+and may carry its own <code>emphasis</code> role, which wins over its group's.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -5034,6 +5036,22 @@ style string.</p>
                   <span class="doc-attribute-annotation">
                     <b>TYPE:</b>
                       <code><span title="int">int</span> | <span title="float">float</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.SwarmDataPointAttrs.emphasis">emphasis</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The point's own emphasis role
+("background" or "highlight"); wins over its group's <code>emphasis</code> and
+the chart's <code>emphasis_rule</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.EMPHASIS&lt;/span&gt;" href="../../constants/#datachart.constants.EMPHASIS">EMPHASIS</a> | <span title="str">str</span> | None</code>
                   </span>
               </p>
             </td>
