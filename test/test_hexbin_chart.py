@@ -315,3 +315,51 @@ def test_reference_lines_span_the_axes():
     (line,) = [c for c in ax.collections if c.get_label() == "h"]
     np.testing.assert_allclose(line.get_segments()[0][:, 0], ax.get_xlim())
     plt.close("all")
+
+
+def _hexagon_size(figure):
+    """The display width and height of the figure's first hexagon."""
+
+    figure.canvas.draw()
+    tiles = _hexbins(figure.axes[0])[0]
+    vertices = tiles.get_transform().transform(tiles.get_paths()[0].vertices)
+    return np.ptp(vertices, axis=0)
+
+
+class TestHexbinScales(unittest.TestCase):
+    """Hexagons are binned in the axes' scale, so a log axis keeps them whole."""
+
+    def setUp(self):
+        rng = np.random.default_rng(0)
+        xy = np.exp(rng.normal(0, 1, (2000, 2)))
+        self.data = {"x": xy[:, 0].tolist(), "y": xy[:, 1].tolist()}
+        self.linear = HexbinChart(data=self.data)
+
+    def tearDown(self):
+        plt.close("all")
+
+    def assert_whole_hexagons(self, figure):
+        ax = figure.axes[0]
+        width, height = _hexagon_size(figure)
+        self.assertTrue(np.isfinite([width, height]).all())
+        self.assertLess(width, ax.bbox.width / 5)
+        self.assertLess(height, ax.bbox.height / 5)
+        self.assertEqual(
+            len(_hexbins(ax)[0].get_offsets()),
+            len(_hexbins(self.linear.axes[0])[0].get_offsets()),
+        )
+
+    def test_log_scales(self):
+        for scalex, scaley in (("log", None), (None, "log"), ("log", "log")):
+            with self.subTest(scalex=scalex, scaley=scaley):
+                figure = HexbinChart(data=self.data, scalex=scalex, scaley=scaley)
+                ax = figure.axes[0]
+                self.assertEqual(ax.get_xscale(), scalex or "linear")
+                self.assertEqual(ax.get_yscale(), scaley or "linear")
+                self.assert_whole_hexagons(figure)
+
+    def test_panel_log_scales(self):
+        figure = Panel([HexbinChart(data=self.data)], scalex="log", scaley="log")
+        ax = figure.axes[0]
+        self.assertEqual((ax.get_xscale(), ax.get_yscale()), ("log", "log"))
+        self.assert_whole_hexagons(figure)

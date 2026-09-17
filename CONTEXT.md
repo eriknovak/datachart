@@ -94,6 +94,12 @@ The frozen per-layer instructions a panel hands to a layer at draw time — z-or
 legend label, assigned color, and bar slot placement.
 _Avoid_: settings (for this), kwargs
 
+**Surface**:
+A filled layer that reads as background — stacked area bands, a filled contour,
+hexbin tiles. In a `Panel` overlay it draws under the marks, and reference lines
+always draw over it.
+_Avoid_: raster (for this), fill layer
+
 **Chart front**:
 A public chart function (`LineChart`, `BarChart`, …) — a thin front that validates
 input and hands the engine an explicit charts structure and settings dict; it does

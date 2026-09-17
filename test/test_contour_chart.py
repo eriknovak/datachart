@@ -7,6 +7,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.collections import PathCollection
 from matplotlib.contour import ContourSet
 from matplotlib.lines import Line2D
 
@@ -186,6 +187,53 @@ class TestContourDraw(unittest.TestCase):
         count = ContourChart(data=surface(), levels=4)
         self.assertTrue(len(_contour_sets(count.axes[0])[0].levels) >= 3)
 
+    def test_explicit_levels_below_the_peak_fill_the_top(self):
+        x = np.arange(10)
+        z = (np.add.outer(x, x) ** 2 / 4).tolist()  # 0 .. 81
+        figure = ContourChart(data={"z": z}, filled=True, levels=[0, 10, 20])
+        (bands,) = _contour_sets(figure.axes[0])
+        self.assertEqual(bands.extend, "max")
+        # one band per level pair, plus the overflow band above 20
+        self.assertEqual(len(bands.get_paths()), 3)
+        self.assertTrue(len(bands.get_paths()[-1].vertices))
+
+    def test_extend_follows_the_surface(self):
+        z = [[0.0, 5.0], [10.0, 15.0]]
+        cases = {
+            "neither": [0, 5, 15],
+            "min": [5, 10, 15],
+            "max": [0, 5, 10],
+            "both": [5, 10],
+        }
+        for extend, levels in cases.items():
+            with self.subTest(extend=extend):
+                figure = ContourChart(data={"z": z}, filled=True, levels=levels)
+                self.assertEqual(_contour_sets(figure.axes[0])[0].extend, extend)
+
+    def test_filled_contour_needs_two_levels(self):
+        z = [[0.0, 5.0], [10.0, 15.0]]
+        for levels in ([7], [7, 7.0]):
+            with self.subTest(levels=levels):
+                with self.assertRaisesRegex(ValueError, "at least two distinct levels"):
+                    ContourChart(data={"z": z}, filled=True, levels=levels)
+        lines = ContourChart(data={"z": z}, levels=[7])
+        self.assertEqual(len(_contour_sets(lines.axes[0])), 1)
+
+    def test_auto_and_count_levels_do_not_extend(self):
+        for levels in (None, 4, CONTOUR_LEVELS.RICE):
+            with self.subTest(levels=levels):
+                figure = ContourChart(data=surface(), filled=True, levels=levels)
+                self.assertEqual(_contour_sets(figure.axes[0])[0].extend, "neither")
+
+    def test_extended_band_hover_spans_to_the_surface_end(self):
+        z = [[0.0, 5.0], [10.0, 15.0]]
+        figure = ContourChart(data={"z": z}, filled=True, levels=[5, 10])
+        ax = figure.axes[0]
+        (bands,) = _contour_sets(ax)
+        (resolve,) = [r for artist, r in figure._hover_targets if artist is bands]
+        self.assertEqual(resolve((0,))["level"], "0 – 5")
+        self.assertEqual(resolve((2,))["level"], "10 – 15")
+
     def test_explicit_none_cmap_is_not_pinned(self):
         figure = ContourChart(data=surface(), style={"plot_contour_cmap": None})
         cs = _contour_sets(figure.axes[0])[0]
@@ -303,7 +351,30 @@ class TestContourCompose(unittest.TestCase):
             ],
         )
         ax = panel.axes[0]
-        self.assertTrue(_contour_sets(ax)[0].filled)
+        (bands,) = _contour_sets(ax)
+        self.assertTrue(bands.filled)
+        (scatter,) = [c for c in ax.collections if type(c) is PathCollection]
+        self.assertLess(bands.get_zorder(), scatter.get_zorder())
+
+    def test_panel_contour_lines_keep_the_line_zorder(self):
+        panel = Panel(
+            [
+                ContourChart(data=bump(0, 0)),
+                LineChart(data=[{"x": i, "y": i} for i in range(-4, 5)]),
+            ],
+        )
+        ax = panel.axes[0]
+        (lines,) = _contour_sets(ax)
+        self.assertEqual(lines.get_zorder(), ax.lines[0].get_zorder())
+        self.assertEqual(lines.get_zorder(), 2)
+
+    def test_reference_line_draws_over_filled_contour(self):
+        figure = ContourChart(
+            data=bump(0, 0), filled=True, hlines={"y": 0, "label": "ref"}
+        )
+        ax = figure.axes[0]
+        (line,) = [c for c in ax.collections if c.get_label() == "ref"]
+        self.assertLess(_contour_sets(ax)[0].get_zorder(), line.get_zorder())
 
     def test_grid_nesting(self):
         fig = Grid(
@@ -353,6 +424,17 @@ class TestContourLevels(unittest.TestCase):
         rice = contour_levels(z, CONTOUR_LEVELS.RICE)
         fd = contour_levels(z, CONTOUR_LEVELS.FD)
         self.assertGreater(len(fd), len(rice))
+
+    def test_contour_levels_sorts_and_dedupes_a_list(self):
+        self.assertEqual(contour_levels(self._surface(), [20, 5, 20, 10]), [5, 10, 20])
+        self.assertEqual(contour_levels(self._surface(), np.array([2, 1])), [1, 2])
+        self.assertEqual(contour_levels(self._surface(), 6), 6)
+
+    def test_contour_levels_rejects_an_invalid_list(self):
+        for levels in ([], [1, "a"], [1, None], [1, float("nan")], 4.0):
+            with self.subTest(levels=levels):
+                with self.assertRaisesRegex(ValueError, "contour `levels`"):
+                    contour_levels(self._surface(), levels)
 
     def test_contour_levels_clamped(self):
         # a 2x2 grid: rice gives k = ceil(2 * 2 ** (1/3)) = 3 -> clamped to 4

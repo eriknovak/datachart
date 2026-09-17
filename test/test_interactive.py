@@ -276,7 +276,10 @@ class TestCartesianLayers:
         assert resolver((1, 0.4)) == {"label": "height", "level": 3}
         filled = ContourChart(data={"z": z}, levels=[1, 3, 5], filled=True)
         ((bands, resolver),) = _targets(filled)
-        assert resolver((0, 2)) == {"label": None, "level": "1 – 3"}
+        assert resolver((1, 2)) == {"label": None, "level": "1 – 3"}
+        # the overflow bands span to the surface extremes
+        assert resolver((0, 2)) == {"label": None, "level": "0 – 1"}
+        assert resolver((3, 2)) == {"label": None, "level": "5 – 8"}
 
 
 SUMMARY_A = {"median": 3, "q1": 2, "q3": 4, "min": 1, "max": 10}

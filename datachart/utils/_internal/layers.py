@@ -77,6 +77,8 @@ from .validate import (
     infer_sankey_columns,
     treemap_record_total,
     validate_baseline,
+    validate_contour_levels,
+    validate_filled_levels,
     validate_emphasis,
     validate_given_ranks,
     validate_label_position,
@@ -1131,6 +1133,8 @@ def _span_bounds(span: dict, key: str, limits: tuple) -> tuple:
 TEXT_COORDS = ("data", "axes")
 # annotations sit above the data marks (zorder 3), below the panel furniture
 TEXT_ANNOTATION_ZORDER = 5
+# reference lines sit above every mark (zorder 3), below annotations (ADR 0054)
+REF_LINE_ZORDER = 3.5
 # connector placement (ADR 0018): the bow side and depth are chosen at draw
 # time against the panel's data, unless plot_text_arrow_curve pins them
 TEXT_BOW_CANDIDATES = (0.2, -0.2, 0.35, -0.35, 0.5, -0.5)
@@ -1364,7 +1368,7 @@ def _draw_ref_lines(ax: plt.Axes, vlines: List[tuple], hlines: List[tuple]) -> N
             ymin=vline.get("ymin", default_ymin),
             ymax=vline.get("ymax", default_ymax),
             label=vline.get("label", ""),
-            **style,
+            **{"zorder": REF_LINE_ZORDER, **style},
         )
     # a line running to the limits must not widen them under autoscale
     if any(v.get("ymin") is None or v.get("ymax") is None for v, _ in vlines):
@@ -1383,7 +1387,7 @@ def _draw_ref_lines(ax: plt.Axes, vlines: List[tuple], hlines: List[tuple]) -> N
             xmin=hline.get("xmin", default_xmin),
             xmax=hline.get("xmax", default_xmax),
             label=hline.get("label", ""),
-            **style,
+            **{"zorder": REF_LINE_ZORDER, **style},
         )
     if any(h.get("xmin") is None or h.get("xmax") is None for h, _ in hlines):
         ax.set_xlim(default_xmin, default_xmax)
@@ -1794,6 +1798,8 @@ class Layer:
     record_roles: list = ()
     # the zone of a temporal x column a layer draws as date numbers
     x_tz: Optional[tzinfo] = None
+    # a filled background layer; a Panel overlay draws it under marks (ADR 0054)
+    surface: bool = False
 
     def __init__(self, chart: dict, settings: dict):
         self.chart = chart
@@ -2805,6 +2811,7 @@ class StackedAreaLayer(Layer):
     """One series of a stack; the panel computes its band (ADR 0025)."""
 
     kind = "stackedarea"
+    surface = True
     # the stack fills its frame: both axes end on the data, not on a tick
     ticks_at_axis_ends = False
 
@@ -6043,7 +6050,8 @@ def contour_levels(
     and `"fd"` the value range over `2 * IQR * n ** (-1/3)`. The count is
     clamped to the 4–20 range and snapped to round values across the range of
     `z`. `"auto"` (or `None`) returns `None`, leaving the choice to
-    matplotlib; an integer or a list of level values passes through.
+    matplotlib; an integer passes through and a list of level values comes
+    back sorted and deduplicated.
 
     Args:
         z: The 2-D grid of values.
@@ -6054,12 +6062,17 @@ def contour_levels(
         The level values, the target count, or `None` for the automatic rule.
 
     Raises:
-        ValueError: If the rule is not one of `CONTOUR_LEVELS`.
+        ValueError: If the rule is not one of `CONTOUR_LEVELS`, or the list
+            is empty or holds a non-finite or non-numeric value.
     """
-    if rule is None or rule == CONTOUR_LEVELS.AUTO:
+    if rule is None:
         return None
-    if not isinstance(rule, str):
+    if isinstance(rule, (int, np.integer)) and not isinstance(rule, bool):
         return rule
+    if not isinstance(rule, str):
+        return validate_contour_levels(rule)
+    if rule == CONTOUR_LEVELS.AUTO:
+        return None
     if rule not in (CONTOUR_LEVELS.RICE, CONTOUR_LEVELS.FD):
         raise ValueError(
             f"Invalid contour `levels` rule {rule!r}. Must be one of "
@@ -6090,6 +6103,7 @@ class ContourLayer(Layer):
 
     def _resolve_style(self):
         self.filled = bool(self.settings.get("filled"))
+        self.surface = self.filled
         self.show_labels = self.settings.get("show_labels")
         self.show_colorbars = self.settings.get("show_colorbars")
         self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
@@ -6109,6 +6123,29 @@ class ContourLayer(Layer):
         self.label_family = resolve_font_family()
         self.x, self.y, self.z = self._grid()
         self.levels = contour_levels(self.z, self.settings.get("levels"))
+        if self.filled:
+            validate_filled_levels(self.levels)
+        self.extend, self.band_edges = self._coverage()
+
+    def _coverage(self) -> tuple:
+        """How filled bands reach past explicit levels, and every band's edges.
+
+        A surface beyond the list's ends fills in the end colors; each such
+        overflow band spans from the end level to the surface extreme.
+        """
+
+        if not isinstance(self.levels, list):
+            return "neither", None
+        edges = list(self.levels)
+        low, high = np.nanmin(self.z), np.nanmax(self.z)
+        below, above = low < edges[0], high > edges[-1]
+        if below:
+            edges.insert(0, float(low))
+        if above:
+            edges.append(float(high))
+        if below and above:
+            return "both", edges
+        return ("min" if below else "max" if above else "neither"), edges
 
     def _grid(self) -> tuple:
         """The validated (x, y, z) arrays; x and y default to the indices."""
@@ -6159,6 +6196,7 @@ class ContourLayer(Layer):
                 self.y,
                 self.z,
                 levels=self.levels,
+                extend=self.extend,
                 cmap=self.cmap,
                 **scaling,
                 **style,
@@ -6167,23 +6205,24 @@ class ContourLayer(Layer):
             proxy = ax.fill_between(
                 [], [], [], color=self.cmap(CONTOUR_SWATCH), label=label
             )
-            self.register_hover(bands, self._level_resolver(bands, label))
+            edges = self.band_edges or list(bands.levels)
+            self.register_hover(bands, self._level_resolver(bands, label, edges))
             if self.value_etch_steps:
-                self._draw_relief(ax, ctx, bands, proxy)
+                self._draw_relief(ax, ctx, bands, proxy, edges)
             elif self.show_colorbars:
                 _draw_colorbar(ax, bands, self.colorbar, ctx.aspect_locked)
             return
         self._draw_lines(ax, ctx, self.show_labels, legend_proxy=True)
 
-    def _draw_relief(self, ax, ctx, bands, proxy) -> None:
+    def _draw_relief(self, ax, ctx, bands, proxy, edges) -> None:
         """Filled bands as a relief map: etched steps, then labelled level lines.
 
         A band takes the step of its middle value under the bands' norm; the
         legend merges consecutive bands that share a step, and the legend
-        proxy wears the middle step.
+        proxy wears the middle step. `edges` bound every drawn band.
         """
 
-        levels = np.asarray(bands.levels, dtype=float)
+        levels = np.asarray(edges, dtype=float)
         middles = (levels[:-1] + levels[1:]) / 2
         n = len(self.value_etch_steps)
         bands.autoscale_None()
@@ -6271,10 +6310,10 @@ class ContourLayer(Layer):
                 text.set_path_effects(halo)
 
     @staticmethod
-    def _level_resolver(contours, label) -> Callable:
-        """A level line reports its level; a filled band the two it lies between."""
+    def _level_resolver(contours, label, edges=None) -> Callable:
+        """A level line reports its level; a filled band the two edges it lies between."""
 
-        levels = [_scalar(level) for level in contours.levels]
+        levels = [_scalar(level) for level in (edges or contours.levels)]
 
         def resolve(index):
             i = index[0]
@@ -6301,6 +6340,7 @@ class HexbinLayer(Layer):
     ticks_at_axis_ends = False
 
     kind = "hexbin"
+    surface = True
 
     def _resolve_style(self):
         self.show_colorbars = self.settings.get("show_colorbars")
@@ -6384,6 +6424,9 @@ class HexbinLayer(Layer):
             self.y,
             C=self.c,
             gridsize=self.gridsize,
+            # hexagons bin in the axes' scale; a later log scale would warp them
+            xscale="log" if ctx.category_scale == SCALE.LOG else "linear",
+            yscale="log" if ctx.value_scale == SCALE.LOG else "linear",
             reduce_C_function=self.reduce,
             mincnt=self.mincnt,
             norm=self.chart.get("norm", None),
@@ -10384,7 +10427,9 @@ class Panel:
             for layer in group.layers:
                 z_order = group.z_order
                 if z_order is None:
-                    z_order = zorder_defaults.get(layer.kind)
+                    z_order = zorder_defaults.get(
+                        "surface" if layer.surface else layer.kind
+                    )
 
                 role = group.layer_role(layer)
 

@@ -241,9 +241,7 @@ class TestGroundColors(unittest.TestCase):
 
     def test_bare_panel_takes_the_ground(self):
         config.update_config(GROUND)
-        figure = SankeyChart(
-            {"links": [{"source": "a", "target": "b", "value": 1.0}]}
-        )
+        figure = SankeyChart({"links": [{"source": "a", "target": "b", "value": 1.0}]})
         self.assertEqual(to_hex(figure.get_facecolor()), PARCHMENT.lower())
 
     def test_halo_follows_the_ground(self):
@@ -263,12 +261,16 @@ class TestAreaAndBodyEtching(unittest.TestCase):
     def test_hatch_cycle_skips_areas_without_etch(self):
         config.update_config({"plot_hatch_cycle": ["/", "x"]})
         figure = StackedAreaChart([LINE, LINE_2])
-        self.assertEqual([c.get_hatch() for c in figure.axes[0].collections], [None, None])
+        self.assertEqual(
+            [c.get_hatch() for c in figure.axes[0].collections], [None, None]
+        )
 
     def test_each_area_takes_its_own_pattern(self):
         config.update_config({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "x"]})
         stacked = StackedAreaChart([LINE, LINE_2])
-        self.assertEqual([c.get_hatch() for c in stacked.axes[0].collections], ["/", "x"])
+        self.assertEqual(
+            [c.get_hatch() for c in stacked.axes[0].collections], ["/", "x"]
+        )
         lines = LineChart([LINE, LINE_2], show_area=True)
         self.assertEqual([c.get_hatch() for c in lines.axes[0].collections], ["/", "x"])
 
@@ -336,7 +338,9 @@ class TestStyleCycles(unittest.TestCase):
         self.assertEqual(len(hollow.get_facecolor()), 0)
         self.assertGreater(hollow.get_linewidths()[0], 0)
         self.assertFalse(
-            np.array_equal(filled.get_paths()[0].vertices, hollow.get_paths()[0].vertices)
+            np.array_equal(
+                filled.get_paths()[0].vertices, hollow.get_paths()[0].vertices
+            )
         )
 
     def test_chart_marker_wins(self):
@@ -527,12 +531,22 @@ class TestValueEtch(unittest.TestCase):
         self.assertLessEqual(len(legend.get_texts()), 5)
         png(figure)
 
+    def test_relief_overflow_band_spans_to_the_surface_peak(self):
+        figure = ContourChart(GRID, filled=True, show_colorbars=True, levels=[0, 2, 4])
+        ax = figure.axes[0]
+        (legend,) = [a for a in ax.artists if isinstance(a, Legend)]
+        self.assertEqual(legend.get_texts()[-1].get_text().split(" – ")[-1], "8")
+        png(figure)
+
 
 TREE = {
     "data": [
         {
             "label": "Asia",
-            "children": [{"label": "China", "value": 14.0}, {"label": "India", "value": 13.0}],
+            "children": [
+                {"label": "China", "value": 14.0},
+                {"label": "India", "value": 13.0},
+            ],
         },
         {"label": "Africa", "value": 12.0},
     ]
@@ -577,7 +591,9 @@ class TestChartInkLooks(unittest.TestCase):
         self.assertEqual(patches["fill:Asia"].get_hatch(), "///")
         self.assertEqual(patches["tile:China"].get_hatch(), "/")
         self.assertEqual(patches["tile:Africa"].get_hatch(), "...")
-        self.assertEqual(to_hex(patches["tile:China"].get_facecolor()), PARCHMENT.lower())
+        self.assertEqual(
+            to_hex(patches["tile:China"].get_facecolor()), PARCHMENT.lower()
+        )
         self.assertTrue(etch_effects(patches["tile:China"]))
         swatch = figure.axes[0].get_legend().get_patches()[0]
         self.assertEqual(swatch.get_hatch(), "/")
@@ -603,7 +619,9 @@ class TestChartInkLooks(unittest.TestCase):
                 "plot_network_group_linestyle": ":",
             }
         )
-        figure = NetworkChart(NETWORK, directed=True, layout="grouped", show_legend=True)
+        figure = NetworkChart(
+            NETWORK, directed=True, layout="grouped", show_legend=True
+        )
         ax = figure.axes[0]
         edges = [p for p in ax.patches if (p.get_gid() or "").startswith("edge:")]
         self.assertTrue(all(ink_effects(edge) for edge in edges))

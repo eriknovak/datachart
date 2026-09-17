@@ -178,11 +178,37 @@ class TestStacking(unittest.TestCase):
         self.assertLess(ax.xaxis.get_zorder(), band.get_zorder())
         self.assertLess(band.get_zorder(), ax.lines[0].get_zorder())
 
+    def test_reference_line_above_marks_and_bands(self):
+        figure = LineChart(
+            data=LINE,
+            vspans={"xmin": 1, "xmax": 3},
+            hlines={"y": 2, "label": "ref"},
+        )
+        ax = figure.axes[0]
+        (band,) = band_patches(ax)
+        (line,) = [c for c in ax.collections if c.get_label() == "ref"]
+        self.assertGreater(line.get_zorder(), ax.lines[0].get_zorder())
+        self.assertGreater(line.get_zorder(), band.get_zorder())
+        # annotations stay on top of reference lines
+        self.assertLess(line.get_zorder(), 5)
+
+    def test_reference_line_above_standalone_marks(self):
+        figure = ScatterChart(data=LINE, vlines={"x": 2, "label": "ref"})
+        ax = figure.axes[0]
+        (line,) = [c for c in ax.collections if c.get_label() == "ref"]
+        points = [c for c in ax.collections if c is not line]
+        self.assertGreater(line.get_zorder(), max(p.get_zorder() for p in points))
+
     def test_theme_zorder_moves_band(self):
         config.update_config({"plot_hspan_zorder": 10})
-        figure = LineChart(data=LINE, hspans={"ymin": 1, "ymax": 3})
-        (band,) = band_patches(figure.axes[0])
+        figure = LineChart(
+            data=LINE, hspans={"ymin": 1, "ymax": 3}, hlines={"y": 2, "label": "ref"}
+        )
+        ax = figure.axes[0]
+        (band,) = band_patches(ax)
         self.assertEqual(band.get_zorder(), 10)
+        (line,) = [c for c in ax.collections if c.get_label() == "ref"]
+        self.assertLess(line.get_zorder(), band.get_zorder())
 
     def test_default_color_is_muted_grey(self):
         figure = LineChart(data=LINE, vspans={"xmin": 1, "xmax": 3})

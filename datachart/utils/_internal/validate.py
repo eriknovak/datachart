@@ -162,6 +162,31 @@ def validate_value_step(step):
     return step
 
 
+def validate_contour_levels(levels) -> List[float]:
+    """Validate an explicit contour level list; returns it sorted and deduplicated."""
+
+    values = list(levels) if np.iterable(levels) else []
+    if not values or not all(
+        isinstance(v, Real) and not isinstance(v, bool) and math.isfinite(v)
+        for v in values
+    ):
+        raise ValueError(
+            f"Invalid contour `levels` list {levels!r}. "
+            "Must be a list holding at least one finite number."
+        )
+    return sorted({float(v) for v in values})
+
+
+def validate_filled_levels(levels) -> None:
+    """Raise unless explicit filled-contour levels hold at least two values."""
+
+    if isinstance(levels, list) and len(levels) < 2:
+        raise ValueError(
+            f"Invalid contour `levels` {levels!r} for a filled contour. "
+            "Bands need at least two distinct levels; add a level or pass a count."
+        )
+
+
 def validate_baseline(baseline):
     """Validate a stacked area baseline; None means the zero baseline."""
 
