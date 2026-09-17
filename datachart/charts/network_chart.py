@@ -163,8 +163,8 @@ def NetworkChart(
             are malformed (a node without an id or a repeated id, an edge
             naming an unknown node or joining a node to itself, a `size` or
             `weight` not above zero, a node without `x`/`y`, or with one
-            outside 0–1, under the fixed layout, an `emphasis` that is not a role), or
-            `plot_network_edge_style` is a headed connector look.
+            outside 0–1, under the fixed layout, an `emphasis` that is not a
+            role), or `plot_network_edge_style` is a headed connector look.
 
     """
     if emphasis is not None:

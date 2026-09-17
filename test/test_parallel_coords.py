@@ -35,6 +35,10 @@ class TestDimensions(unittest.TestCase):
         )
         self.assertEqual(dimension_labels(figure), ["b", "a", "c"])
 
+    def test_list_of_lists_with_a_missing_entry_detects_that_set(self):
+        figure = ParallelCoords([SET_A, SET_B], dimensions=[None, ["a", "b", "c", "d"]])
+        self.assertEqual(dimension_labels(figure), ["a", "b", "c", "d"])
+
     def test_different_list_of_lists_raises(self):
         with self.assertRaisesRegex(ValueError, "must share the same dimensions"):
             ParallelCoords([SET_A, SET_B], dimensions=[["a", "b"], ["b", "a"]])

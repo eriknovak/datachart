@@ -25,7 +25,7 @@ def _get_indexed_value(value: Any, index: int, is_list_type: bool = False) -> An
 
     if is_list_type:
         # For list-type values like xticks, check if it's a list of lists
-        if isinstance(value, list) and len(value) > 0 and isinstance(value[0], list):
+        if isinstance(value, list) and any(isinstance(v, list) for v in value):
             return value[index] if index < len(value) else None
         return value
     else:
