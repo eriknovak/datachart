@@ -355,7 +355,7 @@ RidgelinePlot(
 
 ### Text annotations
 
-Where a reference line marks a value, a note explains a row. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (value, row position) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. Rows sit at positions `1`, `2`, `3`, … from the top, and a ridge rises toward smaller positions: `(4, 0.6)` is a point inside January's ridge, just above its baseline. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling.
+Where a reference line marks a value, a note explains a row. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (value, row position) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. Rows sit at positions `0`, `1`, `2`, … from the top, and a ridge rises toward smaller positions: `(4, -0.4)` is a point inside January's ridge, just above its baseline. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling.
 
 ```
 RidgelinePlot(
@@ -366,7 +366,7 @@ RidgelinePlot(
         "x": 0.62,
         "y": 0.9,
         "coords": "axes",
-        "target": (4, 0.6),
+        "target": (4, -0.4),
     },
     title="Daily mean temperature in Ljubljana",
     xlabel="Temperature (°C)",

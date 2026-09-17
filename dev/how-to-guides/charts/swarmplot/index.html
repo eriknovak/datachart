@@ -6206,14 +6206,14 @@ SwarmPlot(
             <span class="s2">"x"</span><span class="p">:</span> <span class="mf">0.22</span><span class="p">,</span>
             <span class="s2">"y"</span><span class="p">:</span> <span class="mf">0.07</span><span class="p">,</span>
             <span class="s2">"coords"</span><span class="p">:</span> <span class="s2">"axes"</span><span class="p">,</span>
-            <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span>
+            <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span>
         <span class="p">},</span>
         <span class="p">{</span>
             <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"Joe Biden and</span><span class="se">\n</span><span class="s2">Donald Trump, 78"</span><span class="p">,</span>
             <span class="s2">"x"</span><span class="p">:</span> <span class="mf">0.62</span><span class="p">,</span>
             <span class="s2">"y"</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">,</span>
             <span class="s2">"coords"</span><span class="p">:</span> <span class="s2">"axes"</span><span class="p">,</span>
-            <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">78</span><span class="p">),</span>
+            <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">78</span><span class="p">),</span>
         <span class="p">},</span>
     <span class="p">],</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Age of US presidents at inauguration"</span><span class="p">,</span>
@@ -6235,14 +6235,14 @@ SwarmPlot(
             "x": 0.22,
             "y": 0.07,
             "coords": "axes",
-            "target": (2, 42),
+            "target": (1, 42),
         },
         {
             "text": "Joe Biden and\nDonald Trump, 78",
             "x": 0.62,
             "y": 0.85,
             "coords": "axes",
-            "target": (3, 78),
+            "target": (2, 78),
         },
     ],
     title="Age of US presidents at inauguration",
@@ -7219,8 +7219,8 @@ president_records[:2]</div>
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="c1"># point at the single best run; groups sit at positions 1, 2, 3, ...</span>
-<span class="n">position</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">MODELS</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">BEST_RUN</span><span class="p">[</span><span class="s2">"label"</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="c1"># point at the single best run; groups sit at positions 0, 1, 2, ...</span>
+<span class="n">position</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">MODELS</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">BEST_RUN</span><span class="p">[</span><span class="s2">"label"</span><span class="p">])</span>
 <span class="n">Annotate</span><span class="p">(</span>
     <span class="n">panel</span><span class="p">,</span>
     <span class="n">texts</span><span class="o">=</span><span class="p">{</span>
@@ -7250,8 +7250,8 @@ panel = Panel(
     show_grid=SHOW_GRID.Y,
 )
 
-# point at the single best run; groups sit at positions 1, 2, 3, ...
-position = list(MODELS).index(BEST_RUN["label"]) + 1
+# point at the single best run; groups sit at positions 0, 1, 2, ...
+position = list(MODELS).index(BEST_RUN["label"])
 Annotate(
     panel,
     texts={

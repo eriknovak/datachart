@@ -5277,7 +5277,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">order the boxes by their median</td>
-<td style="text-align:left">the order of <code>data</code></td>
+<td style="text-align:left"><code>sort</code></td>
 <td style="text-align:left"><a href="#box-order">Box order</a></td>
 </tr>
 <tr>
@@ -5589,7 +5589,7 @@ BoxPlot(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="box-order">Box order<a class="anchor-link" href="#box-order">¶</a></h3><p>The boxes follow the order in which their labels first appear in the data, which is often an accident of how the file was written. Ordered by their median, the boxes read as a ranking. <code>BoxPlot</code> has no sort parameter, so the order is set by sorting the data points themselves: here by the median body mass of each species, heaviest first. Adelie and Chinstrap penguins share a median of 3,700 g, and a stable sort keeps them in their input order.</p>
+<h3 id="box-order">Box order<a class="anchor-link" href="#box-order">¶</a></h3><p>The boxes follow the order in which their labels first appear in the data, which is often an accident of how the file was written. Ordered by their median, the boxes read as a ranking. <code>sort</code> orders the boxes by their median, <code>"ascending"</code> or <code>"descending"</code>, also available as the <a href="../../../references/constants/#datachart.constants.SORT">SORT</a> constants: here by the median body mass of each species, heaviest first. Adelie and Chinstrap penguins share a median of 3,700 g, and ties keep their input order. An <code>emphasis</code> list stays aligned with the input order, whatever the sort.</p>
 </div>
 </div>
 </div>
@@ -5612,19 +5612,12 @@ BoxPlot(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">statistics</span><span class="w"> </span><span class="kn">import</span> <span class="n">median</span>
-
-<span class="n">SPECIES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Adelie"</span><span class="p">,</span> <span class="s2">"Chinstrap"</span><span class="p">,</span> <span class="s2">"Gentoo"</span><span class="p">]</span>
-<span class="c1"># the median body mass of each species</span>
-<span class="n">species_median</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">species</span><span class="p">:</span> <span class="n">median</span><span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">body_mass</span> <span class="k">if</span> <span class="n">point</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span> <span class="o">==</span> <span class="n">species</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">species</span> <span class="ow">in</span> <span class="n">SPECIES</span>
-<span class="p">}</span>
-<span class="c1"># heaviest species first</span>
-<span class="n">by_median</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">body_mass</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">point</span><span class="p">:</span> <span class="o">-</span><span class="n">species_median</span><span class="p">[</span><span class="n">point</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]])</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SORT</span>
 
 <span class="n">BoxPlot</span><span class="p">(</span>
-    <span class="n">data</span><span class="o">=</span><span class="n">by_median</span><span class="p">,</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">body_mass</span><span class="p">,</span>
+    <span class="c1"># heaviest species first</span>
+    <span class="n">sort</span><span class="o">=</span><span class="n">SORT</span><span class="o">.</span><span class="n">DESCENDING</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Body mass of Palmer penguins, heaviest species first"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Species"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Body mass (g)"</span><span class="p">,</span>
@@ -5633,19 +5626,12 @@ BoxPlot(
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">from statistics import median
-
-SPECIES = ["Adelie", "Chinstrap", "Gentoo"]
-# the median body mass of each species
-species_median = {
-    species: median(point["value"] for point in body_mass if point["label"] == species)
-    for species in SPECIES
-}
-# heaviest species first
-by_median = sorted(body_mass, key=lambda point: -species_median[point["label"]])
+<div class="clipboard-copy-txt" id="cell-6">from datachart.constants import SORT
 
 BoxPlot(
-    data=by_median,
+    data=body_mass,
+    # heaviest species first
+    sort=SORT.DESCENDING,
     title="Body mass of Palmer penguins, heaviest species first",
     xlabel="Species",
     ylabel="Body mass (g)",
@@ -6215,7 +6201,7 @@ BoxPlot(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="reference-lines">Reference lines<a class="anchor-link" href="#reference-lines">¶</a></h3><p>A box on its own says little about whether its values are high or low; a reference line gives it something to be compared with, such as a threshold or the overall mean. <code>hlines</code> draws a horizontal line at a value and <code>vlines</code> a vertical one; positions along the group axis are box positions, and the first box sits at <code>1</code>, so a half-integer sits between two boxes. Each takes a dictionary or a list of them, with the position, an optional <code>label</code> for the legend and a <code>style</code> whose line style is a <a href="../../../references/constants/#datachart.constants.LINE_STYLE">LINE_STYLE</a> value; the keys are listed in <a href="../../../references/typings/#datachart.typings.HLineSettingAttrs">HLineSettingAttrs</a> and <a href="../../../references/typings/#datachart.typings.VLineSettingAttrs">VLineSettingAttrs</a>. The dashed line marks the mean body mass of all 342 penguins: the whole Gentoo box sits above it, and the Adelie and Chinstrap boxes below it. A dotted vertical line separates the two small species from the Gentoo.</p>
+<h3 id="reference-lines">Reference lines<a class="anchor-link" href="#reference-lines">¶</a></h3><p>A box on its own says little about whether its values are high or low; a reference line gives it something to be compared with, such as a threshold or the overall mean. <code>hlines</code> draws a horizontal line at a value and <code>vlines</code> a vertical one; positions along the group axis are box positions, and the first box sits at <code>0</code>, as the first bar does, so a half-integer sits between two boxes. Each takes a dictionary or a list of them, with the position, an optional <code>label</code> for the legend and a <code>style</code> whose line style is a <a href="../../../references/constants/#datachart.constants.LINE_STYLE">LINE_STYLE</a> value; the keys are listed in <a href="../../../references/typings/#datachart.typings.HLineSettingAttrs">HLineSettingAttrs</a> and <a href="../../../references/typings/#datachart.typings.VLineSettingAttrs">VLineSettingAttrs</a>. The dashed line marks the mean body mass of all 342 penguins: the whole Gentoo box sits above it, and the Adelie and Chinstrap boxes below it. A dotted vertical line separates the two small species from the Gentoo.</p>
 </div>
 </div>
 </div>
@@ -6251,7 +6237,7 @@ BoxPlot(
         <span class="s2">"style"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"plot_hline_color"</span><span class="p">:</span> <span class="s2">"#d62728"</span><span class="p">,</span> <span class="s2">"plot_hline_style"</span><span class="p">:</span> <span class="n">LINE_STYLE</span><span class="o">.</span><span class="n">DASHED</span><span class="p">,</span> <span class="s2">"plot_hline_width"</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">},</span>
     <span class="p">},</span>
     <span class="c1"># a dotted line between the second and the third box</span>
-    <span class="n">vlines</span><span class="o">=</span><span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span> <span class="s2">"style"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"plot_vline_color"</span><span class="p">:</span> <span class="s2">"#888888"</span><span class="p">,</span> <span class="s2">"plot_vline_style"</span><span class="p">:</span> <span class="n">LINE_STYLE</span><span class="o">.</span><span class="n">DOTTED</span><span class="p">}},</span>
+    <span class="n">vlines</span><span class="o">=</span><span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="s2">"style"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"plot_vline_color"</span><span class="p">:</span> <span class="s2">"#888888"</span><span class="p">,</span> <span class="s2">"plot_vline_style"</span><span class="p">:</span> <span class="n">LINE_STYLE</span><span class="o">.</span><span class="n">DOTTED</span><span class="p">}},</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Body mass of Palmer penguins against the overall mean"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Species"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Body mass (g)"</span><span class="p">,</span>
@@ -6273,7 +6259,7 @@ BoxPlot(
         "style": {"plot_hline_color": "#d62728", "plot_hline_style": LINE_STYLE.DASHED, "plot_hline_width": 1.5},
     },
     # a dotted line between the second and the third box
-    vlines={"x": 2.5, "style": {"plot_vline_color": "#888888", "plot_vline_style": LINE_STYLE.DOTTED}},
+    vlines={"x": 1.5, "style": {"plot_vline_color": "#888888", "plot_vline_style": LINE_STYLE.DOTTED}},
     title="Body mass of Palmer penguins against the overall mean",
     xlabel="Species",
     ylabel="Body mass (g)",
@@ -6445,7 +6431,7 @@ BoxPlot(
         <span class="s2">"x"</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
         <span class="s2">"y"</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
         <span class="s2">"coords"</span><span class="p">:</span> <span class="s2">"axes"</span><span class="p">,</span>
-        <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">lightest</span><span class="p">),</span>
+        <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">lightest</span><span class="p">),</span>
     <span class="p">},</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Body mass of Palmer penguins"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Species"</span><span class="p">,</span>
@@ -6465,7 +6451,7 @@ BoxPlot(
         "x": 0.6,
         "y": 0.2,
         "coords": "axes",
-        "target": (2, lightest),
+        "target": (1, lightest),
     },
     title="Body mass of Palmer penguins",
     xlabel="Species",
@@ -6735,7 +6721,7 @@ Panel(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="multiple-box-plots">Multiple Box Plots<a class="anchor-link" href="#multiple-box-plots">¶</a></h2><p>To compare several datasets over the same groups, pass a list of lists to <code>data</code>: each inner list is one dataset, and the per-dataset attributes (<code>subtitle</code>, <code>style</code>, <code>hlines</code> and the other reference settings) become lists aligned with it. Boxes never overlay each other, so each dataset is drawn in its own subplot, which <code>subplots=True</code> makes explicit; <code>subtitle</code> titles the subplots, while <code>title</code>, <code>xlabel</code> and <code>ylabel</code> stay global. The hidden cell splits the penguins by sex into <code>body_mass_by_sex</code>, the 165 female and the 168 male penguins (the 9 penguins without a recorded sex are left out). A style per subplot colors each sex.</p>
+<h2 id="multiple-box-plots">Multiple Box Plots<a class="anchor-link" href="#multiple-box-plots">¶</a></h2><p>To compare several datasets over the same groups, pass a list of lists to <code>data</code>: each inner list is one dataset, and the per-dataset attributes (<code>subtitle</code>, <code>style</code>, <code>hlines</code> and the other reference settings) become lists aligned with it. Boxes never overlay each other, so each dataset is drawn in its own subplot, which <code>subplots=True</code> requires; <code>subtitle</code> titles the subplots, while <code>title</code>, <code>xlabel</code> and <code>ylabel</code> stay global. The hidden cell splits the penguins by sex into <code>body_mass_by_sex</code>, the 165 female and the 168 male penguins (the 9 penguins without a recorded sex are left out). A style per subplot colors each sex.</p>
 </div>
 </div>
 </div>
@@ -7510,7 +7496,7 @@ penguin_records[:2]</div>
         <span class="s2">"x"</span><span class="p">:</span> <span class="mf">0.55</span><span class="p">,</span>
         <span class="s2">"y"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
         <span class="s2">"coords"</span><span class="p">:</span> <span class="s2">"axes"</span><span class="p">,</span>
-        <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">700</span><span class="p">),</span>
+        <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">700</span><span class="p">),</span>
     <span class="p">},</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"All services, log scale"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Response time (ms)"</span><span class="p">,</span>
@@ -7564,7 +7550,7 @@ overview = BoxPlot(
         "x": 0.55,
         "y": 0.9,
         "coords": "axes",
-        "target": (4, 700),
+        "target": (3, 700),
     },
     title="All services, log scale",
     ylabel="Response time (ms)",

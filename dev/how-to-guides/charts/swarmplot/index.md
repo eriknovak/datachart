@@ -319,14 +319,14 @@ SwarmPlot(
             "x": 0.22,
             "y": 0.07,
             "coords": "axes",
-            "target": (2, 42),
+            "target": (1, 42),
         },
         {
             "text": "Joe Biden and\nDonald Trump, 78",
             "x": 0.62,
             "y": 0.85,
             "coords": "axes",
-            "target": (3, 78),
+            "target": (2, 78),
         },
     ],
     title="Age of US presidents at inauguration",
@@ -611,8 +611,8 @@ panel = Panel(
     show_grid=SHOW_GRID.Y,
 )
 
-# point at the single best run; groups sit at positions 1, 2, 3, ...
-position = list(MODELS).index(BEST_RUN["label"]) + 1
+# point at the single best run; groups sit at positions 0, 1, 2, ...
+position = list(MODELS).index(BEST_RUN["label"])
 Annotate(
     panel,
     texts={

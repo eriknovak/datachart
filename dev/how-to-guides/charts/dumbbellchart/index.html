@@ -6308,7 +6308,7 @@ DumbbellChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="reference-lines-and-bands">Reference lines and bands<a class="anchor-link" href="#reference-lines-and-bands">¶</a></h3><p>A reference value puts the rows in context: where does the world stand, which rows have crossed a threshold. In the default horizontal chart a value is marked with <code>vlines</code> (a vertical line at a value) and a range shaded with <code>vspans</code>; <code>hlines</code> and <code>hspans</code> take positions along the category axis, which are row positions (<code>1</code> for the first row, <code>2</code> for the second, …), so a half-integer sits between two rows; a vertical chart swaps the pairs. Each takes a dictionary or a list of them, with the position, an optional <code>label</code> for the legend and a <code>style</code>; the keys are listed in <a href="../../../references/typings/#datachart.typings.VLineSettingAttrs">VLineSettingAttrs</a>, <a href="../../../references/typings/#datachart.typings.HLineSettingAttrs">HLineSettingAttrs</a>, <a href="../../../references/typings/#datachart.typings.VSpanSettingAttrs">VSpanSettingAttrs</a> and <a href="../../../references/typings/#datachart.typings.HSpanSettingAttrs">HSpanSettingAttrs</a>. The example marks the global life expectancy of 2019 with a dotted line and shades the band above 80 years, which five countries had reached by 2019 and only Japan had in 2000.</p>
+<h3 id="reference-lines-and-bands">Reference lines and bands<a class="anchor-link" href="#reference-lines-and-bands">¶</a></h3><p>A reference value puts the rows in context: where does the world stand, which rows have crossed a threshold. In the default horizontal chart a value is marked with <code>vlines</code> (a vertical line at a value) and a range shaded with <code>vspans</code>; <code>hlines</code> and <code>hspans</code> take positions along the category axis, which are row positions (<code>0</code> for the first row, <code>1</code> for the second, …), so a half-integer sits between two rows; a vertical chart swaps the pairs. Each takes a dictionary or a list of them, with the position, an optional <code>label</code> for the legend and a <code>style</code>; the keys are listed in <a href="../../../references/typings/#datachart.typings.VLineSettingAttrs">VLineSettingAttrs</a>, <a href="../../../references/typings/#datachart.typings.HLineSettingAttrs">HLineSettingAttrs</a>, <a href="../../../references/typings/#datachart.typings.VSpanSettingAttrs">VSpanSettingAttrs</a> and <a href="../../../references/typings/#datachart.typings.HSpanSettingAttrs">HSpanSettingAttrs</a>. The example marks the global life expectancy of 2019 with a dotted line and shades the band above 80 years, which five countries had reached by 2019 and only Japan had in 2000.</p>
 </div>
 </div>
 </div>
@@ -6394,7 +6394,7 @@ DumbbellChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="text-annotations">Text annotations<a class="anchor-link" href="#text-annotations">¶</a></h3><p>Where a reference line marks a value, a note explains a row. <code>texts</code> places text on the chart, with an optional <code>target</code> to draw a connector to a point; the position is in data coordinates by default (value and row position in a horizontal chart, the first row at <code>1</code>) or in axes fractions with <code>"coords": "axes"</code>, which keeps the note in place whatever the axis limits. The <a href="../../utility/annotations/">Text Annotations</a> guide covers placement, connector looks and styling. The note below points at Russia's start dot and explains the largest gain among the European countries.</p>
+<h3 id="text-annotations">Text annotations<a class="anchor-link" href="#text-annotations">¶</a></h3><p>Where a reference line marks a value, a note explains a row. <code>texts</code> places text on the chart, with an optional <code>target</code> to draw a connector to a point; the position is in data coordinates by default (value and row position in a horizontal chart, the first row at <code>0</code>) or in axes fractions with <code>"coords": "axes"</code>, which keeps the note in place whatever the axis limits. The <a href="../../utility/annotations/">Text Annotations</a> guide covers placement, connector looks and styling. The note below points at Russia's start dot and explains the largest gain among the European countries.</p>
 </div>
 </div>
 </div>
@@ -6417,8 +6417,8 @@ DumbbellChart(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># row positions start at 1</span>
-<span class="n">RUSSIA</span> <span class="o">=</span> <span class="p">[</span><span class="n">record</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">life</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"Russia"</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># row positions start at 0</span>
+<span class="n">RUSSIA</span> <span class="o">=</span> <span class="p">[</span><span class="n">record</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">life</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"Russia"</span><span class="p">)</span>
 
 <span class="n">DumbbellChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">life</span><span class="p">,</span>
@@ -6440,8 +6440,8 @@ DumbbellChart(
     <span class="n">xmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-17"># row positions start at 1
-RUSSIA = [record["label"] for record in life].index("Russia") + 1
+<div class="clipboard-copy-txt" id="cell-17"># row positions start at 0
+RUSSIA = [record["label"] for record in life].index("Russia")
 
 DumbbellChart(
     data=life,
@@ -7159,7 +7159,7 @@ figure.show()</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># the row of the one department whose wait got longer, once sorted by the change</span>
 <span class="n">by_change</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">waits</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">record</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s2">"end"</span><span class="p">]</span> <span class="o">-</span> <span class="n">record</span><span class="p">[</span><span class="s2">"start"</span><span class="p">])</span>
 <span class="n">worse</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">record</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">by_change</span> <span class="k">if</span> <span class="n">record</span><span class="p">[</span><span class="s2">"end"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">record</span><span class="p">[</span><span class="s2">"start"</span><span class="p">])</span>
-<span class="n">WORSE_ROW</span> <span class="o">=</span> <span class="n">by_change</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">worse</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">WORSE_ROW</span> <span class="o">=</span> <span class="n">by_change</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">worse</span><span class="p">)</span>
 
 <span class="n">DumbbellChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">waits</span><span class="p">,</span>
@@ -7195,7 +7195,7 @@ figure.show()</div>
 <div class="clipboard-copy-txt" id="cell-26"># the row of the one department whose wait got longer, once sorted by the change
 by_change = sorted(waits, key=lambda record: record["end"] - record["start"])
 worse = next(record for record in by_change if record["end"] &gt; record["start"])
-WORSE_ROW = by_change.index(worse) + 1
+WORSE_ROW = by_change.index(worse)
 
 DumbbellChart(
     data=waits,

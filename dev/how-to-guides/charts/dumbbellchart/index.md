@@ -325,7 +325,7 @@ DumbbellChart(
 
 ### Reference lines and bands
 
-A reference value puts the rows in context: where does the world stand, which rows have crossed a threshold. In the default horizontal chart a value is marked with `vlines` (a vertical line at a value) and a range shaded with `vspans`; `hlines` and `hspans` take positions along the category axis, which are row positions (`1` for the first row, `2` for the second, …), so a half-integer sits between two rows; a vertical chart swaps the pairs. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) and [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs). The example marks the global life expectancy of 2019 with a dotted line and shades the band above 80 years, which five countries had reached by 2019 and only Japan had in 2000.
+A reference value puts the rows in context: where does the world stand, which rows have crossed a threshold. In the default horizontal chart a value is marked with `vlines` (a vertical line at a value) and a range shaded with `vspans`; `hlines` and `hspans` take positions along the category axis, which are row positions (`0` for the first row, `1` for the second, …), so a half-integer sits between two rows; a vertical chart swaps the pairs. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) and [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs). The example marks the global life expectancy of 2019 with a dotted line and shades the band above 80 years, which five countries had reached by 2019 and only Japan had in 2000.
 
 ```
 DumbbellChart(
@@ -351,11 +351,11 @@ DumbbellChart(
 
 ### Text annotations
 
-Where a reference line marks a value, a note explains a row. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (value and row position in a horizontal chart, the first row at `1`) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The note below points at Russia's start dot and explains the largest gain among the European countries.
+Where a reference line marks a value, a note explains a row. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (value and row position in a horizontal chart, the first row at `0`) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The note below points at Russia's start dot and explains the largest gain among the European countries.
 
 ```
-# row positions start at 1
-RUSSIA = [record["label"] for record in life].index("Russia") + 1
+# row positions start at 0
+RUSSIA = [record["label"] for record in life].index("Russia")
 
 DumbbellChart(
     data=life,
@@ -557,7 +557,7 @@ DumbbellChart(
 # the row of the one department whose wait got longer, once sorted by the change
 by_change = sorted(waits, key=lambda record: record["end"] - record["start"])
 worse = next(record for record in by_change if record["end"] > record["start"])
-WORSE_ROW = by_change.index(worse) + 1
+WORSE_ROW = by_change.index(worse)
 
 DumbbellChart(
     data=waits,

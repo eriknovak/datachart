@@ -324,7 +324,7 @@ ViolinPlot(
 
 ### Reference lines and bands
 
-Reference lines and bands put the violins in context. `hlines` draws a horizontal line at a value, such as the mean of all birds, and `vlines` a vertical one; the violins sit at positions `1`, `2`, `3`, … along the group axis, so a half-integer falls between two violins. `hspans` and `vspans` shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). The example marks the mean of all 342 birds and shades one standard deviation around it: the mean falls in the gap between the lighter species and the Gentoo, where few birds of any species sit, which is why a single average describes none of them well.
+Reference lines and bands put the violins in context. `hlines` draws a horizontal line at a value, such as the mean of all birds, and `vlines` a vertical one; the violins sit at positions `0`, `1`, `2`, … along the group axis, as bars do, so a half-integer falls between two violins. `hspans` and `vspans` shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). The example marks the mean of all 342 birds and shades one standard deviation around it: the mean falls in the gap between the lighter species and the Gentoo, where few birds of any species sit, which is why a single average describes none of them well.
 
 ```
 from statistics import mean, pstdev
@@ -375,8 +375,8 @@ ViolinPlot(
         "x": 0.3,
         "y": 0.85,
         "coords": "axes",
-        # the Gentoo violin sits at position 3
-        "target": (2.78, 4900),
+        # the Gentoo violin sits at position 2
+        "target": (1.78, 4900),
     },
     title="Body mass of Palmer penguins",
     xlabel="Species",

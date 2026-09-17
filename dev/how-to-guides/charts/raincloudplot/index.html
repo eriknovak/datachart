@@ -6121,7 +6121,7 @@ RaincloudPlot(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="reference-lines-and-bands">Reference lines and bands<a class="anchor-link" href="#reference-lines-and-bands">¶</a></h3><p>Reference lines and bands put the rainclouds in context. <code>hlines</code> draws a horizontal line at a value, such as the mean of all penguins, and <code>vlines</code> a vertical one; group positions along the category axis start at <code>1</code>, so a half-integer sits between two groups. <code>hspans</code> and <code>vspans</code> shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position and a <code>style</code>; the keys are listed in <a href="../../../references/typings/#datachart.typings.HLineSettingAttrs">HLineSettingAttrs</a>, <a href="../../../references/typings/#datachart.typings.VLineSettingAttrs">VLineSettingAttrs</a>, <a href="../../../references/typings/#datachart.typings.HSpanSettingAttrs">HSpanSettingAttrs</a> and <a href="../../../references/typings/#datachart.typings.VSpanSettingAttrs">VSpanSettingAttrs</a>. A band of one standard deviation around the overall mean shows that a typical Adelie or Chinstrap penguin falls inside it, while most Gentoo penguins sit above it.</p>
+<h3 id="reference-lines-and-bands">Reference lines and bands<a class="anchor-link" href="#reference-lines-and-bands">¶</a></h3><p>Reference lines and bands put the rainclouds in context. <code>hlines</code> draws a horizontal line at a value, such as the mean of all penguins, and <code>vlines</code> a vertical one; group positions along the category axis start at <code>0</code>, as for bars, so a half-integer sits between two groups. <code>hspans</code> and <code>vspans</code> shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position and a <code>style</code>; the keys are listed in <a href="../../../references/typings/#datachart.typings.HLineSettingAttrs">HLineSettingAttrs</a>, <a href="../../../references/typings/#datachart.typings.VLineSettingAttrs">VLineSettingAttrs</a>, <a href="../../../references/typings/#datachart.typings.HSpanSettingAttrs">HSpanSettingAttrs</a> and <a href="../../../references/typings/#datachart.typings.VSpanSettingAttrs">VSpanSettingAttrs</a>. A band of one standard deviation around the overall mean shows that a typical Adelie or Chinstrap penguin falls inside it, while most Gentoo penguins sit above it.</p>
 </div>
 </div>
 </div>
@@ -6219,7 +6219,7 @@ RaincloudPlot(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="text-annotations">Text annotations<a class="anchor-link" href="#text-annotations">¶</a></h3><p>Where a reference line marks a value, a note explains it. <code>texts</code> places text on the chart, with an optional <code>target</code> to draw a connector to a point; the position is in data coordinates by default (group position, value) or in axes fractions with <code>"coords": "axes"</code>, which keeps the note in place whatever the axis limits. The <a href="../../utility/annotations/">Text Annotations</a> guide covers placement, connector looks and styling. The note below points at the heaviest penguin of the dataset, a 6.3 kg Gentoo male, whose rain point sits just left of the Gentoo position <code>3</code>.</p>
+<h3 id="text-annotations">Text annotations<a class="anchor-link" href="#text-annotations">¶</a></h3><p>Where a reference line marks a value, a note explains it. <code>texts</code> places text on the chart, with an optional <code>target</code> to draw a connector to a point; the position is in data coordinates by default (group position, value) or in axes fractions with <code>"coords": "axes"</code>, which keeps the note in place whatever the axis limits. The <a href="../../utility/annotations/">Text Annotations</a> guide covers placement, connector looks and styling. The note below points at the heaviest penguin of the dataset, a 6.3 kg Gentoo male, whose rain point sits just left of the Gentoo position <code>2</code>.</p>
 </div>
 </div>
 </div>
@@ -6252,7 +6252,7 @@ RaincloudPlot(
         <span class="s2">"x"</span><span class="p">:</span> <span class="mf">0.36</span><span class="p">,</span>
         <span class="s2">"y"</span><span class="p">:</span> <span class="mf">0.93</span><span class="p">,</span>
         <span class="s2">"coords"</span><span class="p">:</span> <span class="s2">"axes"</span><span class="p">,</span>
-        <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mf">2.87</span><span class="p">,</span> <span class="n">heaviest</span><span class="p">),</span>
+        <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.87</span><span class="p">,</span> <span class="n">heaviest</span><span class="p">),</span>
     <span class="p">},</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Body mass of Palmer penguins"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Species"</span><span class="p">,</span>
@@ -6271,7 +6271,7 @@ RaincloudPlot(
         "x": 0.36,
         "y": 0.93,
         "coords": "axes",
-        "target": (2.87, heaviest),
+        "target": (1.87, heaviest),
     },
     title="Body mass of Palmer penguins",
     xlabel="Species",
@@ -6702,12 +6702,12 @@ body_mass_by_sex = [
 
 <span class="n">mean_by_species</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span>
-        <span class="c1"># group positions start at 1</span>
+        <span class="c1"># group positions start at 0</span>
         <span class="s2">"x"</span><span class="p">:</span> <span class="n">position</span><span class="p">,</span>
         <span class="s2">"y"</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">chart_data</span> <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span> <span class="o">==</span> <span class="n">species</span><span class="p">)</span>
         <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">chart_data</span> <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span> <span class="o">==</span> <span class="n">species</span><span class="p">),</span>
     <span class="p">}</span>
-    <span class="k">for</span> <span class="n">position</span><span class="p">,</span> <span class="n">species</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">SPECIES</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">position</span><span class="p">,</span> <span class="n">species</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">SPECIES</span><span class="p">)</span>
 <span class="p">]</span>
 
 <span class="n">Panel</span><span class="p">(</span>
@@ -6728,12 +6728,12 @@ from datachart.utils import Panel
 
 mean_by_species = [
     {
-        # group positions start at 1
+        # group positions start at 0
         "x": position,
         "y": sum(p["value"] for p in chart_data if p["label"] == species)
         / sum(1 for p in chart_data if p["label"] == species),
     }
-    for position, species in enumerate(SPECIES, start=1)
+    for position, species in enumerate(SPECIES)
 ]
 
 Panel(
@@ -7308,7 +7308,7 @@ flipper_records[:2]</div>
             <span class="s2">"x"</span><span class="p">:</span> <span class="mf">0.62</span><span class="p">,</span>
             <span class="s2">"y"</span><span class="p">:</span> <span class="mf">0.72</span><span class="p">,</span>
             <span class="s2">"coords"</span><span class="p">:</span> <span class="s2">"axes"</span><span class="p">,</span>
-            <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+            <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
         <span class="p">},</span>
     <span class="p">],</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Delivery time"</span><span class="p">,</span>
@@ -7359,7 +7359,7 @@ rainclouds = RaincloudPlot(
             "x": 0.62,
             "y": 0.72,
             "coords": "axes",
-            "target": (80, 3),
+            "target": (80, 2),
         },
     ],
     title="Delivery time",

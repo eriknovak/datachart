@@ -37,7 +37,7 @@ Every customization is either a keyword argument of `BoxPlot` or a `plot_box_*` 
 | set the axis range, ticks and tick format     | `ymin`, `ymax`, `yticks`, `yticks_format`                     | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
 | resize the figure                             | `figsize`                                                     | [Figure size and grid](#figure-size-and-grid)                                                           |
 | show grid lines                               | `show_grid`                                                   | [Figure size and grid](#figure-size-and-grid)                                                           |
-| order the boxes by their median               | the order of `data`                                           | [Box order](#box-order)                                                                                 |
+| order the boxes by their median               | `sort`                                                        | [Box order](#box-order)                                                                                 |
 | change the box fill, edge, median or outliers | `style={"plot_box_color": ..., "plot_box_median_color": ...}` | [Box style](#box-style)                                                                                 |
 | draw the boxes horizontally                   | `orientation`                                                 | [Horizontal boxes](#horizontal-boxes)                                                                   |
 | hide the outliers                             | `show_outliers`                                               | [Showing and hiding outliers](#showing-and-hiding-outliers)                                             |
@@ -121,22 +121,15 @@ BoxPlot(
 
 ### Box order
 
-The boxes follow the order in which their labels first appear in the data, which is often an accident of how the file was written. Ordered by their median, the boxes read as a ranking. `BoxPlot` has no sort parameter, so the order is set by sorting the data points themselves: here by the median body mass of each species, heaviest first. Adelie and Chinstrap penguins share a median of 3,700 g, and a stable sort keeps them in their input order.
+The boxes follow the order in which their labels first appear in the data, which is often an accident of how the file was written. Ordered by their median, the boxes read as a ranking. `sort` orders the boxes by their median, `"ascending"` or `"descending"`, also available as the [SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT) constants: here by the median body mass of each species, heaviest first. Adelie and Chinstrap penguins share a median of 3,700 g, and ties keep their input order. An `emphasis` list stays aligned with the input order, whatever the sort.
 
 ```
-from statistics import median
-
-SPECIES = ["Adelie", "Chinstrap", "Gentoo"]
-# the median body mass of each species
-species_median = {
-    species: median(point["value"] for point in body_mass if point["label"] == species)
-    for species in SPECIES
-}
-# heaviest species first
-by_median = sorted(body_mass, key=lambda point: -species_median[point["label"]])
+from datachart.constants import SORT
 
 BoxPlot(
-    data=by_median,
+    data=body_mass,
+    # heaviest species first
+    sort=SORT.DESCENDING,
     title="Body mass of Palmer penguins, heaviest species first",
     xlabel="Species",
     ylabel="Body mass (g)",
@@ -293,7 +286,7 @@ BoxPlot(
 
 ### Reference lines
 
-A box on its own says little about whether its values are high or low; a reference line gives it something to be compared with, such as a threshold or the overall mean. `hlines` draws a horizontal line at a value and `vlines` a vertical one; positions along the group axis are box positions, and the first box sits at `1`, so a half-integer sits between two boxes. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style` whose line style is a [LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE) value; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) and [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs). The dashed line marks the mean body mass of all 342 penguins: the whole Gentoo box sits above it, and the Adelie and Chinstrap boxes below it. A dotted vertical line separates the two small species from the Gentoo.
+A box on its own says little about whether its values are high or low; a reference line gives it something to be compared with, such as a threshold or the overall mean. `hlines` draws a horizontal line at a value and `vlines` a vertical one; positions along the group axis are box positions, and the first box sits at `0`, as the first bar does, so a half-integer sits between two boxes. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style` whose line style is a [LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE) value; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) and [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs). The dashed line marks the mean body mass of all 342 penguins: the whole Gentoo box sits above it, and the Adelie and Chinstrap boxes below it. A dotted vertical line separates the two small species from the Gentoo.
 
 ```
 from datachart.constants import LINE_STYLE
@@ -309,7 +302,7 @@ BoxPlot(
         "style": {"plot_hline_color": "#d62728", "plot_hline_style": LINE_STYLE.DASHED, "plot_hline_width": 1.5},
     },
     # a dotted line between the second and the third box
-    vlines={"x": 2.5, "style": {"plot_vline_color": "#888888", "plot_vline_style": LINE_STYLE.DOTTED}},
+    vlines={"x": 1.5, "style": {"plot_vline_color": "#888888", "plot_vline_style": LINE_STYLE.DOTTED}},
     title="Body mass of Palmer penguins against the overall mean",
     xlabel="Species",
     ylabel="Body mass (g)",
@@ -372,7 +365,7 @@ BoxPlot(
         "x": 0.6,
         "y": 0.2,
         "coords": "axes",
-        "target": (2, lightest),
+        "target": (1, lightest),
     },
     title="Body mass of Palmer penguins",
     xlabel="Species",
@@ -449,7 +442,7 @@ Panel(
 
 ## Multiple Box Plots
 
-To compare several datasets over the same groups, pass a list of lists to `data`: each inner list is one dataset, and the per-dataset attributes (`subtitle`, `style`, `hlines` and the other reference settings) become lists aligned with it. Boxes never overlay each other, so each dataset is drawn in its own subplot, which `subplots=True` makes explicit; `subtitle` titles the subplots, while `title`, `xlabel` and `ylabel` stay global. The hidden cell splits the penguins by sex into `body_mass_by_sex`, the 165 female and the 168 male penguins (the 9 penguins without a recorded sex are left out). A style per subplot colors each sex.
+To compare several datasets over the same groups, pass a list of lists to `data`: each inner list is one dataset, and the per-dataset attributes (`subtitle`, `style`, `hlines` and the other reference settings) become lists aligned with it. Boxes never overlay each other, so each dataset is drawn in its own subplot, which `subplots=True` requires; `subtitle` titles the subplots, while `title`, `xlabel` and `ylabel` stay global. The hidden cell splits the penguins by sex into `body_mass_by_sex`, the 165 female and the 168 male penguins (the 9 penguins without a recorded sex are left out). A style per subplot colors each sex.
 
 ```
 SEX_STYLE = [{"plot_box_color": "#e07a5f"}, {"plot_box_color": "#3d85c6"}]
@@ -666,7 +659,7 @@ overview = BoxPlot(
         "x": 0.55,
         "y": 0.9,
         "coords": "axes",
-        "target": (4, 700),
+        "target": (3, 700),
     },
     title="All services, log scale",
     ylabel="Response time (ms)",

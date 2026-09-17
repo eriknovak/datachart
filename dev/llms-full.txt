@@ -5222,7 +5222,7 @@ DumbbellChart(
 
 ### Reference lines and bands
 
-A reference value puts the rows in context: where does the world stand, which rows have crossed a threshold. In the default horizontal chart a value is marked with `vlines` (a vertical line at a value) and a range shaded with `vspans`; `hlines` and `hspans` take positions along the category axis, which are row positions (`1` for the first row, `2` for the second, …), so a half-integer sits between two rows; a vertical chart swaps the pairs. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) and [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs). The example marks the global life expectancy of 2019 with a dotted line and shades the band above 80 years, which five countries had reached by 2019 and only Japan had in 2000.
+A reference value puts the rows in context: where does the world stand, which rows have crossed a threshold. In the default horizontal chart a value is marked with `vlines` (a vertical line at a value) and a range shaded with `vspans`; `hlines` and `hspans` take positions along the category axis, which are row positions (`0` for the first row, `1` for the second, …), so a half-integer sits between two rows; a vertical chart swaps the pairs. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) and [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs). The example marks the global life expectancy of 2019 with a dotted line and shades the band above 80 years, which five countries had reached by 2019 and only Japan had in 2000.
 
 ```
 DumbbellChart(
@@ -5248,11 +5248,11 @@ DumbbellChart(
 
 ### Text annotations
 
-Where a reference line marks a value, a note explains a row. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (value and row position in a horizontal chart, the first row at `1`) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The note below points at Russia's start dot and explains the largest gain among the European countries.
+Where a reference line marks a value, a note explains a row. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (value and row position in a horizontal chart, the first row at `0`) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The note below points at Russia's start dot and explains the largest gain among the European countries.
 
 ```
-# row positions start at 1
-RUSSIA = [record["label"] for record in life].index("Russia") + 1
+# row positions start at 0
+RUSSIA = [record["label"] for record in life].index("Russia")
 
 DumbbellChart(
     data=life,
@@ -5454,7 +5454,7 @@ DumbbellChart(
 # the row of the one department whose wait got longer, once sorted by the change
 by_change = sorted(waits, key=lambda record: record["end"] - record["start"])
 worse = next(record for record in by_change if record["end"] > record["start"])
-WORSE_ROW = by_change.index(worse) + 1
+WORSE_ROW = by_change.index(worse)
 
 DumbbellChart(
     data=waits,
@@ -6670,7 +6670,7 @@ Every customization is either a keyword argument of `BoxPlot` or a `plot_box_*` 
 | set the axis range, ticks and tick format     | `ymin`, `ymax`, `yticks`, `yticks_format`                     | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
 | resize the figure                             | `figsize`                                                     | [Figure size and grid](#figure-size-and-grid)                                                           |
 | show grid lines                               | `show_grid`                                                   | [Figure size and grid](#figure-size-and-grid)                                                           |
-| order the boxes by their median               | the order of `data`                                           | [Box order](#box-order)                                                                                 |
+| order the boxes by their median               | `sort`                                                        | [Box order](#box-order)                                                                                 |
 | change the box fill, edge, median or outliers | `style={"plot_box_color": ..., "plot_box_median_color": ...}` | [Box style](#box-style)                                                                                 |
 | draw the boxes horizontally                   | `orientation`                                                 | [Horizontal boxes](#horizontal-boxes)                                                                   |
 | hide the outliers                             | `show_outliers`                                               | [Showing and hiding outliers](#showing-and-hiding-outliers)                                             |
@@ -6754,22 +6754,15 @@ BoxPlot(
 
 ### Box order
 
-The boxes follow the order in which their labels first appear in the data, which is often an accident of how the file was written. Ordered by their median, the boxes read as a ranking. `BoxPlot` has no sort parameter, so the order is set by sorting the data points themselves: here by the median body mass of each species, heaviest first. Adelie and Chinstrap penguins share a median of 3,700 g, and a stable sort keeps them in their input order.
+The boxes follow the order in which their labels first appear in the data, which is often an accident of how the file was written. Ordered by their median, the boxes read as a ranking. `sort` orders the boxes by their median, `"ascending"` or `"descending"`, also available as the [SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT) constants: here by the median body mass of each species, heaviest first. Adelie and Chinstrap penguins share a median of 3,700 g, and ties keep their input order. An `emphasis` list stays aligned with the input order, whatever the sort.
 
 ```
-from statistics import median
-
-SPECIES = ["Adelie", "Chinstrap", "Gentoo"]
-# the median body mass of each species
-species_median = {
-    species: median(point["value"] for point in body_mass if point["label"] == species)
-    for species in SPECIES
-}
-# heaviest species first
-by_median = sorted(body_mass, key=lambda point: -species_median[point["label"]])
+from datachart.constants import SORT
 
 BoxPlot(
-    data=by_median,
+    data=body_mass,
+    # heaviest species first
+    sort=SORT.DESCENDING,
     title="Body mass of Palmer penguins, heaviest species first",
     xlabel="Species",
     ylabel="Body mass (g)",
@@ -6926,7 +6919,7 @@ BoxPlot(
 
 ### Reference lines
 
-A box on its own says little about whether its values are high or low; a reference line gives it something to be compared with, such as a threshold or the overall mean. `hlines` draws a horizontal line at a value and `vlines` a vertical one; positions along the group axis are box positions, and the first box sits at `1`, so a half-integer sits between two boxes. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style` whose line style is a [LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE) value; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) and [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs). The dashed line marks the mean body mass of all 342 penguins: the whole Gentoo box sits above it, and the Adelie and Chinstrap boxes below it. A dotted vertical line separates the two small species from the Gentoo.
+A box on its own says little about whether its values are high or low; a reference line gives it something to be compared with, such as a threshold or the overall mean. `hlines` draws a horizontal line at a value and `vlines` a vertical one; positions along the group axis are box positions, and the first box sits at `0`, as the first bar does, so a half-integer sits between two boxes. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style` whose line style is a [LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE) value; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) and [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs). The dashed line marks the mean body mass of all 342 penguins: the whole Gentoo box sits above it, and the Adelie and Chinstrap boxes below it. A dotted vertical line separates the two small species from the Gentoo.
 
 ```
 from datachart.constants import LINE_STYLE
@@ -6942,7 +6935,7 @@ BoxPlot(
         "style": {"plot_hline_color": "#d62728", "plot_hline_style": LINE_STYLE.DASHED, "plot_hline_width": 1.5},
     },
     # a dotted line between the second and the third box
-    vlines={"x": 2.5, "style": {"plot_vline_color": "#888888", "plot_vline_style": LINE_STYLE.DOTTED}},
+    vlines={"x": 1.5, "style": {"plot_vline_color": "#888888", "plot_vline_style": LINE_STYLE.DOTTED}},
     title="Body mass of Palmer penguins against the overall mean",
     xlabel="Species",
     ylabel="Body mass (g)",
@@ -7005,7 +6998,7 @@ BoxPlot(
         "x": 0.6,
         "y": 0.2,
         "coords": "axes",
-        "target": (2, lightest),
+        "target": (1, lightest),
     },
     title="Body mass of Palmer penguins",
     xlabel="Species",
@@ -7082,7 +7075,7 @@ Panel(
 
 ## Multiple Box Plots
 
-To compare several datasets over the same groups, pass a list of lists to `data`: each inner list is one dataset, and the per-dataset attributes (`subtitle`, `style`, `hlines` and the other reference settings) become lists aligned with it. Boxes never overlay each other, so each dataset is drawn in its own subplot, which `subplots=True` makes explicit; `subtitle` titles the subplots, while `title`, `xlabel` and `ylabel` stay global. The hidden cell splits the penguins by sex into `body_mass_by_sex`, the 165 female and the 168 male penguins (the 9 penguins without a recorded sex are left out). A style per subplot colors each sex.
+To compare several datasets over the same groups, pass a list of lists to `data`: each inner list is one dataset, and the per-dataset attributes (`subtitle`, `style`, `hlines` and the other reference settings) become lists aligned with it. Boxes never overlay each other, so each dataset is drawn in its own subplot, which `subplots=True` requires; `subtitle` titles the subplots, while `title`, `xlabel` and `ylabel` stay global. The hidden cell splits the penguins by sex into `body_mass_by_sex`, the 165 female and the 168 male penguins (the 9 penguins without a recorded sex are left out). A style per subplot colors each sex.
 
 ```
 SEX_STYLE = [{"plot_box_color": "#e07a5f"}, {"plot_box_color": "#3d85c6"}]
@@ -7299,7 +7292,7 @@ overview = BoxPlot(
         "x": 0.55,
         "y": 0.9,
         "coords": "axes",
-        "target": (4, 700),
+        "target": (3, 700),
     },
     title="All services, log scale",
     ylabel="Response time (ms)",
@@ -7661,7 +7654,7 @@ ViolinPlot(
 
 ### Reference lines and bands
 
-Reference lines and bands put the violins in context. `hlines` draws a horizontal line at a value, such as the mean of all birds, and `vlines` a vertical one; the violins sit at positions `1`, `2`, `3`, … along the group axis, so a half-integer falls between two violins. `hspans` and `vspans` shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). The example marks the mean of all 342 birds and shades one standard deviation around it: the mean falls in the gap between the lighter species and the Gentoo, where few birds of any species sit, which is why a single average describes none of them well.
+Reference lines and bands put the violins in context. `hlines` draws a horizontal line at a value, such as the mean of all birds, and `vlines` a vertical one; the violins sit at positions `0`, `1`, `2`, … along the group axis, as bars do, so a half-integer falls between two violins. `hspans` and `vspans` shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). The example marks the mean of all 342 birds and shades one standard deviation around it: the mean falls in the gap between the lighter species and the Gentoo, where few birds of any species sit, which is why a single average describes none of them well.
 
 ```
 from statistics import mean, pstdev
@@ -7712,8 +7705,8 @@ ViolinPlot(
         "x": 0.3,
         "y": 0.85,
         "coords": "axes",
-        # the Gentoo violin sits at position 3
-        "target": (2.78, 4900),
+        # the Gentoo violin sits at position 2
+        "target": (1.78, 4900),
     },
     title="Body mass of Palmer penguins",
     xlabel="Species",
@@ -8318,14 +8311,14 @@ SwarmPlot(
             "x": 0.22,
             "y": 0.07,
             "coords": "axes",
-            "target": (2, 42),
+            "target": (1, 42),
         },
         {
             "text": "Joe Biden and\nDonald Trump, 78",
             "x": 0.62,
             "y": 0.85,
             "coords": "axes",
-            "target": (3, 78),
+            "target": (2, 78),
         },
     ],
     title="Age of US presidents at inauguration",
@@ -8610,8 +8603,8 @@ panel = Panel(
     show_grid=SHOW_GRID.Y,
 )
 
-# point at the single best run; groups sit at positions 1, 2, 3, ...
-position = list(MODELS).index(BEST_RUN["label"]) + 1
+# point at the single best run; groups sit at positions 0, 1, 2, ...
+position = list(MODELS).index(BEST_RUN["label"])
 Annotate(
     panel,
     texts={
@@ -8898,7 +8891,7 @@ RaincloudPlot(
 
 ### Reference lines and bands
 
-Reference lines and bands put the rainclouds in context. `hlines` draws a horizontal line at a value, such as the mean of all penguins, and `vlines` a vertical one; group positions along the category axis start at `1`, so a half-integer sits between two groups. `hspans` and `vspans` shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). A band of one standard deviation around the overall mean shows that a typical Adelie or Chinstrap penguin falls inside it, while most Gentoo penguins sit above it.
+Reference lines and bands put the rainclouds in context. `hlines` draws a horizontal line at a value, such as the mean of all penguins, and `vlines` a vertical one; group positions along the category axis start at `0`, as for bars, so a half-integer sits between two groups. `hspans` and `vspans` shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). A band of one standard deviation around the overall mean shows that a typical Adelie or Chinstrap penguin falls inside it, while most Gentoo penguins sit above it.
 
 ```
 from datachart.constants import LINE_STYLE
@@ -8930,7 +8923,7 @@ RaincloudPlot(
 
 ### Text annotations
 
-Where a reference line marks a value, a note explains it. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (group position, value) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The note below points at the heaviest penguin of the dataset, a 6.3 kg Gentoo male, whose rain point sits just left of the Gentoo position `3`.
+Where a reference line marks a value, a note explains it. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (group position, value) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The note below points at the heaviest penguin of the dataset, a 6.3 kg Gentoo male, whose rain point sits just left of the Gentoo position `2`.
 
 ```
 heaviest = max(point["value"] for point in chart_data)
@@ -8943,7 +8936,7 @@ RaincloudPlot(
         "x": 0.36,
         "y": 0.93,
         "coords": "axes",
-        "target": (2.87, heaviest),
+        "target": (1.87, heaviest),
     },
     title="Body mass of Palmer penguins",
     xlabel="Species",
@@ -9069,12 +9062,12 @@ from datachart.utils import Panel
 
 mean_by_species = [
     {
-        # group positions start at 1
+        # group positions start at 0
         "x": position,
         "y": sum(p["value"] for p in chart_data if p["label"] == species)
         / sum(1 for p in chart_data if p["label"] == species),
     }
-    for position, species in enumerate(SPECIES, start=1)
+    for position, species in enumerate(SPECIES)
 ]
 
 Panel(
@@ -9246,7 +9239,7 @@ rainclouds = RaincloudPlot(
             "x": 0.62,
             "y": 0.72,
             "coords": "axes",
-            "target": (80, 3),
+            "target": (80, 2),
         },
     ],
     title="Delivery time",
@@ -9634,7 +9627,7 @@ RidgelinePlot(
 
 ### Text annotations
 
-Where a reference line marks a value, a note explains a row. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (value, row position) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. Rows sit at positions `1`, `2`, `3`, … from the top, and a ridge rises toward smaller positions: `(4, 0.6)` is a point inside January's ridge, just above its baseline. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling.
+Where a reference line marks a value, a note explains a row. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (value, row position) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. Rows sit at positions `0`, `1`, `2`, … from the top, and a ridge rises toward smaller positions: `(4, -0.4)` is a point inside January's ridge, just above its baseline. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling.
 
 ```
 RidgelinePlot(
@@ -9645,7 +9638,7 @@ RidgelinePlot(
         "x": 0.62,
         "y": 0.9,
         "coords": "axes",
-        "target": (4, 0.6),
+        "target": (4, -0.4),
     },
     title="Daily mean temperature in Ljubljana",
     xlabel="Temperature (°C)",
@@ -20316,6 +20309,7 @@ BoxPlot(
     orientation: (
         ORIENTATION | str | None
     ) = ORIENTATION.VERTICAL,
+    sort: SORT | str | None = None,
     scaley: SCALE | str | None = None,
     subplots: bool | None = None,
     max_cols: int | None = None,
@@ -20420,16 +20414,16 @@ Examples:
 
 Added in Unreleased
 
-The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter.
+The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The `sort` group order.
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`          | The data points for the box plot(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. Each data point should have a label (category) and value (numeric). **TYPE:** \`list[BoxDataPointAttrs]                                                                                                                                                                                    |
+| `data`          | The data points for the box plot(s). Can be a single list of data points for one chart, or a list of lists for subplots (requires subplots=True). Each data point should have a label (category) and value (numeric). **TYPE:** \`list[BoxDataPointAttrs]                                                                                                                                                                           |
 | `title`         | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                             |
 | `xlabel`        | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `ylabel`        | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `subtitle`      | The subtitle(s) for individual charts. Used as legend labels. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                       |
-| `emphasis`      | The emphasis role(s), aligned with the box labels of one call (a single value applies to every box): "background" mutes a box and its whiskers, caps, median, and outliers, "highlight" bolds the box edges and median, None leaves it unchanged. **TYPE:** \`EMPHASIS                                                                                                                                                              |
+| `subtitle`      | The subtitle(s) for individual charts: the subplot title and the legend label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                      |
+| `emphasis`      | The emphasis role(s), aligned with the box labels of one call in input order, whatever the sort (a single value applies to every box): "background" mutes a box and its whiskers, caps, median, and outliers, "highlight" bolds the box edges and median, None leaves it unchanged. **TYPE:** \`EMPHASIS                                                                                                                            |
 | `emphasis_rule` | A rule that highlights the groups matching it and mutes the rest: {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}, read against a summary of each group's values, chosen by by: "median" (default), "mean", "min", "max", or "sum". An explicit emphasis role wins, and a count ranks across every group of every chart. See EmphasisRuleAttrs. **TYPE:** \`EmphasisRuleAttrs |
 | `figsize`       | The size of the figure. **TYPE:** \`FIG_SIZE                                                                                                                                                                                                                                                                                                                                                                                        |
 | `xmin`          | The minimum x-axis value. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                                           |
@@ -20445,8 +20439,9 @@ The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_
 | `value_format`  | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                             |
 | `aspect_ratio`  | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                        |
 | `orientation`   | The orientation of the boxes (vertical or horizontal). **TYPE:** \`ORIENTATION                                                                                                                                                                                                                                                                                                                                                      |
+| `sort`          | The order the groups are drawn in: None (input order), "ascending", or "descending" by each group's median; ties keep input order. One call draws one box dataset per axes, so there is no second series to key on and no sort_by. See SORT. **TYPE:** \`SORT                                                                                                                                                                       |
 | `scaley`        | The y-axis scale (e.g., "log", "linear"). **TYPE:** \`SCALE                                                                                                                                                                                                                                                                                                                                                                         |
-| `subplots`      | Whether to create separate subplots for each chart. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                |
+| `subplots`      | Whether to create separate subplots for each chart; required for a list of datasets. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                               |
 | `max_cols`      | Maximum number of columns in subplots (when subplots=True). **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                         |
 | `sharex`        | Whether to share the x-axis in subplots. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                           |
 | `sharey`        | Whether to share the y-axis in subplots. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                           |
@@ -20574,6 +20569,7 @@ ViolinPlot(
     orientation: (
         ORIENTATION | str | None
     ) = ORIENTATION.VERTICAL,
+    sort: SORT | str | None = None,
     scaley: SCALE | str | None = None,
     subplots: bool | None = None,
     max_cols: int | None = None,
@@ -20683,16 +20679,16 @@ Examples:
 
 Added in Unreleased
 
-The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter.
+The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The `sort` group order.
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`          | The data points for the violin plot(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. Each data point should have a label (category) and value (numeric). **TYPE:** \`list[ViolinDataPointAttrs]                                                                                                                                                                              |
+| `data`          | The data points for the violin plot(s). Can be a single list of data points for one chart, or a list of lists for subplots (requires subplots=True). Each data point should have a label (category) and value (numeric). **TYPE:** \`list[ViolinDataPointAttrs]                                                                                                                                                                     |
 | `title`         | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                             |
 | `xlabel`        | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `ylabel`        | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `subtitle`      | The subtitle(s) for individual charts (subplots). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                   |
-| `emphasis`      | The emphasis role(s), aligned with the violin labels of one call (a single value applies to every violin): "background" mutes a violin body and its inner marks, "highlight" bolds the body edge, None leaves it unchanged. **TYPE:** \`EMPHASIS                                                                                                                                                                                    |
+| `subtitle`      | The subtitle(s) for individual charts: the subplot title and the legend label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                      |
+| `emphasis`      | The emphasis role(s), aligned with the violin labels of one call in input order, whatever the sort (a single value applies to every violin): "background" mutes a violin body and its inner marks, "highlight" bolds the body edge, None leaves it unchanged. **TYPE:** \`EMPHASIS                                                                                                                                                  |
 | `emphasis_rule` | A rule that highlights the groups matching it and mutes the rest: {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}, read against a summary of each group's values, chosen by by: "median" (default), "mean", "min", "max", or "sum". An explicit emphasis role wins, and a count ranks across every group of every chart. See EmphasisRuleAttrs. **TYPE:** \`EmphasisRuleAttrs |
 | `figsize`       | The size of the figure. **TYPE:** \`FIG_SIZE                                                                                                                                                                                                                                                                                                                                                                                        |
 | `xmin`          | The minimum x-axis value. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                                           |
@@ -20706,8 +20702,9 @@ The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_
 | `value_format`  | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                             |
 | `aspect_ratio`  | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                        |
 | `orientation`   | The orientation of the violins (vertical or horizontal). **TYPE:** \`ORIENTATION                                                                                                                                                                                                                                                                                                                                                    |
+| `sort`          | The order the groups are drawn in: None (input order), "ascending", or "descending" by each group's median; ties keep input order. One call draws one violin dataset per axes, so there is no second series to key on and no sort_by. See SORT. **TYPE:** \`SORT                                                                                                                                                                    |
 | `scaley`        | The y-axis scale (e.g., "log", "linear"). **TYPE:** \`SCALE                                                                                                                                                                                                                                                                                                                                                                         |
-| `subplots`      | Whether to create separate subplots for each chart. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                |
+| `subplots`      | Whether to create separate subplots for each chart; required for a list of datasets. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                               |
 | `max_cols`      | Maximum number of columns in subplots (when subplots=True). **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                         |
 | `sharex`        | Whether to share the x-axis in subplots. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                           |
 | `sharey`        | Whether to share the y-axis in subplots. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                           |

@@ -6509,7 +6509,7 @@ RidgelinePlot(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="text-annotations">Text annotations<a class="anchor-link" href="#text-annotations">¶</a></h3><p>Where a reference line marks a value, a note explains a row. <code>texts</code> places text on the chart, with an optional <code>target</code> to draw a connector to a point; the position is in data coordinates by default (value, row position) or in axes fractions with <code>"coords": "axes"</code>, which keeps the note in place whatever the axis limits. Rows sit at positions <code>1</code>, <code>2</code>, <code>3</code>, … from the top, and a ridge rises toward smaller positions: <code>(4, 0.6)</code> is a point inside January's ridge, just above its baseline. The <a href="../../utility/annotations/">Text Annotations</a> guide covers placement, connector looks and styling.</p>
+<h3 id="text-annotations">Text annotations<a class="anchor-link" href="#text-annotations">¶</a></h3><p>Where a reference line marks a value, a note explains a row. <code>texts</code> places text on the chart, with an optional <code>target</code> to draw a connector to a point; the position is in data coordinates by default (value, row position) or in axes fractions with <code>"coords": "axes"</code>, which keeps the note in place whatever the axis limits. Rows sit at positions <code>0</code>, <code>1</code>, <code>2</code>, … from the top, and a ridge rises toward smaller positions: <code>(4, -0.4)</code> is a point inside January's ridge, just above its baseline. The <a href="../../utility/annotations/">Text Annotations</a> guide covers placement, connector looks and styling.</p>
 </div>
 </div>
 </div>
@@ -6540,7 +6540,7 @@ RidgelinePlot(
         <span class="s2">"x"</span><span class="p">:</span> <span class="mf">0.62</span><span class="p">,</span>
         <span class="s2">"y"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
         <span class="s2">"coords"</span><span class="p">:</span> <span class="s2">"axes"</span><span class="p">,</span>
-        <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span>
+        <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">),</span>
     <span class="p">},</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Daily mean temperature in Ljubljana"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Temperature (°C)"</span><span class="p">,</span>
@@ -6555,7 +6555,7 @@ RidgelinePlot(
         "x": 0.62,
         "y": 0.9,
         "coords": "axes",
-        "target": (4, 0.6),
+        "target": (4, -0.4),
     },
     title="Daily mean temperature in Ljubljana",
     xlabel="Temperature (°C)",

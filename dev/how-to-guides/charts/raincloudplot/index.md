@@ -272,7 +272,7 @@ RaincloudPlot(
 
 ### Reference lines and bands
 
-Reference lines and bands put the rainclouds in context. `hlines` draws a horizontal line at a value, such as the mean of all penguins, and `vlines` a vertical one; group positions along the category axis start at `1`, so a half-integer sits between two groups. `hspans` and `vspans` shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). A band of one standard deviation around the overall mean shows that a typical Adelie or Chinstrap penguin falls inside it, while most Gentoo penguins sit above it.
+Reference lines and bands put the rainclouds in context. `hlines` draws a horizontal line at a value, such as the mean of all penguins, and `vlines` a vertical one; group positions along the category axis start at `0`, as for bars, so a half-integer sits between two groups. `hspans` and `vspans` shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). A band of one standard deviation around the overall mean shows that a typical Adelie or Chinstrap penguin falls inside it, while most Gentoo penguins sit above it.
 
 ```
 from datachart.constants import LINE_STYLE
@@ -304,7 +304,7 @@ RaincloudPlot(
 
 ### Text annotations
 
-Where a reference line marks a value, a note explains it. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (group position, value) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The note below points at the heaviest penguin of the dataset, a 6.3 kg Gentoo male, whose rain point sits just left of the Gentoo position `3`.
+Where a reference line marks a value, a note explains it. `texts` places text on the chart, with an optional `target` to draw a connector to a point; the position is in data coordinates by default (group position, value) or in axes fractions with `"coords": "axes"`, which keeps the note in place whatever the axis limits. The [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The note below points at the heaviest penguin of the dataset, a 6.3 kg Gentoo male, whose rain point sits just left of the Gentoo position `2`.
 
 ```
 heaviest = max(point["value"] for point in chart_data)
@@ -317,7 +317,7 @@ RaincloudPlot(
         "x": 0.36,
         "y": 0.93,
         "coords": "axes",
-        "target": (2.87, heaviest),
+        "target": (1.87, heaviest),
     },
     title="Body mass of Palmer penguins",
     xlabel="Species",
@@ -443,12 +443,12 @@ from datachart.utils import Panel
 
 mean_by_species = [
     {
-        # group positions start at 1
+        # group positions start at 0
         "x": position,
         "y": sum(p["value"] for p in chart_data if p["label"] == species)
         / sum(1 for p in chart_data if p["label"] == species),
     }
-    for position, species in enumerate(SPECIES, start=1)
+    for position, species in enumerate(SPECIES)
 ]
 
 Panel(
@@ -620,7 +620,7 @@ rainclouds = RaincloudPlot(
             "x": 0.62,
             "y": 0.72,
             "coords": "axes",
-            "target": (80, 3),
+            "target": (80, 2),
         },
     ],
     title="Delivery time",

@@ -6314,7 +6314,7 @@ ViolinPlot(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="reference-lines-and-bands">Reference lines and bands<a class="anchor-link" href="#reference-lines-and-bands">¶</a></h3><p>Reference lines and bands put the violins in context. <code>hlines</code> draws a horizontal line at a value, such as the mean of all birds, and <code>vlines</code> a vertical one; the violins sit at positions <code>1</code>, <code>2</code>, <code>3</code>, … along the group axis, so a half-integer falls between two violins. <code>hspans</code> and <code>vspans</code> shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position, an optional <code>label</code> for the legend and a <code>style</code>; the keys are listed in <a href="../../../references/typings/#datachart.typings.HLineSettingAttrs">HLineSettingAttrs</a>, <a href="../../../references/typings/#datachart.typings.VLineSettingAttrs">VLineSettingAttrs</a>, <a href="../../../references/typings/#datachart.typings.HSpanSettingAttrs">HSpanSettingAttrs</a> and <a href="../../../references/typings/#datachart.typings.VSpanSettingAttrs">VSpanSettingAttrs</a>. The example marks the mean of all 342 birds and shades one standard deviation around it: the mean falls in the gap between the lighter species and the Gentoo, where few birds of any species sit, which is why a single average describes none of them well.</p>
+<h3 id="reference-lines-and-bands">Reference lines and bands<a class="anchor-link" href="#reference-lines-and-bands">¶</a></h3><p>Reference lines and bands put the violins in context. <code>hlines</code> draws a horizontal line at a value, such as the mean of all birds, and <code>vlines</code> a vertical one; the violins sit at positions <code>0</code>, <code>1</code>, <code>2</code>, … along the group axis, as bars do, so a half-integer falls between two violins. <code>hspans</code> and <code>vspans</code> shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position, an optional <code>label</code> for the legend and a <code>style</code>; the keys are listed in <a href="../../../references/typings/#datachart.typings.HLineSettingAttrs">HLineSettingAttrs</a>, <a href="../../../references/typings/#datachart.typings.VLineSettingAttrs">VLineSettingAttrs</a>, <a href="../../../references/typings/#datachart.typings.HSpanSettingAttrs">HSpanSettingAttrs</a> and <a href="../../../references/typings/#datachart.typings.VSpanSettingAttrs">VSpanSettingAttrs</a>. The example marks the mean of all 342 birds and shades one standard deviation around it: the mean falls in the gap between the lighter species and the Gentoo, where few birds of any species sit, which is why a single average describes none of them well.</p>
 </div>
 </div>
 </div>
@@ -6458,8 +6458,8 @@ ViolinPlot(
         <span class="s2">"x"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
         <span class="s2">"y"</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">,</span>
         <span class="s2">"coords"</span><span class="p">:</span> <span class="s2">"axes"</span><span class="p">,</span>
-        <span class="c1"># the Gentoo violin sits at position 3</span>
-        <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mf">2.78</span><span class="p">,</span> <span class="mi">4900</span><span class="p">),</span>
+        <span class="c1"># the Gentoo violin sits at position 2</span>
+        <span class="s2">"target"</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.78</span><span class="p">,</span> <span class="mi">4900</span><span class="p">),</span>
     <span class="p">},</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Body mass of Palmer penguins"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Species"</span><span class="p">,</span>
@@ -6478,8 +6478,8 @@ ViolinPlot(
         "x": 0.3,
         "y": 0.85,
         "coords": "axes",
-        # the Gentoo violin sits at position 3
-        "target": (2.78, 4900),
+        # the Gentoo violin sits at position 2
+        "target": (1.78, 4900),
     },
     title="Body mass of Palmer penguins",
     xlabel="Species",
