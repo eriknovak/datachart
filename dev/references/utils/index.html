@@ -4809,9 +4809,9 @@ its charts are never modified.</p>
 <p>Works on chart figures (including polar ones), <code>Panel</code> output, and
 multi-subplot figures (<code>subplots=True</code>). On a multi-subplot figure every
 text names its target with a 0-based <code>subplot</code> index in render order; the
-figure is redrawn with the same subplot layout — as in a <code>Grid</code> cell,
-each subplot scales on its own, without the source's <code>sharex</code>/<code>sharey</code> —
-and the texts ride the per-subplot panels only, so they show in <code>Grid</code>
+figure is redrawn with the same subplot layout — each subplot scales on
+its own, without the source's <code>sharex</code>/<code>sharey</code>, which a <code>Grid</code> cell of
+the result restores — and the texts ride the per-subplot panels only, so they show in <code>Grid</code>
 cells but not in a <code>Panel</code> overlay of the figure. Grid figures are
 rejected — annotate the sources before composing.</p>
 <div class="admonition info">

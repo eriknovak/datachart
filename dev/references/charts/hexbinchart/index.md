@@ -21,6 +21,8 @@ HexbinChart(
     xmax: int | float | datetime | None = None,
     ymin: int | float | None = None,
     ymax: int | float | None = None,
+    show_legend: bool | None = None,
+    legend: LegendSettingAttrs | None = None,
     show_grid: SHOW_GRID | str | None = None,
     show_colorbars: bool = True,
     aspect_ratio: ASPECT_RATIO | str | None = None,
@@ -128,7 +130,7 @@ Added in v0.9.0
 
 Added in Unreleased
 
-The `xticks_format` and `yticks_format` tick formats. The `label`, `location`, `format`, and `ticks` fields of the `colorbar` setting. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter.
+The `xticks_format` and `yticks_format` tick formats. The `label`, `location`, `format`, and `ticks` fields of the `colorbar` setting. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The `show_legend` and `legend` parameters.
 
 Examples:
 
@@ -159,6 +161,8 @@ Examples:
 | `xmax`           | The maximum x-axis value. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `ymin`           | The minimum y-axis value. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `ymax`           | The maximum y-axis value. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `show_legend`    | Whether to show the legend; it lists the labelled reference lines and bands. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                   |
+| `legend`         | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                                                                                                                          |
 | `show_grid`      | Which grid lines to show (e.g., "both", "x", "y"). Off by default: the hexagons cover it. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                                                                                                                 |
 | `show_colorbars` | Whether to show the colorbar(s). **TYPE:** `bool` **DEFAULT:** `True`                                                                                                                                                                                                                                                                                                                                                                           |
 | `aspect_ratio`   | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                                    |
