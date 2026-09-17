@@ -5,6 +5,9 @@ This module provides helper functions to reduce boilerplate in chart definitions
 
 from typing import Any, Dict, List, Union
 
+# extra attrs whose single value is itself a list, like the tick positions
+LIST_TYPE_EXTRA_ATTRS = {"dimensions"}
+
 
 def _get_indexed_value(value: Any, index: int, is_list_type: bool = False) -> Any:
     """Get the value at the given index if it's a list, otherwise return the value.
@@ -22,7 +25,7 @@ def _get_indexed_value(value: Any, index: int, is_list_type: bool = False) -> An
 
     if is_list_type:
         # For list-type values like xticks, check if it's a list of lists
-        if isinstance(value, list) and len(value) > 0 and isinstance(value[0], list):
+        if isinstance(value, list) and any(isinstance(v, list) for v in value):
             return value[index] if index < len(value) else None
         return value
     else:
@@ -146,7 +149,9 @@ def build_chart_dict_multi(
     # Add extra chart-specific attributes
     for attr_name, attr_value in extra_attrs.items():
         if attr_value is not None:
-            chart_dict[attr_name] = _get_indexed_value(attr_value, index)
+            chart_dict[attr_name] = _get_indexed_value(
+                attr_value, index, is_list_type=attr_name in LIST_TYPE_EXTRA_ATTRS
+            )
 
     return chart_dict
 

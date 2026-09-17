@@ -281,6 +281,38 @@ class TestLayouts(unittest.TestCase):
         # a single node sits at the centre
         np.testing.assert_allclose(spring_layout(1, [], seed=0), [[0.5, 0.5]])
 
+    def test_spring_packs_components_apart(self):
+        # two five-node rings: neither collapses while the other spreads
+        ring = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 0)]
+        pairs = ring + [(i + 5, j + 5) for i, j in ring]
+        pos = spring_layout(10, pairs, seed=0)
+        spreads = [np.ptp(pos[:5], axis=0).max(), np.ptp(pos[5:], axis=0).max()]
+        self.assertLess(max(spreads) / min(spreads), 1.5)
+        self.assertGreater(min(spreads), 0.2)
+        # the components keep clear of each other
+        centres = pos[:5].mean(axis=0), pos[5:].mean(axis=0)
+        self.assertGreater(np.linalg.norm(centres[0] - centres[1]), max(spreads))
+        np.testing.assert_array_equal(pos, spring_layout(10, pairs, seed=0))
+
+    def test_spring_rings_the_isolates_round_the_component(self):
+        # a six-node ring and three isolates
+        pairs = [(i, (i + 1) % 6) for i in range(6)]
+        pos = spring_layout(9, pairs, seed=0)
+        centre = pos[:6].mean(axis=0)
+        reach = np.linalg.norm(pos[:6] - centre, axis=1).max()
+        away = np.linalg.norm(pos[6:] - centre, axis=1)
+        self.assertTrue((away > reach).all())
+        np.testing.assert_allclose(away, away[0], atol=0.05)
+        # the component is not squashed into a blob
+        self.assertGreater(np.ptp(pos[:6], axis=0).max(), 0.4)
+        self.assertGreaterEqual(pos.min(), 0.1 - 1e-9)
+        self.assertLessEqual(pos.max(), 0.9 + 1e-9)
+
+    def test_spring_without_edges_is_a_ring(self):
+        pos = spring_layout(5, [], seed=0)
+        radii = np.linalg.norm(pos - pos.mean(axis=0), axis=1)
+        np.testing.assert_allclose(radii, radii[0])
+
     def test_seed_changes_the_picture(self):
         same = _positions(NetworkChart(DATA))
         again = _positions(NetworkChart(DATA))
@@ -298,6 +330,31 @@ class TestLayouts(unittest.TestCase):
             NetworkChart(
                 {"nodes": [{"id": "A", "x": 0.1}], "edges": []}, layout="fixed"
             )
+
+    def test_fixed_keeps_a_margin(self):
+        nodes = [
+            {"id": "A", "x": 0, "y": 0},
+            {"id": "B", "x": 1, "y": 1},
+            {"id": "C", "x": 0.5, "y": 0.5},
+        ]
+        data = {"nodes": nodes, "edges": [edge("A", "B")]}
+        texts = {"text": "note", "x": 1, "y": 1}
+        ax = NetworkChart(data, layout="fixed", texts=texts).axes[0]
+        # the 0–1 space lands inside the layout margin of the axes box
+        to_axes = ax.transData + ax.transAxes.inverted()
+        np.testing.assert_allclose(
+            to_axes.transform(_positions(ax.figure)),
+            [[0.1, 0.1], [0.9, 0.9], [0.5, 0.5]],
+        )
+        # a text at a node's position lands on that node
+        note = [t for t in ax.texts if t.get_text() == "note"][0]
+        np.testing.assert_allclose(to_axes.transform(note.xy), [0.9, 0.9])
+
+    def test_fixed_rejects_positions_outside_the_unit_square(self):
+        for x, y in ((1.2, 0.5), (0.5, -0.1)):
+            nodes = [{"id": "A", "x": x, "y": y}]
+            with self.assertRaisesRegex(ValueError, "between 0 and 1"):
+                NetworkChart({"nodes": nodes, "edges": []}, layout="fixed")
 
     def test_edge_strengths_map_min_max_onto_the_pull_range(self):
         # the lightest pulls at the minimum, the heaviest at the maximum,

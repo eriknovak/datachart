@@ -291,6 +291,9 @@ TREEMAP_FONT_STEP = 0.5
 # network layouts keep this much of the 0–1 space clear on every side, room
 # for the largest marker and its label (ADR 0029)
 NETWORK_LAYOUT_MARGIN = 0.1
+# fixed positions stay the user's; the view widens by this much on every
+# side, so 0–1 lands inside the same margin (ADR 0029)
+NETWORK_FIXED_PAD = NETWORK_LAYOUT_MARGIN / (1 - 2 * NETWORK_LAYOUT_MARGIN)
 # spring layout: iterations and the initial step, cooled geometrically
 NETWORK_SPRING_ITERATIONS = 300
 NETWORK_SPRING_STEP = 0.1
@@ -306,6 +309,9 @@ NETWORK_CLUSTER_RADIUS = 0.3
 NETWORK_CLUSTER_GAP = 2.0
 NETWORK_CLUSTER_FILL = 0.8
 NETWORK_CLUSTER_PUSH_ITERATIONS = 100
+# a disconnected spring packs its components like clusters, closer: they
+# carry no halo (ADR 0029)
+NETWORK_COMPONENT_GAP = 1.25
 # the cluster halo reaches this far past the rim nodes' markers, room for
 # their labels
 NETWORK_CLUSTER_HALO_PAD = 0.03
@@ -7112,23 +7118,29 @@ def compute_parallel_stats(layers: List["ParallelCoordsLayer"]) -> Optional[dict
     if not all_data:
         return None
 
-    def layer_dimensions(layer):
-        first_chart = layer.charts[0]
-        dimensions = first_chart.get("dimensions", None)
-        if dimensions is not None:
-            return list(dimensions)
-        hue_attr = first_chart.get("hue", "hue")
+    def detected_dimensions(layer):
+        hue_attr = layer.charts[0].get("hue", "hue")
         for chart in layer.charts:
             for d in chart.get("data", []) or []:
                 return [k for k, v in d.items() if k != hue_attr and v is not None]
         return []
 
-    dimensions = layer_dimensions(layers[0])
-    for layer in layers[1:]:
-        if layer_dimensions(layer) != dimensions:
+    # every data set on one axes shares one dimension order
+    all_dimensions = [
+        (
+            list(chart["dimensions"])
+            if chart.get("dimensions") is not None
+            else detected_dimensions(layer)
+        )
+        for layer in layers
+        for chart in layer.charts
+    ]
+    dimensions = all_dimensions[0]
+    for other in all_dimensions[1:]:
+        if other != dimensions:
             raise ValueError(
-                "Composed parallel coordinates charts must share the same "
-                f"dimensions; got {dimensions} and {layer_dimensions(layer)}."
+                "Parallel coordinates data sets and composed charts must share "
+                f"the same dimensions; got {dimensions} and {other}."
             )
 
     if len(dimensions) < 2:
@@ -8794,7 +8806,12 @@ def edge_strengths(weights: list) -> list:
 
 
 def spring_layout(
-    n: int, pairs: list, seed: int, strengths=None, gravity: float = 0.0
+    n: int,
+    pairs: list,
+    seed: int,
+    strengths=None,
+    gravity: float = 0.0,
+    components: bool = True,
 ) -> np.ndarray:
     """Fruchterman–Reingold positions of `n` nodes joined by index `pairs`.
 
@@ -8804,14 +8821,38 @@ def spring_layout(
     the centre in proportion to its distance; the step length cools
     geometrically. Seeded, so the same input renders the same picture. The
     result fits the 0–1 space inside the layout margin.
+
+    With `components`, a disconnected graph lays out each component on its
+    own and packs them by size, the isolated nodes on a ring around the rest
+    (ADR 0029).
     """
+
+    strengths = [1.0] * len(pairs) if strengths is None else list(strengths)
+    if components and n > 1:
+        from scipy.sparse import coo_matrix
+        from scipy.sparse.csgraph import connected_components
+
+        rows, cols = np.array(pairs, int).reshape(-1, 2).T
+        adjacency = coo_matrix((np.ones(len(pairs)), (rows, cols)), shape=(n, n))
+        count, labels = connected_components(adjacency, directed=False)
+        if count > 1:
+            return _fit_layout(
+                _component_layout(labels, pairs, strengths, seed, gravity)
+            )
+    return _fit_layout(_spring_positions(n, pairs, seed, strengths, gravity))
+
+
+def _spring_positions(
+    n: int, pairs: list, seed: int, strengths: list, gravity: float
+) -> np.ndarray:
+    """One spring pass over the whole graph, in its own unfitted space."""
 
     rng = np.random.default_rng(seed)
     pos = rng.random((n, 2))
     if n < 2:
-        return _fit_layout(pos)
+        return pos
     linked = np.zeros((n, n))
-    for (i, j), s in zip(pairs, [1.0] * len(pairs) if strengths is None else strengths):
+    for (i, j), s in zip(pairs, strengths):
         # a reverse pair or a repeated edge keeps the strongest pull
         linked[i, j] = linked[j, i] = max(linked[i, j], s)
     # the ideal edge length for n nodes in a unit square
@@ -8828,7 +8869,84 @@ def spring_layout(
         length = np.maximum(np.linalg.norm(disp, axis=1), 0.01)
         pos += disp / length[:, None] * np.minimum(length, step)[:, None]
         step *= NETWORK_SPRING_COOLING
-    return _fit_layout(pos)
+    return pos
+
+
+def _component_layout(
+    labels: np.ndarray, pairs: list, strengths: list, seed: int, gravity: float
+) -> np.ndarray:
+    """Each component's own spring, packed like clusters; isolates ring the rest."""
+
+    n = len(labels)
+    members = [np.flatnonzero(labels == c) for c in range(labels.max() + 1)]
+    # the largest first, so it takes the centre
+    members.sort(key=len, reverse=True)
+    linked = [idx for idx in members if len(idx) > 1]
+    isolates = [idx[0] for idx in members if len(idx) == 1]
+    pos = np.zeros((n, 2))
+    reach = 0.0
+    if linked:
+        local = []
+        for idx in linked:
+            place = {node: k for k, node in enumerate(idx)}
+            inside = [
+                ((place[i], place[j]), w)
+                for (i, j), w in zip(pairs, strengths)
+                if i in place
+            ]
+            spring = _spring_positions(
+                len(idx),
+                [pair for pair, _ in inside],
+                seed,
+                [w for _, w in inside],
+                gravity,
+            )
+            local.append(spring - (spring.min(axis=0) + spring.max(axis=0)) / 2)
+        sizes = np.array([len(idx) for idx in linked], float)
+        radius = NETWORK_CLUSTER_RADIUS * np.sqrt(sizes / n)
+        # the largest at the centre, the rest a golden-angle spiral around it
+        turns = np.arange(len(linked)) * np.pi * (3 - np.sqrt(5))
+        centers = (
+            np.column_stack([np.cos(turns), np.sin(turns)])
+            * np.sqrt(np.arange(len(linked)))[:, None]
+            * radius[0]
+        )
+        centers, radius = _pack_clusters(centers, radius, NETWORK_COMPONENT_GAP)
+        for idx, spring, centre, r in zip(linked, local, centers, radius):
+            pos[idx] = centre + spring / (np.linalg.norm(spring, axis=1).max() or 1) * r
+        linked_nodes = np.concatenate(linked)
+        middle = (pos[linked_nodes].min(axis=0) + pos[linked_nodes].max(axis=0)) / 2
+        pos[linked_nodes] -= middle
+        reach = np.linalg.norm(pos[linked_nodes], axis=1).max()
+    if isolates:
+        # a lone node takes a one-node cluster's diameter of room on the ring
+        spacing = 2 * NETWORK_CLUSTER_RADIUS / math.sqrt(n)
+        ring = max(reach + spacing, len(isolates) * spacing / (2 * np.pi))
+        pos[isolates] = ring * _ring(len(isolates))
+    return pos
+
+
+def _pack_clusters(centers: np.ndarray, radius: np.ndarray, gap: float) -> tuple:
+    """Cluster centres pushed `gap` times their summed radii apart, each radius
+    shrunk clear of its nearest neighbour."""
+
+    if len(centers) < 2:
+        return centers, radius
+    min_dist = (radius[:, None] + radius[None, :]) * gap
+    for _ in range(NETWORK_CLUSTER_PUSH_ITERATIONS):
+        delta, dist = _centre_distances(centers)
+        overlap = np.maximum(min_dist - dist, 0)
+        if not overlap.any():
+            break
+        centers = centers + (delta / dist[..., None] * (overlap / 2)[..., None]).sum(
+            axis=1
+        )
+    _, dist = _centre_distances(centers)
+    radius_share = radius[:, None] / (radius[:, None] + radius[None, :])
+    radius = np.minimum(
+        radius, (dist * radius_share).min(axis=1) * NETWORK_CLUSTER_FILL
+    )
+    return centers, radius
 
 
 def grouped_layout(groups: list, pairs: list, weights: list, seed: int) -> tuple:
@@ -8864,7 +8982,14 @@ def grouped_layout(groups: list, pairs: list, weights: list, seed: int) -> tuple
             if group_of[i] == g and group_of[j] == g
         ]
         local[idx] = (
-            spring_layout(len(idx), inside, seed, gravity=NETWORK_CLUSTER_GRAVITY) - 0.5
+            spring_layout(
+                len(idx),
+                inside,
+                seed,
+                gravity=NETWORK_CLUSTER_GRAVITY,
+                components=False,
+            )
+            - 0.5
         )
 
     # level two: the groups as a weighted network
@@ -8880,25 +9005,13 @@ def grouped_layout(groups: list, pairs: list, weights: list, seed: int) -> tuple
         seed,
         edge_strengths([between[k] for k in links]),
         gravity=NETWORK_CLUSTER_GRAVITY,
+        components=False,
     )
 
     sizes = np.array([len(idx) for idx in members], float)
-    radius = NETWORK_CLUSTER_RADIUS * np.sqrt(sizes / n)
-    if len(names) > 1:
-        min_dist = (radius[:, None] + radius[None, :]) * NETWORK_CLUSTER_GAP
-        for _ in range(NETWORK_CLUSTER_PUSH_ITERATIONS):
-            delta, dist = _centre_distances(centers)
-            overlap = np.maximum(min_dist - dist, 0)
-            if not overlap.any():
-                break
-            centers = centers + (
-                delta / dist[..., None] * (overlap / 2)[..., None]
-            ).sum(axis=1)
-        _, dist = _centre_distances(centers)
-        radius_share = radius[:, None] / (radius[:, None] + radius[None, :])
-        radius = np.minimum(
-            radius, (dist * radius_share).min(axis=1) * NETWORK_CLUSTER_FILL
-        )
+    centers, radius = _pack_clusters(
+        centers, NETWORK_CLUSTER_RADIUS * np.sqrt(sizes / n), NETWORK_CLUSTER_GAP
+    )
 
     # a group's local picture fills a square; scale its farthest node onto the
     # cluster radius so every node lies within the disc
@@ -8932,9 +9045,14 @@ def circular_layout(n: int) -> np.ndarray:
 
     if n < 2:
         return np.full((n, 2), 0.5)
+    return 0.5 + (0.5 - NETWORK_LAYOUT_MARGIN) * _ring(n)
+
+
+def _ring(n: int) -> np.ndarray:
+    """`n` points evenly spaced on the unit circle, the first at the top, clockwise."""
+
     angles = np.pi / 2 - np.linspace(0, 2 * np.pi, n, endpoint=False)
-    radius = 0.5 - NETWORK_LAYOUT_MARGIN
-    return 0.5 + radius * np.column_stack([np.cos(angles), np.sin(angles)])
+    return np.column_stack([np.cos(angles), np.sin(angles)])
 
 
 def _linear_map(values: list, low: float, high: float, missing: float) -> np.ndarray:
@@ -9123,8 +9241,9 @@ class NetworkLayer(PointLabelMixin, Layer):
     def draw(self, ax: plt.Axes, ctx: DrawContext) -> None:
         style = self.network_style
         pos = self.positions
-        ax.set_xlim(0, 1)
-        ax.set_ylim(0, 1)
+        pad = NETWORK_FIXED_PAD if self.layout == NETWORK_LAYOUT.FIXED else 0
+        ax.set_xlim(-pad, 1 + pad)
+        ax.set_ylim(-pad, 1 + pad)
         ax.set_aspect("equal", adjustable="box")
         ax.axis("off")
         effects = _halo_effects(style.get("halo_width"), self.ground)

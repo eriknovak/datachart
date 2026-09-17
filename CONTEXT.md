@@ -396,13 +396,18 @@ target, weight?}`; nodes may be inferred from edges). `layout` takes a
 `NETWORK_LAYOUT` constant (`SPRING`, seeded in-package Fruchterman–Reingold;
 `WEIGHTED`, the spring with each edge's pull set by its weight; `GROUPED`,
 a plain spring inside each group and a weighted one between the groups;
-`CIRCULAR`; `FIXED` from per-node `x`/`y`); `directed` adds arrowheads.
+`CIRCULAR`; `FIXED` from per-node `x`/`y` in 0–1, inset by the layout
+margin like the others); `directed` adds arrowheads.
 Weight maps to edge width, and to pull only under the two layouts named for
 it; size by square root to marker area; `group` to the multiple color cycle,
 an ungrouped node beside groups taking the edge color. A **cluster** is the
 nodes of one group as `GROUPED` places them: a compact patch arranged by the
 group's own edges, marked by a translucent disc in the group color (the
-**halo**, `plot_network_group_alpha`). One layer per chart, no furniture; rejected in `Panel`, a
+**halo**, `plot_network_group_alpha`). A **component** is a set of nodes
+joined by edges to each other and to no other node; an **isolate** is a
+component of one. Under `SPRING` and `WEIGHTED` a disconnected graph lays out
+each component on its own, packs them like clusters, and rings the isolates
+around them. One layer per chart, no furniture; rejected in `Panel`, a
 cell in `Grid`. Scale: one patch per edge and an O(n²) spring layout —
 comfortable up to ~1k nodes / 3k edges (spring, weighted, grouped) or ~5k /
 15k (circular, fixed); documented as the practical ceiling, not enforced.

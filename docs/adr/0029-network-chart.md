@@ -27,11 +27,26 @@ edges. It is non-Cartesian like the Sankey (ADR 0026) and the treemap
   `FIXED`. `FIXED` reads `x`/`y` from every node record and raises when one
   lacks them. Layout changes what the picture means, so it lives with the
   data, as `nodes` does on `SankeyChart`.
+  Amended (issue #217): `FIXED` positions must lie in 0–1 and raise
+  otherwise. They draw inside the same layout margin as the other layouts
+  through one fixed affine map, never a fit to the data range, so relative
+  placement stays the user's. The map is the view: the limits widen to
+  $-m/(1-2m)$ and $1 + m/(1-2m)$ for margin $m$, so node positions, `texts`,
+  value labels and hover share the user's 0–1 space and a text aimed at a
+  node lands on it.
 - **Spring layout is in-package.** Fruchterman–Reingold in numpy (numpy and
   scipy are already hard dependencies; `networkx` is not added). It is seeded
   by a `seed` front argument, default 0, so golden images and repeated renders
   are stable. Positions are normalised into the 0–1 space with a margin for
   markers and labels. Edge weight does not enter the layout.
+  Amended (issue #216): a disconnected graph no longer runs one global pass,
+  where isolates repel without bound and the fit squashes the real
+  component. Each component of two or more nodes runs its own spring with
+  the chart's seed and is packed like an ADR 0030 cluster (radius
+  $0.3\sqrt{n_c / n}$, largest at the centre, pushed apart to $1.25\,(r_i +
+  r_j)$ since components carry no halo); isolates sit evenly on a ring just
+  outside the packed components, a one-node cluster's diameter apart. A
+  connected graph takes the single pass unchanged.
 - **`directed` is a front flag, default `False`.** Directed edges end in an
   arrowhead clipped at the target node's radius; `A→B` and `B→A` are two
   arrows. Undirected mode merges reverse duplicates into one line. A
@@ -80,6 +95,8 @@ edges. It is non-Cartesian like the Sankey (ADR 0026) and the treemap
   space with equal aspect, `"cartesian"` projection. `Panel` rejects network
   figures with a "use `Grid`" message; `Grid` accepts them as ordinary cells.
   `texts` annotations are placed in the 0–1 layout space.
+  Amended (issue #217): under `FIXED` the view widens past 0–1 by the
+  layout margin; the data space is still the 0–1 layout space.
 
 ## Considered options
 

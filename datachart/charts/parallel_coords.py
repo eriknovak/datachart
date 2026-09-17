@@ -37,7 +37,7 @@ def ParallelCoords(
     style: Optional[
         Union[ParallelCoordsStyleAttrs, List[Optional[ParallelCoordsStyleAttrs]]]
     ] = None,
-    dimensions: Optional[List[str]] = None,
+    dimensions: Optional[Union[List[str], List[List[str]]]] = None,
     hue: Optional[Union[str, List[Optional[str]]]] = None,
     category_orders: Optional[Dict[str, List[str]]] = None,
     texts: Optional[
@@ -107,7 +107,9 @@ def ParallelCoords(
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         style: Style configuration(s) for the lines.
         dimensions: List of dimension names to include and their order. If None,
-            all columns (except hue) are auto-detected.
+            all columns (except hue) are auto-detected. With several data sets,
+            a flat list applies to every set and a list of lists gives one list
+            per set; every set shares one axis, so the lists must be equal.
         hue: The key name in data for line coloring. String values color
             categorically: data points with the same hue value get the same
             color from `color_parallel_hue`. Numeric values color continuously

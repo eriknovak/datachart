@@ -104,13 +104,17 @@ def NetworkChart(
             from the edges in first-seen order.
         layout: How the nodes are placed: a
             [`NETWORK_LAYOUT`][datachart.constants.NETWORK_LAYOUT] constant (default
-            [`NETWORK_LAYOUT.SPRING`][datachart.constants.NETWORK_LAYOUT]). `WEIGHTED`
-            lets each edge's weight set how hard it pulls its nodes together; `GROUPED`
-            clusters the nodes by `group`, arranges the clusters by the summed weight of
-            the edges between them, and marks each with a disc in the group color
-            (`plot_network_group_alpha`). `FIXED` reads each node's `x`/`y` in the 0–1
-            layout space. The three spring layouts cost the square of the node count;
-            past about 1,000 nodes prefer `CIRCULAR` or `FIXED`.
+            [`NETWORK_LAYOUT.SPRING`][datachart.constants.NETWORK_LAYOUT]); on a
+            disconnected network, `SPRING` and `WEIGHTED` place each connected part
+            on its own, side by side, with the unlinked nodes on a ring around them.
+            `WEIGHTED` lets each edge's weight set how hard it pulls its nodes
+            together; `GROUPED` clusters the nodes by `group`, arranges the clusters
+            by the summed weight of the edges between them, and marks each with a
+            disc in the group color (`plot_network_group_alpha`). `FIXED` reads each
+            node's `x`/`y`, each between 0 and 1, and draws that space inside the
+            margin the other layouts keep.
+            The three spring layouts cost the square of the node count; past about
+            1,000 nodes prefer `CIRCULAR` or `FIXED`.
         directed: Whether the edges end in an arrowhead at the target. When
             `False` (the default), an edge and its reverse draw as one line.
         seed: The seed of the spring layouts (default 0); another seed gives
@@ -148,8 +152,8 @@ def NetworkChart(
             [`ARROW_STYLE.CURVE`][datachart.constants.ARROW_STYLE] (default) or
             [`ARROW_STYLE.STRAIGHT`][datachart.constants.ARROW_STYLE]; the arrowhead
             comes from `directed`.
-        texts: Text annotation(s) to draw. The layout spans 0–1 in both
-            directions.
+        texts: Text annotation(s) to draw. Data coordinates are the 0–1 layout
+            space, so under `FIXED` a text at a node's `x`/`y` lands on that node.
 
     Returns:
         The figure containing the network chart.
@@ -158,9 +162,9 @@ def NetworkChart(
         ValueError: If `emphasis` is given, `layout` is unknown, the records
             are malformed (a node without an id or a repeated id, an edge
             naming an unknown node or joining a node to itself, a `size` or
-            `weight` not above zero, a node without `x`/`y` under the fixed
-            layout, an `emphasis` that is not a role), or
-            `plot_network_edge_style` is a headed connector look.
+            `weight` not above zero, a node without `x`/`y`, or with one
+            outside 0–1, under the fixed layout, an `emphasis` that is not a
+            role), or `plot_network_edge_style` is a headed connector look.
 
     """
     if emphasis is not None:
