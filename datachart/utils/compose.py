@@ -58,7 +58,7 @@ from ._internal.layers import (
 )
 
 # figures whose layer owns its axes: no shared coordinate space to overlay
-# (ADR 0026, ADR 0028, ADR 0029, ADR 0044)
+# (ADR 0023, ADR 0026, ADR 0028, ADR 0029, ADR 0044)
 BARE_FIGURES = {
     "sankeychart": "Sankey",
     "treemap": "treemap",
@@ -132,14 +132,10 @@ def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
     if panel is None:
         raise ValueError("Figure has invalid metadata: missing 'panel'")
 
-    groups = []
+    groups, skipped = [], False
     for group in panel.groups:
         supported = [l for l in group.layers if isinstance(l, OVERLAYABLE_LAYERS)]
-        if len(supported) < len(group.layers):
-            warnings.warn(
-                f"Chart at index {index} contains layers of type "
-                f"'{metadata.get('type')}' that cannot be overlaid. Skipping them..."
-            )
+        skipped = skipped or len(supported) < len(group.layers)
         if supported:
             groups.append(
                 LayerGroup(
@@ -160,6 +156,12 @@ def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
             f"Figure at index {index} has no layers that can be overlaid; "
             f"'{metadata.get('type')}' figures cannot be overlaid. "
             "Use `Grid` instead."
+        )
+    # only a partial skip warns; a figure that keeps nothing raised above
+    if skipped:
+        warnings.warn(
+            f"Chart at index {index} contains layers of type "
+            f"'{metadata.get('type')}' that cannot be overlaid. Skipping them..."
         )
     return panel, groups
 
@@ -234,9 +236,8 @@ def Panel(
     panel's own ``scalex``, ``scaley`` and ``scaley_right`` override that per
     axis; where two figures on one axis each set a different scale, the first
     one wins and the panel warns (``overlay_warn_scale_conflict`` in the
-    config). The
-    two value axes scale independently, so linear bars on the primary axis
-    against a log line on the secondary one is one panel.
+    config). The two value axes scale independently, so linear bars on the
+    primary axis against a log line on the secondary one is one panel.
 
     Panel figures nest: ``Panel([Panel([f1, f2]), f3])`` is equivalent to
     ``Panel([f1, f2, f3])``, to any depth. A nested panel contributes its
@@ -395,16 +396,14 @@ def Panel(
     source_settings = [
         item["figure"]._chart_metadata["panel"].settings for item in items
     ]
-    # the first source figure that set a bar mode of its own lends it to the
-    # panel; the caller's own `bar_mode` still wins, the config is the floor
+    # the first source figure that set a bar mode of its own lends it to this
+    # panel, which lends it on in turn; the caller's own `bar_mode` wins
     source_bar_mode = next(
         (s.get("source_bar_mode") for s in source_settings if s.get("source_bar_mode")),
         None,
     )
-    # what this panel lends on in turn: what was chosen, never the config floor
     chosen_bar_mode = bar_mode or source_bar_mode
-    if bar_mode is None:
-        bar_mode = source_bar_mode or config.get("overlay_bar_mode", "group")
+    bar_mode = chosen_bar_mode or config.get("overlay_bar_mode", "group")
 
     # the panel takes literal x/y keys; the orientation (raises on a mix) maps
     # them, and the projection (also raising on a mix) picks the axes kind
@@ -426,7 +425,7 @@ def Panel(
         "warn_thin_bars": config.get("overlay_warn_thin_bars", True),
         "warn_scale_conflict": config.get("overlay_warn_scale_conflict", True),
         "bar_mode": bar_mode,
-        # a nested panel lends the mode it was given, not the config floor
+        # never the config floor: that is not a mode anyone chose
         "source_bar_mode": chosen_bar_mode,
         "bar_ticks": "group",
         "bar_width": config.get("plot_bar_width", 0.8),

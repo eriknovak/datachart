@@ -343,7 +343,8 @@ _Avoid_: direct label (for this), line label, legend label
 A per-cell matrix (`Heatmap`: a 2-D `z` grid per chart with optional `x`, `y`
 labels for its columns and rows) drawn as one colored cell per value at
 integer positions. `x`/`y` are tick labels, not coordinates — uneven spacing
-never changes cell size; that is the contour's job.
+never changes cell size; that is the contour's job. A bare figure: rejected
+in `Panel`, a cell in `Grid`.
 _Avoid_: matrix plot, image plot, colormesh
 
 **Calendar heatmap**:

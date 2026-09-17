@@ -7,7 +7,7 @@ import pytest
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpecFromSubplotSpec
 
-from datachart.charts import LineChart, BarChart
+from datachart.charts import Histogram, LineChart, BarChart
 from datachart.config import config
 from datachart.constants import BAR_MODE, THEME, VALUE_FORMAT
 from datachart.utils import (
@@ -190,14 +190,14 @@ class TestPanelBarMode:
 
     def test_panel_falls_back_to_the_config_bar_mode(self):
         config.update_config({"overlay_bar_mode": BAR_MODE.OVERLAY})
-        fig = Panel([_bar_fig(), _bar_fig()])
-        assert self._bar_mode(fig) == BAR_MODE.OVERLAY
-        config.reset_config()
+        try:
+            fig = Panel([_bar_fig(), _bar_fig()])
+            assert self._bar_mode(fig) == BAR_MODE.OVERLAY
+        finally:
+            config.reset_config()
         plt.close("all")
 
     def test_a_histograms_default_stack_is_not_a_source_mode(self):
-        from datachart.charts import Histogram
-
         hist = Histogram(data=[{"x": v} for v in range(20)])
         fig = Panel([_bar_fig(), hist])
         assert self._bar_mode(fig) == "group"
