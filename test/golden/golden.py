@@ -86,7 +86,7 @@ EXPECTED_CHANGES = {
     "emphasis_hist_reference",
     "emphasis_box_labels",
     "emphasis_panel_cross_type",
-    # parallel coordinate tick labels take the theme font
+    # parallel tick labels take the theme font, then snap to round values (#211)
     "parallel_basic",
     # new quill theme cases (ADR 0048)
     "theme_quill_line",

@@ -114,7 +114,8 @@ def ParallelCoords(
         hue: The key name in data for line coloring. String values color
             categorically: data points with the same hue value get the same
             color from `color_parallel_hue`. Numeric values color continuously
-            along the theme's `color_parallel_hue_continuous` ramp.
+            along the theme's `color_parallel_hue_continuous` ramp, which spans
+            every row, muted ones included.
         category_orders: Dictionary mapping dimension names to lists of category
             values in the desired order. Example: {"rating": ["Low", "Medium", "High"]}.
             Categories not in the list will be appended at the end (sorted).
