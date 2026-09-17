@@ -24,6 +24,11 @@ the opposite of what a box + swarm overlay wants.
   the category width — like seaborn, and unlike a size-blind data-space packing
   that drifts with figure size. Limits changed after draw can shift spacing
   slightly; documented, accepted.
+- **Overlaid swarms pack as one cloud** (amended, issue #206). Points on the
+  same axes at the same category position and side pack together, whichever
+  layer or emphasis role drew them, so a second series never lands on the
+  first. Centres stay shared (still overlay, never dodge); each layer keeps
+  its own spread clamp, and strip layers keep their own jitter.
 - **Strip jitter is deterministic.** `jitter` is a fraction of the category
   width (default 0.4) with a fixed internal seed; no `seed` parameter in v1.
 - **Own style family.** `plot_swarm_*` keys (color, alpha, size, marker,

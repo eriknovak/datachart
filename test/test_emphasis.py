@@ -6,6 +6,8 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.colors import to_hex
 
 from datachart.charts import (
     BarChart,
@@ -14,7 +16,9 @@ from datachart.charts import (
     Histogram,
     LineChart,
     ParallelCoords,
+    RaincloudPlot,
     ScatterChart,
+    SwarmPlot,
 )
 from datachart.config import config
 from datachart.constants import THEME
@@ -294,6 +298,113 @@ class TestParallelEmphasis(unittest.TestCase):
         rows = figure.axes[0].lines[:4]
         ymax = max(max(l.get_ydata()) for l in rows)
         self.assertAlmostEqual(ymax, 1.0)
+
+
+def collection_with(ax, value, axis=1):
+    """The marker collection holding a point whose `axis` coordinate is `value`."""
+    for collection in ax.collections:
+        offsets = collection.get_offsets()
+        if len(offsets) and any(abs(p[axis] - value) < 1e-9 for p in offsets):
+            return collection
+    raise AssertionError(f"no collection holds {value}")
+
+
+class TestMarkerRecordEmphasis(unittest.TestCase):
+    """Scatter and swarm records carry their own `emphasis` key."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    @staticmethod
+    def _swarm_data(role_at=None, role=None):
+        rows = [{"label": "A", "value": float(v)} for v in range(6)]
+        if role_at is not None:
+            rows[role_at]["emphasis"] = role
+        return rows
+
+    def assert_muted(self, collection):
+        self.assertEqual(collection.get_alpha(), config["muted_alpha"])
+        self.assertEqual(
+            to_hex(collection.get_facecolors()[0]), to_hex(config["muted_color"])
+        )
+
+    def assert_not_muted(self, collection):
+        self.assertNotEqual(
+            to_hex(collection.get_facecolors()[0]), to_hex(config["muted_color"])
+        )
+
+    def test_scatter_background_record(self):
+        data = [dict(p) for p in SCAT1]
+        data[2]["emphasis"] = "background"
+        ax = ScatterChart(data).axes[0]
+        self.assert_muted(collection_with(ax, 2.0))
+        sibling = collection_with(ax, 3.0)
+        self.assert_not_muted(sibling)
+        self.assertEqual(len(sibling.get_offsets()), len(SCAT1) - 1)
+
+    def test_scatter_highlight_record_with_hue(self):
+        data = [dict(p, group="ab"[p["x"] % 2]) for p in SCAT1]
+        data[4]["emphasis"] = "highlight"
+        ax = ScatterChart(data, hue="group").axes[0]
+        highlighted, sibling = collection_with(ax, 4.0), collection_with(ax, 2.0)
+        self.assertEqual(len(highlighted.get_offsets()), 1)
+        self.assertGreater(highlighted.get_zorder(), sibling.get_zorder())
+        # the highlight keeps its hue color
+        np.testing.assert_allclose(
+            highlighted.get_facecolors()[0], sibling.get_facecolors()[0]
+        )
+        labels = ax.get_legend_handles_labels()[1]
+        self.assertEqual(sorted(labels), ["a", "b"])
+
+    def test_swarm_highlight_record(self):
+        ax = SwarmPlot(self._swarm_data(3, "highlight")).axes[0]
+        highlighted, sibling = collection_with(ax, 3.0), collection_with(ax, 1.0)
+        self.assertIsNot(highlighted, sibling)
+        self.assertEqual(len(highlighted.get_offsets()), 1)
+        self.assertGreater(highlighted.get_linewidths()[0], sibling.get_linewidths()[0])
+        self.assert_not_muted(sibling)
+
+    def test_swarm_background_record(self):
+        ax = SwarmPlot(self._swarm_data(0, "background")).axes[0]
+        self.assert_muted(collection_with(ax, 0.0))
+        self.assert_not_muted(collection_with(ax, 5.0))
+
+    def test_panel_role_overrides_record_roles(self):
+        swarm = SwarmPlot(self._swarm_data(3, "highlight"))
+        data = [dict(p) for p in SCAT1]
+        data[2]["emphasis"] = "highlight"
+        scatter = ScatterChart(data)
+        for figure, value in ((swarm, 3.0), (scatter, 2.0)):
+            panel = Panel([{"figure": figure, "emphasis": "background"}])
+            self.assert_muted(collection_with(panel.axes[0], value))
+
+    def test_record_role_beats_the_chart_role(self):
+        data = [dict(p) for p in SCAT1]
+        data[2]["emphasis"] = "highlight"
+        ax = ScatterChart(data, emphasis="background").axes[0]
+        self.assert_not_muted(collection_with(ax, 2.0))
+        self.assert_muted(collection_with(ax, 3.0))
+
+    def test_highlighted_point_in_a_muted_series_prints_its_value(self):
+        data = [dict(p) for p in SCAT1]
+        data[3]["emphasis"] = "highlight"
+        ax = ScatterChart(data, emphasis="background", show_values=True).axes[0]
+        self.assertEqual([t.get_text() for t in ax.texts], ["3"])
+
+    def test_raincloud_legend_keeps_a_group_with_an_unmuted_point(self):
+        rows = [{"label": label, "value": float(v)} for label in "AB" for v in range(5)]
+        rows[7]["emphasis"] = "highlight"
+        figure = RaincloudPlot(rows, emphasis=[None, "background"], show_legend=True)
+        legend = figure.axes[0].get_legend()
+        self.assertEqual([t.get_text() for t in legend.get_texts()], ["A", "B"])
+
+    def test_invalid_record_role_raises(self):
+        data = [dict(p) for p in SCAT1]
+        data[1]["emphasis"] = "bold"
+        with self.assertRaises(ValueError):
+            ScatterChart(data)
+        with self.assertRaises(ValueError):
+            SwarmPlot(self._swarm_data(1, "bold"))
 
 
 class TestHistogramEmphasis(unittest.TestCase):

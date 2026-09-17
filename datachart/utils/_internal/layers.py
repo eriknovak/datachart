@@ -16,7 +16,7 @@ import warnings
 from collections import defaultdict
 from datetime import date, datetime, time, timedelta, tzinfo
 from numbers import Real
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from itertools import cycle as iter_cycle
 from typing import Callable, List, NamedTuple, Optional, Union
 
@@ -40,6 +40,7 @@ from matplotlib.colors import (
 )
 from matplotlib.mlab import GaussianKDE
 from matplotlib.lines import Line2D
+from matplotlib.markers import MarkerStyle
 from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
 from matplotlib.path import Path
 from matplotlib.text import Text
@@ -395,11 +396,26 @@ def _hollow_marker(style: dict) -> dict:
     return style
 
 
+# marker collections draw plain, highlighted, then muted
+MARKER_ROLE_ORDER = (None, EMPHASIS_HIGHLIGHT, EMPHASIS_BACKGROUND)
+
+
 def _draw_scatter_marks(scatter, x, y, sizes, style: dict, label, highlighted: bool):
-    """One marker collection; the edge fits its markers unless it is the highlight cue."""
+    """One marker collection; the edge fits its markers unless it is the highlight cue.
+
+    An unfilled marker (`"x"`, `"+"`) is all stroke: matplotlib strokes it in
+    the face color, so it keeps the series color and a visible width.
+    """
 
     style = dict(style)
-    if not highlighted:
+    marker = style.get("marker") or mpl.rcParams["scatter.marker"]
+    if not MarkerStyle(marker).is_filled():
+        style.pop("hollow", None)
+        # matplotlib ignores, with a warning, an edge color on these markers
+        style.pop("edgecolors", None)
+        width = np.max(style.get("linewidths") or 0)
+        style["linewidths"] = max(float(width), HOLLOW_MARKER_EDGE_WIDTH)
+    elif not highlighted:
         style["linewidths"] = _marker_edge_widths(style.get("linewidths"), sizes)
     return scatter(x, y, s=sizes, label=label, **_hollow_marker(style))
 
@@ -1067,14 +1083,38 @@ def _snap_to_periods(ax, axis_name, period, tz, origin, bounds) -> None:
     (ax.set_xlim if axis_name == "x" else ax.set_ylim)(lo, hi)
 
 
-def _normalize_sizes(sizes: np.ndarray, size_range: tuple) -> np.ndarray:
-    """Normalize size values to the specified (min, max) range."""
+def _normalize_sizes(
+    sizes: np.ndarray, size_range: tuple, extent: Optional[tuple] = None
+) -> np.ndarray:
+    """Map size values from `extent` (default: their own) onto the (min, max) range."""
 
     min_size, max_size = size_range
-    if sizes.max() == sizes.min():
+    lo, hi = extent if extent is not None else (sizes.min(), sizes.max())
+    if hi == lo:
         return np.full_like(sizes, (min_size + max_size) / 2, dtype=float)
-    normalized = (sizes - sizes.min()) / (sizes.max() - sizes.min())
+    normalized = (sizes - lo) / (hi - lo)
     return normalized * (max_size - min_size) + min_size
+
+
+def _size_extents(layers_on_axes) -> dict:
+    """The (min, max) of every scatter layer's size data, pooled per axes.
+
+    One bubble scale per axes, so an equal size draws equal in every hue
+    group and every composed figure.
+    """
+
+    extents = {}
+    for layer, owner_ax in layers_on_axes:
+        if not isinstance(layer, ScatterLayer):
+            continue
+        sizes = get_chart_data("size", layer.chart)
+        if sizes is None or len(sizes) == 0:
+            continue
+        lo, hi = float(np.min(sizes)), float(np.max(sizes))
+        if owner_ax in extents:
+            lo, hi = min(lo, extents[owner_ax][0]), max(hi, extents[owner_ax][1])
+        extents[owner_ax] = (lo, hi)
+    return extents
 
 
 def _resolve_ref_lines(chart: dict, key: str) -> List[tuple]:
@@ -1736,6 +1776,8 @@ class DrawContext:
     # (marker, hollow) from the panel's marker cycle
     marker: Optional[tuple] = None
     emphasis: Optional[str] = None
+    # the role a composition sets on the layer's figure; beats record roles
+    panel_emphasis: Optional[str] = None
     parallel_stats: Optional[dict] = None
     parallel_axes: bool = True
     transpose: bool = False
@@ -1748,6 +1790,8 @@ class DrawContext:
     # the resolved scales of the axes the layer draws on (ADR 0041)
     value_scale: Optional[str] = None
     category_scale: Optional[str] = None
+    # the (min, max) size data every bubble on the axes maps from
+    size_extent: Optional[tuple] = None
 
 
 # ================================================
@@ -1796,6 +1840,8 @@ class Layer:
     labels_below_range: bool = False
     # one emphasis role per drawn record, on the layers whose records carry one
     record_roles: list = ()
+    # marker records outrank the layer's own role; bar records yield to it
+    record_roles_beat_layer = False
     # the zone of a temporal x column a layer draws as date numbers
     x_tz: Optional[tzinfo] = None
     # a filled background layer; a Panel overlay draws it under marks (ADR 0054)
@@ -2163,6 +2209,28 @@ class Layer:
         elif width is not None:
             style[width_key] = width * HIGHLIGHT_WIDTH_SCALE
 
+    def draws_all_muted(self, role: Optional[str], panel_role: Optional[str]) -> bool:
+        """Whether every mark draws muted, so the layer takes no color or legend."""
+
+        if role != EMPHASIS_BACKGROUND:
+            return False
+        if panel_role is not None or not self.record_roles_beat_layer:
+            return True
+        return all(r in (None, EMPHASIS_BACKGROUND) for r in self.record_roles)
+
+    def _marker_roles(self, unit_roles: list, ctx: DrawContext) -> list:
+        """Each mark's role: the panel's, else its record's, else its unit's.
+
+        `unit_roles` are the series' or group's roles, one per mark in record
+        order; columnar data carries no records and keeps them.
+        """
+
+        if ctx.panel_emphasis is not None:
+            return [ctx.panel_emphasis] * len(unit_roles)
+        if len(self.record_roles) != len(unit_roles):
+            return list(unit_roles)
+        return [own or unit for own, unit in zip(self.record_roles, unit_roles)]
+
     def _record_roles(self, panel_role: Optional[str], n: int) -> list:
         """One role per drawn record; a layer-level role covers them all instead.
 
@@ -2205,27 +2273,39 @@ class Layer:
 
 
 def _is_bar_record(record, y_key: str) -> bool:
-    """Whether a data entry draws a bar: a dict carrying the `y` column."""
+    """Whether a data entry is a dict carrying the `y_key` column, as a bar is."""
 
     return isinstance(record, dict) and y_key in record
+
+
+def _keyed_records(chart: dict, column: str) -> list:
+    """The chart's records carrying the `column` key; empty for columnar data."""
+
+    key = get_attr_value(column, chart, column)
+    data = chart.get("data")
+    if not isinstance(data, list):
+        return []
+    return [record for record in data if _is_bar_record(record, key)]
 
 
 def _bar_records(chart: dict) -> list:
     """The chart's drawn bar records; empty for columnar data."""
 
-    y_key = get_attr_value("y", chart, "y")
-    data = chart.get("data")
-    if not isinstance(data, list):
-        return []
-    return [record for record in data if _is_bar_record(record, y_key)]
+    return _keyed_records(chart, "y")
 
 
 def _record_emphasis(chart: dict) -> list:
     """The validated per-record emphasis roles of a bar chart, one per drawn bar."""
 
+    return _validated_record_roles(_bar_records(chart), "bar")
+
+
+def _validated_record_roles(records: list, kind: str) -> list:
+    """The validated `emphasis` of each record; None where it sets none."""
+
     return [
-        validate_emphasis(record.get("emphasis"), f"bar record {i} `emphasis`")
-        for i, record in enumerate(_bar_records(chart))
+        validate_emphasis(record.get("emphasis"), f"{kind} record {i} `emphasis`")
+        for i, record in enumerate(records)
     ]
 
 
@@ -3860,9 +3940,13 @@ class UnclippedMarksMixin:
 
 class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
     kind = "scatter"
+    record_roles_beat_layer = True
 
     def _resolve_style(self):
         self.scatter_style = get_scatter_style(self.style)
+        self.record_roles = _validated_record_roles(
+            _keyed_records(self.chart, "x"), self.kind
+        )
         self._resolve_value_labels()
         self._init_point_labels()
         # an explicit `show_values` outranks point labels found under the
@@ -3908,9 +3992,9 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
     def value_data(self):
         return get_chart_data("y", self.chart)
 
-    def _sizes(self, size_data):
+    def _sizes(self, size_data, extent: Optional[tuple] = None):
         if size_data is not None:
-            return _normalize_sizes(size_data, self.size_range)
+            return _normalize_sizes(size_data, self.size_range, extent)
         return self.scatter_style.get("s", self.default_size)
 
     def _mark_legend_size(self, collection, size_data):
@@ -3922,27 +4006,28 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
     def _point_labels(self, x_data) -> Optional[np.ndarray]:
         """One label per drawn point (None where the key is absent), or None."""
 
-        x_attr = get_attr_value("x", self.chart, "x")
         label_attr = get_attr_value("label", self.chart, "label")
-        data = self.chart.get("data")
-        if not isinstance(data, list):
-            return None
-        labels = [d.get(label_attr) for d in data if x_attr in d]
+        labels = [d.get(label_attr) for d in _keyed_records(self.chart, "x")]
         if len(labels) != len(x_data) or all(l is None for l in labels):
             return None
         return np.array([None if l is None else str(l) for l in labels], dtype=object)
 
-    def _mark_labels(self, ax, ctx, x_data, y_data) -> tuple:
-        """The (labels, font, pad) each point carries: its value, or its point label."""
+    def _mark_labels(self, ax, ctx, x_data, y_data, roles) -> tuple:
+        """The (labels, font, pad) each point carries: its value, or its point label.
+
+        A muted point prints no value; a fully muted series keeps its point labels.
+        """
 
         labels = self._point_labels(x_data)
+        muted = roles == EMPHASIS_BACKGROUND
         if (
             self.show_values
             and (labels is None or self.show_values_explicit)
-            and ctx.emphasis != EMPHASIS_BACKGROUND
+            and not muted.all()
         ):
+            values = self._value_texts(ax, y_data, ctx.transpose)
             return (
-                self._value_texts(ax, y_data, ctx.transpose),
+                np.where(muted, None, values),
                 self.value_font,
                 self.value_padding,
             )
@@ -4023,101 +4108,131 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
 
         if x_data is None or y_data is None:
             return
-        labels, font, pad = self._mark_labels(ax, ctx, x_data, y_data)
+        roles = np.array(
+            self._marker_roles([ctx.emphasis] * len(x_data), ctx), dtype=object
+        )
+        labels, font, pad = self._mark_labels(ax, ctx, x_data, y_data, roles)
 
         scatter_style = dict(self.scatter_style)
         if ctx.z_order is not None:
             scatter_style["zorder"] = ctx.z_order
         self._apply_cycle_marker(scatter_style, ctx)
-        self._apply_emphasis(
-            scatter_style, ctx.emphasis, width_key="linewidths", color_key=None
-        )
-        if ctx.emphasis == EMPHASIS_HIGHLIGHT:
-            scatter_style["edgecolors"] = self.highlight_edge_color
+        scatter_style.pop("s", None)
 
         _, _, scatter = _oriented(ax, ctx.transpose)
 
+        # one unit per hue group, or the whole series; each keeps one legend entry
         if hue_data is not None:
-            unique_hues = np.unique(hue_data)
+            units = [
+                (hue_data == hue_val, self.hue_colors[i], str(hue_val))
+                for i, hue_val in enumerate(np.unique(hue_data))
+            ]
+        else:
+            series_color = scatter_style.get("c")
+            if series_color is None:
+                series_color = ctx.color
+            units = [(np.ones(len(x_data), dtype=bool), series_color, self.label(ctx))]
+        for mask, color, label in units:
+            sizes = self._sizes(
+                size_data[mask] if size_data is not None else None, ctx.size_extent
+            )
+            self._draw_unit(
+                ax,
+                ctx,
+                scatter,
+                scatter_style,
+                x_data[mask],
+                y_data[mask],
+                sizes,
+                roles[mask],
+                color=color,
+                label=label,
+                size_data=size_data,
+                labels=labels[mask] if labels is not None else None,
+                font=font,
+                pad=pad,
+            )
 
-            for i, hue_val in enumerate(unique_hues):
-                mask = hue_data == hue_val
-                # sizes normalize within each hue group
-                group_sizes = self._sizes(
-                    size_data[mask] if size_data is not None else None
-                )
-                group_style = {k: v for k, v in scatter_style.items() if k != "s"}
-                group_style["c"] = self.hue_colors[i]
-                label = str(hue_val)
-                if ctx.emphasis == EMPHASIS_BACKGROUND:
-                    group_style["c"] = self.muted_color
-                    label = NO_LEGEND
-                collection = _draw_scatter_marks(
-                    scatter,
-                    x_data[mask],
-                    y_data[mask],
-                    group_sizes,
-                    group_style,
-                    label,
-                    ctx.emphasis == EMPHASIS_HIGHLIGHT,
-                )
-                self.register_marks(ax, collection)
-                self._mark_legend_size(collection, size_data)
-                self.register_hover(
-                    collection,
-                    _point_resolver(label, x_data[mask], y_data[mask], ctx.transpose),
-                )
-                self._record_points(
-                    ax,
-                    ctx,
-                    x_data[mask],
-                    y_data[mask],
-                    group_sizes,
-                    labels[mask] if labels is not None else None,
-                    font,
-                    pad,
-                )
-
-            x_fit = _axis_numbers(ax, ctx.transpose, x_data)
+        x_fit = _axis_numbers(ax, ctx.transpose, x_data)
+        if hue_data is not None:
             if self.show_correlation:
                 self._draw_correlation(ax, x_fit, y_data, color=None)
             if self.show_regression:
                 self._draw_regression(ax, ctx, x_fit, y_data, color=None)
-        else:
-            sizes = self._sizes(size_data)
-            base_style = {k: v for k, v in scatter_style.items() if k != "s"}
-            if base_style.get("c") is None:
-                base_style["c"] = ctx.color
-            if ctx.emphasis == EMPHASIS_BACKGROUND:
-                base_style["c"] = self.muted_color
+            return
+        color = (
+            self.muted_color if ctx.emphasis == EMPHASIS_BACKGROUND else series_color
+        )
+        if self.show_regression:
+            self._draw_regression(ax, ctx, x_fit, y_data, color=color)
+        if self.show_correlation:
+            self._draw_correlation(ax, x_data, y_data, color=color)
 
-            color = base_style.get("c", base_style.get("color"))
+    def _draw_unit(
+        self,
+        ax,
+        ctx,
+        scatter,
+        base_style,
+        x,
+        y,
+        sizes,
+        roles,
+        *,
+        color,
+        label,
+        size_data,
+        labels,
+        font,
+        pad,
+    ) -> None:
+        """Draw one hue group or series: one collection per emphasis role.
+
+        The first unmuted collection carries the legend entry.
+        """
+
+        legend_label = label
+        for role in MARKER_ROLE_ORDER:
+            picked = roles == role
+            if not picked.any():
+                continue
+            style = dict(base_style)
+            style["c"] = self.muted_color if role == EMPHASIS_BACKGROUND else color
+            self._apply_emphasis(style, role, width_key="linewidths", color_key=None)
+            if role == EMPHASIS_HIGHLIGHT:
+                style["edgecolors"] = self.highlight_edge_color
+            role_sizes = sizes[picked] if np.ndim(sizes) else sizes
             collection = _draw_scatter_marks(
                 scatter,
-                x_data,
-                y_data,
-                sizes,
-                base_style,
-                self.label(ctx),
-                ctx.emphasis == EMPHASIS_HIGHLIGHT,
+                x[picked],
+                y[picked],
+                role_sizes,
+                style,
+                NO_LEGEND if role == EMPHASIS_BACKGROUND else legend_label,
+                role == EMPHASIS_HIGHLIGHT,
             )
+            if role != EMPHASIS_BACKGROUND:
+                legend_label = NO_LEGEND
             self.register_marks(ax, collection)
             self._mark_legend_size(collection, size_data)
             self.register_hover(
                 collection,
-                _point_resolver(self.label(ctx), x_data, y_data, ctx.transpose),
+                _point_resolver(label, x[picked], y[picked], ctx.transpose),
             )
-            self._record_points(ax, ctx, x_data, y_data, sizes, labels, font, pad)
+            self._record_points(
+                ax,
+                replace(ctx, emphasis=role),
+                x[picked],
+                y[picked],
+                role_sizes,
+                labels[picked] if labels is not None else None,
+                font,
+                pad,
+            )
 
-            x_fit = _axis_numbers(ax, ctx.transpose, x_data)
-            if self.show_regression:
-                self._draw_regression(ax, ctx, x_fit, y_data, color=color)
-            if self.show_correlation:
-                self._draw_correlation(ax, x_data, y_data, color=color)
 
-
-def grouped_values(chart: dict) -> dict:
-    """A group chart's values keyed by label, in first-seen label order."""
+def grouped_records(chart: dict) -> dict:
+    """A group chart's drawn records keyed by label, in first-seen label order."""
 
     label_attr = get_attr_value("label", chart, "label")
     value_attr = get_attr_value("value", chart, "value")
@@ -4125,10 +4240,19 @@ def grouped_values(chart: dict) -> dict:
     data = chart.get("data", [])
     if isinstance(data, list):
         for d in data:
-            lbl, val = d.get(label_attr), d.get(value_attr)
-            if lbl is not None and val is not None:
-                grouped.setdefault(lbl, []).append(val)
+            if d.get(label_attr) is not None and d.get(value_attr) is not None:
+                grouped.setdefault(d[label_attr], []).append(d)
     return grouped
+
+
+def grouped_values(chart: dict) -> dict:
+    """A group chart's values keyed by label, in first-seen label order."""
+
+    value_attr = get_attr_value("value", chart, "value")
+    return {
+        label: [d[value_attr] for d in records]
+        for label, records in grouped_records(chart).items()
+    }
 
 
 class GroupLayer(Layer):
@@ -4155,6 +4279,19 @@ class GroupLayer(Layer):
             if self.color_by_group
             else None
         )
+        if self.color_by_group:
+            # a raincloud keeps the colors and legend of a muted group whose
+            # rain holds an unmuted point, as its swarm draws it
+            self._take_record_roles()
+
+    def _take_record_roles(self) -> None:
+        """Let the records' own roles outrank the group roles, in drawing order."""
+
+        self.record_roles_beat_layer = True
+        self.record_roles = _validated_record_roles(
+            [d for group in grouped_records(self.chart).values() for d in group],
+            self.kind,
+        )
 
     def group_color(self, index: int, ctx_color: Optional[str]) -> Optional[str]:
         """The color of the group at `index`: its own palette slot, or the layer's."""
@@ -4168,10 +4305,15 @@ class GroupLayer(Layer):
 
         if self.group_colors is None:
             return None
+        records = grouped_records(self.chart)
         return [
             Patch(facecolor=self.group_colors[i]["color"], label=str(label))
             for i, (label, role) in enumerate(zip(self.labels(), roles))
             if role != EMPHASIS_BACKGROUND
+            or any(
+                r.get("emphasis") not in (None, EMPHASIS_BACKGROUND)
+                for r in records[label]
+            )
         ]
 
     def grouped_values(self) -> dict:
@@ -4443,6 +4585,7 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
 
     def _resolve_style(self):
         super()._resolve_style()
+        self._take_record_roles()
         self._resolve_value_labels()
         self._init_point_labels()
         # a raincloud's box prints the median, so its rain labels the extremes
@@ -4478,42 +4621,26 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
         # collections drawn per axes, packed by the panel after limits settle
         self._pending = {}
 
-    def _offsets(
-        self, ax, position: float, values: np.ndarray, side: int
-    ) -> np.ndarray:
-        """Per-point offsets from the category center, in data units.
-
-        A nonzero `side` packs the points on one side only: -1 toward lower
-        category positions, +1 toward higher ones.
-        """
-
-        if self.mode == SWARM_MODE.STRIP:
-            # the jitter width scales with the cell the points may spread over
-            offsets = strip_offsets(
-                len(values), self.jitter * self.max_offset / SWARM_MAX_OFFSET
-            )
-            return offsets if not side else (np.abs(offsets) * 2) * side
+    def diameter_px(self, ax) -> float:
+        """The marker diameter in pixels, the spacing the beeswarm keeps."""
 
         size = self.swarm_style.get("s")
         if size is None:
             size = self.default_size
-        diameter_px = np.sqrt(size) / 72 * ax.figure.dpi
-        centers = np.full(len(values), position, dtype=float)
-        points = (
-            np.column_stack([values, centers])
-            if self.is_horizontal
-            else np.column_stack([centers, values])
+        return np.sqrt(size) / 72 * ax.figure.dpi
+
+    def jitter_offsets(self, values: np.ndarray, side: int) -> np.ndarray:
+        """Per-point jitter from the category center, in data units.
+
+        A nonzero `side` jitters on one side only: -1 toward lower category
+        positions, +1 toward higher ones.
+        """
+
+        # the jitter width scales with the cell the points may spread over
+        offsets = strip_offsets(
+            len(values), self.jitter * self.max_offset / SWARM_MAX_OFFSET
         )
-        px = ax.transData.transform(points)
-        value_px = px[:, 0] if self.is_horizontal else px[:, 1]
-        offsets_px = beeswarm_offsets(value_px, diameter_px, bool(side))
-        # pixels per data unit along the category axis; unsigned, so a side
-        # stays in data units on an inverted axis
-        unit = ax.transData.transform([[0, 1]] if self.is_horizontal else [[1, 0]])
-        origin = ax.transData.transform([[0, 0]])
-        scale = abs((unit - origin)[0][1 if self.is_horizontal else 0])
-        offsets = np.clip(offsets_px / scale, -self.max_offset, self.max_offset)
-        return offsets if not side else offsets * side
+        return offsets if not side else (np.abs(offsets) * 2) * side
 
     def draw(self, ax, ctx):
         grouped = self.grouped_values()
@@ -4523,7 +4650,7 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
             return
 
         index = ctx.category_index
-        roles = self._group_roles(labels, ctx.emphasis)
+        split = self._split_by_role(labels, grouped, ctx)
 
         base_style = dict(self.swarm_style)
         if ctx.z_order is not None:
@@ -4534,20 +4661,21 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
             base_style["s"] = self.default_size
 
         # one collection per role with a single legend entry; colored by
-        # group, one collection per label and the cloud's legend lists them
+        # group, one collection per label and role, and the cloud's legend
+        # lists the groups
         positions = list(index.values())
         lo, hi = min(positions) - 0.5, max(positions) + 0.5
         if self.color_by_group:
             batches = [
-                ([lbl], role, i) for i, (lbl, role) in enumerate(zip(labels, roles))
+                ([lbl], role, i)
+                for i, lbl in enumerate(labels)
+                for role in MARKER_ROLE_ORDER
             ]
         else:
-            batches = [
-                ([lbl for lbl, r in zip(labels, roles) if r == role], role, None)
-                for role in (None, EMPHASIS_HIGHLIGHT, EMPHASIS_BACKGROUND)
-            ]
+            batches = [(labels, role, None) for role in MARKER_ROLE_ORDER]
         legend_taken = self.color_by_group
         for members, role, group_index in batches:
+            members = [lbl for lbl in members if (lbl, role) in split]
             if not members:
                 continue
             style = dict(base_style)
@@ -4556,22 +4684,20 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
             self._apply_emphasis(style, role, width_key="linewidths", color_key="c")
             if role == EMPHASIS_HIGHLIGHT:
                 style["edgecolors"] = self.highlight_edge_color
-            else:
-                style["linewidths"] = _marker_edge_widths(
-                    style.get("linewidths"), style.get("s")
-                )
             label = NO_LEGEND
             if role != EMPHASIS_BACKGROUND and not legend_taken:
                 label = self.label(ctx)
                 legend_taken = True
             groups = [
-                (index[lbl] + self.offset, np.asarray(grouped[lbl], dtype=float))
-                for lbl in members
+                (index[lbl] + self.offset, split[lbl, role][0]) for lbl in members
             ]
             centers = np.concatenate([np.full(len(v), pos) for pos, v in groups])
             values = np.concatenate([v for _, v in groups])
             x, y = (values, centers) if self.is_horizontal else (centers, values)
-            collection = ax.scatter(x, y, label=label, **style)
+            sizes = style.pop("s")
+            collection = _draw_scatter_marks(
+                ax.scatter, x, y, sizes, style, label, role == EMPHASIS_HIGHLIGHT
+            )
             self.register_marks(ax, collection)
             positions = np.concatenate(
                 [np.full(len(v), index[lbl]) for lbl, (_, v) in zip(members, groups)]
@@ -4587,38 +4713,38 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
                 else collection.sticky_edges.x
             )
             edges[:] = [lo, hi]
-            self._pending.setdefault(id(ax), []).append((collection, groups, role))
+            texts = None
+            if self.show_values and role != EMPHASIS_BACKGROUND:
+                texts = np.concatenate([split[lbl, role][1] for lbl in members])
+            self._pending.setdefault(id(ax), []).append((collection, groups, texts))
         interval = ax.dataLim.intervaly if self.is_horizontal else ax.dataLim.intervalx
         interval[:] = (min(interval[0], lo), max(interval[1], hi))
 
-    def pack(self, ax, side: int = 0) -> None:
-        """Spread the points drawn into `ax`; the panel calls this once its view is final.
+    def _split_by_role(self, labels: list, grouped: dict, ctx: DrawContext) -> dict:
+        """Each group's (values, value texts) keyed by (label, role).
 
-        The layer's own side wins; otherwise the panel's `side` applies.
+        A point takes the panel's role, else its record's, else its group's;
+        value texts come from the whole group, so a split keeps its extremes.
         """
 
-        side = self.side or side
-        for collection, groups, role in self._pending.pop(id(ax), []):
-            offsets = np.concatenate(
-                [self._offsets(ax, pos, v, side) for pos, v in groups]
-            )
-            xy = np.asarray(collection.get_offsets()).copy()
-            xy[:, 1 if self.is_horizontal else 0] += offsets
-            collection.set_offsets(xy)
-            # labels read the packed positions; every point is an obstacle
-            texts = None
-            if self.show_values and role != EMPHASIS_BACKGROUND:
-                texts = np.concatenate([self._group_value_texts(v) for _, v in groups])
-            self._pending_labels.setdefault(id(ax), []).append(
-                (
-                    xy[:, 0],
-                    xy[:, 1],
-                    collection.get_sizes(),
-                    texts,
-                    self.value_font,
-                    self.value_padding,
-                )
-            )
+        counts = [len(grouped[lbl]) for lbl in labels]
+        unit_roles = [
+            role
+            for role, n in zip(self._group_roles(labels, ctx.emphasis), counts)
+            for _ in range(n)
+        ]
+        roles = np.array(self._marker_roles(unit_roles, ctx), dtype=object)
+        split, start = {}, 0
+        for lbl, n in zip(labels, counts):
+            values = np.asarray(grouped[lbl], dtype=float)
+            texts = self._group_value_texts(values)
+            own = roles[start : start + n]
+            start += n
+            for role in MARKER_ROLE_ORDER:
+                picked = own == role
+                if picked.any():
+                    split[lbl, role] = (values[picked], texts[picked])
+        return split
 
     def _group_value_texts(self, values: np.ndarray) -> np.ndarray:
         """One group's min, median, and max texts, `None` on every other point.
@@ -4647,6 +4773,93 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
             ax, values[order], not self.is_horizontal, span_px * 72.0 / ax.figure.dpi
         )
         return labelled
+
+
+def _beeswarm_units(
+    ax, position: float, values: np.ndarray, horizontal: bool, diameter_px, one_sided
+) -> np.ndarray:
+    """Unsigned beeswarm offsets of `values` around `position`, in data units."""
+
+    centers = np.full(len(values), position, dtype=float)
+    points = (
+        np.column_stack([values, centers])
+        if horizontal
+        else np.column_stack([centers, values])
+    )
+    px = ax.transData.transform(points)
+    value_px = px[:, 0] if horizontal else px[:, 1]
+    offsets_px = beeswarm_offsets(value_px, diameter_px, one_sided)
+    # pixels per data unit along the category axis; unsigned, so a side
+    # stays in data units on an inverted axis
+    unit = ax.transData.transform([[0, 1]] if horizontal else [[1, 0]])
+    origin = ax.transData.transform([[0, 0]])
+    scale = abs((unit - origin)[0][1 if horizontal else 0])
+    return offsets_px / scale
+
+
+def pack_swarms(ax, layers: list, side: int = 0) -> None:
+    """Spread the swarm points drawn into `ax`; the panel calls this once its view is final.
+
+    Points at one category position and side pack as one cloud, whichever
+    layer or emphasis role drew them, so overlaid series never cover each
+    other (ADR 0020). A layer's own side wins over the panel's `side`, and
+    each layer keeps its own spread. Strip layers jitter on their own.
+    """
+
+    entries = [
+        (layer, *entry) for layer in layers for entry in layer._pending.pop(id(ax), [])
+    ]
+    offsets, clouds = {}, defaultdict(list)
+    for i, (layer, _, groups, _) in enumerate(entries):
+        layer_side = layer.side or side
+        for j, (position, values) in enumerate(groups):
+            if layer.mode == SWARM_MODE.STRIP:
+                offsets[i, j] = layer.jitter_offsets(values, layer_side)
+            else:
+                key = (position, layer_side, layer.is_horizontal)
+                clouds[key].append((i, j))
+
+    def member(i, j) -> tuple:
+        """The layer and values of group `j` in pending entry `i`."""
+
+        layer, _, groups, _ = entries[i]
+        return layer, groups[j][1]
+
+    for (position, cloud_side, horizontal), members in clouds.items():
+        values = [member(i, j)[1] for i, j in members]
+        diameter = max(member(i, j)[0].diameter_px(ax) for i, j in members)
+        units = _beeswarm_units(
+            ax,
+            position,
+            np.concatenate(values),
+            horizontal,
+            diameter,
+            bool(cloud_side),
+        )
+        start = 0
+        for (i, j), part in zip(members, values):
+            spread = member(i, j)[0].max_offset
+            placed = np.clip(units[start : start + len(part)], -spread, spread)
+            offsets[i, j] = placed * cloud_side if cloud_side else placed
+            start += len(part)
+
+    for i, (layer, collection, groups, texts) in enumerate(entries):
+        xy = np.asarray(collection.get_offsets()).copy()
+        xy[:, 1 if layer.is_horizontal else 0] += np.concatenate(
+            [offsets[i, j] for j in range(len(groups))]
+        )
+        collection.set_offsets(xy)
+        # labels read the packed positions; every point is an obstacle
+        layer._pending_labels.setdefault(id(ax), []).append(
+            (
+                xy[:, 0],
+                xy[:, 1],
+                collection.get_sizes(),
+                texts,
+                layer.value_font,
+                layer.value_padding,
+            )
+        )
 
 
 # keeps the two inner boxes of a split violin off the shared seam
@@ -10385,7 +10598,9 @@ class Panel:
         pooled_colors = defaultdict(int)
         for group in self.groups:
             n_background = sum(
-                1 for l in group.layers if group.layer_role(l) == EMPHASIS_BACKGROUND
+                1
+                for l in group.layers
+                if l.draws_all_muted(group.layer_role(l), group.emphasis)
             )
             pooled_colors[palette_key(group)] += max(group.max_colors - n_background, 0)
         cycles = {}
@@ -10409,6 +10624,11 @@ class Panel:
             figure._hover_style = self.snapshot_hover_style()
         hover_targets = figure._hover_targets
         group_axes = [ax_right if a == "right" else ax for a in assignments]
+        size_extents = _size_extents(
+            (layer, target_ax)
+            for group, target_ax in zip(self.groups, group_axes)
+            for layer in group.layers
+        )
         # scales resolve before drawing: a log axis rejects its data up front
         scales = self._resolve_scales(ax_right, group_axes)
         self._validate_log_scales(scales, group_axes, ax_right)
@@ -10432,19 +10652,18 @@ class Panel:
                     )
 
                 role = group.layer_role(layer)
+                muted = layer.draws_all_muted(role, group.emphasis)
 
                 ctx = DrawContext(
                     # a text carrier lookup would advance the pooled cycle
                     # and shift the colors of later composed figures
                     color=(
                         None
-                        if role == EMPHASIS_BACKGROUND or layer.kind == "text"
+                        if muted or layer.kind == "text"
                         else cycle[layer.chart_hash]["color"]
                     ),
                     z_order=z_order,
-                    legend_label=(
-                        NO_LEGEND if role == EMPHASIS_BACKGROUND else group.legend_label
-                    ),
+                    legend_label=NO_LEGEND if muted else group.legend_label,
                     alpha=(
                         bar_alpha
                         if isinstance(layer, (BarLayer, RadialBarLayer))
@@ -10476,6 +10695,7 @@ class Panel:
                         else None
                     ),
                     emphasis=role,
+                    panel_emphasis=group.emphasis,
                     parallel_stats=parallel_stats,
                     parallel_axes=layer is parallel_axes_owner,
                     transpose=horizontal and layer.is_horizontal is None,
@@ -10484,6 +10704,7 @@ class Panel:
                     aspect_locked=aspect_locked,
                     value_scale=value_scale,
                     category_scale=category_scale,
+                    size_extent=size_extents.get(target_ax),
                 )
                 layer.draw(target_ax, ctx)
                 hover_targets.extend(layer.take_hover_targets())
@@ -10960,10 +11181,13 @@ class Panel:
         # scales and limits are final (ADR 0020); over ridges the points pack
         # on the side the ridges rise to, inside them (ADR 0047)
         swarm_side = (-1 if horizontal else 1) if ridges else 0
+        swarms = defaultdict(list)
         for group, owner_ax in zip(self.groups, group_axes):
             for layer in group.layers:
                 if isinstance(layer, SwarmLayer):
-                    layer.pack(owner_ax, swarm_side)
+                    swarms[owner_ax].append(layer)
+        for owner_ax, swarm_layers in swarms.items():
+            pack_swarms(owner_ax, swarm_layers, swarm_side)
 
         # one reference declared for every chart of a figure draws once per
         # axes, so a line or text does not repeat and a band's tint does not
@@ -11052,7 +11276,7 @@ class Panel:
             for group in self.groups:
                 for layer in group.layers:
                     # background layers carry no legend entries
-                    if group.layer_role(layer) == EMPHASIS_BACKGROUND:
+                    if layer.draws_all_muted(group.layer_role(layer), group.emphasis):
                         continue
                     handles = getattr(layer, "legend_handles", lambda: None)()
                     if handles:

@@ -2389,6 +2389,9 @@ class ScatterDataPointAttrs(TypedDict):
         size (Optional[Union[int, float]]): The marker size (for bubble charts).
         hue (Optional[str]): The category for color grouping.
         label (Optional[str]): The label drawn beside the point.
+        emphasis (Optional[Union[EMPHASIS, str]]): The point's own emphasis role
+            ("background" or "highlight"); wins over the chart's `emphasis` and
+            `emphasis_rule`.
 
     """
 
@@ -2397,6 +2400,7 @@ class ScatterDataPointAttrs(TypedDict):
     size: Optional[Union[int, float]]
     hue: Optional[str]
     label: Optional[str]
+    emphasis: Optional[Union[EMPHASIS, str]]
 
 
 class ScatterSingleChartAttrs(TypedDict):
@@ -2530,11 +2534,15 @@ class SwarmDataPointAttrs(TypedDict):
     Attributes:
         label (str): The category label.
         value (Union[int, float]): The numeric value.
+        emphasis (Optional[Union[EMPHASIS, str]]): The point's own emphasis role
+            ("background" or "highlight"); wins over its group's `emphasis` and
+            the chart's `emphasis_rule`.
 
     """
 
     label: str
     value: Union[int, float]
+    emphasis: Optional[Union[EMPHASIS, str]]
 
 
 class SwarmSingleChartAttrs(TypedDict):

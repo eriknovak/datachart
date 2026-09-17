@@ -86,7 +86,8 @@ that group's category-index position, spread across the category width in
 one of two modes: `swarm` (beeswarm — non-overlapping offsets computed from
 the marker size) or `strip` (seeded uniform jitter). Overlaid on a box of the
 same groups it shares the center; several swarm layers overlay at the same
-position in distinct colors rather than dodging.
+position in distinct colors rather than dodging, and pack as one cloud so no
+point covers another.
 _Avoid_: beeswarm (for the chart), strip plot (for the chart), dot plot
 
 **DrawContext**:
@@ -551,7 +552,8 @@ reads relative to its siblings: background is muted and dropped from the
 legend, highlight is nudged forward (front z-order, slightly bolder). Styling,
 not data. Set per chart, per figure in `Panel`, per group label on the group
 fronts, per record on the fronts whose records carry an `emphasis` key
-(treemap, network, bar), or per cell on a heatmap.
+(treemap, network, bar, scatter, swarm), or per cell on a heatmap. A scatter or
+swarm record's own role wins over its series or group role.
 _Avoid_: background theme, de-emphasis flag
 
 **Emphasis rule**:
@@ -575,7 +577,8 @@ A filled marker (scatter, bubble, swarm, radial scatter, network node) keeps
 its theme edge only while the stroke stays under a sixth of the marker
 diameter; a smaller marker draws with no edge, per marker for data-sized
 ones. A highlight edge is the emphasis cue and always stays. Hollow markers
-(box outliers) are exempt — their edge is the marker.
+(box outliers) and unfilled ones (`"x"`, `"+"`) are exempt — their edge is
+the marker, drawn in the series color.
 _Avoid_: edge threshold, min marker size
 
 **Value label**:

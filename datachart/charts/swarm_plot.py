@@ -129,6 +129,7 @@ def SwarmPlot(
         The `legend` parameter.
         The `vspans` and `hspans` reference bands.
         The `emphasis_rule` parameter.
+        The per-point `emphasis` key.
         The `show_values` and `value_format` parameters.
 
     Examples:
@@ -150,7 +151,8 @@ def SwarmPlot(
     Args:
         data: The data points for the swarm plot(s). Can be a single list of data
             points for one chart, or a list of lists for multiple charts.
-            Each data point should have a `label` (category) and `value` (numeric).
+            Each data point should have a `label` (category) and `value` (numeric),
+            and may carry its own `emphasis` role, which wins over its group's.
         title: The title of the chart.
         xlabel: The x-axis label.
         ylabel: The y-axis label.
