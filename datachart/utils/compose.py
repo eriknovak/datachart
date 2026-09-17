@@ -64,6 +64,7 @@ BARE_FIGURES = {
     "treemap": "treemap",
     "networkchart": "network",
     "calendarheatmap": "calendar heatmap",
+    "heatmap": "heatmap",
 }
 
 OVERLAYABLE_LAYERS = (
@@ -154,6 +155,12 @@ def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
                     category_scale=group.category_scale,
                 )
             )
+    if not groups:
+        raise ValueError(
+            f"Figure at index {index} has no layers that can be overlaid; "
+            f"'{metadata.get('type')}' figures cannot be overlaid. "
+            "Use `Grid` instead."
+        )
     return panel, groups
 
 
