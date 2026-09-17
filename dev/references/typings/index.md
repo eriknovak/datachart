@@ -219,7 +219,7 @@ The `label`, `location`, `format`, and `ticks` fields, and the name `ColorbarSet
 | `label`       | The caption beside the bar, reading along it; drawn in the font_ylabel\_\* theme font. **TYPE:** \`str                                                             |
 | `location`    | The chart edge the bar sits on. **TYPE:** \`COLORBAR_LOCATION                                                                                                      |
 | `format`      | The format of the bar's tick labels, with the value named x (e.g. "{x:.0f}"). On a hexbin chart, valfmt still applies when this is unset. **TYPE:** \`VALUE_FORMAT |
-| `ticks`       | Explicit tick positions on the bar. **TYPE:** \`list\[int                                                                                                          |
+| `ticks`       | Explicit tick positions on the bar; positions outside the mapped value range are not drawn. **TYPE:** \`list\[int                                                  |
 | `orientation` | The orientation; derives the edge when location is unset. **TYPE:** \`ORIENTATION                                                                                  |
 
 ## Shared Style
