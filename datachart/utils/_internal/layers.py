@@ -11235,6 +11235,20 @@ class Panel:
                             axis.parameter, axis.role, axis.scale, values, hint
                         )
 
+    def _radial_category_labels(self) -> Optional[np.ndarray]:
+        """The widest categorical layer's labels; the spokes follow them.
+
+        `None` when no layer is categorical, as on a radial histogram.
+        """
+
+        label_sets = [
+            l.labels()
+            for l in self.layers
+            if isinstance(l, RadialLayer) and l.is_categorical
+        ]
+        label_sets = [lbl for lbl in label_sets if lbl is not None and len(lbl)]
+        return max(label_sets, key=len) if label_sets else None
+
     def _apply_polar_grid_selection(self, ax, show_grid) -> None:
         """Draw only the polar grid set the user named (ADR 0015).
 
@@ -11359,15 +11373,8 @@ class Panel:
         # angular category ticks: labels sit evenly around the circle, unless
         # tip labels carry them at the marks instead
         if polar:
-            label_sets = [
-                l.labels()
-                for l in layers
-                if isinstance(l, RadialLayer) and l.is_categorical
-            ]
-            label_sets = [lbl for lbl in label_sets if lbl is not None and len(lbl)]
-            if label_sets:
-                # the widest layer supplies the labels when counts differ
-                cat_labels = max(label_sets, key=len)
+            cat_labels = self._radial_category_labels()
+            if cat_labels is not None:
                 ax.set_xticks(_radial_theta(len(cat_labels)))
                 if s.get("show_tip_labels"):
                     ax.set_xticklabels([""] * len(cat_labels))
@@ -12001,6 +12008,13 @@ class Panel:
             for spine in ax.spines.values():
                 spine.set_visible(False)
 
+        # the r tick labels sit midway between the first two spokes, clear of
+        # both their gridlines and their category labels (issue #191); a
+        # numeric angular axis keeps matplotlib's 22.5deg, midway on its grid
+        cat_labels = self._radial_category_labels()
+        if cat_labels is not None:
+            ax.set_rlabel_position(180 / len(cat_labels))
+
         self._elevate_radial_value_labels(ax)
         self._draw_radial_tip_texts(ax)
 
@@ -12108,15 +12122,9 @@ class Panel:
                 )
 
         if show_tip_labels:
-            label_sets = [
-                l.labels()
-                for l in self.layers
-                if isinstance(l, RadialLayer) and l.is_categorical
-            ]
-            label_sets = [lbl for lbl in label_sets if lbl is not None and len(lbl)]
-            if not label_sets:
+            cat_labels = self._radial_category_labels()
+            if cat_labels is None:
                 return
-            cat_labels = max(label_sets, key=len)
             theta_positions = _radial_theta(len(cat_labels))
             # each label hugs the outermost mark on its own spoke
             outer = {}

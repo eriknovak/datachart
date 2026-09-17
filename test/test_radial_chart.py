@@ -171,6 +171,41 @@ def gridlines(ax) -> tuple:
     )
 
 
+class TestRadialTickLabels:
+    def test_labels_sit_midway_between_the_first_two_spokes(self):
+        six = [{"label": str(i), "y": i + 1} for i in range(6)]
+        ax = RadialChart(data=six).axes[0]
+        assert ax.get_rlabel_position() == pytest.approx(30.0)
+        elevated = [t for t in ax.texts if t.get_color() == "#000000"]
+        assert elevated
+        assert all(t.get_position()[0] == pytest.approx(np.pi / 6) for t in elevated)
+
+    def test_eight_categories_keep_the_matplotlib_angle(self):
+        ax = RadialChart(data=WIND).axes[0]
+        assert ax.get_rlabel_position() == pytest.approx(22.5)
+
+    def test_the_angle_is_data_theta_under_a_custom_startangle(self):
+        six = [{"label": str(i), "y": i + 1} for i in range(6)]
+        ax = RadialChart(
+            data=six, startangle="E", direction=RADIAL_DIRECTION.COUNTERCLOCKWISE
+        ).axes[0]
+        assert ax.get_rlabel_position() == pytest.approx(30.0)
+        spokes = sorted(ax.get_xticks())
+        elevated = [t for t in ax.texts if t.get_color() == "#000000"]
+        midway = (spokes[0] + spokes[1]) / 2
+        assert all(t.get_position()[0] == pytest.approx(midway) for t in elevated)
+
+    def test_a_radial_histogram_keeps_the_matplotlib_angle(self):
+        ax = RadialChart(data=ANGLES, type=RADIAL_TYPE.HISTOGRAM).axes[0]
+        assert ax.get_rlabel_position() == pytest.approx(22.5)
+
+    def test_the_widest_layer_sets_the_angle(self):
+        four = [{"label": str(i), "y": i + 1} for i in range(4)]
+        six = [{"label": str(i), "y": i + 1} for i in range(6)]
+        ax = RadialChart(data=[four, six]).axes[0]
+        assert ax.get_rlabel_position() == pytest.approx(30.0)
+
+
 class TestPolarGrid:
     def test_unset_keeps_both_sets(self):
         spokes, rings = gridlines(RadialChart(data=WIND).axes[0])

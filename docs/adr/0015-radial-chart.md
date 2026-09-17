@@ -38,6 +38,13 @@ of the panel.
   (`RADIAL_DIRECTION.CLOCKWISE`/`COUNTERCLOCKWISE`, default clockwise) and
   `innerradius` (fraction 0–1 of the radial extent, default 0) are chart
   settings. Line visuals close their loop.
+- **The r tick labels sit midway between the first two spokes.**
+  Amended (issue #191): on a categorical angular axis the radial tick labels
+  are placed at `180 / n` degrees for `n` categories, in data theta, so the
+  `startangle` and `direction` carry them exactly as they carry the spokes.
+  Matplotlib's fixed 22.5 degrees lands on a spoke for most category counts
+  and collides with its label. A numeric angular axis (the histogram) keeps
+  22.5 degrees, already midway on its 45-degree theta grid.
 - **An explicit `show_grid` selects the polar grid, unset keeps both.**
   Matplotlib's polar axes draw spokes and rings natively, so restyling one
   set could never hide the other. Amended (issue #190): `show_grid="x"`
