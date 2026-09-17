@@ -10979,9 +10979,10 @@ class Panel:
     def _resolve_scales(self, ax_right, group_axes) -> tuple:
         """The literal x, y and twin value-axis scales (ADR 0041).
 
-        Per axis, an explicit setting wins; otherwise the first group on that
-        axis supplies its stamped scale, and a group built on another one
-        warns. A group that set no scale was built linear.
+        Per axis, an explicit setting wins; otherwise the first group that
+        stamped a scale supplies it, and a group stamped with another one
+        warns. A group that set no scale has nothing to carry: it abstains
+        and adopts whatever the axis resolves to.
         """
 
         s = self.settings
@@ -11000,13 +11001,13 @@ class Panel:
         def pick(explicit, stamps, message):
             if explicit:
                 return explicit
-            if not stamps:
+            stamped = [scale for scale in stamps if scale]
+            if not stamped:
                 return None
-            built = [scale or SCALE.LINEAR for scale in stamps]
-            losers = sorted(set(built[1:]) - {built[0]})
+            losers = sorted(set(stamped[1:]) - {stamped[0]})
             if losers and warn:
-                warnings.warn(message(built[0], losers))
-            return stamps[0]
+                warnings.warn(message(stamped[0], losers))
+            return stamped[0]
 
         def value_conflict(winner, losers):
             return (

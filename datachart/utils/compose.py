@@ -230,9 +230,11 @@ def Panel(
 
     Each axis keeps the scale its figures were built with: a figure drawn
     with ``scaley="log"`` stays log in the panel, on whichever value axis it
-    lands. The panel's own ``scalex``, ``scaley`` and ``scaley_right`` override
-    that per axis; where the figures on one axis disagree, the first one wins
-    and the panel warns (``overlay_warn_scale_conflict`` in the config). The
+    lands. A figure that set no scale takes the one its axis resolves to. The
+    panel's own ``scalex``, ``scaley`` and ``scaley_right`` override that per
+    axis; where two figures on one axis each set a different scale, the first
+    one wins and the panel warns (``overlay_warn_scale_conflict`` in the
+    config). The
     two value axes scale independently, so linear bars on the primary axis
     against a log line on the secondary one is one panel.
 
@@ -331,13 +333,13 @@ def Panel(
         ymin_right: Minimum value for the secondary value-axis limits.
         ymax_right: Maximum value for the secondary value-axis limits.
         scalex: The category-axis scale ("linear", "log", "symlog", "asinh").
-            Default: the scale the first figure was built with. See
-                [`SCALE`][datachart.constants.SCALE].
-        scaley: The primary value-axis scale. Default: the scale the first
-            figure on that axis was built with.
-        scaley_right: The secondary value-axis scale. Default: the scale the
-            first figure on that axis was built with. Inert on a polar panel,
-            which has no secondary axis.
+            Default: the scale of the first figure that was built with one.
+                See [`SCALE`][datachart.constants.SCALE].
+        scaley: The primary value-axis scale. Default: the scale of the first
+            figure on that axis that was built with one.
+        scaley_right: The secondary value-axis scale. Default: the scale of
+            the first figure on that axis that was built with one. Inert on a
+            polar panel, which has no secondary axis.
         bar_mode: How bar and histogram series share the axis: "group" (side-by-side
             bars; histograms overlay), "stack" (stacked), or "overlay" (overlapping).
             Default is taken from config (overlay_bar_mode, default "group"). See
