@@ -23,7 +23,10 @@ not deprecated.
 For composed parallel-coords highlighting to be correct, per-dimension
 normalization moves from the layer to the `Panel` (shared min/max across all
 parallel layers, like shared histogram bins) — a single-layer panel keeps
-today's output.
+today's output. The shared span of a numeric dimension snaps outward to the
+nice ticks enclosing its data, so the axis starts and ends on a labelled
+round value, as a continuous cartesian axis does, and normalization and tick
+labels read one span.
 
 The same release renames the role-based themes to look-based names —
 `PUBLICATION → INK`, `ACADEMIC → HATCH` (which also drops its serif fonts for

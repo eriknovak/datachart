@@ -18,7 +18,7 @@ from datetime import date, datetime, time, timedelta, tzinfo
 from numbers import Real
 from dataclasses import dataclass, replace
 from itertools import cycle as iter_cycle
-from typing import Callable, List, NamedTuple, Optional, Union
+from typing import Callable, List, NamedTuple, Optional, Tuple, Union
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7270,17 +7270,20 @@ class ParallelCoordsLayer(Layer):
                     )
             else:
                 dim_range = dim_max[dim] - dim_min[dim]
-                for tick_pos in [0.0, 0.25, 0.5, 0.75, 1.0]:
+                # a dimension holding one value keeps a single mid-axis tick
+                ticks = stats["dim_ticks"].get(dim, []) if dim_range else []
+                positions = (
+                    [(tick - dim_min[dim]) / dim_range for tick in ticks]
+                    if ticks
+                    else [0.5]
+                )
+                values = ticks if ticks else [dim_min[dim]]
+                for tick_pos, actual in zip(positions, values):
                     ax.plot(
                         [tick_start, tick_end],
                         [tick_pos, tick_pos],
                         zorder=tick_zorder,
                         **self.tick_style,
-                    )
-                    actual = (
-                        dim_min[dim] + tick_pos * dim_range
-                        if dim_range
-                        else dim_min[dim]
                     )
                     ax.text(
                         i + label_x_offset,
@@ -7303,6 +7306,36 @@ def _row_resolver(label, dimensions: list, row: dict) -> Callable[[int], dict]:
         return {"label": label, dim: row.get(dim)}
 
     return resolve
+
+
+def _nice_dim_span(vmin: float, vmax: float) -> Tuple[float, float, List[float]]:
+    """A numeric dimension's nice ticks, and the span they enclose its data with.
+
+    The axis then starts and ends on a labelled round value, as a continuous
+    cartesian axis does under the tick snap. A parallel axis carries no
+    matplotlib axis of its own, so the ticks come straight from the locator.
+    """
+
+    locator = MaxNLocator(nbins=5, steps=[1, 2, 2.5, 5, 10])
+    ticks = np.asarray(locator.tick_values(vmin, vmax), dtype=float)
+    if len(ticks) < 2 or not np.isfinite(ticks).all():
+        return vmin, vmax, []
+    step = float(np.min(np.diff(ticks)))
+    if step <= 0:
+        return vmin, vmax, []
+    tol = step * 1e-6
+    below, above = ticks[ticks <= vmin + tol], ticks[ticks >= vmax - tol]
+    lo = (
+        float(below.max())
+        if len(below)
+        else float(ticks[0] - step * math.ceil((ticks[0] - vmin - tol) / step))
+    )
+    hi = (
+        float(above.min())
+        if len(above)
+        else float(ticks[-1] + step * math.ceil((vmax - ticks[-1] - tol) / step))
+    )
+    return lo, hi, list(np.linspace(lo, hi, int(round((hi - lo) / step)) + 1))
 
 
 def compute_parallel_stats(layers: List["ParallelCoordsLayer"]) -> Optional[dict]:
@@ -7378,21 +7411,26 @@ def compute_parallel_stats(layers: List["ParallelCoordsLayer"]) -> Optional[dict
         else:
             dim_is_categorical[dim] = False
 
-    dim_min, dim_max = {}, {}
+    dim_min, dim_max, dim_ticks = {}, {}, {}
     for dim in dimensions:
         if dim_is_categorical[dim]:
             dim_min[dim] = 0
             dim_max[dim] = len(dim_categories[dim]) - 1
+            continue
+        vals = np.array(
+            [
+                v if v is not None and isinstance(v, (int, float)) else np.nan
+                for v in dim_values_raw[dim]
+            ],
+            dtype=float,
+        )
+        data_min, data_max = np.nanmin(vals), np.nanmax(vals)
+        if data_min == data_max or not np.isfinite([data_min, data_max]).all():
+            dim_min[dim], dim_max[dim], dim_ticks[dim] = data_min, data_max, []
         else:
-            vals = np.array(
-                [
-                    v if v is not None and isinstance(v, (int, float)) else np.nan
-                    for v in dim_values_raw[dim]
-                ],
-                dtype=float,
+            dim_min[dim], dim_max[dim], dim_ticks[dim] = _nice_dim_span(
+                float(data_min), float(data_max)
             )
-            dim_min[dim] = np.nanmin(vals)
-            dim_max[dim] = np.nanmax(vals)
 
     return {
         "dimensions": dimensions,
@@ -7401,6 +7439,7 @@ def compute_parallel_stats(layers: List["ParallelCoordsLayer"]) -> Optional[dict
         "category_map": dim_category_map,
         "dim_min": dim_min,
         "dim_max": dim_max,
+        "dim_ticks": dim_ticks,
     }
 
 

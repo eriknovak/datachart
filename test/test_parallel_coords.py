@@ -8,6 +8,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from datachart.charts import ParallelCoords
+from datachart.utils import Panel
 
 SET_A = [{"a": 1, "b": 2, "c": 3, "d": 9}, {"a": 2, "b": 1, "c": 4, "d": 8}]
 SET_B = [{"a": 3, "b": 5, "c": 1, "d": 7}, {"a": 4, "b": 3, "c": 2, "d": 6}]
@@ -23,6 +24,23 @@ HUE_ROWS = [
 
 def dimension_labels(figure):
     return [t.get_text() for t in figure.axes[0].get_xticklabels()]
+
+
+TICK_ROWS = [
+    {"a": 3.0, "b": 2.2, "c": 5.0},
+    {"a": 9.0, "b": 5.0, "c": 5.0},
+    {"a": 18.0, "b": 8.7, "c": 5.0},
+]
+
+
+def axis_ticks(figure, index):
+    """One dimension axis's tick labels, as (normalized position, text) pairs."""
+    pairs = [
+        (round(text.get_position()[1], 6), text.get_text())
+        for text in figure.axes[0].texts
+        if abs(text.get_position()[0] - index) < 0.5
+    ]
+    return sorted(pairs)
 
 
 def parallel_layer(figure):
@@ -58,6 +76,51 @@ class TestDimensions(unittest.TestCase):
     def test_sets_without_dimensions_detect_every_column(self):
         figure = ParallelCoords([SET_A, SET_B])
         self.assertEqual(dimension_labels(figure), ["a", "b", "c", "d"])
+
+
+class TestNumericAxisTicks(unittest.TestCase):
+    """A numeric dimension snaps outward to the enclosing nice ticks."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_tick_labels_are_round_values(self):
+        figure = ParallelCoords(TICK_ROWS, dimensions=["a", "b"])
+        self.assertEqual(
+            axis_ticks(figure, 0),
+            [(0.0, "0"), (0.25, "5.00"), (0.5, "10.0"), (0.75, "15.0"), (1.0, "20.0")],
+        )
+        self.assertEqual(
+            [text for _, text in axis_ticks(figure, 1)],
+            ["2.00", "4.00", "6.00", "8.00", "10.0"],
+        )
+
+    def test_the_axis_ends_on_a_tick(self):
+        figure = ParallelCoords(TICK_ROWS, dimensions=["a", "b"])
+        for index in (0, 1):
+            positions = [position for position, _ in axis_ticks(figure, index)]
+            self.assertEqual((positions[0], positions[-1]), (0.0, 1.0))
+
+    def test_values_normalize_against_the_snapped_span(self):
+        figure = ParallelCoords(TICK_ROWS, dimensions=["a", "b"])
+        rows = figure.axes[0].lines[: len(TICK_ROWS)]
+        # the "a" span snaps to 0-20, so 3.0 sits at 0.15 and 18.0 at 0.9
+        self.assertAlmostEqual(rows[0].get_ydata()[0], 0.15)
+        self.assertAlmostEqual(rows[2].get_ydata()[0], 0.9)
+
+    def test_composed_layers_share_the_snapped_span(self):
+        small = ParallelCoords([{"a": 1.0, "b": 1.0}, {"a": 3.0, "b": 2.0}])
+        large = ParallelCoords([{"a": 1.0, "b": 1.0}, {"a": 18.0, "b": 2.0}])
+        panel = Panel([small, large])
+        # both layers read the combined 1-18 range, snapped outward to 0-20
+        rows = panel.axes[0].lines[:4]
+        self.assertAlmostEqual(rows[1].get_ydata()[0], 0.15)
+        self.assertAlmostEqual(rows[3].get_ydata()[0], 0.9)
+        self.assertEqual(axis_ticks(panel, 0)[-1], (1.0, "20.0"))
+
+    def test_a_constant_dimension_keeps_one_tick(self):
+        figure = ParallelCoords(TICK_ROWS, dimensions=["a", "c"])
+        self.assertEqual(axis_ticks(figure, 1), [(0.5, "5.00")])
 
 
 class TestHueScale(unittest.TestCase):
