@@ -17,6 +17,11 @@ how strongly they are linked.
   `GROUPED` (`"grouped"`). `SPRING` stays the default and is unchanged: the
   ADR 0029 rejection of weight as attraction holds for it. Weight moves nodes
   only when the user picks a layout named for it.
+  Amended (issue #216): `SPRING` and `WEIGHTED` are unchanged for connected
+  graphs; a disconnected graph packs its components with the cluster
+  placement below (one shared helper, a tighter gap), as ADR 0029 records.
+  `GROUPED` keeps single-pass springs at both levels, its gravity already
+  holding unlinked members and groups.
 - **`WEIGHTED` is the spring solver with a per-edge pull.** The attraction of
   a linked pair is scaled by
 

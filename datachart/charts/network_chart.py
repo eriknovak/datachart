@@ -104,12 +104,15 @@ def NetworkChart(
             from the edges in first-seen order.
         layout: How the nodes are placed: a
             [`NETWORK_LAYOUT`][datachart.constants.NETWORK_LAYOUT] constant (default
-            [`NETWORK_LAYOUT.SPRING`][datachart.constants.NETWORK_LAYOUT]). `WEIGHTED`
-            lets each edge's weight set how hard it pulls its nodes together; `GROUPED`
-            clusters the nodes by `group`, arranges the clusters by the summed weight of
-            the edges between them, and marks each with a disc in the group color
-            (`plot_network_group_alpha`). `FIXED` reads each node's `x`/`y`, each between
-            0 and 1, and draws that space inside the margin the other layouts keep.
+            [`NETWORK_LAYOUT.SPRING`][datachart.constants.NETWORK_LAYOUT]); on a
+            disconnected network, `SPRING` and `WEIGHTED` place each connected part
+            on its own, side by side, with the unlinked nodes on a ring around them.
+            `WEIGHTED` lets each edge's weight set how hard it pulls its nodes
+            together; `GROUPED` clusters the nodes by `group`, arranges the clusters
+            by the summed weight of the edges between them, and marks each with a
+            disc in the group color (`plot_network_group_alpha`). `FIXED` reads each
+            node's `x`/`y`, each between 0 and 1, and draws that space inside the
+            margin the other layouts keep.
             The three spring layouts cost the square of the node count; past about
             1,000 nodes prefer `CIRCULAR` or `FIXED`.
         directed: Whether the edges end in an arrowhead at the target. When

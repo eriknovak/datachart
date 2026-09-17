@@ -60,6 +60,7 @@ from datachart.constants import (
     DATE_FORMAT,
     HEXBIN_REDUCE,
     LEGEND_LOCATION,
+    NETWORK_LABEL_POSITION,
     NETWORK_LAYOUT,
     NORMALIZE,
     SCALE,
@@ -312,6 +313,10 @@ EXPECTED_CHANGES = {
     "hexbin_log_scales",
     "contour_levels_overflow",
     "contour_filled_panel_line_ref",
+    # layout fronts: shared dimensions, fixed inset, packed components
+    "parallel_sets_dimensions",
+    "network_fixed_inset",
+    "network_spring_components",
 }
 
 
@@ -774,6 +779,23 @@ def raincloud_emphasis():
 def swarm_emphasis():
     return SwarmPlot(
         data=swarm_data(), emphasis=["background", None, "highlight"], subtitle="obs"
+    )
+
+
+@case
+def parallel_sets_dimensions():
+    rng = np.random.RandomState(6)
+    sets = [
+        [
+            {"alpha": float(rng.rand() * 10), "beta": float(rng.rand()), "gamma": k}
+            for _ in range(8)
+        ]
+        for k in range(2)
+    ]
+    return ParallelCoords(
+        data=sets,
+        dimensions=["gamma", "beta", "alpha"],
+        style=[{"plot_parallel_color": "#c0c0c0"}, {"plot_parallel_color": "#0f7173"}],
     )
 
 
@@ -2723,6 +2745,29 @@ def network_grid():
     left = NetworkChart(network_team(), show_legend=True, title="team")
     right = LineChart(data=LINE1, title="line")
     return Grid([[left, right]], figsize=(10, 4))
+
+
+@case
+def network_fixed_inset():
+    corners = {"A": (0, 0), "B": (1, 0), "C": (1, 1), "D": (0, 1), "E": (0.5, 0.5)}
+    return NetworkChart(
+        {
+            "nodes": [{"id": k, "x": x, "y": y} for k, (x, y) in corners.items()],
+            "edges": network_edges([("A", "E"), ("B", "E"), ("C", "E"), ("D", "E")]),
+        },
+        layout=NETWORK_LAYOUT.FIXED,
+        label_position=NETWORK_LABEL_POSITION.ABOVE,
+        texts={"text": "corner", "x": 0.7, "y": 0.8, "target": (1, 1)},
+        title="Fixed corners",
+    )
+
+
+@case
+def network_spring_components():
+    pairs = NETWORK_TIES + [("P", "Q"), ("Q", "R"), ("R", "P"), ("S", "T")]
+    ids = dict.fromkeys([k for pair in pairs for k in pair] + ["Lone", "Solo"])
+    data = {"nodes": [{"id": k} for k in ids], "edges": network_edges(pairs)}
+    return NetworkChart(data, title="Components and isolates")
 
 
 @case
