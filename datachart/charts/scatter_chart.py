@@ -196,10 +196,12 @@ def ScatterChart(
         The `show_values`, `value_format`, `value_step` and `legend` parameters.
         The `vspans` and `hspans` reference bands.
         The `emphasis_rule` parameter.
+        The per-point `emphasis` key.
 
     Args:
         data: The data points for the scatter chart(s). Can be a single list of data points
-            for one chart, or a list of lists for multiple charts/subplots.
+            for one chart, or a list of lists for multiple charts/subplots. A point
+            may carry its own `emphasis` role, which wins over its chart's.
         title: The title of the chart.
         xlabel: The x-axis label.
         ylabel: The y-axis label.

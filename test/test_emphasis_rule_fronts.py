@@ -6,6 +6,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+from matplotlib.colors import to_hex
 
 from datachart.charts import (
     BoxPlot,
@@ -82,6 +83,26 @@ class TestSeriesFronts:
         LineChart(charts, emphasis_rule={"top": 1})
         assert charts == series([1.0, 2.0])
 
+    def test_scatter_record_role_beats_the_rule(self):
+        low, high = series([1.0, 1.0], [5.0, 5.0])
+        low[0]["emphasis"] = HL
+        high[1]["emphasis"] = BG
+        figure = ScatterChart([low, high], emphasis_rule={"top": 1})
+        assert chart_roles(figure) == [BG, HL]
+        assert [layer.record_roles for layer in layers(figure)] == [
+            [HL, None],
+            [None, BG],
+        ]
+        ax = figure.axes[0]
+        muted = to_hex(config["muted_color"])
+        faces = {
+            tuple(c.get_offsets()[0]): to_hex(c.get_facecolors()[0])
+            for c in ax.collections
+            if len(c.get_offsets()) == 1
+        }
+        assert faces[(0.0, 1.0)] != muted
+        assert faces[(1.0, 5.0)] == muted
+
     def test_scatter_summarises_y(self):
         points = [
             [{"x": 10.0, "y": 1.0}, {"x": 20.0, "y": 1.0}],
@@ -149,6 +170,22 @@ class TestGroupFronts:
     def test_explicit_group_role_wins(self):
         figure = BoxPlot(GROUPS, emphasis=[HL, None, BG], emphasis_rule={"top": 1})
         assert chart_roles(figure) == [[HL, BG, BG]]
+
+    def test_swarm_record_role_beats_the_rule(self):
+        data = groups(A=[1, 2], B=[7, 8])
+        data[0]["emphasis"] = HL
+        data[3]["emphasis"] = BG
+        figure = SwarmPlot(data, emphasis_rule={"top": 1})
+        assert chart_roles(figure) == [[BG, HL]]
+        muted = to_hex(config["muted_color"])
+        faces = {}
+        for collection in figure.axes[0].collections:
+            for _, value in collection.get_offsets():
+                faces[value] = to_hex(collection.get_facecolors()[0])
+        assert faces[1.0] != muted
+        assert faces[2.0] == muted
+        assert faces[7.0] != muted
+        assert faces[8.0] == muted
 
     def test_single_role_covers_every_group(self):
         figure = BoxPlot(GROUPS, emphasis=BG, emphasis_rule={"top": 1})
