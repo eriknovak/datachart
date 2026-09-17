@@ -7112,23 +7112,33 @@ def compute_parallel_stats(layers: List["ParallelCoordsLayer"]) -> Optional[dict
     if not all_data:
         return None
 
-    def layer_dimensions(layer):
-        first_chart = layer.charts[0]
-        dimensions = first_chart.get("dimensions", None)
-        if dimensions is not None:
-            return list(dimensions)
-        hue_attr = first_chart.get("hue", "hue")
+    def detected_dimensions(layer):
+        hue_attr = layer.charts[0].get("hue", "hue")
         for chart in layer.charts:
             for d in chart.get("data", []) or []:
                 return [k for k, v in d.items() if k != hue_attr and v is not None]
         return []
 
-    dimensions = layer_dimensions(layers[0])
-    for layer in layers[1:]:
-        if layer_dimensions(layer) != dimensions:
+    def chart_dimensions():
+        for layer in layers:
+            detected = None
+            for chart in layer.charts:
+                given = chart.get("dimensions", None)
+                if given is not None:
+                    yield list(given)
+                    continue
+                if detected is None:
+                    detected = detected_dimensions(layer)
+                yield detected
+
+    # every data set on one axes shares one dimension order
+    all_dimensions = chart_dimensions()
+    dimensions = next(all_dimensions)
+    for other in all_dimensions:
+        if other != dimensions:
             raise ValueError(
-                "Composed parallel coordinates charts must share the same "
-                f"dimensions; got {dimensions} and {layer_dimensions(layer)}."
+                "Parallel coordinates data sets and composed charts must share the same "
+                f"dimensions; got {dimensions} and {other}."
             )
 
     if len(dimensions) < 2:
