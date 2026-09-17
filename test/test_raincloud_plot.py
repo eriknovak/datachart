@@ -185,3 +185,15 @@ class TestRaincloudLayers(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestRaincloudReferences(unittest.TestCase):
+    """A reference dict draws once, not once per cloud, rain, and box (#171)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_hline_draws_once(self):
+        fig = RaincloudPlot(data=group_data(), hlines={"y": 12, "label": "ref"})
+        refs = [c for c in fig.axes[0].collections if c.get_label() == "ref"]
+        self.assertEqual(len(refs), 1)

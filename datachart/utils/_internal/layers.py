@@ -1028,6 +1028,8 @@ SPAN_SIDES = {
     "vspans": ("xmin", "xmax", get_vspan_style),
     "hspans": ("ymin", "ymax", get_hspan_style),
 }
+# the layer attributes holding pre-resolved references, pooled per axes
+REF_KEYS = ("vlines", "hlines", "vspans", "hspans", "texts")
 # polar wedge outline samples per degree: enough for the chord error to vanish
 SPAN_SAMPLES_PER_DEGREE = 2
 
@@ -10704,23 +10706,25 @@ class Panel:
                 if isinstance(layer, SwarmLayer):
                     layer.pack(owner_ax, swarm_side)
 
-        # reference lines and bands, after scales and limits, each read on
-        # the axes its figure renders on
+        # one reference declared for every chart of a figure draws once per
+        # axes, so a line or text does not repeat and a band's tint does not
+        # stack with the series count; each is read on its figure's axes
+        pools = {}
         for group, owner_ax in zip(self.groups, group_axes):
+            pooled = pools.setdefault(owner_ax, {key: [] for key in REF_KEYS})
             for layer in group.layers:
-                _draw_ref_lines(owner_ax, layer.vlines, layer.hlines)
-        # one band declared for every chart of a figure draws once, so its
-        # tint does not stack with the series count; the host axes sits under
-        # a twin, so every band lies beneath both axes' marks (ADR 0036)
-        span_pools = {}
-        for group, owner_ax in zip(self.groups, group_axes):
-            vspans, hspans = span_pools.setdefault(owner_ax, ([], []))
-            for layer in group.layers:
-                for pool, spans in ((vspans, layer.vspans), (hspans, layer.hspans)):
-                    for span in spans:
-                        if span not in pool:
-                            pool.append(span)
-        for owner_ax, (vspans, hspans) in span_pools.items():
+                for key in REF_KEYS:
+                    for entry in getattr(layer, key):
+                        if entry not in pooled[key]:
+                            pooled[key].append(entry)
+
+        # reference lines and bands, after scales and limits
+        for owner_ax, pooled in pools.items():
+            _draw_ref_lines(owner_ax, pooled["vlines"], pooled["hlines"])
+        # the host axes sits under a twin, so every band lies beneath both
+        # axes' marks (ADR 0036)
+        for owner_ax, pooled in pools.items():
+            vspans, hspans = pooled["vspans"], pooled["hspans"]
             if owner_ax is ax:
                 _draw_ref_spans(ax, vspans, hspans, polar)
                 continue
@@ -10736,11 +10740,10 @@ class Panel:
         # topmost axes while data coordinates read the owning layer's axes
         top_ax = ax_right if ax_right is not None else ax
         clearance = None
-        if any(layer.texts for layer in layers):
+        if any(pooled["texts"] for pooled in pools.values()):
             clearance = self._clearance_points(group_axes, horizontal)
-        for group, owner_ax in zip(self.groups, group_axes):
-            for layer in group.layers:
-                _draw_texts(top_ax, layer.texts, owner_ax, clearance)
+        for owner_ax, pooled in pools.items():
+            _draw_texts(top_ax, pooled["texts"], owner_ax, clearance)
 
         # point labels are placed once every marker of the panel is drawn and
         # the limits are final, so the estimate sees the real display space

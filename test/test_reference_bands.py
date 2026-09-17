@@ -52,6 +52,7 @@ def band_patches(ax):
         ax.get_xaxis_transform(which="grid"),
         ax.get_yaxis_transform(which="grid"),
     )
+
     def is_band(patch):
         transform = Artist.get_transform(patch)
         # a twin figure's band spans the host frame but is measured on the twin
