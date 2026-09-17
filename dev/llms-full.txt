@@ -5747,7 +5747,7 @@ The other charts accept an `emphasis` attribute that highlights one series and m
 
 ### Text annotations
 
-A blank week or a dark column raises a question, and a note answers it on the chart. `texts` places text on the calendar with an optional `target` to draw a connector to a cell; the [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The cells sit at integer positions: the week column along `x` and the weekday row along `y`, both counted from zero at the top-left cell of the drawn range, which is the week that holds the first day of the first drawn month. Rows count downwards, so `y=-1.5` is above the calendar. A text is anchored at its left edge, and the connector stops a few points short of its target, so a connector that reaches a small cell from above lands in the right column. The note below explains the blank week in November, its column computed from the outage date.
+A blank week or a dark column raises a question, and a note answers it on the chart. `texts` places text on the calendar with an optional `target` to draw a connector to a cell; the [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) guide covers placement, connector looks and styling. The cells sit at integer positions: the week column along `x` and the weekday row along `y`, both counted from zero at the top-left cell of the drawn range, which is the week that holds the first day of the first drawn month. Rows count downwards, so `y=-1.5` is above the calendar. A text is anchored at its left edge, and the connector stops inside the cell it points at. The note below explains the blank week in November, its column computed from the outage date.
 
 ```
 from datachart.constants import ARROW_STYLE
@@ -12661,7 +12661,7 @@ SankeyChart(
 
 ### Column labels and ribbon values
 
-Four columns of names do not say what each column stands for; `column_labels` heads them, one label per column, left to right, in the subtitle style. When the exact amounts matter, `show_values` writes each flow's value at the end of its ribbon, just before the node it enters, and `value_format` formats it: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant (`VALUE_FORMAT.THOUSANDS` for large counts, as in [Example 2](#example-2-where-does-a-signup-funnel-leak-explicit-columns-grey-ribbons-and-a-note)) or any `"{x:.1f}"`, `"{:.1f}%"` or `"%g"` style string. The values here are already percentages of the primary energy, so a positional `"{:.0f}%"` string appends the sign (`VALUE_FORMAT.PERCENT` would multiply by 100). A ribbon too thin for its value slides the value along the ribbon to the first clear spot.
+Four columns of names do not say what each column stands for; `column_labels` heads them, one label per column, left to right, in the subtitle style. When the exact amounts matter, `show_values` writes each flow's value at the end of its ribbon, just before the node it enters, and `value_format` formats it: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant (`VALUE_FORMAT.THOUSANDS` for large counts, as in [Example 2](#example-2-where-does-a-signup-funnel-leak-explicit-columns-grey-ribbons-and-a-note)) or any `"{x:.1f}"`, `"{:.1f}%"` or `"%g"` style string. The values here are already percentages of the primary energy, so a positional `"{:.0f}%"` string appends the sign (`VALUE_FORMAT.PERCENT` would multiply by 100). A ribbon too thin for its value slides the value along the ribbon to the first clear spot, keeping clear of the node bars; where the chart is too dense to leave any clear spot, the value is left out rather than written over a bar or another value.
 
 ```
 from datachart.constants import VALUE_FORMAT
@@ -16222,7 +16222,7 @@ LineChart(
 
 ### Targets and connectors
 
-A note next to a curve is only clear when it is obvious which point it means; a connector removes the doubt. `target` is the `(x, y)` data point the note is about, and it is **always** in data coordinates, even when the note itself is placed on the axes, so a note pinned to a corner still points at its data point. One annotation has one target; two points need two annotations. Place the note in open space some distance from its target, so the connector has room to be drawn.
+A note next to a curve is only clear when it is obvious which point it means; a connector removes the doubt. `target` is the `(x, y)` data point the note is about, and it is **always** in data coordinates, even when the note itself is placed on the axes, so a note pinned to a corner still points at its data point. One annotation has one target; two points need two annotations. Place the note in open space some distance from its target, so the connector has room to be drawn. A connector with little room straightens out instead of curving, and one with no room left — a target the note's own box already covers — is left out.
 
 The two coldest months of the year are January and December; each note below points at one of them, and both notes are placed as axes fractions in open space.
 

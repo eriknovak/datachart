@@ -101,7 +101,7 @@ LineChart(
 
 ### Targets and connectors
 
-A note next to a curve is only clear when it is obvious which point it means; a connector removes the doubt. `target` is the `(x, y)` data point the note is about, and it is **always** in data coordinates, even when the note itself is placed on the axes, so a note pinned to a corner still points at its data point. One annotation has one target; two points need two annotations. Place the note in open space some distance from its target, so the connector has room to be drawn.
+A note next to a curve is only clear when it is obvious which point it means; a connector removes the doubt. `target` is the `(x, y)` data point the note is about, and it is **always** in data coordinates, even when the note itself is placed on the axes, so a note pinned to a corner still points at its data point. One annotation has one target; two points need two annotations. Place the note in open space some distance from its target, so the connector has room to be drawn. A connector with little room straightens out instead of curving, and one with no room left — a target the note's own box already covers — is left out.
 
 The two coldest months of the year are January and December; each note below points at one of them, and both notes are placed as axes fractions in open space.
 
