@@ -103,8 +103,8 @@ def CalendarHeatmap(
             [`CALENDAR_WEEKDAY.MONDAY`][datachart.constants.CALENDAR_WEEKDAY] or
             [`CALENDAR_WEEKDAY.SUNDAY`][datachart.constants.CALENDAR_WEEKDAY]. Defaults
             to the theme's `plot_calendar_heatmap_week_start`.
-        show_month_labels: Whether to label the months along the top axis.
-            Defaults to `True`.
+        show_month_labels: Whether to label the months along the bottom
+            axis, each over the middle of its weeks. Defaults to `True`.
         show_weekday_labels: Whether to label every other weekday along the
             left axis. Defaults to `True`.
         figsize: The size of the figure. Defaults to the default width at a
