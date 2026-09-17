@@ -50,6 +50,7 @@ from matplotlib.transforms import (
     ScaledTranslation,
     TransformedBbox,
     TransformedPath,
+    blended_transform_factory,
 )
 import matplotlib.patheffects as patheffects
 from matplotlib.legend import Legend
@@ -1302,7 +1303,11 @@ def _draw_ref_lines(ax: plt.Axes, vlines: List[tuple], hlines: List[tuple]) -> N
 
 
 def _draw_ref_spans(
-    ax: plt.Axes, vspans: List[tuple], hspans: List[tuple], polar: bool
+    ax: plt.Axes,
+    vspans: List[tuple],
+    hspans: List[tuple],
+    polar: bool,
+    value_ax: Optional[plt.Axes] = None,
 ) -> None:
     """Draw the pre-resolved reference bands on the host axes (ADR 0036).
 
@@ -1314,6 +1319,8 @@ def _draw_ref_spans(
     axes edge instead of the autoscale margin pushing the edge away from it.
     The polar r limits are always pinned: the radial furniture already read
     them, so a band never moves the ring the donut hole was cut from.
+    A band of a twin's figure passes the twin as `value_ax`: its bounds are
+    measured there while it still draws on the host, under both axes' marks.
     """
 
     if not (vspans or hspans):
@@ -1336,19 +1343,28 @@ def _draw_ref_spans(
         ax.set_ylim(rlim)
         return
 
-    xlim = ax.get_xlim()
-    for vspan, style in vspans:
-        lo, hi = _span_bounds(vspan, "vspans", xlim)
-        ax.axvspan(lo, hi, label=vspan.get("label", ""), **style)
-    if any(v.get("xmin") is None or v.get("xmax") is None for v, _ in vspans):
-        ax.set_xlim(xlim)
-
-    ylim = ax.get_ylim()
-    for hspan, style in hspans:
-        lo, hi = _span_bounds(hspan, "hspans", ylim)
-        ax.axhspan(lo, hi, label=hspan.get("label", ""), **style)
-    if any(h.get("ymin") is None or h.get("ymax") is None for h, _ in hspans):
-        ax.set_ylim(ylim)
+    data_ax = ax if value_ax is None else value_ax
+    for key, spans in (("vspans", vspans), ("hspans", hspans)):
+        along_x = key == "vspans"
+        lo_key, hi_key, _ = SPAN_SIDES[key]
+        limits = data_ax.get_xlim() if along_x else data_ax.get_ylim()
+        for span, style in spans:
+            lo, hi = _span_bounds(span, key, limits)
+            label = span.get("label", "")
+            if data_ax is ax:
+                (ax.axvspan if along_x else ax.axhspan)(lo, hi, label=label, **style)
+                continue
+            # the band spans the host's frame but is measured on the twin
+            if along_x:
+                trans = blended_transform_factory(data_ax.transData, ax.transAxes)
+                rect = Rectangle((lo, 0), hi - lo, 1, label=label, **style)
+            else:
+                trans = blended_transform_factory(ax.transAxes, data_ax.transData)
+                rect = Rectangle((0, lo), 1, hi - lo, label=label, **style)
+            rect.set_transform(trans)
+            ax.add_patch(rect)
+        if any(sp.get(lo_key) is None or sp.get(hi_key) is None for sp, _ in spans):
+            (data_ax.set_xlim if along_x else data_ax.set_ylim)(limits)
 
 
 def _draw_legend(
@@ -10688,19 +10704,33 @@ class Panel:
                 if isinstance(layer, SwarmLayer):
                     layer.pack(owner_ax, swarm_side)
 
-        # reference lines and bands, after scales and limits
-        for layer, target_ax in zip(layers, [ax] * len(layers)):
-            _draw_ref_lines(target_ax, layer.vlines, layer.hlines)
+        # reference lines and bands, after scales and limits, each read on
+        # the axes its figure renders on
+        for group, owner_ax in zip(self.groups, group_axes):
+            for layer in group.layers:
+                _draw_ref_lines(owner_ax, layer.vlines, layer.hlines)
         # one band declared for every chart of a figure draws once, so its
         # tint does not stack with the series count; the host axes sits under
-        # a twin, so the band lies beneath both axes' marks
-        vspans, hspans = [], []
-        for layer in layers:
-            for pool, spans in ((vspans, layer.vspans), (hspans, layer.hspans)):
-                for span in spans:
-                    if span not in pool:
-                        pool.append(span)
-        _draw_ref_spans(ax, vspans, hspans, polar)
+        # a twin, so every band lies beneath both axes' marks (ADR 0036)
+        span_pools = {}
+        for group, owner_ax in zip(self.groups, group_axes):
+            vspans, hspans = span_pools.setdefault(owner_ax, ([], []))
+            for layer in group.layers:
+                for pool, spans in ((vspans, layer.vspans), (hspans, layer.hspans)):
+                    for span in spans:
+                        if span not in pool:
+                            pool.append(span)
+        for owner_ax, (vspans, hspans) in span_pools.items():
+            if owner_ax is ax:
+                _draw_ref_spans(ax, vspans, hspans, polar)
+                continue
+            # only the twin's value axis differs from the host's
+            if horizontal:
+                _draw_ref_spans(ax, [], hspans, polar)
+                _draw_ref_spans(ax, vspans, [], polar, value_ax=owner_ax)
+            else:
+                _draw_ref_spans(ax, vspans, [], polar)
+                _draw_ref_spans(ax, [], hspans, polar, value_ax=owner_ax)
 
         # a twin axes renders entirely above its host, so texts live on the
         # topmost axes while data coordinates read the owning layer's axes

@@ -52,7 +52,15 @@ def band_patches(ax):
         ax.get_xaxis_transform(which="grid"),
         ax.get_yaxis_transform(which="grid"),
     )
-    return [p for p in ax.patches if Artist.get_transform(p) in spans]
+    def is_band(patch):
+        transform = Artist.get_transform(patch)
+        # a twin figure's band spans the host frame but is measured on the twin
+        return transform in spans or ax.transAxes in (
+            getattr(transform, "_x", None),
+            getattr(transform, "_y", None),
+        )
+
+    return [p for p in ax.patches if is_band(p)]
 
 
 class TestTypingsAndThemes(unittest.TestCase):
@@ -362,3 +370,41 @@ class TestComposition(unittest.TestCase):
         self.assertEqual(
             len([c for c in polar_ax.collections if isinstance(c, PolyCollection)]), 1
         )
+
+
+class TestRightAxisReferences(unittest.TestCase):
+    """A right-axis figure's references read the right axis (issue #176)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def _panel(self):
+        left = LineChart(data=LINE)
+        right = LineChart(
+            data=[{"x": i, "y": 100 + i * 50} for i in range(6)],
+            hlines={"y": 200, "label": "target"},
+            hspans={"ymin": 150, "ymax": 250, "label": "band"},
+        )
+        fig = Panel(
+            [{"figure": left, "y_axis": "left"}, {"figure": right, "y_axis": "right"}]
+        )
+        fig.canvas.draw()
+        return fig
+
+    def test_hline_draws_on_right_axis(self):
+        fig = self._panel()
+        ax_right = fig.axes[1]
+        segments = [c for c in ax_right.collections if c.get_label() == "target"]
+        self.assertEqual(len(segments), 1)
+        y0, y1 = segments[0].get_segments()[0][:, 1]
+        self.assertEqual((y0, y1), (200, 200))
+
+    def test_hspan_sits_at_right_axis_height(self):
+        fig = self._panel()
+        ax, ax_right = fig.axes[0], fig.axes[1]
+        (band,) = [p for p in ax.patches if p.get_label() == "band"]
+        extents = band.get_window_extent()
+        lo = ax_right.transData.transform((0, 150))[1]
+        hi = ax_right.transData.transform((0, 250))[1]
+        self.assertAlmostEqual(extents.y0, lo, places=3)
+        self.assertAlmostEqual(extents.y1, hi, places=3)
