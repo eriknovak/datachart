@@ -299,6 +299,31 @@ class TestLayouts(unittest.TestCase):
                 {"nodes": [{"id": "A", "x": 0.1}], "edges": []}, layout="fixed"
             )
 
+    def test_fixed_keeps_a_margin(self):
+        nodes = [
+            {"id": "A", "x": 0, "y": 0},
+            {"id": "B", "x": 1, "y": 1},
+            {"id": "C", "x": 0.5, "y": 0.5},
+        ]
+        data = {"nodes": nodes, "edges": [edge("A", "B")]}
+        texts = {"text": "note", "x": 1, "y": 1}
+        ax = NetworkChart(data, layout="fixed", texts=texts).axes[0]
+        # the 0–1 space lands inside the layout margin of the axes box
+        to_axes = ax.transData + ax.transAxes.inverted()
+        np.testing.assert_allclose(
+            to_axes.transform(_positions(ax.figure)),
+            [[0.1, 0.1], [0.9, 0.9], [0.5, 0.5]],
+        )
+        # a text at a node's position lands on that node
+        note = [t for t in ax.texts if t.get_text() == "note"][0]
+        np.testing.assert_allclose(to_axes.transform(note.xy), [0.9, 0.9])
+
+    def test_fixed_rejects_positions_outside_the_unit_square(self):
+        for x, y in ((1.2, 0.5), (0.5, -0.1)):
+            nodes = [{"id": "A", "x": x, "y": y}]
+            with self.assertRaisesRegex(ValueError, "between 0 and 1"):
+                NetworkChart({"nodes": nodes, "edges": []}, layout="fixed")
+
     def test_edge_strengths_map_min_max_onto_the_pull_range(self):
         # the lightest pulls at the minimum, the heaviest at the maximum,
         # a missing weight as the lightest

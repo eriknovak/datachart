@@ -291,6 +291,9 @@ TREEMAP_FONT_STEP = 0.5
 # network layouts keep this much of the 0–1 space clear on every side, room
 # for the largest marker and its label (ADR 0029)
 NETWORK_LAYOUT_MARGIN = 0.1
+# fixed positions stay the user's; the view widens by this much on every
+# side, so 0–1 lands inside the same margin (ADR 0029)
+NETWORK_FIXED_PAD = NETWORK_LAYOUT_MARGIN / (1 - 2 * NETWORK_LAYOUT_MARGIN)
 # spring layout: iterations and the initial step, cooled geometrically
 NETWORK_SPRING_ITERATIONS = 300
 NETWORK_SPRING_STEP = 0.1
@@ -9133,8 +9136,9 @@ class NetworkLayer(PointLabelMixin, Layer):
     def draw(self, ax: plt.Axes, ctx: DrawContext) -> None:
         style = self.network_style
         pos = self.positions
-        ax.set_xlim(0, 1)
-        ax.set_ylim(0, 1)
+        pad = NETWORK_FIXED_PAD if self.layout == NETWORK_LAYOUT.FIXED else 0
+        ax.set_xlim(-pad, 1 + pad)
+        ax.set_ylim(-pad, 1 + pad)
         ax.set_aspect("equal", adjustable="box")
         ax.axis("off")
         effects = _halo_effects(style.get("halo_width"), self.ground)

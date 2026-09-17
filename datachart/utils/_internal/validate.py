@@ -763,6 +763,11 @@ def validate_network_records(nodes, edges, layout) -> None:
                         f"{name} ({node_id!r}) lacks `{key}`; the fixed layout "
                         "needs `x` and `y` on every node."
                     )
+                if not 0 <= record[key] <= 1:
+                    raise ValueError(
+                        f"{name} ({node_id!r}) has `{key}` {record[key]!r}; the "
+                        "fixed layout needs `x` and `y` between 0 and 1."
+                    )
 
     for i, record in enumerate(edges):
         for key in ("source", "target"):
