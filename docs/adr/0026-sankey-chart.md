@@ -48,9 +48,10 @@ height carries the value, and the axes carry nothing.
 - **Labels** sit left of the first column and right of every other column.
   `column_labels` adds one heading above each column in the subtitle style;
   `show_values` writes each flow's value at its ribbon's end, before the
-  node it enters (a thin ribbon slides it along the centreline), formatted
-  by `value_format` as bar values are, in the bar value style behind the same
-  halo. Both are off by default.
+  node it enters (a thin ribbon slides it along the centreline, never onto
+  a node bar, and a value with no clear spot left is dropped — the ribbon's
+  hover still carries it), formatted by `value_format` as bar values are, in
+  the bar value style behind the same halo. Both are off by default.
 
 ## Considered options
 

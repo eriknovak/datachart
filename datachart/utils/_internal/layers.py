@@ -8310,7 +8310,8 @@ class SankeyLayer(Layer):
         # the axes limits are fixed before any text so box estimates use them
         ax.set_xlim(-SANKEY_LABEL_MARGIN, 1 + SANKEY_LABEL_MARGIN)
         ax.set_ylim(0, 1 + (SANKEY_COLUMN_LABEL_HEADROOM if self.column_labels else 0))
-        # every label and value placed so far, for the ribbon values to avoid
+        # the node bars, and every label and value placed so far, for the
+        # ribbon values to avoid
         occupied = []
         effects = _halo_effects(halo, self.ground)
 
@@ -8332,6 +8333,7 @@ class SankeyLayer(Layer):
                     label=name,
                 )
                 ax.add_patch(bar)
+                occupied.append((box.x, box.bottom, box.x + node_width, box.top))
                 node_marks.append((bar, {"label": name, "flow": size[name]}))
                 # labels sit left of the first column, right of every other
                 if ci == 0:
@@ -8458,7 +8460,11 @@ class SankeyLayer(Layer):
                     best = (overlap, x, y, ha, box)
                 if overlap == 0:
                     break
-            _, x, y, ha, box = best
+            overlap, x, y, ha, box = best
+            # nowhere clear along the ribbon: the value is left out rather
+            # than written over a bar or another value; hover still reads it
+            if overlap > 0:
+                continue
             occupied.append(box)
             ax.text(
                 x,
