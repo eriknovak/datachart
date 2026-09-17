@@ -1567,7 +1567,9 @@ class SHOW_GRID:
     """The supported show grid options.
 
     Passed as the `show_grid` chart setting: which grid lines to draw. When
-    unset (or `NONE`), the theme's `chart_default_show_grid` fills in.
+    unset (or `NONE`), the theme's `chart_default_show_grid` fills in. The
+    members name a set to draw, so there is no member for "no grid at all":
+    pass `False` for that.
 
     ![SHOW_GRID at a glance](../assets/imgs/const-show-grid.svg){ width="100%" }
 

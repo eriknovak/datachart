@@ -477,8 +477,8 @@ STEP_LEGEND_EDGE_WIDTH = 0.8
 # ================================================
 
 
-def get_chart_data(attr: str, chart: dict) -> Optional[np.ndarray]:
-    """Extract a data column from a chart dictionary as a numpy array."""
+def _chart_column(attr: str, chart: dict):
+    """A data column's raw values: the dict form's sequence, else one per point."""
 
     attr_label = get_attr_value(attr, chart, attr)
 
@@ -487,11 +487,36 @@ def get_chart_data(attr: str, chart: dict) -> Optional[np.ndarray]:
 
     if isinstance(chart["data"], list):
         filtered = [d[attr_label] for d in chart["data"] if attr_label in d]
-        if not filtered:
-            return None
-        return np.array(filtered)
+        return filtered or None
 
     return None
+
+
+def get_chart_data(attr: str, chart: dict) -> Optional[np.ndarray]:
+    """Extract a data column from a chart dictionary as a numpy array."""
+
+    values = _chart_column(attr, chart)
+    if values is None or isinstance(chart["data"], dict):
+        return values
+    return np.array(values)
+
+
+def get_chart_observations(attr: str, chart: dict) -> Optional[np.ndarray]:
+    """A data column as one flat pool of observations.
+
+    A point carries a single observation or a list of them, and the charts
+    that bin or estimate over a sample read the lot as one series. Records
+    are concatenated, so lists of unequal length never have to square into
+    a grid (issue #233).
+    """
+
+    values = _chart_column(attr, chart)
+    if values is None:
+        return None
+    if isinstance(chart["data"], dict):
+        return np.ravel(values)
+    flat = [np.ravel(value) for value in values]
+    return np.concatenate(flat) if flat else None
 
 
 def get_chart_grid(chart: dict, kind: str, dtype=float) -> tuple:
@@ -3832,7 +3857,7 @@ class HistogramLayer(Layer):
         self._resolve_value_labels()
 
     def x_values(self) -> Optional[np.ndarray]:
-        return get_chart_data("x", self.chart)
+        return get_chart_observations("x", self.chart)
 
     def y_range(self):
         x = self.x_values()
@@ -3986,7 +4011,7 @@ class KdeLayer(Layer):
         self.xlim = self.settings.get("kde_xlim")
 
     def x_values(self) -> Optional[np.ndarray]:
-        return get_chart_data("x", self.chart)
+        return get_chart_observations("x", self.chart)
 
     def curve(self) -> Optional[tuple]:
         """The (x, density) samples; None when the values have no spread."""
@@ -7613,7 +7638,7 @@ class RadialHistogramLayer(RadialLayer):
         self.num_bins = self.settings.get("num_bins") or DEFAULT_NUM_BINS
 
     def x_values(self) -> Optional[np.ndarray]:
-        return get_chart_data("x", self.chart)
+        return get_chart_observations("x", self.chart)
 
     def value_data(self):
         return None
@@ -11235,6 +11260,31 @@ class Panel:
                             axis.parameter, axis.role, axis.scale, values, hint
                         )
 
+    def _radial_category_labels(self) -> Optional[np.ndarray]:
+        """The widest categorical layer's labels; the spokes follow them.
+
+        `None` when no layer is categorical, as on a radial histogram.
+        """
+
+        label_sets = [
+            l.labels()
+            for l in self.layers
+            if isinstance(l, RadialLayer) and l.is_categorical
+        ]
+        label_sets = [lbl for lbl in label_sets if lbl is not None and len(lbl)]
+        return max(label_sets, key=len) if label_sets else None
+
+    def _apply_polar_grid_selection(self, ax, show_grid) -> None:
+        """Draw only the polar grid set the user named (ADR 0015).
+
+        Matplotlib's polar axes draw spokes and rings whatever `ax.grid`
+        restyles, so the set left out is switched off by hand. Unset,
+        `show_grid` never reaches here and both sets stay.
+        """
+
+        ax.xaxis.grid(show_grid in ("x", "both"))
+        ax.yaxis.grid(show_grid in ("y", "both"))
+
     def _apply_minor_value_grid(self, ax, horizontal: bool, value_scale) -> None:
         """Fainter gridlines between a dumbbell's labelled values (ADR 0050).
 
@@ -11288,6 +11338,8 @@ class Panel:
             ax.grid(axis=s["show_grid"], **s.get("grid_style", {}))
             ax.set_axisbelow(True)
             self._apply_minor_value_grid(ax, horizontal, value_scale)
+        if polar and not bare and s.get("show_grid_explicit"):
+            self._apply_polar_grid_selection(ax, s.get("show_grid"))
         if s.get("date_period") and self.temporal_axis and not bare:
             # period edges are the minor ticks; the labelled centres draw no line
             axis = getattr(ax, f"{self.temporal_axis}axis")
@@ -11346,15 +11398,8 @@ class Panel:
         # angular category ticks: labels sit evenly around the circle, unless
         # tip labels carry them at the marks instead
         if polar:
-            label_sets = [
-                l.labels()
-                for l in layers
-                if isinstance(l, RadialLayer) and l.is_categorical
-            ]
-            label_sets = [lbl for lbl in label_sets if lbl is not None and len(lbl)]
-            if label_sets:
-                # the widest layer supplies the labels when counts differ
-                cat_labels = max(label_sets, key=len)
+            cat_labels = self._radial_category_labels()
+            if cat_labels is not None:
                 ax.set_xticks(_radial_theta(len(cat_labels)))
                 if s.get("show_tip_labels"):
                     ax.set_xticklabels([""] * len(cat_labels))
@@ -11491,6 +11536,10 @@ class Panel:
                 fixed = tuple(
                     s.get(f"{axis_name}{end}") is not None for end in ("min", "max")
                 )
+                # a pyramid's `xmax` is mirrored onto both value ends, so it
+                # pins them exactly; ticks may stop short of it
+                if axis_name == "x" and s.get("pyramid_xmax") is not None:
+                    fixed = (True, True)
                 on_data = _snap_limits_to_ticks(
                     ax, axis_name, fixed, data_ends=not polar
                 )
@@ -11984,6 +12033,13 @@ class Panel:
             for spine in ax.spines.values():
                 spine.set_visible(False)
 
+        # the r tick labels sit midway between the first two spokes, clear of
+        # both their gridlines and their category labels (issue #191); a
+        # numeric angular axis keeps matplotlib's 22.5deg, midway on its grid
+        cat_labels = self._radial_category_labels()
+        if cat_labels is not None:
+            ax.set_rlabel_position(180 / len(cat_labels))
+
         self._elevate_radial_value_labels(ax)
         self._draw_radial_tip_texts(ax)
 
@@ -12091,15 +12147,9 @@ class Panel:
                 )
 
         if show_tip_labels:
-            label_sets = [
-                l.labels()
-                for l in self.layers
-                if isinstance(l, RadialLayer) and l.is_categorical
-            ]
-            label_sets = [lbl for lbl in label_sets if lbl is not None and len(lbl)]
-            if not label_sets:
+            cat_labels = self._radial_category_labels()
+            if cat_labels is None:
                 return
-            cat_labels = max(label_sets, key=len)
             theta_positions = _radial_theta(len(cat_labels))
             # each label hugs the outermost mark on its own spoke
             outer = {}
@@ -12180,6 +12230,8 @@ def build_chart_panel_settings(
     """
 
     show_grid = settings.get("show_grid")
+    # a polar panel draws only the set an explicit value names (ADR 0015)
+    show_grid_explicit = show_grid is not None
     # rasters (a heatmap, hexagons, filled contour bands) cover the grid, and a
     # bump chart's ranks read from the lines and labels: no grid unless asked
     gridless = chart_type in (
@@ -12211,6 +12263,7 @@ def build_chart_panel_settings(
         # horizontal bars and histograms take their scale keys literally
         "literal_scale_keys": chart_type not in GROUP_CHART_TYPES,
         "show_grid": show_grid,
+        "show_grid_explicit": show_grid_explicit,
         "grid_style": get_grid_style(first_style),
         "hatch_cycle": config.get("plot_hatch_cycle"),
         "linestyle_cycle": config.get("plot_linestyle_cycle"),

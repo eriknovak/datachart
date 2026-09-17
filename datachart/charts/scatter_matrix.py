@@ -258,7 +258,7 @@ def ScatterMatrix(
     figsize: Optional[Tuple[float, float]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     style: Optional[StyleAttrs] = None,
 ) -> plt.Figure:
     """Creates a scatter matrix.
@@ -338,7 +338,7 @@ def ScatterMatrix(
             above or below the matrix lays its entries out in one row. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show in the cells (e.g., "both", "x",
-            "y").
+            "y"); `False` draws none.
         style: Style attributes for every cell: the scatter, histogram,
             plot text and `plot_scatter_matrix_*` keys. See
             [`ScatterMatrixStyleAttrs`][datachart.typings.ScatterMatrixStyleAttrs].

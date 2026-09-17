@@ -49,7 +49,7 @@ def StackedAreaChart(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     value_step: Optional[int] = None,
@@ -182,7 +182,8 @@ def StackedAreaChart(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_grid: Which grid lines to show (e.g., "both", "x", "y");
+            `False` draws none.
         show_values: Whether to print each value at the midpoint of its band.
         value_format: Format string for the value labels: a
             [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant or any

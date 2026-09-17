@@ -49,7 +49,7 @@ def BoxPlot(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_outliers: Optional[bool] = None,
     show_notch: Optional[bool] = None,
     show_values: Optional[bool] = None,
@@ -178,7 +178,8 @@ def BoxPlot(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_grid: Which grid lines to show (e.g., "both", "x", "y");
+            `False` draws none.
         show_outliers: Whether to show outliers. Defaults to True.
         show_notch: Whether to show notched boxes for median confidence interval.
         show_values: Whether to print each group's median beside its median line.

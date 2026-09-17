@@ -50,7 +50,7 @@ def RaincloudPlot(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_outliers: Optional[bool] = True,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
@@ -182,7 +182,8 @@ def RaincloudPlot(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_grid: Which grid lines to show (e.g., "both", "x", "y");
+            `False` draws none.
         show_outliers: Whether the box shows outliers.
         show_values: Whether to print each group's median beside its box, and
             its minimum and maximum beside the rain points holding them.

@@ -15,6 +15,7 @@ from datachart.utils import Grid, Panel
 BAR = [{"label": label, "y": y} for label, y in zip("ABC", [3.0, 5.0, 4.0])]
 BAR2 = [{"label": label, "y": y} for label, y in zip("ABC", [2.0, 6.0, 1.0])]
 HEAT = {"z": [[0.0, 0.5], [0.8, 1.0]]}
+LINE = [{"x": x, "y": x * x} for x in range(5)]
 
 
 def grid_visible(ax, axis):
@@ -37,6 +38,20 @@ class TestThemeDefaults(unittest.TestCase):
         figure = BarChart(BAR, show_grid="x")
         self.assertTrue(grid_visible(figure.axes[0], "x"))
         self.assertFalse(grid_visible(figure.axes[0], "y"))
+
+    def test_false_draws_no_grid_over_a_theme_default(self):
+        """`show_grid=False` is the off switch, whatever the theme asks for."""
+        for front, data in ((BarChart, BAR), (LineChart, LINE)):
+            with self.subTest(front=front.__name__):
+                ax = front(data, show_grid=False).axes[0]
+                self.assertFalse(grid_visible(ax, "x"))
+                self.assertFalse(grid_visible(ax, "y"))
+
+    def test_false_draws_no_grid_in_a_panel(self):
+        """A `Panel` takes the same off switch as a chart front."""
+        ax = Panel([LineChart(LINE)], show_grid=False).axes[0]
+        self.assertFalse(grid_visible(ax, "x"))
+        self.assertFalse(grid_visible(ax, "y"))
 
     def test_none_theme_default_leaves_grid_off(self):
         """A `None` theme default preserves the no-grid behavior."""

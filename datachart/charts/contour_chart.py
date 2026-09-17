@@ -49,7 +49,7 @@ def ContourChart(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     filled: Optional[bool] = None,
     levels: Optional[Union[CONTOUR_LEVELS, str, int, List[float]]] = None,
     show_labels: Optional[bool] = None,
@@ -189,8 +189,8 @@ def ContourChart(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show (e.g., "both", "x", "y"). Off by
-            default for filled contours.
+        show_grid: Which grid lines to show (e.g., "both", "x", "y"); `False`
+            draws none. Off by default for filled contours.
         filled: Whether to fill the bands between the levels (colored by the
             colormap) instead of drawing iso-lines (in the chart's color).
         levels: Which levels cut the surface: a rule of

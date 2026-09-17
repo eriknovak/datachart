@@ -32,7 +32,7 @@ def ParallelCoords(
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     style: Optional[
         Union[ParallelCoordsStyleAttrs, List[Optional[ParallelCoordsStyleAttrs]]]
@@ -102,7 +102,8 @@ def ParallelCoords(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_grid: Which grid lines to show (e.g., "both", "x", "y");
+            `False` draws none.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         style: Style configuration(s) for the lines.

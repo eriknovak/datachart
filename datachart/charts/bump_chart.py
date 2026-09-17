@@ -54,7 +54,7 @@ def BumpChart(
     line_curve: Optional[float] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     value_step: Optional[int] = None,
@@ -180,8 +180,9 @@ def BumpChart(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show (e.g., "both", "x", "y"). A bump
-            chart draws none unless asked: the ranks read from the lines.
+        show_grid: Which grid lines to show (e.g., "both", "x", "y"); `False`
+            draws none. A bump chart draws none unless asked: the ranks read
+            from the lines.
         show_values: Whether to print each point's original `y` value beside it.
         value_format: Format string for the value labels: a
             [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant or any

@@ -48,7 +48,7 @@ def ScatterChart(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_regression: Optional[bool] = None,
     show_ci: Optional[bool] = None,
     ci_level: Optional[float] = None,
@@ -227,7 +227,8 @@ def ScatterChart(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_grid: Which grid lines to show (e.g., "both", "x", "y");
+            `False` draws none.
         show_regression: Whether to show the regression line.
         show_ci: Whether to show the confidence interval around the regression line.
         ci_level: The confidence interval level (default 0.95).

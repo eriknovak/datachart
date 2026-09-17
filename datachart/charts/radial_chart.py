@@ -59,7 +59,7 @@ def RadialChart(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_yerr: Optional[bool] = None,
     show_area: Optional[bool] = None,
     show_values: Optional[bool] = None,
@@ -160,7 +160,10 @@ def RadialChart(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_grid: Which grid lines to draw: "x" the spokes only, "y" the
+            rings only, "both" both, `False` neither. Left unset, spokes and
+            rings are both drawn and the theme's own choice is the one drawn
+            in the faint grid color; the other stays a darker grey.
         show_yerr: Whether to show the radial error band (line visual).
         show_area: Whether to fill the area inside the line (line visual).
         show_values: Whether to write each mark's value at its tip, rotated

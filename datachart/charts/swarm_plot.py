@@ -48,7 +48,7 @@ def SwarmPlot(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     mode: Union[SWARM_MODE, str] = SWARM_MODE.SWARM,
     jitter: float = 0.4,
     show_values: Optional[bool] = None,
@@ -177,7 +177,8 @@ def SwarmPlot(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_grid: Which grid lines to show (e.g., "both", "x", "y");
+            `False` draws none.
         mode: How the points spread across the category width. See
             [`SWARM_MODE`][datachart.constants.SWARM_MODE]: "swarm" packs the points so
             none overlap, from the marker size at draw time (axis limits changed

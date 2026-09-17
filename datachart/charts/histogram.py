@@ -47,7 +47,7 @@ def Histogram(
     ymax: Optional[Union[int, float]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
-    show_grid: Optional[Union[SHOW_GRID, str]] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_density: Optional[bool] = None,
     show_cumulative: Optional[bool] = None,
     show_values: Optional[bool] = None,
@@ -168,7 +168,8 @@ def Histogram(
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
-        show_grid: Which grid lines to show (e.g., "both", "x", "y").
+        show_grid: Which grid lines to show (e.g., "both", "x", "y");
+            `False` draws none.
         show_density: Whether to plot the density histogram.
         show_cumulative: Whether to plot the cumulative histogram.
         show_values: Whether to print each bin's height at its top; empty bins stay bare.
