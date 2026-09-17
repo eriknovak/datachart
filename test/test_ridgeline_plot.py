@@ -334,3 +334,24 @@ class TestRidgelineDeclarations(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestLogValueAxis(unittest.TestCase):
+    """On a log value axis the density grid is log-spaced (issue #175)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_grid_is_geometric(self):
+        rng = np.random.RandomState(0)
+        data = [
+            {"label": lab, "value": float(v)}
+            for lab, mu in (("A", 2), ("B", 4))
+            for v in rng.lognormal(mu, 1, 200)
+        ]
+        figure = RidgelinePlot(data=data, scaley="log", fill=False)
+        outline = figure.axes[0].lines[0]
+        grid = np.asarray(outline.get_xdata(), float)
+        self.assertTrue((grid > 0).all())
+        ratios = grid[1:] / grid[:-1]
+        np.testing.assert_allclose(ratios, ratios[0], rtol=1e-6)

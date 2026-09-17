@@ -179,3 +179,25 @@ class TestViolinPlot(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestLogValueAxis(unittest.TestCase):
+    """On a log value axis the body is estimated in log space (issue #175)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_body_is_sampled_in_log_space(self):
+        rng = np.random.RandomState(0)
+        values = rng.lognormal(3, 1, 300)
+        figure = ViolinPlot(
+            data=[{"label": "A", "value": float(v)} for v in values], scaley="log"
+        )
+        (body,) = [
+            c for c in figure.axes[0].collections if isinstance(c, PolyCollection)
+        ]
+        coords = np.unique(body.get_paths()[0].vertices[:, 1])
+        ratios = coords[1:] / coords[:-1]
+        np.testing.assert_allclose(ratios, ratios[0], rtol=1e-6)
+        self.assertAlmostEqual(coords[0], values.min())
+        self.assertAlmostEqual(coords[-1], values.max())

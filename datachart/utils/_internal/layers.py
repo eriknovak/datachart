@@ -26,7 +26,7 @@ import matplotlib as mpl
 import matplotlib.dates as mdates
 from dateutil.relativedelta import relativedelta
 from matplotlib.font_manager import FontProperties
-from matplotlib import rc_context
+from matplotlib import cbook, rc_context
 import matplotlib.ticker as mticker
 from matplotlib.ticker import MaxNLocator
 from matplotlib.collections import LineCollection, PathCollection, PolyCollection
@@ -1286,6 +1286,9 @@ def _draw_ref_lines(ax: plt.Axes, vlines: List[tuple], hlines: List[tuple]) -> N
             label=vline.get("label", ""),
             **style,
         )
+    # a line running to the limits must not widen them under autoscale
+    if any(v.get("ymin") is None or v.get("ymax") is None for v, _ in vlines):
+        ax.set_ylim(default_ymin, default_ymax)
 
     default_xmin, default_xmax = ax.get_xlim()
     for hline, style in hlines:
@@ -1302,6 +1305,8 @@ def _draw_ref_lines(ax: plt.Axes, vlines: List[tuple], hlines: List[tuple]) -> N
             label=hline.get("label", ""),
             **style,
         )
+    if any(h.get("xmin") is None or h.get("xmax") is None for h, _ in hlines):
+        ax.set_xlim(default_xmin, default_xmax)
 
 
 def _draw_ref_spans(
@@ -1639,6 +1644,9 @@ class DrawContext:
     sole_dumbbell: bool = False
     # the panel pins its aspect ratio, so colorbars size to the axes box
     aspect_locked: bool = False
+    # the resolved scales of the axes the layer draws on (ADR 0041)
+    value_scale: Optional[str] = None
+    category_scale: Optional[str] = None
 
 
 # ================================================
@@ -3812,9 +3820,16 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
 
         plot, fill, _ = _oriented(ax, ctx.transpose)
 
+        # a log axis fits and samples its data as log10 values
+        x_log = ctx.category_scale == SCALE.LOG
+        y_log = ctx.value_scale == SCALE.LOG
+        x = np.log10(x) if x_log else x
+        y = np.log10(y) if y_log else y
         slope, intercept, _, _, _ = scipy_stats.linregress(x, y)
-        x_line = np.linspace(x.min(), x.max(), 100)
-        y_line = slope * x_line + intercept
+        x_fit = np.linspace(x.min(), x.max(), 100)
+        y_fit = slope * x_fit + intercept
+        x_line = np.power(10.0, x_fit) if x_log else x_fit
+        y_line = np.power(10.0, y_fit) if y_log else y_fit
 
         reg_style = dict(self.regression_style)
         if color is not None and not self.regression_color_pinned:
@@ -3833,12 +3848,15 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
             s_err = np.sqrt(np.sum(residuals**2) / (n - 2))
             x_mean = np.mean(x)
             ss_x = np.sum((x - x_mean) ** 2)
-            se_line = s_err * np.sqrt(1 / n + (x_line - x_mean) ** 2 / ss_x)
+            se_line = s_err * np.sqrt(1 / n + (x_fit - x_mean) ** 2 / ss_x)
             ci = t_val * se_line
+            lower, upper = y_fit - ci, y_fit + ci
+            if y_log:
+                lower, upper = np.power(10.0, lower), np.power(10.0, upper)
             fill(
                 x_line,
-                y_line - ci,
-                y_line + ci,
+                lower,
+                upper,
                 alpha=self.regression_ci_alpha,
                 color=color,
             )
@@ -4976,7 +4994,11 @@ class ViolinLayer(GroupLayer):
                     style["facecolor"] = self.split_colors[j]["color"]
                 elif self.color_by_group and self.violin_style.get("facecolor") is None:
                     style["facecolor"] = self.group_color(i, ctx.color)
-                artists = [self._draw_body(ax, values, position, width, style, side)]
+                artists = [
+                    self._draw_body(
+                        ax, values, position, width, style, side, ctx.value_scale
+                    )
+                ]
                 artists += self._draw_inner(ax, values, position, width, side)
                 self._apply_violin_emphasis(artists, roles[i])
                 if self.show_values and roles[i] != EMPHASIS_BACKGROUND:
@@ -4990,17 +5012,19 @@ class ViolinLayer(GroupLayer):
                 )
                 self.register_hover(artists[0], lambda _, datum=datum: datum)
 
-    def _draw_body(self, ax, values, position, width, style, side):
-        parts = ax.violinplot(
-            [values],
+    def _draw_body(self, ax, values, position, width, style, side, scale=None):
+        options = dict(
             positions=[position],
             widths=width,
             orientation=self.orientation,
-            bw_method=self.bandwidth,
             showextrema=False,
             showmedians=False,
             showmeans=False,
         )
+        if scale == SCALE.LOG:
+            parts = ax.violin([self._log_stats(values)], **options)
+        else:
+            parts = ax.violinplot([values], bw_method=self.bandwidth, **options)
         body = parts["bodies"][0]
         # above the axis gridlines (zorder 1.5), like a box patch
         body.set_zorder(2)
@@ -5022,6 +5046,17 @@ class ViolinLayer(GroupLayer):
             for path in body.get_paths():
                 path.vertices[:, axis] = clip(path.vertices[:, axis], position)
         return body
+
+    def _log_stats(self, values) -> dict:
+        """The body's density estimated on log10 values, mapped back to values."""
+
+        def kde(data, coords):
+            return GaussianKDE(data, self.bandwidth).evaluate(coords)
+
+        (stats,) = cbook.violin_stats([np.log10(values)], kde)
+        for key in ("coords", "mean", "median", "min", "max", "quantiles"):
+            stats[key] = np.power(10.0, stats[key])
+        return stats
 
     def _draw_inner(self, ax, values, position, width, side) -> list:
         if self.inner is None:
@@ -5136,22 +5171,33 @@ class RidgelineLayer(GroupLayer):
         order = sorted(grouped, key=lambda label: sign * np.median(grouped[label]))
         return {label: grouped[label] for label in order}
 
-    def padded_range(self) -> Optional[tuple]:
-        """The union of the rows' padded density ranges; None without a density."""
+    def padded_range(self, log: Optional[bool] = None) -> Optional[tuple]:
+        """The union of the rows' padded density ranges; None without a density.
 
+        On a log value axis the densities, and so their padding, live in
+        log10 space; `log` defaults to the front's own value scale.
+        """
+
+        if log is None:
+            log = self.settings.get("scaley") == SCALE.LOG
         ends = [
             (curve[0]["x"], curve[-1]["x"])
             for curve in (
-                kde1d(values, bandwidth=self.bandwidth, gridsize=2)
+                kde1d(
+                    np.log10(values) if log else values,
+                    bandwidth=self.bandwidth,
+                    gridsize=2,
+                )
                 for values in self.grouped_values().values()
                 if len(values) > 1
             )
         ]
         if not ends:
             return None
-        return min(e[0] for e in ends), max(e[1] for e in ends)
+        lo, hi = min(e[0] for e in ends), max(e[1] for e in ends)
+        return (10.0**lo, 10.0**hi) if log else (lo, hi)
 
-    def _grid_bounds(self) -> tuple:
+    def _grid_bounds(self, log: bool = False) -> tuple:
         """The shared or own padded range, widened to the ticks enclosing it;
         the value-axis limits win.
 
@@ -5159,8 +5205,9 @@ class RidgelineLayer(GroupLayer):
         the length of their grid, so the grid reaches those ticks too.
         """
 
-        lo, hi = self.shared_range or self.padded_range()
-        ticks = np.asarray(mticker.AutoLocator().tick_values(lo, hi), dtype=float)
+        lo, hi = self.shared_range or self.padded_range(log)
+        locator = mticker.LogLocator() if log else mticker.AutoLocator()
+        ticks = np.asarray(locator.tick_values(lo, hi), dtype=float)
         if len(ticks) > 1:
             tol = float(np.min(np.diff(ticks))) * 1e-6
             below, above = ticks[ticks <= lo + tol], ticks[ticks >= hi - tol]
@@ -5185,14 +5232,23 @@ class RidgelineLayer(GroupLayer):
         input_labels = list(super().grouped_values())
         roles = dict(zip(input_labels, self._group_roles(input_labels, ctx.emphasis)))
 
-        lo, hi = self._grid_bounds()
+        # on a log value axis the densities are estimated on log10 values
+        log = ctx.value_scale == SCALE.LOG
+        lo, hi = self._grid_bounds(log)
+        if log:
+            grouped_fit = {k: np.log10(v) for k, v in grouped.items()}
+            lo, hi = np.log10(lo), np.log10(hi)
+        else:
+            grouped_fit = grouped
         curves = [
             kde1d(
                 values, bandwidth=self.bandwidth, gridsize=RIDGE_GRIDSIZE, xlim=(lo, hi)
             )
-            for values in grouped.values()
+            for values in grouped_fit.values()
         ]
         grid = np.array([point["x"] for point in curves[0]])
+        if log:
+            grid = np.power(10.0, grid)
         densities = [np.array([point["y"] for point in curve]) for curve in curves]
         peak = 1 + self.overlap
         common_max = max(float(d.max()) for d in densities)
@@ -10170,8 +10226,12 @@ class Panel:
         # scales resolve before drawing: a log axis rejects its data up front
         scales = self._resolve_scales(ax_right, group_axes)
         self._validate_log_scales(scales, group_axes, ax_right)
+        scalex, scaley, scale_right = scales
         for group, target_ax in zip(self.groups, group_axes):
             cycle = cycles[palette_key(group)]
+            on_twin = ax_right is not None and target_ax is ax_right
+            value_scale = scale_right if on_twin else (scalex if horizontal else scaley)
+            category_scale = scaley if horizontal else scalex
             bins = s.get("hist_bins_override")
             if bins is None:
                 bins = group.hist_bins()
@@ -10232,6 +10292,8 @@ class Panel:
                     category_index=category_index,
                     sole_dumbbell=dumbbell_count == 1,
                     aspect_locked=aspect_locked,
+                    value_scale=value_scale,
+                    category_scale=category_scale,
                 )
                 layer.draw(target_ax, ctx)
                 hover_targets.extend(layer.take_hover_targets())
