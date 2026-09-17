@@ -33,6 +33,14 @@ THEMES = [
 ]
 
 
+LEGEND_LOCATION_EDGES = [
+    LEGEND_LOCATION.OUTSIDE_RIGHT,
+    LEGEND_LOCATION.OUTSIDE_LEFT,
+    LEGEND_LOCATION.OUTSIDE_TOP,
+    LEGEND_LOCATION.OUTSIDE_BOTTOM,
+]
+
+
 def columns():
     rng = np.random.RandomState(3)
     a = rng.randn(30)
@@ -473,14 +481,22 @@ class TestScatterMatrixComposition(unittest.TestCase):
             Panel([ScatterMatrix(columns())])
 
     def test_nests_in_grid(self):
-        matrix = ScatterMatrix(columns(), hue="species", dimensions=["a", "b"])
         line = LineChart([{"x": 0, "y": 1}, {"x": 1, "y": 2}])
-        figure = Grid([[line, matrix]])
-        # the line, four matrix cells, two diagonal twins, and the legend
-        self.assertEqual(len(figure.axes), 8)
-        self.assertEqual(len([ax for ax in figure.axes if ax.get_legend()]), 1)
-        outer = Grid([[figure]])
-        self.assertEqual(len(outer.axes), 8)
+        for location in LEGEND_LOCATION_EDGES:
+            with self.subTest(location=location):
+                matrix = ScatterMatrix(
+                    columns(),
+                    hue="species",
+                    dimensions=["a", "b"],
+                    legend={"location": location},
+                )
+                figure = Grid([[line, matrix]])
+                # the line, four matrix cells, two diagonal twins, and the legend
+                self.assertEqual(len(figure.axes), 8)
+                self.assertEqual(len([ax for ax in figure.axes if ax.get_legend()]), 1)
+                outer = Grid([[figure]])
+                self.assertEqual(len(outer.axes), 8)
+                outer.canvas.draw()
 
     def test_nested_columns_keep_equal_widths(self):
         matrix = ScatterMatrix(columns(), hue="species", dimensions=["a", "b", "c"])

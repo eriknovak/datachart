@@ -1661,7 +1661,7 @@ def _fit_legend(
         else ("upper right", "lower right", "center right")
     )
     a0, a1 = legend.axes.bbox.get_points()[:, dim]
-    # the value that stays put as the range scales: its low end, or a mirror's zero
+    # the fixed point as the range scales: its low end, or a mirror's zero
     origin = axes[0].transData.transform((0, 0))[dim] if mirror else a0
     best = None
     for name in names:
@@ -1735,7 +1735,7 @@ def _fit_outside_legend(legend: Legend, axes: list, renderer) -> None:
         "top": (furniture.y1 - ax_box.y1, (0, 1)),
         "bottom": (ax_box.y0 - furniture.y0, (0, -1)),
     }[side]
-    shift = max(shift + pad, 0) if shift > 0 else 0
+    shift = shift + pad if shift > 0 else 0
     if shift:
         inches = shift / legend.figure.dpi
         offset = ScaledTranslation(
@@ -1750,7 +1750,7 @@ def _fit_outside_legend(legend: Legend, axes: list, renderer) -> None:
             tuple(anchor), transform=legend.axes.transAxes + offset
         )
     for ax, bottom in zip(titled, bottoms):
-        # an inch offset on the title, like the legend's, survives re-layout
+        # matplotlib's own title offset, in inches, survives re-layout
         lift = box.y1 + shift + pad - bottom
         if lift > 0:
             points = ax.titleOffsetTrans.get_matrix()[1, 2] * 72 / ax.figure.dpi

@@ -148,12 +148,30 @@ class TestLegendSetting(unittest.TestCase):
             show_legend=True,
             legend={"location": LEGEND_LOCATION.OUTSIDE_TOP},
         )
-        for figure in (Grid([[source, None]]), Grid([[source], [source]])):
-            with self.subTest(cells=len(figure.axes)):
+        # a twin-axis panel titles its host and draws the legend on its twin
+        panel = Panel(
+            [
+                {"figure": BarChart(BARS, subtitle="bars"), "y_axis": "left"},
+                {"figure": LineChart(LINES[0], subtitle="line"), "y_axis": "right"},
+            ],
+            title="Panel title",
+            show_legend=True,
+            legend={"location": LEGEND_LOCATION.OUTSIDE_TOP},
+        )
+        cases = {
+            "one": Grid([[source, None]]),
+            "stacked": Grid([[source], [source]]),
+            "panel": Grid([[panel, source]]),
+        }
+        for name, figure in cases.items():
+            with self.subTest(case=name):
                 figure.canvas.draw()
                 renderer = figure.canvas.get_renderer()
                 for ax in figure.axes:
-                    legend = ax.get_legend()
+                    if not ax.title.get_text():
+                        continue
+                    siblings = ax._twinned_axes.get_siblings(ax)
+                    (legend,) = [a.get_legend() for a in siblings if a.get_legend()]
                     title = ax.title.get_window_extent(renderer)
                     box = legend.get_window_extent(renderer)
                     self.assertGreaterEqual(box.y0, ax.bbox.y1)

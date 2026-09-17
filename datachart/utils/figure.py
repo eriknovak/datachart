@@ -188,17 +188,16 @@ def _render_grid_node(
     title, xlabel, ylabel = node.get("title"), node.get("xlabel"), node.get("ylabel")
     legend = node.get("legend")
     edge = legend.get("edge", "right") if legend else None
-    band = LABEL_ROW_HEIGHT
     heights = (
-        ([band] if title else [])
-        + ([band] if edge == "top" else [])
+        ([LABEL_ROW_HEIGHT] if title else [])
+        + ([LABEL_ROW_HEIGHT] if edge == "top" else [])
         + [1] * nrows
-        + ([band] if xlabel else [])
-        + ([band] if edge == "bottom" else [])
+        + ([LABEL_ROW_HEIGHT] if xlabel else [])
+        + ([LABEL_ROW_HEIGHT] if edge == "bottom" else [])
     )
     widths = (
         ([LEGEND_COLUMN_WIDTH] if edge == "left" else [])
-        + ([band] if ylabel else [])
+        + ([LABEL_ROW_HEIGHT] if ylabel else [])
         + [1] * ncols
         + ([LEGEND_COLUMN_WIDTH] if edge == "right" else [])
     )

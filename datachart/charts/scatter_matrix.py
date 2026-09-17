@@ -51,6 +51,8 @@ LEGEND_EDGES = {
     LEGEND_LOCATION.OUTSIDE_TOP: "top",
     LEGEND_LOCATION.OUTSIDE_BOTTOM: "bottom",
 }
+# the edges whose legend is a row above or below the cells
+ROW_EDGES = ("top", "bottom")
 # the share of a dimension's range padded onto each end of its limits
 LIMIT_MARGIN = 0.05
 
@@ -78,10 +80,10 @@ def _columns(data) -> Dict[str, list]:
     )
 
 
-def _legend_edge(legend: Optional[LegendSettingAttrs]) -> str:
+def _legend_edge(legend: LegendSettingAttrs) -> str:
     """The matrix edge the legend sits on; only an outside location has one."""
 
-    location = (legend or {}).get("location")
+    location = legend.get("location")
     if location not in LEGEND_EDGES:
         accepted = ", ".join(f"`{k}`" for k in LEGEND_EDGES if k is not None)
         raise ValueError(
@@ -358,6 +360,7 @@ def ScatterMatrix(
     sharex = True if sharex is None else sharex
     sharey = True if sharey is None else sharey
     show_legend = hue is not None if show_legend is None else show_legend
+    legend = legend or {}
     edge = _legend_edge(legend)
     style = dict(style or {})
 
@@ -456,10 +459,10 @@ def ScatterMatrix(
             if k not in ("loc", "bbox_to_anchor")
         }
         # the hue column names the groups; the theme's generic title does not
-        if (legend or {}).get("title") is None:
+        if legend.get("title") is None:
             legend_style["title"] = hue
         # a row lays the groups side by side
-        if edge in ("top", "bottom") and (legend or {}).get("ncols") is None:
+        if edge in ROW_EDGES and legend.get("ncols") is None:
             legend_style["ncols"] = len(groups)
         node_legend = {
             "cell": legend_cell,
@@ -484,8 +487,9 @@ def ScatterMatrix(
 
     size = n - trim
     if figsize is None:
-        column = LEGEND_WIDTH if node_legend and edge in ("left", "right") else 0
-        row = LEGEND_HEIGHT if node_legend and edge in ("top", "bottom") else 0
+        in_row = node_legend is not None and edge in ROW_EDGES
+        column = LEGEND_WIDTH if node_legend and not in_row else 0
+        row = LEGEND_HEIGHT if in_row else 0
         # a wide matrix shrinks its cells to fit a full-width page figure
         cell = min(CELL_SIZE, (FIG_SIZE.FULL_MEDIUM[0] - column) / size)
         figsize = (cell * size + column, cell * size + row)
