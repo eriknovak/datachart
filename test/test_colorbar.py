@@ -1,6 +1,8 @@
 """Tests for the per-figure colorbar setting (ADR 0035)."""
 
+import io
 import unittest
+from datetime import date, timedelta
 
 import matplotlib
 
@@ -9,7 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
 
-from datachart.charts import ContourChart, Heatmap, HexbinChart
+from datachart.charts import CalendarHeatmap, ContourChart, Heatmap, HexbinChart
 from datachart.config import config
 from datachart.constants import COLORBAR_LOCATION, ORIENTATION, THEME
 from datachart.typings import ColorbarSettingAttrs
@@ -64,6 +66,22 @@ def edge_of(figure, colorbar):
     if colorbar.orientation == "vertical":
         return "right" if cax.x0 >= ax.x1 else "left"
     return "top" if cax.y0 >= ax.y1 else "bottom"
+
+
+def saved_bar_extent(figure):
+    """The colorbar's and the saved area's extents during a tight-bbox save."""
+    seen = {}
+
+    def record(event):
+        renderer = event.renderer
+        (bar,) = colorbars_of(figure)
+        seen["bar"] = bar.ax.get_tightbbox(renderer)
+        seen["saved"] = figure.bbox.frozen()
+
+    cid = figure.canvas.mpl_connect("draw_event", record)
+    figure.savefig(io.BytesIO(), bbox_inches="tight")
+    figure.canvas.mpl_disconnect(cid)
+    return seen["bar"], seen["saved"]
 
 
 def pixels(figure):
@@ -258,6 +276,28 @@ class TestColorbarRendering(unittest.TestCase):
                     self.assertTrue(figure.bbox.contains(bar.x0, bar.y0))
                     self.assertTrue(figure.bbox.contains(bar.x1, bar.y1))
                     plt.close(figure)
+
+    def test_locked_bar_survives_the_tight_bbox_save(self):
+        start = date(2024, 1, 1)
+        dates = [start + timedelta(days=i) for i in range(60)]
+        figures = {
+            "calendar": lambda location: CalendarHeatmap(
+                {"date": dates, "value": list(range(60))},
+                show_colorbars=True,
+                colorbar={"label": "Steps", "location": location},
+            ),
+            "heatmap": lambda location: FRONTS["heatmap"](
+                colorbar={"label": "Value", "location": location},
+                aspect_ratio="equal",
+            ),
+        }
+        for name, front in figures.items():
+            for location in ("right", "left", "top", "bottom"):
+                with self.subTest(front=name, location=location):
+                    bar, saved = saved_bar_extent(front(location))
+                    self.assertTrue(saved.contains(bar.x0, bar.y0), (bar, saved))
+                    self.assertTrue(saved.contains(bar.x1, bar.y1), (bar, saved))
+                    plt.close("all")
 
     def test_grid_cell_keeps_label_and_edge(self):
         source = FRONTS["heatmap"](

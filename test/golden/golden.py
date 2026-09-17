@@ -317,6 +317,8 @@ EXPECTED_CHANGES = {
     "parallel_sets_dimensions",
     "network_fixed_inset",
     "network_spring_components",
+    # colorbar fixes: tight-bbox locked bar, axis label beside its ticks
+    "calendar_narrow_colorbar",
 }
 
 
@@ -2597,6 +2599,17 @@ def calendar_grid():
     left = CalendarHeatmap({"date": days, "value": values}, title="per day")
     right = LineChart(data=LINE1, title="line")
     return Grid([[left, right]], figsize=(12, 3))
+
+
+@case
+def calendar_narrow_colorbar():
+    days, values = calendar_days(2024, seed=4)
+    return CalendarHeatmap(
+        {"date": days[:60], "value": values[:60]},
+        title="Two months",
+        show_colorbars=True,
+        colorbar={"label": "commits"},
+    )
 
 
 @case

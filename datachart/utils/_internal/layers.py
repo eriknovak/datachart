@@ -60,8 +60,6 @@ from matplotlib.legend_handler import (
     HandlerPathCollection,
     HandlerPolyCollection,
 )
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-from mpl_toolkits.axes_grid1.axes_size import Fixed as FixedPad
 
 from .colors import (
     create_color_cycle,
@@ -5832,17 +5830,8 @@ def _place_colorbar(ax: plt.Axes, mappable, setting: dict, aspect_locked: bool):
             pad=COLORBAR_PAD,
             aspect=along / (across * COLORBAR_FRACTION),
         )
-    # a left or bottom bar crosses the chart's tick labels: pad past them
-    crosses_ticks = location in (COLORBAR_LOCATION.LEFT, COLORBAR_LOCATION.BOTTOM)
-    pad = COLORBAR_DIVIDER_PAD
-    if crosses_ticks:
-        pad = _AxisClearance(ax, location, pad)
-    cax = make_axes_locatable(ax).append_axes(
-        location, size=f"{COLORBAR_FRACTION:.0%}", pad=pad
-    )
-    # the layout engine reserves room for a child axes, not a divider axes
-    ax.figure.delaxes(cax)
-    ax.add_child_axes(cax)
+    cax = ax.inset_axes((0, 0, 1, 1))
+    cax.set_axes_locator(_LockedBarLocator(ax, location))
     kwargs = {"orientation": orientation}
     if location == COLORBAR_LOCATION.LEFT:
         # a left bar reads outward; the other edges keep matplotlib's tick side
@@ -5850,22 +5839,42 @@ def _place_colorbar(ax: plt.Axes, mappable, setting: dict, aspect_locked: bool):
     return ax.figure.colorbar(mappable, cax=cax, **kwargs)
 
 
-class _AxisClearance(FixedPad):
-    """A divider pad that clears the chart axis' tick labels on one edge."""
+class _LockedBarLocator:
+    """Places a bar beside the axes' drawn box, in display space.
 
-    def __init__(self, ax: plt.Axes, location: str, pad: float):
-        super().__init__(pad)
+    Display space stays valid while a tight-bbox save swaps the figure box,
+    which an inch-based divider does not (#192).
+    """
+
+    def __init__(self, ax: plt.Axes, location: str):
         self._ax, self._location = ax, location
 
-    def get_size(self, renderer):
-        ax = self._ax
-        if self._location == COLORBAR_LOCATION.LEFT:
-            bbox = ax.yaxis.get_tightbbox(renderer)
-            extent = ax.bbox.x0 - bbox.x0 if bbox else 0.0
+    def __call__(self, cax: plt.Axes, renderer) -> Bbox:
+        ax, location = self._ax, self._location
+        ax.apply_aspect()
+        box = ax.get_position(original=False).transformed(ax.figure.transSubfigure)
+        pad = COLORBAR_DIVIDER_PAD * ax.figure.dpi
+        # a left or bottom bar crosses the chart's tick labels: pad past them
+        if location == COLORBAR_LOCATION.LEFT:
+            ticks = ax.yaxis.get_tightbbox(renderer)
+            pad += max(box.x0 - ticks.x0, 0.0) if ticks else 0.0
+        elif location == COLORBAR_LOCATION.BOTTOM:
+            ticks = ax.xaxis.get_tightbbox(renderer)
+            pad += max(box.y0 - ticks.y0, 0.0) if ticks else 0.0
+        x0, y0, width, height = box.bounds
+        if location in (COLORBAR_LOCATION.LEFT, COLORBAR_LOCATION.RIGHT):
+            size = width * COLORBAR_FRACTION
+            x0 = x0 - pad - size if location == COLORBAR_LOCATION.LEFT else box.x1 + pad
+            bar = Bbox.from_bounds(x0, y0, size, height)
         else:
-            bbox = ax.xaxis.get_tightbbox(renderer)
-            extent = ax.bbox.y0 - bbox.y0 if bbox else 0.0
-        return 0.0, self.fixed_size + max(extent, 0.0) / ax.figure.dpi
+            size = height * COLORBAR_FRACTION
+            y0 = (
+                y0 - pad - size
+                if location == COLORBAR_LOCATION.BOTTOM
+                else box.y1 + pad
+            )
+            bar = Bbox.from_bounds(x0, y0, width, size)
+        return bar.transformed(ax.figure.transSubfigure.inverted())
 
 
 def _value_formatter(valfmt):
