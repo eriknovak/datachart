@@ -7,11 +7,12 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from datachart.charts import BarChart, LineChart, RadialChart
+from datachart.charts import BarChart, Heatmap, LineChart, RadialChart, ScatterChart
 from datachart.config import config
 from datachart.constants import THEME
 from datachart.utils import Annotate, Grid, Panel
 from datachart.utils._internal.chart_builder import build_charts_structure
+from datachart.utils._internal.config_helpers import TEXT_ARROW_TARGET_GAP
 
 LINE1 = [{"x": i, "y": i**2} for i in range(10)]
 LINE2 = [{"x": i, "y": 3 * i} for i in range(10)]
@@ -391,3 +392,52 @@ class TestAnnotateSubplots(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestConnectorTargetGap(unittest.TestCase):
+    """The connector stops short of its target, but never off the mark (#184)."""
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    @staticmethod
+    def tip_in_data(figure, content):
+        figure.canvas.draw()
+        ax = figure.axes[0]
+        (text,) = annotation_texts_on(ax, content)
+        vertices = text.arrow_patch.get_path().vertices
+        return ax.transData.inverted().transform(vertices[-1])
+
+    def test_gap_stays_inside_a_small_heatmap_cell(self):
+        cells = [[(row * col) % 7 for col in range(40)] for row in range(40)]
+        figure = Heatmap(
+            {"z": cells},
+            texts={
+                "text": "n",
+                "x": 0.1,
+                "y": 0.1,
+                "coords": "axes",
+                "target": (20, 20),
+            },
+        )
+        x, y = self.tip_in_data(figure, "n")
+        # imshow centers cell (20, 20) on (20, 20); its borders sit half a unit out
+        self.assertLessEqual(abs(x - 20), 0.5)
+        self.assertLessEqual(abs(y - 20), 0.5)
+
+    def test_gap_is_unchanged_without_a_mark_under_the_target(self):
+        figure = LineChart(LINE1, texts=NOTE)
+        (text,) = annotation_texts(figure, "note")
+        self.assertEqual(text.arrowprops["shrinkB"], TEXT_ARROW_TARGET_GAP)
+
+    def test_gap_stops_on_the_scatter_marker_it_names(self):
+        data = [{"x": i, "y": i % 5} for i in range(10)]
+        figure = ScatterChart(
+            data,
+            texts={"text": "n", "x": 2, "y": 4, "target": (5, 0)},
+            style={"plot_scatter_size": 16},
+        )
+        (text,) = annotation_texts(figure, "n")
+        # a 16 pt² marker is 2 pt across its radius, under the 5 pt gap
+        self.assertEqual(text.arrowprops["shrinkB"], 2.0)

@@ -1196,6 +1196,30 @@ TEXT_SHORT_GAP = 1.5
 TEXT_SHORT_NONE = 2 * TEXT_SHORT_GAP
 
 
+def _px_to_points(ax: plt.Axes, pixels: float) -> float:
+    """A display distance in points, the unit the connector's gaps use."""
+
+    return pixels * 72.0 / ax.figure.dpi
+
+
+def _points_to_px(ax: plt.Axes, points: float) -> float:
+    """A distance in points as display pixels."""
+
+    return points * ax.figure.dpi / 72.0
+
+
+def _target_gap(ax: plt.Axes, target: tuple, layers: List, gap: float) -> float:
+    """The connector's target gap, capped to the mark it points at (ADR 0018).
+
+    A fixed gap overshoots a mark smaller than itself and lands the tip on
+    the neighbour; the smallest half-extent reported under the point wins.
+    """
+
+    extents = [layer.target_extent(ax, target) for layer in layers]
+    extents = [extent for extent in extents if extent is not None]
+    return min([gap, *extents])
+
+
 def _facing_relpos(start: np.ndarray, target: np.ndarray) -> tuple:
     """The point on the text box border facing the target, as box fractions."""
 
@@ -1316,7 +1340,11 @@ def _data_point(ax: plt.Axes, point) -> tuple:
 
 
 def _draw_texts(
-    ax: plt.Axes, texts: List[tuple], data_ax: plt.Axes = None, clearance=None
+    ax: plt.Axes,
+    texts: List[tuple],
+    data_ax: plt.Axes = None,
+    clearance=None,
+    layers: List = (),
 ) -> None:
     """Draw the pre-resolved text annotations.
 
@@ -1324,7 +1352,8 @@ def _draw_texts(
     twin-axis marks — while data coordinates read from `data_ax`, the
     owning layer's axes. `clearance` holds the panel's data in display
     coordinates; a curved connector left on its default bows toward the
-    side with the most open space.
+    side with the most open space. `layers` are the layers drawn on
+    `data_ax`, which size the gap a connector leaves at its target.
     """
 
     data_ax = data_ax if data_ax is not None else ax
@@ -1373,6 +1402,9 @@ def _draw_texts(
         arrowprops = dict(style["arrowprops"])
         curve = arrowprops.pop("curve")
         pinned = arrowprops.pop("curve_pinned")
+        arrowprops["shrinkB"] = _target_gap(
+            data_ax, target, layers, arrowprops["shrinkB"]
+        )
         if length < TEXT_SHORT_STRAIGHT:
             rad = 0.0
             arrowprops["shrinkA"] = min(arrowprops["shrinkA"], TEXT_SHORT_GAP)
@@ -1934,6 +1966,16 @@ class Layer:
 
     def _resolve_emphasis(self, value):
         return validate_emphasis(value)
+
+    def target_extent(self, ax: plt.Axes, point: tuple) -> Optional[float]:
+        """Half the extent (points) of the mark this layer draws under `point`.
+
+        A connector's target gap is capped to it, so the tip stops inside
+        the mark it names. None when the layer has no mark there — most
+        layers draw marks a 5 pt gap cannot overshoot.
+        """
+
+        return None
 
     def _colorbar_edge(self, shown) -> Optional[str]:
         """The resolved colorbar's edge, when shown; etched steps draw none."""
@@ -4149,6 +4191,28 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
             **font,
         )
 
+    def target_extent(self, ax, point) -> Optional[float]:
+        """The radius (points) of the drawn marker `point` sits on, if any.
+
+        The marks carry the sizes the panel finally gave them, so a sized
+        series reports the radius of the very marker the target names.
+        """
+
+        target = np.asarray(ax.transData.transform(point), dtype=float)
+        for collection in getattr(self, "_marks", {}).get(id(ax), ()):
+            offsets = collection.get_offsets()
+            if not len(offsets):
+                continue
+            points = collection.get_offset_transform().transform(offsets)
+            index = int(np.argmin(np.hypot(*(points - target).T)))
+            sizes = np.asarray(collection.get_sizes(), dtype=float)
+            if not sizes.size:
+                continue
+            radius = float(np.sqrt(sizes[index % sizes.size]) / 2)
+            if np.hypot(*(points[index] - target)) <= _points_to_px(ax, radius):
+                return radius
+        return None
+
     def draw(self, ax, ctx):
         x_data = get_chart_data("x", self.chart)
         y_data = get_chart_data("y", self.chart)
@@ -6030,6 +6094,23 @@ class HeatmapLayer(Layer):
 
     def date_label_axes(self):
         return self.date_axes
+
+    def target_extent(self, ax, point) -> Optional[float]:
+        """Half the smaller side of the cell holding `point`, in points.
+
+        `imshow` centers cell (row, col) on (col, row), so a point rounds
+        to its cell and the borders sit half a unit out.
+        """
+
+        col, row = round(point[0]), round(point[1])
+        n_rows, n_cols = len(self.z), len(self.z[0]) if self.z else 0
+        if not (0 <= row < n_rows and 0 <= col < n_cols):
+            return None
+        corners = ax.transData.transform(
+            [(col - 0.5, row - 0.5), (col + 0.5, row + 0.5)]
+        )
+        width, height = np.abs(corners[1] - corners[0])
+        return _px_to_points(ax, min(width, height) / 2)
 
     def draw(self, ax, ctx):
         data = self.z
@@ -11420,8 +11501,10 @@ class Panel:
         # axes, so a line or text does not repeat and a band's tint does not
         # stack with the series count; each is read on its figure's axes
         pools = {}
+        pooled_layers = defaultdict(list)
         for group, owner_ax in zip(self.groups, group_axes):
             pooled = pools.setdefault(owner_ax, {key: [] for key in REF_KEYS})
+            pooled_layers[owner_ax].extend(group.layers)
             for layer in group.layers:
                 for key in REF_KEYS:
                     for entry in getattr(layer, key):
@@ -11453,7 +11536,9 @@ class Panel:
         if any(pooled["texts"] for pooled in pools.values()):
             clearance = self._clearance_points(group_axes, horizontal)
         for owner_ax, pooled in pools.items():
-            _draw_texts(top_ax, pooled["texts"], owner_ax, clearance)
+            _draw_texts(
+                top_ax, pooled["texts"], owner_ax, clearance, pooled_layers[owner_ax]
+            )
 
         # point labels are placed once every marker of the panel is drawn and
         # the limits are final, so the estimate sees the real display space
