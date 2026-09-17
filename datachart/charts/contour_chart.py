@@ -196,7 +196,8 @@ def ContourChart(
         levels: Which levels cut the surface: a rule of
             [`CONTOUR_LEVELS`][datachart.constants.CONTOUR_LEVELS] (`"auto"`, the
             default, leaves the choice to matplotlib), a target level count, or an
-            explicit list of level values.
+            explicit list of level values. Filled values beyond a list's ends
+            take the end colours, and the colorbar marks the overflow.
         show_labels: Whether to write the level values along the iso-lines.
         show_colorbars: Whether to show the colorbar(s) of filled contours.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
