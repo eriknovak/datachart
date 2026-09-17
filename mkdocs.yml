@@ -172,10 +172,10 @@ plugins:
           - how-to-guides/styling/theme-gallery.ipynb: Each predefined theme's swatches with hex codes and six signature charts, grouped by use.
           - how-to-guides/styling/colormaps.ipynb: "Every COLORS palette as a strip and six-series swatches, grouped by kind, with chips for the predefined themes that use it and the role; which kind fits which theme attribute."
         Utility:
-          - how-to-guides/utility/index.md: Map of statistics, figure saving, and interactive figures.
-          - how-to-guides/utility/stats.ipynb: Statistical utilities for preparing chart data.
-          - how-to-guides/utility/saving.md: "Saving figures with save_figure: choosing vector or raster formats and dpi, embedding SVG or PNG in web pages, and why interactive web charts are out of scope."
-          - how-to-guides/utility/interactive.md: "Zooming, panning, and hovering over marks with show(interactive=True): the interactive extra, notebook and script behavior, and the chart types with hover support."
+          - how-to-guides/utility/index.md: Map of the statistics, figure saving, and interactive figure guides.
+          - how-to-guides/utility/stats.ipynb: "Statistics basics on the Palmer penguins: centers, spreads, shape, correlation, trend lines, bootstrap intervals, binning, smoothers on the NASA temperature record, density estimates, each fed back into a chart, and worked examples on real data."
+          - how-to-guides/utility/saving.md: "Saving figures with save_figure: vector or raster formats and dpi, transparent backgrounds, several formats in one call, embedding SVG or PNG in web pages, and worked examples for a manuscript, a slide, and a documentation page."
+          - how-to-guides/utility/interactive.md: "Zooming, panning, and hovering over marks with show(interactive=True): the interactive extra, notebook and script behavior, what the hover annotation of every chart type shows, and worked examples for finding an outlier, reading a two-axis panel, and checking a grid."
         API Reference:
           - references/index.md: Top-level module reference.
           - references/charts.md: Chart function signatures and parameters.
