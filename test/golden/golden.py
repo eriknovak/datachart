@@ -323,6 +323,12 @@ EXPECTED_CHANGES = {
     # legend fixes: matrix legend edge, grid-cell title over the legend
     "matrix_legend_bottom",
     "grid_panel_title_outside_top_legend",
+    # subplots draw from the series palette, like a single chart (#183)
+    "line_multi_subplots",
+    "bar_multi_subplots",
+    "hist_multi_subplots",
+    "scatter_multi_subplots",
+    "stackedarea_subplots",
 }
 
 

@@ -46,12 +46,14 @@ so `Panel([LineChart(..., scaley="log")])` rendered linear.
 - **An explicit setting beats a stamped one**, per axis. Among the groups on
   one axis, the first in panel order wins — first-one-wins, as the tick
   formats and the stacked baseline already do, narrowed to that axis.
-- **A figure that set no scale was built linear**, so it takes part in
-  first-one-wins and in the conflict warning as `"linear"` rather than
-  abstaining. A linear bar chart listed before a log line on the same axis
-  keeps that axis linear and warns. Treating an unset scale as "no opinion"
-  would let one log figure anywhere in the list silently drag every
-  unscaled figure on its axis onto log.
+- **A figure that set no scale abstains** (issue #178). It takes no part in
+  first-one-wins and none in the conflict warning: the first figure that did
+  set a scale supplies the axis, and only two figures that both set one, and
+  set different ones, conflict. A figure with no scale has nothing to carry,
+  and a bar chart listed before a log line is the ordinary way to write the
+  motivating panel — counting it as linear discarded the one scale in the
+  panel and warned about a conflict the caller never created. When no figure
+  on an axis set a scale, the axis keeps the matplotlib default.
 - **The category axis has no twin**, so `scalex` collapses to a single
   first-one-wins across every group, and there is no `scalex_right`.
 - **Conflicts warn, under `overlay_warn_scale_conflict`.** The loser is
@@ -131,9 +133,12 @@ labels stay panel furniture.
   draw time, after the panel front has already swapped, so a horizontal
   panel holding a box plot swaps twice and lands the scale on the category
   axis.
-- *Letting an unset scale abstain from first-one-wins.* Rejected: it sounds
-  permissive and behaves aggressively, since a single log figure would then
-  set the axis for every figure that never asked for one.
+- *Counting an unset scale as linear.* Rejected (issue #178): the worry was
+  that one log figure would drag every unscaled figure on its axis onto log,
+  but that is what carrying a scale over means, and the log values are the
+  ones a linear axis misreads. The rule instead lost the scale of the only
+  figure that had one whenever an unscaled figure came first, which is the
+  usual order.
 - *A `scalex_right`.* Rejected: the secondary axis is always a second value
   axis (`twinx` vertical, `twiny` horizontal), so there is no second
   category axis for it to name.

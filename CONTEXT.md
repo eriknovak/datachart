@@ -21,11 +21,12 @@ limits, grid, ticks, legend assembly, and twin-axis assignment. Also the public 
 (`datachart.utils.Panel`) that overlays rendered figures into one panel.
 Panel figures nest: a nested panel flattens into the outer one, keeping its
 per-figure prefs while the outermost call supplies all panel-level furniture.
-Axis scale is the one exception: it is stamped onto each layer group as a
-pref rather than held as furniture, so it survives nesting and follows its
-group to whichever axis twin assignment sends it to. A dropped scale renders
-a clean but misleading chart where a dropped label or limit is visible
-(ADR 0041).
+Axis scale and bar mode are the exceptions: axis scale is stamped onto each
+layer group as a pref rather than held as furniture, so it survives nesting
+and follows its group to whichever axis twin assignment sends it to
+(ADR 0041), and a source figure's own `bar_mode` is adopted by a panel that
+sets none (ADR 0005). A dropped scale renders a clean but misleading chart
+where a dropped label or limit is visible.
 A panel has an orientation, inferred from its orientable layers (horizontal
 only when all of them are); its value axis follows it.
 _Avoid_: overlay (for the concept), subplot, axes group
@@ -342,7 +343,8 @@ _Avoid_: direct label (for this), line label, legend label
 A per-cell matrix (`Heatmap`: a 2-D `z` grid per chart with optional `x`, `y`
 labels for its columns and rows) drawn as one colored cell per value at
 integer positions. `x`/`y` are tick labels, not coordinates — uneven spacing
-never changes cell size; that is the contour's job.
+never changes cell size; that is the contour's job. A bare figure: rejected
+in `Panel`, a cell in `Grid`.
 _Avoid_: matrix plot, image plot, colormesh
 
 **Calendar heatmap**:

@@ -7,7 +7,7 @@ import pytest
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpecFromSubplotSpec
 
-from datachart.charts import LineChart, BarChart
+from datachart.charts import Histogram, LineChart, BarChart
 from datachart.config import config
 from datachart.constants import BAR_MODE, THEME, VALUE_FORMAT
 from datachart.utils import (
@@ -27,8 +27,36 @@ def _line_fig():
     return LineChart(data=[{"x": i, "y": i * 2} for i in range(5)])
 
 
-def _bar_fig():
-    return BarChart(data=[{"label": c, "y": v} for c, v in zip("ABCD", [3, 1, 4, 2])])
+def _bar_fig(**kwargs):
+    return BarChart(
+        data=[{"label": c, "y": v} for c, v in zip("ABCD", [3, 1, 4, 2])], **kwargs
+    )
+
+
+class TestSubplotColors:
+    """One series looks the same alone, in a subplot and in a cell (issue #183)."""
+
+    @staticmethod
+    def _first_patch_color(figure):
+        figure.canvas.draw()
+        for ax in figure.axes:
+            for patch in ax.patches:
+                return patch.get_facecolor()
+        raise AssertionError("the figure drew no bars")
+
+    def test_a_subplot_matches_a_single_chart(self):
+        single = _bar_fig()
+        bars = [{"label": c, "y": v} for c, v in zip("ABCD", [3, 1, 4, 2])]
+        subplots = BarChart(data=[bars, bars], subplots=True)
+        assert self._first_patch_color(subplots) == self._first_patch_color(single)
+        plt.close("all")
+
+    def test_a_subplots_figure_in_a_grid_matches_a_single_chart(self):
+        single = _bar_fig()
+        bars = [{"label": c, "y": v} for c, v in zip("ABCD", [3, 1, 4, 2])]
+        grid = Grid([BarChart(data=[bars, bars], subplots=True)])
+        assert self._first_patch_color(grid) == self._first_patch_color(single)
+        plt.close("all")
 
 
 class TestPanel:
@@ -123,6 +151,56 @@ class TestGroupedBarAlignment:
         fig = Panel([_bar_fig(), _bar_fig()], bar_mode="stack")
         centers = {round(p.get_x() + p.get_width() / 2, 6) for p in fig.axes[0].patches}
         assert centers == {0, 1, 2, 3}
+        plt.close("all")
+
+
+class TestPanelBarMode:
+    """How a panel resolves `bar_mode` (issue #177)."""
+
+    @staticmethod
+    def _bar_mode(figure):
+        return figure._chart_metadata["panel"].settings["bar_mode"]
+
+    def test_panel_adopts_a_source_figures_bar_mode(self):
+        fig = Panel([_bar_fig(bar_mode=BAR_MODE.STACK), _bar_fig()])
+        assert self._bar_mode(fig) == BAR_MODE.STACK
+        plt.close("all")
+
+    def test_panel_takes_the_first_source_that_set_one(self):
+        fig = Panel(
+            [
+                _bar_fig(),
+                _bar_fig(bar_mode=BAR_MODE.STACK),
+                _bar_fig(bar_mode=BAR_MODE.OVERLAY),
+            ]
+        )
+        assert self._bar_mode(fig) == BAR_MODE.STACK
+        plt.close("all")
+
+    def test_panel_bar_mode_wins_over_a_source_figure(self):
+        fig = Panel([_bar_fig(bar_mode=BAR_MODE.STACK)], bar_mode=BAR_MODE.OVERLAY)
+        assert self._bar_mode(fig) == BAR_MODE.OVERLAY
+        plt.close("all")
+
+    def test_nested_panel_bar_mode_propagates(self):
+        inner = Panel([_bar_fig(), _bar_fig()], bar_mode=BAR_MODE.STACK)
+        fig = Panel([inner, _line_fig()])
+        assert self._bar_mode(fig) == BAR_MODE.STACK
+        plt.close("all")
+
+    def test_panel_falls_back_to_the_config_bar_mode(self):
+        config.update_config({"overlay_bar_mode": BAR_MODE.OVERLAY})
+        try:
+            fig = Panel([_bar_fig(), _bar_fig()])
+            assert self._bar_mode(fig) == BAR_MODE.OVERLAY
+        finally:
+            config.reset_config()
+        plt.close("all")
+
+    def test_a_histograms_default_stack_is_not_a_source_mode(self):
+        hist = Histogram(data=[{"x": v} for v in range(20)])
+        fig = Panel([_bar_fig(), hist])
+        assert self._bar_mode(fig) == "group"
         plt.close("all")
 
 

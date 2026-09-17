@@ -10207,22 +10207,20 @@ class LayerGroup:
         return np.histogram(np.hstack(tuple(xall)), bins=self.num_bins)[1]
 
 
-def group_from_chart(
-    layers: List[Layer], settings: dict, mode: str = "multiple"
-) -> LayerGroup:
-    """Build a chart front's layer group; palettes are resolved here."""
+def group_from_chart(layers: List[Layer], settings: dict) -> LayerGroup:
+    """Build a chart front's layer group; palettes are resolved here.
 
-    if mode == "singular":
-        palette, max_colors = config["color_general_singular"], 1
-    else:
-        # one color per dataset: a raincloud's three layers share one chart
-        n_charts = len(layers_per_chart(layers))
-        palette, max_colors = config["color_general_multiple"], max(n_charts, 1)
+    Every group draws from the multiple palette, a subplot's single dataset
+    included, so a series looks the same alone, in a subplot and in a grid
+    cell (issue #183).
+    """
 
+    # one color per dataset: a raincloud's three layers share one chart
+    n_charts = len(layers_per_chart(layers))
     return LayerGroup(
         layers,
-        palette=palette,
-        max_colors=max_colors,
+        palette=config["color_general_multiple"],
+        max_colors=max(n_charts, 1),
         num_bins=settings.get("num_bins"),
     )
 
@@ -10979,9 +10977,10 @@ class Panel:
     def _resolve_scales(self, ax_right, group_axes) -> tuple:
         """The literal x, y and twin value-axis scales (ADR 0041).
 
-        Per axis, an explicit setting wins; otherwise the first group on that
-        axis supplies its stamped scale, and a group built on another one
-        warns. A group that set no scale was built linear.
+        Per axis, an explicit setting wins; otherwise the first group that
+        stamped a scale supplies it, and a group stamped with another one
+        warns. A group that set no scale has nothing to carry: it abstains
+        and adopts whatever the axis resolves to.
         """
 
         s = self.settings
@@ -11000,13 +10999,13 @@ class Panel:
         def pick(explicit, stamps, message):
             if explicit:
                 return explicit
-            if not stamps:
+            stamped = [scale for scale in stamps if scale]
+            if not stamped:
                 return None
-            built = [scale or SCALE.LINEAR for scale in stamps]
-            losers = sorted(set(built[1:]) - {built[0]})
+            losers = sorted(set(stamped[1:]) - {stamped[0]})
             if losers and warn:
-                warnings.warn(message(built[0], losers))
-            return stamps[0]
+                warnings.warn(message(stamped[0], losers))
+            return stamped[0]
 
         def value_conflict(winner, losers):
             return (
@@ -12111,6 +12110,8 @@ def build_chart_panel_settings(
         # histograms stack by default; bars group (ADR 0014)
         "bar_mode": settings.get("bar_mode")
         or ("stack" if chart_type == "histogram" else "group"),
+        # the caller's own mode, unresolved, for a panel to adopt (ADR 0005)
+        "source_bar_mode": settings.get("bar_mode"),
         "tighten_xlim": chart_type in ("linechart", "stackedareachart", "bumpchart"),
         # validated here so a bad value fails at the front, like the emphasis roles
         "baseline": validate_baseline(settings.get("baseline")),

@@ -58,12 +58,13 @@ from ._internal.layers import (
 )
 
 # figures whose layer owns its axes: no shared coordinate space to overlay
-# (ADR 0026, ADR 0028, ADR 0029, ADR 0044)
+# (ADR 0023, ADR 0026, ADR 0028, ADR 0029, ADR 0044)
 BARE_FIGURES = {
     "sankeychart": "Sankey",
     "treemap": "treemap",
     "networkchart": "network",
     "calendarheatmap": "calendar heatmap",
+    "heatmap": "heatmap",
 }
 
 OVERLAYABLE_LAYERS = (
@@ -131,14 +132,10 @@ def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
     if panel is None:
         raise ValueError("Figure has invalid metadata: missing 'panel'")
 
-    groups = []
+    groups, skipped = [], False
     for group in panel.groups:
         supported = [l for l in group.layers if isinstance(l, OVERLAYABLE_LAYERS)]
-        if len(supported) < len(group.layers):
-            warnings.warn(
-                f"Chart at index {index} contains layers of type "
-                f"'{metadata.get('type')}' that cannot be overlaid. Skipping them..."
-            )
+        skipped = skipped or len(supported) < len(group.layers)
         if supported:
             groups.append(
                 LayerGroup(
@@ -154,6 +151,18 @@ def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
                     category_scale=group.category_scale,
                 )
             )
+    if not groups:
+        raise ValueError(
+            f"Figure at index {index} has no layers that can be overlaid; "
+            f"'{metadata.get('type')}' figures cannot be overlaid. "
+            "Use `Grid` instead."
+        )
+    # only a partial skip warns; a figure that keeps nothing raised above
+    if skipped:
+        warnings.warn(
+            f"Chart at index {index} contains layers of type "
+            f"'{metadata.get('type')}' that cannot be overlaid. Skipping them..."
+        )
     return panel, groups
 
 
@@ -223,18 +232,19 @@ def Panel(
 
     Each axis keeps the scale its figures were built with: a figure drawn
     with ``scaley="log"`` stays log in the panel, on whichever value axis it
-    lands. The panel's own ``scalex``, ``scaley`` and ``scaley_right`` override
-    that per axis; where the figures on one axis disagree, the first one wins
-    and the panel warns (``overlay_warn_scale_conflict`` in the config). The
-    two value axes scale independently, so linear bars on the primary axis
-    against a log line on the secondary one is one panel.
+    lands. A figure that set no scale takes the one its axis resolves to. The
+    panel's own ``scalex``, ``scaley`` and ``scaley_right`` override that per
+    axis; where two figures on one axis each set a different scale, the first
+    one wins and the panel warns (``overlay_warn_scale_conflict`` in the
+    config). The two value axes scale independently, so linear bars on the
+    primary axis against a log line on the secondary one is one panel.
 
     Panel figures nest: ``Panel([Panel([f1, f2]), f3])`` is equivalent to
     ``Panel([f1, f2, f3])``, to any depth. A nested panel contributes its
-    figures with their per-figure options and axis scales intact, while the
-    other panel-level settings (title, labels, limits, ...) always come from
-    the outermost call. Dict options on a nested panel override its
-    per-figure options only when explicitly given.
+    figures with their per-figure options, axis scales and ``bar_mode``
+    intact, while the other panel-level settings (title, labels, limits, ...)
+    always come from the outermost call. Dict options on a nested panel
+    override its per-figure options only when explicitly given.
 
     !!! info "Added in v0.8.0"
 
@@ -324,16 +334,17 @@ def Panel(
         ymin_right: Minimum value for the secondary value-axis limits.
         ymax_right: Maximum value for the secondary value-axis limits.
         scalex: The category-axis scale ("linear", "log", "symlog", "asinh").
-            Default: the scale the first figure was built with. See
-                [`SCALE`][datachart.constants.SCALE].
-        scaley: The primary value-axis scale. Default: the scale the first
-            figure on that axis was built with.
-        scaley_right: The secondary value-axis scale. Default: the scale the
-            first figure on that axis was built with. Inert on a polar panel,
-            which has no secondary axis.
+            Default: the scale of the first figure that was built with one.
+                See [`SCALE`][datachart.constants.SCALE].
+        scaley: The primary value-axis scale. Default: the scale of the first
+            figure on that axis that was built with one.
+        scaley_right: The secondary value-axis scale. Default: the scale of
+            the first figure on that axis that was built with one. Inert on a
+            polar panel, which has no secondary axis.
         bar_mode: How bar and histogram series share the axis: "group" (side-by-side
             bars; histograms overlay), "stack" (stacked), or "overlay" (overlapping).
-            Default is taken from config (overlay_bar_mode, default "group"). See
+            Default: the mode of the first figure that was built with one, then
+            the config (overlay_bar_mode, default "group"). See
             [`BAR_MODE`][datachart.constants.BAR_MODE].
 
     Returns:
@@ -360,8 +371,6 @@ def Panel(
 
     if auto_secondary_axis is None:
         auto_secondary_axis = config.get("overlay_auto_threshold", 3.0)
-    if bar_mode is None:
-        bar_mode = config.get("overlay_bar_mode", "group")
     theme_grid = show_grid is None
     if theme_grid:
         show_grid = config.get("chart_default_show_grid")
@@ -384,6 +393,18 @@ def Panel(
                 )
             )
 
+    source_settings = [
+        item["figure"]._chart_metadata["panel"].settings for item in items
+    ]
+    # the first source figure that set a bar mode of its own lends it to this
+    # panel, which lends it on in turn; the caller's own `bar_mode` wins
+    source_bar_mode = next(
+        (s.get("source_bar_mode") for s in source_settings if s.get("source_bar_mode")),
+        None,
+    )
+    chosen_bar_mode = bar_mode or source_bar_mode
+    bar_mode = chosen_bar_mode or config.get("overlay_bar_mode", "group")
+
     # the panel takes literal x/y keys; the orientation (raises on a mix) maps
     # them, and the projection (also raising on a mix) picks the axes kind
     probe = _PanelSeam(groups)
@@ -404,6 +425,8 @@ def Panel(
         "warn_thin_bars": config.get("overlay_warn_thin_bars", True),
         "warn_scale_conflict": config.get("overlay_warn_scale_conflict", True),
         "bar_mode": bar_mode,
+        # never the config floor: that is not a mode anyone chose
+        "source_bar_mode": chosen_bar_mode,
         "bar_ticks": "group",
         "bar_width": config.get("plot_bar_width", 0.8),
         "bar_overlay_alpha": config.get("overlay_bar_alpha", 0.7),
@@ -441,9 +464,6 @@ def Panel(
         "scaley_right": scaley_right,
     }
 
-    source_settings = [
-        item["figure"]._chart_metadata["panel"].settings for item in items
-    ]
     # the x-axis hugs the data only when every source figure hugs it too
     panel_settings["tighten_xlim"] = all(s.get("tighten_xlim") for s in source_settings)
     # the first source figure that formats an axis' ticks formats the panel's

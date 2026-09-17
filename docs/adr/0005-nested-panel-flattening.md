@@ -17,9 +17,18 @@ prefs, silently dropping the inner panel's `y_axis`, `z_order`, and
   with their per-figure prefs preserved. Nesting composes to any depth, since
   every Panel figure stores flat merged groups.
 - **Outer furniture wins.** The inner Panel's panel-level settings (title,
-  labels, `bar_mode`, limits, legend, thresholds) are discarded; the outermost
-  call's settings apply. The transport keeps carrying only what composition
+  labels, limits, legend, thresholds) are discarded; the outermost call's
+  settings apply. The transport keeps carrying only what composition
   consumes.
+- **`bar_mode` is a pref, not furniture** (issue #177). A source figure that
+  set a bar mode of its own lends it to the panel: the first such figure in
+  list order wins, as the stacked baseline and the tick formats already do,
+  and an outer `bar_mode` still overrides it. The config default applies only
+  when no figure set one. A panel that stacks its bars keeps stacking them
+  when it is dropped into another panel or given one more series, which is
+  the one thing the discard rule got visibly wrong. Only the mode the caller
+  passed travels; a front's resolved default (a histogram's `"stack"`) does
+  not, or every histogram would stack the bars beside it.
 - **Outer dict options override only when explicitly given.**
   `{"figure": inner_panel, "y_axis": "right"}` re-assigns all of the inner
   panel's groups; an omitted option leaves each inner group's own pref intact.

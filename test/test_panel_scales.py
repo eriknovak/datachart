@@ -201,6 +201,57 @@ class TestStampedScales:
         assert scales(ax) == ("linear", "linear")
         assert scales(ax_right) == ("linear", "log")
 
+    def test_unset_first_adopts_the_log_behind_it(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            fig = Panel(
+                [
+                    {"figure": LineChart(data=LINE), "y_axis": "left"},
+                    {"figure": LineChart(data=LINE, scaley="log"), "y_axis": "left"},
+                ]
+            )
+        assert scales(render(fig)[0]) == ("linear", "log")
+
+    def test_log_first_keeps_its_scale_over_an_unset_figure(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            fig = Panel(
+                [
+                    {"figure": LineChart(data=LINE, scaley="log"), "y_axis": "left"},
+                    {"figure": LineChart(data=LINE2), "y_axis": "left"},
+                ]
+            )
+        assert scales(render(fig)[0]) == ("linear", "log")
+
+    def test_unset_first_on_the_secondary_axis_adopts_too(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            fig = Panel(
+                [
+                    {"figure": BarChart(data=BARS), "y_axis": "left"},
+                    {"figure": LineChart(data=LINE2), "y_axis": "right"},
+                    {"figure": LineChart(data=LINE, scaley="log"), "y_axis": "right"},
+                ]
+            )
+        ax, ax_right = render(fig)
+        assert scales(ax) == ("linear", "linear")
+        assert scales(ax_right) == ("linear", "log")
+
+    def test_unset_category_scale_adopts_too(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            fig = Panel(
+                [
+                    {"figure": LineChart(data=LINE), "y_axis": "left"},
+                    {"figure": LineChart(data=LINE, scalex="log"), "y_axis": "left"},
+                ]
+            )
+        assert scales(render(fig)[0]) == ("log", "linear")
+
+    def test_no_figure_sets_a_scale_leaves_the_axes_default(self):
+        fig = Panel([LineChart(data=LINE), LineChart(data=LINE2)])
+        assert scales(render(fig)[0]) == ("linear", "linear")
+
     def test_stamp_survives_grid_and_annotate(self):
         panel = Panel([LineChart(data=LINE, scaley="log")])
         annotated = Annotate(panel, texts={"text": "t", "x": 1, "y": 10})
@@ -214,14 +265,14 @@ class TestWarnings:
         with pytest.warns(UserWarning, match=r"y_axis.*scaley_right") as record:
             fig = Panel(
                 [
-                    {"figure": LineChart(data=LINE), "y_axis": "left"},
+                    {"figure": LineChart(data=LINE, scaley="symlog"), "y_axis": "left"},
                     {"figure": LineChart(data=LINE, scaley="log"), "y_axis": "left"},
                 ]
             )
         assert len(record) == 1
-        assert "'linear'" in str(record[0].message)
-        # the first figure was built linear, so linear wins
-        assert scales(render(fig)[0]) == ("linear", "linear")
+        assert "'symlog'" in str(record[0].message)
+        # the first figure that set a scale wins
+        assert scales(render(fig)[0]) == ("linear", "symlog")
 
     def test_conflict_on_the_secondary_axis_warns_too(self):
         with pytest.warns(UserWarning, match=r"scaley_right") as record:
@@ -229,7 +280,10 @@ class TestWarnings:
                 [
                     {"figure": BarChart(data=BARS), "y_axis": "left"},
                     {"figure": LineChart(data=LINE, scaley="log"), "y_axis": "right"},
-                    {"figure": LineChart(data=LINE2), "y_axis": "right"},
+                    {
+                        "figure": LineChart(data=LINE2, scaley="symlog"),
+                        "y_axis": "right",
+                    },
                 ]
             )
         assert len(record) == 1
@@ -251,7 +305,10 @@ class TestWarnings:
         with pytest.warns(UserWarning) as record:
             Panel(
                 [
-                    {"figure": LineChart(data=LINE, scalex="log"), "y_axis": "left"},
+                    {
+                        "figure": LineChart(data=LINE, scalex="log", scaley="symlog"),
+                        "y_axis": "left",
+                    },
                     {
                         "figure": LineChart(data=LINE, scalex="symlog", scaley="log"),
                         "y_axis": "left",

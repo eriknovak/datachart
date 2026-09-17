@@ -5,7 +5,7 @@ import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 
-from datachart.charts import LineChart, BarChart, ScatterChart, Histogram
+from datachart.charts import LineChart, BarChart, ScatterChart, Heatmap, Histogram
 from datachart.utils import Panel, Grid
 
 
@@ -376,6 +376,27 @@ class TestPanel:
             Panel(charts=[{"figure": plain_fig}])
 
         plt.close(plain_fig)
+
+    def test_heatmap_figure_raises(self):
+        """A heatmap owns its axes, so it cannot join a panel."""
+        heat_fig = Heatmap(data={"z": [[1, 2], [3, 4]]})
+        line_fig = LineChart(data=[{"x": i, "y": i} for i in range(4)])
+
+        with pytest.raises(ValueError, match="heatmap figures cannot be overlaid"):
+            Panel(charts=[heat_fig, line_fig])
+
+        plt.close(heat_fig)
+        plt.close(line_fig)
+
+    def test_figure_without_overlayable_layers_raises(self):
+        """A figure whose every layer owns its axes raises instead of warning."""
+        heat_fig = Heatmap(data={"z": [[1, 2], [3, 4]]})
+        heat_fig._chart_metadata["type"] = "unknown"
+
+        with pytest.raises(ValueError, match="'unknown'.*cannot be overlaid"):
+            Panel(charts=[heat_fig])
+
+        plt.close(heat_fig)
 
     def test_multiple_bar_charts_overlay(self):
         """Test overlaying multiple bar charts with position adjustment."""
