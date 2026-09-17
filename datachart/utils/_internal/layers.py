@@ -689,49 +689,65 @@ class ScheduleTicks(mticker.Locator):
 
     Minute, hour, and day steps run regularly from the first start; minutes
     and hours only when the schedule carries times. Month steps fall on the
-    first of the month. The first start and the last end are always ticks;
-    a regular tick within half a step of either gives way, so they never
-    crowd.
+    first of the calendar months the step divides (quarters, years). The
+    first start and the last end are always ticks; a regular tick within
+    half a step of either gives way, so they never crowd.
     """
 
-    def __init__(self, start: float, end: float, tz=None):
-        self.start, self.end, self.tz = start, end, tz
+    def __init__(self, start: float, end: float, tz=None, timed: bool = False):
+        self.start, self.end, self.tz, self.timed = start, end, tz, timed
 
     def tick_values(self, vmin, vmax):
         span = self.end - self.start
         if span <= 0:
             return [self.start]
-        start, end = mdates.num2date([self.start, self.end], tz=self.tz)
-        timed = any(d.time() != time() for d in (start, end))
-        steps = (SCHEDULE_TICK_SUBDAY if timed else ()) + SCHEDULE_TICK_DAYS
+        steps = (SCHEDULE_TICK_SUBDAY if self.timed else ()) + SCHEDULE_TICK_DAYS
         # the finest step that keeps the count, preferring one that divides
         # the span so the last interval is no shorter than the rest
         fitting = [d for d in steps if span / d <= SCHEDULE_TICKS_MAX]
         even = [d for d in fitting if np.isclose(span / d, round(span / d))]
         step = (even or fitting or [None])[0]
         if step is not None:
-            ticks = [self.start + k * step for k in range(round(span / step) + 1)]
-            ticks = [t for t in ticks if t < self.end - step / 2]
-            return ticks + [self.end]
-        months = next(
-            (
-                m
-                for m in SCHEDULE_TICK_MONTHS
-                if span / (m * 30.4) <= SCHEDULE_TICKS_MAX
-            ),
-            SCHEDULE_TICK_MONTHS[-1],
-        )
-        step = months * 30.4
-        # month labels read the day when ticks keep the start's, so snap to the 1st
-        first = start.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        ticks, k = [self.start], 1
-        while (
-            tick := mdates.date2num(first + relativedelta(months=months * k))
-        ) < self.end - step / 2:
+            regular = (self.start + k * step for k in range(1, round(span / step)))
+        else:
+            months = next(
+                (
+                    m
+                    for m in SCHEDULE_TICK_MONTHS
+                    if span / (m * 30.4) <= SCHEDULE_TICKS_MAX
+                ),
+                SCHEDULE_TICK_MONTHS[-1],
+            )
+            step = months * 30.4
+            regular = self._month_starts(months)
+        ticks = [self.start]
+        for tick in regular:
+            if tick >= self.end - step / 2:
+                break
             if tick - self.start >= step / 2:
                 ticks.append(tick)
-            k += 1
         return ticks + [self.end]
+
+    def _month_starts(self, months: int):
+        """The 1sts of every `months`-th calendar month from the start's on."""
+
+        start = mdates.num2date(self.start, tz=self.tz)
+        # counted from year 0, so 3 months lands on quarters and 12 on Januaries
+        index = -(-(start.year * 12 + start.month - 1) // months) * months
+        while True:
+            year, month = divmod(index, 12)
+            yield mdates.date2num(
+                start.replace(
+                    year=year,
+                    month=month + 1,
+                    day=1,
+                    hour=0,
+                    minute=0,
+                    second=0,
+                    microsecond=0,
+                )
+            )
+            index += months
 
     def __call__(self):
         return self.tick_values(*sorted(self.axis.get_view_interval()))
@@ -10803,11 +10819,12 @@ class Panel:
             and self.temporal_axis is None
             and all(l.chart.get("xticks") is None for l in layers)
         ):
-            period_axis = ax.yaxis if horizontal else ax.xaxis
             periods = np.concatenate(
                 [_axis_numbers(ax, horizontal, l.x_values()) for l in layers]
             )
-            period_axis.set_major_locator(PeriodTicks(periods))
+            (ax.yaxis if horizontal else ax.xaxis).set_major_locator(
+                PeriodTicks(periods)
+            )
 
         # a continuous axis starts and ends on a tick: each free end of the
         # view moves outward to the next tick (a polar theta axis excepted),
@@ -11178,7 +11195,13 @@ class Panel:
         """A gantt panel's date ticks: first start to last end, regular between."""
 
         bounds = self._schedule_bounds()
-        return None if bounds is None else ScheduleTicks(*bounds, tz)
+        if bounds is None:
+            return None
+        ends = np.concatenate(
+            [np.concatenate([l.starts, l.starts + l.durations]) for l in self.layers]
+        )
+        timed = any(d.time() != time() for d in mdates.num2date(ends, tz=tz))
+        return ScheduleTicks(*bounds, tz, timed)
 
     def _project_origin(self, tz):
         """The project start: `xmin` when given, else the earliest task start."""
