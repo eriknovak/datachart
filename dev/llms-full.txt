@@ -6434,7 +6434,7 @@ Panel(
 
 ### Cumulative view
 
-Some questions are about thresholds, not shapes: *how many penguins have flippers of 200 mm or less?* `show_cumulative=True` makes each bar hold the count of all values up to and including its bin, so the bars climb to the sample size. Combined with `show_density=True`, the bars hold the share of values instead and every series climbs to 1, which is the empirical cumulative distribution. At 200 mm, 95% of the Adelie penguins and 74% of the Chinstrap penguins are counted, and not a single Gentoo penguin.
+Some questions are about thresholds, not shapes: *how many penguins have flippers of 200 mm or less?* `show_cumulative=True` makes each bar hold the count of all values up to and including its bin, so the bars climb to the sample size. Combined with `show_density=True`, the bars hold the share of values instead and every series climbs to 1, which is the empirical cumulative distribution. At 200 mm, 95% of the Adelie penguins and 74% of the Chinstrap penguins are counted, and not a single Gentoo penguin. A `STEP` outline ends at its final level here: a running total never falls back, so a cumulative outline has no closing drop to zero.
 
 ```
 Histogram(
@@ -6462,7 +6462,7 @@ Histogram(
 
 ### Axis scales
 
-On a linear count axis the bins in the tail of a distribution hold a handful of values and vanish next to the peak. `scaley` (or `scalex` for a horizontal histogram) takes a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member, and a logarithmic count axis gives every occupied bin a visible bar. The bins stay equal-width on the data scale whichever axis scale is applied, so a log scale on the binned axis stretches them unevenly and is rarely what you want.
+On a linear count axis the bins in the tail of a distribution hold a handful of values and vanish next to the peak. `scaley` (or `scalex` for a horizontal histogram) takes a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member, and a logarithmic count axis gives every occupied bin a visible bar. The bins stay equal-width on the data scale whichever axis scale is applied, so a log scale on the binned axis stretches them unevenly and is rarely what you want. A log axis has no zero, so a `STEP` outline breaks over the empty bins instead of dropping to the axis floor.
 
 Flipper lengths have no long tail, so this example switches dataset. `quakes`, defined in a hidden cell, holds 5,000 illustrative earthquake magnitudes from a seeded generator that follows the Gutenberg-Richter law: every step of one magnitude up makes earthquakes about ten times rarer. On a linear axis the strong earthquakes are invisible; on a log axis the counts fall along a straight line, which is how seismologists read the law.
 
