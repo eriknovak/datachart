@@ -29,12 +29,28 @@ from ..typings import (
     ScatterMatrixDataPointAttrs,
     StyleAttrs,
 )
-from ..constants import BAR_MODE, SCATTER_MATRIX_DIAGONAL, SHOW_GRID
+from ..constants import (
+    BAR_MODE,
+    FIG_SIZE,
+    LEGEND_LOCATION,
+    SCATTER_MATRIX_DIAGONAL,
+    SHOW_GRID,
+)
 
 # a matrix cell's side, in inches, when no figsize is given
 CELL_SIZE = 2.2
-# the extra figure width, in inches, the legend column takes
+# the extra figure width, in inches, a left or right legend column takes
 LEGEND_WIDTH = 1.2
+# the extra figure height, in inches, a top or bottom legend row takes
+LEGEND_HEIGHT = 0.5
+# the legend edge each accepted location selects
+LEGEND_EDGES = {
+    None: "right",
+    LEGEND_LOCATION.OUTSIDE_RIGHT: "right",
+    LEGEND_LOCATION.OUTSIDE_LEFT: "left",
+    LEGEND_LOCATION.OUTSIDE_TOP: "top",
+    LEGEND_LOCATION.OUTSIDE_BOTTOM: "bottom",
+}
 # the share of a dimension's range padded onto each end of its limits
 LIMIT_MARGIN = 0.05
 
@@ -60,6 +76,19 @@ def _columns(data) -> Dict[str, list]:
     raise ValueError(
         "The scatter matrix `data` must be a dict of columns or a list of records."
     )
+
+
+def _legend_edge(legend: Optional[LegendSettingAttrs]) -> str:
+    """The matrix edge the legend sits on; only an outside location has one."""
+
+    location = (legend or {}).get("location")
+    if location not in LEGEND_EDGES:
+        accepted = ", ".join(f"`{k}`" for k in LEGEND_EDGES if k is not None)
+        raise ValueError(
+            "The scatter matrix legend sits outside the cells; its `location` "
+            f"must be one of {accepted}, got `{location}`."
+        )
+    return LEGEND_EDGES[location]
 
 
 def _is_number(value) -> bool:
@@ -296,11 +325,15 @@ def ScatterMatrix(
             keeps its own, unlabelled height.
         title: The title of the figure.
         figsize: The size of the figure; the cells stay square inside it.
-            Defaults to 2.2 inches per cell.
+            Defaults to 2.2 inches per cell, shrunk so the figure is at most
+            6.3 inches (a full page width) wide.
         show_legend: Whether to show the legend of the hue groups (default
             `True` when `hue` is set).
-        legend: The legend setting: title, column count and alignment; the legend sits
-            to the right of the matrix. See
+        legend: The legend setting: title, column count, alignment and
+            location. The title defaults to the `hue` column's name; an
+            empty string hides it. The location is one of the four
+            `LEGEND_LOCATION.OUTSIDE_*` edges (default right); a legend
+            above or below the matrix lays its entries out in one row. See
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show in the cells (e.g., "both", "x",
             "y").
@@ -314,7 +347,8 @@ def ScatterMatrix(
     Raises:
         ValueError: If `data` is malformed or has no numeric column, a
             dimension is missing or not numeric, or `hue` is missing, has
-            missing values, or is numeric.
+            missing values, or is numeric, or the legend location is not
+            an outside edge.
 
     """
     columns = _columns(data)
@@ -324,6 +358,7 @@ def ScatterMatrix(
     sharex = True if sharex is None else sharex
     sharey = True if sharey is None else sharey
     show_legend = hue is not None if show_legend is None else show_legend
+    edge = _legend_edge(legend)
     style = dict(style or {})
 
     values = {name: _as_floats(columns[name]) for name in dims}
@@ -415,13 +450,21 @@ def ScatterMatrix(
 
     node_legend = None
     if show_legend and hue is not None and legend_cell is not None:
+        legend_style = {
+            k: v
+            for k, v in get_legend_style(legend).items()
+            if k not in ("loc", "bbox_to_anchor")
+        }
+        # the hue column names the groups; the theme's generic title does not
+        if (legend or {}).get("title") is None:
+            legend_style["title"] = hue
+        # a row lays the groups side by side
+        if edge in ("top", "bottom") and (legend or {}).get("ncols") is None:
+            legend_style["ncols"] = len(groups)
         node_legend = {
             "cell": legend_cell,
-            "style": {
-                k: v
-                for k, v in get_legend_style(legend).items()
-                if k not in ("loc", "bbox_to_anchor")
-            },
+            "edge": edge,
+            "style": legend_style,
             "family": resolve_font_family(),
         }
 
@@ -441,10 +484,11 @@ def ScatterMatrix(
 
     size = n - trim
     if figsize is None:
-        figsize = (
-            CELL_SIZE * size + (LEGEND_WIDTH if node_legend else 0),
-            CELL_SIZE * size,
-        )
+        column = LEGEND_WIDTH if node_legend and edge in ("left", "right") else 0
+        row = LEGEND_HEIGHT if node_legend and edge in ("top", "bottom") else 0
+        # a wide matrix shrinks its cells to fit a full-width page figure
+        cell = min(CELL_SIZE, (FIG_SIZE.FULL_MEDIUM[0] - column) / size)
+        figsize = (cell * size + column, cell * size + row)
     figure = new_figure(figsize=figsize)
     # the figure title is the suptitle; nested, the node renders it as a heading
     _render_grid_node(figure, {**node, "title": None}, GridSpec(1, 1, figure=figure)[0])
