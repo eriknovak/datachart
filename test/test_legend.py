@@ -139,6 +139,42 @@ class TestLegendSetting(unittest.TestCase):
                     self.assertLessEqual(box.x1, furniture.x0)
                     self.assertGreaterEqual(box.x0, figure.bbox.x0)
 
+    def test_outside_top_legend_sits_under_a_grid_cell_title(self):
+        """In a grid cell the reading order is title, legend, then axes."""
+        source = LineChart(
+            LINES,
+            subtitle=["a", "b"],
+            title="Cell title",
+            show_legend=True,
+            legend={"location": LEGEND_LOCATION.OUTSIDE_TOP},
+        )
+        for figure in (Grid([[source, None]]), Grid([[source], [source]])):
+            with self.subTest(cells=len(figure.axes)):
+                figure.canvas.draw()
+                renderer = figure.canvas.get_renderer()
+                for ax in figure.axes:
+                    legend = ax.get_legend()
+                    title = ax.title.get_window_extent(renderer)
+                    box = legend.get_window_extent(renderer)
+                    self.assertGreaterEqual(box.y0, ax.bbox.y1)
+                    self.assertGreaterEqual(title.y0, box.y1)
+                    self.assertLessEqual(title.y1, figure.bbox.y1)
+
+    def test_outside_top_legend_sits_under_a_standalone_title(self):
+        figure = LineChart(
+            LINES,
+            subtitle=["a", "b"],
+            title="Figure title",
+            show_legend=True,
+            legend={"location": LEGEND_LOCATION.OUTSIDE_TOP},
+        )
+        figure.canvas.draw()
+        renderer = figure.canvas.get_renderer()
+        box = legend_of(figure).get_window_extent(renderer)
+        title = figure._suptitle.get_window_extent(renderer)
+        self.assertGreaterEqual(box.y0, figure.axes[0].bbox.y1)
+        self.assertGreaterEqual(title.y0, box.y1)
+
     def test_bare_panel_location_wins_over_the_pin(self):
         """A treemap keeps its outside pin unless the caller names a location."""
         pinned = Treemap(RECORDS, show_legend=True)

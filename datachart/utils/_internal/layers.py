@@ -1690,36 +1690,62 @@ def _fit_outside_legend(legend: Legend, axes: list, renderer) -> None:
     An outside location anchors to the axes edge, where the axis furniture
     lives. Once layout has sized the axes, the legend shifts outward by the
     furniture's overhang on that side, as a fixed offset in inches so the
-    re-layout that makes room for it keeps the gap.
+    re-layout that makes room for it keeps the gap. Above the axes, an axes
+    title (a panel's title in a grid cell) is not furniture: the legend sits
+    under it, and the title lifts to clear the legend.
     """
 
     box = legend.get_window_extent(renderer)
     ax_box = legend.axes.bbox
+    pad = _legend_pad_px(legend.figure)
+    if box.x0 >= ax_box.x1:
+        side = "right"
+    elif box.x1 <= ax_box.x0:
+        side = "left"
+    elif box.y0 >= ax_box.y1:
+        side = "top"
+    elif box.y1 <= ax_box.y0:
+        side = "bottom"
+    else:
+        return
+    titled = [ax for ax in axes if side == "top" and ax.title.get_text()]
+    # read before hiding: a hidden title's position goes stale
+    bottoms = [ax.title.get_window_extent(renderer).y0 for ax in titled]
     legend.set_in_layout(False)
+    for ax in titled:
+        ax.title.set_visible(False)
     try:
         furniture = Bbox.union([ax.get_tightbbox(renderer) for ax in axes])
     finally:
         legend.set_in_layout(True)
-    if box.x0 >= ax_box.x1:
-        shift, direction = furniture.x1 - ax_box.x1, (1, 0)
-    elif box.x1 <= ax_box.x0:
-        shift, direction = ax_box.x0 - furniture.x0, (-1, 0)
-    elif box.y0 >= ax_box.y1:
-        shift, direction = furniture.y1 - ax_box.y1, (0, 1)
-    elif box.y1 <= ax_box.y0:
-        shift, direction = ax_box.y0 - furniture.y0, (0, -1)
-    else:
-        return
-    if shift <= 0:
-        return
-    inches = (shift + _legend_pad_px(legend.figure)) / legend.figure.dpi
-    offset = ScaledTranslation(
-        direction[0] * inches, direction[1] * inches, legend.figure.dpi_scale_trans
-    )
-    # the anchor reads back in display space; the offset hangs off its
-    # axes-fraction position so the re-layout keeps the gap
-    anchor = legend.axes.transAxes.inverted().transform(legend.get_bbox_to_anchor().p0)
-    legend.set_bbox_to_anchor(tuple(anchor), transform=legend.axes.transAxes + offset)
+        for ax in titled:
+            ax.title.set_visible(True)
+    shift, direction = {
+        "right": (furniture.x1 - ax_box.x1, (1, 0)),
+        "left": (ax_box.x0 - furniture.x0, (-1, 0)),
+        "top": (furniture.y1 - ax_box.y1, (0, 1)),
+        "bottom": (ax_box.y0 - furniture.y0, (0, -1)),
+    }[side]
+    shift = max(shift + pad, 0) if shift > 0 else 0
+    if shift:
+        inches = shift / legend.figure.dpi
+        offset = ScaledTranslation(
+            direction[0] * inches, direction[1] * inches, legend.figure.dpi_scale_trans
+        )
+        # the anchor reads back in display space; the offset hangs off its
+        # axes-fraction position so the re-layout keeps the gap
+        anchor = legend.axes.transAxes.inverted().transform(
+            legend.get_bbox_to_anchor().p0
+        )
+        legend.set_bbox_to_anchor(
+            tuple(anchor), transform=legend.axes.transAxes + offset
+        )
+    for ax, bottom in zip(titled, bottoms):
+        # an inch offset on the title, like the legend's, survives re-layout
+        lift = box.y1 + shift + pad - bottom
+        if lift > 0:
+            points = ax.titleOffsetTrans.get_matrix()[1, 2] * 72 / ax.figure.dpi
+            ax._set_title_offset_trans(points + lift * 72 / ax.figure.dpi)
 
 
 def _legend_pad_px(figure) -> float:
