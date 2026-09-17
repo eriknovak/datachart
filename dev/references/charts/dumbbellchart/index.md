@@ -34,7 +34,7 @@ DumbbellChart(
     sharey: bool | None = None,
     show_legend: bool | None = None,
     legend: LegendSettingAttrs | None = None,
-    show_grid: SHOW_GRID | str | None = None,
+    show_grid: SHOW_GRID | str | bool | None = None,
     show_values: DUMBBELL_VALUE | str | None = None,
     show_direction: bool | None = None,
     value_format: VALUE_FORMAT | str | None = None,
@@ -120,7 +120,7 @@ Examples:
 | `sharey`          | Whether the subplots share the y-axis. **TYPE:** \`bool                                                                                                                                                                                                                                                                                     |
 | `show_legend`     | Whether to show the legend. Defaults to on when start_name or end_name is given. **TYPE:** \`bool                                                                                                                                                                                                                                           |
 | `legend`          | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                      |
-| `show_grid`       | Which grid lines to show ("both", "x", "y"). Unset, the theme's grid runs along the value axis, whichever way it points. See SHOW_GRID. **TYPE:** \`SHOW_GRID                                                                                                                                                                               |
+| `show_grid`       | Which grid lines to show ("both", "x", "y"); False draws none. Unset, the theme's grid runs along the value axis, whichever way it points. See SHOW_GRID. **TYPE:** \`SHOW_GRID                                                                                                                                                             |
 | `show_values`     | The value labels: None (none), "endpoints" (each endpoint's value past its dot, away from the connector), or "delta" (end - start at the connector midpoint). See DUMBBELL_VALUE. **TYPE:** \`DUMBBELL_VALUE                                                                                                                                |
 | `show_direction`  | Whether to draw a thin arrow beside each connector, pointing from start to end: above a horizontal dumbbell, right of a vertical one. Records whose endpoints coincide draw none. **TYPE:** \`bool                                                                                                                                          |
 | `value_format`    | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:+.1f}", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                     |

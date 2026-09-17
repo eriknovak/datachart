@@ -25,7 +25,7 @@ ScatterMatrix(
     figsize: tuple[float, float] | None = None,
     show_legend: bool | None = None,
     legend: LegendSettingAttrs | None = None,
-    show_grid: SHOW_GRID | str | None = None,
+    show_grid: SHOW_GRID | str | bool | None = None,
     style: StyleAttrs | None = None
 ) -> plt.Figure
 ```
@@ -81,7 +81,7 @@ Examples:
 | `figsize`          | The size of the figure; the cells stay square inside it. Defaults to 2.2 inches per cell, shrunk so the figure is at most 6.3 inches (a full page width) wide. **TYPE:** \`tuple[float, float]                                                                                                                                                        |
 | `show_legend`      | Whether to show the legend of the hue groups (default True when hue is set). **TYPE:** \`bool                                                                                                                                                                                                                                                         |
 | `legend`           | The legend setting: title, column count, alignment and location. The title defaults to the hue column's name; an empty string hides it. The location is one of the four LEGEND_LOCATION.OUTSIDE\_\* edges (default right); a legend above or below the matrix lays its entries out in one row. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs |
-| `show_grid`        | Which grid lines to show in the cells (e.g., "both", "x", "y"). **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                                                 |
+| `show_grid`        | Which grid lines to show in the cells (e.g., "both", "x", "y"); False draws none. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                               |
 | `style`            | Style attributes for every cell: the scatter, histogram, plot text and plot_scatter_matrix\_\* keys. See ScatterMatrixStyleAttrs. **TYPE:** \`StyleAttrs                                                                                                                                                                                              |
 
 | RETURNS      | DESCRIPTION                               |

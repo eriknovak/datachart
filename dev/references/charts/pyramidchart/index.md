@@ -19,7 +19,7 @@ PyramidChart(
     xmax: int | float | None = None,
     show_legend: bool | None = None,
     legend: LegendSettingAttrs | None = None,
-    show_grid: SHOW_GRID | str | None = None,
+    show_grid: SHOW_GRID | str | bool | None = None,
     show_yerr: bool | None = None,
     show_values: bool | None = None,
     value_format: VALUE_FORMAT | str | None = None,
@@ -109,7 +109,7 @@ Examples:
 | `xmax`          | The maximum per-side value; the value axis spans (-xmax, xmax). **TYPE:** \`int                                                                                                                                                                                                               |
 | `show_legend`   | Whether to show the legend. **TYPE:** \`bool                                                                                                                                                                                                                                                  |
 | `legend`        | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                        |
-| `show_grid`     | Which grid lines to show ("both", "x", "y"). See SHOW_GRID. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                             |
+| `show_grid`     | Which grid lines to show ("both", "x", "y"); False draws none. See SHOW_GRID. **TYPE:** \`SHOW_GRID                                                                                                                                                                                           |
 | `show_yerr`     | Whether to show error bars on the bars. **TYPE:** \`bool                                                                                                                                                                                                                                      |
 | `show_values`   | Whether to show bar value labels at the edge of each bar. **TYPE:** \`bool                                                                                                                                                                                                                    |
 | `value_format`  | Format string for bar value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                       |

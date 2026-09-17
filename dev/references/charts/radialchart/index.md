@@ -26,7 +26,7 @@ RadialChart(
     ymax: int | float | None = None,
     show_legend: bool | None = None,
     legend: LegendSettingAttrs | None = None,
-    show_grid: SHOW_GRID | str | None = None,
+    show_grid: SHOW_GRID | str | bool | None = None,
     show_yerr: bool | None = None,
     show_area: bool | None = None,
     show_values: bool | None = None,
@@ -128,7 +128,7 @@ Examples:
 | `ymax`            | The maximum radial-axis value. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                    |
 | `show_legend`     | Whether to show the legend. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                      |
 | `legend`          | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                                                            |
-| `show_grid`       | Which grid lines to show (e.g., "both", "x", "y"). **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                                                                                          |
+| `show_grid`       | Which grid lines to draw: "x" the spokes only, "y" the rings only, "both" both, False neither. Left unset, spokes and rings are both drawn and the theme's own choice is the one drawn in the faint grid color; the other stays a darker grey. **TYPE:** \`SHOW_GRID                                                                                                              |
 | `show_yerr`       | Whether to show the radial error band (line visual). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                             |
 | `show_area`       | Whether to fill the area inside the line (line visual). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                          |
 | `show_values`     | Whether to write each mark's value at its tip, rotated along the spoke. **TYPE:** \`bool                                                                                                                                                                                                                                                                                          |

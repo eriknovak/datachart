@@ -748,7 +748,7 @@ Examples:
 
 The supported show grid options.
 
-Passed as the `show_grid` chart setting: which grid lines to draw. When unset (or `NONE`), the theme's `chart_default_show_grid` fills in.
+Passed as the `show_grid` chart setting: which grid lines to draw. When unset (or `NONE`), the theme's `chart_default_show_grid` fills in. The members name a set to draw, so there is no member for "no grid at all": pass `False` for that.
 
 Examples:
 
