@@ -33,6 +33,32 @@ def _bar_fig(**kwargs):
     )
 
 
+class TestSubplotColors:
+    """One series looks the same alone, in a subplot and in a cell (issue #183)."""
+
+    @staticmethod
+    def _first_patch_color(figure):
+        figure.canvas.draw()
+        for ax in figure.axes:
+            for patch in ax.patches:
+                return patch.get_facecolor()
+        raise AssertionError("the figure drew no bars")
+
+    def test_a_subplot_matches_a_single_chart(self):
+        single = _bar_fig()
+        bars = [{"label": c, "y": v} for c, v in zip("ABCD", [3, 1, 4, 2])]
+        subplots = BarChart(data=[bars, bars], subplots=True)
+        assert self._first_patch_color(subplots) == self._first_patch_color(single)
+        plt.close("all")
+
+    def test_a_subplots_figure_in_a_grid_matches_a_single_chart(self):
+        single = _bar_fig()
+        bars = [{"label": c, "y": v} for c, v in zip("ABCD", [3, 1, 4, 2])]
+        grid = Grid([BarChart(data=[bars, bars], subplots=True)])
+        assert self._first_patch_color(grid) == self._first_patch_color(single)
+        plt.close("all")
+
+
 class TestPanel:
     """Test suite for the Panel composition front."""
 

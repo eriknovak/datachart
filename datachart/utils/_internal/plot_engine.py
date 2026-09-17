@@ -84,9 +84,7 @@ def composition_panel(
     if title is None and len(charts) == 1:
         title = charts[0].get("subtitle", None)
     composition_settings["title"] = title
-    return Panel(
-        [group_from_chart(layers, settings, mode="multiple")], composition_settings
-    )
+    return Panel([group_from_chart(layers, settings)], composition_settings)
 
 
 def render_chart(
@@ -164,9 +162,7 @@ def render_chart(
         for key in axes_labels:
             panel_settings[key] = settings.get(key)
         panel_settings["label_styles"] = Panel.snapshot_label_styles()
-        panel = Panel(
-            [group_from_chart(layers, settings, mode="multiple")], panel_settings
-        )
+        panel = Panel([group_from_chart(layers, settings)], panel_settings)
         panel.render(axes[0])
     else:
         if settings.get("show_legend") and chart_type != "heatmap":
@@ -206,7 +202,7 @@ def render_chart(
             )
             panel_settings["hist_bins_override"] = hist_bins
             panel = Panel(
-                [group_from_chart(chart_layers, settings, mode="singular")],
+                [group_from_chart(chart_layers, settings)],
                 panel_settings,
             )
             panel.render(ax)
@@ -248,7 +244,7 @@ def render_chart(
             sub_settings["ylabel"] = ylabel
             subplot_panels.append(
                 Panel(
-                    [group_from_chart(chart_layers, settings, mode="singular")],
+                    [group_from_chart(chart_layers, settings)],
                     sub_settings,
                 )
             )

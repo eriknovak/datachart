@@ -49,7 +49,7 @@ class ColorStyleAttrs(TypedDict):
     """The typing for the general color style.
 
     Attributes:
-        color_general_singular (Union[COLORS, str, List[str], None]): The colors used when each dataset gets its own subplot, i.e. `subplots=True` (palette name, single color, or list of hex colors).
+        color_general_singular (Union[COLORS, str, List[str], None]): The colors used where a chart needs one color rather than a series palette: the parallel coords numeric hue ramp and the network node base color (palette name, single color, or list of hex colors).
         color_general_multiple (Union[COLORS, str, List[str], None]): The colors used when the datasets share one coordinate space, which is the default for every chart (palette name, single color, or list of hex colors).
         color_parallel_hue (Union[COLORS, str, List[str], None]): The color palette for parallel coords hue categories (palette name, single color, or list of hex colors).
         color_parallel_hue_continuous (Union[COLORS, str, List[str], None]): The sequential ramp for parallel coords numeric hue columns (palette name, single color, or list of hex colors).

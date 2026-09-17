@@ -32,8 +32,9 @@ previous one, like matplotlib's `stackplot`.
   `LineChart`; for `ZERO` and `PERCENT` the y-axis bottom is pinned to 0 (no
   autoscale margin below the stack), as bars do. `SYM` and the wiggles keep
   the default margins.
-- **`subplots=True` unstacks**: one single-series area per subplot, drawn
-  from the singular palette, bottom pinned to 0.
+- **`subplots=True` unstacks**: one single-series area per subplot, bottom
+  pinned to 0. (Since issue #183 a subplot draws from the same palette a
+  single chart does, so the areas keep their color.)
 - **Style reuses the area and line keys.** The fill takes `plot_area_*`
   (color, hatch, zorder) with its own `plot_stackedarea_alpha` (0.8 — the
   0.25 of `plot_area_alpha` is tuned for a band under a line and washes out
