@@ -4602,42 +4602,26 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
         # collections drawn per axes, packed by the panel after limits settle
         self._pending = {}
 
-    def _offsets(
-        self, ax, position: float, values: np.ndarray, side: int
-    ) -> np.ndarray:
-        """Per-point offsets from the category center, in data units.
-
-        A nonzero `side` packs the points on one side only: -1 toward lower
-        category positions, +1 toward higher ones.
-        """
-
-        if self.mode == SWARM_MODE.STRIP:
-            # the jitter width scales with the cell the points may spread over
-            offsets = strip_offsets(
-                len(values), self.jitter * self.max_offset / SWARM_MAX_OFFSET
-            )
-            return offsets if not side else (np.abs(offsets) * 2) * side
+    def diameter_px(self, ax) -> float:
+        """The marker diameter in pixels, the spacing the beeswarm keeps."""
 
         size = self.swarm_style.get("s")
         if size is None:
             size = self.default_size
-        diameter_px = np.sqrt(size) / 72 * ax.figure.dpi
-        centers = np.full(len(values), position, dtype=float)
-        points = (
-            np.column_stack([values, centers])
-            if self.is_horizontal
-            else np.column_stack([centers, values])
+        return np.sqrt(size) / 72 * ax.figure.dpi
+
+    def strip_offsets(self, values: np.ndarray, side: int) -> np.ndarray:
+        """Per-point jitter from the category center, in data units.
+
+        A nonzero `side` jitters on one side only: -1 toward lower category
+        positions, +1 toward higher ones.
+        """
+
+        # the jitter width scales with the cell the points may spread over
+        offsets = strip_offsets(
+            len(values), self.jitter * self.max_offset / SWARM_MAX_OFFSET
         )
-        px = ax.transData.transform(points)
-        value_px = px[:, 0] if self.is_horizontal else px[:, 1]
-        offsets_px = beeswarm_offsets(value_px, diameter_px, bool(side))
-        # pixels per data unit along the category axis; unsigned, so a side
-        # stays in data units on an inverted axis
-        unit = ax.transData.transform([[0, 1]] if self.is_horizontal else [[1, 0]])
-        origin = ax.transData.transform([[0, 0]])
-        scale = abs((unit - origin)[0][1 if self.is_horizontal else 0])
-        offsets = np.clip(offsets_px / scale, -self.max_offset, self.max_offset)
-        return offsets if not side else offsets * side
+        return offsets if not side else (np.abs(offsets) * 2) * side
 
     def draw(self, ax, ctx):
         grouped = self.grouped_values()
@@ -4743,32 +4727,6 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
                     split[lbl, role] = (values[picked], texts[picked])
         return split
 
-    def pack(self, ax, side: int = 0) -> None:
-        """Spread the points drawn into `ax`; the panel calls this once its view is final.
-
-        The layer's own side wins; otherwise the panel's `side` applies.
-        """
-
-        side = self.side or side
-        for collection, groups, texts in self._pending.pop(id(ax), []):
-            offsets = np.concatenate(
-                [self._offsets(ax, pos, v, side) for pos, v in groups]
-            )
-            xy = np.asarray(collection.get_offsets()).copy()
-            xy[:, 1 if self.is_horizontal else 0] += offsets
-            collection.set_offsets(xy)
-            # labels read the packed positions; every point is an obstacle
-            self._pending_labels.setdefault(id(ax), []).append(
-                (
-                    xy[:, 0],
-                    xy[:, 1],
-                    collection.get_sizes(),
-                    texts,
-                    self.value_font,
-                    self.value_padding,
-                )
-            )
-
     def _group_value_texts(self, values: np.ndarray) -> np.ndarray:
         """One group's min, median, and max texts, `None` on every other point.
 
@@ -4796,6 +4754,87 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
             ax, values[order], not self.is_horizontal, span_px * 72.0 / ax.figure.dpi
         )
         return labelled
+
+
+def _beeswarm_units(
+    ax, position: float, values: np.ndarray, horizontal: bool, diameter_px, one_sided
+) -> np.ndarray:
+    """Unsigned beeswarm offsets of `values` around `position`, in data units."""
+
+    centers = np.full(len(values), position, dtype=float)
+    points = (
+        np.column_stack([values, centers])
+        if horizontal
+        else np.column_stack([centers, values])
+    )
+    px = ax.transData.transform(points)
+    value_px = px[:, 0] if horizontal else px[:, 1]
+    offsets_px = beeswarm_offsets(value_px, diameter_px, one_sided)
+    # pixels per data unit along the category axis; unsigned, so a side
+    # stays in data units on an inverted axis
+    unit = ax.transData.transform([[0, 1]] if horizontal else [[1, 0]])
+    origin = ax.transData.transform([[0, 0]])
+    scale = abs((unit - origin)[0][1 if horizontal else 0])
+    return offsets_px / scale
+
+
+def pack_swarms(ax, layers: list, side: int = 0) -> None:
+    """Spread the swarm points drawn into `ax`; the panel calls this once its view is final.
+
+    Points at one category position and side pack as one cloud, whichever
+    layer or emphasis role drew them, so overlaid series never cover each
+    other (ADR 0020). A layer's own side wins over the panel's `side`, and
+    each layer keeps its own spread. Strip layers jitter on their own.
+    """
+
+    entries = [
+        (layer, *entry) for layer in layers for entry in layer._pending.pop(id(ax), [])
+    ]
+    offsets, clouds = {}, defaultdict(list)
+    for i, (layer, _, groups, _) in enumerate(entries):
+        layer_side = layer.side or side
+        for j, (position, values) in enumerate(groups):
+            if layer.mode == SWARM_MODE.STRIP:
+                offsets[i, j] = layer.strip_offsets(values, layer_side)
+            else:
+                key = (position, layer_side, layer.is_horizontal)
+                clouds[key].append((i, j))
+
+    for (position, cloud_side, horizontal), members in clouds.items():
+        values = [entries[i][2][j][1] for i, j in members]
+        diameter = max(entries[i][0].diameter_px(ax) for i, _ in members)
+        units = _beeswarm_units(
+            ax,
+            position,
+            np.concatenate(values),
+            horizontal,
+            diameter,
+            bool(cloud_side),
+        )
+        start = 0
+        for (i, j), part in zip(members, values):
+            spread = entries[i][0].max_offset
+            placed = np.clip(units[start : start + len(part)], -spread, spread)
+            offsets[i, j] = placed * cloud_side if cloud_side else placed
+            start += len(part)
+
+    for i, (layer, collection, groups, texts) in enumerate(entries):
+        xy = np.asarray(collection.get_offsets()).copy()
+        xy[:, 1 if layer.is_horizontal else 0] += np.concatenate(
+            [offsets[i, j] for j in range(len(groups))]
+        )
+        collection.set_offsets(xy)
+        # labels read the packed positions; every point is an obstacle
+        layer._pending_labels.setdefault(id(ax), []).append(
+            (
+                xy[:, 0],
+                xy[:, 1],
+                collection.get_sizes(),
+                texts,
+                layer.value_font,
+                layer.value_padding,
+            )
+        )
 
 
 # keeps the two inner boxes of a split violin off the shared seam
@@ -11117,10 +11156,13 @@ class Panel:
         # scales and limits are final (ADR 0020); over ridges the points pack
         # on the side the ridges rise to, inside them (ADR 0047)
         swarm_side = (-1 if horizontal else 1) if ridges else 0
+        swarms = defaultdict(list)
         for group, owner_ax in zip(self.groups, group_axes):
             for layer in group.layers:
                 if isinstance(layer, SwarmLayer):
-                    layer.pack(owner_ax, swarm_side)
+                    swarms[owner_ax].append(layer)
+        for owner_ax, swarm_layers in swarms.items():
+            pack_swarms(owner_ax, swarm_layers, swarm_side)
 
         # one reference declared for every chart of a figure draws once per
         # axes, so a line or text does not repeat and a band's tint does not

@@ -175,6 +175,31 @@ class TestSwarmPlot(unittest.TestCase):
         xs = _swarm_collections(ax)[1].get_offsets()[:, 0]
         np.testing.assert_allclose(np.round(xs), [4, 1])
 
+    def _assert_no_overlap(self, figure, positions):
+        ax = figure.axes[0]
+        diameter = np.sqrt(config["plot_swarm_size"]) / 72 * figure.dpi
+        xy = np.concatenate([c.get_offsets() for c in _swarm_collections(ax)])
+        for pos in positions:
+            px = ax.transData.transform(xy[np.abs(xy[:, 0] - pos) <= 0.5])
+            dist = np.sqrt(((px[:, None, :] - px[None, :, :]) ** 2).sum(-1))
+            dist[np.diag_indices_from(dist)] = np.inf
+            self.assertGreaterEqual(dist.min(), diameter * 0.99)
+
+    def test_composed_swarms_pack_as_one_cloud(self):
+        first = SwarmPlot(group_data(seed=1, n=30))
+        second = SwarmPlot(group_data(seed=2, n=30))
+        self._assert_no_overlap(Panel([first, second]), (1, 2, 3))
+
+    def test_series_of_one_chart_pack_as_one_cloud(self):
+        figure = SwarmPlot([group_data(seed=1, n=30), group_data(seed=2, n=30)])
+        self._assert_no_overlap(figure, (1, 2, 3))
+
+    def test_emphasis_split_packs_as_one_cloud(self):
+        data = group_data(n=40)
+        for row in data[::3]:
+            row["emphasis"] = "background"
+        self._assert_no_overlap(SwarmPlot(data), (1, 2, 3))
+
     def test_subplots(self):
         figure = SwarmPlot([group_data(), group_data(seed=5)], subplots=True)
         self.assertEqual(len(figure.axes), 2)
