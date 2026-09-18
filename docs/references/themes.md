@@ -17,7 +17,7 @@ Every theme is a complete [`StyleAttrs`](typings.md#datachart.typings.StyleAttrs
 | Theme                                                | Look                                                                  | Apply with |
 | :--------------------------------------------------- | :-------------------------------------------------------------------- | :--------- |
 | **Screen and presentations**                         |                                                                       |            |
-| [`DEFAULT_THEME`](#datachart.themes.DEFAULT_THEME)     | the package's baseline palette and furniture                          | `THEME.DEFAULT` |
+| [`DEFAULT_THEME`](#datachart.themes.DEFAULT_THEME)     | softened Okabe–Ito palette, colour-blind safe, baseline furniture     | `THEME.DEFAULT` |
 | [`MATERIAL_THEME`](#datachart.themes.MATERIAL_THEME)   | the Google palette, light grid                                        | `THEME.MATERIAL` |
 | [`MINIMAL_THEME`](#datachart.themes.MINIMAL_THEME)     | accent violet, no spines, flat bars                                   | `THEME.MINIMAL` |
 | [`HARBOR_THEME`](#datachart.themes.HARBOR_THEME)       | navy and amber in lightness steps, colour-blind safe                  | `THEME.HARBOR` |

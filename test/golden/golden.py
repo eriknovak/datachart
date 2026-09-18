@@ -75,6 +75,22 @@ from datachart.utils.stats import kde1d, kde2d
 
 # Cases whose output intentionally changed since the last published baseline.
 EXPECTED_CHANGES = {
+    # DEFAULT palette: softened Okabe–Ito, colour-blind safe on every pair
+    "bar_horizontal",
+    "bar_single",
+    "bar_yerr_limits",
+    "box_basic",
+    "box_horizontal_notch",
+    "grid_custom_layout",
+    "grid_uniform_mixed",
+    "hist_horizontal_density",
+    "hist_single",
+    "line_log",
+    "line_single",
+    "line_ticks",
+    "line_yerr",
+    "scatter_labels",
+    "scatter_single",
     # new colour-blind-safe themes
     "theme_harbor_line",
     "theme_harbor_bar",
