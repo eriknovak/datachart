@@ -7,7 +7,7 @@ Each predefined theme has a card here: a strip of its color swatches with hex co
 | [Screen and presentations](#screen-and-presentations)   |                                                                            |
 | [`THEME.DEFAULT`](#default)                             | Tableau-style categorical palette, open spines, soft grid.                 |
 | [`THEME.MATERIAL`](#material)                           | Google palette, bottom spine only, light grid.                             |
-| [`THEME.MINIMAL`](#minimal)                             | Accent blue with deep grays, no spines, flat bars.                         |
+| [`THEME.MINIMAL`](#minimal)                             | Accent violet with deep grays, no spines, flat bars.                       |
 | [Print and black-and-white](#print-and-black-and-white) |                                                                            |
 | [`THEME.GREYSCALE`](#greyscale)                         | Monochrome, print-friendly.                                                |
 | [`THEME.INK`](#ink)                                     | Diversified YlGnBu palette with navy ink accents.                          |
@@ -45,19 +45,19 @@ Selected with [`THEME.MATERIAL`](https://eriknovak.github.io/datachart/dev/refer
 ```
 config.set_theme(THEME.MATERIAL)
 show_swatches()
-signature(pair=("#4285F4", "#EA4335")).show()
+signature(pair=("#1A73E8", "#D93025")).show()
 ```
 
 ### Minimal
 
-Accent blue with deep grays, no spines or tick marks, flat bars.
+Accent violet with deep grays, no spines or tick marks, flat bars.
 
 Selected with [`THEME.MINIMAL`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MINIMAL_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MINIMAL_THEME).
 
 ```
 config.set_theme(THEME.MINIMAL)
 show_swatches()
-signature(pair=("#2B7FFF", "#525C66")).show()
+signature(pair=("#7048E8", "#1F2933")).show()
 ```
 
 ## Print and black-and-white
@@ -85,7 +85,7 @@ Selected with [`THEME.INK`](https://eriknovak.github.io/datachart/dev/references
 ```
 config.set_theme(THEME.INK)
 show_swatches()
-signature(pair=("#225EA8", "#41B6C4")).show()
+signature(pair=("#0C2C84", "#41B6C4")).show()
 ```
 
 ### Hatch
@@ -97,7 +97,7 @@ Selected with [`THEME.HATCH`](https://eriknovak.github.io/datachart/dev/referenc
 ```
 config.set_theme(THEME.HATCH)
 show_swatches()
-signature(pair=("#5B84C4", "#C85450")).show()
+signature(pair=("#B5563A", "#4F6D8F")).show()
 ```
 
 ## Illustrative

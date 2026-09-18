@@ -404,6 +404,7 @@ Examples:
 | `Sunset2`        | Multi-hue sunset palette. Equals to "Sunset2". **TYPE:** `str`                                    |
 | `YlGnBu`         | Multi-hue yellow-green-blue palette. Equals to "YlGnBu". **TYPE:** `str`                          |
 | `YlOrRd`         | Multi-hue yellow-orange-red palette. Equals to "YlOrRd". **TYPE:** `str`                          |
+| `YlOrBr`         | Multi-hue yellow-orange-brown palette. Equals to "YlOrBr". **TYPE:** `str`                        |
 | `PuBuGn`         | Multi-hue purple-blue-green palette. Equals to "PuBuGn". **TYPE:** `str`                          |
 | `GnBu`           | Multi-hue green-blue palette. Equals to "GnBu". **TYPE:** `str`                                   |
 | `Egypt`          | Multi-hue Egypt palette. Equals to "Egypt". **TYPE:** `str`                                       |

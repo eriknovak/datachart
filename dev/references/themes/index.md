@@ -16,7 +16,7 @@ Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/d
 | [`GREYSCALE_THEME`](#datachart.themes.GREYSCALE_THEME) | greys only, for print without color                                             | `THEME.GREYSCALE` |
 | [`INK_THEME`](#datachart.themes.INK_THEME)             | dark-ink accents, print-ready                                                   | `THEME.INK`       |
 | [`HATCH_THEME`](#datachart.themes.HATCH_THEME)         | a hatch cycle, black edges, dotted grid                                         | `THEME.HATCH`     |
-| [`MINIMAL_THEME`](#datachart.themes.MINIMAL_THEME)     | accent blue, no spines, flat bars                                               | `THEME.MINIMAL`   |
+| [`MINIMAL_THEME`](#datachart.themes.MINIMAL_THEME)     | accent violet, no spines, flat bars                                             | `THEME.MINIMAL`   |
 | [`MATERIAL_THEME`](#datachart.themes.MATERIAL_THEME)   | the Google palette, light grid                                                  | `THEME.MATERIAL`  |
 | [`SKETCH_THEME`](#datachart.themes.SKETCH_THEME)       | hand-drawn: xkcd-style wobble and halo, Comic Neue font                         | `THEME.SKETCH`    |
 | [`QUILL_THEME`](#datachart.themes.QUILL_THEME)         | black ink on white paper, pen-stroked lines, etched fills, IM Fell English font | `THEME.QUILL`     |
@@ -150,20 +150,20 @@ The ink theme: dark-ink accents, print-ready.
 ```
 HATCH_THEME: StyleAttrs = make_theme(
     {
-        "color_general_singular": COLORS.Blues,
+        "color_general_singular": COLORS.YlOrBr,
         "color_general_multiple": [
-            "#5B84C4",
-            "#C85450",
-            "#8C8C8C",
-            "#6C9A78",
-            "#A8C4E8",
-            "#C9A227",
+            "#B5563A",
+            "#4F6D8F",
+            "#D4A64A",
+            "#4E7A5A",
+            "#A6A6A6",
+            "#7B5EA7",
         ],
         "color_parallel_hue_continuous": [
-            "#D3DEF0",
-            "#A8C4E8",
-            "#5B84C4",
-            "#2E4E8F",
+            "#F3E0C3",
+            "#E0AE6A",
+            "#B5563A",
+            "#6B2E1A",
         ],
         "font_general_sansserif": [
             "Helvetica",
@@ -191,10 +191,12 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_text_arrow_color": "#000000",
         "plot_gantt_dependency_color": "#000000",
         "plot_gantt_today_color": "#000000",
+        "plot_dumbbell_start_color": "#4F6D8F",
+        "plot_dumbbell_end_color": "#B5563A",
         "plot_dumbbell_edge_color": "#000000",
         "plot_dumbbell_connector_color": "#8C8C8C",
         "plot_dumbbell_arrow_color": "#000000",
-        "plot_heatmap_cmap": COLORS.Blues,
+        "plot_heatmap_cmap": COLORS.YlOrBr,
         "plot_heatmap_frame_color": "#000000",
         "plot_violin_edgecolor": "#000000",
         "plot_ridgeline_edgecolor": "#000000",
@@ -209,19 +211,18 @@ The hatch theme: hatch cycle, black edges, dotted grid.
 ```
 MINIMAL_THEME: StyleAttrs = make_theme(
     {
-        "color_general_singular": COLORS.Blues,
+        "color_general_singular": COLORS.Purples,
         "color_general_multiple": [
-            "#2B7FFF",
-            "#A9B4BE",
-            "#7C8894",
-            "#525C66",
-            "#2E3740",
+            "#7048E8",
+            "#1F2933",
+            "#8A97A3",
+            "#C5CDD4",
         ],
         "color_parallel_hue_continuous": [
-            "#D9D9D9",
-            "#A9B4BE",
-            "#6FA0F5",
-            "#2B7FFF",
+            "#DCD3F7",
+            "#A796EE",
+            "#7048E8",
+            "#3B1E9E",
         ],
         "font_general_color": "#1F1F1F",
         "font_title_color": "#1F1F1F",
@@ -241,18 +242,18 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "plot_line_width": 2.0,
         "plot_scatter_edge_color": "#FFFFFF",
         "plot_swarm_edge_color": "#FFFFFF",
-        "plot_dumbbell_start_color": "#A9B4BE",
-        "plot_dumbbell_end_color": "#2B7FFF",
+        "plot_dumbbell_start_color": "#C5CDD4",
+        "plot_dumbbell_end_color": "#7048E8",
         "plot_dumbbell_connector_color": "#DDE3E8",
         "plot_text_box_edgecolor": "#CFD8DC",
         "plot_text_arrow_color": "#9AA4AE",
-        "plot_heatmap_cmap": COLORS.Blues,
+        "plot_heatmap_cmap": COLORS.Purples,
         "plot_heatmap_frame_color": "#9AA4AE",
     }
 )
 ```
 
-The minimal theme: accent blue, no spines, flat bars.
+The minimal theme: accent violet, no spines, flat bars.
 
 ### datachart.themes.MATERIAL_THEME
 
@@ -261,18 +262,18 @@ MATERIAL_THEME: StyleAttrs = make_theme(
     {
         "color_general_singular": COLORS.Blues,
         "color_general_multiple": [
-            "#4285F4",
-            "#FBBC04",
-            "#34A853",
-            "#EA4335",
-            "#7BAAF7",
-            "#46BDC6",
+            "#1A73E8",
+            "#D93025",
+            "#F9AB00",
+            "#1E8E3E",
+            "#12B5CB",
+            "#9334E6",
         ],
         "color_parallel_hue_continuous": [
             "#C6DAFC",
             "#7BAAF7",
-            "#4285F4",
-            "#1B5FD9",
+            "#1A73E8",
+            "#174EA6",
         ],
         "font_general_sansserif": [
             "Roboto",
@@ -293,8 +294,8 @@ MATERIAL_THEME: StyleAttrs = make_theme(
         "plot_line_width": 2.0,
         "plot_text_box_edgecolor": "#757575",
         "plot_text_arrow_color": "#757575",
-        "plot_dumbbell_start_color": "#FBBC04",
-        "plot_dumbbell_end_color": "#4285F4",
+        "plot_dumbbell_start_color": "#F9AB00",
+        "plot_dumbbell_end_color": "#1A73E8",
         "plot_dumbbell_edge_width": 0,
         "plot_heatmap_cmap": COLORS.Blues,
         "plot_heatmap_frame_color": "#000000",
@@ -309,13 +310,19 @@ The material theme: Google palette, light grid.
 ```
 SKETCH_THEME: StyleAttrs = make_theme(
     {
-        "color_general_singular": COLORS.Blues,
+        "color_general_singular": COLORS.YlOrRd,
         "color_general_multiple": [
-            "#2E86AB",
             "#E4572E",
-            "#76B041",
+            "#2E86AB",
             "#F5B700",
             "#7E5AAB",
+            "#76B041",
+        ],
+        "color_parallel_hue_continuous": [
+            "#FDD49E",
+            "#FC8D59",
+            "#E4572E",
+            "#99000D",
         ],
         "font_general_family": "sans-serif",
         "font_general_sansserif": [
@@ -340,7 +347,7 @@ SKETCH_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_end_color": "#E4572E",
         "plot_dumbbell_edge_color": "#222222",
         "plot_dumbbell_connector_color": "#8A8A8A",
-        "plot_heatmap_cmap": COLORS.Blues,
+        "plot_heatmap_cmap": COLORS.YlOrRd,
         "plot_treemap_group_edge_width": 0,
         "plot_sketch_params": [0.5, 100, 2],
         "plot_sketch_halo_width": 1.5,
