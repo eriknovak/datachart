@@ -20,6 +20,9 @@ from ..themes import (
     MATERIAL_THEME,
     SKETCH_THEME,
     QUILL_THEME,
+    HARBOR_THEME,
+    MUTED_THEME,
+    CONTRAST_THEME,
 )
 
 THEMES = {
@@ -31,6 +34,9 @@ THEMES = {
     THEME.MATERIAL: MATERIAL_THEME,
     THEME.SKETCH: SKETCH_THEME,
     THEME.QUILL: QUILL_THEME,
+    THEME.HARBOR: HARBOR_THEME,
+    THEME.MUTED: MUTED_THEME,
+    THEME.CONTRAST: CONTRAST_THEME,
 }
 
 # bumped only when a reader of the current shape could misread an older file

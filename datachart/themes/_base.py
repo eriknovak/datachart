@@ -49,14 +49,15 @@ def canonical_style(style: dict) -> dict:
 BASE_THEME: StyleAttrs = {
     # general color style
     "color_general_singular": COLORS.Blues,
-    # Tableau tones, ordered so no adjacent pair collapses for deutan readers
+    # Okabe–Ito tones softened and closed with charcoal; every pair stays
+    # apart for deutan, protan and tritan readers (OKLab ΔE ≥ 10.8)
     "color_general_multiple": [
-        "#4E79A7",
-        "#E15759",
-        "#76B7B2",
-        "#F28E2B",
-        "#B07AA1",
-        "#59A14F",
+        "#3B76B0",
+        "#E8A63E",
+        "#2F9E82",
+        "#C24E2A",
+        "#7CBCE4",
+        "#444444",
     ],
     # None: parallel coords hue categories take color_general_multiple
     "color_parallel_hue": None,

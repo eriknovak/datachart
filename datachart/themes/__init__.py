@@ -15,6 +15,9 @@ from .minimal import MINIMAL_THEME
 from .material import MATERIAL_THEME
 from .sketch import SKETCH_THEME
 from .quill import QUILL_THEME
+from .harbor import HARBOR_THEME
+from .muted import MUTED_THEME
+from .contrast import CONTRAST_THEME
 
 __all__ = [
     "DEFAULT_THEME",
@@ -25,4 +28,7 @@ __all__ = [
     "MATERIAL_THEME",
     "SKETCH_THEME",
     "QUILL_THEME",
+    "HARBOR_THEME",
+    "MUTED_THEME",
+    "CONTRAST_THEME",
 ]
