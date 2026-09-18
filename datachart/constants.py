@@ -1483,12 +1483,18 @@ class THEME:
         GREYSCALE (str): The greyscale theme. Equals to `"greyscale"`.
         INK (str): The ink theme (dark-ink accents, print-ready). Equals to `"ink"`.
         HATCH (str): The hatch theme (hatch cycle, value labels, dotted grid). Equals to `"hatch"`.
-        MINIMAL (str): The minimal theme (accent blue, no spines, flat bars). Equals to `"minimal"`.
+        MINIMAL (str): The minimal theme (accent violet, no spines, flat bars). Equals to `"minimal"`.
         MATERIAL (str): The material theme (Google palette, light grid). Equals to `"material"`.
         SKETCH (str): The sketch theme (hand-drawn, xkcd-style wobble and halo,
             Comic Neue font). Equals to `"sketch"`.
         QUILL (str): The quill theme (black ink on white paper: pen-stroked lines,
             etched fills, IM Fell English font). Equals to `"quill"`.
+        HARBOR (str): The harbor theme (navy and amber in lightness steps,
+            colour-blind safe). Equals to `"harbor"`.
+        MUTED (str): The muted theme (Tol's muted colours, dash and marker
+            cycles, colour-blind safe). Equals to `"muted"`.
+        CONTRAST (str): The contrast theme (lightness-stepped colours plus
+            hatches, print-safe). Equals to `"contrast"`.
     """
 
     DEFAULT = "default"
@@ -1499,6 +1505,9 @@ class THEME:
     MATERIAL = "material"
     SKETCH = "sketch"
     QUILL = "quill"
+    HARBOR = "harbor"
+    MUTED = "muted"
+    CONTRAST = "contrast"
 
 
 class EMPHASIS:

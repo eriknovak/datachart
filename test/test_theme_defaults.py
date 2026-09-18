@@ -303,3 +303,37 @@ class TestFurnitureConsistency(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestColourSafeThemes(unittest.TestCase):
+    """The colour-blind-safe themes keep their series apart by more than hue."""
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_palettes_have_distinct_colors(self):
+        for theme in (THEME.HARBOR, THEME.MUTED, THEME.CONTRAST):
+            with self.subTest(theme=theme):
+                config.set_theme(theme)
+                colors = config["color_general_multiple"]
+                self.assertEqual(len(colors), len(set(colors)))
+                self.assertGreaterEqual(len(colors), 5)
+
+    def test_print_themes_carry_a_second_cue(self):
+        """MUTED and CONTRAST tell series apart without colour too."""
+        for theme in (THEME.MUTED, THEME.CONTRAST):
+            with self.subTest(theme=theme):
+                config.set_theme(theme)
+                n = len(config["color_general_multiple"])
+                self.assertEqual(len(config["plot_linestyle_cycle"]), n)
+                self.assertEqual(len(config["plot_marker_cycle"]), n)
+        config.set_theme(THEME.CONTRAST)
+        self.assertEqual(len(config["plot_hatch_cycle"]), 5)
+
+    def test_muted_line_styles_differ_per_series(self):
+        config.set_theme(THEME.MUTED)
+        series = [[{"x": x, "y": x * k} for x in range(5)] for k in (1, 2, 3)]
+        figure = LineChart(series)
+        styles = [line.get_linestyle() for line in figure.axes[0].get_lines()[:3]]
+        self.assertEqual(len(set(styles)), 3)

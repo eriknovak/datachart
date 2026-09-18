@@ -24,6 +24,9 @@ Every theme is a complete [`StyleAttrs`](typings.md#datachart.typings.StyleAttrs
 | [`MATERIAL_THEME`](#datachart.themes.MATERIAL_THEME)   | the Google palette, light grid                                        | `THEME.MATERIAL` |
 | [`SKETCH_THEME`](#datachart.themes.SKETCH_THEME)       | hand-drawn: xkcd-style wobble and halo, Comic Neue font               | `THEME.SKETCH` |
 | [`QUILL_THEME`](#datachart.themes.QUILL_THEME)         | black ink on white paper, pen-stroked lines, etched fills, IM Fell English font | `THEME.QUILL` |
+| [`HARBOR_THEME`](#datachart.themes.HARBOR_THEME)       | navy and amber in lightness steps, colour-blind safe                  | `THEME.HARBOR` |
+| [`MUTED_THEME`](#datachart.themes.MUTED_THEME)         | Tol's muted colours, dash and marker cycles, colour-blind safe        | `THEME.MUTED` |
+| [`CONTRAST_THEME`](#datachart.themes.CONTRAST_THEME)   | lightness-stepped colours plus hatches, print-safe                    | `THEME.CONTRAST` |
 
 ## Themes
 
@@ -35,3 +38,6 @@ Every theme is a complete [`StyleAttrs`](typings.md#datachart.typings.StyleAttrs
 ::: datachart.themes.MATERIAL_THEME
 ::: datachart.themes.SKETCH_THEME
 ::: datachart.themes.QUILL_THEME
+::: datachart.themes.HARBOR_THEME
+::: datachart.themes.MUTED_THEME
+::: datachart.themes.CONTRAST_THEME

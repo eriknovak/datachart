@@ -75,6 +75,11 @@ from datachart.utils.stats import kde1d, kde2d
 
 # Cases whose output intentionally changed since the last published baseline.
 EXPECTED_CHANGES = {
+    # new colour-blind-safe themes
+    "theme_harbor_line",
+    "theme_harbor_bar",
+    "theme_muted_line",
+    "theme_contrast_bar",
     # one lead hue per theme: DEFAULT reordered, PaperYlGnBu navy first, SKETCH vermilion first
     "line_multi",
     "bar_multi_grouped",
@@ -950,6 +955,30 @@ def theme_sketch_line():
 @case
 def theme_sketch_bar():
     config.set_theme(THEME.SKETCH)
+    return BarChart(data=[BAR1, BAR2], show_legend=True)
+
+
+@case
+def theme_harbor_line():
+    config.set_theme(THEME.HARBOR)
+    return LineChart(data=[LINE1, LINE2], subtitle=["a", "b"], show_legend=True)
+
+
+@case
+def theme_harbor_bar():
+    config.set_theme(THEME.HARBOR)
+    return BarChart(data=[BAR1, BAR2], show_legend=True)
+
+
+@case
+def theme_muted_line():
+    config.set_theme(THEME.MUTED)
+    return LineChart(data=[LINE1, LINE2], subtitle=["a", "b"], show_legend=True)
+
+
+@case
+def theme_contrast_bar():
+    config.set_theme(THEME.CONTRAST)
     return BarChart(data=[BAR1, BAR2], show_legend=True)
 
 
