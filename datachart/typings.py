@@ -1192,53 +1192,6 @@ class StyleAttrs(
 
 
 # ================================================
-# Common Chart Attributes
-# ================================================
-
-
-class _ChartCommonAttrs(TypedDict):
-    """The chart attributes common to all chart types.
-
-    Attributes:
-        title (Union[str, None]): The title of the charts.
-        xlabel (Union[str, None]): The xlabel of the charts.
-        ylabel (Union[str, None]): The ylabel of the charts.
-        figsize (Union[FIG_SIZE, Tuple[float, float], None]): The size of the figure.
-        xmin (Union[int, float, datetime, None]): Determine the minimum x-axis value; a datetime on a datetime axis.
-        xmax (Union[int, float, datetime, None]): Determine the maximum x-axis value; a datetime on a datetime axis.
-        ymin (Union[int, float, None]): Determine the minimum y-axis value.
-        ymax (Union[int, float, None]): Determine the maximum y-axis value.
-        show_legend (Union[bool, None]): Whether or not to show the legend.
-        show_grid (Union[SHOW_GRID, str, bool, None]): Determine which grid lines to show; `False` draws none.
-        aspect_ratio (Union[ASPECT_RATIO, str, None]): The aspect ratio of the charts.
-
-        subplots (Union[bool, None]): Whether or not to create a separate subplot for each chart.
-        max_cols (Union[int, None]): The maximum number of columns in the subplots. Active only when `subplots` is `True`.
-        sharex (Union[bool, None]): Whether or not to share the x-axis in the subplots. Active only when `subplots` is `True`.
-        sharey (Union[bool, None]): Whether or not to share the y-axis in the subplots. Active only when `subplots` is `True`.
-
-    """
-
-    title: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    figsize: Union[FIG_SIZE, Tuple[float, float], None]
-    xmin: Union[int, float, datetime, None]
-    xmax: Union[int, float, datetime, None]
-    ymin: Union[int, float, None]
-    ymax: Union[int, float, None]
-    # visibility attributes
-    show_legend: Union[bool, None]
-    show_grid: Union[SHOW_GRID, str, bool, None]
-    aspect_ratio: Union[ASPECT_RATIO, str, None]
-    # the subplot attributes
-    subplots: Union[bool, None]
-    max_cols: Union[int, None]
-    sharex: Union[bool, None]
-    sharey: Union[bool, None]
-
-
-# ================================================
 # Vertical and Horizontal Line Attributes
 # ================================================
 
@@ -2818,13 +2771,7 @@ class RadialSingleChartAttrs(TypedDict):
 
 # old name -> new name; removed one release after it ships (ADR 0043)
 # None: no public replacement; the type is kept privately as `_<old name>`
-_DEPRECATED_ALIASES = {
-    "VLinePlotAttrs": "VLineSettingAttrs",
-    "HLinePlotAttrs": "HLineSettingAttrs",
-    "TextAttrs": "TextSettingAttrs",
-    "HeatmapColorbarAttrs": "ColorbarSettingAttrs",
-    "ChartCommonAttrs": None,
-}
+_DEPRECATED_ALIASES = {}
 
 
 def __getattr__(name):

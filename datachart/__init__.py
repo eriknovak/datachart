@@ -7,7 +7,7 @@ the charts. Each module has its own reference page.
 
 """
 
-__version__ = "0.10.1"
+__version__ = "0.10.2"
 
 from . import charts
 from . import utils

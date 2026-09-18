@@ -1,3 +1,13 @@
+### datachart-0.10.2 (2026-09-18)
+
+**Breaking Changes**
+
+- Removed the deprecated `VLinePlotAttrs`, `HLinePlotAttrs`, `TextAttrs`, `HeatmapColorbarAttrs`, and `ChartCommonAttrs` names announced in 0.10.0
+
+**Bug Fixes**
+
+- Heatmap value labels turn white on any dark cell, judged per cell, so colormaps with a dark low end such as Cividis stay readable
+
 ### datachart-0.10.1 (2026-09-18)
 
 **New Features**
@@ -11,7 +21,6 @@
 **Bug Fixes**
 
 - `color_parallel_hue` defaults to `None` and takes `color_general_multiple`, so parallel coords hue categories follow the active theme
-- Heatmap value labels turn white on any dark cell, judged per cell, so colormaps with a dark low end such as Cividis stay readable
 
 ### datachart-0.10.0 (2026-09-18)
 
