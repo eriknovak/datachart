@@ -8,16 +8,22 @@ The `themes` module contains the predefined style themes that are used to visual
 
 ## Choosing a Theme
 
-Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs) dictionary, named for its visual trait. Apply one with [`config.set_theme`](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) and the member of [`THEME`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) in the last column; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each on six charts, and the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) shows how to adjust one or build your own.
+Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs) dictionary, named for its visual trait and listed here by where it works best. Apply one with [`config.set_theme`](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) and the member of [`THEME`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) in the last column; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each on six charts, and the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) shows how to adjust one or build your own.
 
 | Theme                                                  | Look                                                                            | Apply with        |
 | ------------------------------------------------------ | ------------------------------------------------------------------------------- | ----------------- |
-| [`DEFAULT_THEME`](#datachart.themes.DEFAULT_THEME)     | the package's baseline palette and furniture                                    | `THEME.DEFAULT`   |
+| **Screen and presentations**                           |                                                                                 |                   |
+| [`DEFAULT_THEME`](#datachart.themes.DEFAULT_THEME)     | softened Okabe–Ito palette, colour-blind safe, baseline furniture               | `THEME.DEFAULT`   |
+| [`MATERIAL_THEME`](#datachart.themes.MATERIAL_THEME)   | the Google palette, light grid                                                  | `THEME.MATERIAL`  |
+| [`MINIMAL_THEME`](#datachart.themes.MINIMAL_THEME)     | accent violet, no spines, flat bars                                             | `THEME.MINIMAL`   |
+| [`HARBOR_THEME`](#datachart.themes.HARBOR_THEME)       | navy and amber in lightness steps, colour-blind safe                            | `THEME.HARBOR`    |
+| **Print and black-and-white**                          |                                                                                 |                   |
 | [`GREYSCALE_THEME`](#datachart.themes.GREYSCALE_THEME) | greys only, for print without color                                             | `THEME.GREYSCALE` |
 | [`INK_THEME`](#datachart.themes.INK_THEME)             | dark-ink accents, print-ready                                                   | `THEME.INK`       |
 | [`HATCH_THEME`](#datachart.themes.HATCH_THEME)         | a hatch cycle, black edges, dotted grid                                         | `THEME.HATCH`     |
-| [`MINIMAL_THEME`](#datachart.themes.MINIMAL_THEME)     | accent violet, no spines, flat bars                                             | `THEME.MINIMAL`   |
-| [`MATERIAL_THEME`](#datachart.themes.MATERIAL_THEME)   | the Google palette, light grid                                                  | `THEME.MATERIAL`  |
+| [`MUTED_THEME`](#datachart.themes.MUTED_THEME)         | Tol's muted colours, dash and marker cycles, colour-blind safe                  | `THEME.MUTED`     |
+| [`CONTRAST_THEME`](#datachart.themes.CONTRAST_THEME)   | lightness-stepped colours plus hatches, print-safe                              | `THEME.CONTRAST`  |
+| **Illustrative**                                       |                                                                                 |                   |
 | [`SKETCH_THEME`](#datachart.themes.SKETCH_THEME)       | hand-drawn: xkcd-style wobble and halo, Comic Neue font                         | `THEME.SKETCH`    |
 | [`QUILL_THEME`](#datachart.themes.QUILL_THEME)         | black ink on white paper, pen-stroked lines, etched fills, IM Fell English font | `THEME.QUILL`     |
 
@@ -30,6 +36,143 @@ DEFAULT_THEME: StyleAttrs = make_theme({})
 ```
 
 The default theme: the package's baseline palette and furniture.
+
+The palette is a softened Okabe–Ito set closed with charcoal, so every pair of series stays apart for deutan, protan and tritan readers.
+
+### datachart.themes.MATERIAL_THEME
+
+```
+MATERIAL_THEME: StyleAttrs = make_theme(
+    {
+        "color_general_singular": COLORS.Blues,
+        "color_general_multiple": [
+            "#1A73E8",
+            "#D93025",
+            "#F9AB00",
+            "#1E8E3E",
+            "#12B5CB",
+            "#9334E6",
+        ],
+        "color_parallel_hue_continuous": [
+            "#C6DAFC",
+            "#7BAAF7",
+            "#1A73E8",
+            "#174EA6",
+        ],
+        "font_general_sansserif": [
+            "Roboto",
+            "Arial",
+            "Helvetica",
+            "Liberation Sans",
+        ],
+        "axes_spines_top_visible": False,
+        "axes_spines_right_visible": False,
+        "axes_spines_left_visible": False,
+        "plot_grid_color": "#E0E0E0",
+        "plot_grid_alpha": 1.0,
+        "plot_grid_linewidth": 0.8,
+        "plot_bar_alpha": 1.0,
+        "plot_bar_edge_width": 0,
+        "plot_stackedarea_edge_width": 0,
+        "plot_hist_edge_width": 0,
+        "plot_line_width": 2.0,
+        "plot_text_box_edgecolor": "#757575",
+        "plot_text_arrow_color": "#757575",
+        "plot_dumbbell_start_color": "#F9AB00",
+        "plot_dumbbell_end_color": "#1A73E8",
+        "plot_dumbbell_edge_width": 0,
+        "plot_heatmap_cmap": COLORS.Blues,
+        "plot_heatmap_frame_color": "#000000",
+    }
+)
+```
+
+The material theme: Google palette, light grid.
+
+### datachart.themes.MINIMAL_THEME
+
+```
+MINIMAL_THEME: StyleAttrs = make_theme(
+    {
+        "color_general_singular": COLORS.Purples,
+        "color_general_multiple": [
+            "#7048E8",
+            "#1F2933",
+            "#8A97A3",
+            "#C5CDD4",
+        ],
+        "color_parallel_hue_continuous": [
+            "#DCD3F7",
+            "#A796EE",
+            "#7048E8",
+            "#3B1E9E",
+        ],
+        "font_general_color": "#1F1F1F",
+        "font_title_color": "#1F1F1F",
+        "axes_spines_top_visible": False,
+        "axes_spines_right_visible": False,
+        "axes_spines_left_visible": False,
+        "axes_spines_bottom_visible": False,
+        "axes_ticks_length": 0,
+        "plot_grid_color": "#EFEFEF",
+        "plot_grid_alpha": 1.0,
+        "plot_bar_alpha": 1.0,
+        "plot_bar_edge_width": 0,
+        "plot_stackedarea_edge_width": 0,
+        "plot_value_fontsize": 9,
+        "plot_value_color": "#1F1F1F",
+        "plot_hist_edge_width": 0,
+        "plot_line_width": 2.0,
+        "plot_scatter_edge_color": "#FFFFFF",
+        "plot_swarm_edge_color": "#FFFFFF",
+        "plot_dumbbell_start_color": "#C5CDD4",
+        "plot_dumbbell_end_color": "#7048E8",
+        "plot_dumbbell_connector_color": "#DDE3E8",
+        "plot_text_box_edgecolor": "#CFD8DC",
+        "plot_text_arrow_color": "#9AA4AE",
+        "plot_heatmap_cmap": COLORS.Purples,
+        "plot_heatmap_frame_color": "#9AA4AE",
+    }
+)
+```
+
+The minimal theme: accent violet, no spines, flat bars.
+
+### datachart.themes.HARBOR_THEME
+
+```
+HARBOR_THEME: StyleAttrs = make_theme(
+    {
+        "color_general_singular": COLORS.Cividis,
+        "color_general_multiple": [
+            "#1F4E79",
+            "#D08C3A",
+            "#6FA3D3",
+            "#EFC98C",
+            "#8C6D5A",
+            "#1A1A1A",
+        ],
+        "color_parallel_hue_continuous": [
+            "#BCAE6C",
+            "#7D7C78",
+            "#434E6C",
+            "#00224E",
+        ],
+        "plot_line_width": 2.0,
+        "plot_bar_alpha": 1.0,
+        "plot_bar_edge_width": 0,
+        "plot_stackedarea_edge_width": 0,
+        "plot_hist_edge_width": 0,
+        "plot_dumbbell_start_color": "#EFC98C",
+        "plot_dumbbell_end_color": "#1F4E79",
+        "plot_heatmap_cmap": COLORS.Cividis,
+    }
+)
+```
+
+The harbor theme: navy and amber in lightness steps, colour-blind safe.
+
+Two hue families, navy to sky and amber to sand, with taupe and near-black closing the set; lightness does the separating, so every pair of series stays apart for deutan, protan and tritan readers. Flat bars, 2 pt lines and the Cividis value scale.
 
 ### datachart.themes.GREYSCALE_THEME
 
@@ -206,104 +349,83 @@ HATCH_THEME: StyleAttrs = make_theme(
 
 The hatch theme: hatch cycle, black edges, dotted grid.
 
-### datachart.themes.MINIMAL_THEME
+### datachart.themes.MUTED_THEME
 
 ```
-MINIMAL_THEME: StyleAttrs = make_theme(
+MUTED_THEME: StyleAttrs = make_theme(
     {
-        "color_general_singular": COLORS.Purples,
+        "color_general_singular": COLORS.YlOrBr,
         "color_general_multiple": [
-            "#7048E8",
-            "#1F2933",
-            "#8A97A3",
-            "#C5CDD4",
+            "#332288",
+            "#88CCEE",
+            "#DDCC77",
+            "#CC6677",
+            "#882255",
         ],
         "color_parallel_hue_continuous": [
-            "#DCD3F7",
-            "#A796EE",
-            "#7048E8",
-            "#3B1E9E",
+            "#FEE391",
+            "#FE9929",
+            "#CC4C02",
+            "#662506",
         ],
-        "font_general_color": "#1F1F1F",
-        "font_title_color": "#1F1F1F",
-        "axes_spines_top_visible": False,
-        "axes_spines_right_visible": False,
-        "axes_spines_left_visible": False,
-        "axes_spines_bottom_visible": False,
-        "axes_ticks_length": 0,
-        "plot_grid_color": "#EFEFEF",
-        "plot_grid_alpha": 1.0,
+        "plot_linestyle_cycle": ["-", "--", "-.", ":", "-"],
+        "plot_marker_cycle": ["o", "s", "^", "D", "v"],
+        "plot_line_width": 1.2,
         "plot_bar_alpha": 1.0,
-        "plot_bar_edge_width": 0,
-        "plot_stackedarea_edge_width": 0,
-        "plot_value_fontsize": 9,
-        "plot_value_color": "#1F1F1F",
-        "plot_hist_edge_width": 0,
-        "plot_line_width": 2.0,
-        "plot_scatter_edge_color": "#FFFFFF",
-        "plot_swarm_edge_color": "#FFFFFF",
-        "plot_dumbbell_start_color": "#C5CDD4",
-        "plot_dumbbell_end_color": "#7048E8",
-        "plot_dumbbell_connector_color": "#DDE3E8",
-        "plot_text_box_edgecolor": "#CFD8DC",
-        "plot_text_arrow_color": "#9AA4AE",
-        "plot_heatmap_cmap": COLORS.Purples,
-        "plot_heatmap_frame_color": "#9AA4AE",
+        "plot_bar_edge_color": "#000000",
+        "plot_bar_edge_width": 0.6,
+        "plot_hist_edge_color": "#000000",
+        "plot_grid_linestyle": LINE_STYLE.DOTTED,
+        "plot_grid_color": "#C8C8C8",
+        "plot_dumbbell_start_color": "#DDCC77",
+        "plot_dumbbell_end_color": "#332288",
+        "plot_heatmap_cmap": COLORS.YlOrBr,
     }
 )
 ```
 
-The minimal theme: accent violet, no spines, flat bars.
+The muted theme: Tol's muted colours, dashes and markers, colour-blind safe.
 
-### datachart.themes.MATERIAL_THEME
+Indigo, cyan, sand, rose and wine from Paul Tol's muted scheme, every pair distinct for deutan, protan and tritan readers. Lines also differ by dash and scatter points by marker, bars carry black edges, and the grid is dotted, so a figure survives a greyscale print. The value scale is YlOrBr.
+
+### datachart.themes.CONTRAST_THEME
 
 ```
-MATERIAL_THEME: StyleAttrs = make_theme(
+CONTRAST_THEME: StyleAttrs = make_theme(
     {
-        "color_general_singular": COLORS.Blues,
+        "color_general_singular": COLORS.Cividis,
         "color_general_multiple": [
-            "#1A73E8",
-            "#D93025",
-            "#F9AB00",
-            "#1E8E3E",
-            "#12B5CB",
-            "#9334E6",
+            "#1F4E79",
+            "#D4B24C",
+            "#B45C6A",
+            "#2B2B2B",
+            "#9A9A9A",
         ],
         "color_parallel_hue_continuous": [
-            "#C6DAFC",
-            "#7BAAF7",
-            "#1A73E8",
-            "#174EA6",
+            "#BCAE6C",
+            "#7D7C78",
+            "#434E6C",
+            "#00224E",
         ],
-        "font_general_sansserif": [
-            "Roboto",
-            "Arial",
-            "Helvetica",
-            "Liberation Sans",
-        ],
-        "axes_spines_top_visible": False,
-        "axes_spines_right_visible": False,
-        "axes_spines_left_visible": False,
-        "plot_grid_color": "#E0E0E0",
-        "plot_grid_alpha": 1.0,
-        "plot_grid_linewidth": 0.8,
+        "plot_linestyle_cycle": ["-", "--", "-.", ":", "-"],
+        "plot_marker_cycle": ["o", "s", "^", "D", "v"],
+        "plot_hatch_cycle": ["", "//", "..", "xx", "\\"],
+        "plot_line_width": 1.4,
         "plot_bar_alpha": 1.0,
-        "plot_bar_edge_width": 0,
-        "plot_stackedarea_edge_width": 0,
-        "plot_hist_edge_width": 0,
-        "plot_line_width": 2.0,
-        "plot_text_box_edgecolor": "#757575",
-        "plot_text_arrow_color": "#757575",
-        "plot_dumbbell_start_color": "#F9AB00",
-        "plot_dumbbell_end_color": "#1A73E8",
-        "plot_dumbbell_edge_width": 0,
-        "plot_heatmap_cmap": COLORS.Blues,
-        "plot_heatmap_frame_color": "#000000",
+        "plot_bar_edge_color": "#000000",
+        "plot_bar_edge_width": 0.8,
+        "plot_hist_edge_color": "#000000",
+        "plot_grid_color": "#C8C8C8",
+        "plot_dumbbell_start_color": "#D4B24C",
+        "plot_dumbbell_end_color": "#1F4E79",
+        "plot_heatmap_cmap": COLORS.Cividis,
     }
 )
 ```
 
-The material theme: Google palette, light grid.
+The contrast theme: lightness-stepped colours plus hatches, print-safe.
+
+Navy, straw, dusty rose, charcoal and grey, each a clear lightness step from the next, so a greyscale print or photocopy still tells the series apart, and every pair stays distinct for deutan, protan and tritan readers. Bars take a hatch cycle and black edges, lines a dash cycle, scatter points a marker cycle. The value scale is Cividis.
 
 ### datachart.themes.SKETCH_THEME
 
