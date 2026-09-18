@@ -20,7 +20,7 @@ Every theme is a complete [`StyleAttrs`](typings.md#datachart.typings.StyleAttrs
 | [`GREYSCALE_THEME`](#datachart.themes.GREYSCALE_THEME) | greys only, for print without color                                   | `THEME.GREYSCALE` |
 | [`INK_THEME`](#datachart.themes.INK_THEME)             | dark-ink accents, print-ready                                         | `THEME.INK` |
 | [`HATCH_THEME`](#datachart.themes.HATCH_THEME)         | a hatch cycle, black edges, dotted grid                               | `THEME.HATCH` |
-| [`MINIMAL_THEME`](#datachart.themes.MINIMAL_THEME)     | accent blue, no spines, flat bars                                     | `THEME.MINIMAL` |
+| [`MINIMAL_THEME`](#datachart.themes.MINIMAL_THEME)     | accent violet, no spines, flat bars                                   | `THEME.MINIMAL` |
 | [`MATERIAL_THEME`](#datachart.themes.MATERIAL_THEME)   | the Google palette, light grid                                        | `THEME.MATERIAL` |
 | [`SKETCH_THEME`](#datachart.themes.SKETCH_THEME)       | hand-drawn: xkcd-style wobble and halo, Comic Neue font               | `THEME.SKETCH` |
 | [`QUILL_THEME`](#datachart.themes.QUILL_THEME)         | black ink on white paper, pen-stroked lines, etched fills, IM Fell English font | `THEME.QUILL` |

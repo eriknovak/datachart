@@ -7071,7 +7071,9 @@ class ParallelCoordsLayer(Layer):
         self.dim_label_style = get_parallel_dim_label_style(shared_style)
         self.dim_label_rotation = get_parallel_dim_label_rotation(shared_style)
         self.dim_label_pad = get_parallel_dim_label_pad(shared_style)
-        self.hue_palette = config.get("color_parallel_hue", "Set1")
+        self.hue_palette = (
+            config.get("color_parallel_hue") or config["color_general_multiple"]
+        )
 
         # per-line styles are shared per source chart
         self.line_styles = [

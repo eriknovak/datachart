@@ -49,15 +49,17 @@ def canonical_style(style: dict) -> dict:
 BASE_THEME: StyleAttrs = {
     # general color style
     "color_general_singular": COLORS.Blues,
+    # Tableau tones, ordered so no adjacent pair collapses for deutan readers
     "color_general_multiple": [
         "#4E79A7",
-        "#F28E2B",
-        "#59A14F",
         "#E15759",
-        "#B07AA1",
         "#76B7B2",
+        "#F28E2B",
+        "#B07AA1",
+        "#59A14F",
     ],
-    "color_parallel_hue": COLORS.Tab10,
+    # None: parallel coords hue categories take color_general_multiple
+    "color_parallel_hue": None,
     "color_parallel_hue_continuous": ["#C6DBEF", "#6BAED6", "#2171B5", "#08306B"],
     # muted style, applied to background-emphasis layers (ADR 0009)
     "muted_color": "#CFCFCF",

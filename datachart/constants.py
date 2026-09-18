@@ -619,6 +619,7 @@ class COLORS:
         Sunset2 (str): Multi-hue sunset palette. Equals to `"Sunset2"`.
         YlGnBu (str): Multi-hue yellow-green-blue palette. Equals to `"YlGnBu"`.
         YlOrRd (str): Multi-hue yellow-orange-red palette. Equals to `"YlOrRd"`.
+        YlOrBr (str): Multi-hue yellow-orange-brown palette. Equals to `"YlOrBr"`.
         PuBuGn (str): Multi-hue purple-blue-green palette. Equals to `"PuBuGn"`.
         GnBu (str): Multi-hue green-blue palette. Equals to `"GnBu"`.
         Egypt (str): Multi-hue Egypt palette. Equals to `"Egypt"`.
@@ -665,6 +666,7 @@ class COLORS:
     Sunset2 = "Sunset2"
     YlGnBu = "YlGnBu"
     YlOrRd = "YlOrRd"
+    YlOrBr = "YlOrBr"
     PuBuGn = "PuBuGn"
     GnBu = "GnBu"
     Egypt = "Egypt"

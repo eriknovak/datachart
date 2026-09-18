@@ -75,6 +75,12 @@ from datachart.utils.stats import kde1d, kde2d
 
 # Cases whose output intentionally changed since the last published baseline.
 EXPECTED_CHANGES = {
+    # one lead hue per theme: DEFAULT reordered, PaperYlGnBu navy first, SKETCH vermilion first
+    "line_multi",
+    "bar_multi_grouped",
+    "hist_multi_stacked",
+    "scatter_hue_size",
+    "overlay_zorder_grid",
     # theme renames: PUBLICATION -> INK (same style, new case name)
     "theme_ink_line",
     # new emphasis cases (ADR 0009)
