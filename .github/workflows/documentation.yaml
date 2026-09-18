@@ -17,6 +17,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      # silences the Material team's MkDocs 2.0 banner printed on every build
+      NO_MKDOCS_2_WARNING: "1"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -25,15 +28,6 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: 3.12
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-      # only the material plugin cache: the mkdocs-jupyter cache must not
-      # carry executed notebooks across builds
-      - uses: actions/cache@v6
-        with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: .cache/plugin
-          restore-keys: |
-            mkdocs-material-
       # the themes' Helvetica/Arial stacks fall back to this metric-compatible
       # clone when the notebooks render here
       - run: sudo apt-get install -y --no-install-recommends fonts-liberation

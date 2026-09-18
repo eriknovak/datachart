@@ -15,9 +15,11 @@ exclude_docs: |
   hooks/
   overrides/
 
-# fails the build when a nav page is missing from llmstxt sections (ADR 0016)
 hooks:
+  # fails the build when a nav page is missing from llmstxt sections (ADR 0016)
   - docs/hooks/llmstxt_guard.py
+  # notebook kernels read docs/hooks/jupyter_nbconvert_config.py
+  - docs/hooks/nbconvert_config.py
 
 theme:
   name: material
