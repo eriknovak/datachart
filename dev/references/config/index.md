@@ -75,8 +75,6 @@ Sets the global configuration to match the theme.
 
 Replaces the whole style configuration with a deep copy of the theme: one of the THEME constants or a name registered with `register_theme`. Use it to switch the look of every chart rendered afterwards; call `update_config` on top for per-attribute tweaks.
 
-Added in v0.5.0
-
 Examples:
 
 ```
@@ -98,8 +96,6 @@ register_theme(name: str, theme: StyleAttrs) -> None
 ```
 
 Registers a custom theme so it can be applied with `set_theme`.
-
-Added in v0.8.1
 
 The theme must define every attribute of the default theme; missing keys are filled from it, unknown keys are rejected.
 
@@ -181,8 +177,6 @@ Applies style overrides for the duration of a `with` block.
 
 On entry the attributes are applied the way `update_config` applies them; on exit the configuration that entered the block is restored, also when the block raises. Any `set_theme` or `update_config` performed inside the block is discarded at exit. Use it for a one-off figure that needs a different font or palette without touching the global state. The scope is plain save-and-restore on the global configuration: it is neither thread-safe nor async-safe.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -208,8 +202,6 @@ using_theme(theme: THEME) -> Iterator[None]
 Applies a theme for the duration of a `with` block.
 
 On entry the theme is applied the way `set_theme` applies it; on exit both the configuration and the active theme name that entered the block are restored, also when the block raises. Any `set_theme` or `update_config` performed inside the block is discarded at exit. The scope is plain save-and-restore on the global configuration: it is neither thread-safe nor async-safe.
-
-Added in Unreleased
 
 Examples:
 
@@ -237,8 +229,6 @@ Lists the theme names `set_theme` accepts.
 
 Returns the predefined themes in declaration order, followed by every name added with `register_theme` or `load_theme` in registration order.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -262,8 +252,6 @@ save_theme(
 Writes a theme file.
 
 With no name the live configuration is saved, so a look assembled with `update_config` can be shared or committed directly; the file is named after its stem. With a name that registered theme is saved instead. The file is JSON and carries only the attributes that differ from the default theme, so it stays short and reviewable; load it back with `load_theme`. The parent directory must exist.
-
-Added in Unreleased
 
 Examples:
 
@@ -294,8 +282,6 @@ load_theme(
 Registers the theme held in a theme file and returns its name.
 
 The file is read as written by `save_theme` and registered through `register_theme`, so missing attributes are filled from the default theme, alias keys resolve to their canonical name, and unknown keys are rejected. The name is, in order of precedence, the `name` argument, the name in the file, or the file's stem; an existing theme of that name is replaced. Loading only registers: apply the theme with `set_theme` or `using_theme`.
-
-Added in Unreleased
 
 Examples:
 

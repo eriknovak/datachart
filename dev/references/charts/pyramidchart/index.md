@@ -68,12 +68,6 @@ A pyramid chart draws exactly two series as horizontal bars mirrored around a sh
 
 Both series are supplied as positive values; value ticks and labels show absolute values. Unlike the other chart fronts, the axis parameters are spatial: `xlabel`, `xticks`, and `xmax` address the horizontal value axis, and `ylabel` the vertical category axis.
 
-Added in v0.8.0
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands. The `sort` and `sort_by` category order, the `emphasis_rule`, and the per-record `emphasis` key.
-
 Examples:
 
 ```

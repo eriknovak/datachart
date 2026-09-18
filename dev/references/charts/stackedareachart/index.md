@@ -120,8 +120,6 @@ Creates the stacked area chart.
 
 Stacked areas fill each series on top of the previous one along an ordered axis, so the top edge traces the total and the bands show how it splits into parts — class proportions over time, traffic by channel per year. Every series must share the same `x` values. Use it for composition that changes along an axis; for the trajectories themselves use LineChart, and for composition at a few discrete categories use BarChart with `bar_mode="stack"`.
 
-Added in v0.9.0
-
 Examples:
 
 ```
@@ -137,10 +135,6 @@ Examples:
 ...     ylabel="Visits",
 ... )
 ```
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format`, `value_step` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter.
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

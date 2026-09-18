@@ -119,8 +119,6 @@ Creates the box plot.
 
 A box plot summarizes a numeric distribution per group by its median, quartiles, whiskers, and outliers. Use it to compare the level and spread of many groups compactly, or to spot skew and outliers, when the full distribution shape is not needed. For shape use ViolinPlot; for the raw points use SwarmPlot.
 
-Added in v0.7.0
-
 Examples:
 
 ```
@@ -139,10 +137,6 @@ Examples:
 ...     ylabel="Value"
 ... )
 ```
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The `sort` group order.
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -238,10 +232,6 @@ The typing for the box plot style.
 | `plot_xticks_label_rotate`    | The label rotation of the xticks. **TYPE:** \`int     |
 | `plot_yticks_label_rotate`    | The label rotation of the yticks. **TYPE:** \`int     |
 | `plot_box_hatch`              | The hatch pattern of the box. **TYPE:** \`HATCH_STYLE |
-
-Added in Unreleased
-
-The `plot_box_hatch` attribute.
 
 ## Constants
 

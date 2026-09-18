@@ -56,8 +56,6 @@ sum_values(values: list[int | float]) -> float
 
 Calculates the sum of all values.
 
-Added in v0.7.0
-
 Examples:
 
 ```
@@ -132,8 +130,6 @@ Gets the most frequent value.
 
 Meant for discrete data, where values repeat; on continuous data every value tends to be unique and the mode is just the smallest one. Ties are broken by taking the smallest of the most frequent values.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -188,8 +184,6 @@ variance(values: list[int | float]) -> float
 
 Calculates the variance of the values.
 
-Added in v0.7.0
-
 Examples:
 
 ```
@@ -239,8 +233,6 @@ iqr(values: list[int | float]) -> float
 
 Calculates the interquartile range (Q3 - Q1).
 
-Added in v0.7.0
-
 The interquartile range is the difference between the 75th percentile (Q3) and the 25th percentile (Q1). It is a measure of statistical dispersion and is useful for identifying outliers.
 
 Examples:
@@ -269,10 +261,6 @@ Gets the minimum of the values.
 
 Numeric values return a float; any other ordered values, such as datetimes, return their minimum unchanged.
 
-Added in Unreleased
-
-Non-numeric values pass through instead of raising.
-
 Examples:
 
 ```
@@ -298,10 +286,6 @@ maximum(values: list[Any]) -> Any
 Gets the maximum of the values.
 
 Numeric values return a float; any other ordered values, such as datetimes, return their maximum unchanged.
-
-Added in Unreleased
-
-Non-numeric values pass through instead of raising.
 
 Examples:
 
@@ -330,8 +314,6 @@ skewness(values: list[int | float]) -> float
 Calculates the skewness of the values.
 
 Skewness measures the asymmetry of the distribution: positive when the tail extends to the right of the bulk, negative when it extends to the left, and zero for a symmetric distribution.
-
-Added in Unreleased
 
 Examples:
 
@@ -366,8 +348,6 @@ Calculates the excess kurtosis of the values.
 
 Kurtosis measures how heavy the tails of the distribution are compared to a normal distribution, which scores zero: positive for heavier tails and sharper peaks, negative for lighter tails and flatter shapes.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -400,8 +380,6 @@ correlation(
 ```
 
 Calculates the Pearson correlation coefficient between two lists.
-
-Added in v0.7.0
 
 The Pearson correlation coefficient measures the linear relationship between two datasets. It ranges from -1 (perfect negative correlation) to 1 (perfect positive correlation), with 0 indicating no linear correlation. A temporal `x` (dates, datetimes, or `datetime64`) is correlated as matplotlib date numbers.
 
@@ -441,8 +419,6 @@ Calculates the Spearman rank correlation between two lists.
 
 The Spearman coefficient is the Pearson correlation of the ranks, so it measures any monotone relationship, not only a linear one, and is robust to outliers. It ranges from -1 to 1 like `correlation`, and likewise accepts a temporal `x`.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -481,8 +457,6 @@ linear_fit(
 Fits a straight line to the (x, y) points.
 
 An ordinary least-squares fit of `y = slope * x + intercept`, with the coefficient of determination `r2` saying how much of the variation in `y` the line explains (1 is a perfect fit). A temporal `x` (dates, datetimes, or `datetime64`) is fitted as matplotlib date numbers, so the slope is per day and the intercept is relative to matplotlib's date epoch.
-
-Added in Unreleased
 
 Examples:
 
@@ -530,8 +504,6 @@ Estimates a confidence interval of a statistic by bootstrapping.
 
 The values are resampled with replacement `n_resamples` times, the statistic is computed on each resample, and the interval is the central `level` share of those results (the percentile bootstrap). The half-width of the interval is a ready-made error bar for a `BarChart`.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -576,8 +548,6 @@ Bins the values into histogram counts and edges.
 
 The `bins` are passed straight to `numpy.histogram_bin_edges`: a rule name such as `"auto"`, `"fd"`, `"rice"`, or `"sturges"` picks the edges from the data, an integer sets the number of equal-width bins, and a list gives the edges explicitly. These rules are unrelated to the `CONTOUR_LEVELS` rules that share their names.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -615,8 +585,6 @@ Smooths the values with a trailing moving average.
 
 Each output is the mean of the `window` values ending at that index, so the result lines up with the input and is `nan` until the window fills.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -650,8 +618,6 @@ ewma(
 Smooths the values with an exponentially weighted moving average.
 
 Each output blends the current value with the previous output, `alpha * value + (1 - alpha) * previous`, starting from the first value. A larger `alpha` follows the data more closely; a smaller one smooths harder.
-
-Added in Unreleased
 
 Examples:
 
@@ -688,8 +654,6 @@ loess(
 Smooths the (x, y) points with a locally weighted linear fit.
 
 At each `x` a straight line is fitted to the nearest `frac` share of the points, weighted by a tricube kernel so closer points count more, and the smoothed `y` is that line's value there (LOESS/LOWESS). The result is a list of `{x, y}` points sorted by `x`, ready for `LineChart`, as `kde1d` returns. A smaller `frac` follows the data more closely. A temporal `x` (dates, datetimes, or `datetime64`) is smoothed as date numbers and the curve's `x` values come back as datetimes, in the input's zone.
-
-Added in Unreleased
 
 Examples:
 
@@ -734,8 +698,6 @@ kde1d(
 Estimates the density of the values as a curve.
 
 A Gaussian kernel density estimate evaluated on `gridsize` evenly spaced points over the range of the values, extended by `cut` bandwidths on each side so the curve tails off instead of being clipped at the extremes, or over an explicit `xlim` so several curves share one grid. The result is a list of `{x, y}` points ready for `LineChart`; the curve integrates to 1, so it overlays a density `Histogram` of the same values.
-
-Added in v0.9.0
 
 Examples:
 
@@ -782,8 +744,6 @@ kde2d(
 Estimates the density of the (x, y) points as a gridded surface.
 
 A Gaussian kernel density estimate evaluated on a `gridsize` × `gridsize` grid over the range of the points, extended by `cut` bandwidths on each side so the outer contours close instead of being clipped, or over explicit `xlim`/`ylim` so several surfaces share one grid. The result is an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of a scattered dataset is `ContourChart(kde2d(x, y))`. A temporal `x` (dates, datetimes, or `datetime64`) gives a grid of datetime `x` values, in the input's zone, and `xlim` may then be a pair of datetimes.
-
-Added in v0.9.0
 
 Examples:
 

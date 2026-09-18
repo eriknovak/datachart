@@ -43,8 +43,6 @@ Creates the Sankey chart.
 
 A Sankey diagram draws weighted flows between categories: nodes are bars laid out in columns and each flow is a ribbon whose height carries its value — label transitions between annotators, attrition through a signup funnel, energy from source to use. Use it when the question is where a quantity goes; for the totals per category alone use BarChart.
 
-Added in v0.9.0
-
 Examples:
 
 ```
@@ -135,10 +133,6 @@ The typing for the Sankey chart style.
 | `plot_sankey_link_alpha`       | The ribbon alpha. **TYPE:** \`float                                                            |
 | `plot_sankey_label_halo_width` | The width of the halo, in the axes face color, behind labels; 0 disables it. **TYPE:** \`float |
 | `plot_sankey_node_fill`        | Whether the node bars are filled; False draws them as outlines. **TYPE:** \`bool               |
-
-Added in Unreleased
-
-The `plot_sankey_node_fill` attribute.
 
 ## Constants
 

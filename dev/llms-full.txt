@@ -18256,10 +18256,6 @@ Examples:
 ... )
 ```
 
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format`, `value_step` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter.
-
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                             |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `data`          | The data points for the line chart(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** \`list[LineDataPointAttrs]                                                                                                                                                                                                                                         |
@@ -18488,8 +18484,6 @@ Creates the stacked area chart.
 
 Stacked areas fill each series on top of the previous one along an ordered axis, so the top edge traces the total and the bands show how it splits into parts — class proportions over time, traffic by channel per year. Every series must share the same `x` values. Use it for composition that changes along an axis; for the trajectories themselves use LineChart, and for composition at a few discrete categories use BarChart with `bar_mode="stack"`.
 
-Added in v0.9.0
-
 Examples:
 
 ```
@@ -18505,10 +18499,6 @@ Examples:
 ...     ylabel="Visits",
 ... )
 ```
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format`, `value_step` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter.
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -18718,8 +18708,6 @@ BumpChart(
 Creates the bump chart.
 
 A bump chart shows rank over time: one line per series, rank 1 at the top, a marker at every period, and the series named at the line's end in place of a y-axis. Use it for league tables, popularity, or market-share rankings, where the order matters more than the gaps between values. Periods may be numbers, dates, or strings; strings draw as categories in first-seen order. For the values themselves use LineChart; for a single period's order use BarChart with `sort`.
-
-Added in Unreleased
 
 Examples:
 
@@ -18950,10 +18938,6 @@ Creates the bar chart.
 
 Bars compare a numeric value across discrete categories: each label gets a bar whose length encodes its value. Use it when the categories are few and unordered (or ordinal) and the question is "which is bigger, and by how much"; several series can be grouped, stacked, or overlaid via `bar_mode`. For a continuous x-axis reach for LineChart, for distributions for Histogram.
 
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands. The `sort` and `sort_by` category order, the `emphasis_rule`, and the per-record `emphasis` key.
-
 Examples:
 
 ```
@@ -19158,12 +19142,6 @@ A pyramid chart draws exactly two series as horizontal bars mirrored around a sh
 
 Both series are supplied as positive values; value ticks and labels show absolute values. Unlike the other chart fronts, the axis parameters are spatial: `xlabel`, `xticks`, and `xmax` address the horizontal value axis, and `ylabel` the vertical category axis.
 
-Added in v0.8.0
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands. The `sort` and `sort_by` category order, the `emphasis_rule`, and the per-record `emphasis` key.
-
 Examples:
 
 ```
@@ -19345,12 +19323,6 @@ Creates the radial chart.
 
 A radial chart plots series on polar axes: as a line (radar) profile, an area, bars, or a histogram, chosen with `type`. Use the radar form to compare a few entities across several metrics on a shared scale, and the bar and histogram forms for cyclic categories such as hours, weekdays, or compass directions.
 
-Added in v0.8.0
-
-Added in Unreleased
-
-The `legend` parameter. The `vspans` and `hspans` reference bands. The `sort` and `sort_by` category order, the `emphasis_rule`, and the per-record `emphasis` key (bar visual).
-
 Examples:
 
 ```
@@ -19512,8 +19484,6 @@ Creates the calendar heatmap.
 
 A calendar heatmap draws one cell per day, the weeks as columns and the weekdays as rows, colored by the day's value, with the months separated and labelled. Use it when a daily series has a weekly or seasonal rhythm worth seeing at a glance: commits, sales, steps, rainfall. Data spanning several years draws one calendar per year; for a matrix that is not a calendar, use Heatmap.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -19568,8 +19538,6 @@ Bases: `TypedDict`
 
 The data attributes for the calendar heatmap.
 
-Added in Unreleased
-
 | ATTRIBUTE | DESCRIPTION                                                                                                                                                              |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `date`    | One temporal object per day: a date, datetime, numpy.datetime64, or pandas Timestamp. Date strings are never parsed, and every date appears once. **TYPE:** \`list\[date |
@@ -19584,8 +19552,6 @@ Added in Unreleased
 Bases: `TypedDict`
 
 The typing for the calendar heatmap style.
-
-Added in Unreleased
 
 | ATTRIBUTE                                | DESCRIPTION                                                                                                                                   |
 | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -19677,8 +19643,6 @@ A gantt chart shows a schedule: one horizontal bar per task from its start to it
 
 The chart is always horizontal, so the axis parameters are spatial: `xlabel`, `xmin`, `xmax`, and `xticks_format` address the horizontal date axis, and `ylabel` the vertical task axis. It composes in `Grid`, but not in `Panel`.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -19746,8 +19710,6 @@ Bases: `TypedDict`
 
 The task record attributes for the gantt chart.
 
-Added in Unreleased
-
 | ATTRIBUTE    | DESCRIPTION                                                                                                                                          |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `task`       | The task name, unique within the chart; the label of its row. **TYPE:** `str`                                                                        |
@@ -19769,8 +19731,6 @@ Bases: `TypedDict`
 The typing for the gantt chart style.
 
 The range bars take the `plot_bar_*` keys (color, alpha, edge, hatch, zorder); these keys set what is specific to a gantt chart.
-
-Added in Unreleased
 
 | ATTRIBUTE                      | DESCRIPTION                                                                                               |
 | ------------------------------ | --------------------------------------------------------------------------------------------------------- |
@@ -19892,8 +19852,6 @@ A dumbbell chart shows two values per category: a dot at `start`, a dot at `end`
 
 The rows sit on the category index the box, violin and swarm plots share, so the chart composes with them and with other dumbbell charts in `Panel`, and in `Grid`. Several data lists overlay in distinct colors, each start dot a lighter shade of its end dot.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -19966,8 +19924,6 @@ Bases: `TypedDict`
 
 The record attributes for the dumbbell chart.
 
-Added in Unreleased
-
 | ATTRIBUTE  | DESCRIPTION                                                                                                             |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `label`    | The category, unique within the chart; the label of its row (or column). **TYPE:** `str`                                |
@@ -19986,8 +19942,6 @@ Bases: `TypedDict`
 The typing for the dumbbell chart style.
 
 The value labels take the shared `plot_value_*` keys.
-
-Added in Unreleased
 
 | ATTRIBUTE                        | DESCRIPTION                                                                                                                                           |
 | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -20162,10 +20116,6 @@ Examples:
 ...     ylabel="Y"
 ... )
 ```
-
-Added in Unreleased
-
-The `show_values`, `value_format` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter.
 
 | PARAMETER         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -20393,8 +20343,6 @@ Creates the box plot.
 
 A box plot summarizes a numeric distribution per group by its median, quartiles, whiskers, and outliers. Use it to compare the level and spread of many groups compactly, or to spot skew and outliers, when the full distribution shape is not needed. For shape use ViolinPlot; for the raw points use SwarmPlot.
 
-Added in v0.7.0
-
 Examples:
 
 ```
@@ -20413,10 +20361,6 @@ Examples:
 ...     ylabel="Value"
 ... )
 ```
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The `sort` group order.
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -20512,10 +20456,6 @@ The typing for the box plot style.
 | `plot_xticks_label_rotate`    | The label rotation of the xticks. **TYPE:** \`int     |
 | `plot_yticks_label_rotate`    | The label rotation of the yticks. **TYPE:** \`int     |
 | `plot_box_hatch`              | The hatch pattern of the box. **TYPE:** \`HATCH_STYLE |
-
-Added in Unreleased
-
-The `plot_box_hatch` attribute.
 
 ## Constants
 
@@ -20658,8 +20598,6 @@ Creates the violin plot.
 
 A violin plot draws the kernel density estimate of each group's numeric distribution as a mirrored profile, showing shape (multimodality, skew, tails) that a box plot hides. Use it to compare distributions across groups when shape matters and each group has enough samples for a density estimate.
 
-Added in v0.9.0
-
 Examples:
 
 ```
@@ -20678,10 +20616,6 @@ Examples:
 ...     ylabel="Value"
 ... )
 ```
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The `sort` group order.
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -20771,10 +20705,6 @@ The typing for the violin plot style.
 | `plot_violin_median_color`    | The color of the median dot. **TYPE:** \`str                              |
 | `plot_violin_median_size`     | The size of the median dot. **TYPE:** \`int                               |
 | `plot_violin_hatch`           | The hatch pattern of the body. **TYPE:** \`HATCH_STYLE                    |
-
-Added in Unreleased
-
-The `plot_violin_hatch` attribute.
 
 ## Constants
 
@@ -20916,12 +20846,6 @@ SwarmPlot(
 Creates the swarm plot.
 
 A swarm plot draws every observation as a point at its group's category position, spread across the category width so the points do not hide each other, making counts and gaps visible. Use it for small-to-medium samples where each observation matters, or overlay it on a BoxPlot with `Panel` (the two share positions). For large samples prefer ViolinPlot.
-
-Added in v0.9.0
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The per-point `emphasis` key. The `show_values` and `value_format` parameters.
 
 Examples:
 
@@ -21169,12 +21093,6 @@ Creates the raincloud plot.
 
 A raincloud plot draws each group as a cloud (a half violin of its density), its rain (the raw observations), and a box (the quartile summary) side by side at one category position, all in the group's palette color. Use it when you want the shape, the summary statistics, and the individual observations in a single view, for example when reporting experimental results per condition. Vertical rainclouds keep the cloud on the right; horizontal ones keep it above.
 
-Added in v0.9.0
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The `show_values` and `value_format` parameters.
-
 Examples:
 
 ```
@@ -21417,8 +21335,6 @@ RidgelinePlot(
 Creates the ridgeline plot.
 
 A ridgeline plot (joy plot) draws the kernel density estimate of each group's numeric distribution as a ridge on its own row, the rows stacked and partly overlapping, first row at the top. Use it to show how one distribution shifts across many groups in the space a grid of histograms would spend on a few.
-
-Added in Unreleased
 
 Examples:
 
@@ -21680,8 +21596,6 @@ Creates a scatter chart.
 
 Each point is one observation placed by two numeric variables, optionally with a third encoded as marker size. Use it to check whether two variables are related, spot clusters and outliers, and quantify the link with the optional regression line and correlation coefficient. For ordered series use LineChart.
 
-Added in v0.7.0
-
 Examples:
 
 ```
@@ -21743,10 +21657,6 @@ Examples:
 ...     label="name"
 ... )
 ```
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format`, `value_step` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The per-point `emphasis` key.
 
 | PARAMETER          | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -21939,12 +21849,6 @@ Heatmap(
 Creates the heatmap.
 
 A heatmap maps every cell of a 2-D matrix to a color, so structure in a grid of numbers (correlations, confusion matrices, feature-by-time tables) reads at a glance. Use it when both axes are categorical or gridded and the value is what matters; the color scale, colorbar, and cell value labels are all configurable.
-
-Added in v0.4.0
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `legend` parameter, and the `label`, `location`, `format`, and `ticks` fields of the `colorbar` setting. The `emphasis_rule` parameter and the per-cell `emphasis` grid of `data`.
 
 Examples:
 
@@ -22194,12 +22098,6 @@ ContourChart(
 Creates the contour chart.
 
 A contour chart draws a surface sampled on a grid — a loss landscape, a 2-D density, a terrain — as iso-lines of equal value, or as filled bands between them. Use it to read the shape of a function of two variables: where its minima and ridges sit and how steeply it changes. Lines overlay on other charts and on each other; fills stand alone, with an optional colorbar. For a per-cell view of a matrix use Heatmap; for the raw points behind a density use ScatterChart.
-
-Added in v0.9.0
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `legend` parameter, and the `label`, `location`, `format`, and `ticks` fields of the `colorbar` setting. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter.
 
 Examples:
 
@@ -22458,12 +22356,6 @@ Creates the hexbin chart.
 
 A hexbin chart tiles the plane with hexagons and colors each by the number of points falling in it — or, with a per-point `c`, by an aggregate of those values. Use it where a scatter chart turns into an opaque blob: thousands of points, overlapping clusters, or a value that varies across the plane. For the points themselves use ScatterChart; for a smooth density estimate use ContourChart on stats.kde2d.
 
-Added in v0.9.0
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `label`, `location`, `format`, and `ticks` fields of the `colorbar` setting. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The `show_legend` and `legend` parameters.
-
 Examples:
 
 ```
@@ -22634,12 +22526,6 @@ Creates the parallel coordinates chart.
 
 Parallel coordinates draw each record as a polyline across one vertical axis per dimension. Use it to explore multivariate data: clusters show as bundles of similar lines, and correlations between neighboring dimensions show as parallel or crossing segments. Works best with a handful of dimensions; color the records by group with `hue` to compare groups.
 
-Added in v0.7.0
-
-Added in Unreleased
-
-The `legend` parameter. The `emphasis_rule` parameter.
-
 Examples:
 
 ```
@@ -22796,12 +22682,6 @@ A network chart draws relational data as a node-link diagram — module dependen
 
 Every edge is its own patch and the spring layout weighs every pair of nodes, so the chart is meant for networks that can be read, not for whole graphs. Without a problem: up to about 1,000 nodes and 3,000 edges under the spring layout (a few seconds), up to about 5,000 nodes and 15,000 edges under the circular or fixed layout (under a minute). Beyond that the spring layout grows with the square of the node count — 2,000 nodes take half a minute, 5,000 several minutes and gigabytes of memory — and every layout pays a few milliseconds per edge to draw and again to save. Aggregate or filter a larger graph first.
 
-Added in v0.9.1
-
-Added in Unreleased
-
-The `legend` parameter. The `emphasis_rule` parameter. The `label_position` parameter.
-
 Examples:
 
 ```
@@ -22927,10 +22807,6 @@ The typing for the network chart style.
 | `plot_network_group_linestyle`      | Draws each cluster's mark as a ring in this line style and the edge color instead of a disc. None draws the disc. **TYPE:** \`LINE_STYLE                                                                                                    |
 | `plot_network_edge_ink_stroke`      | The pen the edges are drawn with, as for plot_ink_stroke, plus swell (the pressure swell amplitude) and noise (the grain); a directed edge draws as a stroked shaft with a small head. None draws plain edges. **TYPE:** \`dict[str, float] |
 
-Added in Unreleased
-
-The `plot_network_group_linestyle` and `plot_network_edge_ink_stroke` attributes.
-
 ## Constants
 
 The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values.
@@ -22980,8 +22856,6 @@ Creates a scatter matrix.
 Every pair of numeric dimensions gets a scatter chart, and each dimension's own distribution sits on the diagonal. Use it to scan many variables for relationships, clusters and outliers at once, optionally split by a categorical `hue`. For two variables use ScatterChart; for many dimensions per observation read as lines, use ParallelCoords.
 
 The figure is a grid: it nests inside Grid and cannot be overlaid with Panel.
-
-Added in Unreleased
 
 Examples:
 
@@ -23049,8 +22923,6 @@ The record attributes for the scatter matrix.
 
 A dictionary where keys are column names: numeric columns become dimensions, and one categorical column may be named as the `hue`. The same columns can be passed as one dictionary of lists instead.
 
-Added in Unreleased
-
 | ATTRIBUTE | DESCRIPTION                                                                                   |
 | --------- | --------------------------------------------------------------------------------------------- |
 | `hue`     | The category for color grouping, under the column name the hue setting names. **TYPE:** \`str |
@@ -23066,8 +22938,6 @@ Bases: `TypedDict`
 The typing for the scatter matrix style.
 
 The cells take the scatter, histogram and plot text keys; these keys style what the matrix adds on top of them.
-
-Added in Unreleased
 
 | ATTRIBUTE                                | DESCRIPTION                                                                                                 |
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
@@ -23134,8 +23004,6 @@ SankeyChart(
 Creates the Sankey chart.
 
 A Sankey diagram draws weighted flows between categories: nodes are bars laid out in columns and each flow is a ribbon whose height carries its value — label transitions between annotators, attrition through a signup funnel, energy from source to use. Use it when the question is where a quantity goes; for the totals per category alone use BarChart.
-
-Added in v0.9.0
 
 Examples:
 
@@ -23228,10 +23096,6 @@ The typing for the Sankey chart style.
 | `plot_sankey_label_halo_width` | The width of the halo, in the axes face color, behind labels; 0 disables it. **TYPE:** \`float |
 | `plot_sankey_node_fill`        | Whether the node bars are filled; False draws them as outlines. **TYPE:** \`bool               |
 
-Added in Unreleased
-
-The `plot_sankey_node_fill` attribute.
-
 ## Constants
 
 The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values.
@@ -23286,12 +23150,6 @@ Treemap(
 Creates the treemap.
 
 A treemap tiles part-of-whole data as rectangles whose area is the value — disk usage by folder, a budget by line, population by continent and country. A record's `children` group it, up to four levels deep: a group is a box in its color with a header band, its children inset in a lighter tint. Every level is sorted largest first and tiled so the rectangles stay near square. Use it when the question is how a whole splits; for the values alone, or for more than a handful of small parts, use BarChart.
-
-Added in v0.9.1
-
-Added in Unreleased
-
-The `legend` parameter. The `emphasis_rule` parameter.
 
 Examples:
 
@@ -23390,10 +23248,6 @@ The typing for the treemap style.
 | `plot_treemap_label_halo_width`     | The width of the halo, in the axes face color, behind labels; 0 disables it. **TYPE:** \`float                                                                                                                                                                                            |
 | `plot_treemap_etch_density`         | With plot_etch and a hatch cycle, how many times each nesting level repeats its top-level group's pattern, outermost first (a level past the list is blank); every box fills with the axes face so outer etching never shows through. None keeps the colored tiles. **TYPE:** \`list[int] |
 
-Added in Unreleased
-
-The `plot_treemap_etch_density` attribute.
-
 ## Constants
 
 The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values.
@@ -23465,12 +23319,6 @@ A panel has an orientation, inferred from its figures: it is horizontal when eve
 Each axis keeps the scale its figures were built with: a figure drawn with `scaley="log"` stays log in the panel, on whichever value axis it lands. A figure that set no scale takes the one its axis resolves to. The panel's own `scalex`, `scaley` and `scaley_right` override that per axis; where two figures on one axis each set a different scale, the first one wins and the panel warns (`overlay_warn_scale_conflict` in the config). The two value axes scale independently, so linear bars on the primary axis against a log line on the secondary one is one panel.
 
 Panel figures nest: `Panel([Panel([f1, f2]), f3])` is equivalent to `Panel([f1, f2, f3])`, to any depth. A nested panel contributes its figures with their per-figure options, axis scales and `bar_mode` intact, while the other panel-level settings (title, labels, limits, ...) always come from the outermost call. Dict options on a nested panel override its per-figure options only when explicitly given.
-
-Added in v0.8.0
-
-Added in Unreleased
-
-The `legend`, `scalex`, `scaley` and `scaley_right` parameters.
 
 Examples:
 
@@ -23577,8 +23425,6 @@ Each figure's chart is redrawn into its grid cell. Nested rows define the layout
 
 Grids nest: a Grid figure placed in a cell occupies exactly that cell and rebuilds its internal layout inside it, to any depth. The nested grid keeps its own title (a heading spanning its subgrid) and its own sharex/sharey among its own cells; the outer grid's sharex/sharey applies only to its top-level cells. Panel figures also nest in a cell; the reverse — a Grid figure inside a Panel — stays an error.
 
-Added in v0.8.0
-
 Examples:
 
 ```
@@ -23648,12 +23494,6 @@ Add text annotations to an already rendered figure.
 Returns a new figure with the annotations riding the figure's chart metadata, styled by the current theme at call time — so they follow themes and survive `Panel` and `Grid` composition. The source figure and its charts are never modified.
 
 Works on chart figures (including polar ones), `Panel` output, and multi-subplot figures (`subplots=True`). On a multi-subplot figure every text names its target with a 0-based `subplot` index in render order; the figure is redrawn with the same subplot layout — each subplot scales on its own, without the source's `sharex`/`sharey`, which a `Grid` cell of the result restores — and the texts ride the per-subplot panels only, so they show in `Grid` cells but not in a `Panel` overlay of the figure. Grid figures are rejected — annotate the sources before composing.
-
-Added in v0.8.0
-
-Added in Unreleased
-
-Multi-subplot figures, targeted per text with the `subplot` index.
 
 Examples:
 
@@ -23735,10 +23575,6 @@ Examples:
 ['/path/to/save/chart.pdf', '/path/to/save/chart.png']
 ```
 
-Added in Unreleased
-
-The list form of `format`, and the returned paths.
-
 | PARAMETER     | DESCRIPTION                                                                                                                                     |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `figure`      | The figure to save. **TYPE:** `plt.Figure`                                                                                                      |
@@ -23812,8 +23648,6 @@ sum_values(values: list[int | float]) -> float
 ```
 
 Calculates the sum of all values.
-
-Added in v0.7.0
 
 Examples:
 
@@ -23889,8 +23723,6 @@ Gets the most frequent value.
 
 Meant for discrete data, where values repeat; on continuous data every value tends to be unique and the mode is just the smallest one. Ties are broken by taking the smallest of the most frequent values.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -23945,8 +23777,6 @@ variance(values: list[int | float]) -> float
 
 Calculates the variance of the values.
 
-Added in v0.7.0
-
 Examples:
 
 ```
@@ -23996,8 +23826,6 @@ iqr(values: list[int | float]) -> float
 
 Calculates the interquartile range (Q3 - Q1).
 
-Added in v0.7.0
-
 The interquartile range is the difference between the 75th percentile (Q3) and the 25th percentile (Q1). It is a measure of statistical dispersion and is useful for identifying outliers.
 
 Examples:
@@ -24026,10 +23854,6 @@ Gets the minimum of the values.
 
 Numeric values return a float; any other ordered values, such as datetimes, return their minimum unchanged.
 
-Added in Unreleased
-
-Non-numeric values pass through instead of raising.
-
 Examples:
 
 ```
@@ -24055,10 +23879,6 @@ maximum(values: list[Any]) -> Any
 Gets the maximum of the values.
 
 Numeric values return a float; any other ordered values, such as datetimes, return their maximum unchanged.
-
-Added in Unreleased
-
-Non-numeric values pass through instead of raising.
 
 Examples:
 
@@ -24087,8 +23907,6 @@ skewness(values: list[int | float]) -> float
 Calculates the skewness of the values.
 
 Skewness measures the asymmetry of the distribution: positive when the tail extends to the right of the bulk, negative when it extends to the left, and zero for a symmetric distribution.
-
-Added in Unreleased
 
 Examples:
 
@@ -24123,8 +23941,6 @@ Calculates the excess kurtosis of the values.
 
 Kurtosis measures how heavy the tails of the distribution are compared to a normal distribution, which scores zero: positive for heavier tails and sharper peaks, negative for lighter tails and flatter shapes.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -24157,8 +23973,6 @@ correlation(
 ```
 
 Calculates the Pearson correlation coefficient between two lists.
-
-Added in v0.7.0
 
 The Pearson correlation coefficient measures the linear relationship between two datasets. It ranges from -1 (perfect negative correlation) to 1 (perfect positive correlation), with 0 indicating no linear correlation. A temporal `x` (dates, datetimes, or `datetime64`) is correlated as matplotlib date numbers.
 
@@ -24198,8 +24012,6 @@ Calculates the Spearman rank correlation between two lists.
 
 The Spearman coefficient is the Pearson correlation of the ranks, so it measures any monotone relationship, not only a linear one, and is robust to outliers. It ranges from -1 to 1 like `correlation`, and likewise accepts a temporal `x`.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -24238,8 +24050,6 @@ linear_fit(
 Fits a straight line to the (x, y) points.
 
 An ordinary least-squares fit of `y = slope * x + intercept`, with the coefficient of determination `r2` saying how much of the variation in `y` the line explains (1 is a perfect fit). A temporal `x` (dates, datetimes, or `datetime64`) is fitted as matplotlib date numbers, so the slope is per day and the intercept is relative to matplotlib's date epoch.
-
-Added in Unreleased
 
 Examples:
 
@@ -24287,8 +24097,6 @@ Estimates a confidence interval of a statistic by bootstrapping.
 
 The values are resampled with replacement `n_resamples` times, the statistic is computed on each resample, and the interval is the central `level` share of those results (the percentile bootstrap). The half-width of the interval is a ready-made error bar for a `BarChart`.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -24333,8 +24141,6 @@ Bins the values into histogram counts and edges.
 
 The `bins` are passed straight to `numpy.histogram_bin_edges`: a rule name such as `"auto"`, `"fd"`, `"rice"`, or `"sturges"` picks the edges from the data, an integer sets the number of equal-width bins, and a list gives the edges explicitly. These rules are unrelated to the `CONTOUR_LEVELS` rules that share their names.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -24372,8 +24178,6 @@ Smooths the values with a trailing moving average.
 
 Each output is the mean of the `window` values ending at that index, so the result lines up with the input and is `nan` until the window fills.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -24407,8 +24211,6 @@ ewma(
 Smooths the values with an exponentially weighted moving average.
 
 Each output blends the current value with the previous output, `alpha * value + (1 - alpha) * previous`, starting from the first value. A larger `alpha` follows the data more closely; a smaller one smooths harder.
-
-Added in Unreleased
 
 Examples:
 
@@ -24445,8 +24247,6 @@ loess(
 Smooths the (x, y) points with a locally weighted linear fit.
 
 At each `x` a straight line is fitted to the nearest `frac` share of the points, weighted by a tricube kernel so closer points count more, and the smoothed `y` is that line's value there (LOESS/LOWESS). The result is a list of `{x, y}` points sorted by `x`, ready for `LineChart`, as `kde1d` returns. A smaller `frac` follows the data more closely. A temporal `x` (dates, datetimes, or `datetime64`) is smoothed as date numbers and the curve's `x` values come back as datetimes, in the input's zone.
-
-Added in Unreleased
 
 Examples:
 
@@ -24491,8 +24291,6 @@ kde1d(
 Estimates the density of the values as a curve.
 
 A Gaussian kernel density estimate evaluated on `gridsize` evenly spaced points over the range of the values, extended by `cut` bandwidths on each side so the curve tails off instead of being clipped at the extremes, or over an explicit `xlim` so several curves share one grid. The result is a list of `{x, y}` points ready for `LineChart`; the curve integrates to 1, so it overlays a density `Histogram` of the same values.
-
-Added in v0.9.0
 
 Examples:
 
@@ -24539,8 +24337,6 @@ kde2d(
 Estimates the density of the (x, y) points as a gridded surface.
 
 A Gaussian kernel density estimate evaluated on a `gridsize` × `gridsize` grid over the range of the points, extended by `cut` bandwidths on each side so the outer contours close instead of being clipped, or over explicit `xlim`/`ylim` so several surfaces share one grid. The result is an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of a scattered dataset is `ContourChart(kde2d(x, y))`. A temporal `x` (dates, datetimes, or `datetime64`) gives a grid of datetime `x` values, in the input's zone, and `xlim` may then be a pair of datetimes.
-
-Added in v0.9.0
 
 Examples:
 
@@ -24649,8 +24445,6 @@ Sets the global configuration to match the theme.
 
 Replaces the whole style configuration with a deep copy of the theme: one of the THEME constants or a name registered with `register_theme`. Use it to switch the look of every chart rendered afterwards; call `update_config` on top for per-attribute tweaks.
 
-Added in v0.5.0
-
 Examples:
 
 ```
@@ -24672,8 +24466,6 @@ register_theme(name: str, theme: StyleAttrs) -> None
 ```
 
 Registers a custom theme so it can be applied with `set_theme`.
-
-Added in v0.8.1
 
 The theme must define every attribute of the default theme; missing keys are filled from it, unknown keys are rejected.
 
@@ -24755,8 +24547,6 @@ Applies style overrides for the duration of a `with` block.
 
 On entry the attributes are applied the way `update_config` applies them; on exit the configuration that entered the block is restored, also when the block raises. Any `set_theme` or `update_config` performed inside the block is discarded at exit. Use it for a one-off figure that needs a different font or palette without touching the global state. The scope is plain save-and-restore on the global configuration: it is neither thread-safe nor async-safe.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -24782,8 +24572,6 @@ using_theme(theme: THEME) -> Iterator[None]
 Applies a theme for the duration of a `with` block.
 
 On entry the theme is applied the way `set_theme` applies it; on exit both the configuration and the active theme name that entered the block are restored, also when the block raises. Any `set_theme` or `update_config` performed inside the block is discarded at exit. The scope is plain save-and-restore on the global configuration: it is neither thread-safe nor async-safe.
-
-Added in Unreleased
 
 Examples:
 
@@ -24811,8 +24599,6 @@ Lists the theme names `set_theme` accepts.
 
 Returns the predefined themes in declaration order, followed by every name added with `register_theme` or `load_theme` in registration order.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -24836,8 +24622,6 @@ save_theme(
 Writes a theme file.
 
 With no name the live configuration is saved, so a look assembled with `update_config` can be shared or committed directly; the file is named after its stem. With a name that registered theme is saved instead. The file is JSON and carries only the attributes that differ from the default theme, so it stays short and reviewable; load it back with `load_theme`. The parent directory must exist.
-
-Added in Unreleased
 
 Examples:
 
@@ -24868,8 +24652,6 @@ load_theme(
 Registers the theme held in a theme file and returns its name.
 
 The file is read as written by `save_theme` and registered through `register_theme`, so missing attributes are filled from the default theme, alias keys resolve to their canonical name, and unknown keys are rejected. The name is, in order of precedence, the `name` argument, the name in the file, or the file's stem; an existing theme of that name is replaced. Loading only registers: apply the theme with `set_theme` or `using_theme`.
-
-Added in Unreleased
 
 Examples:
 
@@ -24977,8 +24759,6 @@ DEFAULT_THEME: StyleAttrs = make_theme({})
 
 The default theme: the package's baseline palette and furniture.
 
-Added in v0.5.0
-
 ### datachart.themes.GREYSCALE_THEME
 
 ```
@@ -25028,8 +24808,6 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
 ```
 
 The greyscale theme: shades of grey for print or colorblind-safe output.
-
-Added in v0.5.0
 
 ### datachart.themes.INK_THEME
 
@@ -25095,8 +24873,6 @@ INK_THEME: StyleAttrs = make_theme(
 
 The ink theme: dark-ink accents, print-ready.
 
-Added in v0.8.0
-
 ### datachart.themes.HATCH_THEME
 
 ```
@@ -25156,8 +24932,6 @@ HATCH_THEME: StyleAttrs = make_theme(
 
 The hatch theme: hatch cycle, black edges, dotted grid.
 
-Added in v0.8.0
-
 ### datachart.themes.MINIMAL_THEME
 
 ```
@@ -25207,8 +24981,6 @@ MINIMAL_THEME: StyleAttrs = make_theme(
 ```
 
 The minimal theme: accent blue, no spines, flat bars.
-
-Added in v0.8.0
 
 ### datachart.themes.MATERIAL_THEME
 
@@ -25260,8 +25032,6 @@ MATERIAL_THEME: StyleAttrs = make_theme(
 
 The material theme: Google palette, light grid.
 
-Added in v0.8.0
-
 ### datachart.themes.SKETCH_THEME
 
 ```
@@ -25309,8 +25079,6 @@ SKETCH_THEME: StyleAttrs = make_theme(
 The sketch theme: hand-drawn, xkcd-style wobble and halo, Comic Neue font.
 
 Paths wobble, lines carry a white halo, spines and lines are thick, the grid is off, and text is set in Comic Neue, which ships with the package; Humor Sans and Comic Sans MS are the fallbacks should the bundled face fail to register.
-
-Added in v0.9.1
 
 ### datachart.themes.QUILL_THEME
 
@@ -25516,8 +25284,6 @@ QUILL_THEME: StyleAttrs = make_theme(
 The quill theme: black ink on white paper, as a quill and an etching needle draw.
 
 One ink only: series differ by line style, marker and etching, never by color. Series lines are broad-nib pen strokes whose width varies along the line, bars, areas and bodies are etched by hand instead of hatched, the furniture wobbles, and text is set in IM Fell English, which ships with the package, titles in its italic.
-
-Added in Unreleased
 
 # Constants Module
 
@@ -25983,10 +25749,6 @@ Examples:
 | `SKETCH`    | The sketch theme (hand-drawn, xkcd-style wobble and halo, Comic Neue font). Equals to "sketch". **TYPE:** `str`                       |
 | `QUILL`     | The quill theme (black ink on white paper: pen-stroked lines, etched fills, IM Fell English font). Equals to "quill". **TYPE:** `str` |
 
-Added in Unreleased
-
-The `QUILL` theme.
-
 ### datachart.constants.EMPHASIS
 
 The supported emphasis roles.
@@ -26061,10 +25823,6 @@ Examples:
 | `OUTSIDE_TOP`    | Above the axes, centered. Equals to "outside top". **TYPE:** `str`             |
 | `OUTSIDE_BOTTOM` | Below the axes, centered. Equals to "outside bottom". **TYPE:** `str`          |
 
-Added in Unreleased
-
-The four `OUTSIDE_*` members.
-
 ## Chart Constants
 
 Constants several charts share.
@@ -26095,8 +25853,6 @@ Examples:
 The supported category sort orders.
 
 Passed as the `sort` setting of the bar-type fronts (`BarChart`, `PyramidChart`, and the `RadialChart` bar visual): the order the categories are drawn in, by value. One order serves every series in the chart, keyed by the total across them or by the series `sort_by` names; ties keep input order.
-
-Added in Unreleased
 
 Examples:
 
@@ -26245,8 +26001,6 @@ The predefined date formats.
 
 Passed as the `xticks_format` or `yticks_format` attribute of a chart whose axis holds datetime values, to label its ticks. Every member but `AUTO` is a `strftime` pattern; any other pattern is accepted as well. On a time axis `AUTO` picks concise, non-repeating labels for the visible span; on a category axis with date labels it prints the ISO date, plus the time when any label carries one.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -26383,8 +26137,6 @@ The supported bump chart ranking rules.
 
 Passed as the `rank_by` setting of the bump chart: whether each series' `y` is already a rank or a value ranked per period, over the series present there. Ties keep input order.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -26405,8 +26157,6 @@ Examples:
 The supported end label positions.
 
 Passed as the `label_position` setting of the bump chart: beside which end of each line its series label prints.
-
-Added in Unreleased
 
 Examples:
 
@@ -26469,8 +26219,6 @@ The supported week start days.
 
 Passed as the `week_start` setting of the calendar heatmap: the weekday drawn in the top row of every week column. The theme's `plot_calendar_heatmap_week_start` supplies the default.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -26489,8 +26237,6 @@ Examples:
 The supported date axis periods.
 
 Passed as the `period` setting of the gantt chart: the calendar period the date axis is divided into. Lines mark the period edges, each period is labelled at its centre, and a second row names the enclosing period.
-
-Added in Unreleased
 
 Examples:
 
@@ -26516,8 +26262,6 @@ The supported gantt chart value labels.
 
 Passed as the `show_values` setting of the gantt chart: what each bar prints past its end. None prints nothing.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -26537,8 +26281,6 @@ Examples:
 The supported gantt chart sort keys.
 
 Passed as the `sort_by` setting of the gantt chart: what a `sort` other than `SORT.NONE` orders the task rows by.
-
-Added in Unreleased
 
 Examples:
 
@@ -26560,8 +26302,6 @@ The supported gantt dependency arrow entries.
 
 Passed as the `plot_gantt_dependency_entry` style attribute of the gantt chart: which side of the dependent task a dependency arrow enters.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -26582,8 +26322,6 @@ The supported dumbbell chart value labels.
 
 Passed as the `show_values` setting of the dumbbell chart: what each record prints. None prints nothing.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -26603,8 +26341,6 @@ Examples:
 The supported dumbbell chart sort keys.
 
 Passed as the `sort_by` setting of the dumbbell chart: what a `sort` other than `SORT.NONE` orders the categories by.
-
-Added in Unreleased
 
 Examples:
 
@@ -26646,8 +26382,6 @@ Examples:
 The supported ridgeline density scales.
 
 Passed as the `normalize` setting of ridgeline plots: whether every ridge is scaled to the same peak height, so their shapes compare, or all ridges share one density scale, so their heights compare.
-
-Added in Unreleased
 
 Examples:
 
@@ -26742,8 +26476,6 @@ The supported node label positions.
 
 Passed as the `label_position` setting of the network chart: where each node's name prints against its marker.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -26764,8 +26496,6 @@ Examples:
 The supported scatter matrix diagonal cells.
 
 Passed as the `diagonal` setting of the scatter matrix: what each dimension's own cell shows.
-
-Added in Unreleased
 
 Examples:
 
@@ -26862,10 +26592,6 @@ Bases: `TypedDict`
 
 The vertical reference line setting, passed to a chart front as `vlines`.
 
-Added in Unreleased
-
-The name `VLineSettingAttrs`; `VLinePlotAttrs` is deprecated.
-
 | ATTRIBUTE | DESCRIPTION                                                     |
 | --------- | --------------------------------------------------------------- |
 | `x`       | The x-axis position of the line. **TYPE:** \`int                |
@@ -26879,10 +26605,6 @@ The name `VLineSettingAttrs`; `VLinePlotAttrs` is deprecated.
 Bases: `TypedDict`
 
 The horizontal reference line setting, passed to a chart front as `hlines`.
-
-Added in Unreleased
-
-The name `HLineSettingAttrs`; `HLinePlotAttrs` is deprecated.
 
 | ATTRIBUTE | DESCRIPTION                                                       |
 | --------- | ----------------------------------------------------------------- |
@@ -26900,8 +26622,6 @@ The vertical reference band setting, passed to a chart front as `vspans`.
 
 A vertical band shades the region between two x-axis positions over the full height of the axes. On a radial chart the bounds are angles in degrees and the band is a wedge over the full radius.
 
-Added in Unreleased
-
 | ATTRIBUTE | DESCRIPTION                                                           |
 | --------- | --------------------------------------------------------------------- |
 | `xmin`    | The lower x-axis bound. Defaults to the axis minimum. **TYPE:** \`int |
@@ -26917,8 +26637,6 @@ The horizontal reference band setting, passed to a chart front as `hspans`.
 
 A horizontal band shades the region between two y-axis positions over the full width of the axes. On a radial chart the bounds are radii and the band is an annulus over the full circle.
 
-Added in Unreleased
-
 | ATTRIBUTE | DESCRIPTION                                                           |
 | --------- | --------------------------------------------------------------------- |
 | `ymin`    | The lower y-axis bound. Defaults to the axis minimum. **TYPE:** \`int |
@@ -26932,10 +26650,6 @@ Bases: `TypedDict`
 
 The text annotation setting, passed to a chart front as `texts`.
 
-Added in Unreleased
-
-The name `TextSettingAttrs`; `TextAttrs` is deprecated.
-
 | ATTRIBUTE | DESCRIPTION                                                                                                                                                                                                                       |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `text`    | The annotation text. **TYPE:** `str`                                                                                                                                                                                              |
@@ -26946,10 +26660,6 @@ The name `TextSettingAttrs`; `TextAttrs` is deprecated.
 | `style`   | The per-text style attributes. **TYPE:** \`TextStyleAttrs                                                                                                                                                                         |
 | `subplot` | The 0-based index, in render order, of the subplot the text lands in. Read only by Annotate on a multi-subplot figure, where every text must name one; chart fronts target subplots with a list of lists instead. **TYPE:** \`int |
 
-Added in Unreleased
-
-The `subplot` attribute.
-
 ### datachart.typings.LegendSettingAttrs
 
 Bases: `TypedDict`
@@ -26957,8 +26667,6 @@ Bases: `TypedDict`
 The per-figure legend setting, passed to a chart front as `legend`.
 
 Every field is optional; a `None` field falls back to the theme's `plot_legend_*` attribute of the same name.
-
-Added in Unreleased
 
 | ATTRIBUTE   | DESCRIPTION                                                                                           |
 | ----------- | ----------------------------------------------------------------------------------------------------- |
@@ -26974,8 +26682,6 @@ Bases: `TypedDict`
 The emphasis rule setting, passed to a chart front as `emphasis_rule`.
 
 Exactly one comparison key: a unit matching it is highlighted and every other unit muted. Each front selects its own unit — a bar, leaf, node, row, cell or bin reads its one value; a group or series reads a summary of its values, chosen by `by`. A unit's explicit `emphasis` role wins.
-
-Added in Unreleased
 
 | ATTRIBUTE | DESCRIPTION                                                                                                                                                                                       |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -26994,10 +26700,6 @@ The per-figure colorbar setting, passed to a chart front as `colorbar`.
 
 Every field is optional. `location` is the control: it places the bar on any edge of the chart. With no `location`, `orientation` derives the edge: vertical means right, horizontal means top. When both are given `location` wins.
 
-Added in Unreleased
-
-The `label`, `location`, `format`, and `ticks` fields, and the name `ColorbarSettingAttrs`.
-
 | ATTRIBUTE     | DESCRIPTION                                                                                                                                                        |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `label`       | The caption beside the bar, reading along it; drawn in the font_ylabel\_\* theme font. **TYPE:** \`str                                                             |
@@ -27015,8 +26717,6 @@ Style groups several charts read from their `style` dictionary: the value labels
 Bases: `TypedDict`
 
 The typing for the value labels: the numbers a chart prints beside its marks when `show_values` is on. One style serves every chart that takes `show_values`; the `plot_bar_value_*` keys of `BarStyleAttrs` are aliases.
-
-Added in Unreleased
 
 | ATTRIBUTE               | DESCRIPTION                                                                                                                                                                    |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -27085,8 +26785,6 @@ Bases: `TypedDict`
 
 The typing for the vertical reference band style.
 
-Added in Unreleased
-
 | ATTRIBUTE               | DESCRIPTION                                                                                |
 | ----------------------- | ------------------------------------------------------------------------------------------ |
 | `plot_vspan_color`      | The fill color of the band. Defaults to the theme's muted color. **TYPE:** \`str           |
@@ -27101,8 +26799,6 @@ Added in Unreleased
 Bases: `TypedDict`
 
 The typing for the horizontal reference band style.
-
-Added in Unreleased
 
 | ATTRIBUTE               | DESCRIPTION                                                                                |
 | ----------------------- | ------------------------------------------------------------------------------------------ |
@@ -27216,10 +26912,6 @@ The typing for the axes style.
 | `axes_spines_color`          | The color of the spines. None keeps matplotlib's. **TYPE:** \`str                                           |
 | `axes_ticks_color`           | The color of the tick marks. None keeps matplotlib's. **TYPE:** \`str                                       |
 
-Added in Unreleased
-
-The `figure_facecolor`, `axes_facecolor`, `axes_spines_color` and `axes_ticks_color` attributes.
-
 ### datachart.typings.LegendStyleAttrs
 
 Bases: `TypedDict`
@@ -27239,10 +26931,6 @@ The typing for the legend style.
 | `plot_legend_ncols`       | The number of legend columns. **TYPE:** \`int                         |
 | `plot_legend_edge_color`  | The legend frame color. None keeps matplotlib's. **TYPE:** \`str      |
 | `plot_legend_face_color`  | The legend background color. None keeps matplotlib's. **TYPE:** \`str |
-
-Added in Unreleased
-
-The `plot_legend_title`, `plot_legend_ncols`, `plot_legend_edge_color` and `plot_legend_face_color` attributes.
 
 ### datachart.typings.GridStyleAttrs
 
@@ -27273,17 +26961,11 @@ The typing for theme-driven defaults and cycles.
 | `plot_linestyle_cycle`              | The line styles assigned per line, bump and radial line series, parallel to the color cycle. An explicit per-chart line style wins. None disables the cycle. **TYPE:** \`list\[LINE_STYLE                                                                                             |
 | `plot_marker_cycle`                 | The markers assigned per scatter and radial scatter series, parallel to the color cycle, and per network node group: a marker, or {"marker": ..., "hollow": True} to draw it as an outline. An explicit per-chart marker wins. None disables the cycle. **TYPE:** \`list\[LINE_MARKER |
 
-Added in Unreleased
-
-The `chart_default_node_label_position`, `plot_linestyle_cycle` and `plot_marker_cycle` attributes.
-
 ### datachart.typings.SketchStyleAttrs
 
 Bases: `TypedDict`
 
 The typing for the sketch attributes: the theme's render-scoped rc-level look (path wobble, halo stroke). The panel snapshots the wobble at build time and applies it inside a scoped matplotlib rc context, so no global rc setting changes; the halo resolves like any style key, so a chart's `style` can override it. Composition keeps the look of the figures it was built from.
-
-Added in v0.9.1
 
 | ATTRIBUTE                | DESCRIPTION                                                                                                                                                                                                                                              |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -27295,8 +26977,6 @@ Added in v0.9.1
 Bases: `TypedDict`
 
 The typing for the ink attributes: marks drawn as a quill and an etching needle would draw them. Every attribute resolves when the chart is built and rides on its artists, so composition keeps the look; `None` turns it off.
-
-Added in Unreleased
 
 | ATTRIBUTE         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

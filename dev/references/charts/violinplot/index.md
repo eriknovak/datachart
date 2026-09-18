@@ -122,8 +122,6 @@ Creates the violin plot.
 
 A violin plot draws the kernel density estimate of each group's numeric distribution as a mirrored profile, showing shape (multimodality, skew, tails) that a box plot hides. Use it to compare distributions across groups when shape matters and each group has enough samples for a density estimate.
 
-Added in v0.9.0
-
 Examples:
 
 ```
@@ -142,10 +140,6 @@ Examples:
 ...     ylabel="Value"
 ... )
 ```
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The `sort` group order.
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -235,10 +229,6 @@ The typing for the violin plot style.
 | `plot_violin_median_color`    | The color of the median dot. **TYPE:** \`str                              |
 | `plot_violin_median_size`     | The size of the median dot. **TYPE:** \`int                               |
 | `plot_violin_hatch`           | The hatch pattern of the body. **TYPE:** \`HATCH_STYLE                    |
-
-Added in Unreleased
-
-The `plot_violin_hatch` attribute.
 
 ## Constants
 

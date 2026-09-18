@@ -31,8 +31,6 @@ DEFAULT_THEME: StyleAttrs = make_theme({})
 
 The default theme: the package's baseline palette and furniture.
 
-Added in v0.5.0
-
 ### datachart.themes.GREYSCALE_THEME
 
 ```
@@ -82,8 +80,6 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
 ```
 
 The greyscale theme: shades of grey for print or colorblind-safe output.
-
-Added in v0.5.0
 
 ### datachart.themes.INK_THEME
 
@@ -149,8 +145,6 @@ INK_THEME: StyleAttrs = make_theme(
 
 The ink theme: dark-ink accents, print-ready.
 
-Added in v0.8.0
-
 ### datachart.themes.HATCH_THEME
 
 ```
@@ -210,8 +204,6 @@ HATCH_THEME: StyleAttrs = make_theme(
 
 The hatch theme: hatch cycle, black edges, dotted grid.
 
-Added in v0.8.0
-
 ### datachart.themes.MINIMAL_THEME
 
 ```
@@ -261,8 +253,6 @@ MINIMAL_THEME: StyleAttrs = make_theme(
 ```
 
 The minimal theme: accent blue, no spines, flat bars.
-
-Added in v0.8.0
 
 ### datachart.themes.MATERIAL_THEME
 
@@ -314,8 +304,6 @@ MATERIAL_THEME: StyleAttrs = make_theme(
 
 The material theme: Google palette, light grid.
 
-Added in v0.8.0
-
 ### datachart.themes.SKETCH_THEME
 
 ```
@@ -363,8 +351,6 @@ SKETCH_THEME: StyleAttrs = make_theme(
 The sketch theme: hand-drawn, xkcd-style wobble and halo, Comic Neue font.
 
 Paths wobble, lines carry a white halo, spines and lines are thick, the grid is off, and text is set in Comic Neue, which ships with the package; Humor Sans and Comic Sans MS are the fallbacks should the bundled face fail to register.
-
-Added in v0.9.1
 
 ### datachart.themes.QUILL_THEME
 
@@ -570,5 +556,3 @@ QUILL_THEME: StyleAttrs = make_theme(
 The quill theme: black ink on white paper, as a quill and an etching needle draw.
 
 One ink only: series differ by line style, marker and etching, never by color. Series lines are broad-nib pen strokes whose width varies along the line, bars, areas and bodies are etched by hand instead of hatched, the furniture wobbles, and text is set in IM Fell English, which ships with the package, titles in its italic.
-
-Added in Unreleased

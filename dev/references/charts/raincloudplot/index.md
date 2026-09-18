@@ -122,12 +122,6 @@ Creates the raincloud plot.
 
 A raincloud plot draws each group as a cloud (a half violin of its density), its rain (the raw observations), and a box (the quartile summary) side by side at one category position, all in the group's palette color. Use it when you want the shape, the summary statistics, and the individual observations in a single view, for example when reporting experimental results per condition. Vertical rainclouds keep the cloud on the right; horizontal ones keep it above.
 
-Added in v0.9.0
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `legend` parameter. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The `show_values` and `value_format` parameters.
-
 Examples:
 
 ```

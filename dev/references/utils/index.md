@@ -60,12 +60,6 @@ Each axis keeps the scale its figures were built with: a figure drawn with `scal
 
 Panel figures nest: `Panel([Panel([f1, f2]), f3])` is equivalent to `Panel([f1, f2, f3])`, to any depth. A nested panel contributes its figures with their per-figure options, axis scales and `bar_mode` intact, while the other panel-level settings (title, labels, limits, ...) always come from the outermost call. Dict options on a nested panel override its per-figure options only when explicitly given.
 
-Added in v0.8.0
-
-Added in Unreleased
-
-The `legend`, `scalex`, `scaley` and `scaley_right` parameters.
-
 Examples:
 
 ```
@@ -171,8 +165,6 @@ Each figure's chart is redrawn into its grid cell. Nested rows define the layout
 
 Grids nest: a Grid figure placed in a cell occupies exactly that cell and rebuilds its internal layout inside it, to any depth. The nested grid keeps its own title (a heading spanning its subgrid) and its own sharex/sharey among its own cells; the outer grid's sharex/sharey applies only to its top-level cells. Panel figures also nest in a cell; the reverse — a Grid figure inside a Panel — stays an error.
 
-Added in v0.8.0
-
 Examples:
 
 ```
@@ -242,12 +234,6 @@ Add text annotations to an already rendered figure.
 Returns a new figure with the annotations riding the figure's chart metadata, styled by the current theme at call time — so they follow themes and survive `Panel` and `Grid` composition. The source figure and its charts are never modified.
 
 Works on chart figures (including polar ones), `Panel` output, and multi-subplot figures (`subplots=True`). On a multi-subplot figure every text names its target with a 0-based `subplot` index in render order; the figure is redrawn with the same subplot layout — each subplot scales on its own, without the source's `sharex`/`sharey`, which a `Grid` cell of the result restores — and the texts ride the per-subplot panels only, so they show in `Grid` cells but not in a `Panel` overlay of the figure. Grid figures are rejected — annotate the sources before composing.
-
-Added in v0.8.0
-
-Added in Unreleased
-
-Multi-subplot figures, targeted per text with the `subplot` index.
 
 Examples:
 
@@ -328,10 +314,6 @@ Examples:
 >>> save_figure(figure, "/path/to/save/chart", format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
 ['/path/to/save/chart.pdf', '/path/to/save/chart.png']
 ```
-
-Added in Unreleased
-
-The list form of `format`, and the returned paths.
 
 | PARAMETER     | DESCRIPTION                                                                                                                                     |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |

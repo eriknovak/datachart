@@ -132,10 +132,6 @@ Examples:
 ... )
 ```
 
-Added in Unreleased
-
-The `show_values`, `value_format` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter.
-
 | PARAMETER         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `data`            | The data points for the histogram(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** \`list[HistDataPointAttrs]                                                                                                                                                                                                                                                         |

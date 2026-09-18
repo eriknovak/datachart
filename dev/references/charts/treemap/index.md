@@ -44,12 +44,6 @@ Creates the treemap.
 
 A treemap tiles part-of-whole data as rectangles whose area is the value — disk usage by folder, a budget by line, population by continent and country. A record's `children` group it, up to four levels deep: a group is a box in its color with a header band, its children inset in a lighter tint. Every level is sorted largest first and tiled so the rectangles stay near square. Use it when the question is how a whole splits; for the values alone, or for more than a handful of small parts, use BarChart.
 
-Added in v0.9.1
-
-Added in Unreleased
-
-The `legend` parameter. The `emphasis_rule` parameter.
-
 Examples:
 
 ```
@@ -146,10 +140,6 @@ The typing for the treemap style.
 | `plot_treemap_highlight_edge_width` | The border width of a highlighted record. **TYPE:** \`float                                                                                                                                                                                                                               |
 | `plot_treemap_label_halo_width`     | The width of the halo, in the axes face color, behind labels; 0 disables it. **TYPE:** \`float                                                                                                                                                                                            |
 | `plot_treemap_etch_density`         | With plot_etch and a hatch cycle, how many times each nesting level repeats its top-level group's pattern, outermost first (a level past the list is blank); every box fills with the axes face so outer etching never shows through. None keeps the colored tiles. **TYPE:** \`list[int] |
-
-Added in Unreleased
-
-The `plot_treemap_etch_density` attribute.
 
 ## Constants
 

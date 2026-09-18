@@ -49,12 +49,6 @@ Creates the parallel coordinates chart.
 
 Parallel coordinates draw each record as a polyline across one vertical axis per dimension. Use it to explore multivariate data: clusters show as bundles of similar lines, and correlations between neighboring dimensions show as parallel or crossing segments. Works best with a handful of dimensions; color the records by group with `hue` to compare groups.
 
-Added in v0.7.0
-
-Added in Unreleased
-
-The `legend` parameter. The `emphasis_rule` parameter.
-
 Examples:
 
 ```

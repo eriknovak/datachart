@@ -52,12 +52,6 @@ A network chart draws relational data as a node-link diagram — module dependen
 
 Every edge is its own patch and the spring layout weighs every pair of nodes, so the chart is meant for networks that can be read, not for whole graphs. Without a problem: up to about 1,000 nodes and 3,000 edges under the spring layout (a few seconds), up to about 5,000 nodes and 15,000 edges under the circular or fixed layout (under a minute). Beyond that the spring layout grows with the square of the node count — 2,000 nodes take half a minute, 5,000 several minutes and gigabytes of memory — and every layout pays a few milliseconds per edge to draw and again to save. Aggregate or filter a larger graph first.
 
-Added in v0.9.1
-
-Added in Unreleased
-
-The `legend` parameter. The `emphasis_rule` parameter. The `label_position` parameter.
-
 Examples:
 
 ```
@@ -182,10 +176,6 @@ The typing for the network chart style.
 | `plot_network_group_alpha`          | The alpha of the disc in the group color behind each cluster of the grouped layout; 0 disables it. **TYPE:** \`float                                                                                                                        |
 | `plot_network_group_linestyle`      | Draws each cluster's mark as a ring in this line style and the edge color instead of a disc. None draws the disc. **TYPE:** \`LINE_STYLE                                                                                                    |
 | `plot_network_edge_ink_stroke`      | The pen the edges are drawn with, as for plot_ink_stroke, plus swell (the pressure swell amplitude) and noise (the grain); a directed edge draws as a stroked shaft with a small head. None draws plain edges. **TYPE:** \`dict[str, float] |
-
-Added in Unreleased
-
-The `plot_network_group_linestyle` and `plot_network_edge_ink_stroke` attributes.
 
 ## Constants
 

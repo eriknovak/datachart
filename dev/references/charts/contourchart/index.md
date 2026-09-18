@@ -128,12 +128,6 @@ Creates the contour chart.
 
 A contour chart draws a surface sampled on a grid — a loss landscape, a 2-D density, a terrain — as iso-lines of equal value, or as filled bands between them. Use it to read the shape of a function of two variables: where its minima and ridges sit and how steeply it changes. Lines overlay on other charts and on each other; fills stand alone, with an optional colorbar. For a per-cell view of a matrix use Heatmap; for the raw points behind a density use ScatterChart.
 
-Added in v0.9.0
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `legend` parameter, and the `label`, `location`, `format`, and `ticks` fields of the `colorbar` setting. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter.
-
 Examples:
 
 ```

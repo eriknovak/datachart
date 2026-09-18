@@ -462,10 +462,6 @@ Examples:
 | `SKETCH`    | The sketch theme (hand-drawn, xkcd-style wobble and halo, Comic Neue font). Equals to "sketch". **TYPE:** `str`                       |
 | `QUILL`     | The quill theme (black ink on white paper: pen-stroked lines, etched fills, IM Fell English font). Equals to "quill". **TYPE:** `str` |
 
-Added in Unreleased
-
-The `QUILL` theme.
-
 ### datachart.constants.EMPHASIS
 
 The supported emphasis roles.
@@ -540,10 +536,6 @@ Examples:
 | `OUTSIDE_TOP`    | Above the axes, centered. Equals to "outside top". **TYPE:** `str`             |
 | `OUTSIDE_BOTTOM` | Below the axes, centered. Equals to "outside bottom". **TYPE:** `str`          |
 
-Added in Unreleased
-
-The four `OUTSIDE_*` members.
-
 ## Chart Constants
 
 Constants several charts share.
@@ -574,8 +566,6 @@ Examples:
 The supported category sort orders.
 
 Passed as the `sort` setting of the bar-type fronts (`BarChart`, `PyramidChart`, and the `RadialChart` bar visual): the order the categories are drawn in, by value. One order serves every series in the chart, keyed by the total across them or by the series `sort_by` names; ties keep input order.
-
-Added in Unreleased
 
 Examples:
 
@@ -724,8 +714,6 @@ The predefined date formats.
 
 Passed as the `xticks_format` or `yticks_format` attribute of a chart whose axis holds datetime values, to label its ticks. Every member but `AUTO` is a `strftime` pattern; any other pattern is accepted as well. On a time axis `AUTO` picks concise, non-repeating labels for the visible span; on a category axis with date labels it prints the ISO date, plus the time when any label carries one.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -862,8 +850,6 @@ The supported bump chart ranking rules.
 
 Passed as the `rank_by` setting of the bump chart: whether each series' `y` is already a rank or a value ranked per period, over the series present there. Ties keep input order.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -884,8 +870,6 @@ Examples:
 The supported end label positions.
 
 Passed as the `label_position` setting of the bump chart: beside which end of each line its series label prints.
-
-Added in Unreleased
 
 Examples:
 
@@ -948,8 +932,6 @@ The supported week start days.
 
 Passed as the `week_start` setting of the calendar heatmap: the weekday drawn in the top row of every week column. The theme's `plot_calendar_heatmap_week_start` supplies the default.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -968,8 +950,6 @@ Examples:
 The supported date axis periods.
 
 Passed as the `period` setting of the gantt chart: the calendar period the date axis is divided into. Lines mark the period edges, each period is labelled at its centre, and a second row names the enclosing period.
-
-Added in Unreleased
 
 Examples:
 
@@ -995,8 +975,6 @@ The supported gantt chart value labels.
 
 Passed as the `show_values` setting of the gantt chart: what each bar prints past its end. None prints nothing.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -1016,8 +994,6 @@ Examples:
 The supported gantt chart sort keys.
 
 Passed as the `sort_by` setting of the gantt chart: what a `sort` other than `SORT.NONE` orders the task rows by.
-
-Added in Unreleased
 
 Examples:
 
@@ -1039,8 +1015,6 @@ The supported gantt dependency arrow entries.
 
 Passed as the `plot_gantt_dependency_entry` style attribute of the gantt chart: which side of the dependent task a dependency arrow enters.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -1061,8 +1035,6 @@ The supported dumbbell chart value labels.
 
 Passed as the `show_values` setting of the dumbbell chart: what each record prints. None prints nothing.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -1082,8 +1054,6 @@ Examples:
 The supported dumbbell chart sort keys.
 
 Passed as the `sort_by` setting of the dumbbell chart: what a `sort` other than `SORT.NONE` orders the categories by.
-
-Added in Unreleased
 
 Examples:
 
@@ -1125,8 +1095,6 @@ Examples:
 The supported ridgeline density scales.
 
 Passed as the `normalize` setting of ridgeline plots: whether every ridge is scaled to the same peak height, so their shapes compare, or all ridges share one density scale, so their heights compare.
-
-Added in Unreleased
 
 Examples:
 
@@ -1221,8 +1189,6 @@ The supported node label positions.
 
 Passed as the `label_position` setting of the network chart: where each node's name prints against its marker.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -1243,8 +1209,6 @@ Examples:
 The supported scatter matrix diagonal cells.
 
 Passed as the `diagonal` setting of the scatter matrix: what each dimension's own cell shows.
-
-Added in Unreleased
 
 Examples:
 

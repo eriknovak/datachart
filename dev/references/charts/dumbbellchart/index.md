@@ -79,8 +79,6 @@ A dumbbell chart shows two values per category: a dot at `start`, a dot at `end`
 
 The rows sit on the category index the box, violin and swarm plots share, so the chart composes with them and with other dumbbell charts in `Panel`, and in `Grid`. Several data lists overlay in distinct colors, each start dot a lighter shade of its end dot.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -153,8 +151,6 @@ Bases: `TypedDict`
 
 The record attributes for the dumbbell chart.
 
-Added in Unreleased
-
 | ATTRIBUTE  | DESCRIPTION                                                                                                             |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `label`    | The category, unique within the chart; the label of its row (or column). **TYPE:** `str`                                |
@@ -173,8 +169,6 @@ Bases: `TypedDict`
 The typing for the dumbbell chart style.
 
 The value labels take the shared `plot_value_*` keys.
-
-Added in Unreleased
 
 | ATTRIBUTE                        | DESCRIPTION                                                                                                                                           |
 | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |

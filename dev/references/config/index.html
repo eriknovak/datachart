@@ -4557,9 +4557,6 @@ to globally customize the chart and plot styles.</p>
 <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.THEME&lt;/span&gt;" href="../constants/#datachart.constants.THEME"><code>THEME</code></a> constants or a name registered with
 <code>register_theme</code>. Use it to switch the look of every chart rendered afterwards;
 call <code>update_config</code> on top for per-attribute tweaks.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in v0.5.0</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -4617,9 +4614,6 @@ call <code>update_config</code> on top for per-attribute tweaks.</p>
     <div class="doc doc-contents ">
 
         <p>Registers a custom theme so it can be applied with <code>set_theme</code>.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in v0.8.1</p>
-</div>
 <p>The theme must define every attribute of the default theme; missing
 keys are filled from it, unknown keys are rejected.</p>
 
@@ -4817,9 +4811,6 @@ inside the block is discarded at exit. Use it for a one-off figure that
 needs a different font or palette without touching the global state.
 The scope is plain save-and-restore on the global configuration: it is
 neither thread-safe nor async-safe.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -4908,9 +4899,6 @@ block are restored, also when the block raises. Any <code>set_theme</code> or
 <code>update_config</code> performed inside the block is discarded at exit. The
 scope is plain save-and-restore on the global configuration: it is
 neither thread-safe nor async-safe.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -4973,9 +4961,6 @@ constants or a registered name.</p>
         <p>Lists the theme names <code>set_theme</code> accepts.</p>
 <p>Returns the predefined themes in declaration order, followed by every
 name added with <code>register_theme</code> or <code>load_theme</code> in registration order.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5035,9 +5020,6 @@ named after its stem. With a name that registered theme is saved
 instead. The file is JSON and carries only the attributes that differ
 from the default theme, so it stays short and reviewable; load it back
 with <code>load_theme</code>. The parent directory must exist.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5148,9 +5130,6 @@ are rejected. The name is, in order of precedence, the <code>name</code>
 argument, the name in the file, or the file's stem; an existing theme
 of that name is replaced. Loading only registers: apply the theme with
 <code>set_theme</code> or <code>using_theme</code>.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>

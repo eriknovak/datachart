@@ -3981,13 +3981,6 @@ figures with their per-figure options, axis scales and <code>bar_mode</code>
 intact, while the other panel-level settings (title, labels, limits, ...)
 always come from the outermost call. Dict options on a nested panel
 override its per-figure options only when explicitly given.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in v0.8.0</p>
-</div>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-<p>The <code>legend</code>, <code>scalex</code>, <code>scaley</code> and <code>scaley_right</code> parameters.</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -4565,9 +4558,6 @@ keeps its own title (a heading spanning its subgrid) and its own
 sharex/sharey among its own cells; the outer grid's sharex/sharey applies
 only to its top-level cells. Panel figures also nest in a cell; the
 reverse — a Grid figure inside a Panel — stays an error.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in v0.8.0</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -4862,13 +4852,6 @@ its own, without the source's <code>sharex</code>/<code>sharey</code>, which a <
 the result restores — and the texts ride the per-subplot panels only, so they show in <code>Grid</code>
 cells but not in a <code>Panel</code> overlay of the figure. Grid figures are
 rejected — annotate the sources before composing.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in v0.8.0</p>
-</div>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-<p>Multi-subplot figures, targeted per text with the <code>subplot</code> index.</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5046,10 +5029,6 @@ supported format, and one file per format is written next to it.
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"/path/to/save/chart"</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="p">[</span><span class="n">FIG_FORMAT</span><span class="o">.</span><span class="n">PDF</span><span class="p">,</span> <span class="n">FIG_FORMAT</span><span class="o">.</span><span class="n">PNG</span><span class="p">])</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">['/path/to/save/chart.pdf', '/path/to/save/chart.png']</span>
 </code></pre></div>
-        <div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-<p>The list form of <code>format</code>, and the returned paths.</p>
-</div>
 
 
 <table>

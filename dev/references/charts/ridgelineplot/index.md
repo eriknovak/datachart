@@ -125,8 +125,6 @@ Creates the ridgeline plot.
 
 A ridgeline plot (joy plot) draws the kernel density estimate of each group's numeric distribution as a ridge on its own row, the rows stacked and partly overlapping, first row at the top. Use it to show how one distribution shifts across many groups in the space a grid of histograms would spend on a few.
 
-Added in Unreleased
-
 Examples:
 
 ```

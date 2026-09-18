@@ -127,8 +127,6 @@ Creates a scatter chart.
 
 Each point is one observation placed by two numeric variables, optionally with a third encoded as marker size. Use it to check whether two variables are related, spot clusters and outliers, and quantify the link with the optional regression line and correlation coefficient. For ordered series use LineChart.
 
-Added in v0.7.0
-
 Examples:
 
 ```
@@ -190,10 +188,6 @@ Examples:
 ...     label="name"
 ... )
 ```
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `show_values`, `value_format`, `value_step` and `legend` parameters. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The per-point `emphasis` key.
 
 | PARAMETER          | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

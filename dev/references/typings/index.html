@@ -4908,10 +4908,6 @@ chart's reference page; the shared ones on the typings page.</p>
 
 
         <p>The vertical reference line setting, passed to a chart front as <code>vlines</code>.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-<p>The name <code>VLineSettingAttrs</code>; <code>VLinePlotAttrs</code> is deprecated.</p>
-</div>
 
 
 <table>
@@ -5042,10 +5038,6 @@ chart's reference page; the shared ones on the typings page.</p>
 
 
         <p>The horizontal reference line setting, passed to a chart front as <code>hlines</code>.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-<p>The name <code>HLineSettingAttrs</code>; <code>HLinePlotAttrs</code> is deprecated.</p>
-</div>
 
 
 <table>
@@ -5179,9 +5171,6 @@ chart's reference page; the shared ones on the typings page.</p>
 <p>A vertical band shades the region between two x-axis positions over the
 full height of the axes. On a radial chart the bounds are angles in
 degrees and the band is a wedge over the full radius.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <table>
@@ -5301,9 +5290,6 @@ degrees and the band is a wedge over the full radius.</p>
 <p>A horizontal band shades the region between two y-axis positions over the
 full width of the axes. On a radial chart the bounds are radii and the
 band is an annulus over the full circle.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <table>
@@ -5420,10 +5406,6 @@ band is an annulus over the full circle.</p>
 
 
         <p>The text annotation setting, passed to a chart front as <code>texts</code>.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-<p>The name <code>TextSettingAttrs</code>; <code>TextAttrs</code> is deprecated.</p>
-</div>
 
 
 <table>
@@ -5540,10 +5522,6 @@ target subplots with a list of lists instead.</p>
           </tr>
       </tbody>
     </table>
-        <div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-<p>The <code>subplot</code> attribute.</p>
-</div>
 
 
 
@@ -5594,9 +5572,6 @@ target subplots with a list of lists instead.</p>
         <p>The per-figure legend setting, passed to a chart front as <code>legend</code>.</p>
 <p>Every field is optional; a <code>None</code> field falls back to the theme's
 <code>plot_legend_*</code> attribute of the same name.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <table>
@@ -5718,9 +5693,6 @@ outside member places the legend beside the axes.</p>
 other unit muted. Each front selects its own unit — a bar, leaf, node,
 row, cell or bin reads its one value; a group or series reads a summary
 of its values, chosen by <code>by</code>. A unit's explicit <code>emphasis</code> role wins.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <table>
@@ -5872,11 +5844,6 @@ to <code>"mean"</code>; a front reading one value per unit rejects it.</p>
 any edge of the chart. With no <code>location</code>, <code>orientation</code> derives the edge:
 vertical means right, horizontal means top. When both are given <code>location</code>
 wins.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-<p>The <code>label</code>, <code>location</code>, <code>format</code>, and <code>ticks</code> fields, and the name
-<code>ColorbarSettingAttrs</code>.</p>
-</div>
 
 
 <table>
@@ -6017,9 +5984,6 @@ the edge when <code>location</code> is unset.</p>
         <p>The typing for the value labels: the numbers a chart prints beside its
 marks when <code>show_values</code> is on. One style serves every chart that takes
 <code>show_values</code>; the <code>plot_bar_value_*</code> keys of <code>BarStyleAttrs</code> are aliases.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <table>
@@ -6628,9 +6592,6 @@ marks when <code>show_values</code> is on. One style serves every chart that tak
 
 
         <p>The typing for the vertical reference band style.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <table>
@@ -6775,9 +6736,6 @@ marks when <code>show_values</code> is on. One style serves every chart that tak
 
 
         <p>The typing for the horizontal reference band style.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <table>
@@ -7966,11 +7924,6 @@ keeps matplotlib's.</p>
           </tr>
       </tbody>
     </table>
-        <div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-<p>The <code>figure_facecolor</code>, <code>axes_facecolor</code>, <code>axes_spines_color</code> and
-<code>axes_ticks_color</code> attributes.</p>
-</div>
 
 
 
@@ -8187,11 +8140,6 @@ keeps matplotlib's.</p>
           </tr>
       </tbody>
     </table>
-        <div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-<p>The <code>plot_legend_title</code>, <code>plot_legend_ncols</code>, <code>plot_legend_edge_color</code>
-and <code>plot_legend_face_color</code> attributes.</p>
-</div>
 
 
 
@@ -8482,11 +8430,6 @@ explicit per-chart marker wins.
           </tr>
       </tbody>
     </table>
-        <div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-<p>The <code>chart_default_node_label_position</code>, <code>plot_linestyle_cycle</code> and
-<code>plot_marker_cycle</code> attributes.</p>
-</div>
 
 
 
@@ -8539,9 +8482,6 @@ look (path wobble, halo stroke). The panel snapshots the wobble at build
 time and applies it inside a scoped matplotlib rc context, so no global rc
 setting changes; the halo resolves like any style key, so a chart's <code>style</code>
 can override it. Composition keeps the look of the figures it was built from.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in v0.9.1</p>
-</div>
 
 
 <table>
@@ -8637,9 +8577,6 @@ and patches stay clean. <code>None</code> or <code>0</code> draws no halo.</p>
         <p>The typing for the ink attributes: marks drawn as a quill and an etching
 needle would draw them. Every attribute resolves when the chart is built and
 rides on its artists, so composition keeps the look; <code>None</code> turns it off.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <table>

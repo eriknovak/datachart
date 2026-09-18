@@ -4816,9 +4816,6 @@ smoothers, and density estimates. Every function takes plain Python lists.</p>
     <div class="doc doc-contents first">
 
         <p>Calculates the sum of all values.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in v0.7.0</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5059,9 +5056,6 @@ smoothers, and density estimates. Every function takes plain Python lists.</p>
 <p>Meant for discrete data, where values repeat; on continuous data every
 value tends to be unique and the mode is just the smallest one. Ties are
 broken by taking the smallest of the most frequent values.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5245,9 +5239,6 @@ broken by taking the smallest of the most frequent values.</p>
     <div class="doc doc-contents first">
 
         <p>Calculates the variance of the values.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in v0.7.0</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5422,9 +5413,6 @@ broken by taking the smallest of the most frequent values.</p>
     <div class="doc doc-contents first">
 
         <p>Calculates the interquartile range (Q3 - Q1).</p>
-<div class="admonition info">
-<p class="admonition-title">Added in v0.7.0</p>
-</div>
 <p>The interquartile range is the difference between the 75th percentile
 (Q3) and the 25th percentile (Q1). It is a measure of statistical
 dispersion and is useful for identifying outliers.</p>
@@ -5509,10 +5497,6 @@ dispersion and is useful for identifying outliers.</p>
         <p>Gets the minimum of the values.</p>
 <p>Numeric values return a float; any other ordered values, such as
 datetimes, return their minimum unchanged.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-<p>Non-numeric values pass through instead of raising.</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5594,10 +5578,6 @@ datetimes, return their minimum unchanged.</p>
         <p>Gets the maximum of the values.</p>
 <p>Numeric values return a float; any other ordered values, such as
 datetimes, return their maximum unchanged.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-<p>Non-numeric values pass through instead of raising.</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5681,9 +5661,6 @@ datetimes, return their maximum unchanged.</p>
 <p>Skewness measures the asymmetry of the distribution: positive when the
 tail extends to the right of the bulk, negative when it extends to the
 left, and zero for a symmetric distribution.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5804,9 +5781,6 @@ left, and zero for a symmetric distribution.</p>
 <p>Kurtosis measures how heavy the tails of the distribution are compared
 to a normal distribution, which scores zero: positive for heavier tails
 and sharper peaks, negative for lighter tails and flatter shapes.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5925,9 +5899,6 @@ and sharper peaks, negative for lighter tails and flatter shapes.</p>
     <div class="doc doc-contents first">
 
         <p>Calculates the Pearson correlation coefficient between two lists.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in v0.7.0</p>
-</div>
 <p>The Pearson correlation coefficient measures the linear relationship
 between two datasets. It ranges from -1 (perfect negative correlation)
 to 1 (perfect positive correlation), with 0 indicating no linear
@@ -6073,9 +6044,6 @@ temporal and numeric values.</p>
 measures any monotone relationship, not only a linear one, and is robust
 to outliers. It ranges from -1 to 1 like <code>correlation</code>, and likewise
 accepts a temporal <code>x</code>.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -6230,9 +6198,6 @@ coefficient of determination <code>r2</code> saying how much of the variation in
 <code>y</code> the line explains (1 is a perfect fit). A temporal <code>x</code> (dates,
 datetimes, or <code>datetime64</code>) is fitted as matplotlib date numbers, so the
 slope is per day and the intercept is relative to matplotlib's date epoch.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -6415,9 +6380,6 @@ temporal and numeric values.</p>
 statistic is computed on each resample, and the interval is the central
 <code>level</code> share of those results (the percentile bootstrap). The half-width
 of the interval is a ready-made error bar for a <code>BarChart</code>.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -6639,9 +6601,6 @@ name such as <code>"auto"</code>, <code>"fd"</code>, <code>"rice"</code>, or <co
 from the data, an integer sets the number of equal-width bins, and a list
 gives the edges explicitly. These rules are unrelated to the
 <code>CONTOUR_LEVELS</code> rules that share their names.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -6794,9 +6753,6 @@ gives the edges explicitly. These rules are unrelated to the
         <p>Smooths the values with a trailing moving average.</p>
 <p>Each output is the mean of the <code>window</code> values ending at that index, so
 the result lines up with the input and is <code>nan</code> until the window fills.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -6935,9 +6891,6 @@ not an integer.</p>
 <code>alpha * value + (1 - alpha) * previous</code>, starting from the first value.
 A larger <code>alpha</code> follows the data more closely; a smaller one smooths
 harder.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -7080,9 +7033,6 @@ list of <code>{x, y}</code> points sorted by <code>x</code>, ready for <code>Lin
 returns. A smaller <code>frac</code> follows the data more closely. A temporal <code>x</code>
 (dates, datetimes, or <code>datetime64</code>) is smoothed as date numbers and the
 curve's <code>x</code> values come back as datetimes, in the input's zone.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in Unreleased</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -7263,9 +7213,6 @@ side so the curve tails off instead of being clipped at the extremes, or
 over an explicit <code>xlim</code> so several curves share one grid. The
 result is a list of <code>{x, y}</code> points ready for <code>LineChart</code>; the curve
 integrates to 1, so it overlays a density <code>Histogram</code> of the same values.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in v0.9.0</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -7471,9 +7418,6 @@ an <code>{x, y, z}</code> chart dict ready for <code>ContourChart</code> — the
 a scattered dataset is <code>ContourChart(kde2d(x, y))</code>. A temporal <code>x</code>
 (dates, datetimes, or <code>datetime64</code>) gives a grid of datetime <code>x</code> values,
 in the input's zone, and <code>xlim</code> may then be a pair of datetimes.</p>
-<div class="admonition info">
-<p class="admonition-title">Added in v0.9.0</p>
-</div>
 
 
 <p><span class="doc-section-title">Examples:</span></p>

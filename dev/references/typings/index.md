@@ -78,10 +78,6 @@ Bases: `TypedDict`
 
 The vertical reference line setting, passed to a chart front as `vlines`.
 
-Added in Unreleased
-
-The name `VLineSettingAttrs`; `VLinePlotAttrs` is deprecated.
-
 | ATTRIBUTE | DESCRIPTION                                                     |
 | --------- | --------------------------------------------------------------- |
 | `x`       | The x-axis position of the line. **TYPE:** \`int                |
@@ -95,10 +91,6 @@ The name `VLineSettingAttrs`; `VLinePlotAttrs` is deprecated.
 Bases: `TypedDict`
 
 The horizontal reference line setting, passed to a chart front as `hlines`.
-
-Added in Unreleased
-
-The name `HLineSettingAttrs`; `HLinePlotAttrs` is deprecated.
 
 | ATTRIBUTE | DESCRIPTION                                                       |
 | --------- | ----------------------------------------------------------------- |
@@ -116,8 +108,6 @@ The vertical reference band setting, passed to a chart front as `vspans`.
 
 A vertical band shades the region between two x-axis positions over the full height of the axes. On a radial chart the bounds are angles in degrees and the band is a wedge over the full radius.
 
-Added in Unreleased
-
 | ATTRIBUTE | DESCRIPTION                                                           |
 | --------- | --------------------------------------------------------------------- |
 | `xmin`    | The lower x-axis bound. Defaults to the axis minimum. **TYPE:** \`int |
@@ -133,8 +123,6 @@ The horizontal reference band setting, passed to a chart front as `hspans`.
 
 A horizontal band shades the region between two y-axis positions over the full width of the axes. On a radial chart the bounds are radii and the band is an annulus over the full circle.
 
-Added in Unreleased
-
 | ATTRIBUTE | DESCRIPTION                                                           |
 | --------- | --------------------------------------------------------------------- |
 | `ymin`    | The lower y-axis bound. Defaults to the axis minimum. **TYPE:** \`int |
@@ -148,10 +136,6 @@ Bases: `TypedDict`
 
 The text annotation setting, passed to a chart front as `texts`.
 
-Added in Unreleased
-
-The name `TextSettingAttrs`; `TextAttrs` is deprecated.
-
 | ATTRIBUTE | DESCRIPTION                                                                                                                                                                                                                       |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `text`    | The annotation text. **TYPE:** `str`                                                                                                                                                                                              |
@@ -162,10 +146,6 @@ The name `TextSettingAttrs`; `TextAttrs` is deprecated.
 | `style`   | The per-text style attributes. **TYPE:** \`TextStyleAttrs                                                                                                                                                                         |
 | `subplot` | The 0-based index, in render order, of the subplot the text lands in. Read only by Annotate on a multi-subplot figure, where every text must name one; chart fronts target subplots with a list of lists instead. **TYPE:** \`int |
 
-Added in Unreleased
-
-The `subplot` attribute.
-
 ### datachart.typings.LegendSettingAttrs
 
 Bases: `TypedDict`
@@ -173,8 +153,6 @@ Bases: `TypedDict`
 The per-figure legend setting, passed to a chart front as `legend`.
 
 Every field is optional; a `None` field falls back to the theme's `plot_legend_*` attribute of the same name.
-
-Added in Unreleased
 
 | ATTRIBUTE   | DESCRIPTION                                                                                           |
 | ----------- | ----------------------------------------------------------------------------------------------------- |
@@ -190,8 +168,6 @@ Bases: `TypedDict`
 The emphasis rule setting, passed to a chart front as `emphasis_rule`.
 
 Exactly one comparison key: a unit matching it is highlighted and every other unit muted. Each front selects its own unit — a bar, leaf, node, row, cell or bin reads its one value; a group or series reads a summary of its values, chosen by `by`. A unit's explicit `emphasis` role wins.
-
-Added in Unreleased
 
 | ATTRIBUTE | DESCRIPTION                                                                                                                                                                                       |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -210,10 +186,6 @@ The per-figure colorbar setting, passed to a chart front as `colorbar`.
 
 Every field is optional. `location` is the control: it places the bar on any edge of the chart. With no `location`, `orientation` derives the edge: vertical means right, horizontal means top. When both are given `location` wins.
 
-Added in Unreleased
-
-The `label`, `location`, `format`, and `ticks` fields, and the name `ColorbarSettingAttrs`.
-
 | ATTRIBUTE     | DESCRIPTION                                                                                                                                                        |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `label`       | The caption beside the bar, reading along it; drawn in the font_ylabel\_\* theme font. **TYPE:** \`str                                                             |
@@ -231,8 +203,6 @@ Style groups several charts read from their `style` dictionary: the value labels
 Bases: `TypedDict`
 
 The typing for the value labels: the numbers a chart prints beside its marks when `show_values` is on. One style serves every chart that takes `show_values`; the `plot_bar_value_*` keys of `BarStyleAttrs` are aliases.
-
-Added in Unreleased
 
 | ATTRIBUTE               | DESCRIPTION                                                                                                                                                                    |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -301,8 +271,6 @@ Bases: `TypedDict`
 
 The typing for the vertical reference band style.
 
-Added in Unreleased
-
 | ATTRIBUTE               | DESCRIPTION                                                                                |
 | ----------------------- | ------------------------------------------------------------------------------------------ |
 | `plot_vspan_color`      | The fill color of the band. Defaults to the theme's muted color. **TYPE:** \`str           |
@@ -317,8 +285,6 @@ Added in Unreleased
 Bases: `TypedDict`
 
 The typing for the horizontal reference band style.
-
-Added in Unreleased
 
 | ATTRIBUTE               | DESCRIPTION                                                                                |
 | ----------------------- | ------------------------------------------------------------------------------------------ |
@@ -432,10 +398,6 @@ The typing for the axes style.
 | `axes_spines_color`          | The color of the spines. None keeps matplotlib's. **TYPE:** \`str                                           |
 | `axes_ticks_color`           | The color of the tick marks. None keeps matplotlib's. **TYPE:** \`str                                       |
 
-Added in Unreleased
-
-The `figure_facecolor`, `axes_facecolor`, `axes_spines_color` and `axes_ticks_color` attributes.
-
 ### datachart.typings.LegendStyleAttrs
 
 Bases: `TypedDict`
@@ -455,10 +417,6 @@ The typing for the legend style.
 | `plot_legend_ncols`       | The number of legend columns. **TYPE:** \`int                         |
 | `plot_legend_edge_color`  | The legend frame color. None keeps matplotlib's. **TYPE:** \`str      |
 | `plot_legend_face_color`  | The legend background color. None keeps matplotlib's. **TYPE:** \`str |
-
-Added in Unreleased
-
-The `plot_legend_title`, `plot_legend_ncols`, `plot_legend_edge_color` and `plot_legend_face_color` attributes.
 
 ### datachart.typings.GridStyleAttrs
 
@@ -489,17 +447,11 @@ The typing for theme-driven defaults and cycles.
 | `plot_linestyle_cycle`              | The line styles assigned per line, bump and radial line series, parallel to the color cycle. An explicit per-chart line style wins. None disables the cycle. **TYPE:** \`list\[LINE_STYLE                                                                                             |
 | `plot_marker_cycle`                 | The markers assigned per scatter and radial scatter series, parallel to the color cycle, and per network node group: a marker, or {"marker": ..., "hollow": True} to draw it as an outline. An explicit per-chart marker wins. None disables the cycle. **TYPE:** \`list\[LINE_MARKER |
 
-Added in Unreleased
-
-The `chart_default_node_label_position`, `plot_linestyle_cycle` and `plot_marker_cycle` attributes.
-
 ### datachart.typings.SketchStyleAttrs
 
 Bases: `TypedDict`
 
 The typing for the sketch attributes: the theme's render-scoped rc-level look (path wobble, halo stroke). The panel snapshots the wobble at build time and applies it inside a scoped matplotlib rc context, so no global rc setting changes; the halo resolves like any style key, so a chart's `style` can override it. Composition keeps the look of the figures it was built from.
-
-Added in v0.9.1
 
 | ATTRIBUTE                | DESCRIPTION                                                                                                                                                                                                                                              |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -511,8 +463,6 @@ Added in v0.9.1
 Bases: `TypedDict`
 
 The typing for the ink attributes: marks drawn as a quill and an etching needle would draw them. Every attribute resolves when the chart is built and rides on its artists, so composition keeps the look; `None` turns it off.
-
-Added in Unreleased
 
 | ATTRIBUTE         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

@@ -61,8 +61,6 @@ A gantt chart shows a schedule: one horizontal bar per task from its start to it
 
 The chart is always horizontal, so the axis parameters are spatial: `xlabel`, `xmin`, `xmax`, and `xticks_format` address the horizontal date axis, and `ylabel` the vertical task axis. It composes in `Grid`, but not in `Panel`.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -130,8 +128,6 @@ Bases: `TypedDict`
 
 The task record attributes for the gantt chart.
 
-Added in Unreleased
-
 | ATTRIBUTE    | DESCRIPTION                                                                                                                                          |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `task`       | The task name, unique within the chart; the label of its row. **TYPE:** `str`                                                                        |
@@ -153,8 +149,6 @@ Bases: `TypedDict`
 The typing for the gantt chart style.
 
 The range bars take the `plot_bar_*` keys (color, alpha, edge, hatch, zorder); these keys set what is specific to a gantt chart.
-
-Added in Unreleased
 
 | ATTRIBUTE                      | DESCRIPTION                                                                                               |
 | ------------------------------ | --------------------------------------------------------------------------------------------------------- |

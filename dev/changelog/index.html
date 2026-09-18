@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#datachart-091-2026-09-07" class="md-skip">
+        <a href="#datachart-0100-2026-09-18" class="md-skip">
           Skip to content
         </a>
       
@@ -3682,6 +3682,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#datachart-0100-2026-09-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        datachart-0.10.0 (2026-09-18)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#datachart-091-2026-09-07" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3950,6 +3961,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#datachart-0100-2026-09-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        datachart-0.10.0 (2026-09-18)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#datachart-091-2026-09-07" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4177,6 +4199,80 @@
 
   <h1>Changelog</h1>
 
+<h3 id="datachart-0100-2026-09-18">datachart-0.10.0 (2026-09-18)</h3>
+<p><strong>Breaking Changes</strong></p>
+<ul>
+<li>Chart-specific constants carry their chart's prefix: <code>BASELINE</code> is now <code>STACKED_AREA_BASELINE</code> and <code>DIRECTION</code> is now <code>RADIAL_DIRECTION</code></li>
+<li>A log axis raises <code>ValueError</code> on data at or below zero instead of silently dropping the points</li>
+<li>Box, violin, swarm, and raincloud groups sit at 0-based positions like bars, so reference lines and annotation targets aimed at a group shift by one</li>
+<li>The <code>MINIMAL</code>, <code>MATERIAL</code>, and <code>HATCH</code> themes no longer show value labels by default</li>
+</ul>
+<p><strong>Deprecations</strong></p>
+<ul>
+<li><code>VLinePlotAttrs</code>, <code>HLinePlotAttrs</code>, <code>TextAttrs</code>, and <code>HeatmapColorbarAttrs</code> are renamed to <code>VLineSettingAttrs</code>, <code>HLineSettingAttrs</code>, <code>TextSettingAttrs</code>, and <code>ColorbarSettingAttrs</code>; the old names warn and are removed in the next release</li>
+<li><code>ChartCommonAttrs</code> warns and is removed in the next release</li>
+</ul>
+<p><strong>New Features</strong></p>
+<ul>
+<li>Added <code>BumpChart</code> with the <code>BUMP_RANK</code> and <code>BUMP_LABEL_POSITION</code> constants</li>
+<li>Added <code>CalendarHeatmap</code> with the <code>CALENDAR_WEEKDAY</code> constant</li>
+<li>Added <code>RidgelinePlot</code> with the <code>RIDGELINE_SCALE</code> constant</li>
+<li>Added <code>GanttChart</code> with periods, group headers, milestones, dependency arrows, and a today marker, plus the <code>GANTT_VALUE</code>, <code>GANTT_SORT_KEY</code>, <code>GANTT_ARROW_ENTRY</code>, and <code>GANTT_DATE_PERIOD</code> constants</li>
+<li>Added <code>DumbbellChart</code> with the <code>DUMBBELL_VALUE</code> and <code>DUMBBELL_SORT_KEY</code> constants</li>
+<li>Added <code>ScatterMatrix</code> with the <code>SCATTER_MATRIX_DIAGONAL</code> constant</li>
+<li>Added the <code>QUILL</code> theme: black ink on white paper with a bundled IM Fell English font, and the ink stroke, etch, hatch cycle, line-style cycle, and marker cycle attributes behind it</li>
+<li>Added <code>NETWORK_LAYOUT.WEIGHTED</code> and <code>NETWORK_LAYOUT.GROUPED</code>, and the <code>NETWORK_LABEL_POSITION</code> constant</li>
+<li>Added <code>figure.show(interactive=True)</code> for zoom, pan, and hover-to-inspect on every chart, behind the <code>datachart[interactive]</code> extra</li>
+<li>Added value labels (<code>show_values</code>, <code>value_format</code>) to line, scatter, histogram, stacked area, box, violin, swarm, and raincloud charts, with a halo behind them</li>
+<li>Added scatter point labels</li>
+<li>Added the per-figure <code>legend</code> setting (title, location, columns, alignment) and the <code>LEGEND_LOCATION.OUTSIDE_*</code> locations</li>
+<li>Added the per-figure <code>colorbar</code> setting with label, four-edge location, format, and ticks</li>
+<li>Added reference bands (<code>vspans</code>, <code>hspans</code>) to every chart that takes reference lines, and to <code>RadialChart</code></li>
+<li>Added a datetime x axis on continuous charts, dated group labels, and the <code>xticks_format</code> / <code>yticks_format</code> settings with the <code>DATE_FORMAT</code> constant</li>
+<li>Added <code>sort</code> and <code>sort_by</code> to bar, pyramid, radial, box, and violin charts with the <code>SORT</code> constant</li>
+<li>Added <code>emphasis_rule</code> to every chart and per-record emphasis on bar, scatter, and swarm records</li>
+<li>Added <code>Panel</code> axis scales (<code>scalex</code>, <code>scaley</code>, <code>scaley_right</code>)</li>
+<li>Added <code>Annotate</code> targeting of a multi-subplot figure's subplots with the <code>subplot</code> index</li>
+<li>Added <code>config.override</code> and <code>config.using_theme</code> context managers, <code>config.list_themes</code>, and JSON theme files through <code>config.save_theme</code> / <code>config.load_theme</code></li>
+<li>Added <code>spearman</code>, <code>mode</code>, <code>skewness</code>, <code>kurtosis</code>, <code>linear_fit</code>, <code>bootstrap_ci</code>, <code>histogram</code>, <code>rolling_mean</code>, <code>ewma</code>, and <code>loess</code> to <code>utils.stats</code>; <code>minimum</code> and <code>maximum</code> accept datetimes and the paired helpers accept a temporal x</li>
+<li><code>save_figure</code> writes several formats in one call and returns the paths written</li>
+<li><code>Treemap</code> nests groups four levels deep, fills a group's box in its own color, and takes one pad for the top-level gap and the gutter</li>
+<li>A plain color string is accepted wherever a palette name is</li>
+<li>Documentation: a landing page, one reference page per chart, chart guides rewritten around real datasets, figures for every constant, and notebooks executed at build time</li>
+</ul>
+<p><strong>Bug Fixes</strong></p>
+<ul>
+<li>Draw reference lines over marks, and filled surfaces under lines in a <code>Panel</code></li>
+<li>Keep every subplot's data inside shared axes and end an axis on the tick its data sits on</li>
+<li>Keep a subplots figure's title, labels, and sharing in a <code>Grid</code> cell</li>
+<li>Draw a subplot in the color a single chart uses</li>
+<li>Hide value labels and marks anchored past a user-set axis limit</li>
+<li>Estimate densities and regressions in log space on a log axis</li>
+<li>Convert text positions through the axis units on a date axis</li>
+<li>Give a covered legend headroom at the value-axis end and draw it over right-axis marks</li>
+<li>Keep an outside-top legend under a grid cell's title and color the legend title like its labels</li>
+<li>List labelled reference lines beside a chart's own legend keys</li>
+<li>Draw one shared reference dict once per axes, and a right-axis figure's references in its own coordinates</li>
+<li><code>Panel</code>: adopt a source figure's bar mode, let a figure with no scale abstain from the axis vote, and raise on a heatmap figure</li>
+<li>Colorbar: reserve room for every aspect-locked bar, keep it in tight saves, keep the axis label beside its ticks, and drop explicit ticks outside the mapped range</li>
+<li>Key treemap and sankey colors by input order</li>
+<li>A single color makes a colormap with both ends; spell <code>Magma</code>, <code>Turbo</code>, and <code>OkabeIto_Black</code> as pypalettes knows them</li>
+<li>Fall back to Liberation Sans where Helvetica and Arial are missing, and take the theme font on heatmap values, contour labels, colorbar ticks, and parallel labels</li>
+<li>Drop the theme edge on markers too small to carry it</li>
+<li>A <code>plot_bar_value_*</code> alias wins over a spread theme's canonical key</li>
+<li>Histogram: pool the observations a point holds in a list, break a step outline where a log axis has no zero, and end a cumulative step outline at its total</li>
+<li>Parallel coordinates: snap a numeric dimension to its enclosing ticks, span the hue ramp over every record, and accept a flat dimensions list or a missing per-set entry</li>
+<li>Radial: place the r tick labels between the first two spokes and let <code>show_grid</code> select which polar grid set draws</li>
+<li>Pyramid: pin the value axis to a user <code>xmax</code> and keep the legend headroom fit symmetric</li>
+<li>Sankey: keep ribbon values off the node bars</li>
+<li>Box and violin: key the subtitle in the legend and raise on a dataset list without subplots</li>
+<li>Swarm: pack overlaid points as one cloud, draw unfilled markers as strokes in the series color, and draw dots whole on an axis end that sits on the data</li>
+<li>Scatter: one bubble size scale per axes</li>
+<li>Contour: fill values beyond an explicit levels list, accept numpy arrays as levels, and explain a filled contour given fewer than two levels</li>
+<li>Hexbin: bin hexagons in the axes' log scale</li>
+<li>Network: lay out disconnected spring graphs component by component and inset the fixed layout by the layout margin</li>
+<li>Annotations: cap the connector's target gap to the mark it names and keep the stub on a connector that still has room</li>
+</ul>
 <h3 id="datachart-091-2026-09-07">datachart-0.9.1 (2026-09-07)</h3>
 <p><strong>New Features</strong></p>
 <ul>

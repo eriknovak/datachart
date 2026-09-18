@@ -54,8 +54,6 @@ Creates the calendar heatmap.
 
 A calendar heatmap draws one cell per day, the weeks as columns and the weekdays as rows, colored by the day's value, with the months separated and labelled. Use it when a daily series has a weekly or seasonal rhythm worth seeing at a glance: commits, sales, steps, rainfall. Data spanning several years draws one calendar per year; for a matrix that is not a calendar, use Heatmap.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -110,8 +108,6 @@ Bases: `TypedDict`
 
 The data attributes for the calendar heatmap.
 
-Added in Unreleased
-
 | ATTRIBUTE | DESCRIPTION                                                                                                                                                              |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `date`    | One temporal object per day: a date, datetime, numpy.datetime64, or pandas Timestamp. Date strings are never parsed, and every date appears once. **TYPE:** \`list\[date |
@@ -126,8 +122,6 @@ Added in Unreleased
 Bases: `TypedDict`
 
 The typing for the calendar heatmap style.
-
-Added in Unreleased
 
 | ATTRIBUTE                                | DESCRIPTION                                                                                                                                   |
 | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |

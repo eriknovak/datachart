@@ -126,12 +126,6 @@ Creates the hexbin chart.
 
 A hexbin chart tiles the plane with hexagons and colors each by the number of points falling in it — or, with a per-point `c`, by an aggregate of those values. Use it where a scatter chart turns into an opaque blob: thousands of points, overlapping clusters, or a value that varies across the plane. For the points themselves use ScatterChart; for a smooth density estimate use ContourChart on stats.kde2d.
 
-Added in v0.9.0
-
-Added in Unreleased
-
-The `xticks_format` and `yticks_format` tick formats. The `label`, `location`, `format`, and `ticks` fields of the `colorbar` setting. The `vspans` and `hspans` reference bands. The `emphasis_rule` parameter. The `show_legend` and `legend` parameters.
-
 Examples:
 
 ```

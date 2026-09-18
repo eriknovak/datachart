@@ -36,8 +36,6 @@ Every pair of numeric dimensions gets a scatter chart, and each dimension's own 
 
 The figure is a grid: it nests inside Grid and cannot be overlaid with Panel.
 
-Added in Unreleased
-
 Examples:
 
 ```
@@ -104,8 +102,6 @@ The record attributes for the scatter matrix.
 
 A dictionary where keys are column names: numeric columns become dimensions, and one categorical column may be named as the `hue`. The same columns can be passed as one dictionary of lists instead.
 
-Added in Unreleased
-
 | ATTRIBUTE | DESCRIPTION                                                                                   |
 | --------- | --------------------------------------------------------------------------------------------- |
 | `hue`     | The category for color grouping, under the column name the hue setting names. **TYPE:** \`str |
@@ -121,8 +117,6 @@ Bases: `TypedDict`
 The typing for the scatter matrix style.
 
 The cells take the scatter, histogram and plot text keys; these keys style what the matrix adds on top of them.
-
-Added in Unreleased
 
 | ATTRIBUTE                                | DESCRIPTION                                                                                                 |
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
