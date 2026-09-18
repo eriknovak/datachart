@@ -9,6 +9,7 @@ import os
 import sys
 
 from jupyter_core.paths import jupyter_runtime_dir
+from jupyter_core.utils import ensure_dir_exists
 
 c = get_config()  # noqa: F821 - injected by the traitlets config loader
 
@@ -17,4 +18,7 @@ if sys.platform != "win32":
     c.KernelManager.transport = "ipc"
     # absolute socket prefix: the kernel runs in the notebook's directory and
     # the client in the repo root, so the relative default never connects
-    c.KernelManager.ip = os.path.join(jupyter_runtime_dir(), "kernel-ipc")
+    runtime_dir = jupyter_runtime_dir()
+    # a fresh CI runner has no runtime dir yet, and zmq will not create it
+    ensure_dir_exists(runtime_dir)
+    c.KernelManager.ip = os.path.join(runtime_dir, "kernel-ipc")
