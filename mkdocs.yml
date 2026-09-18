@@ -13,14 +13,16 @@ exclude_docs: |
   adr/
   agents/
   hooks/
+  overrides/
 
 # fails the build when a nav page is missing from llmstxt sections (ADR 0016)
 hooks:
   - docs/hooks/llmstxt_guard.py
-  - docs/hooks/readme_links.py
 
 theme:
   name: material
+  # home.html: the landing page template (hero and chart marquees)
+  custom_dir: docs/overrides
   features:
     - content.code.copy
     - content.code.annotate
@@ -134,7 +136,8 @@ plugins:
         themes; per-chart overrides go in each chart's `style` parameter.
       sections:
         Getting Started:
-          - index.md: Package overview, installation, and a first example.
+          - index.md: Landing page with a chart gallery, links to the guides and reference, installation, and a first example.
+          - ai-assistants.md: "Pointing an AI coding assistant at these docs: llms.txt and per-page markdown, the Context7 and GitMCP servers, and a project-rules snippet describing the package."
           - how-to-guides/index.md: "Map of the guide sections: charts, composition, styling, utility."
         Charts:
           - how-to-guides/charts/index.md: Map of the chart guides by family, with Panel and Grid support per chart, and the highlighting guide.
@@ -229,6 +232,8 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.emoji:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
       emoji_index: !!python/name:material.extensions.emoji.twemoji
@@ -330,5 +335,6 @@ nav:
     - typings: references/typings.md
 
 
+  - AI Assistants: ai-assistants.md
   - Changelog: changelog.md
   - Development: development.md

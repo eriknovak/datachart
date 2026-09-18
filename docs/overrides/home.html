@@ -1,0 +1,91 @@
+{#- Landing page: hero and chart marquees above the page content, which
+    index.md supplies (cards, install, first chart). Sidebars are hidden
+    through the page's `hide` metadata. -#}
+{% extends "main.html" %}
+
+{% set chart_tiles = [
+  ("line", "Line chart", "how-to-guides/charts/linechart/"),
+  ("bar", "Bar chart", "how-to-guides/charts/barchart/"),
+  ("scatter", "Scatter chart", "how-to-guides/charts/scatterchart/"),
+  ("sankey", "Sankey chart", "how-to-guides/charts/sankeychart/"),
+  ("heatmap", "Heatmap", "how-to-guides/charts/heatmap/"),
+  ("bump", "Bump chart", "how-to-guides/charts/bumpchart/"),
+  ("violin", "Violin plot", "how-to-guides/charts/violinplot/"),
+  ("treemap", "Treemap", "how-to-guides/charts/treemap/"),
+  ("gantt", "Gantt chart", "how-to-guides/charts/ganttchart/"),
+  ("contour", "Contour chart", "how-to-guides/charts/contourchart/"),
+  ("pyramid", "Pyramid chart", "how-to-guides/charts/pyramidchart/"),
+  ("ridgeline", "Ridgeline plot", "how-to-guides/charts/ridgelineplot/"),
+  ("network", "Network chart", "how-to-guides/charts/networkchart/"),
+] %}
+{% set composition_tiles = [
+  ("stackedarea", "Stacked area chart", "how-to-guides/charts/stackedareachart/"),
+  ("histogram", "Histogram", "how-to-guides/charts/histogram/"),
+  ("dumbbell", "Dumbbell chart", "how-to-guides/charts/dumbbellchart/"),
+  ("hexbin", "Hexbin chart", "how-to-guides/charts/hexbinchart/"),
+  ("radial", "Radial chart", "how-to-guides/charts/radialchart/"),
+  ("raincloud", "Raincloud plot", "how-to-guides/charts/raincloudplot/"),
+  ("parallelcoords", "Parallel coordinates", "how-to-guides/charts/parallelcoords/"),
+  ("box", "Box plot", "how-to-guides/charts/boxplot/"),
+  ("swarm", "Swarm plot", "how-to-guides/charts/swarmplot/"),
+  ("scattermatrix", "Scatter matrix", "how-to-guides/charts/scattermatrix/"),
+  ("calendarheatmap", "Calendar heatmap", "how-to-guides/charts/calendarheatmap/"),
+  ("panel", "Panel", "how-to-guides/utility/panel/"),
+  ("grid", "Grid", "how-to-guides/utility/grid/"),
+  ("highlighting", "Highlighting", "how-to-guides/styling/highlighting/"),
+  ("annotate", "Text annotations", "how-to-guides/utility/annotations/"),
+] %}
+
+{% macro marquee(tiles, reverse) %}
+  <div class="dc-marquee">
+    <div class="dc-marquee__track{% if reverse %} dc-marquee__track--reverse{% endif %}">
+      {%- for copy in range(2) %}
+        {%- for slug, name, href in tiles %}
+          <a class="dc-tile" href="{{ href | url }}" title="{{ name }}"{% if copy %} aria-hidden="true" tabindex="-1"{% endif %}>
+            <img src="{{ ('assets/imgs/gallery-' ~ slug ~ '.png') | url }}" alt="{{ name }}">
+            <span class="dc-tile__caption">{{ name }}</span>
+          </a>
+        {%- endfor %}
+      {%- endfor %}
+    </div>
+  </div>
+{% endmacro %}
+
+{% block styles %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ 'css/home.css' | url }}">
+{% endblock %}
+
+{% block tabs %}
+  {{ super() }}
+  <section class="dc-hero md-typeset">
+    <img class="dc-hero__logo" src="{{ 'assets/imgs/logo.png' | url }}" alt="">
+    <h1 class="dc-hero__title">datachart</h1>
+    <p class="dc-hero__tagline">{{ config.site_description }}</p>
+    <p class="dc-hero__lede">
+      Twenty-four chart types, each a single function call on plain lists of dicts.
+      Built on matplotlib, styled by one global theme, composable with Panel and Grid.
+    </p>
+    <div class="dc-hero__actions">
+      <a class="dc-btn dc-btn--primary" href="{{ 'how-to-guides/' | url }}">Get started</a>
+      <a class="dc-btn" href="{{ 'how-to-guides/charts/' | url }}">Browse the charts</a>
+      {#- the copy button mirrors the one Material adds to code blocks inside
+          the content area, which the hero sits outside of -#}
+      <div class="dc-hero__install">
+        <pre id="dc-install"><nav class="md-code__nav"><button class="md-code__button" title="{{ lang.t('clipboard.copy') }}" data-clipboard-target="#dc-install > code" data-md-type="copy"></button></nav><code>pip install datachart</code></pre>
+      </div>
+    </div>
+  </section>
+  <section class="dc-gallery" aria-label="Chart gallery">
+    {{ marquee(chart_tiles, false) }}
+    {{ marquee(composition_tiles, true) }}
+    <p class="dc-gallery__note">
+      Every chart above has a how-to guide. Hover to pause, click to open.
+      <a href="{{ 'how-to-guides/charts/' | url }}">See all chart types</a>
+    </p>
+  </section>
+{% endblock %}
+
+{% block content %}
+  {{ page.content }}
+{% endblock %}
