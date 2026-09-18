@@ -1,3 +1,78 @@
+### datachart-0.10.0 (2026-09-18)
+
+**Breaking Changes**
+
+- Chart-specific constants carry their chart's prefix: `BASELINE` is now `STACKED_AREA_BASELINE` and `DIRECTION` is now `RADIAL_DIRECTION`
+- A log axis raises `ValueError` on data at or below zero instead of silently dropping the points
+- Box, violin, swarm, and raincloud groups sit at 0-based positions like bars, so reference lines and annotation targets aimed at a group shift by one
+- The `MINIMAL`, `MATERIAL`, and `HATCH` themes no longer show value labels by default
+
+**Deprecations**
+
+- `VLinePlotAttrs`, `HLinePlotAttrs`, `TextAttrs`, and `HeatmapColorbarAttrs` are renamed to `VLineSettingAttrs`, `HLineSettingAttrs`, `TextSettingAttrs`, and `ColorbarSettingAttrs`; the old names warn and are removed in the next release
+- `ChartCommonAttrs` warns and is removed in the next release
+
+**New Features**
+
+- Added `BumpChart` with the `BUMP_RANK` and `BUMP_LABEL_POSITION` constants
+- Added `CalendarHeatmap` with the `CALENDAR_WEEKDAY` constant
+- Added `RidgelinePlot` with the `RIDGELINE_SCALE` constant
+- Added `GanttChart` with periods, group headers, milestones, dependency arrows, and a today marker, plus the `GANTT_VALUE`, `GANTT_SORT_KEY`, `GANTT_ARROW_ENTRY`, and `GANTT_DATE_PERIOD` constants
+- Added `DumbbellChart` with the `DUMBBELL_VALUE` and `DUMBBELL_SORT_KEY` constants
+- Added `ScatterMatrix` with the `SCATTER_MATRIX_DIAGONAL` constant
+- Added the `QUILL` theme: black ink on white paper with a bundled IM Fell English font, and the ink stroke, etch, hatch cycle, line-style cycle, and marker cycle attributes behind it
+- Added `NETWORK_LAYOUT.WEIGHTED` and `NETWORK_LAYOUT.GROUPED`, and the `NETWORK_LABEL_POSITION` constant
+- Added `figure.show(interactive=True)` for zoom, pan, and hover-to-inspect on every chart, behind the `datachart[interactive]` extra
+- Added value labels (`show_values`, `value_format`) to line, scatter, histogram, stacked area, box, violin, swarm, and raincloud charts, with a halo behind them
+- Added scatter point labels
+- Added the per-figure `legend` setting (title, location, columns, alignment) and the `LEGEND_LOCATION.OUTSIDE_*` locations
+- Added the per-figure `colorbar` setting with label, four-edge location, format, and ticks
+- Added reference bands (`vspans`, `hspans`) to every chart that takes reference lines, and to `RadialChart`
+- Added a datetime x axis on continuous charts, dated group labels, and the `xticks_format` / `yticks_format` settings with the `DATE_FORMAT` constant
+- Added `sort` and `sort_by` to bar, pyramid, radial, box, and violin charts with the `SORT` constant
+- Added `emphasis_rule` to every chart and per-record emphasis on bar, scatter, and swarm records
+- Added `Panel` axis scales (`scalex`, `scaley`, `scaley_right`)
+- Added `Annotate` targeting of a multi-subplot figure's subplots with the `subplot` index
+- Added `config.override` and `config.using_theme` context managers, `config.list_themes`, and JSON theme files through `config.save_theme` / `config.load_theme`
+- Added `spearman`, `mode`, `skewness`, `kurtosis`, `linear_fit`, `bootstrap_ci`, `histogram`, `rolling_mean`, `ewma`, and `loess` to `utils.stats`; `minimum` and `maximum` accept datetimes and the paired helpers accept a temporal x
+- `save_figure` writes several formats in one call and returns the paths written
+- `Treemap` nests groups four levels deep, fills a group's box in its own color, and takes one pad for the top-level gap and the gutter
+- A plain color string is accepted wherever a palette name is
+- Documentation: a landing page, one reference page per chart, chart guides rewritten around real datasets, figures for every constant, and notebooks executed at build time
+
+**Bug Fixes**
+
+- Draw reference lines over marks, and filled surfaces under lines in a `Panel`
+- Keep every subplot's data inside shared axes and end an axis on the tick its data sits on
+- Keep a subplots figure's title, labels, and sharing in a `Grid` cell
+- Draw a subplot in the color a single chart uses
+- Hide value labels and marks anchored past a user-set axis limit
+- Estimate densities and regressions in log space on a log axis
+- Convert text positions through the axis units on a date axis
+- Give a covered legend headroom at the value-axis end and draw it over right-axis marks
+- Keep an outside-top legend under a grid cell's title and color the legend title like its labels
+- List labelled reference lines beside a chart's own legend keys
+- Draw one shared reference dict once per axes, and a right-axis figure's references in its own coordinates
+- `Panel`: adopt a source figure's bar mode, let a figure with no scale abstain from the axis vote, and raise on a heatmap figure
+- Colorbar: reserve room for every aspect-locked bar, keep it in tight saves, keep the axis label beside its ticks, and drop explicit ticks outside the mapped range
+- Key treemap and sankey colors by input order
+- A single color makes a colormap with both ends; spell `Magma`, `Turbo`, and `OkabeIto_Black` as pypalettes knows them
+- Fall back to Liberation Sans where Helvetica and Arial are missing, and take the theme font on heatmap values, contour labels, colorbar ticks, and parallel labels
+- Drop the theme edge on markers too small to carry it
+- A `plot_bar_value_*` alias wins over a spread theme's canonical key
+- Histogram: pool the observations a point holds in a list, break a step outline where a log axis has no zero, and end a cumulative step outline at its total
+- Parallel coordinates: snap a numeric dimension to its enclosing ticks, span the hue ramp over every record, and accept a flat dimensions list or a missing per-set entry
+- Radial: place the r tick labels between the first two spokes and let `show_grid` select which polar grid set draws
+- Pyramid: pin the value axis to a user `xmax` and keep the legend headroom fit symmetric
+- Sankey: keep ribbon values off the node bars
+- Box and violin: key the subtitle in the legend and raise on a dataset list without subplots
+- Swarm: pack overlaid points as one cloud, draw unfilled markers as strokes in the series color, and draw dots whole on an axis end that sits on the data
+- Scatter: one bubble size scale per axes
+- Contour: fill values beyond an explicit levels list, accept numpy arrays as levels, and explain a filled contour given fewer than two levels
+- Hexbin: bin hexagons in the axes' log scale
+- Network: lay out disconnected spring graphs component by component and inset the fixed layout by the layout margin
+- Annotations: cap the connector's target gap to the mark it names and keep the stub on a connector that still has room
+
 ### datachart-0.9.1 (2026-09-07)
 
 **New Features**
