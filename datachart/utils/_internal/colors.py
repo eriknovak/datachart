@@ -41,12 +41,12 @@ DEFAULT_MAX_COLOR = 5
 # datachart-defined palettes, consulted before pypalettes
 CUSTOM_PALETTES: Dict[str, List[str]] = {
     COLORS.PaperYlGnBu: [
-        "#225EA8",
-        "#7FCDBB",
         "#0C2C84",
-        "#C7E9B4",
-        "#41B6C4",
+        "#7FCDBB",
         "#1D91C0",
+        "#C7E9B4",
+        "#225EA8",
+        "#41B6C4",
     ],
     COLORS.PaperAccent: ["#5B84C4", "#C85450"],
 }

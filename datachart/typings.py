@@ -51,7 +51,7 @@ class ColorStyleAttrs(TypedDict):
     Attributes:
         color_general_singular (Union[COLORS, str, List[str], None]): The colors used where a chart needs one color rather than a series palette: the parallel coords numeric hue ramp and the network node base color (palette name, single color, or list of hex colors).
         color_general_multiple (Union[COLORS, str, List[str], None]): The colors used when the datasets share one coordinate space, which is the default for every chart (palette name, single color, or list of hex colors).
-        color_parallel_hue (Union[COLORS, str, List[str], None]): The color palette for parallel coords hue categories (palette name, single color, or list of hex colors).
+        color_parallel_hue (Union[COLORS, str, List[str], None]): The color palette for parallel coords hue categories (palette name, single color, or list of hex colors); `None` takes `color_general_multiple`.
         color_parallel_hue_continuous (Union[COLORS, str, List[str], None]): The sequential ramp for parallel coords numeric hue columns (palette name, single color, or list of hex colors).
         muted_color (Union[str, None]): The color applied to background-emphasis layers.
         muted_alpha (Union[float, None]): The alpha applied to background-emphasis layers.

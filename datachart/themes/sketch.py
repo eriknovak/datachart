@@ -7,13 +7,20 @@ register_bundled_fonts("ComicNeue-Regular.ttf", "ComicNeue-Bold.ttf")
 
 SKETCH_THEME: StyleAttrs = make_theme(
     {
-        "color_general_singular": COLORS.Blues,
+        # marker-pen tones, vermilion first; green never sits next to red
+        "color_general_singular": COLORS.YlOrRd,
         "color_general_multiple": [
-            "#2E86AB",
             "#E4572E",
-            "#76B041",
+            "#2E86AB",
             "#F5B700",
             "#7E5AAB",
+            "#76B041",
+        ],
+        "color_parallel_hue_continuous": [
+            "#FDD49E",
+            "#FC8D59",
+            "#E4572E",
+            "#99000D",
         ],
         "font_general_family": "sans-serif",
         # the fallbacks only apply when the bundled face fails to register
@@ -36,7 +43,7 @@ SKETCH_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_end_color": "#E4572E",
         "plot_dumbbell_edge_color": "#222222",
         "plot_dumbbell_connector_color": "#8A8A8A",
-        "plot_heatmap_cmap": COLORS.Blues,
+        "plot_heatmap_cmap": COLORS.YlOrRd,
         # a wobbled box around wobbled tiles reads as a second drawing; the
         # band and the pad already mark the group
         "plot_treemap_group_edge_width": 0,

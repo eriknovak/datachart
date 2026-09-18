@@ -4,20 +4,21 @@ from ..constants import LINE_STYLE, COLORS
 
 HATCH_THEME: StyleAttrs = make_theme(
     {
-        "color_general_singular": COLORS.Blues,
+        # muted print tones under black edges and hatches, rust first
+        "color_general_singular": COLORS.YlOrBr,
         "color_general_multiple": [
-            "#5B84C4",
-            "#C85450",
-            "#8C8C8C",
-            "#6C9A78",
-            "#A8C4E8",
-            "#C9A227",
+            "#B5563A",
+            "#4F6D8F",
+            "#D4A64A",
+            "#4E7A5A",
+            "#A6A6A6",
+            "#7B5EA7",
         ],
         "color_parallel_hue_continuous": [
-            "#D3DEF0",
-            "#A8C4E8",
-            "#5B84C4",
-            "#2E4E8F",
+            "#F3E0C3",
+            "#E0AE6A",
+            "#B5563A",
+            "#6B2E1A",
         ],
         "font_general_sansserif": [
             "Helvetica",
@@ -45,10 +46,12 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_text_arrow_color": "#000000",
         "plot_gantt_dependency_color": "#000000",
         "plot_gantt_today_color": "#000000",
+        "plot_dumbbell_start_color": "#4F6D8F",
+        "plot_dumbbell_end_color": "#B5563A",
         "plot_dumbbell_edge_color": "#000000",
         "plot_dumbbell_connector_color": "#8C8C8C",
         "plot_dumbbell_arrow_color": "#000000",
-        "plot_heatmap_cmap": COLORS.Blues,
+        "plot_heatmap_cmap": COLORS.YlOrBr,
         "plot_heatmap_frame_color": "#000000",
         "plot_violin_edgecolor": "#000000",
         "plot_ridgeline_edgecolor": "#000000",
