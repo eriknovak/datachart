@@ -1,3 +1,17 @@
+### datachart-0.10.1 (2026-09-18)
+
+**New Features**
+
+- Added the `HARBOR`, `MUTED`, and `CONTRAST` colour-blind-safe themes
+- Made the `DEFAULT` palette colour-blind safe with a softened Okabe–Ito set closed with charcoal
+- Gave every theme its own lead hue: `MINIMAL` is violet, and `MATERIAL`, `HATCH`, and `SKETCH` no longer share the default blue
+- Added `COLORS.YlOrBr`
+- Scored every theme for colour-blindness suitability in the theme gallery
+
+**Bug Fixes**
+
+- `color_parallel_hue` defaults to `None` and takes `color_general_multiple`, so parallel coords hue categories follow the active theme
+
 ### datachart-0.10.0 (2026-09-18)
 
 **Breaking Changes**
