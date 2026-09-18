@@ -11,6 +11,7 @@
 **Bug Fixes**
 
 - `color_parallel_hue` defaults to `None` and takes `color_general_multiple`, so parallel coords hue categories follow the active theme
+- Heatmap value labels turn white on any dark cell, judged per cell, so colormaps with a dark low end such as Cividis stay readable
 
 ### datachart-0.10.0 (2026-09-18)
 

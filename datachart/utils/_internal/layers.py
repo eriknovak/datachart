@@ -462,8 +462,8 @@ VALUE_HEADROOM_HORIZONTAL = 0.12
 # the marks give up at most this fraction of the axes for it, padded in points
 LEGEND_HEADROOM_MAX = 0.35
 LEGEND_HEADROOM_PAD_PT = 4.0
-# normalized cell value above which heatmap value text switches to white
-HEATMAP_TEXT_CONTRAST_THRESHOLD = 0.55
+# cell luminance below which heatmap value text switches to white
+HEATMAP_TEXT_DARK_LUMINANCE = 0.5
 # the low end of a sequential cmap vanishes on white: iso-lines sample from here
 CONTOUR_LINE_CMAP_START = 0.3
 # the cmap sample that stands in for a cmap-colored contour in the legend
@@ -6093,6 +6093,13 @@ def heatmap_cell_roles(chart: dict, z: list) -> list:
     ]
 
 
+def _luminance(rgba) -> float:
+    """The perceived brightness of a color, 0 (black) to 1 (white)."""
+
+    r, g, b = rgba[:3]
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
 class HeatmapLayer(Layer):
     ticks_at_axis_ends = False
     kind = "heatmap"
@@ -6108,9 +6115,6 @@ class HeatmapLayer(Layer):
         self.heatmap_style = heatmap_style
         self.font_style = get_heatmap_font_style(self.style, self.style_prefix)
         self.edge_style = get_heatmap_edge_style(self.style, self.style_prefix)
-        # white value text only helps when the cmap's high end is actually dark
-        r, g, b = heatmap_style["cmap"](1.0)[:3]
-        self.contrast_values = (0.2126 * r + 0.7152 * g + 0.0722 * b) < 0.5
         self.frame_color = self.style.get(
             "plot_heatmap_frame_color",
             config.get("plot_heatmap_frame_color") or "#000000",
@@ -6256,9 +6260,9 @@ class HeatmapLayer(Layer):
                 font_style = dict(self.font_style)
                 # a faded cell is light whatever its value
                 if (
-                    self.contrast_values
-                    and float(im.norm(value)) > HEATMAP_TEXT_CONTRAST_THRESHOLD
-                    and self.cell_roles[i][j] != EMPHASIS_BACKGROUND
+                    self.cell_roles[i][j] != EMPHASIS_BACKGROUND
+                    and _luminance(im.cmap(im.norm(value)))
+                    < HEATMAP_TEXT_DARK_LUMINANCE
                 ):
                     font_style["color"] = "#FFFFFF"
                 if self.value_etch_steps:
