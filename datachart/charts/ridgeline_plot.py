@@ -128,8 +128,6 @@ def RidgelinePlot(
     distribution shifts across many groups in the space a grid of histograms
     would spend on a few.
 
-    !!! info "Added in Unreleased"
-
     Examples:
         >>> from datachart.charts import RidgelinePlot
         >>> figure = RidgelinePlot(

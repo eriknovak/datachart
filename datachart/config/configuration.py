@@ -84,8 +84,6 @@ class Config:
         `register_theme`. Use it to switch the look of every chart rendered afterwards;
         call `update_config` on top for per-attribute tweaks.
 
-        !!! info "Added in v0.5.0"
-
         Examples:
             >>> from datachart.constants import THEME
             >>> from datachart.config import config
@@ -108,8 +106,6 @@ class Config:
 
     def register_theme(self, name: str, theme: StyleAttrs) -> None:
         """Registers a custom theme so it can be applied with `set_theme`.
-
-        !!! info "Added in v0.8.1"
 
         The theme must define every attribute of the default theme; missing
         keys are filled from it, unknown keys are rejected.
@@ -202,8 +198,6 @@ class Config:
         The scope is plain save-and-restore on the global configuration: it is
         neither thread-safe nor async-safe.
 
-        !!! info "Added in Unreleased"
-
         Examples:
             >>> from datachart.config import config
             >>> with config.override(font_general_size=14):
@@ -234,8 +228,6 @@ class Config:
         scope is plain save-and-restore on the global configuration: it is
         neither thread-safe nor async-safe.
 
-        !!! info "Added in Unreleased"
-
         Examples:
             >>> from datachart.constants import THEME
             >>> from datachart.config import config
@@ -260,8 +252,6 @@ class Config:
         Returns the predefined themes in declaration order, followed by every
         name added with `register_theme` or `load_theme` in registration order.
 
-        !!! info "Added in Unreleased"
-
         Examples:
             >>> from datachart.config import config
             >>> "default" in config.list_themes()
@@ -282,8 +272,6 @@ class Config:
         instead. The file is JSON and carries only the attributes that differ
         from the default theme, so it stays short and reviewable; load it back
         with `load_theme`. The parent directory must exist.
-
-        !!! info "Added in Unreleased"
 
         Examples:
             >>> from datachart.config import config
@@ -333,8 +321,6 @@ class Config:
         argument, the name in the file, or the file's stem; an existing theme
         of that name is replaced. Loading only registers: apply the theme with
         `set_theme` or `using_theme`.
-
-        !!! info "Added in Unreleased"
 
         Examples:
             >>> from datachart.config import config

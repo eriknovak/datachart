@@ -99,9 +99,6 @@ class TestDateFormatConstant(unittest.TestCase):
         self.assertEqual(DATE_FORMAT.DAY, "%d")
         self.assertEqual(DATE_FORMAT.TIME, "%H:%M")
 
-    def test_added_in_admonition(self):
-        self.assertIn('!!! info "Added in Unreleased"', DATE_FORMAT.__doc__)
-
 
 class TestTemporalAxis(unittest.TestCase):
     def tearDown(self):

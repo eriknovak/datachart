@@ -214,10 +214,6 @@ class DatachartFigure(Figure):
         dependencies come with the `interactive` extra:
         `pip install "datachart[interactive]"`.
 
-        !!! info "Added in Unreleased"
-
-            The `interactive` parameter.
-
         Args:
             warn: If True, warn when the backend cannot open a window.
             interactive: If True, display the figure with zoom, pan, and

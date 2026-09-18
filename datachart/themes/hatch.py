@@ -55,6 +55,4 @@ HATCH_THEME: StyleAttrs = make_theme(
     }
 )
 """The hatch theme: hatch cycle, black edges, dotted grid.
-
-!!! info "Added in v0.8.0"
 """

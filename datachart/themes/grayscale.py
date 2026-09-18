@@ -55,6 +55,4 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
     }
 )
 """The greyscale theme: shades of grey for print or colorblind-safe output.
-
-!!! info "Added in v0.5.0"
 """

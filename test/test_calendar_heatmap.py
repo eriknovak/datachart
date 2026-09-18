@@ -158,7 +158,6 @@ class TestCalendarFront(unittest.TestCase):
         import datachart.charts as charts
 
         self.assertIn("CalendarHeatmap", charts.__all__)
-        self.assertIn('!!! info "Added in Unreleased"', CalendarHeatmap.__doc__)
 
     def test_bad_data_shape_raises(self):
         with self.assertRaises(ValueError) as cm:

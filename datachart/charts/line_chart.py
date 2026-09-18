@@ -138,13 +138,6 @@ def LineChart(
         ...     ylabel="Y"
         ... )
 
-    !!! info "Added in Unreleased"
-
-        The `xticks_format` and `yticks_format` tick formats.
-        The `show_values`, `value_format`, `value_step` and `legend` parameters.
-        The `vspans` and `hspans` reference bands.
-        The `emphasis_rule` parameter.
-
     Args:
         data: The data points for the line chart(s). Can be a single list of data points
             for one chart, or a list of lists for multiple charts/subplots.

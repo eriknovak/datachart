@@ -130,17 +130,6 @@ def HexbinChart(
     estimate use [`ContourChart`][datachart.charts.ContourChart] on
     [`stats.kde2d`][datachart.utils.stats.kde2d].
 
-    !!! info "Added in v0.9.0"
-
-    !!! info "Added in Unreleased"
-
-        The `xticks_format` and `yticks_format` tick formats.
-        The `label`, `location`, `format`, and `ticks` fields of the
-        `colorbar` setting.
-        The `vspans` and `hspans` reference bands.
-        The `emphasis_rule` parameter.
-        The `show_legend` and `legend` parameters.
-
     Examples:
         >>> from datachart.charts import HexbinChart
         >>> figure = HexbinChart(

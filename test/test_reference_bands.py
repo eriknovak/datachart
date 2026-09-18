@@ -65,15 +65,14 @@ def band_patches(ax):
 
 
 class TestTypingsAndThemes(unittest.TestCase):
-    def test_typings_exported_and_tagged(self):
+    def test_typings_exported(self):
         for name in (
             "VSpanSettingAttrs",
             "HSpanSettingAttrs",
             "VSpanStyleAttrs",
             "HSpanStyleAttrs",
         ):
-            cls = getattr(typings, name)
-            self.assertIn("Added in Unreleased", cls.__doc__)
+            self.assertTrue(hasattr(typings, name))
         self.assertEqual(
             set(typings.VSpanSettingAttrs.__annotations__),
             {"xmin", "xmax", "style", "label"},

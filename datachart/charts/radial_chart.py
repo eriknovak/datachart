@@ -117,15 +117,6 @@ def RadialChart(
     bar and histogram forms for cyclic categories such as hours, weekdays, or
     compass directions.
 
-    !!! info "Added in v0.8.0"
-
-    !!! info "Added in Unreleased"
-
-        The `legend` parameter.
-        The `vspans` and `hspans` reference bands.
-        The `sort` and `sort_by` category order, the `emphasis_rule`, and
-        the per-record `emphasis` key (bar visual).
-
     Examples:
         >>> from datachart.charts import RadialChart
         >>> figure = RadialChart(

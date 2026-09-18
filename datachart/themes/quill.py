@@ -223,6 +223,4 @@ color. Series lines are broad-nib pen strokes whose width varies along the
 line, bars, areas and bodies are etched by hand instead of hatched, the
 furniture wobbles, and text is set in IM Fell English, which ships with the
 package, titles in its italic.
-
-!!! info "Added in Unreleased"
 """

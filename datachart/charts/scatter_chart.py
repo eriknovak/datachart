@@ -129,8 +129,6 @@ def ScatterChart(
     optional regression line and correlation coefficient. For ordered series
     use [`LineChart`][datachart.charts.LineChart].
 
-    !!! info "Added in v0.7.0"
-
     Examples:
         >>> from datachart.charts import ScatterChart
         >>> # Basic scatter plot
@@ -189,14 +187,6 @@ def ScatterChart(
         ...     ],
         ...     label="name"
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `xticks_format` and `yticks_format` tick formats.
-        The `show_values`, `value_format`, `value_step` and `legend` parameters.
-        The `vspans` and `hspans` reference bands.
-        The `emphasis_rule` parameter.
-        The per-point `emphasis` key.
 
     Args:
         data: The data points for the scatter chart(s). Can be a single list of data points

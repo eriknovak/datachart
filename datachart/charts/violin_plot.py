@@ -126,8 +126,6 @@ def ViolinPlot(
     when shape matters and each group has enough samples for a density
     estimate.
 
-    !!! info "Added in v0.9.0"
-
     Examples:
         >>> from datachart.charts import ViolinPlot
         >>> figure = ViolinPlot(
@@ -143,14 +141,6 @@ def ViolinPlot(
         ...     xlabel="Group",
         ...     ylabel="Value"
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `xticks_format` and `yticks_format` tick formats.
-        The `show_values`, `value_format` and `legend` parameters.
-        The `vspans` and `hspans` reference bands.
-        The `emphasis_rule` parameter.
-        The `sort` group order.
 
     Args:
         data: The data points for the violin plot(s). Can be a single list of data points

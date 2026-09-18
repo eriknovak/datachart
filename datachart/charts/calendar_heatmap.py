@@ -69,8 +69,6 @@ def CalendarHeatmap(
     spanning several years draws one calendar per year; for a matrix that
     is not a calendar, use [`Heatmap`][datachart.charts.Heatmap].
 
-    !!! info "Added in Unreleased"
-
     Examples:
         >>> from datetime import date, timedelta
         >>> from datachart.charts import CalendarHeatmap

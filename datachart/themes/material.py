@@ -41,6 +41,4 @@ MATERIAL_THEME: StyleAttrs = make_theme(
     }
 )
 """The material theme: Google palette, light grid.
-
-!!! info "Added in v0.8.0"
 """

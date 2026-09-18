@@ -150,12 +150,6 @@ class AxesStyleAttrs(TypedDict):
             keeps matplotlib's.
         axes_ticks_color (Union[str, None]): The color of the tick marks. `None`
             keeps matplotlib's.
-
-    !!! info "Added in Unreleased"
-
-        The `figure_facecolor`, `axes_facecolor`, `axes_spines_color` and
-        `axes_ticks_color` attributes.
-
     """
 
     axes_spines_top_visible: Union[bool, None]
@@ -189,12 +183,6 @@ class LegendStyleAttrs(TypedDict):
             `None` keeps matplotlib's.
         plot_legend_face_color (Union[str, None]): The legend background color.
             `None` keeps matplotlib's.
-
-    !!! info "Added in Unreleased"
-
-        The `plot_legend_title`, `plot_legend_ncols`, `plot_legend_edge_color`
-        and `plot_legend_face_color` attributes.
-
     """
 
     plot_legend_shadow: Union[bool, None]
@@ -327,11 +315,6 @@ class SankeyStyleAttrs(TypedDict):
         plot_sankey_link_alpha (Union[float, None]): The ribbon alpha.
         plot_sankey_label_halo_width (Union[float, None]): The width of the halo, in the axes face color, behind labels; 0 disables it.
         plot_sankey_node_fill (Union[bool, None]): Whether the node bars are filled; `False` draws them as outlines.
-
-    !!! info "Added in Unreleased"
-
-        The `plot_sankey_node_fill` attribute.
-
     """
 
     plot_sankey_node_width: Union[float, None]
@@ -358,11 +341,6 @@ class TreemapStyleAttrs(TypedDict):
         plot_treemap_highlight_edge_width (Union[float, None]): The border width of a highlighted record.
         plot_treemap_label_halo_width (Union[float, None]): The width of the halo, in the axes face color, behind labels; 0 disables it.
         plot_treemap_etch_density (Union[List[int], None]): With `plot_etch` and a hatch cycle, how many times each nesting level repeats its top-level group's pattern, outermost first (a level past the list is blank); every box fills with the axes face so outer etching never shows through. `None` keeps the colored tiles.
-
-    !!! info "Added in Unreleased"
-
-        The `plot_treemap_etch_density` attribute.
-
     """
 
     plot_treemap_edge_color: Union[str, None]
@@ -400,12 +378,6 @@ class NetworkStyleAttrs(TypedDict):
         plot_network_group_alpha (Union[float, None]): The alpha of the disc in the group color behind each cluster of the grouped layout; 0 disables it.
         plot_network_group_linestyle (Union[LINE_STYLE, str, None]): Draws each cluster's mark as a ring in this line style and the edge color instead of a disc. `None` draws the disc.
         plot_network_edge_ink_stroke (Union[Dict[str, float], None]): The pen the edges are drawn with, as for `plot_ink_stroke`, plus `swell` (the pressure swell amplitude) and `noise` (the grain); a directed edge draws as a stroked shaft with a small head. `None` draws plain edges.
-
-    !!! info "Added in Unreleased"
-
-        The `plot_network_group_linestyle` and `plot_network_edge_ink_stroke`
-        attributes.
-
     """
 
     plot_network_node_color: Union[str, None]
@@ -468,8 +440,6 @@ class ValueLabelStyleAttrs(TypedDict):
     """The typing for the value labels: the numbers a chart prints beside its
     marks when `show_values` is on. One style serves every chart that takes
     `show_values`; the `plot_bar_value_*` keys of `BarStyleAttrs` are aliases.
-
-    !!! info "Added in Unreleased"
 
     Attributes:
         plot_value_fontsize (Union[int, float, None]): The font size of the value labels.
@@ -553,8 +523,6 @@ class HLineStyleAttrs(TypedDict):
 class VSpanStyleAttrs(TypedDict):
     """The typing for the vertical reference band style.
 
-    !!! info "Added in Unreleased"
-
     Attributes:
         plot_vspan_color (Union[str, None]): The fill color of the band. Defaults to the theme's muted color.
         plot_vspan_alpha (Union[float, None]): The alpha value of the band.
@@ -575,8 +543,6 @@ class VSpanStyleAttrs(TypedDict):
 
 class HSpanStyleAttrs(TypedDict):
     """The typing for the horizontal reference band style.
-
-    !!! info "Added in Unreleased"
 
     Attributes:
         plot_hspan_color (Union[str, None]): The fill color of the band. Defaults to the theme's muted color.
@@ -670,8 +636,6 @@ class GanttStyleAttrs(TypedDict):
     The range bars take the `plot_bar_*` keys (color, alpha, edge, hatch,
     zorder); these keys set what is specific to a gantt chart.
 
-    !!! info "Added in Unreleased"
-
     Attributes:
         plot_gantt_bar_height (Union[int, float, None]): The height of a task bar, as a fraction of its row.
         plot_gantt_progress_color (Union[str, None]): The color of the progress bar; `None` darkens the task bar's color.
@@ -719,8 +683,6 @@ class DumbbellStyleAttrs(TypedDict):
 
     The value labels take the shared `plot_value_*` keys.
 
-    !!! info "Added in Unreleased"
-
     Attributes:
         plot_dumbbell_start_color (Union[str, None]): The color of the start dots; `None` takes the first color of the `PaperAccent` pair.
         plot_dumbbell_end_color (Union[str, None]): The color of the end dots; `None` takes the second color of the `PaperAccent` pair.
@@ -765,8 +727,6 @@ class DumbbellStyleAttrs(TypedDict):
 
 class CalendarHeatmapStyleAttrs(TypedDict):
     """The typing for the calendar heatmap style.
-
-    !!! info "Added in Unreleased"
 
     Attributes:
         plot_calendar_heatmap_cmap (Union[str, List[str], colors.LinearSegmentedColormap, None]): The colormap of the day cells (palette name, single color, list of hex colors, or colormap); `None` takes the heatmap colormap.
@@ -905,11 +865,6 @@ class BoxStyleAttrs(TypedDict):
         plot_xticks_label_rotate (Union[int, float, None]): The label rotation of the xticks.
         plot_yticks_label_rotate (Union[int, float, None]): The label rotation of the yticks.
         plot_box_hatch (Union[HATCH_STYLE, str, None]): The hatch pattern of the box.
-
-    !!! info "Added in Unreleased"
-
-        The `plot_box_hatch` attribute.
-
     """
 
     plot_box_color: Union[str, None]
@@ -968,11 +923,6 @@ class ViolinStyleAttrs(TypedDict):
         plot_violin_median_color (Union[str, None]): The color of the median dot.
         plot_violin_median_size (Union[int, float, None]): The size of the median dot.
         plot_violin_hatch (Union[HATCH_STYLE, str, None]): The hatch pattern of the body.
-
-    !!! info "Added in Unreleased"
-
-        The `plot_violin_hatch` attribute.
-
     """
 
     plot_violin_color: Union[str, None]
@@ -1076,8 +1026,6 @@ class ScatterMatrixStyleAttrs(TypedDict):
     The cells take the scatter, histogram and plot text keys; these keys
     style what the matrix adds on top of them.
 
-    !!! info "Added in Unreleased"
-
     Attributes:
         plot_scatter_matrix_regression_color (Union[str, None]): The color of the regression lines under `show_regression`; `None` takes each hue group's color.
         plot_scatter_matrix_regression_width (Union[int, float, None]): The line width of the regression lines.
@@ -1128,12 +1076,6 @@ class ThemeDefaultAttrs(TypedDict):
             or `{"marker": ..., "hollow": True}` to draw it as an outline. An
             explicit per-chart marker wins.
             `None` disables the cycle.
-
-    !!! info "Added in Unreleased"
-
-        The `chart_default_node_label_position`, `plot_linestyle_cycle` and
-        `plot_marker_cycle` attributes.
-
     """
 
     chart_default_show_grid: Union[SHOW_GRID, str, None]
@@ -1152,8 +1094,6 @@ class SketchStyleAttrs(TypedDict):
     time and applies it inside a scoped matplotlib rc context, so no global rc
     setting changes; the halo resolves like any style key, so a chart's `style`
     can override it. Composition keeps the look of the figures it was built from.
-
-    !!! info "Added in v0.9.1"
 
     Attributes:
         plot_sketch_params (Union[List[float], None]): The path wobble as
@@ -1174,8 +1114,6 @@ class InkStyleAttrs(TypedDict):
     """The typing for the ink attributes: marks drawn as a quill and an etching
     needle would draw them. Every attribute resolves when the chart is built and
     rides on its artists, so composition keeps the look; `None` turns it off.
-
-    !!! info "Added in Unreleased"
 
     Attributes:
         plot_ink_stroke (Union[Dict[str, float], None]): The broad-nib pen the
@@ -1308,10 +1246,6 @@ class _ChartCommonAttrs(TypedDict):
 class VLineSettingAttrs(TypedDict):
     """The vertical reference line setting, passed to a chart front as `vlines`.
 
-    !!! info "Added in Unreleased"
-
-        The name `VLineSettingAttrs`; `VLinePlotAttrs` is deprecated.
-
     Attributes:
         x (Union[int, float]): The x-axis position of the line.
         ymin (Union[int, float, None]): The minimum y-axis position value.
@@ -1330,10 +1264,6 @@ class VLineSettingAttrs(TypedDict):
 
 class HLineSettingAttrs(TypedDict):
     """The horizontal reference line setting, passed to a chart front as `hlines`.
-
-    !!! info "Added in Unreleased"
-
-        The name `HLineSettingAttrs`; `HLinePlotAttrs` is deprecated.
 
     Attributes:
         y (Union[int, float]): The x-axis position of the line.
@@ -1363,8 +1293,6 @@ class VSpanSettingAttrs(TypedDict):
     full height of the axes. On a radial chart the bounds are angles in
     degrees and the band is a wedge over the full radius.
 
-    !!! info "Added in Unreleased"
-
     Attributes:
         xmin (Union[int, float, None]): The lower x-axis bound. Defaults to the axis minimum.
         xmax (Union[int, float, None]): The upper x-axis bound. Defaults to the axis maximum.
@@ -1385,8 +1313,6 @@ class HSpanSettingAttrs(TypedDict):
     A horizontal band shades the region between two y-axis positions over the
     full width of the axes. On a radial chart the bounds are radii and the
     band is an annulus over the full circle.
-
-    !!! info "Added in Unreleased"
 
     Attributes:
         ymin (Union[int, float, None]): The lower y-axis bound. Defaults to the axis minimum.
@@ -1413,8 +1339,6 @@ class LegendSettingAttrs(TypedDict):
     Every field is optional; a `None` field falls back to the theme's
     `plot_legend_*` attribute of the same name.
 
-    !!! info "Added in Unreleased"
-
     Attributes:
         title (Union[str, None]): The legend title; an empty string draws none.
         location (Union[LEGEND_LOCATION, str, None]): The legend location. An
@@ -1437,8 +1361,6 @@ class EmphasisRuleAttrs(TypedDict):
     other unit muted. Each front selects its own unit — a bar, leaf, node,
     row, cell or bin reads its one value; a group or series reads a summary
     of its values, chosen by `by`. A unit's explicit `emphasis` role wins.
-
-    !!! info "Added in Unreleased"
 
     Attributes:
         above (Union[int, float]): Highlight values strictly above this.
@@ -1464,10 +1386,6 @@ class EmphasisRuleAttrs(TypedDict):
 class TextSettingAttrs(TypedDict):
     """The text annotation setting, passed to a chart front as `texts`.
 
-    !!! info "Added in Unreleased"
-
-        The name `TextSettingAttrs`; `TextAttrs` is deprecated.
-
     Attributes:
         text (str): The annotation text.
         x (Union[int, float]): The x-axis position of the text.
@@ -1482,11 +1400,6 @@ class TextSettingAttrs(TypedDict):
             subplot the text lands in. Read only by `Annotate` on a
             multi-subplot figure, where every text must name one; chart fronts
             target subplots with a list of lists instead.
-
-    !!! info "Added in Unreleased"
-
-        The `subplot` attribute.
-
     """
 
     text: str
@@ -1957,11 +1870,6 @@ class ColorbarSettingAttrs(TypedDict):
     vertical means right, horizontal means top. When both are given `location`
     wins.
 
-    !!! info "Added in Unreleased"
-
-        The `label`, `location`, `format`, and `ticks` fields, and the name
-        `ColorbarSettingAttrs`.
-
     Attributes:
         label (Union[str, None]): The caption beside the bar, reading along
             it; drawn in the `font_ylabel_*` theme font.
@@ -2056,8 +1964,6 @@ class HeatmapSingleChartAttrs(TypedDict):
 class CalendarHeatmapDataAttrs(TypedDict):
     """The data attributes for the calendar heatmap.
 
-    !!! info "Added in Unreleased"
-
     Attributes:
         date (List[Union[date, datetime]]): One temporal object per day: a `date`, `datetime`, `numpy.datetime64`, or pandas `Timestamp`. Date strings are never parsed, and every date appears once.
         value (List[Union[int, float, None]]): The value of each day, one per date; `None` leaves the day blank.
@@ -2070,8 +1976,6 @@ class CalendarHeatmapDataAttrs(TypedDict):
 
 class CalendarHeatmapSingleChartAttrs(TypedDict):
     """The single chart attributes for the calendar heatmap.
-
-    !!! info "Added in Unreleased"
 
     Attributes:
         data (CalendarHeatmapDataAttrs): The dated values defining the calendar.
@@ -2107,8 +2011,6 @@ class CalendarHeatmapSingleChartAttrs(TypedDict):
 class GanttTaskAttrs(TypedDict):
     """The task record attributes for the gantt chart.
 
-    !!! info "Added in Unreleased"
-
     Attributes:
         task (str): The task name, unique within the chart; the label of its row.
         start (Union[date, datetime]): When the task starts: a `date`, `datetime`, `numpy.datetime64`, or pandas `Timestamp`. Date strings are never parsed.
@@ -2131,8 +2033,6 @@ class GanttTaskAttrs(TypedDict):
 
 class GanttSingleChartAttrs(TypedDict):
     """The single chart attributes for the gantt chart.
-
-    !!! info "Added in Unreleased"
 
     Attributes:
         data (List[GanttTaskAttrs]): The task records defining one schedule.
@@ -2166,8 +2066,6 @@ class GanttSingleChartAttrs(TypedDict):
 class DumbbellRecordAttrs(TypedDict):
     """The record attributes for the dumbbell chart.
 
-    !!! info "Added in Unreleased"
-
     Attributes:
         label (str): The category, unique within the chart; the label of its row (or column).
         start (Union[int, float]): The value of the start endpoint.
@@ -2184,8 +2082,6 @@ class DumbbellRecordAttrs(TypedDict):
 
 class DumbbellSingleChartAttrs(TypedDict):
     """The single chart attributes for the dumbbell chart.
-
-    !!! info "Added in Unreleased"
 
     Attributes:
         data (List[DumbbellRecordAttrs]): The records defining one set of dumbbells.
@@ -2847,8 +2743,6 @@ class ScatterMatrixDataPointAttrs(TypedDict):
     A dictionary where keys are column names: numeric columns become
     dimensions, and one categorical column may be named as the `hue`. The
     same columns can be passed as one dictionary of lists instead.
-
-    !!! info "Added in Unreleased"
 
     Attributes:
         hue (Optional[str]): The category for color grouping, under the

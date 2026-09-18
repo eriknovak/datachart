@@ -131,16 +131,6 @@ def ContourChart(
     [`Heatmap`][datachart.charts.Heatmap]; for the raw points behind a density
     use [`ScatterChart`][datachart.charts.ScatterChart].
 
-    !!! info "Added in v0.9.0"
-
-    !!! info "Added in Unreleased"
-
-        The `xticks_format` and `yticks_format` tick formats.
-        The `legend` parameter, and the `label`, `location`, `format`, and
-        `ticks` fields of the `colorbar` setting.
-        The `vspans` and `hspans` reference bands.
-        The `emphasis_rule` parameter.
-
     Examples:
         >>> from datachart.charts import ContourChart
         >>> figure = ContourChart(

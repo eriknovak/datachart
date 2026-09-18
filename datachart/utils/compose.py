@@ -246,12 +246,6 @@ def Panel(
     always come from the outermost call. Dict options on a nested panel
     override its per-figure options only when explicitly given.
 
-    !!! info "Added in v0.8.0"
-
-    !!! info "Added in Unreleased"
-
-        The `legend`, `scalex`, `scaley` and `scaley_right` parameters.
-
     Examples:
         >>> from datachart.charts import LineChart, BarChart
         >>> from datachart.utils import Panel
@@ -542,12 +536,6 @@ def Annotate(
     cells but not in a `Panel` overlay of the figure. Grid figures are
     rejected — annotate the sources before composing.
 
-    !!! info "Added in v0.8.0"
-
-    !!! info "Added in Unreleased"
-
-        Multi-subplot figures, targeted per text with the `subplot` index.
-
     Examples:
         >>> from datachart.charts import LineChart
         >>> from datachart.utils import Annotate
@@ -775,8 +763,6 @@ def Grid(
     sharex/sharey among its own cells; the outer grid's sharex/sharey applies
     only to its top-level cells. Panel figures also nest in a cell; the
     reverse — a Grid figure inside a Panel — stays an error.
-
-    !!! info "Added in v0.8.0"
 
     Examples:
         >>> from datachart.charts import LineChart, BarChart, ScatterChart

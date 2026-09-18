@@ -275,8 +275,6 @@ def ScatterMatrix(
     [`Grid`][datachart.utils.Grid] and cannot be overlaid with
     [`Panel`][datachart.utils.Panel].
 
-    !!! info "Added in Unreleased"
-
     Examples:
         >>> from datachart.charts import ScatterMatrix
         >>> figure = ScatterMatrix(

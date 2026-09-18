@@ -123,8 +123,6 @@ def BumpChart(
     for a single period's order use [`BarChart`][datachart.charts.BarChart]
     with `sort`.
 
-    !!! info "Added in Unreleased"
-
     Examples:
         >>> from datachart.charts import BumpChart
         >>> figure = BumpChart(

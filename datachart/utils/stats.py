@@ -44,8 +44,6 @@ def count(values: List[Union[int, float]]) -> int:
 def sum_values(values: List[Union[int, float]]) -> float:
     """Calculates the sum of all values.
 
-    !!! info "Added in v0.7.0"
-
     Examples:
         >>> from datachart.utils.stats import sum_values
         >>> sum_values([1, 2, 3, 4, 5])
@@ -130,8 +128,6 @@ def stdev(values: List[Union[int, float]]) -> float:
 def variance(values: List[Union[int, float]]) -> float:
     """Calculates the variance of the values.
 
-    !!! info "Added in v0.7.0"
-
     Examples:
         >>> from datachart.utils.stats import variance
         >>> variance([1, 2, 3, 4, 5])
@@ -175,8 +171,6 @@ def quantile(values: List[Union[int, float]], q: float) -> float:
 def iqr(values: List[Union[int, float]]) -> float:
     """Calculates the interquartile range (Q3 - Q1).
 
-    !!! info "Added in v0.7.0"
-
     The interquartile range is the difference between the 75th percentile
     (Q3) and the 25th percentile (Q1). It is a measure of statistical
     dispersion and is useful for identifying outliers.
@@ -211,10 +205,6 @@ def minimum(values: List[Any]) -> Any:
     Numeric values return a float; any other ordered values, such as
     datetimes, return their minimum unchanged.
 
-    !!! info "Added in Unreleased"
-
-        Non-numeric values pass through instead of raising.
-
     Examples:
         >>> from datachart.utils.stats import minimum
         >>> minimum([1, 2, 3, 4, 5])
@@ -240,10 +230,6 @@ def maximum(values: List[Any]) -> Any:
     Numeric values return a float; any other ordered values, such as
     datetimes, return their maximum unchanged.
 
-    !!! info "Added in Unreleased"
-
-        Non-numeric values pass through instead of raising.
-
     Examples:
         >>> from datachart.utils.stats import maximum
         >>> maximum([1, 2, 3, 4, 5])
@@ -265,8 +251,6 @@ def maximum(values: List[Any]) -> Any:
 
 def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
     """Calculates the Pearson correlation coefficient between two lists.
-
-    !!! info "Added in v0.7.0"
 
     The Pearson correlation coefficient measures the linear relationship
     between two datasets. It ranges from -1 (perfect negative correlation)
@@ -362,8 +346,6 @@ def spearman(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
     to outliers. It ranges from -1 to 1 like `correlation`, and likewise
     accepts a temporal `x`.
 
-    !!! info "Added in Unreleased"
-
     Examples:
         >>> from datachart.utils.stats import spearman
         >>> round(spearman([1, 2, 3, 4, 5], [1, 4, 9, 16, 25]), 6)
@@ -398,8 +380,6 @@ def mode(values: List[Union[int, float]]) -> float:
     Meant for discrete data, where values repeat; on continuous data every
     value tends to be unique and the mode is just the smallest one. Ties are
     broken by taking the smallest of the most frequent values.
-
-    !!! info "Added in Unreleased"
 
     Examples:
         >>> from datachart.utils.stats import mode
@@ -443,8 +423,6 @@ def skewness(values: List[Union[int, float]]) -> float:
     tail extends to the right of the bulk, negative when it extends to the
     left, and zero for a symmetric distribution.
 
-    !!! info "Added in Unreleased"
-
     Examples:
         >>> from datachart.utils.stats import skewness
         >>> skewness([1, 2, 3, 4, 5])
@@ -471,8 +449,6 @@ def kurtosis(values: List[Union[int, float]]) -> float:
     Kurtosis measures how heavy the tails of the distribution are compared
     to a normal distribution, which scores zero: positive for heavier tails
     and sharper peaks, negative for lighter tails and flatter shapes.
-
-    !!! info "Added in Unreleased"
 
     Examples:
         >>> from datachart.utils.stats import kurtosis
@@ -502,8 +478,6 @@ def linear_fit(
     `y` the line explains (1 is a perfect fit). A temporal `x` (dates,
     datetimes, or `datetime64`) is fitted as matplotlib date numbers, so the
     slope is per day and the intercept is relative to matplotlib's date epoch.
-
-    !!! info "Added in Unreleased"
 
     Examples:
         >>> from datachart.utils.stats import linear_fit
@@ -550,8 +524,6 @@ def bootstrap_ci(
     statistic is computed on each resample, and the interval is the central
     `level` share of those results (the percentile bootstrap). The half-width
     of the interval is a ready-made error bar for a `BarChart`.
-
-    !!! info "Added in Unreleased"
 
     Examples:
         >>> from datachart.utils.stats import bootstrap_ci, median
@@ -620,8 +592,6 @@ def histogram(
     gives the edges explicitly. These rules are unrelated to the
     `CONTOUR_LEVELS` rules that share their names.
 
-    !!! info "Added in Unreleased"
-
     Examples:
         >>> from datachart.utils.stats import histogram
         >>> histogram([1, 2, 2, 3, 3, 3, 4], bins=3)
@@ -658,8 +628,6 @@ def rolling_mean(values: List[Union[int, float]], window: int) -> List[float]:
 
     Each output is the mean of the `window` values ending at that index, so
     the result lines up with the input and is `nan` until the window fills.
-
-    !!! info "Added in Unreleased"
 
     Examples:
         >>> from datachart.utils.stats import rolling_mean
@@ -698,8 +666,6 @@ def ewma(values: List[Union[int, float]], alpha: float) -> List[float]:
     `alpha * value + (1 - alpha) * previous`, starting from the first value.
     A larger `alpha` follows the data more closely; a smaller one smooths
     harder.
-
-    !!! info "Added in Unreleased"
 
     Examples:
         >>> from datachart.utils.stats import ewma
@@ -740,8 +706,6 @@ def loess(
     returns. A smaller `frac` follows the data more closely. A temporal `x`
     (dates, datetimes, or `datetime64`) is smoothed as date numbers and the
     curve's `x` values come back as datetimes, in the input's zone.
-
-    !!! info "Added in Unreleased"
 
     Examples:
         >>> from datachart.utils.stats import loess
@@ -834,8 +798,6 @@ def kde1d(
     result is a list of `{x, y}` points ready for `LineChart`; the curve
     integrates to 1, so it overlays a density `Histogram` of the same values.
 
-    !!! info "Added in v0.9.0"
-
     Examples:
         >>> from datachart.utils.stats import kde1d
         >>> curve = kde1d([1, 2, 2, 3, 3, 3, 4, 4, 5], gridsize=5, cut=0)
@@ -887,8 +849,6 @@ def kde2d(
     a scattered dataset is `ContourChart(kde2d(x, y))`. A temporal `x`
     (dates, datetimes, or `datetime64`) gives a grid of datetime `x` values,
     in the input's zone, and `xlim` may then be a pair of datetimes.
-
-    !!! info "Added in v0.9.0"
 
     Examples:
         >>> from datachart.utils.stats import kde2d

@@ -121,8 +121,6 @@ def BoxPlot(
     needed. For shape use [`ViolinPlot`][datachart.charts.ViolinPlot]; for the raw
     points use [`SwarmPlot`][datachart.charts.SwarmPlot].
 
-    !!! info "Added in v0.7.0"
-
     Examples:
         >>> from datachart.charts import BoxPlot
         >>> figure = BoxPlot(
@@ -138,14 +136,6 @@ def BoxPlot(
         ...     xlabel="Group",
         ...     ylabel="Value"
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `xticks_format` and `yticks_format` tick formats.
-        The `show_values`, `value_format` and `legend` parameters.
-        The `vspans` and `hspans` reference bands.
-        The `emphasis_rule` parameter.
-        The `sort` group order.
 
     Args:
         data: The data points for the box plot(s). Can be a single list of data points

@@ -121,17 +121,6 @@ def SwarmPlot(
     positions). For large samples prefer
     [`ViolinPlot`][datachart.charts.ViolinPlot].
 
-    !!! info "Added in v0.9.0"
-
-    !!! info "Added in Unreleased"
-
-        The `xticks_format` and `yticks_format` tick formats.
-        The `legend` parameter.
-        The `vspans` and `hspans` reference bands.
-        The `emphasis_rule` parameter.
-        The per-point `emphasis` key.
-        The `show_values` and `value_format` parameters.
-
     Examples:
         >>> from datachart.charts import SwarmPlot
         >>> figure = SwarmPlot(

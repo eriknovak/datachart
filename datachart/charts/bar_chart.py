@@ -125,14 +125,6 @@ def BarChart(
     [`LineChart`][datachart.charts.LineChart], for distributions for
     [`Histogram`][datachart.charts.Histogram].
 
-    !!! info "Added in Unreleased"
-
-        The `xticks_format` and `yticks_format` tick formats.
-        The `legend` parameter.
-        The `vspans` and `hspans` reference bands.
-        The `sort` and `sort_by` category order, the `emphasis_rule`, and
-        the per-record `emphasis` key.
-
     Examples:
         >>> from datachart.charts import BarChart
         >>> figure = BarChart(

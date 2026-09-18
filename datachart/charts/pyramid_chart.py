@@ -79,16 +79,6 @@ def PyramidChart(
     spatial: `xlabel`, `xticks`, and `xmax` address the horizontal value axis,
     and `ylabel` the vertical category axis.
 
-    !!! info "Added in v0.8.0"
-
-    !!! info "Added in Unreleased"
-
-        The `xticks_format` and `yticks_format` tick formats.
-        The `legend` parameter.
-        The `vspans` and `hspans` reference bands.
-        The `sort` and `sort_by` category order, the `emphasis_rule`, and
-        the per-record `emphasis` key.
-
     Examples:
         >>> from datachart.charts import PyramidChart
         >>> figure = PyramidChart(

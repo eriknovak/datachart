@@ -68,14 +68,6 @@ def NetworkChart(
     memory — and every layout pays a few milliseconds per edge to draw and
     again to save. Aggregate or filter a larger graph first.
 
-    !!! info "Added in v0.9.1"
-
-    !!! info "Added in Unreleased"
-
-        The `legend` parameter.
-        The `emphasis_rule` parameter.
-        The `label_position` parameter.
-
     Examples:
         >>> from datachart.charts import NetworkChart
         >>> figure = NetworkChart(

@@ -654,10 +654,6 @@ def save_figure(
         >>> save_figure(figure, "/path/to/save/chart", format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
         ['/path/to/save/chart.pdf', '/path/to/save/chart.png']
 
-    !!! info "Added in Unreleased"
-
-        The list form of `format`, and the returned paths.
-
     Args:
         figure: The figure to save.
         path: The path where the figure is saved. A stem when `format` is a list.

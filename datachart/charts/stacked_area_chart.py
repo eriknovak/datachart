@@ -127,8 +127,6 @@ def StackedAreaChart(
     discrete categories use [`BarChart`][datachart.charts.BarChart] with
     `bar_mode="stack"`.
 
-    !!! info "Added in v0.9.0"
-
     Examples:
         >>> from datachart.charts import StackedAreaChart
         >>> figure = StackedAreaChart(
@@ -141,13 +139,6 @@ def StackedAreaChart(
         ...     xlabel="Year",
         ...     ylabel="Visits",
         ... )
-
-    !!! info "Added in Unreleased"
-
-        The `xticks_format` and `yticks_format` tick formats.
-        The `show_values`, `value_format`, `value_step` and `legend` parameters.
-        The `vspans` and `hspans` reference bands.
-        The `emphasis_rule` parameter.
 
     Args:
         data: The data points for the stacked series. A single list of points

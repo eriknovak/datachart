@@ -100,8 +100,6 @@ def DumbbellChart(
     `Panel`, and in `Grid`. Several data lists overlay in distinct colors,
     each start dot a lighter shade of its end dot.
 
-    !!! info "Added in Unreleased"
-
     Examples:
         >>> from datachart.charts import DumbbellChart
         >>> figure = DumbbellChart(

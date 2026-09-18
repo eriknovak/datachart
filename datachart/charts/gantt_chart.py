@@ -88,8 +88,6 @@ def GanttChart(
     axis, and `ylabel` the vertical task axis. It composes in `Grid`, but not
     in `Panel`.
 
-    !!! info "Added in Unreleased"
-
     Examples:
         >>> from datetime import date
         >>> from datachart.charts import GanttChart

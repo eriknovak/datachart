@@ -56,13 +56,6 @@ def ParallelCoords(
     show as parallel or crossing segments. Works best with a handful of
     dimensions; color the records by group with `hue` to compare groups.
 
-    !!! info "Added in v0.7.0"
-
-    !!! info "Added in Unreleased"
-
-        The `legend` parameter.
-        The `emphasis_rule` parameter.
-
     Examples:
         >>> from datachart.charts import ParallelCoords
         >>> figure = ParallelCoords(

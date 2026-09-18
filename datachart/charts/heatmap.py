@@ -79,15 +79,6 @@ def Heatmap(
     the value is what matters; the color scale, colorbar, and cell value labels
     are all configurable.
 
-    !!! info "Added in v0.4.0"
-
-    !!! info "Added in Unreleased"
-
-        The `xticks_format` and `yticks_format` tick formats.
-        The `legend` parameter, and the `label`, `location`, `format`, and
-        `ticks` fields of the `colorbar` setting.
-        The `emphasis_rule` parameter and the per-cell `emphasis` grid of `data`.
-
     Examples:
         >>> from datachart.charts import Heatmap
         >>> figure = Heatmap(

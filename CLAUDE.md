@@ -47,11 +47,6 @@ The docs notebooks execute at build time (`mkdocs-jupyter` with
 cached by notebook content in `.cache/mkdocs-jupyter`; after changing
 `datachart`, delete that directory so `mkdocs serve` re-renders the outputs.
 
-Public fronts, config methods, stats functions, and theme constants carry an
-`!!! info "Added in vX.Y"` admonition in their docstring (charts: after the
-what/when paragraph, before `Examples:`). A new public front gets
-`!!! info "Added in Unreleased"`.
-
 `llms.txt`, `llms-full.txt`, and per-page `.md` endpoints are generated at build
 by the `llmstxt` plugin in mkdocs.yml — never hand-write them. A new guide or
 reference page must be added to the plugin's `sections` config with a
@@ -73,11 +68,9 @@ uv sync --group dev
 python -m build --sdist --wheel --outdir dist/
 ```
 
-Release checklist: bump `__version__`, write the CHANGELOG section, and
-replace every `"Added in Unreleased"` docstring tag with the new version
-(`grep -rn "Added in Unreleased" datachart`). Remove any
-`_DEPRECATED_ALIASES` entry in `datachart/typings.py` that already shipped in
-a release, and the private `_<name>` type behind a `None` entry. Publishing
+Release checklist: bump `__version__` and write the CHANGELOG section. Remove
+any `_DEPRECATED_ALIASES` entry in `datachart/typings.py` that already shipped
+in a release, and the private `_<name>` type behind a `None` entry. Publishing
 the GitHub release then triggers PyPI and the versioned docs.
 
 ## Architecture

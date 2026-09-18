@@ -484,11 +484,6 @@ class LEGEND_LOCATION:
         OUTSIDE_LEFT (str): Beside the left edge, top-aligned. Equals to `"outside left"`.
         OUTSIDE_TOP (str): Above the axes, centered. Equals to `"outside top"`.
         OUTSIDE_BOTTOM (str): Below the axes, centered. Equals to `"outside bottom"`.
-
-    !!! info "Added in Unreleased"
-
-        The four `OUTSIDE_*` members.
-
     """
 
     BEST = "best"
@@ -573,8 +568,6 @@ class SORT:
     categories are drawn in, by value. One order serves every series in the
     chart, keyed by the total across them or by the series `sort_by` names;
     ties keep input order.
-
-    !!! info "Added in Unreleased"
 
     ![SORT at a glance](../assets/imgs/const-sort.svg){ width="100%" }
 
@@ -782,8 +775,6 @@ class CALENDAR_WEEKDAY:
 
     ![CALENDAR_WEEKDAY at a glance](../assets/imgs/const-weekday.svg){ width="100%" }
 
-    !!! info "Added in Unreleased"
-
     Examples:
         >>> from datachart.constants import CALENDAR_WEEKDAY
         >>> CALENDAR_WEEKDAY.MONDAY
@@ -856,8 +847,6 @@ class RIDGELINE_SCALE:
     Passed as the `normalize` setting of ridgeline plots: whether every ridge
     is scaled to the same peak height, so their shapes compare, or all
     ridges share one density scale, so their heights compare.
-
-    !!! info "Added in Unreleased"
 
     ![RIDGELINE_SCALE at a glance](../assets/imgs/const-ridgeline-scale.svg){ width="100%" }
 
@@ -1073,8 +1062,6 @@ class BUMP_RANK:
     `y` is already a rank or a value ranked per period, over the series
     present there. Ties keep input order.
 
-    !!! info "Added in Unreleased"
-
     ![BUMP_RANK at a glance](../assets/imgs/const-rank.svg){ width="100%" }
 
     Examples:
@@ -1102,8 +1089,6 @@ class BUMP_LABEL_POSITION:
     Passed as the `label_position` setting of the bump chart: beside which
     end of each line its series label prints.
 
-    !!! info "Added in Unreleased"
-
     ![BUMP_LABEL_POSITION at a glance](../assets/imgs/const-label-position.svg){ width="100%" }
 
     Examples:
@@ -1130,8 +1115,6 @@ class NETWORK_LABEL_POSITION:
 
     Passed as the `label_position` setting of the network chart: where each
     node's name prints against its marker.
-
-    !!! info "Added in Unreleased"
 
     ![NETWORK_LABEL_POSITION at a glance](../assets/imgs/const-network-label-position.svg){ width="100%" }
 
@@ -1163,8 +1146,6 @@ class GANTT_VALUE:
     Passed as the `show_values` setting of the gantt chart: what each bar
     prints past its end. None prints nothing.
 
-    !!! info "Added in Unreleased"
-
     ![GANTT_VALUE at a glance](../assets/imgs/const-gantt-value.svg){ width="100%" }
 
     Examples:
@@ -1189,8 +1170,6 @@ class GANTT_SORT_KEY:
 
     Passed as the `sort_by` setting of the gantt chart: what a `sort` other
     than `SORT.NONE` orders the task rows by.
-
-    !!! info "Added in Unreleased"
 
     ![GANTT_SORT_KEY at a glance](../assets/imgs/const-gantt-sort-key.svg){ width="100%" }
 
@@ -1217,8 +1196,6 @@ class GANTT_ARROW_ENTRY:
 
     Passed as the `plot_gantt_dependency_entry` style attribute of the gantt
     chart: which side of the dependent task a dependency arrow enters.
-
-    !!! info "Added in Unreleased"
 
     ![GANTT_ARROW_ENTRY at a glance](../assets/imgs/const-gantt-arrow-entry.svg){ width="100%" }
 
@@ -1247,8 +1224,6 @@ class DUMBBELL_VALUE:
     Passed as the `show_values` setting of the dumbbell chart: what each
     record prints. None prints nothing.
 
-    !!! info "Added in Unreleased"
-
     ![DUMBBELL_VALUE at a glance](../assets/imgs/const-dumbbell-value.svg){ width="100%" }
 
     Examples:
@@ -1276,8 +1251,6 @@ class DUMBBELL_SORT_KEY:
     Passed as the `sort_by` setting of the dumbbell chart: what a `sort`
     other than `SORT.NONE` orders the categories by.
 
-    !!! info "Added in Unreleased"
-
     ![DUMBBELL_SORT_KEY at a glance](../assets/imgs/const-dumbbell-sort-key.svg){ width="100%" }
 
     Examples:
@@ -1304,8 +1277,6 @@ class SCATTER_MATRIX_DIAGONAL:
 
     Passed as the `diagonal` setting of the scatter matrix: what each
     dimension's own cell shows.
-
-    !!! info "Added in Unreleased"
 
     ![SCATTER_MATRIX_DIAGONAL at a glance](../assets/imgs/const-diagonal.svg){ width="100%" }
 
@@ -1336,8 +1307,6 @@ class GANTT_DATE_PERIOD:
     Passed as the `period` setting of the gantt chart: the calendar period
     the date axis is divided into. Lines mark the period edges, each period
     is labelled at its centre, and a second row names the enclosing period.
-
-    !!! info "Added in Unreleased"
 
     ![GANTT_DATE_PERIOD at a glance](../assets/imgs/const-date-period.svg){ width="100%" }
 
@@ -1467,8 +1436,6 @@ class DATE_FORMAT:
     span; on a category axis with date labels it prints the ISO date, plus
     the time when any label carries one.
 
-    !!! info "Added in Unreleased"
-
     ![DATE_FORMAT at a glance](../assets/imgs/const-date-format.svg){ width="100%" }
 
     Examples:
@@ -1520,11 +1487,6 @@ class THEME:
             Comic Neue font). Equals to `"sketch"`.
         QUILL (str): The quill theme (black ink on white paper: pen-stroked lines,
             etched fills, IM Fell English font). Equals to `"quill"`.
-
-    !!! info "Added in Unreleased"
-
-        The `QUILL` theme.
-
     """
 
     DEFAULT = "default"
