@@ -20,33 +20,68 @@ themes; per-chart overrides go in each chart's `style` parameter.
 
 # Getting Started
 
-*Data visualization package, simple to use, highly customizable*
+Documentation
 
-[**Documentation**](https://eriknovak.github.io/datachart) · [**How-to Guides**](https://eriknovak.github.io/datachart/latest/how-to-guides/) · [**API Reference**](https://eriknovak.github.io/datachart/latest/references/) · [**Source**](https://github.com/eriknovak/datachart)
+## Find your way around
 
-______________________________________________________________________
+Start with a guide, look things up in the reference, or point your AI assistant at the docs.
 
-The datachart package is a python package for creating data visualizations, built on top of [matplotlib](https://matplotlib.org/). It is designed to be simple to use and highly customizable, i.e. it is easy to change the look and feel of the charts.
+\[### How-to guides
 
-**Features:**
+Every chart type, composition with Panel and Grid, styling, and the utilities, each a runnable notebook on real data.
 
-- **Charts.** Chart types for trends, comparisons, distributions, relationships, and flows — each created with a single function call from plain lists of dicts. See [Charts](#charts).
-- **Composition.** Combine rendered charts with `Panel` (overlay charts on a single plot, with optional dual y-axes) and `Grid` (arrange charts in a grid; grids nest). See [Composition](#composition).
-- **Themes & configuration.** Predefined themes, each named for its visual trait, plus a global `config` for tweaking any style attribute — per-chart `style` overrides included. See [Themes](#themes).
+Open the guides →\](https://eriknovak.github.io/datachart/dev/how-to-guides/index.md) \[### API reference
 
-## Quick start
+Signatures and attribute tables for the charts, utils, config, themes, constants, and typings modules.
+
+Browse the reference →\](https://eriknovak.github.io/datachart/dev/references/index.md) \[### Themes and styling
+
+Seven predefined themes, the global config, colormaps, and emphasis for the series that matters.
+
+See the theme gallery →\](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) \[### Composition
+
+Overlay charts on one axes with Panel, or lay them out with Grid. Grids nest.
+
+Compose figures →\](https://eriknovak.github.io/datachart/dev/how-to-guides/composition/index.md) \[### AI assistants
+
+llms.txt, per-page markdown, and MCP servers, so a coding assistant writes datachart code from the current docs.
+
+Point your assistant here →\](https://eriknovak.github.io/datachart/dev/ai-assistants/index.md) \[### Source and changelog
+
+Bug reports, feature requests, and pull requests are welcome on GitHub.
+
+Go to the repository →\](https://github.com/eriknovak/datachart)
+
+Install
+
+## Two commands, Python 3.10 or higher
+
+Install from PyPI with pip or uv. Add the `interactive` extra for zoom, pan, and hover-to-inspect.
 
 ```
-pip install datachart   # or: uv add datachart
+pip install -U datachart
 ```
 
-Every chart takes a list of series, each a list of dicts. Set a theme once and every chart follows it:
+```
+uv add datachart
+```
+
+```
+pip install -U "datachart[interactive]"
+```
+
+Every chart returns a plain matplotlib `Figure`, so anything matplotlib can do with it still works. See [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) and [Interactive Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/interactive/index.md).
+
+First chart
+
+## A line chart in one call
+
+Every chart takes a list of series, each a list of dicts. Set a theme once and every chart follows it.
 
 ```
 from datachart.charts import LineChart
 from datachart.config import config
 from datachart.constants import THEME
-from datachart.utils import save_figure
 
 config.set_theme(THEME.INK)
 
@@ -67,123 +102,108 @@ figure = LineChart(
     xticklabels=months,
     show_legend=True,
 )
-save_figure(figure, "line.png")
 ```
 
-`figure` is a plain matplotlib `Figure`, so anything matplotlib can do with it still works.
+# AI Assistants
 
-## Charts
+A coding assistant writes better `datachart` code when it reads the current documentation instead of recalling an older release: chart types, parameters, and constants change between versions, and a guessed keyword argument fails at runtime. The site is published in formats made for that. This page shows how to hand the docs to an assistant, from a link pasted into a prompt to a server the assistant queries on its own, and ends with a rules snippet that tells it how the package is meant to be used.
 
-Every chart is a single function call taking plain lists of dicts, and every function accepts a list of series to overlay or a `subplots=True` flag to split them apart. The dict keys per chart are listed in each guide.
+## What the site publishes
 
-| Family            | Charts                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Use for                                                                                                           |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **Trends**        | [LineChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/linechart/), [StackedAreaChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/stackedareachart/), [BumpChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/bumpchart/)                                                                                                                                                                                                                                                                                                                                                                                                   | values over an ordered axis; area for part-of-whole over time; rank over time                                     |
-| **Comparisons**   | [BarChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/barchart/), [PyramidChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/pyramidchart/), [RadialChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/radialchart/), [CalendarHeatmap](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/calendarheatmap/), [GanttChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/ganttchart/), [DumbbellChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/dumbbellchart/)                                                                                                  | category totals, paired populations, cyclic/periodic values, daily rhythm, schedules, before/after change         |
-| **Distributions** | [Histogram](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/histogram/), [BoxPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/boxplot/), [ViolinPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/violinplot/), [SwarmPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/swarmplot/), [RaincloudPlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/raincloudplot/), [RidgelinePlot](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/ridgelineplot/)                                                                                                                  | shape and spread of one variable, per group; many groups stacked in ridges                                        |
-| **Relationships** | [ScatterChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/scatterchart/), [Heatmap](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/heatmap/), [ContourChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/contourchart/), [HexbinChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/hexbinchart/), [ParallelCoords](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/parallelcoords/), [NetworkChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/networkchart/), [ScatterMatrix](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/scattermatrix/) | two-variable correlation, matrices, dense 2-D density, many dimensions, who is linked to whom, every pair at once |
-| **Flows**         | [SankeyChart](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/sankeychart/)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | quantities moving between stages                                                                                  |
-| **Proportions**   | [Treemap](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/treemap/)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | how a whole splits into parts, grouped up to four levels deep                                                     |
+Every build of the documentation writes three machine-readable views next to the pages:
 
-## Composition
+| View      | URL                                                                         | What it holds                                                                                                                                                            |
+| --------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Index     | [llms.txt](https://eriknovak.github.io/datachart/latest/llms.txt)           | Every page with a one-line description, grouped by section. Small enough to paste.                                                                                       |
+| Full text | [llms-full.txt](https://eriknovak.github.io/datachart/latest/llms-full.txt) | The whole site in one file: guide prose, code, and the API reference.                                                                                                    |
+| Per page  | append `index.md` to a page URL                                             | The page as plain markdown, for example [how-to-guides/charts/linechart/index.md](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/linechart/index.md). |
 
-Rendered figures compose. [`Grid`](https://eriknovak.github.io/datachart/latest/how-to-guides/utility/grid/) arranges them in a grid (nested lists define rows; grids nest), and [`Panel`](https://eriknovak.github.io/datachart/latest/how-to-guides/utility/panel/) overlays charts on one plot, with an optional secondary y-axis. Four chart types, one theme, one grid — with a `Panel` in the last cell:
+The `latest` segment in the URLs is the released version. Replace it with `dev` for the documentation of the main branch, or with a version number such as `0.9.1` to pin a release.
 
-```
-import numpy as np
+## Paste a link
 
-from datachart.charts import BarChart, Histogram, LineChart, ScatterChart
-from datachart.config import config
-from datachart.constants import LEGEND_LOCATION, THEME
-from datachart.utils import Grid, Panel, save_figure
-
-config.set_theme(THEME.INK)
-rng = np.random.default_rng(0)
-
-line = LineChart(
-    [[{"x": x, "y": 50 + a * np.sin(x / 3) + x} for x in range(21)] for a in (20, 12, 5)],
-    title="Line", subtitle=["Run 1", "Run 2", "Run 3"], show_legend=True,
-)
-bars = BarChart(
-    [[{"label": f"Bench {b}", "y": y} for b, y in zip("ABCD", ys)]
-     for ys in ([66, 59, 77, 83], [65, 58, 78, 82])],
-    title="Grouped bar", subtitle=["Model A", "Model B"], show_legend=True,
-)
-scatter = ScatterChart(
-    [[{"x": x, "y": y} for x, y in zip(rng.normal(cx, 1.2, 60), rng.normal(cy, 1, 60))]
-     for cx, cy in ((3, 4), (7, 7), (10, 3))],
-    title="Scatter", subtitle=["C1", "C2", "C3"], show_legend=True,
-)
-
-# Panel overlays figures on one axes; the line gets its own y-axis on the right
-samples = np.sort(rng.normal(55, 12, 500))
-hist = Histogram([{"x": x} for x in samples], subtitle="Count")
-cdf = LineChart(
-    [{"x": x, "y": 100 * i / len(samples)} for i, x in enumerate(samples, 1)],
-    subtitle="Cumulative %",
-)
-config.update_config({"plot_legend_location": LEGEND_LOCATION.UPPER_LEFT})
-overlay = Panel(
-    [hist, cdf], title="Histogram + line", ylabel_right="%",
-    auto_secondary_axis=1, show_legend=True,
-)
-
-# Grid arranges figures in cells; nested lists define the rows
-figure = Grid([[line, bars], [scatter, overlay]], title="INK theme")
-save_figure(figure, "grid.png")
-```
-
-## Themes
-
-Predefined themes, applied with `config.set_theme(THEME.<NAME>)`. Any attribute can then be tweaked globally via `config.update_config(...)` or per chart via the `style` argument — see the [themes](https://eriknovak.github.io/datachart/latest/how-to-guides/styling/themes/), [config](https://eriknovak.github.io/datachart/latest/how-to-guides/styling/config/), and [theme gallery](https://eriknovak.github.io/datachart/latest/how-to-guides/styling/theme-gallery/) guides.
-
-More examples on how to use the `datachart` package are available on the official [How-to Guides](https://eriknovak.github.io/datachart/latest/how-to-guides/).
-
-## Install
-
-Requires [python](https://www.python.org/) 3.10 or higher.
+The simplest route needs no setup: put the URL of the index or of the page you need in the prompt. Assistants with web access fetch it and read from the current docs.
 
 ```
-pip install -U datachart
+Draw a grouped bar chart of the medal table with datachart. Read the guide
+first: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/barchart/index.md
 ```
 
-With [uv](https://docs.astral.sh/uv/):
+For a longer task, paste `llms.txt` once at the start of the session; the assistant then knows which page to fetch for each question.
+
+## Connect an MCP server
+
+An assistant that supports the [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) can query the docs without a link in every prompt. Two hosted servers cover this repository; neither needs anything installed.
+
+### Context7
+
+[Context7](https://context7.com/eriknovak/datachart) indexes the documentation per version and returns the pages that match a question. The library ID is `/eriknovak/datachart`.
 
 ```
-uv add datachart
+claude mcp add --transport http context7 https://mcp.context7.com/mcp
 ```
 
-For zoom, pan, and hover-to-inspect via `figure.show(interactive=True)`, add the `interactive` extra: `pip install "datachart[interactive]"`.
-
-## Using with LLMs
-
-The documentation is available in LLM-friendly formats:
-
-- [llms.txt](https://eriknovak.github.io/datachart/latest/llms.txt) — index of the documentation with descriptions
-- [llms-full.txt](https://eriknovak.github.io/datachart/latest/llms-full.txt) — full documentation in a single file
-- Every documentation page is also available as plain markdown by appending `index.md` to its URL, e.g. [how-to-guides/charts/linechart/index.md](https://eriknovak.github.io/datachart/latest/how-to-guides/charts/linechart/index.md)
-
-You can also connect your AI assistant directly:
-
-- [Context7](https://context7.com/eriknovak/datachart) — up-to-date, version-aware docs for AI coding assistants
-- [GitMCP](https://gitmcp.io/eriknovak/datachart) — an MCP server serving this repository's documentation
-
-## Contributing
-
-Bug reports, feature requests, and pull requests are welcome — open an [issue](https://github.com/eriknovak/datachart/issues) to report a problem or propose a chart, theme, or option you are missing.
-
-To work on the package locally:
-
 ```
-git clone https://github.com/eriknovak/datachart.git
-cd datachart
-uv sync --group dev                  # package + dev dependencies
-python -m unittest discover test     # unit tests
-pytest                               # documentation notebooks
-mkdocs serve                         # docs at http://127.0.0.1:8000
+{
+  "mcpServers": {
+    "context7": {
+      "url": "https://mcp.context7.com/mcp"
+    }
+  }
+}
 ```
 
-Code is formatted with `black`; the pre-commit hook runs it for you.
+Then name the library in the prompt, or add "use context7" to have the assistant resolve it:
+
+```
+Use context7 to look up datachart's Panel, then overlay a histogram and a
+cumulative line with the line on a secondary axis.
+```
+
+### GitMCP
+
+[GitMCP](https://gitmcp.io/eriknovak/datachart) serves the repository's documentation as an MCP endpoint at `https://gitmcp.io/eriknovak/datachart`, with tools to fetch and search it.
+
+```
+claude mcp add --transport sse datachart-docs https://gitmcp.io/eriknovak/datachart
+```
+
+```
+{
+  "mcpServers": {
+    "datachart-docs": {
+      "url": "https://gitmcp.io/eriknovak/datachart"
+    }
+  }
+}
+```
+
+Once connected, the assistant calls the server whenever a question is about `datachart`; no prompt wording is needed.
+
+## Describe the package in the project rules
+
+A link tells the assistant where the docs are; a rules file tells it how the package fits together, so it reaches for the right function before it reads anything. Add the block below to the file your assistant reads at the start of a session: `CLAUDE.md` for Claude Code, `AGENTS.md` for Codex and others, `.cursor/rules` for Cursor.
+
+```
+## Charts: datachart
+
+Charts are drawn with the `datachart` package (built on matplotlib).
+Docs: https://eriknovak.github.io/datachart/latest/ (index for LLMs: /llms.txt;
+any page as markdown by appending index.md to its URL).
+
+- Every chart is one function from `datachart.charts` (LineChart, BarChart,
+  ScatterChart, Histogram, ...) that takes a list of series, each a list of
+  dicts. Look up the dict keys and parameters of a chart in its guide before
+  using it: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/
+- Style is global: `config.set_theme(THEME.X)` and `config.update_config(...)`
+  from `datachart.config` and `datachart.constants`. Per-chart overrides go in
+  the chart's `style` argument. Do not restyle through matplotlib directly.
+- Combine finished figures with `Panel` (overlay on shared axes) and `Grid`
+  (arrange in cells) from `datachart.utils`; write files with `save_figure`.
+- Every chart returns a matplotlib `Figure`.
+```
+
+The block is deliberately short. The assistant fetches the details from the guides once it knows they exist, and a long copy of the reference goes stale with the next release.
 
 # How-to Guides
 

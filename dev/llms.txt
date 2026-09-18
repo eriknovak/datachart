@@ -20,7 +20,8 @@ themes; per-chart overrides go in each chart's `style` parameter.
 
 ## Getting Started
 
-- [Home](https://eriknovak.github.io/datachart/dev/index.md): Package overview, installation, and a first example.
+- [Home](https://eriknovak.github.io/datachart/dev/index.md): Landing page with a chart gallery, links to the guides and reference, installation, and a first example.
+- [AI Assistants](https://eriknovak.github.io/datachart/dev/ai-assistants/index.md): Pointing an AI coding assistant at these docs: llms.txt and per-page markdown, the Context7 and GitMCP servers, and a project-rules snippet describing the package.
 - [How-to Guides](https://eriknovak.github.io/datachart/dev/how-to-guides/index.md): Map of the guide sections: charts, composition, styling, utility.
 
 ## Charts
