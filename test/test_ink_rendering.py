@@ -632,7 +632,8 @@ class TestChartInkLooks(unittest.TestCase):
         self.assertEqual(rings[0].get_linestyle(), ":")
         nodes = [c for c in ax.collections if c.get_gid() == "nodes"]
         self.assertEqual([len(c.get_offsets()) for c in nodes], [2, 1])
-        self.assertEqual(len(nodes[1].get_facecolors()), 0)
+        # a hollow node is paper, so the roads stop at its rim
+        self.assertEqual(tuple(nodes[1].get_facecolors()[0][:3]), (1.0, 1.0, 1.0))
         handle = ax.get_legend().legend_handles[1]
         self.assertEqual(handle.get_marker(), "s")
         self.assertEqual(handle.get_markerfacecolor(), "none")

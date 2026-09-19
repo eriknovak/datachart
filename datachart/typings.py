@@ -375,6 +375,7 @@ class NetworkStyleAttrs(TypedDict):
         plot_network_edge_width_max (Union[int, float, None]): The width of the heaviest edge.
         plot_network_highlight_edge_width (Union[float, None]): The stroke width of a highlighted node.
         plot_network_label_halo_width (Union[float, None]): The width of the halo, in the axes face color, behind labels; 0 disables it.
+        plot_network_label_family (Union[str, None]): The font family of the node labels; `None` keeps the general font.
         plot_network_group_alpha (Union[float, None]): The alpha of the disc in the group color behind each cluster of the grouped layout; 0 disables it.
         plot_network_group_linestyle (Union[LINE_STYLE, str, None]): Draws each cluster's mark as a ring in this line style and the edge color instead of a disc. `None` draws the disc.
         plot_network_edge_ink_stroke (Union[Dict[str, float], None]): The pen the edges are drawn with, as for `plot_ink_stroke`, plus `swell` (the pressure swell amplitude) and `noise` (the grain); a directed edge draws as a stroked shaft with a small head. `None` draws plain edges.
@@ -396,6 +397,7 @@ class NetworkStyleAttrs(TypedDict):
     plot_network_edge_width_max: Union[int, float, None]
     plot_network_highlight_edge_width: Union[float, None]
     plot_network_label_halo_width: Union[float, None]
+    plot_network_label_family: Union[str, None]
     plot_network_group_alpha: Union[float, None]
     plot_network_group_linestyle: Union[LINE_STYLE, str, None]
     plot_network_edge_ink_stroke: Union[Dict[str, float], None]
@@ -446,6 +448,7 @@ class ValueLabelStyleAttrs(TypedDict):
         plot_value_color (Union[str, None]): The color of the value labels.
         plot_value_padding (Union[int, float, None]): The gap between a mark and its value label, in points.
         plot_value_halo_width (Union[int, float, None]): The width, in points, of the halo, in the axes face color, stroked around the value labels so they stay legible over marks and lines. `None` or `0` draws no halo.
+        plot_value_tab (Union[Dict[str, Union[float, str]], None]): The tab a value label is set on, a rounded box in the ground color like a label ribbon on an engraved chart. Keys: `facecolor`, `edgecolor`, `line_width` (points), `pad` (in font sizes) and `rounding` (in font sizes). `None` draws no tab.
 
     """
 
@@ -453,6 +456,7 @@ class ValueLabelStyleAttrs(TypedDict):
     plot_value_color: Union[str, None]
     plot_value_padding: Union[int, float, None]
     plot_value_halo_width: Union[int, float, None]
+    plot_value_tab: Union[Dict[str, Union[float, str]], None]
 
 
 class HistStyleAttrs(TypedDict):

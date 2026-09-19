@@ -170,6 +170,7 @@ BASE_THEME: StyleAttrs = {
     "plot_network_node_color": None,
     "plot_network_node_alpha": 0.95,
     "plot_network_node_marker": "o",
+    "plot_network_label_family": None,
     "plot_network_node_size": 200,
     "plot_network_node_size_min": 80,
     "plot_network_node_size_max": 900,
@@ -257,6 +258,7 @@ BASE_THEME: StyleAttrs = {
     "plot_value_color": "#000000",
     "plot_value_padding": 3,
     "plot_value_halo_width": 2,
+    "plot_value_tab": None,
     # plot hist style
     "plot_hist_color": None,
     "plot_hist_alpha": 0.9,

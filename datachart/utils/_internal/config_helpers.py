@@ -354,6 +354,7 @@ def get_value_label_style(chart_style: dict) -> dict:
         ("color", "plot_value_color"),
         ("padding", "plot_value_padding"),
         ("halo_width", "plot_value_halo_width"),
+        ("tab", "plot_value_tab"),
     ]
 
     return create_config_dict(canonical_style(chart_style), config_attrs)
@@ -612,6 +613,7 @@ def get_network_style(chart_style: dict) -> dict:
         ("edge_width_max", "plot_network_edge_width_max"),
         ("highlight_linewidth", "plot_network_highlight_edge_width"),
         ("halo_width", "plot_network_label_halo_width"),
+        ("label_family", "plot_network_label_family"),
         ("group_alpha", "plot_network_group_alpha"),
         ("group_linestyle", "plot_network_group_linestyle"),
         ("edge_ink_stroke", "plot_network_edge_ink_stroke"),

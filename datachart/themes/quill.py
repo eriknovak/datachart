@@ -14,6 +14,8 @@ register_bundled_fonts("IMFeENrm28P.ttf", "IMFeENit28P.ttf", "IMFeENsc28P.ttf")
 
 INK = "#1A120A"
 PAPER = "#FFFFFF"
+# iron-gall ink faded to brown, for the hairlines behind the marks
+FADED_INK = "#6B5A3C"
 
 QUILL_THEME: StyleAttrs = make_theme(
     {
@@ -100,8 +102,16 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_bar_edge_color": INK,
         "plot_bar_error_color": INK,
         "plot_value_color": INK,
-        # a thin old-style figure needs a wide halo to read over dense etching
+        # a value over marks sits on a ruled paper tab, as a label ribbon on an
+        # engraving; the halo serves the labels that take no tab
         "plot_value_halo_width": 5,
+        "plot_value_tab": {
+            "facecolor": PAPER,
+            "edgecolor": INK,
+            "line_width": 0.6,
+            "pad": 0.16,
+            "rounding": 0.1,
+        },
         "plot_hist_alpha": 1.0,
         "plot_hist_edge_width": 1.0,
         "plot_hist_edge_color": INK,
@@ -195,24 +205,28 @@ QUILL_THEME: StyleAttrs = make_theme(
         # dense around a group's band and gutters, sparse on its tiles
         "plot_treemap_etch_density": [3, 1, 0],
         "plot_network_node_edge_color": INK,
-        "plot_network_node_edge_width": 1.6,
+        "plot_network_node_edge_width": 1.2,
+        "plot_network_node_size": 70,
         "plot_network_node_alpha": 1.0,
         # groups differ by the marker cycle's shapes, filled and hollow
-        "plot_network_edge_color": INK,
-        "plot_network_edge_alpha": 0.9,
+        "plot_network_edge_color": FADED_INK,
+        "plot_network_edge_alpha": 0.6,
         "plot_network_edge_style": ARROW_STYLE.STRAIGHT,
         "plot_network_edge_curve": 0.0,
-        # roads share one base width; the pen, not the weight, varies it
-        "plot_network_edge_width_min": 2.0,
-        "plot_network_edge_width_max": 2.8,
-        # a road is pressure, not a nib: its width swells along its length
+        # hairline roads, as the rhumb lines of a portolan chart, stay countable
+        "plot_network_edge_width_min": 0.5,
+        "plot_network_edge_width_max": 1.3,
         "plot_network_edge_ink_stroke": {
-            "width_scale": 1.4,
+            "width_scale": 1.0,
             "nib_floor": 1.0,
             "wobble": 0.0,
-            "swell": 0.5,
-            "noise": 0.12,
+            "swell": 0.0,
+            "noise": 0.05,
         },
+        # names in small caps; the halo clears the plate round each, as an
+        # engraver leaves it bare, so edges stop short of a label
+        "plot_network_label_family": "IM FELL English SC",
+        "plot_network_label_halo_width": 5,
         "plot_network_group_linestyle": LINE_STYLE.DOTTED,
     }
 )

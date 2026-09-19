@@ -1998,7 +1998,7 @@ class Layer:
         self.value_etch_steps = get_value_etch(self.style) if self.etch else None
         # the ground halo of a value over value steps, as value labels take it
         self.value_halo = _halo_effects(
-            get_value_label_style(self.style)["halo_width"], self.ground
+            get_value_label_style(self.style).get("halo_width"), self.ground
         )
         self.step_legend_style = None
         if self.value_etch_steps:
@@ -6253,6 +6253,13 @@ class HeatmapLayer(Layer):
     def _draw_cell_values(self, ax, im) -> None:
         """Print each cell's value at its centre; a blank cell stays bare."""
 
+        tab = get_value_label_style(self.style).get("tab")
+        if self.value_etch_steps:
+            im.autoscale_None()
+            steps = value_steps(
+                im.norm(np.ma.masked_invalid(np.asarray(self.z, dtype=float))),
+                len(self.value_etch_steps),
+            )
         for i, row in enumerate(self.z):
             for j, value in enumerate(row):
                 if np.isnan(value):
@@ -6266,9 +6273,14 @@ class HeatmapLayer(Layer):
                 ):
                     font_style["color"] = "#FFFFFF"
                 if self.value_etch_steps:
-                    # a value over the etching reads through a halo of the ground
+                    # a value over the etching reads through a halo of the
+                    # ground, or a tab where the etching is lines that cross it
                     font_style["color"] = self.font_style.get("color")
-                    font_style["path_effects"] = self.value_halo
+                    hatch = self.value_etch_steps[steps[i][j]][1]
+                    if tab and set(hatch) & set("/\\x+|-"):
+                        font_style["bbox"] = _value_tab_bbox(tab)
+                    else:
+                        font_style["path_effects"] = self.value_halo
                 text = ax.text(
                     j, i, self.cell_text(value), ha="center", va="center", **font_style
                 )
@@ -7069,7 +7081,7 @@ class ParallelCoordsLayer(Layer):
             []
             if self.tick_label_bbox is not None
             else _halo_effects(
-                get_value_label_style(shared_style)["halo_width"], self.ground
+                get_value_label_style(shared_style).get("halo_width"), self.ground
             )
         )
         self.dim_label_style = get_parallel_dim_label_style(shared_style)
@@ -8178,13 +8190,27 @@ def _step_label(low, high) -> str:
 def _value_label_font(style: dict) -> dict:
     """The text kwargs of a value label from its resolved `plot_value_*` style."""
 
-    return {
+    font = {
         "fontsize": style["fontsize"],
         "color": style["color"],
         "family": resolve_font_family(),
         "path_effects": _halo_effects(
             style.get("halo_width"), config.get("axes_facecolor")
         ),
+    }
+    if style.get("tab"):
+        font["bbox"] = _value_tab_bbox(style["tab"])
+    return font
+
+
+def _value_tab_bbox(tab: dict) -> dict:
+    """The text `bbox` kwargs of a `plot_value_tab` setting."""
+
+    return {
+        "boxstyle": f"round,pad={tab['pad']},rounding_size={tab['rounding']}",
+        "facecolor": tab["facecolor"],
+        "edgecolor": tab["edgecolor"],
+        "linewidth": tab["line_width"],
     }
 
 
@@ -8352,6 +8378,8 @@ class SankeyLayer(Layer):
             self.sankey_style.get("link_color")
         )
         self._resolve_bare_labels()
+        # a ribbon is a light wash the value reads on, so it takes no tab
+        self.value_font.pop("bbox", None)
         # column headings read as per-column subtitles
         self.column_label_style = get_text_style("subtitle")
         # one color per node in first appearance across the links, so the
@@ -8993,6 +9021,7 @@ class TreemapLayer(Layer):
             fontsize=value_size,
             color=self.muted_color if muted else self.value_font["color"],
             **common,
+            **({"bbox": self.value_font["bbox"]} if "bbox" in self.value_font else {}),
         )
 
 
@@ -9651,10 +9680,11 @@ class NetworkLayer(PointLabelMixin, Layer):
                 "linewidths": [widths[k] for k in ks],
             }
             if hollow:
-                # the outline in the face color is the mark; a collection alpha
-                # would fill "none" faces, so the alpha rides on the edge color
+                # the outline in the face color is the mark, on paper so the
+                # edges stop at its rim; the alpha rides on the colors, as a
+                # collection alpha would fill the face
                 look = {
-                    "facecolors": "none",
+                    "facecolors": [to_rgba(self.ground, alpha[k]) for k in ks],
                     "edgecolors": [
                         to_rgba(edges[k] if highlighted[k] else face[k], alpha[k])
                         for k in ks
@@ -9684,6 +9714,8 @@ class NetworkLayer(PointLabelMixin, Layer):
                 **self.label_style,
                 "color": self.muted_color if muted[k] else self.label_style["color"],
             }
+            if style.get("label_family"):
+                font["family"] = resolve_font_family(style["label_family"])
             if best:
                 # the panel places it once every mark is drawn, clear of the rest
                 self._record_points(
