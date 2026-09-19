@@ -16702,6 +16702,10 @@ The styling guides cover everything that controls how charts look: the predefine
 
   Every predefined theme as a card of color swatches with hex codes and six signature charts, grouped by use, to pick one by eye.
 
+- [Theme Explorer](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-explorer/index.md)
+
+  Pick a theme and see it draw every chart type, or pick a chart and see it under every theme.
+
 - [Colormaps](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/colormaps/index.md)
 
   Every `COLORS` palette by kind, with the predefined themes that use it, and which kind fits which theme attribute.
@@ -17114,6 +17118,32 @@ Applying a theme replaces the whole global configuration, so remember to call `c
 ```
 config.reset_config()
 ```
+
+# Theme Explorer
+
+Pick a theme and see how it draws every chart, or pick a chart and see it under every theme. The [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each theme's palette and six signature charts; this page covers the chart types the gallery leaves out, with values, dense marks and value scales, where the themes differ most. Every image is rendered by datachart when the site is built.
+
+The sample data and the builder of each chart are defined in a hidden cell. The next cell renders each chart under each theme with `config.set_theme(...)`, then hands the pictures to a small page with the selectors.
+
+```
+def render(build, theme):
+    """One chart under one theme, as a WebP data URI."""
+    config.set_theme(theme)
+    fig = build()
+    buffer = io.BytesIO()
+    fig.savefig(buffer, format="webp", dpi=100, pil_kwargs={"quality": 82})
+    plt.close(fig)
+    return "data:image/webp;base64," + base64.b64encode(buffer.getvalue()).decode()
+
+
+images = {
+    theme: {name: render(build, theme) for name, build in CHARTS.items()}
+    for theme in THEMES
+}
+config.reset_config()
+```
+
+Applying a theme replaces the whole global configuration, so the last line of the build cell resets it. See the [themes how-to](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) for customizing themes attribute by attribute.
 
 # Colormaps
 
@@ -22878,6 +22908,7 @@ The typing for the network chart style.
 | `plot_network_edge_width_max`       | The width of the heaviest edge. **TYPE:** \`int                                                                                                                                                                                             |
 | `plot_network_highlight_edge_width` | The stroke width of a highlighted node. **TYPE:** \`float                                                                                                                                                                                   |
 | `plot_network_label_halo_width`     | The width of the halo, in the axes face color, behind labels; 0 disables it. **TYPE:** \`float                                                                                                                                              |
+| `plot_network_label_family`         | The font family of the node labels; None keeps the general font. **TYPE:** \`str                                                                                                                                                            |
 | `plot_network_group_alpha`          | The alpha of the disc in the group color behind each cluster of the grouped layout; 0 disables it. **TYPE:** \`float                                                                                                                        |
 | `plot_network_group_linestyle`      | Draws each cluster's mark as a ring in this line style and the edge color instead of a disc. None draws the disc. **TYPE:** \`LINE_STYLE                                                                                                    |
 | `plot_network_edge_ink_stroke`      | The pen the edges are drawn with, as for plot_ink_stroke, plus swell (the pressure swell amplitude) and noise (the grain); a directed edge draws as a stroked shaft with a small head. None draws plain edges. **TYPE:** \`dict[str, float] |
@@ -25429,6 +25460,13 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_bar_error_color": INK,
         "plot_value_color": INK,
         "plot_value_halo_width": 5,
+        "plot_value_tab": {
+            "facecolor": PAPER,
+            "edgecolor": INK,
+            "line_width": 0.6,
+            "pad": 0.16,
+            "rounding": 0.1,
+        },
         "plot_hist_alpha": 1.0,
         "plot_hist_edge_width": 1.0,
         "plot_hist_edge_color": INK,
@@ -25519,21 +25557,24 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_treemap_level_shade": 0.55,
         "plot_treemap_etch_density": [3, 1, 0],
         "plot_network_node_edge_color": INK,
-        "plot_network_node_edge_width": 1.6,
+        "plot_network_node_edge_width": 1.2,
+        "plot_network_node_size": 70,
         "plot_network_node_alpha": 1.0,
-        "plot_network_edge_color": INK,
-        "plot_network_edge_alpha": 0.9,
+        "plot_network_edge_color": FADED_INK,
+        "plot_network_edge_alpha": 0.6,
         "plot_network_edge_style": ARROW_STYLE.STRAIGHT,
         "plot_network_edge_curve": 0.0,
-        "plot_network_edge_width_min": 2.0,
-        "plot_network_edge_width_max": 2.8,
+        "plot_network_edge_width_min": 0.5,
+        "plot_network_edge_width_max": 1.3,
         "plot_network_edge_ink_stroke": {
-            "width_scale": 1.4,
+            "width_scale": 1.0,
             "nib_floor": 1.0,
             "wobble": 0.0,
-            "swell": 0.5,
-            "noise": 0.12,
+            "swell": 0.0,
+            "noise": 0.05,
         },
+        "plot_network_label_family": "IM FELL English SC",
+        "plot_network_label_halo_width": 5,
         "plot_network_group_linestyle": LINE_STYLE.DOTTED,
     }
 )
@@ -26984,12 +27025,13 @@ Bases: `TypedDict`
 
 The typing for the value labels: the numbers a chart prints beside its marks when `show_values` is on. One style serves every chart that takes `show_values`; the `plot_bar_value_*` keys of `BarStyleAttrs` are aliases.
 
-| ATTRIBUTE               | DESCRIPTION                                                                                                                                                                    |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `plot_value_fontsize`   | The font size of the value labels. **TYPE:** \`int                                                                                                                             |
-| `plot_value_color`      | The color of the value labels. **TYPE:** \`str                                                                                                                                 |
-| `plot_value_padding`    | The gap between a mark and its value label, in points. **TYPE:** \`int                                                                                                         |
-| `plot_value_halo_width` | The width, in points, of the halo, in the axes face color, stroked around the value labels so they stay legible over marks and lines. None or 0 draws no halo. **TYPE:** \`int |
+| ATTRIBUTE               | DESCRIPTION                                                                                                                                                                                                                                                     |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_value_fontsize`   | The font size of the value labels. **TYPE:** \`int                                                                                                                                                                                                              |
+| `plot_value_color`      | The color of the value labels. **TYPE:** \`str                                                                                                                                                                                                                  |
+| `plot_value_padding`    | The gap between a mark and its value label, in points. **TYPE:** \`int                                                                                                                                                                                          |
+| `plot_value_halo_width` | The width, in points, of the halo, in the axes face color, stroked around the value labels so they stay legible over marks and lines. None or 0 draws no halo. **TYPE:** \`int                                                                                  |
+| `plot_value_tab`        | The tab a value label is set on, a rounded box in the ground color like a label ribbon on an engraved chart. Keys: facecolor, edgecolor, line_width (points), pad (in font sizes) and rounding (in font sizes). None draws no tab. **TYPE:** \`dict\[str, float |
 
 ### datachart.typings.AreaStyleAttrs
 

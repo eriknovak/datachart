@@ -10,6 +10,10 @@ The styling guides cover everything that controls how charts look: the predefine
 
   Every predefined theme as a card of color swatches with hex codes and six signature charts, grouped by use, to pick one by eye.
 
+- [Theme Explorer](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-explorer/index.md)
+
+  Pick a theme and see it draw every chart type, or pick a chart and see it under every theme.
+
 - [Colormaps](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/colormaps/index.md)
 
   Every `COLORS` palette by kind, with the predefined themes that use it, and which kind fits which theme attribute.

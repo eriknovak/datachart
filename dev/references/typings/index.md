@@ -204,12 +204,13 @@ Bases: `TypedDict`
 
 The typing for the value labels: the numbers a chart prints beside its marks when `show_values` is on. One style serves every chart that takes `show_values`; the `plot_bar_value_*` keys of `BarStyleAttrs` are aliases.
 
-| ATTRIBUTE               | DESCRIPTION                                                                                                                                                                    |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `plot_value_fontsize`   | The font size of the value labels. **TYPE:** \`int                                                                                                                             |
-| `plot_value_color`      | The color of the value labels. **TYPE:** \`str                                                                                                                                 |
-| `plot_value_padding`    | The gap between a mark and its value label, in points. **TYPE:** \`int                                                                                                         |
-| `plot_value_halo_width` | The width, in points, of the halo, in the axes face color, stroked around the value labels so they stay legible over marks and lines. None or 0 draws no halo. **TYPE:** \`int |
+| ATTRIBUTE               | DESCRIPTION                                                                                                                                                                                                                                                     |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_value_fontsize`   | The font size of the value labels. **TYPE:** \`int                                                                                                                                                                                                              |
+| `plot_value_color`      | The color of the value labels. **TYPE:** \`str                                                                                                                                                                                                                  |
+| `plot_value_padding`    | The gap between a mark and its value label, in points. **TYPE:** \`int                                                                                                                                                                                          |
+| `plot_value_halo_width` | The width, in points, of the halo, in the axes face color, stroked around the value labels so they stay legible over marks and lines. None or 0 draws no halo. **TYPE:** \`int                                                                                  |
+| `plot_value_tab`        | The tab a value label is set on, a rounded box in the ground color like a label ribbon on an engraved chart. Keys: facecolor, edgecolor, line_width (points), pad (in font sizes) and rounding (in font sizes). None draws no tab. **TYPE:** \`dict\[str, float |
 
 ### datachart.typings.AreaStyleAttrs
 
