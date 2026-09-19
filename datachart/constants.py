@@ -622,6 +622,8 @@ class COLORS:
         YlOrBr (str): Multi-hue yellow-orange-brown palette. Equals to `"YlOrBr"`.
         PuBuGn (str): Multi-hue purple-blue-green palette. Equals to `"PuBuGn"`.
         GnBu (str): Multi-hue green-blue palette. Equals to `"GnBu"`.
+        BuPu (str): Multi-hue blue-purple palette. Equals to `"BuPu"`.
+        PuBu (str): Multi-hue purple-blue palette. Equals to `"PuBu"`.
         Egypt (str): Multi-hue Egypt palette. Equals to `"Egypt"`.
         Hiroshige (str): Multi-hue Hiroshige palette. Equals to `"Hiroshige"`.
         Lake (str): Multi-hue lake palette. Equals to `"Lake"`.
@@ -669,6 +671,8 @@ class COLORS:
     YlOrBr = "YlOrBr"
     PuBuGn = "PuBuGn"
     GnBu = "GnBu"
+    BuPu = "BuPu"
+    PuBu = "PuBu"
     Egypt = "Egypt"
     Hiroshige = "Hiroshige"
     Lake = "Lake"
@@ -1495,6 +1499,10 @@ class THEME:
             cycles, colour-blind safe). Equals to `"muted"`.
         CONTRAST (str): The contrast theme (lightness-stepped colours plus
             hatches, print-safe). Equals to `"contrast"`.
+        MUTEDHATCH (str): The muted-hatch theme (Tol's muted colours under
+            hatches, BuPu value scale). Equals to `"mutedhatch"`.
+        SLATEHATCH (str): The slate-hatch theme (the hatch theme without rust,
+            slate blue first, PuBu value scale). Equals to `"slatehatch"`.
     """
 
     DEFAULT = "default"
@@ -1508,6 +1516,8 @@ class THEME:
     HARBOR = "harbor"
     MUTED = "muted"
     CONTRAST = "contrast"
+    MUTEDHATCH = "mutedhatch"
+    SLATEHATCH = "slatehatch"
 
 
 class EMPHASIS:

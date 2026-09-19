@@ -96,6 +96,8 @@ EXPECTED_CHANGES = {
     "theme_harbor_bar",
     "theme_muted_line",
     "theme_contrast_bar",
+    "theme_mutedhatch_bar",
+    "theme_slatehatch_bar",
     # one lead hue per theme: DEFAULT reordered, PaperYlGnBu navy first, SKETCH vermilion first
     "line_multi",
     "bar_multi_grouped",
@@ -995,6 +997,18 @@ def theme_muted_line():
 @case
 def theme_contrast_bar():
     config.set_theme(THEME.CONTRAST)
+    return BarChart(data=[BAR1, BAR2], show_legend=True)
+
+
+@case
+def theme_mutedhatch_bar():
+    config.set_theme(THEME.MUTEDHATCH)
+    return BarChart(data=[BAR1, BAR2], show_legend=True)
+
+
+@case
+def theme_slatehatch_bar():
+    config.set_theme(THEME.SLATEHATCH)
     return BarChart(data=[BAR1, BAR2], show_legend=True)
 
 

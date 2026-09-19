@@ -18,6 +18,8 @@ from .quill import QUILL_THEME
 from .harbor import HARBOR_THEME
 from .muted import MUTED_THEME
 from .contrast import CONTRAST_THEME
+from .mutedhatch import MUTEDHATCH_THEME
+from .slatehatch import SLATEHATCH_THEME
 
 __all__ = [
     "DEFAULT_THEME",
@@ -31,4 +33,6 @@ __all__ = [
     "HARBOR_THEME",
     "MUTED_THEME",
     "CONTRAST_THEME",
+    "MUTEDHATCH_THEME",
+    "SLATEHATCH_THEME",
 ]

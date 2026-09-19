@@ -27,6 +27,8 @@ Every theme is a complete [`StyleAttrs`](typings.md#datachart.typings.StyleAttrs
 | [`HATCH_THEME`](#datachart.themes.HATCH_THEME)         | a hatch cycle, black edges, dotted grid                               | `THEME.HATCH` |
 | [`MUTED_THEME`](#datachart.themes.MUTED_THEME)         | Tol's muted colours, dash and marker cycles, colour-blind safe        | `THEME.MUTED` |
 | [`CONTRAST_THEME`](#datachart.themes.CONTRAST_THEME)   | lightness-stepped colours plus hatches, print-safe                    | `THEME.CONTRAST` |
+| [`MUTEDHATCH_THEME`](#datachart.themes.MUTEDHATCH_THEME) | Tol's muted colours under hatches, BuPu value scale | `THEME.MUTEDHATCH` |
+| [`SLATEHATCH_THEME`](#datachart.themes.SLATEHATCH_THEME) | the hatch theme without rust, slate blue first, PuBu value scale | `THEME.SLATEHATCH` |
 | **Illustrative**                                     |                                                                       |            |
 | [`SKETCH_THEME`](#datachart.themes.SKETCH_THEME)       | hand-drawn: xkcd-style wobble and halo, Comic Neue font               | `THEME.SKETCH` |
 | [`QUILL_THEME`](#datachart.themes.QUILL_THEME)         | black ink on white paper, pen-stroked lines, etched fills, IM Fell English font | `THEME.QUILL` |
@@ -42,5 +44,7 @@ Every theme is a complete [`StyleAttrs`](typings.md#datachart.typings.StyleAttrs
 ::: datachart.themes.HATCH_THEME
 ::: datachart.themes.MUTED_THEME
 ::: datachart.themes.CONTRAST_THEME
+::: datachart.themes.MUTEDHATCH_THEME
+::: datachart.themes.SLATEHATCH_THEME
 ::: datachart.themes.SKETCH_THEME
 ::: datachart.themes.QUILL_THEME

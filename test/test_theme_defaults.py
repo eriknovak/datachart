@@ -313,7 +313,13 @@ class TestColourSafeThemes(unittest.TestCase):
         plt.close("all")
 
     def test_palettes_have_distinct_colors(self):
-        for theme in (THEME.HARBOR, THEME.MUTED, THEME.CONTRAST):
+        for theme in (
+            THEME.HARBOR,
+            THEME.MUTED,
+            THEME.CONTRAST,
+            THEME.MUTEDHATCH,
+            THEME.SLATEHATCH,
+        ):
             with self.subTest(theme=theme):
                 config.set_theme(theme)
                 colors = config["color_general_multiple"]
@@ -330,6 +336,32 @@ class TestColourSafeThemes(unittest.TestCase):
                 self.assertEqual(len(config["plot_marker_cycle"]), n)
         config.set_theme(THEME.CONTRAST)
         self.assertEqual(len(config["plot_hatch_cycle"]), 5)
+
+    def test_mutedhatch_pairs_muted_colours_with_contrast_hatches(self):
+        config.set_theme(THEME.MUTED)
+        muted = config["color_general_multiple"]
+        config.set_theme(THEME.CONTRAST)
+        hatches = config["plot_hatch_cycle"]
+        config.set_theme(THEME.MUTEDHATCH)
+        self.assertEqual(config["color_general_multiple"], muted)
+        self.assertEqual(config["plot_hatch_cycle"], hatches)
+        self.assertEqual(config["plot_heatmap_cmap"], "BuPu")
+        series = [[{**p, "y": p["y"] + k} for p in BAR] for k in range(5)]
+        figure = BarChart(series, show_values=False)
+        drawn = [str(c.patches[0].get_hatch() or "") for c in figure.axes[0].containers]
+        self.assertEqual(drawn, ["", "//", "..", "xx", "\\"])
+
+    def test_slatehatch_drops_rust_from_hatch(self):
+        config.set_theme(THEME.HATCH)
+        hatch = config.config
+        rust = "#B5563A"
+        self.assertIn(rust, hatch["color_general_multiple"])
+        config.set_theme(THEME.SLATEHATCH)
+        slate = config.config
+        self.assertNotIn(rust, slate["color_general_multiple"])
+        self.assertEqual(slate["color_general_multiple"][0], "#4F6D8F")
+        self.assertEqual(slate["plot_heatmap_cmap"], "PuBu")
+        self.assertEqual(slate["plot_hatch_cycle"], hatch["plot_hatch_cycle"])
 
     def test_muted_line_styles_differ_per_series(self):
         config.set_theme(THEME.MUTED)
