@@ -177,6 +177,7 @@ plugins:
           - how-to-guides/styling/index.md: Map of themes, the theme gallery, and colormaps.
           - how-to-guides/styling/themes.ipynb: "Applying the predefined themes through the config singleton, what a theme controls, building a custom theme with register_theme, and sharing it as a JSON theme file."
           - how-to-guides/styling/theme-gallery.ipynb: Each predefined theme's swatches with hex codes and six signature charts, grouped by use.
+          - how-to-guides/styling/theme-explorer.ipynb: "Pick a predefined theme and see it draw every chart type, or pick a chart and see it under every theme, including values, dense marks and value scales."
           - how-to-guides/styling/colormaps.ipynb: "Every COLORS palette as a strip and six-series swatches, grouped by kind, with chips for the predefined themes that use it and the role; which kind fits which theme attribute."
         Utility:
           - how-to-guides/utility/index.md: Map of the statistics, figure saving, and interactive figure guides.
@@ -287,6 +288,7 @@ nav:
       - how-to-guides/styling/index.md
       - Themes: how-to-guides/styling/themes.ipynb
       - Theme Gallery: how-to-guides/styling/theme-gallery.ipynb
+      - Theme Explorer: how-to-guides/styling/theme-explorer.ipynb
       - Colormaps: how-to-guides/styling/colormaps.ipynb
     - Utility:
       - how-to-guides/utility/index.md

@@ -20,6 +20,10 @@ The styling guides cover everything that controls how charts look: the predefine
 
     ![The same bar chart under all eight predefined themes](../../assets/imgs/gallery-themegallery.png)
 
+-   [Theme Explorer](theme-explorer.ipynb)
+
+    Pick a theme and see it draw every chart type, or pick a chart and see it under every theme.
+
 -   [Colormaps](colormaps.ipynb)
 
     Every `COLORS` palette by kind, with the predefined themes that use it, and which kind fits which theme attribute.
