@@ -407,6 +407,8 @@ Examples:
 | `YlOrBr`         | Multi-hue yellow-orange-brown palette. Equals to "YlOrBr". **TYPE:** `str`                        |
 | `PuBuGn`         | Multi-hue purple-blue-green palette. Equals to "PuBuGn". **TYPE:** `str`                          |
 | `GnBu`           | Multi-hue green-blue palette. Equals to "GnBu". **TYPE:** `str`                                   |
+| `BuPu`           | Multi-hue blue-purple palette. Equals to "BuPu". **TYPE:** `str`                                  |
+| `PuBu`           | Multi-hue purple-blue palette. Equals to "PuBu". **TYPE:** `str`                                  |
 | `Egypt`          | Multi-hue Egypt palette. Equals to "Egypt". **TYPE:** `str`                                       |
 | `Hiroshige`      | Multi-hue Hiroshige palette. Equals to "Hiroshige". **TYPE:** `str`                               |
 | `Lake`           | Multi-hue lake palette. Equals to "Lake". **TYPE:** `str`                                         |
@@ -452,19 +454,21 @@ Examples:
 "default"
 ```
 
-| ATTRIBUTE   | DESCRIPTION                                                                                                                           |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `DEFAULT`   | The default theme. Equals to "default". **TYPE:** `str`                                                                               |
-| `GREYSCALE` | The greyscale theme. Equals to "greyscale". **TYPE:** `str`                                                                           |
-| `INK`       | The ink theme (dark-ink accents, print-ready). Equals to "ink". **TYPE:** `str`                                                       |
-| `HATCH`     | The hatch theme (hatch cycle, value labels, dotted grid). Equals to "hatch". **TYPE:** `str`                                          |
-| `MINIMAL`   | The minimal theme (accent violet, no spines, flat bars). Equals to "minimal". **TYPE:** `str`                                         |
-| `MATERIAL`  | The material theme (Google palette, light grid). Equals to "material". **TYPE:** `str`                                                |
-| `SKETCH`    | The sketch theme (hand-drawn, xkcd-style wobble and halo, Comic Neue font). Equals to "sketch". **TYPE:** `str`                       |
-| `QUILL`     | The quill theme (black ink on white paper: pen-stroked lines, etched fills, IM Fell English font). Equals to "quill". **TYPE:** `str` |
-| `HARBOR`    | The harbor theme (navy and amber in lightness steps, colour-blind safe). Equals to "harbor". **TYPE:** `str`                          |
-| `MUTED`     | The muted theme (Tol's muted colours, dash and marker cycles, colour-blind safe). Equals to "muted". **TYPE:** `str`                  |
-| `CONTRAST`  | The contrast theme (lightness-stepped colours plus hatches, print-safe). Equals to "contrast". **TYPE:** `str`                        |
+| ATTRIBUTE    | DESCRIPTION                                                                                                                           |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT`    | The default theme. Equals to "default". **TYPE:** `str`                                                                               |
+| `GREYSCALE`  | The greyscale theme. Equals to "greyscale". **TYPE:** `str`                                                                           |
+| `INK`        | The ink theme (dark-ink accents, print-ready). Equals to "ink". **TYPE:** `str`                                                       |
+| `HATCH`      | The hatch theme (hatch cycle, value labels, dotted grid). Equals to "hatch". **TYPE:** `str`                                          |
+| `MINIMAL`    | The minimal theme (accent violet, no spines, flat bars). Equals to "minimal". **TYPE:** `str`                                         |
+| `MATERIAL`   | The material theme (Google palette, light grid). Equals to "material". **TYPE:** `str`                                                |
+| `SKETCH`     | The sketch theme (hand-drawn, xkcd-style wobble and halo, Comic Neue font). Equals to "sketch". **TYPE:** `str`                       |
+| `QUILL`      | The quill theme (black ink on white paper: pen-stroked lines, etched fills, IM Fell English font). Equals to "quill". **TYPE:** `str` |
+| `HARBOR`     | The harbor theme (navy and amber in lightness steps, colour-blind safe). Equals to "harbor". **TYPE:** `str`                          |
+| `MUTED`      | The muted theme (Tol's muted colours, dash and marker cycles, colour-blind safe). Equals to "muted". **TYPE:** `str`                  |
+| `CONTRAST`   | The contrast theme (lightness-stepped colours plus hatches, print-safe). Equals to "contrast". **TYPE:** `str`                        |
+| `MUTEDHATCH` | The muted-hatch theme (Tol's muted colours under hatches, BuPu value scale). Equals to "mutedhatch". **TYPE:** `str`                  |
+| `SLATEHATCH` | The slate-hatch theme (the hatch theme without rust, slate blue first, PuBu value scale). Equals to "slatehatch". **TYPE:** `str`     |
 
 ### datachart.constants.EMPHASIS
 

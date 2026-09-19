@@ -10,22 +10,24 @@ The `themes` module contains the predefined style themes that are used to visual
 
 Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs) dictionary, named for its visual trait and listed here by where it works best. Apply one with [`config.set_theme`](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) and the member of [`THEME`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) in the last column; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each on six charts, and the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) shows how to adjust one or build your own.
 
-| Theme                                                  | Look                                                                            | Apply with        |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------- | ----------------- |
-| **Screen and presentations**                           |                                                                                 |                   |
-| [`DEFAULT_THEME`](#datachart.themes.DEFAULT_THEME)     | softened Okabe–Ito palette, colour-blind safe, baseline furniture               | `THEME.DEFAULT`   |
-| [`MATERIAL_THEME`](#datachart.themes.MATERIAL_THEME)   | the Google palette, light grid                                                  | `THEME.MATERIAL`  |
-| [`MINIMAL_THEME`](#datachart.themes.MINIMAL_THEME)     | accent violet, no spines, flat bars                                             | `THEME.MINIMAL`   |
-| [`HARBOR_THEME`](#datachart.themes.HARBOR_THEME)       | navy and amber in lightness steps, colour-blind safe                            | `THEME.HARBOR`    |
-| **Print and black-and-white**                          |                                                                                 |                   |
-| [`GREYSCALE_THEME`](#datachart.themes.GREYSCALE_THEME) | greys only, for print without color                                             | `THEME.GREYSCALE` |
-| [`INK_THEME`](#datachart.themes.INK_THEME)             | dark-ink accents, print-ready                                                   | `THEME.INK`       |
-| [`HATCH_THEME`](#datachart.themes.HATCH_THEME)         | a hatch cycle, black edges, dotted grid                                         | `THEME.HATCH`     |
-| [`MUTED_THEME`](#datachart.themes.MUTED_THEME)         | Tol's muted colours, dash and marker cycles, colour-blind safe                  | `THEME.MUTED`     |
-| [`CONTRAST_THEME`](#datachart.themes.CONTRAST_THEME)   | lightness-stepped colours plus hatches, print-safe                              | `THEME.CONTRAST`  |
-| **Illustrative**                                       |                                                                                 |                   |
-| [`SKETCH_THEME`](#datachart.themes.SKETCH_THEME)       | hand-drawn: xkcd-style wobble and halo, Comic Neue font                         | `THEME.SKETCH`    |
-| [`QUILL_THEME`](#datachart.themes.QUILL_THEME)         | black ink on white paper, pen-stroked lines, etched fills, IM Fell English font | `THEME.QUILL`     |
+| Theme                                                    | Look                                                                            | Apply with         |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------ |
+| **Screen and presentations**                             |                                                                                 |                    |
+| [`DEFAULT_THEME`](#datachart.themes.DEFAULT_THEME)       | softened Okabe–Ito palette, colour-blind safe, baseline furniture               | `THEME.DEFAULT`    |
+| [`MATERIAL_THEME`](#datachart.themes.MATERIAL_THEME)     | the Google palette, light grid                                                  | `THEME.MATERIAL`   |
+| [`MINIMAL_THEME`](#datachart.themes.MINIMAL_THEME)       | accent violet, no spines, flat bars                                             | `THEME.MINIMAL`    |
+| [`HARBOR_THEME`](#datachart.themes.HARBOR_THEME)         | navy and amber in lightness steps, colour-blind safe                            | `THEME.HARBOR`     |
+| **Print and black-and-white**                            |                                                                                 |                    |
+| [`GREYSCALE_THEME`](#datachart.themes.GREYSCALE_THEME)   | greys only, for print without color                                             | `THEME.GREYSCALE`  |
+| [`INK_THEME`](#datachart.themes.INK_THEME)               | dark-ink accents, print-ready                                                   | `THEME.INK`        |
+| [`HATCH_THEME`](#datachart.themes.HATCH_THEME)           | a hatch cycle, black edges, dotted grid                                         | `THEME.HATCH`      |
+| [`MUTED_THEME`](#datachart.themes.MUTED_THEME)           | Tol's muted colours, dash and marker cycles, colour-blind safe                  | `THEME.MUTED`      |
+| [`CONTRAST_THEME`](#datachart.themes.CONTRAST_THEME)     | lightness-stepped colours plus hatches, print-safe                              | `THEME.CONTRAST`   |
+| [`MUTEDHATCH_THEME`](#datachart.themes.MUTEDHATCH_THEME) | Tol's muted colours under hatches, BuPu value scale                             | `THEME.MUTEDHATCH` |
+| [`SLATEHATCH_THEME`](#datachart.themes.SLATEHATCH_THEME) | the hatch theme without rust, slate blue first, PuBu value scale                | `THEME.SLATEHATCH` |
+| **Illustrative**                                         |                                                                                 |                    |
+| [`SKETCH_THEME`](#datachart.themes.SKETCH_THEME)         | hand-drawn: xkcd-style wobble and halo, Comic Neue font                         | `THEME.SKETCH`     |
+| [`QUILL_THEME`](#datachart.themes.QUILL_THEME)           | black ink on white paper, pen-stroked lines, etched fills, IM Fell English font | `THEME.QUILL`      |
 
 ## Themes
 
@@ -426,6 +428,58 @@ CONTRAST_THEME: StyleAttrs = make_theme(
 The contrast theme: lightness-stepped colours plus hatches, print-safe.
 
 Navy, straw, dusty rose, charcoal and grey, each a clear lightness step from the next, so a greyscale print or photocopy still tells the series apart, and every pair stays distinct for deutan, protan and tritan readers. Bars take a hatch cycle and black edges, lines a dash cycle, scatter points a marker cycle. The value scale is Cividis.
+
+### datachart.themes.MUTEDHATCH_THEME
+
+```
+MUTEDHATCH_THEME: StyleAttrs = {
+    **MUTED_THEME,
+    "color_general_singular": COLORS.BuPu,
+    "color_parallel_hue_continuous": [
+        "#EDF8FB",
+        "#9EBCDA",
+        "#8856A7",
+        "#4D004B",
+    ],
+    "plot_hatch_cycle": CONTRAST_THEME["plot_hatch_cycle"],
+    "plot_bar_edge_width": 0.8,
+    "plot_heatmap_cmap": COLORS.BuPu,
+}
+```
+
+The muted-hatch theme: Tol's muted colours under Contrast's hatches.
+
+Indigo, cyan, sand, rose and wine bars take the hatch cycle and black edges; lines keep the muted dashes and markers. The value scale is BuPu.
+
+### datachart.themes.SLATEHATCH_THEME
+
+```
+SLATEHATCH_THEME: StyleAttrs = {
+    **HATCH_THEME,
+    "color_general_singular": COLORS.PuBu,
+    "color_general_multiple": [
+        "#4F6D8F",
+        "#D4D389",
+        "#743538",
+        "#67A652",
+        "#C06AC9",
+        "#8EB2D2",
+    ],
+    "color_parallel_hue_continuous": [
+        "#F1EEF6",
+        "#A6BDDB",
+        "#3690C0",
+        "#023858",
+    ],
+    "plot_dumbbell_start_color": "#4F6D8F",
+    "plot_dumbbell_end_color": "#743538",
+    "plot_heatmap_cmap": COLORS.PuBu,
+}
+```
+
+The slate-hatch theme: the hatch theme without rust.
+
+Slate blue, sand, wine, green, orchid and sky blue under black edges and hatches, with a dotted grid. The value scale is PuBu.
 
 ### datachart.themes.SKETCH_THEME
 
