@@ -667,7 +667,7 @@ def scatter_hue_size():
 @case
 def scatter_error_bars():
     # every second point carries an asymmetric y error, the rest a symmetric
-    # one; the last point of each group carries none
+    # one; the appended point carries none
     data = [
         {
             "x": i,

@@ -481,8 +481,10 @@ CONTOUR_SWATCH = 0.7
 STEP_LEGEND_EDGE_WIDTH = 0.8
 # an error bar sits this far under the markers it belongs to (ADR 0057)
 ERROR_BAR_Z_STEP = 0.1
-# the error each axis reads, and the one it draws along when transposed
-ERROR_AXES = {"xerr": "yerr", "yerr": "xerr"}
+# the error columns a scatter point may carry, and the axis each is drawn
+# along once a transposed panel has swapped the two
+ERROR_KEYS = ("xerr", "yerr")
+ERROR_AXIS_SWAP = {"xerr": "yerr", "yerr": "xerr"}
 
 
 # ================================================
@@ -2511,6 +2513,12 @@ def _axis_numbers(ax, transpose: bool, x) -> np.ndarray:
     return np.asarray(axis.convert_units(x), dtype=float)
 
 
+def _drawn_error_axis(axis: str, transpose: bool) -> str:
+    """The axis an error is drawn along; a transposed panel swaps the two."""
+
+    return ERROR_AXIS_SWAP[axis] if transpose else axis
+
+
 def _masked_errors(errors: dict, mask) -> dict:
     """The error distances of the points `mask` picks, per axis."""
 
@@ -2538,7 +2546,7 @@ def _point_resolver(label, x, y, transpose: bool, errors=None) -> Callable[[int]
             if distances is None or np.isnan(distances[0][index]):
                 continue
             low, high = float(distances[0][index]), float(distances[1][index])
-            key = ERROR_AXES[axis] if transpose else axis
+            key = _drawn_error_axis(axis, transpose)
             datum[key] = low if low == high else f"-{low:g}/+{high:g}"
         return datum
 
@@ -4203,7 +4211,7 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
         self.error_style = get_scatter_error_style(self.style)
         # a point carrying the key gets its bar unless the front says otherwise
         self.show_errors = {
-            axis: self.settings.get(f"show_{axis}") is not False for axis in ERROR_AXES
+            axis: self.settings.get(f"show_{axis}") is not False for axis in ERROR_KEYS
         }
         self.record_roles = _validated_record_roles(
             _keyed_records(self.chart, "x"), self.kind
@@ -4264,31 +4272,35 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
                 "s", self.default_size
             )
 
+    def _point_column(self, key: str, n: int) -> Optional[list]:
+        """One raw value per drawn point (None where the key is absent), or None.
+
+        The records keyed by `x` are the drawn points; a column that names a
+        different number of them names none of them.
+        """
+
+        values = [record.get(key) for record in _keyed_records(self.chart, "x")]
+        if len(values) != n or all(value is None for value in values):
+            return None
+        return values
+
     def _point_labels(self, x_data) -> Optional[np.ndarray]:
         """One label per drawn point (None where the key is absent), or None."""
 
         label_attr = get_attr_value("label", self.chart, "label")
-        labels = [d.get(label_attr) for d in _keyed_records(self.chart, "x")]
-        if len(labels) != len(x_data) or all(l is None for l in labels):
+        labels = self._point_column(label_attr, len(x_data))
+        if labels is None:
             return None
         return np.array([None if l is None else str(l) for l in labels], dtype=object)
 
     def _error_distances(self, axis: str, n: int) -> Optional[np.ndarray]:
-        """The `(2, n)` low/high distances of `axis`, NaN where a point has none.
-
-        The drawn points name the column: records keyed by `x` carry one value
-        each, and a column of another length names no point, so it is dropped.
-        """
+        """The `(2, n)` low/high distances of `axis`, NaN where a point has none."""
 
         if not self.show_errors[axis]:
             return None
         key = get_attr_value(axis, self.chart, axis)
-        data = self.chart.get("data")
-        if isinstance(data, dict):
-            values = list(data.get(key) or [])
-        else:
-            values = [record.get(key) for record in _keyed_records(self.chart, "x")]
-        if len(values) != n or all(value is None for value in values):
+        values = self._point_column(key, n)
+        if values is None:
             return None
         pairs = validate_error_distances(values, key)
         return np.array(
@@ -4305,10 +4317,12 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
         error_style = dict(self.error_style)
         error_style.setdefault("ecolor", style.get("c"))
         for axis, distances in errors.items():
-            drawn = distances is not None and ~np.isnan(distances[0])
-            if distances is None or not drawn.any():
+            if distances is None:
                 continue
-            key = ERROR_AXES[axis] if ctx.transpose else axis
+            drawn = ~np.isnan(distances[0])
+            if not drawn.any():
+                continue
+            key = _drawn_error_axis(axis, ctx.transpose)
             px, py = (y, x) if ctx.transpose else (x, y)
             ax.errorbar(
                 px[drawn],
@@ -4445,7 +4459,7 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
             if series_color is None:
                 series_color = ctx.color
             units = [(np.ones(len(x_data), dtype=bool), series_color, self.label(ctx))]
-        errors = {axis: self._error_distances(axis, len(x_data)) for axis in ERROR_AXES}
+        errors = {axis: self._error_distances(axis, len(x_data)) for axis in ERROR_KEYS}
         for mask, color, label in units:
             sizes = self._sizes(
                 size_data[mask] if size_data is not None else None, ctx.size_extent
