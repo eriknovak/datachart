@@ -81,6 +81,7 @@ from .validate import (
     validate_contour_levels,
     validate_filled_levels,
     validate_emphasis,
+    validate_error_distances,
     validate_given_ranks,
     validate_label_position,
     validate_node_label_position,
@@ -149,6 +150,7 @@ from .config_helpers import (
     get_hexbin_style,
     get_colorbar_setting,
     get_scatter_style,
+    get_scatter_error_style,
     get_regression_style,
     get_box_style,
     get_box_outlier_style,
@@ -477,6 +479,14 @@ CONTOUR_LINE_CMAP_START = 0.3
 CONTOUR_SWATCH = 0.7
 # value steps (ADR 0048): the legend swatch outline
 STEP_LEGEND_EDGE_WIDTH = 0.8
+# an error bar sits this far under the markers it belongs to (ADR 0057)
+ERROR_BAR_Z_STEP = 0.1
+# the bar's cap, as a flat bracket at its far end; the width is in points
+ERROR_CAP_STYLE = "-[,widthB={width},lengthB=0"
+# the error columns a scatter point may carry, and the axis each is drawn
+# along once a transposed panel has swapped the two
+ERROR_KEYS = ("xerr", "yerr")
+ERROR_AXIS_SWAP = {"xerr": "yerr", "yerr": "xerr"}
 
 
 # ================================================
@@ -2505,19 +2515,42 @@ def _axis_numbers(ax, transpose: bool, x) -> np.ndarray:
     return np.asarray(axis.convert_units(x), dtype=float)
 
 
-def _point_resolver(label, x, y, transpose: bool) -> Callable[[int], dict]:
+def _drawn_error_axis(axis: str, transpose: bool) -> str:
+    """The axis an error is drawn along; a transposed panel swaps the two."""
+
+    return ERROR_AXIS_SWAP[axis] if transpose else axis
+
+
+def _masked_errors(errors: dict, mask) -> dict:
+    """The error distances of the points `mask` picks, per axis."""
+
+    return {
+        axis: None if distances is None else distances[:, mask]
+        for axis, distances in errors.items()
+    }
+
+
+def _point_resolver(label, x, y, transpose: bool, errors=None) -> Callable[[int], dict]:
     """The hover resolver of a point series drawn from `x` and `y` arrays.
 
     The datum names the *drawn* axes: a transposed series (horizontal panel
     or bars) reports its `x` values under `y` and vice versa, so the axis
-    labels on the artist's axes always describe the values.
+    labels on the artist's axes always describe the values. A point's error
+    distances follow its values, under the axis they are drawn along.
     """
 
     def resolve(index: int) -> dict:
         x_val, y_val = _scalar(x[index]), _scalar(y[index])
         if transpose:
             x_val, y_val = y_val, x_val
-        return {"label": label, "x": x_val, "y": y_val}
+        datum = {"label": label, "x": x_val, "y": y_val}
+        for axis, distances in (errors or {}).items():
+            if distances is None or np.isnan(distances[0][index]):
+                continue
+            low, high = float(distances[0][index]), float(distances[1][index])
+            key = _drawn_error_axis(axis, transpose)
+            datum[key] = low if low == high else f"-{low:g}/+{high:g}"
+        return datum
 
     return resolve
 
@@ -4177,6 +4210,11 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
 
     def _resolve_style(self):
         self.scatter_style = get_scatter_style(self.style)
+        self.error_style = get_scatter_error_style(self.style)
+        # a point carrying the key gets its bar unless the front says otherwise
+        self.show_errors = {
+            axis: self.settings.get(f"show_{axis}") is not False for axis in ERROR_KEYS
+        }
         self.record_roles = _validated_record_roles(
             _keyed_records(self.chart, "x"), self.kind
         )
@@ -4236,14 +4274,94 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
                 "s", self.default_size
             )
 
+    def _point_column(self, key: str, n: int) -> Optional[list]:
+        """One raw value per drawn point (None where the key is absent), or None.
+
+        The records keyed by `x` are the drawn points; a column that names a
+        different number of them names none of them.
+        """
+
+        values = [record.get(key) for record in _keyed_records(self.chart, "x")]
+        if len(values) != n or all(value is None for value in values):
+            return None
+        return values
+
     def _point_labels(self, x_data) -> Optional[np.ndarray]:
         """One label per drawn point (None where the key is absent), or None."""
 
         label_attr = get_attr_value("label", self.chart, "label")
-        labels = [d.get(label_attr) for d in _keyed_records(self.chart, "x")]
-        if len(labels) != len(x_data) or all(l is None for l in labels):
+        labels = self._point_column(label_attr, len(x_data))
+        if labels is None:
             return None
         return np.array([None if l is None else str(l) for l in labels], dtype=object)
+
+    def _error_distances(self, axis: str, n: int) -> Optional[np.ndarray]:
+        """The `(2, n)` low/high distances of `axis`, NaN where a point has none."""
+
+        if not self.show_errors[axis]:
+            return None
+        key = get_attr_value(axis, self.chart, axis)
+        values = self._point_column(key, n)
+        if values is None:
+            return None
+        pairs = validate_error_distances(values, key)
+        return np.array(
+            [(np.nan, np.nan) if pair is None else pair for pair in pairs], dtype=float
+        ).T
+
+    def _draw_errors(self, ax, ctx, x, y, sizes, errors: dict, style: dict) -> None:
+        """One bar per point per side, each running from its marker's edge outward.
+
+        A translucent marker shows whatever is drawn under it, so the bar
+        stops at the marker rather than crossing it; the gap is the marker's
+        radius in points, which the patch resolves at draw time and so keeps
+        whatever the axes do afterwards. The bar wears the color the markers
+        took, so a hue group's bars match it and a muted role's bars dim with
+        it (ADR 0057).
+        """
+
+        color = self.error_style.get("ecolor") or style.get("c")
+        capsize = self.error_style.get("capsize") or 0
+        arrowstyle = ERROR_CAP_STYLE.format(width=2 * capsize) if capsize else "-"
+        radii = np.broadcast_to(
+            np.sqrt(np.asarray(sizes, dtype=float)) / 2, np.shape(x)
+        )
+        px, py = (y, x) if ctx.transpose else (x, y)
+        px = np.asarray(ax.xaxis.convert_units(px), dtype=float)
+        py = np.asarray(ax.yaxis.convert_units(py), dtype=float)
+        ends = []
+        for axis, distances in errors.items():
+            if distances is None:
+                continue
+            step = (
+                (1.0, 0.0)
+                if _drawn_error_axis(axis, ctx.transpose) == "xerr"
+                else (0.0, 1.0)
+            )
+            for index in np.flatnonzero(~np.isnan(distances[0])):
+                point = np.array([px[index], py[index]])
+                for reach in (-distances[0][index], distances[1][index]):
+                    if reach == 0:
+                        continue
+                    end = point + reach * np.array(step)
+                    ends.append(end)
+                    ax.add_patch(
+                        FancyArrowPatch(
+                            point,
+                            end,
+                            arrowstyle=arrowstyle,
+                            mutation_scale=1,
+                            shrinkA=radii[index],
+                            shrinkB=0,
+                            color=color,
+                            linewidth=self.error_style.get("elinewidth"),
+                            alpha=style.get("alpha"),
+                            zorder=style.get("zorder", 0) - ERROR_BAR_Z_STEP,
+                        )
+                    )
+        # a patch draws where it is put; the axes learn the reach from the ends
+        if ends:
+            ax.update_datalim(ends)
 
     def _mark_labels(self, ax, ctx, x_data, y_data, roles) -> tuple:
         """The (labels, font, pad) each point carries: its value, or its point label.
@@ -4370,6 +4488,7 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
             if series_color is None:
                 series_color = ctx.color
             units = [(np.ones(len(x_data), dtype=bool), series_color, self.label(ctx))]
+        errors = {axis: self._error_distances(axis, len(x_data)) for axis in ERROR_KEYS}
         for mask, color, label in units:
             sizes = self._sizes(
                 size_data[mask] if size_data is not None else None, ctx.size_extent
@@ -4389,6 +4508,7 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
                 labels=labels[mask] if labels is not None else None,
                 font=font,
                 pad=pad,
+                errors=_masked_errors(errors, mask),
             )
 
         x_fit = _axis_numbers(ax, ctx.transpose, x_data)
@@ -4423,6 +4543,7 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
         labels,
         font,
         pad,
+        errors,
     ) -> None:
         """Draw one hue group or series: one collection per emphasis role.
 
@@ -4440,6 +4561,10 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
             if role == EMPHASIS_HIGHLIGHT:
                 style["edgecolors"] = self.highlight_edge_color
             role_sizes = sizes[picked] if np.ndim(sizes) else sizes
+            role_errors = _masked_errors(errors, picked)
+            self._draw_errors(
+                ax, ctx, x[picked], y[picked], role_sizes, role_errors, style
+            )
             collection = _draw_scatter_marks(
                 scatter,
                 x[picked],
@@ -4455,7 +4580,9 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
             self._mark_legend_size(collection, size_data)
             self.register_hover(
                 collection,
-                _point_resolver(label, x[picked], y[picked], ctx.transpose),
+                _point_resolver(
+                    label, x[picked], y[picked], ctx.transpose, role_errors
+                ),
             )
             self._record_points(
                 ax,

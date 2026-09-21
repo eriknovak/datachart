@@ -370,6 +370,8 @@ EXPECTED_CHANGES = {
     "heatmap_centered",
     "heatmap_twoslope",
     "calendar_centered",
+    # new scatter error bar case (ADR 0057)
+    "scatter_error_bars",
 }
 
 
@@ -660,6 +662,24 @@ def scatter_hue_size():
         for i in range(30)
     ]
     return ScatterChart(data=data, show_legend=True)
+
+
+@case
+def scatter_error_bars():
+    # every second point carries an asymmetric y error, the rest a symmetric
+    # one; the appended point carries none
+    data = [
+        {
+            "x": i,
+            "y": (i * 3) % 11,
+            "hue": "grp" + str(i % 3),
+            "xerr": 0.3,
+            **({"yerr": [0.4, 1.6]} if i % 2 else {"yerr": 0.8}),
+        }
+        for i in range(12)
+    ]
+    data.append({"x": 12, "y": 5, "hue": "grp0"})
+    return ScatterChart(data=data, show_legend=True, title="Scores with intervals")
 
 
 @case

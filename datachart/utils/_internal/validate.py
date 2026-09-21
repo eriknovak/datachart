@@ -166,6 +166,30 @@ def validate_point_labels(label, show_values) -> None:
         )
 
 
+def validate_error_distances(values: list, key: str) -> List[Optional[tuple]]:
+    """The `(low, high)` distances of each point's error, None where a point has none.
+
+    A distance is a non-negative finite number; one number reaches the same
+    distance both ways, a `[low, high]` pair reaches `low` below and `high`
+    above (ADR 0057).
+    """
+
+    distances = []
+    for index, value in enumerate(values):
+        if value is None:
+            distances.append(None)
+            continue
+        pair = tuple(value) if isinstance(value, (list, tuple)) else (value, value)
+        if len(pair) != 2 or not all(_is_distance(side) for side in pair):
+            raise ValueError(
+                f"Invalid `{key}` value {value!r} for point {index}. Must be a "
+                "non-negative number, or a `[low, high]` pair of them, measured "
+                "as distances from the point."
+            )
+        distances.append((float(pair[0]), float(pair[1])))
+    return distances
+
+
 def validate_value_step(step):
     """Validate a value-label step: None or a positive whole number."""
 
@@ -519,6 +543,10 @@ def validate_emphasis_rule(rule, by: Optional[str] = None):
 
 def _is_number(value) -> bool:
     return isinstance(value, Real) and not isinstance(value, bool)
+
+
+def _is_distance(value) -> bool:
+    return _is_number(value) and math.isfinite(value) and value >= 0
 
 
 SANKEY_LINK_COLORS = ("source", "target", "grey")

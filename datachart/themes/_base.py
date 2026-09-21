@@ -363,6 +363,10 @@ BASE_THEME: StyleAttrs = {
     "plot_scatter_zorder": 3,
     "plot_scatter_edge_width": 0.5,
     "plot_scatter_edge_color": "#FFFFFF",
+    # a None error color follows the point it belongs to (ADR 0057)
+    "plot_scatter_error_color": None,
+    "plot_scatter_error_width": 1.0,
+    "plot_scatter_error_capsize": 2,
     # plot regression style
     "plot_regression_color": None,
     "plot_regression_alpha": 0.9,

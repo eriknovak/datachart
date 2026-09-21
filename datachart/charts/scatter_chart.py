@@ -50,6 +50,8 @@ def ScatterChart(
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
+    show_xerr: Optional[bool] = None,
+    show_yerr: Optional[bool] = None,
     show_regression: Optional[bool] = None,
     show_ci: Optional[bool] = None,
     ci_level: Optional[float] = None,
@@ -127,6 +129,8 @@ def ScatterChart(
     size: Optional[Union[str, List[Optional[str]]]] = None,
     hue: Optional[Union[str, List[Optional[str]]]] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
+    xerr: Optional[Union[str, List[Optional[str]]]] = None,
+    yerr: Optional[Union[str, List[Optional[str]]]] = None,
     size_range: Optional[Tuple[float, float]] = None,
 ) -> plt.Figure:
     """Creates a scatter chart.
@@ -227,6 +231,9 @@ def ScatterChart(
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y");
             `False` draws none.
+        show_xerr: Whether to draw the x-axis error bars; `True` by default,
+            so a point carrying the key gets its bar.
+        show_yerr: Whether to draw the y-axis error bars, as `show_xerr`.
         show_regression: Whether to show the regression line.
         show_ci: Whether to show the confidence interval around the regression line.
         ci_level: The confidence interval level (default 0.95).
@@ -275,6 +282,14 @@ def ScatterChart(
             marker at the spot with the least overlap against the other
             markers, labels, and the axes edge; points without the key stay
             unlabelled.
+        xerr: The key name in data for the x-axis error values (default: "xerr").
+            The value is a distance from the point: one number reaches the same
+            distance both ways, a `(low, high)` pair reaches `low` left and
+            `high` right. A point without the key draws no bar. Each bar runs
+            from the edge of its marker outward, in the point's own color,
+            which `plot_scatter_error_color` overrides.
+        yerr: The key name in data for the y-axis error values (default: "yerr"),
+            read like `xerr`.
         size_range: Tuple of (min_size, max_size) for bubble charts (default: (20, 200)).
 
     Returns:
@@ -305,6 +320,8 @@ def ScatterChart(
         size=size,
         hue=hue,
         label=label,
+        xerr=xerr,
+        yerr=yerr,
     )
 
     # Figure-level settings; None values resolve to defaults downstream
@@ -321,6 +338,8 @@ def ScatterChart(
         "show_legend": show_legend,
         "legend": legend,
         "show_grid": show_grid,
+        "show_xerr": show_xerr,
+        "show_yerr": show_yerr,
         "aspect_ratio": aspect_ratio,
         "subplots": subplots,
         "max_cols": max_cols,
