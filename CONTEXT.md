@@ -579,6 +579,20 @@ its face, so a dark theme carries light furniture (ADR 0058).
 _Avoid_: publication, academic, background (former role-based theme names),
 dark mode (a flag; `DARK` is a theme)
 
+**Lead**:
+The colour source a theme's palettes descend from: a sequential colormap
+(the value scale is the lead itself, the series palette and the parallel
+coords ramp are sampled from it) or a categorical palette (the series
+palette is the lead, the value scale is the base's). A lead is sequential
+when its lightness runs one way; a diverging map is never a lead.
+_Avoid_: primary colour, accent, brand colour
+
+**Derived theme**:
+A theme built from a base theme and a lead: the base's furniture, fonts,
+hatches and rendering unchanged, its lead-dependent palettes rebuilt from the
+new lead. It is a plain theme dictionary, applied like any hand-written one.
+_Avoid_: theme variant, recoloured theme, sub-theme
+
 **Furniture**:
 Everything the panel dresses an axes with around the marks: spines, ticks,
 axis and tick fonts, grid, limits, legend, value labels, annotation text,

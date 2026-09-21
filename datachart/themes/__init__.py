@@ -21,8 +21,10 @@ from .contrast import CONTRAST_THEME
 from .mutedhatch import MUTEDHATCH_THEME
 from .slatehatch import SLATEHATCH_THEME
 from .dark import DARK_THEME
+from .derive import derive_theme
 
 __all__ = [
+    "derive_theme",
     "DEFAULT_THEME",
     "GREYSCALE_THEME",
     "INK_THEME",

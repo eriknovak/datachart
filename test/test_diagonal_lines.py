@@ -40,6 +40,9 @@ WIND = [{"label": d, "y": v} for d, v in zip(["N", "E", "S", "W"], [3, 5, 4, 6])
 GROUPS = [{"label": g, "value": float(v)} for g in "AB" for v in range(6)]
 SPANS = [{"label": "A", "start": 1, "end": 3}, {"label": "B", "start": 2, "end": 5}]
 DLINE_KEYS = ("color", "style", "width", "alpha")
+PREDEFINED_THEMES = {
+    name: getattr(themes, name) for name in themes.__all__ if name.endswith("_THEME")
+}
 
 
 def ref_lines(ax):
@@ -62,8 +65,7 @@ class TestTypingsAndThemes(unittest.TestCase):
         )
 
     def test_theme_keys_in_every_theme(self):
-        for theme_name in themes.__all__:
-            theme = getattr(themes, theme_name)
+        for theme_name, theme in PREDEFINED_THEMES.items():
             for key in DLINE_KEYS:
                 self.assertIn(f"plot_dline_{key}", theme, theme_name)
 
@@ -73,8 +75,7 @@ class TestTypingsAndThemes(unittest.TestCase):
             self.assertEqual(config[f"plot_dline_{key}"], config[f"plot_hline_{key}"])
 
     def test_every_theme_styles_the_diagonal_as_its_horizontal_line(self):
-        for theme_name in themes.__all__:
-            theme = getattr(themes, theme_name)
+        for theme_name, theme in PREDEFINED_THEMES.items():
             for key in DLINE_KEYS:
                 self.assertEqual(
                     theme[f"plot_dline_{key}"], theme[f"plot_hline_{key}"], theme_name

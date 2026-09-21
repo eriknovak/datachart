@@ -36,6 +36,9 @@ LINE = [{"x": i, "y": i * 2} for i in range(6)]
 BAR = [{"label": c, "y": v} for c, v in zip("ABCD", [3, 5, 4, 6])]
 WIND = [{"label": d, "y": v} for d, v in zip(["N", "E", "S", "W"], [3, 5, 4, 6])]
 SPAN_KEYS = ("color", "alpha", "hatch", "edge_color", "edge_width", "zorder")
+PREDEFINED_THEMES = {
+    name: getattr(themes, name) for name in themes.__all__ if name.endswith("_THEME")
+}
 
 
 def hatch_color(patch):
@@ -83,8 +86,7 @@ class TestTypingsAndThemes(unittest.TestCase):
         )
 
     def test_theme_keys_in_every_theme(self):
-        for theme_name in themes.__all__:
-            theme = getattr(themes, theme_name)
+        for theme_name, theme in PREDEFINED_THEMES.items():
             for side in ("vspan", "hspan"):
                 for key in SPAN_KEYS:
                     self.assertIn(f"plot_{side}_{key}", theme, theme_name)
