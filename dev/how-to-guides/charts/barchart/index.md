@@ -44,7 +44,7 @@ Every customization is either a keyword argument of `BarChart` or a `plot_bar_*`
 | print the value on each bar                 | `show_values`, `value_format`                          | [Value labels](#value-labels)                                                                           |
 | change the bar color, width, hatch, or edge | `style={"plot_bar_color": ..., "plot_bar_hatch": ...}` | [Bar style](#bar-style)                                                                                 |
 | highlight some bars, mute the rest          | `emphasis_rule`, the `"emphasis"` key of a data point  | [Emphasis](#emphasis)                                                                                   |
-| mark a threshold or a boundary              | `hlines`, `vlines`                                     | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| mark a threshold or a boundary              | `hlines`, `vlines`, `dlines`                           | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | shade a range or a group of bars            | `hspans`, `vspans`                                     | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | put a note on the chart                     | `texts`                                                | [Text annotations](#text-annotations)                                                                   |
 | use dates as category labels                | `date` objects as `label`, `xticks_format`             | [Date labels](#date-labels)                                                                             |
@@ -288,6 +288,8 @@ BarChart(
 
 Reference lines and bands put the bars in context. `hlines` draws a horizontal line at a value, such as the mean of the table, and `vlines` a vertical one at a bar position; positions along the category axis are bar indices (`0`, `1`, `2`, …), so a half-integer sits between two bars. `hspans` and `vspans` shade a range instead of marking a value: a band of acceptable values, or a group of bars. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). The example marks the mean of the top ten with a dashed line and shades the three podium positions.
 
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). Here it asks whether the medal table falls off evenly: the line runs from the first bar to the tenth, and the bars that stand above it won more than an even decline would give them. Positions on the category axis are bar indices, so the slope is medals per position.
+
 ```
 from datachart.constants import LINE_STYLE
 
@@ -304,6 +306,32 @@ BarChart(
     # shade the first three bars
     vspans={"xmin": -0.5, "xmax": 2.5, "label": "podium"},
     title="Paris 2024 medal table, ranked by total medals",
+    xlabel="Country",
+    ylabel="Medals",
+    xtickrotate=45,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+    sort=SORT.DESCENDING,
+    ymin=0,
+).show()
+```
+
+```
+totals = sorted((point["y"] for point in medals_total), reverse=True)
+# an even decline from the first bar to the tenth, in medals per position
+even_step = (totals[-1] - totals[0]) / (len(totals) - 1)
+
+BarChart(
+    data=medals_total,
+    # the line the table would follow if every position cost the same
+    dlines={
+        "slope": even_step,
+        "intercept": totals[0],
+        "label": "even decline",
+        "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    title="Paris 2024 medal table against an even decline",
     xlabel="Country",
     ylabel="Medals",
     xtickrotate=45,

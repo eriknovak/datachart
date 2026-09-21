@@ -48,7 +48,7 @@ Every customization is either a keyword argument of `ViolinPlot` or a `plot_viol
 | style the inner marks and the median dot             | `style={"plot_violin_inner_color": ..., "plot_violin_median_color": ...}` | [Violin style](#violin-style)                                                                           |
 | draw the violins horizontally                        | `orientation`                                                             | [Horizontal violins](#horizontal-violins)                                                               |
 | highlight some violins, mute the rest                | `emphasis`, `emphasis_rule`                                               | [Emphasis](#emphasis)                                                                                   |
-| mark a threshold or shade a range                    | `hlines`, `vlines`, `hspans`, `vspans`                                    | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| mark a threshold or shade a range                    | `hlines`, `dlines`, `vlines`, `hspans`, `vspans`                          | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | put a note on the chart                              | `texts`                                                                   | [Text annotations](#text-annotations)                                                                   |
 | use dates as group labels                            | `date` objects as `label`, `xticks_format`                                | [Date labels](#date-labels)                                                                             |
 | draw a box plot or the observations over the violins | `Panel` with `BoxPlot` or `SwarmPlot`                                     | [Violins with boxes and swarms](#violins-with-boxes-and-swarms)                                         |
@@ -70,6 +70,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
+| `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
 | `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
 | `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
@@ -326,6 +327,8 @@ ViolinPlot(
 
 Reference lines and bands put the violins in context. `hlines` draws a horizontal line at a value, such as the mean of all birds, and `vlines` a vertical one; the violins sit at positions `0`, `1`, `2`, … along the group axis, as bars do, so a half-integer falls between two violins. `hspans` and `vspans` shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). The example marks the mean of all 342 birds and shades one standard deviation around it: the mean falls in the gap between the lighter species and the Gentoo, where few birds of any species sit, which is why a single average describes none of them well.
 
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). The violins sit at `0`, `1`, `2`, so a diagonal asks whether the species step up evenly: the line runs from the first mean to the last, and the middle violin sits below it.
+
 ```
 from statistics import mean, pstdev
 
@@ -358,6 +361,34 @@ ViolinPlot(
     show_legend=True,
     # one row above the axes, clear of the band
     legend={"location": LEGEND_LOCATION.OUTSIDE_TOP, "ncols": 2},
+).show()
+```
+
+```
+species = list(dict.fromkeys(penguin["label"] for penguin in penguins))
+means = [
+    mean(penguin["value"] for penguin in penguins if penguin["label"] == name)
+    for name in species
+]
+# an even step from the first species to the last
+even_step = (means[-1] - means[0]) / (len(species) - 1)
+
+ViolinPlot(
+    data=penguins,
+    # the line the means would sit on if the species stepped up evenly
+    dlines={
+        "slope": even_step,
+        "intercept": means[0],
+        "label": "even step between species",
+        "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    title="Body mass of Palmer penguins against an even step",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    yticks_format="{x:,.0f}",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
 ).show()
 ```
 

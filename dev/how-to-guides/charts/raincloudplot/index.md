@@ -44,7 +44,7 @@ Every customization is either a keyword argument of `RaincloudPlot` or an attrib
 | print each group's median, min and max             | `show_values`, `value_format`                                                         | [Value labels](#value-labels)                                                                           |
 | draw the rainclouds horizontally                   | `orientation`                                                                         | [Horizontal rainclouds](#horizontal-rainclouds)                                                         |
 | highlight some groups, mute the rest               | `emphasis`, `emphasis_rule`                                                           | [Emphasis](#emphasis)                                                                                   |
-| mark a threshold or shade a range                  | `hlines`, `vlines`, `hspans`, `vspans`                                                | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| mark a threshold or shade a range                  | `hlines`, `dlines`, `vlines`, `hspans`, `vspans`                                      | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | put a note on the chart                            | `texts`                                                                               | [Text annotations](#text-annotations)                                                                   |
 | use dates as group labels                          | `date` objects as `label`, `xticks_format`                                            | [Date labels](#date-labels)                                                                             |
 | list the groups in a titled legend                 | `show_legend`, `legend`                                                               | [Legend](#legend)                                                                                       |
@@ -274,6 +274,8 @@ RaincloudPlot(
 
 Reference lines and bands put the rainclouds in context. `hlines` draws a horizontal line at a value, such as the mean of all penguins, and `vlines` a vertical one; group positions along the category axis start at `0`, as for bars, so a half-integer sits between two groups. `hspans` and `vspans` shade a range instead of marking a value. Each takes a dictionary or a list of them, with the position and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). A band of one standard deviation around the overall mean shows that a typical Adelie or Chinstrap penguin falls inside it, while most Gentoo penguins sit above it.
 
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). The groups sit at `0`, `1`, `2`, so a diagonal asks whether they step up evenly: the line runs from the first group's mean to the last, and a cloud that hangs below it weighs less than an even step would give it.
+
 ```
 from datachart.constants import LINE_STYLE
 
@@ -299,6 +301,34 @@ RaincloudPlot(
     ylabel="Body mass (g)",
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
+).show()
+```
+
+```
+groups = list(dict.fromkeys(point["label"] for point in chart_data))
+means = [
+    sum(point["value"] for point in chart_data if point["label"] == name)
+    / sum(1 for point in chart_data if point["label"] == name)
+    for name in groups
+]
+# an even step from the first group to the last
+even_step = (means[-1] - means[0]) / (len(groups) - 1)
+
+RaincloudPlot(
+    data=chart_data,
+    # the line the means would sit on if the groups stepped up evenly
+    dlines={
+        "slope": even_step,
+        "intercept": means[0],
+        "label": "even step between groups",
+        "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    title="Body mass against an even step between groups",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
 ).show()
 ```
 

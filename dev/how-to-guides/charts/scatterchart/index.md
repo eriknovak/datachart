@@ -47,7 +47,7 @@ Every customization is either a keyword argument of `ScatterChart` or a `plot_sc
 | fit a trend line and measure the correlation  | `show_regression`, `show_ci`, `ci_level`, `show_correlation`    | [Regression line](#regression-line)                                                                     |
 | keep one unit the same length on both axes    | `aspect_ratio`                                                  | [Aspect ratio](#aspect-ratio)                                                                           |
 | highlight some series, mute the rest          | `emphasis`, `emphasis_rule`                                     | [Emphasis](#emphasis)                                                                                   |
-| mark a threshold or a reference value         | `hlines`, `vlines`                                              | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| mark a threshold or a reference value         | `hlines`, `vlines`, `dlines`                                    | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | shade a range of values                       | `hspans`, `vspans`                                              | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | put a note on the chart                       | `texts`                                                         | [Text annotations](#text-annotations)                                                                   |
 | compare several series in one chart           | `data` as a list of lists, `subtitle`, `show_legend`            | [Multiple Scatter Charts](#multiple-scatter-charts)                                                     |
@@ -381,6 +381,8 @@ ScatterChart(
 
 Is a country above or below the world as a whole? Reference lines answer by marking a value: `hlines` draws a horizontal line at a `y` value and `vlines` a vertical one at an `x` value. `hspans` and `vspans` shade a range instead; a band needs at least one bound, and a missing bound runs to the axis edge. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs), and the line patterns in [LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE). The lines below split the chart into quadrants: the world life expectancy in 2019 (73.1 years, WHO) and the median GDP per capita of the countries shown.
 
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). The line is straight in data coordinates, which means straight on a linear axis only: on a logarithmic one it draws as a curve. The chart above uses a logarithmic income axis for that reason; this one drops it and keeps to the poorest countries, where the diagonal reads as what it is — the years of life a thousand dollars buys at the bottom of the income scale. Above it the gain flattens, which is why the full range wants the log axis.
+
 ```
 from statistics import median
 
@@ -412,6 +414,35 @@ ScatterChart(
     # a fixed income range, so the horizontal line spans it
     xmin=400,
     xmax=100_000,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.BOTH,
+    show_legend=True,
+).show()
+```
+
+```
+POOREST = 10_000
+poorest = [point for point in countries if point["x"] <= POOREST]
+lowest = min(poorest, key=lambda point: point["x"])
+highest = max(poorest, key=lambda point: point["x"])
+# years of life expectancy per dollar, across the poorest countries
+per_dollar = (highest["y"] - lowest["y"]) / (highest["x"] - lowest["x"])
+
+ScatterChart(
+    data=poorest,
+    hue="region",
+    # the gradient across the bottom of the income scale
+    dlines={
+        "slope": per_dollar,
+        "intercept": lowest["y"] - per_dollar * lowest["x"],
+        "label": f"{per_dollar * 1000:.1f} years per $1,000",
+        "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    title="Life expectancy and income below $10,000 per head, 2019",
+    xlabel="GDP per capita (USD)",
+    ylabel="Life expectancy (years)",
+    xmin=0,
+    xmax=POOREST,
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
     show_legend=True,

@@ -44,7 +44,7 @@ Every customization is either a keyword argument of `BoxPlot` or a `plot_box_*` 
 | check whether two medians differ              | `show_notch`                                                  | [Notched boxes](#notched-boxes)                                                                         |
 | print the median of each box                  | `show_values`, `value_format`                                 | [Value labels](#value-labels)                                                                           |
 | highlight some boxes, mute the rest           | `emphasis`, `emphasis_rule`                                   | [Emphasis](#emphasis)                                                                                   |
-| mark a threshold or a summary value           | `hlines`, `vlines`                                            | [Reference lines](#reference-lines)                                                                     |
+| mark a threshold or a summary value           | `hlines`, `vlines`, `dlines`                                  | [Reference lines](#reference-lines)                                                                     |
 | shade a range of values                       | `hspans`, `vspans`                                            | [Reference bands](#reference-bands)                                                                     |
 | title and place the legend                    | `show_legend`, `legend`                                       | [Reference bands](#reference-bands)                                                                     |
 | put a note on the chart                       | `texts`                                                       | [Text annotations](#text-annotations)                                                                   |
@@ -68,6 +68,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
+| `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
 | `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
 | `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
@@ -288,6 +289,8 @@ BoxPlot(
 
 A box on its own says little about whether its values are high or low; a reference line gives it something to be compared with, such as a threshold or the overall mean. `hlines` draws a horizontal line at a value and `vlines` a vertical one; positions along the group axis are box positions, and the first box sits at `0`, as the first bar does, so a half-integer sits between two boxes. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style` whose line style is a [LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE) value; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) and [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs). The dashed line marks the mean body mass of all 342 penguins: the whole Gentoo box sits above it, and the Adelie and Chinstrap boxes below it. A dotted vertical line separates the two small species from the Gentoo.
 
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). The boxes sit at `0`, `1`, `2`, so a diagonal asks whether the species step up evenly: the line runs from the first median to the last, and the middle box sits below it.
+
 ```
 from datachart.constants import LINE_STYLE
 
@@ -309,6 +312,37 @@ BoxPlot(
     yticks_format=VALUE_FORMAT.THOUSANDS,
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
+).show()
+```
+
+```
+from statistics import median
+
+# the species in the order the boxes are drawn, and their medians
+species = list(dict.fromkeys(point["label"] for point in body_mass))
+medians = [
+    median(point["value"] for point in body_mass if point["label"] == name)
+    for name in species
+]
+# an even step from the first species to the last
+even_step = (medians[-1] - medians[0]) / (len(species) - 1)
+
+BoxPlot(
+    data=body_mass,
+    # the line the medians would sit on if the species stepped up evenly
+    dlines={
+        "slope": even_step,
+        "intercept": medians[0],
+        "label": "even step between species",
+        "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    title="Body mass of Palmer penguins against an even step",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    yticks_format=VALUE_FORMAT.THOUSANDS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
 ).show()
 ```
 

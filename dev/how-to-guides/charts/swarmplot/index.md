@@ -44,7 +44,7 @@ Every customization is either a keyword argument of `SwarmPlot` or a `plot_swarm
 | print each group's min, median, and max       | `show_values`, `value_format`                             | [Value labels](#value-labels)                                                                           |
 | highlight some groups, mute the rest          | `emphasis`, `emphasis_rule`                               | [Emphasis](#emphasis)                                                                                   |
 | highlight single points                       | a series of their own, `emphasis`                         | [Emphasis](#emphasis)                                                                                   |
-| mark a threshold or shade a range             | `hlines`, `vlines`, `hspans`, `vspans`                    | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| mark a threshold or shade a range             | `hlines`, `dlines`, `vlines`, `hspans`, `vspans`          | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | name a point on the chart                     | `texts`                                                   | [Text annotations](#text-annotations)                                                                   |
 | use dates as group labels                     | `date` objects as `label`, `xticks_format`                | [Date labels](#date-labels)                                                                             |
 | put the points over a box or violin plot      | `Panel`                                                   | [Swarms over boxes and violins](#swarms-over-boxes-and-violins)                                         |
@@ -273,6 +273,8 @@ SwarmPlot(
 
 Reference lines and bands put the points in context. `hlines` draws a horizontal line at a value, such as a limit or the overall median, and `vlines` a vertical one; `hspans` and `vspans` shade a range instead. The groups sit at positions `1`, `2`, `3`, … along the category axis, so a vertical line at `1.5` falls between the first two groups. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs), and the line styles in [LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE). The US Constitution requires a president to be at least 35: a band shades the ages below it, and a dashed line marks the median age of all 47 presidencies. Nobody came close to the limit.
 
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). The groups sit at `0`, `1`, `2`, … along the category axis, so a diagonal asks whether the ages drift across them: the line runs from the first group's median to the last, and the swarms standing above it took office older than that drift would have them.
+
 ```
 from statistics import median
 
@@ -301,6 +303,38 @@ SwarmPlot(
     show_grid=SHOW_GRID.Y,
     show_legend=True,
     # outside the axes, clear of the points
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+).show()
+```
+
+```
+from statistics import median
+
+periods = list(dict.fromkeys(point["label"] for point in inauguration_ages))
+medians = [
+    median(point["value"] for point in inauguration_ages if point["label"] == name)
+    for name in periods
+]
+# the even drift from the first group to the last, in years per group
+drift = (medians[-1] - medians[0]) / (len(periods) - 1)
+
+SwarmPlot(
+    data=inauguration_ages,
+    # the line the medians would sit on if the age drifted evenly
+    dlines={
+        "slope": drift,
+        "intercept": medians[0],
+        "label": "even drift",
+        "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    title="Age of US presidents at inauguration against an even drift",
+    xlabel="Took office in",
+    ylabel="Age (years)",
+    ymin=30,
+    ymax=80,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
     legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
 ).show()
 ```

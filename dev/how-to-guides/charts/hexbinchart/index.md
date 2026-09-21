@@ -54,7 +54,7 @@ Every customization is either a keyword argument of `HexbinChart` or a `plot_hex
 | color the hexagons by a value              | `c` in `data`, `reduce`                                          | [Aggregating a value](#aggregating-a-value)                                                             |
 | change the colormap or draw hexagon edges  | `style={"plot_hexbin_cmap": ..., "plot_hexbin_edge_width": ...}` | [Hexagon style](#hexagon-style)                                                                         |
 | highlight the densest hexagons             | `emphasis_rule`                                                  | [Emphasis](#emphasis)                                                                                   |
-| mark a value or shade a range              | `vlines`, `hlines`, `vspans`, `hspans`                           | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| mark a value or shade a range              | `vlines`, `hlines`, `dlines`, `vspans`, `hspans`                 | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | put a note on the chart                    | `texts`                                                          | [Text annotations](#text-annotations)                                                                   |
 | draw each dataset in its own subplot       | `data` as a list, `subplots`, `max_cols`, `sharex`, `sharey`     | [Multiple Hexbin Charts](#multiple-hexbin-charts)                                                       |
 | draw points or a trend over the hexagons   | `Panel`                                                          | [Composing with Panel](#composing-with-panel)                                                           |
@@ -71,6 +71,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `reduce`                                                        | [`HEXBIN_REDUCE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HEXBIN_REDUCE)                                                                                                                                                                                                                                               |
 | `figsize`                                                       | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                                                                                                                                         |
+| `legend={"location": ..., "alignment": ...}`                    | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN)                                                                                                                       |
 | `show_grid`                                                     | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                                                                                                                                       |
 | `aspect_ratio`                                                  | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                                                                                                                                                 |
 | `scalex`                                                        | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                                                                                                                                               |
@@ -292,6 +293,8 @@ HexbinChart(
 
 Reference lines and bands give the hexagons a frame to be read against. `vlines` and `hlines` draw a line at an x or y value, such as the median area and rent, which split the listings into four quadrants; `vspans` and `hspans` shade a range, such as a renter's budget. Each takes a dictionary or a list of them, with the position, an optional `label` and a `style`; the keys are listed in [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) and [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs). A band needs at least one bound; an omitted bound runs to the edge of the axes. The chart below crosses the medians with dashed lines and shades a budget of 800 to 1,200 €, which shows how much of the market around the median a renter on that budget can reach.
 
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). Both axes carry a measurement here, so a diagonal is a rate: the rent a square metre buys. The line is the median rate of the listings, and the hexagons above it are the listings that cost more per square metre than the market.
+
 ```
 from datachart.constants import LINE_STYLE
 
@@ -316,6 +319,27 @@ HexbinChart(
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
     figsize=FIG_SIZE.FULL_SHORT,
+).show()
+```
+
+```
+rate = float(np.median(np.array(points["y"]) / np.array(points["x"])))
+
+HexbinChart(
+    data=points,
+    # the median rent per square metre, through the origin
+    dlines={
+        "slope": rate,
+        "intercept": 0,
+        "label": f"median rate, {rate:.0f} €/m²",
+        "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    mincnt=1,
+    title="Apartment listings against the median rent per square metre",
+    xlabel="Floor area (m²)",
+    ylabel="Rent (€/month)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_legend=True,
 ).show()
 ```
 

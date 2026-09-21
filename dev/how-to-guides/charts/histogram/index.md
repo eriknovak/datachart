@@ -44,7 +44,7 @@ Every customization is either a keyword argument of `Histogram` or a `plot_hist_
 | change the color, hatch, or edge of the bins | `style={"plot_hist_color": ..., "plot_hist_hatch": ...}`      | [Histogram style](#histogram-style)                                                                     |
 | draw the bars horizontally                   | `orientation`                                                 | [Orientation](#orientation)                                                                             |
 | print the count at the top of each bin       | `show_values`, `value_format`                                 | [Value labels](#value-labels)                                                                           |
-| mark a mean, a median, or a cut-off          | `vlines`, `hlines`                                            | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| mark a mean, a median, or a cut-off          | `vlines`, `hlines`, `dlines`                                  | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | shade a range of values                      | `vspans`, `hspans`                                            | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | put a note on the chart                      | `texts`                                                       | [Text annotations](#text-annotations)                                                                   |
 | compare several distributions in one chart   | `data` as a list of lists, `subtitle`, `style`, `show_legend` | [Multiple Histograms](#multiple-histograms)                                                             |
@@ -216,6 +216,8 @@ A summary statistic means more when it sits on the distribution it summarizes. `
 
 The example marks the mean (201 mm) and the median (197 mm) and shades one standard deviation around the mean. The mean sits right of the median because the long-flippered Gentoo penguins pull it, and it lands on the slope down into the dip between the peaks: for a two-peaked distribution the "typical" value describes few of the penguins. The taller figure and `ymax` leave the legend room above the bars.
 
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). A histogram's axes are a measurement and a count, so a diagonal is only a reference for how fast the count climbs — which is exactly what a cumulative histogram needs. `show_cumulative` turns the bars into a running total, and the line is the total a perfectly even spread of flipper lengths would follow. The real total lags it at the short end, then runs above it from about 190 mm on, because the penguins cluster at two lengths instead of spreading out.
+
 ```
 from datachart.constants import LINE_STYLE
 
@@ -252,6 +254,34 @@ Histogram(
     xticks=FLIPPER_TICKS,
     figsize=FIG_SIZE.FULL_MEDIUM,
     ymax=60,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+).show()
+```
+
+```
+shortest, longest = min(flippers), max(flippers)
+# the running total a uniform spread would reach, in penguins per millimeter
+per_mm = len(flippers) / (longest - shortest)
+
+Histogram(
+    data=penguins,
+    subtitle="penguins",
+    show_cumulative=True,
+    # the straight climb a uniform spread would follow
+    dlines={
+        "slope": per_mm,
+        "intercept": -per_mm * shortest,
+        "xmin": shortest,
+        "xmax": longest,
+        "label": "uniform spread",
+        "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    title="Flipper length of Palmer penguins, running total",
+    xlabel="Flipper length (mm)",
+    ylabel="Penguins up to this length",
+    xticks=FLIPPER_TICKS,
+    figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
 ).show()

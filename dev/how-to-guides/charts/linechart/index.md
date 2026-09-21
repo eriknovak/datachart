@@ -45,7 +45,7 @@ Every customization is either a keyword argument of `LineChart` or a `plot_line_
 | draw the line as steps                  | `style={"plot_line_drawstyle": ...}`                                  | [Line style](#line-style)                                                                               |
 | fill the area under the line            | `show_area`, `style={"plot_area_color": ..., "plot_area_alpha": ...}` | [Area under the line](#area-under-the-line)                                                             |
 | print the value beside the points       | `show_values`, `value_format`, `value_step`                           | [Value labels](#value-labels)                                                                           |
-| mark a threshold or an event            | `hlines`, `vlines`                                                    | [Reference lines](#reference-lines)                                                                     |
+| mark a threshold or an event            | `hlines`, `vlines`, `dlines`                                          | [Reference lines](#reference-lines)                                                                     |
 | shade a period or a range               | `hspans`, `vspans`                                                    | [Reference bands](#reference-bands)                                                                     |
 | put a note on the chart                 | `texts`                                                               | [Text annotations](#text-annotations)                                                                   |
 | compare several series in one chart     | `data` as a list of lists, `subtitle`, `show_legend`                  | [Multiple Line Charts](#multiple-line-charts)                                                           |
@@ -231,6 +231,8 @@ LineChart(
 
 A reference line gives the reader something to measure the line against: a threshold it must not cross, or the moment something happened. `hlines` draws a horizontal line at a value and `vlines` a vertical one at an x position, each a dictionary or a list of them with the position, an optional `label` for the legend and a `style`; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) and [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs). The x position is in data coordinates, so a line can sit anywhere along the axis. The example marks the 1.5 °C of the Paris Agreement, which is measured against pre-industrial levels and lands near 1.2 °C on this 1951–1980 baseline, and the year the Agreement was adopted.
 
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). The line is straight in data coordinates, which means straight on a linear axis only: on a logarithmic one it draws as a curve. Here it draws the warming trend since 1970, about 0.18 °C per decade: `xmin` and `xmax` keep it to the years it describes, and the line the anomaly rises along says the pace has held.
+
 ```
 # 1.5 °C above pre-industrial, about 0.3 °C below the 1951-1980 mean used here
 PARIS_LIMIT = 1.2
@@ -250,6 +252,35 @@ LineChart(
         "x": PARIS_YEAR,
         "label": "Paris Agreement",
         "style": {"plot_vline_color": "#555555", "plot_vline_style": LINE_STYLE.DOTTED},
+    },
+    title="Global mean surface temperature anomaly",
+    xlabel="Year",
+    ylabel="Anomaly (°C)",
+    xticks=list(range(1880, 2025, 20)),
+    yticks_format="{x:+.1f}",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+).show()
+```
+
+```
+TREND_FROM, TREND_TO = 1970, max(YEARS)
+TREND_PER_YEAR = 0.018
+# the anomaly the trend starts from
+start = dict(zip(YEARS, ANOMALY))[TREND_FROM]
+
+LineChart(
+    data=warming,
+    subtitle="anomaly",
+    # 0.18 °C per decade, over the years it describes
+    dlines={
+        "slope": TREND_PER_YEAR,
+        "intercept": start - TREND_PER_YEAR * TREND_FROM,
+        "xmin": TREND_FROM,
+        "xmax": TREND_TO,
+        "label": "0.18 °C per decade since 1970",
+        "style": {"plot_dline_color": "#c1121f", "plot_dline_style": LINE_STYLE.DASHED},
     },
     title="Global mean surface temperature anomaly",
     xlabel="Year",

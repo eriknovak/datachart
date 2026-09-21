@@ -42,7 +42,7 @@ Every customization is either a keyword argument of `PyramidChart` or a `plot_ba
 | change the bar color, hatch, or edge, per side | `style`                                                         | [Bar style](#bar-style)                                                                                 |
 | rank the categories by size                    | `sort`, `sort_by`                                               | [Sorting](#sorting)                                                                                     |
 | highlight some bars, mute the rest             | `emphasis_rule`, the `"emphasis"` key of a data point           | [Emphasis](#emphasis)                                                                                   |
-| mark a value or an age boundary                | `vlines`, `hlines`                                              | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| mark a value or an age boundary                | `vlines`, `hlines`, `dlines`                                    | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | shade a value range or a run of bands          | `vspans`, `hspans`                                              | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | put a note on the chart                        | `texts`                                                         | [Text annotations](#text-annotations)                                                                   |
 | put several pyramids side by side              | `Grid`                                                          | [Multiple Pyramid Charts](#multiple-pyramid-charts)                                                     |
@@ -274,6 +274,8 @@ Reference lines and bands put the bars in context. `vlines` draws a vertical lin
 
 Two things are particular to the pyramid. The value axis is mirrored, so a line on the left half sits at a negative `x`. And a single line applies to both sides and is drawn once per side, which doubles its legend entry; a list aligned with `data`, with the lines on the first side and `None` on the second, draws each line once. Bands are drawn once whichever way they are given. The example draws the size of the youngest cohort up through each side (every band from 5-9 to 70-74 is larger than the cohort being born now), marks the retirement age between the 60-64 and 65-69 bands, and shades the working-age bands from 15-19 to 60-64.
 
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). The bands sit at `0`, `1`, `2`, … up the category axis and the bars carry the population, so a diagonal asks whether the pyramid tapers evenly: the line runs from the youngest band to the 60–64 band on the women's side, and the bands that reach past it are the bulges in the population.
+
 ```
 from datachart.constants import LINE_STYLE
 
@@ -299,6 +301,30 @@ PyramidChart(
     xlabel="Population (thousands)",
     ylabel="Age band",
     figsize=FIG_SIZE.FULL_TALL,
+).show()
+```
+
+```
+TOP_BAND = 12  # the 60-64 band
+# an even taper from the youngest band to it: bands per thousand women
+bands_per_thousand = TOP_BAND / (WOMEN[TOP_BAND] - WOMEN[0])
+
+PyramidChart(
+    data=[men, women],
+    subtitle=SIDES,
+    # the line the bands would end on if the taper were even
+    dlines={
+        "slope": bands_per_thousand,
+        "intercept": -bands_per_thousand * WOMEN[0],
+        "xmin": 0,
+        "label": "even taper",
+        "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    title="Population by age and sex against an even taper",
+    xlabel="Population (thousands)",
+    ylabel="Age band",
+    figsize=FIG_SIZE.FULL_TALL,
+    show_legend=True,
 ).show()
 ```
 

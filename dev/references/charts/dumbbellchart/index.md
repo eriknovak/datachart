@@ -61,6 +61,9 @@ DumbbellChart(
     hlines: (
         HLineSettingAttrs | list[HLineSettingAttrs] | None
     ) = None,
+    dlines: (
+        DLineSettingAttrs | list[DLineSettingAttrs] | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs | list[VSpanSettingAttrs] | None
     ) = None,
@@ -133,6 +136,7 @@ Examples:
 | `ytickrotate`     | Rotation angle for the y-axis tick labels. **TYPE:** \`int                                                                                                                                                                                                                                                                                  |
 | `vlines`          | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                     |
 | `hlines`          | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                   |
+| `dlines`          | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                             |
 | `vspans`          | Vertical reference band(s) to shade. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                          |
 | `hspans`          | Horizontal reference band(s) to shade. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                        |
 | `texts`           | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                    |
@@ -160,7 +164,7 @@ The record attributes for the dumbbell chart.
 
 ## Style
 
-`style` takes the keys of [`DumbbellStyleAttrs`](#datachart.typings.DumbbellStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs) and [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`DumbbellStyleAttrs`](#datachart.typings.DumbbellStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.DumbbellStyleAttrs
 

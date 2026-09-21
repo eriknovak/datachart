@@ -100,6 +100,7 @@ SHOWS = {
 SHARED = {
     "VLineSettingAttrs",
     "HLineSettingAttrs",
+    "DLineSettingAttrs",
     "VSpanSettingAttrs",
     "HSpanSettingAttrs",
     "TextSettingAttrs",
@@ -111,6 +112,7 @@ SHARED = {
     "RegressionStyleAttrs",
     "VLineStyleAttrs",
     "HLineStyleAttrs",
+    "DLineStyleAttrs",
     "VSpanStyleAttrs",
     "HSpanStyleAttrs",
     "TextStyleAttrs",
@@ -136,9 +138,9 @@ STYLE_GROUPS = [
     (("show_area",), "the area fill", ["AreaStyleAttrs"], set()),
     (("show_regression",), "the regression line", ["RegressionStyleAttrs"], set()),
     (
-        ("vlines", "hlines"),
+        ("vlines", "hlines", "dlines"),
         "reference lines",
-        ["VLineStyleAttrs", "HLineStyleAttrs"],
+        ["VLineStyleAttrs", "HLineStyleAttrs", "DLineStyleAttrs"],
         set(),
     ),
     (

@@ -5292,7 +5292,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">mark a threshold or shade a range</td>
-<td style="text-align:left"><code>hlines</code>, <code>vlines</code>, <code>hspans</code>, <code>vspans</code></td>
+<td style="text-align:left"><code>hlines</code>, <code>dlines</code>, <code>vlines</code>, <code>hspans</code>, <code>vspans</code></td>
 <td style="text-align:left"><a href="#reference-lines-and-bands">Reference lines and bands</a></td>
 </tr>
 <tr>
@@ -6115,6 +6115,7 @@ SwarmPlot(
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="reference-lines-and-bands">Reference lines and bands<a class="anchor-link" href="#reference-lines-and-bands">¶</a></h3><p>Reference lines and bands put the points in context. <code>hlines</code> draws a horizontal line at a value, such as a limit or the overall median, and <code>vlines</code> a vertical one; <code>hspans</code> and <code>vspans</code> shade a range instead. The groups sit at positions <code>1</code>, <code>2</code>, <code>3</code>, … along the category axis, so a vertical line at <code>1.5</code> falls between the first two groups. Each takes a dictionary or a list of them, with the position, an optional <code>label</code> for the legend and a <code>style</code>; the keys are listed in <a href="../../../references/typings/#datachart.typings.HLineSettingAttrs">HLineSettingAttrs</a>, <a href="../../../references/typings/#datachart.typings.VLineSettingAttrs">VLineSettingAttrs</a>, <a href="../../../references/typings/#datachart.typings.HSpanSettingAttrs">HSpanSettingAttrs</a> and <a href="../../../references/typings/#datachart.typings.VSpanSettingAttrs">VSpanSettingAttrs</a>, and the line styles in <a href="../../../references/constants/#datachart.constants.LINE_STYLE">LINE_STYLE</a>. The US Constitution requires a president to be at least 35: a band shades the ages below it, and a dashed line marks the median age of all 47 presidencies. Nobody came close to the limit.</p>
+<p><code>dlines</code> completes the trio. Where <code>vlines</code> fixes an x and <code>hlines</code> a y, a diagonal is fixed by a <code>slope</code> and an <code>intercept</code>, so it runs through the data space instead of across it; <code>dlines={}</code> on its own draws the parity line <code>y = x</code>. It spans the axes unless <code>xmin</code> and <code>xmax</code> clip it to a segment, and takes the same optional <code>label</code> and <code>style</code>; the keys are listed in <a href="../../../references/typings/#datachart.typings.DLineSettingAttrs">DLineSettingAttrs</a>. The groups sit at <code>0</code>, <code>1</code>, <code>2</code>, … along the category axis, so a diagonal asks whether the ages drift across them: the line runs from the first group's median to the last, and the swarms standing above it took office older than that drift would have them.</p>
 </div>
 </div>
 </div>
@@ -6213,6 +6214,101 @@ SwarmPlot(
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-14">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">statistics</span><span class="w"> </span><span class="kn">import</span> <span class="n">median</span>
+
+<span class="n">periods</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">inauguration_ages</span><span class="p">))</span>
+<span class="n">medians</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">median</span><span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">inauguration_ages</span> <span class="k">if</span> <span class="n">point</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span> <span class="o">==</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">periods</span>
+<span class="p">]</span>
+<span class="c1"># the even drift from the first group to the last, in years per group</span>
+<span class="n">drift</span> <span class="o">=</span> <span class="p">(</span><span class="n">medians</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">medians</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">periods</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">SwarmPlot</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">inauguration_ages</span><span class="p">,</span>
+    <span class="c1"># the line the medians would sit on if the age drifted evenly</span>
+    <span class="n">dlines</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"slope"</span><span class="p">:</span> <span class="n">drift</span><span class="p">,</span>
+        <span class="s2">"intercept"</span><span class="p">:</span> <span class="n">medians</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="s2">"label"</span><span class="p">:</span> <span class="s2">"even drift"</span><span class="p">,</span>
+        <span class="s2">"style"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"plot_dline_color"</span><span class="p">:</span> <span class="s2">"#1d3557"</span><span class="p">,</span> <span class="s2">"plot_dline_style"</span><span class="p">:</span> <span class="n">LINE_STYLE</span><span class="o">.</span><span class="n">DASHED</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Age of US presidents at inauguration against an even drift"</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Took office in"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Age (years)"</span><span class="p">,</span>
+    <span class="n">ymin</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">ymax</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_SHORT</span><span class="p">,</span>
+    <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
+    <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">legend</span><span class="o">=</span><span class="p">{</span><span class="s2">"location"</span><span class="p">:</span> <span class="n">LEGEND_LOCATION</span><span class="o">.</span><span class="n">OUTSIDE_RIGHT</span><span class="p">},</span>
+<span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-14">from statistics import median
+
+periods = list(dict.fromkeys(point["label"] for point in inauguration_ages))
+medians = [
+    median(point["value"] for point in inauguration_ages if point["label"] == name)
+    for name in periods
+]
+# the even drift from the first group to the last, in years per group
+drift = (medians[-1] - medians[0]) / (len(periods) - 1)
+
+SwarmPlot(
+    data=inauguration_ages,
+    # the line the medians would sit on if the age drifted evenly
+    dlines={
+        "slope": drift,
+        "intercept": medians[0],
+        "label": "even drift",
+        "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    title="Age of US presidents at inauguration against an even drift",
+    xlabel="Took office in",
+    ylabel="Age (years)",
+    ymin=30,
+    ymax=80,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+    show_legend=True,
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+).show()</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
+<img alt="No description has been provided for this image" class="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoEAAAD7CAYAAAAVdU42AAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjExLjEsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvctoD+AAAAAlwSFlzAAAPYQAAD2EBqD+naQAAWfJJREFUeJzt3Xd0FFX7wPHvbsqm901P6IHQIRECvnRBAZH2KqKAFBugYPupIBYEpemLigWsgIqKFEVABaQrKL33IjW9bNpu2vz+iFkJ2Q27aZvyfM7hHPbu7J1nZmdmn9x7545KURQFIYQQQghRp6htHYAQQgghhKh6kgQKIYQQQtRBkgQKIYQQQtRBkgQKIYQQQtRBkgQKIYQQQtRBkgQKIYQQQtRBkgQKIYQQQtRBkgQKIYQQQtRBkgTWUQUFBSxfvpyZM2fy66+/2jqcGmXPnj1MmzaNc+fOlbqcXq9n2rRp/PDDD1UTWDVn6X4T5tX1fVjXt7+2seYaaeq7l9+x8pMksIyKDsj333/f1qGUyZNPPsmwYcP45JNP+O2330wuc+3aNaZNm8b69evN1hMfH8+0adNYu3Ztiffy8/PZvn077733HtOnT+eNN95gyZIl/P333xW2Hbawb98+3njjDS5cuFDqcnq9njfeeMPkvqmLLN1vwry6vg/r+vbXNtZcI01995b8jolbUESZ3HXXXYparVZUKpVy7tw5W4djNa1Wq7Ro0ULJz883u8yePXsUQJk8ebLZZY4cOaIAysSJE4uV7927V2ncuLECKC4uLkqjRo2UoKAgRaVSKWq1Wpk6dWpFbUqVy87OVhISEpScnJxSl0tJSVEAZdy4cVUS1xdffKHs3LmzStZVlnVbut/Ev27er3V9H1bV9tvyXKpLrLlGmvruTf2OyXdnHWkJLIPz58/z66+/Mn78eAA+/vhjG0dkvYSEBCIiIlCrK/4QyMvLY9CgQfz999988cUXpKWlcfbsWa5du8b58+fp3r07b775JkuXLq3wdVcFJycn/Pz8cHBwsHUoxTz//PPs2rWr2q67uu636uzm/VrX92FVbb8tzyVhmqnv3tTvmHx31rG3dQA10aJFi1AUhaeffpojR47wxRdfMGPGDJMXJkVR2LBhA/v27cPFxYUBAwbQqFEjXn/9dSIjI7n33nuLLX/t2jV+/vlnrl69iqenJ926daNt27YWx3bx4kU2bNhAbGws7u7udOrUiZiYGOP7e/bs4ccffwTgxIkTTJs2jbZt2/Lf//63bDvDhNOnT3PlyhUeeOABRo8eXey9+vXrs2zZMsaMGUNWVlap9ezatYt169YxceJEFEXhxx9/JDExkQYNGjB48GBcXV1LbNfkyZO5ePEimzZtYsiQITRt2hSwfL/m5OSwfv16zp07R25uLvXr16d///64u7uXWNeYMWNo1KgRUPg9//LLL+zfvx8XFxd69+5NaGio2W2zJJ59+/axevVqJk2ahL29PatXryY2Npbw8HAGDRpkjGnfvn18+eWXJCQk8Msvv5CamsrIkSNp2rSpRdtTmosXL/Lbb78RGxuLVqulc+fOtGzZsliM5tZ9s5v3m6XbZ0088O9x8+ijjxIeHm4sz8jIYPbs2cTExHD33Xcbyy09R62p91bHY1n3q06nK3HsFdVX2nlfVKe1+9sUS74Da/arNfWW9xi61flgzfFsTdwVte9vdd3YtGkTW7duZezYsTRs2LDYZ3U6HXPnzqVly5bcf//9FtdZUfFbeo00d+7ceOwnJyeX+B1zd3fn+vXrVn13AukOtpZer1f8/PyUzp07K4qiKJ988okCKN99912JZfPz85W7775bAZSgoCClY8eOipubm/LVV18pgDJmzJhiyy9atEjRaDSKr6+v0qVLF6V+/frG5Urrti0ye/Zsxd7eXvHy8lJuv/124+cHDBig6PV6RVEUZf369Ur//v0VQAkMDFT69++vvPXWWybrK2t3cHJysgIoDz744C1jLs2iRYsUQJk7d67i6empREZGKqGhoQqgNGrUSLl+/bpx2U8//VQBlE8++USxt7dXAOWbb74x1mPJfj137pwSGhqqODo6KlFRUcptt92mODk5Kd7e3squXbuMy3300UcKoGzcuFFRlMLveeDAgQqghIeHK506dVI8PT2VWbNmmezqsDSeJUuWKICyePFiJSgoSGnUqJHStGlTBVBCQ0OVa9euKYqiKL/++qty++23K4ASGRmp9O/fX/nrr78s3h5zZs2apdjZ2Sn+/v5KTEyMEhgYqKhUKuWll14yLmNu3abcvN8s3T5r4lEURZk/f74CKDt27ChWfv369RLHqjXnqDX1lnY8lme/3rwPFcWy874s+9sUS78Da699ltZbnmPIkvPBmuPZmrgrYt9bct3Y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4NixY8ZlXFxc6Nmzp/U7QYgykJbAGkSv1/P444/Tv39/PvvsM2P56dOn2blzp/HfU089xYEDBzh69CidOnXi999/Z/ny5cTExJCdnc358+dp3749K1euZNKkSUydOrVM67W2fnNxippHp9MxcuRIBg4cyPfff28sP3ToEFFRUaxZs4aHHnqI//3vfwDExsbSsWNHvvnmG5577jmeeuqpUuupqPWaK9+7dy8dOnRg7dq1zJw5k549eyLDo2umP//8k9tuu42ffvqJJ554wjjv7Pnz5+nYsSMrV67k0UcfZebMmaWWJyQkMGTIEIYMGcKvv/5a4es1t/zXX3/NO++8Y7wuyiNSRZVSRI0RHx+v/Pjjj8qCBQuUZ5991uQyJ06cULp27aoUFBQoM2fOVF577TXjezExMcru3buVp59+WpkzZ46iKIpSUFCgtGzZUrl69arV6y1P/TfGKWqe8+fPK5s2bVJeffVVZdasWcbykSNHKp999pmiKIpiMBiUJk2aKGlpacWWy8vLU5o0aaJcv37dbD0VtV5z5e+8847y66+/Gj8fGhqqXLlypfw7RlS5WbNmKb/88ouiKIXfsZubm5Kenq5MnDhR+eSTTxRFUZTs7GwlLCys1PIjR44ou3fvLvZ+Ra7X3PLPPfecsmjRogrfL0JYQloCaxCtVss999xT6jJPP/00s2fPRqVSMWjQIDZs2MDXX3/NBx98gLOzM23atCElJYXg4GAAVCoVDRs2ZN++fVavtzz13xinqHkaNGhAr169SpTf+N07Ojqi1Wo5duwYu3btolu3bgDY2dlx22238eeff5qtp6LWa6588uTJ3HHHHfz444+88sordOzY0bicqFlefPFF7rzzTqDwOfSOjo44OzsXO+acnJyIjIzk0KFDZstbtmxJx44dK2295pbX6XRoNBp27NjBoUOHKmy/CGEJGRNYixw4cIC8vDw6deoEFD49xc3NjbNnz5KUlERwcDBqtZo+ffqwYMECOnXqxOnTp/nrr7+48847Wbt2bYk6HR0d6dOnj8n1WVP/oEGDzMYpao8+ffrwzjvv0KxZM/bu3cuJEydITEwkMTERb29v43JeXl4kJCSYrCMxMZHdu3eXKHdzc6N79+5WrddcORQ+ZnLLli2cOnWKTp06yR8kNVxubi5jx45lxowZ2NnZmT3mrDkWr127xv79+0uU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"/>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -6230,10 +6326,10 @@ SwarmPlot(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-14">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-15">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6272,7 +6368,7 @@ SwarmPlot(
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-14">SwarmPlot(
+<div class="clipboard-copy-txt" id="cell-15">SwarmPlot(
     data=inauguration_ages,
     # name the youngest and the oldest presidents
     texts=[
@@ -6337,10 +6433,10 @@ SwarmPlot(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-15">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-16">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6361,7 +6457,7 @@ SwarmPlot(
     <span class="n">xticks_format</span><span class="o">=</span><span class="s2">"</span><span class="si">%d</span><span class="s2"> %b"</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-15">SwarmPlot(
+<div class="clipboard-copy-txt" id="cell-16">SwarmPlot(
     data=race_times,
     title="Finishing times of a weekly 5 km run",
     xlabel="Run",
@@ -6405,10 +6501,10 @@ SwarmPlot(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-16">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-17">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6434,7 +6530,7 @@ SwarmPlot(
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-16">from datachart.charts import BoxPlot, ViolinPlot
+<div class="clipboard-copy-txt" id="cell-17">from datachart.charts import BoxPlot, ViolinPlot
 from datachart.utils import Panel
 
 Panel(
@@ -6483,10 +6579,10 @@ Panel(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-17">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-18">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6509,7 +6605,7 @@ Panel(
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-17">Panel(
+<div class="clipboard-copy-txt" id="cell-18">Panel(
     [
         # the body only, faded behind the points
         ViolinPlot(data=inauguration_ages, inner=None, style={"plot_violin_alpha": 0.3}),
@@ -6558,10 +6654,10 @@ Panel(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-18">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-19">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6594,7 +6690,7 @@ Panel(
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-18"># large, translucent Democrats under small, solid Republicans
+<div class="clipboard-copy-txt" id="cell-19"># large, translucent Democrats under small, solid Republicans
 PARTY_STYLE = [
     {"plot_swarm_color": PARTY_COLORS[0], "plot_swarm_size": 70, "plot_swarm_alpha": 0.35, "plot_swarm_edge_width": 0},
     {"plot_swarm_color": PARTY_COLORS[1], "plot_swarm_size": 14},
@@ -6650,10 +6746,10 @@ SwarmPlot(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-19">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-20">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6679,7 +6775,7 @@ SwarmPlot(
     <span class="n">legend</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Party"</span><span class="p">,</span> <span class="s2">"location"</span><span class="p">:</span> <span class="n">LEGEND_LOCATION</span><span class="o">.</span><span class="n">OUTSIDE_TOP</span><span class="p">,</span> <span class="s2">"ncols"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-19">SwarmPlot(
+<div class="clipboard-copy-txt" id="cell-20">SwarmPlot(
     data=ages_by_party,
     subtitle=PARTIES,
     style=PARTY_STYLE,
@@ -6728,10 +6824,10 @@ SwarmPlot(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-20">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-21">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6758,7 +6854,7 @@ SwarmPlot(
     <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-20">SwarmPlot(
+<div class="clipboard-copy-txt" id="cell-21">SwarmPlot(
     data=ages_by_party,
     subtitle=PARTIES,
     # one color per party, the same point size in both panels
@@ -6822,10 +6918,10 @@ SwarmPlot(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-21">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-22">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6852,7 +6948,7 @@ SwarmPlot(
     <span class="n">ymin</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-21">from datachart.constants import SCALE
+<div class="clipboard-copy-txt" id="cell-22">from datachart.constants import SCALE
 
 SwarmPlot(
     data=days_in_office,
@@ -6902,10 +6998,10 @@ SwarmPlot(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-22">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-23">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6921,7 +7017,7 @@ SwarmPlot(
 <span class="p">]</span>
 <span class="n">president_records</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-22">president_records = [
+<div class="clipboard-copy-txt" id="cell-23">president_records = [
     {"name": name, "era": era(took), "age": age_on(born, took)}
     for name, _, born, took, _ in PRESIDENCIES
 ]
@@ -6935,7 +7031,7 @@ president_records[:2]</div>
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[26]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[27]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
 <pre>[{'name': 'George Washington', 'era': '1789–1897', 'age': 57},
  {'name': 'John Adams', 'era': '1789–1897', 'age': 61}]</pre>
@@ -6950,10 +7046,10 @@ president_records[:2]</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-23">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-24">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6977,7 +7073,7 @@ president_records[:2]</div>
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-23">SwarmPlot(
+<div class="clipboard-copy-txt" id="cell-24">SwarmPlot(
     data=president_records,
     # the keys that hold the group and the value
     label="era",
@@ -7038,10 +7134,10 @@ president_records[:2]</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-24">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-25">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -7078,7 +7174,7 @@ president_records[:2]</div>
     <span class="n">legend</span><span class="o">=</span><span class="p">{</span><span class="s2">"location"</span><span class="p">:</span> <span class="n">LEGEND_LOCATION</span><span class="o">.</span><span class="n">UPPER_LEFT</span><span class="p">},</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-24">SwarmPlot(
+<div class="clipboard-copy-txt" id="cell-25">SwarmPlot(
     data=response_times,
     # scatter the many points across the category width
     mode=SWARM_MODE.STRIP,
@@ -7141,10 +7237,10 @@ president_records[:2]</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [31]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [32]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-25">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-26">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -7176,7 +7272,7 @@ president_records[:2]</div>
     <span class="n">legend</span><span class="o">=</span><span class="p">{</span><span class="s2">"location"</span><span class="p">:</span> <span class="n">LEGEND_LOCATION</span><span class="o">.</span><span class="n">LOWER_RIGHT</span><span class="p">},</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-25">SwarmPlot(
+<div class="clipboard-copy-txt" id="cell-26">SwarmPlot(
     # reversed, so January ends up at the top
     data=daily_temperatures[::-1],
     orientation=ORIENTATION.HORIZONTAL,
@@ -7234,10 +7330,10 @@ president_records[:2]</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [33]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [34]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-26">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-27">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -7278,7 +7374,7 @@ president_records[:2]</div>
     <span class="p">},</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-26">from datachart.utils import Annotate
+<div class="clipboard-copy-txt" id="cell-27">from datachart.utils import Annotate
 
 LEADERS = ["Deep", "Deep + aug."]
 roles = [EMPHASIS.HIGHLIGHT if model in LEADERS else EMPHASIS.BACKGROUND for model in MODELS]

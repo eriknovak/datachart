@@ -47,7 +47,7 @@ Every customization is either a keyword argument of `DumbbellChart` or a `plot_d
 | dash the connectors                           | `connector_style`                                      | [Markers and connectors](#markers-and-connectors)                                                       |
 | change the dot and connector colors and sizes | `style={"plot_dumbbell_start_color": ..., ...}`        | [Dumbbell style](#dumbbell-style)                                                                       |
 | highlight some categories, mute the rest      | `emphasis_rule`, the `"emphasis"` key of a record      | [Emphasis](#emphasis)                                                                                   |
-| mark a reference value                        | `vlines`, `hlines`                                     | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| mark a reference value                        | `vlines`, `hlines`, `dlines`                           | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | shade a range of values                       | `vspans`, `hspans`                                     | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | put a note on the chart                       | `texts`                                                | [Text annotations](#text-annotations)                                                                   |
 | compare several groups on the same categories | `data` as a list of lists, `subtitle`                  | [Multiple Dumbbell Charts](#multiple-dumbbell-charts)                                                   |
@@ -327,6 +327,8 @@ DumbbellChart(
 
 A reference value puts the rows in context: where does the world stand, which rows have crossed a threshold. In the default horizontal chart a value is marked with `vlines` (a vertical line at a value) and a range shaded with `vspans`; `hlines` and `hspans` take positions along the category axis, which are row positions (`0` for the first row, `1` for the second, …), so a half-integer sits between two rows; a vertical chart swaps the pairs. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) and [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs). The example marks the global life expectancy of 2019 with a dotted line and shades the band above 80 years, which five countries had reached by 2019 and only Japan had in 2000.
 
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). The rows sit at `0`, `1`, `2`, … down the category axis, so a diagonal asks whether the ranking declines evenly: the line runs from the top row's 2019 value to the bottom row's, and a row left of it has fallen behind that pace.
+
 ```
 DumbbellChart(
     data=life,
@@ -344,6 +346,32 @@ DumbbellChart(
     start_name="2000",
     end_name="2019",
     legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+    xmin=50,
+    xmax=90,
+).show()
+```
+
+```
+ends = [record["end"] for record in life]
+# an even decline down the ranking: rows per year of life expectancy
+rows_per_year = (len(ends) - 1) / (ends[-1] - ends[0])
+
+DumbbellChart(
+    data=life,
+    # the line the rows would sit on if the ranking declined evenly
+    dlines={
+        "slope": rows_per_year,
+        "intercept": -rows_per_year * ends[0],
+        "label": "even decline down the ranking",
+        "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    title="Life expectancy at birth against an even decline",
+    xlabel="Years",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    start_name="2000",
+    end_name="2019",
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+    show_legend=True,
     xmin=50,
     xmax=90,
 ).show()

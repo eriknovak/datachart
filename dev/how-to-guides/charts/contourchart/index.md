@@ -45,7 +45,7 @@ Every customization is either a keyword argument of `ContourChart` or a `plot_co
 | change the line color, width, or style   | `style={"plot_contour_color": ..., "plot_contour_line_width": ...}` | [Contour style](#contour-style)                                                                         |
 | color the lines or bands with a colormap | `style={"plot_contour_cmap": ...}`                                  | [Contour style](#contour-style)                                                                         |
 | pin or rescale the colormap range        | `vmin`, `vmax`, `norm`                                              | [Normalization](#normalization)                                                                         |
-| mark a position or shade a region        | `vlines`, `hlines`, `vspans`, `hspans`                              | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| mark a position or shade a region        | `vlines`, `hlines`, `dlines`, `vspans`, `hspans`                    | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | put a note on the chart                  | `texts`                                                             | [Text annotations](#text-annotations)                                                                   |
 | overlay several surfaces                 | `data` as a list, `subtitle`, `show_legend`                         | [Multiple Contour Charts](#multiple-contour-charts)                                                     |
 | title and place the legend               | `legend`                                                            | [Legend](#legend)                                                                                       |
@@ -340,6 +340,8 @@ ContourChart(
 
 Reference lines and bands put the surface in context. `vlines` and `hlines` draw a line at an x or a y position, and a pair of them crosses at a point, here the saddle, the natural pass between the peaks. `vspans` and `hspans` shade a range of x or y, here the nature reserve that covers the land north of 6 km. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs) and [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs). The legend goes outside the axes (see [Legend](#legend)), so it covers no part of the map.
 
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). Both axes of a contour chart are distances, so a diagonal is a transect: a line the terrain is read along. The example runs north-east through the saddle, crossing both summits' slopes.
+
 ```
 from datachart.constants import LEGEND_LOCATION
 
@@ -352,6 +354,27 @@ ContourChart(
     hspans={"ymin": 6, "label": "nature reserve", "style": {"plot_hspan_color": "#2a9d8f"}},
     levels=SADDLE_LEVELS,
     title="The saddle and the nature reserve",
+    xlabel="Distance east (km)",
+    ylabel="Distance north (km)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    aspect_ratio=ASPECT_RATIO.EQUAL,
+    show_legend=True,
+    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+).show()
+```
+
+```
+ContourChart(
+    data=terrain,
+    # a transect through the saddle, heading north-east
+    dlines={
+        "slope": 1,
+        "intercept": SADDLE[1] - SADDLE[0],
+        "label": "north-east transect",
+        "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    levels=SADDLE_LEVELS,
+    title="A transect through the saddle",
     xlabel="Distance east (km)",
     ylabel="Distance north (km)",
     figsize=FIG_SIZE.FULL_MEDIUM,

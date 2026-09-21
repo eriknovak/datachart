@@ -46,7 +46,7 @@ Every customization is either a keyword argument of `BumpChart` or an attribute 
 | change the line width, markers, or colors   | `style={"plot_bump_line_width": ..., "plot_line_color": ...}` | [Line style](#line-style)                                                                               |
 | print the values behind the ranks           | `show_values`, `value_format`, `value_step`                   | [Value labels](#value-labels)                                                                           |
 | highlight some series, mute the rest        | `emphasis`, `emphasis_rule`                                   | [Emphasis](#emphasis)                                                                                   |
-| mark a period or shade a range of places    | `vlines`, `hlines`, `vspans`, `hspans`                        | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| mark a period or shade a range of places    | `vlines`, `hlines`, `dlines`, `vspans`, `hspans`              | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | show every place of the table, or crop it   | `ymin`, `ymax`, `xmin`, `xmax`                                | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | put a note on the chart                     | `texts`                                                       | [Text annotations](#text-annotations)                                                                   |
 | use a legend instead of end labels          | `show_labels=False`, `show_legend`, `legend`                  | [Legend](#legend)                                                                                       |
@@ -289,6 +289,8 @@ BumpChart(
 
 Reference lines and bands give the ranks a meaning. On a bump chart their `y` is a rank: `hspans` shades a range of places, such as the qualification places of a league, and `hlines` marks a cut-off between two places (a half-rank sits between them). `vlines` and `vspans` mark periods, such as a rule change or a disrupted season. Each takes a dictionary or a list of them, with the position, a `style`, and an optional `label` that names it in the legend when `show_legend` is on; the keys are listed in [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs), [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs) and [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs). The rank axis runs from the best rank at the top (`ymin`) to the worst at the bottom (`ymax`), both defaulting to the ranks in the data; `ymax=20.5` shows all twenty places of the league, so the bands mean what they say. `xmin` and `xmax` crop the period axis the same way. The example shades the four Champions League places and the three relegation places, marks the cut-off between 17th and 18th, and shades 2019/20, the season finished behind closed doors after the pandemic pause. The season is `2020` in the data, so the band runs from `2019.5` to `2020.5`.
 
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). On a bump chart both axes carry numbers — the season and the position — so a diagonal is a steady climb or slide through the table. The example draws one place gained per season from tenth, the pace a club would have to keep to reach the Champions League places.
+
 ```
 from datachart.constants import LINE_STYLE
 
@@ -312,6 +314,31 @@ BumpChart(
     ymin=0.5,
     ymax=20.5,
     title="Final Premier League positions",
+    xlabel="Season ending",
+    ylabel="Position",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+```
+seasons = [point["x"] for point in premier_league[0]]
+FROM_SEASON, FROM_PLACE = seasons[0], 10
+
+BumpChart(
+    data=premier_league,
+    subtitle=CLUBS,
+    rank_by=BUMP_RANK.GIVEN,
+    # one place gained per season, starting tenth: the axis counts down, so the
+    # slope is negative
+    dlines={
+        "slope": -1,
+        "intercept": FROM_PLACE + FROM_SEASON,
+        "label": "one place a season",
+        "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    ymin=0.5,
+    ymax=20.5,
+    title="Final Premier League positions against a steady climb",
     xlabel="Season ending",
     ylabel="Position",
     figsize=FIG_SIZE.FULL_MEDIUM,

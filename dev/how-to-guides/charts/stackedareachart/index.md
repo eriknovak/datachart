@@ -47,7 +47,7 @@ Every customization is either a keyword argument of `StackedAreaChart` or a `plo
 | centre the stack or draw a streamgraph         | `baseline=STACKED_AREA_BASELINE.SYM`, `.WIGGLE`, `.WEIGHTED_WIGGLE` | [Baseline](#baseline)                                                                                   |
 | print the values on the bands                  | `show_values`, `value_format`, `value_step`                         | [Value labels](#value-labels)                                                                           |
 | highlight some series, mute the rest           | `emphasis`, `emphasis_rule`                                         | [Emphasis](#emphasis)                                                                                   |
-| mark a year or a level                         | `vlines`, `hlines`                                                  | [Reference lines](#reference-lines)                                                                     |
+| mark a year or a level                         | `vlines`, `hlines`, `dlines`                                        | [Reference lines](#reference-lines)                                                                     |
 | keep reference lines visible over the bands    | `style={"plot_area_zorder": 1}`                                     | [Reference lines](#reference-lines)                                                                     |
 | shade a period or a range of levels            | `vspans`, `hspans`                                                  | [Reference bands](#reference-bands)                                                                     |
 | put a note on the chart                        | `texts`                                                             | [Text annotations](#text-annotations)                                                                   |
@@ -316,6 +316,8 @@ StackedAreaChart(
 
 A reference line puts a year or a level on the chart: an event on the time axis, a benchmark on the value axis. `vlines` draws a vertical line at an `x` value and `hlines` a horizontal one at a `y` value; each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style` with the `plot_vline_*` or `plot_hline_*` attributes ([VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs)); [LINE_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE) holds the dash patterns. Two things need care on a stack. A line given for the whole chart is drawn by each series, so a stack of seven would draw and list every line seven times; attach the lines to one series instead, with a list aligned with `data` that holds the lines in the first slot and `None` in the rest. And the bands are drawn over the lines by default, which hides a line wherever it crosses the stack; the `"plot_area_zorder": 1` in `SOURCE_STYLE` draws the bands underneath. The example marks the Paris Agreement and the pandemic year, and the level of total generation in 2000: every band above that line is growth the world has added since.
 
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). Both axes carry numbers here, so a diagonal is a growth path: the straight line from the first year's total to the last. Where the top of the stack runs above it, generation grew faster than the even path; where it dips below, slower.
+
 ```
 from datachart.constants import LINE_STYLE
 
@@ -342,6 +344,34 @@ StackedAreaChart(
     xticks=[2000, 2005, 2010, 2015, 2020, 2023],
     yticks_format="{x:,.0f}",
     figsize=FIG_SIZE.FULL_MEDIUM,
+    ymax=40000,
+).show()
+```
+
+```
+years = [point["x"] for point in generation[0]]
+# the straight path from the first year's total to the last
+per_year = (TOTALS[-1] - TOTALS[0]) / (years[-1] - years[0])
+
+StackedAreaChart(
+    data=generation,
+    style=SOURCE_STYLE,
+    subtitle=SOURCES,
+    # the even growth path across the whole period
+    dlines={
+        "slope": per_year,
+        "intercept": TOTALS[0] - per_year * years[0],
+        "label": "even growth path",
+        "style": {"plot_dline_color": "#1f1f1f", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    title="World electricity generation against an even growth path",
+    xlabel="Year",
+    ylabel="Generation (TWh)",
+    xticks=[2000, 2005, 2010, 2015, 2020, 2023],
+    yticks_format="{x:,.0f}",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_legend=True,
+    legend={"title": "Source", "location": LEGEND_LOCATION.UPPER_LEFT, "ncols": 2},
     ymax=40000,
 ).show()
 ```

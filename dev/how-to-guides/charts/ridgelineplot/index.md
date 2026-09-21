@@ -46,7 +46,7 @@ Every customization is either a keyword argument of `RidgelinePlot` or a `plot_r
 | fix the value range of the ridges          | `xmin`, `xmax`                                              | [Value range](#value-range)                                                                             |
 | stack the rows along the x-axis            | `orientation`                                               | [Orientation](#orientation)                                                                             |
 | highlight some rows, mute the rest         | `emphasis`, `emphasis_rule`                                 | [Emphasis](#emphasis)                                                                                   |
-| mark a threshold or shade a range          | `vlines`, `vspans`, `hlines`, `hspans`                      | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| mark a threshold or shade a range          | `vlines`, `vspans`, `hlines`, `dlines`, `hspans`            | [Reference lines and bands](#reference-lines-and-bands)                                                 |
 | title and place the legend                 | `show_legend`, `legend`                                     | [Legend](#legend)                                                                                       |
 | put a note on the chart                    | `texts`                                                     | [Text annotations](#text-annotations)                                                                   |
 | draw several ridgelines side by side       | `data` as a list of lists, `subtitle`, `sharex`, `max_cols` | [Multiple Ridgeline Plots](#multiple-ridgeline-plots)                                                   |
@@ -307,7 +307,9 @@ RidgelinePlot(
 
 ### Reference lines and bands
 
-A threshold turns a distribution into an answer: how much of each month lies below freezing, or inside a comfortable range. With the default orientation the value axis is the x-axis, so `vlines` draws a vertical line at a value and `vspans` shades a range of values; `hlines` and `hspans` work along the row axis, where the rows sit at positions `1`, `2`, `3`, … from the top. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) and [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs). The example marks the freezing point with a dashed line and shades 18 to 24 °C, a comfortable range for a day outdoors.
+A threshold turns a distribution into an answer: how much of each month lies below freezing, or inside a comfortable range. With the default orientation the value axis is the x-axis, so `vlines` draws a vertical line at a value and `vspans` shades a range of values; `hlines` and `hspans` work along the row axis, where the rows sit at positions `0`, `1`, `2`, … from the top. Each takes a dictionary or a list of them, with the position, an optional `label` for the legend and a `style`; the keys are listed in [VLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineSettingAttrs), [VSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanSettingAttrs), [HLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineSettingAttrs) and [HSpanSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanSettingAttrs). The example marks the freezing point with a dashed line and shades 18 to 24 °C, a comfortable range for a day outdoors.
+
+`dlines` completes the trio. Where `vlines` fixes an x and `hlines` a y, a diagonal is fixed by a `slope` and an `intercept`, so it runs through the data space instead of across it; `dlines={}` on its own draws the parity line `y = x`. It spans the axes unless `xmin` and `xmax` clip it to a segment, and takes the same optional `label` and `style`; the keys are listed in [DLineSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineSettingAttrs). The rows sit at `0`, `1`, `2`, … from the top and the value axis carries the temperature, so a diagonal is the pace of the seasons: the line runs from the January row to the July row, one row per degree of warming, and the months that fall left of it warmed slower than that pace.
 
 ```
 from datachart.constants import LINE_STYLE
@@ -325,6 +327,30 @@ RidgelinePlot(
     title="Daily mean temperature in Ljubljana",
     xlabel="Temperature (°C)",
     figsize=FIG_SIZE.FULL_MEDIUM,
+).show()
+```
+
+```
+JANUARY, JULY = 0, 6
+# rows per degree, from the January row to the July row; the rows count 0, 1, 2,
+# ... from the top
+rows_per_degree = (JULY - JANUARY) / (MONTHLY_MEAN[JULY] - MONTHLY_MEAN[JANUARY])
+
+RidgelinePlot(
+    data=temperatures,
+    # the steady climb from January to July
+    dlines={
+        "slope": rows_per_degree,
+        "intercept": JANUARY - rows_per_degree * MONTHLY_MEAN[JANUARY],
+        "xmin": MONTHLY_MEAN[JANUARY],
+        "xmax": MONTHLY_MEAN[JULY],
+        "label": "steady climb, January to July",
+        "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
+    },
+    title="Daily mean temperature in Ljubljana",
+    xlabel="Temperature (°C)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_legend=True,
 ).show()
 ```
 

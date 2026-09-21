@@ -66,6 +66,7 @@ The dictionaries a chart takes beside its data: reference lines and bands, text 
 | I want to…                                    | Pass               | As                                                                                                                       |
 | --------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------ |
 | mark a value on the x or y axis               | `vlines`, `hlines` | [`VLineSettingAttrs`](#datachart.typings.VLineSettingAttrs), [`HLineSettingAttrs`](#datachart.typings.HLineSettingAttrs) |
+| draw a line through the data, such as parity  | `dlines`           | [`DLineSettingAttrs`](#datachart.typings.DLineSettingAttrs)                                                              |
 | shade a range of the x or y axis              | `vspans`, `hspans` | [`VSpanSettingAttrs`](#datachart.typings.VSpanSettingAttrs), [`HSpanSettingAttrs`](#datachart.typings.HSpanSettingAttrs) |
 | write a note on the chart                     | `texts`            | [`TextSettingAttrs`](#datachart.typings.TextSettingAttrs)                                                                |
 | title, place, or lay out the legend           | `legend`           | [`LegendSettingAttrs`](#datachart.typings.LegendSettingAttrs)                                                            |
@@ -99,6 +100,23 @@ The horizontal reference line setting, passed to a chart front as `hlines`.
 | `xmax`    | The maximum y-axis position value. **TYPE:** \`int                |
 | `style`   | The horizontal line style attributes. **TYPE:** \`HLineStyleAttrs |
 | `label`   | The label of the horizontal line. **TYPE:** \`str                 |
+
+### datachart.typings.DLineSettingAttrs
+
+Bases: `TypedDict`
+
+The diagonal reference line setting, passed to a chart front as `dlines`.
+
+The line is straight in data coordinates, so it curves on a log axis, where it is drawn between the axis limits. On linear axes, and without `xmin` and `xmax`, it spans the axes and follows the zoom.
+
+| ATTRIBUTE   | DESCRIPTION                                                           |
+| ----------- | --------------------------------------------------------------------- |
+| `slope`     | The slope of the line. Defaults to 1. **TYPE:** \`int                 |
+| `intercept` | The y-axis value of the line at x = 0. Defaults to 0. **TYPE:** \`int |
+| `xmin`      | The x-axis position the line starts at. **TYPE:** \`int               |
+| `xmax`      | The x-axis position the line ends at. **TYPE:** \`int                 |
+| `style`     | The diagonal line style attributes. **TYPE:** \`DLineStyleAttrs       |
+| `label`     | The label of the diagonal line. **TYPE:** \`str                       |
 
 ### datachart.typings.VSpanSettingAttrs
 
@@ -266,6 +284,19 @@ The typing for the horizontal line style.
 | `plot_hline_width` | The width of the horizontal line. **TYPE:** \`int         |
 | `plot_hline_alpha` | The alpha value of the horizontal line. **TYPE:** \`float |
 
+### datachart.typings.DLineStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the diagonal line style.
+
+| ATTRIBUTE          | DESCRIPTION                                             |
+| ------------------ | ------------------------------------------------------- |
+| `plot_dline_color` | The color of the diagonal line. **TYPE:** \`str         |
+| `plot_dline_style` | The style of the diagonal line. **TYPE:** \`LINE_STYLE  |
+| `plot_dline_width` | The width of the diagonal line. **TYPE:** \`int         |
+| `plot_dline_alpha` | The alpha value of the diagonal line. **TYPE:** \`float |
+
 ### datachart.typings.VSpanStyleAttrs
 
 Bases: `TypedDict`
@@ -327,7 +358,7 @@ The keys a theme defines and [`config`](https://eriknovak.github.io/datachart/de
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `GanttStyleAttrs`, `DumbbellStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ScatterMatrixStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `DLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `GanttStyleAttrs`, `DumbbellStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ScatterMatrixStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
 
 The style attributes. Combines all style typings.
 
