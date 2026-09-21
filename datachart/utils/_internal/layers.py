@@ -32,7 +32,9 @@ from matplotlib.ticker import MaxNLocator
 from matplotlib.collections import LineCollection, PathCollection, PolyCollection
 from matplotlib.container import BarContainer
 from matplotlib.colors import (
+    CenteredNorm,
     LinearSegmentedColormap,
+    TwoSlopeNorm,
     to_hex,
     to_rgb,
     to_rgba,
@@ -197,6 +199,7 @@ from ...constants import (
     LEGEND_LOCATION,
     NETWORK_LAYOUT,
     NETWORK_LABEL_POSITION,
+    NORMALIZE,
     ORIENTATION,
     RADIAL_DIRECTION,
     RADIAL_TYPE,
@@ -465,6 +468,8 @@ LEGEND_HEADROOM_MAX = 0.35
 LEGEND_HEADROOM_PAD_PT = 4.0
 # cell luminance below which heatmap value text switches to white
 HEATMAP_TEXT_DARK_LUMINANCE = 0.5
+# the norms that hold `vcenter` in the middle of a diverging cmap (ADR 0056)
+CENTRED_NORMS = (NORMALIZE.CENTERED, NORMALIZE.TWOSLOPE)
 # the low end of a sequential cmap vanishes on white: iso-lines sample from here
 CONTOUR_LINE_CMAP_START = 0.3
 # the cmap sample that stands in for a cmap-colored contour in the legend
@@ -2010,6 +2015,8 @@ class Layer:
     surface: bool = False
     # the edge the layer's drawn colorbar takes; None when it draws none
     colorbar_edge: Optional[str] = None
+    # the normalized position a value step must break on; None spaces them evenly
+    step_centre: Optional[float] = None
 
     def __init__(self, chart: dict, settings: dict):
         self.chart = chart
@@ -2357,7 +2364,7 @@ class Layer:
         """The step legend of a normalized value scale: one entry per even step."""
 
         n = len(self.value_etch_steps)
-        edges = norm.inverse(np.linspace(0, 1, n + 1))
+        edges = norm.inverse(step_edges(n, self.step_centre))
         entries = [(k, _step_label(edges[k], edges[k + 1])) for k in range(n)]
         self._draw_step_legend(ax, entries, title)
 
@@ -6006,22 +6013,31 @@ COLORBAR_DIVIDER_PAD = 0.1
 
 
 def _draw_colorbar(
-    ax: plt.Axes, mappable, setting: dict, aspect_locked: bool = False
+    ax: plt.Axes,
+    mappable,
+    setting: dict,
+    aspect_locked: bool = False,
+    centre: Optional[float] = None,
 ) -> None:
-    """Draw a colorbar on the edge the resolved setting names (ADR 0035)."""
+    """Draw a colorbar on the edge the resolved setting names (ADR 0035).
+
+    `centre` is the value a centred norm holds fixed: the bar marks it
+    alongside its even ticks, so the sign reads off the scale (ADR 0056).
+    """
 
     colorbar = _place_colorbar(ax, mappable, setting, aspect_locked)
     fmt = _value_formatter(setting["format"])
     if fmt is not None:
         colorbar.formatter = fmt
         colorbar.update_ticks()
-    if setting["ticks"] is not None:
+    ticks = setting["ticks"]
+    if ticks is None and centre is not None:
+        ticks = sorted(set(colorbar.get_ticks()) | {centre})
+    if ticks is not None:
         # set_ticks widens the bar to every tick; keep it to the mapped range
         low, high = colorbar.vmin, colorbar.vmax
         slack = (high - low) * 1e-9
-        colorbar.set_ticks(
-            [t for t in setting["ticks"] if low - slack <= t <= high + slack]
-        )
+        colorbar.set_ticks([t for t in ticks if low - slack <= t <= high + slack])
     if setting["label"]:
         colorbar.set_label(setting["label"], **setting["label_style"])
     # tick labels take no family through tick_params; restyled directly
@@ -6156,7 +6172,13 @@ class HeatmapLayer(Layer):
         self.show_colorbars = self.settings.get("show_colorbars")
         self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
         self.colorbar_edge = self._colorbar_edge(self.show_colorbars)
-        heatmap_style = get_heatmap_style(self.style, self.style_prefix)
+        centred = self.chart.get("norm") in CENTRED_NORMS
+        self.norm = self._resolve_norm()
+        # the centre a centred norm holds, and the flag the cells read off it
+        self.vcenter = self.norm.vcenter if centred else None
+        # every centred norm maps its centre to the middle of the colormap
+        self.step_centre = 0.5 if centred else None
+        heatmap_style = get_heatmap_style(self.style, self.style_prefix, centred)
         heatmap_style["cmap"] = get_colormap(heatmap_style["cmap"])
         self.heatmap_style = heatmap_style
         self.font_style = get_heatmap_font_style(self.style, self.style_prefix)
@@ -6176,6 +6198,28 @@ class HeatmapLayer(Layer):
             if axis_kind(labels) == AXIS_TEMPORAL
         }
         self._label_axes(x, y)
+
+    def _resolve_norm(self):
+        """The chart's norm: a centred one as an instance, the rest verbatim.
+
+        A centred norm carries `vmin`/`vmax` itself, so `imshow` takes the
+        instance alone; `centered` folds them into one half-range each side
+        of `vcenter`, `twoslope` keeps them apart (ADR 0056).
+        """
+
+        norm = self.chart.get("norm")
+        if norm not in CENTRED_NORMS:
+            return norm
+        vcenter = self.chart.get("vcenter")
+        vcenter = 0.0 if vcenter is None else vcenter
+        bounds = (self.chart.get("vmin"), self.chart.get("vmax"))
+        if norm == NORMALIZE.TWOSLOPE:
+            return TwoSlopeNorm(vcenter, *bounds)
+        halfrange = max(
+            (abs(bound - vcenter) for bound in bounds if bound is not None),
+            default=None,
+        )
+        return CenteredNorm(vcenter, halfrange)
 
     def _resolve_cell_values(self) -> None:
         """The cell value switch and text; the heatmap keeps its own names."""
@@ -6238,12 +6282,13 @@ class HeatmapLayer(Layer):
 
         # the panel owns the aspect; imshow's own "equal" would size the
         # colorbar to a box the panel then stretches
+        bounded = self.vcenter is None
         im = ax.imshow(
             data,
             aspect="auto",
-            norm=self.chart.get("norm", None),
-            vmin=self.chart.get("vmin", None),
-            vmax=self.chart.get("vmax", None),
+            norm=self.norm,
+            vmin=self.chart.get("vmin", None) if bounded else None,
+            vmax=self.chart.get("vmax", None) if bounded else None,
             **self._cell_style(),
         )
         label = self.label(ctx)
@@ -6261,7 +6306,7 @@ class HeatmapLayer(Layer):
         if self.show_colorbars and self.value_etch_steps:
             self._draw_even_step_legend(ax, im.norm, self.colorbar["label"])
         elif self.show_colorbars:
-            _draw_colorbar(ax, im, self.colorbar, ctx.aspect_locked)
+            _draw_colorbar(ax, im, self.colorbar, ctx.aspect_locked, self.vcenter)
 
         self._draw_frame(ax)
 
@@ -6271,7 +6316,9 @@ class HeatmapLayer(Layer):
         im.autoscale_None()
         values = np.asarray(self.z, dtype=float)
         steps = value_steps(
-            im.norm(np.ma.masked_invalid(values)), len(self.value_etch_steps)
+            im.norm(np.ma.masked_invalid(values)),
+            len(self.value_etch_steps),
+            self.step_centre,
         )
         rows, cols = np.indices(values.shape)
         squares = np.array([[-0.5, -0.5], [0.5, -0.5], [0.5, 0.5], [-0.5, 0.5]])
@@ -6305,6 +6352,7 @@ class HeatmapLayer(Layer):
             steps = value_steps(
                 im.norm(np.ma.masked_invalid(np.asarray(self.z, dtype=float))),
                 len(self.value_etch_steps),
+                self.step_centre,
             )
         for i, row in enumerate(self.z):
             for j, value in enumerate(row):
@@ -8219,11 +8267,35 @@ class Etch(patheffects.AbstractPathEffect):
                 renderer.draw_path(outline, tpath, affine, None)
 
 
-def value_steps(normed, n: int) -> np.ndarray:
+def step_edges(n: int, centre: Optional[float] = None) -> np.ndarray:
+    """The `n + 1` normalized edges of `n` value steps; `centre` always gets one.
+
+    Without a centre the steps are evenly spaced. With one they are evenly
+    spaced on each side of it, so a diverging scale never runs a single step
+    across its middle (ADR 0056).
+    """
+
+    if centre is None or not 0 < centre < 1:
+        return np.linspace(0.0, 1.0, n + 1)
+    below = min(max(int(round(n * centre)), 1), n - 1)
+    return np.concatenate(
+        [
+            np.linspace(0.0, centre, below + 1),
+            np.linspace(centre, 1.0, n - below + 1)[1:],
+        ]
+    )
+
+
+def value_steps(normed, n: int, centre: Optional[float] = None) -> np.ndarray:
     """The step, 0 to `n - 1`, of each value normalized to [0, 1]; -1 where missing."""
 
     normed = np.ma.masked_invalid(np.ma.asarray(normed, dtype=float))
-    steps = np.clip(np.floor(normed.filled(0.0) * n), 0, n - 1).astype(int)
+    values = normed.filled(0.0)
+    if centre is None:
+        steps = np.clip(np.floor(values * n), 0, n - 1).astype(int)
+    else:
+        inner = step_edges(n, centre)[1:-1]
+        steps = np.clip(np.searchsorted(inner, values, side="right"), 0, n - 1)
     return np.where(np.ma.getmaskarray(normed), -1, steps)
 
 
