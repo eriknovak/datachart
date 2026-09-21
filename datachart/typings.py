@@ -842,6 +842,11 @@ class ScatterStyleAttrs(TypedDict):
         plot_scatter_zorder (Union[int, float, None]): The zorder of the scatter.
         plot_scatter_edge_width (Union[int, float, None]): The edge width of markers.
         plot_scatter_edge_color (Union[str, None]): The edge color of markers.
+        plot_scatter_error_color (Union[str, None]): The color of the error bars;
+            `None` takes the color of the point they belong to.
+        plot_scatter_error_width (Union[int, float, None]): The error bar line width.
+        plot_scatter_error_capsize (Union[int, float, None]): The half-width of the
+            cap drawn at each end of an error bar; `0` draws none.
 
     """
 
@@ -852,6 +857,9 @@ class ScatterStyleAttrs(TypedDict):
     plot_scatter_zorder: Union[int, float, None]
     plot_scatter_edge_width: Union[int, float, None]
     plot_scatter_edge_color: Union[str, None]
+    plot_scatter_error_color: Union[str, None]
+    plot_scatter_error_width: Union[int, float, None]
+    plot_scatter_error_capsize: Union[int, float, None]
 
 
 class RegressionStyleAttrs(TypedDict):

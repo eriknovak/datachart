@@ -8,8 +8,16 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from datachart.config import config
+from datachart.config.configuration import THEMES
 from datachart.constants import THEME
+from datachart.utils._internal.config_helpers import get_scatter_error_style
 from datachart.utils._internal.validate import validate_error_distances
+
+ERROR_KEYS = (
+    "plot_scatter_error_color",
+    "plot_scatter_error_width",
+    "plot_scatter_error_capsize",
+)
 
 POINTS = [
     {"x": 1, "y": 10, "xerr": 0.2, "yerr": 1.0},
@@ -53,6 +61,35 @@ class TestErrorValidation(unittest.TestCase):
             with self.subTest(value=value):
                 with self.assertRaises(ValueError):
                     validate_error_distances([value], "yerr")
+
+
+class TestErrorStyle(unittest.TestCase):
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+
+    def test_every_theme_carries_the_error_keys(self):
+        for name, theme in THEMES.items():
+            for key in ERROR_KEYS:
+                with self.subTest(theme=name, key=key):
+                    self.assertIn(key, theme)
+
+    def test_the_default_color_follows_the_point(self):
+        self.assertNotIn("ecolor", get_scatter_error_style({}))
+
+    def test_the_style_resolves_the_theme_keys(self):
+        style = get_scatter_error_style({})
+        self.assertEqual(style["elinewidth"], config["plot_scatter_error_width"])
+        self.assertEqual(style["capsize"], config["plot_scatter_error_capsize"])
+
+    def test_a_chart_style_wins_over_the_theme(self):
+        style = get_scatter_error_style(
+            {
+                "plot_scatter_error_color": "#123456",
+                "plot_scatter_error_width": 3.0,
+                "plot_scatter_error_capsize": 5,
+            }
+        )
+        self.assertEqual(style, {"ecolor": "#123456", "elinewidth": 3.0, "capsize": 5})
 
 
 class TestErrorFrontParameters(unittest.TestCase):

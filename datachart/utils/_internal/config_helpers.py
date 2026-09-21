@@ -1191,6 +1191,27 @@ def get_scatter_style(chart_style: dict) -> dict:
     return create_config_dict(chart_style, config_attrs)
 
 
+def get_scatter_error_style(chart_style: dict) -> dict:
+    """Get the scatter error bar style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The scatter error bar setting; without `ecolor` when the color follows
+        the point (ADR 0057).
+
+    """
+
+    config_attrs = [
+        ("ecolor", "plot_scatter_error_color"),
+        ("elinewidth", "plot_scatter_error_width"),
+        ("capsize", "plot_scatter_error_capsize"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
 def get_swarm_style(chart_style: dict) -> dict:
     """Get the swarm plot style.
 
