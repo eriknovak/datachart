@@ -629,6 +629,7 @@ class HeatmapStyleAttrs(TypedDict):
 
     Attributes:
         plot_heatmap_cmap (Union[str, List[str], colors.LinearSegmentedColormap, None]): The color map of the heatmap (palette name, single color, list of hex colors, or colormap).
+        plot_heatmap_cmap_diverging (Union[str, List[str], colors.LinearSegmentedColormap, None]): The color map a centred `norm` (`"centered"` or `"twoslope"`) draws in, in place of `plot_heatmap_cmap`; a `plot_heatmap_cmap` set in the chart's own style still wins.
         plot_heatmap_alpha (Union[float, None]): The alpha value of the heatmap.
         plot_heatmap_font_size (Union[int, float, str, None]): The font size of the heatmap.
         plot_heatmap_font_color (Union[str, None]): The font color of the heatmap.
@@ -641,6 +642,9 @@ class HeatmapStyleAttrs(TypedDict):
     """
 
     plot_heatmap_cmap: Union[str, List[str], colors.LinearSegmentedColormap, None]
+    plot_heatmap_cmap_diverging: Union[
+        str, List[str], colors.LinearSegmentedColormap, None
+    ]
     plot_heatmap_alpha: Union[float, None]
     plot_heatmap_font_size: Union[int, float, str, None]
     plot_heatmap_font_color: Union[str, None]
@@ -751,6 +755,7 @@ class CalendarHeatmapStyleAttrs(TypedDict):
 
     Attributes:
         plot_calendar_heatmap_cmap (Union[str, List[str], colors.LinearSegmentedColormap, None]): The colormap of the day cells (palette name, single color, list of hex colors, or colormap); `None` takes the heatmap colormap.
+        plot_calendar_heatmap_cmap_diverging (Union[str, List[str], colors.LinearSegmentedColormap, None]): The colormap the day cells take under a centred `norm`; `None` takes the heatmap diverging colormap.
         plot_calendar_heatmap_alpha (Union[float, None]): The alpha value of the day cells.
         plot_calendar_heatmap_font_size (Union[int, float, str, None]): The font size of the cell values.
         plot_calendar_heatmap_font_color (Union[str, None]): The font color of the cell values.
@@ -765,6 +770,9 @@ class CalendarHeatmapStyleAttrs(TypedDict):
     """
 
     plot_calendar_heatmap_cmap: Union[
+        str, List[str], colors.LinearSegmentedColormap, None
+    ]
+    plot_calendar_heatmap_cmap_diverging: Union[
         str, List[str], colors.LinearSegmentedColormap, None
     ]
     plot_calendar_heatmap_alpha: Union[float, None]

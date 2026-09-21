@@ -42,6 +42,7 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "plot_text_box_edgecolor": "#CFD8DC",
         "plot_text_arrow_color": "#9AA4AE",
         "plot_heatmap_cmap": COLORS.Purples,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
         "plot_heatmap_frame_color": "#9AA4AE",
     }
 )

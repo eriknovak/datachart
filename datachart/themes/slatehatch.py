@@ -24,6 +24,7 @@ SLATEHATCH_THEME: StyleAttrs = {
     "plot_dumbbell_start_color": "#4F6D8F",
     "plot_dumbbell_end_color": "#743538",
     "plot_heatmap_cmap": COLORS.PuBu,
+    "plot_heatmap_cmap_diverging": COLORS.BrBG,
 }
 """The slate-hatch theme: the hatch theme without rust.
 

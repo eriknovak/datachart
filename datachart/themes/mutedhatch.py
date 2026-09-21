@@ -17,6 +17,7 @@ MUTEDHATCH_THEME: StyleAttrs = {
     "plot_hatch_cycle": CONTRAST_THEME["plot_hatch_cycle"],
     "plot_bar_edge_width": 0.8,
     "plot_heatmap_cmap": COLORS.BuPu,
+    "plot_heatmap_cmap_diverging": COLORS.BrBG,
 }
 """The muted-hatch theme: Tol's muted colours under Contrast's hatches.
 

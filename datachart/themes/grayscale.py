@@ -47,6 +47,7 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_connector_color": "#85929E",
         "plot_dumbbell_arrow_color": "#5D6D7E",
         "plot_heatmap_cmap": COLORS.Greys,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
         "plot_heatmap_frame_color": "#000000",
         "plot_regression_color": "#34495E",
         "plot_box_median_color": "#000000",

@@ -34,6 +34,7 @@ MUTED_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_start_color": "#DDCC77",
         "plot_dumbbell_end_color": "#332288",
         "plot_heatmap_cmap": COLORS.YlOrBr,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
     }
 )
 """The muted theme: Tol's muted colours, dashes and markers, colour-blind safe.

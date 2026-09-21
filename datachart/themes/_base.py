@@ -315,8 +315,9 @@ BASE_THEME: StyleAttrs = {
     "plot_text_arrow_curve": None,
     "plot_text_arrow_color": "#7F8C8D",
     "plot_text_arrow_width": 1.0,
-    # plot heatmap style
+    # plot heatmap style; a centred norm takes the diverging cmap (ADR 0056)
     "plot_heatmap_cmap": COLORS.Blues,
+    "plot_heatmap_cmap_diverging": COLORS.PuOr,
     "plot_heatmap_alpha": 0.95,
     "plot_heatmap_font_size": 8,
     "plot_heatmap_font_color": "#000000",
@@ -328,6 +329,7 @@ BASE_THEME: StyleAttrs = {
     # plot calendar heatmap style (ADR 0044); a None cmap derives from the
     # heatmap cmap, a None month line color from the heatmap frame color
     "plot_calendar_heatmap_cmap": None,
+    "plot_calendar_heatmap_cmap_diverging": None,
     "plot_calendar_heatmap_alpha": 0.95,
     "plot_calendar_heatmap_font_size": 6,
     "plot_calendar_heatmap_font_color": "#000000",

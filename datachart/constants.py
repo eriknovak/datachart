@@ -739,6 +739,11 @@ class NORMALIZE:
         SYMLOG (str): The symlog normalization. Equals to `"symlog"`.
         ASINH (str): The asinh normalization. Equals to `"asinh"`.
         LOGIT (str): The logit normalization. Equals to `"logit"`.
+        CENTERED (str): The normalization holding `vcenter` in the middle of the
+            colormap, the same distance to each side of it. Equals to `"centered"`.
+        TWOSLOPE (str): The normalization holding `vcenter` in the middle of the
+            colormap, with `vmin` and `vmax` at unequal distances from it.
+            Equals to `"twoslope"`.
 
     """
 
@@ -747,6 +752,8 @@ class NORMALIZE:
     SYMLOG = "symlog"
     ASINH = "asinh"
     LOGIT = "logit"
+    CENTERED = "centered"
+    TWOSLOPE = "twoslope"
 
 
 class ORIENTATION:

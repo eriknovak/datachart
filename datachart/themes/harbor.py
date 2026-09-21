@@ -30,6 +30,7 @@ HARBOR_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_start_color": "#EFC98C",
         "plot_dumbbell_end_color": "#1F4E79",
         "plot_heatmap_cmap": COLORS.Cividis,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
     }
 )
 """The harbor theme: navy and amber in lightness steps, colour-blind safe.
