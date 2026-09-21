@@ -197,6 +197,17 @@ scaled to the same peak (`PER_ROW`, the default: shapes compare). Passed
 as `normalize`; distinct from the heatmap's `NORMALIZE` colormap norm.
 _Avoid_: normalization (for the concept), common scale (for the enum)
 
+**Reference line**:
+A straight line drawn against the data as a marker, not a series — a threshold,
+a date, a parity or chance line. Declared with the chart in three families by
+what fixes the line: `vlines=` (an x position), `hlines=` (a y position), and
+`dlines=` (a slope and an intercept, defaulting to the parity line `y = x`).
+Stored on the layer, drawn by the panel after limits are set — so it survives
+composition — and never takes a cycle color, a bar slot, or a legend entry
+unless labelled. A diagonal line lives in data space: straight on linear axes
+only.
+_Avoid_: guide line, abline, parity line (for the setting; it is one value of it)
+
 **Text**:
 A per-chart annotation — a string placed at a position (data coordinates by
 default, axes-fraction on request) with an optional arrow to a target point,
