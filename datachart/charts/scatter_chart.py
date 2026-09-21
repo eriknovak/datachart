@@ -285,8 +285,9 @@ def ScatterChart(
         xerr: The key name in data for the x-axis error values (default: "xerr").
             The value is a distance from the point: one number reaches the same
             distance both ways, a `(low, high)` pair reaches `low` left and
-            `high` right. A point without the key draws no bar. The bar takes
-            the point's own color, which `plot_scatter_error_color` overrides.
+            `high` right. A point without the key draws no bar. Each bar runs
+            from the edge of its marker outward, in the point's own color,
+            which `plot_scatter_error_color` overrides.
         yerr: The key name in data for the y-axis error values (default: "yerr"),
             read like `xerr`.
         size_range: Tuple of (min_size, max_size) for bubble charts (default: (20, 200)).

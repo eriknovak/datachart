@@ -25,11 +25,14 @@ second series cannot fake the bar (#248).
   the whisker needs contrast against it; a scatter marker is small, and a bar
   in a foreign colour reads as a second series. Width and capsize have their
   own keys so a theme can thin or cap them.
-- **The bar is a second artist with no marker of its own.** Drawn with
-  `ax.errorbar(fmt="none")` one z-step under the scatter collection, so hover
-  and emphasis keep addressing the scatter artists and the bar never occludes
-  the marker. Emphasis dims the bar with its point rather than hiding it, so
-  the picture stays stable under hover.
+- **The bar stops at the edge of its marker.** A marker draws translucent, so
+  a bar run through it shows as a darker cross over the face. Each side is its
+  own marker-less patch from the point outward, shrunk by the marker's radius
+  in points — the same shrink the network chart stops an edge with at a node —
+  so the gap holds whatever the axes, the figure size or a bubble's own size
+  do afterwards. The patches sit a z-step under the markers, so hover and
+  emphasis keep addressing the scatter artists. Emphasis dims the bar with its
+  point rather than hiding it, so the picture stays stable under hover.
 - **Scatter only.** `ScatterMatrix`, hexbin, and contour layers ignore the
   keys: a matrix cell has no room for bars and the raster layers aggregate
   the points away.
@@ -43,3 +46,9 @@ symmetric number would still have to be a distance.
 **Hiding a dimmed point's bars** was rejected. Emphasis is meant to be
 readable while hovering; bars that vanish and return move the eye more than
 bars that fade.
+
+**One `errorbar` artist per axis, drawn under the markers** was rejected. It is
+a single call and matplotlib's own default, but the bar crosses the marker and
+a translucent face lets it through. **Masking it with an opaque disc under the
+marker** was rejected with it: it hides the bar, but the marker then stops
+blending with whatever it overlaps.

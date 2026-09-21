@@ -251,11 +251,12 @@ _Avoid_: annotation (for this), tag, name label, adjusted text
 A scatter point's uncertainty in either variable, read from the data keys the
 `xerr` and `yerr` parameters name. A value is a distance from the point: one
 number reaches the same distance both ways, a `[low, high]` pair reaches
-`low` below and `high` above. A point without one draws none. Drawn behind
-the marker in the point's own colour — so a hue group's bars match its
-markers — and dimmed with it under emphasis; hover reports the distances
-beside the point's values. Bubble size does not touch it. Scatter matrices,
-hexbins, and contours have no error bars.
+`low` below and `high` above. A point without one draws none. Each side runs
+from the edge of its marker outward, in the point's own colour — so a hue
+group's bars match its markers — and dims with it under emphasis; hover
+reports the distances beside the point's values. A bubble's size widens the
+gap the bar starts at, never the bar. Scatter matrices, hexbins, and contours
+have no error bars.
 _Avoid_: error band (that is a line chart's `yerr`), confidence interval (for
 the value), whisker, uncertainty range
 

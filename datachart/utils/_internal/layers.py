@@ -481,6 +481,8 @@ CONTOUR_SWATCH = 0.7
 STEP_LEGEND_EDGE_WIDTH = 0.8
 # an error bar sits this far under the markers it belongs to (ADR 0057)
 ERROR_BAR_Z_STEP = 0.1
+# the bar's cap, as a flat bracket at its far end; the width is in points
+ERROR_CAP_STYLE = "-[,widthB={width},lengthB=0"
 # the error columns a scatter point may carry, and the axis each is drawn
 # along once a transposed panel has swapped the two
 ERROR_KEYS = ("xerr", "yerr")
@@ -4307,32 +4309,59 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
             [(np.nan, np.nan) if pair is None else pair for pair in pairs], dtype=float
         ).T
 
-    def _draw_errors(self, ax, ctx, x, y, errors: dict, style: dict) -> None:
-        """One marker-less bar artist per axis, a z-step under the role's markers.
+    def _draw_errors(self, ax, ctx, x, y, sizes, errors: dict, style: dict) -> None:
+        """One bar per point per side, each running from its marker's edge outward.
 
-        The bar wears the color the markers took, so a hue group's bars match
-        it and a muted role's bars dim with it (ADR 0057).
+        A translucent marker shows whatever is drawn under it, so the bar
+        stops at the marker rather than crossing it; the gap is the marker's
+        radius in points, which the patch resolves at draw time and so keeps
+        whatever the axes do afterwards. The bar wears the color the markers
+        took, so a hue group's bars match it and a muted role's bars dim with
+        it (ADR 0057).
         """
 
-        error_style = dict(self.error_style)
-        error_style.setdefault("ecolor", style.get("c"))
+        color = self.error_style.get("ecolor") or style.get("c")
+        capsize = self.error_style.get("capsize") or 0
+        arrowstyle = ERROR_CAP_STYLE.format(width=2 * capsize) if capsize else "-"
+        radii = np.broadcast_to(
+            np.sqrt(np.asarray(sizes, dtype=float)) / 2, np.shape(x)
+        )
+        px, py = (y, x) if ctx.transpose else (x, y)
+        px = np.asarray(ax.xaxis.convert_units(px), dtype=float)
+        py = np.asarray(ax.yaxis.convert_units(py), dtype=float)
+        ends = []
         for axis, distances in errors.items():
             if distances is None:
                 continue
-            drawn = ~np.isnan(distances[0])
-            if not drawn.any():
-                continue
-            key = _drawn_error_axis(axis, ctx.transpose)
-            px, py = (y, x) if ctx.transpose else (x, y)
-            ax.errorbar(
-                px[drawn],
-                py[drawn],
-                **{key: distances[:, drawn]},
-                fmt="none",
-                alpha=style.get("alpha"),
-                zorder=style.get("zorder", 0) - ERROR_BAR_Z_STEP,
-                **error_style,
+            step = (
+                (1.0, 0.0)
+                if _drawn_error_axis(axis, ctx.transpose) == "xerr"
+                else (0.0, 1.0)
             )
+            for index in np.flatnonzero(~np.isnan(distances[0])):
+                point = np.array([px[index], py[index]])
+                for reach in (-distances[0][index], distances[1][index]):
+                    if reach == 0:
+                        continue
+                    end = point + reach * np.array(step)
+                    ends.append(end)
+                    ax.add_patch(
+                        FancyArrowPatch(
+                            point,
+                            end,
+                            arrowstyle=arrowstyle,
+                            mutation_scale=1,
+                            shrinkA=radii[index],
+                            shrinkB=0,
+                            color=color,
+                            linewidth=self.error_style.get("elinewidth"),
+                            alpha=style.get("alpha"),
+                            zorder=style.get("zorder", 0) - ERROR_BAR_Z_STEP,
+                        )
+                    )
+        # a patch draws where it is put; the axes learn the reach from the ends
+        if ends:
+            ax.update_datalim(ends)
 
     def _mark_labels(self, ax, ctx, x_data, y_data, roles) -> tuple:
         """The (labels, font, pad) each point carries: its value, or its point label.
@@ -4533,7 +4562,9 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
                 style["edgecolors"] = self.highlight_edge_color
             role_sizes = sizes[picked] if np.ndim(sizes) else sizes
             role_errors = _masked_errors(errors, picked)
-            self._draw_errors(ax, ctx, x[picked], y[picked], role_errors, style)
+            self._draw_errors(
+                ax, ctx, x[picked], y[picked], role_sizes, role_errors, style
+            )
             collection = _draw_scatter_marks(
                 scatter,
                 x[picked],
