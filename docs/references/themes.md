@@ -12,7 +12,7 @@ title: Themes Module
 
 ## Choosing a Theme
 
-Every theme is a complete [`StyleAttrs`](typings.md#datachart.typings.StyleAttrs) dictionary, named for its visual trait and listed here by where it works best. Apply one with [`config.set_theme`](config.md#datachart.config.Config.set_theme) and the member of [`THEME`](constants.md#datachart.constants.THEME) in the last column; the [Theme Gallery](../how-to-guides/styling/theme-gallery.ipynb) shows each on six charts, and the [Themes guide](../how-to-guides/styling/themes.ipynb) shows how to adjust one or build your own.
+Every theme is a complete [`StyleAttrs`](typings.md#datachart.typings.StyleAttrs) dictionary, named for its visual trait and listed here by where it works best. Apply one with [`config.set_theme`](config.md#datachart.config.Config.set_theme) and the member of [`THEME`](constants.md#datachart.constants.THEME) in the last column; the [Theme Gallery](../how-to-guides/styling/theme-gallery.ipynb) shows each on six charts, and the [Themes guide](../how-to-guides/styling/themes.ipynb) shows how to adjust one or build your own. [`derive_theme`](#datachart.themes.derive_theme) rebuilds any theme's palettes from a colormap and keeps its furniture.
 
 | Theme                                                | Look                                                                  | Apply with |
 | :--------------------------------------------------- | :-------------------------------------------------------------------- | :--------- |
@@ -33,6 +33,10 @@ Every theme is a complete [`StyleAttrs`](typings.md#datachart.typings.StyleAttrs
 | **Illustrative**                                     |                                                                       |            |
 | [`SKETCH_THEME`](#datachart.themes.SKETCH_THEME)       | hand-drawn: xkcd-style wobble and halo, Comic Neue font               | `THEME.SKETCH` |
 | [`QUILL_THEME`](#datachart.themes.QUILL_THEME)         | black ink on white paper, pen-stroked lines, etched fills, IM Fell English font | `THEME.QUILL` |
+
+## Deriving a Theme
+
+::: datachart.themes.derive_theme
 
 ## Themes
 

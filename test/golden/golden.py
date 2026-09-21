@@ -103,6 +103,8 @@ EXPECTED_CHANGES = {
     "theme_dark_bar",
     "theme_dark_scatter",
     "theme_dark_heatmap",
+    # new derived theme case (#245)
+    "theme_derived_minimal_greens_bar",
     # one lead hue per theme: DEFAULT reordered, PaperYlGnBu navy first, SKETCH vermilion first
     "line_multi",
     "bar_multi_grouped",
@@ -1217,6 +1219,16 @@ def theme_dark_heatmap():
         show_colorbars=True,
         colorbar={"label": "value"},
     )
+
+
+@case
+def theme_derived_minimal_greens_bar():
+    """MINIMAL furniture under a Greens lead: stepped series, Greens value scale."""
+    from datachart.themes import derive_theme
+
+    config.register_theme("forest", derive_theme(THEME.MINIMAL, lead=COLORS.Greens))
+    config.set_theme("forest")
+    return BarChart(data=[BAR1, BAR2], show_legend=True, show_values=True)
 
 
 @case

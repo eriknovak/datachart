@@ -29,7 +29,7 @@ from datachart.charts import (
     ViolinPlot,
 )
 from datachart.config import config
-from datachart import themes
+from datachart.config.configuration import THEMES
 from datachart.utils import Grid, Panel
 from datachart.utils._internal.config_helpers import get_dline_style
 from datachart.utils._internal.layers import DLINE_CURVE_SAMPLES, REF_LINE_ZORDER
@@ -62,8 +62,7 @@ class TestTypingsAndThemes(unittest.TestCase):
         )
 
     def test_theme_keys_in_every_theme(self):
-        for theme_name in themes.__all__:
-            theme = getattr(themes, theme_name)
+        for theme_name, theme in THEMES.items():
             for key in DLINE_KEYS:
                 self.assertIn(f"plot_dline_{key}", theme, theme_name)
 
@@ -73,8 +72,7 @@ class TestTypingsAndThemes(unittest.TestCase):
             self.assertEqual(config[f"plot_dline_{key}"], config[f"plot_hline_{key}"])
 
     def test_every_theme_styles_the_diagonal_as_its_horizontal_line(self):
-        for theme_name in themes.__all__:
-            theme = getattr(themes, theme_name)
+        for theme_name, theme in THEMES.items():
             for key in DLINE_KEYS:
                 self.assertEqual(
                     theme[f"plot_dline_{key}"], theme[f"plot_hline_{key}"], theme_name

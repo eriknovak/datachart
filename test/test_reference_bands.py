@@ -28,7 +28,7 @@ from datachart.charts import (
     ViolinPlot,
 )
 from datachart.config import config
-from datachart import themes
+from datachart.config.configuration import THEMES
 from datachart.utils import Grid, Panel
 from datachart.utils._internal.config_helpers import get_hspan_style, get_vspan_style
 
@@ -83,8 +83,7 @@ class TestTypingsAndThemes(unittest.TestCase):
         )
 
     def test_theme_keys_in_every_theme(self):
-        for theme_name in themes.__all__:
-            theme = getattr(themes, theme_name)
+        for theme_name, theme in THEMES.items():
             for side in ("vspan", "hspan"):
                 for key in SPAN_KEYS:
                     self.assertIn(f"plot_{side}_{key}", theme, theme_name)
