@@ -29,6 +29,8 @@ ScatterChart(
     show_legend: bool | None = None,
     legend: LegendSettingAttrs | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
+    show_xerr: bool | None = None,
+    show_yerr: bool | None = None,
     show_regression: bool | None = None,
     show_ci: bool | None = None,
     ci_level: float | None = None,
@@ -129,6 +131,8 @@ ScatterChart(
     size: str | list[str | None] | None = None,
     hue: str | list[str | None] | None = None,
     label: str | list[str | None] | None = None,
+    xerr: str | list[str | None] | None = None,
+    yerr: str | list[str | None] | None = None,
     size_range: tuple[float, float] | None = None
 ) -> plt.Figure
 ```
@@ -216,6 +220,8 @@ Examples:
 | `show_legend`      | Whether to show the legend. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                 |
 | `legend`           | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                                                                                                       |
 | `show_grid`        | Which grid lines to show (e.g., "both", "x", "y"); False draws none. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                                                                                                                   |
+| `show_xerr`        | Whether to draw the x-axis error bars; True by default, so a point carrying the key gets its bar. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                           |
+| `show_yerr`        | Whether to draw the y-axis error bars, as show_xerr. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                        |
 | `show_regression`  | Whether to show the regression line. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                        |
 | `show_ci`          | Whether to show the confidence interval around the regression line. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                         |
 | `ci_level`         | The confidence interval level (default 0.95). **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                              |
@@ -250,6 +256,8 @@ Examples:
 | `size`             | The key name in data for marker size values (for bubble charts). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                             |
 | `hue`              | The key name in data for color grouping (categorical variable). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                              |
 | `label`            | The key name in data for the point labels (default: "label"), aligned like style for multiple charts; None in the list leaves that chart unlabelled. Each label is drawn beside its marker at the spot with the least overlap against the other markers, labels, and the axes edge; points without the key stay unlabelled. **TYPE:** \`str                                                                                  |
+| `xerr`             | The key name in data for the x-axis error values (default: "xerr"). The value is a distance from the point: one number reaches the same distance both ways, a (low, high) pair reaches low left and high right. A point without the key draws no bar. Each bar runs from the edge of its marker outward, in the point's own color, which plot_scatter_error_color overrides. **TYPE:** \`str                                 |
+| `yerr`             | The key name in data for the y-axis error values (default: "yerr"), read like xerr. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                          |
 | `size_range`       | Tuple of (min_size, max_size) for bubble charts (default: (20, 200)). **TYPE:** \`tuple[float, float]                                                                                                                                                                                                                                                                                                                        |
 
 | RETURNS      | DESCRIPTION                              |
@@ -258,7 +266,7 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`ScatterDataPointAttrs`](#datachart.typings.ScatterDataPointAttrs); the `emphasis`, `x`, `y`, `size`, `hue` and `label` parameters rename its keys.
+Each record in `data` is a [`ScatterDataPointAttrs`](#datachart.typings.ScatterDataPointAttrs); the `emphasis`, `x`, `y`, `size`, `hue`, `label`, `xerr` and `yerr` parameters rename its keys. An error value is a distance from the point, so a `(low, high)` pair reaches `low` one way and `high` the other.
 
 ### datachart.typings.ScatterDataPointAttrs
 
@@ -266,14 +274,16 @@ Bases: `TypedDict`
 
 The data point attributes for the scatter chart.
 
-| ATTRIBUTE  | DESCRIPTION                                                                                                                         |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `x`        | The x-axis value. **TYPE:** \`int                                                                                                   |
-| `y`        | The y-axis value. **TYPE:** \`int                                                                                                   |
-| `size`     | The marker size (for bubble charts). **TYPE:** \`int                                                                                |
-| `hue`      | The category for color grouping. **TYPE:** \`str                                                                                    |
-| `label`    | The label drawn beside the point. **TYPE:** \`str                                                                                   |
-| `emphasis` | The point's own emphasis role ("background" or "highlight"); wins over the chart's emphasis and emphasis_rule. **TYPE:** \`EMPHASIS |
+| ATTRIBUTE  | DESCRIPTION                                                                                                                                                           |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `x`        | The x-axis value. **TYPE:** \`int                                                                                                                                     |
+| `y`        | The y-axis value. **TYPE:** \`int                                                                                                                                     |
+| `size`     | The marker size (for bubble charts). **TYPE:** \`int                                                                                                                  |
+| `hue`      | The category for color grouping. **TYPE:** \`str                                                                                                                      |
+| `label`    | The label drawn beside the point. **TYPE:** \`str                                                                                                                     |
+| `emphasis` | The point's own emphasis role ("background" or "highlight"); wins over the chart's emphasis and emphasis_rule. **TYPE:** \`EMPHASIS                                   |
+| `xerr`     | The x-axis error, as a distance from the point: one number reaches the same distance both ways, a (low, high) pair reaches low left and high right. **TYPE:** \`float |
+| `yerr`     | The y-axis error, as a distance from the point, read like xerr. **TYPE:** \`float                                                                                     |
 
 ## Style
 
@@ -285,15 +295,18 @@ Bases: `TypedDict`
 
 The typing for the scatter chart style.
 
-| ATTRIBUTE                 | DESCRIPTION                                       |
-| ------------------------- | ------------------------------------------------- |
-| `plot_scatter_color`      | The scatter marker color. **TYPE:** \`str         |
-| `plot_scatter_alpha`      | The alpha value of the markers. **TYPE:** \`float |
-| `plot_scatter_size`       | The marker size. **TYPE:** \`int                  |
-| `plot_scatter_marker`     | The marker shape. **TYPE:** \`LINE_MARKER         |
-| `plot_scatter_zorder`     | The zorder of the scatter. **TYPE:** \`int        |
-| `plot_scatter_edge_width` | The edge width of markers. **TYPE:** \`int        |
-| `plot_scatter_edge_color` | The edge color of markers. **TYPE:** \`str        |
+| ATTRIBUTE                    | DESCRIPTION                                                                                    |
+| ---------------------------- | ---------------------------------------------------------------------------------------------- |
+| `plot_scatter_color`         | The scatter marker color. **TYPE:** \`str                                                      |
+| `plot_scatter_alpha`         | The alpha value of the markers. **TYPE:** \`float                                              |
+| `plot_scatter_size`          | The marker size. **TYPE:** \`int                                                               |
+| `plot_scatter_marker`        | The marker shape. **TYPE:** \`LINE_MARKER                                                      |
+| `plot_scatter_zorder`        | The zorder of the scatter. **TYPE:** \`int                                                     |
+| `plot_scatter_edge_width`    | The edge width of markers. **TYPE:** \`int                                                     |
+| `plot_scatter_edge_color`    | The edge color of markers. **TYPE:** \`str                                                     |
+| `plot_scatter_error_color`   | The color of the error bars; None takes the color of the point they belong to. **TYPE:** \`str |
+| `plot_scatter_error_width`   | The error bar line width. **TYPE:** \`int                                                      |
+| `plot_scatter_error_capsize` | The half-width of the cap drawn at each end of an error bar; 0 draws none. **TYPE:** \`int     |
 
 ## Constants
 

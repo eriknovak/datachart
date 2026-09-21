@@ -44,6 +44,7 @@ Every customization is either a keyword argument of `ScatterChart` or a `plot_sc
 | scale the markers by a third value            | `size`, `size_range`                                            | [Bubble chart](#bubble-chart)                                                                           |
 | name some or all of the points                | `label`, the `"label"` key of a data point                      | [Point labels](#point-labels)                                                                           |
 | print the value beside each point             | `show_values`, `value_format`, `value_step`                     | [Value labels](#value-labels)                                                                           |
+| show the uncertainty of each point            | `xerr`, `yerr`, `show_xerr`, `show_yerr`                        | [Error bars](#error-bars)                                                                               |
 | fit a trend line and measure the correlation  | `show_regression`, `show_ci`, `ci_level`, `show_correlation`    | [Regression line](#regression-line)                                                                     |
 | keep one unit the same length on both axes    | `aspect_ratio`                                                  | [Aspect ratio](#aspect-ratio)                                                                           |
 | highlight some series, mute the rest          | `emphasis`, `emphasis_rule`                                     | [Emphasis](#emphasis)                                                                                   |
@@ -271,6 +272,42 @@ ScatterChart(
     scalex=SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.BOTH,
+).show()
+```
+
+### Error bars
+
+A point drawn on its own claims the measurement is exact. When it is a mean over runs, an estimate from a sample, or anything else with a margin, the reader cannot tell a real gap between two points from the noise. `xerr` and `yerr` name the keys that hold that margin, and every point carrying one gets a bar, drawn in the point's own color. Each bar starts at the edge of its marker, so a translucent or a large marker stays clean.
+
+A value is a *distance* from the point, not a bound: one number reaches the same distance both ways, so a margin of 0.6 points is `0.6`, and a point without the key draws no bar. `benchmarks`, defined in a hidden cell, holds eight illustrative model checkpoints, each evaluated five times on one test set: `x` is the median inference latency in milliseconds and `xerr` its spread across the runs, `y` the mean accuracy in percent and `yerr` the standard error of that mean. Both are the default key names, so the bars need no argument at all.
+
+```
+ScatterChart(
+    # every point carries an "xerr" and a "yerr" key
+    data=benchmarks,
+    title="Accuracy and latency of eight checkpoints",
+    xlabel="Inference latency (ms)",
+    ylabel="Accuracy (%)",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.BOTH,
+).show()
+```
+
+An interval that is not symmetric about the point is a `[low, high]` pair, again as distances: `low` reaches below the point and `high` above it. A bootstrap interval of the same evaluations is such a pair, stored here under `accuracy_ci`, which `yerr` names; `show_xerr=False` drops the latency bars so the comparison is only about accuracy. The look of the bars is styleable: `plot_scatter_error_width` sets their thickness, `plot_scatter_error_capsize` the half-width of the cap at each end (`0` draws none), and `plot_scatter_error_color` pins one color for all of them, where the default follows each point.
+
+```
+ScatterChart(
+    data=benchmarks,
+    # the bootstrap interval: a low and a high distance from the mean
+    yerr="accuracy_ci",
+    # the latency bars stay out of this one
+    show_xerr=False,
+    style={"plot_scatter_error_width": 1.5, "plot_scatter_error_capsize": 4},
+    title="Accuracy of eight checkpoints, with bootstrap intervals",
+    xlabel="Inference latency (ms)",
+    ylabel="Accuracy (%)",
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_grid=SHOW_GRID.BOTH,
 ).show()
