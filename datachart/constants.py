@@ -1514,6 +1514,8 @@ class THEME:
             hatches, BuPu value scale). Equals to `"mutedhatch"`.
         SLATEHATCH (str): The slate-hatch theme (the hatch theme without rust,
             slate blue first, PuBu value scale). Equals to `"slatehatch"`.
+        DARK (str): The dark theme (bright marks on a near-black page, light
+            furniture, Viridis value scale). Equals to `"dark"`.
     """
 
     DEFAULT = "default"
@@ -1529,6 +1531,7 @@ class THEME:
     CONTRAST = "contrast"
     MUTEDHATCH = "mutedhatch"
     SLATEHATCH = "slatehatch"
+    DARK = "dark"
 
 
 class EMPHASIS:

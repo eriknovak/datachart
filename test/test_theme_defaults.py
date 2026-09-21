@@ -5,9 +5,10 @@ import unittest
 import matplotlib
 
 matplotlib.use("Agg")
+import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 
-from datachart.charts import BarChart, Heatmap, LineChart
+from datachart.charts import BarChart, Heatmap, LineChart, RadialChart
 from datachart.config import config
 from datachart.constants import THEME
 from datachart.config.configuration import THEMES
@@ -17,6 +18,7 @@ BAR = [{"label": label, "y": y} for label, y in zip("ABC", [3.0, 5.0, 4.0])]
 BAR2 = [{"label": label, "y": y} for label, y in zip("ABC", [2.0, 6.0, 1.0])]
 HEAT = {"z": [[0.0, 0.5], [0.8, 1.0]]}
 LINE = [{"x": x, "y": x * x} for x in range(5)]
+RADIAL = [{"label": d, "y": y} for d, y in zip("NESW", [4.0, 7.0, 3.0, 6.0])]
 
 
 def grid_visible(ax, axis):
@@ -316,6 +318,7 @@ class TestColourSafeThemes(unittest.TestCase):
             THEME.CONTRAST,
             THEME.MUTEDHATCH,
             THEME.SLATEHATCH,
+            THEME.DARK,
         ):
             with self.subTest(theme=theme):
                 config.set_theme(theme)
@@ -366,6 +369,163 @@ class TestColourSafeThemes(unittest.TestCase):
         figure = LineChart(series)
         styles = [line.get_linestyle() for line in figure.axes[0].get_lines()[:3]]
         self.assertEqual(len(set(styles)), 3)
+
+
+class TestDarkTheme(unittest.TestCase):
+    """DARK inverts the furniture and leaves the marks alone (ADR 0058)."""
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def luminance(self, color):
+        r, g, b = mcolors.to_rgb(color)
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+    def test_the_theme_is_registered(self):
+        self.assertIn(THEME.DARK, THEMES)
+        config.set_theme(THEME.DARK)
+        self.assertEqual(config.theme, THEME.DARK)
+
+    def test_the_theme_is_complete(self):
+        """Every base attribute survives the overrides."""
+        config.set_theme(THEME.DEFAULT)
+        base_keys = set(config.config)
+        config.set_theme(THEME.DARK)
+        self.assertEqual(set(config.config), base_keys)
+
+    def test_the_background_is_two_tone_and_dark(self):
+        config.set_theme(THEME.DARK)
+        figure_face = self.luminance(config["figure_facecolor"])
+        axes_face = self.luminance(config["axes_facecolor"])
+        self.assertLess(figure_face, 0.2)
+        self.assertLess(axes_face, 0.2)
+        self.assertGreater(axes_face, figure_face)
+
+    def test_every_furniture_colour_reads_on_the_dark_face(self):
+        """No furniture attribute is left at its light-theme black."""
+        config.set_theme(THEME.DARK)
+        for key in (
+            "font_general_color",
+            "font_title_color",
+            "font_subtitle_color",
+            "font_xlabel_color",
+            "font_ylabel_color",
+            "plot_legend_label_color",
+            "plot_value_color",
+            "plot_text_color",
+            "plot_bar_error_color",
+            "plot_heatmap_frame_color",
+            "plot_calendar_heatmap_month_line_color",
+            "plot_parallel_axis_color",
+            "plot_parallel_tick_color",
+            "plot_parallel_tick_label_color",
+            "plot_parallel_dim_label_color",
+            "plot_box_edgecolor",
+            "plot_box_median_color",
+            "plot_box_whisker_color",
+            "plot_box_cap_color",
+        ):
+            with self.subTest(key=key):
+                self.assertGreater(self.luminance(config[key]), 0.5)
+
+    def test_the_drawn_furniture_follows_the_theme(self):
+        config.set_theme(THEME.DARK)
+        figure = LineChart(LINE, title="Dark")
+        ax = figure.axes[0]
+        self.assertEqual(
+            mcolors.to_hex(figure.get_facecolor()).upper(),
+            config["figure_facecolor"].upper(),
+        )
+        self.assertEqual(
+            mcolors.to_hex(ax.get_facecolor()).upper(), config["axes_facecolor"].upper()
+        )
+        self.assertEqual(
+            mcolors.to_hex(ax.spines["bottom"].get_edgecolor()).upper(),
+            config["axes_spines_color"].upper(),
+        )
+        label = ax.get_xticklabels()[0]
+        self.assertEqual(
+            mcolors.to_hex(label.get_color()).upper(),
+            config["font_general_color"].upper(),
+        )
+
+    def test_the_colorbar_labels_follow_the_theme(self):
+        """A colorbar's ticks and outline are furniture too (ADR 0058)."""
+        config.set_theme(THEME.DARK)
+        figure = Heatmap(HEAT, show_colorbars=True)
+        bar_axes = [ax for ax in figure.axes if ax is not figure.axes[0]]
+        self.assertTrue(bar_axes)
+        labels = bar_axes[0].get_yticklabels() or bar_axes[0].get_xticklabels()
+        self.assertTrue(labels)
+        for label in labels:
+            self.assertGreater(self.luminance(label.get_color()), 0.5)
+
+    def test_a_light_heatmap_cell_keeps_dark_text(self):
+        """The cell label follows the cell, not the figure face (ADR 0058)."""
+        config.set_theme(THEME.DARK)
+        figure = Heatmap(HEAT, show_heatmap_values=True)
+        texts = [t for t in figure.axes[0].texts if t.get_text()]
+        self.assertTrue(texts)
+        by_value = {t.get_text(): t for t in texts}
+        self.assertLess(self.luminance(by_value["1.0"].get_color()), 0.5)
+
+    def test_the_marks_keep_their_own_colours(self):
+        """The palette is the theme's own, not a furniture colour."""
+        config.set_theme(THEME.DARK)
+        colors = config["color_general_multiple"]
+        self.assertEqual(len(colors), len(set(colors)))
+        face = config["axes_facecolor"]
+        for color in colors:
+            with self.subTest(color=color):
+                self.assertGreater(self.luminance(color) - self.luminance(face), 0.15)
+
+
+class TestFurnitureFollowsEveryTheme(unittest.TestCase):
+    """A colorbar and a polar radius wear the theme's tick color, not black.
+
+    Both were hard-wired to black until DARK needed them light, so every
+    theme whose `font_general_color` is not black moved with the fix.
+    """
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_the_colorbar_tick_labels_take_the_theme_color(self):
+        for theme in THEMES:
+            with self.subTest(theme=theme):
+                config.set_theme(theme)
+                expected = config["font_general_color"]
+                figure = Heatmap(HEAT, show_colorbars=True)
+                bars = [ax for ax in figure.axes if ax is not figure.axes[0]]
+                if not bars:
+                    # a value-etch theme draws a stepped legend, not a bar
+                    self.assertIsNotNone(config["plot_value_etch"])
+                    continue
+                labels = bars[0].get_yticklabels() or bars[0].get_xticklabels()
+                self.assertTrue(labels)
+                for label in labels:
+                    self.assertEqual(
+                        mcolors.to_hex(label.get_color()).upper(),
+                        mcolors.to_hex(expected).upper(),
+                    )
+                plt.close("all")
+
+    def test_the_radius_labels_take_the_theme_color(self):
+        for theme in THEMES:
+            with self.subTest(theme=theme):
+                config.set_theme(theme)
+                expected = config["font_general_color"]
+                figure = RadialChart(RADIAL, type="bar")
+                texts = [t for t in figure.axes[0].texts if t.get_text()]
+                self.assertTrue(texts)
+                for text in texts:
+                    self.assertEqual(
+                        mcolors.to_hex(text.get_color()).upper(),
+                        mcolors.to_hex(expected).upper(),
+                    )
+                plt.close("all")
 
 
 class TestDivergingColormapDefaults(unittest.TestCase):

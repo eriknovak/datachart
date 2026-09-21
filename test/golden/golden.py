@@ -98,6 +98,11 @@ EXPECTED_CHANGES = {
     "theme_contrast_bar",
     "theme_mutedhatch_bar",
     "theme_slatehatch_bar",
+    # new dark theme cases (ADR 0058)
+    "theme_dark_line",
+    "theme_dark_bar",
+    "theme_dark_scatter",
+    "theme_dark_heatmap",
     # one lead hue per theme: DEFAULT reordered, PaperYlGnBu navy first, SKETCH vermilion first
     "line_multi",
     "bar_multi_grouped",
@@ -1180,6 +1185,38 @@ def theme_quill_network_treemap():
         show_legend=True,
     )
     return Grid([[network, treemap]], figsize=(9, 4))
+
+
+@case
+def theme_dark_line():
+    config.set_theme(THEME.DARK)
+    return LineChart(data=[LINE1, LINE2], subtitle=["a", "b"], show_legend=True)
+
+
+@case
+def theme_dark_bar():
+    config.set_theme(THEME.DARK)
+    return BarChart(data=[BAR1, BAR2], show_legend=True, show_values=True)
+
+
+@case
+def theme_dark_scatter():
+    config.set_theme(THEME.DARK)
+    shifted = [{"x": p["x"], "y": p["y"] + 4} for p in SCAT1]
+    return ScatterChart(data=[SCAT1, shifted], show_legend=True)
+
+
+@case
+def theme_dark_heatmap():
+    """The frame, separators and colorbar invert; a light cell keeps dark text."""
+    config.set_theme(THEME.DARK)
+    data = {"z": [[(i * j) % 7 for j in range(5)] for i in range(4)]}
+    return Heatmap(
+        data=data,
+        show_heatmap_values=True,
+        show_colorbars=True,
+        colorbar={"label": "value"},
+    )
 
 
 @case

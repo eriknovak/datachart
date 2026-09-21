@@ -20,6 +20,7 @@ from .muted import MUTED_THEME
 from .contrast import CONTRAST_THEME
 from .mutedhatch import MUTEDHATCH_THEME
 from .slatehatch import SLATEHATCH_THEME
+from .dark import DARK_THEME
 
 __all__ = [
     "DEFAULT_THEME",
@@ -35,4 +36,5 @@ __all__ = [
     "CONTRAST_THEME",
     "MUTEDHATCH_THEME",
     "SLATEHATCH_THEME",
+    "DARK_THEME",
 ]

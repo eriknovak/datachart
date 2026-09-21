@@ -6169,6 +6169,13 @@ def _draw_colorbar(
         colorbar.set_ticks([t for t in ticks if low - slack <= t <= high + slack])
     if setting["label"]:
         colorbar.set_label(setting["label"], **setting["label_style"])
+    furniture = setting["furniture"]
+    ticks_style = {"labelcolor": furniture["labelcolor"]}
+    if furniture["color"] is not None:
+        ticks_style["color"] = furniture["color"]
+    colorbar.ax.tick_params(which="both", **ticks_style)
+    if furniture["outline"] is not None:
+        colorbar.outline.set_edgecolor(furniture["outline"])
     # tick labels take no family through tick_params; restyled directly
     family = setting["label_style"]["family"]
     for label in colorbar.ax.get_xticklabels() + colorbar.ax.get_yticklabels():
@@ -12366,7 +12373,7 @@ class Panel:
         return spines.get("bottom", {}).get("zorder", DEFAULT_SPINE_ZORDER)
 
     def _elevate_radial_value_labels(self, ax) -> None:
-        """Redraw the r tick labels above the marks and the border, in black.
+        """Redraw the r tick labels above the marks and the border.
 
         The native axis draws grid lines and tick labels in one layer, so the
         labels cannot sit above the data while the grid stays below it.
@@ -12400,7 +12407,7 @@ class Panel:
                 va="center",
                 fontsize=tick_style.get("labelsize"),
                 fontfamily=furniture.get("font_family"),
-                color="#000000",
+                color=tick_style.get("labelcolor"),
                 zorder=self._spine_zorder() + RADIAL_LABEL_Z_OVER_SPINE,
                 path_effects=self._text_halo(),
             )

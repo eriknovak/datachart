@@ -8,10 +8,12 @@ import matplotlib
 
 matplotlib.use("Agg", force=True)
 
+import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 
 from datachart.charts import LineChart
-from datachart.constants import FIG_FORMAT
+from datachart.config import config
+from datachart.constants import FIG_FORMAT, THEME
 from datachart.utils import save_figure
 
 
@@ -61,6 +63,45 @@ class TestSaveFigure(unittest.TestCase):
         with self.assertRaises(ValueError) as ctx:
             save_figure(self.figure, self.path("fig1"), format=[])
         self.assertIn("format", str(ctx.exception))
+
+
+class TestSaveFigureKeepsTheThemeGround(unittest.TestCase):
+    """A dark figure carries its face into the file (ADR 0058)."""
+
+    def setUp(self):
+        config.set_theme(THEME.DARK)
+        self.figure = LineChart(data=[{"x": i, "y": i * 2} for i in range(5)])
+        self.face = mcolors.to_rgba(config["figure_facecolor"])
+        self.tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmpdir.cleanup)
+        self.addCleanup(plt.close, "all")
+        self.addCleanup(config.set_theme, THEME.DEFAULT)
+
+    def path(self, name: str) -> str:
+        return os.path.join(self.tmpdir.name, name)
+
+    def corner(self, path):
+        return tuple(plt.imread(path)[0][0])
+
+    def test_png_keeps_the_dark_ground(self):
+        path = self.path("dark.png")
+        save_figure(self.figure, path, dpi=72)
+        self.assertEqual(
+            [round(c, 2) for c in self.corner(path)],
+            [round(c, 2) for c in self.face],
+        )
+
+    def test_svg_keeps_the_dark_ground(self):
+        path = self.path("dark.svg")
+        save_figure(self.figure, path, format=FIG_FORMAT.SVG)
+        with open(path) as handle:
+            markup = handle.read()
+        self.assertIn(config["figure_facecolor"].lower(), markup.lower())
+
+    def test_transparent_drops_the_ground(self):
+        path = self.path("clear.png")
+        save_figure(self.figure, path, dpi=72, transparent=True)
+        self.assertEqual(self.corner(path)[3], 0.0)
 
 
 if __name__ == "__main__":
