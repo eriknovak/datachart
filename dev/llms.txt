@@ -63,7 +63,7 @@ themes; per-chart overrides go in each chart's `style` parameter.
 ## Styling
 
 - [Styling](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/index.md): Map of themes, the theme gallery, and colormaps.
-- [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md): Applying the predefined themes through the config singleton, what a theme controls, building a custom theme with register_theme, and sharing it as a JSON theme file.
+- [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md): Applying the predefined themes through the config singleton, what a theme controls, building a custom theme with register_theme, deriving a theme variant from a colormap with derive_theme, and sharing it as a JSON theme file.
 - [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md): Each predefined theme's swatches with hex codes and six signature charts, grouped by use.
 - [Colormaps](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/colormaps/index.md): Every COLORS palette as a strip and six-series swatches, grouped by kind, with chips for the predefined themes that use it and the role; which kind fits which theme attribute.
 

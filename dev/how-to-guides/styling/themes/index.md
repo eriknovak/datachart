@@ -1,15 +1,16 @@
 # Themes
 
-A theme is the complete set of style attributes the charts read when they are built: the palettes, the fonts, the axes furniture, and the per-chart defaults, one value per key of [StyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs). The package ships eight predefined themes, each named for its visual trait; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows their color swatches and signature charts, grouped by use. Themes are applied and built through the global [config](https://eriknovak.github.io/datachart/dev/references/config/index.md) instance:
+A theme is the complete set of style attributes the charts read when they are built: the palettes, the fonts, the axes furniture, and the per-chart defaults, one value per key of [StyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs). The package ships fourteen predefined themes, each named for its visual trait; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows their color swatches and signature charts, grouped by use. Themes are applied and built through the global [config](https://eriknovak.github.io/datachart/dev/references/config/index.md) instance:
 
-| Task                                     | Method                                     | Section                                             |
-| ---------------------------------------- | ------------------------------------------ | --------------------------------------------------- |
-| Switch the look of every chart           | `set_theme`, `list_themes`                 | [Applying a Theme](#applying-a-theme)               |
-| Switch it for one block only             | `using_theme`                              | [Applying a Theme](#applying-a-theme)               |
-| Read and change single attributes        | `config[...]`, `update_config`, `override` | [What a Theme Controls](#what-a-theme-controls)     |
-| Make your own theme switchable by name   | `register_theme`                           | [Building Your Own Theme](#building-your-own-theme) |
-| Share a theme as a file and load it back | `save_theme`, `load_theme`                 | [Sharing a Theme](#sharing-a-theme)                 |
-| Return to the default theme              | `reset_config`                             | [Applying a Theme](#applying-a-theme)               |
+| Task                                     | Method                                     | Section                                                               |
+| ---------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------- |
+| Switch the look of every chart           | `set_theme`, `list_themes`                 | [Applying a Theme](#applying-a-theme)                                 |
+| Switch it for one block only             | `using_theme`                              | [Applying a Theme](#applying-a-theme)                                 |
+| Read and change single attributes        | `config[...]`, `update_config`, `override` | [What a Theme Controls](#what-a-theme-controls)                       |
+| Make your own theme switchable by name   | `register_theme`                           | [Building Your Own Theme](#building-your-own-theme)                   |
+| Recolour a theme from a colormap         | `derive_theme`                             | [Deriving a Theme from a Colormap](#deriving-a-theme-from-a-colormap) |
+| Share a theme as a file and load it back | `save_theme`, `load_theme`                 | [Sharing a Theme](#sharing-a-theme)                                   |
+| Return to the default theme              | `reset_config`                             | [Applying a Theme](#applying-a-theme)                                 |
 
 ```
 from datachart.config import config
@@ -164,6 +165,41 @@ demo().show()
 Adding the theme to the `datachart` package
 
 If you think the theme would be useful to others, open a pull request that adds it to the `datachart.themes` module.
+
+## Deriving a Theme from a Colormap
+
+Every predefined theme is a *lead* colormap plus the palettes sampled from it, and most of the colormaps in [COLORS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORS) back no theme. `derive_theme` takes a base theme and a lead and rebuilds only the lead-dependent attributes, so a theme with a different hue is one call rather than a copied dictionary. The base is a [THEME](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) constant, a registered name, or a theme dictionary; the lead is a `COLORS` constant, any pypalettes name, or a list of colors. Fonts, spines, hatches, and sketch or ink rendering stay as the base sets them.
+
+A **sequential** lead (its lightness runs one way, like `Greens` or `Viridis`) becomes the value scale, `color_general_singular` and `plot_heatmap_cmap`; the series palette is six of its colors in lightness steps, interleaved dark and light so neighbouring series stay apart, the parallel coords ramp is four of them, and the dumbbell pair its lightest and darkest sample. The result is a plain dictionary, so `override` tries it out:
+
+```
+from datachart.constants import COLORS
+from datachart.themes import derive_theme
+
+forest = derive_theme(THEME.MINIMAL, lead=COLORS.Greens)
+swatches(forest["color_general_multiple"])
+with config.override(forest):
+    demo().show()
+```
+
+A **categorical** lead (`Tab10`, `Set2`, `Dark2`, or your own list of swatches) becomes the series palette, its first color the singular one, and the base keeps its value scale, ramp, and dumbbell pair. A diverging map is neither: its lightness turns in the middle, so it reads as categorical and is not a lead.
+
+```
+with config.override(derive_theme(THEME.MINIMAL, lead=COLORS.Dark2)):
+    demo().show()
+```
+
+Keyword arguments set any other attribute on the result, an unknown name raises, and `register_theme` makes the variant switchable by name like any theme; a dark base keeps the samples off its page:
+
+```
+ember = derive_theme(THEME.INK, lead=COLORS.Reds, font_general_family="serif")
+config.register_theme("ember", ember)
+with config.using_theme("ember"):
+    demo().show()
+
+with config.override(derive_theme(THEME.DARK, lead=COLORS.Oranges)):
+    demo().show()
+```
 
 ## Sharing a Theme
 

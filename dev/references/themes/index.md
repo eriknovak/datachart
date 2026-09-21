@@ -8,7 +8,7 @@ The `themes` module contains the predefined style themes that are used to visual
 
 ## Choosing a Theme
 
-Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs) dictionary, named for its visual trait and listed here by where it works best. Apply one with [`config.set_theme`](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) and the member of [`THEME`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) in the last column; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each on six charts, and the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) shows how to adjust one or build your own.
+Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs) dictionary, named for its visual trait and listed here by where it works best. Apply one with [`config.set_theme`](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) and the member of [`THEME`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) in the last column; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each on six charts, and the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) shows how to adjust one or build your own. [`derive_theme`](#datachart.themes.derive_theme) rebuilds any theme's palettes from a colormap and keeps its furniture.
 
 | Theme                                                    | Look                                                                            | Apply with         |
 | -------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------ |
@@ -29,6 +29,41 @@ Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/d
 | **Illustrative**                                         |                                                                                 |                    |
 | [`SKETCH_THEME`](#datachart.themes.SKETCH_THEME)         | hand-drawn: xkcd-style wobble and halo, Comic Neue font                         | `THEME.SKETCH`     |
 | [`QUILL_THEME`](#datachart.themes.QUILL_THEME)           | black ink on white paper, pen-stroked lines, etched fills, IM Fell English font | `THEME.QUILL`      |
+
+## Deriving a Theme
+
+### datachart.themes.derive_theme
+
+```
+derive_theme(
+    base: str | StyleAttrs, lead: Lead, **overrides
+) -> StyleAttrs
+```
+
+Build a theme variant: the base's furniture with palettes rebuilt from the lead.
+
+A sequential lead becomes the value scale (`color_general_singular`, `plot_heatmap_cmap`); the series palette is six of its colors in lightness steps, interleaved dark and light, the parallel coords ramp four of them from light to dark, and the dumbbell pair its lightest and darkest sample. A categorical lead becomes the series palette, its first color the singular one, and the base keeps its value scale, ramp, and dumbbell pair. Fonts, spines, hatches, and rendering attributes are never touched. The result is a plain theme dictionary: apply it with `register_theme` or `override`.
+
+Examples:
+
+```
+>>> from datachart.config import config
+>>> from datachart.constants import COLORS, THEME
+>>> from datachart.themes import derive_theme
+>>> forest = derive_theme(THEME.MINIMAL, lead=COLORS.Greens)
+>>> config.register_theme("forest", forest)
+>>> config.set_theme("forest")
+```
+
+| PARAMETER     | DESCRIPTION                                                                                                                                                                 |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `base`        | A THEME constant, a registered theme name, or a theme dictionary; a partial dictionary is completed from the default theme, as register_theme completes it. **TYPE:** \`str |
+| `lead`        | A COLORS constant, a pypalettes palette name, or a list of colors. A diverging map is not a lead; it is read as categorical. **TYPE:** `Lead`                               |
+| `**overrides` | Style attributes set on the result; an unknown name raises. **DEFAULT:** `{}`                                                                                               |
+
+| RETURNS      | DESCRIPTION        |
+| ------------ | ------------------ |
+| `StyleAttrs` | The derived theme. |
 
 ## Themes
 

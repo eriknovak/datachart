@@ -24,6 +24,8 @@ Each predefined theme has a card here: a strip of its color swatches with hex co
 
 Themes also carry *defaults for chart settings*: every theme but `SKETCH` and `QUILL` shows a muted y-grid unless a chart call sets `show_grid` itself, and `HATCH` hatches bar series via its hatch cycle, which is why the very same chart code below renders with grids and hatches that differ per theme. An explicit setting always wins.
 
+A theme with a different hue is not a new card: `derive_theme` in the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/#deriving-a-theme-from-a-colormap) rebuilds any theme's palettes from a colormap in [COLORS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORS) and keeps its furniture.
+
 The sample data and the two helpers behind every card are defined in a hidden cell. `show_swatches()` reads the palette, the colormaps and the font straight from the active [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md), so the strip always matches the theme as shipped. It closes with the theme's colour-blindness scores, computed by `cvd_scores()` as explained in the next section; `cvd_table()` lists them for every theme. `signature(pair)` builds the six charts with the very same code for every theme; `pair` supplies the two colors the twin-axis panel styles explicitly (one per axis), picked from the theme's own swatches. Each card opens with the one call that selects the theme.
 
 ## Colour-blindness suitability
