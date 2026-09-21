@@ -44,6 +44,7 @@ SKETCH_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_edge_color": "#222222",
         "plot_dumbbell_connector_color": "#8A8A8A",
         "plot_heatmap_cmap": COLORS.YlOrRd,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
         # a wobbled box around wobbled tiles reads as a second drawing; the
         # band and the pad already mark the group
         "plot_treemap_group_edge_width": 0,

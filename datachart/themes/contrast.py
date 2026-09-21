@@ -33,6 +33,7 @@ CONTRAST_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_start_color": "#D4B24C",
         "plot_dumbbell_end_color": "#1F4E79",
         "plot_heatmap_cmap": COLORS.Cividis,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
     }
 )
 """The contrast theme: lightness-stepped colours plus hatches, print-safe.

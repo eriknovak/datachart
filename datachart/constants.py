@@ -739,6 +739,15 @@ class NORMALIZE:
         SYMLOG (str): The symlog normalization. Equals to `"symlog"`.
         ASINH (str): The asinh normalization. Equals to `"asinh"`.
         LOGIT (str): The logit normalization. Equals to `"logit"`.
+        CENTERED (str): The normalization holding `vcenter` in the middle of the
+            colormap, the same distance to each side of it. Equals to `"centered"`.
+        TWOSLOPE (str): The normalization holding `vcenter` in the middle of the
+            colormap, with `vmin` and `vmax` at unequal distances from it.
+            Equals to `"twoslope"`.
+
+    `CENTERED` and `TWOSLOPE` are read by the heatmap and calendar heatmap,
+    which draw them in the theme's diverging colormap; the other charts
+    taking a `norm` support the first five.
 
     """
 
@@ -747,6 +756,8 @@ class NORMALIZE:
     SYMLOG = "symlog"
     ASINH = "asinh"
     LOGIT = "logit"
+    CENTERED = "centered"
+    TWOSLOPE = "twoslope"
 
 
 class ORIENTATION:

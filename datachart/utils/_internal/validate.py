@@ -30,6 +30,7 @@ from ...constants import (
     GANTT_VALUE,
     NETWORK_LAYOUT,
     NETWORK_LABEL_POSITION,
+    NORMALIZE,
     RIDGELINE_SCALE,
     SCALE,
     SCATTER_MATRIX_DIAGONAL,
@@ -344,6 +345,23 @@ def validate_log_values(parameter: str, role: str, scale, values, hint=None) -> 
         "'asinh' for data at or below zero."
     )
     raise ValueError(f"{message} {hint}" if hint else message)
+
+
+def validate_two_slope_bounds(vcenter, vmin, vmax) -> None:
+    """Reject bounds a `twoslope` norm cannot run two slopes between.
+
+    The centre has to sit strictly inside the range, or matplotlib raises
+    without naming the setting the user typed.
+    """
+
+    if (vmin is None or vmin < vcenter) and (vmax is None or vmax > vcenter):
+        return
+    raise ValueError(
+        f"`norm` '{NORMALIZE.TWOSLOPE}' needs `vcenter` strictly between "
+        f"`vmin` and `vmax`, but got vmin={vmin}, vcenter={vcenter}, "
+        f"vmax={vmax}. Move `vcenter` into the range, or drop the bound that "
+        f"excludes it. Use '{NORMALIZE.CENTERED}' for one symmetric range."
+    )
 
 
 def validate_ticks_format(value, axis: str, dated: bool) -> None:

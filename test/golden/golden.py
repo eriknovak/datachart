@@ -366,6 +366,10 @@ EXPECTED_CHANGES = {
     # (#199, #198)
     "hist_step_log",
     "hist_step_cumulative",
+    # new centred norm cases (ADR 0056)
+    "heatmap_centered",
+    "heatmap_twoslope",
+    "calendar_centered",
 }
 
 
@@ -709,6 +713,38 @@ def heatmap_labels():
 def heatmap_blank_cells():
     data = {"z": [[1, None, 3], [None, 5, 6]]}
     return Heatmap(data=data, show_heatmap_values=True, show_colorbars=True)
+
+
+def signed_matrix():
+    """A signed 5x5 matrix: a difference table running either side of zero."""
+    rng = np.random.RandomState(11)
+    return (rng.rand(5, 5) * 8 - 3).round(1).tolist()
+
+
+@case
+def heatmap_centered():
+    data = {"z": signed_matrix()}
+    return Heatmap(
+        data=data,
+        norm=NORMALIZE.CENTERED,
+        show_heatmap_values=True,
+        show_colorbars=True,
+        title="Centred on zero",
+    )
+
+
+@case
+def heatmap_twoslope():
+    data = {"z": signed_matrix()}
+    return Heatmap(
+        data=data,
+        norm=NORMALIZE.TWOSLOPE,
+        vmin=-3,
+        vmax=5,
+        show_heatmap_values=True,
+        show_colorbars=True,
+        title="Two slopes about zero",
+    )
 
 
 @case
@@ -2736,6 +2772,21 @@ def calendar_sunday_start():
         show_values=True,
         style={"plot_calendar_heatmap_cmap": COLORS.Greens},
         title="Q1 2024, weeks from Sunday",
+        figsize=(9, 2.6),
+    )
+
+
+@case
+def calendar_centered():
+    days, values = calendar_days(2024, seed=4)
+    # the daily departure from the year's mean: a signed anomaly about zero
+    mean = sum(values) / len(values)
+    quarter = [(d, round(v - mean, 1)) for d, v in zip(days, values) if d.month <= 3]
+    return CalendarHeatmap(
+        {"date": [d for d, _ in quarter], "value": [v for _, v in quarter]},
+        norm=NORMALIZE.CENTERED,
+        show_colorbars=True,
+        title="Q1 2024, daily anomaly",
         figsize=(9, 2.6),
     )
 

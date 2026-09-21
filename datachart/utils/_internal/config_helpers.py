@@ -933,29 +933,71 @@ def get_plot_text_arrow_style(text_style: dict) -> dict:
 # -------------------------------------
 
 
-def get_heatmap_style(heatmap_style: dict, prefix: str = "plot_heatmap") -> dict:
+def get_heatmap_style(
+    heatmap_style: dict, prefix: str = "plot_heatmap", diverging: bool = False
+) -> dict:
     """Get the heatmap style.
 
     The calendar heatmap reads the same keys under its own prefix; its `None`
-    colormap derives from the heatmap colormap (ADR 0044).
+    colormap derives from the heatmap colormap (ADR 0044). `diverging` says
+    the chart draws under a centred norm, which takes the diverging colormap.
 
     Args:
         heatmap_style: The heatmap style dictionary.
         prefix: The style key prefix of the chart reading the style.
+        diverging: Whether the chart's norm is a centred one.
 
     Returns:
         The heatmap style setting.
 
     """
 
-    config_attrs = [
-        ("cmap", f"{prefix}_cmap"),
-        ("alpha", f"{prefix}_alpha"),
-    ]
-
-    style = create_config_dict(heatmap_style, config_attrs)
-    style.setdefault("cmap", get_attr_value("plot_heatmap_cmap", heatmap_style, config))
+    style = create_config_dict(heatmap_style, [("alpha", f"{prefix}_alpha")])
+    style["cmap"] = get_heatmap_cmap(heatmap_style, prefix, diverging)
     return style
+
+
+def get_heatmap_cmap(heatmap_style: dict, prefix: str, diverging: bool):
+    """The colormap a heatmap draws its cells in.
+
+    Under a centred norm the theme's diverging colormap replaces its
+    sequential one, but a colormap named in the chart's own style still wins
+    (ADR 0056); a config with no diverging map left falls back to the
+    sequential one rather than drawing without a colormap. A `None` key under
+    the calendar prefix derives from the heatmap key, as the sequential pair
+    does (ADR 0044).
+
+    Args:
+        heatmap_style: The heatmap style dictionary.
+        prefix: The style key prefix of the chart reading the style.
+        diverging: Whether the chart's norm is a centred one.
+
+    Returns:
+        The colormap name, colors, or instance; None when none is set.
+
+    """
+
+    def first_set(keys, chart_only=False):
+        """The first key holding a colormap; `chart_only` skips the theme."""
+        for key in keys:
+            value = (
+                heatmap_style.get(key)
+                if chart_only
+                else get_attr_value(key, heatmap_style, config)
+            )
+            if value is not None:
+                return value
+        return None
+
+    sequential = [f"{prefix}_cmap", "plot_heatmap_cmap"]
+    if diverging:
+        diverging_keys = [f"{prefix}_cmap_diverging", "plot_heatmap_cmap_diverging"]
+        return (
+            first_set(sequential, chart_only=True)
+            or first_set(diverging_keys)
+            or first_set(sequential)
+        )
+    return first_set(sequential)
 
 
 def get_heatmap_font_style(heatmap_style: dict, prefix: str = "plot_heatmap") -> dict:

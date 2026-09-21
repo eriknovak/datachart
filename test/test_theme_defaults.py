@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from datachart.charts import BarChart, Heatmap, LineChart
 from datachart.config import config
 from datachart.constants import THEME
+from datachart.config.configuration import THEMES
 from datachart.utils import Grid, Panel
 
 BAR = [{"label": label, "y": y} for label, y in zip("ABC", [3.0, 5.0, 4.0])]
@@ -301,10 +302,6 @@ class TestFurnitureConsistency(unittest.TestCase):
             self.assertEqual(config[key], value)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestColourSafeThemes(unittest.TestCase):
     """The colour-blind-safe themes keep their series apart by more than hue."""
 
@@ -369,3 +366,32 @@ class TestColourSafeThemes(unittest.TestCase):
         figure = LineChart(series)
         styles = [line.get_linestyle() for line in figure.axes[0].get_lines()[:3]]
         self.assertEqual(len(set(styles)), 3)
+
+
+class TestDivergingColormapDefaults(unittest.TestCase):
+    """Every theme names a diverging heatmap colormap of its own (ADR 0056)."""
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_every_theme_sets_a_diverging_colormap(self):
+        for theme in THEMES:
+            with self.subTest(theme=theme):
+                config.set_theme(theme)
+                self.assertTrue(config["plot_heatmap_cmap_diverging"])
+
+    def test_the_diverging_colormap_differs_from_the_sequential_one(self):
+        for theme in THEMES:
+            with self.subTest(theme=theme):
+                config.set_theme(theme)
+                self.assertNotEqual(
+                    config["plot_heatmap_cmap_diverging"], config["plot_heatmap_cmap"]
+                )
+
+    def test_the_calendar_diverging_colormap_derives_from_the_heatmap_one(self):
+        self.assertIsNone(config["plot_calendar_heatmap_cmap_diverging"])
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -47,6 +47,7 @@ def Heatmap(
     norm: Optional[Union[str, List[Optional[str]]]] = None,
     vmin: Optional[Union[float, List[Optional[float]]]] = None,
     vmax: Optional[Union[float, List[Optional[float]]]] = None,
+    vcenter: Optional[Union[float, List[Optional[float]]]] = None,
     valfmt: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
     xticks: Optional[
         Union[List[Union[int, float]], List[List[Union[int, float]]]]
@@ -139,9 +140,13 @@ def Heatmap(
         sharex: Whether to share the x-axis in subplots.
         sharey: Whether to share the y-axis in subplots.
         style: Style configuration(s) for the heatmap(s).
-        norm: Value normalization method(s).
+        norm: Value normalization method(s). `"centered"` and `"twoslope"`
+            hold `vcenter` in the middle of the theme's diverging colormap;
+            see [`NORMALIZE`][datachart.constants.NORMALIZE].
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
+        vcenter: The value(s) a centred normalization holds in the middle of
+            the colormap (0 by default); ignored by every other norm.
         valfmt: Format string(s) for cell values, with the value named `x`
             (e.g., `"{x:.1f}"`). See [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT].
         xticks: Custom x-axis tick positions.
@@ -194,6 +199,7 @@ def Heatmap(
         norm=norm,
         vmin=vmin,
         vmax=vmax,
+        vcenter=vcenter,
         valfmt=valfmt,
         colorbar=colorbar,
         texts=texts,

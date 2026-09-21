@@ -49,6 +49,7 @@ def CalendarHeatmap(
     norm: Optional[Union[str, List[Optional[str]]]] = None,
     vmin: Optional[Union[float, List[Optional[float]]]] = None,
     vmax: Optional[Union[float, List[Optional[float]]]] = None,
+    vcenter: Optional[Union[float, List[Optional[float]]]] = None,
     colorbar: Optional[
         Union[ColorbarSettingAttrs, List[Optional[ColorbarSettingAttrs]]]
     ] = None,
@@ -121,9 +122,13 @@ def CalendarHeatmap(
             [`VALUE_FORMAT.DEFAULT`][datachart.constants.VALUE_FORMAT]) or any
             `"{x:.1f}"`, `"{:.1f}"`, or `"%g"` style string.
         style: Style configuration(s) for the calendar(s).
-        norm: Value normalization method(s).
+        norm: Value normalization method(s). `"centered"` and `"twoslope"`
+            hold `vcenter` in the middle of the theme's diverging colormap;
+            see [`NORMALIZE`][datachart.constants.NORMALIZE].
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
+        vcenter: The value(s) a centred normalization holds in the middle of
+            the colormap (0 by default); ignored by every other norm.
         colorbar: The colorbar setting(s): label, location, tick format, and tick
             positions. See
             [`ColorbarSettingAttrs`][datachart.typings.ColorbarSettingAttrs].
@@ -163,6 +168,7 @@ def CalendarHeatmap(
         norm=norm,
         vmin=vmin,
         vmax=vmax,
+        vcenter=vcenter,
         colorbar=colorbar,
         texts=texts,
     )

@@ -38,6 +38,7 @@ MATERIAL_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_end_color": "#1A73E8",
         "plot_dumbbell_edge_width": 0,
         "plot_heatmap_cmap": COLORS.Blues,
+        "plot_heatmap_cmap_diverging": COLORS.PuOr,
         "plot_heatmap_frame_color": "#000000",
     }
 )
