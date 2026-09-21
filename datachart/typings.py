@@ -2312,6 +2312,11 @@ class ScatterDataPointAttrs(TypedDict):
         emphasis (Optional[Union[EMPHASIS, str]]): The point's own emphasis role
             ("background" or "highlight"); wins over the chart's `emphasis` and
             `emphasis_rule`.
+        xerr (Optional[Union[float, Tuple[float, float]]]): The x-axis error, as a
+            distance from the point: one number reaches the same distance both
+            ways, a `(low, high)` pair reaches `low` left and `high` right.
+        yerr (Optional[Union[float, Tuple[float, float]]]): The y-axis error, as a
+            distance from the point, read like `xerr`.
 
     """
 
@@ -2321,6 +2326,8 @@ class ScatterDataPointAttrs(TypedDict):
     hue: Optional[str]
     label: Optional[str]
     emphasis: Optional[Union[EMPHASIS, str]]
+    xerr: Optional[Union[float, Tuple[float, float]]]
+    yerr: Optional[Union[float, Tuple[float, float]]]
 
 
 class ScatterSingleChartAttrs(TypedDict):
@@ -2349,6 +2356,8 @@ class ScatterSingleChartAttrs(TypedDict):
         size (Union[str, None]): The key name in `data` that contains the marker size value.
         hue (Union[str, None]): The key name in `data` that contains the hue/category value.
         label (Union[str, None]): The key name in `data` that contains the point label.
+        xerr (Union[str, None]): The key name in `data` that contains the x-axis error. Defaults to `"xerr"`.
+        yerr (Union[str, None]): The key name in `data` that contains the y-axis error. Defaults to `"yerr"`.
 
     """
 
@@ -2377,6 +2386,8 @@ class ScatterSingleChartAttrs(TypedDict):
     size: Union[str, None]
     hue: Union[str, None]
     label: Union[str, None]
+    xerr: Union[str, None]
+    yerr: Union[str, None]
 
 
 # ================================================

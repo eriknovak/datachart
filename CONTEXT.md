@@ -247,6 +247,18 @@ least-overlap spot, never dropped; a background layer's labels take the muted
 color.
 _Avoid_: annotation (for this), tag, name label, adjusted text
 
+**Error bar**:
+A scatter point's uncertainty in either variable, read from the data keys the
+`xerr` and `yerr` parameters name. A value is a distance from the point: one
+number reaches the same distance both ways, a `[low, high]` pair reaches
+`low` below and `high` above. A point without one draws none. Drawn behind
+the marker in the point's own colour — so a hue group's bars match its
+markers — and dimmed with it under emphasis; hover reports the distances
+beside the point's values. Bubble size does not touch it. Scatter matrices,
+hexbins, and contours have no error bars.
+_Avoid_: error band (that is a line chart's `yerr`), confidence interval (for
+the value), whisker, uncertainty range
+
 **Bump chart**:
 Rank over time (`BumpChart`: an `{x, y}` point list per series, one line
 each) drawn with rank 1 at the top of an integer y-axis. `rank_by` (a `BUMP_RANK`
