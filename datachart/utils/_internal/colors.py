@@ -16,6 +16,8 @@ Methods:
         Create a color cycle.
     is_plain_color(name):
         Tell a plain color apart from a palette name.
+    oklab_lightness(color):
+        The perceptual lightness of a color.
 
 """
 
@@ -77,6 +79,34 @@ def is_plain_color(name: str) -> bool:
     except Exception:
         return True
     return False
+
+
+def oklab_lightness(color) -> float:
+    """The OKLab lightness of a color, 0 (black) to 1 (white).
+
+    Args:
+        color: Any matplotlib color.
+
+    Returns:
+        The lightness.
+
+    """
+
+    linear = [
+        c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+        for c in colors.to_rgb(color)
+    ]
+    lms = np.cbrt(
+        np.array(
+            [
+                [0.4122214708, 0.5363325363, 0.0514459929],
+                [0.2119034982, 0.6806995451, 0.1073969566],
+                [0.0883024619, 0.2817188376, 0.6299787005],
+            ]
+        )
+        @ linear
+    )
+    return float(np.array([0.2104542553, 0.7936177850, -0.0040720468]) @ lms)
 
 
 # ===============================================

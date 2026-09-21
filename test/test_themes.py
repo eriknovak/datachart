@@ -6,7 +6,10 @@ import unittest
 from datachart.config import config
 from datachart.constants import COLORS, THEME
 from datachart.themes import DARK_THEME, MINIMAL_THEME, derive_theme
-from datachart.themes.derive import lightness
+from datachart.utils._internal.colors import (
+    get_color_scale,
+    oklab_lightness as lightness,
+)
 
 LEAD_KEYS = (
     "color_general_singular",
@@ -60,7 +63,8 @@ class TestDeriveTheme(unittest.TestCase):
 
     def test_categorical_lead_keeps_the_base_value_scale(self):
         theme = derive_theme(THEME.MINIMAL, lead=COLORS.Tab10)
-        self.assertEqual(theme["color_general_multiple"], COLORS.Tab10)
+        # the colors themselves, so a series never draws a blend of two of them
+        self.assertEqual(theme["color_general_multiple"], get_color_scale(COLORS.Tab10))
         self.assertEqual(theme["color_general_singular"], "#1f77b4")
         for key in LEAD_KEYS[2:]:
             self.assertEqual(theme[key], MINIMAL_THEME[key], key)
@@ -85,6 +89,11 @@ class TestDeriveTheme(unittest.TestCase):
             max(lightness(c) for c in light["color_general_multiple"]),
         )
         self.assertEqual(dark["figure_facecolor"], DARK_THEME["figure_facecolor"])
+        # a transparent page is not a dark page
+        clear = derive_theme({"figure_facecolor": "none"}, lead=COLORS.Greens)
+        self.assertEqual(
+            clear["color_general_multiple"], light["color_general_multiple"]
+        )
 
     def test_overrides_apply_and_unknown_keys_raise(self):
         theme = derive_theme(THEME.INK, lead=COLORS.Reds, font_general_family="serif")
