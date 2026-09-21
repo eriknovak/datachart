@@ -8,7 +8,7 @@ matplotlib.use("Agg")
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 
-from datachart.charts import BarChart, Heatmap, LineChart
+from datachart.charts import BarChart, Heatmap, LineChart, RadialChart
 from datachart.config import config
 from datachart.constants import THEME
 from datachart.config.configuration import THEMES
@@ -18,6 +18,7 @@ BAR = [{"label": label, "y": y} for label, y in zip("ABC", [3.0, 5.0, 4.0])]
 BAR2 = [{"label": label, "y": y} for label, y in zip("ABC", [2.0, 6.0, 1.0])]
 HEAT = {"z": [[0.0, 0.5], [0.8, 1.0]]}
 LINE = [{"x": x, "y": x * x} for x in range(5)]
+RADIAL = [{"label": d, "y": y} for d, y in zip("NESW", [4.0, 7.0, 3.0, 6.0])]
 
 
 def grid_visible(ax, axis):
@@ -478,6 +479,53 @@ class TestDarkTheme(unittest.TestCase):
         for color in colors:
             with self.subTest(color=color):
                 self.assertGreater(self.luminance(color) - self.luminance(face), 0.15)
+
+
+class TestFurnitureFollowsEveryTheme(unittest.TestCase):
+    """A colorbar and a polar radius wear the theme's tick color, not black.
+
+    Both were hard-wired to black until DARK needed them light, so every
+    theme whose `font_general_color` is not black moved with the fix.
+    """
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_the_colorbar_tick_labels_take_the_theme_color(self):
+        for theme in THEMES:
+            with self.subTest(theme=theme):
+                config.set_theme(theme)
+                expected = config["font_general_color"]
+                figure = Heatmap(HEAT, show_colorbars=True)
+                bars = [ax for ax in figure.axes if ax is not figure.axes[0]]
+                if not bars:
+                    # a value-etch theme draws a stepped legend, not a bar
+                    self.assertIsNotNone(config["plot_value_etch"])
+                    continue
+                labels = bars[0].get_yticklabels() or bars[0].get_xticklabels()
+                self.assertTrue(labels)
+                for label in labels:
+                    self.assertEqual(
+                        mcolors.to_hex(label.get_color()).upper(),
+                        mcolors.to_hex(expected).upper(),
+                    )
+                plt.close("all")
+
+    def test_the_radius_labels_take_the_theme_color(self):
+        for theme in THEMES:
+            with self.subTest(theme=theme):
+                config.set_theme(theme)
+                expected = config["font_general_color"]
+                figure = RadialChart(RADIAL, type="bar")
+                texts = [t for t in figure.axes[0].texts if t.get_text()]
+                self.assertTrue(texts)
+                for text in texts:
+                    self.assertEqual(
+                        mcolors.to_hex(text.get_color()).upper(),
+                        mcolors.to_hex(expected).upper(),
+                    )
+                plt.close("all")
 
 
 class TestDivergingColormapDefaults(unittest.TestCase):

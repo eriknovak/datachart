@@ -14,9 +14,12 @@ to a dark value, and it sets the rule any later dark theme follows.
 ## Commitments
 
 - **Named for the trait, not the palette.** The theme is `DARK` because the
-  background is what a user is looking for. Its palettes may change (the
-  sequential map is `Neon`, with `Viridis` as the fallback should `Neon` fail
-  the gallery's colour-blindness scoring) without the name lying.
+  background is what a user is looking for, and its palettes may change
+  without the name lying. `Neon` was the first candidate for the sequential
+  map and failed the gallery's colour-blindness scoring (deutan 3.7, protan
+  3.5, normal 7.8) besides running non-monotone in lightness, which a value
+  scale cannot do; the map is `Viridis`. The diverging map is `Coolwarm`,
+  the only one whose both ends stay clear of a near-black page.
 - **Two-tone background.** The figure face is near-black and the axes face a
   step lighter, so the plotting area reads as a panel on the page the way it
   does on a light theme's white-on-white with spines.
@@ -37,10 +40,11 @@ to a dark value, and it sets the rule any later dark theme follows.
 
 ## Considered options
 
-**Naming the theme after its palette (`NEON`)** was rejected. `Harbor` earns
-its name because the palette is the trait; here the palette is a candidate
-under a colour-blindness gate, and a fallback to `Viridis` would strand the
-name.
+**Naming the theme after its palette (`NEON`)** was rejected, and the
+rejection paid off immediately: the palette was a candidate under a
+colour-blindness gate, `Neon` failed it, and a theme called `NEON` drawing in
+Viridis would have been stranded. `Harbor` earns its name because there the
+palette is the trait.
 
 **A `dark` flag that inverts any theme** was rejected. Every theme tunes
 its furniture to its face by hand; a mechanical inversion would give thirteen
