@@ -27,7 +27,9 @@ also bypasses the theme (#247).
   centred or two-slope norm takes the diverging map. A `plot_heatmap_cmap`
   given in the chart's own `style` still wins, because an explicit chart
   colormap is the one thing the user typed; the theme's sequential map never
-  applies under a centred norm.
+  applies under a centred norm while a diverging one is set. A config that
+  clears the diverging key falls back to the sequential map, because drawing
+  without a colormap is worse than drawing in the wrong one.
 - **Every theme gets a real diverging map, including the hue-less ones.** The
   grayscale and quill themes (sequential `Greys`) and the Cividis themes take
   `RdBu` like the rest. A diverging map's job is to show sign, which a
@@ -35,6 +37,11 @@ also bypasses the theme (#247).
   luminance, so both dark ends stay readable. Themes whose sequential map is
   blue-led (`Blues`, `YlGnBu`, `PuBu`, `BuPu`) take `PuOr` or `BrBG` so the
   two maps read apart in the gallery.
+- **A two-slope norm checks its own bounds.** `vcenter` has to sit strictly
+  between `vmin` and `vmax`, which matplotlib enforces with a message naming
+  none of the three settings the user typed. The layer checks first and
+  raises its own, as the other user-facing values do.
+
 - **The value legend places a step edge at the centre.** Under a centred norm
   the even-step legend recomputes its edges so one falls on `vcenter`, and the
   plain colorbar adds a tick there. A legend that straddles zero with one step

@@ -490,10 +490,6 @@ class TestComposition(unittest.TestCase):
         self.assertFalse(any(s.get_visible() for s in grid.axes[0].spines.values()))
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestCalendarCenteredNorm(unittest.TestCase):
     """A centred norm on the calendar takes the derived diverging map (ADR 0056)."""
 
@@ -537,3 +533,7 @@ class TestCalendarCenteredNorm(unittest.TestCase):
         )
         halfranges = {ax.images[0].norm.halfrange for ax in figure.axes if ax.images}
         self.assertEqual(len(halfranges), 1)
+
+
+if __name__ == "__main__":
+    unittest.main()

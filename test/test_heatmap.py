@@ -121,10 +121,6 @@ class TestHeatmapLabels(unittest.TestCase):
         self.assertEqual(_tick_labels(figure.axes[1], "y"), ["p", "q"])
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestMarksOutsideUserLimits(unittest.TestCase):
     """A cropped cell's value is skipped (issue #174)."""
 
@@ -183,6 +179,11 @@ class TestCenteredNorm(unittest.TestCase):
         self.assertIsInstance(image.norm, colors.LogNorm)
         self.assertEqual((image.norm.vmin, image.norm.vmax), (1, 6))
 
+    def test_twoslope_bounds_missing_the_centre_raise(self):
+        with self.assertRaises(ValueError) as cm:
+            Heatmap({"z": Z}, norm=NORMALIZE.TWOSLOPE, vmin=1, vmax=6)
+        self.assertIn("vcenter", str(cm.exception))
+
 
 class TestDivergingColormap(unittest.TestCase):
     """A centred norm takes the theme's diverging colormap (ADR 0056)."""
@@ -226,12 +227,30 @@ class TestDivergingColormap(unittest.TestCase):
         config.update_config({"plot_heatmap_cmap": "Greens"})
         self.assertNotEqual(self._cmap(norm=NORMALIZE.CENTERED), "Greens")
 
+    def test_a_config_without_a_diverging_map_falls_back_to_the_sequential_one(self):
+        config.update_config(
+            {"plot_heatmap_cmap": "Greens", "plot_heatmap_cmap_diverging": None}
+        )
+        self.assertEqual(self._cmap(norm=NORMALIZE.CENTERED), "Greens")
+
 
 class TestCenteredColorbar(unittest.TestCase):
     """The colorbar marks the centre a centred norm holds fixed."""
 
     def tearDown(self):
         plt.close("all")
+
+    def _bar_ticks(self, **kwargs):
+        figure = Heatmap({"z": SIGNED}, show_colorbars=True, **kwargs)
+        figure.canvas.draw()
+        bar = [ax for ax in figure.axes if ax is not figure.axes[0]][0]
+        return [float(t) for t in bar.get_yticks()]
+
+    def test_user_ticks_replace_the_centre_tick(self):
+        ticks = self._bar_ticks(
+            norm=NORMALIZE.CENTERED, vcenter=1, colorbar={"ticks": [-2, 2]}
+        )
+        self.assertEqual(ticks, [-2.0, 2.0])
 
     def test_colorbar_ticks_include_the_centre(self):
         figure = Heatmap(
@@ -263,3 +282,7 @@ class TestCenteredValueSteps(unittest.TestCase):
     def test_even_steps_stay_even_without_a_centre(self):
         ranges = self._step_ranges()
         self.assertFalse(any(r.startswith("0 ") for r in ranges[1:]), ranges)
+
+
+if __name__ == "__main__":
+    unittest.main()

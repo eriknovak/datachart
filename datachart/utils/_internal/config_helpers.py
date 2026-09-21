@@ -962,8 +962,10 @@ def get_heatmap_cmap(heatmap_style: dict, prefix: str, diverging: bool):
 
     Under a centred norm the theme's diverging colormap replaces its
     sequential one, but a colormap named in the chart's own style still wins
-    (ADR 0056). A `None` key under the calendar prefix derives from the
-    heatmap key, as the sequential pair does (ADR 0044).
+    (ADR 0056); a config with no diverging map left falls back to the
+    sequential one rather than drawing without a colormap. A `None` key under
+    the calendar prefix derives from the heatmap key, as the sequential pair
+    does (ADR 0044).
 
     Args:
         heatmap_style: The heatmap style dictionary.
@@ -975,20 +977,27 @@ def get_heatmap_cmap(heatmap_style: dict, prefix: str, diverging: bool):
 
     """
 
-    sequential = [f"{prefix}_cmap", "plot_heatmap_cmap"]
-    if diverging:
-        for key in sequential:
-            if heatmap_style.get(key) is not None:
-                return heatmap_style[key]
-        for key in (f"{prefix}_cmap_diverging", "plot_heatmap_cmap_diverging"):
-            value = get_attr_value(key, heatmap_style, config)
+    def first_set(keys, chart_only=False):
+        """The first key holding a colormap; `chart_only` skips the theme."""
+        for key in keys:
+            value = (
+                heatmap_style.get(key)
+                if chart_only
+                else get_attr_value(key, heatmap_style, config)
+            )
             if value is not None:
                 return value
-    for key in sequential:
-        value = get_attr_value(key, heatmap_style, config)
-        if value is not None:
-            return value
-    return None
+        return None
+
+    sequential = [f"{prefix}_cmap", "plot_heatmap_cmap"]
+    if diverging:
+        diverging_keys = [f"{prefix}_cmap_diverging", "plot_heatmap_cmap_diverging"]
+        return (
+            first_set(sequential, chart_only=True)
+            or first_set(diverging_keys)
+            or first_set(sequential)
+        )
+    return first_set(sequential)
 
 
 def get_heatmap_font_style(heatmap_style: dict, prefix: str = "plot_heatmap") -> dict:

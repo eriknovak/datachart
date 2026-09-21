@@ -302,10 +302,6 @@ class TestFurnitureConsistency(unittest.TestCase):
             self.assertEqual(config[key], value)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestColourSafeThemes(unittest.TestCase):
     """The colour-blind-safe themes keep their series apart by more than hue."""
 
@@ -395,3 +391,7 @@ class TestDivergingColormapDefaults(unittest.TestCase):
 
     def test_the_calendar_diverging_colormap_derives_from_the_heatmap_one(self):
         self.assertIsNone(config["plot_calendar_heatmap_cmap_diverging"])
+
+
+if __name__ == "__main__":
+    unittest.main()

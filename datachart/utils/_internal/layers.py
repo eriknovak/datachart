@@ -108,6 +108,7 @@ from .validate import (
     validate_shared_x,
     validate_span_bounds,
     validate_ticks_format,
+    validate_two_slope_bounds,
     validate_value_step,
     validate_week_start,
 )
@@ -6023,6 +6024,7 @@ def _draw_colorbar(
 
     `centre` is the value a centred norm holds fixed: the bar marks it
     alongside its even ticks, so the sign reads off the scale (ADR 0056).
+    A `ticks` setting is the user's own list and replaces both.
     """
 
     colorbar = _place_colorbar(ax, mappable, setting, aspect_locked)
@@ -6172,13 +6174,12 @@ class HeatmapLayer(Layer):
         self.show_colorbars = self.settings.get("show_colorbars")
         self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
         self.colorbar_edge = self._colorbar_edge(self.show_colorbars)
-        centred = self.chart.get("norm") in CENTRED_NORMS
+        self.centred = self.chart.get("norm") in CENTRED_NORMS
         self.norm = self._resolve_norm()
-        # the centre a centred norm holds, and the flag the cells read off it
-        self.vcenter = self.norm.vcenter if centred else None
+        self.vcenter = self.norm.vcenter if self.centred else None
         # every centred norm maps its centre to the middle of the colormap
-        self.step_centre = 0.5 if centred else None
-        heatmap_style = get_heatmap_style(self.style, self.style_prefix, centred)
+        self.step_centre = 0.5 if self.centred else None
+        heatmap_style = get_heatmap_style(self.style, self.style_prefix, self.centred)
         heatmap_style["cmap"] = get_colormap(heatmap_style["cmap"])
         self.heatmap_style = heatmap_style
         self.font_style = get_heatmap_font_style(self.style, self.style_prefix)
@@ -6208,12 +6209,13 @@ class HeatmapLayer(Layer):
         """
 
         norm = self.chart.get("norm")
-        if norm not in CENTRED_NORMS:
+        if not self.centred:
             return norm
         vcenter = self.chart.get("vcenter")
         vcenter = 0.0 if vcenter is None else vcenter
         bounds = (self.chart.get("vmin"), self.chart.get("vmax"))
         if norm == NORMALIZE.TWOSLOPE:
+            validate_two_slope_bounds(vcenter, *bounds)
             return TwoSlopeNorm(vcenter, *bounds)
         halfrange = max(
             (abs(bound - vcenter) for bound in bounds if bound is not None),
@@ -6282,13 +6284,12 @@ class HeatmapLayer(Layer):
 
         # the panel owns the aspect; imshow's own "equal" would size the
         # colorbar to a box the panel then stretches
-        bounded = self.vcenter is None
         im = ax.imshow(
             data,
             aspect="auto",
             norm=self.norm,
-            vmin=self.chart.get("vmin", None) if bounded else None,
-            vmax=self.chart.get("vmax", None) if bounded else None,
+            vmin=None if self.centred else self.chart.get("vmin", None),
+            vmax=None if self.centred else self.chart.get("vmax", None),
             **self._cell_style(),
         )
         label = self.label(ctx)
