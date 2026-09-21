@@ -31,6 +31,8 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_vline_style": LINE_STYLE.DASHED,
         "plot_hline_color": "#7F8C8D",
         "plot_hline_style": LINE_STYLE.DASHED,
+        "plot_dline_color": "#7F8C8D",
+        "plot_dline_style": LINE_STYLE.DASHED,
         "plot_vspan_color": "#7F8C8D",
         "plot_hspan_color": "#7F8C8D",
         "plot_text_box_edgecolor": "#000000",

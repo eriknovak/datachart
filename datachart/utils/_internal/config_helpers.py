@@ -734,6 +734,32 @@ def get_hline_style(hline_style: dict) -> dict:
 
 
 # -------------------------------------
+# Diagonal Line Style
+# -------------------------------------
+
+
+def get_dline_style(dline_style: dict) -> dict:
+    """Get the diagonal line chart style.
+
+    Args:
+        dline_style: The diagonal line style dictionary.
+
+    Returns:
+        The diagonal line style setting.
+
+    """
+
+    config_attrs = [
+        ("color", "plot_dline_color"),
+        ("linestyle", "plot_dline_style"),
+        ("linewidth", "plot_dline_width"),
+        ("alpha", "plot_dline_alpha"),
+    ]
+
+    return create_config_dict(dline_style, config_attrs)
+
+
+# -------------------------------------
 # Vertical Band Style
 # -------------------------------------
 

@@ -11,6 +11,7 @@ from ..typings import (
     BarStyleAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
+    DLineSettingAttrs,
     VSpanSettingAttrs,
     HSpanSettingAttrs,
     TextSettingAttrs,
@@ -59,6 +60,7 @@ def PyramidChart(
     yticks_format: Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]] = None,
     vlines: Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs]]] = None,
     hlines: Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs]]] = None,
+    dlines: Optional[Union[DLineSettingAttrs, List[DLineSettingAttrs]]] = None,
     vspans: Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]] = None,
     hspans: Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]] = None,
     texts: Optional[Union[TextSettingAttrs, List[TextSettingAttrs]]] = None,
@@ -151,6 +153,7 @@ def PyramidChart(
         yticks_format: The y-axis tick label format, as `xticks_format`.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
+        dlines: Diagonal line(s) to plot, by slope and intercept.
         vspans: Vertical reference band(s) to shade, between two x positions.
         hspans: Horizontal reference band(s) to shade, between two y positions.
         texts: Text annotation(s) to draw.
@@ -198,6 +201,7 @@ def PyramidChart(
         ytickrotate=ytickrotate,
         vlines=vlines,
         hlines=hlines,
+        dlines=dlines,
         vspans=vspans,
         hspans=hspans,
         texts=texts,
