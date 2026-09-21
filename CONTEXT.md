@@ -571,10 +571,20 @@ _Avoid_: pickable, tooltip source, hover artist
 
 **Theme**:
 A complete, named set of style attributes (`DEFAULT`, `GREYSCALE`, `MINIMAL`,
-`MATERIAL`, `INK`, `HATCH`, `SKETCH`, `QUILL`). Applying one replaces the whole global
+`MATERIAL`, `INK`, `HATCH`, `SKETCH`, `QUILL`, `HARBOR`, `MUTED`, `CONTRAST`,
+`MUTEDHATCH`, `SLATEHATCH`, `DARK`). Applying one replaces the whole global
 configuration. Themes are named for their visual trait, never for a use case
-or audience.
-_Avoid_: publication, academic, background (former role-based theme names)
+or audience. A theme is complete on its own: every furniture colour matches
+its face, so a dark theme carries light furniture (ADR 0058).
+_Avoid_: publication, academic, background (former role-based theme names),
+dark mode (a flag; `DARK` is a theme)
+
+**Furniture**:
+Everything the panel dresses an axes with around the marks: spines, ticks,
+axis and tick fonts, grid, limits, legend, value labels, annotation text,
+heatmap frame and edges, colorbar labels. Its colours contrast with the face
+rather than carry data; marks and their colour cycles are not furniture.
+_Avoid_: chrome, decorations
 
 **Active theme**:
 The name of the theme last applied, held on the configuration as `theme` and
