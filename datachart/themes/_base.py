@@ -279,6 +279,11 @@ BASE_THEME: StyleAttrs = {
     "plot_hline_style": LINE_STYLE.SOLID,
     "plot_hline_width": 1,
     "plot_hline_alpha": 0.7,
+    # plot dline style
+    "plot_dline_color": None,
+    "plot_dline_style": LINE_STYLE.SOLID,
+    "plot_dline_width": 1,
+    "plot_dline_alpha": 0.7,
     # plot vspan (vertical reference band) style; None color: the muted color
     "plot_vspan_color": None,
     "plot_vspan_alpha": 0.25,

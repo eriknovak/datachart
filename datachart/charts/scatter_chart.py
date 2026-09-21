@@ -13,6 +13,7 @@ from ..typings import (
     ScatterStyleAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
+    DLineSettingAttrs,
     VSpanSettingAttrs,
     HSpanSettingAttrs,
     TextSettingAttrs,
@@ -91,6 +92,13 @@ def ScatterChart(
             HLineSettingAttrs,
             List[HLineSettingAttrs],
             List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]],
+        ]
+    ] = None,
+    dlines: Optional[
+        Union[
+            DLineSettingAttrs,
+            List[DLineSettingAttrs],
+            List[Union[DLineSettingAttrs, List[DLineSettingAttrs], None]],
         ]
     ] = None,
     vspans: Optional[
@@ -253,6 +261,7 @@ def ScatterChart(
         yticks_format: The y-axis tick label format, as `xticks_format`.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
+        dlines: Diagonal line(s) to plot, by slope and intercept.
         vspans: Vertical reference band(s) to shade, between two x positions.
         hspans: Horizontal reference band(s) to shade, between two y positions.
         texts: Text annotation(s) to draw.
@@ -287,6 +296,7 @@ def ScatterChart(
         ytickrotate=ytickrotate,
         vlines=vlines,
         hlines=hlines,
+        dlines=dlines,
         vspans=vspans,
         hspans=hspans,
         texts=texts,

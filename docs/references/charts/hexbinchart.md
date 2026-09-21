@@ -22,7 +22,7 @@ Each record in `data` is a [`HexbinDataAttrs`](#datachart.typings.HexbinDataAttr
 
 ## Style
 
-`style` takes the keys of [`HexbinStyleAttrs`](#datachart.typings.HexbinStyleAttrs). The chart also reads the shared groups it draws: reference lines ([`VLineStyleAttrs`](../typings.md#datachart.typings.VLineStyleAttrs) and [`HLineStyleAttrs`](../typings.md#datachart.typings.HLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](../typings.md#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](../typings.md#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](../typings.md#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](../config.md).
+`style` takes the keys of [`HexbinStyleAttrs`](#datachart.typings.HexbinStyleAttrs). The chart also reads the shared groups it draws: reference lines ([`VLineStyleAttrs`](../typings.md#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](../typings.md#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](../typings.md#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](../typings.md#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](../typings.md#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](../typings.md#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](../config.md).
 
 ::: datachart.typings.HexbinStyleAttrs
     options:
@@ -36,6 +36,7 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | :-- | :-- |
 | `reduce` | [`HEXBIN_REDUCE`](../constants.md#datachart.constants.HEXBIN_REDUCE) |
 | `figsize` | [`FIG_SIZE`](../constants.md#datachart.constants.FIG_SIZE) |
+| `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](../constants.md#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](../constants.md#datachart.constants.LEGEND_ALIGN) |
 | `show_grid` | [`SHOW_GRID`](../constants.md#datachart.constants.SHOW_GRID) |
 | `aspect_ratio` | [`ASPECT_RATIO`](../constants.md#datachart.constants.ASPECT_RATIO) |
 | `scalex` | [`SCALE`](../constants.md#datachart.constants.SCALE) |

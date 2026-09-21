@@ -524,6 +524,23 @@ class HLineStyleAttrs(TypedDict):
     plot_hline_alpha: Union[float, None]
 
 
+class DLineStyleAttrs(TypedDict):
+    """The typing for the diagonal line style.
+
+    Attributes:
+        plot_dline_color (Union[str, None]): The color of the diagonal line.
+        plot_dline_style (Union[LINE_STYLE, str, None]): The style of the diagonal line.
+        plot_dline_width (Union[int, float, None]): The width of the diagonal line.
+        plot_dline_alpha (Union[float, None]): The alpha value of the diagonal line.
+
+    """
+
+    plot_dline_color: Union[str, None]
+    plot_dline_style: Union[LINE_STYLE, str, None]
+    plot_dline_width: Union[int, float, None]
+    plot_dline_alpha: Union[float, None]
+
+
 class VSpanStyleAttrs(TypedDict):
     """The typing for the vertical reference band style.
 
@@ -1169,6 +1186,7 @@ class StyleAttrs(
     HistStyleAttrs,
     VLineStyleAttrs,
     HLineStyleAttrs,
+    DLineStyleAttrs,
     VSpanStyleAttrs,
     HSpanStyleAttrs,
     TextStyleAttrs,
@@ -1196,7 +1214,7 @@ class StyleAttrs(
 
 
 # ================================================
-# Vertical and Horizontal Line Attributes
+# Reference Line Attributes
 # ================================================
 
 
@@ -1235,6 +1253,31 @@ class HLineSettingAttrs(TypedDict):
     xmin: Union[int, float, None]
     xmax: Union[int, float, None]
     style: Union[HLineStyleAttrs, None]
+    label: Union[str, None]
+
+
+class DLineSettingAttrs(TypedDict):
+    """The diagonal reference line setting, passed to a chart front as `dlines`.
+
+    The line is straight in data coordinates, so it curves on a log axis,
+    where it is drawn between the axis limits. On linear axes, and without
+    `xmin` and `xmax`, it spans the axes and follows the zoom.
+
+    Attributes:
+        slope (Union[int, float, None]): The slope of the line. Defaults to 1.
+        intercept (Union[int, float, None]): The y-axis value of the line at x = 0. Defaults to 0.
+        xmin (Union[int, float, None]): The x-axis position the line starts at.
+        xmax (Union[int, float, None]): The x-axis position the line ends at.
+        style (Union[DLineStyleAttrs, None]): The diagonal line style attributes.
+        label (Union[str, None]): The label of the diagonal line.
+
+    """
+
+    slope: Union[int, float, None]
+    intercept: Union[int, float, None]
+    xmin: Union[int, float, None]
+    xmax: Union[int, float, None]
+    style: Union[DLineStyleAttrs, None]
     label: Union[str, None]
 
 
@@ -1406,6 +1449,7 @@ class LineSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -1430,6 +1474,7 @@ class LineSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -1461,6 +1506,7 @@ class StackedAreaSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -1484,6 +1530,7 @@ class StackedAreaSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -1511,6 +1558,7 @@ class BumpSingleChartAttrs(TypedDict):
         xtickrotate (Union[int, None]): The xtick rotation value.
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -1531,6 +1579,7 @@ class BumpSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -1718,6 +1767,7 @@ class BarSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -1742,6 +1792,7 @@ class BarSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -1785,6 +1836,7 @@ class HistogramSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -1807,6 +1859,7 @@ class HistogramSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -2048,6 +2101,7 @@ class DumbbellSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -2063,6 +2117,7 @@ class DumbbellSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -2112,6 +2167,7 @@ class ContourSingleChartAttrs(TypedDict):
 
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting of a filled contour.
@@ -2139,6 +2195,7 @@ class ContourSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     colorbar: Union[ColorbarSettingAttrs, None]
@@ -2192,6 +2249,7 @@ class HexbinSingleChartAttrs(TypedDict):
 
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting.
@@ -2222,6 +2280,7 @@ class HexbinSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     colorbar: Union[ColorbarSettingAttrs, None]
@@ -2273,6 +2332,7 @@ class ScatterSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -2299,6 +2359,7 @@ class ScatterSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -2345,6 +2406,7 @@ class BoxSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -2368,6 +2430,7 @@ class BoxSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -2415,6 +2478,7 @@ class SwarmSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -2438,6 +2502,7 @@ class SwarmSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -2480,6 +2545,7 @@ class ViolinSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -2503,6 +2569,7 @@ class ViolinSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -2546,6 +2613,7 @@ class RidgelineSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -2569,6 +2637,7 @@ class RidgelineSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -2612,6 +2681,7 @@ class RaincloudSingleChartAttrs(TypedDict):
         ytickrotate (Union[int, None]): The ytick rotation value.
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
+        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -2635,6 +2705,7 @@ class RaincloudSingleChartAttrs(TypedDict):
 
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
+    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]

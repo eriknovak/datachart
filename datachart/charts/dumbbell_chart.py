@@ -12,6 +12,7 @@ from ..utils._internal.validate import (
     validate_sort,
 )
 from ..typings import (
+    DLineSettingAttrs,
     DumbbellRecordAttrs,
     DumbbellStyleAttrs,
     EmphasisRuleAttrs,
@@ -80,6 +81,7 @@ def DumbbellChart(
     ytickrotate: Optional[Union[int, List[Optional[int]]]] = None,
     vlines: Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs]]] = None,
     hlines: Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs]]] = None,
+    dlines: Optional[Union[DLineSettingAttrs, List[DLineSettingAttrs]]] = None,
     vspans: Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]] = None,
     hspans: Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]] = None,
     texts: Optional[Union[TextSettingAttrs, List[TextSettingAttrs]]] = None,
@@ -185,6 +187,7 @@ def DumbbellChart(
         ytickrotate: Rotation angle for the y-axis tick labels.
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
+        dlines: Diagonal line(s) to plot, by slope and intercept.
         vspans: Vertical reference band(s) to shade.
         hspans: Horizontal reference band(s) to shade.
         texts: Text annotation(s) to draw.
@@ -213,6 +216,7 @@ def DumbbellChart(
         ytickrotate=ytickrotate,
         vlines=vlines,
         hlines=hlines,
+        dlines=dlines,
         vspans=vspans,
         hspans=hspans,
         texts=texts,

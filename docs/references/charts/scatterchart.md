@@ -14,7 +14,7 @@ One point per observation, placed by two numeric variables. The [Scatter Chart g
 
 ## Data
 
-Each record in `data` is a [`ScatterDataPointAttrs`](#datachart.typings.ScatterDataPointAttrs); the `x`, `y`, `size`, `hue` and `label` parameters rename its keys.
+Each record in `data` is a [`ScatterDataPointAttrs`](#datachart.typings.ScatterDataPointAttrs); the `emphasis`, `x`, `y`, `size`, `hue` and `label` parameters rename its keys.
 
 ::: datachart.typings.ScatterDataPointAttrs
     options:
@@ -22,7 +22,7 @@ Each record in `data` is a [`ScatterDataPointAttrs`](#datachart.typings.ScatterD
 
 ## Style
 
-`style` takes the keys of [`ScatterStyleAttrs`](#datachart.typings.ScatterStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](../typings.md#datachart.typings.ValueLabelStyleAttrs)), the regression line ([`RegressionStyleAttrs`](../typings.md#datachart.typings.RegressionStyleAttrs)), reference lines ([`VLineStyleAttrs`](../typings.md#datachart.typings.VLineStyleAttrs) and [`HLineStyleAttrs`](../typings.md#datachart.typings.HLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](../typings.md#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](../typings.md#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](../typings.md#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](../config.md).
+`style` takes the keys of [`ScatterStyleAttrs`](#datachart.typings.ScatterStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](../typings.md#datachart.typings.ValueLabelStyleAttrs)), the regression line ([`RegressionStyleAttrs`](../typings.md#datachart.typings.RegressionStyleAttrs)), reference lines ([`VLineStyleAttrs`](../typings.md#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](../typings.md#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](../typings.md#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](../typings.md#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](../typings.md#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](../typings.md#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](../config.md).
 
 ::: datachart.typings.ScatterStyleAttrs
     options:

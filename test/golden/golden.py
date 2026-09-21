@@ -339,6 +339,9 @@ EXPECTED_CHANGES = {
     "matrix_blank_diagonal_grid",
     # reference lines draw over the marks (ADR 0054)
     "line_vlines_hlines",
+    # diagonal reference lines (ADR 0055)
+    "line_dlines",
+    "panel_dlines_two_sources",
     # new filled-surface cases: log hexbin, level overflow, surface order
     "hexbin_log_scales",
     "contour_levels_overflow",
@@ -481,6 +484,34 @@ def line_vlines_hlines():
         hlines={"y": 40, "label": "h"},
         show_legend=True,
     )
+
+
+@case
+def line_dlines():
+    return LineChart(
+        data=LINE2,
+        dlines=[
+            {"label": "parity"},
+            {"slope": 3, "intercept": 5, "xmin": 2, "xmax": 6, "label": "clipped"},
+        ],
+        show_legend=True,
+        title="Unclipped and clipped diagonals",
+    )
+
+
+@case
+def panel_dlines_two_sources():
+    first = ScatterChart(
+        data=SCAT1,
+        subtitle="measured",
+        dlines={"label": "parity"},
+    )
+    second = ScatterChart(
+        data=[{"x": i, "y": 3 * i - 4} for i in range(20)],
+        subtitle="modelled",
+        dlines={"slope": 3, "intercept": -4, "label": "fit"},
+    )
+    return Panel([first, second], show_legend=True, title="Two sources, two diagonals")
 
 
 @case
