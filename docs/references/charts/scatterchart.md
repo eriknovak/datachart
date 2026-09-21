@@ -14,7 +14,7 @@ One point per observation, placed by two numeric variables. The [Scatter Chart g
 
 ## Data
 
-Each record in `data` is a [`ScatterDataPointAttrs`](#datachart.typings.ScatterDataPointAttrs); the `emphasis`, `x`, `y`, `size`, `hue` and `label` parameters rename its keys.
+Each record in `data` is a [`ScatterDataPointAttrs`](#datachart.typings.ScatterDataPointAttrs); the `emphasis`, `x`, `y`, `size`, `hue`, `label`, `xerr` and `yerr` parameters rename its keys. An error value is a distance from the point, so a `(low, high)` pair reaches `low` one way and `high` the other.
 
 ::: datachart.typings.ScatterDataPointAttrs
     options:
