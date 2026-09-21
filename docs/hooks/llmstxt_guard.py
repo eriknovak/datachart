@@ -1,12 +1,13 @@
-"""Build guard: every nav guide/reference page must appear in the llmstxt
-sections config, so new pages cannot silently drop out of llms.txt."""
+"""Build guard: every nav guide, use-case and reference page must appear in
+the llmstxt sections config, so new pages cannot silently drop out of
+llms.txt."""
 
 from fnmatch import fnmatch
 
 from mkdocs.exceptions import PluginError
 
-# only guide and reference pages belong in llms.txt (ADR 0016)
-GUARDED_PREFIXES = ("how-to-guides/", "references/")
+# only guide, use-case and reference pages belong in llms.txt (ADR 0016)
+GUARDED_PREFIXES = ("how-to-guides/", "use-cases/", "references/")
 
 
 def _nav_paths(items):
