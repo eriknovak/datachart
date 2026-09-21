@@ -1166,7 +1166,7 @@ def _size_extents(layers_on_axes) -> dict:
 
 
 # per family: the style resolver for a reference line
-LINE_STYLES = {
+REF_LINE_STYLES = {
     "vlines": get_vline_style,
     "hlines": get_hline_style,
     "dlines": get_dline_style,
@@ -1180,7 +1180,7 @@ def _resolve_ref_lines(chart: dict, key: str) -> List[tuple]:
     if lines is None:
         return []
     lines = lines if isinstance(lines, list) else [lines]
-    get_style = LINE_STYLES[key]
+    get_style = REF_LINE_STYLES[key]
     return [(line, get_style(line.get("style", {}) or {})) for line in lines]
 
 
@@ -1528,33 +1528,36 @@ def _draw_ref_lines(
     if any(h.get("xmin") is None or h.get("xmax") is None for h, _ in hlines):
         ax.set_xlim(default_xmin, default_xmax)
 
-    if not dlines:
-        return
-    # a diagonal is a marker, not data: it may not rescale either axis
-    xlim, ylim = ax.get_xlim(), ax.get_ylim()
-    straight = ax.get_xscale() == "linear" and ax.get_yscale() == "linear"
-    for dline, style in dlines:
-        slope = dline.get("slope")
-        intercept = dline.get("intercept")
-        # the parity line y = x is the default
-        slope = 1 if slope is None else slope
-        intercept = 0 if intercept is None else intercept
-        xmin, xmax = dline.get("xmin"), dline.get("xmax")
-        kwargs = {
-            "label": dline.get("label", ""),
-            **{"zorder": REF_LINE_ZORDER, **style},
-        }
-        if xmin is None and xmax is None and straight:
-            # unbounded: the line spans the axes and follows the zoom
-            ax.axline((0, intercept), slope=slope, **kwargs)
-            continue
-        # an omitted bound runs to the axis limit, as a band's does
-        x0 = xlim[0] if xmin is None else xmin
-        x1 = xlim[1] if xmax is None else xmax
-        xs = np.linspace(x0, x1, 2 if straight else DLINE_CURVE_SAMPLES)
-        ax.plot(xs, slope * xs + intercept, **kwargs)
-    ax.set_xlim(*xlim)
-    ax.set_ylim(*ylim)
+    if dlines:
+        # a diagonal is a marker, not data: it may not rescale either axis
+        xlim, ylim = ax.get_xlim(), ax.get_ylim()
+        straight = ax.get_xscale() == "linear" and ax.get_yscale() == "linear"
+        for dline, style in dlines:
+            slope = dline.get("slope")
+            intercept = dline.get("intercept")
+            # the parity line y = x is the default
+            slope = 1 if slope is None else slope
+            intercept = 0 if intercept is None else intercept
+            xmin, xmax = dline.get("xmin"), dline.get("xmax")
+            kwargs = {
+                "label": dline.get("label", ""),
+                # an unset color is the first cycle color, as the other two
+                # families take; a plotted segment would otherwise draw the
+                # next color of the axes cycle and advance it
+                "color": "C0",
+                **{"zorder": REF_LINE_ZORDER, **style},
+            }
+            if xmin is None and xmax is None and straight:
+                # unbounded: the line spans the axes and follows the zoom
+                ax.axline((0, intercept), slope=slope, **kwargs)
+                continue
+            # an omitted bound runs to the axis limit, as a band's does
+            x0 = xlim[0] if xmin is None else xmin
+            x1 = xlim[1] if xmax is None else xmax
+            xs = np.linspace(x0, x1, 2 if straight else DLINE_CURVE_SAMPLES)
+            ax.plot(xs, slope * xs + intercept, **kwargs)
+        ax.set_xlim(*xlim)
+        ax.set_ylim(*ylim)
 
 
 def _draw_ref_spans(

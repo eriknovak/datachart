@@ -1259,8 +1259,9 @@ class HLineSettingAttrs(TypedDict):
 class DLineSettingAttrs(TypedDict):
     """The diagonal reference line setting, passed to a chart front as `dlines`.
 
-    The line is straight in data coordinates, so it curves on a log axis.
-    Without `xmin` and `xmax` it spans the axes and follows the zoom.
+    The line is straight in data coordinates, so it curves on a log axis,
+    where it is drawn between the axis limits. On linear axes, and without
+    `xmin` and `xmax`, it spans the axes and follows the zoom.
 
     Attributes:
         slope (Union[int, float, None]): The slope of the line. Defaults to 1.

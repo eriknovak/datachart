@@ -32,7 +32,7 @@ from datachart.config import config
 from datachart import themes
 from datachart.utils import Grid, Panel
 from datachart.utils._internal.config_helpers import get_dline_style
-from datachart.utils._internal.layers import REF_LINE_ZORDER
+from datachart.utils._internal.layers import DLINE_CURVE_SAMPLES, REF_LINE_ZORDER
 
 LINE = [{"x": i, "y": i * 2} for i in range(6)]
 BAR = [{"label": c, "y": v} for c, v in zip("ABCD", [3, 5, 4, 6])]
@@ -71,6 +71,14 @@ class TestTypingsAndThemes(unittest.TestCase):
         config.reset_config()
         for key in DLINE_KEYS:
             self.assertEqual(config[f"plot_dline_{key}"], config[f"plot_hline_{key}"])
+
+    def test_every_theme_styles_the_diagonal_as_its_horizontal_line(self):
+        for theme_name in themes.__all__:
+            theme = getattr(themes, theme_name)
+            for key in DLINE_KEYS:
+                self.assertEqual(
+                    theme[f"plot_dline_{key}"], theme[f"plot_hline_{key}"], theme_name
+                )
 
 
 class TestStyleResolver(unittest.TestCase):
@@ -155,6 +163,19 @@ class TestGeometry(unittest.TestCase):
         figure = LineChart(data=LINE, dlines=[{}, {"slope": -1, "intercept": 10}])
         self.assertEqual(len(ref_lines(figure.axes[0])), 2)
 
+    def test_a_non_linear_axis_draws_the_curve(self):
+        data = [{"x": i, "y": 10**i} for i in range(1, 5)]
+        figure = LineChart(data=data, scaley="log", dlines={"slope": 1000})
+        ax = figure.axes[0]
+        (line,) = ref_lines(ax)
+        # axline refuses a slope on a log axis, so the line is sampled instead
+        self.assertNotIsInstance(line, AxLine)
+        self.assertEqual(len(line.get_xdata()), DLINE_CURVE_SAMPLES)
+        xdata = list(line.get_xdata())
+        self.assertAlmostEqual(xdata[0], ax.get_xlim()[0])
+        self.assertAlmostEqual(xdata[-1], ax.get_xlim()[1])
+        self.assertAlmostEqual(list(line.get_ydata())[-1], 1000 * xdata[-1])
+
 
 class TestStyleAndLegend(unittest.TestCase):
     def tearDown(self):
@@ -180,6 +201,25 @@ class TestStyleAndLegend(unittest.TestCase):
         (line,) = ref_lines(figure.axes[0])
         self.assertEqual(line.get_color(), "#123456")
         self.assertEqual(line.get_linewidth(), 4)
+
+    def test_an_unset_color_is_the_same_for_every_line(self):
+        # a plotted segment would otherwise take the next color of the cycle
+        figure = LineChart(
+            data=LINE,
+            dlines=[{}, {"xmin": 1, "xmax": 3}, {"xmin": 2, "xmax": 4}],
+        )
+        colors = {line.get_color() for line in ref_lines(figure.axes[0])}
+        self.assertEqual(colors, {"C0"})
+
+    def test_a_null_style_falls_back_to_the_theme(self):
+        figure = LineChart(
+            data=LINE,
+            dlines={"style": None},
+            hlines={"y": 2, "style": None},
+            vlines={"x": 2, "style": None},
+        )
+        (line,) = ref_lines(figure.axes[0])
+        self.assertEqual(line.get_alpha(), config["plot_dline_alpha"])
 
     def test_line_sits_above_the_marks(self):
         figure = LineChart(data=LINE, dlines={})

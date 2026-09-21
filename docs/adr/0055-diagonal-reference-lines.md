@@ -33,9 +33,14 @@ per axes through `REF_KEYS`. The diagonal takes the same seam, so it survives
   segment between two computed endpoints, mirroring how `hlines` clips, and
   the limit-restore guard `_draw_ref_lines` already applies keeps the segment
   from widening the axes under autoscale. Two draw paths behind one setting
-  are accepted because `axline` cannot be clipped to a data range.
+  are accepted because `axline` cannot be clipped to a data range. A
+  non-linear axis takes the segment path too, sampled across the axis
+  limits: `axline` refuses a slope where either scale is non-linear, and a
+  two-point segment would draw the chord rather than the curve. The line
+  then no longer follows the zoom, which only the unbounded linear case does.
 - **Data space only.** The line is straight in data coordinates, so it curves
-  on a log axis. The guide documents this; there is no transform option. A
+  on a log axis, where it is sampled rather than refused. The guide documents
+  this; there is no transform option. A
   user who wants a straight line on a log axis knows the transform and can
   compute the slope and intercept in it.
 - **Every front that takes `hlines` takes `dlines`.** Fifteen fronts today. A
