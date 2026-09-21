@@ -369,6 +369,21 @@ The heatmap's cells, value labels, and colorbar, under
 in `Grid`.
 _Avoid_: contributions graph, GitHub calendar, date heatmap
 
+**Centred norm**:
+A heatmap value norm that fixes one value (`vcenter`, default `0`) to the
+middle of the colormap: `NORMALIZE.CENTERED` spans the same distance to each
+side of it, `NORMALIZE.TWOSLOPE` lets `vmin` and `vmax` sit at unequal
+distances. Both draw with the theme's diverging colormap, so the sign of a
+correlation or a difference reads as a hue and the centre as its neutral.
+_Avoid_: diverging norm, symmetric norm, midpoint norm
+
+**Diverging colormap**:
+A theme's second heatmap colormap (`plot_heatmap_cmap_diverging`; the
+calendar heatmap's derives from it): two hues meeting at a neutral middle,
+taken by a centred norm in place of the sequential `plot_heatmap_cmap`. A
+chart-level `plot_heatmap_cmap` still wins.
+_Avoid_: bipolar colormap, signed colormap
+
 **Contour**:
 A gridded surface (`ContourChart`: 1-D `x`, `y` axes and a 2-D `z` grid per
 chart) drawn as iso-lines in the chart's cycle color or, when `filled`, as
