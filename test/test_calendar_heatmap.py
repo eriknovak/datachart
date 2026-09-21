@@ -13,7 +13,13 @@ from matplotlib.collections import LineCollection
 
 from datachart.charts import CalendarHeatmap, LineChart
 from datachart.config import config
-from datachart.constants import COLORBAR_LOCATION, THEME, VALUE_FORMAT, CALENDAR_WEEKDAY
+from datachart.constants import (
+    COLORBAR_LOCATION,
+    NORMALIZE,
+    THEME,
+    VALUE_FORMAT,
+    CALENDAR_WEEKDAY,
+)
 from datachart.themes import _base
 from datachart.utils import Grid, Panel
 from datachart.utils._internal.layers import DrawContext
@@ -486,3 +492,48 @@ class TestComposition(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestCalendarCenteredNorm(unittest.TestCase):
+    """A centred norm on the calendar takes the derived diverging map (ADR 0056)."""
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def _anomaly(self, **kwargs):
+        dates = days(date(2024, 1, 1), 60)
+        values = [(i % 7) - 3 for i in range(60)]
+        return CalendarHeatmap({"date": dates, "value": values}, **kwargs)
+
+    def test_centered_norm_builds_a_centered_norm(self):
+        image = self._anomaly(norm=NORMALIZE.CENTERED).axes[0].images[0]
+        self.assertIsInstance(image.norm, matplotlib.colors.CenteredNorm)
+
+    def test_vcenter_moves_the_centre(self):
+        image = self._anomaly(norm=NORMALIZE.CENTERED, vcenter=-1).axes[0].images[0]
+        self.assertEqual(image.norm.vcenter, -1)
+
+    def test_diverging_colormap_derives_from_the_heatmap_key(self):
+        image = self._anomaly(norm=NORMALIZE.CENTERED).axes[0].images[0]
+        self.assertEqual(image.cmap.name, config["plot_heatmap_cmap_diverging"])
+
+    def test_calendar_diverging_style_wins_over_the_heatmap_one(self):
+        image = (
+            self._anomaly(
+                norm=NORMALIZE.CENTERED,
+                style={"plot_calendar_heatmap_cmap_diverging": "Spectral"},
+            )
+            .axes[0]
+            .images[0]
+        )
+        self.assertEqual(image.cmap.name, "Spectral")
+
+    def test_years_share_one_half_range(self):
+        dates = days(date(2023, 12, 1), 70)
+        values = [i - 35 for i in range(70)]
+        figure = CalendarHeatmap(
+            {"date": dates, "value": values}, norm=NORMALIZE.CENTERED
+        )
+        halfranges = {ax.images[0].norm.halfrange for ax in figure.axes if ax.images}
+        self.assertEqual(len(halfranges), 1)
