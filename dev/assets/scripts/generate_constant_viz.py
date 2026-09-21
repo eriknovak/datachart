@@ -999,12 +999,29 @@ def normalize():
         )
         for label, value in members
     ]
+    # the centred norms need signed values and draw in the diverging cmap
+    signed = {"z": np.linspace(-0.6, 0.95, 16).reshape(4, 4).round(2).tolist()}
+    figs += [
+        Heatmap(
+            data=signed,
+            norm=value,
+            vmin=-0.6,
+            vmax=0.95,
+            show_colorbars=False,
+            title=f"NORMALIZE.{label}",
+        )
+        for label, value in (
+            ("CENTERED", NORMALIZE.CENTERED),
+            ("TWOSLOPE", NORMALIZE.TWOSLOPE),
+        )
+    ]
     chart_grid(
         figs,
         "const-normalize.svg",
-        1.7,
-        footnote="Same cell values under each norm; "
-        "SYMLOG and ASINH also accept zero and negative values.",
+        3.4,
+        cols=4,
+        footnote="The first five norms share one grid of positive values; "
+        "CENTERED and TWOSLOPE hold zero in the middle of a signed one.",
     )
 
 

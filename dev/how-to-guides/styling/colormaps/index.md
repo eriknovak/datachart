@@ -6,10 +6,11 @@ A palette is named wherever a theme asks for colors: the two general palettes, t
 | ------------------------------------------------- | ----------------------------------------------------- | ----------------------- |
 | Series sharing one axes                           | `color_general_multiple`                              | Categorical             |
 | Single-color roles (network nodes, parallel ramp) | `color_general_singular`                              | Sequential              |
-| Heatmap cells                                     | `plot_heatmap_cmap`                                   | Sequential or diverging |
+| Heatmap cells                                     | `plot_heatmap_cmap`                                   | Sequential              |
+| Heatmap cells under a centred norm                | `plot_heatmap_cmap_diverging`                         | Diverging               |
 | Parallel-coordinates hue                          | `color_parallel_hue`, `color_parallel_hue_continuous` | Categorical, sequential |
 
-A palette asked for one color gives its last one, so a sequential palette yields one strong color and a graded set when several are asked for. The calendar heatmap, hexbin, and contour colormaps follow the heatmap's unless set. See the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for setting these attributes and building a theme around them.
+A palette asked for one color gives its last one, so a sequential palette yields one strong color and a graded set when several are asked for. The calendar heatmap, hexbin, and contour colormaps follow the heatmap's unless set. A heatmap drawn with `norm="centered"` or `norm="twoslope"` takes `plot_heatmap_cmap_diverging` in place of `plot_heatmap_cmap`, so a signed matrix reads its sign as a hue; see the [Heatmap guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/#normalization). See the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for setting these attributes and building a theme around them.
 
 Each palette below is shown as a continuous strip and as the six colors a chart with six series receives; hover a swatch for its hex code. A palette is passed as its `COLORS` value, or as the plain name string. A chip names a predefined theme that uses the palette and the role it plays there, and links to the theme's card in the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md).
 

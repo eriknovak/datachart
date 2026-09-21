@@ -5769,6 +5769,7 @@ Every customization is either a keyword argument of `CalendarHeatmap` or a `plot
 | change the cell borders or month separators | `style={"plot_calendar_heatmap_edge_width": ..., "plot_calendar_heatmap_month_line_color": ...}` | [Calendar style](#calendar-style)                                                                       |
 | fix the value range of the colormap         | `vmin`, `vmax`                                                                                   | [Normalization](#normalization)                                                                         |
 | spread skewed values over the colormap      | `norm`                                                                                           | [Normalization](#normalization)                                                                         |
+| center the colors on a neutral value        | `norm="centered"`, `vcenter`                                                                     | [Normalization](#normalization)                                                                         |
 | highlight one series, mute the rest         | not supported                                                                                    | [Emphasis](#emphasis)                                                                                   |
 | put a note on a day                         | `texts`                                                                                          | [Text annotations](#text-annotations)                                                                   |
 | draw several years                          | `data` spanning several years, `max_cols`                                                        | [One calendar per year](#one-calendar-per-year)                                                         |
@@ -5928,6 +5929,28 @@ CalendarHeatmap(
     norm=NORMALIZE.LOG,
     title="Cyclists counted per day, 2024",
     show_colorbars=True,
+).show()
+```
+
+A daily series is often read as a departure from something rather than as a level: how far above or below the usual a day ran. `norm=NORMALIZE.CENTERED` is for that shape. It holds `vcenter` (zero by default) in the middle of the theme's diverging colormap and runs the same distance to each side, so a day above the baseline and a day equally far below get the same depth in opposite hues, and the neutral middle is exactly the baseline. It also switches the cells from the theme's sequential colormap to its diverging one, `plot_heatmap_cmap_diverging`, which the calendar inherits like the sequential map; a `plot_calendar_heatmap_cmap` in the chart's own `style` still wins.
+
+Subtracting the year's mean from every count turns the cyclist counts into such a series. Winter reads brown, the summer peak purple, and the weekends stand out as the quiet days inside every week.
+
+```
+# each day as its departure from the year's mean count
+mean_count = sum(cyclists["value"]) / len(cyclists["value"])
+anomaly = {
+    "date": cyclists["date"],
+    "value": [v - mean_count for v in cyclists["value"]],
+}
+
+CalendarHeatmap(
+    data=anomaly,
+    # zero, the year's mean, sits in the middle of the diverging colormap
+    norm=NORMALIZE.CENTERED,
+    title="Cyclists per day against the 2024 mean",
+    show_colorbars=True,
+    colorbar={"label": "Departure from the mean"},
 ).show()
 ```
 
@@ -11032,9 +11055,10 @@ Every customization is either a keyword argument of `Heatmap` or a `plot_heatmap
 | write the values into the cells            | `show_heatmap_values`, `valfmt`                                              | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
 | caption, move, or format the colorbar      | `colorbar={"label": ..., "location": ..., "format": ..., "ticks": ...}`      | [Colorbar placement](#colorbar-placement)                                                               |
 | change the colormap or transparency        | `style={"plot_heatmap_cmap": ..., "plot_heatmap_alpha": ...}`                | [Heatmap style](#heatmap-style)                                                                         |
+| change the colormap a centred norm uses    | `style={"plot_heatmap_cmap_diverging": ...}`                                 | [Normalization](#normalization)                                                                         |
 | style the cell values                      | `style={"plot_heatmap_font_size": ..., "plot_heatmap_font_color": ..., ...}` | [Heatmap style](#heatmap-style)                                                                         |
 | draw borders between the cells             | `style={"plot_heatmap_edge_width": ..., "plot_heatmap_edge_color": ...}`     | [Heatmap style](#heatmap-style)                                                                         |
-| center a diverging colormap on a value     | `vmin`, `vmax`                                                               | [Normalization](#normalization)                                                                         |
+| center a diverging colormap on a value     | `norm="centered"`, `vcenter`                                                 | [Normalization](#normalization)                                                                         |
 | spread skewed values over the colormap     | `norm`                                                                       | [Normalization](#normalization)                                                                         |
 | highlight some cells, mute the rest        | `emphasis_rule`, an `emphasis` grid in `data`                                | [Emphasis](#emphasis)                                                                                   |
 | put a note on a cell                       | `texts`                                                                      | [Text annotations](#text-annotations)                                                                   |
@@ -11194,7 +11218,7 @@ Heatmap(
 
 The colors come from a two-step mapping: each value is first normalized to the 0 to 1 range, then picks its color from the colormap. Both steps can be tuned, and each tuning is a claim about the data, so it should be an honest one.
 
-**Value range.** By default the smallest value maps to the first color and the largest to the last. `vmin` and `vmax` pin the endpoints instead. With a diverging colormap this is what places the neutral middle on a meaningful value: the temperatures run from −6.7 to 28.5 °C, so the white center of `COLORS.Coolwarm` would land on about 11 °C, a value that means nothing. A range of −30 to 30 °C centers it on freezing, and every blue cell is now a month below zero. Pinning the range is also how two heatmaps get comparable colors (see [Example 3](#example-3-did-fine-tuning-fix-the-confusion-shared-value-range-and-a-grid)).
+**Value range.** By default the smallest value maps to the first color and the largest to the last. `vmin` and `vmax` pin the endpoints instead. With a diverging colormap this is what places the neutral middle on a meaningful value: the temperatures run from −6.7 to 28.5 °C, so the white center of `COLORS.Coolwarm` would land on about 11 °C, a value that means nothing. A range of −30 to 30 °C centers it on freezing, and every blue cell is now a month below zero. Pinning the range is also how two heatmaps get comparable colors (see [Example 3](#example-3-did-fine-tuning-fix-the-confusion-shared-value-range-and-a-grid)). **Centered normalization** below does the same centring without naming a colormap or working out the range by hand.
 
 ```
 Heatmap(
@@ -11232,6 +11256,29 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
         show_colorbars=True,
         show_heatmap_values=True,
         valfmt=VALUE_FORMAT.INTEGER,
+    ).show()
+```
+
+**Centered normalization.** Values that carry a sign—a correlation, a difference, an anomaly—have one value that means "neither": usually zero. `norm=NORMALIZE.CENTERED` holds that value in the middle of the colormap and runs the same distance to each side of it, so a cell's hue is its sign and its depth is its size. The colormap it draws in is the theme's `plot_heatmap_cmap_diverging`, not the sequential `plot_heatmap_cmap` every other norm uses, so the centring and the colors that show it arrive together and follow a theme switch; a `plot_heatmap_cmap` in the chart's own `style` still wins if you want to name one yourself.
+
+`vcenter` moves the middle off zero when the neutral value is elsewhere—a baseline accuracy, last year's average. `vmin` and `vmax` still pin the ends, folded into the larger distance from the centre so the scale stays symmetric. When the two sides genuinely differ in reach and you want both fully used, `NORMALIZE.TWOSLOPE` keeps `vmin` and `vmax` where you put them and stretches each side to the centre separately; it is the honest choice only when you say so in the caption, because equal color steps then mean different value steps on either side.
+
+The temperatures below are centered on 0 °C, then on 18 °C, a room-temperature comfort baseline: the same table, two different questions.
+
+```
+for centre, label in [(0, "freezing"), (18, "room temperature")]:
+    Heatmap(
+        data=temperatures,
+        # the middle of the theme's diverging colormap sits on `vcenter`
+        norm=NORMALIZE.CENTERED,
+        vcenter=centre,
+        title=f"Mean monthly temperature (\u00b0C), centered on {label}",
+        xlabel="Month",
+        ylabel="City",
+        figsize=FIG_SIZE.FULL_MEDIUM,
+        show_colorbars=True,
+        show_heatmap_values=True,
+        valfmt=VALUE_FORMAT.DECIMAL,
     ).show()
 ```
 
@@ -11407,27 +11454,27 @@ Heatmap(
 
 The examples below put the features above to work, each one answering a question. The data lives in hidden cells; each example says what its data is and where it comes from.
 
-### Example 1: How Do Penguin Measurements Move Together? (Diverging Colormap, Pinned Range, and a Note)
+### Example 1: How Do Penguin Measurements Move Together? (Centered Norm, Half a Matrix, and a Note)
 
-`correlations` holds the Pearson correlation between four body measurements (bill length, bill depth, flipper length and body mass) of the 342 penguins in the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0). A correlation is signed, so the chart needs a diverging colormap whose white middle sits on zero: `COLORS.RdBu` pinned to the −1 to 1 range with `vmin` and `vmax` gives equally strong correlations of either sign equally dark shades. The variables label both axes, square cells keep the matrix symmetric, and the cells carry the coefficients. One cell is a known trap: bill length and depth correlate negatively across all penguins but positively within each species, a case of Simpson's paradox, and a note says so.
+`correlations` holds the Pearson correlation between four body measurements (bill length, bill depth, flipper length and body mass) of the 342 penguins in the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0). A correlation matrix is symmetric, so the upper triangle repeats the lower one and the diagonal is 1.00 by definition: both are left `None`, which draws them blank and leaves six cells that each say something. A correlation is also signed, so `norm=NORMALIZE.CENTERED` puts zero in the middle of the theme's diverging colormap and gives equally strong correlations of either sign equally dark shades, without naming a colormap or a range by hand. The variables label both axes, square cells keep the matrix square, and the cells carry the coefficients. One cell is a known trap: bill length and depth correlate negatively across all penguins but positively within each species, a case of Simpson's paradox, and a note says so.
 
 ```
 Heatmap(
     data=correlations,
-    # a diverging colormap, pinned so that zero sits on white
+    # zero sits in the middle of the theme's diverging colormap
+    norm=NORMALIZE.CENTERED,
+    vmin=-1,
+    vmax=1,
     style={
-        "plot_heatmap_cmap": COLORS.RdBu,
         "plot_heatmap_edge_width": 1,
         "plot_heatmap_edge_color": "#FFFFFF",
     },
-    vmin=-1,
-    vmax=1,
     # a note on the bill length and depth cell
     texts={
         "text": "positive within\neach species",
-        "x": 0.2,
-        "y": -0.95,
-        "target": (1, 0),
+        "x": 1.8,
+        "y": 0.7,
+        "target": (0, 1),
     },
     title="Correlation of Palmer penguin measurements",
     xtickrotate=30,
@@ -17337,7 +17384,7 @@ config.reset_config()
 
 # Theme Gallery
 
-Each predefined theme has a card here: a strip of its color swatches with hex codes, the sequential colormap, and the font it sets in, its colour-blindness scores, and the same six signature charts rendered under that theme — grouped bars, lines, a fitted scatter, a box plot, a heatmap, and a twin-axis [`Panel`](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md). The six charts cover every trait a theme can differ in: palette, edges and fills, line strokes and markers, bodies, value scales, and the furniture around them (spines, grid, ticks, legend). The themes are grouped by where they work best:
+Each predefined theme has a card here: a strip of its color swatches with hex codes, the sequential and diverging colormaps, and the font it sets in, its colour-blindness scores, and the same six signature charts rendered under that theme — grouped bars, lines, a fitted scatter, a box plot, a heatmap, and a twin-axis [`Panel`](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md). The six charts cover every trait a theme can differ in: palette, edges and fills, line strokes and markers, bodies, value scales, and the furniture around them (spines, grid, ticks, legend). The themes are grouped by where they work best:
 
 | Theme                                                   | Character                                                                  |
 | ------------------------------------------------------- | -------------------------------------------------------------------------- |
@@ -17360,7 +17407,7 @@ Each predefined theme has a card here: a strip of its color swatches with hex co
 
 Themes also carry *defaults for chart settings*: every theme but `SKETCH` and `QUILL` shows a muted y-grid unless a chart call sets `show_grid` itself, and `HATCH` hatches bar series via its hatch cycle, which is why the very same chart code below renders with grids and hatches that differ per theme. An explicit setting always wins.
 
-The sample data and the two helpers behind every card are defined in a hidden cell. `show_swatches()` reads the palette, sequential colormap and font straight from the active [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md), so the strip always matches the theme as shipped. It closes with the theme's colour-blindness scores, computed by `cvd_scores()` as explained in the next section; `cvd_table()` lists them for every theme. `signature(pair)` builds the six charts with the very same code for every theme; `pair` supplies the two colors the twin-axis panel styles explicitly (one per axis), picked from the theme's own swatches. Each card opens with the one call that selects the theme.
+The sample data and the two helpers behind every card are defined in a hidden cell. `show_swatches()` reads the palette, the colormaps and the font straight from the active [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md), so the strip always matches the theme as shipped. It closes with the theme's colour-blindness scores, computed by `cvd_scores()` as explained in the next section; `cvd_table()` lists them for every theme. `signature(pair)` builds the six charts with the very same code for every theme; `pair` supplies the two colors the twin-axis panel styles explicitly (one per axis), picked from the theme's own swatches. Each card opens with the one call that selects the theme.
 
 ## Colour-blindness suitability
 
@@ -17556,10 +17603,11 @@ A palette is named wherever a theme asks for colors: the two general palettes, t
 | ------------------------------------------------- | ----------------------------------------------------- | ----------------------- |
 | Series sharing one axes                           | `color_general_multiple`                              | Categorical             |
 | Single-color roles (network nodes, parallel ramp) | `color_general_singular`                              | Sequential              |
-| Heatmap cells                                     | `plot_heatmap_cmap`                                   | Sequential or diverging |
+| Heatmap cells                                     | `plot_heatmap_cmap`                                   | Sequential              |
+| Heatmap cells under a centred norm                | `plot_heatmap_cmap_diverging`                         | Diverging               |
 | Parallel-coordinates hue                          | `color_parallel_hue`, `color_parallel_hue_continuous` | Categorical, sequential |
 
-A palette asked for one color gives its last one, so a sequential palette yields one strong color and a graded set when several are asked for. The calendar heatmap, hexbin, and contour colormaps follow the heatmap's unless set. See the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for setting these attributes and building a theme around them.
+A palette asked for one color gives its last one, so a sequential palette yields one strong color and a graded set when several are asked for. The calendar heatmap, hexbin, and contour colormaps follow the heatmap's unless set. A heatmap drawn with `norm="centered"` or `norm="twoslope"` takes `plot_heatmap_cmap_diverging` in place of `plot_heatmap_cmap`, so a signed matrix reads its sign as a hue; see the [Heatmap guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/#normalization). See the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for setting these attributes and building a theme around them.
 
 Each palette below is shown as a continuous strip and as the six colors a chart with six series receives; hover a swatch for its hex code. A palette is passed as its `COLORS` value, or as the plain name string. A chip names a predefined theme that uses the palette and the role it plays there, and links to the theme's card in the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md).
 
@@ -20022,6 +20070,7 @@ CalendarHeatmap(
     norm: str | list[str | None] | None = None,
     vmin: float | list[float | None] | None = None,
     vmax: float | list[float | None] | None = None,
+    vcenter: float | list[float | None] | None = None,
     colorbar: (
         ColorbarSettingAttrs
         | list[ColorbarSettingAttrs | None]
@@ -20072,9 +20121,10 @@ Examples:
 | `show_values`         | Whether to write each day's value into its cell. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                |
 | `value_format`        | The format of the cell values: a VALUE_FORMAT constant (default VALUE_FORMAT.DEFAULT) or any "{x:.1f}", "{:.1f}", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                 |
 | `style`               | Style configuration(s) for the calendar(s). **TYPE:** \`CalendarHeatmapStyleAttrs                                                                                                                                                                                                                                                                                                                                                |
-| `norm`                | Value normalization method(s). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                   |
+| `norm`                | Value normalization method(s). "centered" and "twoslope" hold vcenter in the middle of the theme's diverging colormap; see NORMALIZE. **TYPE:** \`str                                                                                                                                                                                                                                                                            |
 | `vmin`                | Minimum value(s) for normalization. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                            |
 | `vmax`                | Maximum value(s) for normalization. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                            |
+| `vcenter`             | The value(s) a centred normalization holds in the middle of the colormap (0 by default); ignored by every other norm. **TYPE:** \`float                                                                                                                                                                                                                                                                                          |
 | `colorbar`            | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** \`ColorbarSettingAttrs                                                                                                                                                                                                                                                                                            |
 | `texts`               | Text annotation(s) to draw, on every calendar of their dataset. The cells sit at integer positions: the week column along x, the weekday row along y, counted from zero at the top-left cell of the drawn range. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                    |
 
@@ -20114,6 +20164,7 @@ The typing for the calendar heatmap style.
 | ATTRIBUTE                                | DESCRIPTION                                                                                                                                   |
 | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `plot_calendar_heatmap_cmap`             | The colormap of the day cells (palette name, single color, list of hex colors, or colormap); None takes the heatmap colormap. **TYPE:** \`str |
+| `plot_calendar_heatmap_cmap_diverging`   | The colormap the day cells take under a centred norm; None takes the heatmap diverging colormap. **TYPE:** \`str                              |
 | `plot_calendar_heatmap_alpha`            | The alpha value of the day cells. **TYPE:** \`float                                                                                           |
 | `plot_calendar_heatmap_font_size`        | The font size of the cell values. **TYPE:** \`int                                                                                             |
 | `plot_calendar_heatmap_font_color`       | The font color of the cell values. **TYPE:** \`str                                                                                            |
@@ -22452,6 +22503,7 @@ Heatmap(
     norm: str | list[str | None] | None = None,
     vmin: float | list[float | None] | None = None,
     vmax: float | list[float | None] | None = None,
+    vcenter: float | list[float | None] | None = None,
     valfmt: (
         VALUE_FORMAT | str | list[str | None] | None
     ) = None,
@@ -22536,9 +22588,10 @@ Examples:
 | `sharex`              | Whether to share the x-axis in subplots. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `sharey`              | Whether to share the y-axis in subplots. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `style`               | Style configuration(s) for the heatmap(s). **TYPE:** \`HeatmapStyleAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `norm`                | Value normalization method(s). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `norm`                | Value normalization method(s). "centered" and "twoslope" hold vcenter in the middle of the theme's diverging colormap; see NORMALIZE. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `vmin`                | Minimum value(s) for normalization. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `vmax`                | Maximum value(s) for normalization. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `vcenter`             | The value(s) a centred normalization holds in the middle of the colormap (0 by default); ignored by every other norm. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `valfmt`              | Format string(s) for cell values, with the value named x (e.g., "{x:.1f}"). See VALUE_FORMAT. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `xticks`              | Custom x-axis tick positions. **TYPE:** \`list\[int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `xticklabels`         | Custom x-axis tick labels. **TYPE:** \`list[str]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
@@ -22582,17 +22635,18 @@ Bases: `TypedDict`
 
 The typing for the heatmap chart style.
 
-| ATTRIBUTE                  | DESCRIPTION                                                                                                 |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `plot_heatmap_cmap`        | The color map of the heatmap (palette name, single color, list of hex colors, or colormap). **TYPE:** \`str |
-| `plot_heatmap_alpha`       | The alpha value of the heatmap. **TYPE:** \`float                                                           |
-| `plot_heatmap_font_size`   | The font size of the heatmap. **TYPE:** \`int                                                               |
-| `plot_heatmap_font_color`  | The font color of the heatmap. **TYPE:** \`str                                                              |
-| `plot_heatmap_font_style`  | The font style of the heatmap. **TYPE:** \`FONT_STYLE                                                       |
-| `plot_heatmap_font_weight` | The font weight of the heatmap. **TYPE:** \`FONT_WEIGHT                                                     |
-| `plot_heatmap_frame_color` | The color of the frame always drawn around heatmap axes. **TYPE:** \`str                                    |
-| `plot_heatmap_edge_width`  | The width of the borders drawn between the cells (0 draws none). **TYPE:** \`int                            |
-| `plot_heatmap_edge_color`  | The color of the borders drawn between the cells. **TYPE:** \`str                                           |
+| ATTRIBUTE                     | DESCRIPTION                                                                                                                                                                   |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plot_heatmap_cmap`           | The color map of the heatmap (palette name, single color, list of hex colors, or colormap). **TYPE:** \`str                                                                   |
+| `plot_heatmap_cmap_diverging` | The color map a centred norm ("centered" or "twoslope") draws in, in place of plot_heatmap_cmap; a plot_heatmap_cmap set in the chart's own style still wins. **TYPE:** \`str |
+| `plot_heatmap_alpha`          | The alpha value of the heatmap. **TYPE:** \`float                                                                                                                             |
+| `plot_heatmap_font_size`      | The font size of the heatmap. **TYPE:** \`int                                                                                                                                 |
+| `plot_heatmap_font_color`     | The font color of the heatmap. **TYPE:** \`str                                                                                                                                |
+| `plot_heatmap_font_style`     | The font style of the heatmap. **TYPE:** \`FONT_STYLE                                                                                                                         |
+| `plot_heatmap_font_weight`    | The font weight of the heatmap. **TYPE:** \`FONT_WEIGHT                                                                                                                       |
+| `plot_heatmap_frame_color`    | The color of the frame always drawn around heatmap axes. **TYPE:** \`str                                                                                                      |
+| `plot_heatmap_edge_width`     | The width of the borders drawn between the cells (0 draws none). **TYPE:** \`int                                                                                              |
+| `plot_heatmap_edge_color`     | The color of the borders drawn between the cells. **TYPE:** \`str                                                                                                             |
 
 ## Constants
 
@@ -25477,6 +25531,7 @@ MATERIAL_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_end_color": "#1A73E8",
         "plot_dumbbell_edge_width": 0,
         "plot_heatmap_cmap": COLORS.Blues,
+        "plot_heatmap_cmap_diverging": COLORS.PuOr,
         "plot_heatmap_frame_color": "#000000",
     }
 )
@@ -25526,6 +25581,7 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "plot_text_box_edgecolor": "#CFD8DC",
         "plot_text_arrow_color": "#9AA4AE",
         "plot_heatmap_cmap": COLORS.Purples,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
         "plot_heatmap_frame_color": "#9AA4AE",
     }
 )
@@ -25561,6 +25617,7 @@ HARBOR_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_start_color": "#EFC98C",
         "plot_dumbbell_end_color": "#1F4E79",
         "plot_heatmap_cmap": COLORS.Cividis,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
     }
 )
 ```
@@ -25608,6 +25665,7 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_connector_color": "#85929E",
         "plot_dumbbell_arrow_color": "#5D6D7E",
         "plot_heatmap_cmap": COLORS.Greys,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
         "plot_heatmap_frame_color": "#000000",
         "plot_regression_color": "#34495E",
         "plot_box_median_color": "#000000",
@@ -25667,6 +25725,7 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_connector_color": "#7F8C8D",
         "plot_dumbbell_arrow_color": "#34495E",
         "plot_heatmap_cmap": COLORS.YlGnBu,
+        "plot_heatmap_cmap_diverging": COLORS.PuOr,
         "plot_heatmap_frame_color": "#0B1F44",
         "plot_scatter_edge_width": 0.6,
         "plot_scatter_edge_color": "#0B1F44",
@@ -25739,6 +25798,7 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_connector_color": "#8C8C8C",
         "plot_dumbbell_arrow_color": "#000000",
         "plot_heatmap_cmap": COLORS.YlOrBr,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
         "plot_heatmap_frame_color": "#000000",
         "plot_violin_edgecolor": "#000000",
         "plot_ridgeline_edgecolor": "#000000",
@@ -25779,6 +25839,7 @@ MUTED_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_start_color": "#DDCC77",
         "plot_dumbbell_end_color": "#332288",
         "plot_heatmap_cmap": COLORS.YlOrBr,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
     }
 )
 ```
@@ -25818,6 +25879,7 @@ CONTRAST_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_start_color": "#D4B24C",
         "plot_dumbbell_end_color": "#1F4E79",
         "plot_heatmap_cmap": COLORS.Cividis,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
     }
 )
 ```
@@ -25841,6 +25903,7 @@ MUTEDHATCH_THEME: StyleAttrs = {
     "plot_hatch_cycle": CONTRAST_THEME["plot_hatch_cycle"],
     "plot_bar_edge_width": 0.8,
     "plot_heatmap_cmap": COLORS.BuPu,
+    "plot_heatmap_cmap_diverging": COLORS.BrBG,
 }
 ```
 
@@ -25871,6 +25934,7 @@ SLATEHATCH_THEME: StyleAttrs = {
     "plot_dumbbell_start_color": "#4F6D8F",
     "plot_dumbbell_end_color": "#743538",
     "plot_heatmap_cmap": COLORS.PuBu,
+    "plot_heatmap_cmap_diverging": COLORS.BrBG,
 }
 ```
 
@@ -25921,6 +25985,7 @@ SKETCH_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_edge_color": "#222222",
         "plot_dumbbell_connector_color": "#8A8A8A",
         "plot_heatmap_cmap": COLORS.YlOrRd,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
         "plot_treemap_group_edge_width": 0,
         "plot_sketch_params": [0.5, 100, 2],
         "plot_sketch_halo_width": 1.5,
@@ -26062,6 +26127,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_arrow_color": INK,
         "plot_dumbbell_connector_width": 1.2,
         "plot_heatmap_cmap": COLORS.Greys,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
         "plot_heatmap_frame_color": INK,
         "plot_heatmap_font_color": INK,
         "plot_heatmap_font_size": 10,
@@ -26755,13 +26821,17 @@ Examples:
 "linear"
 ```
 
-| ATTRIBUTE | DESCRIPTION                                                   |
-| --------- | ------------------------------------------------------------- |
-| `LINEAR`  | The linear normalization. Equals to "linear". **TYPE:** `str` |
-| `LOG`     | The logistic normalization. Equals to "log". **TYPE:** `str`  |
-| `SYMLOG`  | The symlog normalization. Equals to "symlog". **TYPE:** `str` |
-| `ASINH`   | The asinh normalization. Equals to "asinh". **TYPE:** `str`   |
-| `LOGIT`   | The logit normalization. Equals to "logit". **TYPE:** `str`   |
+| ATTRIBUTE  | DESCRIPTION                                                                                                                                             |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `LINEAR`   | The linear normalization. Equals to "linear". **TYPE:** `str`                                                                                           |
+| `LOG`      | The logistic normalization. Equals to "log". **TYPE:** `str`                                                                                            |
+| `SYMLOG`   | The symlog normalization. Equals to "symlog". **TYPE:** `str`                                                                                           |
+| `ASINH`    | The asinh normalization. Equals to "asinh". **TYPE:** `str`                                                                                             |
+| `LOGIT`    | The logit normalization. Equals to "logit". **TYPE:** `str`                                                                                             |
+| `CENTERED` | The normalization holding vcenter in the middle of the colormap, the same distance to each side of it. Equals to "centered". **TYPE:** `str`            |
+| `TWOSLOPE` | The normalization holding vcenter in the middle of the colormap, with vmin and vmax at unequal distances from it. Equals to "twoslope". **TYPE:** `str` |
+
+`CENTERED` and `TWOSLOPE` are read by the heatmap and calendar heatmap, which draw them in the theme's diverging colormap; the other charts taking a `norm` support the first five.
 
 ### datachart.constants.ORIENTATION
 

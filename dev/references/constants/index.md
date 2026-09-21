@@ -604,13 +604,17 @@ Examples:
 "linear"
 ```
 
-| ATTRIBUTE | DESCRIPTION                                                   |
-| --------- | ------------------------------------------------------------- |
-| `LINEAR`  | The linear normalization. Equals to "linear". **TYPE:** `str` |
-| `LOG`     | The logistic normalization. Equals to "log". **TYPE:** `str`  |
-| `SYMLOG`  | The symlog normalization. Equals to "symlog". **TYPE:** `str` |
-| `ASINH`   | The asinh normalization. Equals to "asinh". **TYPE:** `str`   |
-| `LOGIT`   | The logit normalization. Equals to "logit". **TYPE:** `str`   |
+| ATTRIBUTE  | DESCRIPTION                                                                                                                                             |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `LINEAR`   | The linear normalization. Equals to "linear". **TYPE:** `str`                                                                                           |
+| `LOG`      | The logistic normalization. Equals to "log". **TYPE:** `str`                                                                                            |
+| `SYMLOG`   | The symlog normalization. Equals to "symlog". **TYPE:** `str`                                                                                           |
+| `ASINH`    | The asinh normalization. Equals to "asinh". **TYPE:** `str`                                                                                             |
+| `LOGIT`    | The logit normalization. Equals to "logit". **TYPE:** `str`                                                                                             |
+| `CENTERED` | The normalization holding vcenter in the middle of the colormap, the same distance to each side of it. Equals to "centered". **TYPE:** `str`            |
+| `TWOSLOPE` | The normalization holding vcenter in the middle of the colormap, with vmin and vmax at unequal distances from it. Equals to "twoslope". **TYPE:** `str` |
+
+`CENTERED` and `TWOSLOPE` are read by the heatmap and calendar heatmap, which draw them in the theme's diverging colormap; the other charts taking a `norm` support the first five.
 
 ### datachart.constants.ORIENTATION
 

@@ -44,6 +44,7 @@ Every customization is either a keyword argument of `CalendarHeatmap` or a `plot
 | change the cell borders or month separators | `style={"plot_calendar_heatmap_edge_width": ..., "plot_calendar_heatmap_month_line_color": ...}` | [Calendar style](#calendar-style)                                                                       |
 | fix the value range of the colormap         | `vmin`, `vmax`                                                                                   | [Normalization](#normalization)                                                                         |
 | spread skewed values over the colormap      | `norm`                                                                                           | [Normalization](#normalization)                                                                         |
+| center the colors on a neutral value        | `norm="centered"`, `vcenter`                                                                     | [Normalization](#normalization)                                                                         |
 | highlight one series, mute the rest         | not supported                                                                                    | [Emphasis](#emphasis)                                                                                   |
 | put a note on a day                         | `texts`                                                                                          | [Text annotations](#text-annotations)                                                                   |
 | draw several years                          | `data` spanning several years, `max_cols`                                                        | [One calendar per year](#one-calendar-per-year)                                                         |
@@ -203,6 +204,28 @@ CalendarHeatmap(
     norm=NORMALIZE.LOG,
     title="Cyclists counted per day, 2024",
     show_colorbars=True,
+).show()
+```
+
+A daily series is often read as a departure from something rather than as a level: how far above or below the usual a day ran. `norm=NORMALIZE.CENTERED` is for that shape. It holds `vcenter` (zero by default) in the middle of the theme's diverging colormap and runs the same distance to each side, so a day above the baseline and a day equally far below get the same depth in opposite hues, and the neutral middle is exactly the baseline. It also switches the cells from the theme's sequential colormap to its diverging one, `plot_heatmap_cmap_diverging`, which the calendar inherits like the sequential map; a `plot_calendar_heatmap_cmap` in the chart's own `style` still wins.
+
+Subtracting the year's mean from every count turns the cyclist counts into such a series. Winter reads brown, the summer peak purple, and the weekends stand out as the quiet days inside every week.
+
+```
+# each day as its departure from the year's mean count
+mean_count = sum(cyclists["value"]) / len(cyclists["value"])
+anomaly = {
+    "date": cyclists["date"],
+    "value": [v - mean_count for v in cyclists["value"]],
+}
+
+CalendarHeatmap(
+    data=anomaly,
+    # zero, the year's mean, sits in the middle of the diverging colormap
+    norm=NORMALIZE.CENTERED,
+    title="Cyclists per day against the 2024 mean",
+    show_colorbars=True,
+    colorbar={"label": "Departure from the mean"},
 ).show()
 ```
 

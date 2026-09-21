@@ -41,9 +41,10 @@ Every customization is either a keyword argument of `Heatmap` or a `plot_heatmap
 | write the values into the cells            | `show_heatmap_values`, `valfmt`                                              | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
 | caption, move, or format the colorbar      | `colorbar={"label": ..., "location": ..., "format": ..., "ticks": ...}`      | [Colorbar placement](#colorbar-placement)                                                               |
 | change the colormap or transparency        | `style={"plot_heatmap_cmap": ..., "plot_heatmap_alpha": ...}`                | [Heatmap style](#heatmap-style)                                                                         |
+| change the colormap a centred norm uses    | `style={"plot_heatmap_cmap_diverging": ...}`                                 | [Normalization](#normalization)                                                                         |
 | style the cell values                      | `style={"plot_heatmap_font_size": ..., "plot_heatmap_font_color": ..., ...}` | [Heatmap style](#heatmap-style)                                                                         |
 | draw borders between the cells             | `style={"plot_heatmap_edge_width": ..., "plot_heatmap_edge_color": ...}`     | [Heatmap style](#heatmap-style)                                                                         |
-| center a diverging colormap on a value     | `vmin`, `vmax`                                                               | [Normalization](#normalization)                                                                         |
+| center a diverging colormap on a value     | `norm="centered"`, `vcenter`                                                 | [Normalization](#normalization)                                                                         |
 | spread skewed values over the colormap     | `norm`                                                                       | [Normalization](#normalization)                                                                         |
 | highlight some cells, mute the rest        | `emphasis_rule`, an `emphasis` grid in `data`                                | [Emphasis](#emphasis)                                                                                   |
 | put a note on a cell                       | `texts`                                                                      | [Text annotations](#text-annotations)                                                                   |
@@ -203,7 +204,7 @@ Heatmap(
 
 The colors come from a two-step mapping: each value is first normalized to the 0 to 1 range, then picks its color from the colormap. Both steps can be tuned, and each tuning is a claim about the data, so it should be an honest one.
 
-**Value range.** By default the smallest value maps to the first color and the largest to the last. `vmin` and `vmax` pin the endpoints instead. With a diverging colormap this is what places the neutral middle on a meaningful value: the temperatures run from −6.7 to 28.5 °C, so the white center of `COLORS.Coolwarm` would land on about 11 °C, a value that means nothing. A range of −30 to 30 °C centers it on freezing, and every blue cell is now a month below zero. Pinning the range is also how two heatmaps get comparable colors (see [Example 3](#example-3-did-fine-tuning-fix-the-confusion-shared-value-range-and-a-grid)).
+**Value range.** By default the smallest value maps to the first color and the largest to the last. `vmin` and `vmax` pin the endpoints instead. With a diverging colormap this is what places the neutral middle on a meaningful value: the temperatures run from −6.7 to 28.5 °C, so the white center of `COLORS.Coolwarm` would land on about 11 °C, a value that means nothing. A range of −30 to 30 °C centers it on freezing, and every blue cell is now a month below zero. Pinning the range is also how two heatmaps get comparable colors (see [Example 3](#example-3-did-fine-tuning-fix-the-confusion-shared-value-range-and-a-grid)). **Centered normalization** below does the same centring without naming a colormap or working out the range by hand.
 
 ```
 Heatmap(
@@ -241,6 +242,29 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
         show_colorbars=True,
         show_heatmap_values=True,
         valfmt=VALUE_FORMAT.INTEGER,
+    ).show()
+```
+
+**Centered normalization.** Values that carry a sign—a correlation, a difference, an anomaly—have one value that means "neither": usually zero. `norm=NORMALIZE.CENTERED` holds that value in the middle of the colormap and runs the same distance to each side of it, so a cell's hue is its sign and its depth is its size. The colormap it draws in is the theme's `plot_heatmap_cmap_diverging`, not the sequential `plot_heatmap_cmap` every other norm uses, so the centring and the colors that show it arrive together and follow a theme switch; a `plot_heatmap_cmap` in the chart's own `style` still wins if you want to name one yourself.
+
+`vcenter` moves the middle off zero when the neutral value is elsewhere—a baseline accuracy, last year's average. `vmin` and `vmax` still pin the ends, folded into the larger distance from the centre so the scale stays symmetric. When the two sides genuinely differ in reach and you want both fully used, `NORMALIZE.TWOSLOPE` keeps `vmin` and `vmax` where you put them and stretches each side to the centre separately; it is the honest choice only when you say so in the caption, because equal color steps then mean different value steps on either side.
+
+The temperatures below are centered on 0 °C, then on 18 °C, a room-temperature comfort baseline: the same table, two different questions.
+
+```
+for centre, label in [(0, "freezing"), (18, "room temperature")]:
+    Heatmap(
+        data=temperatures,
+        # the middle of the theme's diverging colormap sits on `vcenter`
+        norm=NORMALIZE.CENTERED,
+        vcenter=centre,
+        title=f"Mean monthly temperature (\u00b0C), centered on {label}",
+        xlabel="Month",
+        ylabel="City",
+        figsize=FIG_SIZE.FULL_MEDIUM,
+        show_colorbars=True,
+        show_heatmap_values=True,
+        valfmt=VALUE_FORMAT.DECIMAL,
     ).show()
 ```
 
@@ -416,27 +440,27 @@ Heatmap(
 
 The examples below put the features above to work, each one answering a question. The data lives in hidden cells; each example says what its data is and where it comes from.
 
-### Example 1: How Do Penguin Measurements Move Together? (Diverging Colormap, Pinned Range, and a Note)
+### Example 1: How Do Penguin Measurements Move Together? (Centered Norm, Half a Matrix, and a Note)
 
-`correlations` holds the Pearson correlation between four body measurements (bill length, bill depth, flipper length and body mass) of the 342 penguins in the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0). A correlation is signed, so the chart needs a diverging colormap whose white middle sits on zero: `COLORS.RdBu` pinned to the −1 to 1 range with `vmin` and `vmax` gives equally strong correlations of either sign equally dark shades. The variables label both axes, square cells keep the matrix symmetric, and the cells carry the coefficients. One cell is a known trap: bill length and depth correlate negatively across all penguins but positively within each species, a case of Simpson's paradox, and a note says so.
+`correlations` holds the Pearson correlation between four body measurements (bill length, bill depth, flipper length and body mass) of the 342 penguins in the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0). A correlation matrix is symmetric, so the upper triangle repeats the lower one and the diagonal is 1.00 by definition: both are left `None`, which draws them blank and leaves six cells that each say something. A correlation is also signed, so `norm=NORMALIZE.CENTERED` puts zero in the middle of the theme's diverging colormap and gives equally strong correlations of either sign equally dark shades, without naming a colormap or a range by hand. The variables label both axes, square cells keep the matrix square, and the cells carry the coefficients. One cell is a known trap: bill length and depth correlate negatively across all penguins but positively within each species, a case of Simpson's paradox, and a note says so.
 
 ```
 Heatmap(
     data=correlations,
-    # a diverging colormap, pinned so that zero sits on white
+    # zero sits in the middle of the theme's diverging colormap
+    norm=NORMALIZE.CENTERED,
+    vmin=-1,
+    vmax=1,
     style={
-        "plot_heatmap_cmap": COLORS.RdBu,
         "plot_heatmap_edge_width": 1,
         "plot_heatmap_edge_color": "#FFFFFF",
     },
-    vmin=-1,
-    vmax=1,
     # a note on the bill length and depth cell
     texts={
         "text": "positive within\neach species",
-        "x": 0.2,
-        "y": -0.95,
-        "target": (1, 0),
+        "x": 1.8,
+        "y": 0.7,
+        "target": (0, 1),
     },
     title="Correlation of Palmer penguin measurements",
     xtickrotate=30,

@@ -9404,8 +9404,42 @@ before they are mapped to colors. Distinct from
               </p>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.NORMALIZE.CENTERED">CENTERED</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The normalization holding <code>vcenter</code> in the middle of the
+colormap, the same distance to each side of it. Equals to <code>"centered"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.NORMALIZE.TWOSLOPE">TWOSLOPE</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The normalization holding <code>vcenter</code> in the middle of the
+colormap, with <code>vmin</code> and <code>vmax</code> at unequal distances from it.
+Equals to <code>"twoslope"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
       </tbody>
     </table>
+        <p><code>CENTERED</code> and <code>TWOSLOPE</code> are read by the heatmap and calendar heatmap,
+which draw them in the theme's diverging colormap; the other charts
+taking a <code>norm</code> support the first five.</p>
 
 
 

@@ -84,6 +84,7 @@ MATERIAL_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_end_color": "#1A73E8",
         "plot_dumbbell_edge_width": 0,
         "plot_heatmap_cmap": COLORS.Blues,
+        "plot_heatmap_cmap_diverging": COLORS.PuOr,
         "plot_heatmap_frame_color": "#000000",
     }
 )
@@ -133,6 +134,7 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "plot_text_box_edgecolor": "#CFD8DC",
         "plot_text_arrow_color": "#9AA4AE",
         "plot_heatmap_cmap": COLORS.Purples,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
         "plot_heatmap_frame_color": "#9AA4AE",
     }
 )
@@ -168,6 +170,7 @@ HARBOR_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_start_color": "#EFC98C",
         "plot_dumbbell_end_color": "#1F4E79",
         "plot_heatmap_cmap": COLORS.Cividis,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
     }
 )
 ```
@@ -215,6 +218,7 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_connector_color": "#85929E",
         "plot_dumbbell_arrow_color": "#5D6D7E",
         "plot_heatmap_cmap": COLORS.Greys,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
         "plot_heatmap_frame_color": "#000000",
         "plot_regression_color": "#34495E",
         "plot_box_median_color": "#000000",
@@ -274,6 +278,7 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_connector_color": "#7F8C8D",
         "plot_dumbbell_arrow_color": "#34495E",
         "plot_heatmap_cmap": COLORS.YlGnBu,
+        "plot_heatmap_cmap_diverging": COLORS.PuOr,
         "plot_heatmap_frame_color": "#0B1F44",
         "plot_scatter_edge_width": 0.6,
         "plot_scatter_edge_color": "#0B1F44",
@@ -346,6 +351,7 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_connector_color": "#8C8C8C",
         "plot_dumbbell_arrow_color": "#000000",
         "plot_heatmap_cmap": COLORS.YlOrBr,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
         "plot_heatmap_frame_color": "#000000",
         "plot_violin_edgecolor": "#000000",
         "plot_ridgeline_edgecolor": "#000000",
@@ -386,6 +392,7 @@ MUTED_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_start_color": "#DDCC77",
         "plot_dumbbell_end_color": "#332288",
         "plot_heatmap_cmap": COLORS.YlOrBr,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
     }
 )
 ```
@@ -425,6 +432,7 @@ CONTRAST_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_start_color": "#D4B24C",
         "plot_dumbbell_end_color": "#1F4E79",
         "plot_heatmap_cmap": COLORS.Cividis,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
     }
 )
 ```
@@ -448,6 +456,7 @@ MUTEDHATCH_THEME: StyleAttrs = {
     "plot_hatch_cycle": CONTRAST_THEME["plot_hatch_cycle"],
     "plot_bar_edge_width": 0.8,
     "plot_heatmap_cmap": COLORS.BuPu,
+    "plot_heatmap_cmap_diverging": COLORS.BrBG,
 }
 ```
 
@@ -478,6 +487,7 @@ SLATEHATCH_THEME: StyleAttrs = {
     "plot_dumbbell_start_color": "#4F6D8F",
     "plot_dumbbell_end_color": "#743538",
     "plot_heatmap_cmap": COLORS.PuBu,
+    "plot_heatmap_cmap_diverging": COLORS.BrBG,
 }
 ```
 
@@ -528,6 +538,7 @@ SKETCH_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_edge_color": "#222222",
         "plot_dumbbell_connector_color": "#8A8A8A",
         "plot_heatmap_cmap": COLORS.YlOrRd,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
         "plot_treemap_group_edge_width": 0,
         "plot_sketch_params": [0.5, 100, 2],
         "plot_sketch_halo_width": 1.5,
@@ -669,6 +680,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_dumbbell_arrow_color": INK,
         "plot_dumbbell_connector_width": 1.2,
         "plot_heatmap_cmap": COLORS.Greys,
+        "plot_heatmap_cmap_diverging": COLORS.RdBu,
         "plot_heatmap_frame_color": INK,
         "plot_heatmap_font_color": INK,
         "plot_heatmap_font_size": 10,
