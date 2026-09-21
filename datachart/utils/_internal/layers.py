@@ -2520,19 +2520,27 @@ def _masked_errors(errors: dict, mask) -> dict:
     }
 
 
-def _point_resolver(label, x, y, transpose: bool) -> Callable[[int], dict]:
+def _point_resolver(label, x, y, transpose: bool, errors=None) -> Callable[[int], dict]:
     """The hover resolver of a point series drawn from `x` and `y` arrays.
 
     The datum names the *drawn* axes: a transposed series (horizontal panel
     or bars) reports its `x` values under `y` and vice versa, so the axis
-    labels on the artist's axes always describe the values.
+    labels on the artist's axes always describe the values. A point's error
+    distances follow its values, under the axis they are drawn along.
     """
 
     def resolve(index: int) -> dict:
         x_val, y_val = _scalar(x[index]), _scalar(y[index])
         if transpose:
             x_val, y_val = y_val, x_val
-        return {"label": label, "x": x_val, "y": y_val}
+        datum = {"label": label, "x": x_val, "y": y_val}
+        for axis, distances in (errors or {}).items():
+            if distances is None or np.isnan(distances[0][index]):
+                continue
+            low, high = float(distances[0][index]), float(distances[1][index])
+            key = ERROR_AXES[axis] if transpose else axis
+            datum[key] = low if low == high else f"-{low:g}/+{high:g}"
+        return datum
 
     return resolve
 
@@ -4510,9 +4518,8 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
             if role == EMPHASIS_HIGHLIGHT:
                 style["edgecolors"] = self.highlight_edge_color
             role_sizes = sizes[picked] if np.ndim(sizes) else sizes
-            self._draw_errors(
-                ax, ctx, x[picked], y[picked], _masked_errors(errors, picked), style
-            )
+            role_errors = _masked_errors(errors, picked)
+            self._draw_errors(ax, ctx, x[picked], y[picked], role_errors, style)
             collection = _draw_scatter_marks(
                 scatter,
                 x[picked],
@@ -4528,7 +4535,9 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
             self._mark_legend_size(collection, size_data)
             self.register_hover(
                 collection,
-                _point_resolver(label, x[picked], y[picked], ctx.transpose),
+                _point_resolver(
+                    label, x[picked], y[picked], ctx.transpose, role_errors
+                ),
             )
             self._record_points(
                 ax,

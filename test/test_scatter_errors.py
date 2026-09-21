@@ -249,6 +249,37 @@ class TestErrorDrawing(unittest.TestCase):
         self.assertLess(bars[0].get_zorder(), marks[0].get_zorder())
 
 
+class TestErrorHover(unittest.TestCase):
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_a_symmetric_error_reports_its_distance(self):
+        figure = ScatterChart(data=[{"x": 1, "y": 10, "yerr": 2}])
+        ((_, resolve),) = figure._hover_targets
+        self.assertEqual(resolve(0), {"label": None, "x": 1, "y": 10, "yerr": 2.0})
+
+    def test_an_asymmetric_error_reports_both_distances(self):
+        figure = ScatterChart(data=[{"x": 1, "y": 10, "xerr": [0.5, 1.5]}])
+        ((_, resolve),) = figure._hover_targets
+        self.assertEqual(resolve(0)["xerr"], "-0.5/+1.5")
+
+    def test_a_point_without_an_error_reports_none(self):
+        figure = ScatterChart(data=POINTS)
+        ((_, resolve),) = figure._hover_targets
+        self.assertEqual(list(resolve(0)), ["label", "x", "y", "xerr", "yerr"])
+        self.assertEqual(list(resolve(2)), ["label", "x", "y"])
+
+    def test_a_transposed_panel_swaps_the_error_fields(self):
+        bars = BarChart(
+            data=[{"label": "a", "y": 1}], orientation=ORIENTATION.HORIZONTAL
+        )
+        points = ScatterChart(data=[{"x": 1, "y": 10, "yerr": 2}])
+        figure = Panel([bars, points])
+        _, resolve = figure._hover_targets[-1]
+        self.assertEqual(resolve(0), {"label": None, "x": 10, "y": 1, "xerr": 2.0})
+
+
 class TestErrorFrontParameters(unittest.TestCase):
     def tearDown(self):
         config.set_theme(THEME.DEFAULT)
