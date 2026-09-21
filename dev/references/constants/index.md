@@ -469,6 +469,7 @@ Examples:
 | `CONTRAST`   | The contrast theme (lightness-stepped colours plus hatches, print-safe). Equals to "contrast". **TYPE:** `str`                        |
 | `MUTEDHATCH` | The muted-hatch theme (Tol's muted colours under hatches, BuPu value scale). Equals to "mutedhatch". **TYPE:** `str`                  |
 | `SLATEHATCH` | The slate-hatch theme (the hatch theme without rust, slate blue first, PuBu value scale). Equals to "slatehatch". **TYPE:** `str`     |
+| `DARK`       | The dark theme (bright marks on a near-black page, light furniture, Viridis value scale). Equals to "dark". **TYPE:** `str`           |
 
 ### datachart.constants.EMPHASIS
 

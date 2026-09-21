@@ -49,7 +49,8 @@ def tile(theme):
         figsize=TILE,
     )
     buffer = io.BytesIO()
-    figure.savefig(buffer, format="png", dpi=DPI, facecolor="white")
+    # no facecolor: a tile keeps the ground its theme sets (ADR 0058)
+    figure.savefig(buffer, format="png", dpi=DPI)
     plt.close(figure)
     config.reset_config()
     return Image.open(buffer).convert("RGB")

@@ -17,6 +17,7 @@ Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/d
 | [`MATERIAL_THEME`](#datachart.themes.MATERIAL_THEME)     | the Google palette, light grid                                                  | `THEME.MATERIAL`   |
 | [`MINIMAL_THEME`](#datachart.themes.MINIMAL_THEME)       | accent violet, no spines, flat bars                                             | `THEME.MINIMAL`    |
 | [`HARBOR_THEME`](#datachart.themes.HARBOR_THEME)         | navy and amber in lightness steps, colour-blind safe                            | `THEME.HARBOR`     |
+| [`DARK_THEME`](#datachart.themes.DARK_THEME)             | bright marks on a near-black page, light furniture, Viridis value scale         | `THEME.DARK`       |
 | **Print and black-and-white**                            |                                                                                 |                    |
 | [`GREYSCALE_THEME`](#datachart.themes.GREYSCALE_THEME)   | greys only, for print without color                                             | `THEME.GREYSCALE`  |
 | [`INK_THEME`](#datachart.themes.INK_THEME)               | dark-ink accents, print-ready                                                   | `THEME.INK`        |
@@ -178,6 +179,95 @@ HARBOR_THEME: StyleAttrs = make_theme(
 The harbor theme: navy and amber in lightness steps, colour-blind safe.
 
 Two hue families, navy to sky and amber to sand, with taupe and near-black closing the set; lightness does the separating, so every pair of series stays apart for deutan, protan and tritan readers. Flat bars, 2 pt lines and the Cividis value scale.
+
+### datachart.themes.DARK_THEME
+
+```
+DARK_THEME: StyleAttrs = make_theme(
+    {
+        "color_general_singular": [
+            "#007094",
+            "#009C95",
+            "#00BE7D",
+            "#98D84A",
+            "#FDE333",
+        ],
+        "color_general_multiple": [
+            "#63A6DE",
+            "#CFA23A",
+            "#4FE49B",
+            "#DC5470",
+            "#A35CE8",
+            "#E6E9F2",
+        ],
+        "color_parallel_hue_continuous": [
+            "#009C95",
+            "#00BE7D",
+            "#98D84A",
+            "#FDE333",
+        ],
+        "muted_color": "#4A515B",
+        "font_general_color": TEXT,
+        "font_title_color": BRIGHT,
+        "font_subtitle_color": DIM,
+        "font_xlabel_color": TEXT,
+        "font_ylabel_color": TEXT,
+        "figure_facecolor": PAGE,
+        "axes_facecolor": AXES_FACE,
+        "axes_spines_color": RULE,
+        "axes_ticks_color": RULE,
+        "plot_grid_color": GRID,
+        "plot_grid_alpha": 1.0,
+        "plot_legend_label_color": TEXT,
+        "plot_legend_edge_color": EDGE,
+        "plot_legend_face_color": AXES_FACE,
+        "plot_stackedarea_edge_color": PAGE,
+        "plot_sankey_node_edge_color": PAGE,
+        "plot_treemap_edge_color": PAGE,
+        "plot_network_node_edge_color": PAGE,
+        "plot_network_edge_color": DIM,
+        "plot_bar_edge_color": PAGE,
+        "plot_bar_error_color": TEXT,
+        "plot_hist_edge_color": PAGE,
+        "plot_hexbin_edge_color": PAGE,
+        "plot_scatter_edge_color": PAGE,
+        "plot_swarm_edge_color": PAGE,
+        "plot_gantt_dependency_color": DIM,
+        "plot_gantt_today_color": "#FF6B6B",
+        "plot_dumbbell_start_color": "#CFA23A",
+        "plot_dumbbell_end_color": "#63A6DE",
+        "plot_dumbbell_edge_color": PAGE,
+        "plot_dumbbell_connector_color": "#6E7681",
+        "plot_dumbbell_arrow_color": DIM,
+        "plot_value_color": BRIGHT,
+        "plot_text_color": BRIGHT,
+        "plot_text_box_facecolor": "#242A33",
+        "plot_text_box_edgecolor": EDGE,
+        "plot_text_arrow_color": DIM,
+        "plot_heatmap_cmap": COLORS.Viridis,
+        "plot_heatmap_cmap_diverging": COLORS.Coolwarm,
+        "plot_heatmap_frame_color": TEXT,
+        "plot_heatmap_edge_color": PAGE,
+        "plot_calendar_heatmap_edge_color": PAGE,
+        "plot_calendar_heatmap_month_line_color": TEXT,
+        "plot_parallel_axis_color": TEXT,
+        "plot_parallel_tick_color": TEXT,
+        "plot_parallel_tick_label_color": BRIGHT,
+        "plot_parallel_tick_label_bg_color": AXES_FACE,
+        "plot_parallel_dim_label_color": TEXT,
+        "plot_box_edgecolor": TEXT,
+        "plot_box_median_color": BRIGHT,
+        "plot_box_whisker_color": TEXT,
+        "plot_box_cap_color": TEXT,
+        "plot_box_outlier_color": AXES_FACE,
+        "plot_box_outlier_edge_color": TEXT,
+    }
+)
+```
+
+The dark theme: bright marks on a near-black page.
+
+The page is near-black and the plotting area a step lighter, so the axes read as a card on it. Every furniture colour — spines, ticks, fonts, grid, legend frame, value labels, annotation boxes, heatmap frame and separators — carries a light counterpart, and the marks take a six-colour bright palette over the Viridis value scale.
 
 ### datachart.themes.GREYSCALE_THEME
 

@@ -9,6 +9,7 @@ Each predefined theme has a card here: a strip of its color swatches with hex co
 | [`THEME.MATERIAL`](#material)                           | Google palette, bottom spine only, light grid.                             |
 | [`THEME.MINIMAL`](#minimal)                             | Accent violet with deep grays, no spines, flat bars.                       |
 | [`THEME.HARBOR`](#harbor)                               | Navy and amber in lightness steps, colour-blind safe.                      |
+| [`THEME.DARK`](#dark)                                   | Bright marks on a near-black page, light furniture, Viridis value scale.   |
 | [Print and black-and-white](#print-and-black-and-white) |                                                                            |
 | [`THEME.GREYSCALE`](#greyscale)                         | Monochrome, print-friendly.                                                |
 | [`THEME.INK`](#ink)                                     | Diversified YlGnBu palette with navy ink accents.                          |
@@ -29,7 +30,7 @@ The sample data and the two helpers behind every card are defined in a hidden ce
 
 A reader compares any two series on a chart, so every theme is scored on its worst pair of palette colours, not only on neighbouring ones. Each colour is passed through the Machado, Oliveira and Fernandes (2009) simulation of deuteranopia, protanopia and tritanopia at full severity, and the distance between the two closest colours is measured in the OKLab colour space (ΔE, ×100). *Normal* is the same distance without simulation, and *greyscale gap* is the smallest lightness step between two colours once the chart is printed without colour.
 
-A theme **passes** when the worst pair stays at ΔE 8 or more for both deutan and protan readers and at 15 or more for everyone; between 6 and 8 it is **weak**, acceptable only where a second cue (dashes, markers, hatches) tells the series apart; below that it **fails**. Tritan scores are reported but not gated, since that deficiency is rare. `GREYSCALE` and `QUILL` separate series by lightness and pattern rather than hue, so their scores read the colour axis only. `DEFAULT`, `HARBOR`, `MUTED`, `CONTRAST`, `MUTEDHATCH` and `SLATEHATCH` were built to pass this check. `HATCH` does not: its hues sit close together, so its hatches are the cue that tells series apart.
+A theme **passes** when the worst pair stays at ΔE 8 or more for both deutan and protan readers and at 15 or more for everyone; between 6 and 8 it is **weak**, acceptable only where a second cue (dashes, markers, hatches) tells the series apart; below that it **fails**. Tritan scores are reported but not gated, since that deficiency is rare. `GREYSCALE` and `QUILL` separate series by lightness and pattern rather than hue, so their scores read the colour axis only. `DEFAULT`, `HARBOR`, `DARK`, `MUTED`, `CONTRAST`, `MUTEDHATCH` and `SLATEHATCH` were built to pass this check. `HATCH` does not: its hues sit close together, so its hatches are the cue that tells series apart.
 
 ```
 cvd_table()
@@ -37,7 +38,7 @@ cvd_table()
 
 ## Screen and presentations
 
-Colorful categorical palettes on light furniture, for notebooks, dashboards and slides.
+Colorful categorical palettes for notebooks, dashboards and slides, on light furniture except `DARK`, which inverts it.
 
 ### Default
 
@@ -85,6 +86,18 @@ Selected with [`THEME.HARBOR`](https://eriknovak.github.io/datachart/dev/referen
 config.set_theme(THEME.HARBOR)
 show_swatches()
 signature(pair=("#1F4E79", "#D08C3A")).show()
+```
+
+### Dark
+
+Azure, amber, mint, rose, violet and a near-white, each lifted clear of the page, on a near-black figure with the plotting area a step lighter. Every furniture colour — spines, ticks, fonts, grid, legend frame, value labels, annotation boxes, heatmap frame and separators — carries a light counterpart, so the theme is complete without a single override. The value scale is Viridis, which reads dark to light and so rises off the panel. A heatmap cell label still follows its own cell, so a light cell keeps dark text.
+
+Selected with [`THEME.DARK`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`DARK_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.DARK_THEME).
+
+```
+config.set_theme(THEME.DARK)
+show_swatches()
+signature(pair=("#63A6DE", "#DC5470")).show()
 ```
 
 ## Print and black-and-white
