@@ -25,6 +25,7 @@ from ..themes import (
     CONTRAST_THEME,
     MUTEDHATCH_THEME,
     SLATEHATCH_THEME,
+    DARK_THEME,
 )
 
 THEMES = {
@@ -41,6 +42,7 @@ THEMES = {
     THEME.CONTRAST: CONTRAST_THEME,
     THEME.MUTEDHATCH: MUTEDHATCH_THEME,
     THEME.SLATEHATCH: SLATEHATCH_THEME,
+    THEME.DARK: DARK_THEME,
 }
 
 # bumped only when a reader of the current shape could misread an older file

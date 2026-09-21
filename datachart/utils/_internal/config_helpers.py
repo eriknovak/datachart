@@ -1724,7 +1724,8 @@ def get_colorbar_setting(
 
     Returns:
         The resolved setting: `location`, `orientation`, `label`, `format`,
-        `ticks`, and the `label_style`.
+        `ticks`, the `label_style`, and the `furniture` colors the bar's own
+        ticks, tick labels and outline take.
 
     """
 
@@ -1751,6 +1752,12 @@ def get_colorbar_setting(
         "format": valfmt if fmt is None else fmt,
         "ticks": colorbar.get("ticks"),
         "label_style": get_text_style("ylabel"),
+        # the bar wears the axes furniture, so it inverts with the theme
+        "furniture": {
+            "labelcolor": config["font_general_color"],
+            "color": config.get("axes_ticks_color"),
+            "outline": config.get("axes_spines_color"),
+        },
     }
 
 
