@@ -21,6 +21,7 @@ Every theme is a complete [`StyleAttrs`](typings.md#datachart.typings.StyleAttrs
 | [`MATERIAL_THEME`](#datachart.themes.MATERIAL_THEME)   | the Google palette, light grid                                        | `THEME.MATERIAL` |
 | [`MINIMAL_THEME`](#datachart.themes.MINIMAL_THEME)     | accent violet, no spines, flat bars                                   | `THEME.MINIMAL` |
 | [`HARBOR_THEME`](#datachart.themes.HARBOR_THEME)       | navy and amber in lightness steps, colour-blind safe                  | `THEME.HARBOR` |
+| [`DARK_THEME`](#datachart.themes.DARK_THEME)           | bright marks on a near-black page, light furniture, Viridis value scale | `THEME.DARK` |
 | **Print and black-and-white**                        |                                                                       |            |
 | [`GREYSCALE_THEME`](#datachart.themes.GREYSCALE_THEME) | greys only, for print without color                                   | `THEME.GREYSCALE` |
 | [`INK_THEME`](#datachart.themes.INK_THEME)             | dark-ink accents, print-ready                                         | `THEME.INK` |
@@ -39,6 +40,7 @@ Every theme is a complete [`StyleAttrs`](typings.md#datachart.typings.StyleAttrs
 ::: datachart.themes.MATERIAL_THEME
 ::: datachart.themes.MINIMAL_THEME
 ::: datachart.themes.HARBOR_THEME
+::: datachart.themes.DARK_THEME
 ::: datachart.themes.GREYSCALE_THEME
 ::: datachart.themes.INK_THEME
 ::: datachart.themes.HATCH_THEME

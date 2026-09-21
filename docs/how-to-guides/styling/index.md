@@ -18,7 +18,7 @@ The styling guides cover everything that controls how charts look: the predefine
 
     Every predefined theme as a card of color swatches with hex codes and six signature charts, grouped by use, to pick one by eye.
 
-    ![The same bar chart under all eight predefined themes](../../assets/imgs/gallery-themegallery.png)
+    ![The same bar chart under every predefined theme](../../assets/imgs/gallery-themegallery.png)
 
 -   [Colormaps](colormaps.ipynb)
 
