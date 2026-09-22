@@ -188,6 +188,7 @@ plugins:
           - use-cases/index.md: "Map of the use-case pages: one field per page, each a dataset walked from the first figure to the last."
           - use-cases/ai-ml-nlp.ipynb: The figures of a model report on an illustrative experiment log, from training curves, a hyperparameter sweep and a confusion matrix through ROC, precision-recall and calibration to per-class scores, feature importance, a leaderboard, benchmark intervals, the corpus token statistics, and a closing paper-style panel.
           - use-cases/statistics.ipynb: The figures of a statistics report on the Palmer penguins, from group distributions with their Kruskal-Wallis and Mann-Whitney results and bootstrapped effect sizes through a correlation matrix, a scatter matrix and Simpson's paradox to a fitted line, its residuals, a Q-Q plot, the empirical distributions, and a closing report panel.
+          - use-cases/biomedical.ipynb: The figures of a trial report on a simulated three-arm, 12-week study, from the endpoint per arm with pairwise brackets, bootstrapped dose-response intervals and the share at target through the mean course with confidence bands, every subject's course, and retention to a diverging heatmap of the marker panel, safety-lab dumbbells, a flagged swarm of individual liver-enzyme rises, and a closing report panel.
         API Reference:
           - references/index.md: Top-level module reference, with a where-to-look table over the reference pages.
           - references/charts/index.md: Map of the chart reference pages by family, with each chart's data record, style typing, and guide.
@@ -304,6 +305,7 @@ nav:
     - use-cases/index.md
     - AI, Machine Learning and NLP: use-cases/ai-ml-nlp.ipynb
     - Statistics: use-cases/statistics.ipynb
+    - Medical and Biomedical Experiments: use-cases/biomedical.ipynb
 
 
   - API Reference:
