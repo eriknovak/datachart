@@ -211,6 +211,14 @@ How two or more variables relate to each other.
 
     ![A scatter matrix of three measurements split by species](../../assets/imgs/gallery-scattermatrix.png)
 
+-   [Image Chart](imagechart.ipynb)
+
+    [Panel](../utility/panel.ipynb){ .chip } [Grid](../utility/grid.ipynb){ .chip }
+
+    A picture in data coordinates, under or over another chart: a map, a floor plan, a microscope image.
+
+    ![Stations scattered over a shaded relief](../../assets/imgs/gallery-image.png)
+
 </div>
 
 ## Flows

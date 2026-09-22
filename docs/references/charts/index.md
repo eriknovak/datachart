@@ -49,6 +49,7 @@ One page per chart: the function and its parameters, the shape of its data, the 
 | [ParallelCoords](parallelcoords.md) | Each record as a polyline across one axis per dimension. | [`ParallelCoordsDataPointAttrs`](parallelcoords.md#datachart.typings.ParallelCoordsDataPointAttrs) | [`ParallelCoordsStyleAttrs`](parallelcoords.md#datachart.typings.ParallelCoordsStyleAttrs) | [Parallel Coordinates](../../how-to-guides/charts/parallelcoords.ipynb) |
 | [NetworkChart](networkchart.md) | Nodes joined by edges, placed by a layout. | [`NetworkSingleChartAttrs`](networkchart.md#datachart.typings.NetworkSingleChartAttrs) | [`NetworkStyleAttrs`](networkchart.md#datachart.typings.NetworkStyleAttrs) | [Network Chart](../../how-to-guides/charts/networkchart.ipynb) |
 | [ScatterMatrix](scattermatrix.md) | A scatter chart for every pair of dimensions, distributions on the diagonal. | [`ScatterMatrixDataPointAttrs`](scattermatrix.md#datachart.typings.ScatterMatrixDataPointAttrs) | [`StyleAttrs`](../typings.md#datachart.typings.StyleAttrs) | [Scatter Matrix](../../how-to-guides/charts/scattermatrix.ipynb) |
+| [ImageChart](imagechart.md) | A picture in data coordinates, under or over the other charts. | [`ImageDataAttrs`](imagechart.md#datachart.typings.ImageDataAttrs) | [`ImageStyleAttrs`](imagechart.md#datachart.typings.ImageStyleAttrs) | [Image Chart](../../how-to-guides/charts/imagechart.ipynb) |
 
 ### Flows
 

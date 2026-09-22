@@ -37,6 +37,7 @@ from datachart.charts import (
     Heatmap,
     HexbinChart,
     Histogram,
+    ImageChart,
     LineChart,
     NetworkChart,
     ParallelCoords,
@@ -421,6 +422,33 @@ def network():
     )
 
 
+def image():
+    # a smooth relief of two hills and a valley, with stations on it
+    y, x = np.mgrid[0:6:120j, 0:9:180j]
+    relief = np.exp(-((x - 2.5) ** 2 + (y - 4) ** 2) / 3) + 0.8 * np.exp(
+        -((x - 6.5) ** 2 + (y - 2) ** 2) / 2
+    )
+    stations = rng.uniform((0.5, 0.5), (8.5, 5.5), (14, 2))
+    return Panel(
+        [
+            ImageChart(
+                {"image": relief[::-1], "extent": (0, 9, 0, 6)},
+                style={"plot_image_cmap": "terrain", "plot_image_alpha": 0.8},
+                # start the colormap past its sea blues, so the valley reads as land
+                vmin=-0.35,
+                vmax=1.1,
+            ),
+            ScatterChart(
+                [{"x": float(sx), "y": float(sy)} for sx, sy in stations],
+                style={"plot_scatter_color": "#1d3557"},
+            ),
+        ],
+        xlabel="Easting (km)",
+        ylabel_left="Northing (km)",
+        figsize=FIGSIZE,
+    )
+
+
 def scattermatrix():
     n = 40
     species = [["setosa", "virginica"][i % 2] for i in range(n)]
@@ -633,6 +661,7 @@ CHARTS = (
     parallelcoords,
     network,
     scattermatrix,
+    image,
     sankey,
     treemap,
 )

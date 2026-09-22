@@ -32,6 +32,7 @@ from datachart.charts import (
     Heatmap,
     HexbinChart,
     Histogram,
+    ImageChart,
     LineChart,
     NetworkChart,
     RadialChart,
@@ -65,6 +66,7 @@ from datachart.constants import (
     GANTT_VALUE,
     HATCH_STYLE,
     HEXBIN_REDUCE,
+    IMAGE_POSITION,
     HISTOGRAM_TYPE,
     LEGEND_ALIGN,
     LINE_DRAW_STYLE,
@@ -87,7 +89,7 @@ from datachart.constants import (
     VIOLIN_INNER,
 )
 from datachart.themes import DEFAULT_THEME
-from datachart.utils import Grid
+from datachart.utils import Grid, Panel
 from datachart.utils._internal.colors import create_color_cycle
 
 IMGS = pathlib.Path(__file__).resolve().parents[1] / "imgs"
@@ -856,6 +858,31 @@ def hexbin_reduce():
     )
 
 
+def image_position():
+    # a translucent square over the middle of a line, grid on
+    square = np.zeros((10, 10, 4))
+    square[..., :3] = to_rgba(DARK)[:3]
+    square[..., 3] = 0.55
+    line = LineChart(
+        data=[{"x": x, "y": (x - 4) ** 2} for x in range(9)], show_grid="both"
+    )
+    figs = [
+        Panel(
+            [
+                line,
+                ImageChart({"image": square, "extent": (2, 6, 1, 12)}, position=value),
+            ],
+            title=f"IMAGE_POSITION.{label}",
+            show_grid="both",
+        )
+        for label, value in [
+            ("BELOW", IMAGE_POSITION.BELOW),
+            ("ABOVE", IMAGE_POSITION.ABOVE),
+        ]
+    ]
+    chart_grid(figs, "const-image-position.svg", 2.2)
+
+
 def swarm_mode():
     members = [("SWARM", SWARM_MODE.SWARM), ("STRIP", SWARM_MODE.STRIP)]
     figs = [
@@ -1518,6 +1545,7 @@ def main():
     bandwidth()
     contour_levels()
     hexbin_reduce()
+    image_position()
     swarm_mode()
     radial_type()
     direction()
