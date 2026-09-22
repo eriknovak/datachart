@@ -1333,7 +1333,9 @@ A bracket spans two categories of the category axis, with a tick at each end
 pointing toward the data and its text centred beyond the span. Without `y` it
 sits above the data within its span, and brackets that overlap stack without
 covering each other; the value axis then grows to fit them, unless the chart
-sets its own limit.
+sets its own limit. A chart whose marks carry no position of their own, such
+as a histogram, has no data inside the span to read, so the bracket clears
+the whole chart instead.
 
 Attributes:
     from (Union[str, int, float]): The category the bracket starts at: its label, or a position on the category axis.

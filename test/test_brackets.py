@@ -199,6 +199,22 @@ class TestGeometry(unittest.TestCase):
             tick_points(line, ax), config["plot_bracket_tick"], places=4
         )
 
+    def test_the_tick_holds_its_length_on_a_log_axis(self):
+        figure = BoxPlot(
+            data=[
+                {"label": g, "value": float(v)}
+                for g, top in (("A", 10), ("B", 10000))
+                for v in (1, top)
+            ],
+            scaley="log",
+            brackets={"from": "A", "to": "B"},
+        )
+        ax = figure.axes[0]
+        (line,) = bracket_lines(ax)
+        self.assertAlmostEqual(
+            tick_points(line, ax), config["plot_bracket_tick"], places=4
+        )
+
     def test_a_per_bracket_tick_length_overrides_the_theme(self):
         figure = BoxPlot(
             data=EVEN,
@@ -360,6 +376,26 @@ class TestPlacement(unittest.TestCase):
         limits = plain.axes[0].get_xlim()
         figure = BoxPlot(data=EVEN, brackets={"from": "A", "to": "D", "text": "*"})
         self.assertEqual(figure.axes[0].get_xlim(), limits)
+
+    def test_a_span_clears_only_the_data_inside_it(self):
+        # the whole chart reaches 100, the span only 16
+        figure = LineChart(
+            data=[{"x": i, "y": float(i * i)} for i in range(11)],
+            brackets={"from": 1, "to": 4},
+        )
+        (line,) = bracket_lines(figure.axes[0])
+        self.assertAlmostEqual(value_of(line), 16 + 100 * BRACKET_GAP)
+
+    def test_a_pyramid_keeps_the_user_limit_and_its_mirror(self):
+        figure = PyramidChart(
+            data=[BAR, BAR], xmax=12, brackets={"from": "A", "to": "C"}
+        )
+        self.assertEqual(figure.axes[0].get_xlim(), (-12, 12))
+
+    def test_a_pyramid_grows_both_ends_of_its_mirror(self):
+        figure = PyramidChart(data=[BAR, BAR], brackets={"from": "A", "to": "C"})
+        low, high = figure.axes[0].get_xlim()
+        self.assertAlmostEqual(low, -high)
 
     def test_a_pinned_bracket_does_not_shrink_the_axis(self):
         plain = BoxPlot(data=EVEN)

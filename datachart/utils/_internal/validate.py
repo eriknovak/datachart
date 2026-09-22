@@ -176,6 +176,19 @@ def validate_bracket_ends(bracket: dict) -> None:
         )
 
 
+def validate_bracket_endpoint(endpoint, positions: dict) -> float:
+    """A bracket endpoint as a category-axis position: a number is one already."""
+
+    if isinstance(endpoint, Real) and not isinstance(endpoint, bool):
+        return float(endpoint)
+    if endpoint in positions:
+        return float(positions[endpoint])
+    raise ValueError(
+        f"Unknown bracket endpoint {endpoint!r}. The chart's categories are "
+        f"{list(positions)}."
+    )
+
+
 def validate_point_labels(label, show_values) -> None:
     """Raise when a scatter chart asks for point labels and value labels at once."""
 
