@@ -541,6 +541,23 @@ class DLineStyleAttrs(TypedDict):
     plot_dline_alpha: Union[float, None]
 
 
+class BracketStyleAttrs(TypedDict):
+    """The typing for the pairwise comparison bracket style.
+
+    Attributes:
+        plot_bracket_color (Union[str, None]): The color of the bracket line and its text.
+        plot_bracket_width (Union[int, float, None]): The width of the bracket line.
+        plot_bracket_tick (Union[int, float, None]): The length of the bracket's end ticks, in points.
+        plot_bracket_alpha (Union[float, None]): The alpha value of the bracket.
+
+    """
+
+    plot_bracket_color: Union[str, None]
+    plot_bracket_width: Union[int, float, None]
+    plot_bracket_tick: Union[int, float, None]
+    plot_bracket_alpha: Union[float, None]
+
+
 class VSpanStyleAttrs(TypedDict):
     """The typing for the vertical reference band style.
 
@@ -1203,6 +1220,7 @@ class StyleAttrs(
     VLineStyleAttrs,
     HLineStyleAttrs,
     DLineStyleAttrs,
+    BracketStyleAttrs,
     VSpanStyleAttrs,
     HSpanStyleAttrs,
     TextStyleAttrs,
@@ -1295,6 +1313,36 @@ class DLineSettingAttrs(TypedDict):
     xmax: Union[int, float, None]
     style: Union[DLineStyleAttrs, None]
     label: Union[str, None]
+
+
+# `from` is a keyword, so the bracket setting is declared functionally
+BracketSettingAttrs = TypedDict(
+    "BracketSettingAttrs",
+    {
+        "from": Union[str, int, float],
+        "to": Union[str, int, float],
+        "text": Union[str, None],
+        "y": Union[int, float, None],
+        "style": Union[BracketStyleAttrs, None],
+    },
+    total=False,
+)
+BracketSettingAttrs.__doc__ = """The pairwise comparison bracket setting, passed to a chart front as `brackets`.
+
+A bracket spans two categories of the category axis, with a tick at each end
+pointing toward the data and its text centred beyond the span. Without `y` it
+sits above the data within its span, and brackets that overlap stack without
+covering each other; the value axis then grows to fit them, unless the chart
+sets its own limit.
+
+Attributes:
+    from (Union[str, int, float]): The category the bracket starts at: its label, or a position on the category axis.
+    to (Union[str, int, float]): The category the bracket ends at: its label, or a position on the category axis.
+    text (Union[str, None]): The text drawn beyond the span, such as a p-value.
+    y (Union[int, float, None]): The value-axis position of the bracket line; on a horizontal chart, the x position.
+    style (Union[BracketStyleAttrs, None]): The bracket style attributes.
+
+"""
 
 
 # ================================================
@@ -1466,6 +1514,7 @@ class LineSingleChartAttrs(TypedDict):
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
+        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -1491,6 +1540,7 @@ class LineSingleChartAttrs(TypedDict):
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
+    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -1523,6 +1573,7 @@ class StackedAreaSingleChartAttrs(TypedDict):
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
+        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -1547,6 +1598,7 @@ class StackedAreaSingleChartAttrs(TypedDict):
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
+    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -1575,6 +1627,7 @@ class BumpSingleChartAttrs(TypedDict):
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
+        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -1596,6 +1649,7 @@ class BumpSingleChartAttrs(TypedDict):
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
+    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -1784,6 +1838,7 @@ class BarSingleChartAttrs(TypedDict):
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
+        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -1809,6 +1864,7 @@ class BarSingleChartAttrs(TypedDict):
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
+    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -1853,6 +1909,7 @@ class HistogramSingleChartAttrs(TypedDict):
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
+        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -1876,6 +1933,7 @@ class HistogramSingleChartAttrs(TypedDict):
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
+    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -2118,6 +2176,7 @@ class DumbbellSingleChartAttrs(TypedDict):
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
+        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -2134,6 +2193,7 @@ class DumbbellSingleChartAttrs(TypedDict):
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
+    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -2184,6 +2244,7 @@ class ContourSingleChartAttrs(TypedDict):
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
+        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting of a filled contour.
@@ -2212,6 +2273,7 @@ class ContourSingleChartAttrs(TypedDict):
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
+    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     colorbar: Union[ColorbarSettingAttrs, None]
@@ -2266,6 +2328,7 @@ class HexbinSingleChartAttrs(TypedDict):
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
+        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting.
@@ -2297,6 +2360,7 @@ class HexbinSingleChartAttrs(TypedDict):
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
+    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     colorbar: Union[ColorbarSettingAttrs, None]
@@ -2356,6 +2420,7 @@ class ScatterSingleChartAttrs(TypedDict):
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
+        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -2385,6 +2450,7 @@ class ScatterSingleChartAttrs(TypedDict):
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
+    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -2434,6 +2500,7 @@ class BoxSingleChartAttrs(TypedDict):
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
+        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -2458,6 +2525,7 @@ class BoxSingleChartAttrs(TypedDict):
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
+    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -2506,6 +2574,7 @@ class SwarmSingleChartAttrs(TypedDict):
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
+        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -2530,6 +2599,7 @@ class SwarmSingleChartAttrs(TypedDict):
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
+    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -2573,6 +2643,7 @@ class ViolinSingleChartAttrs(TypedDict):
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
+        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -2597,6 +2668,7 @@ class ViolinSingleChartAttrs(TypedDict):
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
+    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -2641,6 +2713,7 @@ class RidgelineSingleChartAttrs(TypedDict):
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
+        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -2665,6 +2738,7 @@ class RidgelineSingleChartAttrs(TypedDict):
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
+    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -2709,6 +2783,7 @@ class RaincloudSingleChartAttrs(TypedDict):
         vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
         hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
         dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
+        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
         vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
         hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -2733,6 +2808,7 @@ class RaincloudSingleChartAttrs(TypedDict):
     vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
     hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
     dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
+    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
     vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]

@@ -162,6 +162,20 @@ def validate_span_bounds(span: dict, lo: str, hi: str) -> None:
         )
 
 
+def validate_bracket_ends(bracket: dict) -> None:
+    """Raise unless a pairwise bracket names both of the categories it spans."""
+
+    if (
+        not isinstance(bracket, dict)
+        or bracket.get("from") is None
+        or bracket.get("to") is None
+    ):
+        raise ValueError(
+            "A bracket needs both of its endpoints: set `from` and `to` to the "
+            "categories it spans."
+        )
+
+
 def validate_point_labels(label, show_values) -> None:
     """Raise when a scatter chart asks for point labels and value labels at once."""
 

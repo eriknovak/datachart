@@ -284,6 +284,11 @@ BASE_THEME: StyleAttrs = {
     "plot_dline_style": LINE_STYLE.SOLID,
     "plot_dline_width": 1,
     "plot_dline_alpha": 0.7,
+    # plot bracket (pairwise comparison) style; the tick length is in points
+    "plot_bracket_color": None,
+    "plot_bracket_width": 1,
+    "plot_bracket_tick": 4,
+    "plot_bracket_alpha": 0.7,
     # plot vspan (vertical reference band) style; None color: the muted color
     "plot_vspan_color": None,
     "plot_vspan_alpha": 0.25,

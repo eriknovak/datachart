@@ -121,6 +121,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_hline_style": LINE_STYLE.DASHED,
         "plot_dline_color": INK,
         "plot_dline_style": LINE_STYLE.DASHED,
+        "plot_bracket_color": INK,
         "plot_vspan_color": INK,
         "plot_hspan_color": INK,
         "plot_vspan_alpha": 1.0,
