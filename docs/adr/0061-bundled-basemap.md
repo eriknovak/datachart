@@ -43,13 +43,18 @@ smaller file.
   layer, annotation and reference line. Plate carrée is the one case where
   the basemap and the data already agree, and it is the case that needs no
   code.
-- **`aspect="geographic"` is the cartographic answer, and it belongs to every
-  chart.** Drawing degrees straight stretches a region horizontally away from
-  the equator; narrowing one degree of longitude by the cosine of the mid
-  latitude fixes the proportions without being a projection. It is opt-in, so
-  nothing changes for a caller whose axes are not geographic. The seismology
-  page hand-rolls this exact factor today, which is the evidence that it
-  belongs in the library.
+- **`aspect_ratio="geographic"` is the cartographic answer, and it belongs to
+  every chart.** Drawing degrees straight stretches a region horizontally
+  away from the equator; narrowing one degree of longitude by the cosine of
+  the mid latitude fixes the proportions without being a projection. It is
+  opt-in, so nothing changes for a caller whose axes are not geographic. The
+  seismology page hand-rolls this exact factor today, which is the evidence
+  that it belongs in the library. It is a value of the `aspect_ratio` setting
+  the fronts already take, not a second `aspect` parameter beside it, and
+  `Panel` takes the setting too so a composed map can ask for it.
+- **Beside data, the basemap has no say over the limits.** A world of
+  outlines under a regional hexbin would otherwise zoom the hexbin out to the
+  globe. Alone, it frames its own outlines exactly.
 - **`IMAGE_POSITION` becomes `DRAW_POSITION`.** ADR 0052 gives a chart prefix
   only to a constant one chart owns, and the basemap takes the same rung
   setting. The rename is free and carries no alias: `ImageChart` merged after

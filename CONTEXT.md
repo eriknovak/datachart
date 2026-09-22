@@ -449,8 +449,8 @@ _Avoid_: map, coastline chart, shapefile, geometry (for the front), tile layer
 **Geographic aspect**:
 The axes shape that keeps a small region's proportions right when longitude
 and latitude are plotted straight: one degree of longitude is narrowed by the
-cosine of the mid latitude. Requested with `aspect="geographic"`, off by
-default, and available to every chart rather than only the basemap.
+cosine of the mid latitude. Requested with `aspect_ratio="geographic"`, off
+by default, and available to every chart rather than only the basemap.
 _Avoid_: projection (it is not one), equal aspect, scale factor
 
 **Extent**:
