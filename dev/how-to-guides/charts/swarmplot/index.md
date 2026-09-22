@@ -45,6 +45,7 @@ Every customization is either a keyword argument of `SwarmPlot` or a `plot_swarm
 | highlight some groups, mute the rest          | `emphasis`, `emphasis_rule`                               | [Emphasis](#emphasis)                                                                                   |
 | highlight single points                       | a series of their own, `emphasis`                         | [Emphasis](#emphasis)                                                                                   |
 | mark a threshold or shade a range             | `hlines`, `dlines`, `vlines`, `hspans`, `vspans`          | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| compare two groups with a bracket             | `brackets`                                                | [Brackets](#brackets)                                                                                   |
 | name a point on the chart                     | `texts`                                                   | [Text annotations](#text-annotations)                                                                   |
 | use dates as group labels                     | `date` objects as `label`, `xticks_format`                | [Date labels](#date-labels)                                                                             |
 | put the points over a box or violin plot      | `Panel`                                                   | [Swarms over boxes and violins](#swarms-over-boxes-and-violins)                                         |
@@ -336,6 +337,39 @@ SwarmPlot(
     show_grid=SHOW_GRID.Y,
     show_legend=True,
     legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+).show()
+```
+
+### Brackets
+
+A reference line marks a value; a bracket marks a comparison. `brackets` draws a line spanning two groups, with a tick at each end pointing at them and a text above it — the conventional way to write “these two differ” on a figure. Each bracket names its ends by their labels, so no group positions are computed, and `text` is whatever you worked out elsewhere: datachart draws the result and runs no test of its own. A bracket without a `y` places itself above the data inside its span, and any two that overlap stack a step apart, so several comparisons need no hand-picked heights; the value axis grows to fit them unless the chart sets its own limit. `y` pins a bracket where the figure needs it, and `style` takes the `plot_bracket_*` attributes: the colour (which the text takes too), the line width, the alpha, and `plot_bracket_tick`, the length of the end ticks in points. On a horizontal chart the bracket spans vertically, its ticks point left and its text sits to the right. The keys are listed in [BracketSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketSettingAttrs).
+
+The eras look different at a glance, and a bracket per pair says they are not: no comparison of inauguration ages comes near the usual 0.05 threshold. Neither bracket carries a position — the chart placed them above the swarms they span and grew the axis to fit.
+
+```
+from scipy.stats import mannwhitneyu
+
+
+def ages_of(era_name):
+    return [point["value"] for point in inauguration_ages if point["label"] == era_name]
+
+
+def p_text(first, second):
+    """The two-sided Mann-Whitney U result, as the bracket prints it."""
+    return f"p = {mannwhitneyu(ages_of(first), ages_of(second)).pvalue:.2f}"
+
+
+SwarmPlot(
+    data=inauguration_ages,
+    brackets=[
+        {"from": ERAS[0], "to": ERAS[1], "text": p_text(ERAS[0], ERAS[1])},
+        {"from": ERAS[1], "to": ERAS[2], "text": p_text(ERAS[1], ERAS[2])},
+    ],
+    title="Age of US presidents at inauguration, era against era",
+    xlabel="Took office in",
+    ylabel="Age (years)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
 ).show()
 ```
 

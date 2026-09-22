@@ -63,6 +63,7 @@ RadialChart(
     vlines: dict | None = None,
     hlines: dict | None = None,
     dlines: dict | None = None,
+    brackets: dict | None = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -149,6 +150,7 @@ Examples:
 | `vlines`          | Not supported on a polar axes. Raises when passed. **TYPE:** \`dict                                                                                                                                                                                                                                                                                                               |
 | `hlines`          | Not supported on a polar axes. Raises when passed. **TYPE:** \`dict                                                                                                                                                                                                                                                                                                               |
 | `dlines`          | Not supported on a polar axes. Raises when passed. **TYPE:** \`dict                                                                                                                                                                                                                                                                                                               |
+| `brackets`        | Not supported on a polar axes. Raises when passed. **TYPE:** \`dict                                                                                                                                                                                                                                                                                                               |
 | `vspans`          | Angular wedge(s) to shade over the full radius; xmin and xmax are angles in degrees from the start angle, an omitted bound running to 0 or 360. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                     |
 | `hspans`          | Annulus (annuli) to shade over the full circle; ymin and ymax are radial values, an omitted bound running to the radial limit. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                      |
 | `label`           | The key name in data for the category labels (default: "label"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                  |

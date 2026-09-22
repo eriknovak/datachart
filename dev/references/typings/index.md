@@ -67,6 +67,7 @@ The dictionaries a chart takes beside its data: reference lines and bands, text 
 | --------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------ |
 | mark a value on the x or y axis               | `vlines`, `hlines` | [`VLineSettingAttrs`](#datachart.typings.VLineSettingAttrs), [`HLineSettingAttrs`](#datachart.typings.HLineSettingAttrs) |
 | draw a line through the data, such as parity  | `dlines`           | [`DLineSettingAttrs`](#datachart.typings.DLineSettingAttrs)                                                              |
+| compare two categories with a bracket         | `brackets`         | [`BracketSettingAttrs`](#datachart.typings.BracketSettingAttrs)                                                          |
 | shade a range of the x or y axis              | `vspans`, `hspans` | [`VSpanSettingAttrs`](#datachart.typings.VSpanSettingAttrs), [`HSpanSettingAttrs`](#datachart.typings.HSpanSettingAttrs) |
 | write a note on the chart                     | `texts`            | [`TextSettingAttrs`](#datachart.typings.TextSettingAttrs)                                                                |
 | title, place, or lay out the legend           | `legend`           | [`LegendSettingAttrs`](#datachart.typings.LegendSettingAttrs)                                                            |
@@ -117,6 +118,22 @@ The line is straight in data coordinates, so it curves on a log axis, where it i
 | `xmax`      | The x-axis position the line ends at. **TYPE:** \`int                 |
 | `style`     | The diagonal line style attributes. **TYPE:** \`DLineStyleAttrs       |
 | `label`     | The label of the diagonal line. **TYPE:** \`str                       |
+
+### datachart.typings.BracketSettingAttrs
+
+```
+BracketSettingAttrs = TypedDict(
+    "BracketSettingAttrs",
+    {
+        "from": Union[str, int, float],
+        "to": Union[str, int, float],
+        "text": Union[str, None],
+        "y": Union[int, float, None],
+        "style": Union[BracketStyleAttrs, None],
+    },
+    total=False,
+)
+```
 
 ### datachart.typings.VSpanSettingAttrs
 
@@ -297,6 +314,19 @@ The typing for the diagonal line style.
 | `plot_dline_width` | The width of the diagonal line. **TYPE:** \`int         |
 | `plot_dline_alpha` | The alpha value of the diagonal line. **TYPE:** \`float |
 
+### datachart.typings.BracketStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the pairwise comparison bracket style.
+
+| ATTRIBUTE            | DESCRIPTION                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| `plot_bracket_color` | The color of the bracket line and its text. **TYPE:** \`str       |
+| `plot_bracket_width` | The width of the bracket line. **TYPE:** \`int                    |
+| `plot_bracket_tick`  | The length of the bracket's end ticks, in points. **TYPE:** \`int |
+| `plot_bracket_alpha` | The alpha value of the bracket. **TYPE:** \`float                 |
+
 ### datachart.typings.VSpanStyleAttrs
 
 Bases: `TypedDict`
@@ -358,7 +388,7 @@ The keys a theme defines and [`config`](https://eriknovak.github.io/datachart/de
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `DLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `GanttStyleAttrs`, `DumbbellStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ScatterMatrixStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `DLineStyleAttrs`, `BracketStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `GanttStyleAttrs`, `DumbbellStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ScatterMatrixStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
 
 The style attributes. Combines all style typings.
 

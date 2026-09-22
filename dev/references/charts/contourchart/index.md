@@ -98,6 +98,16 @@ ContourChart(
         ]
         | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -202,6 +212,7 @@ Examples:
 | `vlines`         | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                               |
 | `hlines`         | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                             |
 | `dlines`         | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                       |
+| `brackets`       | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                                                                                                                                               |
 | `vspans`         | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                           |
 | `hspans`         | Horizontal reference band(s) to shade, between two y positions. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                         |
 | `colorbar`       | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** \`ColorbarSettingAttrs                                                                                                                                                                                                                                                                                                 |
@@ -229,7 +240,7 @@ The data attributes for the contour chart.
 
 ## Style
 
-`style` takes the keys of [`ContourStyleAttrs`](#datachart.typings.ContourStyleAttrs). The chart also reads the shared groups it draws: reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`ContourStyleAttrs`](#datachart.typings.ContourStyleAttrs). The chart also reads the shared groups it draws: reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.ContourStyleAttrs
 

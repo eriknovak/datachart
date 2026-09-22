@@ -73,42 +73,16 @@ adjusted = holm(pairwise)
 {f"{a} vs {b}": float(f"{p:.3g}") for (a, b), p in zip(PAIRS, adjusted)}
 ```
 
-Each pairwise result becomes a bracket: an `hlines` segment between the two species' positions — categories sit at `0`, `1`, `2` — and a `texts` label centered over it. The brackets are stacked so no two overlap, and the omnibus result is a fourth note pinned to the axes with `coords="axes"` rather than to a data position.
+Each pairwise result becomes a `brackets` entry: the two species by name and the adjusted p-value as its text. The chart places each bracket above the clouds it spans, stacks the ones that overlap, and grows the value axis to fit them, so no position is computed here. The omnibus result is a `texts` note pinned to the axes with `coords="axes"` rather than to a data position.
 
 ```
 NOTE_STYLE = {"plot_text_size": 9}
-BRACKET_Y = [6650, 7000, 7350]
 REFERENCE_HLINE = {"plot_hline_color": "#666666", "plot_hline_width": 1}
-LABEL_STYLE = {
-    "plot_text_halign": "center",
-    "plot_text_valign": "bottom",
-    "plot_text_box_visible": False,
-    "plot_text_size": 9,
-}
 
 
 def as_p(pvalue):
     return "p < 0.001" if pvalue < 0.001 else f"p = {pvalue:.2f}"
 
-
-brackets = [
-    {
-        "y": y,
-        "xmin": SPECIES.index(a),
-        "xmax": SPECIES.index(b),
-        "style": REFERENCE_HLINE,
-    }
-    for (a, b), y in zip(PAIRS, BRACKET_Y)
-]
-bracket_labels = [
-    {
-        "text": as_p(pvalue),
-        "x": (SPECIES.index(a) + SPECIES.index(b)) / 2,
-        "y": y + 60,
-        "style": LABEL_STYLE,
-    }
-    for (a, b), y, pvalue in zip(PAIRS, BRACKET_Y, adjusted)
-]
 
 omnibus_note = f"Kruskal-Wallis H = {omnibus.statistic:.0f}, {as_p(omnibus.pvalue)}"
 
@@ -121,17 +95,17 @@ mass_figure = RaincloudPlot(
     title="Gentoo stands apart; Adelie and Chinstrap weigh the same",
     ylabel="Body mass (g)",
     ymin=2400,
-    ymax=7700,
-    hlines=brackets,
-    texts=bracket_labels
-    + [
-        {
-            "text": omnibus_note,
-            "x": 0.02,
-            "y": 0.97,
-            "coords": "axes",
-        }
+    # one bracket per pairwise test, named by the species it compares
+    brackets=[
+        {"from": a, "to": b, "text": as_p(pvalue)}
+        for (a, b), pvalue in zip(PAIRS, adjusted)
     ],
+    texts={
+        "text": omnibus_note,
+        "x": 0.02,
+        "y": 0.97,
+        "coords": "axes",
+    },
     figsize=FIG_SIZE.FULL_MEDIUM,
 )
 mass_figure.show()

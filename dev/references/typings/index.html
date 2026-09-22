@@ -3911,6 +3911,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.typings.BracketSettingAttrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;BracketSettingAttrs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.typings.VSpanSettingAttrs" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4053,6 +4064,17 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;DLineStyleAttrs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.typings.BracketStyleAttrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;BracketStyleAttrs
       
     </span>
   </a>
@@ -4465,6 +4487,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.typings.BracketSettingAttrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;BracketSettingAttrs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.typings.VSpanSettingAttrs" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4607,6 +4640,17 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;DLineStyleAttrs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.typings.BracketStyleAttrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;BracketStyleAttrs
       
     </span>
   </a>
@@ -5065,6 +5109,11 @@ chart's reference page; the shared ones on the typings page.</p>
 <td style="text-align: left;"><a href="#datachart.typings.DLineSettingAttrs"><code>DLineSettingAttrs</code></a></td>
 </tr>
 <tr>
+<td style="text-align: left;">compare two categories with a bracket</td>
+<td style="text-align: left;"><code>brackets</code></td>
+<td style="text-align: left;"><a href="#datachart.typings.BracketSettingAttrs"><code>BracketSettingAttrs</code></a></td>
+</tr>
+<tr>
 <td style="text-align: left;">shade a range of the x or y axis</td>
 <td style="text-align: left;"><code>vspans</code>, <code>hspans</code></td>
 <td style="text-align: left;"><a href="#datachart.typings.VSpanSettingAttrs"><code>VSpanSettingAttrs</code></a>, <a href="#datachart.typings.HSpanSettingAttrs"><code>HSpanSettingAttrs</code></a></td>
@@ -5495,6 +5544,34 @@ where it is drawn between the axis limits. On linear axes, and without
 
 
   </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="datachart.typings.BracketSettingAttrs" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">datachart.typings.BracketSettingAttrs</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">BracketSettingAttrs</span> <span class="o">=</span> <span class="n"><span title="typing.TypedDict">TypedDict</span></span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">"BracketSettingAttrs"</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="p">{</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="s2">"from"</span><span class="p">:</span> <span class="n"><span title="typing.Union">Union</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">],</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">"to"</span><span class="p">:</span> <span class="n"><span title="typing.Union">Union</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">],</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="s2">"text"</span><span class="p">:</span> <span class="n"><span title="typing.Union">Union</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="s2">"y"</span><span class="p">:</span> <span class="n"><span title="typing.Union">Union</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        <span class="s2">"style"</span><span class="p">:</span> <span class="n"><span title="typing.Union">Union</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.BracketStyleAttrs&lt;/span&gt;" href="#datachart.typings.BracketStyleAttrs">BracketStyleAttrs</a></span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="p">},</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n"><span title="typing.TypedDict(total)">total</span></span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
 
     </div>
 
@@ -7058,6 +7135,122 @@ marks when <code>show_values</code> is on. One style serves every chart that tak
 
 
 
+<h3 id="datachart.typings.BracketStyleAttrs" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.typings.BracketStyleAttrs</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
+
+
+
+        <p>The typing for the pairwise comparison bracket style.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">ATTRIBUTE</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.BracketStyleAttrs.plot_bracket_color">plot_bracket_color</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The color of the bracket line and its text.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span> | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.BracketStyleAttrs.plot_bracket_width">plot_bracket_width</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The width of the bracket line.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span> | <span title="float">float</span> | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.BracketStyleAttrs.plot_bracket_tick">plot_bracket_tick</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The length of the bracket's end ticks, in points.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span> | <span title="float">float</span> | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.BracketStyleAttrs.plot_bracket_alpha">plot_bracket_alpha</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The alpha value of the bracket.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="float">float</span> | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h3 id="datachart.typings.VSpanStyleAttrs" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.typings.VSpanStyleAttrs</span>
 
@@ -7641,7 +7834,7 @@ marks when <code>show_values</code> is on. One style serves every chart that tak
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ColorStyleAttrs&lt;/span&gt;" href="#datachart.typings.ColorStyleAttrs">ColorStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.FontStyleAttrs&lt;/span&gt;" href="#datachart.typings.FontStyleAttrs">FontStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.AxesStyleAttrs&lt;/span&gt;" href="#datachart.typings.AxesStyleAttrs">AxesStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.LegendStyleAttrs&lt;/span&gt;" href="#datachart.typings.LegendStyleAttrs">LegendStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.AreaStyleAttrs&lt;/span&gt;" href="#datachart.typings.AreaStyleAttrs">AreaStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.GridStyleAttrs&lt;/span&gt;" href="#datachart.typings.GridStyleAttrs">GridStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.LineStyleAttrs&lt;/span&gt;" href="../charts/linechart/#datachart.typings.LineStyleAttrs">LineStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.StackedAreaStyleAttrs&lt;/span&gt;" href="../charts/stackedareachart/#datachart.typings.StackedAreaStyleAttrs">StackedAreaStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.BumpStyleAttrs&lt;/span&gt;" href="../charts/bumpchart/#datachart.typings.BumpStyleAttrs">BumpStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.SankeyStyleAttrs&lt;/span&gt;" href="../charts/sankeychart/#datachart.typings.SankeyStyleAttrs">SankeyStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.TreemapStyleAttrs&lt;/span&gt;" href="../charts/treemap/#datachart.typings.TreemapStyleAttrs">TreemapStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.NetworkStyleAttrs&lt;/span&gt;" href="../charts/networkchart/#datachart.typings.NetworkStyleAttrs">NetworkStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.BarStyleAttrs&lt;/span&gt;" href="../charts/barchart/#datachart.typings.BarStyleAttrs">BarStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ValueLabelStyleAttrs&lt;/span&gt;" href="#datachart.typings.ValueLabelStyleAttrs">ValueLabelStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HistStyleAttrs&lt;/span&gt;" href="../charts/histogram/#datachart.typings.HistStyleAttrs">HistStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.VLineStyleAttrs&lt;/span&gt;" href="#datachart.typings.VLineStyleAttrs">VLineStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HLineStyleAttrs&lt;/span&gt;" href="#datachart.typings.HLineStyleAttrs">HLineStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.DLineStyleAttrs&lt;/span&gt;" href="#datachart.typings.DLineStyleAttrs">DLineStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.VSpanStyleAttrs&lt;/span&gt;" href="#datachart.typings.VSpanStyleAttrs">VSpanStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HSpanStyleAttrs&lt;/span&gt;" href="#datachart.typings.HSpanStyleAttrs">HSpanStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.TextStyleAttrs&lt;/span&gt;" href="#datachart.typings.TextStyleAttrs">TextStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HeatmapStyleAttrs&lt;/span&gt;" href="../charts/heatmap/#datachart.typings.HeatmapStyleAttrs">HeatmapStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.CalendarHeatmapStyleAttrs&lt;/span&gt;" href="../charts/calendarheatmap/#datachart.typings.CalendarHeatmapStyleAttrs">CalendarHeatmapStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.GanttStyleAttrs&lt;/span&gt;" href="../charts/ganttchart/#datachart.typings.GanttStyleAttrs">GanttStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.DumbbellStyleAttrs&lt;/span&gt;" href="../charts/dumbbellchart/#datachart.typings.DumbbellStyleAttrs">DumbbellStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ContourStyleAttrs&lt;/span&gt;" href="../charts/contourchart/#datachart.typings.ContourStyleAttrs">ContourStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HexbinStyleAttrs&lt;/span&gt;" href="../charts/hexbinchart/#datachart.typings.HexbinStyleAttrs">HexbinStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ScatterStyleAttrs&lt;/span&gt;" href="../charts/scatterchart/#datachart.typings.ScatterStyleAttrs">ScatterStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.RegressionStyleAttrs&lt;/span&gt;" href="#datachart.typings.RegressionStyleAttrs">RegressionStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.BoxStyleAttrs&lt;/span&gt;" href="../charts/boxplot/#datachart.typings.BoxStyleAttrs">BoxStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.SwarmStyleAttrs&lt;/span&gt;" href="../charts/swarmplot/#datachart.typings.SwarmStyleAttrs">SwarmStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ViolinStyleAttrs&lt;/span&gt;" href="../charts/violinplot/#datachart.typings.ViolinStyleAttrs">ViolinStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.RidgelineStyleAttrs&lt;/span&gt;" href="../charts/ridgelineplot/#datachart.typings.RidgelineStyleAttrs">RidgelineStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ParallelCoordsStyleAttrs&lt;/span&gt;" href="../charts/parallelcoords/#datachart.typings.ParallelCoordsStyleAttrs">ParallelCoordsStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ScatterMatrixStyleAttrs&lt;/span&gt;" href="../charts/scattermatrix/#datachart.typings.ScatterMatrixStyleAttrs">ScatterMatrixStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ThemeDefaultAttrs&lt;/span&gt;" href="#datachart.typings.ThemeDefaultAttrs">ThemeDefaultAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.SketchStyleAttrs&lt;/span&gt;" href="#datachart.typings.SketchStyleAttrs">SketchStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.InkStyleAttrs&lt;/span&gt;" href="#datachart.typings.InkStyleAttrs">InkStyleAttrs</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ColorStyleAttrs&lt;/span&gt;" href="#datachart.typings.ColorStyleAttrs">ColorStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.FontStyleAttrs&lt;/span&gt;" href="#datachart.typings.FontStyleAttrs">FontStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.AxesStyleAttrs&lt;/span&gt;" href="#datachart.typings.AxesStyleAttrs">AxesStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.LegendStyleAttrs&lt;/span&gt;" href="#datachart.typings.LegendStyleAttrs">LegendStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.AreaStyleAttrs&lt;/span&gt;" href="#datachart.typings.AreaStyleAttrs">AreaStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.GridStyleAttrs&lt;/span&gt;" href="#datachart.typings.GridStyleAttrs">GridStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.LineStyleAttrs&lt;/span&gt;" href="../charts/linechart/#datachart.typings.LineStyleAttrs">LineStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.StackedAreaStyleAttrs&lt;/span&gt;" href="../charts/stackedareachart/#datachart.typings.StackedAreaStyleAttrs">StackedAreaStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.BumpStyleAttrs&lt;/span&gt;" href="../charts/bumpchart/#datachart.typings.BumpStyleAttrs">BumpStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.SankeyStyleAttrs&lt;/span&gt;" href="../charts/sankeychart/#datachart.typings.SankeyStyleAttrs">SankeyStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.TreemapStyleAttrs&lt;/span&gt;" href="../charts/treemap/#datachart.typings.TreemapStyleAttrs">TreemapStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.NetworkStyleAttrs&lt;/span&gt;" href="../charts/networkchart/#datachart.typings.NetworkStyleAttrs">NetworkStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.BarStyleAttrs&lt;/span&gt;" href="../charts/barchart/#datachart.typings.BarStyleAttrs">BarStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ValueLabelStyleAttrs&lt;/span&gt;" href="#datachart.typings.ValueLabelStyleAttrs">ValueLabelStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HistStyleAttrs&lt;/span&gt;" href="../charts/histogram/#datachart.typings.HistStyleAttrs">HistStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.VLineStyleAttrs&lt;/span&gt;" href="#datachart.typings.VLineStyleAttrs">VLineStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HLineStyleAttrs&lt;/span&gt;" href="#datachart.typings.HLineStyleAttrs">HLineStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.DLineStyleAttrs&lt;/span&gt;" href="#datachart.typings.DLineStyleAttrs">DLineStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.BracketStyleAttrs&lt;/span&gt;" href="#datachart.typings.BracketStyleAttrs">BracketStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.VSpanStyleAttrs&lt;/span&gt;" href="#datachart.typings.VSpanStyleAttrs">VSpanStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HSpanStyleAttrs&lt;/span&gt;" href="#datachart.typings.HSpanStyleAttrs">HSpanStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.TextStyleAttrs&lt;/span&gt;" href="#datachart.typings.TextStyleAttrs">TextStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HeatmapStyleAttrs&lt;/span&gt;" href="../charts/heatmap/#datachart.typings.HeatmapStyleAttrs">HeatmapStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.CalendarHeatmapStyleAttrs&lt;/span&gt;" href="../charts/calendarheatmap/#datachart.typings.CalendarHeatmapStyleAttrs">CalendarHeatmapStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.GanttStyleAttrs&lt;/span&gt;" href="../charts/ganttchart/#datachart.typings.GanttStyleAttrs">GanttStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.DumbbellStyleAttrs&lt;/span&gt;" href="../charts/dumbbellchart/#datachart.typings.DumbbellStyleAttrs">DumbbellStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ContourStyleAttrs&lt;/span&gt;" href="../charts/contourchart/#datachart.typings.ContourStyleAttrs">ContourStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.HexbinStyleAttrs&lt;/span&gt;" href="../charts/hexbinchart/#datachart.typings.HexbinStyleAttrs">HexbinStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ScatterStyleAttrs&lt;/span&gt;" href="../charts/scatterchart/#datachart.typings.ScatterStyleAttrs">ScatterStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.RegressionStyleAttrs&lt;/span&gt;" href="#datachart.typings.RegressionStyleAttrs">RegressionStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.BoxStyleAttrs&lt;/span&gt;" href="../charts/boxplot/#datachart.typings.BoxStyleAttrs">BoxStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.SwarmStyleAttrs&lt;/span&gt;" href="../charts/swarmplot/#datachart.typings.SwarmStyleAttrs">SwarmStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ViolinStyleAttrs&lt;/span&gt;" href="../charts/violinplot/#datachart.typings.ViolinStyleAttrs">ViolinStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.RidgelineStyleAttrs&lt;/span&gt;" href="../charts/ridgelineplot/#datachart.typings.RidgelineStyleAttrs">RidgelineStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ParallelCoordsStyleAttrs&lt;/span&gt;" href="../charts/parallelcoords/#datachart.typings.ParallelCoordsStyleAttrs">ParallelCoordsStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ScatterMatrixStyleAttrs&lt;/span&gt;" href="../charts/scattermatrix/#datachart.typings.ScatterMatrixStyleAttrs">ScatterMatrixStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ThemeDefaultAttrs&lt;/span&gt;" href="#datachart.typings.ThemeDefaultAttrs">ThemeDefaultAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.SketchStyleAttrs&lt;/span&gt;" href="#datachart.typings.SketchStyleAttrs">SketchStyleAttrs</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.InkStyleAttrs&lt;/span&gt;" href="#datachart.typings.InkStyleAttrs">InkStyleAttrs</a></code></p>
 
 
 

@@ -1268,6 +1268,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#brackets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Brackets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#text-annotations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4353,6 +4364,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#brackets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Brackets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#text-annotations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5512,6 +5534,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <td style="text-align:left">mark a threshold or shade a range</td>
 <td style="text-align:left"><code>hlines</code>, <code>dlines</code>, <code>vlines</code>, <code>hspans</code>, <code>vspans</code></td>
 <td style="text-align:left"><a href="#reference-lines-and-bands">Reference lines and bands</a></td>
+</tr>
+<tr>
+<td style="text-align:left">compare two groups with a bracket</td>
+<td style="text-align:left"><code>brackets</code></td>
+<td style="text-align:left"><a href="#brackets">Brackets</a></td>
 </tr>
 <tr>
 <td style="text-align:left">put a note on the chart</td>
@@ -6718,7 +6745,8 @@ ViolinPlot(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="text-annotations">Text annotations<a class="anchor-link" href="#text-annotations">¶</a></h3><p>Where a reference line marks a value, a note explains a shape. <code>texts</code> places text on the chart, with an optional <code>target</code> to draw a connector to a point; the position is in data coordinates by default (group position, value) or in axes fractions with <code>"coords": "axes"</code>, which keeps the note in place whatever the axis limits. The <a href="../../utility/annotations/">Text Annotations</a> guide covers placement, connector looks and styling. The note below points at the Gentoo waist and says what it is.</p>
+<h3 id="brackets">Brackets<a class="anchor-link" href="#brackets">¶</a></h3><p>A reference line marks a value; a bracket marks a comparison. <code>brackets</code> draws a line spanning two groups, with a tick at each end pointing at them and a text above it — the conventional way to write “these two differ” on a figure. Each bracket names its ends by their labels, so no group positions are computed, and <code>text</code> is whatever you worked out elsewhere: datachart draws the result and runs no test of its own. A bracket without a <code>y</code> places itself above the data inside its span, and any two that overlap stack a step apart, so several comparisons need no hand-picked heights; the value axis grows to fit them unless the chart sets its own limit. <code>y</code> pins a bracket where the figure needs it, and <code>style</code> takes the <code>plot_bracket_*</code> attributes: the colour (which the text takes too), the line width, the alpha, and <code>plot_bracket_tick</code>, the length of the end ticks in points. On a horizontal chart the bracket spans vertically, its ticks point left and its text sits to the right. The keys are listed in <a href="../../../references/typings/#datachart.typings.BracketSettingAttrs">BracketSettingAttrs</a>.</p>
+<p>One bracket per result, styled apart: the pair the test separates is drawn in the red of the marked line, the pair it cannot in a muted grey.</p>
 </div>
 </div>
 </div>
@@ -6732,6 +6760,130 @@ ViolinPlot(
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-17">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">mannwhitneyu</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mass_of</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">penguin</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span> <span class="k">for</span> <span class="n">penguin</span> <span class="ow">in</span> <span class="n">penguins</span> <span class="k">if</span> <span class="n">penguin</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span> <span class="o">==</span> <span class="n">name</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">p_text</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The two-sided Mann-Whitney U result, as the bracket prints it."""</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">mannwhitneyu</span><span class="p">(</span><span class="n">mass_of</span><span class="p">(</span><span class="n">first</span><span class="p">),</span> <span class="n">mass_of</span><span class="p">(</span><span class="n">second</span><span class="p">))</span><span class="o">.</span><span class="n">pvalue</span>
+    <span class="k">return</span> <span class="s2">"p &lt; 0.001"</span> <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mf">0.001</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"p = </span><span class="si">{</span><span class="n">p</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span>
+
+
+<span class="n">ViolinPlot</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">,</span>
+    <span class="n">brackets</span><span class="o">=</span><span class="p">[</span>
+        <span class="c1"># the pair the test cannot separate</span>
+        <span class="p">{</span>
+            <span class="s2">"from"</span><span class="p">:</span> <span class="s2">"Adelie"</span><span class="p">,</span>
+            <span class="s2">"to"</span><span class="p">:</span> <span class="s2">"Chinstrap"</span><span class="p">,</span>
+            <span class="s2">"text"</span><span class="p">:</span> <span class="n">p_text</span><span class="p">(</span><span class="s2">"Adelie"</span><span class="p">,</span> <span class="s2">"Chinstrap"</span><span class="p">),</span>
+            <span class="s2">"style"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"plot_bracket_color"</span><span class="p">:</span> <span class="s2">"#6c757d"</span><span class="p">},</span>
+        <span class="p">},</span>
+        <span class="c1"># and the pair it separates, in the color of the marked line</span>
+        <span class="p">{</span>
+            <span class="s2">"from"</span><span class="p">:</span> <span class="s2">"Chinstrap"</span><span class="p">,</span>
+            <span class="s2">"to"</span><span class="p">:</span> <span class="s2">"Gentoo"</span><span class="p">,</span>
+            <span class="s2">"text"</span><span class="p">:</span> <span class="n">p_text</span><span class="p">(</span><span class="s2">"Chinstrap"</span><span class="p">,</span> <span class="s2">"Gentoo"</span><span class="p">),</span>
+            <span class="s2">"style"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"plot_bracket_color"</span><span class="p">:</span> <span class="s2">"#c1121f"</span><span class="p">,</span> <span class="s2">"plot_bracket_width"</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">],</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Body mass of Palmer penguins, compared pair by pair"</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Species"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Body mass (g)"</span><span class="p">,</span>
+    <span class="n">yticks_format</span><span class="o">=</span><span class="s2">"</span><span class="si">{x:,.0f}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_SHORT</span><span class="p">,</span>
+    <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-17">from scipy.stats import mannwhitneyu
+
+
+def mass_of(name):
+    return [penguin["value"] for penguin in penguins if penguin["label"] == name]
+
+
+def p_text(first, second):
+    """The two-sided Mann-Whitney U result, as the bracket prints it."""
+    p = mannwhitneyu(mass_of(first), mass_of(second)).pvalue
+    return "p &lt; 0.001" if p &lt; 0.001 else f"p = {p:.2f}"
+
+
+ViolinPlot(
+    data=penguins,
+    brackets=[
+        # the pair the test cannot separate
+        {
+            "from": "Adelie",
+            "to": "Chinstrap",
+            "text": p_text("Adelie", "Chinstrap"),
+            "style": {"plot_bracket_color": "#6c757d"},
+        },
+        # and the pair it separates, in the color of the marked line
+        {
+            "from": "Chinstrap",
+            "to": "Gentoo",
+            "text": p_text("Chinstrap", "Gentoo"),
+            "style": {"plot_bracket_color": "#c1121f", "plot_bracket_width": 1.5},
+        },
+    ],
+    title="Body mass of Palmer penguins, compared pair by pair",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    yticks_format="{x:,.0f}",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
+).show()</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
+<img alt="No description has been provided for this image" class="" src="data:image/png;base64,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"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="text-annotations">Text annotations<a class="anchor-link" href="#text-annotations">¶</a></h3><p>Where a reference line marks a value, a note explains a shape. <code>texts</code> places text on the chart, with an optional <code>target</code> to draw a connector to a point; the position is in data coordinates by default (group position, value) or in axes fractions with <code>"coords": "axes"</code>, which keeps the note in place whatever the axis limits. The <a href="../../utility/annotations/">Text Annotations</a> guide covers placement, connector looks and styling. The note below points at the Gentoo waist and says what it is.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-18">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6761,7 +6913,7 @@ ViolinPlot(
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-17">ViolinPlot(
+<div class="clipboard-copy-txt" id="cell-18">ViolinPlot(
     data=penguins,
     inner=VIOLIN_INNER.QUARTILES,
     # a note pinned to the axes, pointing at the Gentoo waist
@@ -6817,10 +6969,10 @@ ViolinPlot(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-18">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-19">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6843,7 +6995,7 @@ ViolinPlot(
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-18">from datachart.constants import DATE_FORMAT
+<div class="clipboard-copy-txt" id="cell-19">from datachart.constants import DATE_FORMAT
 
 ViolinPlot(
     data=daily_temperatures,
@@ -6889,10 +7041,10 @@ ViolinPlot(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-19">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-20">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6921,7 +7073,7 @@ ViolinPlot(
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-19">from datachart.charts import BoxPlot, SwarmPlot
+<div class="clipboard-copy-txt" id="cell-20">from datachart.charts import BoxPlot, SwarmPlot
 from datachart.utils import Panel
 
 Panel(
@@ -6973,10 +7125,10 @@ Panel(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-20">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-21">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -6999,7 +7151,7 @@ Panel(
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-20">Panel(
+<div class="clipboard-copy-txt" id="cell-21">Panel(
     [
         # the body only, faded behind the points
         ViolinPlot(data=penguins, inner=None, style={"plot_violin_alpha": 0.25}),
@@ -7045,10 +7197,10 @@ Panel(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-21">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-22">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -7072,7 +7224,7 @@ Panel(
     <span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-21">ViolinPlot(
+<div class="clipboard-copy-txt" id="cell-22">ViolinPlot(
     # one dataset per subplot
     data=[penguins, flippers],
     # a subtitle and a style per subplot
@@ -7119,10 +7271,10 @@ Panel(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-22">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-23">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -7147,7 +7299,7 @@ Panel(
     <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-22">ViolinPlot(
+<div class="clipboard-copy-txt" id="cell-23">ViolinPlot(
     data=[penguins, flippers],
     subtitle=["Body mass (g)", "Flipper length (mm)"],
     style=[{"plot_violin_color": "#457b9d"}, {"plot_violin_color": "#e76f51"}],
@@ -7209,10 +7361,10 @@ Panel(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-23">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-24">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -7237,7 +7389,7 @@ Panel(
         <span class="n">scaley</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-23">from datachart.constants import SCALE
+<div class="clipboard-copy-txt" id="cell-24">from datachart.constants import SCALE
 
 for scale in [SCALE.LINEAR, SCALE.LOG]:
     ViolinPlot(
@@ -7291,10 +7443,10 @@ for scale in [SCALE.LINEAR, SCALE.LOG]:
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-24">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-25">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -7321,7 +7473,7 @@ for scale in [SCALE.LINEAR, SCALE.LOG]:
     <span class="n">yticklabels</span><span class="o">=</span><span class="p">[</span><span class="s2">"1 min"</span><span class="p">,</span> <span class="s2">"10 min"</span><span class="p">,</span> <span class="s2">"100 min"</span><span class="p">,</span> <span class="s2">"1 day"</span><span class="p">,</span> <span class="s2">"10 days"</span><span class="p">],</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-24">import math
+<div class="clipboard-copy-txt" id="cell-25">import math
 
 log_reply = [{**point, "value": math.log10(point["value"])} for point in first_reply]
 
@@ -7371,10 +7523,10 @@ ViolinPlot(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-25">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-26">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -7391,7 +7543,7 @@ ViolinPlot(
 <span class="p">]</span>
 <span class="n">penguin_records</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-25">penguin_records = [
+<div class="clipboard-copy-txt" id="cell-26">penguin_records = [
     {"species": group["species"], "sex": group["sex"], "body_mass_g": mass}
     for group in PENGUINS
     for mass in group["body_mass"]
@@ -7406,7 +7558,7 @@ penguin_records[:2]</div>
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[28]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[29]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
 <pre>[{'species': 'Adelie', 'sex': 'Female', 'body_mass_g': 3800},
  {'species': 'Adelie', 'sex': 'Female', 'body_mass_g': 3250}]</pre>
@@ -7421,10 +7573,10 @@ penguin_records[:2]</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-26">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-27">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -7447,7 +7599,7 @@ penguin_records[:2]</div>
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-26">ViolinPlot(
+<div class="clipboard-copy-txt" id="cell-27">ViolinPlot(
     data=penguin_records,
     # the keys that hold the group and the value
     label="species",
@@ -7507,10 +7659,10 @@ penguin_records[:2]</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [31]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [32]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-27">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-28">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -7546,7 +7698,7 @@ penguin_records[:2]</div>
     <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-27">from datachart.utils import Grid
+<div class="clipboard-copy-txt" id="cell-28">from datachart.utils import Grid
 
 violins = ViolinPlot(
     data=response_times,
@@ -7608,10 +7760,10 @@ Grid(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [33]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [34]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-28">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-29">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -7645,7 +7797,7 @@ Grid(
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-28">from datachart.constants import VALUE_FORMAT
+<div class="clipboard-copy-txt" id="cell-29">from datachart.constants import VALUE_FORMAT
 
 ViolinPlot(
     data=benchmark,
@@ -7702,10 +7854,10 @@ ViolinPlot(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [34]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [35]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-29">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-30">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -7742,7 +7894,7 @@ ViolinPlot(
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_TALL</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-29">def measurement_panel(data, title, unit, note):
+<div class="clipboard-copy-txt" id="cell-30">def measurement_panel(data, title, unit, note):
     # faded violins with every bird on top, and a note on what it shows
     return Panel(
         [

@@ -49,6 +49,7 @@ Every customization is either a keyword argument of `ViolinPlot` or a `plot_viol
 | draw the violins horizontally                        | `orientation`                                                             | [Horizontal violins](#horizontal-violins)                                                               |
 | highlight some violins, mute the rest                | `emphasis`, `emphasis_rule`                                               | [Emphasis](#emphasis)                                                                                   |
 | mark a threshold or shade a range                    | `hlines`, `dlines`, `vlines`, `hspans`, `vspans`                          | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| compare two groups with a bracket                    | `brackets`                                                                | [Brackets](#brackets)                                                                                   |
 | put a note on the chart                              | `texts`                                                                   | [Text annotations](#text-annotations)                                                                   |
 | use dates as group labels                            | `date` objects as `label`, `xticks_format`                                | [Date labels](#date-labels)                                                                             |
 | draw a box plot or the observations over the violins | `Panel` with `BoxPlot` or `SwarmPlot`                                     | [Violins with boxes and swarms](#violins-with-boxes-and-swarms)                                         |
@@ -389,6 +390,53 @@ ViolinPlot(
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
+).show()
+```
+
+### Brackets
+
+A reference line marks a value; a bracket marks a comparison. `brackets` draws a line spanning two groups, with a tick at each end pointing at them and a text above it — the conventional way to write “these two differ” on a figure. Each bracket names its ends by their labels, so no group positions are computed, and `text` is whatever you worked out elsewhere: datachart draws the result and runs no test of its own. A bracket without a `y` places itself above the data inside its span, and any two that overlap stack a step apart, so several comparisons need no hand-picked heights; the value axis grows to fit them unless the chart sets its own limit. `y` pins a bracket where the figure needs it, and `style` takes the `plot_bracket_*` attributes: the colour (which the text takes too), the line width, the alpha, and `plot_bracket_tick`, the length of the end ticks in points. On a horizontal chart the bracket spans vertically, its ticks point left and its text sits to the right. The keys are listed in [BracketSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketSettingAttrs).
+
+One bracket per result, styled apart: the pair the test separates is drawn in the red of the marked line, the pair it cannot in a muted grey.
+
+```
+from scipy.stats import mannwhitneyu
+
+
+def mass_of(name):
+    return [penguin["value"] for penguin in penguins if penguin["label"] == name]
+
+
+def p_text(first, second):
+    """The two-sided Mann-Whitney U result, as the bracket prints it."""
+    p = mannwhitneyu(mass_of(first), mass_of(second)).pvalue
+    return "p < 0.001" if p < 0.001 else f"p = {p:.2f}"
+
+
+ViolinPlot(
+    data=penguins,
+    brackets=[
+        # the pair the test cannot separate
+        {
+            "from": "Adelie",
+            "to": "Chinstrap",
+            "text": p_text("Adelie", "Chinstrap"),
+            "style": {"plot_bracket_color": "#6c757d"},
+        },
+        # and the pair it separates, in the color of the marked line
+        {
+            "from": "Chinstrap",
+            "to": "Gentoo",
+            "text": p_text("Chinstrap", "Gentoo"),
+            "style": {"plot_bracket_color": "#c1121f", "plot_bracket_width": 1.5},
+        },
+    ],
+    title="Body mass of Palmer penguins, compared pair by pair",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    yticks_format="{x:,.0f}",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
 ).show()
 ```
 

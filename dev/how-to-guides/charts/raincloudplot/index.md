@@ -45,6 +45,7 @@ Every customization is either a keyword argument of `RaincloudPlot` or an attrib
 | draw the rainclouds horizontally                   | `orientation`                                                                         | [Horizontal rainclouds](#horizontal-rainclouds)                                                         |
 | highlight some groups, mute the rest               | `emphasis`, `emphasis_rule`                                                           | [Emphasis](#emphasis)                                                                                   |
 | mark a threshold or shade a range                  | `hlines`, `dlines`, `vlines`, `hspans`, `vspans`                                      | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| compare two groups with a bracket                  | `brackets`                                                                            | [Brackets](#brackets)                                                                                   |
 | put a note on the chart                            | `texts`                                                                               | [Text annotations](#text-annotations)                                                                   |
 | use dates as group labels                          | `date` objects as `label`, `xticks_format`                                            | [Date labels](#date-labels)                                                                             |
 | list the groups in a titled legend                 | `show_legend`, `legend`                                                               | [Legend](#legend)                                                                                       |
@@ -329,6 +330,49 @@ RaincloudPlot(
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
+).show()
+```
+
+### Brackets
+
+A reference line marks a value; a bracket marks a comparison. `brackets` draws a line spanning two groups, with a tick at each end pointing at them and a text above it — the conventional way to write “these two differ” on a figure. Each bracket names its ends by their labels, so no group positions are computed, and `text` is whatever you worked out elsewhere: datachart draws the result and runs no test of its own. A bracket without a `y` places itself above the data inside its span, and any two that overlap stack a step apart, so several comparisons need no hand-picked heights; the value axis grows to fit them unless the chart sets its own limit. `y` pins a bracket where the figure needs it, and `style` takes the `plot_bracket_*` attributes: the colour (which the text takes too), the line width, the alpha, and `plot_bracket_tick`, the length of the end ticks in points. On a horizontal chart the bracket spans vertically, its ticks point left and its text sits to the right. The keys are listed in [BracketSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketSettingAttrs).
+
+A raincloud already shows every observation, so the brackets only have to say which differences survive a test. Longer end ticks keep them legible over the clouds.
+
+```
+from scipy.stats import mannwhitneyu
+
+
+def mass_of(name):
+    return [point["value"] for point in chart_data if point["label"] == name]
+
+
+def p_text(first, second):
+    """The two-sided Mann-Whitney U result, as the bracket prints it."""
+    p = mannwhitneyu(mass_of(first), mass_of(second)).pvalue
+    return "p < 0.001" if p < 0.001 else f"p = {p:.2f}"
+
+
+RaincloudPlot(
+    data=chart_data,
+    brackets=[
+        {
+            "from": first,
+            "to": second,
+            "text": p_text(first, second),
+            "style": {"plot_bracket_tick": 6},
+        }
+        for first, second in [
+            ("Adelie", "Chinstrap"),
+            ("Chinstrap", "Gentoo"),
+            ("Adelie", "Gentoo"),
+        ]
+    ],
+    title="Body mass of Palmer penguins, compared pair by pair",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
 ).show()
 ```
 

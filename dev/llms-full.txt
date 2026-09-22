@@ -6925,6 +6925,7 @@ Every customization is either a keyword argument of `BoxPlot` or a `plot_box_*` 
 | print the median of each box                  | `show_values`, `value_format`                                 | [Value labels](#value-labels)                                                                           |
 | highlight some boxes, mute the rest           | `emphasis`, `emphasis_rule`                                   | [Emphasis](#emphasis)                                                                                   |
 | mark a threshold or a summary value           | `hlines`, `vlines`, `dlines`                                  | [Reference lines](#reference-lines)                                                                     |
+| compare two groups with a bracket             | `brackets`                                                    | [Brackets](#brackets)                                                                                   |
 | shade a range of values                       | `hspans`, `vspans`                                            | [Reference bands](#reference-bands)                                                                     |
 | title and place the legend                    | `show_legend`, `legend`                                       | [Reference bands](#reference-bands)                                                                     |
 | put a note on the chart                       | `texts`                                                       | [Text annotations](#text-annotations)                                                                   |
@@ -7223,6 +7224,43 @@ BoxPlot(
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
+).show()
+```
+
+### Brackets
+
+A reference line marks a value; a bracket marks a comparison. `brackets` draws a line spanning two groups, with a tick at each end pointing at them and a text above it — the conventional way to write “these two differ” on a figure. Each bracket names its ends by their labels, so no group positions are computed, and `text` is whatever you worked out elsewhere: datachart draws the result and runs no test of its own. A bracket without a `y` places itself above the data inside its span, and any two that overlap stack a step apart, so several comparisons need no hand-picked heights; the value axis grows to fit them unless the chart sets its own limit. `y` pins a bracket where the figure needs it, and `style` takes the `plot_bracket_*` attributes: the colour (which the text takes too), the line width, the alpha, and `plot_bracket_tick`, the length of the end ticks in points. On a horizontal chart the bracket spans vertically, its ticks point left and its text sits to the right. The keys are listed in [BracketSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketSettingAttrs).
+
+The brackets below carry a Mann–Whitney U test of every pair of species. Two of the three pairs separate cleanly; Adelie and Chinstrap do not, and the bracket says so rather than leaving the reader to guess from two overlapping boxes.
+
+```
+from scipy.stats import mannwhitneyu
+
+
+def mass_of(name):
+    return [point["value"] for point in body_mass if point["label"] == name]
+
+
+def p_text(first, second):
+    """The two-sided Mann-Whitney U result, as the bracket prints it."""
+    p = mannwhitneyu(mass_of(first), mass_of(second)).pvalue
+    return "p < 0.001" if p < 0.001 else f"p = {p:.2f}"
+
+
+BoxPlot(
+    data=body_mass,
+    # every pair of species; the chart stacks the three brackets
+    brackets=[
+        {"from": "Adelie", "to": "Chinstrap", "text": p_text("Adelie", "Chinstrap")},
+        {"from": "Chinstrap", "to": "Gentoo", "text": p_text("Chinstrap", "Gentoo")},
+        {"from": "Adelie", "to": "Gentoo", "text": p_text("Adelie", "Gentoo")},
+    ],
+    title="Body mass of Palmer penguins, compared pair by pair",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    yticks_format=VALUE_FORMAT.THOUSANDS,
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
 ).show()
 ```
 
@@ -7660,6 +7698,7 @@ Every customization is either a keyword argument of `ViolinPlot` or a `plot_viol
 | draw the violins horizontally                        | `orientation`                                                             | [Horizontal violins](#horizontal-violins)                                                               |
 | highlight some violins, mute the rest                | `emphasis`, `emphasis_rule`                                               | [Emphasis](#emphasis)                                                                                   |
 | mark a threshold or shade a range                    | `hlines`, `dlines`, `vlines`, `hspans`, `vspans`                          | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| compare two groups with a bracket                    | `brackets`                                                                | [Brackets](#brackets)                                                                                   |
 | put a note on the chart                              | `texts`                                                                   | [Text annotations](#text-annotations)                                                                   |
 | use dates as group labels                            | `date` objects as `label`, `xticks_format`                                | [Date labels](#date-labels)                                                                             |
 | draw a box plot or the observations over the violins | `Panel` with `BoxPlot` or `SwarmPlot`                                     | [Violins with boxes and swarms](#violins-with-boxes-and-swarms)                                         |
@@ -8000,6 +8039,53 @@ ViolinPlot(
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
+).show()
+```
+
+### Brackets
+
+A reference line marks a value; a bracket marks a comparison. `brackets` draws a line spanning two groups, with a tick at each end pointing at them and a text above it — the conventional way to write “these two differ” on a figure. Each bracket names its ends by their labels, so no group positions are computed, and `text` is whatever you worked out elsewhere: datachart draws the result and runs no test of its own. A bracket without a `y` places itself above the data inside its span, and any two that overlap stack a step apart, so several comparisons need no hand-picked heights; the value axis grows to fit them unless the chart sets its own limit. `y` pins a bracket where the figure needs it, and `style` takes the `plot_bracket_*` attributes: the colour (which the text takes too), the line width, the alpha, and `plot_bracket_tick`, the length of the end ticks in points. On a horizontal chart the bracket spans vertically, its ticks point left and its text sits to the right. The keys are listed in [BracketSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketSettingAttrs).
+
+One bracket per result, styled apart: the pair the test separates is drawn in the red of the marked line, the pair it cannot in a muted grey.
+
+```
+from scipy.stats import mannwhitneyu
+
+
+def mass_of(name):
+    return [penguin["value"] for penguin in penguins if penguin["label"] == name]
+
+
+def p_text(first, second):
+    """The two-sided Mann-Whitney U result, as the bracket prints it."""
+    p = mannwhitneyu(mass_of(first), mass_of(second)).pvalue
+    return "p < 0.001" if p < 0.001 else f"p = {p:.2f}"
+
+
+ViolinPlot(
+    data=penguins,
+    brackets=[
+        # the pair the test cannot separate
+        {
+            "from": "Adelie",
+            "to": "Chinstrap",
+            "text": p_text("Adelie", "Chinstrap"),
+            "style": {"plot_bracket_color": "#6c757d"},
+        },
+        # and the pair it separates, in the color of the marked line
+        {
+            "from": "Chinstrap",
+            "to": "Gentoo",
+            "text": p_text("Chinstrap", "Gentoo"),
+            "style": {"plot_bracket_color": "#c1121f", "plot_bracket_width": 1.5},
+        },
+    ],
+    title="Body mass of Palmer penguins, compared pair by pair",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    yticks_format="{x:,.0f}",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
 ).show()
 ```
 
@@ -8349,6 +8435,7 @@ Every customization is either a keyword argument of `SwarmPlot` or a `plot_swarm
 | highlight some groups, mute the rest          | `emphasis`, `emphasis_rule`                               | [Emphasis](#emphasis)                                                                                   |
 | highlight single points                       | a series of their own, `emphasis`                         | [Emphasis](#emphasis)                                                                                   |
 | mark a threshold or shade a range             | `hlines`, `dlines`, `vlines`, `hspans`, `vspans`          | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| compare two groups with a bracket             | `brackets`                                                | [Brackets](#brackets)                                                                                   |
 | name a point on the chart                     | `texts`                                                   | [Text annotations](#text-annotations)                                                                   |
 | use dates as group labels                     | `date` objects as `label`, `xticks_format`                | [Date labels](#date-labels)                                                                             |
 | put the points over a box or violin plot      | `Panel`                                                   | [Swarms over boxes and violins](#swarms-over-boxes-and-violins)                                         |
@@ -8640,6 +8727,39 @@ SwarmPlot(
     show_grid=SHOW_GRID.Y,
     show_legend=True,
     legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+).show()
+```
+
+### Brackets
+
+A reference line marks a value; a bracket marks a comparison. `brackets` draws a line spanning two groups, with a tick at each end pointing at them and a text above it — the conventional way to write “these two differ” on a figure. Each bracket names its ends by their labels, so no group positions are computed, and `text` is whatever you worked out elsewhere: datachart draws the result and runs no test of its own. A bracket without a `y` places itself above the data inside its span, and any two that overlap stack a step apart, so several comparisons need no hand-picked heights; the value axis grows to fit them unless the chart sets its own limit. `y` pins a bracket where the figure needs it, and `style` takes the `plot_bracket_*` attributes: the colour (which the text takes too), the line width, the alpha, and `plot_bracket_tick`, the length of the end ticks in points. On a horizontal chart the bracket spans vertically, its ticks point left and its text sits to the right. The keys are listed in [BracketSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketSettingAttrs).
+
+The eras look different at a glance, and a bracket per pair says they are not: no comparison of inauguration ages comes near the usual 0.05 threshold. Neither bracket carries a position — the chart placed them above the swarms they span and grew the axis to fit.
+
+```
+from scipy.stats import mannwhitneyu
+
+
+def ages_of(era_name):
+    return [point["value"] for point in inauguration_ages if point["label"] == era_name]
+
+
+def p_text(first, second):
+    """The two-sided Mann-Whitney U result, as the bracket prints it."""
+    return f"p = {mannwhitneyu(ages_of(first), ages_of(second)).pvalue:.2f}"
+
+
+SwarmPlot(
+    data=inauguration_ages,
+    brackets=[
+        {"from": ERAS[0], "to": ERAS[1], "text": p_text(ERAS[0], ERAS[1])},
+        {"from": ERAS[1], "to": ERAS[2], "text": p_text(ERAS[1], ERAS[2])},
+    ],
+    title="Age of US presidents at inauguration, era against era",
+    xlabel="Took office in",
+    ylabel="Age (years)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
 ).show()
 ```
 
@@ -9010,6 +9130,7 @@ Every customization is either a keyword argument of `RaincloudPlot` or an attrib
 | draw the rainclouds horizontally                   | `orientation`                                                                         | [Horizontal rainclouds](#horizontal-rainclouds)                                                         |
 | highlight some groups, mute the rest               | `emphasis`, `emphasis_rule`                                                           | [Emphasis](#emphasis)                                                                                   |
 | mark a threshold or shade a range                  | `hlines`, `dlines`, `vlines`, `hspans`, `vspans`                                      | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| compare two groups with a bracket                  | `brackets`                                                                            | [Brackets](#brackets)                                                                                   |
 | put a note on the chart                            | `texts`                                                                               | [Text annotations](#text-annotations)                                                                   |
 | use dates as group labels                          | `date` objects as `label`, `xticks_format`                                            | [Date labels](#date-labels)                                                                             |
 | list the groups in a titled legend                 | `show_legend`, `legend`                                                               | [Legend](#legend)                                                                                       |
@@ -9294,6 +9415,49 @@ RaincloudPlot(
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
+).show()
+```
+
+### Brackets
+
+A reference line marks a value; a bracket marks a comparison. `brackets` draws a line spanning two groups, with a tick at each end pointing at them and a text above it — the conventional way to write “these two differ” on a figure. Each bracket names its ends by their labels, so no group positions are computed, and `text` is whatever you worked out elsewhere: datachart draws the result and runs no test of its own. A bracket without a `y` places itself above the data inside its span, and any two that overlap stack a step apart, so several comparisons need no hand-picked heights; the value axis grows to fit them unless the chart sets its own limit. `y` pins a bracket where the figure needs it, and `style` takes the `plot_bracket_*` attributes: the colour (which the text takes too), the line width, the alpha, and `plot_bracket_tick`, the length of the end ticks in points. On a horizontal chart the bracket spans vertically, its ticks point left and its text sits to the right. The keys are listed in [BracketSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketSettingAttrs).
+
+A raincloud already shows every observation, so the brackets only have to say which differences survive a test. Longer end ticks keep them legible over the clouds.
+
+```
+from scipy.stats import mannwhitneyu
+
+
+def mass_of(name):
+    return [point["value"] for point in chart_data if point["label"] == name]
+
+
+def p_text(first, second):
+    """The two-sided Mann-Whitney U result, as the bracket prints it."""
+    p = mannwhitneyu(mass_of(first), mass_of(second)).pvalue
+    return "p < 0.001" if p < 0.001 else f"p = {p:.2f}"
+
+
+RaincloudPlot(
+    data=chart_data,
+    brackets=[
+        {
+            "from": first,
+            "to": second,
+            "text": p_text(first, second),
+            "style": {"plot_bracket_tick": 6},
+        }
+        for first, second in [
+            ("Adelie", "Chinstrap"),
+            ("Chinstrap", "Gentoo"),
+            ("Adelie", "Gentoo"),
+        ]
+    ],
+    title="Body mass of Palmer penguins, compared pair by pair",
+    xlabel="Species",
+    ylabel="Body mass (g)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
 ).show()
 ```
 
@@ -19262,42 +19426,16 @@ adjusted = holm(pairwise)
 {f"{a} vs {b}": float(f"{p:.3g}") for (a, b), p in zip(PAIRS, adjusted)}
 ```
 
-Each pairwise result becomes a bracket: an `hlines` segment between the two species' positions — categories sit at `0`, `1`, `2` — and a `texts` label centered over it. The brackets are stacked so no two overlap, and the omnibus result is a fourth note pinned to the axes with `coords="axes"` rather than to a data position.
+Each pairwise result becomes a `brackets` entry: the two species by name and the adjusted p-value as its text. The chart places each bracket above the clouds it spans, stacks the ones that overlap, and grows the value axis to fit them, so no position is computed here. The omnibus result is a `texts` note pinned to the axes with `coords="axes"` rather than to a data position.
 
 ```
 NOTE_STYLE = {"plot_text_size": 9}
-BRACKET_Y = [6650, 7000, 7350]
 REFERENCE_HLINE = {"plot_hline_color": "#666666", "plot_hline_width": 1}
-LABEL_STYLE = {
-    "plot_text_halign": "center",
-    "plot_text_valign": "bottom",
-    "plot_text_box_visible": False,
-    "plot_text_size": 9,
-}
 
 
 def as_p(pvalue):
     return "p < 0.001" if pvalue < 0.001 else f"p = {pvalue:.2f}"
 
-
-brackets = [
-    {
-        "y": y,
-        "xmin": SPECIES.index(a),
-        "xmax": SPECIES.index(b),
-        "style": REFERENCE_HLINE,
-    }
-    for (a, b), y in zip(PAIRS, BRACKET_Y)
-]
-bracket_labels = [
-    {
-        "text": as_p(pvalue),
-        "x": (SPECIES.index(a) + SPECIES.index(b)) / 2,
-        "y": y + 60,
-        "style": LABEL_STYLE,
-    }
-    for (a, b), y, pvalue in zip(PAIRS, BRACKET_Y, adjusted)
-]
 
 omnibus_note = f"Kruskal-Wallis H = {omnibus.statistic:.0f}, {as_p(omnibus.pvalue)}"
 
@@ -19310,17 +19448,17 @@ mass_figure = RaincloudPlot(
     title="Gentoo stands apart; Adelie and Chinstrap weigh the same",
     ylabel="Body mass (g)",
     ymin=2400,
-    ymax=7700,
-    hlines=brackets,
-    texts=bracket_labels
-    + [
-        {
-            "text": omnibus_note,
-            "x": 0.02,
-            "y": 0.97,
-            "coords": "axes",
-        }
+    # one bracket per pairwise test, named by the species it compares
+    brackets=[
+        {"from": a, "to": b, "text": as_p(pvalue)}
+        for (a, b), pvalue in zip(PAIRS, adjusted)
     ],
+    texts={
+        "text": omnibus_note,
+        "x": 0.02,
+        "y": 0.97,
+        "coords": "axes",
+    },
     figsize=FIG_SIZE.FULL_MEDIUM,
 )
 mass_figure.show()
@@ -19867,6 +20005,16 @@ LineChart(
         ]
         | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -19964,6 +20112,7 @@ Examples:
 | `vlines`        | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                 |
 | `hlines`        | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                               |
 | `dlines`        | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                                                                                                         |
+| `brackets`      | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                                                                                                                                 |
 | `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                                                                             |
 | `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                                                                           |
 | `texts`         | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                |
@@ -19993,7 +20142,7 @@ The data point attributes for the line chart.
 
 ## Style
 
-`style` takes the keys of [`LineStyleAttrs`](#datachart.typings.LineStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), the area fill ([`AreaStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.AreaStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`LineStyleAttrs`](#datachart.typings.LineStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), the area fill ([`AreaStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.AreaStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.LineStyleAttrs
 
@@ -20125,6 +20274,16 @@ StackedAreaChart(
         ]
         | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -20218,6 +20377,7 @@ Examples:
 | `vlines`        | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                      |
 | `hlines`        | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                    |
 | `dlines`        | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                                                                                                              |
+| `brackets`      | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                                                                                                                                      |
 | `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                  |
 | `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                |
 | `texts`         | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                     |
@@ -20238,7 +20398,7 @@ Each record in `data` is a [`LineDataPointAttrs`](https://eriknovak.github.io/da
 
 ## Style
 
-`style` takes the keys of [`StackedAreaStyleAttrs`](#datachart.typings.StackedAreaStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`StackedAreaStyleAttrs`](#datachart.typings.StackedAreaStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.StackedAreaStyleAttrs
 
@@ -20361,6 +20521,16 @@ BumpChart(
         ]
         | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -20454,6 +20624,7 @@ Examples:
 | `vlines`         | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                                                                          |
 | `hlines`         | Horizontal line(s) to plot, at rank positions. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                                                     |
 | `dlines`         | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                                                                                  |
+| `brackets`       | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                                                                                                          |
 | `vspans`         | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                                                      |
 | `hspans`         | Horizontal reference band(s) to shade, between two ranks. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                                                          |
 | `texts`          | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                         |
@@ -20470,7 +20641,7 @@ Each record in `data` is a [`LineDataPointAttrs`](https://eriknovak.github.io/da
 
 ## Style
 
-`style` takes the keys of [`BumpStyleAttrs`](#datachart.typings.BumpStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`BumpStyleAttrs`](#datachart.typings.BumpStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.BumpStyleAttrs
 
@@ -20600,6 +20771,16 @@ BarChart(
         ]
         | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -20699,6 +20880,7 @@ Examples:
 | `vlines`        | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                         |
 | `hlines`        | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                       |
 | `dlines`        | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                 |
+| `brackets`      | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                         |
 | `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                     |
 | `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                   |
 | `texts`         | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                        |
@@ -20729,7 +20911,7 @@ The data point attributes for the bar chart.
 
 ## Style
 
-`style` takes the keys of [`BarStyleAttrs`](#datachart.typings.BarStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`BarStyleAttrs`](#datachart.typings.BarStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.BarStyleAttrs
 
@@ -20825,6 +21007,11 @@ PyramidChart(
     dlines: (
         DLineSettingAttrs | list[DLineSettingAttrs] | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs | list[VSpanSettingAttrs] | None
     ) = None,
@@ -20900,6 +21087,7 @@ Examples:
 | `vlines`        | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                       |
 | `hlines`        | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                     |
 | `dlines`        | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                               |
+| `brackets`      | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                       |
 | `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                   |
 | `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                 |
 | `texts`         | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                      |
@@ -20917,7 +21105,7 @@ Each record in `data` is a [`BarDataPointAttrs`](https://eriknovak.github.io/dat
 
 ## Style
 
-`style` takes the keys of [`BarStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`BarStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ## Constants
 
@@ -20998,6 +21186,7 @@ RadialChart(
     vlines: dict | None = None,
     hlines: dict | None = None,
     dlines: dict | None = None,
+    brackets: dict | None = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -21084,6 +21273,7 @@ Examples:
 | `vlines`          | Not supported on a polar axes. Raises when passed. **TYPE:** \`dict                                                                                                                                                                                                                                                                                                               |
 | `hlines`          | Not supported on a polar axes. Raises when passed. **TYPE:** \`dict                                                                                                                                                                                                                                                                                                               |
 | `dlines`          | Not supported on a polar axes. Raises when passed. **TYPE:** \`dict                                                                                                                                                                                                                                                                                                               |
+| `brackets`        | Not supported on a polar axes. Raises when passed. **TYPE:** \`dict                                                                                                                                                                                                                                                                                                               |
 | `vspans`          | Angular wedge(s) to shade over the full radius; xmin and xmax are angles in degrees from the start angle, an omitted bound running to 0 or 360. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                     |
 | `hspans`          | Annulus (annuli) to shade over the full circle; ymin and ymax are radial values, an omitted bound running to the radial limit. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                      |
 | `label`           | The key name in data for the category labels (default: "label"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                  |
@@ -21547,6 +21737,11 @@ DumbbellChart(
     dlines: (
         DLineSettingAttrs | list[DLineSettingAttrs] | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs | list[VSpanSettingAttrs] | None
     ) = None,
@@ -21620,6 +21815,7 @@ Examples:
 | `vlines`          | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                     |
 | `hlines`          | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                   |
 | `dlines`          | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                             |
+| `brackets`        | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                                                     |
 | `vspans`          | Vertical reference band(s) to shade. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                          |
 | `hspans`          | Horizontal reference band(s) to shade. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                        |
 | `texts`           | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                    |
@@ -21647,7 +21843,7 @@ The record attributes for the dumbbell chart.
 
 ## Style
 
-`style` takes the keys of [`DumbbellStyleAttrs`](#datachart.typings.DumbbellStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`DumbbellStyleAttrs`](#datachart.typings.DumbbellStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.DumbbellStyleAttrs
 
@@ -21787,6 +21983,16 @@ Histogram(
         ]
         | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -21882,6 +22088,7 @@ Examples:
 | `vlines`          | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                                |
 | `hlines`          | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                              |
 | `dlines`          | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                        |
+| `brackets`        | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                                                                                                                                                |
 | `vspans`          | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                            |
 | `hspans`          | Horizontal reference band(s) to shade, between two y positions. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                          |
 | `texts`           | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                               |
@@ -21907,7 +22114,7 @@ The data point attributes for the histogram chart.
 
 ## Style
 
-`style` takes the keys of [`HistStyleAttrs`](#datachart.typings.HistStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`HistStyleAttrs`](#datachart.typings.HistStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.HistStyleAttrs
 
@@ -22041,6 +22248,16 @@ BoxPlot(
         ]
         | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -22138,6 +22355,7 @@ Examples:
 | `vlines`        | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                             |
 | `hlines`        | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                           |
 | `dlines`        | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                     |
+| `brackets`      | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                                                                                                                                             |
 | `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                         |
 | `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                       |
 | `texts`         | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                            |
@@ -22165,7 +22383,7 @@ The data point attributes for the box plot.
 
 ## Style
 
-`style` takes the keys of [`BoxStyleAttrs`](#datachart.typings.BoxStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`BoxStyleAttrs`](#datachart.typings.BoxStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.BoxStyleAttrs
 
@@ -22305,6 +22523,16 @@ ViolinPlot(
         ]
         | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -22403,6 +22631,7 @@ Examples:
 | `vlines`        | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                             |
 | `hlines`        | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                           |
 | `dlines`        | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                     |
+| `brackets`      | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                                                                                                                                             |
 | `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                         |
 | `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                       |
 | `texts`         | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                            |
@@ -22433,7 +22662,7 @@ The data point attributes for the violin plot.
 
 ## Style
 
-`style` takes the keys of [`ViolinStyleAttrs`](#datachart.typings.ViolinStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`ViolinStyleAttrs`](#datachart.typings.ViolinStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.ViolinStyleAttrs
 
@@ -22569,6 +22798,16 @@ SwarmPlot(
         ]
         | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -22665,6 +22904,7 @@ Examples:
 | `vlines`        | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                             |
 | `hlines`        | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                           |
 | `dlines`        | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                     |
+| `brackets`      | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                                                                                                                                             |
 | `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                         |
 | `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                       |
 | `texts`         | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                            |
@@ -22693,7 +22933,7 @@ The data point attributes for the swarm plot.
 
 ## Style
 
-`style` takes the keys of [`SwarmStyleAttrs`](#datachart.typings.SwarmStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`SwarmStyleAttrs`](#datachart.typings.SwarmStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.SwarmStyleAttrs
 
@@ -22826,6 +23066,16 @@ RaincloudPlot(
         ]
         | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -22924,6 +23174,7 @@ Examples:
 | `vlines`        | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                             |
 | `hlines`        | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                           |
 | `dlines`        | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                     |
+| `brackets`      | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                                                                                                                                             |
 | `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                         |
 | `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                       |
 | `texts`         | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                            |
@@ -22951,7 +23202,7 @@ The data point attributes for the raincloud plot.
 
 ## Style
 
-`style` takes the keys of [`RaincloudStyleAttrs`](#datachart.typings.RaincloudStyleAttrs). RaincloudStyleAttrs is the union of [`ViolinStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/violinplot/#datachart.typings.ViolinStyleAttrs), [`SwarmStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/swarmplot/#datachart.typings.SwarmStyleAttrs) and [`BoxStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.typings.BoxStyleAttrs), one per part of the chart. The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`RaincloudStyleAttrs`](#datachart.typings.RaincloudStyleAttrs). RaincloudStyleAttrs is the union of [`ViolinStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/violinplot/#datachart.typings.ViolinStyleAttrs), [`SwarmStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/swarmplot/#datachart.typings.SwarmStyleAttrs) and [`BoxStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.typings.BoxStyleAttrs), one per part of the chart. The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.RaincloudStyleAttrs
 
@@ -23071,6 +23322,16 @@ RidgelinePlot(
         ]
         | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -23172,6 +23433,7 @@ Examples:
 | `vlines`        | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                             |
 | `hlines`        | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                           |
 | `dlines`        | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                     |
+| `brackets`      | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                                                                                                                                             |
 | `vspans`        | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                         |
 | `hspans`        | Horizontal reference band(s) to shade, between two y positions. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                       |
 | `texts`         | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                            |
@@ -23210,7 +23472,7 @@ The data point attributes for the ridgeline plot.
 
 ## Style
 
-`style` takes the keys of [`RidgelineStyleAttrs`](#datachart.typings.RidgelineStyleAttrs). The chart also reads the shared groups it draws: reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`RidgelineStyleAttrs`](#datachart.typings.RidgelineStyleAttrs). The chart also reads the shared groups it draws: reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.RidgelineStyleAttrs
 
@@ -23345,6 +23607,16 @@ ScatterChart(
         | list[
             DLineSettingAttrs
             | list[DLineSettingAttrs]
+            | None
+        ]
+        | None
+    ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
             | None
         ]
         | None
@@ -23499,6 +23771,7 @@ Examples:
 | `vlines`           | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                      |
 | `hlines`           | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                    |
 | `dlines`           | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                                                                                                              |
+| `brackets`         | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                                                                                                                                      |
 | `vspans`           | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                  |
 | `hspans`           | Horizontal reference band(s) to shade, between two y positions. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                |
 | `texts`            | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                     |
@@ -23538,7 +23811,7 @@ The data point attributes for the scatter chart.
 
 ## Style
 
-`style` takes the keys of [`ScatterStyleAttrs`](#datachart.typings.ScatterStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), the regression line ([`RegressionStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.RegressionStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`ScatterStyleAttrs`](#datachart.typings.ScatterStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)), the regression line ([`RegressionStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.RegressionStyleAttrs)), reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.ScatterStyleAttrs
 
@@ -23878,6 +24151,16 @@ ContourChart(
         ]
         | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -23982,6 +24265,7 @@ Examples:
 | `vlines`         | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                               |
 | `hlines`         | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                             |
 | `dlines`         | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                       |
+| `brackets`       | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                                                                                                                                               |
 | `vspans`         | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                           |
 | `hspans`         | Horizontal reference band(s) to shade, between two y positions. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                         |
 | `colorbar`       | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** \`ColorbarSettingAttrs                                                                                                                                                                                                                                                                                                 |
@@ -24009,7 +24293,7 @@ The data attributes for the contour chart.
 
 ## Style
 
-`style` takes the keys of [`ContourStyleAttrs`](#datachart.typings.ContourStyleAttrs). The chart also reads the shared groups it draws: reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`ContourStyleAttrs`](#datachart.typings.ContourStyleAttrs). The chart also reads the shared groups it draws: reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.ContourStyleAttrs
 
@@ -24146,6 +24430,16 @@ HexbinChart(
         ]
         | None
     ) = None,
+    brackets: (
+        BracketSettingAttrs
+        | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
+        | None
+    ) = None,
     vspans: (
         VSpanSettingAttrs
         | list[VSpanSettingAttrs]
@@ -24245,6 +24539,7 @@ Examples:
 | `vlines`         | Vertical line(s) to plot. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                                         |
 | `hlines`         | Horizontal line(s) to plot. **TYPE:** \`HLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                                       |
 | `dlines`         | Diagonal line(s) to plot, by slope and intercept. **TYPE:** \`DLineSettingAttrs                                                                                                                                                                                                                                                                                                                                                                 |
+| `brackets`       | Pairwise comparison bracket(s) to draw between two categories, with an optional text such as a p-value. **TYPE:** \`BracketSettingAttrs                                                                                                                                                                                                                                                                                                         |
 | `vspans`         | Vertical reference band(s) to shade, between two x positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                                     |
 | `hspans`         | Horizontal reference band(s) to shade, between two y positions. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                                                                                                   |
 | `colorbar`       | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** \`ColorbarSettingAttrs                                                                                                                                                                                                                                                                                                           |
@@ -24272,7 +24567,7 @@ The data attributes for the hexbin chart.
 
 ## Style
 
-`style` takes the keys of [`HexbinStyleAttrs`](#datachart.typings.HexbinStyleAttrs). The chart also reads the shared groups it draws: reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
+`style` takes the keys of [`HexbinStyleAttrs`](#datachart.typings.HexbinStyleAttrs). The chart also reads the shared groups it draws: reference lines ([`VLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md).
 
 ### datachart.typings.HexbinStyleAttrs
 
@@ -26892,6 +27187,7 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         "plot_hline_style": LINE_STYLE.DASHED,
         "plot_dline_color": "#5D6D7E",
         "plot_dline_style": LINE_STYLE.DASHED,
+        "plot_bracket_color": "#5D6D7E",
         "plot_vspan_color": "#5D6D7E",
         "plot_hspan_color": "#5D6D7E",
         "plot_text_box_edgecolor": "#B0B0B0",
@@ -26952,6 +27248,7 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_hline_style": LINE_STYLE.DASHED,
         "plot_dline_color": "#7F8C8D",
         "plot_dline_style": LINE_STYLE.DASHED,
+        "plot_bracket_color": "#7F8C8D",
         "plot_vspan_color": "#7F8C8D",
         "plot_hspan_color": "#7F8C8D",
         "plot_text_box_edgecolor": "#000000",
@@ -27343,6 +27640,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_hline_style": LINE_STYLE.DASHED,
         "plot_dline_color": INK,
         "plot_dline_style": LINE_STYLE.DASHED,
+        "plot_bracket_color": INK,
         "plot_vspan_color": INK,
         "plot_hspan_color": INK,
         "plot_vspan_alpha": 1.0,
@@ -28763,6 +29061,7 @@ The dictionaries a chart takes beside its data: reference lines and bands, text 
 | --------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------ |
 | mark a value on the x or y axis               | `vlines`, `hlines` | [`VLineSettingAttrs`](#datachart.typings.VLineSettingAttrs), [`HLineSettingAttrs`](#datachart.typings.HLineSettingAttrs) |
 | draw a line through the data, such as parity  | `dlines`           | [`DLineSettingAttrs`](#datachart.typings.DLineSettingAttrs)                                                              |
+| compare two categories with a bracket         | `brackets`         | [`BracketSettingAttrs`](#datachart.typings.BracketSettingAttrs)                                                          |
 | shade a range of the x or y axis              | `vspans`, `hspans` | [`VSpanSettingAttrs`](#datachart.typings.VSpanSettingAttrs), [`HSpanSettingAttrs`](#datachart.typings.HSpanSettingAttrs) |
 | write a note on the chart                     | `texts`            | [`TextSettingAttrs`](#datachart.typings.TextSettingAttrs)                                                                |
 | title, place, or lay out the legend           | `legend`           | [`LegendSettingAttrs`](#datachart.typings.LegendSettingAttrs)                                                            |
@@ -28813,6 +29112,22 @@ The line is straight in data coordinates, so it curves on a log axis, where it i
 | `xmax`      | The x-axis position the line ends at. **TYPE:** \`int                 |
 | `style`     | The diagonal line style attributes. **TYPE:** \`DLineStyleAttrs       |
 | `label`     | The label of the diagonal line. **TYPE:** \`str                       |
+
+### datachart.typings.BracketSettingAttrs
+
+```
+BracketSettingAttrs = TypedDict(
+    "BracketSettingAttrs",
+    {
+        "from": Union[str, int, float],
+        "to": Union[str, int, float],
+        "text": Union[str, None],
+        "y": Union[int, float, None],
+        "style": Union[BracketStyleAttrs, None],
+    },
+    total=False,
+)
+```
 
 ### datachart.typings.VSpanSettingAttrs
 
@@ -28993,6 +29308,19 @@ The typing for the diagonal line style.
 | `plot_dline_width` | The width of the diagonal line. **TYPE:** \`int         |
 | `plot_dline_alpha` | The alpha value of the diagonal line. **TYPE:** \`float |
 
+### datachart.typings.BracketStyleAttrs
+
+Bases: `TypedDict`
+
+The typing for the pairwise comparison bracket style.
+
+| ATTRIBUTE            | DESCRIPTION                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| `plot_bracket_color` | The color of the bracket line and its text. **TYPE:** \`str       |
+| `plot_bracket_width` | The width of the bracket line. **TYPE:** \`int                    |
+| `plot_bracket_tick`  | The length of the bracket's end ticks, in points. **TYPE:** \`int |
+| `plot_bracket_alpha` | The alpha value of the bracket. **TYPE:** \`float                 |
+
 ### datachart.typings.VSpanStyleAttrs
 
 Bases: `TypedDict`
@@ -29054,7 +29382,7 @@ The keys a theme defines and [`config`](https://eriknovak.github.io/datachart/de
 
 ### datachart.typings.StyleAttrs
 
-Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `DLineStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `GanttStyleAttrs`, `DumbbellStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ScatterMatrixStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
+Bases: `ColorStyleAttrs`, `FontStyleAttrs`, `AxesStyleAttrs`, `LegendStyleAttrs`, `AreaStyleAttrs`, `GridStyleAttrs`, `LineStyleAttrs`, `StackedAreaStyleAttrs`, `BumpStyleAttrs`, `SankeyStyleAttrs`, `TreemapStyleAttrs`, `NetworkStyleAttrs`, `BarStyleAttrs`, `ValueLabelStyleAttrs`, `HistStyleAttrs`, `VLineStyleAttrs`, `HLineStyleAttrs`, `DLineStyleAttrs`, `BracketStyleAttrs`, `VSpanStyleAttrs`, `HSpanStyleAttrs`, `TextStyleAttrs`, `HeatmapStyleAttrs`, `CalendarHeatmapStyleAttrs`, `GanttStyleAttrs`, `DumbbellStyleAttrs`, `ContourStyleAttrs`, `HexbinStyleAttrs`, `ScatterStyleAttrs`, `RegressionStyleAttrs`, `BoxStyleAttrs`, `SwarmStyleAttrs`, `ViolinStyleAttrs`, `RidgelineStyleAttrs`, `ParallelCoordsStyleAttrs`, `ScatterMatrixStyleAttrs`, `ThemeDefaultAttrs`, `SketchStyleAttrs`, `InkStyleAttrs`
 
 The style attributes. Combines all style typings.
 
