@@ -1,7 +1,7 @@
 """Derive a theme variant from a base theme and a lead colormap."""
 
 import copy
-from typing import List, Union
+from typing import Any, List, Union
 
 import numpy as np
 import matplotlib.colors as mcolors
@@ -54,7 +54,9 @@ def _resolve_base(base: Union[str, StyleAttrs]) -> StyleAttrs:
     return copy.deepcopy(THEMES[base])
 
 
-def derive_theme(base: Union[str, StyleAttrs], lead: Lead, **overrides) -> StyleAttrs:
+def derive_theme(
+    base: Union[str, StyleAttrs], lead: Lead, **overrides: Any
+) -> StyleAttrs:
     """Build a theme variant: the base's furniture with palettes rebuilt from the lead.
 
     A sequential lead becomes the value scale (`color_general_singular`,
