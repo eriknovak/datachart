@@ -6,7 +6,7 @@ title: Use Cases
 
 The how-to guides answer "how do I draw this chart?". The use cases answer the question a reader usually arrives with: "which figures does my report need, and how do I build them?" Each page takes one field, walks one dataset from the first figure to the last, and ends with the figures composed into a single panel. Every figure links to the chart guide behind it, so the page stays a tour and the guide stays the reference.
 
-The section grows one field at a time: AI, machine learning and NLP, statistics, medical and biomedical experiments, demographics and social science, business and product analytics, and economics and finance.
+The section grows one field at a time: AI, machine learning and NLP, statistics, medical and biomedical experiments, demographics and social science, business and product analytics, economics and finance, and seismology and geodesy.
 
 <div class="grid cards card-gallery" markdown>
 
@@ -46,6 +46,12 @@ The section grows one field at a time: AI, machine learning and NLP, statistics,
 
     <p class="card-icon" markdown="span">:material-finance:</p>
 
+-   [Seismology and Geodesy](seismology.ipynb)
+
+    The figures of an earthquake report on one year of one region: where the seismicity concentrates, what the ground under it looks like, how the magnitudes are distributed, how fast the aftershocks died away, when they arrived, which way the rupture ran, and which instruments were watching.
+
+    <p class="card-icon" markdown="span">:material-earth:</p>
+
 </div>
 
 ## What each page answers
@@ -70,3 +76,6 @@ The section grows one field at a time: AI, machine learning and NLP, statistics,
 | | Planning | What ships when, and what is late? | `GanttChart` |
 | [Economics and Finance](economics.ipynb) | Growth | When did the economies shrink, which are the largest, and how does structure change with growth? | `LineChart`, `BumpChart`, `StackedAreaChart` in a `Grid` |
 | | Prices, incomes and the shocks | Where did inflation bite, what did the pandemic cost, who caught up, and how do the G20 compare at once? | `Heatmap`, `BarChart`, `DumbbellChart`, `ParallelCoords` |
+| [Seismology and Geodesy](seismology.ipynb) | Where the earthquakes are | Where does the seismicity concentrate, and what does the ground under it look like? | `HexbinChart`, `ContourChart` |
+| | The sequence | How are the magnitudes distributed, how fast did the aftershocks decay, when did they arrive, and which way did the rupture run? | `LineChart` on log axes, `CalendarHeatmap`, `RadialChart` |
+| | The instruments | Which stations were watching, and how are they spread? | `NetworkChart` |
