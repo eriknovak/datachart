@@ -187,6 +187,7 @@ plugins:
         Use Cases:
           - use-cases/index.md: "Map of the use-case pages: one field per page, each a dataset walked from the first figure to the last."
           - use-cases/ai-ml-nlp.ipynb: The figures of a model report on an illustrative experiment log, from training curves, a hyperparameter sweep and a confusion matrix through ROC, precision-recall and calibration to per-class scores, feature importance, a leaderboard, benchmark intervals, the corpus token statistics, and a closing paper-style panel.
+          - use-cases/statistics.ipynb: The figures of a statistics report on the Palmer penguins, from group distributions with their Kruskal-Wallis and Mann-Whitney results and bootstrapped effect sizes through a correlation matrix, a scatter matrix and Simpson's paradox to a fitted line, its residuals, a Q-Q plot, the empirical distributions, and a closing report panel.
         API Reference:
           - references/index.md: Top-level module reference, with a where-to-look table over the reference pages.
           - references/charts/index.md: Map of the chart reference pages by family, with each chart's data record, style typing, and guide.
@@ -302,6 +303,7 @@ nav:
   - Use Cases:
     - use-cases/index.md
     - AI, Machine Learning and NLP: use-cases/ai-ml-nlp.ipynb
+    - Statistics: use-cases/statistics.ipynb
 
 
   - API Reference:
