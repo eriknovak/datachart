@@ -15,7 +15,6 @@ import math
 import warnings
 from collections import defaultdict
 from datetime import date, datetime, time, timedelta, tzinfo
-from numbers import Real
 from dataclasses import dataclass, replace
 from itertools import cycle as iter_cycle
 from typing import Callable, List, NamedTuple, Optional, Tuple, Union
@@ -76,6 +75,7 @@ from .validate import (
     infer_network_nodes,
     first_seen_nodes,
     infer_sankey_columns,
+    is_number,
     treemap_record_total,
     validate_baseline,
     validate_contour_levels,
@@ -722,10 +722,7 @@ class ProjectPeriodEdges(mticker.Locator):
         self.months = months
 
     def tick_values(self, vmin, vmax):
-        lo, hi = (
-            v if isinstance(v, (int, float)) else mdates.date2num(v)
-            for v in (vmin, vmax)
-        )
+        lo, hi = (v if is_number(v) else mdates.date2num(v) for v in (vmin, vmax))
         first = _months_since(self.origin, mdates.num2date(lo, tz=self.origin.tzinfo))
         # no edge before the origin: the time before M1 is no project period
         k = max(first // self.months - 1, 0)
@@ -2892,7 +2889,7 @@ def _align_to_periods(x, y, periods: list, index: int) -> np.ndarray:
         seen.add(period)
         if value is None:
             continue
-        if not isinstance(value, Real) or isinstance(value, bool):
+        if not is_number(value):
             raise ValueError(
                 f"Bump chart series {index} has a non-numeric `y` {value!r} at "
                 f"period {period!r}; `y` must be a number."
@@ -7333,8 +7330,7 @@ class ParallelCoordsLayer(Layer):
 
         non_null_hues = [h for h in all_hues if h is not None]
         self.continuous_hue = bool(non_null_hues) and all(
-            isinstance(h, (int, float)) and not isinstance(h, bool)
-            for h in non_null_hues
+            is_number(h) for h in non_null_hues
         )
         if self.continuous_hue:
             ramp = (
@@ -7401,7 +7397,7 @@ class ParallelCoordsLayer(Layer):
         range_val = stats["dim_max"][dim] - stats["dim_min"][dim]
         if range_val == 0:
             return 0.0
-        if value is None or not isinstance(value, (int, float)):
+        if not is_number(value):
             return np.nan
         return (value - stats["dim_min"][dim]) / range_val
 
@@ -7653,10 +7649,7 @@ def compute_parallel_stats(layers: List["ParallelCoordsLayer"]) -> Optional[dict
             dim_max[dim] = len(dim_categories[dim]) - 1
             continue
         vals = np.array(
-            [
-                v if v is not None and isinstance(v, (int, float)) else np.nan
-                for v in dim_values_raw[dim]
-            ],
+            [v if is_number(v) else np.nan for v in dim_values_raw[dim]],
             dtype=float,
         )
         data_min, data_max = np.nanmin(vals), np.nanmax(vals)
@@ -10367,7 +10360,7 @@ def _parallel_units(charts: List[dict], settings: dict, by) -> tuple:
         roles = _aligned_roles(chart, len(rows))
         for i, row in enumerate(rows):
             value = row.get(hue)
-            if not isinstance(value, Real) or isinstance(value, bool):
+            if not is_number(value):
                 raise ValueError(
                     f"`emphasis_rule` reads each row's `{hue}` value as a "
                     f"number; row {i} has {value!r}."
@@ -12243,7 +12236,7 @@ class Panel:
                 if isinstance(l, GanttLayer) and len(l.starts)
             ]
             start = min(starts) if starts else 0.0
-        if not isinstance(start, (int, float)):
+        if not is_number(start):
             start = float(to_date_numbers([start])[0])
         return mdates.num2date(start, tz=tz)
 
