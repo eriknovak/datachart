@@ -48,9 +48,9 @@ cached by notebook content in `.cache/mkdocs-jupyter`; after changing
 `datachart`, delete that directory so `mkdocs serve` re-renders the outputs.
 
 `llms.txt`, `llms-full.txt`, and per-page `.md` endpoints are generated at build
-by the `llmstxt` plugin in mkdocs.yml — never hand-write them. A new guide or
-reference page must be added to the plugin's `sections` config with a
-description, or `docs/hooks/llmstxt_guard.py` fails the build.
+by the `llmstxt` plugin in mkdocs.yml — never hand-write them. A new guide,
+use-case, or reference page must be added to the plugin's `sections` config with
+a description, or `docs/hooks/llmstxt_guard.py` fails the build.
 
 ADRs are internal records: never reference them in docstrings or anything else
 mkdocs renders (`docs/adr/` and `docs/agents/` are excluded from the site via

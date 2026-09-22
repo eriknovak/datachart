@@ -74,7 +74,7 @@ line-length = 88
 
 [tool.pytest.ini_options]
 addopts = "--nbmake"
-testpaths = ["docs/how-to-guides"]
+testpaths = ["docs/how-to-guides", "docs/use-cases"]
 
 [tool.coverage.run]
 source = ["datachart"]

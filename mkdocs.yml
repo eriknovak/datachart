@@ -184,6 +184,9 @@ plugins:
           - how-to-guides/utility/stats.ipynb: "Statistics basics on the Palmer penguins: centers, spreads, shape, correlation, trend lines, bootstrap intervals, binning, smoothers on the NASA temperature record, density estimates, each fed back into a chart, and worked examples on real data."
           - how-to-guides/utility/saving.md: "Saving figures with save_figure: vector or raster formats and dpi, transparent backgrounds, several formats in one call, embedding SVG or PNG in web pages, and worked examples for a manuscript, a slide, and a documentation page."
           - how-to-guides/utility/interactive.md: "Zooming, panning, and hovering over marks with show(interactive=True): the interactive extra, notebook and script behavior, what the hover annotation of every chart type shows, and worked examples for finding an outlier, reading a two-axis panel, and checking a grid."
+        Use Cases:
+          - use-cases/index.md: "Map of the use-case pages: one field per page, each a dataset walked from the first figure to the last."
+          - use-cases/ai-ml-nlp.ipynb: The figures of a model report on an illustrative experiment log, from training curves, a hyperparameter sweep and a confusion matrix through ROC, precision-recall and calibration to per-class scores, feature importance, a leaderboard, benchmark intervals, the corpus token statistics, and a closing paper-style panel.
         API Reference:
           - references/index.md: Top-level module reference, with a where-to-look table over the reference pages.
           - references/charts/index.md: Map of the chart reference pages by family, with each chart's data record, style typing, and guide.
@@ -294,6 +297,11 @@ nav:
       - Statistics: how-to-guides/utility/stats.ipynb
       - Saving Figures: how-to-guides/utility/saving.md
       - Interactive Figures: how-to-guides/utility/interactive.md
+
+
+  - Use Cases:
+    - use-cases/index.md
+    - AI, Machine Learning and NLP: use-cases/ai-ml-nlp.ipynb
 
 
   - API Reference:

@@ -20,6 +20,12 @@ hide:
     <p>Every chart type, composition with Panel and Grid, styling, and the utilities, each a runnable notebook on real data.</p>
     <span class="dc-card__more">Open the guides &rarr;</span>
   </a>
+  <a class="dc-card" href="use-cases/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 3h6"/><path d="M10 3v5.5L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 8.5V3"/><path d="M7.4 14.5h9.2"/></svg>
+    <h3>Use cases</h3>
+    <p>The figures a report in one field needs, worked through one dataset from the first figure to the last.</p>
+    <span class="dc-card__more">Read the use cases &rarr;</span>
+  </a>
   <a class="dc-card" href="references/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/><path d="m14 4-4 16"/></svg>
     <h3>API reference</h3>
