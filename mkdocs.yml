@@ -189,6 +189,9 @@ plugins:
           - use-cases/ai-ml-nlp.ipynb: The figures of a model report on an illustrative experiment log, from training curves, a hyperparameter sweep and a confusion matrix through ROC, precision-recall and calibration to per-class scores, feature importance, a leaderboard, benchmark intervals, the corpus token statistics, and a closing paper-style panel.
           - use-cases/statistics.ipynb: The figures of a statistics report on the Palmer penguins, from group distributions with their Kruskal-Wallis and Mann-Whitney results and bootstrapped effect sizes through a correlation matrix, a scatter matrix and Simpson's paradox to a fitted line, its residuals, a Q-Q plot, the empirical distributions, and a closing report panel.
           - use-cases/biomedical.ipynb: The figures of a trial report on a simulated three-arm, 12-week study, from the endpoint per arm with pairwise brackets, bootstrapped dose-response intervals and the share at target through the mean course with confidence bands, every subject's course, and retention to a diverging heatmap of the marker panel, safety-lab dumbbells, a flagged swarm of individual liver-enzyme rises, and a closing report panel.
+          - use-cases/demographics.ipynb: The figures of a population report on World Bank data for Slovenia and the world, from population pyramids of 1960 and 2023 side by side, the age-group shares with their crossover year and fertility against life expectancy on twin axes, to life-expectancy gains as dumbbells, the world's distribution as ridgelines, the Preston curve of income against longevity, and a closing report panel.
+          - use-cases/business.ipynb: The figures of a product review on a simulated subscription service, from the revenue mix by plan as a stacked area, a treemap of segments and a bump chart of channel ranks, through the sign-up funnel as a Sankey, a calendar heatmap of daily sign-ups and a cohort-retention heatmap, to a Gantt roadmap and a closing review panel.
+          - use-cases/economics.ipynb: The figures of an economic report on World Bank data for the major economies, from growth with recession bands, a bump chart of the largest economies and the sector shares of three economies, through an inflation heatmap, the pandemic year as sorted bars and income per head as dumbbells, to a parallel-coordinates profile of the G20 and a closing report panel.
         API Reference:
           - references/index.md: Top-level module reference, with a where-to-look table over the reference pages.
           - references/charts/index.md: Map of the chart reference pages by family, with each chart's data record, style typing, and guide.
@@ -306,6 +309,9 @@ nav:
     - AI, Machine Learning and NLP: use-cases/ai-ml-nlp.ipynb
     - Statistics: use-cases/statistics.ipynb
     - Medical and Biomedical Experiments: use-cases/biomedical.ipynb
+    - Demographics and Social Science: use-cases/demographics.ipynb
+    - Business and Product Analytics: use-cases/business.ipynb
+    - Economics and Finance: use-cases/economics.ipynb
 
 
   - API Reference:
