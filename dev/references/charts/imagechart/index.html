@@ -12,13 +12,13 @@
         <meta name="author" content="Erik Novak">
       
       
-        <link rel="canonical" href="https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/">
+        <link rel="canonical" href="https://eriknovak.github.io/datachart/dev/references/charts/imagechart/">
       
       
-        <link rel="prev" href="../networkchart/">
+        <link rel="prev" href="../scattermatrix/">
       
       
-        <link rel="next" href="../imagechart/">
+        <link rel="next" href="../sankeychart/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>ScatterMatrix - datachart</title>
+        <title>ImageChart - datachart</title>
       
     
     
@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#scattermatrix" class="md-skip">
+        <a href="#imagechart" class="md-skip">
           Skip to content
         </a>
       
@@ -121,7 +121,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ScatterMatrix
+              ImageChart
             
           </span>
         </div>
@@ -3495,6 +3495,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../scattermatrix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ScatterMatrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -3514,7 +3542,7 @@
   <span class="md-ellipsis">
     
   
-    ScatterMatrix
+    ImageChart
   
 
     
@@ -3532,7 +3560,7 @@
   <span class="md-ellipsis">
     
   
-    ScatterMatrix
+    ImageChart
   
 
     
@@ -3570,10 +3598,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#datachart.charts.ScatterMatrix" class="md-nav__link">
+  <a href="#datachart.charts.ImageChart" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;ScatterMatrix
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;ImageChart
       
     </span>
   </a>
@@ -3598,10 +3626,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#datachart.typings.ScatterMatrixDataPointAttrs" class="md-nav__link">
+  <a href="#datachart.typings.ImageDataAttrs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ScatterMatrixDataPointAttrs
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ImageDataAttrs
       
     </span>
   </a>
@@ -3626,10 +3654,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#datachart.typings.ScatterMatrixStyleAttrs" class="md-nav__link">
+  <a href="#datachart.typings.ImageStyleAttrs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ScatterMatrixStyleAttrs
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ImageStyleAttrs
       
     </span>
   </a>
@@ -3656,34 +3684,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../imagechart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ImageChart
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -4227,10 +4227,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#datachart.charts.ScatterMatrix" class="md-nav__link">
+  <a href="#datachart.charts.ImageChart" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;ScatterMatrix
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;ImageChart
       
     </span>
   </a>
@@ -4255,10 +4255,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#datachart.typings.ScatterMatrixDataPointAttrs" class="md-nav__link">
+  <a href="#datachart.typings.ImageDataAttrs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ScatterMatrixDataPointAttrs
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ImageDataAttrs
       
     </span>
   </a>
@@ -4283,10 +4283,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#datachart.typings.ScatterMatrixStyleAttrs" class="md-nav__link">
+  <a href="#datachart.typings.ImageStyleAttrs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ScatterMatrixStyleAttrs
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ImageStyleAttrs
       
     </span>
   </a>
@@ -4326,81 +4326,78 @@
 
 
 
-<h1 id="scattermatrix">ScatterMatrix</h1>
-<p>A scatter chart for every pair of dimensions, distributions on the diagonal. The <a href="../../../how-to-guides/charts/scattermatrix/">Scatter Matrix guide</a> shows every feature on real data; this page is the contract: the function, the shape of its data, the keys <code>style</code> takes, and the constant each parameter accepts.</p>
+<h1 id="imagechart">ImageChart</h1>
+<p>A picture in data coordinates, under or over the other charts. The <a href="../../../how-to-guides/charts/imagechart/">Image Chart guide</a> shows every feature on real data; this page is the contract: the function, the shape of its data, the keys <code>style</code> takes, and the constant each parameter accepts.</p>
 <h2 id="function">Function</h2>
 
 
 <div class="doc doc-object doc-function">
 
 
-<h3 id="datachart.charts.ScatterMatrix" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">datachart.charts.ScatterMatrix</span>
+<h3 id="datachart.charts.ImageChart" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">datachart.charts.ImageChart</span>
 
 
 </h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">ScatterMatrix</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">data</span><span class="p">:</span> <span class="p">(</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="typing.Any">Any</span></span><span class="p">]]</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="o">|</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ScatterMatrixDataPointAttrs&lt;/span&gt;" href="#datachart.typings.ScatterMatrixDataPointAttrs">ScatterMatrixDataPointAttrs</a></span><span class="p">]</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="p">),</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">dimensions</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">hue</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">diagonal</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SCATTER_MATRIX_DIAGONAL&lt;/span&gt;" href="../../constants/#datachart.constants.SCATTER_MATRIX_DIAGONAL">SCATTER_MATRIX_DIAGONAL</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">lower_only</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">show_regression</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">show_correlation</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">sharex</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">sharey</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">title</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="n">figsize</span><span class="p">:</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">show_legend</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">legend</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.LegendSettingAttrs&lt;/span&gt;" href="../../typings/#datachart.typings.LegendSettingAttrs">LegendSettingAttrs</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="n">show_grid</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SHOW_GRID&lt;/span&gt;" href="../../constants/#datachart.constants.SHOW_GRID">SHOW_GRID</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="n">style</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.StyleAttrs&lt;/span&gt;" href="../../typings/#datachart.typings.StyleAttrs">StyleAttrs</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="matplotlib.pyplot">plt</span></span><span class="o">.</span><span class="n"><span title="matplotlib.pyplot.Figure">Figure</span></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">ImageChart</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">data</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ImageDataAttrs&lt;/span&gt;" href="#datachart.typings.ImageDataAttrs">ImageDataAttrs</a></span> <span class="o">|</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ImageDataAttrs&lt;/span&gt;" href="#datachart.typings.ImageDataAttrs">ImageDataAttrs</a></span><span class="p">],</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">position</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.IMAGE_POSITION&lt;/span&gt;" href="../../constants/#datachart.constants.IMAGE_POSITION">IMAGE_POSITION</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">title</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">xlabel</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">ylabel</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">subtitle</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">figsize</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_SIZE&lt;/span&gt;" href="../../constants/#datachart.constants.FIG_SIZE">FIG_SIZE</a></span> <span class="o">|</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">xmin</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">xmax</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">ymin</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">ymax</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">vmin</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">vmax</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="n">show_grid</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SHOW_GRID&lt;/span&gt;" href="../../constants/#datachart.constants.SHOW_GRID">SHOW_GRID</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">aspect_ratio</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.ASPECT_RATIO&lt;/span&gt;" href="../../constants/#datachart.constants.ASPECT_RATIO">ASPECT_RATIO</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">subplots</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="n">max_cols</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="n">sharex</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>    <span class="n">sharey</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>    <span class="n">style</span><span class="p">:</span> <span class="p">(</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>        <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ImageStyleAttrs&lt;/span&gt;" href="#datachart.typings.ImageStyleAttrs">ImageStyleAttrs</a></span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>        <span class="o">|</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ImageStyleAttrs&lt;/span&gt;" href="#datachart.typings.ImageStyleAttrs">ImageStyleAttrs</a></span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>        <span class="o">|</span> <span class="kc">None</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>    <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="matplotlib.pyplot">plt</span></span><span class="o">.</span><span class="n"><span title="matplotlib.pyplot.Figure">Figure</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
 
-        <p>Creates a scatter matrix.</p>
-<p>Every pair of numeric dimensions gets a scatter chart, and each
-dimension's own distribution sits on the diagonal. Use it to scan many
-variables for relationships, clusters and outliers at once, optionally
-split by a categorical <code>hue</code>. For two variables use
-<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;datachart.charts.ScatterChart&lt;/span&gt;" href="../scatterchart/#datachart.charts.ScatterChart"><code>ScatterChart</code></a>; for many dimensions
-per observation read as lines, use
-<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;datachart.charts.ParallelCoords&lt;/span&gt;" href="../parallelcoords/#datachart.charts.ParallelCoords"><code>ParallelCoords</code></a>.</p>
-<p>The figure is a grid: it nests inside
-<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;datachart.utils.Grid&lt;/span&gt;" href="../../utils/#datachart.utils.Grid"><code>Grid</code></a> and cannot be overlaid with
-<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;datachart.utils.Panel&lt;/span&gt;" href="../../utils/#datachart.utils.Panel"><code>Panel</code></a>.</p>
+        <p>Creates the image chart.</p>
+<p>An image chart places a picture in data coordinates: its pixels stretch
+to fill an <code>extent</code>, the <code>(xmin, xmax, ymin, ymax)</code> rectangle it covers
+on the axes. On its own it is a picture with axes; its use is under
+another chart that shares its coordinates, composed with <code>Panel</code> — a
+scatter of stations over a floor plan, a heatmap over a microscope
+image, epicentres over a relief grid. The picture is a file path, a PIL
+image, an RGB(A) array, or a 2-D array read through a colormap.</p>
+<p>The picture carries no series: it takes no cycle color, no legend entry
+and no emphasis. <code>position</code> decides where it sits in the draw order,
+under the gridlines and every mark by default, so the order of the
+figures in <code>Panel</code> never does. Its extent counts toward the axis
+limits like any other chart's data, and <code>xmin</code>, <code>xmax</code>, <code>ymin</code> and
+<code>ymax</code> narrow them back.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.charts</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScatterMatrix</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">figure</span> <span class="o">=</span> <span class="n">ScatterMatrix</span><span class="p">(</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">... </span>    <span class="n">data</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">... </span>        <span class="s2">"length"</span><span class="p">:</span> <span class="p">[</span><span class="mf">5.1</span><span class="p">,</span> <span class="mf">4.9</span><span class="p">,</span> <span class="mf">6.3</span><span class="p">,</span> <span class="mf">5.8</span><span class="p">,</span> <span class="mf">7.1</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">],</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">... </span>        <span class="s2">"width"</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.3</span><span class="p">,</span> <span class="mf">2.7</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">],</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">... </span>        <span class="s2">"petal"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.4</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">5.1</span><span class="p">,</span> <span class="mf">5.9</span><span class="p">,</span> <span class="mf">5.1</span><span class="p">],</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="gp">... </span>        <span class="s2">"species"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">],</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="gp">... </span>    <span class="p">},</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="gp">... </span>    <span class="n">hue</span><span class="o">=</span><span class="s2">"species"</span><span class="p">,</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="gp">... </span><span class="p">)</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="gp">&gt;&gt;&gt;</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># records work too; correlations above the diagonal</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">records</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="gp">... </span>    <span class="p">{</span><span class="s2">"length"</span><span class="p">:</span> <span class="mf">5.1</span><span class="p">,</span> <span class="s2">"width"</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">,</span> <span class="s2">"petal"</span><span class="p">:</span> <span class="mf">1.4</span><span class="p">},</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="gp">... </span>    <span class="p">{</span><span class="s2">"length"</span><span class="p">:</span> <span class="mf">6.3</span><span class="p">,</span> <span class="s2">"width"</span><span class="p">:</span> <span class="mf">3.3</span><span class="p">,</span> <span class="s2">"petal"</span><span class="p">:</span> <span class="mf">6.0</span><span class="p">},</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="gp">... </span>    <span class="p">{</span><span class="s2">"length"</span><span class="p">:</span> <span class="mf">5.8</span><span class="p">,</span> <span class="s2">"width"</span><span class="p">:</span> <span class="mf">2.7</span><span class="p">,</span> <span class="s2">"petal"</span><span class="p">:</span> <span class="mf">5.1</span><span class="p">},</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="gp">... </span><span class="p">]</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">figure</span> <span class="o">=</span> <span class="n">ScatterMatrix</span><span class="p">(</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="gp">... </span>    <span class="n">data</span><span class="o">=</span><span class="n">records</span><span class="p">,</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="gp">... </span>    <span class="n">diagonal</span><span class="o">=</span><span class="s2">"kde"</span><span class="p">,</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="gp">... </span>    <span class="n">show_correlation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="gp">... </span>    <span class="n">show_regression</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="gp">... </span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.charts</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageChart</span><span class="p">,</span> <span class="n">ScatterChart</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Panel</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">relief</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">))</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">figure</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">... </span>    <span class="p">[</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="gp">... </span>        <span class="n">ImageChart</span><span class="p">({</span><span class="s2">"image"</span><span class="p">:</span> <span class="n">relief</span><span class="p">,</span> <span class="s2">"extent"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)}),</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="gp">... </span>        <span class="n">ScatterChart</span><span class="p">([{</span><span class="s2">"x"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mi">4</span><span class="p">}]),</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="gp">... </span>    <span class="p">],</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s2">"Stations on the relief"</span><span class="p">,</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -4418,30 +4415,33 @@ per observation read as lines, use
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The observations: a dict of equal-length columns, or a list of
-records. Missing values (<code>None</code>) are left out pair by pair.</p>
+                <p>The picture and where it sits: a <code>{"image", "extent"}</code> dict, or a
+list of them to overlay several pictures or draw one per subplot. See
+<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ImageDataAttrs&lt;/span&gt;" href="#datachart.typings.ImageDataAttrs"><code>ImageDataAttrs</code></a>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="list">list</span>[<span title="typing.Any">Any</span>]] | <span title="list">list</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ScatterMatrixDataPointAttrs&lt;/span&gt;" href="#datachart.typings.ScatterMatrixDataPointAttrs">ScatterMatrixDataPointAttrs</a>]</code>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ImageDataAttrs&lt;/span&gt;" href="#datachart.typings.ImageDataAttrs">ImageDataAttrs</a> | <span title="list">list</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ImageDataAttrs&lt;/span&gt;" href="#datachart.typings.ImageDataAttrs">ImageDataAttrs</a>]</code>
                   </span>
               </p>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>dimensions</code>
+                <code>position</code>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The numeric columns to plot, in order. Defaults to every
-numeric column except the <code>hue</code>, in input order.</p>
+                <p>Where the picture sits in the draw order: <code>"below"</code> (default)
+under the gridlines and every mark, or <code>"above"</code> over the marks and
+under the reference lines. See
+<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.IMAGE_POSITION&lt;/span&gt;" href="../../constants/#datachart.constants.IMAGE_POSITION"><code>IMAGE_POSITION</code></a>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="list">list</span>[<span title="str">str</span>] | None</code>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.IMAGE_POSITION&lt;/span&gt;" href="../../constants/#datachart.constants.IMAGE_POSITION">IMAGE_POSITION</a> | <span title="str">str</span> | None</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
@@ -4452,13 +4452,11 @@ numeric column except the <code>hue</code>, in input order.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>hue</code>
+                <code>title</code>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The column whose categories colour the points, one colour per
-category and one legend for the whole figure. A numeric column
-raises.</p>
+                <p>The title of the chart.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -4474,18 +4472,16 @@ raises.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>diagonal</code>
+                <code>xlabel</code>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>What each dimension's own cell shows: a histogram (<code>"hist"</code>, default),
-a density curve (<code>"kde"</code>), or nothing (<code>"none"</code>). See
-<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SCATTER_MATRIX_DIAGONAL&lt;/span&gt;" href="../../constants/#datachart.constants.SCATTER_MATRIX_DIAGONAL"><code>SCATTER_MATRIX_DIAGONAL</code></a>.</p>
+                <p>The label of the x-axis.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SCATTER_MATRIX_DIAGONAL&lt;/span&gt;" href="../../constants/#datachart.constants.SCATTER_MATRIX_DIAGONAL">SCATTER_MATRIX_DIAGONAL</a> | <span title="str">str</span> | None</code>
+                      <code><span title="str">str</span> | None</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
@@ -4496,12 +4492,235 @@ a density curve (<code>"kde"</code>), or nothing (<code>"none"</code>). See
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>lower_only</code>
+                <code>ylabel</code>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>Whether to leave the cells above the diagonal empty.
-Wins over <code>show_correlation</code>.</p>
+                <p>The label of the y-axis.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>subtitle</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The subtitle of each chart.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span> | <span title="list">list</span>[<span title="str">str</span> | None] | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>figsize</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The size of the figure as (width, height) in inches. See
+<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_SIZE&lt;/span&gt;" href="../../constants/#datachart.constants.FIG_SIZE"><code>FIG_SIZE</code></a>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_SIZE&lt;/span&gt;" href="../../constants/#datachart.constants.FIG_SIZE">FIG_SIZE</a> | <span title="tuple">tuple</span>[<span title="float">float</span>, <span title="float">float</span>] | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>xmin</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The minimum value of the x-axis.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span> | <span title="float">float</span> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>xmax</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The maximum value of the x-axis.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span> | <span title="float">float</span> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ymin</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The minimum value of the y-axis.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span> | <span title="float">float</span> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ymax</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The maximum value of the y-axis.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span> | <span title="float">float</span> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>vmin</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The value at the low end of the colormap; a 2-D array only.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="float">float</span> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>vmax</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The value at the high end of the colormap; a 2-D array only.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="float">float</span> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>show_grid</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Which grid lines to show ("both", "x", "y"); <code>False</code> draws
+none. The grid draws over a picture placed below. See
+<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SHOW_GRID&lt;/span&gt;" href="../../constants/#datachart.constants.SHOW_GRID"><code>SHOW_GRID</code></a>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SHOW_GRID&lt;/span&gt;" href="../../constants/#datachart.constants.SHOW_GRID">SHOW_GRID</a> | <span title="str">str</span> | <span title="bool">bool</span> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>aspect_ratio</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The aspect ratio of the axes box. See
+<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.ASPECT_RATIO&lt;/span&gt;" href="../../constants/#datachart.constants.ASPECT_RATIO"><code>ASPECT_RATIO</code></a>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.ASPECT_RATIO&lt;/span&gt;" href="../../constants/#datachart.constants.ASPECT_RATIO">ASPECT_RATIO</a> | <span title="str">str</span> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>subplots</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Whether to draw each picture in its own subplot.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -4517,38 +4736,16 @@ Wins over <code>show_correlation</code>.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>show_regression</code>
+                <code>max_cols</code>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>Whether to draw a least-squares line per hue group
-in every scatter cell.</p>
+                <p>The maximum number of subplot columns.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="bool">bool</span> | None</code>
-                  </span>
-                  <span class="doc-param-default">
-                    <b>DEFAULT:</b>
-                      <code>None</code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>show_correlation</code>
-            </td>
-            <td class="doc-param-details">
-              <div class="doc-md-description">
-                <p>Whether to replace the scatters above the diagonal
-with the Pearson correlation of each hue group.</p>
-              </div>
-              <p>
-                  <span class="doc-param-annotation">
-                    <b>TYPE:</b>
-                      <code><span title="bool">bool</span> | None</code>
+                      <code><span title="int">int</span> | None</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
@@ -4563,8 +4760,7 @@ with the Pearson correlation of each hue group.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>Whether the cells of a column share one x-axis and only
-the bottom row labels its ticks (default <code>True</code>).</p>
+                <p>Whether the subplots share the x-axis.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -4584,124 +4780,12 @@ the bottom row labels its ticks (default <code>True</code>).</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>Whether the cells of a row share one y-axis and only the
-left column labels its ticks (default <code>True</code>). A diagonal cell's
-axis shows its row's scale too; its histogram or density curve
-keeps its own, unlabelled height.</p>
+                <p>Whether the subplots share the y-axis.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
                       <code><span title="bool">bool</span> | None</code>
-                  </span>
-                  <span class="doc-param-default">
-                    <b>DEFAULT:</b>
-                      <code>None</code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>title</code>
-            </td>
-            <td class="doc-param-details">
-              <div class="doc-md-description">
-                <p>The title of the figure.</p>
-              </div>
-              <p>
-                  <span class="doc-param-annotation">
-                    <b>TYPE:</b>
-                      <code><span title="str">str</span> | None</code>
-                  </span>
-                  <span class="doc-param-default">
-                    <b>DEFAULT:</b>
-                      <code>None</code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>figsize</code>
-            </td>
-            <td class="doc-param-details">
-              <div class="doc-md-description">
-                <p>The size of the figure; the cells stay square inside it.
-Defaults to 2.2 inches per cell, shrunk so the figure is at most
-6.3 inches (a full page width) wide.</p>
-              </div>
-              <p>
-                  <span class="doc-param-annotation">
-                    <b>TYPE:</b>
-                      <code><span title="tuple">tuple</span>[<span title="float">float</span>, <span title="float">float</span>] | None</code>
-                  </span>
-                  <span class="doc-param-default">
-                    <b>DEFAULT:</b>
-                      <code>None</code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>show_legend</code>
-            </td>
-            <td class="doc-param-details">
-              <div class="doc-md-description">
-                <p>Whether to show the legend of the hue groups (default
-<code>True</code> when <code>hue</code> is set).</p>
-              </div>
-              <p>
-                  <span class="doc-param-annotation">
-                    <b>TYPE:</b>
-                      <code><span title="bool">bool</span> | None</code>
-                  </span>
-                  <span class="doc-param-default">
-                    <b>DEFAULT:</b>
-                      <code>None</code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>legend</code>
-            </td>
-            <td class="doc-param-details">
-              <div class="doc-md-description">
-                <p>The legend setting: title, column count, alignment and
-location. The title defaults to the <code>hue</code> column's name; an
-empty string hides it. The location is one of the four
-<code>LEGEND_LOCATION.OUTSIDE_*</code> edges (default right); a legend
-above or below the matrix lays its entries out in one row. See
-<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.LegendSettingAttrs&lt;/span&gt;" href="../../typings/#datachart.typings.LegendSettingAttrs"><code>LegendSettingAttrs</code></a>.</p>
-              </div>
-              <p>
-                  <span class="doc-param-annotation">
-                    <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.LegendSettingAttrs&lt;/span&gt;" href="../../typings/#datachart.typings.LegendSettingAttrs">LegendSettingAttrs</a> | None</code>
-                  </span>
-                  <span class="doc-param-default">
-                    <b>DEFAULT:</b>
-                      <code>None</code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>show_grid</code>
-            </td>
-            <td class="doc-param-details">
-              <div class="doc-md-description">
-                <p>Which grid lines to show in the cells (e.g., "both", "x",
-"y"); <code>False</code> draws none.</p>
-              </div>
-              <p>
-                  <span class="doc-param-annotation">
-                    <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SHOW_GRID&lt;/span&gt;" href="../../constants/#datachart.constants.SHOW_GRID">SHOW_GRID</a> | <span title="str">str</span> | <span title="bool">bool</span> | None</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
@@ -4716,14 +4800,13 @@ above or below the matrix lays its entries out in one row. See
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>Style attributes for every cell: the scatter, histogram,
-plot text and <code>plot_scatter_matrix_*</code> keys. See
-<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ScatterMatrixStyleAttrs&lt;/span&gt;" href="#datachart.typings.ScatterMatrixStyleAttrs"><code>ScatterMatrixStyleAttrs</code></a>.</p>
+                <p>Style configuration(s) for each chart. See
+<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ImageStyleAttrs&lt;/span&gt;" href="#datachart.typings.ImageStyleAttrs"><code>ImageStyleAttrs</code></a>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.StyleAttrs&lt;/span&gt;" href="../../typings/#datachart.typings.StyleAttrs">StyleAttrs</a> | None</code>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ImageStyleAttrs&lt;/span&gt;" href="#datachart.typings.ImageStyleAttrs">ImageStyleAttrs</a> | <span title="list">list</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ImageStyleAttrs&lt;/span&gt;" href="#datachart.typings.ImageStyleAttrs">ImageStyleAttrs</a> | None] | None</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
@@ -4752,7 +4835,7 @@ plot text and <code>plot_scatter_matrix_*</code> keys. See
             </td>
             <td class="doc-returns-details">
               <div class="doc-md-description">
-                <p>The figure containing the scatter matrix.</p>
+                <p>The figure containing the image chart.</p>
               </div>
             </td>
           </tr>
@@ -4776,10 +4859,9 @@ plot text and <code>plot_scatter_matrix_*</code> keys. See
             </td>
             <td class="doc-raises-details">
               <div class="doc-md-description">
-                <p>If <code>data</code> is malformed or has no numeric column, a
-dimension is missing or not numeric, or <code>hue</code> is missing, has
-missing values, or is numeric, or the legend location is not
-an outside edge.</p>
+                <p>If the image is not a readable picture or array, the
+<code>extent</code> is missing, not four finite numbers, or has no width or
+height, or <code>position</code> is not an <code>IMAGE_POSITION</code>.</p>
               </div>
             </td>
           </tr>
@@ -4790,15 +4872,15 @@ an outside edge.</p>
     </div>
 
 </div><h2 id="data">Data</h2>
-<p>Each record in <code>data</code> is a <a href="#datachart.typings.ScatterMatrixDataPointAttrs"><code>ScatterMatrixDataPointAttrs</code></a>; the <code>hue</code> parameter renames its keys.</p>
+<p>Each record in <code>data</code> is a <a href="#datachart.typings.ImageDataAttrs"><code>ImageDataAttrs</code></a>.</p>
 
 
 <div class="doc doc-object doc-class">
 
 
 
-<h3 id="datachart.typings.ScatterMatrixDataPointAttrs" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.typings.ScatterMatrixDataPointAttrs</span>
+<h3 id="datachart.typings.ImageDataAttrs" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.typings.ImageDataAttrs</span>
 
 
 </h3>
@@ -4810,10 +4892,7 @@ an outside edge.</p>
 
 
 
-        <p>The record attributes for the scatter matrix.</p>
-<p>A dictionary where keys are column names: numeric columns become
-dimensions, and one categorical column may be named as the <code>hue</code>. The
-same columns can be passed as one dictionary of lists instead.</p>
+        <p>The data attributes for the image chart.</p>
 
 
 <table>
@@ -4825,16 +4904,29 @@ same columns can be passed as one dictionary of lists instead.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="datachart.typings.ScatterMatrixDataPointAttrs.hue">hue</span></code></td>
+            <td><code><span title="datachart.typings.ImageDataAttrs.image">image</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The category for color grouping, under the
-column name the <code>hue</code> setting names.</p>
+                <p>The picture: a path to an image file, a PIL image, an RGB(A) array of shape <code>(rows, columns, 3 or 4)</code>, or a 2-D array read through the <code>plot_image_cmap</code> colormap. The first row is the top edge.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
                     <b>TYPE:</b>
-                      <code><span title="str">str</span> | None</code>
+                      <code><span title="str">str</span> | <span title="os">os</span>.<span title="os.PathLike">PathLike</span> | <span title="PIL.Image.Image">PILImage</span> | <span title="numpy">np</span>.<span title="numpy.ndarray">ndarray</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.ImageDataAttrs.extent">extent</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The data-space rectangle the pixels stretch to fill, as <code>(xmin, xmax, ymin, ymax)</code>: four finite numbers, <code>xmin</code> different from <code>xmax</code> and <code>ymin</code> from <code>ymax</code>. A reversed pair flips the picture.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="tuple">tuple</span>[<span title="float">float</span>, <span title="float">float</span>, <span title="float">float</span>, <span title="float">float</span>]</code>
                   </span>
               </p>
             </td>
@@ -4870,15 +4962,15 @@ column name the <code>hue</code> setting names.</p>
     </div>
 
 </div><h2 id="style">Style</h2>
-<p><code>style</code> takes the keys of <a href="../../typings/#datachart.typings.StyleAttrs"><code>StyleAttrs</code></a>. Its own keys are those of <a href="#datachart.typings.ScatterMatrixStyleAttrs"><code>ScatterMatrixStyleAttrs</code></a>. The chart also reads the shared groups it draws: the regression line (<a href="../../typings/#datachart.typings.RegressionStyleAttrs"><code>RegressionStyleAttrs</code></a>). Every key falls back to the theme, so the same keys set the default look through <a href="../../config/"><code>config</code></a>.</p>
+<p><code>style</code> takes the keys of <a href="#datachart.typings.ImageStyleAttrs"><code>ImageStyleAttrs</code></a>. Every key falls back to the theme, so the same keys set the default look through <a href="../../config/"><code>config</code></a>.</p>
 
 
 <div class="doc doc-object doc-class">
 
 
 
-<h3 id="datachart.typings.ScatterMatrixStyleAttrs" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.typings.ScatterMatrixStyleAttrs</span>
+<h3 id="datachart.typings.ImageStyleAttrs" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.typings.ImageStyleAttrs</span>
 
 
 </h3>
@@ -4890,9 +4982,7 @@ column name the <code>hue</code> setting names.</p>
 
 
 
-        <p>The typing for the scatter matrix style.</p>
-<p>The cells take the scatter, histogram and plot text keys; these keys
-style what the matrix adds on top of them.</p>
+        <p>The typing for the image chart style.</p>
 
 
 <table>
@@ -4904,10 +4994,38 @@ style what the matrix adds on top of them.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="datachart.typings.ScatterMatrixStyleAttrs.plot_scatter_matrix_regression_color">plot_scatter_matrix_regression_color</span></code></td>
+            <td><code><span title="datachart.typings.ImageStyleAttrs.plot_image_alpha">plot_image_alpha</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The color of the regression lines under <code>show_regression</code>; <code>None</code> takes each hue group's color.</p>
+                <p>The alpha value of the picture; below 1 lets the axes ground show through.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="float">float</span> | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.ImageStyleAttrs.plot_image_cmap">plot_image_cmap</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The colormap a 2-D array is read through (palette name, single color, list of hex colors, or colormap); an RGB(A) picture ignores it.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span> | <span title="list">list</span>[<span title="str">str</span>] | <span title="matplotlib.colors">colors</span>.<span title="matplotlib.colors.LinearSegmentedColormap">LinearSegmentedColormap</span> | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.ImageStyleAttrs.plot_image_interpolation">plot_image_interpolation</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>How the pixels are resampled to the axes, as matplotlib's <code>imshow</code> names it (<code>"antialiased"</code>, <code>"nearest"</code>, <code>"bilinear"</code>, ...).</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
@@ -4918,99 +5036,15 @@ style what the matrix adds on top of them.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="datachart.typings.ScatterMatrixStyleAttrs.plot_scatter_matrix_regression_width">plot_scatter_matrix_regression_width</span></code></td>
+            <td><code><span title="datachart.typings.ImageStyleAttrs.plot_image_aspect">plot_image_aspect</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The line width of the regression lines.</p>
+                <p>The aspect of the pixels: <code>"auto"</code> stretches the picture to fill its extent and leaves the axes shape to the data; <code>"equal"</code> keeps the pixels square and reshapes the axes.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
                     <b>TYPE:</b>
-                      <code><span title="int">int</span> | <span title="float">float</span> | None</code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="datachart.typings.ScatterMatrixStyleAttrs.plot_scatter_matrix_regression_style">plot_scatter_matrix_regression_style</span></code></td>
-            <td class="doc-attribute-details">
-              <div class="doc-md-description">
-                <p>The line style of the regression lines.</p>
-              </div>
-              <p>
-                  <span class="doc-attribute-annotation">
-                    <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.LINE_STYLE&lt;/span&gt;" href="../../constants/#datachart.constants.LINE_STYLE">LINE_STYLE</a> | <span title="str">str</span> | None</code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="datachart.typings.ScatterMatrixStyleAttrs.plot_scatter_matrix_correlation_size">plot_scatter_matrix_correlation_size</span></code></td>
-            <td class="doc-attribute-details">
-              <div class="doc-md-description">
-                <p>The font size of the correlation text under <code>show_correlation</code>.</p>
-              </div>
-              <p>
-                  <span class="doc-attribute-annotation">
-                    <b>TYPE:</b>
-                      <code><span title="int">int</span> | <span title="float">float</span> | None</code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="datachart.typings.ScatterMatrixStyleAttrs.plot_scatter_matrix_correlation_weight">plot_scatter_matrix_correlation_weight</span></code></td>
-            <td class="doc-attribute-details">
-              <div class="doc-md-description">
-                <p>The font weight of the correlation text.</p>
-              </div>
-              <p>
-                  <span class="doc-attribute-annotation">
-                    <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FONT_WEIGHT&lt;/span&gt;" href="../../constants/#datachart.constants.FONT_WEIGHT">FONT_WEIGHT</a> | <span title="str">str</span> | None</code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="datachart.typings.ScatterMatrixStyleAttrs.plot_scatter_matrix_kde_width">plot_scatter_matrix_kde_width</span></code></td>
-            <td class="doc-attribute-details">
-              <div class="doc-md-description">
-                <p>The line width of the diagonal density curves.</p>
-              </div>
-              <p>
-                  <span class="doc-attribute-annotation">
-                    <b>TYPE:</b>
-                      <code><span title="int">int</span> | <span title="float">float</span> | None</code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="datachart.typings.ScatterMatrixStyleAttrs.plot_scatter_matrix_kde_alpha">plot_scatter_matrix_kde_alpha</span></code></td>
-            <td class="doc-attribute-details">
-              <div class="doc-md-description">
-                <p>The alpha value of the fill under the diagonal density curves; 0 draws no fill.</p>
-              </div>
-              <p>
-                  <span class="doc-attribute-annotation">
-                    <b>TYPE:</b>
-                      <code><span title="float">float</span> | None</code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="datachart.typings.ScatterMatrixStyleAttrs.plot_scatter_matrix_diagonal_alpha">plot_scatter_matrix_diagonal_alpha</span></code></td>
-            <td class="doc-attribute-details">
-              <div class="doc-md-description">
-                <p>The alpha value of the diagonal histograms, overlaid per hue group.</p>
-              </div>
-              <p>
-                  <span class="doc-attribute-annotation">
-                    <b>TYPE:</b>
-                      <code><span title="float">float</span> | None</code>
+                      <code><span title="str">str</span> | <span title="float">float</span> | None</code>
                   </span>
               </p>
             </td>
@@ -5056,16 +5090,20 @@ style what the matrix adds on top of them.</p>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: left;"><code>diagonal</code></td>
-<td style="text-align: left;"><a href="../../constants/#datachart.constants.SCATTER_MATRIX_DIAGONAL"><code>SCATTER_MATRIX_DIAGONAL</code></a></td>
+<td style="text-align: left;"><code>position</code></td>
+<td style="text-align: left;"><a href="../../constants/#datachart.constants.IMAGE_POSITION"><code>IMAGE_POSITION</code></a></td>
 </tr>
 <tr>
-<td style="text-align: left;"><code>legend={"location": ..., "alignment": ...}</code></td>
-<td style="text-align: left;"><a href="../../constants/#datachart.constants.LEGEND_LOCATION"><code>LEGEND_LOCATION</code></a>, <a href="../../constants/#datachart.constants.LEGEND_ALIGN"><code>LEGEND_ALIGN</code></a></td>
+<td style="text-align: left;"><code>figsize</code></td>
+<td style="text-align: left;"><a href="../../constants/#datachart.constants.FIG_SIZE"><code>FIG_SIZE</code></a></td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>show_grid</code></td>
 <td style="text-align: left;"><a href="../../constants/#datachart.constants.SHOW_GRID"><code>SHOW_GRID</code></a></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>aspect_ratio</code></td>
+<td style="text-align: left;"><a href="../../constants/#datachart.constants.ASPECT_RATIO"><code>ASPECT_RATIO</code></a></td>
 </tr>
 </tbody>
 </table>
@@ -5107,7 +5145,7 @@ style what the matrix adds on top of them.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../networkchart/" class="md-footer__link md-footer__link--prev" aria-label="Previous: NetworkChart">
+          <a href="../scattermatrix/" class="md-footer__link md-footer__link--prev" aria-label="Previous: ScatterMatrix">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -5117,20 +5155,20 @@ style what the matrix adds on top of them.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                NetworkChart
+                ScatterMatrix
               </div>
             </div>
           </a>
         
         
           
-          <a href="../imagechart/" class="md-footer__link md-footer__link--next" aria-label="Next: ImageChart">
+          <a href="../sankeychart/" class="md-footer__link md-footer__link--next" aria-label="Next: SankeyChart">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                ImageChart
+                SankeyChart
               </div>
             </div>
             <div class="md-footer__button md-icon">

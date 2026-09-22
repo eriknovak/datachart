@@ -2,7 +2,7 @@
 
 An earthquake report asks the same questions in the same order: where the shaking concentrates, what the ground under it looks like, how the sizes are distributed, how fast the aftershocks die away, when they arrived, which way the rupture ran, and which instruments were watching. This page walks one year of one region through those questions and names the figure that answers each, so the chart to reach for arrives with the question rather than the other way round. Every figure links to the chart guide that covers it in full.
 
-The region is the Aegean and Anatolia, between 34 and 42 degrees north and 19 and 45 degrees east, and the year is 2023, when the Kahramanmaraş sequence struck southern Türkiye. Every number is real. The 831 earthquakes of magnitude 4 and above come from the [USGS earthquake catalogue](https://earthquake.usgs.gov/fdsnws/event/1/) (public domain), the relief grid from [NOAA's ETOPO](https://www.ncei.noaa.gov/products/etopo-global-relief-model) global model (public domain), and the 28 broadband seismic stations from the [FDSN station service](https://service.iris.edu/fdsnws/station/1/) (EarthScope, CC BY 4.0). The axes carry longitude and latitude in degrees, without a coastline beneath them, because datachart draws the coordinates and not the map.
+The region is the Aegean and Anatolia, between 34 and 42 degrees north and 19 and 45 degrees east, and the year is 2023, when the Kahramanmaraş sequence struck southern Türkiye. Every number is real. The 831 earthquakes of magnitude 4 and above come from the [USGS earthquake catalogue](https://earthquake.usgs.gov/fdsnws/event/1/) (public domain), the relief grid from [NOAA's ETOPO](https://www.ncei.noaa.gov/products/etopo-global-relief-model) global model (public domain), and the 28 broadband seismic stations from the [FDSN station service](https://service.iris.edu/fdsnws/station/1/) (EarthScope, CC BY 4.0). The axes carry longitude and latitude in degrees. datachart draws no coastlines, so the map under the epicentres is the relief grid itself, placed on the same axes as a picture.
 
 ```
 import math
@@ -14,6 +14,7 @@ from datachart.charts import (
     CalendarHeatmap,
     ContourChart,
     HexbinChart,
+    ImageChart,
     LineChart,
     NetworkChart,
     RadialChart,
@@ -28,7 +29,7 @@ from datachart.constants import (
     SCALE,
     SHOW_GRID,
 )
-from datachart.utils import Grid
+from datachart.utils import Grid, Panel
 ```
 
 The hidden cell below holds the three tables. `EVENTS` is one tuple per earthquake: the hours since the start of 2023, the latitude, the longitude, the depth in kilometres, and the magnitude. `RELIEF` is the ETOPO grid as `lat` and `lon` axes and a `z` row per latitude, in metres above sea level. `STATIONS` is one tuple per station: its code, latitude, longitude, network, and the place it stands. The sections that follow only reshape those into the records the charts take.
@@ -37,7 +38,7 @@ The hidden cell below holds the three tables. `EVENTS` is one tuple per earthqua
 
 ### Where does the seismicity concentrate?
 
-The first figure of an earthquake report is the map of the epicentres, and eight hundred points on one axes overplot wherever the activity is densest, which is exactly where the reader looks. A [hexbin chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md) bins them instead: the plane is tiled with hexagons and each one is coloured by the number of events inside it, so density reads as colour and nothing hides behind a marker. The counts span three orders of magnitude between a quiet hexagon and the aftershock zone, so `norm=NORMALIZE.LOG` gives the colour scale a logarithmic reach and keeps the sparse cells visible. `mincnt=1` leaves the empty sea blank rather than colouring it as zero.
+The first figure of an earthquake report is the map of the epicentres, and eight hundred points on one axes overplot wherever the activity is densest, which is exactly where the reader looks. A [hexbin chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md) bins them instead: the plane is tiled with hexagons and each one is coloured by the number of events inside it, so density reads as colour and nothing hides behind a marker. The counts span three orders of magnitude between a quiet hexagon and the aftershock zone, so `norm=NORMALIZE.LOG` gives the colour scale a logarithmic reach and keeps the sparse cells visible. `mincnt=1` leaves the empty cells blank rather than colouring them as zero, and through them shows the ground: an [image chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/imagechart/index.md) draws the relief grid as a faded grey picture stretched over its extent, and [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) puts it under the hexagons, so the density reads against the land and the sea it falls on. The grid's first row is its southern edge while a picture's first row is its top, so the rows are flipped.
 
 ```
 LATITUDE, LONGITUDE, DEPTH, MAGNITUDE = 1, 2, 3, 4
@@ -49,11 +50,24 @@ magnitude = np.array([event[MAGNITUDE] for event in EVENTS])
 main = int(magnitude.argmax())
 second = int(np.where(magnitude < magnitude[main], magnitude, 0).argmax())
 
-epicentre_figure = HexbinChart(
+# the relief as a faded grey picture; a picture's first row is its top, so
+# the grid's rows go north first, and each sample is a quarter-degree cell
+HALF_STEP = 0.125
+relief_image = ImageChart(
+    {
+        "image": np.array(RELIEF["z"])[::-1],
+        "extent": (
+            RELIEF["lon"][0] - HALF_STEP,
+            RELIEF["lon"][-1] + HALF_STEP,
+            RELIEF["lat"][0] - HALF_STEP,
+            RELIEF["lat"][-1] + HALF_STEP,
+        ),
+    },
+    style={"plot_image_alpha": 0.45, "plot_image_interpolation": "bilinear"},
+)
+
+density = HexbinChart(
     {"x": longitude.tolist(), "y": latitude.tolist()},
-    title="A year of earthquakes: the faults draw themselves",
-    xlabel="Longitude (°E)",
-    ylabel="Latitude (°N)",
     gridsize=42,
     # counts run from 1 to several hundred, so the colour scale is logarithmic
     norm=NORMALIZE.LOG,
@@ -69,6 +83,14 @@ epicentre_figure = HexbinChart(
         "coords": "axes",
         "target": (longitude[main], latitude[main]),
     },
+)
+
+# the image sits below the hexagons whatever the order of the figures
+epicentre_figure = Panel(
+    [relief_image, density],
+    title="A year of earthquakes: the faults draw themselves",
+    xlabel="Longitude (°E)",
+    ylabel_left="Latitude (°N)",
     figsize=(9.0, 4.2),
 )
 epicentre_figure.show()

@@ -83,6 +83,7 @@ The `constants` module provides a set of predefined constants used in the packag
 | `RIDGELINE_SCALE`         | The supported ridgeline density scales.       |
 | `CONTOUR_LEVELS`          | The supported contour level rules.            |
 | `HEXBIN_REDUCE`           | The supported hexbin aggregations.            |
+| `IMAGE_POSITION`          | The supported image chart draw positions.     |
 | `NETWORK_LAYOUT`          | The supported network chart layouts.          |
 | `NETWORK_LABEL_POSITION`  | The supported network node label positions.   |
 | `SCATTER_MATRIX_DIAGONAL` | The supported scatter matrix diagonal cells.  |
@@ -127,6 +128,7 @@ Which constants the parameters of each chart accept, by chart family. A constant
 | [ParallelCoords](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.charts.ParallelCoords) | —                                                                                                                                | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO)                                                                                                                                                                                                                                                                                                                 |
 | [NetworkChart](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/#datachart.charts.NetworkChart)       | [`NETWORK_LAYOUT`](#datachart.constants.NETWORK_LAYOUT), [`NETWORK_LABEL_POSITION`](#datachart.constants.NETWORK_LABEL_POSITION) | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                                                                                                                                                                             |
 | [ScatterMatrix](https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/#datachart.charts.ScatterMatrix)    | [`SCATTER_MATRIX_DIAGONAL`](#datachart.constants.SCATTER_MATRIX_DIAGONAL)                                                        | [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`SHOW_GRID`](#datachart.constants.SHOW_GRID)                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| [ImageChart](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/#datachart.charts.ImageChart)             | [`IMAGE_POSITION`](#datachart.constants.IMAGE_POSITION)                                                                          | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO)                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 ### Flows
 
@@ -1237,3 +1239,23 @@ Examples:
 | `HIST`    | A histogram of the dimension, one per hue group. Equals to "hist". **TYPE:** `str`           |
 | `KDE`     | A kernel density curve of the dimension, one per hue group. Equals to "kde". **TYPE:** `str` |
 | `NONE`    | A blank cell. Equals to "none". **TYPE:** `str`                                              |
+
+### datachart.constants.IMAGE_POSITION
+
+The supported image chart draw positions.
+
+Passed as the `position` setting of the image chart: where the picture sits in the draw order of the axes it shares with other charts. The position decides it, never the order of the figures in `Panel`.
+
+Examples:
+
+```
+>>> from datachart.constants import IMAGE_POSITION
+>>> IMAGE_POSITION.DEFAULT
+"below"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                                                                                   |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT` | The default position. Same as IMAGE_POSITION.BELOW. **TYPE:** `str`                                                           |
+| `BELOW`   | Under every mark and under the gridlines, so the grid and the data read over the picture. Equals to "below". **TYPE:** `str`  |
+| `ABOVE`   | Over the marks, under the reference lines and the text annotations; a watermark or a mask. Equals to "above". **TYPE:** `str` |

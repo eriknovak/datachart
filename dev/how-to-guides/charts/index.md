@@ -153,6 +153,12 @@ How two or more variables relate to each other.
 
   A scatter chart for every pair of dimensions, with each dimension's distribution on the diagonal.
 
+- [Image Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/imagechart/index.md)
+
+  [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md)
+
+  A picture in data coordinates, under or over another chart: a map, a floor plan, a microscope image.
+
 ## Flows
 
 How a quantity moves between categories: where it comes from and where it goes.
