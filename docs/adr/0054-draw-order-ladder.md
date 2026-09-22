@@ -34,9 +34,10 @@ next layer lands on a known rung.
 
 - **A surface is a layer flag, not a chart kind.** `Layer.surface` marks a
   filled layer that reads as background: stacked area bands, hexbin tiles,
-  and a contour when `filled`. The overlay lookup reads
-  `"surface"` before the layer's `kind`, so one contour class draws at 1 when
-  filled and at 2 as lines.
+  and a contour when `filled`. The overlay lookup reads the layer's
+  `zorder_key`: `"surface"` before its `kind`, so one contour class draws at 1
+  when filled and at 2 as lines; an image names its position instead
+  (ADR 0060).
 - **Surfaces sit at the bottom of an overlay.** A surface covers its whole
   area, so anything under it disappears. ADR 0024 already promised that
   lines, scatter, or contours can sit on top of a hexbin. At 1, a surface

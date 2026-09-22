@@ -434,7 +434,7 @@ def image():
             ImageChart(
                 {"image": relief[::-1], "extent": (0, 9, 0, 6)},
                 style={"plot_image_cmap": "terrain", "plot_image_alpha": 0.8},
-                # start the colormap past its sea blues, so the valley reads as land
+                # skip the colormap's sea blues, so the valley reads as land
                 vmin=-0.35,
                 vmax=1.1,
             ),

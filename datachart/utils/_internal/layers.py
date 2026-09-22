@@ -1279,6 +1279,14 @@ REF_LINE_ZORDER = 3.5
 # an image's rung (ADR 0054, 0060): below under the gridlines (0.5), above
 # over the marks (3) and under the reference lines
 IMAGE_ZORDER = {IMAGE_POSITION.BELOW: 0.25, IMAGE_POSITION.ABOVE: 3.25}
+
+
+def image_zorder_key(position: str) -> str:
+    """An image's key in a Panel overlay's zorder table."""
+
+    return f"image_{position}"
+
+
 # a diagonal is straight in data space, so on a non-linear axis it is a curve
 # in display space and has to be sampled (ADR 0055)
 DLINE_CURVE_SAMPLES = 100
@@ -7426,7 +7434,7 @@ class ImageLayer(Layer):
 
     @property
     def zorder_key(self) -> str:
-        return f"image_{self.position}"
+        return image_zorder_key(self.position)
 
     def value_data(self):
         return np.array(self.extent[2:])
@@ -7443,7 +7451,7 @@ class ImageLayer(Layer):
             zorder=z_order,
             **self.image_style,
         )
-        # imshow sets the view to the extent; the marks drawn before it count too
+        # imshow pins the view to the extent; earlier marks must count too
         ax.autoscale_view()
 
 

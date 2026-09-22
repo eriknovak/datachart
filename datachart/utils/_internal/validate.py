@@ -1231,13 +1231,13 @@ def validate_image(image) -> np.ndarray:
 
     if isinstance(image, (str, os.PathLike)):
         try:
-            image = Image.open(image)
+            with Image.open(image) as opened:
+                opened.load()
+                image = opened.copy()
         except (OSError, ValueError) as error:
             raise ValueError(f"Cannot read the image {image!r}: {error}") from error
-    if isinstance(image, Image.Image):
-        if image.mode not in IMAGE_ARRAY_MODES:
-            image = image.convert("RGBA")
-        image = np.asarray(image)
+    if isinstance(image, Image.Image) and image.mode not in IMAGE_ARRAY_MODES:
+        image = image.convert("RGBA")
     try:
         array = np.asarray(image)
     except ValueError:

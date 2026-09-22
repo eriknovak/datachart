@@ -56,6 +56,7 @@ from ._internal.layers import (
     GroupLayer,
     TextLayer,
     IMAGE_ZORDER,
+    image_zorder_key,
     value_axis_grid,
 )
 
@@ -437,7 +438,7 @@ def Panel(
             "surface": 1,
             "contour": 2,
             # an image takes its position's rung, whatever the figure order
-            **{f"image_{p}": z for p, z in IMAGE_ZORDER.items()},
+            **{image_zorder_key(p): z for p, z in IMAGE_ZORDER.items()},
         },
         "show_grid": show_grid,
         # the caller's own value, unresolved: a polar panel draws only the
