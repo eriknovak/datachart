@@ -8,11 +8,14 @@ chart's reference page; the shared ones on the typings page.
 
 """
 
+import os
 import warnings
 from datetime import date, datetime
 from typing import TypedDict, Union, Tuple, List, Optional, Dict, Literal
 
+import numpy as np
 import matplotlib.colors as colors
+from PIL.Image import Image as PILImage
 from .constants import (
     ARROW_STYLE,
     ASPECT_RATIO,
@@ -848,6 +851,23 @@ class HexbinStyleAttrs(TypedDict):
     plot_hexbin_gridsize: Union[int, None]
 
 
+class ImageStyleAttrs(TypedDict):
+    """The typing for the image chart style.
+
+    Attributes:
+        plot_image_alpha (Union[float, None]): The alpha value of the picture; below 1 lets the axes ground show through.
+        plot_image_cmap (Union[str, List[str], colors.LinearSegmentedColormap, None]): The colormap a 2-D array is read through (palette name, single color, list of hex colors, or colormap); an RGB(A) picture ignores it.
+        plot_image_interpolation (Union[str, None]): How the pixels are resampled to the axes, as matplotlib's `imshow` names it (`"antialiased"`, `"nearest"`, `"bilinear"`, ...).
+        plot_image_aspect (Union[str, float, None]): The aspect of the pixels: `"auto"` stretches the picture to fill its extent and leaves the axes shape to the data; `"equal"` keeps the pixels square and reshapes the axes.
+
+    """
+
+    plot_image_alpha: Union[float, None]
+    plot_image_cmap: Union[str, List[str], colors.LinearSegmentedColormap, None]
+    plot_image_interpolation: Union[str, None]
+    plot_image_aspect: Union[str, float, None]
+
+
 class ScatterStyleAttrs(TypedDict):
     """The typing for the scatter chart style.
 
@@ -1230,6 +1250,7 @@ class StyleAttrs(
     DumbbellStyleAttrs,
     ContourStyleAttrs,
     HexbinStyleAttrs,
+    ImageStyleAttrs,
     ScatterStyleAttrs,
     RegressionStyleAttrs,
     BoxStyleAttrs,
@@ -2367,6 +2388,24 @@ class HexbinSingleChartAttrs(TypedDict):
     hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
     colorbar: Union[ColorbarSettingAttrs, None]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+
+
+# ================================================
+# Image Chart Attributes
+# ================================================
+
+
+class ImageDataAttrs(TypedDict):
+    """The data attributes for the image chart.
+
+    Attributes:
+        image (Union[str, os.PathLike, PILImage, np.ndarray]): The picture: a path to an image file, a PIL image, an RGB(A) array of shape `(rows, columns, 3 or 4)`, or a 2-D array read through the `plot_image_cmap` colormap. The first row is the top edge.
+        extent (Tuple[float, float, float, float]): The data-space rectangle the pixels stretch to fill, as `(xmin, xmax, ymin, ymax)`: four finite numbers, `xmin` different from `xmax` and `ymin` from `ymax`. A reversed pair flips the picture.
+
+    """
+
+    image: Union[str, os.PathLike, PILImage, np.ndarray]
+    extent: Tuple[float, float, float, float]
 
 
 # ================================================

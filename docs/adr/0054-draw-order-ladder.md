@@ -21,11 +21,13 @@ next layer lands on a known rung.
 
   | zorder | what |
   | --- | --- |
+  | 0.25 | an image placed below (`IMAGE_ZORDER`, ADR 0060) |
   | 0.5 | gridlines (`set_axisbelow(True)`) |
   | 1 | overlay surfaces, bars, histograms (Panel table) |
   | 1.75 | reference bands (`plot_{v,h}span_zorder`, ADR 0036) |
   | 2 | overlay lines, scatter, and contour lines (Panel table) |
   | 3 | standalone marks (`plot_*_zorder` theme defaults) |
+  | 3.25 | an image placed above (`IMAGE_ZORDER`, ADR 0060) |
   | 3.5 | reference lines (`REF_LINE_ZORDER`) |
   | 5 | annotations (`TEXT_ANNOTATION_ZORDER`) |
   | 100 | spines (`axes_spines_zorder`) |

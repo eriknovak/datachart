@@ -360,6 +360,11 @@ BASE_THEME: StyleAttrs = {
     "plot_hexbin_edge_width": 0,
     "plot_hexbin_edge_color": "#FFFFFF",
     "plot_hexbin_gridsize": 30,
+    # plot image style; "auto" fills the extent, never reshapes the axes (ADR 0060)
+    "plot_image_alpha": 1.0,
+    "plot_image_cmap": "gray",
+    "plot_image_interpolation": "antialiased",
+    "plot_image_aspect": "auto",
     # plot scatter style
     "plot_scatter_color": None,
     "plot_scatter_alpha": 0.75,

@@ -45,6 +45,7 @@ from datachart.charts import (
     SankeyChart,
     Treemap,
     NetworkChart,
+    ImageChart,
 )
 from datachart.utils import Panel, Grid, Annotate
 from datachart.config import config
@@ -60,6 +61,7 @@ from datachart.constants import (
     DATE_FORMAT,
     HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
+    IMAGE_POSITION,
     LEGEND_LOCATION,
     NETWORK_LABEL_POSITION,
     NETWORK_LAYOUT,
@@ -75,6 +77,11 @@ from datachart.utils.stats import kde1d, kde2d
 
 # Cases whose output intentionally changed since the last published baseline.
 EXPECTED_CHANGES = {
+    # new image chart cases (ADR 0060)
+    "image_below_scatter",
+    "image_above_line",
+    "image_field_cmap",
+    "image_panel_in_grid",
     # new pairwise bracket cases (#258)
     "raincloud_brackets_stacked",
     "box_horizontal_bracket",
@@ -3605,6 +3612,84 @@ def grid_panel_title_outside_top_legend():
         legend={"location": LEGEND_LOCATION.OUTSIDE_TOP, "ncols": 2},
     )
     return Grid([[panel, LineChart(data=LINE2, title="Neighbour")]])
+
+
+# ----- image chart (ADR 0060) -----
+
+
+def image_pixels():
+    """A 40 x 60 RGB picture: a warm gradient with a cool square in it."""
+
+    rows, cols = np.mgrid[0:40, 0:60]
+    pixels = np.stack(
+        [200 + rows, 120 + cols, np.full(rows.shape, 90)], axis=-1
+    ).astype(np.uint8)
+    pixels[10:25, 20:40] = (60, 110, 190)
+    return pixels
+
+
+def image_field():
+    """A 30 x 50 signed surface, a ridge and a basin."""
+
+    y, x = np.mgrid[-1.5:1.5:30j, -2.5:2.5:50j]
+    return np.exp(-((x - 1) ** 2) - y**2) - np.exp(-((x + 1) ** 2) - y**2)
+
+
+@case
+def image_below_scatter():
+    return Panel(
+        [
+            ScatterChart(SCAT1, subtitle="stations"),
+            ImageChart({"image": image_pixels(), "extent": (-2, 22, -5, 45)}),
+        ],
+        title="Scatter over a picture; figure order does not decide",
+        show_grid="both",
+    )
+
+
+@case
+def image_above_line():
+    watermark = np.full((20, 20, 4), 70, dtype=np.uint8)
+    watermark[..., 3] = 0
+    watermark[5:15, 5:15, 3] = 160
+    return Panel(
+        [
+            LineChart(LINE1, subtitle="line", hlines={"y": 45}),
+            ImageChart(
+                {"image": watermark, "extent": (2, 7, 20, 70)},
+                position=IMAGE_POSITION.ABOVE,
+            ),
+        ],
+        title="A picture above the marks, under the reference line",
+    )
+
+
+@case
+def image_field_cmap():
+    return ImageChart(
+        {"image": image_field(), "extent": (-2.5, 2.5, -1.5, 1.5)},
+        style={"plot_image_cmap": "RdBu_r"},
+        vmin=-1,
+        vmax=1,
+        title="A 2-D array through a colormap",
+    )
+
+
+@case
+def image_panel_in_grid():
+    under = Panel(
+        [
+            ImageChart(
+                {"image": image_field(), "extent": (-2.5, 2.5, -1.5, 1.5)},
+                style={"plot_image_alpha": 0.6},
+            ),
+            ScatterChart([{"x": 1.0, "y": 0.0}, {"x": -1.0, "y": 0.0}]),
+        ],
+        title="Composed",
+    )
+    return Grid(
+        [[under, ImageChart({"image": image_pixels(), "extent": (0, 3, 0, 2)})]]
+    )
 
 
 if __name__ == "__main__":

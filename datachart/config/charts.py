@@ -45,6 +45,10 @@ CHART_CONFIGS = {
         "multiplot": True,
         "subplots": True,
     },
+    "imagechart": {
+        "multiplot": True,
+        "subplots": True,
+    },
     "scatterchart": {
         "multiplot": True,
         "subplots": True,
