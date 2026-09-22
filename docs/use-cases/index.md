@@ -32,6 +32,6 @@ The section grows one field at a time: AI, machine learning and NLP, then statis
 | | Evaluation | What does the model confuse? Can its confidence be trusted? | `Heatmap`, `LineChart`, `Histogram`, `BarChart` |
 | | Comparison | Where does it sit among published models, and is the gap real? | `BumpChart`, `DumbbellChart`, `ScatterChart` |
 | | The data | How long are the documents, and what did filtering remove? | `RidgelinePlot`, `LineChart`, `SankeyChart` |
-| [Statistics](statistics.ipynb) | Comparison | Do the groups differ, and by how much? | `RaincloudPlot`, `ScatterChart`, `Histogram` |
-| | Association | Which measurements move together, and how much is the pooling hiding? | `Heatmap`, `ScatterMatrix`, `ScatterChart` |
-| | Diagnostics | Does the fitted line hold up, and are its residuals well behaved? | `ScatterChart` in a `Grid`, `LineChart` |
+| [Statistics](statistics.ipynb) | Comparing the groups | Do the groups differ, and by how much? | `RaincloudPlot`, `ScatterChart`, `Histogram` |
+| | Relating the measurements | Which measurements move together, and how much is the pooling hiding? | `Heatmap`, `ScatterMatrix`, `ScatterChart` |
+| | Checking the model | Does the fitted line hold up, and are its residuals well behaved? | `ScatterChart` in a `Grid`, `LineChart` |
