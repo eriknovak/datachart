@@ -70,6 +70,10 @@ DARK_THEME: StyleAttrs = make_theme(
         "plot_bar_error_color": TEXT,
         "plot_hist_edge_color": PAGE,
         "plot_hexbin_edge_color": PAGE,
+        # the land a step above the face, its outlines a step above the land
+        "plot_basemap_land_color": "#262B33",
+        "plot_basemap_coastline_color": "#59626E",
+        "plot_basemap_border_color": EDGE,
         "plot_scatter_edge_color": PAGE,
         "plot_swarm_edge_color": PAGE,
         "plot_gantt_dependency_color": DIM,

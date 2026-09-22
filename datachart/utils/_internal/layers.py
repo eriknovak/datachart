@@ -8,10 +8,12 @@ histogram bins, axis scales and limits, grid, legend assembly, and twin-axis
 frozen DrawContext with its per-layer instructions.
 """
 
+import functools
 import hashlib
 from contextlib import contextmanager
 import json
 import math
+import os
 import warnings
 from collections import defaultdict
 from datetime import date, datetime, time, timedelta, tzinfo
@@ -95,6 +97,9 @@ from .validate import (
     validate_gantt_arrow_entry,
     validate_gantt_show_values,
     validate_gantt_sort_by,
+    validate_basemap_features,
+    validate_basemap_geometry,
+    validate_geographic_latitudes,
     validate_image,
     validate_image_extent,
     validate_draw_position,
@@ -156,6 +161,7 @@ from .config_helpers import (
     get_contour_label_style,
     get_hexbin_style,
     get_image_style,
+    get_basemap_style,
     get_colorbar_setting,
     get_scatter_style,
     get_scatter_error_style,
@@ -207,6 +213,7 @@ from ...constants import (
     GANTT_VALUE,
     HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
+    BASEMAP_FEATURE,
     DRAW_POSITION,
     LEGEND_LOCATION,
     NETWORK_LAYOUT,
@@ -1276,15 +1283,64 @@ TEXT_COORDS = ("data", "axes")
 TEXT_ANNOTATION_ZORDER = 5
 # reference lines sit above every mark (zorder 3), below annotations (ADR 0054)
 REF_LINE_ZORDER = 3.5
-# an image's rung (ADR 0054, 0060): below under the gridlines (0.5), above
-# over the marks (3) and under the reference lines
+# an image's or basemap's rung (ADR 0054, 0060, 0061): below under the
+# gridlines (0.5), above over the marks (3) and under the reference lines
 DRAW_ZORDER = {DRAW_POSITION.BELOW: 0.25, DRAW_POSITION.ABOVE: 3.25}
 
 
 def draw_zorder_key(position: str) -> str:
-    """An image's key in a Panel overlay's zorder table."""
+    """An image's or basemap's key in a Panel overlay's zorder table."""
 
-    return f"image_{position}"
+    return f"draw_{position}"
+
+
+# the Natural Earth 1:110m outlines bundled with the package (ADR 0061)
+BASEMAP_FILE = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    os.pardir,
+    os.pardir,
+    "charts",
+    "_basemap",
+    "natural_earth_110m.npz",
+)
+BASEMAP_FILLED = (BASEMAP_FEATURE.LAND, BASEMAP_FEATURE.LAKES)
+# drawn bottom up, so a lake sits on the land and a line on both
+BASEMAP_ORDER = (
+    BASEMAP_FEATURE.LAND,
+    BASEMAP_FEATURE.LAKES,
+    BASEMAP_FEATURE.BORDERS,
+    BASEMAP_FEATURE.COASTLINE,
+)
+
+
+@functools.lru_cache(maxsize=None)
+def load_basemap(feature: str) -> np.ndarray:
+    """One bundled feature as `(n, 2)` lon/lat rows, `NaN` between outlines."""
+
+    with np.load(BASEMAP_FILE) as bundle:
+        return bundle[feature].astype(float)
+
+
+def _split_outlines(rows: np.ndarray) -> List[np.ndarray]:
+    """The outlines of `NaN`-separated rows; empty ones dropped."""
+
+    breaks = np.flatnonzero(np.isnan(rows).any(axis=1))
+    parts = np.split(rows, breaks)
+    return [part[np.isfinite(part).all(axis=1)] for part in parts if len(part)]
+
+
+def _filled_path(outlines: List[np.ndarray]) -> Path:
+    """One compound path of closed rings; a ring wound the other way is a hole."""
+
+    rings = [ring for ring in outlines if len(ring) >= 3]
+    vertices = np.concatenate([np.vstack([ring, ring[:1]]) for ring in rings])
+    codes = np.concatenate(
+        [
+            [Path.MOVETO] + [Path.LINETO] * (len(ring) - 1) + [Path.CLOSEPOLY]
+            for ring in rings
+        ]
+    )
+    return Path(vertices, codes)
 
 
 # a diagonal is straight in data space, so on a non-linear axis it is a curve
@@ -7455,6 +7511,72 @@ class ImageLayer(Layer):
         ax.autoscale_view()
 
 
+class BasemapLayer(Layer):
+    """Coastlines, land, borders and lakes in longitude and latitude (ADR 0061).
+
+    Carries no series, like the image: no cycle color, no legend entry, no
+    emphasis. Composed with data it leaves the limits to the data; alone it
+    frames its own outlines.
+    """
+
+    takes_color = False
+
+    kind = "basemap"
+
+    def _resolve_style(self):
+        data = self.chart.get("data") or {}
+        geometry = data.get("geometry")
+        if geometry is None:
+            features = validate_basemap_features(data.get("features"))
+            outlines = [(f, load_basemap(f)) for f in features]
+        elif data.get("features") is not None:
+            raise ValueError(
+                "Pass either basemap `features` or `geometry`: the geometry "
+                "replaces the bundled outlines."
+            )
+        else:
+            outlines = validate_basemap_geometry(geometry)
+        # bottom up, the caller's order kept within one feature
+        self.outlines = sorted(outlines, key=lambda o: BASEMAP_ORDER.index(o[0]))
+        self.position = validate_draw_position(self.settings.get("position"))
+        self.feature_style = get_basemap_style(self.style)
+        lakes = self.feature_style[BASEMAP_FEATURE.LAKES]
+        lakes.setdefault("facecolor", self.ground)
+
+    @property
+    def zorder_key(self) -> str:
+        return draw_zorder_key(self.position)
+
+    def bounds(self) -> tuple:
+        """The `(xmin, xmax, ymin, ymax)` the outlines span."""
+
+        rows = np.concatenate([rows for _, rows in self.outlines])
+        rows = rows[np.isfinite(rows).all(axis=1)]
+        (x0, y0), (x1, y1) = rows.min(axis=0), rows.max(axis=0)
+        return float(x0), float(x1), float(y0), float(y1)
+
+    def draw(self, ax, ctx):
+        z_order = DRAW_ZORDER[self.position] if ctx.z_order is None else ctx.z_order
+        for feature, rows in self.outlines:
+            outlines = _split_outlines(rows)
+            style = self.feature_style[feature]
+            # a basemap never widens the view; a lone one frames it in render
+            if feature in BASEMAP_FILLED:
+                # add_artist, unlike add_patch, leaves the data limits alone
+                ax.add_artist(
+                    PathPatch(
+                        _filled_path(outlines),
+                        edgecolor="none",
+                        zorder=z_order,
+                        **style,
+                    )
+                )
+            else:
+                ax.add_collection(
+                    LineCollection(outlines, zorder=z_order, **style), autolim=False
+                )
+
+
 class ParallelCoordsLayer(Layer):
     """One parallel-coords set; holds every chart's data as a single drawable."""
 
@@ -10248,6 +10370,7 @@ LAYER_TYPES = {
     "ganttchart": GanttLayer,
     "dumbbellchart": DumbbellLayer,
     "imagechart": ImageLayer,
+    "basemapchart": BasemapLayer,
 }
 
 RADIAL_LAYER_TYPES = {
@@ -11311,13 +11434,13 @@ class Panel:
         assignments = ["left"] * len(self.groups)
         ax_right = None
         if s.get("twin_axes") and not polar:
-            # text carrier groups hold no data, and an image shares the data's
-            # coordinates: both stay on the primary axis and never enter the
-            # scale clustering
+            # text carrier groups hold no data, and an image or a basemap
+            # shares the data's coordinates: they stay on the primary axis and
+            # never enter the scale clustering
             data_indices = [
                 i
                 for i, group in enumerate(self.groups)
-                if any(l.kind not in ("text", "image") for l in group.layers)
+                if any(l.kind not in ("text", "image", "basemap") for l in group.layers)
             ]
             data_assignments = determine_axis_assignment(
                 [self.groups[i] for i in data_indices],
@@ -11817,6 +11940,23 @@ class Panel:
         style["alpha"] = style.get("alpha", 1.0) * MINOR_GRID_ALPHA_SCALE
         ax.grid(axis=name, which="minor", **style)
 
+    def _geographic_aspect(self, ax) -> float:
+        """The aspect that narrows a degree of longitude by cos(mid latitude)."""
+
+        lo, hi = ax.get_ylim()
+        data = ax.dataLim.intervaly
+        user_set = any(self.settings.get(k) is not None for k in ("ymin", "ymax"))
+        if (
+            not user_set
+            and np.isfinite(data).all()
+            and -90 <= min(data) <= max(data) <= 90
+        ):
+            # the autoscale margin may overshoot a pole the data stays within
+            lo, hi = np.clip((lo, hi), -90, 90)
+            ax.set_ylim(lo, hi)
+        middle = validate_geographic_latitudes((lo, hi))
+        return 1 / math.cos(math.radians(middle))
+
     def _finalize(
         self, ax, ax_right, bar_layers, horizontal, scales, group_axes, limit_marks
     ) -> None:
@@ -11884,6 +12024,19 @@ class Panel:
         # the y-axis is a rank axis only when every data layer draws ranks;
         # beside other charts it follows the panel as usual (ADR 0046)
         data_layers = [l for l in layers if l.kind != "text"]
+
+        # a lone basemap frames its outlines; beside data it frames nothing
+        if data_layers and all(isinstance(l, BasemapLayer) for l in data_layers):
+            bounds = np.array([l.bounds() for l in data_layers])
+            x0, x1 = bounds[:, 0].min(), bounds[:, 1].max()
+            y0, y1 = bounds[:, 2].min(), bounds[:, 3].max()
+            ax.update_datalim([(x0, y0), (x1, y1)])
+            ax.autoscale_view()
+            # a flat outline keeps the autoscale's padding on its flat axis
+            for axis_name, lo, hi in (("x", x0, x1), ("y", y0, y1)):
+                if hi > lo:
+                    getattr(ax, f"set_{axis_name}lim")(lo, hi)
+                    pinned.add(axis_name)
         rank_axis = bool(data_layers) and all(
             isinstance(l, BumpLayer) for l in data_layers
         )
@@ -12146,7 +12299,10 @@ class Panel:
 
         # aspect ratio (a polar axes keeps its own; a bare layer fixed its own)
         if s.get("aspect_ratio") and not polar and not bare:
-            ax.set(adjustable="box", aspect=s["aspect_ratio"])
+            aspect = s["aspect_ratio"]
+            if aspect == ASPECT_RATIO.GEOGRAPHIC:
+                aspect = self._geographic_aspect(ax)
+            ax.set(adjustable="box", aspect=aspect)
 
         # a cell inside a shared grid leaves its inner tick labels to the edge
         for axis in s.get("hide_ticklabels") or ():

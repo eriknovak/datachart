@@ -20,6 +20,7 @@ from .constants import (
     ARROW_STYLE,
     ASPECT_RATIO,
     BAR_MODE,
+    BASEMAP_FEATURE,
     CALENDAR_WEEKDAY,
     COLORBAR_LOCATION,
     COLORS,
@@ -868,6 +869,29 @@ class ImageStyleAttrs(TypedDict):
     plot_image_aspect: Union[str, float, None]
 
 
+class BasemapStyleAttrs(TypedDict):
+    """The typing for the basemap chart style.
+
+    Attributes:
+        plot_basemap_land_color (Union[str, None]): The fill color of the land.
+        plot_basemap_coastline_color (Union[str, None]): The color of the coastlines.
+        plot_basemap_coastline_width (Union[float, None]): The width of the coastlines, in points.
+        plot_basemap_border_color (Union[str, None]): The color of the borders between countries.
+        plot_basemap_border_width (Union[float, None]): The width of the borders, in points.
+        plot_basemap_border_style (Union[LINE_STYLE, str, None]): The line style of the borders. See [`LINE_STYLE`][datachart.constants.LINE_STYLE].
+        plot_basemap_lake_color (Union[str, None]): The fill color of the lakes; `None` takes the axes background, so a lake reads as water.
+
+    """
+
+    plot_basemap_land_color: Union[str, None]
+    plot_basemap_coastline_color: Union[str, None]
+    plot_basemap_coastline_width: Union[float, None]
+    plot_basemap_border_color: Union[str, None]
+    plot_basemap_border_width: Union[float, None]
+    plot_basemap_border_style: Union[LINE_STYLE, str, None]
+    plot_basemap_lake_color: Union[str, None]
+
+
 class ScatterStyleAttrs(TypedDict):
     """The typing for the scatter chart style.
 
@@ -1251,6 +1275,7 @@ class StyleAttrs(
     ContourStyleAttrs,
     HexbinStyleAttrs,
     ImageStyleAttrs,
+    BasemapStyleAttrs,
     ScatterStyleAttrs,
     RegressionStyleAttrs,
     BoxStyleAttrs,
@@ -2406,6 +2431,26 @@ class ImageDataAttrs(TypedDict):
 
     image: Union[str, os.PathLike, PILImage, np.ndarray]
     extent: Tuple[float, float, float, float]
+
+
+# ================================================
+# Basemap Chart Attributes
+# ================================================
+
+
+class BasemapDataAttrs(TypedDict):
+    """The geometry attributes for the basemap chart.
+
+    Attributes:
+        lon (List[float]): The longitudes of the outlines, drawn on the x-axis. A `NaN` separates one outline from the next.
+        lat (List[float]): The latitudes of the outlines, drawn on the y-axis; as long as `lon`, with its `NaN` at the same places.
+        feature (Optional[Union[BASEMAP_FEATURE, str]]): How the outlines are drawn and styled: `"coastline"` (default) or `"borders"` as lines, `"land"` or `"lakes"` as filled areas. See [`BASEMAP_FEATURE`][datachart.constants.BASEMAP_FEATURE].
+
+    """
+
+    lon: List[float]
+    lat: List[float]
+    feature: Optional[Union[BASEMAP_FEATURE, str]]
 
 
 # ================================================

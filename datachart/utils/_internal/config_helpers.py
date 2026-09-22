@@ -1228,6 +1228,43 @@ def get_image_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Basemap Style
+# -------------------------------------
+
+
+def get_basemap_style(chart_style: dict) -> dict:
+    """Get the basemap chart style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The style of each feature: a line feature keyed as `LineCollection`
+        takes it, a filled one as `PathPatch` does.
+
+    """
+
+    config_attrs = {
+        "coastline": [
+            ("colors", "plot_basemap_coastline_color"),
+            ("linewidths", "plot_basemap_coastline_width"),
+        ],
+        "borders": [
+            ("colors", "plot_basemap_border_color"),
+            ("linewidths", "plot_basemap_border_width"),
+            ("linestyles", "plot_basemap_border_style"),
+        ],
+        "land": [("facecolor", "plot_basemap_land_color")],
+        "lakes": [("facecolor", "plot_basemap_lake_color")],
+    }
+
+    return {
+        feature: create_config_dict(chart_style, attrs)
+        for feature, attrs in config_attrs.items()
+    }
+
+
+# -------------------------------------
 # Scatter Style
 # -------------------------------------
 

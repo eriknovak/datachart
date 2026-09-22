@@ -17,6 +17,7 @@ import numpy as np
 from PIL import Image
 
 from ...constants import (
+    BASEMAP_FEATURE,
     ARROW_STYLE,
     BANDWIDTH,
     BUMP_LABEL_POSITION,
@@ -54,6 +55,12 @@ AXIS_NUMERIC = "numeric"
 AXIS_CATEGORICAL = "categorical"
 EMPHASIS_ROLES = (EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT)
 DRAW_POSITIONS = (DRAW_POSITION.BELOW, DRAW_POSITION.ABOVE)
+BASEMAP_FEATURES = (
+    BASEMAP_FEATURE.COASTLINE,
+    BASEMAP_FEATURE.LAND,
+    BASEMAP_FEATURE.BORDERS,
+    BASEMAP_FEATURE.LAKES,
+)
 # PIL modes an array keeps as is: grey levels read through the colormap
 IMAGE_ARRAY_MODES = ("L", "I", "F", "RGB", "RGBA")
 RANK_RULES = (BUMP_RANK.VALUE_DESCENDING, BUMP_RANK.VALUE_ASCENDING, BUMP_RANK.GIVEN)
@@ -1174,7 +1181,7 @@ def validate_gantt_groups(records, sort_by, show_group_headers=False) -> None:
 
 
 def validate_draw_position(position):
-    """Validate an image draw position; None means below the marks."""
+    """Validate an image or basemap draw position; None means below the marks."""
 
     if position is None:
         return DRAW_POSITION.DEFAULT
@@ -1255,3 +1262,73 @@ def validate_image(image) -> np.ndarray:
             + (f" of shape {array.shape}." if array is not None else ".")
         )
     return array
+
+
+def validate_basemap_features(features) -> tuple:
+    """The features as a tuple of names; None means coastline and land."""
+
+    if features is None:
+        return BASEMAP_FEATURE.DEFAULT
+    if isinstance(features, str):
+        features = (features,)
+    features = tuple(features)
+    unknown = [f for f in features if f not in BASEMAP_FEATURES]
+    if unknown or not features:
+        raise ValueError(
+            f"Invalid basemap `features` {unknown or list(features)!r}. "
+            f"Must be one or more of {BASEMAP_FEATURES}."
+        )
+    return features
+
+
+def validate_basemap_geometry(geometry) -> list:
+    """The caller's outlines as `(feature, (n, 2) float array)` pairs.
+
+    Each outline set is a `{"lon", "lat", "feature"}` dict, `NaN` separating
+    one outline from the next; one dict or a list of them.
+    """
+
+    entries = [geometry] if isinstance(geometry, dict) else geometry
+    if not isinstance(entries, (list, tuple)) or not entries:
+        raise ValueError(
+            "Invalid basemap `geometry`: must be a `{lon, lat, feature}` dict "
+            f"or a non-empty list of them; got {type(geometry).__name__}."
+        )
+    outlines = []
+    for i, entry in enumerate(entries):
+        where = f"basemap `geometry` entry {i}"
+        if not isinstance(entry, dict) or "lon" not in entry or "lat" not in entry:
+            raise ValueError(f"Invalid {where}: must be a dict with `lon` and `lat`.")
+        feature = entry.get("feature") or BASEMAP_FEATURE.COASTLINE
+        if feature not in BASEMAP_FEATURES:
+            raise ValueError(
+                f"Invalid {where}: `feature` {feature!r} must be one of "
+                f"{BASEMAP_FEATURES}."
+            )
+        try:
+            lon = np.asarray(entry["lon"], dtype=float)
+            lat = np.asarray(entry["lat"], dtype=float)
+        except (TypeError, ValueError) as error:
+            raise ValueError(
+                f"Invalid {where}: `lon` and `lat` must be numbers."
+            ) from error
+        if lon.ndim != 1 or lon.shape != lat.shape or not np.isfinite(lon).any():
+            raise ValueError(
+                f"Invalid {where}: `lon` and `lat` must be flat sequences of "
+                "the same length holding at least one point."
+            )
+        outlines.append((feature, np.column_stack([lon, lat])))
+    return outlines
+
+
+def validate_geographic_latitudes(ylim) -> float:
+    """The mid latitude of a geographic axes; raise past the poles."""
+
+    lo, hi = sorted(ylim)
+    if lo < -90 or hi > 90:
+        raise ValueError(
+            f'`aspect_ratio="geographic"` reads the y-axis as latitude, but it '
+            f"runs from {lo:g} to {hi:g}, outside -90 to 90. Plot latitude on "
+            "y, or set `ymin` and `ymax` within it."
+        )
+    return (lo + hi) / 2
