@@ -75,6 +75,10 @@ from datachart.utils.stats import kde1d, kde2d
 
 # Cases whose output intentionally changed since the last published baseline.
 EXPECTED_CHANGES = {
+    # new pairwise bracket cases (#258)
+    "raincloud_brackets_stacked",
+    "box_horizontal_bracket",
+    "panel_brackets_two_sources",
     # DEFAULT palette: softened Okabe–Ito, colour-blind safe on every pair
     "bar_horizontal",
     "bar_single",
@@ -938,6 +942,44 @@ def raincloud_horizontal():
 def raincloud_emphasis():
     return RaincloudPlot(
         data=swarm_data(), emphasis=["background", None, "highlight"], bandwidth=0.3
+    )
+
+
+@case
+def raincloud_brackets_stacked():
+    return RaincloudPlot(
+        data=swarm_data(),
+        title="Pairwise comparisons",
+        brackets=[
+            {"from": "A", "to": "B", "text": "p = .03"},
+            {"from": "B", "to": "C", "text": "p < .001"},
+            {"from": "A", "to": "C", "text": "p < .001"},
+        ],
+    )
+
+
+@case
+def box_horizontal_bracket():
+    return BoxPlot(
+        data=swarm_data(seed=7),
+        orientation="horizontal",
+        brackets={"from": "A", "to": "C", "text": "ns"},
+    )
+
+
+@case
+def panel_brackets_two_sources():
+    data = swarm_data()
+    return Panel(
+        [
+            BoxPlot(
+                data=data,
+                show_outliers=False,
+                brackets={"from": "A", "to": "B", "text": "*"},
+            ),
+            SwarmPlot(data=data, brackets={"from": "B", "to": "C", "text": "**"}),
+        ],
+        title="box + swarm, bracketed",
     )
 
 
