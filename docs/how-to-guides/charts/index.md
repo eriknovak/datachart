@@ -219,6 +219,14 @@ How two or more variables relate to each other.
 
     ![Stations scattered over a shaded relief](../../assets/imgs/gallery-image.png)
 
+-   [Basemap Chart](basemapchart.ipynb)
+
+    [Panel](../utility/panel.ipynb){ .chip } [Grid](../utility/grid.ipynb){ .chip }
+
+    Coastlines, land, borders and lakes under a chart of longitude and latitude, bundled with the package.
+
+    ![Epicentres over the land and borders of the Aegean and Anatolia](../../assets/imgs/gallery-basemap.png)
+
 </div>
 
 ## Flows

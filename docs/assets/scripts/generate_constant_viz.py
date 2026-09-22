@@ -33,6 +33,7 @@ from datachart.charts import (
     HexbinChart,
     Histogram,
     ImageChart,
+    BasemapChart,
     LineChart,
     NetworkChart,
     RadialChart,
@@ -68,6 +69,7 @@ from datachart.constants import (
     HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
     DRAW_POSITION,
+    BASEMAP_FEATURE,
     LEGEND_ALIGN,
     LINE_DRAW_STYLE,
     LINE_MARKER,
@@ -883,6 +885,36 @@ def draw_position():
     chart_grid(figs, "const-draw-position.svg", 2.2)
 
 
+def basemap_feature():
+    # each feature alone, over the Baltic, where all four show
+    members = [
+        ("COASTLINE", BASEMAP_FEATURE.COASTLINE),
+        ("LAND", BASEMAP_FEATURE.LAND),
+        ("BORDERS", BASEMAP_FEATURE.BORDERS),
+        ("LAKES", BASEMAP_FEATURE.LAKES),
+    ]
+    figs = [
+        BasemapChart(
+            value,
+            title=f"BASEMAP_FEATURE.{label}",
+            xmin=5,
+            xmax=40,
+            ymin=50,
+            ymax=66,
+            style={"plot_basemap_lake_color": "#9ecae1"},
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-basemap-feature.svg",
+        4.4,
+        cols=2,
+        footnote="The lakes are drawn in blue here; by default they take the "
+        "axes background, so they read as the sea does.",
+    )
+
+
 def swarm_mode():
     members = [("SWARM", SWARM_MODE.SWARM), ("STRIP", SWARM_MODE.STRIP)]
     figs = [
@@ -1546,6 +1578,7 @@ def main():
     contour_levels()
     hexbin_reduce()
     draw_position()
+    basemap_feature()
     swarm_mode()
     radial_type()
     direction()

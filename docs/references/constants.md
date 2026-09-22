@@ -49,7 +49,8 @@ Which constants the parameters of each chart accept, by chart family. A constant
 | [ParallelCoords](charts/parallelcoords.md#datachart.charts.ParallelCoords) | — | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO) |
 | [NetworkChart](charts/networkchart.md#datachart.charts.NetworkChart) | [`NETWORK_LAYOUT`](#datachart.constants.NETWORK_LAYOUT), [`NETWORK_LABEL_POSITION`](#datachart.constants.NETWORK_LABEL_POSITION) | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT) |
 | [ScatterMatrix](charts/scattermatrix.md#datachart.charts.ScatterMatrix) | [`SCATTER_MATRIX_DIAGONAL`](#datachart.constants.SCATTER_MATRIX_DIAGONAL) | [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`SHOW_GRID`](#datachart.constants.SHOW_GRID) |
-| [ImageChart](charts/imagechart.md#datachart.charts.ImageChart) | [`DRAW_POSITION`](#datachart.constants.DRAW_POSITION) | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO) |
+| [ImageChart](charts/imagechart.md#datachart.charts.ImageChart) | — | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO), [`DRAW_POSITION`](#datachart.constants.DRAW_POSITION) |
+| [BasemapChart](charts/basemapchart.md#datachart.charts.BasemapChart) | [`BASEMAP_FEATURE`](#datachart.constants.BASEMAP_FEATURE) | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO), [`DRAW_POSITION`](#datachart.constants.DRAW_POSITION) |
 
 ### Flows
 
@@ -185,6 +186,10 @@ Constants several charts share.
     options:
         heading_level: 3
 
+::: datachart.constants.DRAW_POSITION
+    options:
+        heading_level: 3
+
 ## Chart-Specific Constants
 
 Constants one chart owns, in the order of the [charts reference](charts/index.md).
@@ -265,6 +270,6 @@ Constants one chart owns, in the order of the [charts reference](charts/index.md
     options:
         heading_level: 3
 
-::: datachart.constants.DRAW_POSITION
+::: datachart.constants.BASEMAP_FEATURE
     options:
         heading_level: 3

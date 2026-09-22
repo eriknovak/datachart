@@ -51,6 +51,7 @@ The records a chart's `data` takes and the keys its `style` accepts are document
 | [NetworkChart](charts/networkchart.md) | Nodes joined by edges, placed by a layout. | [`NetworkSingleChartAttrs`](charts/networkchart.md#datachart.typings.NetworkSingleChartAttrs) | [`NetworkStyleAttrs`](charts/networkchart.md#datachart.typings.NetworkStyleAttrs) |
 | [ScatterMatrix](charts/scattermatrix.md) | A scatter chart for every pair of dimensions, distributions on the diagonal. | [`ScatterMatrixDataPointAttrs`](charts/scattermatrix.md#datachart.typings.ScatterMatrixDataPointAttrs) | [`StyleAttrs`](#datachart.typings.StyleAttrs) |
 | [ImageChart](charts/imagechart.md) | A picture in data coordinates, under or over the other charts. | [`ImageDataAttrs`](charts/imagechart.md#datachart.typings.ImageDataAttrs) | [`ImageStyleAttrs`](charts/imagechart.md#datachart.typings.ImageStyleAttrs) |
+| [BasemapChart](charts/basemapchart.md) | Coastlines, land, borders and lakes under a chart of longitude and latitude. | [`BasemapDataAttrs`](charts/basemapchart.md#datachart.typings.BasemapDataAttrs) | [`BasemapStyleAttrs`](charts/basemapchart.md#datachart.typings.BasemapStyleAttrs) |
 
 ### Flows
 

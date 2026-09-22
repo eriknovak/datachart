@@ -128,7 +128,7 @@ plugins:
         Histogram, Heatmap, ContourChart, HexbinChart, BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot,
         RidgelinePlot,
         ParallelCoords, PyramidChart, RadialChart, CalendarHeatmap, GanttChart, DumbbellChart, SankeyChart, NetworkChart,
-        ScatterMatrix, ImageChart,
+        ScatterMatrix, ImageChart, BasemapChart,
         Treemap), figure
         composition via Panel (overlaying charts on shared axes) and Grid
         (arranging charts in a grid), and a global configuration system with
@@ -170,6 +170,7 @@ plugins:
           - how-to-guides/styling/highlighting.ipynb: Emphasizing and muting data series on any chart with the emphasis option, by role or by rule.
           - how-to-guides/charts/scattermatrix.ipynb: Scatter matrix basics on the Palmer penguins, columns or records, selecting dimensions, hue groups and the single legend, histogram, density or blank diagonals, the lower triangle, correlation text and Simpson's paradox, regression lines, shared axes, grid lines, scatter matrix style, Grid composition, themes, and worked examples on real and illustrative data.
           - how-to-guides/charts/imagechart.ipynb: Image chart basics on NOAA ETOPO relief of the Aegean and Anatolia, the data and extent contract, flipping a grid whose first row is south, axis labels and limits, figure size and grid, colormaps and a signed value range for 2-D arrays, file paths, PIL images and RGB pictures, interpolation, transparency, square pixels, composing under or over other charts with Panel and the DRAW_POSITION draw order, subplots, and worked examples on 2023 earthquakes, an office floor plan, and a regional and close-up Grid.
+          - how-to-guides/charts/basemapchart.ipynb: Basemap chart basics with the bundled Natural Earth 1:110m outlines and the 2023 earthquakes of the Aegean and Anatolia, choosing coastline, land, borders and lakes with BASEMAP_FEATURE, axis labels and limits, the geographic aspect ratio, figure size and graticule, land, line and lake style, caller outlines with geometry, composing under or over other charts with Panel and the DRAW_POSITION draw order, and worked examples on the 2023 earthquakes, the capitals of the European Union, and a regional and close-up Grid.
         Composition:
           - how-to-guides/composition/index.md: Map of Panel, Grid, and text annotations with Annotate.
           - how-to-guides/utility/panel.ipynb: "Overlaying charts in one coordinate space with Panel: two value axes, legend, drawing order, emphasis, limits and scales, bar mode, nesting, horizontal panels, configuration, and worked examples."
@@ -220,6 +221,7 @@ plugins:
           - references/charts/networkchart.md: The NetworkChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
           - references/charts/scattermatrix.md: The ScatterMatrix function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
           - references/charts/imagechart.md: The ImageChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
+          - references/charts/basemapchart.md: The BasemapChart function and its parameters, its geometry record, the keys its style takes, and the constants its parameters accept.
           - references/charts/sankeychart.md: The SankeyChart function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
           - references/charts/treemap.md: The Treemap function and its parameters, its data record, the keys its style takes, and the constants its parameters accept.
           - references/utils/index.md: Panel, Grid, Annotate, and save_figure signatures, with a table of which utility fits which task.
@@ -285,6 +287,7 @@ nav:
         - Network Chart: how-to-guides/charts/networkchart.ipynb
         - Scatter Matrix: how-to-guides/charts/scattermatrix.ipynb
         - Image Chart: how-to-guides/charts/imagechart.ipynb
+        - Basemap Chart: how-to-guides/charts/basemapchart.ipynb
       - Flows:
         - Sankey Chart: how-to-guides/charts/sankeychart.ipynb
       - Part of a Whole:
@@ -349,6 +352,7 @@ nav:
         - NetworkChart: references/charts/networkchart.md
         - ScatterMatrix: references/charts/scattermatrix.md
         - ImageChart: references/charts/imagechart.md
+        - BasemapChart: references/charts/basemapchart.md
       - Flows:
         - SankeyChart: references/charts/sankeychart.md
       - Part of a Whole:

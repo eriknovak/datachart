@@ -992,6 +992,8 @@ class BASEMAP_FEATURE:
     Natural Earth 1:110m outlines are drawn. The ocean is not a feature; it
     is the axes background the land sits on.
 
+    ![BASEMAP_FEATURE at a glance](../assets/imgs/const-basemap-feature.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import BASEMAP_FEATURE
         >>> BASEMAP_FEATURE.DEFAULT
