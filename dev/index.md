@@ -8,7 +8,11 @@ Start with a guide, look things up in the reference, or point your AI assistant 
 
 Every chart type, composition with Panel and Grid, styling, and the utilities, each a runnable notebook on real data.
 
-Open the guides →\](https://eriknovak.github.io/datachart/dev/how-to-guides/index.md) \[### API reference
+Open the guides →\](https://eriknovak.github.io/datachart/dev/how-to-guides/index.md) \[### Use cases
+
+The figures a report in one field needs, worked through one dataset from the first figure to the last.
+
+Read the use cases →\](https://eriknovak.github.io/datachart/dev/use-cases/index.md) \[### API reference
 
 Signatures and attribute tables for the charts, utils, config, themes, constants, and typings modules.
 

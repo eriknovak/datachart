@@ -74,6 +74,11 @@ themes; per-chart overrides go in each chart's `style` parameter.
 - [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md): Saving figures with save_figure: vector or raster formats and dpi, transparent backgrounds, several formats in one call, embedding SVG or PNG in web pages, and worked examples for a manuscript, a slide, and a documentation page.
 - [Interactive Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/interactive/index.md): Zooming, panning, and hovering over marks with show(interactive=True): the interactive extra, notebook and script behavior, what the hover annotation of every chart type shows, and worked examples for finding an outlier, reading a two-axis panel, and checking a grid.
 
+## Use Cases
+
+- [Use Cases](https://eriknovak.github.io/datachart/dev/use-cases/index.md): Map of the use-case pages: one field per page, each a dataset walked from the first figure to the last.
+- [AI, Machine Learning and NLP](https://eriknovak.github.io/datachart/dev/use-cases/ai-ml-nlp/index.md): The figures of a model report on an illustrative experiment log, from training curves, a hyperparameter sweep and a confusion matrix through ROC, precision-recall and calibration to per-class scores, feature importance, a leaderboard, benchmark intervals, the corpus token statistics, and a closing paper-style panel.
+
 ## API Reference
 
 - [Datachart Module](https://eriknovak.github.io/datachart/dev/references/index.md): Top-level module reference, with a where-to-look table over the reference pages.
