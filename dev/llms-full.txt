@@ -26892,7 +26892,7 @@ Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/d
 
 ```
 derive_theme(
-    base: str | StyleAttrs, lead: Lead, **overrides
+    base: str | StyleAttrs, lead: Lead, **overrides: Any
 ) -> StyleAttrs
 ```
 
@@ -26915,7 +26915,7 @@ Examples:
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `base`        | A THEME constant, a registered theme name, or a theme dictionary; a partial dictionary is completed from the default theme, as register_theme completes it. **TYPE:** \`str |
 | `lead`        | A COLORS constant, a pypalettes palette name, or a list of colors. A diverging map is not a lead; it is read as categorical. **TYPE:** `Lead`                               |
-| `**overrides` | Style attributes set on the result; an unknown name raises. **DEFAULT:** `{}`                                                                                               |
+| `**overrides` | Style attributes set on the result; an unknown name raises. **TYPE:** `Any` **DEFAULT:** `{}`                                                                               |
 
 | RETURNS      | DESCRIPTION        |
 | ------------ | ------------------ |
