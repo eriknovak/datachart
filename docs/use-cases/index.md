@@ -30,7 +30,7 @@ The section grows one field at a time: AI, machine learning and NLP, statistics,
 
 -   [Demographics and Social Science](demographics.ipynb)
 
-    The figures of a population report, from one country to the world: the pyramid then and now, how the young and the old traded places, the fertility and longevity behind it, who gained the most years of life, whether the world is converging, and whether income still buys longevity.
+    The figures of a population report, from one country to the world: the pyramid then and now, how the young and the old traded places, the fertility and longevity behind it, who arrives and who leaves, which regions age fastest, who gained the most years of life, whether the world is converging, and whether income still buys longevity.
 
     <p class="card-icon" markdown="span">:material-account-group-outline:</p>
 
@@ -63,6 +63,7 @@ The section grows one field at a time: AI, machine learning and NLP, statistics,
 | | Over the twelve weeks | When did the arms separate, did every subject follow, and who stayed? | `LineChart` |
 | | The wider panel | What else moved with the dose, and is the safety signal an arm or a few subjects? | `Heatmap`, `DumbbellChart`, `SwarmPlot` |
 | [Demographics and Social Science](demographics.ipynb) | The age structure | What does the population look like now and then, how did the shares shift, and what drove it? | `PyramidChart` in a `Grid`, `StackedAreaChart`, `LineChart` in a `Panel` |
+| | Who comes, who goes, and where they live | Who arrives and who leaves, and which regions are ageing fastest? | `SankeyChart`, `Heatmap` |
 | | The country among the others | Who gained the most years, is the world converging, and do richer countries live longer? | `DumbbellChart`, `RidgelinePlot`, `ScatterChart` |
 | [Business and Product Analytics](business.ipynb) | The revenue | Where does the revenue come from, which segments carry it, and which channels bring the customers? | `StackedAreaChart`, `Treemap`, `BumpChart` |
 | | Acquisition and retention | Where does the funnel leak, when do people sign up, and do the customers who pay stay? | `SankeyChart`, `CalendarHeatmap`, `Heatmap` |
