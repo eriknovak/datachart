@@ -35,9 +35,9 @@ The hidden cell below holds the measurements themselves. `PENGUIN_ROWS` is the t
 
 ### Do the three species differ in body mass?
 
-The first figure of a comparison shows the distributions themselves, not their summaries: a test says whether a difference exists, and only the shapes say whether the question was sensible to ask. A [raincloud plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/raincloudplot/index.md) draws all three readings at once — the density of each species, its box, and every bird as a point — so a bimodal group or a stray outlier cannot hide behind a median.
+The first figure of a comparison shows the distributions themselves, not their summaries: a test says whether a difference exists, and only the shapes say whether the question was sensible to ask. A [raincloud plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/raincloudplot/index.md) draws all three readings at once (the density of each species, its box, and every bird as a point), so a bimodal group or a stray outlier cannot hide behind a median.
 
-The test beside it is the Kruskal-Wallis H, a rank-based one-way test that asks whether any group sits higher than the others. It is used here in place of a one-way ANOVA because nothing yet says these distributions are normal — the last section of this page asks that question directly. A significant omnibus result says only *some* pair differs, so each pair gets its own Mann-Whitney U test, and the three p-values are corrected for having been asked together with the Holm step-down rule.
+The test beside it is the Kruskal-Wallis H, a rank-based one-way test that asks whether any group sits higher than the others. It is used here in place of a one-way ANOVA because nothing yet says these distributions are normal; the last section of this page asks that question directly. A significant omnibus result says only *some* pair differs, so each pair gets its own Mann-Whitney U test, and the three p-values are corrected for having been asked together with the Holm step-down rule.
 
 ```
 SPECIES = ["Adelie", "Chinstrap", "Gentoo"]
@@ -111,11 +111,11 @@ mass_figure = RaincloudPlot(
 mass_figure.show()
 ```
 
-The omnibus test is significant, and the brackets say where that came from: Gentoo against either of the others, and nothing between Adelie and Chinstrap, whose clouds sit on top of each other. A table of three p-values would have said the same, but the figure also shows the Chinstrap cloud is the narrowest and the Gentoo box the highest — neither of which a test reports.
+The omnibus test is significant, and the brackets say where that came from: Gentoo against either of the others, and nothing between Adelie and Chinstrap, whose clouds sit on top of each other. A table of three p-values would have said the same, but the figure also shows that the Chinstrap cloud is the narrowest and the Gentoo box the highest, which no test reports.
 
 ### How large is each difference, and how sure can we be of it?
 
-A p-value says a difference is unlikely to be an accident; it never says how large the difference is. The size belongs in its own figure, with an interval attached, and the interval here comes from a bootstrap: both groups are resampled with replacement a few thousand times, the difference of means is recorded each time, and the middle 95% of those recordings is the interval. `bootstrap_ci`, in the [statistics utilities](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md), does this in one call for a statistic of **one** sample — a mean, a median, an IQR; a difference needs both groups resampled, so the helper below does that and keeps the draws, which the next figure needs anyway.
+A p-value says a difference is unlikely to be an accident; it never says how large the difference is. The size belongs in its own figure, with an interval attached, and the interval here comes from a bootstrap: both groups are resampled with replacement a few thousand times, the difference of means is recorded each time, and the middle 95% of those recordings is the interval. `bootstrap_ci`, in the [statistics utilities](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md), does this in one call for a statistic of **one** sample (a mean, a median, an IQR); a difference needs both groups resampled, so the helper below does that and keeps the draws, which the next figure needs anyway.
 
 Each pair is one row, so the differences go on the x-axis of a [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) and the pairs on the y-axis. `xerr` takes the interval as *distances* from the point rather than as endpoints, which is the subtraction the chart cannot do for you, and `show_xerr` draws it. The `vlines` zero is the reference every row is read against: a bar that crosses it is a difference the data does not establish.
 
@@ -176,13 +176,13 @@ effect_figure = ScatterChart(
 effect_figure.show()
 ```
 
-The bottom row straddles zero, so the 32 g the sample happens to show is not a difference the data establishes. The other two sit around 1.35 kg with intervals 230 to 260 g wide, under a fifth of the effect. That comparison is what the figure exists for: the bar and the point share one axis, so the size of the uncertainty is read against the size of the finding instead of being quoted beside it.
+The bottom row straddles zero, so the 32 g the sample happens to show is not a difference the data establishes. The other two sit around 1.35 kg with intervals 230 to 260 g wide, under a fifth of the effect. The figure exists for that comparison: the bar and the point share one axis, so the size of the uncertainty is read against the size of the finding instead of being quoted beside it.
 
 ### What is the interval actually made of?
 
 An interval is two numbers, and two numbers hide the shape they came from. Drawing the resampled differences as a [histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md) shows that shape and makes the percentile rule visible: the observed difference is one `vlines` mark, the two bounds are two more, and the bars between them are the 95% the interval claims.
 
-This is worth one figure in a report when the interval is the result — a bootstrap that comes out skewed or multi-peaked is telling you the statistic is unstable, and a symmetric hill like this one is telling you a normal-theory interval would have said the same thing more cheaply.
+This is worth one figure in a report when the interval is the result: a bootstrap that comes out skewed or multi-peaked says the statistic is unstable, and a symmetric hill like this one says a normal-theory interval would have given the same answer more cheaply.
 
 ```
 OBSERVED_VLINE = {"plot_vline_color": "#111111", "plot_vline_width": 1.6}
@@ -216,13 +216,13 @@ Histogram(
 ).show()
 ```
 
-The observed difference sits in the middle of the hill, as it must — the bootstrap is centered on the sample. What the figure adds is the width: the resamples spread over a couple of hundred grams, a sixth of the difference itself, so the finding survives any reasonable redraw of the sample.
+The observed difference sits in the middle of the hill, as it must, since the bootstrap is centered on the sample. The figure adds the width: the resamples spread over a couple of hundred grams, a sixth of the difference itself, so the finding survives any reasonable redraw of the sample.
 
 ## Relating the measurements
 
 ### Which measurements move together?
 
-With four measurements there are six pairs, and reading six numbers out of a paragraph is what a correlation matrix exists to prevent. The matrix is a square grid of values, so it is a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) — but a correlation is signed, and a sequential colormap run from the smallest value would put zero on an arbitrary shade. `norm=NORMALIZE.CENTERED` pins zero to the middle of the theme's diverging colormap and runs the same distance to each side, so a cell's hue is its sign and its depth is its strength.
+With four measurements there are six pairs, and reading six numbers out of a paragraph is what a correlation matrix exists to prevent. The matrix is a square grid of values, so it is a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md). A correlation is signed, though, and a sequential colormap run from the smallest value would put zero on an arbitrary shade. `norm=NORMALIZE.CENTERED` pins zero to the middle of the theme's diverging colormap and runs the same distance to each side, so a cell's hue is its sign and its depth is its strength.
 
 A correlation matrix is also symmetric, which means half of it is decoration. A `None` in `z` leaves a cell blank, so the upper triangle goes; the diagonal of ones goes with the first row and the last column, which hold nothing once it does, and the six numbers that carry information remain.
 
@@ -259,7 +259,7 @@ correlation_figure = Heatmap(
 correlation_figure.show()
 ```
 
-Flipper length and body mass at 0.87 are close to the same measurement taken twice, which matters later: a model given both learns little from the second. The surprise is bill depth, which runs *against* all three others — deeper bills on lighter, shorter-flippered birds. That is the figure's real finding, and the next two exist to explain it.
+Flipper length and body mass at 0.87 are close to the same measurement taken twice, which matters later: a model given both learns little from the second. The surprise is bill depth, which runs *against* all three others: deeper bills on lighter, shorter-flippered birds. That is the finding of this figure, and the next two figures explain it.
 
 ### What is a single correlation hiding?
 
@@ -279,13 +279,13 @@ ScatterMatrix(
 ).show()
 ```
 
-The bill depth row is the one to read. Every cell in it slopes downward as a whole, and inside every cluster the same cell slopes *upward* — the three species sit on a diagonal staircase that the pooled cloud follows instead. This is Simpson's paradox, and it is the reason a correlation matrix should never be the last figure of an association section.
+The bill depth row is the one to read. Every cell in it slopes downward as a whole, and inside every cluster the same cell slopes *upward*: the three species sit on a diagonal staircase that the pooled cloud follows instead. This is Simpson's paradox, and it is the reason a correlation matrix should never be the last figure of an association section.
 
 ### Is it the mixture, or is it the outliers?
 
 One pair deserves the close-up, and it comes with a second question: a Pearson correlation measures how close the points lie to a straight line and is pulled hard by a few extreme ones, while a Spearman correlation measures only whether the ranks move together and barely notices them. When the two disagree the culprit is usually an outlier or a curve; when they agree, as here, neither is the explanation and the mixture is.
 
-Both coefficients come from the [statistics utilities](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md) — `correlation` and `spearman` — and go into a `texts` note. The [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) fits the pooled line itself with `show_regression`, and `hue` colors the points by species so the pooled line can be read against the groups it was fitted through.
+Both coefficients come from the [statistics utilities](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md) (`correlation` and `spearman`) and go into a `texts` note. The [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) fits the pooled line itself with `show_regression`, and `hue` colors the points by species so the pooled line can be read against the groups it was fitted through.
 
 ```
 PAIR = ("flipper length", "bill depth")
@@ -332,7 +332,7 @@ ScatterChart(
 ).show()
 ```
 
-Pearson and Spearman land about 0.06 apart, so the negative pooled figure is not the work of a handful of stray birds. Every species on its own gives a positive coefficient, and the largest of them is stronger than the pooled one is negative. The honest sentence for the report is that flipper length and bill depth rise together within a species, and that species differ enough in both to reverse the sign when they are pooled.
+Pearson and Spearman land about 0.06 apart, so the negative pooled figure is not the work of a handful of stray birds. Every species on its own gives a positive coefficient, and the largest of them is stronger than the pooled one is negative. For the report: flipper length and bill depth rise together within a species, and the species differ enough in both to reverse the sign when they are pooled.
 
 ## Checking the model
 
@@ -340,7 +340,7 @@ Pearson and Spearman land about 0.06 apart, so the negative pooled figure is not
 
 Flipper length and body mass were the strongest pair in the matrix, so a straight line through them is the obvious model. Two figures check it, and they belong together: the fit itself, which says whether the line is plausible at all, and its residuals against the values it predicted, which say where it is wrong.
 
-`linear_fit` returns the slope, the intercept and the r², so the residuals can be computed in the open rather than read off the chart. The [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) draws the same fit with `show_regression` and shades its confidence band with `show_ci`. In the residual plot the reference is the zero line — an `hlines` mark — and the shape to look for is no shape: a horizontal band of even width. A [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) stacks the two, one above the other. The cells keep their own x-axes rather than sharing one, because the residuals are plotted against *fitted* values, not against flipper length.
+`linear_fit` returns the slope, the intercept and the r², so the residuals can be computed in the open rather than read off the chart. The [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) draws the same fit with `show_regression` and shades its confidence band with `show_ci`. In the residual plot the reference is the zero line, an `hlines` mark, and the shape to look for is no shape: a horizontal band of even width. A [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) stacks the two, one above the other. The cells keep their own x-axes rather than sharing one, because the residuals are plotted against *fitted* values, not against flipper length.
 
 ```
 flipper = np.array(values("flipper length"), dtype=float)
@@ -387,11 +387,11 @@ Grid(
 ).show()
 ```
 
-The line explains about three quarters of the variation in body mass, and the residual band is flat and of even width — no curve the line missed, and no fan opening towards the heavy end. The one structure left is a dip in the middle of the range, where Chinstrap birds sit on average 216 g below the line: the species mixture the correlation figures found, showing up again as the thing a single line cannot absorb.
+The line explains about three quarters of the variation in body mass, and the residual band is flat and of even width: no curve the line missed, and no fan opening towards the heavy end. The one structure left is a dip in the middle of the range, where Chinstrap birds sit on average 216 g below the line: the species mixture the correlation figures found, showing up again as the thing a single line cannot absorb.
 
 ### Are the residuals normal enough to quote an interval?
 
-Every interval and p-value a least-squares fit reports assumes its residuals are roughly normal. A Q-Q plot tests that by eye: sort the residuals, divide them by their standard deviation, and plot each against the value a standard normal distribution would have put in that position. If the assumption holds the points fall on the parity line, which is a `dlines` diagonal — the one reference mark a [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) draws without a data series behind it.
+Every interval and p-value a least-squares fit reports assumes its residuals are roughly normal. A Q-Q plot tests that by eye: sort the residuals, divide them by their standard deviation, and plot each against the value a standard normal distribution would have put in that position. If the assumption holds the points fall on the parity line, which is a `dlines` diagonal, the one reference mark a [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) draws without a data series behind it.
 
 The Shapiro-Wilk test answers the same question with one number, and the two belong together: the test says whether to reject, the figure says *where* the deviation is, and on 342 points a test will flag departures too small to matter.
 
@@ -429,7 +429,7 @@ The middle of the distribution lies on the line and both ends sit above it: the 
 
 ### What do the distributions say with no model at all?
 
-The first figure of this page drew densities, which means it drew a bandwidth choice. The last one draws none: an empirical cumulative distribution puts each observation at its own rank, so the curve is the data and nothing else. Any quantile can be read straight off it — the median is where the curve crosses 0.5 — and two curves that never touch are two distributions that do not overlap at all.
+The first figure of this page drew densities, which means it drew a bandwidth choice. The last one draws none: an empirical cumulative distribution puts each observation at its own rank, so the curve is the data and nothing else. Any quantile can be read straight off it (the median is where the curve crosses 0.5), and two curves that never touch are two distributions that do not overlap at all.
 
 A [line chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) draws it once the points are sorted, with `plot_line_drawstyle` set to a stepped style so the curve rises at the observations instead of sloping between them, which is what a smooth line would falsely imply.
 
@@ -456,11 +456,11 @@ LineChart(
 ).show()
 ```
 
-The Adelie and Chinstrap curves run through each other for their whole length, which is the non-significant pair of the first figure seen without any test. The Gentoo curve only starts where the other two are already seven tenths of the way up, and the horizontal 0.5 line crosses it about 1.3 kg further right — the same effect the second figure measured, read straight off the data.
+The Adelie and Chinstrap curves run through each other for their whole length, which is the non-significant pair of the first figure seen without any test. The Gentoo curve only starts where the other two are already seven tenths of the way up, and the horizontal 0.5 line crosses it about 1.3 kg further right: the same effect the second figure measured, read straight off the data.
 
 ## The report figure
 
-A paper has room for one figure, not nine. The four that carry the argument — the groups differ, here is what moves with what, here is the model, and here is why its intervals can be trusted — go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout: one inner list per row.
+A paper has room for one figure, not nine. The four that carry the argument (the groups differ, here is what moves with what, here is the model, and here is why its intervals can be trusted) go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout: one inner list per row.
 
 ```
 Grid(

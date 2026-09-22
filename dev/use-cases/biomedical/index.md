@@ -2,7 +2,7 @@
 
 A trial report asks the same questions in the same order: did the arms differ at the end, how large is the difference and does it grow with the dose, how many subjects reached the target, when did the arms separate, who stayed in the trial, what else moved, and is any of it a safety concern. This page walks one trial through those questions and names the figure that answers each, so the chart to reach for arrives with the question rather than the other way round. Every figure links to the chart guide that covers it in full.
 
-The trial is a **simulated** 12-week, three-arm study of a glucose-lowering compound: 40 subjects each on placebo, a low dose and a high dose, with HbA1c measured at five visits, a panel of eight metabolic markers, four safety labs, and a dropout each time a subject left. It is one seeded numpy draw in a hidden cell, so every docs build produces the same figures, and it stands in for any arm-by-time experiment — a preclinical dose study, a cell assay across conditions, a cohort followed over visits. The tests are `scipy.stats` calls written out in the open; a real protocol would prespecify a covariate-adjusted model in their place.
+The trial is a **simulated** 12-week, three-arm study of a glucose-lowering compound: 40 subjects each on placebo, a low dose and a high dose, with HbA1c measured at five visits, a panel of eight metabolic markers, four safety labs, and a dropout each time a subject left. It is one seeded numpy draw in a hidden cell, so every docs build produces the same figures, and it stands in for any arm-by-time experiment (a preclinical dose study, a cell assay across conditions, a cohort followed over visits). The tests are `scipy.stats` calls written out in the open; a real protocol would prespecify a covariate-adjusted model in their place.
 
 ```
 import numpy as np
@@ -35,7 +35,7 @@ The hidden cell below holds the whole simulation. `subjects` is one dict per sub
 
 ### Do the arms differ at the end of the trial?
 
-The first figure of a trial report shows the endpoint itself, per arm, with every subject visible: a test says whether the arms differ, and only the points say whether one outlier or one subgroup is doing the work. A [box plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/boxplot/index.md) gives each arm its median and quartiles, and a [swarm plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/swarmplot/index.md) laid over it in a [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) adds the subjects themselves — the two share their category positions, so the points land on their boxes. The endpoint is the change from baseline at week 12, for the subjects who reached it.
+The first figure of a trial report shows the endpoint itself, per arm, with every subject visible: a test says whether the arms differ, and only the points say whether one outlier or one subgroup is doing the work. A [box plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/boxplot/index.md) gives each arm its median and quartiles, and a [swarm plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/swarmplot/index.md) laid over it in a [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) adds the subjects themselves; the two share their category positions, so the points land on their boxes. The endpoint is the change from baseline at week 12, for the subjects who reached it.
 
 The test is the Kruskal-Wallis H, a rank-based one-way test that asks whether any arm sits apart from the others, chosen over an ANOVA because nothing yet says the changes are normal. A significant omnibus result says only *some* pair differs, so each pair gets a Mann-Whitney U test and the three p-values are corrected for having been asked together with the Holm step-down rule.
 
@@ -150,11 +150,11 @@ dose_figure = BarChart(
 dose_figure.show()
 ```
 
-The placebo arm falls by about 0.16 points, which is the drift a trial expects from regression to the mean and closer attention; the low dose adds roughly 0.4 to that and the high dose another 0.45. No interval reaches its neighbour, so the dose-response is monotone and each step is established, not merely suggested. That is the sentence a report quotes, and this figure is where it comes from.
+The placebo arm falls by about 0.16 points, which is the drift a trial expects from regression to the mean and closer attention; the low dose adds roughly 0.4 to that and the high dose another 0.45. No interval reaches its neighbour, so the dose-response is monotone and each step is established rather than merely suggested.
 
 ### How many subjects reached the target?
 
-A mean change is the trialist's number; the clinician's number is how many subjects ended under the treatment target. Both are read off the distribution of week-12 values, and a [violin plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/violinplot/index.md) shows that distribution's shape per arm — where its bulk sits, and whether a tail reaches across the target line. The target is an `hlines` mark with a `label`, so it enters the legend, and the share of each arm at or under it is a `texts` note at that arm's position, placed in data coordinates.
+A mean change is the trialist's number; the clinician's number is how many subjects ended under the treatment target. Both are read off the distribution of week-12 values, and a [violin plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/violinplot/index.md) shows that distribution's shape per arm: where its bulk sits, and whether a tail reaches across the target line. The target is an `hlines` mark with a `label`, so it enters the legend, and the share of each arm at or under it is a `texts` note at that arm's position, placed in data coordinates.
 
 ```
 TARGET = 7.0
@@ -193,7 +193,7 @@ The placebo violin sits almost entirely above the line, the low-dose one is cent
 
 ### When did the arms separate?
 
-An endpoint is one visit; the trial had five, and the course between them says when the effect appeared and whether it had finished by the end. A [line chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) draws the arm means over the visits, and `show_yerr` turns the `yerr` of each point into a band — here the 95% confidence interval of the mean, so where two bands stop overlapping is roughly where two arms become distinguishable.
+An endpoint is one visit; the trial had five, and the course between them says when the effect appeared and whether it had finished by the end. A [line chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) draws the arm means over the visits, and `show_yerr` turns the `yerr` of each point into a band, here the 95% confidence interval of the mean, so where two bands stop overlapping is roughly where two arms become distinguishable.
 
 ```
 course = {
@@ -232,7 +232,7 @@ course_figure = LineChart(
 course_figure.show()
 ```
 
-The three lines leave the same point and the high-dose band has cleared the placebo band by week 4; the low-dose band takes until week 8. Both dose curves are still falling at week 12, more slowly than before, so the trial ended before the effect had fully settled — a 24-week extension would be the obvious next study, and this figure is the argument for it.
+The three lines leave the same point and the high-dose band has cleared the placebo band by week 4; the low-dose band takes until week 8. Both dose curves are still falling at week 12, more slowly than before, so the trial ended before the effect had fully settled; a 24-week extension is the obvious next study, and this figure is the argument for it.
 
 ### Did every subject follow the mean?
 
@@ -304,7 +304,7 @@ retention_figure = LineChart(
 retention_figure.show()
 ```
 
-Nine placebo subjects left against two and three on the doses, and the placebo curve drops steadily from the first week: subjects who feel no benefit stop coming. That matters for the endpoint figure, which saw only the completers — an arm that loses its non-responders looks better at week 12 than it was. The retention figure is where a reader checks whether that could have happened, and here it is the placebo arm, not the treated ones, that thinned.
+Nine placebo subjects left against two and three on the doses, and the placebo curve drops steadily from the first week: subjects who feel no benefit stop coming. That matters for the endpoint figure, which saw only the completers: an arm that loses its non-responders looks better at week 12 than it was. The retention figure is where a reader checks for that, and here the placebo arm thinned while the treated ones did not.
 
 ## The wider panel
 
@@ -331,11 +331,11 @@ marker_figure = Heatmap(
 marker_figure.show()
 ```
 
-The placebo column is near white throughout, the columns darken left to right, and the insulin-resistance rows darken most — the compound is doing what its mechanism predicts. The one cell running the other way is HDL cholesterol, which rises, and a rise in HDL is a favourable change; a diverging colormap makes that opposite sign visible where a single-hue one would have hidden it as a light cell.
+The placebo column is near white throughout, the columns darken left to right, and the insulin-resistance rows darken most: the compound is doing what its mechanism predicts. The one cell running the other way is HDL cholesterol, which rises, and a rise in HDL is a favourable change; a diverging colormap makes that opposite sign visible where a single-hue one would have hidden it as a light cell.
 
 ### Where are the safety signals?
 
-The safety labs are read differently from the efficacy markers: the question is not how far each moved but whether any moved at all, per arm, from a baseline that should have been the same in every arm. Two values per arm and lab — baseline and week 12 — is a [dumbbell chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md): a dot at each, a connector between, and `show_values="delta"` printing the change at the connector. The labs live on four different scales, so `subplots=True` gives each its own axes, and `show_direction` draws an arrow from baseline to week 12 so the direction reads without a legend.
+The safety labs are read differently from the efficacy markers: the safety question is whether any lab moved at all, per arm, from a baseline that should have been the same in every arm. Two values per arm and lab (baseline and week 12) is a [dumbbell chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md): a dot at each, a connector between, and `show_values="delta"` printing the change at the connector. The labs live on four different scales, so `subplots=True` gives each its own axes, and `show_direction` draws an arrow from baseline to week 12 so the direction reads without a legend.
 
 ```
 DumbbellChart(
@@ -396,11 +396,11 @@ alt_figure = SwarmPlot(
 alt_figure.show()
 ```
 
-The three swarms sit on the zero line with the same spread, and four outlined points stand alone above the flag. The arm mean was those four subjects, not the arm: the rest of the high-dose swarm is indistinguishable from placebo. The report's sentence changes accordingly — from "ALT rose on the high dose" to "four of forty high-dose subjects had a flagged ALT rise" — and the figure is the evidence for the second version.
+The three swarms sit on the zero line with the same spread, and four outlined points stand alone above the flag. The arm mean was those four subjects, not the arm: the rest of the high-dose swarm is indistinguishable from placebo. The report's sentence changes accordingly, from "ALT rose on the high dose" to "four of forty high-dose subjects had a flagged ALT rise", and the figure is the evidence for the second version.
 
 ## The report figure
 
-A paper has room for one figure, not nine. The four that carry the argument — the arms differ, here is when they parted, here is the rest of the panel, and here is who stayed — go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout: one inner list per row. The endpoint cell is itself a `Panel`, and the grid takes it like any other figure.
+A paper has room for one figure, not nine. The four that carry the argument (the arms differ, here is when they parted, here is the rest of the panel, and here is who stayed) go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout: one inner list per row. The endpoint cell is itself a `Panel`, and the grid takes it like any other figure.
 
 ```
 Grid(

@@ -2,7 +2,7 @@
 
 A model report answers the same handful of questions in the same order: did the run converge, which settings won, what does the model get wrong, can its confidence be trusted, how does it compare with what others have published, and what is in the data behind it. This page walks one story through those questions and names the figure that answers each, so the chart to reach for comes with the question rather than the other way round. Every figure links to the chart guide that covers it in full.
 
-The story is a six-class support ticket classifier: a small encoder fine-tuned to route tickets into `Billing`, `Refunds`, `Shipping`, `Account`, `Technical`, and `Feedback`. Its training log, its held-out predictions, and its corpus are **simulated** — one seeded numpy draw in a hidden cell, so every docs build produces the same figures. The model comparison is the exception: those figures use published benchmark numbers, with the source named where they appear.
+The story is a six-class support ticket classifier: a small encoder fine-tuned to route tickets into `Billing`, `Refunds`, `Shipping`, `Account`, `Technical`, and `Feedback`. Its training log, its held-out predictions, and its corpus are **simulated**: one seeded numpy draw in a hidden cell, so every docs build produces the same figures. The model comparison is the exception: those figures use published benchmark numbers, with the source named where they appear.
 
 ```
 from datachart.charts import (
@@ -27,7 +27,7 @@ The hidden cell below holds the whole simulation: `train_loss` and `valid_loss` 
 
 ### Did the run converge, and what was the schedule doing?
 
-The first figure of any report is the loss against the step, and it has to answer two questions at once: whether training and validation still move together, and what the learning rate was doing while they did. The five seeds become one line with an error band — `yerr` per point and `show_yerr=True` — and the warmup is a shaded `vspans` band rather than a note in the caption. The schedule belongs on its own axis, so the two charts go into a [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) with the schedule on the right one; the band stays on the left-axis figure, since reference marks are drawn against the axis of the figure that carries them.
+The first figure of any report is the loss against the step, and it has to answer two questions at once: whether training and validation still move together, and what the learning rate was doing while they did. The five seeds become one line with an error band (`yerr` per point and `show_yerr=True`), and the warmup is a shaded `vspans` band rather than a note in the caption. The schedule belongs on its own axis, so the two charts go into a [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) with the schedule on the right one; the band stays on the left-axis figure, since reference marks are drawn against the axis of the figure that carries them.
 
 Each point of a [line chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) is a dict with `x`, `y`, and, here, the spread across seeds as `yerr`:
 
@@ -72,7 +72,7 @@ loss_figure = Panel(
 loss_figure.show()
 ```
 
-The band is the story: the seeds agree while the loss falls and start to disagree once the validation curve flattens, which is where the run stops being worth continuing.
+The band carries the finding: the seeds agree while the loss falls and start to disagree once the validation curve flattens, which is where the run stops being worth continuing.
 
 ### Which settings actually mattered?
 
@@ -110,7 +110,7 @@ Every line that ends near the top of the last axis passes through a learning rat
 
 ### Which classes does the model confuse?
 
-A confusion matrix is a grid of counts, and a grid of counts is a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md). Raw counts make the biggest class the brightest row whatever the model does, so the cells hold the share of each true class — every row sums to 1 — and the class sizes move into the row labels, where they belong. `z` is the grid, `x` and `y` are its labels, and `show_heatmap_values` writes each cell into the figure so the matrix reads as a table too.
+A confusion matrix is a grid of counts, and a grid of counts is a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md). Raw counts make the biggest class the brightest row whatever the model does, so the cells hold the share of each true class (every row sums to 1) and the class sizes move into the row labels, where they belong. `z` is the grid, `x` and `y` are its labels, and `show_heatmap_values` writes each cell into the figure so the matrix reads as a table too.
 
 ```
 row_labels = [
@@ -136,7 +136,7 @@ confusion_figure.show()
 
 ### How does the model trade precision for recall?
 
-Both curves sweep the decision threshold, so both are line charts over a derived pair of arrays. What makes them readable is the reference line each needs: a ROC curve is read against chance, which is the diagonal, and a precision-recall curve is read against the share of positives, which is a horizontal line. `dlines` draws the first and `hlines` the second, so neither has to be faked with an extra data series. The two go side by side in a [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), since they answer one question together; both are [line charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) over a pair of arrays.
+Both curves sweep the decision threshold, so both are line charts over a derived pair of arrays. Each needs a reference line to be readable: a ROC curve is read against chance, which is the diagonal, and a precision-recall curve is read against the share of positives, which is a horizontal line. `dlines` draws the first and `hlines` the second, so neither has to be faked with an extra data series. The two go side by side in a [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), since they answer one question together; both are [line charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) over a pair of arrays.
 
 ```
 def as_points(xs, ys):
@@ -176,7 +176,7 @@ Grid(
 ).show()
 ```
 
-Both ROC curves hug the top left, which is what ROC does on an uncommon class: it rewards the model for the true negatives it gets for free. The precision-recall pair, read against the 13% of tickets that really are refunds, is the one to quote — at 80% recall the baseline is right about half the time and the fine-tuned model three times in four.
+Both ROC curves hug the top left, which is what ROC does on an uncommon class: it rewards the model for the true negatives it gets for free. The precision-recall pair, read against the 13% of tickets that really are refunds, is the one to quote: at 80% recall the baseline is right about half the time and the fine-tuned model three times in four.
 
 ### Can the model's confidence be trusted?
 
@@ -214,11 +214,11 @@ calibration_figure = Grid(
 calibration_figure.show()
 ```
 
-Every point sits below the parity line, and the histogram says where that matters: most predictions land in the top bin, so the small gap there costs more than the large gap on the left. That is the figure that justifies temperature scaling before the model ships.
+Every point sits below the parity line, and the histogram says where that matters: most predictions land in the top bin, so the small gap there costs more than the large gap on the left. This figure justifies temperature scaling before the model ships.
 
 ### Which classes did the fine-tune actually move?
 
-A per-class score table is a [bar chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md) with the classes on the long axis, which means horizontal bars and `sort` so the order carries information. The point of the figure is not the level but the change, so each record carries its own `emphasis` role: the two classes the fine-tune moved by more than five points are highlighted, the rest are pushed to the background.
+A per-class score table is a [bar chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md) with the classes on the long axis, which means horizontal bars and `sort` so the order carries information. The change is what the figure shows, so each record carries its own `emphasis` role: the two classes the fine-tune moved by more than five points are highlighted, the rest are pushed to the background.
 
 ```
 f1_records = [
@@ -245,7 +245,7 @@ BarChart(
 
 ### Which features carry the decision?
 
-Permutation importance produces the same shape — one label, one number — so it is the same [bar chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md), and the two figures read as a pair in a report. The table here is written out rather than simulated, as the output of such a run usually is.
+Permutation importance produces the same shape, one label and one number, so it is the same [bar chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md), and the two figures read as a pair in a report. The table here is written out rather than simulated, as the output of such a run usually is.
 
 ```
 # the drop in macro F1 when the token is shuffled out of the input
@@ -303,7 +303,7 @@ leaderboard_figure = BumpChart(
 leaderboard_figure.show()
 ```
 
-Only one pair crosses: Gemma2-9B leads Qwen2-7B on MMLU, the knowledge benchmark, and trails it on the three that ask for reasoning or code. Everything else keeps its place, which is itself the finding — a single average would have said as much with less work, and would have hidden the one exception.
+Only one pair crosses: Gemma2-9B leads Qwen2-7B on MMLU, the knowledge benchmark, and trails it on the three that ask for reasoning or code. Everything else keeps its place. A single average would have reported the same order with less work and hidden the one exception.
 
 ### What did a round of post-training change?
 
@@ -381,13 +381,13 @@ ScatterChart(
 ).show()
 ```
 
-The MMLU bars are shorter than the markers; the HumanEval bars reach about eight points either way, so the Gemma2-9B and Llama3-8B scores on that benchmark are not distinguishable at all. This interval is the optimistic one — it counts only the sampling of the test set, not the prompt, the decoding, or the seed.
+The MMLU bars are shorter than the markers; the HumanEval bars reach about eight points either way, so the Gemma2-9B and Llama3-8B scores on that benchmark are not distinguishable at all. This interval is the optimistic one: it counts only the sampling of the test set, and none of the prompt, the decoding, or the seed.
 
 ## The corpus behind the model
 
 ### How long are the documents, and did the splits stay comparable?
 
-One distribution per split, stacked so the shapes can be compared, is a [ridgeline plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/ridgelineplot/index.md): each record is a `label` and a `value`, and the chart estimates the density per label. It answers a question a summary table cannot — whether the splits were drawn from the same population.
+One distribution per split, stacked so the shapes can be compared, is a [ridgeline plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/ridgelineplot/index.md): each record is a `label` and a `value`, and the chart estimates the density per label. It answers a question a summary table cannot: whether the splits were drawn from the same population.
 
 ```
 lengths = [
@@ -407,7 +407,7 @@ RidgelinePlot(
 ).show()
 ```
 
-Train and validation sit on top of each other, as they should — they were split at random. The test split was collected a quarter later and its whole distribution has moved right, which is worth a sentence in the report before any score from it is believed.
+Train and validation sit on top of each other, as they should, since they were split at random. The test split was collected a quarter later and its whole distribution has moved right, which is worth a sentence in the report before any score from it is believed.
 
 ### Does the vocabulary behave?
 
@@ -458,11 +458,11 @@ SankeyChart(
 ).show()
 ```
 
-The last ribbon is a hairline, and that is the finding: labelling, not crawling, is what the corpus is short of. Four numbers in a paragraph never make that as obvious as a ribbon that disappears.
+The last ribbon is a hairline: the corpus is short of labelled documents, not of crawled ones. A ribbon that disappears makes that plainer than four numbers in a paragraph.
 
 ## The report figure
 
-A paper or a model card rarely has room for thirteen figures. The four that carry the argument — the run converged, here is what it confuses, here is where it sits among published models, and here is how much its confidence is worth — go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout: one inner list per row.
+A paper or a model card rarely has room for thirteen figures. The four that carry the argument (the run converged, here is what it confuses, here is where it sits among published models, and here is how much its confidence is worth) go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout: one inner list per row.
 
 ```
 Grid(

@@ -18,7 +18,7 @@
         <link rel="prev" href="../statistics/">
       
       
-        <link rel="next" href="../../references/">
+        <link rel="next" href="../demographics/">
       
       
         
@@ -2233,6 +2233,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -2575,6 +2583,118 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../demographics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demographics and Social Science
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../business/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Business and Product Analytics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../economics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Economics and Finance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../seismology/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Earth Science: Seismology and Geodesy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -5013,7 +5133,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>A trial report asks the same questions in the same order: did the arms differ at the end, how large is the difference and does it grow with the dose, how many subjects reached the target, when did the arms separate, who stayed in the trial, what else moved, and is any of it a safety concern. This page walks one trial through those questions and names the figure that answers each, so the chart to reach for arrives with the question rather than the other way round. Every figure links to the chart guide that covers it in full.</p>
-<p>The trial is a <strong>simulated</strong> 12-week, three-arm study of a glucose-lowering compound: 40 subjects each on placebo, a low dose and a high dose, with HbA1c measured at five visits, a panel of eight metabolic markers, four safety labs, and a dropout each time a subject left. It is one seeded numpy draw in a hidden cell, so every docs build produces the same figures, and it stands in for any arm-by-time experiment — a preclinical dose study, a cell assay across conditions, a cohort followed over visits. The tests are <code>scipy.stats</code> calls written out in the open; a real protocol would prespecify a covariate-adjusted model in their place.</p>
+<p>The trial is a <strong>simulated</strong> 12-week, three-arm study of a glucose-lowering compound: 40 subjects each on placebo, a low dose and a high dose, with HbA1c measured at five visits, a panel of eight metabolic markers, four safety labs, and a dropout each time a subject left. It is one seeded numpy draw in a hidden cell, so every docs build produces the same figures, and it stands in for any arm-by-time experiment (a preclinical dose study, a cell assay across conditions, a cohort followed over visits). The tests are <code>scipy.stats</code> calls written out in the open; a real protocol would prespecify a covariate-adjusted model in their place.</p>
 </div>
 </div>
 </div>
@@ -5118,7 +5238,7 @@ from datachart.utils.stats import bootstrap_ci</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="do-the-arms-differ-at-the-end-of-the-trial">Do the arms differ at the end of the trial?<a class="anchor-link" href="#do-the-arms-differ-at-the-end-of-the-trial">¶</a></h3><p>The first figure of a trial report shows the endpoint itself, per arm, with every subject visible: a test says whether the arms differ, and only the points say whether one outlier or one subgroup is doing the work. A <a href="../../how-to-guides/charts/boxplot/">box plot</a> gives each arm its median and quartiles, and a <a href="../../how-to-guides/charts/swarmplot/">swarm plot</a> laid over it in a <a href="../../how-to-guides/utility/panel/">Panel</a> adds the subjects themselves — the two share their category positions, so the points land on their boxes. The endpoint is the change from baseline at week 12, for the subjects who reached it.</p>
+<h3 id="do-the-arms-differ-at-the-end-of-the-trial">Do the arms differ at the end of the trial?<a class="anchor-link" href="#do-the-arms-differ-at-the-end-of-the-trial">¶</a></h3><p>The first figure of a trial report shows the endpoint itself, per arm, with every subject visible: a test says whether the arms differ, and only the points say whether one outlier or one subgroup is doing the work. A <a href="../../how-to-guides/charts/boxplot/">box plot</a> gives each arm its median and quartiles, and a <a href="../../how-to-guides/charts/swarmplot/">swarm plot</a> laid over it in a <a href="../../how-to-guides/utility/panel/">Panel</a> adds the subjects themselves; the two share their category positions, so the points land on their boxes. The endpoint is the change from baseline at week 12, for the subjects who reached it.</p>
 <p>The test is the Kruskal-Wallis H, a rank-based one-way test that asks whether any arm sits apart from the others, chosen over an ANOVA because nothing yet says the changes are normal. A significant omnibus result says only <em>some</em> pair differs, so each pair gets a Mann-Whitney U test and the three p-values are corrected for having been asked together with the Holm step-down rule.</p>
 </div>
 </div>
@@ -5459,7 +5579,7 @@ dose_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The placebo arm falls by about 0.16 points, which is the drift a trial expects from regression to the mean and closer attention; the low dose adds roughly 0.4 to that and the high dose another 0.45. No interval reaches its neighbour, so the dose-response is monotone and each step is established, not merely suggested. That is the sentence a report quotes, and this figure is where it comes from.</p>
+<p>The placebo arm falls by about 0.16 points, which is the drift a trial expects from regression to the mean and closer attention; the low dose adds roughly 0.4 to that and the high dose another 0.45. No interval reaches its neighbour, so the dose-response is monotone and each step is established rather than merely suggested.</p>
 </div>
 </div>
 </div>
@@ -5470,7 +5590,7 @@ dose_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="how-many-subjects-reached-the-target">How many subjects reached the target?<a class="anchor-link" href="#how-many-subjects-reached-the-target">¶</a></h3><p>A mean change is the trialist's number; the clinician's number is how many subjects ended under the treatment target. Both are read off the distribution of week-12 values, and a <a href="../../how-to-guides/charts/violinplot/">violin plot</a> shows that distribution's shape per arm — where its bulk sits, and whether a tail reaches across the target line. The target is an <code>hlines</code> mark with a <code>label</code>, so it enters the legend, and the share of each arm at or under it is a <code>texts</code> note at that arm's position, placed in data coordinates.</p>
+<h3 id="how-many-subjects-reached-the-target">How many subjects reached the target?<a class="anchor-link" href="#how-many-subjects-reached-the-target">¶</a></h3><p>A mean change is the trialist's number; the clinician's number is how many subjects ended under the treatment target. Both are read off the distribution of week-12 values, and a <a href="../../how-to-guides/charts/violinplot/">violin plot</a> shows that distribution's shape per arm: where its bulk sits, and whether a tail reaches across the target line. The target is an <code>hlines</code> mark with a <code>label</code>, so it enters the legend, and the share of each arm at or under it is a <code>texts</code> note at that arm's position, placed in data coordinates.</p>
 </div>
 </div>
 </div>
@@ -5596,7 +5716,7 @@ target_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="when-did-the-arms-separate">When did the arms separate?<a class="anchor-link" href="#when-did-the-arms-separate">¶</a></h3><p>An endpoint is one visit; the trial had five, and the course between them says when the effect appeared and whether it had finished by the end. A <a href="../../how-to-guides/charts/linechart/">line chart</a> draws the arm means over the visits, and <code>show_yerr</code> turns the <code>yerr</code> of each point into a band — here the 95% confidence interval of the mean, so where two bands stop overlapping is roughly where two arms become distinguishable.</p>
+<h3 id="when-did-the-arms-separate">When did the arms separate?<a class="anchor-link" href="#when-did-the-arms-separate">¶</a></h3><p>An endpoint is one visit; the trial had five, and the course between them says when the effect appeared and whether it had finished by the end. A <a href="../../how-to-guides/charts/linechart/">line chart</a> draws the arm means over the visits, and <code>show_yerr</code> turns the <code>yerr</code> of each point into a band, here the 95% confidence interval of the mean, so where two bands stop overlapping is roughly where two arms become distinguishable.</p>
 </div>
 </div>
 </div>
@@ -5712,7 +5832,7 @@ course_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The three lines leave the same point and the high-dose band has cleared the placebo band by week 4; the low-dose band takes until week 8. Both dose curves are still falling at week 12, more slowly than before, so the trial ended before the effect had fully settled — a 24-week extension would be the obvious next study, and this figure is the argument for it.</p>
+<p>The three lines leave the same point and the high-dose band has cleared the placebo band by week 4; the low-dose band takes until week 8. Both dose curves are still falling at week 12, more slowly than before, so the trial ended before the effect had fully settled; a 24-week extension is the obvious next study, and this figure is the argument for it.</p>
 </div>
 </div>
 </div>
@@ -5938,7 +6058,7 @@ retention_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Nine placebo subjects left against two and three on the doses, and the placebo curve drops steadily from the first week: subjects who feel no benefit stop coming. That matters for the endpoint figure, which saw only the completers — an arm that loses its non-responders looks better at week 12 than it was. The retention figure is where a reader checks whether that could have happened, and here it is the placebo arm, not the treated ones, that thinned.</p>
+<p>Nine placebo subjects left against two and three on the doses, and the placebo curve drops steadily from the first week: subjects who feel no benefit stop coming. That matters for the endpoint figure, which saw only the completers: an arm that loses its non-responders looks better at week 12 than it was. The retention figure is where a reader checks for that, and here the placebo arm thinned while the treated ones did not.</p>
 </div>
 </div>
 </div>
@@ -6040,7 +6160,7 @@ marker_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The placebo column is near white throughout, the columns darken left to right, and the insulin-resistance rows darken most — the compound is doing what its mechanism predicts. The one cell running the other way is HDL cholesterol, which rises, and a rise in HDL is a favourable change; a diverging colormap makes that opposite sign visible where a single-hue one would have hidden it as a light cell.</p>
+<p>The placebo column is near white throughout, the columns darken left to right, and the insulin-resistance rows darken most: the compound is doing what its mechanism predicts. The one cell running the other way is HDL cholesterol, which rises, and a rise in HDL is a favourable change; a diverging colormap makes that opposite sign visible where a single-hue one would have hidden it as a light cell.</p>
 </div>
 </div>
 </div>
@@ -6051,7 +6171,7 @@ marker_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="where-are-the-safety-signals">Where are the safety signals?<a class="anchor-link" href="#where-are-the-safety-signals">¶</a></h3><p>The safety labs are read differently from the efficacy markers: the question is not how far each moved but whether any moved at all, per arm, from a baseline that should have been the same in every arm. Two values per arm and lab — baseline and week 12 — is a <a href="../../how-to-guides/charts/dumbbellchart/">dumbbell chart</a>: a dot at each, a connector between, and <code>show_values="delta"</code> printing the change at the connector. The labs live on four different scales, so <code>subplots=True</code> gives each its own axes, and <code>show_direction</code> draws an arrow from baseline to week 12 so the direction reads without a legend.</p>
+<h3 id="where-are-the-safety-signals">Where are the safety signals?<a class="anchor-link" href="#where-are-the-safety-signals">¶</a></h3><p>The safety labs are read differently from the efficacy markers: the safety question is whether any lab moved at all, per arm, from a baseline that should have been the same in every arm. Two values per arm and lab (baseline and week 12) is a <a href="../../how-to-guides/charts/dumbbellchart/">dumbbell chart</a>: a dot at each, a connector between, and <code>show_values="delta"</code> printing the change at the connector. The labs live on four different scales, so <code>subplots=True</code> gives each its own axes, and <code>show_direction</code> draws an arrow from baseline to week 12 so the direction reads without a legend.</p>
 </div>
 </div>
 </div>
@@ -6252,7 +6372,7 @@ alt_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The three swarms sit on the zero line with the same spread, and four outlined points stand alone above the flag. The arm mean was those four subjects, not the arm: the rest of the high-dose swarm is indistinguishable from placebo. The report's sentence changes accordingly — from "ALT rose on the high dose" to "four of forty high-dose subjects had a flagged ALT rise" — and the figure is the evidence for the second version.</p>
+<p>The three swarms sit on the zero line with the same spread, and four outlined points stand alone above the flag. The arm mean was those four subjects, not the arm: the rest of the high-dose swarm is indistinguishable from placebo. The report's sentence changes accordingly, from "ALT rose on the high dose" to "four of forty high-dose subjects had a flagged ALT rise", and the figure is the evidence for the second version.</p>
 </div>
 </div>
 </div>
@@ -6274,7 +6394,7 @@ alt_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>A paper has room for one figure, not nine. The four that carry the argument — the arms differ, here is when they parted, here is the rest of the panel, and here is who stayed — go into one panel with <a href="../../how-to-guides/utility/grid/">Grid</a>, which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout: one inner list per row. The endpoint cell is itself a <code>Panel</code>, and the grid takes it like any other figure.</p>
+<p>A paper has room for one figure, not nine. The four that carry the argument (the arms differ, here is when they parted, here is the rest of the panel, and here is who stayed) go into one panel with <a href="../../how-to-guides/utility/grid/">Grid</a>, which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout: one inner list per row. The endpoint cell is itself a <code>Panel</code>, and the grid takes it like any other figure.</p>
 </div>
 </div>
 </div>
@@ -6402,13 +6522,13 @@ alt_figure.show()</div>
         
         
           
-          <a href="../../references/" class="md-footer__link md-footer__link--next" aria-label="Next: Datachart Module">
+          <a href="../demographics/" class="md-footer__link md-footer__link--next" aria-label="Next: Demographics and Social Science">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Datachart Module
+                Demographics and Social Science
               </div>
             </div>
             <div class="md-footer__button md-icon">

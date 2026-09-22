@@ -18850,7 +18850,7 @@ save_figure(figure, "rainfall_grid.pdf")   # the static figure, unchanged by the
 
 The how-to guides answer "how do I draw this chart?". The use cases answer the question a reader usually arrives with: "which figures does my report need, and how do I build them?" Each page takes one field, walks one dataset from the first figure to the last, and ends with the figures composed into a single panel. Every figure links to the chart guide behind it, so the page stays a tour and the guide stays the reference.
 
-The section grows one field at a time: AI, machine learning and NLP, statistics, then medical and biomedical experiments.
+The section grows one field at a time: AI, machine learning and NLP, statistics, medical and biomedical experiments, demographics and social science, business and product analytics, economics and finance, and seismology and geodesy.
 
 - [AI, Machine Learning and NLP](https://eriknovak.github.io/datachart/dev/use-cases/ai-ml-nlp/index.md)
 
@@ -18864,26 +18864,53 @@ The section grows one field at a time: AI, machine learning and NLP, statistics,
 
   The figures of a trial report, in the order the questions come: the endpoint per arm with its pairwise tests, the dose-response with intervals, the share at target, the course of the arms over the visits, every subject's own course, who stayed enrolled, the wider marker panel, the safety labs, and the individuals behind a safety signal.
 
+- [Demographics and Social Science](https://eriknovak.github.io/datachart/dev/use-cases/demographics/index.md)
+
+  The figures of a population report, from one country to the world: the pyramid then and now, how the young and the old traded places, the fertility and longevity behind it, who arrives and who leaves, which regions age fastest, who gained the most years of life, whether the world is converging, and whether income still buys longevity.
+
+- [Business and Product Analytics](https://eriknovak.github.io/datachart/dev/use-cases/business/index.md)
+
+  The figures of a product review, in the order the questions come: the revenue mix by plan, the segments that carry it, the channels and their changing ranks, where the funnel leaks, when people sign up, whether the customers who pay stay, and what ships next.
+
+- [Economics and Finance](https://eriknovak.github.io/datachart/dev/use-cases/economics/index.md)
+
+  The figures of an economic report on the major economies: growth and its recessions, which economies are largest and how the order changed, how structure shifts with growth, where inflation bit, what the pandemic year cost, who caught up on income, and the G20 compared on every front at once.
+
+- [Seismology and Geodesy](https://eriknovak.github.io/datachart/dev/use-cases/seismology/index.md)
+
+  The figures of an earthquake report on one year of one region: where the seismicity concentrates, what the ground under it looks like, how the magnitudes are distributed, how fast the aftershocks died away, when they arrived, which way the rupture ran, and which instruments were watching.
+
 ## What each page answers
 
-| Page                                                                                                          | Act                       | Questions it answers                                                              | Charts it reaches for                                            |
-| ------------------------------------------------------------------------------------------------------------- | ------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| [AI, Machine Learning and NLP](https://eriknovak.github.io/datachart/dev/use-cases/ai-ml-nlp/index.md)        | Training                  | Did the run converge? Which settings mattered?                                    | `LineChart` in a `Panel`, `ParallelCoords`                       |
-|                                                                                                               | Evaluation                | What does the model confuse? Can its confidence be trusted?                       | `Heatmap`, `LineChart`, `Histogram`, `BarChart`                  |
-|                                                                                                               | Comparison                | Where does it sit among published models, and is the gap real?                    | `BumpChart`, `DumbbellChart`, `ScatterChart`                     |
-|                                                                                                               | The data                  | How long are the documents, and what did filtering remove?                        | `RidgelinePlot`, `LineChart`, `SankeyChart`                      |
-| [Statistics](https://eriknovak.github.io/datachart/dev/use-cases/statistics/index.md)                         | Comparing the groups      | Do the groups differ, and by how much?                                            | `RaincloudPlot`, `ScatterChart`, `Histogram`                     |
-|                                                                                                               | Relating the measurements | Which measurements move together, and how much is the pooling hiding?             | `Heatmap`, `ScatterMatrix`, `ScatterChart`                       |
-|                                                                                                               | Checking the model        | Does the fitted line hold up, and are its residuals well behaved?                 | `ScatterChart` in a `Grid`, `LineChart`                          |
-| [Medical and Biomedical Experiments](https://eriknovak.github.io/datachart/dev/use-cases/biomedical/index.md) | The primary endpoint      | Do the arms differ, by how much, and how many reached the target?                 | `BoxPlot` and `SwarmPlot` in a `Panel`, `BarChart`, `ViolinPlot` |
-|                                                                                                               | Over the twelve weeks     | When did the arms separate, did every subject follow, and who stayed?             | `LineChart`                                                      |
-|                                                                                                               | The wider panel           | What else moved with the dose, and is the safety signal an arm or a few subjects? | `Heatmap`, `DumbbellChart`, `SwarmPlot`                          |
+| Page                                                                                                          | Act                                      | Questions it answers                                                                                                             | Charts it reaches for                                                    |
+| ------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [AI, Machine Learning and NLP](https://eriknovak.github.io/datachart/dev/use-cases/ai-ml-nlp/index.md)        | Training                                 | Did the run converge? Which settings mattered?                                                                                   | `LineChart` in a `Panel`, `ParallelCoords`                               |
+|                                                                                                               | Evaluation                               | What does the model confuse? Can its confidence be trusted?                                                                      | `Heatmap`, `LineChart`, `Histogram`, `BarChart`                          |
+|                                                                                                               | Comparison                               | Where does it sit among published models, and is the gap real?                                                                   | `BumpChart`, `DumbbellChart`, `ScatterChart`                             |
+|                                                                                                               | The data                                 | How long are the documents, and what did filtering remove?                                                                       | `RidgelinePlot`, `LineChart`, `SankeyChart`                              |
+| [Statistics](https://eriknovak.github.io/datachart/dev/use-cases/statistics/index.md)                         | Comparing the groups                     | Do the groups differ, and by how much?                                                                                           | `RaincloudPlot`, `ScatterChart`, `Histogram`                             |
+|                                                                                                               | Relating the measurements                | Which measurements move together, and how much is the pooling hiding?                                                            | `Heatmap`, `ScatterMatrix`, `ScatterChart`                               |
+|                                                                                                               | Checking the model                       | Does the fitted line hold up, and are its residuals well behaved?                                                                | `ScatterChart` in a `Grid`, `LineChart`                                  |
+| [Medical and Biomedical Experiments](https://eriknovak.github.io/datachart/dev/use-cases/biomedical/index.md) | The primary endpoint                     | Do the arms differ, by how much, and how many reached the target?                                                                | `BoxPlot` and `SwarmPlot` in a `Panel`, `BarChart`, `ViolinPlot`         |
+|                                                                                                               | Over the twelve weeks                    | When did the arms separate, did every subject follow, and who stayed?                                                            | `LineChart`                                                              |
+|                                                                                                               | The wider panel                          | What else moved with the dose, and is the safety signal an arm or a few subjects?                                                | `Heatmap`, `DumbbellChart`, `SwarmPlot`                                  |
+| [Demographics and Social Science](https://eriknovak.github.io/datachart/dev/use-cases/demographics/index.md)  | The age structure                        | What does the population look like now and then, how did the shares shift, and what drove it?                                    | `PyramidChart` in a `Grid`, `StackedAreaChart`, `LineChart` in a `Panel` |
+|                                                                                                               | Who comes, who goes, and where they live | Who arrives and who leaves, and which regions are ageing fastest?                                                                | `SankeyChart`, `Heatmap`                                                 |
+|                                                                                                               | The country among the others             | Who gained the most years, is the world converging, and do richer countries live longer?                                         | `DumbbellChart`, `RidgelinePlot`, `ScatterChart`                         |
+| [Business and Product Analytics](https://eriknovak.github.io/datachart/dev/use-cases/business/index.md)       | The revenue                              | Where does the revenue come from, which segments carry it, and which channels bring the customers?                               | `StackedAreaChart`, `Treemap`, `BumpChart`                               |
+|                                                                                                               | Acquisition and retention                | Where does the funnel leak, when do people sign up, and do the customers who pay stay?                                           | `SankeyChart`, `CalendarHeatmap`, `Heatmap`                              |
+|                                                                                                               | Planning                                 | What ships when, and what is late?                                                                                               | `GanttChart`                                                             |
+| [Economics and Finance](https://eriknovak.github.io/datachart/dev/use-cases/economics/index.md)               | Growth                                   | When did the economies shrink, which are the largest, and how does structure change with growth?                                 | `LineChart`, `BumpChart`, `StackedAreaChart` in a `Grid`                 |
+|                                                                                                               | Prices, incomes and the shocks           | Where did inflation bite, what did the pandemic cost, who caught up, and how do the G20 compare at once?                         | `Heatmap`, `BarChart`, `DumbbellChart`, `ParallelCoords`                 |
+| [Seismology and Geodesy](https://eriknovak.github.io/datachart/dev/use-cases/seismology/index.md)             | Where the earthquakes are                | Where does the seismicity concentrate, and what does the ground under it look like?                                              | `HexbinChart`, `ContourChart`                                            |
+|                                                                                                               | The sequence                             | How are the magnitudes distributed, how fast did the aftershocks decay, when did they arrive, and which way did the rupture run? | `LineChart` on log axes, `CalendarHeatmap`, `RadialChart`                |
+|                                                                                                               | The instruments                          | Which stations were watching, and how are they spread?                                                                           | `NetworkChart`                                                           |
 
 # AI, Machine Learning and NLP
 
 A model report answers the same handful of questions in the same order: did the run converge, which settings won, what does the model get wrong, can its confidence be trusted, how does it compare with what others have published, and what is in the data behind it. This page walks one story through those questions and names the figure that answers each, so the chart to reach for comes with the question rather than the other way round. Every figure links to the chart guide that covers it in full.
 
-The story is a six-class support ticket classifier: a small encoder fine-tuned to route tickets into `Billing`, `Refunds`, `Shipping`, `Account`, `Technical`, and `Feedback`. Its training log, its held-out predictions, and its corpus are **simulated** — one seeded numpy draw in a hidden cell, so every docs build produces the same figures. The model comparison is the exception: those figures use published benchmark numbers, with the source named where they appear.
+The story is a six-class support ticket classifier: a small encoder fine-tuned to route tickets into `Billing`, `Refunds`, `Shipping`, `Account`, `Technical`, and `Feedback`. Its training log, its held-out predictions, and its corpus are **simulated**: one seeded numpy draw in a hidden cell, so every docs build produces the same figures. The model comparison is the exception: those figures use published benchmark numbers, with the source named where they appear.
 
 ```
 from datachart.charts import (
@@ -18908,7 +18935,7 @@ The hidden cell below holds the whole simulation: `train_loss` and `valid_loss` 
 
 ### Did the run converge, and what was the schedule doing?
 
-The first figure of any report is the loss against the step, and it has to answer two questions at once: whether training and validation still move together, and what the learning rate was doing while they did. The five seeds become one line with an error band — `yerr` per point and `show_yerr=True` — and the warmup is a shaded `vspans` band rather than a note in the caption. The schedule belongs on its own axis, so the two charts go into a [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) with the schedule on the right one; the band stays on the left-axis figure, since reference marks are drawn against the axis of the figure that carries them.
+The first figure of any report is the loss against the step, and it has to answer two questions at once: whether training and validation still move together, and what the learning rate was doing while they did. The five seeds become one line with an error band (`yerr` per point and `show_yerr=True`), and the warmup is a shaded `vspans` band rather than a note in the caption. The schedule belongs on its own axis, so the two charts go into a [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) with the schedule on the right one; the band stays on the left-axis figure, since reference marks are drawn against the axis of the figure that carries them.
 
 Each point of a [line chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) is a dict with `x`, `y`, and, here, the spread across seeds as `yerr`:
 
@@ -18953,7 +18980,7 @@ loss_figure = Panel(
 loss_figure.show()
 ```
 
-The band is the story: the seeds agree while the loss falls and start to disagree once the validation curve flattens, which is where the run stops being worth continuing.
+The band carries the finding: the seeds agree while the loss falls and start to disagree once the validation curve flattens, which is where the run stops being worth continuing.
 
 ### Which settings actually mattered?
 
@@ -18991,7 +19018,7 @@ Every line that ends near the top of the last axis passes through a learning rat
 
 ### Which classes does the model confuse?
 
-A confusion matrix is a grid of counts, and a grid of counts is a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md). Raw counts make the biggest class the brightest row whatever the model does, so the cells hold the share of each true class — every row sums to 1 — and the class sizes move into the row labels, where they belong. `z` is the grid, `x` and `y` are its labels, and `show_heatmap_values` writes each cell into the figure so the matrix reads as a table too.
+A confusion matrix is a grid of counts, and a grid of counts is a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md). Raw counts make the biggest class the brightest row whatever the model does, so the cells hold the share of each true class (every row sums to 1) and the class sizes move into the row labels, where they belong. `z` is the grid, `x` and `y` are its labels, and `show_heatmap_values` writes each cell into the figure so the matrix reads as a table too.
 
 ```
 row_labels = [
@@ -19017,7 +19044,7 @@ confusion_figure.show()
 
 ### How does the model trade precision for recall?
 
-Both curves sweep the decision threshold, so both are line charts over a derived pair of arrays. What makes them readable is the reference line each needs: a ROC curve is read against chance, which is the diagonal, and a precision-recall curve is read against the share of positives, which is a horizontal line. `dlines` draws the first and `hlines` the second, so neither has to be faked with an extra data series. The two go side by side in a [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), since they answer one question together; both are [line charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) over a pair of arrays.
+Both curves sweep the decision threshold, so both are line charts over a derived pair of arrays. Each needs a reference line to be readable: a ROC curve is read against chance, which is the diagonal, and a precision-recall curve is read against the share of positives, which is a horizontal line. `dlines` draws the first and `hlines` the second, so neither has to be faked with an extra data series. The two go side by side in a [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), since they answer one question together; both are [line charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) over a pair of arrays.
 
 ```
 def as_points(xs, ys):
@@ -19057,7 +19084,7 @@ Grid(
 ).show()
 ```
 
-Both ROC curves hug the top left, which is what ROC does on an uncommon class: it rewards the model for the true negatives it gets for free. The precision-recall pair, read against the 13% of tickets that really are refunds, is the one to quote — at 80% recall the baseline is right about half the time and the fine-tuned model three times in four.
+Both ROC curves hug the top left, which is what ROC does on an uncommon class: it rewards the model for the true negatives it gets for free. The precision-recall pair, read against the 13% of tickets that really are refunds, is the one to quote: at 80% recall the baseline is right about half the time and the fine-tuned model three times in four.
 
 ### Can the model's confidence be trusted?
 
@@ -19095,11 +19122,11 @@ calibration_figure = Grid(
 calibration_figure.show()
 ```
 
-Every point sits below the parity line, and the histogram says where that matters: most predictions land in the top bin, so the small gap there costs more than the large gap on the left. That is the figure that justifies temperature scaling before the model ships.
+Every point sits below the parity line, and the histogram says where that matters: most predictions land in the top bin, so the small gap there costs more than the large gap on the left. This figure justifies temperature scaling before the model ships.
 
 ### Which classes did the fine-tune actually move?
 
-A per-class score table is a [bar chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md) with the classes on the long axis, which means horizontal bars and `sort` so the order carries information. The point of the figure is not the level but the change, so each record carries its own `emphasis` role: the two classes the fine-tune moved by more than five points are highlighted, the rest are pushed to the background.
+A per-class score table is a [bar chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md) with the classes on the long axis, which means horizontal bars and `sort` so the order carries information. The change is what the figure shows, so each record carries its own `emphasis` role: the two classes the fine-tune moved by more than five points are highlighted, the rest are pushed to the background.
 
 ```
 f1_records = [
@@ -19126,7 +19153,7 @@ BarChart(
 
 ### Which features carry the decision?
 
-Permutation importance produces the same shape — one label, one number — so it is the same [bar chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md), and the two figures read as a pair in a report. The table here is written out rather than simulated, as the output of such a run usually is.
+Permutation importance produces the same shape, one label and one number, so it is the same [bar chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md), and the two figures read as a pair in a report. The table here is written out rather than simulated, as the output of such a run usually is.
 
 ```
 # the drop in macro F1 when the token is shuffled out of the input
@@ -19184,7 +19211,7 @@ leaderboard_figure = BumpChart(
 leaderboard_figure.show()
 ```
 
-Only one pair crosses: Gemma2-9B leads Qwen2-7B on MMLU, the knowledge benchmark, and trails it on the three that ask for reasoning or code. Everything else keeps its place, which is itself the finding — a single average would have said as much with less work, and would have hidden the one exception.
+Only one pair crosses: Gemma2-9B leads Qwen2-7B on MMLU, the knowledge benchmark, and trails it on the three that ask for reasoning or code. Everything else keeps its place. A single average would have reported the same order with less work and hidden the one exception.
 
 ### What did a round of post-training change?
 
@@ -19262,13 +19289,13 @@ ScatterChart(
 ).show()
 ```
 
-The MMLU bars are shorter than the markers; the HumanEval bars reach about eight points either way, so the Gemma2-9B and Llama3-8B scores on that benchmark are not distinguishable at all. This interval is the optimistic one — it counts only the sampling of the test set, not the prompt, the decoding, or the seed.
+The MMLU bars are shorter than the markers; the HumanEval bars reach about eight points either way, so the Gemma2-9B and Llama3-8B scores on that benchmark are not distinguishable at all. This interval is the optimistic one: it counts only the sampling of the test set, and none of the prompt, the decoding, or the seed.
 
 ## The corpus behind the model
 
 ### How long are the documents, and did the splits stay comparable?
 
-One distribution per split, stacked so the shapes can be compared, is a [ridgeline plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/ridgelineplot/index.md): each record is a `label` and a `value`, and the chart estimates the density per label. It answers a question a summary table cannot — whether the splits were drawn from the same population.
+One distribution per split, stacked so the shapes can be compared, is a [ridgeline plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/ridgelineplot/index.md): each record is a `label` and a `value`, and the chart estimates the density per label. It answers a question a summary table cannot: whether the splits were drawn from the same population.
 
 ```
 lengths = [
@@ -19288,7 +19315,7 @@ RidgelinePlot(
 ).show()
 ```
 
-Train and validation sit on top of each other, as they should — they were split at random. The test split was collected a quarter later and its whole distribution has moved right, which is worth a sentence in the report before any score from it is believed.
+Train and validation sit on top of each other, as they should, since they were split at random. The test split was collected a quarter later and its whole distribution has moved right, which is worth a sentence in the report before any score from it is believed.
 
 ### Does the vocabulary behave?
 
@@ -19339,11 +19366,11 @@ SankeyChart(
 ).show()
 ```
 
-The last ribbon is a hairline, and that is the finding: labelling, not crawling, is what the corpus is short of. Four numbers in a paragraph never make that as obvious as a ribbon that disappears.
+The last ribbon is a hairline: the corpus is short of labelled documents, not of crawled ones. A ribbon that disappears makes that plainer than four numbers in a paragraph.
 
 ## The report figure
 
-A paper or a model card rarely has room for thirteen figures. The four that carry the argument — the run converged, here is what it confuses, here is where it sits among published models, and here is how much its confidence is worth — go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout: one inner list per row.
+A paper or a model card rarely has room for thirteen figures. The four that carry the argument (the run converged, here is what it confuses, here is where it sits among published models, and here is how much its confidence is worth) go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout: one inner list per row.
 
 ```
 Grid(
@@ -19395,9 +19422,9 @@ The hidden cell below holds the measurements themselves. `PENGUIN_ROWS` is the t
 
 ### Do the three species differ in body mass?
 
-The first figure of a comparison shows the distributions themselves, not their summaries: a test says whether a difference exists, and only the shapes say whether the question was sensible to ask. A [raincloud plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/raincloudplot/index.md) draws all three readings at once — the density of each species, its box, and every bird as a point — so a bimodal group or a stray outlier cannot hide behind a median.
+The first figure of a comparison shows the distributions themselves, not their summaries: a test says whether a difference exists, and only the shapes say whether the question was sensible to ask. A [raincloud plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/raincloudplot/index.md) draws all three readings at once (the density of each species, its box, and every bird as a point), so a bimodal group or a stray outlier cannot hide behind a median.
 
-The test beside it is the Kruskal-Wallis H, a rank-based one-way test that asks whether any group sits higher than the others. It is used here in place of a one-way ANOVA because nothing yet says these distributions are normal — the last section of this page asks that question directly. A significant omnibus result says only *some* pair differs, so each pair gets its own Mann-Whitney U test, and the three p-values are corrected for having been asked together with the Holm step-down rule.
+The test beside it is the Kruskal-Wallis H, a rank-based one-way test that asks whether any group sits higher than the others. It is used here in place of a one-way ANOVA because nothing yet says these distributions are normal; the last section of this page asks that question directly. A significant omnibus result says only *some* pair differs, so each pair gets its own Mann-Whitney U test, and the three p-values are corrected for having been asked together with the Holm step-down rule.
 
 ```
 SPECIES = ["Adelie", "Chinstrap", "Gentoo"]
@@ -19471,11 +19498,11 @@ mass_figure = RaincloudPlot(
 mass_figure.show()
 ```
 
-The omnibus test is significant, and the brackets say where that came from: Gentoo against either of the others, and nothing between Adelie and Chinstrap, whose clouds sit on top of each other. A table of three p-values would have said the same, but the figure also shows the Chinstrap cloud is the narrowest and the Gentoo box the highest — neither of which a test reports.
+The omnibus test is significant, and the brackets say where that came from: Gentoo against either of the others, and nothing between Adelie and Chinstrap, whose clouds sit on top of each other. A table of three p-values would have said the same, but the figure also shows that the Chinstrap cloud is the narrowest and the Gentoo box the highest, which no test reports.
 
 ### How large is each difference, and how sure can we be of it?
 
-A p-value says a difference is unlikely to be an accident; it never says how large the difference is. The size belongs in its own figure, with an interval attached, and the interval here comes from a bootstrap: both groups are resampled with replacement a few thousand times, the difference of means is recorded each time, and the middle 95% of those recordings is the interval. `bootstrap_ci`, in the [statistics utilities](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md), does this in one call for a statistic of **one** sample — a mean, a median, an IQR; a difference needs both groups resampled, so the helper below does that and keeps the draws, which the next figure needs anyway.
+A p-value says a difference is unlikely to be an accident; it never says how large the difference is. The size belongs in its own figure, with an interval attached, and the interval here comes from a bootstrap: both groups are resampled with replacement a few thousand times, the difference of means is recorded each time, and the middle 95% of those recordings is the interval. `bootstrap_ci`, in the [statistics utilities](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md), does this in one call for a statistic of **one** sample (a mean, a median, an IQR); a difference needs both groups resampled, so the helper below does that and keeps the draws, which the next figure needs anyway.
 
 Each pair is one row, so the differences go on the x-axis of a [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) and the pairs on the y-axis. `xerr` takes the interval as *distances* from the point rather than as endpoints, which is the subtraction the chart cannot do for you, and `show_xerr` draws it. The `vlines` zero is the reference every row is read against: a bar that crosses it is a difference the data does not establish.
 
@@ -19536,13 +19563,13 @@ effect_figure = ScatterChart(
 effect_figure.show()
 ```
 
-The bottom row straddles zero, so the 32 g the sample happens to show is not a difference the data establishes. The other two sit around 1.35 kg with intervals 230 to 260 g wide, under a fifth of the effect. That comparison is what the figure exists for: the bar and the point share one axis, so the size of the uncertainty is read against the size of the finding instead of being quoted beside it.
+The bottom row straddles zero, so the 32 g the sample happens to show is not a difference the data establishes. The other two sit around 1.35 kg with intervals 230 to 260 g wide, under a fifth of the effect. The figure exists for that comparison: the bar and the point share one axis, so the size of the uncertainty is read against the size of the finding instead of being quoted beside it.
 
 ### What is the interval actually made of?
 
 An interval is two numbers, and two numbers hide the shape they came from. Drawing the resampled differences as a [histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md) shows that shape and makes the percentile rule visible: the observed difference is one `vlines` mark, the two bounds are two more, and the bars between them are the 95% the interval claims.
 
-This is worth one figure in a report when the interval is the result — a bootstrap that comes out skewed or multi-peaked is telling you the statistic is unstable, and a symmetric hill like this one is telling you a normal-theory interval would have said the same thing more cheaply.
+This is worth one figure in a report when the interval is the result: a bootstrap that comes out skewed or multi-peaked says the statistic is unstable, and a symmetric hill like this one says a normal-theory interval would have given the same answer more cheaply.
 
 ```
 OBSERVED_VLINE = {"plot_vline_color": "#111111", "plot_vline_width": 1.6}
@@ -19576,13 +19603,13 @@ Histogram(
 ).show()
 ```
 
-The observed difference sits in the middle of the hill, as it must — the bootstrap is centered on the sample. What the figure adds is the width: the resamples spread over a couple of hundred grams, a sixth of the difference itself, so the finding survives any reasonable redraw of the sample.
+The observed difference sits in the middle of the hill, as it must, since the bootstrap is centered on the sample. The figure adds the width: the resamples spread over a couple of hundred grams, a sixth of the difference itself, so the finding survives any reasonable redraw of the sample.
 
 ## Relating the measurements
 
 ### Which measurements move together?
 
-With four measurements there are six pairs, and reading six numbers out of a paragraph is what a correlation matrix exists to prevent. The matrix is a square grid of values, so it is a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) — but a correlation is signed, and a sequential colormap run from the smallest value would put zero on an arbitrary shade. `norm=NORMALIZE.CENTERED` pins zero to the middle of the theme's diverging colormap and runs the same distance to each side, so a cell's hue is its sign and its depth is its strength.
+With four measurements there are six pairs, and reading six numbers out of a paragraph is what a correlation matrix exists to prevent. The matrix is a square grid of values, so it is a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md). A correlation is signed, though, and a sequential colormap run from the smallest value would put zero on an arbitrary shade. `norm=NORMALIZE.CENTERED` pins zero to the middle of the theme's diverging colormap and runs the same distance to each side, so a cell's hue is its sign and its depth is its strength.
 
 A correlation matrix is also symmetric, which means half of it is decoration. A `None` in `z` leaves a cell blank, so the upper triangle goes; the diagonal of ones goes with the first row and the last column, which hold nothing once it does, and the six numbers that carry information remain.
 
@@ -19619,7 +19646,7 @@ correlation_figure = Heatmap(
 correlation_figure.show()
 ```
 
-Flipper length and body mass at 0.87 are close to the same measurement taken twice, which matters later: a model given both learns little from the second. The surprise is bill depth, which runs *against* all three others — deeper bills on lighter, shorter-flippered birds. That is the figure's real finding, and the next two exist to explain it.
+Flipper length and body mass at 0.87 are close to the same measurement taken twice, which matters later: a model given both learns little from the second. The surprise is bill depth, which runs *against* all three others: deeper bills on lighter, shorter-flippered birds. That is the finding of this figure, and the next two figures explain it.
 
 ### What is a single correlation hiding?
 
@@ -19639,13 +19666,13 @@ ScatterMatrix(
 ).show()
 ```
 
-The bill depth row is the one to read. Every cell in it slopes downward as a whole, and inside every cluster the same cell slopes *upward* — the three species sit on a diagonal staircase that the pooled cloud follows instead. This is Simpson's paradox, and it is the reason a correlation matrix should never be the last figure of an association section.
+The bill depth row is the one to read. Every cell in it slopes downward as a whole, and inside every cluster the same cell slopes *upward*: the three species sit on a diagonal staircase that the pooled cloud follows instead. This is Simpson's paradox, and it is the reason a correlation matrix should never be the last figure of an association section.
 
 ### Is it the mixture, or is it the outliers?
 
 One pair deserves the close-up, and it comes with a second question: a Pearson correlation measures how close the points lie to a straight line and is pulled hard by a few extreme ones, while a Spearman correlation measures only whether the ranks move together and barely notices them. When the two disagree the culprit is usually an outlier or a curve; when they agree, as here, neither is the explanation and the mixture is.
 
-Both coefficients come from the [statistics utilities](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md) — `correlation` and `spearman` — and go into a `texts` note. The [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) fits the pooled line itself with `show_regression`, and `hue` colors the points by species so the pooled line can be read against the groups it was fitted through.
+Both coefficients come from the [statistics utilities](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md) (`correlation` and `spearman`) and go into a `texts` note. The [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) fits the pooled line itself with `show_regression`, and `hue` colors the points by species so the pooled line can be read against the groups it was fitted through.
 
 ```
 PAIR = ("flipper length", "bill depth")
@@ -19692,7 +19719,7 @@ ScatterChart(
 ).show()
 ```
 
-Pearson and Spearman land about 0.06 apart, so the negative pooled figure is not the work of a handful of stray birds. Every species on its own gives a positive coefficient, and the largest of them is stronger than the pooled one is negative. The honest sentence for the report is that flipper length and bill depth rise together within a species, and that species differ enough in both to reverse the sign when they are pooled.
+Pearson and Spearman land about 0.06 apart, so the negative pooled figure is not the work of a handful of stray birds. Every species on its own gives a positive coefficient, and the largest of them is stronger than the pooled one is negative. For the report: flipper length and bill depth rise together within a species, and the species differ enough in both to reverse the sign when they are pooled.
 
 ## Checking the model
 
@@ -19700,7 +19727,7 @@ Pearson and Spearman land about 0.06 apart, so the negative pooled figure is not
 
 Flipper length and body mass were the strongest pair in the matrix, so a straight line through them is the obvious model. Two figures check it, and they belong together: the fit itself, which says whether the line is plausible at all, and its residuals against the values it predicted, which say where it is wrong.
 
-`linear_fit` returns the slope, the intercept and the r², so the residuals can be computed in the open rather than read off the chart. The [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) draws the same fit with `show_regression` and shades its confidence band with `show_ci`. In the residual plot the reference is the zero line — an `hlines` mark — and the shape to look for is no shape: a horizontal band of even width. A [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) stacks the two, one above the other. The cells keep their own x-axes rather than sharing one, because the residuals are plotted against *fitted* values, not against flipper length.
+`linear_fit` returns the slope, the intercept and the r², so the residuals can be computed in the open rather than read off the chart. The [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) draws the same fit with `show_regression` and shades its confidence band with `show_ci`. In the residual plot the reference is the zero line, an `hlines` mark, and the shape to look for is no shape: a horizontal band of even width. A [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) stacks the two, one above the other. The cells keep their own x-axes rather than sharing one, because the residuals are plotted against *fitted* values, not against flipper length.
 
 ```
 flipper = np.array(values("flipper length"), dtype=float)
@@ -19747,11 +19774,11 @@ Grid(
 ).show()
 ```
 
-The line explains about three quarters of the variation in body mass, and the residual band is flat and of even width — no curve the line missed, and no fan opening towards the heavy end. The one structure left is a dip in the middle of the range, where Chinstrap birds sit on average 216 g below the line: the species mixture the correlation figures found, showing up again as the thing a single line cannot absorb.
+The line explains about three quarters of the variation in body mass, and the residual band is flat and of even width: no curve the line missed, and no fan opening towards the heavy end. The one structure left is a dip in the middle of the range, where Chinstrap birds sit on average 216 g below the line: the species mixture the correlation figures found, showing up again as the thing a single line cannot absorb.
 
 ### Are the residuals normal enough to quote an interval?
 
-Every interval and p-value a least-squares fit reports assumes its residuals are roughly normal. A Q-Q plot tests that by eye: sort the residuals, divide them by their standard deviation, and plot each against the value a standard normal distribution would have put in that position. If the assumption holds the points fall on the parity line, which is a `dlines` diagonal — the one reference mark a [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) draws without a data series behind it.
+Every interval and p-value a least-squares fit reports assumes its residuals are roughly normal. A Q-Q plot tests that by eye: sort the residuals, divide them by their standard deviation, and plot each against the value a standard normal distribution would have put in that position. If the assumption holds the points fall on the parity line, which is a `dlines` diagonal, the one reference mark a [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) draws without a data series behind it.
 
 The Shapiro-Wilk test answers the same question with one number, and the two belong together: the test says whether to reject, the figure says *where* the deviation is, and on 342 points a test will flag departures too small to matter.
 
@@ -19789,7 +19816,7 @@ The middle of the distribution lies on the line and both ends sit above it: the 
 
 ### What do the distributions say with no model at all?
 
-The first figure of this page drew densities, which means it drew a bandwidth choice. The last one draws none: an empirical cumulative distribution puts each observation at its own rank, so the curve is the data and nothing else. Any quantile can be read straight off it — the median is where the curve crosses 0.5 — and two curves that never touch are two distributions that do not overlap at all.
+The first figure of this page drew densities, which means it drew a bandwidth choice. The last one draws none: an empirical cumulative distribution puts each observation at its own rank, so the curve is the data and nothing else. Any quantile can be read straight off it (the median is where the curve crosses 0.5), and two curves that never touch are two distributions that do not overlap at all.
 
 A [line chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) draws it once the points are sorted, with `plot_line_drawstyle` set to a stepped style so the curve rises at the observations instead of sloping between them, which is what a smooth line would falsely imply.
 
@@ -19816,11 +19843,11 @@ LineChart(
 ).show()
 ```
 
-The Adelie and Chinstrap curves run through each other for their whole length, which is the non-significant pair of the first figure seen without any test. The Gentoo curve only starts where the other two are already seven tenths of the way up, and the horizontal 0.5 line crosses it about 1.3 kg further right — the same effect the second figure measured, read straight off the data.
+The Adelie and Chinstrap curves run through each other for their whole length, which is the non-significant pair of the first figure seen without any test. The Gentoo curve only starts where the other two are already seven tenths of the way up, and the horizontal 0.5 line crosses it about 1.3 kg further right: the same effect the second figure measured, read straight off the data.
 
 ## The report figure
 
-A paper has room for one figure, not nine. The four that carry the argument — the groups differ, here is what moves with what, here is the model, and here is why its intervals can be trusted — go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout: one inner list per row.
+A paper has room for one figure, not nine. The four that carry the argument (the groups differ, here is what moves with what, here is the model, and here is why its intervals can be trusted) go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout: one inner list per row.
 
 ```
 Grid(
@@ -19839,7 +19866,7 @@ Every figure on this page is one call to a chart function over a list of dicts, 
 
 A trial report asks the same questions in the same order: did the arms differ at the end, how large is the difference and does it grow with the dose, how many subjects reached the target, when did the arms separate, who stayed in the trial, what else moved, and is any of it a safety concern. This page walks one trial through those questions and names the figure that answers each, so the chart to reach for arrives with the question rather than the other way round. Every figure links to the chart guide that covers it in full.
 
-The trial is a **simulated** 12-week, three-arm study of a glucose-lowering compound: 40 subjects each on placebo, a low dose and a high dose, with HbA1c measured at five visits, a panel of eight metabolic markers, four safety labs, and a dropout each time a subject left. It is one seeded numpy draw in a hidden cell, so every docs build produces the same figures, and it stands in for any arm-by-time experiment — a preclinical dose study, a cell assay across conditions, a cohort followed over visits. The tests are `scipy.stats` calls written out in the open; a real protocol would prespecify a covariate-adjusted model in their place.
+The trial is a **simulated** 12-week, three-arm study of a glucose-lowering compound: 40 subjects each on placebo, a low dose and a high dose, with HbA1c measured at five visits, a panel of eight metabolic markers, four safety labs, and a dropout each time a subject left. It is one seeded numpy draw in a hidden cell, so every docs build produces the same figures, and it stands in for any arm-by-time experiment (a preclinical dose study, a cell assay across conditions, a cohort followed over visits). The tests are `scipy.stats` calls written out in the open; a real protocol would prespecify a covariate-adjusted model in their place.
 
 ```
 import numpy as np
@@ -19872,7 +19899,7 @@ The hidden cell below holds the whole simulation. `subjects` is one dict per sub
 
 ### Do the arms differ at the end of the trial?
 
-The first figure of a trial report shows the endpoint itself, per arm, with every subject visible: a test says whether the arms differ, and only the points say whether one outlier or one subgroup is doing the work. A [box plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/boxplot/index.md) gives each arm its median and quartiles, and a [swarm plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/swarmplot/index.md) laid over it in a [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) adds the subjects themselves — the two share their category positions, so the points land on their boxes. The endpoint is the change from baseline at week 12, for the subjects who reached it.
+The first figure of a trial report shows the endpoint itself, per arm, with every subject visible: a test says whether the arms differ, and only the points say whether one outlier or one subgroup is doing the work. A [box plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/boxplot/index.md) gives each arm its median and quartiles, and a [swarm plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/swarmplot/index.md) laid over it in a [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) adds the subjects themselves; the two share their category positions, so the points land on their boxes. The endpoint is the change from baseline at week 12, for the subjects who reached it.
 
 The test is the Kruskal-Wallis H, a rank-based one-way test that asks whether any arm sits apart from the others, chosen over an ANOVA because nothing yet says the changes are normal. A significant omnibus result says only *some* pair differs, so each pair gets a Mann-Whitney U test and the three p-values are corrected for having been asked together with the Holm step-down rule.
 
@@ -19987,11 +20014,11 @@ dose_figure = BarChart(
 dose_figure.show()
 ```
 
-The placebo arm falls by about 0.16 points, which is the drift a trial expects from regression to the mean and closer attention; the low dose adds roughly 0.4 to that and the high dose another 0.45. No interval reaches its neighbour, so the dose-response is monotone and each step is established, not merely suggested. That is the sentence a report quotes, and this figure is where it comes from.
+The placebo arm falls by about 0.16 points, which is the drift a trial expects from regression to the mean and closer attention; the low dose adds roughly 0.4 to that and the high dose another 0.45. No interval reaches its neighbour, so the dose-response is monotone and each step is established rather than merely suggested.
 
 ### How many subjects reached the target?
 
-A mean change is the trialist's number; the clinician's number is how many subjects ended under the treatment target. Both are read off the distribution of week-12 values, and a [violin plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/violinplot/index.md) shows that distribution's shape per arm — where its bulk sits, and whether a tail reaches across the target line. The target is an `hlines` mark with a `label`, so it enters the legend, and the share of each arm at or under it is a `texts` note at that arm's position, placed in data coordinates.
+A mean change is the trialist's number; the clinician's number is how many subjects ended under the treatment target. Both are read off the distribution of week-12 values, and a [violin plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/violinplot/index.md) shows that distribution's shape per arm: where its bulk sits, and whether a tail reaches across the target line. The target is an `hlines` mark with a `label`, so it enters the legend, and the share of each arm at or under it is a `texts` note at that arm's position, placed in data coordinates.
 
 ```
 TARGET = 7.0
@@ -20030,7 +20057,7 @@ The placebo violin sits almost entirely above the line, the low-dose one is cent
 
 ### When did the arms separate?
 
-An endpoint is one visit; the trial had five, and the course between them says when the effect appeared and whether it had finished by the end. A [line chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) draws the arm means over the visits, and `show_yerr` turns the `yerr` of each point into a band — here the 95% confidence interval of the mean, so where two bands stop overlapping is roughly where two arms become distinguishable.
+An endpoint is one visit; the trial had five, and the course between them says when the effect appeared and whether it had finished by the end. A [line chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) draws the arm means over the visits, and `show_yerr` turns the `yerr` of each point into a band, here the 95% confidence interval of the mean, so where two bands stop overlapping is roughly where two arms become distinguishable.
 
 ```
 course = {
@@ -20069,7 +20096,7 @@ course_figure = LineChart(
 course_figure.show()
 ```
 
-The three lines leave the same point and the high-dose band has cleared the placebo band by week 4; the low-dose band takes until week 8. Both dose curves are still falling at week 12, more slowly than before, so the trial ended before the effect had fully settled — a 24-week extension would be the obvious next study, and this figure is the argument for it.
+The three lines leave the same point and the high-dose band has cleared the placebo band by week 4; the low-dose band takes until week 8. Both dose curves are still falling at week 12, more slowly than before, so the trial ended before the effect had fully settled; a 24-week extension is the obvious next study, and this figure is the argument for it.
 
 ### Did every subject follow the mean?
 
@@ -20141,7 +20168,7 @@ retention_figure = LineChart(
 retention_figure.show()
 ```
 
-Nine placebo subjects left against two and three on the doses, and the placebo curve drops steadily from the first week: subjects who feel no benefit stop coming. That matters for the endpoint figure, which saw only the completers — an arm that loses its non-responders looks better at week 12 than it was. The retention figure is where a reader checks whether that could have happened, and here it is the placebo arm, not the treated ones, that thinned.
+Nine placebo subjects left against two and three on the doses, and the placebo curve drops steadily from the first week: subjects who feel no benefit stop coming. That matters for the endpoint figure, which saw only the completers: an arm that loses its non-responders looks better at week 12 than it was. The retention figure is where a reader checks for that, and here the placebo arm thinned while the treated ones did not.
 
 ## The wider panel
 
@@ -20168,11 +20195,11 @@ marker_figure = Heatmap(
 marker_figure.show()
 ```
 
-The placebo column is near white throughout, the columns darken left to right, and the insulin-resistance rows darken most — the compound is doing what its mechanism predicts. The one cell running the other way is HDL cholesterol, which rises, and a rise in HDL is a favourable change; a diverging colormap makes that opposite sign visible where a single-hue one would have hidden it as a light cell.
+The placebo column is near white throughout, the columns darken left to right, and the insulin-resistance rows darken most: the compound is doing what its mechanism predicts. The one cell running the other way is HDL cholesterol, which rises, and a rise in HDL is a favourable change; a diverging colormap makes that opposite sign visible where a single-hue one would have hidden it as a light cell.
 
 ### Where are the safety signals?
 
-The safety labs are read differently from the efficacy markers: the question is not how far each moved but whether any moved at all, per arm, from a baseline that should have been the same in every arm. Two values per arm and lab — baseline and week 12 — is a [dumbbell chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md): a dot at each, a connector between, and `show_values="delta"` printing the change at the connector. The labs live on four different scales, so `subplots=True` gives each its own axes, and `show_direction` draws an arrow from baseline to week 12 so the direction reads without a legend.
+The safety labs are read differently from the efficacy markers: the safety question is whether any lab moved at all, per arm, from a baseline that should have been the same in every arm. Two values per arm and lab (baseline and week 12) is a [dumbbell chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md): a dot at each, a connector between, and `show_values="delta"` printing the change at the connector. The labs live on four different scales, so `subplots=True` gives each its own axes, and `show_direction` draws an arrow from baseline to week 12 so the direction reads without a legend.
 
 ```
 DumbbellChart(
@@ -20233,11 +20260,11 @@ alt_figure = SwarmPlot(
 alt_figure.show()
 ```
 
-The three swarms sit on the zero line with the same spread, and four outlined points stand alone above the flag. The arm mean was those four subjects, not the arm: the rest of the high-dose swarm is indistinguishable from placebo. The report's sentence changes accordingly — from "ALT rose on the high dose" to "four of forty high-dose subjects had a flagged ALT rise" — and the figure is the evidence for the second version.
+The three swarms sit on the zero line with the same spread, and four outlined points stand alone above the flag. The arm mean was those four subjects, not the arm: the rest of the high-dose swarm is indistinguishable from placebo. The report's sentence changes accordingly, from "ALT rose on the high dose" to "four of forty high-dose subjects had a flagged ALT rise", and the figure is the evidence for the second version.
 
 ## The report figure
 
-A paper has room for one figure, not nine. The four that carry the argument — the arms differ, here is when they parted, here is the rest of the panel, and here is who stayed — go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout: one inner list per row. The endpoint cell is itself a `Panel`, and the grid takes it like any other figure.
+A paper has room for one figure, not nine. The four that carry the argument (the arms differ, here is when they parted, here is the rest of the panel, and here is who stayed) go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout: one inner list per row. The endpoint cell is itself a `Panel`, and the grid takes it like any other figure.
 
 ```
 Grid(
@@ -20251,6 +20278,1145 @@ Grid(
 ```
 
 Every figure on this page is one call to a chart function over a list of dicts, and every number in them comes from a `scipy.stats` call or a few lines of numpy written out in the cell above it. To adapt any of them, open the guide it links to and read the parameter that does the job; the [annotations guide](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) covers the brackets, reference lines and notes the figures share. The charts index lists them all: [Charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md).
+
+# Demographics and Social Science
+
+A population report asks the same questions in the same order: what the population looks like today and what it looked like a generation ago, how the young and the old traded places over the decades, what drove that shift, and how the country sits among the others, from who gained the most years of life to whether the world is converging and whether income still buys longevity. This page walks one country through those questions, then widens to the world, and names the figure that answers each, so the chart to reach for arrives with the question rather than the other way round. Every figure links to the chart guide that covers it in full.
+
+The country is **Slovenia**, and every number is real. The World Bank's [World Development Indicators](https://datacatalog.worldbank.org/search/dataset/0037712) ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)) supply the long series (the population by five-year age band and sex, the age-group shares, the fertility rate and the life expectancy from 1960 to 2023) and the world figures (the life expectancy of every country in 1990, 2000, 2010 and 2022, and the GDP per capita and population of 198 countries in 2022). [Eurostat](https://ec.europa.eu/eurostat/data/database) ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)) supplies the national detail the world indicators stop short of: immigration and emigration by citizenship in 2023, and the median age of the twelve statistical regions since 2014. Swap the country and the same cells draw it.
+
+```
+from datachart.charts import (
+    DumbbellChart,
+    Heatmap,
+    LineChart,
+    PyramidChart,
+    RidgelinePlot,
+    SankeyChart,
+    ScatterChart,
+    StackedAreaChart,
+)
+from datachart.constants import (
+    DUMBBELL_SORT_KEY,
+    EMPHASIS,
+    FIG_SIZE,
+    LEGEND_LOCATION,
+    RIDGELINE_SCALE,
+    SCALE,
+    SHOW_GRID,
+    SORT,
+    VALUE_FORMAT,
+)
+from datachart.utils import Grid, Panel
+```
+
+The hidden cell below holds the numbers. `PYRAMID` is the population of each five-year `AGE_BAND` by sex in 1960 and 2023, in thousands; `AGE_SHARES` is the share of the population under 15, of working age and 65 or over in every year since 1960; `VITALS` is the fertility rate and the life expectancy at birth per year; `MIGRATION` is the 2023 immigration and emigration by citizenship group; `REGION_AGE` is the median age of each statistical region on 1 January of every year since 2014; `LIFE_SPAN` is the life expectancy of a dozen countries in 1990 and 2022; `WORLD_LIFE` is the life expectancy of every country in four years; and `PRESTON` is the GDP per capita, life expectancy and population of 198 countries in 2022, with the World Bank region of each. The sections that follow only reshape those into the records the charts take.
+
+## The age structure
+
+### What does the population look like, and what did it look like a lifetime ago?
+
+The pyramid is the first figure of a population report: men to the left, women to the right, one bar per age band from the youngest at the bottom to the oldest at the top. Its outline records the demographic history in one shape. A wide base means many births, a narrow top means few survivors, and every notch is a war, a baby boom or a wave of emigration passing through. A [pyramid chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/pyramidchart/index.md) takes the two sides as two lists of records in the same band order, and `subtitle` names them for the legend.
+
+A change of shape needs two years. Two pyramids drawn with the same `xmax` sit side by side in a [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already built and redraws them into its cells, so the bars of 1960 and 2023 share one scale and compare bar to bar.
+
+```
+MEN, WOMEN = "Men", "Women"
+
+
+def pyramid(year):
+    return PyramidChart(
+        # the two sides, youngest band first: [left, right]
+        [
+            [{"label": band, "y": people} for band, people in zip(AGE_BANDS, PYRAMID[year][MEN])],
+            [{"label": band, "y": people} for band, people in zip(AGE_BANDS, PYRAMID[year][WOMEN])],
+        ],
+        subtitle=[MEN, WOMEN],
+        title=str(year),
+        xlabel="Population (thousands)",
+        # the same span on both, so the bars compare across the years
+        xmax=95,
+        show_legend=True,
+    )
+
+
+pyramid_1960, pyramid_2023 = pyramid(1960), pyramid(2023)
+
+Grid(
+    [pyramid_1960, pyramid_2023],
+    title="Slovenia's population, 1960 and 2023: a pyramid turned into an urn",
+    figsize=(9.0, 5.0),
+).show()
+```
+
+The 1960 shape is the classic pyramid, widest at the bottom and tapering steadily, with a notch at 40–44 for the small cohorts born during the First World War. The 2023 shape is an urn: the base has narrowed to about two thirds of its 1960 width, the widest bands are now 40–49 and 55–59, and the 80+ band has grown from 15 thousand to 117 thousand, with women outnumbering men in it by more than two to one, which is the sex gap in longevity made visible. The population as a whole grew by a third, and all of that growth landed in the upper half.
+
+### How did the young and the old trade places?
+
+Two snapshots show the ends of the change; the yearly shares show its pace and whether it came in steps. The population splits into the under-15s, the working ages and the 65-and-overs, and three shares that sum to a hundred are a [stacked area chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/stackedareachart/index.md): each band's thickness is its share, the bands stack to the whole, and the boundaries between them carry the change. The year the oldest share overtook the youngest is the number a report quotes from this figure, so it is a `vlines` mark with a `label`, computed from the data rather than typed in.
+
+```
+AGE_GROUPS = ["Under 15", "15 to 64", "65 and over"]
+REFERENCE_VLINE = {"plot_vline_color": "#444444", "plot_vline_style": "--", "plot_vline_width": 1}
+YEARS = sorted(AGE_SHARES)
+
+# the first year the 65+ share exceeds the under-15 share
+CROSSOVER = next(year for year in YEARS if AGE_SHARES[year][2] > AGE_SHARES[year][0])
+
+shares_figure = StackedAreaChart(
+    [
+        [{"x": year, "y": AGE_SHARES[year][index]} for year in YEARS]
+        for index in range(len(AGE_GROUPS))
+    ],
+    title=f"The old overtook the young in {CROSSOVER}",
+    xlabel="Year",
+    ylabel="Share of the population (%)",
+    subtitle=AGE_GROUPS,
+    vlines={"x": CROSSOVER, "label": f"Crossover ({CROSSOVER})", "style": REFERENCE_VLINE},
+    ymax=100,
+    show_legend=True,
+    legend={"location": LEGEND_LOCATION.OUTSIDE_TOP, "ncols": 4},
+    figsize=FIG_SIZE.FULL_MEDIUM,
+)
+shares_figure.show()
+```
+
+The under-15 band thins from 27% in 1960 to 15% in 2023, fastest in the 1980s and 1990s; the 65-and-over band grows from 8% to 21%, slowly at first and steeply after 2010 as the large post-war cohorts pass 65. The two cross in 2004. The working-age band in the middle peaked around 2000 at 70% and has shrunk since, which is the number behind every pension debate: fewer workers per pensioner, and the trend has not turned.
+
+### What drove the shift?
+
+An age structure changes for two reasons, and a report has to separate them: fewer births narrow the base, and longer lives widen the top. Both are yearly series in different units, so they share the year axis and not the value axis. Two [line charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) go into a [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md), each assigned to its own value axis with `y_axis`, so neither flattens the other. The fertility rate is read against the replacement level of 2.1 births per woman, drawn as an `hlines` mark with a `label` on the fertility figure, which owns the left axis.
+
+```
+REPLACEMENT = 2.1
+REFERENCE_HLINE = {"plot_hline_color": "#666666", "plot_hline_style": "--", "plot_hline_width": 1}
+
+fertility = LineChart(
+    [{"x": year, "y": VITALS[year][0]} for year in YEARS],
+    subtitle="Fertility rate",
+    hlines={"y": REPLACEMENT, "label": f"Replacement ({REPLACEMENT})", "style": REFERENCE_HLINE},
+)
+longevity = LineChart(
+    [{"x": year, "y": VITALS[year][1]} for year in YEARS],
+    subtitle="Life expectancy",
+)
+
+vitals_figure = Panel(
+    [
+        {"figure": fertility, "y_axis": "left"},
+        {"figure": longevity, "y_axis": "right"},
+    ],
+    title="Fewer births, longer lives",
+    xlabel="Year",
+    ylabel_left="Births per woman",
+    ylabel_right="Life expectancy at birth (years)",
+    ymin=0,
+    ymin_right=60,
+    show_legend=True,
+    show_grid=SHOW_GRID.Y,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+)
+vitals_figure.show()
+```
+
+The fertility rate held above replacement until 1980, then fell through it and bottomed at 1.20 in 2003; the partial recovery since has not brought it back. Life expectancy rose from 69 to 82 years over the same period, most of it after 1990. The two curves are the two halves of the previous figure: the base narrowed when the fertility line crossed the dashed one, and the top widened as the life-expectancy line climbed. Neither is a Slovenian peculiarity, which is the reason to widen the view.
+
+## Who comes, who goes, and where they live
+
+### Who arrives, and who leaves?
+
+Births and deaths are half of a population's change; the other half crosses the border, and a report has to say who. A year's migration is a set of flows, so many people of each citizenship arriving and so many leaving, and a [Sankey chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/sankeychart/index.md) draws flows as bands whose width is their size: the arrivals fan out into citizenship groups on the left, and each group splits on the right into the people who left the same year and the net gain that stayed. A group that lost more people than it gained has no gain to show, so a net loss feeds it from the left instead. The `links` are the flows as (source, target, value) records, `column_labels` names the three stages, and `show_values` prints the counts on the nodes.
+
+```
+GROUPS = [group for group in MIGRATION["immigration"] if group != "Total"]
+arrivals, departures = MIGRATION["immigration"], MIGRATION["emigration"]
+
+links = []
+for group in GROUPS:
+    links.append({"source": "Immigrants", "target": group, "value": arrivals[group]})
+    links.append({"source": group, "target": "Emigrants", "value": departures[group]})
+    balance = arrivals[group] - departures[group]
+    if balance > 0:
+        links.append({"source": group, "target": "Net gain", "value": balance})
+    else:
+        # a group that shrank is fed from the left, so its node balances
+        links.append({"source": "Net loss", "target": group, "value": -balance})
+
+migration_figure = SankeyChart(
+    {"links": links},
+    title="Slovenia gained 11,500 people in 2023, nearly all from outside the EU",
+    column_labels=["Arrivals", "Citizenship", "Departures"],
+    show_values=True,
+    value_format=VALUE_FORMAT.THOUSANDS,
+    figsize=(9.0, 5.5),
+)
+migration_figure.show()
+```
+
+33,939 people arrived and 22,411 left, a net gain of 11,528. Citizens of Bosnia and Herzegovina alone are a third of the arrivals and a net gain of 6,020, with Kosovo, Serbia and North Macedonia behind them: the successor states of the country Slovenia left in 1991 are still where most of its newcomers come from. EU citizens added 418. The one band running the other way is Slovenian citizens: 5,627 left against 4,031 who returned, a net loss of 1,596, so the non-EU inflow covers the whole net gain and the emigration of nationals besides.
+
+### Which regions are ageing fastest?
+
+A national median age hides that the regions age at different speeds, since the capital draws the young and the periphery keeps the old, and the check is one number per region per year. Twelve regions by twelve years is a table that a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) reads in one look: each cell coloured by the median age, the rows sorted by the latest year so the oldest region sits at the top, and `show_heatmap_values` printing the ages so the cells are read rather than guessed. A row that darkens faster than its neighbours is a region ageing faster.
+
+```
+REGIONS = sorted(REGION_AGE, key=lambda region: -REGION_AGE[region][-1])
+
+region_figure = Heatmap(
+    {"x": REGION_YEARS, "y": REGIONS, "z": [REGION_AGE[region] for region in REGIONS]},
+    title="Every region is older than a decade ago; the capital region stays youngest",
+    xlabel="Year",
+    ylabel="Statistical region, by median age in 2025",
+    show_heatmap_values=True,
+    valfmt="{x:.1f}",
+    show_colorbars=True,
+    colorbar={"label": "Median age (years)"},
+    figsize=(9.0, 5.5),
+)
+region_figure.show()
+```
+
+Every row darkens from left to right, so no region got younger, and the rows keep their order: Pomurska is the oldest region in every year and Osrednjeslovenska, which holds the capital, the youngest, 6.1 years apart in 2025. The pace differs. Pomurska added 4.5 years of median age in eleven years and Osrednjeslovenska only 2.6, so the gap between the periphery and the centre is widening. This is the regional version of the crossover figure above.
+
+## The country among the others
+
+### Who gained the most years since 1990?
+
+Life expectancy in two years for a dozen countries is a before-and-after comparison, and a [dumbbell chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md) is its figure: a dot at 1990, a dot at 2022, and the connector between them is the gain. `sort` and `sort_by` order the rows so the longest-lived countries sit at the top, `show_values="delta"` prints each gain at the connector, and the country of the page takes the `"highlight"` role through its record's own `emphasis`, so it stands out among its neighbours without a second chart.
+
+```
+HOME = "Slovenia"
+
+span_figure = DumbbellChart(
+    [
+        {
+            "label": country,
+            "start": start,
+            "end": end,
+            "emphasis": EMPHASIS.HIGHLIGHT if country == HOME else None,
+        }
+        for country, (start, end) in LIFE_SPAN.items()
+    ],
+    title="Every country gained years, some ten times more than others",
+    xlabel="Life expectancy at birth (years)",
+    start_name="1990",
+    end_name="2022",
+    sort=SORT.DESCENDING,
+    sort_by=DUMBBELL_SORT_KEY.END,
+    show_values="delta",
+    value_format=VALUE_FORMAT.DECIMAL,
+    show_legend=True,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+)
+span_figure.show()
+```
+
+No connector points left: every country in the set lives longer than in 1990. The longest connectors belong to countries that started low (Ethiopia added 22 years, Rwanda 20), and starting low did not guarantee catching up: Nigeria gained 8 years from the lowest start of all, and South Africa, through the HIV epidemic, only 2.6. At the top the gains are small because less is left to gain; the United States, with 2.2 years, gained least of all. Slovenia added 8 years, more than Japan and less than South Korea, which caught up with both. The mixed picture is why the next figure asks the same of every country at once.
+
+### Is the world converging?
+
+A dozen countries suggest convergence; the claim needs all of them. The life expectancy of every country in one year is a distribution, and four years give four distributions that a [ridgeline plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/ridgelineplot/index.md) stacks one above the other, each a smoothed density over the countries, so a shift to the right and a narrowing are both visible at a glance. The rows are years, given as each record's `label`, and `normalize=RIDGELINE_SCALE.COMMON` draws every row to the same height, so a narrower, taller ridge means more countries clustered at one value.
+
+```
+world_figure = RidgelinePlot(
+    [
+        {"label": str(year), "value": value}
+        for year, values in WORLD_LIFE.items()
+        for value in values
+    ],
+    title="The world's countries move right and bunch together",
+    xlabel="Life expectancy at birth (years)",
+    ylabel="Year",
+    normalize=RIDGELINE_SCALE.COMMON,
+    overlap=0.5,
+    xmin=30,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+)
+world_figure.show()
+```
+
+In 1990 the ridge is wide and has a second hump, a cluster of countries in the mid-40s below the main peak in the low 70s. Each later ridge moves right and the lower hump shrinks into the shoulder of the main one. By 2022 the median country is at 74 years against 69 in 1990, and the middle half of the countries spans 11 years instead of 13. The world is converging from below: the left tail is what moved.
+
+### Do richer countries live longer?
+
+The Preston curve is the classic figure of development: every country as one point, GDP per capita across, life expectancy up. Income spans two orders of magnitude, so on a linear axis the poorer half of the world piles up against the left edge; `scalex=SCALE.LOG` spreads them out and turns the curve into something close to a line. The [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) takes a `hue` per record to colour the points by region and a `size` to scale them by population, so a small rich country and a large poor one read differently. The country of the page gets a `texts` note with a `target`, which draws the arrow from the note to its point.
+
+```
+HOME_POINT = next(row for row in PRESTON if row[0] == HOME)
+
+preston_figure = ScatterChart(
+    [
+        {"x": gdp, "y": life, "size": people, "hue": region}
+        for country, region, gdp, life, people in PRESTON
+    ],
+    title="Income buys years, with diminishing returns",
+    xlabel="GDP per capita (2021 PPP dollars, log scale)",
+    ylabel="Life expectancy at birth (years)",
+    scalex=SCALE.LOG,
+    xticks=[1000, 10000, 100000],
+    xticklabels=["1,000", "10,000", "100,000"],
+    # a note on the home country, with an arrow to its point
+    texts={
+        "text": HOME,
+        "x": 0.08,
+        "y": 0.9,
+        "coords": "axes",
+        "target": (HOME_POINT[2], HOME_POINT[3]),
+    },
+    ymin=45,
+    show_legend=True,
+    legend={"location": LEGEND_LOCATION.LOWER_RIGHT},
+    show_grid=SHOW_GRID.BOTH,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+)
+preston_figure.show()
+```
+
+The cloud rises steeply through the poorer countries and flattens past about 30,000 dollars: the same doubling of income buys many years at the bottom and almost none at the top. The correlation between log income and life expectancy is 0.85 across the 198 countries. The colours add the geography, with Sub-Saharan Africa in the lower left and Europe in the upper right, and the sizes add the people: the two largest circles, India and China, sit in the middle of the band, where most of the world's population lives. Slovenia sits on the curve, at 47,059 dollars and 81 years, where its income predicts.
+
+## The report figure
+
+A report has room for one figure, not ten. The four that carry the argument (the shape today, how the shares shifted, who gained years, and where income puts the country) go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures drawn above and redraws them into its cells. Nested lists are the layout, one inner list per row, and the pyramid is the same figure that was one cell of the first grid.
+
+```
+Grid(
+    [
+        [pyramid_2023, shares_figure],
+        [span_figure, preston_figure],
+    ],
+    title="Slovenia's population: the shape, the shift, the neighbours, and the curve",
+    figsize=(11.0, 8.5),
+).show()
+```
+
+Every figure on this page is one call to a chart function over a list of dicts, and every number in them is a World Bank series reshaped by a line or two of Python written out in the cell above it. To adapt any of them, open the guide it links to and read the parameter that does the job; the [annotations guide](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) covers the reference lines and notes the figures share. The charts index lists them all: [Charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md).
+
+# Business and Product Analytics
+
+A product review asks the same questions every quarter: where the revenue comes from and whether the mix is changing, which segments and channels carry it, where prospective customers drop out, when they arrive, whether the ones who pay stay, and what ships next. This page walks one product through those questions and names the figure that answers each, so the chart to reach for arrives with the question rather than the other way round. Every figure links to the chart guide that covers it in full.
+
+The product is a **simulated** subscription service with three plans, followed from January 2023 to December 2025: its monthly recurring revenue per plan, its new customers per acquisition channel and quarter, its 2025 revenue by region and industry, the 2025 sign-up funnel, every day's sign-ups, the retention of each month's paying cohort, and the roadmap for the first half of 2026. It is one seeded numpy draw in a hidden cell, so every docs build produces the same figures, and it stands in for any product with a funnel, a revenue mix and a roadmap.
+
+```
+from datetime import date, timedelta
+
+import numpy as np
+
+from datachart.charts import (
+    BumpChart,
+    CalendarHeatmap,
+    GanttChart,
+    Heatmap,
+    SankeyChart,
+    StackedAreaChart,
+    Treemap,
+)
+from datachart.constants import (
+    ASPECT_RATIO,
+    FIG_SIZE,
+    GANTT_DATE_PERIOD,
+    GANTT_VALUE,
+    LEGEND_LOCATION,
+    SHOW_GRID,
+    VALUE_FORMAT,
+)
+from datachart.utils import Grid
+```
+
+The hidden cell below holds the whole simulation. `mrr` is the monthly recurring revenue of each of the `PLANS` over the 36 `MONTHS`, in thousands of dollars; `new_customers` counts the customers each of the `CHANNELS` brought in per quarter; `REGIONS` nests the 2025 revenue by region and industry; `FUNNEL` is the 2025 funnel from sign-up on, as (from, to, people) steps; `signups` is the sign-ups on each of the `DAYS` of 2025; `retention` is the share of each of the `COHORTS` still paying k months after its first payment; and `ROADMAP` is the task list of the first half of 2026. The sections that follow only reshape those into the records the charts take.
+
+## The revenue
+
+### Where does the revenue come from, and is the mix changing?
+
+The first figure of a product review is the revenue over time, split by where it comes from. Three plans that add up to the whole are a [stacked area chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/stackedareachart/index.md): each band's thickness is one plan's monthly recurring revenue, the top edge is the total, and a band that thickens faster than the others is a mix shift. The `x` values are `date` objects, so the axis is a real time axis that labels the years and months itself, and `subtitle` names the bands for the legend.
+
+```
+mrr_figure = StackedAreaChart(
+    [[{"x": month, "y": value} for month, value in zip(MONTHS, mrr[plan])] for plan in PLANS],
+    title="Team carries the revenue now, and Enterprise is the fastest-growing slice",
+    xlabel="Month",
+    ylabel="Monthly recurring revenue (thousand $)",
+    subtitle=PLANS,
+    show_legend=True,
+    legend={"location": LEGEND_LOCATION.UPPER_LEFT},
+    show_grid=SHOW_GRID.Y,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+)
+mrr_figure.show()
+```
+
+Monthly recurring revenue grew from about 22 thousand dollars to 211 thousand over the three years, and the bands say how. Starter, the self-serve plan, carried the first year and then flattened: its band is the same thickness in 2025 as in mid-2024. Team overtook it in July 2023 and has widened since, and Enterprise, a sliver until the sales team arrived in early 2024, is the band growing fastest at the right edge. The mix shifted from self-serve to sold, and the rest of the review explains how.
+
+### Which segments carry it?
+
+A year's revenue by region and industry is a table of 23 cells that a reader cannot rank at a glance; a [treemap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/treemap/index.md) draws each cell as a rectangle proportional to its revenue, nested inside its region, so the largest segments are the largest areas and the regions compare by outline. The records nest the same way (a region record with `children` for its industries), and `show_values` prints each leaf's revenue in its cell.
+
+```
+segments_figure = Treemap(
+    {
+        "data": [
+            {
+                "label": region,
+                "children": [
+                    {"label": industry, "value": revenue}
+                    for industry, revenue in industries.items()
+                ],
+            }
+            for region, industries in REGIONS.items()
+        ]
+    },
+    title="2025 revenue by region and industry (thousand $)",
+    show_values=True,
+    value_format=VALUE_FORMAT.THOUSANDS,
+    figsize=(8.0, 5.0),
+)
+segments_figure.show()
+```
+
+Europe and North America are almost equal and together hold 78% of the revenue; Asia-Pacific is a third the size of either and Latin America a sliver. The same industry leads in every region: software customers bring 39% of all revenue, and finance is second everywhere except Latin America. That concentration is a strength in a sales deck and a risk in a board pack.
+
+### Which channels bring the customers, and has the order changed?
+
+Six acquisition channels over eight quarters is a ranking that changes, and a [bump chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/bumpchart/index.md) draws exactly that: one line per channel, its vertical position each quarter is its rank by new customers, and a line that climbs is a channel overtaking the others. The chart ranks the raw counts itself, so the records carry the counts and `subtitle` names the lines at their ends. The quarters are given as their index on the `x` axis and named with `xticklabels`.
+
+```
+channels_figure = BumpChart(
+    [
+        [{"x": index, "y": count} for index, count in enumerate(new_customers[channel])]
+        for channel in CHANNELS
+    ],
+    title="Partner referrals climbed from last to first while paid search sank",
+    xlabel="Quarter",
+    ylabel="Rank by new customers",
+    subtitle=CHANNELS,
+    xticks=list(range(len(QUARTERS))),
+    xticklabels=QUARTERS,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+)
+channels_figure.show()
+```
+
+In the first quarter of 2024 the order was organic search, paid search and outbound; by the last quarter of 2025 it is partner, organic search and content. The partner line crosses every other line on its way up and the paid-search line crosses four on its way down: the marketing budget moved from advertising to the partner programme, and the customers followed. Content climbed too, more quietly, and referral held its place.
+
+## Acquisition and retention
+
+### Where do prospective customers drop out?
+
+A funnel is a sequence of steps that each lose people, and the question is which step loses most. A [Sankey chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/sankeychart/index.md) draws every step as a flow whose width is its count, so the thinning of the paid stream from left to right is the funnel itself and each branch that leaves it is a drop-out reason. The `links` are the steps as (source, target, value) records, `column_labels` names the stages along the top, and `show_values` prints the counts on the nodes. The funnel starts at the sign-up: the 240,000 visitors before it would be a flow twelve times wider than everything after, and the chart would show nothing else.
+
+```
+funnel_figure = SankeyChart(
+    {"links": [{"source": source, "target": target, "value": people} for source, target, people in FUNNEL]},
+    title="Of 18,400 sign-ups in 2025, 2,650 became customers who stayed",
+    column_labels=["Sign-up", "Trial", "Payment", "90 days"],
+    show_values=True,
+    value_format=VALUE_FORMAT.THOUSANDS,
+    figsize=(8.0, 4.5),
+)
+funnel_figure.show()
+```
+
+Only 8% of visitors sign up at all, which is normal for a marketing site and not where the fix is. The trial is the step to worry about: 72% of the people who start one let it expire, a bigger loss than the 40% who sign up and never activate. Once someone pays, 85% are still paying after 90 days. The trial step is where the onboarding work on the roadmap comes from, and the retention figure below is where its effect shows.
+
+### When do people sign up?
+
+Daily counts over a year carry three rhythms at once (the week, the seasons and the one-off events), and a line of 365 points shows none of them clearly. A [calendar heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/calendarheatmap/index.md) lays the year out as a calendar, one cell per day coloured by its count, so weekends read as pale rows, holidays as pale columns and a launch as a dark stripe. The records are two parallel lists, `date` and `value`, and a wide figure with `aspect_ratio=ASPECT_RATIO.AUTO` stretches the cells to fill it. One event at three times the usual rate would push every ordinary day into the palest shades, so `vmax` caps the colour scale below it: the launch saturates and the rest of the year keeps its contrast.
+
+```
+signups_figure = CalendarHeatmap(
+    {"date": DAYS, "value": signups.tolist()},
+    title="Sign-ups per day, 2025: weekdays, the March launch, and a quiet August",
+    figsize=(9.0, 2.6),
+    aspect_ratio=ASPECT_RATIO.AUTO,
+    # cap the scale so the launch saturates instead of washing out the rhythm
+    vmax=130,
+    show_colorbars=True,
+    colorbar={"label": "Sign-ups"},
+)
+signups_figure.show()
+```
+
+Weekdays average 75 sign-ups and weekends 28, so the two pale rows at the bottom of every month are Saturday and Sunday. The dark stripe in the second week of March is the launch, three days at three times the usual rate; August is pale throughout and the last week of December nearly white. The cells also darken slowly from left to right, which is the growth of the product showing through the noise. A support team reads its staffing off this figure, and a marketing team reads which campaign moved the numbers.
+
+### Do the customers who pay stay?
+
+Revenue can grow while every cohort leaks, as long as new customers arrive faster than old ones leave; the check is to follow each month's new paying customers on their own and count how many are still paying one, two, three months later. Twelve cohorts by twelve months is a triangle (the January cohort has eleven months of history, the December cohort none), and a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) draws it with `None` for the cells that have not happened yet, `show_heatmap_values` printing the retained share in each cell, and `valfmt` giving it a percent sign. Reading down a column compares cohorts at the same age, which is how an onboarding change shows up.
+
+```
+cohort_figure = Heatmap(
+    {
+        "x": list(range(12)),
+        "y": [cohort.strftime("%b %Y") for cohort in COHORTS],
+        "z": retention,
+    },
+    title="Cohorts after the July onboarding change keep a tenth more of their customers",
+    xlabel="Months since first payment",
+    ylabel="Cohort",
+    show_heatmap_values=True,
+    valfmt="{x:.0f}%",
+    vmin=40,
+    vmax=100,
+    figsize=(8.0, 5.5),
+)
+cohort_figure.show()
+```
+
+Every row falls fastest in its first month and then flattens, which is the usual shape: the customers who were going to leave mostly leave at once. The rows split into two families. The January to June cohorts keep about 61% of their customers at three months; the July cohort onwards keeps about 75% at the same age, and the step is visible as a colour boundary between the June and July rows in every column. The guided setup that shipped in July is the difference, and this figure is the evidence a product team brings when it asks for more of the same.
+
+## Planning
+
+### What ships when, and what is late?
+
+A roadmap is a set of tasks with dates, owners and dependencies, and the figure for it is the [Gantt chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/ganttchart/index.md): one bar per task from its start to its end, grouped by team, with a filled portion for the progress made and arrows for what waits on what. `show_today` draws today's line, which is the point of the figure in a review: a bar that has not filled up to the line is behind. `period` sets the axis grain, and `show_values` prints each bar's progress.
+
+```
+roadmap_figure = GanttChart(
+    ROADMAP,
+    title="H1 2026 roadmap: onboarding on track, billing a week behind",
+    period=GANTT_DATE_PERIOD.MONTH,
+    show_today=True,
+    today=TODAY,
+    show_dependencies=True,
+    show_group_headers=True,
+    show_values=GANTT_VALUE.PROGRESS,
+    show_legend=True,
+    figsize=(9.0, 5.5),
+)
+roadmap_figure.show()
+```
+
+The onboarding track is on schedule: the wizard is done, and the sample workspaces are 70% through with a week and a half to go. Billing is the track to watch. Usage-based pricing should have finished last Friday and is at 90%, so the invoice work that depends on it starts late, and the annual plans behind that slip with it. The platform track's audit log is on time, but the enterprise launch at the end of June waits on all three tracks, and the arrows converging on it show which one it waits for. The launch date belongs to the slowest chain.
+
+## The review figure
+
+A quarterly review has room for one figure, not eight. The four that carry the story (the revenue mix, the channel ranks, the retention step, and the funnel) go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout, one inner list per row.
+
+```
+Grid(
+    [
+        [mrr_figure, channels_figure],
+        [cohort_figure, funnel_figure],
+    ],
+    title="2025 in review: the revenue mix, the channels, the cohorts, and the funnel",
+    figsize=(12.0, 9.0),
+).show()
+```
+
+Every figure on this page is one call to a chart function over a list of dicts, and every number in them comes from a few lines of numpy written out in the hidden cell at the top. To adapt any of them, open the guide it links to and read the parameter that does the job; the [annotations guide](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) covers the reference lines and notes the figures can carry. The charts index lists them all: [Charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md).
+
+# Economics and Finance
+
+An economic report asks the same questions in the same order: how the big economies grew and when they shrank, which are the largest and how the order changed, how an economy's structure changes as it grows, where and when inflation bit, what the last shock cost, who caught up on income, and how the economies compare on every front at once. This page walks the world's major economies through those questions and names the figure that answers each, so the chart to reach for arrives with the question rather than the other way round. Every figure links to the chart guide that covers it in full.
+
+Every number is real: the GDP growth of the United States, the euro area, China, Japan and the world since 1980, the nominal GDP of every country in six benchmark years, the sector shares of China, India and South Korea since 1960, and the inflation, growth, unemployment, trade, investment and income of the nineteen G20 countries, all from the World Bank's [World Development Indicators](https://datacatalog.worldbank.org/search/dataset/0037712) ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)). Swap the countries and the same cells draw it.
+
+```
+from datachart.charts import (
+    BarChart,
+    BumpChart,
+    DumbbellChart,
+    Heatmap,
+    LineChart,
+    ParallelCoords,
+    StackedAreaChart,
+)
+from datachart.constants import (
+    DUMBBELL_SORT_KEY,
+    EMPHASIS,
+    FIG_SIZE,
+    LEGEND_LOCATION,
+    NORMALIZE,
+    ORIENTATION,
+    SHOW_GRID,
+    SORT,
+    VALUE_FORMAT,
+)
+from datachart.utils import Grid
+```
+
+The hidden cell below holds the numbers. `GROWTH` is the yearly GDP growth of five economies over the `GROWTH_YEARS`; `GDP_RANK` is the nominal GDP, in trillions of current dollars, of every country that was among the ten largest in any of six benchmark years; `SECTORS` is the share of agriculture, industry and services in the GDP of three economies since 1960; `INFLATION` is the yearly consumer-price inflation of the G20 countries since 2015, `PANDEMIC` their growth in 2020, `INCOME` their GDP per capita in 2000 and 2023, and `G20_2023` six indicators of each in 2023 with its World Bank income group. The sections that follow only reshape those into the records the charts take.
+
+## Growth
+
+### How did the big economies grow, and when did they shrink?
+
+The first figure of an economic report is growth over time, one line per economy, and the years that matter are the ones below zero. A [line chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) draws the five series over the same years, an `hlines` mark at zero is the line a contraction crosses, and the two global recessions are `vspans`, shaded bands with a `label` that enters the legend, so the reader sees at once which lines dipped into them and which did not. The world line takes the `"highlight"` role through `emphasis`, drawn bold in front of the others, because it is the one the rest are read against.
+
+```
+ECONOMIES = list(GROWTH)
+RECESSIONS = [
+    {"xmin": 2008.5, "xmax": 2009.5, "label": "Financial crisis"},
+    {"xmin": 2019.5, "xmax": 2020.5, "label": "Pandemic"},
+]
+ZERO_LINE = {"plot_hline_color": "#666666", "plot_hline_width": 1}
+
+growth_figure = LineChart(
+    [
+        [{"x": year, "y": value} for year, value in zip(GROWTH_YEARS, GROWTH[economy])]
+        for economy in ECONOMIES
+    ],
+    title="China never contracted; the others did in both global recessions",
+    xlabel="Year",
+    ylabel="GDP growth (%)",
+    subtitle=ECONOMIES,
+    # the world line bold and in front, the rest at normal weight
+    emphasis=[None if economy != "World" else EMPHASIS.HIGHLIGHT for economy in ECONOMIES],
+    hlines={"y": 0, "style": ZERO_LINE},
+    vspans=RECESSIONS,
+    show_legend=True,
+    legend={"location": LEGEND_LOCATION.OUTSIDE_TOP, "ncols": 4},
+    show_grid=SHOW_GRID.Y,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+)
+growth_figure.show()
+```
+
+The world line runs between 2 and 5% for four decades and dips below zero only twice, in 2009 at -1.3% and in 2020 at -2.9%, which is what the two bands mark. Inside the bands the lines separate: the euro area and Japan fell furthest both times, the United States less, and China's line never crosses zero at all; its worst year was 2020 at 2.3%. Outside the bands, China's line sits far above the others through the 1990s and 2000s and has drifted down towards them since, which is the growth the next figure turns into rank.
+
+### Which economies are the largest, and how has the order changed?
+
+The size of an economy is a ranking: a report says "the second-largest economy", not its dollar figure. A [bump chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/bumpchart/index.md) draws rankings over time: one line per country, its vertical position each benchmark year is its rank by nominal GDP, and a line that climbs is a country overtaking the others. The chart ranks the raw values itself, so the records carry GDP in trillions and `subtitle` names the lines at their ends. Fourteen lines crossing is a tangle, and `emphasis` cuts it: the two lines the section is about take the `"highlight"` role and the rest the `"background"` role, drawn thin and grey, so the two bold lines carry the story and the others are the context they climb through. A series starts when the country's data does, so Russia's line begins in 1990.
+
+```
+COUNTRIES = list(GDP_RANK)
+
+rank_figure = BumpChart(
+    [[{"x": year, "y": gdp} for year, gdp in GDP_RANK[country]] for country in COUNTRIES],
+    title="China climbed from outside the top ten to second; India entered at fifth",
+    xlabel="Year",
+    ylabel="Rank by nominal GDP",
+    subtitle=COUNTRIES,
+    # the two climbers bold, everyone else as grey context
+    emphasis=[
+        EMPHASIS.HIGHLIGHT if country in ("China", "India") else EMPHASIS.BACKGROUND
+        for country in COUNTRIES
+    ],
+    xticks=[year for year, _ in GDP_RANK["United States"]],
+    figsize=(8.0, 5.5),
+)
+rank_figure.show()
+```
+
+The United States holds first place in every year, and Japan holds second for three decades before China passes it in 2010 and Germany in 2023. China's line carries the figure: 12th in 1980, 11th in 1990, 6th in 2000, and second since 2010. India's line enters the top ten in 2010 and reaches fifth in 2023. The other lines drift down a place or two as the two Asian economies pass them.
+
+### How does an economy change as it grows?
+
+Every economy that grows rich goes through the same structural change: agriculture shrinks, industry rises and then yields to services. Three economies at different stages of it show the whole path. The three sector shares add up to nearly the whole of GDP (the remainder is net taxes), so each economy is a [stacked area chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/stackedareachart/index.md) with the bands stacked to the whole. Three charts built with the same `ymax` sit side by side in a [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already built and redraws them into its cells, so the reader compares the boundaries across the three at the same scale.
+
+```
+SECTOR_NAMES = ["Agriculture", "Industry", "Services"]
+
+
+def structure(economy):
+    years = sorted(SECTORS[economy])
+    return StackedAreaChart(
+        [
+            [{"x": year, "y": SECTORS[economy][year][index]} for year in years]
+            for index in range(len(SECTOR_NAMES))
+        ],
+        title=economy,
+        subtitle=SECTOR_NAMES,
+        ymax=100,
+        # one legend for the row, below the middle chart
+        show_legend=economy == "India",
+        legend={"location": LEGEND_LOCATION.OUTSIDE_BOTTOM, "ncols": 3},
+    )
+
+
+Grid(
+    [structure(economy) for economy in SECTORS],
+    title="Agriculture gives way to industry, and industry to services (% of GDP)",
+    xlabel="Year",
+    ylabel="Share of GDP (%)",
+    figsize=(11.0, 3.8),
+).show()
+```
+
+South Korea is the finished path: agriculture was 36% of GDP in 1960 and is 1% now, industry rose through the 1970s and 1980s and has held near a third since, and services took the rest. China is the same path forty years behind, with industry still near 37% and services passing it only around 2012. India skipped a step: its agriculture band shrank the same way, but industry never rose past a third and services took the share directly.
+
+## Prices, incomes and the shocks
+
+### Where and when did inflation bite?
+
+Nineteen countries over nine years of inflation is a table a reader cannot scan for the hot years; a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) colours each cell by its value, so a hot year is a dark column and a chronically inflationary country is a dark row. Two members run inflation in the tens and hundreds of percent, which would leave every other cell the same pale shade on a linear scale, so `norm=NORMALIZE.SYMLOG` gives the colour scale a logarithmic reach that keeps the contrast among the single digits, and `show_heatmap_values` prints the numbers so the extreme cells are read rather than guessed.
+
+```
+MEMBERS = sorted(INFLATION, key=lambda country: -INFLATION[country][INFLATION_YEARS.index(2022)])
+
+inflation_figure = Heatmap(
+    {"x": INFLATION_YEARS, "y": MEMBERS, "z": [INFLATION[country] for country in MEMBERS]},
+    title="2022 was the hot year everywhere; Argentina and Türkiye are hot every year",
+    xlabel="Year",
+    ylabel="Country, by 2022 inflation",
+    norm=NORMALIZE.SYMLOG,
+    show_heatmap_values=True,
+    valfmt="{x:.1f}",
+    show_colorbars=True,
+    colorbar={"label": "Inflation (%)"},
+    figsize=(8.0, 6.5),
+)
+inflation_figure.show()
+```
+
+The 2022 column is the darkest for almost every row: the post-pandemic surge took Germany to 7% and Italy to 8%, the United Kingdom to 8% and the United States to 8%, and 2023 is already paler. Two rows are dark in every column, Argentina and Türkiye, where inflation is a condition rather than an episode, and two are pale in every column, China and Japan, which never saw the surge. Saudi Arabia is pale throughout too, with a pegged currency and subsidised prices. The heatmap separates the episode from the condition.
+
+### How much did the pandemic year cost?
+
+One year, nineteen economies, one number each: the growth of 2020 is a [bar chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md), sorted so the reader sees the order without reading the labels, with a `vlines` mark at zero as the line the bars are measured from. The bars run sideways, with `orientation`, so the country names read as a list and the value axis is horizontal, `show_values` prints each figure at the bar's end, and each record's own `emphasis` gives the economies that grew in the pandemic year the `"highlight"` role and the rest the `"background"` role, because the two that grew are the exception the report has to explain.
+
+```
+pandemic_figure = BarChart(
+    [
+        {
+            "label": country,
+            "y": growth,
+            "emphasis": EMPHASIS.HIGHLIGHT if growth > 0 else EMPHASIS.BACKGROUND,
+        }
+        for country, growth in PANDEMIC.items()
+    ],
+    title="Only China and Türkiye grew in 2020",
+    xlabel="GDP growth in 2020 (%)",
+    orientation=ORIENTATION.HORIZONTAL,
+    sort=SORT.ASCENDING,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL,
+    # the value axis is horizontal, so the zero line is vertical
+    vlines={"x": 0, "style": {"plot_vline_color": "#666666", "plot_vline_width": 1}},
+    figsize=(6.3, 6.0),
+)
+pandemic_figure.show()
+```
+
+China and Türkiye are the only bars to the right of the line, at 2.3 and 1.8%. Everyone else contracted: the United Kingdom at -10.0% with Argentina, Italy and Mexico close behind, and Australia, South Korea, Indonesia and the United States at the top with falls of 2.1% or less. The figure is one year; the growth chart above shows the world back above zero in 2021.
+
+### Who caught up on income?
+
+Growth rates compound into income levels, and the level is what a household feels. GDP per capita in 2000 and 2023, at purchasing-power parity so the dollars buy the same basket everywhere, is a before-and-after question for a [dumbbell chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md): a dot at each year and the connector between them is the gain. `sort_by` the 2023 value puts the richest at the top, and `show_values="delta"` prints each gain at its connector, so a long connector low on the chart is a country catching up and a short one high on it is a rich country growing slowly.
+
+```
+income_figure = DumbbellChart(
+    [{"label": country, "start": start, "end": end} for country, (start, end) in INCOME.items()],
+    title="China's income per head grew fivefold; Italy's barely moved",
+    xlabel="GDP per capita (2021 PPP dollars)",
+    start_name="2000",
+    end_name="2023",
+    sort=SORT.DESCENDING,
+    sort_by=DUMBBELL_SORT_KEY.END,
+    show_values="delta",
+    value_format=VALUE_FORMAT.THOUSANDS,
+    show_legend=True,
+    figsize=(7.0, 6.0),
+)
+income_figure.show()
+```
+
+The connectors at the top are long in dollars and short in proportion: the United States added 19,306 dollars, a gain of 35%. Lower down the connectors are the reverse. China multiplied its income per head by 5.6, India by 2.9, and both are still in the lower half of the chart, which says how far they started from. Italy, with a gain of 5%, grew least, and the euro-area members and Japan sit just above it. Convergence is under way, and this figure says how much of the gap is left.
+
+### How do the economies compare on every front at once?
+
+A report ends with the table (growth, inflation, unemployment, the current account, trade and investment for every country), and a table of six columns and seventeen rows is read one column at a time. A [parallel coordinates chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/parallelcoords/index.md) draws every column as its own axis and every country as a line across them, so a country's profile is a shape and the countries that look alike run together. `dimensions` picks the axes, every key of the records but the name and the group, and `hue` colours the lines by the World Bank income group, which is the grouping the profiles are expected to follow. Argentina and Türkiye are left off, because their inflation would squash every other line to the bottom of that axis.
+
+```
+DIMENSIONS = [key for key in G20_2023[0] if key not in ("country", "income")]
+
+profile_figure = ParallelCoords(
+    G20_2023,
+    title="The G20 in 2023: the high-income economies grow slowly and invest less",
+    dimensions=DIMENSIONS,
+    hue="income",
+    show_legend=True,
+    legend={"location": LEGEND_LOCATION.OUTSIDE_TOP, "ncols": 3},
+    figsize=(9.0, 5.0),
+)
+profile_figure.show()
+```
+
+The lines sort themselves by colour on the first and last axes: the high-income group sits low on growth and low on investment, the middle-income group high on both, which is the catch-up of the previous figure seen from its cause. In between, the groups mix, since unemployment and the current account cut across income, and the outliers stand alone: the two lines at the top of the trade axis are South Korea and Germany, the exporters, and the one at the top of investment is China. The profile chart says which rows of the table to read.
+
+## The report figure
+
+A report has room for one figure, not eight. The four that carry the argument (growth and its recessions, the ranking, the pandemic year, and the inflation surge) go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout, one inner list per row.
+
+```
+Grid(
+    [
+        [growth_figure, rank_figure],
+        [pandemic_figure, inflation_figure],
+    ],
+    title="The major economies: growth, rank, the pandemic year, and the inflation surge",
+    figsize=(13.0, 11.0),
+).show()
+```
+
+Every figure on this page is one call to a chart function over a list of dicts, and every number in them is a World Bank series reshaped by a line or two of Python written out in the cell above it. To adapt any of them, open the guide it links to and read the parameter that does the job; the [annotations guide](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) covers the reference lines, bands and notes the figures share. The charts index lists them all: [Charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md).
+
+# Earth Science: Seismology and Geodesy
+
+An earthquake report asks the same questions in the same order: where the shaking concentrates, what the ground under it looks like, how the sizes are distributed, how fast the aftershocks die away, when they arrived, which way the rupture ran, and which instruments were watching. This page walks one year of one region through those questions and names the figure that answers each, so the chart to reach for arrives with the question rather than the other way round. Every figure links to the chart guide that covers it in full.
+
+The region is the Aegean and Anatolia, between 34 and 42 degrees north and 19 and 45 degrees east, and the year is 2023, when the Kahramanmaraş sequence struck southern Türkiye. Every number is real. The 831 earthquakes of magnitude 4 and above come from the [USGS earthquake catalogue](https://earthquake.usgs.gov/fdsnws/event/1/) (public domain), the relief grid from [NOAA's ETOPO](https://www.ncei.noaa.gov/products/etopo-global-relief-model) global model (public domain), and the 28 broadband seismic stations from the [FDSN station service](https://service.iris.edu/fdsnws/station/1/) (EarthScope, CC BY 4.0). The axes carry longitude and latitude in degrees, without a coastline beneath them, because datachart draws the coordinates and not the map.
+
+```
+import math
+from datetime import date, timedelta
+
+import numpy as np
+
+from datachart.charts import (
+    CalendarHeatmap,
+    ContourChart,
+    HexbinChart,
+    LineChart,
+    NetworkChart,
+    RadialChart,
+)
+from datachart.constants import (
+    ASPECT_RATIO,
+    FIG_SIZE,
+    NETWORK_LABEL_POSITION,
+    NETWORK_LAYOUT,
+    NORMALIZE,
+    RADIAL_TYPE,
+    SCALE,
+    SHOW_GRID,
+)
+from datachart.utils import Grid
+```
+
+The hidden cell below holds the three tables. `EVENTS` is one tuple per earthquake: the hours since the start of 2023, the latitude, the longitude, the depth in kilometres, and the magnitude. `RELIEF` is the ETOPO grid as `lat` and `lon` axes and a `z` row per latitude, in metres above sea level. `STATIONS` is one tuple per station: its code, latitude, longitude, network, and the place it stands. The sections that follow only reshape those into the records the charts take.
+
+## Where the earthquakes are
+
+### Where does the seismicity concentrate?
+
+The first figure of an earthquake report is the map of the epicentres, and eight hundred points on one axes overplot wherever the activity is densest, which is exactly where the reader looks. A [hexbin chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md) bins them instead: the plane is tiled with hexagons and each one is coloured by the number of events inside it, so density reads as colour and nothing hides behind a marker. The counts span three orders of magnitude between a quiet hexagon and the aftershock zone, so `norm=NORMALIZE.LOG` gives the colour scale a logarithmic reach and keeps the sparse cells visible. `mincnt=1` leaves the empty sea blank rather than colouring it as zero.
+
+```
+LATITUDE, LONGITUDE, DEPTH, MAGNITUDE = 1, 2, 3, 4
+latitude = np.array([event[LATITUDE] for event in EVENTS])
+longitude = np.array([event[LONGITUDE] for event in EVENTS])
+magnitude = np.array([event[MAGNITUDE] for event in EVENTS])
+
+# the largest event of the year, and the one that followed it nine hours later
+main = int(magnitude.argmax())
+second = int(np.where(magnitude < magnitude[main], magnitude, 0).argmax())
+
+epicentre_figure = HexbinChart(
+    {"x": longitude.tolist(), "y": latitude.tolist()},
+    title="A year of earthquakes: the faults draw themselves",
+    xlabel="Longitude (°E)",
+    ylabel="Latitude (°N)",
+    gridsize=42,
+    # counts run from 1 to several hundred, so the colour scale is logarithmic
+    norm=NORMALIZE.LOG,
+    mincnt=1,
+    # a hairline edge keeps the single-event cells visible on white
+    style={"plot_hexbin_edge_width": 0.3, "plot_hexbin_edge_color": "#d0d0d0"},
+    show_colorbars=True,
+    colorbar={"label": "Earthquakes of magnitude 4 and above"},
+    texts={
+        "text": "Kahramanmaraş\nsequence",
+        "x": 0.63,
+        "y": 0.88,
+        "coords": "axes",
+        "target": (longitude[main], latitude[main]),
+    },
+    figsize=(9.0, 4.2),
+)
+epicentre_figure.show()
+```
+
+The bright cells trace lines rather than filling the box, and the lines are the faults. One dense band runs northeast to southwest at about 37 degrees east, where 560 of the year's 831 events fall within 200 km of a single epicentre: that is the Kahramanmaraş sequence, and the rest of this page is largely about it. A second, fainter band curves down the west of the region, from Albania through western Greece and along the arc south of Crete, where the African plate dives beneath the Aegean. The two together hold 90% of the year's earthquakes, and the ground between them is nearly blank.
+
+### What does the ground under them look like?
+
+Epicentres are points on a surface, and the surface is what a reader needs in order to place them. A [contour chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md) draws a gridded field as filled bands between its level lines, so the ETOPO relief becomes the shape of the region: the Aegean basin, the Anatolian plateau, and the mountain front between them. The grid goes in as `z` with its `lat` and `lon` axes, `filled` shades the bands, and `levels` sets how many are drawn. Elevation is signed, so the colormap is a diverging one and `vmin` and `vmax` are set symmetrically about zero: sea level lands on its pale midpoint, and the coastline appears without a coastline dataset. The two mainshocks are `texts` notes anchored to their own coordinates.
+
+```
+relief_figure = ContourChart(
+    {"x": RELIEF["lon"], "y": RELIEF["lat"], "z": RELIEF["z"]},
+    title="The Aegean basin, the Anatolian plateau, and the front between them",
+    xlabel="Longitude (°E)",
+    ylabel="Latitude (°N)",
+    filled=True,
+    levels=14,
+    # a diverging colormap with the range symmetric about zero, so sea
+    # level falls on its pale midpoint and the coastline draws itself
+    style={"plot_contour_cmap": "BrBG_r"},
+    vmin=-4500,
+    vmax=4500,
+    show_colorbars=True,
+    colorbar={"label": "Elevation (m)"},
+    texts=[
+        {
+            "text": f"M{magnitude[index]:.1f}",
+            "x": longitude[index] + offset,
+            "y": latitude[index] + 1.4,
+            "target": (longitude[index], latitude[index]),
+        }
+        for index, offset in [(main, -2.2), (second, 2.2)]
+    ],
+    figsize=(9.0, 4.2),
+)
+relief_figure.show()
+```
+
+Sea level sits at the midpoint of the colour scale, so the coastline is the band where the shading changes sign and the Aegean reads as a shallow sea between two land masses. The two mainshocks sit on the mountain front that runs northeast from the corner of the Mediterranean, where the colour changes fastest. The relief is steep there for the same reason the earthquakes are there: the Arabian plate is pushing north into Anatolia, so the crust is both breaking and rising. The deepest cells, in the lower left, are the Hellenic trench at more than 4,000 m below sea level, which is the surface expression of the arc the hexbin figure picked out.
+
+## The sequence
+
+### How are the magnitudes distributed?
+
+Earthquake sizes follow the Gutenberg-Richter law: the number of events of magnitude M or greater falls by a constant factor for every unit of magnitude, so a plot of the cumulative count against magnitude is a straight line on a logarithmic count axis. The slope of that line is the b-value, which is close to 1 for most of the world and is the number a seismicity report quotes. A [line chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) with `scaley=SCALE.LOG` draws it, and a second series carries the fitted line so the eye can judge the fit rather than trust it.
+
+The line bends away from the data at the left because a catalogue misses small events far from stations. The magnitude where that begins is the completeness magnitude, taken here as 4.5 and marked with `vlines`; the b-value is estimated from the events above it with the Aki maximum-likelihood formula, which needs only their mean magnitude.
+
+```
+MC = 4.5  # the magnitude above which the catalogue is complete
+
+steps = np.round(np.arange(4.0, magnitude.max() + 0.1, 0.1), 1)
+cumulative = [int((magnitude >= step - 1e-9).sum()) for step in steps]
+
+# Aki's maximum-likelihood b-value, from the mean magnitude above MC
+complete = magnitude[magnitude >= MC]
+b_value = 1 / (math.log(10) * (complete.mean() - (MC - 0.05)))
+a_value = math.log10(len(complete)) + b_value * MC
+
+gutenberg_figure = LineChart(
+    [
+        [{"x": float(step), "y": count} for step, count in zip(steps, cumulative)],
+        [
+            {"x": float(step), "y": 10 ** (a_value - b_value * step)}
+            for step in steps
+        ],
+    ],
+    title=f"Ten times fewer earthquakes for every unit of magnitude (b = {b_value:.2f})",
+    xlabel="Magnitude",
+    ylabel="Earthquakes of this magnitude or greater",
+    subtitle=["Catalogue", f"Fit above M{MC}"],
+    # the counts fall by three orders of magnitude across the axis
+    scaley=SCALE.LOG,
+    # the fit runs on below one event a year; the axis stops where the data does
+    ymin=0.8,
+    vlines={"x": MC, "label": f"Completeness (M{MC})"},
+    show_legend=True,
+    show_grid=SHOW_GRID.BOTH,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+)
+gutenberg_figure.show()
+```
+
+Below the completeness line the observed curve falls away from the fit, which is the catalogue missing small events rather than the Earth producing fewer of them. Above it the two follow each other from magnitude 4.5 to about 5.5, and then part again in the other direction: the catalogue counts six events of magnitude 6 and above where the fit predicts 3.4, and two above magnitude 7 where the fit predicts 0.2. The fitted b-value of 1.26 sits a little above the global average of 1, which means the region produces proportionally more small earthquakes than large ones. The excess at the top of the scale is the other half of the same reading: a rate of 0.2 magnitude 7 events a year is one every five years, and 2023 had two, so this was not an average year.
+
+### How fast did the aftershocks die away?
+
+Aftershock rates decay as one over the time since the mainshock, which is Omori's law, and the decay spans three orders of magnitude in both time and rate. Both axes therefore need a logarithmic scale, set with `scalex` and `scaley` on the same [line chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md), where the power law is again a straight line. The rate is counted in bins that widen with time, because a fixed daily bin would hold hundreds of events on the first day and none at all after a month.
+
+```
+HOURS = 0
+hours = np.array([event[HOURS] for event in EVENTS])
+
+# everything after the mainshock within 200 km of it
+km_per_degree_east = 111.2 * math.cos(math.radians(latitude[main]))
+distance = np.hypot(
+    (latitude - latitude[main]) * 111.2,
+    (longitude - longitude[main]) * km_per_degree_east,
+)
+after = (hours > hours[main]) & (distance <= 200)
+elapsed = (hours[after] - hours[main]) / 24
+
+# bins that widen with time, so each one holds enough events to count
+edges = np.array([0.02, 0.05, 0.1, 0.3, 1, 3, 10, 30, 100, 330])
+counts, _ = np.histogram(elapsed, bins=edges)
+centres = np.sqrt(edges[:-1] * edges[1:])
+rate = counts / np.diff(edges)
+
+observed = counts > 0
+slope, intercept = np.polyfit(
+    np.log10(centres[observed]), np.log10(rate[observed]), 1
+)
+
+omori_figure = LineChart(
+    [
+        [
+            {"x": float(day), "y": float(value)}
+            for day, value in zip(centres[observed], rate[observed])
+        ],
+        [
+            {"x": float(day), "y": 10 ** (intercept + slope * math.log10(day))}
+            for day in centres
+        ],
+    ],
+    title=f"The aftershock rate falls as one over the elapsed time (p = {-slope:.2f})",
+    xlabel="Days since the mainshock",
+    ylabel="Aftershocks per day",
+    subtitle=["Observed rate", "Omori fit"],
+    scalex=SCALE.LOG,
+    scaley=SCALE.LOG,
+    show_legend=True,
+    show_grid=SHOW_GRID.BOTH,
+    figsize=FIG_SIZE.FULL_MEDIUM,
+)
+omori_figure.show()
+```
+
+The first day carried 214 aftershocks of magnitude 4 and above, and by the end of the year the rate is under one a week. The points lie on the fitted line from a few hours out to the tenth month, so one power law describes the whole decay. The fitted exponent of 0.93 is within the usual range of 0.9 to 1.4, and it has a practical reading: the rate roughly halves every time the elapsed time doubles, so the hazard a week after the mainshock is about a seventh of the hazard on the first day. The first two points sit below the line rather than on it, which is a known limitation of catalogues rather than a feature of the Earth: in the hours after a great earthquake the ground never stops shaking, and smaller events are lost in the noise before they can be measured.
+
+### When did they arrive?
+
+A power law gives the shape of the decay, and the calendar gives its size against the rest of the year. Daily counts over a year are 365 numbers with a strong local structure, which a [calendar heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/calendarheatmap/index.md) lays out as a calendar, one cell per day coloured by its count. The mainshock day holds more than two hundred events and every ordinary day holds none or one, so `vmax` caps the colour scale well below the peak: the February cells saturate and the rest of the year keeps its contrast.
+
+```
+DAYS = [date(2023, 1, 1) + timedelta(days=offset) for offset in range(365)]
+per_day = np.bincount((hours // 24).astype(int), minlength=365)[:365]
+
+calendar_figure = CalendarHeatmap(
+    {"date": DAYS, "value": per_day.tolist()},
+    title="Earthquakes per day in 2023: one week holds half the year",
+    figsize=(9.0, 2.6),
+    aspect_ratio=ASPECT_RATIO.AUTO,
+    # the mainshock day is an order of magnitude above any other
+    vmax=12,
+    show_colorbars=True,
+    colorbar={"label": "Earthquakes of magnitude 4 and above"},
+)
+calendar_figure.show()
+```
+
+The year is almost empty apart from February, which is dark for its whole length and black in its first week. The single darkest cell is 6 February, with 224 events, and the week beginning there holds 47% of the year's earthquakes. The figure also shows what the Omori fit implies: the cells fade through March and April rather than stopping, because an aftershock sequence has no end, only a rate that falls below the rate of everything else.
+
+### Which way did the rupture run?
+
+A fault is a line, so its aftershocks spread along a direction rather than filling a circle, and the direction is the strike of the fault that broke. The azimuth from the mainshock to each aftershock is an angle, and angles belong on a circular axis: a [radial chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/radialchart/index.md) with `type=RADIAL_TYPE.HISTOGRAM` counts them into sectors and draws the rose diagram that structural geology has used for a century. The chart bins the raw angles itself, so each record carries one azimuth as `x`, and the default orientation already puts north at the top and runs clockwise, which is the compass convention.
+
+```
+# the compass bearing from the mainshock to each aftershock
+azimuth = np.degrees(
+    np.arctan2(
+        (longitude[after] - longitude[main]) * km_per_degree_east,
+        (latitude[after] - latitude[main]) * 111.2,
+    )
+) % 360
+
+rose_figure = RadialChart(
+    [{"x": float(bearing)} for bearing in azimuth],
+    type=RADIAL_TYPE.HISTOGRAM,
+    title="The aftershocks spread northeast and southwest, along the fault",
+    # 16 sectors of 22.5 degrees, the usual resolution of a rose diagram
+    num_bins=16,
+    show_grid=SHOW_GRID.BOTH,
+    figsize=FIG_SIZE.SQUARE,
+)
+rose_figure.show()
+```
+
+The rose has three lobes and an empty quarter. The pair pointing northeast and southwest are opposite bearings along one line, and that line is the strike of the East Anatolian Fault: an aftershock zone is the length of the rupture, so its shape is the fault drawn by its own earthquakes. Only four aftershocks fall in the whole quarter between east and south, which is the measure of how tightly the rest is aligned. The third lobe, between northwest and north, is the second rupture: the magnitude 7.5 event nine hours later broke a different fault 88 km almost due north of the first, and its aftershocks spread on either side of that bearing. A map of the same points would leave the reader to estimate the trends by eye.
+
+## The instruments
+
+### Which stations were watching?
+
+Every number on this page comes from instruments, and the geometry of those instruments decides how well an earthquake can be located: an event inside a dense array is pinned down, one outside it is not. A [network chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/networkchart/index.md) with `layout=NETWORK_LAYOUT.FIXED` draws each station at the position given in its own `x` and `y`, so the figure is the station map rather than a diagram of one. The layout works inside a unit square, so both axes take one scale factor and the region keeps its proportions. The region is three times as wide as it is tall, which packs the western stations into a corner, so a second panel repeats the exercise for the stations west of 30 degrees east alone and names every one of them. The edges are the baselines between stations closer than 250 km to each other, excluding the zero-length one where two operators share a single site, and node size counts the baselines each station has. Five operators are represented: the Albanian Seismological Network, GEOFON, the Aristotle University of Thessaloniki network, the Global Seismograph Network, and MedNet.
+
+```
+CODE, STATION_LAT, STATION_LON = 0, 1, 2
+BASELINE_KM = 250
+ZOOM_EAST = 30  # the meridian the enlarged panel stops at
+
+
+def separation(one, other):
+    """The distance between two stations in kilometres."""
+    mean_latitude = math.radians((one[STATION_LAT] + other[STATION_LAT]) / 2)
+    return math.hypot(
+        (one[STATION_LAT] - other[STATION_LAT]) * 111.2,
+        (one[STATION_LON] - other[STATION_LON]) * 111.2 * math.cos(mean_latitude),
+    )
+
+
+def station_map(group, subtitle, name_every):
+    """A map of `group`, scaled into the unit square the fixed layout uses."""
+    edges = [
+        {"source": one[CODE], "target": other[CODE], "weight": separation(one, other)}
+        for index, one in enumerate(group)
+        for other in group[index + 1 :]
+        # a zero-length baseline is two operators sharing one site, not a pair
+        if 0 < separation(one, other) <= BASELINE_KM
+    ]
+    baselines = {station[CODE]: 0 for station in group}
+    for edge in edges:
+        baselines[edge["source"]] += 1
+        baselines[edge["target"]] += 1
+
+    # both axes take one scale factor, so the region keeps its proportions
+    middle = math.radians(sum(s[STATION_LAT] for s in group) / len(group))
+    east = {s[CODE]: s[STATION_LON] * 111.2 * math.cos(middle) for s in group}
+    north = {s[CODE]: s[STATION_LAT] * 111.2 for s in group}
+    span = max(
+        max(east.values()) - min(east.values()),
+        max(north.values()) - min(north.values()),
+    )
+
+    def unit(places, value):
+        reach = max(places.values()) - min(places.values())
+        return (value - min(places.values())) / span + (1 - reach / span) / 2
+
+    return NetworkChart(
+        {
+            "nodes": [
+                {
+                    "id": station[CODE],
+                    # the wide panel names only the stations with no baseline
+                    "label": station[CODE].split(".")[1]
+                    if name_every or not baselines[station[CODE]]
+                    else "",
+                    "x": unit(east, east[station[CODE]]),
+                    "y": unit(north, north[station[CODE]]),
+                    "size": 1 + baselines[station[CODE]],
+                }
+                for station in group
+            ],
+            "edges": edges,
+        },
+        layout=NETWORK_LAYOUT.FIXED,
+        label_position=NETWORK_LABEL_POSITION.ABOVE,
+        subtitle=subtitle,
+        style={"plot_network_node_size_min": 16, "plot_network_node_size_max": 95},
+    )
+
+
+aegean = [station for station in STATIONS if station[STATION_LON] <= ZOOM_EAST]
+
+Grid(
+    [
+        [
+            station_map(STATIONS, "The whole region", name_every=False),
+            station_map(aegean, f"West of {ZOOM_EAST}°E, enlarged", name_every=True),
+        ]
+    ],
+    title=f"Broadband stations and the baselines shorter than {BASELINE_KM} km",
+    figsize=(11.0, 5.6),
+).show()
+```
+
+The array breaks into three linked groups and five stations standing alone, and the split runs from west to east. The enlarged panel holds two of the groups and 79 of the 80 baselines: thirteen stations across Albania and northern Greece, where the busiest carries eleven, and eight more ringing Crete and the southern Aegean. East of there the map empties out. A pair sits in eastern Türkiye, and the rest are singletons: Cyprus, Ankara, Garni in Armenia, and Isparta, where two operators run instruments at one site, so the figure draws them on top of each other and one label covers both. The 28 stations here are the globally shared broadband instruments alone, and the national networks that do the routine work in Türkiye and Greece are denser, so a location computed from them is better than this array by itself would give. Read against the first figure the geometry still matters, because the most active part of the region is where this array is thinnest.
+
+## The report figure
+
+A paper has room for one figure, not seven. The four that carry the argument (where the earthquakes are, how their sizes are distributed, how the aftershocks decayed, and which way the rupture ran) go into one panel with [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md), which takes the figures already drawn above and redraws them into its cells. Nested lists are the layout, one inner list per row.
+
+```
+Grid(
+    [
+        [epicentre_figure, gutenberg_figure],
+        [omori_figure, rose_figure],
+    ],
+    title="The Kahramanmaraş year: the map, the sizes, the decay, and the direction",
+    figsize=(14.0, 9.0),
+).show()
+```
+
+One number on this page is worth a caveat: 445 of the 831 events, more than half, carry a depth of exactly 10 km, which is the value the catalogue assigns when the depth is not resolved, so a figure of depth against anything would be drawing the convention rather than the Earth. This page therefore has no depth figure. Every other figure is one call to a chart function over a list of dicts, and every number in them comes from a few lines of numpy written out in the cell above it. To adapt any of them, open the guide it links to and read the parameter that does the job; the [annotations guide](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) covers the reference lines and notes the figures share. The charts index lists them all: [Charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md).
 # API Reference
 
 # Datachart Module
