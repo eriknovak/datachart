@@ -61,7 +61,7 @@ from datachart.constants import (
     DATE_FORMAT,
     HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
-    IMAGE_POSITION,
+    DRAW_POSITION,
     LEGEND_LOCATION,
     NETWORK_LABEL_POSITION,
     NETWORK_LAYOUT,
@@ -3657,7 +3657,7 @@ def image_above_line():
             LineChart(LINE1, subtitle="line", hlines={"y": 45}),
             ImageChart(
                 {"image": watermark, "extent": (2, 7, 20, 70)},
-                position=IMAGE_POSITION.ABOVE,
+                position=DRAW_POSITION.ABOVE,
             ),
         ],
         title="A picture above the marks, under the reference line",

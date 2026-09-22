@@ -431,11 +431,27 @@ A picture placed in the data's coordinate space (`ImageChart`: a file path, a
 PIL image, an RGB(A) array, or a 2-D array read through a colormap), anchored
 by an `extent` (`xmin`, `xmax`, `ymin`, `ymax`) that its pixels stretch to
 fill. Carries no series, so it takes no cycle color, no legend entry and no
-emphasis. `position` (an `IMAGE_POSITION` constant) picks its rung on the
+emphasis. `position` (a `DRAW_POSITION` constant) picks its rung on the
 draw-order ladder, `BELOW` every mark by default. Composed under or over
 another chart with `Panel`, never declared on one.
-_Avoid_: underlay, basemap, background, raster, watermark (that is one use of
+_Avoid_: underlay, background, raster, watermark (that is one use of
 `position=ABOVE`)
+
+**Basemap**:
+The land under a geographic chart (`BasemapChart`: coastlines, land fill,
+country borders and lakes, picked with `BASEMAP_FEATURE`), drawn from
+outlines bundled with the package rather than fetched or computed. Shares
+`DRAW_POSITION` with the image, `BELOW` by default. Composed under a chart
+whose x and y are already longitude and latitude — it transforms nothing, so
+the marks it sits under need no transform either.
+_Avoid_: map, coastline chart, shapefile, geometry (for the front), tile layer
+
+**Geographic aspect**:
+The axes shape that keeps a small region's proportions right when longitude
+and latitude are plotted straight: one degree of longitude is narrowed by the
+cosine of the mid latitude. Requested with `aspect="geographic"`, off by
+default, and available to every chart rather than only the basemap.
+_Avoid_: projection (it is not one), equal aspect, scale factor
 
 **Extent**:
 The data-space rectangle an image's pixels are stretched to fill, given as

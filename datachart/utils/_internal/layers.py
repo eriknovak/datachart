@@ -97,7 +97,7 @@ from .validate import (
     validate_gantt_sort_by,
     validate_image,
     validate_image_extent,
-    validate_image_position,
+    validate_draw_position,
     validate_log_values,
     validate_overlap,
     validate_ridge_marks,
@@ -207,7 +207,7 @@ from ...constants import (
     GANTT_VALUE,
     HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
-    IMAGE_POSITION,
+    DRAW_POSITION,
     LEGEND_LOCATION,
     NETWORK_LAYOUT,
     NETWORK_LABEL_POSITION,
@@ -1278,10 +1278,10 @@ TEXT_ANNOTATION_ZORDER = 5
 REF_LINE_ZORDER = 3.5
 # an image's rung (ADR 0054, 0060): below under the gridlines (0.5), above
 # over the marks (3) and under the reference lines
-IMAGE_ZORDER = {IMAGE_POSITION.BELOW: 0.25, IMAGE_POSITION.ABOVE: 3.25}
+DRAW_ZORDER = {DRAW_POSITION.BELOW: 0.25, DRAW_POSITION.ABOVE: 3.25}
 
 
-def image_zorder_key(position: str) -> str:
+def draw_zorder_key(position: str) -> str:
     """An image's key in a Panel overlay's zorder table."""
 
     return f"image_{position}"
@@ -7421,7 +7421,7 @@ class ImageLayer(Layer):
         data = self.chart.get("data") or {}
         self.image = validate_image(data.get("image"))
         self.extent = validate_image_extent(data.get("extent"))
-        self.position = validate_image_position(self.settings.get("position"))
+        self.position = validate_draw_position(self.settings.get("position"))
         style = get_image_style(self.style)
         if self.image.ndim == 2:
             style["cmap"] = get_colormap(style["cmap"])
@@ -7434,7 +7434,7 @@ class ImageLayer(Layer):
 
     @property
     def zorder_key(self) -> str:
-        return image_zorder_key(self.position)
+        return draw_zorder_key(self.position)
 
     def value_data(self):
         return np.array(self.extent[2:])
@@ -7443,7 +7443,7 @@ class ImageLayer(Layer):
         return np.array(self.extent[:2])
 
     def draw(self, ax, ctx):
-        z_order = IMAGE_ZORDER[self.position] if ctx.z_order is None else ctx.z_order
+        z_order = DRAW_ZORDER[self.position] if ctx.z_order is None else ctx.z_order
         ax.imshow(
             self.image,
             extent=self.extent,

@@ -73,7 +73,7 @@ Classes:
     RIDGELINE_SCALE:         The supported ridgeline density scales.
     CONTOUR_LEVELS:          The supported contour level rules.
     HEXBIN_REDUCE:           The supported hexbin aggregations.
-    IMAGE_POSITION:          The supported image chart draw positions.
+    DRAW_POSITION:           The supported image chart draw positions.
     NETWORK_LAYOUT:          The supported network chart layouts.
     NETWORK_LABEL_POSITION:     The supported network node label positions.
     SCATTER_MATRIX_DIAGONAL: The supported scatter matrix diagonal cells.
@@ -984,22 +984,22 @@ class HEXBIN_REDUCE:
     MAX = "max"
 
 
-class IMAGE_POSITION:
+class DRAW_POSITION:
     """The supported image chart draw positions.
 
     Passed as the `position` setting of the image chart: where the picture
     sits in the draw order of the axes it shares with other charts. The
     position decides it, never the order of the figures in `Panel`.
 
-    ![IMAGE_POSITION at a glance](../assets/imgs/const-image-position.svg){ width="100%" }
+    ![DRAW_POSITION at a glance](../assets/imgs/const-draw-position.svg){ width="100%" }
 
     Examples:
-        >>> from datachart.constants import IMAGE_POSITION
-        >>> IMAGE_POSITION.DEFAULT
+        >>> from datachart.constants import DRAW_POSITION
+        >>> DRAW_POSITION.DEFAULT
         "below"
 
     Attributes:
-        DEFAULT (str): The default position. Same as `IMAGE_POSITION.BELOW`.
+        DEFAULT (str): The default position. Same as `DRAW_POSITION.BELOW`.
         BELOW (str): Under every mark and under the gridlines, so the grid and
             the data read over the picture. Equals to `"below"`.
         ABOVE (str): Over the marks, under the reference lines and the text

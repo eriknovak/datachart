@@ -30,7 +30,7 @@ from ...constants import (
     GANTT_DATE_PERIOD,
     GANTT_SORT_KEY,
     GANTT_VALUE,
-    IMAGE_POSITION,
+    DRAW_POSITION,
     NETWORK_LAYOUT,
     NETWORK_LABEL_POSITION,
     NORMALIZE,
@@ -53,7 +53,7 @@ AXIS_TEMPORAL = "temporal"
 AXIS_NUMERIC = "numeric"
 AXIS_CATEGORICAL = "categorical"
 EMPHASIS_ROLES = (EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT)
-IMAGE_POSITIONS = (IMAGE_POSITION.BELOW, IMAGE_POSITION.ABOVE)
+DRAW_POSITIONS = (DRAW_POSITION.BELOW, DRAW_POSITION.ABOVE)
 # PIL modes an array keeps as is: grey levels read through the colormap
 IMAGE_ARRAY_MODES = ("L", "I", "F", "RGB", "RGBA")
 RANK_RULES = (BUMP_RANK.VALUE_DESCENDING, BUMP_RANK.VALUE_ASCENDING, BUMP_RANK.GIVEN)
@@ -1173,15 +1173,15 @@ def validate_gantt_groups(records, sort_by, show_group_headers=False) -> None:
         )
 
 
-def validate_image_position(position):
+def validate_draw_position(position):
     """Validate an image draw position; None means below the marks."""
 
     if position is None:
-        return IMAGE_POSITION.DEFAULT
-    if position not in IMAGE_POSITIONS:
+        return DRAW_POSITION.DEFAULT
+    if position not in DRAW_POSITIONS:
         raise ValueError(
             f"Invalid `position` value {position!r}. "
-            f"Must be one of {IMAGE_POSITIONS} or None."
+            f"Must be one of {DRAW_POSITIONS} or None."
         )
     return position
 

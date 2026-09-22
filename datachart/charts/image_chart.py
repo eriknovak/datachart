@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
-from ..utils._internal.validate import validate_image_position
+from ..utils._internal.validate import validate_draw_position
 from ..typings import ImageDataAttrs, ImageStyleAttrs
-from ..constants import ASPECT_RATIO, FIG_SIZE, IMAGE_POSITION, SHOW_GRID
+from ..constants import ASPECT_RATIO, FIG_SIZE, DRAW_POSITION, SHOW_GRID
 
 # ================================================
 # Main Chart Definition
@@ -16,7 +16,7 @@ from ..constants import ASPECT_RATIO, FIG_SIZE, IMAGE_POSITION, SHOW_GRID
 def ImageChart(
     data: Union[ImageDataAttrs, List[ImageDataAttrs]],
     *,
-    position: Optional[Union[IMAGE_POSITION, str]] = None,
+    position: Optional[Union[DRAW_POSITION, str]] = None,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
@@ -73,7 +73,7 @@ def ImageChart(
         position: Where the picture sits in the draw order: `"below"` (default)
             under the gridlines and every mark, or `"above"` over the marks and
             under the reference lines. See
-            [`IMAGE_POSITION`][datachart.constants.IMAGE_POSITION].
+            [`DRAW_POSITION`][datachart.constants.DRAW_POSITION].
         title: The title of the chart.
         xlabel: The label of the x-axis.
         ylabel: The label of the y-axis.
@@ -104,10 +104,10 @@ def ImageChart(
     Raises:
         ValueError: If the image is not a readable picture or array, the
             `extent` is missing, not four finite numbers, or has no width or
-            height, or `position` is not an `IMAGE_POSITION`.
+            height, or `position` is not an `DRAW_POSITION`.
 
     """
-    validate_image_position(position)
+    validate_draw_position(position)
 
     charts = build_charts_structure(
         data,
