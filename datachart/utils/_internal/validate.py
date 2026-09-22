@@ -17,9 +17,9 @@ import numpy as np
 from PIL import Image
 
 from ...constants import (
-    BASEMAP_FEATURE,
     ARROW_STYLE,
     BANDWIDTH,
+    BASEMAP_FEATURE,
     BUMP_LABEL_POSITION,
     BUMP_RANK,
     CALENDAR_WEEKDAY,
@@ -55,12 +55,14 @@ AXIS_NUMERIC = "numeric"
 AXIS_CATEGORICAL = "categorical"
 EMPHASIS_ROLES = (EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT)
 DRAW_POSITIONS = (DRAW_POSITION.BELOW, DRAW_POSITION.ABOVE)
+# in draw order, bottom up: a lake sits on the land and a line on both
 BASEMAP_FEATURES = (
-    BASEMAP_FEATURE.COASTLINE,
     BASEMAP_FEATURE.LAND,
-    BASEMAP_FEATURE.BORDERS,
     BASEMAP_FEATURE.LAKES,
+    BASEMAP_FEATURE.BORDERS,
+    BASEMAP_FEATURE.COASTLINE,
 )
+BASEMAP_FILLED = (BASEMAP_FEATURE.LAND, BASEMAP_FEATURE.LAKES)
 # PIL modes an array keeps as is: grey levels read through the colormap
 IMAGE_ARRAY_MODES = ("L", "I", "F", "RGB", "RGBA")
 RANK_RULES = (BUMP_RANK.VALUE_DESCENDING, BUMP_RANK.VALUE_ASCENDING, BUMP_RANK.GIVEN)
@@ -1264,6 +1266,16 @@ def validate_image(image) -> np.ndarray:
     return array
 
 
+def validate_basemap_source(features, geometry) -> None:
+    """Raise when both the bundled features and caller outlines are given."""
+
+    if features is not None and geometry is not None:
+        raise ValueError(
+            "Pass either basemap `features` or `geometry`: the geometry "
+            "replaces the bundled outlines."
+        )
+
+
 def validate_basemap_features(features) -> tuple:
     """The features as a tuple of names; None means coastline and land."""
 
@@ -1312,12 +1324,23 @@ def validate_basemap_geometry(geometry) -> list:
             raise ValueError(
                 f"Invalid {where}: `lon` and `lat` must be numbers."
             ) from error
-        if lon.ndim != 1 or lon.shape != lat.shape or not np.isfinite(lon).any():
+        if lon.ndim != 1 or lon.shape != lat.shape:
             raise ValueError(
                 f"Invalid {where}: `lon` and `lat` must be flat sequences of "
-                "the same length holding at least one point."
+                "the same length."
             )
-        outlines.append((feature, np.column_stack([lon, lat])))
+        rows = np.column_stack([lon, lat])
+        # a filled outline needs a ring: three points between two NaN breaks
+        finite = np.isfinite(rows).all(axis=1)
+        runs = np.diff(np.flatnonzero(np.concatenate([[1], ~finite, [1]]))) - 1
+        needed = 3 if feature in BASEMAP_FILLED else 1
+        if not (runs >= needed).any():
+            raise ValueError(
+                f"Invalid {where}: a {feature!r} outline needs at least "
+                f"{needed} point{'s' if needed > 1 else ''} with a finite `lon` "
+                "and `lat`."
+            )
+        outlines.append((feature, rows))
     return outlines
 
 

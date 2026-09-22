@@ -97,8 +97,11 @@ from .validate import (
     validate_gantt_arrow_entry,
     validate_gantt_show_values,
     validate_gantt_sort_by,
+    BASEMAP_FEATURES,
+    BASEMAP_FILLED,
     validate_basemap_features,
     validate_basemap_geometry,
+    validate_basemap_source,
     validate_geographic_latitudes,
     validate_image,
     validate_image_extent,
@@ -1302,14 +1305,6 @@ BASEMAP_FILE = os.path.join(
     "charts",
     "_basemap",
     "natural_earth_110m.npz",
-)
-BASEMAP_FILLED = (BASEMAP_FEATURE.LAND, BASEMAP_FEATURE.LAKES)
-# drawn bottom up, so a lake sits on the land and a line on both
-BASEMAP_ORDER = (
-    BASEMAP_FEATURE.LAND,
-    BASEMAP_FEATURE.LAKES,
-    BASEMAP_FEATURE.BORDERS,
-    BASEMAP_FEATURE.COASTLINE,
 )
 
 
@@ -7460,16 +7455,30 @@ class HexbinLayer(Layer):
         ax.add_collection(outline, autolim=False)
 
 
-class ImageLayer(Layer):
-    """A picture stretched over its extent in data coordinates (ADR 0060).
+class DrawPositionLayer(Layer):
+    """A layer that carries no series, on the rung its `DRAW_POSITION` picks.
 
-    Carries no series: it takes no cycle color, no legend entry and no
-    emphasis. Its position picks its rung on the draw-order ladder.
+    Takes no cycle color, no legend entry and no emphasis (ADR 0054, 0060).
     """
+
+    takes_color = False
+    position: str = DRAW_POSITION.DEFAULT
+
+    @property
+    def zorder_key(self) -> str:
+        return draw_zorder_key(self.position)
+
+    def rung(self, ctx) -> float:
+        """The layer's zorder: its position's rung unless the panel set one."""
+
+        return DRAW_ZORDER[self.position] if ctx.z_order is None else ctx.z_order
+
+
+class ImageLayer(DrawPositionLayer):
+    """A picture stretched over its extent in data coordinates (ADR 0060)."""
 
     # the picture fills its extent; the axes end where it does
     ticks_at_axis_ends = False
-    takes_color = False
 
     kind = "image"
 
@@ -7488,10 +7497,6 @@ class ImageLayer(Layer):
             style.pop("cmap", None)
         self.image_style = style
 
-    @property
-    def zorder_key(self) -> str:
-        return draw_zorder_key(self.position)
-
     def value_data(self):
         return np.array(self.extent[2:])
 
@@ -7499,7 +7504,7 @@ class ImageLayer(Layer):
         return np.array(self.extent[:2])
 
     def draw(self, ax, ctx):
-        z_order = DRAW_ZORDER[self.position] if ctx.z_order is None else ctx.z_order
+        z_order = self.rung(ctx)
         ax.imshow(
             self.image,
             extent=self.extent,
@@ -7511,41 +7516,30 @@ class ImageLayer(Layer):
         ax.autoscale_view()
 
 
-class BasemapLayer(Layer):
+class BasemapLayer(DrawPositionLayer):
     """Coastlines, land, borders and lakes in longitude and latitude (ADR 0061).
 
-    Carries no series, like the image: no cycle color, no legend entry, no
-    emphasis. Composed with data it leaves the limits to the data; alone it
-    frames its own outlines.
+    Composed with data it leaves the limits to the data; alone it frames its
+    own outlines.
     """
-
-    takes_color = False
 
     kind = "basemap"
 
     def _resolve_style(self):
         data = self.chart.get("data") or {}
         geometry = data.get("geometry")
+        validate_basemap_source(data.get("features"), geometry)
         if geometry is None:
             features = validate_basemap_features(data.get("features"))
             outlines = [(f, load_basemap(f)) for f in features]
-        elif data.get("features") is not None:
-            raise ValueError(
-                "Pass either basemap `features` or `geometry`: the geometry "
-                "replaces the bundled outlines."
-            )
         else:
             outlines = validate_basemap_geometry(geometry)
         # bottom up, the caller's order kept within one feature
-        self.outlines = sorted(outlines, key=lambda o: BASEMAP_ORDER.index(o[0]))
+        self.outlines = sorted(outlines, key=lambda o: BASEMAP_FEATURES.index(o[0]))
         self.position = validate_draw_position(self.settings.get("position"))
         self.feature_style = get_basemap_style(self.style)
         lakes = self.feature_style[BASEMAP_FEATURE.LAKES]
         lakes.setdefault("facecolor", self.ground)
-
-    @property
-    def zorder_key(self) -> str:
-        return draw_zorder_key(self.position)
 
     def bounds(self) -> tuple:
         """The `(xmin, xmax, ymin, ymax)` the outlines span."""
@@ -7556,7 +7550,7 @@ class BasemapLayer(Layer):
         return float(x0), float(x1), float(y0), float(y1)
 
     def draw(self, ax, ctx):
-        z_order = DRAW_ZORDER[self.position] if ctx.z_order is None else ctx.z_order
+        z_order = self.rung(ctx)
         for feature, rows in self.outlines:
             outlines = _split_outlines(rows)
             style = self.feature_style[feature]
@@ -11440,7 +11434,7 @@ class Panel:
             data_indices = [
                 i
                 for i, group in enumerate(self.groups)
-                if any(l.kind not in ("text", "image", "basemap") for l in group.layers)
+                if any(l.takes_color for l in group.layers)
             ]
             data_assignments = determine_axis_assignment(
                 [self.groups[i] for i in data_indices],

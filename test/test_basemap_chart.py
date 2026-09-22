@@ -171,6 +171,8 @@ class TestBasemapGeometry(unittest.TestCase):
             {"lon": [0, 1], "lat": [0, 1], "feature": "rivers"},
             [ROAD, "coast"],
             {"lon": [], "lat": []},
+            {"lon": [0, 1, 2], "lat": [np.nan] * 3},
+            {"lon": [0, 1], "lat": [0, 1], "feature": "land"},
         ):
             with self.subTest(bad=bad):
                 with self.assertRaisesRegex(ValueError, "geometry"):

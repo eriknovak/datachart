@@ -104,7 +104,7 @@ def ImageChart(
     Raises:
         ValueError: If the image is not a readable picture or array, the
             `extent` is missing, not four finite numbers, or has no width or
-            height, or `position` is not an `DRAW_POSITION`.
+            height, or `position` is not a `DRAW_POSITION`.
 
     """
     validate_draw_position(position)
