@@ -2231,6 +2231,8 @@
       
         
       
+        
+      
     
     
     
@@ -2329,6 +2331,34 @@
     
   
     Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="biomedical/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Medical and Biomedical Experiments
   
 
     
@@ -3888,7 +3918,7 @@
 
 <h1 id="use-cases">Use Cases</h1>
 <p>The how-to guides answer "how do I draw this chart?". The use cases answer the question a reader usually arrives with: "which figures does my report need, and how do I build them?" Each page takes one field, walks one dataset from the first figure to the last, and ends with the figures composed into a single panel. Every figure links to the chart guide behind it, so the page stays a tour and the guide stays the reference.</p>
-<p>The section grows one field at a time: AI, machine learning and NLP, then statistics.</p>
+<p>The section grows one field at a time: AI, machine learning and NLP, statistics, then medical and biomedical experiments.</p>
 <div class="grid cards card-gallery">
 <ul>
 <li>
@@ -3900,6 +3930,11 @@
 <p><a href="statistics/">Statistics</a></p>
 <p>The figures of a statistics report, in the order the analysis happens: group distributions with their test results, effect sizes with confidence intervals, a bootstrap distribution, a correlation matrix, a scatter matrix, one pair read two ways, a fitted line with its residuals, a Q-Q plot, and the empirical distributions behind it all.</p>
 <p><p class="card-icon" markdown="span"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.96 11.31C10.82 8.1 11.5 6 13 6s2.18 2.1 3.04 5.31C17 14.92 18.1 19 22 19v-2c-2.2 0-3-2.46-4.03-6.2C17.08 7.46 16.15 4 13 4s-4.08 3.46-4.97 6.8C7.03 14.54 6.2 17 4 17V2H2v20h20v-2H4v-1c3.9 0 5-4.08 5.96-7.69"/></svg></span></p></p>
+</li>
+<li>
+<p><a href="biomedical/">Medical and Biomedical Experiments</a></p>
+<p>The figures of a trial report, in the order the questions come: the endpoint per arm with its pairwise tests, the dose-response with intervals, the share at target, the course of the arms over the visits, every subject's own course, who stayed enrolled, the wider marker panel, the safety labs, and the individuals behind a safety signal.</p>
+<p><p class="card-icon" markdown="span"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m4.22 11.29 7.07-7.07a6.01 6.01 0 0 1 8.49 0c2.34 2.34 2.34 6.14 0 8.49l-7.07 7.07c-2.35 2.34-6.15 2.34-8.49 0a6.01 6.01 0 0 1 0-8.49m1.42 1.42a3.98 3.98 0 0 0-1.04 3.86l5.99-5.98 4.24 4.24 3.53-3.54a3.98 3.98 0 0 0 0-5.65 3.98 3.98 0 0 0-5.65 0z"/></svg></span></p></p>
 </li>
 </ul>
 </div>
@@ -3955,6 +3990,24 @@
 <td>Checking the model</td>
 <td>Does the fitted line hold up, and are its residuals well behaved?</td>
 <td><code>ScatterChart</code> in a <code>Grid</code>, <code>LineChart</code></td>
+</tr>
+<tr>
+<td><a href="biomedical/">Medical and Biomedical Experiments</a></td>
+<td>The primary endpoint</td>
+<td>Do the arms differ, by how much, and how many reached the target?</td>
+<td><code>BoxPlot</code> and <code>SwarmPlot</code> in a <code>Panel</code>, <code>BarChart</code>, <code>ViolinPlot</code></td>
+</tr>
+<tr>
+<td></td>
+<td>Over the twelve weeks</td>
+<td>When did the arms separate, did every subject follow, and who stayed?</td>
+<td><code>LineChart</code></td>
+</tr>
+<tr>
+<td></td>
+<td>The wider panel</td>
+<td>What else moved with the dose, and is the safety signal an arm or a few subjects?</td>
+<td><code>Heatmap</code>, <code>DumbbellChart</code>, <code>SwarmPlot</code></td>
 </tr>
 </tbody>
 </table>
