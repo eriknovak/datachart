@@ -6,6 +6,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 
 from datachart.charts import ParallelCoords
 from datachart.utils import Panel
@@ -122,6 +123,14 @@ class TestNumericAxisTicks(unittest.TestCase):
         figure = ParallelCoords(TICK_ROWS, dimensions=["a", "c"])
         self.assertEqual(axis_ticks(figure, 1), [(0.5, "5.00")])
 
+    def test_numpy_integers_normalize_like_python_ints(self):
+        plain_rows = [{"a": 3, "b": 2}, {"a": 9, "b": 5}, {"a": 18, "b": 9}]
+        numpy_rows = [{k: np.int64(v) for k, v in row.items()} for row in plain_rows]
+        plain = ParallelCoords(plain_rows).axes[0].lines[:3]
+        with_numpy = ParallelCoords(numpy_rows).axes[0].lines[:3]
+        for numpy_row, plain_row in zip(with_numpy, plain):
+            np.testing.assert_allclose(numpy_row.get_ydata(), plain_row.get_ydata())
+
 
 class TestHueScale(unittest.TestCase):
     """A numeric hue ramp spans every record: the emphasis rule mutes, it does not rescale."""
@@ -147,6 +156,11 @@ class TestHueScale(unittest.TestCase):
         figure = ParallelCoords(
             HUE_ROWS, hue="mass", emphasis=["background"] * len(HUE_ROWS)
         )
+        self.assertTrue(parallel_layer(figure).continuous_hue)
+
+    def test_a_numpy_integer_hue_reads_as_continuous(self):
+        rows = [dict(row, mass=np.int64(row["mass"])) for row in HUE_ROWS]
+        figure = ParallelCoords(rows, hue="mass")
         self.assertTrue(parallel_layer(figure).continuous_hue)
 
     def test_a_categorical_hue_skips_background_rows_in_the_legend(self):

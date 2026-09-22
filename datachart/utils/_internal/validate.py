@@ -70,12 +70,18 @@ STACK_BASELINES = (
 )
 
 
+def is_number(value) -> bool:
+    """Whether `value` is a real number; bools are not, numpy scalars are."""
+
+    # numpy integers are not Python ints, so an (int, float) check drops them
+    return isinstance(value, Real) and not isinstance(value, bool)
+
+
 def validate_bandwidth(bandwidth) -> None:
     """Raise unless `bandwidth` is None, a bandwidth rule, or a number."""
 
     if bandwidth is not None and not (
-        bandwidth in BANDWIDTH_RULES
-        or (isinstance(bandwidth, (int, float)) and not isinstance(bandwidth, bool))
+        bandwidth in BANDWIDTH_RULES or is_number(bandwidth)
     ):
         raise ValueError(
             f"Invalid `bandwidth` value {bandwidth!r}. "
