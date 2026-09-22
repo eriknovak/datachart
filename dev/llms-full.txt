@@ -50,11 +50,7 @@ Compose figures →\](https://eriknovak.github.io/datachart/dev/how-to-guides/co
 
 llms.txt, per-page markdown, and MCP servers, so a coding assistant writes datachart code from the current docs.
 
-Point your assistant here →\](https://eriknovak.github.io/datachart/dev/ai-assistants/index.md) \[### Source and changelog
-
-Bug reports, feature requests, and pull requests are welcome on GitHub.
-
-Go to the repository →\](https://github.com/eriknovak/datachart)
+Point your assistant here →\](https://eriknovak.github.io/datachart/dev/ai-assistants/index.md)
 
 Install
 
