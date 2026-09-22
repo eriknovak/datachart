@@ -13,6 +13,7 @@ from ..utils._internal.validate import (
 )
 from ..typings import (
     DLineSettingAttrs,
+    BracketSettingAttrs,
     DumbbellRecordAttrs,
     DumbbellStyleAttrs,
     EmphasisRuleAttrs,
@@ -82,6 +83,7 @@ def DumbbellChart(
     vlines: Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs]]] = None,
     hlines: Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs]]] = None,
     dlines: Optional[Union[DLineSettingAttrs, List[DLineSettingAttrs]]] = None,
+    brackets: Optional[Union[BracketSettingAttrs, List[BracketSettingAttrs]]] = None,
     vspans: Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]] = None,
     hspans: Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]] = None,
     texts: Optional[Union[TextSettingAttrs, List[TextSettingAttrs]]] = None,
@@ -188,6 +190,8 @@ def DumbbellChart(
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
         dlines: Diagonal line(s) to plot, by slope and intercept.
+        brackets: Pairwise comparison bracket(s) to draw between two
+            categories, with an optional text such as a p-value.
         vspans: Vertical reference band(s) to shade.
         hspans: Horizontal reference band(s) to shade.
         texts: Text annotation(s) to draw.
@@ -217,6 +221,7 @@ def DumbbellChart(
         vlines=vlines,
         hlines=hlines,
         dlines=dlines,
+        brackets=brackets,
         vspans=vspans,
         hspans=hspans,
         texts=texts,

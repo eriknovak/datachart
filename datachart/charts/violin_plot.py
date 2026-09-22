@@ -13,6 +13,7 @@ from ..typings import (
     VLineSettingAttrs,
     HLineSettingAttrs,
     DLineSettingAttrs,
+    BracketSettingAttrs,
     VSpanSettingAttrs,
     HSpanSettingAttrs,
     TextSettingAttrs,
@@ -97,6 +98,13 @@ def ViolinPlot(
             DLineSettingAttrs,
             List[DLineSettingAttrs],
             List[Union[DLineSettingAttrs, List[DLineSettingAttrs], None]],
+        ]
+    ] = None,
+    brackets: Optional[
+        Union[
+            BracketSettingAttrs,
+            List[BracketSettingAttrs],
+            List[Union[BracketSettingAttrs, List[BracketSettingAttrs], None]],
         ]
     ] = None,
     vspans: Optional[
@@ -216,6 +224,8 @@ def ViolinPlot(
         vlines: Vertical line(s) to plot.
         hlines: Horizontal line(s) to plot.
         dlines: Diagonal line(s) to plot, by slope and intercept.
+        brackets: Pairwise comparison bracket(s) to draw between two
+            categories, with an optional text such as a p-value.
         vspans: Vertical reference band(s) to shade, between two x positions.
         hspans: Horizontal reference band(s) to shade, between two y positions.
         texts: Text annotation(s) to draw.
@@ -255,6 +265,7 @@ def ViolinPlot(
         vlines=vlines,
         hlines=hlines,
         dlines=dlines,
+        brackets=brackets,
         vspans=vspans,
         hspans=hspans,
         texts=texts,

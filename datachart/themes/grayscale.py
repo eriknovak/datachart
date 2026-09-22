@@ -35,6 +35,7 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         "plot_hline_style": LINE_STYLE.DASHED,
         "plot_dline_color": "#5D6D7E",
         "plot_dline_style": LINE_STYLE.DASHED,
+        "plot_bracket_color": "#5D6D7E",
         "plot_vspan_color": "#5D6D7E",
         "plot_hspan_color": "#5D6D7E",
         "plot_text_box_edgecolor": "#B0B0B0",

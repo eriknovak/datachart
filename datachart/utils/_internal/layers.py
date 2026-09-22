@@ -107,6 +107,8 @@ from .validate import (
     validate_sankey_link_color,
     validate_axis_kinds,
     validate_shared_x,
+    validate_bracket_ends,
+    validate_bracket_endpoint,
     validate_span_bounds,
     validate_ticks_format,
     validate_two_slope_bounds,
@@ -139,6 +141,8 @@ from .config_helpers import (
     get_vline_style,
     get_hline_style,
     get_dline_style,
+    get_bracket_style,
+    get_bracket_tick,
     get_vspan_style,
     get_hspan_style,
     get_heatmap_style,
@@ -1197,6 +1201,29 @@ def _resolve_ref_lines(chart: dict, key: str) -> List[tuple]:
     return [(line, get_style(line.get("style", {}) or {})) for line in lines]
 
 
+def _resolve_brackets(chart: dict) -> List[tuple]:
+    """Resolve pairwise bracket styles at build time (ADR 0059)."""
+
+    brackets = chart.get("brackets")
+    if brackets is None:
+        return []
+    brackets = brackets if isinstance(brackets, list) else [brackets]
+    resolved = []
+    for bracket in brackets:
+        validate_bracket_ends(bracket)
+        style = bracket.get("style") or {}
+        line = get_bracket_style(style)
+        # a plotted line would otherwise take the next color of the axes cycle
+        line.setdefault("color", REF_CYCLE_COLOR)
+        font = get_plot_text_style(style)
+        # the text names the comparison the line draws, so it shares its color
+        font["color"] = line["color"]
+        resolved.append(
+            (bracket, {"line": line, "tick": get_bracket_tick(style), "font": font})
+        )
+    return resolved
+
+
 # per side: the bound keys and the style resolver; on polar a vspan is
 # bounded in degrees, an hspan in radius
 SPAN_SIDES = {
@@ -1204,7 +1231,7 @@ SPAN_SIDES = {
     "hspans": ("ymin", "ymax", get_hspan_style),
 }
 # the layer attributes holding pre-resolved references, pooled per axes
-REF_KEYS = ("vlines", "hlines", "dlines", "vspans", "hspans", "texts")
+REF_KEYS = ("vlines", "hlines", "dlines", "brackets", "vspans", "hspans", "texts")
 # polar wedge outline samples per degree: enough for the chord error to vanish
 SPAN_SAMPLES_PER_DEGREE = 2
 
@@ -1247,6 +1274,14 @@ REF_LINE_ZORDER = 3.5
 # a diagonal is straight in data space, so on a non-linear axis it is a curve
 # in display space and has to be sampled (ADR 0055)
 DLINE_CURVE_SAMPLES = 100
+# an unset reference-line color: the first cycle color, without advancing it
+REF_CYCLE_COLOR = "C0"
+# a bracket clears the data in its span by this fraction of the data range,
+# and every bracket it overlaps by this one (ADR 0059)
+BRACKET_GAP = 0.03
+BRACKET_STEP = 0.08
+# the gap (points) between a bracket's span and its text
+BRACKET_TEXT_PAD = 2.0
 # connector placement (ADR 0018): the bow side and depth are chosen at draw
 # time against the panel's data, unless plot_text_arrow_curve pins them
 TEXT_BOW_CANDIDATES = (0.2, -0.2, 0.35, -0.35, 0.5, -0.5)
@@ -1557,7 +1592,7 @@ def _draw_ref_lines(
                 # an unset color is the first cycle color, as the other two
                 # families take; a plotted segment would otherwise draw the
                 # next color of the axes cycle and advance it
-                "color": "C0",
+                "color": REF_CYCLE_COLOR,
                 **{"zorder": REF_LINE_ZORDER, **style},
             }
             if xmin is None and xmax is None and straight:
@@ -1571,6 +1606,87 @@ def _draw_ref_lines(
             ax.plot(xs, slope * xs + intercept, **kwargs)
         ax.set_xlim(*xlim)
         ax.set_ylim(*ylim)
+
+
+def _bracket_categories(layers: List["Layer"], category_index: dict) -> tuple:
+    """A panel's categories for bracket placement, as (positions, tops).
+
+    `positions` maps a label to its place on the category axis: group layers
+    share the panel's category index, a bar family layer places its labels in
+    its own order, as it draws them. `tops` maps a position to the top of the
+    data drawn there.
+    """
+
+    positions = dict(category_index)
+    tops = {}
+    for layer in layers:
+        if isinstance(layer, GroupLayer):
+            grouped = layer.grouped_values()
+        elif isinstance(layer, BarLayer):
+            labels, values = layer.labels(), layer.y_values()
+            if labels is None or values is None:
+                continue
+            # a bar is one value at its label, where a group is many
+            grouped = {label: [value] for label, value in zip(labels, values)}
+        else:
+            continue
+        for position, (label, values) in enumerate(grouped.items()):
+            positions.setdefault(label, position)
+            if len(values):
+                top = float(np.max(values))
+                tops[label] = max(top, tops.get(label, top))
+    return positions, {
+        positions[label]: top
+        for label, top in tops.items()
+        if np.isfinite(top) and label in positions
+    }
+
+
+def _span_top(layer: "Layer", start: float, end: float) -> Optional[float]:
+    """The top of a continuous layer's values between two category positions.
+
+    None when the layer draws no paired numeric (x, y) data to read, which
+    leaves the bracket clearing the whole panel instead.
+    """
+
+    xs, ys = get_chart_data("x", layer.chart), get_chart_data("y", layer.chart)
+    if xs is None or ys is None or len(xs) != len(ys):
+        return None
+    if not np.issubdtype(np.asarray(xs).dtype, np.number):
+        return None
+    inside = np.asarray(ys)[(np.asarray(xs) >= start) & (np.asarray(xs) <= end)]
+    return float(np.max(inside)) if len(inside) else None
+
+
+def _bracket_base(layers, tops: dict, start: float, end: float, high: float) -> float:
+    """The top of the data a bracket spans; the panel's own top without it."""
+
+    spanned = [top for position, top in tops.items() if start <= position <= end]
+    spanned += [
+        top
+        for top in (_span_top(layer, start, end) for layer in layers)
+        if top is not None
+    ]
+    return max(spanned) if spanned else high
+
+
+def _bracket_tick_tip(ax: plt.Axes, point: tuple, horizontal: bool, length: float):
+    """`point` moved `length` points toward the data, on the value axis.
+
+    Measured through the display transform at the bracket's own position, so
+    the tick holds its length on a non-linear value axis too.
+    """
+
+    x, y = ax.transData.transform(point)
+    offset = length * ax.figure.dpi / 72
+    moved = (x - offset, y) if horizontal else (x, y - offset)
+    return ax.transData.inverted().transform(moved)[0 if horizontal else 1]
+
+
+def _value_limits(ax: plt.Axes, horizontal: bool) -> tuple:
+    """The axes' limits on the value axis, whichever way the panel runs."""
+
+    return ax.get_xlim() if horizontal else ax.get_ylim()
 
 
 def _draw_ref_spans(
@@ -2039,6 +2155,7 @@ class Layer:
         self.vlines = _resolve_ref_lines(chart, "vlines")
         self.hlines = _resolve_ref_lines(chart, "hlines")
         self.dlines = _resolve_ref_lines(chart, "dlines")
+        self.brackets = _resolve_brackets(chart)
         self.texts = _resolve_texts(chart)
         self.emphasis = self._resolve_emphasis(chart.get("emphasis"))
         # snapshot at build so muting harmonizes with the layer's own theme
@@ -11913,6 +12030,12 @@ class Panel:
             _draw_ref_lines(
                 owner_ax, pooled["vlines"], pooled["hlines"], pooled["dlines"]
             )
+        # a bracket reads the category positions and the data extent of its
+        # axes, so it stacks above the marks it spans
+        for owner_ax, pooled in pools.items():
+            self._draw_brackets(
+                owner_ax, pooled["brackets"], pooled_layers[owner_ax], horizontal
+            )
         # the host axes sits under a twin, so every band lies beneath both
         # axes' marks (ADR 0036)
         for owner_ax, pooled in pools.items():
@@ -12239,6 +12362,103 @@ class Panel:
         if not is_number(start):
             start = float(to_date_numbers([start])[0])
         return mdates.num2date(start, tz=tz)
+
+    def _place_brackets(self, ax, brackets: List[tuple], layers, horizontal: bool):
+        """Each bracket's (start, end, value), and the stack step (ADR 0059).
+
+        A bracket without a `y` clears the data within its span by a gap, then
+        climbs a step over every already placed bracket it overlaps, so the
+        stack never covers itself. Both are fractions of the value-axis data
+        range.
+        """
+
+        positions, tops = _bracket_categories(
+            layers, self.category_index(self.layers) or {}
+        )
+        ranges = [r for r in (layer.y_range() for layer in layers) if r is not None]
+        if ranges:
+            low, high = min(r[0] for r in ranges), max(r[1] for r in ranges)
+        else:
+            low, high = _value_limits(ax, horizontal)
+        extent = (high - low) or abs(high) or 1.0
+        gap, step = extent * BRACKET_GAP, extent * BRACKET_STEP
+
+        placed = []
+        for bracket, _ in brackets:
+            start = validate_bracket_endpoint(bracket.get("from"), positions)
+            end = validate_bracket_endpoint(bracket.get("to"), positions)
+            start, end = min(start, end), max(start, end)
+            value = bracket.get("y")
+            if value is None:
+                value = _bracket_base(layers, tops, start, end, high) + gap
+                for other_start, other_end, other_value in placed:
+                    overlaps = min(end, other_end) >= max(start, other_start)
+                    if overlaps and value < other_value + step:
+                        value = other_value + step
+            placed.append((start, end, float(value)))
+        return placed, step
+
+    def _draw_brackets(
+        self, ax, brackets: List[tuple], layers: List["Layer"], horizontal: bool
+    ) -> None:
+        """Draw the pre-resolved pairwise comparison brackets (ADR 0059).
+
+        Each bracket is one line artist — a tick, the span, a tick — and one
+        text artist beyond it. The value axis grows to fit the topmost text,
+        unless the chart sets its own limit there; a pyramid grows both ends,
+        keeping the mirror it draws in (ADR 0017). Placement runs before the
+        ticks are sized, because their length is in points and reads the
+        final limits.
+        """
+
+        if not brackets:
+            return
+
+        s = self.settings
+        placed, step = self._place_brackets(ax, brackets, layers, horizontal)
+        # a pyramid moves the user's x limit aside to mirror it
+        mirrored = bool(s.get("pyramid"))
+        limit = (
+            s.get("pyramid_xmax")
+            if mirrored
+            else s.get("xmax" if horizontal else "ymax")
+        )
+        low, high = _value_limits(ax, horizontal)
+        room = max(value for _, _, value in placed) + step
+        if limit is None and high > low and room > high:
+            set_limits = ax.set_xlim if horizontal else ax.set_ylim
+            set_limits(-room if mirrored else low, room)
+
+        # the brackets are marks, not data: they may not rescale either axis
+        xlim, ylim = ax.get_xlim(), ax.get_ylim()
+        for (start, end, value), (bracket, style) in zip(placed, brackets):
+            # the ticks point toward the data: down on a vertical chart, left
+            # on a horizontal one
+            point = (value, start) if horizontal else (start, value)
+            tip = _bracket_tick_tip(ax, point, horizontal, style["tick"])
+            span = ([tip, value, value, tip], [start, start, end, end])
+            ax.plot(
+                *(span if horizontal else (span[1], span[0])),
+                **{"zorder": REF_LINE_ZORDER, **style["line"]},
+            )
+            text = bracket.get("text")
+            if text is None:
+                continue
+            centre = (start + end) / 2
+            ax.annotate(
+                text,
+                xy=(value, centre) if horizontal else (centre, value),
+                xytext=(BRACKET_TEXT_PAD, 0) if horizontal else (0, BRACKET_TEXT_PAD),
+                textcoords="offset points",
+                zorder=REF_LINE_ZORDER,
+                **{
+                    **style["font"],
+                    "ha": "left" if horizontal else "center",
+                    "va": "center" if horizontal else "bottom",
+                },
+            )
+        ax.set_xlim(*xlim)
+        ax.set_ylim(*ylim)
 
     def _apply_pyramid_mirror(self, ax) -> None:
         """The pyramid's mirror furniture (ADR 0017).

@@ -760,6 +760,45 @@ def get_dline_style(dline_style: dict) -> dict:
 
 
 # -------------------------------------
+# Pairwise Bracket Style
+# -------------------------------------
+
+
+def get_bracket_style(bracket_style: dict) -> dict:
+    """Get the pairwise comparison bracket line style.
+
+    Args:
+        bracket_style: The bracket style dictionary.
+
+    Returns:
+        The bracket line style setting.
+
+    """
+
+    config_attrs = [
+        ("color", "plot_bracket_color"),
+        ("linewidth", "plot_bracket_width"),
+        ("alpha", "plot_bracket_alpha"),
+    ]
+
+    return create_config_dict(bracket_style, config_attrs)
+
+
+def get_bracket_tick(bracket_style: dict) -> float:
+    """Get the length of a bracket's end ticks, in points.
+
+    Args:
+        bracket_style: The bracket style dictionary.
+
+    Returns:
+        The tick length in points.
+
+    """
+
+    return get_attr_value("plot_bracket_tick", bracket_style, config)
+
+
+# -------------------------------------
 # Vertical Band Style
 # -------------------------------------
 

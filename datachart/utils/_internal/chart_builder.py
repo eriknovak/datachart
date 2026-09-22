@@ -72,6 +72,7 @@ def build_chart_dict_multi(
     vlines: Any = None,
     hlines: Any = None,
     dlines: Any = None,
+    brackets: Any = None,
     vspans: Any = None,
     hspans: Any = None,
     texts: Any = None,
@@ -93,6 +94,7 @@ def build_chart_dict_multi(
         vlines: The vertical lines.
         hlines: The horizontal lines.
         dlines: The diagonal lines.
+        brackets: The pairwise comparison brackets.
         vspans: The vertical reference bands.
         hspans: The horizontal reference bands.
         texts: The text annotations.
@@ -141,6 +143,8 @@ def build_chart_dict_multi(
 
     if dlines is not None:
         chart_dict["dlines"] = _get_indexed_value(dlines, index)
+    if brackets is not None:
+        chart_dict["brackets"] = _get_indexed_value(brackets, index)
 
     if vspans is not None:
         chart_dict["vspans"] = _get_indexed_value(vspans, index)
@@ -175,6 +179,7 @@ def build_chart_dict_single(
     vlines: Any = None,
     hlines: Any = None,
     dlines: Any = None,
+    brackets: Any = None,
     vspans: Any = None,
     hspans: Any = None,
     texts: Any = None,
@@ -195,6 +200,7 @@ def build_chart_dict_single(
         vlines: The vertical lines.
         hlines: The horizontal lines.
         dlines: The diagonal lines.
+        brackets: The pairwise comparison brackets.
         vspans: The vertical reference bands.
         hspans: The horizontal reference bands.
         texts: The text annotations.
@@ -237,6 +243,8 @@ def build_chart_dict_single(
 
     if dlines is not None:
         chart_dict["dlines"] = dlines
+    if brackets is not None:
+        chart_dict["brackets"] = brackets
 
     if vspans is not None:
         chart_dict["vspans"] = vspans
@@ -269,6 +277,7 @@ def build_charts_structure(
     vlines: Any = None,
     hlines: Any = None,
     dlines: Any = None,
+    brackets: Any = None,
     vspans: Any = None,
     hspans: Any = None,
     texts: Any = None,
@@ -292,6 +301,7 @@ def build_charts_structure(
         vlines: The vertical lines.
         hlines: The horizontal lines.
         dlines: The diagonal lines.
+        brackets: The pairwise comparison brackets.
         vspans: The vertical reference bands.
         hspans: The horizontal reference bands.
         texts: The text annotations.
@@ -327,6 +337,7 @@ def build_charts_structure(
         "vlines": vlines,
         "hlines": hlines,
         "dlines": dlines,
+        "brackets": brackets,
         "vspans": vspans,
         "hspans": hspans,
         "texts": texts,

@@ -91,6 +91,7 @@ def RadialChart(
     vlines: Optional[dict] = None,
     hlines: Optional[dict] = None,
     dlines: Optional[dict] = None,
+    brackets: Optional[dict] = None,
     vspans: Optional[
         Union[
             VSpanSettingAttrs,
@@ -205,6 +206,7 @@ def RadialChart(
         vlines: Not supported on a polar axes. Raises when passed.
         hlines: Not supported on a polar axes. Raises when passed.
         dlines: Not supported on a polar axes. Raises when passed.
+        brackets: Not supported on a polar axes. Raises when passed.
         vspans: Angular wedge(s) to shade over the full radius; `xmin` and
             `xmax` are angles in degrees from the start angle, an omitted
             bound running to 0 or 360.
@@ -225,11 +227,11 @@ def RadialChart(
             "RadialChart does not support `scalex`: "
             "the angular axis has no scale to change."
         )
-    if vlines is not None or hlines is not None or dlines is not None:
+    if any(ref is not None for ref in (vlines, hlines, dlines, brackets)):
         raise ValueError(
-            "RadialChart does not support `vlines`, `hlines` and `dlines`: "
-            "straight reference lines are geometrically meaningless on a "
-            "polar axes."
+            "RadialChart does not support `vlines`, `hlines`, `dlines` and "
+            "`brackets`: straight reference marks are geometrically "
+            "meaningless on a polar axes."
         )
     radial_type = RADIAL_TYPE.LINE if type is None else type
     if radial_type not in _RADIAL_TYPES:

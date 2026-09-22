@@ -71,6 +71,7 @@ The dictionaries a chart takes beside its data: reference lines and bands, text 
 | :------------------------------------------ | :-------------------- | :-- |
 | mark a value on the x or y axis             | `vlines`, `hlines`    | [`VLineSettingAttrs`](#datachart.typings.VLineSettingAttrs), [`HLineSettingAttrs`](#datachart.typings.HLineSettingAttrs) |
 | draw a line through the data, such as parity | `dlines`              | [`DLineSettingAttrs`](#datachart.typings.DLineSettingAttrs) |
+| compare two categories with a bracket        | `brackets`            | [`BracketSettingAttrs`](#datachart.typings.BracketSettingAttrs) |
 | shade a range of the x or y axis            | `vspans`, `hspans`    | [`VSpanSettingAttrs`](#datachart.typings.VSpanSettingAttrs), [`HSpanSettingAttrs`](#datachart.typings.HSpanSettingAttrs) |
 | write a note on the chart                   | `texts`               | [`TextSettingAttrs`](#datachart.typings.TextSettingAttrs) |
 | title, place, or lay out the legend         | `legend`              | [`LegendSettingAttrs`](#datachart.typings.LegendSettingAttrs) |
@@ -86,6 +87,10 @@ The dictionaries a chart takes beside its data: reference lines and bands, text 
         heading_level: 3
 
 ::: datachart.typings.DLineSettingAttrs
+    options:
+        heading_level: 3
+
+::: datachart.typings.BracketSettingAttrs
     options:
         heading_level: 3
 
@@ -138,6 +143,10 @@ Style groups several charts read from their `style` dictionary: the value labels
         heading_level: 3
 
 ::: datachart.typings.DLineStyleAttrs
+    options:
+        heading_level: 3
+
+::: datachart.typings.BracketStyleAttrs
     options:
         heading_level: 3
 
