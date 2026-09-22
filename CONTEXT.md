@@ -208,6 +208,19 @@ unless labelled. A diagonal line lives in data space: straight on linear axes
 only.
 _Avoid_: guide line, abline, parity line (for the setting; it is one value of it)
 
+**Bracket**:
+A pairwise-comparison mark on the category axis: a line spanning two
+categories with a tick at each end pointing toward the data and an optional
+text (a p-value, a star) centred beyond it. Declared with the chart
+(`brackets=`) as a fourth reference-mark family; `from` and `to` name the
+categories by label (or a numeric position), `y` optionally pins the
+value-axis position. Unpinned brackets stack above the data in their span
+without overlapping and grow the value axis to fit. Follows the panel
+orientation. Stored on the layer, drawn by the panel after limits are set —
+so it survives composition — and never takes a cycle color, a bar slot, or a
+legend entry.
+_Avoid_: significance bar, annotation bracket, hline pair (for the workaround)
+
 **Text**:
 A per-chart annotation — a string placed at a position (data coordinates by
 default, axes-fraction on request) with an optional arrow to a target point,
