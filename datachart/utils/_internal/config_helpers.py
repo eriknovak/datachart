@@ -1202,6 +1202,32 @@ def get_hexbin_style(chart_style: dict) -> dict:
 
 
 # -------------------------------------
+# Image Style
+# -------------------------------------
+
+
+def get_image_style(chart_style: dict) -> dict:
+    """Get the image chart style.
+
+    Args:
+        chart_style: The chart style dictionary.
+
+    Returns:
+        The image style setting, keyed as `imshow` takes it.
+
+    """
+
+    config_attrs = [
+        ("alpha", "plot_image_alpha"),
+        ("cmap", "plot_image_cmap"),
+        ("interpolation", "plot_image_interpolation"),
+        ("aspect", "plot_image_aspect"),
+    ]
+
+    return create_config_dict(chart_style, config_attrs)
+
+
+# -------------------------------------
 # Scatter Style
 # -------------------------------------
 

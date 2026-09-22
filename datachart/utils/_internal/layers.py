@@ -95,6 +95,9 @@ from .validate import (
     validate_gantt_arrow_entry,
     validate_gantt_show_values,
     validate_gantt_sort_by,
+    validate_image,
+    validate_image_extent,
+    validate_image_position,
     validate_log_values,
     validate_overlap,
     validate_ridge_marks,
@@ -152,6 +155,7 @@ from .config_helpers import (
     get_contour_style,
     get_contour_label_style,
     get_hexbin_style,
+    get_image_style,
     get_colorbar_setting,
     get_scatter_style,
     get_scatter_error_style,
@@ -203,6 +207,7 @@ from ...constants import (
     GANTT_VALUE,
     HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
+    IMAGE_POSITION,
     LEGEND_LOCATION,
     NETWORK_LAYOUT,
     NETWORK_LABEL_POSITION,
@@ -1271,6 +1276,17 @@ TEXT_COORDS = ("data", "axes")
 TEXT_ANNOTATION_ZORDER = 5
 # reference lines sit above every mark (zorder 3), below annotations (ADR 0054)
 REF_LINE_ZORDER = 3.5
+# an image's rung (ADR 0054, 0060): below under the gridlines (0.5), above
+# over the marks (3) and under the reference lines
+IMAGE_ZORDER = {IMAGE_POSITION.BELOW: 0.25, IMAGE_POSITION.ABOVE: 3.25}
+
+
+def image_zorder_key(position: str) -> str:
+    """An image's key in a Panel overlay's zorder table."""
+
+    return f"image_{position}"
+
+
 # a diagonal is straight in data space, so on a non-linear axis it is a curve
 # in display space and has to be sampled (ADR 0055)
 DLINE_CURVE_SAMPLES = 100
@@ -2137,6 +2153,8 @@ class Layer:
     x_tz: Optional[tzinfo] = None
     # a filled background layer; a Panel overlay draws it under marks (ADR 0054)
     surface: bool = False
+    # a layer that draws no series takes no color-cycle slot
+    takes_color: bool = True
     # the edge the layer's drawn colorbar takes; None when it draws none
     colorbar_edge: Optional[str] = None
     # the normalized position a value step must break on; None spaces them evenly
@@ -2151,7 +2169,8 @@ class Layer:
         self.settings = settings
         self.subtitle = chart.get("subtitle", None)
         self.style = chart.get("style", {}) or {}
-        self.chart_hash = get_chart_hash(chart)
+        # the key of the layer's cycle entries; a picture would not serialize
+        self.chart_hash = get_chart_hash(chart) if self.takes_color else None
         self.vlines = _resolve_ref_lines(chart, "vlines")
         self.hlines = _resolve_ref_lines(chart, "hlines")
         self.dlines = _resolve_ref_lines(chart, "dlines")
@@ -2188,6 +2207,12 @@ class Layer:
 
     def _resolve_emphasis(self, value):
         return validate_emphasis(value)
+
+    @property
+    def zorder_key(self) -> str:
+        """The layer's rung in a Panel overlay's zorder table (ADR 0054)."""
+
+        return "surface" if self.surface else self.kind
 
     def target_extent(self, ax: plt.Axes, point: tuple) -> Optional[float]:
         """Half the extent (points) of the mark this layer draws under `point`.
@@ -7379,6 +7404,57 @@ class HexbinLayer(Layer):
         ax.add_collection(outline, autolim=False)
 
 
+class ImageLayer(Layer):
+    """A picture stretched over its extent in data coordinates (ADR 0060).
+
+    Carries no series: it takes no cycle color, no legend entry and no
+    emphasis. Its position picks its rung on the draw-order ladder.
+    """
+
+    # the picture fills its extent; the axes end where it does
+    ticks_at_axis_ends = False
+    takes_color = False
+
+    kind = "image"
+
+    def _resolve_style(self):
+        data = self.chart.get("data") or {}
+        self.image = validate_image(data.get("image"))
+        self.extent = validate_image_extent(data.get("extent"))
+        self.position = validate_image_position(self.settings.get("position"))
+        style = get_image_style(self.style)
+        if self.image.ndim == 2:
+            style["cmap"] = get_colormap(style["cmap"])
+            style["vmin"] = self.settings.get("vmin")
+            style["vmax"] = self.settings.get("vmax")
+        else:
+            # an RGB(A) picture carries its own colors
+            style.pop("cmap", None)
+        self.image_style = style
+
+    @property
+    def zorder_key(self) -> str:
+        return image_zorder_key(self.position)
+
+    def value_data(self):
+        return np.array(self.extent[2:])
+
+    def category_data(self):
+        return np.array(self.extent[:2])
+
+    def draw(self, ax, ctx):
+        z_order = IMAGE_ZORDER[self.position] if ctx.z_order is None else ctx.z_order
+        ax.imshow(
+            self.image,
+            extent=self.extent,
+            origin="upper",
+            zorder=z_order,
+            **self.image_style,
+        )
+        # imshow pins the view to the extent; earlier marks must count too
+        ax.autoscale_view()
+
+
 class ParallelCoordsLayer(Layer):
     """One parallel-coords set; holds every chart's data as a single drawable."""
 
@@ -8090,6 +8166,7 @@ class TextLayer(Layer):
 
     kind = "text"
     projection = None
+    takes_color = False
 
     def __init__(self, texts):
         super().__init__({"texts": texts}, {})
@@ -10170,6 +10247,7 @@ LAYER_TYPES = {
     "calendarheatmap": CalendarHeatmapLayer,
     "ganttchart": GanttLayer,
     "dumbbellchart": DumbbellLayer,
+    "imagechart": ImageLayer,
 }
 
 RADIAL_LAYER_TYPES = {
@@ -10787,12 +10865,13 @@ def group_from_chart(layers: List[Layer], settings: dict) -> LayerGroup:
     cell (issue #183).
     """
 
-    # one color per dataset: a raincloud's three layers share one chart
-    n_charts = len(layers_per_chart(layers))
+    # one color per dataset (a raincloud's three layers share one chart);
+    # a colorless dataset claims no slot of the pooled cycle
+    n_charts = sum(chart[0].takes_color for chart in layers_per_chart(layers))
     return LayerGroup(
         layers,
         palette=config["color_general_multiple"],
-        max_colors=max(n_charts, 1),
+        max_colors=n_charts,
         num_bins=settings.get("num_bins"),
     )
 
@@ -11232,12 +11311,13 @@ class Panel:
         assignments = ["left"] * len(self.groups)
         ax_right = None
         if s.get("twin_axes") and not polar:
-            # text carrier groups hold no data: they stay on the primary axis
-            # and never enter the scale clustering
+            # text carrier groups hold no data, and an image shares the data's
+            # coordinates: both stay on the primary axis and never enter the
+            # scale clustering
             data_indices = [
                 i
                 for i, group in enumerate(self.groups)
-                if any(l.kind != "text" for l in group.layers)
+                if any(l.kind not in ("text", "image") for l in group.layers)
             ]
             data_assignments = determine_axis_assignment(
                 [self.groups[i] for i in data_indices],
@@ -11444,19 +11524,17 @@ class Panel:
             for layer in group.layers:
                 z_order = group.z_order
                 if z_order is None:
-                    z_order = zorder_defaults.get(
-                        "surface" if layer.surface else layer.kind
-                    )
+                    z_order = zorder_defaults.get(layer.zorder_key)
 
                 role = group.layer_role(layer)
                 muted = layer.draws_all_muted(role, group.emphasis)
 
                 ctx = DrawContext(
-                    # a text carrier lookup would advance the pooled cycle
-                    # and shift the colors of later composed figures
+                    # a colorless lookup would advance the pooled cycle and
+                    # shift the colors of later composed figures
                     color=(
                         None
-                        if muted or layer.kind == "text"
+                        if muted or not layer.takes_color
                         else cycle[layer.chart_hash]["color"]
                     ),
                     z_order=z_order,

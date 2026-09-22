@@ -5,6 +5,7 @@ so the fronts fail early with one message instead of deep inside matplotlib.
 """
 
 import math
+import os
 from collections import defaultdict
 from datetime import date, datetime
 from numbers import Real
@@ -13,6 +14,7 @@ from typing import List, Optional
 
 import matplotlib.dates as mdates
 import numpy as np
+from PIL import Image
 
 from ...constants import (
     ARROW_STYLE,
@@ -28,6 +30,7 @@ from ...constants import (
     GANTT_DATE_PERIOD,
     GANTT_SORT_KEY,
     GANTT_VALUE,
+    IMAGE_POSITION,
     NETWORK_LAYOUT,
     NETWORK_LABEL_POSITION,
     NORMALIZE,
@@ -50,6 +53,9 @@ AXIS_TEMPORAL = "temporal"
 AXIS_NUMERIC = "numeric"
 AXIS_CATEGORICAL = "categorical"
 EMPHASIS_ROLES = (EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT)
+IMAGE_POSITIONS = (IMAGE_POSITION.BELOW, IMAGE_POSITION.ABOVE)
+# PIL modes an array keeps as is: grey levels read through the colormap
+IMAGE_ARRAY_MODES = ("L", "I", "F", "RGB", "RGBA")
 RANK_RULES = (BUMP_RANK.VALUE_DESCENDING, BUMP_RANK.VALUE_ASCENDING, BUMP_RANK.GIVEN)
 LABEL_POSITIONS = (
     BUMP_LABEL_POSITION.START,
@@ -1165,3 +1171,87 @@ def validate_gantt_groups(records, sort_by, show_group_headers=False) -> None:
             "`show_group_headers` draws a header per task group, but no task "
             "carries a `group` key."
         )
+
+
+def validate_image_position(position):
+    """Validate an image draw position; None means below the marks."""
+
+    if position is None:
+        return IMAGE_POSITION.DEFAULT
+    if position not in IMAGE_POSITIONS:
+        raise ValueError(
+            f"Invalid `position` value {position!r}. "
+            f"Must be one of {IMAGE_POSITIONS} or None."
+        )
+    return position
+
+
+def validate_image_extent(extent) -> tuple:
+    """The extent as four floats; raise unless it spans a real rectangle."""
+
+    if extent is None:
+        raise ValueError(
+            "An image requires an `extent`: the `(xmin, xmax, ymin, ymax)` "
+            "rectangle its pixels fill, in data coordinates."
+        )
+    if (
+        isinstance(extent, str)
+        or not hasattr(extent, "__len__")
+        or len(extent) != 4
+        or not all(is_number(v) for v in extent)
+    ):
+        raise ValueError(
+            f"Invalid image `extent` {extent!r}. Must be four numbers "
+            "`(xmin, xmax, ymin, ymax)`."
+        )
+    extent = tuple(float(v) for v in extent)
+    if not all(math.isfinite(v) for v in extent):
+        raise ValueError(
+            f"Invalid image `extent` {extent!r}. Every bound must be finite."
+        )
+    if extent[0] == extent[1]:
+        raise ValueError(
+            f"Invalid image `extent` {extent!r}: `xmin` equals `xmax`, so the "
+            "image has no width."
+        )
+    if extent[2] == extent[3]:
+        raise ValueError(
+            f"Invalid image `extent` {extent!r}: `ymin` equals `ymax`, so the "
+            "image has no height."
+        )
+    return extent
+
+
+def validate_image(image) -> np.ndarray:
+    """The picture as an array: a 2-D field or RGB(A) pixels, first row on top.
+
+    A path is opened with PIL; a PIL image in a palette or other packed mode
+    is converted to RGBA so its colors survive.
+    """
+
+    if isinstance(image, (str, os.PathLike)):
+        try:
+            with Image.open(image) as opened:
+                opened.load()
+                image = opened.copy()
+        except (OSError, ValueError) as error:
+            raise ValueError(f"Cannot read the image {image!r}: {error}") from error
+    if isinstance(image, Image.Image) and image.mode not in IMAGE_ARRAY_MODES:
+        image = image.convert("RGBA")
+    try:
+        array = np.asarray(image)
+    except ValueError:
+        array = None
+    if (
+        array is None
+        or array.dtype.kind not in "biuf"
+        or not (array.ndim == 2 or (array.ndim == 3 and array.shape[2] in (3, 4)))
+        or 0 in array.shape
+    ):
+        raise ValueError(
+            "An image must be a path, a PIL image, an RGB(A) array of shape "
+            "(rows, columns, 3 or 4), or a 2-D array; "
+            f"got {type(image).__name__}"
+            + (f" of shape {array.shape}." if array is not None else ".")
+        )
+    return array

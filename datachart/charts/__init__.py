@@ -34,6 +34,7 @@ from .hexbin_chart import HexbinChart
 from .parallel_coords import ParallelCoords
 from .network_chart import NetworkChart
 from .scatter_matrix import ScatterMatrix
+from .image_chart import ImageChart
 
 # flows
 from .sankey_chart import SankeyChart
@@ -67,6 +68,7 @@ __all__ = [
     "ParallelCoords",
     "NetworkChart",
     "ScatterMatrix",
+    "ImageChart",
     # flows
     "SankeyChart",
     # part of a whole

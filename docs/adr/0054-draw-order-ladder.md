@@ -21,20 +21,23 @@ next layer lands on a known rung.
 
   | zorder | what |
   | --- | --- |
+  | 0.25 | an image placed below (`IMAGE_ZORDER`, ADR 0060) |
   | 0.5 | gridlines (`set_axisbelow(True)`) |
   | 1 | overlay surfaces, bars, histograms (Panel table) |
   | 1.75 | reference bands (`plot_{v,h}span_zorder`, ADR 0036) |
   | 2 | overlay lines, scatter, and contour lines (Panel table) |
   | 3 | standalone marks (`plot_*_zorder` theme defaults) |
+  | 3.25 | an image placed above (`IMAGE_ZORDER`, ADR 0060) |
   | 3.5 | reference lines (`REF_LINE_ZORDER`) |
   | 5 | annotations (`TEXT_ANNOTATION_ZORDER`) |
   | 100 | spines (`axes_spines_zorder`) |
 
 - **A surface is a layer flag, not a chart kind.** `Layer.surface` marks a
   filled layer that reads as background: stacked area bands, hexbin tiles,
-  and a contour when `filled`. The overlay lookup reads
-  `"surface"` before the layer's `kind`, so one contour class draws at 1 when
-  filled and at 2 as lines.
+  and a contour when `filled`. The overlay lookup reads the layer's
+  `zorder_key`: `"surface"` before its `kind`, so one contour class draws at 1
+  when filled and at 2 as lines; an image names its position instead
+  (ADR 0060).
 - **Surfaces sit at the bottom of an overlay.** A surface covers its whole
   area, so anything under it disappears. ADR 0024 already promised that
   lines, scatter, or contours can sit on top of a hexbin. At 1, a surface

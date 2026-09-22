@@ -426,6 +426,24 @@ color attrs (`norm`, `vmin`, `vmax`, `colorbar`) and furniture (grid off,
 colorbar inset) with Heatmap and filled Contour.
 _Avoid_: hex density plot, hexagonal heatmap, 2-D histogram
 
+**Image**:
+A picture placed in the data's coordinate space (`ImageChart`: a file path, a
+PIL image, an RGB(A) array, or a 2-D array read through a colormap), anchored
+by an `extent` (`xmin`, `xmax`, `ymin`, `ymax`) that its pixels stretch to
+fill. Carries no series, so it takes no cycle color, no legend entry and no
+emphasis. `position` (an `IMAGE_POSITION` constant) picks its rung on the
+draw-order ladder, `BELOW` every mark by default. Composed under or over
+another chart with `Panel`, never declared on one.
+_Avoid_: underlay, basemap, background, raster, watermark (that is one use of
+`position=ABOVE`)
+
+**Extent**:
+The data-space rectangle an image's pixels are stretched to fill, given as
+`(xmin, xmax, ymin, ymax)`. Participates in the panel's data limits like any
+other layer's span, so an image wider than the data widens the axes; `xmin`
+and the other limit settings narrow it back.
+_Avoid_: bounds, bbox, footprint, georeference
+
 **Stacked area**:
 Series filled on top of one another along an ordered axis
 (`StackedAreaChart`: `LineChart`'s multi-series `{x, y}` input, identical
