@@ -2229,6 +2229,8 @@
       
         
       
+        
+      
     
     
     
@@ -2299,6 +2301,34 @@
     
   
     AI, Machine Learning and NLP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="statistics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics
   
 
     
@@ -3858,13 +3888,18 @@
 
 <h1 id="use-cases">Use Cases</h1>
 <p>The how-to guides answer "how do I draw this chart?". The use cases answer the question a reader usually arrives with: "which figures does my report need, and how do I build them?" Each page takes one field, walks one dataset from the first figure to the last, and ends with the figures composed into a single panel. Every figure links to the chart guide behind it, so the page stays a tour and the guide stays the reference.</p>
-<p>The section grows one field at a time; AI, machine learning, and NLP is the first.</p>
+<p>The section grows one field at a time: AI, machine learning and NLP, then statistics.</p>
 <div class="grid cards card-gallery">
 <ul>
 <li>
 <p><a href="ai-ml-nlp/">AI, Machine Learning and NLP</a></p>
 <p>The figures of a model report, in the order the work happens: training curves, a hyperparameter sweep, a confusion matrix, ROC and precision-recall curves, calibration, per-class scores, feature importance, a leaderboard across benchmarks, and the token statistics of the corpus behind it.</p>
 <p><p class="card-icon" markdown="span"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.5 15.5c0 1.11-.89 2-2 2s-2-.89-2-2 .9-2 2-2 2 .9 2 2m-9-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.89 2-2-.89-2-2-2M23 15v3c0 .55-.45 1-1 1h-1v1c0 1.11-.89 2-2 2H5a2 2 0 0 1-2-2v-1H2c-.55 0-1-.45-1-1v-3c0-.55.45-1 1-1h1c0-3.87 3.13-7 7-7h1V5.73c-.6-.34-1-.99-1-1.73 0-1.1.9-2 2-2s2 .9 2 2c0 .74-.4 1.39-1 1.73V7h1c3.87 0 7 3.13 7 7h1c.55 0 1 .45 1 1m-2 1h-2v-2c0-2.76-2.24-5-5-5h-4c-2.76 0-5 2.24-5 5v2H3v1h2v3h14v-3h2z"/></svg></span></p></p>
+</li>
+<li>
+<p><a href="statistics/">Statistics</a></p>
+<p>The figures of a statistics report, in the order the analysis happens: group distributions with their test results, effect sizes with confidence intervals, a bootstrap distribution, a correlation matrix, a scatter matrix, one pair read two ways, a fitted line with its residuals, a Q-Q plot, and the empirical distributions behind it all.</p>
+<p><p class="card-icon" markdown="span"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.96 11.31C10.82 8.1 11.5 6 13 6s2.18 2.1 3.04 5.31C17 14.92 18.1 19 22 19v-2c-2.2 0-3-2.46-4.03-6.2C17.08 7.46 16.15 4 13 4s-4.08 3.46-4.97 6.8C7.03 14.54 6.2 17 4 17V2H2v20h20v-2H4v-1c3.9 0 5-4.08 5.96-7.69"/></svg></span></p></p>
 </li>
 </ul>
 </div>
@@ -3902,6 +3937,24 @@
 <td>The data</td>
 <td>How long are the documents, and what did filtering remove?</td>
 <td><code>RidgelinePlot</code>, <code>LineChart</code>, <code>SankeyChart</code></td>
+</tr>
+<tr>
+<td><a href="statistics/">Statistics</a></td>
+<td>Comparing the groups</td>
+<td>Do the groups differ, and by how much?</td>
+<td><code>RaincloudPlot</code>, <code>ScatterChart</code>, <code>Histogram</code></td>
+</tr>
+<tr>
+<td></td>
+<td>Relating the measurements</td>
+<td>Which measurements move together, and how much is the pooling hiding?</td>
+<td><code>Heatmap</code>, <code>ScatterMatrix</code>, <code>ScatterChart</code></td>
+</tr>
+<tr>
+<td></td>
+<td>Checking the model</td>
+<td>Does the fitted line hold up, and are its residuals well behaved?</td>
+<td><code>ScatterChart</code> in a <code>Grid</code>, <code>LineChart</code></td>
 </tr>
 </tbody>
 </table>
