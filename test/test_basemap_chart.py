@@ -18,7 +18,14 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.patches import PathPatch
 
-from datachart.charts import BasemapChart, HexbinChart, LineChart, ScatterChart
+from datachart.charts import (
+    BasemapChart,
+    ContourChart,
+    HexbinChart,
+    ImageChart,
+    LineChart,
+    ScatterChart,
+)
 from datachart.config import config
 from datachart.constants import (
     ASPECT_RATIO,
@@ -157,14 +164,15 @@ class TestCountries(unittest.TestCase):
         self.assertEqual(len(collections), 1)
 
     def test_highlight_edge_outlines_the_picked_countries_on_top(self):
-        figure = BasemapChart(
-            [BASEMAP_FEATURE.COUNTRIES, BASEMAP_FEATURE.BORDERS],
-            highlight=["SVN", "AUT", "MLT"],
-            style={
-                "plot_basemap_highlight_edge_color": "#000000",
-                "plot_basemap_highlight_edge_width": 1.5,
-            },
-        )
+        with self.assertWarnsRegex(UserWarning, "MLT"):
+            figure = BasemapChart(
+                [BASEMAP_FEATURE.COUNTRIES, BASEMAP_FEATURE.BORDERS],
+                highlight=["SVN", "AUT", "MLT"],
+                style={
+                    "plot_basemap_highlight_edge_color": "#000000",
+                    "plot_basemap_highlight_edge_width": 1.5,
+                },
+            )
         ax = figure.axes[0]
         fills_, edges = [c for c in ax.collections if isinstance(c, PatchCollection)]
         # Malta is not drawn at 1:110m, so two outlines
@@ -479,6 +487,94 @@ class TestBasemapComposition(unittest.TestCase):
         cell = Panel([BasemapChart(), hexbin])
         figure = Grid([[cell, ScatterChart(points())]])
         self.assertTrue(any(isinstance(p, PathPatch) for p in figure.axes[0].patches))
+
+
+class TestComposedWithGeographicCharts(unittest.TestCase):
+    """The basemap under each chart whose x and y are longitude and latitude."""
+
+    def setUp(self):
+        rng = np.random.default_rng(3)
+        self.lon = np.concatenate([rng.normal(23, 1.6, 400), rng.normal(37, 0.9, 400)])
+        self.lat = np.concatenate(
+            [rng.normal(37.5, 1, 400), rng.normal(37.6, 0.6, 400)]
+        )
+        self.land = matplotlib.colors.to_rgb(config["plot_basemap_land_color"])
+
+    def tearDown(self):
+        plt.close("all")
+
+    def hexbin(self, **kwargs):
+        return HexbinChart(
+            {"x": self.lon.tolist(), "y": self.lat.tolist()}, gridsize=25, **kwargs
+        )
+
+    def test_hexbin_with_mincnt_and_alpha_shows_the_land_between_cells(self):
+        figure = Panel(
+            [
+                BasemapChart(),
+                self.hexbin(mincnt=1, style={"plot_hexbin_alpha": 0.75}),
+            ],
+            xmin=19,
+            xmax=45,
+            ymin=34,
+            ymax=42,
+        )
+        # central Anatolia: inside the hexbin's extent, with no events
+        np.testing.assert_allclose(pixel(figure, 31, 39.5), self.land, atol=0.03)
+
+    def test_hexbin_empty_cells_cover_the_land_without_mincnt(self):
+        figure = Panel([BasemapChart(), self.hexbin()], xmin=19, xmax=45)
+        self.assertGreater(np.abs(pixel(figure, 31, 39.5) - self.land).max(), 0.03)
+
+    def test_hexbin_keeps_its_colorbar_and_limits(self):
+        alone = self.hexbin(mincnt=1)
+        composed = Panel([BasemapChart(), self.hexbin(mincnt=1)])
+        self.assertEqual(len(composed.axes), len(alone.axes))
+        self.assertEqual(composed.axes[0].get_xlim(), alone.axes[0].get_xlim())
+
+    def test_contour_lines_and_filled(self):
+        xs = np.linspace(19, 45, 30)
+        ys = np.linspace(34, 42, 15)
+        z = np.exp(-((xs[None, :] - 30) ** 2 / 20 + (ys[:, None] - 38) ** 2 / 4))
+        data = {"x": xs.tolist(), "y": ys.tolist(), "z": z.tolist()}
+        for filled in (False, True):
+            with self.subTest(filled=filled):
+                figure = Panel([BasemapChart(), ContourChart(data, filled=filled)])
+                ax = figure.axes[0]
+                (land,) = [p for p in ax.patches if isinstance(p, PathPatch)]
+                marks = [c for c in ax.collections if not isinstance(c, LineCollection)]
+                self.assertTrue(marks)
+                self.assertLess(land.get_zorder(), min(c.get_zorder() for c in marks))
+
+    def test_line_track_and_its_legend(self):
+        track = LineChart(
+            [{"x": x, "y": 35 + 0.2 * (x - 20)} for x in range(20, 45, 2)],
+            subtitle="track",
+        )
+        figure = Panel([BasemapChart(), track], show_legend=True)
+        texts = [t.get_text() for t in figure.axes[0].get_legend().get_texts()]
+        self.assertEqual(texts, ["track"])
+
+    def test_image_and_basemap_share_the_lower_rung(self):
+        relief = ImageChart({"image": np.ones((4, 4)), "extent": (19, 45, 34, 42)})
+        figure = Panel([relief, BasemapChart("coastline"), ScatterChart(points())])
+        ax = figure.axes[0]
+        self.assertEqual(ax.get_images()[0].get_zorder(), DRAW_ZORDER["below"])
+        self.assertEqual(lines(figure)[0].get_zorder(), DRAW_ZORDER["below"])
+
+    def test_grid_of_geographic_panels(self):
+        figure = Grid(
+            [
+                [
+                    Panel([BasemapChart(), ScatterChart(points())]),
+                    Panel(
+                        [BasemapChart(), self.hexbin(mincnt=1)],
+                        aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
+                    ),
+                ]
+            ]
+        )
+        self.assertGreaterEqual(len(figure.axes), 2)
 
 
 class TestGeographicAspect(unittest.TestCase):
