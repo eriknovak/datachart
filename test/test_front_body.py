@@ -5,7 +5,17 @@ import unittest
 from unittest import mock
 
 import datachart.charts
-from datachart.charts import BoxPlot, Heatmap, LineChart, NetworkChart
+from datachart.charts import (
+    BasemapChart,
+    BoxPlot,
+    ContourChart,
+    Heatmap,
+    HexbinChart,
+    LineChart,
+    NetworkChart,
+    RadialChart,
+    RidgelinePlot,
+)
 from datachart.utils._internal import plot_engine
 from datachart.utils._internal.chart_kinds import CHART_KINDS, SHARED_PARAMETERS
 
@@ -203,7 +213,7 @@ class TestRenderSplit(unittest.TestCase):
             subtitle="s",
             vmin=0,
             vmax=4,
-            valfmt="{x:.1f}",
+            value_format="{x:.1f}",
             colorbar={"location": "right"},
             xticklabels=["a", "b"],
             title="T",
@@ -217,7 +227,7 @@ class TestRenderSplit(unittest.TestCase):
                 "subtitle": "s",
                 "vmin": 0,
                 "vmax": 4,
-                "valfmt": "{x:.1f}",
+                "value_format": "{x:.1f}",
                 "colorbar": {"location": "right"},
                 "xticklabels": ["a", "b"],
             },
@@ -228,12 +238,50 @@ class TestRenderSplit(unittest.TestCase):
                 **UNSET,
                 "title": "T",
                 "show_colorbars": True,
-                "show_heatmap_values": None,
+                "show_values": None,
                 "show_legend": None,
                 "subplots": None,
                 "xlabel": None,
             },
         )
+
+
+GRID = {"z": [[1, 2], [3, 4]]}
+POINTS = {"x": [0, 1, 2], "y": [0, 1, 2]}
+GROUPS = [{"label": "a", "value": v} for v in (1, 2, 3, 5)]
+WIND = [{"label": "N", "y": 1}, {"label": "E", "y": 2}, {"label": "S", "y": 3}]
+
+# front, its data, the deprecated name, the new name, and a value for both
+RENAMES = [
+    (Heatmap, GRID, "show_heatmap_values", "show_values", True),
+    (Heatmap, GRID, "valfmt", "value_format", "{x:.2f}"),
+    (ContourChart, GRID, "valfmt", "value_format", "{x:.2f}"),
+    (HexbinChart, POINTS, "valfmt", "value_format", "{x:.2f}"),
+    (RidgelinePlot, GROUPS, "normalize", "ridge_scale", "common"),
+    (RadialChart, WIND, "type", "mark", "bar"),
+]
+
+
+class TestDeprecatedNames(unittest.TestCase):
+    def test_old_name_warns_at_the_caller_and_maps_to_the_new(self):
+        for front, data, old, new, value in RENAMES:
+            with self.subTest(front=front.__name__, name=old):
+                expected = captured(front, data, **{new: value})
+                with self.assertWarnsRegex(DeprecationWarning, f"`{new}`") as caught:
+                    got = captured(front, data, **{old: value})
+                self.assertEqual(caught.filename, __file__)
+                self.assertEqual(got, expected)
+
+    def test_basemap_features_is_data(self):
+        expected = captured(BasemapChart, "land")
+        with self.assertWarnsRegex(DeprecationWarning, "`data`"):
+            got = captured(BasemapChart, features="land")
+        self.assertEqual(got, expected)
+
+    def test_both_names_raise(self):
+        with self.assertWarns(DeprecationWarning):
+            with self.assertRaisesRegex(ValueError, "`show_values` only"):
+                Heatmap(GRID, show_values=True, show_heatmap_values=True)
 
 
 class TestDictShape(unittest.TestCase):

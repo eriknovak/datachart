@@ -130,7 +130,7 @@ class TestColorbarSetting(unittest.TestCase):
         setting = get_colorbar_setting({"location": None, "orientation": None})
         self.assertEqual(setting["location"], COLORBAR_LOCATION.RIGHT)
 
-    def test_format_falls_back_to_valfmt(self):
+    def test_format_falls_back_to_value_format(self):
         self.assertEqual(get_colorbar_setting({}, "{x:.0f}")["format"], "{x:.0f}")
         setting = get_colorbar_setting({"format": "{x:.2f}"}, "{x:.0f}")
         self.assertEqual(setting["format"], "{x:.2f}")
@@ -213,23 +213,26 @@ class TestColorbarRendering(unittest.TestCase):
                 self.assertTrue(all(len(l.split(".")[-1]) == 3 for l in labels))
                 plt.close(figure)
 
-    def test_hexbin_valfmt_is_the_format_fallback(self):
-        figure = HexbinChart(data=points(), gridsize=8, valfmt="{x:.2f}")
+    def test_hexbin_value_format_is_the_format_fallback(self):
+        figure = HexbinChart(data=points(), gridsize=8, value_format="{x:.2f}")
         colorbar = colorbar_of(figure)
         self.assertIsInstance(colorbar.formatter, mticker.StrMethodFormatter)
         self.assertEqual(colorbar.formatter.fmt, "{x:.2f}")
 
         figure = HexbinChart(
-            data=points(), gridsize=8, valfmt="{x:.2f}", colorbar={"format": "{x:.1f}"}
+            data=points(),
+            gridsize=8,
+            value_format="{x:.2f}",
+            colorbar={"format": "{x:.1f}"},
         )
         self.assertEqual(colorbar_of(figure).formatter.fmt, "{x:.1f}")
 
-    def test_heatmap_valfmt_still_formats_cells(self):
+    def test_heatmap_value_format_still_formats_cells(self):
         figure = Heatmap(
             data={"z": Z},
             show_colorbars=True,
-            show_heatmap_values=True,
-            valfmt="{x:.1f}",
+            show_values=True,
+            value_format="{x:.1f}",
             colorbar={"format": "{x:.3f}"},
         )
         colorbar = colorbar_of(figure)

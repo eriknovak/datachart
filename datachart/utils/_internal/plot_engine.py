@@ -90,11 +90,37 @@ def composition_panel(
     return Panel([group_from_chart(layers, settings)], composition_settings)
 
 
+def rename_deprecated(kind: ChartKind, params: dict) -> dict:
+    """The front's arguments with each deprecated name moved to its new one.
+
+    Warns once per deprecated name the caller set, pointing at the front's
+    caller; raises `ValueError` when both names are set.
+    """
+
+    params = dict(params)
+    for old, new in kind.renamed.items():
+        value = params.pop(old, None)
+        if value is None:
+            continue
+        # this function, `render`, the front, then the caller
+        warnings.warn(
+            f"`{old}` is deprecated and will be removed in the next release; "
+            f"use `{new}` instead.",
+            DeprecationWarning,
+            stacklevel=4,
+        )
+        if params.get(new) is not None:
+            raise ValueError(f"Pass `{new}` only; `{old}` is its deprecated name.")
+        params[new] = value
+    return params
+
+
 def render(
     chart_type: str, params: dict, expand: Optional[Expand] = None
 ) -> plt.Figure:
     """Render a chart front's arguments, split by its row (ADR 0066).
 
+    Deprecated names move to their new ones and rejected parameters raise.
     Per-chart keys are indexed against the charts; every other argument is a
     figure-level setting, with the row's defaults filling what was left unset.
 
@@ -110,6 +136,10 @@ def render(
     """
 
     kind = chart_kind(chart_type)
+    params = rename_deprecated(kind, params)
+    for name, reason in kind.rejects.items():
+        if params.get(name) is not None:
+            raise ValueError(reason)
     chart_keys = kind.per_chart_keys
     per_chart = {k: v for k, v in params.items() if k in chart_keys}
     settings = {k: v for k, v in params.items() if k not in chart_keys and k != "data"}

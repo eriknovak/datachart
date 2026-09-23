@@ -134,6 +134,7 @@ from .validate import (
     validate_week_start,
 )
 from .config_helpers import (
+    get_heatmap_cmap,
     get_attr_value,
     resolve_font_family,
     get_area_style,
@@ -675,7 +676,7 @@ def _tick_formatter(fmt, temporal: bool, locator=None, tz=None):
 
     On a temporal axis the format is a `strftime` pattern, AUTO the concise
     formatter over `locator`. Elsewhere any value-label style string (`{x}`,
-    `{}`, or `%`) formats each tick, like the heatmap's `valfmt`.
+    `{}`, or `%`) formats each tick, like the heatmap's `value_format`.
     """
 
     if temporal:
@@ -6116,7 +6117,7 @@ class RidgelineLayer(GroupLayer):
             self.is_horizontal = True
         self.bandwidth = self.settings.get("bandwidth")
         self.inner = validate_ridgeline_inner(self.settings.get("inner"))
-        self.normalize = validate_ridgeline_scale(self.settings.get("normalize"))
+        self.ridge_scale = validate_ridgeline_scale(self.settings.get("ridge_scale"))
         self.fill = self.settings.get("fill") is not False
         self.show_outline = self.settings.get("show_outline") is not False
         validate_ridge_marks(self.fill, self.show_outline)
@@ -6221,7 +6222,7 @@ class RidgelineLayer(GroupLayer):
             density = densities[i]
             scale = (
                 common_max
-                if self.normalize == RIDGELINE_SCALE.COMMON
+                if self.ridge_scale == RIDGELINE_SCALE.COMMON
                 else density.max()
             )
             heights = density / (float(scale) or 1.0) * peak
@@ -6478,6 +6479,30 @@ def _luminance(rgba) -> float:
     return 0.2126 * r + 0.7152 * g + 0.0722 * b
 
 
+def colormap_scaling(chart: dict) -> dict:
+    """The `norm`, `vmin` and `vmax` a colormapped draw call takes.
+
+    A centred norm is an instance holding `vcenter` in the middle of the
+    colormap and carrying the bounds itself: `centered` folds them into one
+    half-range each side of `vcenter`, `twoslope` keeps them apart (ADR 0056).
+    Any other norm passes by name beside the bounds.
+    """
+
+    norm, vmin, vmax = chart.get("norm"), chart.get("vmin"), chart.get("vmax")
+    if norm not in CENTRED_NORMS:
+        return {"norm": norm, "vmin": vmin, "vmax": vmax}
+    vcenter = chart.get("vcenter")
+    vcenter = 0.0 if vcenter is None else vcenter
+    if norm == NORMALIZE.TWOSLOPE:
+        validate_two_slope_bounds(vcenter, vmin, vmax)
+        return {"norm": TwoSlopeNorm(vcenter, vmin, vmax)}
+    halfrange = max(
+        (abs(bound - vcenter) for bound in (vmin, vmax) if bound is not None),
+        default=None,
+    )
+    return {"norm": CenteredNorm(vcenter, halfrange)}
+
+
 class HeatmapLayer(Layer):
     ticks_at_axis_ends = False
     kind = "heatmap"
@@ -6490,8 +6515,8 @@ class HeatmapLayer(Layer):
         self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
         self.colorbar_edge = self._colorbar_edge(self.show_colorbars)
         self.centred = self.chart.get("norm") in CENTRED_NORMS
-        self.norm = self._resolve_norm()
-        self.vcenter = self.norm.vcenter if self.centred else None
+        self.scaling = colormap_scaling(self.chart)
+        self.vcenter = self.scaling["norm"].vcenter if self.centred else None
         # every centred norm maps its centre to the middle of the colormap
         self.step_centre = 0.5 if self.centred else None
         heatmap_style = get_heatmap_style(self.style, self.style_prefix, self.centred)
@@ -6515,34 +6540,13 @@ class HeatmapLayer(Layer):
         }
         self._label_axes(x, y)
 
-    def _resolve_norm(self):
-        """The chart's norm: a centred one as an instance, the rest verbatim.
-
-        A centred norm carries `vmin`/`vmax` itself, so `imshow` takes the
-        instance alone; `centered` folds them into one half-range each side
-        of `vcenter`, `twoslope` keeps them apart (ADR 0056).
-        """
-
-        norm = self.chart.get("norm")
-        if not self.centred:
-            return norm
-        vcenter = self.chart.get("vcenter")
-        vcenter = 0.0 if vcenter is None else vcenter
-        bounds = (self.chart.get("vmin"), self.chart.get("vmax"))
-        if norm == NORMALIZE.TWOSLOPE:
-            validate_two_slope_bounds(vcenter, *bounds)
-            return TwoSlopeNorm(vcenter, *bounds)
-        halfrange = max(
-            (abs(bound - vcenter) for bound in bounds if bound is not None),
-            default=None,
-        )
-        return CenteredNorm(vcenter, halfrange)
-
     def _resolve_cell_values(self) -> None:
         """The cell value switch and text; the heatmap keeps its own names."""
 
-        self.show_cell_values = bool(self.settings.get("show_heatmap_values"))
-        formatter = _value_formatter(self.chart.get("valfmt", DEFAULT_VALUE_FORMAT))
+        self.show_cell_values = bool(self.settings.get("show_values"))
+        formatter = _value_formatter(
+            self.chart.get("value_format", DEFAULT_VALUE_FORMAT)
+        )
         self.cell_text = lambda value: formatter(value, None)
 
     def _grid(self) -> tuple:
@@ -6602,9 +6606,7 @@ class HeatmapLayer(Layer):
         im = ax.imshow(
             data,
             aspect="auto",
-            norm=self.norm,
-            vmin=None if self.centred else self.chart.get("vmin", None),
-            vmax=None if self.centred else self.chart.get("vmax", None),
+            **self.scaling,
             **self._cell_style(),
         )
         label = self.label(ctx)
@@ -7018,7 +7020,13 @@ class ContourLayer(Layer):
         self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
         self.colorbar_edge = self._colorbar_edge(self.filled and self.show_colorbars)
         style = get_contour_style(self.style)
-        self.cmap = get_colormap(style.pop("cmap"))
+        self.centred = self.chart.get("norm") in CENTRED_NORMS
+        self.scaling = colormap_scaling(self.chart)
+        self.vcenter = self.scaling["norm"].vcenter if self.centred else None
+        cmap = style.pop("cmap")
+        if self.centred:
+            cmap = get_heatmap_cmap(self.style, "plot_contour", diverging=True)
+        self.cmap = get_colormap(cmap)
         # lines take a pinned contour cmap only, past its washed-out low end
         self.line_cmap = None
         cmap_pinned = get_attr_value("plot_contour_cmap", self.style, config)
@@ -7089,11 +7097,7 @@ class ContourLayer(Layer):
         style = dict(self.contour_style)
         if ctx.z_order is not None:
             style["zorder"] = ctx.z_order
-        scaling = {
-            "norm": self.chart.get("norm", None),
-            "vmin": self.chart.get("vmin", None),
-            "vmax": self.chart.get("vmax", None),
-        }
+        scaling = dict(self.scaling)
         label = self.label(ctx)
 
         if self.filled:
@@ -7120,7 +7124,9 @@ class ContourLayer(Layer):
             if self.value_etch_steps:
                 self._draw_relief(ax, ctx, bands, proxy, edges)
             elif self.show_colorbars:
-                _draw_colorbar(ax, bands, self.colorbar, ctx.aspect_locked)
+                _draw_colorbar(
+                    ax, bands, self.colorbar, ctx.aspect_locked, self.vcenter
+                )
             return
         self._draw_lines(ax, ctx, self.show_labels, legend_proxy=True)
 
@@ -7171,11 +7177,7 @@ class ContourLayer(Layer):
         style = dict(self.contour_style)
         if ctx.z_order is not None:
             style["zorder"] = ctx.z_order
-        scaling = {
-            "norm": self.chart.get("norm", None),
-            "vmin": self.chart.get("vmin", None),
-            "vmax": self.chart.get("vmax", None),
-        }
+        scaling = dict(self.scaling)
         label = self.label(ctx)
         # a pinned line color beats the cmap; a muted background beats both
         by_level = (
@@ -7208,7 +7210,7 @@ class ContourLayer(Layer):
             )
         if show_labels:
             label_style = dict(self.label_style)
-            fmt = _value_formatter(self.chart.get("valfmt"))
+            fmt = _value_formatter(self.chart.get("value_format"))
             if fmt is not None:
                 label_style["fmt"] = fmt
             if ctx.emphasis == EMPHASIS_BACKGROUND:
@@ -7254,12 +7256,17 @@ class HexbinLayer(Layer):
 
     def _resolve_style(self):
         self.show_colorbars = self.settings.get("show_colorbars")
-        # valfmt is the tick format the colorbar setting falls back on
+        # value_format is the tick format the colorbar setting falls back on
         self.colorbar = get_colorbar_setting(
-            self.chart.get("colorbar"), self.chart.get("valfmt")
+            self.chart.get("colorbar"), self.chart.get("value_format")
         )
         self.colorbar_edge = self._colorbar_edge(self.show_colorbars)
+        self.centred = self.chart.get("norm") in CENTRED_NORMS
+        self.scaling = colormap_scaling(self.chart)
+        self.vcenter = self.scaling["norm"].vcenter if self.centred else None
         style = get_hexbin_style(self.style)
+        if self.centred:
+            style["cmap"] = get_heatmap_cmap(self.style, "plot_hexbin", diverging=True)
         style["cmap"] = get_colormap(style["cmap"])
         self.hexbin_style = style
         self.x, self.y, self.c = self._columns()
@@ -7340,9 +7347,7 @@ class HexbinLayer(Layer):
             yscale="log" if ctx.value_scale == SCALE.LOG else "linear",
             reduce_C_function=self.reduce,
             mincnt=self.mincnt,
-            norm=self.chart.get("norm", None),
-            vmin=self.chart.get("vmin", None),
-            vmax=self.chart.get("vmax", None),
+            **self.scaling,
             **style,
         )
         label = self.label(ctx)
@@ -7366,7 +7371,7 @@ class HexbinLayer(Layer):
         if self.show_colorbars and self.value_etch_steps:
             self._draw_even_step_legend(ax, tiles.norm, self.colorbar["label"])
         elif self.show_colorbars:
-            _draw_colorbar(ax, tiles, self.colorbar, ctx.aspect_locked)
+            _draw_colorbar(ax, tiles, self.colorbar, ctx.aspect_locked, self.vcenter)
 
     def _draw_bin_steps(self, ax, tiles, values, faded: bool) -> None:
         """The bins as etched value steps under their outlines.

@@ -268,13 +268,26 @@ def _parallel_layers(charts: List[dict], settings: dict) -> List[Layer]:
     return [ParallelCoordsLayer(list(charts), settings)]
 
 
-def _radial_layers(charts: List[dict], settings: dict) -> List[Layer]:
-    visual = settings.get("type") or RADIAL_TYPE.LINE
+def _radial_mark(charts: List[dict], settings: dict) -> List[dict]:
+    # the visual is checked before the emphasis rule and the sort read bars
+    visual = settings.get("mark") or RADIAL_TYPE.LINE
     if visual not in RADIAL_LAYER_TYPES:
         raise ValueError(
-            f"Invalid radial `type` value {visual!r}. "
-            f"Must be one of {sorted(RADIAL_LAYER_TYPES)}."
+            f"Invalid `mark` value {visual!r}. "
+            f"Must be one of {tuple(RADIAL_LAYER_TYPES)}."
         )
+    if visual != RADIAL_TYPE.BAR and any(
+        settings.get(key) is not None for key in ("sort", "sort_by", "emphasis_rule")
+    ):
+        raise ValueError(
+            "RadialChart takes `sort`, `sort_by`, and `emphasis_rule` on the "
+            f"bar visual only; the {visual!r} visual has no bars to order."
+        )
+    return charts
+
+
+def _radial_layers(charts: List[dict], settings: dict) -> List[Layer]:
+    visual = settings.get("mark") or RADIAL_TYPE.LINE
     return [RADIAL_LAYER_TYPES[visual](chart, settings) for chart in charts]
 
 
@@ -372,6 +385,17 @@ _KINDS = (
         chart_keys=frozenset({"label", "x", "y", "yerr"}),
         build=_radial_layers,
         projection="polar",
+        rejects={
+            "scalex": "RadialChart does not support `scalex`: the angular axis "
+            "has no scale to change.",
+            **{
+                name: f"RadialChart does not support `{name}`: straight "
+                "reference marks are geometrically meaningless on a polar axes."
+                for name in ("vlines", "hlines", "dlines", "brackets")
+            },
+        },
+        renamed={"type": "mark"},
+        prepare=_radial_mark,
         # the front takes a rule and a sort on the bar visual only
         emphasis_units=bar_units,
         order=sort_bar_charts,
@@ -477,6 +501,7 @@ _KINDS = (
         chart_keys=frozenset({"label", "value"}),
         build=_ridgeline_layers,
         multiplot=False,
+        renamed={"normalize": "ridge_scale"},
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -493,7 +518,9 @@ _KINDS = (
         "heatmap",
         "heatmap",
         HeatmapLayer,
-        chart_keys=frozenset({"colorbar", "norm", "valfmt", "vcenter", "vmax", "vmin"}),
+        chart_keys=frozenset(
+            {"colorbar", "norm", "value_format", "vcenter", "vmax", "vmin"}
+        ),
         dict_data=True,
         data_keys=("z",),
         multiplot=False,
@@ -502,6 +529,7 @@ _KINDS = (
             "a heatmap has no series to mute or highlight. Set the `emphasis` "
             "grid on `data` for per-cell roles instead.",
         ),
+        renamed={"show_heatmap_values": "show_values", "valfmt": "value_format"},
         overlayable=False,
         # a raster covers the grid
         gridless=_always,
@@ -512,8 +540,11 @@ _KINDS = (
         "contourchart",
         "contour chart",
         ContourLayer,
-        chart_keys=frozenset({"colorbar", "norm", "valfmt", "vmax", "vmin"}),
+        chart_keys=frozenset(
+            {"colorbar", "norm", "value_format", "vcenter", "vmax", "vmin"}
+        ),
         dict_data=True,
+        renamed={"valfmt": "value_format"},
         # filled contour bands cover the grid
         gridless=_filled,
         emphasis_units=series_units("z"),
@@ -530,7 +561,8 @@ _KINDS = (
                 "mincnt",
                 "norm",
                 "reduce",
-                "valfmt",
+                "value_format",
+                "vcenter",
                 "vmax",
                 "vmin",
             }
@@ -541,6 +573,7 @@ _KINDS = (
             "a hexbin chart is a single colormapped layer with no series to "
             "mute or highlight.",
         ),
+        renamed={"valfmt": "value_format"},
         # hexagons cover the grid
         gridless=_always,
     ),
@@ -583,6 +616,7 @@ _KINDS = (
         dict_data=True,
         multiplot=False,
         subplots=False,
+        renamed={"features": "data"},
     ),
     ChartKind(
         "sankeychart",

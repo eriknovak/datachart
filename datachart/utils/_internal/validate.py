@@ -150,17 +150,17 @@ def validate_overlap(overlap) -> float:
     return float(overlap)
 
 
-def validate_ridgeline_scale(normalize):
+def validate_ridgeline_scale(ridge_scale):
     """Validate a ridgeline density scale; None means `PER_ROW`."""
 
-    if normalize is None:
+    if ridge_scale is None:
         return RIDGELINE_SCALE.DEFAULT
-    if normalize not in RIDGELINE_SCALES:
+    if ridge_scale not in RIDGELINE_SCALES:
         raise ValueError(
-            f"Invalid `normalize` value {normalize!r}. "
+            f"Invalid `ridge_scale` value {ridge_scale!r}. "
             f"Must be one of {RIDGELINE_SCALES} or None."
         )
-    return normalize
+    return ridge_scale
 
 
 def validate_ridgeline_inner(inner):
@@ -1289,7 +1289,7 @@ def validate_basemap_source(
     if geometry is None:
         return
     for name, value in (
-        ("features", features),
+        ("data", features),
         ("resolution", resolution),
         ("highlight", highlight),
     ):
@@ -1307,7 +1307,7 @@ def validate_basemap_highlight(highlight, features) -> tuple:
         return ()
     if BASEMAP_FEATURE.COUNTRIES not in features:
         raise ValueError(
-            "`highlight` picks countries out, so `features` must include "
+            "`highlight` picks countries out, so `data` must include "
             f"{BASEMAP_FEATURE.COUNTRIES!r}."
         )
     codes = (highlight,) if isinstance(highlight, str) else tuple(highlight)
@@ -1381,7 +1381,7 @@ def validate_basemap_features(features) -> tuple:
     unknown = [f for f in features if f not in BASEMAP_FEATURES]
     if unknown or not features:
         raise ValueError(
-            f"Invalid basemap `features` {unknown or list(features)!r}. "
+            f"Invalid basemap `data` features {unknown or list(features)!r}. "
             f"Must be one or more of {BASEMAP_FEATURES}."
         )
     return features

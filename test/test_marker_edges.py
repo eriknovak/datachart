@@ -66,7 +66,7 @@ class TestMarkerEdgeWidths(unittest.TestCase):
 
     def test_tiny_radial_drops_its_edge(self):
         fig = RadialChart(
-            SPOKES, type=RADIAL_TYPE.SCATTER, style={"plot_scatter_size": TINY}
+            SPOKES, mark=RADIAL_TYPE.SCATTER, style={"plot_scatter_size": TINY}
         )
         self.assertEqual(list(_points(fig.axes[0])[0].get_linewidths()), [0.0])
 

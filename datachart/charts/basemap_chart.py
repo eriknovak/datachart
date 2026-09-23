@@ -14,13 +14,16 @@ from ..constants import (
     SHOW_GRID,
 )
 
+# the settings the map layer reads from its chart's data
+_MAP_KEYS = ("resolution", "highlight", "geometry")
+
 # ================================================
 # Main Chart Definition
 # ================================================
 
 
 def BasemapChart(
-    features: Optional[Union[BASEMAP_FEATURE, str, List[str]]] = None,
+    data: Optional[Union[BASEMAP_FEATURE, str, List[str]]] = None,
     *,
     resolution: Optional[Union[BASEMAP_RESOLUTION, str]] = None,
     highlight: Optional[Union[str, List[str]]] = None,
@@ -37,6 +40,7 @@ def BasemapChart(
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     style: Optional[BasemapStyleAttrs] = None,
+    features: Optional[Union[BASEMAP_FEATURE, str, List[str]]] = None,
 ) -> plt.Figure:
     """Creates the basemap chart.
 
@@ -86,7 +90,7 @@ def BasemapChart(
         ... )
 
     Args:
-        features: The features to draw: one name or a list of them,
+        data: The features to draw: one name or a list of them,
             coastline and land by default. See
             [`BASEMAP_FEATURE`][datachart.constants.BASEMAP_FEATURE].
         resolution: The Natural Earth scale: `"110m"` (default), `"50m"` or
@@ -97,7 +101,7 @@ def BasemapChart(
             feature. A code too small to draw at the chosen resolution warns.
         geometry: Your own outlines, drawn in place of Natural Earth's: a
             `{"lon", "lat", "feature"}` dict, or a list of them. Cannot be
-            combined with `features`, `resolution` or `highlight`. See
+            combined with `data`, `resolution` or `highlight`. See
             [`BasemapDataAttrs`][datachart.typings.BasemapDataAttrs].
         position: Where the map sits in the draw order: `"below"` (default)
             under the gridlines and every mark, or `"above"` over the marks and
@@ -120,6 +124,7 @@ def BasemapChart(
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         style: Style configuration of the map. See
             [`BasemapStyleAttrs`][datachart.typings.BasemapStyleAttrs].
+        features: Deprecated; use `data`. Removed in the next release.
 
     Returns:
         The figure containing the basemap chart.
@@ -127,7 +132,7 @@ def BasemapChart(
     Raises:
         ValueError: If a feature is not a `BASEMAP_FEATURE`, `resolution` is not
             a `BASEMAP_RESOLUTION`, `geometry` is not outlines of matching
-            longitudes and latitudes or comes with `features`, `resolution`
+            longitudes and latitudes or comes with `data`, `resolution`
             or `highlight`, a `highlight` code is not three letters or comes
             without the countries feature, a feature is not published at
             `resolution`, `position` is not a `DRAW_POSITION`, or a geographic
@@ -138,9 +143,12 @@ def BasemapChart(
     params = dict(locals())
 
     validate_draw_position(position)
+
+    return render("basemapchart", params, expand=_basemap_chart)
+
+
+def _basemap_chart(chart: dict, settings: dict) -> tuple:
     # the basemap's one chart is its features and overlay geometry
-    params["data"] = {
-        key: params.pop(key)
-        for key in ("features", "resolution", "highlight", "geometry")
-    }
-    return render("basemapchart", params)
+    data = {"features": chart["data"]}
+    data.update((key, settings.pop(key)) for key in _MAP_KEYS)
+    return {**chart, "data": data}, settings

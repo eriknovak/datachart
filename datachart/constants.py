@@ -864,7 +864,7 @@ class VIOLIN_INNER:
 class RIDGELINE_SCALE:
     """The supported ridgeline density scales.
 
-    Passed as the `normalize` setting of ridgeline plots: whether every ridge
+    Passed as the `ridge_scale` setting of ridgeline plots: whether every ridge
     is scaled to the same peak height, so their shapes compare, or all
     ridges share one density scale, so their heights compare.
 

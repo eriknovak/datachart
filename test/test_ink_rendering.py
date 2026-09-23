@@ -190,7 +190,7 @@ class TestEtch(unittest.TestCase):
         config.update_config({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "x"]})
         hist = Histogram({"x": [1.0, 2.0, 2.0, 3.0, 3.0, 3.0]})
         self.assertTrue(etch_effects(hist.axes[0].patches[0]))
-        radial = RadialChart(BAR, type="bar")
+        radial = RadialChart(BAR, mark="bar")
         self.assertTrue(etch_effects(radial.axes[0].patches[0]))
         self.assertEqual(hatched_draws(hist) + hatched_draws(radial), 0)
 
@@ -394,7 +394,7 @@ class TestQuillTheme(unittest.TestCase):
 
     def test_value_texts_take_the_theme_font(self):
         config.set_theme(THEME.QUILL)
-        heatmap = Heatmap(GRID, show_heatmap_values=True)
+        heatmap = Heatmap(GRID, show_values=True)
         self.assertEqual(heatmap.axes[0].texts[0].get_fontname(), "IM FELL English")
         contour = ContourChart(GRID, show_labels=True)
         self.assertEqual(contour.axes[0].texts[0].get_fontname(), "IM FELL English")
@@ -571,7 +571,7 @@ class TestValueEtch(unittest.TestCase):
 
     def test_values_read_through_a_ground_halo(self):
         config.update_config(GROUND)
-        text = Heatmap(GRID, show_heatmap_values=True).axes[0].texts[-1]
+        text = Heatmap(GRID, show_values=True).axes[0].texts[-1]
         self.assertIsNone(text.get_bbox_patch())
         (halo,) = text.get_path_effects()
         self.assertEqual(to_hex(halo._gc["foreground"]), PARCHMENT.lower())

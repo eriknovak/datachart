@@ -45,7 +45,7 @@ class TestFrontValidation:
 
     def test_unknown_type_raises(self):
         with pytest.raises(ValueError, match="type"):
-            RadialChart(data=WIND, type="pie")
+            RadialChart(data=WIND, mark="pie")
 
     def test_bad_direction_raises(self):
         with pytest.raises(ValueError, match="direction"):
@@ -125,7 +125,7 @@ class TestAngularPlacement:
         assert r[-1] == r[0]
 
     def test_bar_sector_positions(self):
-        ax = RadialChart(data=WIND, type=RADIAL_TYPE.BAR).axes[0]
+        ax = RadialChart(data=WIND, mark=RADIAL_TYPE.BAR).axes[0]
         n = len(WIND)
         patches = ax.patches
         assert len(patches) == n
@@ -137,7 +137,7 @@ class TestAngularPlacement:
         assert all(p.get_width() < 2 * np.pi / n for p in patches)
 
     def test_stacked_bars(self):
-        fig = RadialChart(data=[WIND, WIND2], type=RADIAL_TYPE.BAR, bar_mode="stack")
+        fig = RadialChart(data=[WIND, WIND2], mark=RADIAL_TYPE.BAR, bar_mode="stack")
         patches = fig.axes[0].patches
         n = len(WIND)
         first, second = patches[:n], patches[n:]
@@ -146,14 +146,14 @@ class TestAngularPlacement:
         assert bottoms == heights
 
     def test_scatter_points_on_sectors(self):
-        ax = RadialChart(data=WIND, type=RADIAL_TYPE.SCATTER).axes[0]
+        ax = RadialChart(data=WIND, mark=RADIAL_TYPE.SCATTER).axes[0]
         offsets = ax.collections[0].get_offsets()
         assert np.allclose(
             sorted(offsets[:, 0]), np.linspace(0, 2 * np.pi, len(WIND), endpoint=False)
         )
 
     def test_histogram_bins_degrees_over_full_circle(self):
-        ax = RadialChart(data=ANGLES, type=RADIAL_TYPE.HISTOGRAM, num_bins=4).axes[0]
+        ax = RadialChart(data=ANGLES, mark=RADIAL_TYPE.HISTOGRAM, num_bins=4).axes[0]
         patches = ax.patches
         assert len(patches) == 4
         assert sum(p.get_width() for p in patches) == pytest.approx(2 * np.pi)
@@ -196,7 +196,7 @@ class TestRadialTickLabels:
         assert all(t.get_position()[0] == pytest.approx(midway) for t in elevated)
 
     def test_a_radial_histogram_keeps_the_matplotlib_angle(self):
-        ax = RadialChart(data=ANGLES, type=RADIAL_TYPE.HISTOGRAM).axes[0]
+        ax = RadialChart(data=ANGLES, mark=RADIAL_TYPE.HISTOGRAM).axes[0]
         assert ax.get_rlabel_position() == pytest.approx(22.5)
 
     def test_the_widest_layer_sets_the_angle(self):
@@ -246,14 +246,14 @@ class TestPolarGrid:
 
 class TestValueLabelEmphasis:
     def test_marks_sit_above_the_grid(self):
-        ax = RadialChart(data=WIND, type=RADIAL_TYPE.BAR, show_grid="both").axes[0]
+        ax = RadialChart(data=WIND, mark=RADIAL_TYPE.BAR, show_grid="both").axes[0]
         assert ax.get_axisbelow() is True
         # the grid draws at the axis artists' zorder; every mark must beat it
         axis_z = max(ax.xaxis.get_zorder(), ax.yaxis.get_zorder())
         assert all(p.get_zorder() > axis_z for p in ax.patches)
 
     def test_value_labels_redrawn_on_top_in_black(self):
-        ax = RadialChart(data=WIND, type=RADIAL_TYPE.BAR).axes[0]
+        ax = RadialChart(data=WIND, mark=RADIAL_TYPE.BAR).axes[0]
         assert all(t.get_text() == "" for t in ax.get_yticklabels())
         elevated = [t for t in ax.texts if t.get_color() == "#000000"]
         assert elevated
@@ -284,13 +284,13 @@ class TestValueLabelEmphasis:
 
 class TestTipTexts:
     def test_tip_labels_replace_the_ring_labels(self):
-        ax = RadialChart(data=WIND, type=RADIAL_TYPE.BAR, show_tip_labels=True).axes[0]
+        ax = RadialChart(data=WIND, mark=RADIAL_TYPE.BAR, show_tip_labels=True).axes[0]
         assert all(t.get_text() == "" for t in ax.get_xticklabels())
         tip_texts = {t.get_text() for t in ax.texts}
         assert {d["label"] for d in WIND} <= tip_texts
 
     def test_tip_labels_sit_beyond_the_marks(self):
-        ax = RadialChart(data=WIND, type=RADIAL_TYPE.BAR, show_tip_labels=True).axes[0]
+        ax = RadialChart(data=WIND, mark=RADIAL_TYPE.BAR, show_tip_labels=True).axes[0]
         tops = {
             round(p.get_x() + p.get_width() / 2, 6): p.get_y() + p.get_height()
             for p in ax.patches
@@ -302,7 +302,7 @@ class TestTipTexts:
                 assert r > tops[round(theta, 6)]
 
     def test_tip_labels_flip_on_the_left_half(self):
-        ax = RadialChart(data=WIND, type=RADIAL_TYPE.BAR, show_tip_labels=True).axes[0]
+        ax = RadialChart(data=WIND, mark=RADIAL_TYPE.BAR, show_tip_labels=True).axes[0]
         by_text = {t.get_text(): t for t in ax.texts}
         # N points up (screen 90°) and W sits on the left half (screen 180°)
         assert by_text["N"].get_ha() == "left"
@@ -311,7 +311,7 @@ class TestTipTexts:
 
     def test_show_values_writes_each_value(self):
         ax = RadialChart(
-            data=WIND, type=RADIAL_TYPE.BAR, show_values=True, value_format="{x:.1f}"
+            data=WIND, mark=RADIAL_TYPE.BAR, show_values=True, value_format="{x:.1f}"
         ).axes[0]
         expected = {f"{d['y']:.1f}" for d in WIND}
         value_texts = [t for t in ax.texts if t.get_text() in expected]
@@ -320,7 +320,7 @@ class TestTipTexts:
         assert all(t.get_bbox_patch() is not None for t in value_texts)
 
     def test_tip_labels_carry_a_halo(self):
-        ax = RadialChart(data=WIND, type=RADIAL_TYPE.BAR, show_tip_labels=True).axes[0]
+        ax = RadialChart(data=WIND, mark=RADIAL_TYPE.BAR, show_tip_labels=True).axes[0]
         labels = {d["label"] for d in WIND}
         tip_texts = [t for t in ax.texts if t.get_text() in labels]
         assert tip_texts
@@ -333,7 +333,7 @@ class TestTipTexts:
 
     def test_stacked_values_per_segment(self):
         fig = RadialChart(
-            data=[WIND, WIND2], type=RADIAL_TYPE.BAR, bar_mode="stack", show_values=True
+            data=[WIND, WIND2], mark=RADIAL_TYPE.BAR, bar_mode="stack", show_values=True
         )
         texts = [t.get_text() for t in fig.axes[0].texts]
         for d in WIND:
@@ -358,7 +358,7 @@ class TestRendering:
             (RADIAL_TYPE.SCATTER, WIND),
             (RADIAL_TYPE.HISTOGRAM, ANGLES),
         ]:
-            fig = RadialChart(data=data, type=radial_type, title="t")
+            fig = RadialChart(data=data, mark=radial_type, title="t")
             fig.canvas.draw()
             plt.close(fig)
 

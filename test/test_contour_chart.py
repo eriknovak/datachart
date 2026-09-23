@@ -165,9 +165,12 @@ class TestContourDraw(unittest.TestCase):
         self.assertEqual(tuple(cs.get_edgecolor()[0][:3]), (1.0, 0.0, 0.0))
         self.assertEqual(cs.get_linewidth()[0], 3)
 
-    def test_labels_drawn_with_valfmt(self):
+    def test_labels_drawn_with_value_format(self):
         figure = ContourChart(
-            data=surface(), show_labels=True, valfmt="{x:.0f}", levels=[50, 100, 200]
+            data=surface(),
+            show_labels=True,
+            value_format="{x:.0f}",
+            levels=[50, 100, 200],
         )
         ax = figure.axes[0]
         texts = [t.get_text() for t in ax.texts]
