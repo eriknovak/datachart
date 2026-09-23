@@ -32,10 +32,13 @@ class TestADRIndex(unittest.TestCase):
         self.numbers = {p.name[:4] for p in self.files}
         self.readme = (ADR_DIR / "README.md").read_text(encoding="utf-8")
 
-    def test_every_adr_is_indexed(self):
-        for path in self.files:
-            with self.subTest(adr=path.name):
-                self.assertIn(path.name, self.readme)
+    def test_every_adr_is_indexed_once(self):
+        entries = re.findall(r"^- \[([0-9]{4})\]\(([^)]+)\)", self.readme, re.M)
+        listed = [number for number, _ in entries]
+        self.assertEqual(sorted(listed), sorted(self.numbers))
+        for number, target in entries:
+            with self.subTest(adr=number):
+                self.assertTrue((ADR_DIR / target).is_file())
 
     def test_index_lists_no_missing_adr(self):
         linked = set(re.findall(r"\(([0-9]{4})-[^)]*\.md\)", self.readme))
