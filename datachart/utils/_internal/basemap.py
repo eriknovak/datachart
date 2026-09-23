@@ -10,14 +10,12 @@ ring.
 
 import functools
 import json
-import os
-import pathlib
-import tempfile
 import urllib.request
 
 import numpy as np
 
 from ...constants import BASEMAP_RESOLUTION
+from .cache import DOWNLOAD_TIMEOUT, cache_dir, write_atomic
 from .validate import BASEMAP_FEATURE_RESOLUTIONS, BASEMAP_RESOLUTIONS
 
 # a tagged release, so every download converts the same outlines
@@ -38,19 +36,6 @@ LAYERS = {
 }
 # the key of a country: ISO_A3 is -99 for France and Norway, this never is
 COUNTRY_KEY = "ADM0_A3"
-CACHE_ENV = "DATACHART_CACHE_DIR"
-# 1:10m roads is a 50 MB GeoJSON; 60 s does not finish it (ADR 0062)
-DOWNLOAD_TIMEOUT = 300
-
-
-def cache_dir() -> pathlib.Path:
-    """Where the downloaded resolutions are kept."""
-
-    configured = os.environ.get(CACHE_ENV)
-    if configured:
-        return pathlib.Path(configured)
-    base = os.environ.get("XDG_CACHE_HOME") or pathlib.Path.home() / ".cache"
-    return pathlib.Path(base) / "datachart"
 
 
 def _signed_area(ring: np.ndarray) -> float:
@@ -115,13 +100,9 @@ def load_outlines(feature: str, resolution: str) -> dict:
     path = cache_dir() / f"natural_earth_{resolution}_{feature}.npz"
     if not path.exists():
         rows, codes = fetch(feature, resolution)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        # written aside and renamed, so an interrupted write leaves no half file
-        with tempfile.NamedTemporaryFile(
-            dir=path.parent, suffix=".npz", delete=False
-        ) as partial:
-            np.savez_compressed(partial, rows=rows, codes=codes)
-        os.replace(partial.name, path)
+        write_atomic(
+            path, lambda partial: np.savez_compressed(partial, rows=rows, codes=codes)
+        )
     with np.load(path) as cached:
         return {"rows": cached["rows"].astype(float), "codes": cached["codes"]}
 

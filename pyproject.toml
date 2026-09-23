@@ -65,9 +65,8 @@ include = ["datachart*"]
 
 [tool.setuptools.package-data]
 datachart = [
-    "themes/_fonts/*.ttf",
-    "themes/_fonts/OFL.txt",
     "charts/_basemap/NATURAL_EARTH.txt",
+    "utils/_internal/FONTS.txt",
 ]
 
 [tool.setuptools.dynamic]
