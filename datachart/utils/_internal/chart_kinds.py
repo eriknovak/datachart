@@ -720,12 +720,10 @@ def _nested(setting: Any) -> Any:
     return Union[setting, List[setting], List[Union[setting, List[setting], None]]]
 
 
-def _per_chart(name: str, annotation: Any, per_chart: Any) -> SharedParameter:
-    return SharedParameter(name, annotation, per_chart=per_chart)
-
-
 def _setting(name: str, setting: Any) -> SharedParameter:
-    return _per_chart(name, Union[setting, List[setting]], _nested(setting))
+    return SharedParameter(
+        name, Union[setting, List[setting]], per_chart=_nested(setting)
+    )
 
 
 _Number = Union[int, float]
@@ -770,20 +768,22 @@ _SHARED = (
     SharedParameter("mode", Union[SWARM_MODE, str]),
     SharedParameter("jitter", float, default=0.4),
     SharedParameter("position", Union[DRAW_POSITION, str]),
-    _per_chart(
+    SharedParameter(
         "value_format",
         Union[VALUE_FORMAT, str],
-        Union[VALUE_FORMAT, str, List[Optional[str]]],
+        per_chart=Union[VALUE_FORMAT, str, List[Optional[str]]],
     ),
-    _per_chart("subtitle", str, _each(str)),
-    _per_chart(
-        "emphasis", Union[EMPHASIS, str], Union[EMPHASIS, str, List[Optional[str]]]
+    SharedParameter("subtitle", str, per_chart=_each(str)),
+    SharedParameter(
+        "emphasis",
+        Union[EMPHASIS, str],
+        per_chart=Union[EMPHASIS, str, List[Optional[str]]],
     ),
-    _per_chart("xticklabels", _Labels, Union[_Labels, List[_Labels]]),
-    _per_chart("xtickrotate", int, _each(int)),
-    _per_chart("yticks", _Ticks, Union[_Ticks, List[_Ticks]]),
-    _per_chart("yticklabels", _Labels, Union[_Labels, List[_Labels]]),
-    _per_chart("ytickrotate", int, _each(int)),
+    SharedParameter("xticklabels", _Labels, per_chart=Union[_Labels, List[_Labels]]),
+    SharedParameter("xtickrotate", int, per_chart=_each(int)),
+    SharedParameter("yticks", _Ticks, per_chart=Union[_Ticks, List[_Ticks]]),
+    SharedParameter("yticklabels", _Labels, per_chart=Union[_Labels, List[_Labels]]),
+    SharedParameter("ytickrotate", int, per_chart=_each(int)),
     _setting("vlines", VLineSettingAttrs),
     _setting("hlines", HLineSettingAttrs),
     _setting("dlines", DLineSettingAttrs),
@@ -791,18 +791,20 @@ _SHARED = (
     _setting("vspans", VSpanSettingAttrs),
     _setting("hspans", HSpanSettingAttrs),
     _setting("texts", TextSettingAttrs),
-    _per_chart("label", str, _each(str)),
-    _per_chart("x", str, _each(str)),
-    _per_chart("y", str, _each(str)),
-    _per_chart("yerr", str, _each(str)),
-    _per_chart("value", str, _each(str)),
-    _per_chart("hue", str, _each(str)),
-    _per_chart("dimensions", _Labels, Union[_Labels, List[_Labels]]),
-    _per_chart("vmin", float, _each(float)),
-    _per_chart("vmax", float, _each(float)),
-    _per_chart("vcenter", float, _each(float)),
-    _per_chart("norm", str, _each(str)),
-    _per_chart("colorbar", ColorbarSettingAttrs, _each(ColorbarSettingAttrs)),
+    SharedParameter("label", str, per_chart=_each(str)),
+    SharedParameter("x", str, per_chart=_each(str)),
+    SharedParameter("y", str, per_chart=_each(str)),
+    SharedParameter("yerr", str, per_chart=_each(str)),
+    SharedParameter("value", str, per_chart=_each(str)),
+    SharedParameter("hue", str, per_chart=_each(str)),
+    SharedParameter("dimensions", _Labels, per_chart=Union[_Labels, List[_Labels]]),
+    SharedParameter("vmin", float, per_chart=_each(float)),
+    SharedParameter("vmax", float, per_chart=_each(float)),
+    SharedParameter("vcenter", float, per_chart=_each(float)),
+    SharedParameter("norm", str, per_chart=_each(str)),
+    SharedParameter(
+        "colorbar", ColorbarSettingAttrs, per_chart=_each(ColorbarSettingAttrs)
+    ),
 )
 
 SHARED_PARAMETERS = {parameter.name: parameter for parameter in _SHARED}

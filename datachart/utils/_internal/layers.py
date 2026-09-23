@@ -6545,9 +6545,9 @@ class HeatmapLayer(Layer):
         self._label_axes(x, y)
 
     def _resolve_cell_values(self) -> None:
-        """The cell value switch and text; the heatmap keeps its own names."""
+        """The cell value switch, as set or the theme default, and its text."""
 
-        self.show_cell_values = bool(self.settings.get("show_values"))
+        self.show_cell_values = bool(resolve_show_values(self.settings))
         formatter = _value_formatter(
             self.chart.get("value_format", DEFAULT_VALUE_FORMAT)
         )

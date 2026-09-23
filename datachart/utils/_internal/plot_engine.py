@@ -30,7 +30,7 @@ from ...constants import COLORBAR_LOCATION, FIG_SIZE, ORIENTATION
 # ================================================
 
 # rewrites a front's built charts and settings before assembly
-Expand = Callable[[List[dict], dict], Tuple[List[dict], dict]]
+Expand = Callable[[Union[dict, List[dict]], dict], Tuple[Union[dict, List[dict]], dict]]
 
 # the figure-level settings a subplots figure carries into a grid cell
 SUBPLOT_FURNITURE_KEYS = ("title", "xlabel", "ylabel", "sharex", "sharey")
