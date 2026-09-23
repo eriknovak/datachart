@@ -22,7 +22,7 @@ edges. It is non-Cartesian like the Sankey (ADR 0026) and the treemap
   case the node set is inferred from the edges in first-seen order. Duplicate
   ids, edges referencing unknown ids, and non-positive `size` or `weight`
   raise `ValueError` from `validate.py`. A list of chart dicts renders one
-  network per subplot (`CHART_CONFIGS`: `multiplot: False, subplots: True`).
+  network per subplot (`ChartKind`: `multiplot=False, subplots=True`).
 - **Layout is a chart attribute, not style.** The front's `layout` argument
   takes a `NETWORK_LAYOUT` constant: `SPRING` (default), `CIRCULAR`, or
   `FIXED`. `FIXED` reads `x`/`y` from every node record and raises when one

@@ -18,7 +18,7 @@ space and the axes carry nothing.
   `value` or carries one equal to the children's sum; a mismatch raises
   `ValueError`. Zero and negative values raise; a silently vanishing tile
   surprises more than an error. A list of chart dicts renders one treemap
-  per subplot (`CHART_CONFIGS`: `multiplot: False, subplots: True`).
+  per subplot (`ChartKind`: `multiplot=False, subplots=True`).
 - **Squarify only.** Every level is sorted by value descending and tiled by
   the squarified algorithm in the axes' pixel aspect at draw time, read from
   the axes bbox, so tiles look square at any `figsize` and in a `Grid` cell.
