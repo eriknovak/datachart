@@ -109,6 +109,15 @@ input and hands the engine an explicit charts structure and settings dict; it do
 not draw, and its signature is the allowlist of what the chart supports.
 _Avoid_: chart class, chart type (for the function), attrs dict
 
+**Chart kind**:
+The one record of what a chart front *is* — its layer class, record shape,
+projection, group / bare / gridless flags, emphasis unit, multiplot and subplot
+rules, accepted reference marks, rejected parameters — held as a frozen
+`ChartKind` row in one table and read through one accessor. The engine,
+builder, and composition branch on the row, never on the chart-type string;
+a front with no row fails before drawing.
+_Avoid_: chart config, chart registry, chart-type table
+
 **Setting payload**:
 A dict a caller passes to a chart front to configure one per-figure element —
 a reference line, band, text, legend, or colorbar — as opposed to the chart

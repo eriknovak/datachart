@@ -37,6 +37,7 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 - [0008](0008-unmanaged-figures.md) — Figures are unmanaged; showing is explicit via `Figure.show()` (amended by [0031](0031-interactive-show-hover-seam.md))
 - [0031](0031-interactive-show-hover-seam.md) — `show(interactive=True)` is the single interactive opt-in, fed by a per-layer hover seam
 - [0054](0054-draw-order-ladder.md) — Draw order is a fixed ladder: surfaces at the bottom, reference lines near the top (amended by [0060](0060-image-chart.md))
+- [0065](0065-chart-kind-descriptor.md) — A chart front's identity is one `ChartKind` row, not eight registries
 
 ## Composition: Panel and Grid
 
