@@ -44,11 +44,6 @@ something that shipped.
   spans four records. Each line carries the number, the title, and the
   amendments. Gaps in the numbering are listed with the reason, so 0061's
   absence reads as a decision rather than a lost file.
-- **`test/test_adr_index.py` keeps the index honest.** Every ADR file appears
-  in the README, every number the README links resolves to a file, every
-  `status:` is a known value, and every `amended-by:` target exists and is a
-  higher number than the file carrying it. The index is the kind of document
-  that rots silently, and the test is cheaper than the audit that produced it.
 - **An amendment is a changed commitment, not a citation.** An ADR that builds
   on, extends consistently with, or merely mentions an earlier one adds no
   tag; one that reverses, narrows, widens or replaces something the earlier

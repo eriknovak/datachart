@@ -22,9 +22,6 @@ An amendment is a *changed* commitment. An ADR that builds on an earlier one,
 extends it consistently, or fulfils a follow-up the earlier one already named
 adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 
-`test/test_adr_index.py` fails if this index falls out of step with the files,
-or if a `status:` or `amended-by:` value does not resolve.
-
 ### Numbering gaps
 
 - **0061** — the bundled basemap, folded into
