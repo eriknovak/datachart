@@ -682,7 +682,7 @@ SKETCH_THEME: StyleAttrs = make_theme(
 
 The sketch theme: hand-drawn, xkcd-style wobble and halo, Comic Neue font.
 
-Paths wobble, lines carry a white halo, spines and lines are thick, the grid is off, and text is set in Comic Neue, which ships with the package; Humor Sans and Comic Sans MS are the fallbacks should the bundled face fail to register.
+Paths wobble, lines carry a white halo, spines and lines are thick, the grid is off, and text is set in Comic Neue, downloaded on first use; Humor Sans and Comic Sans MS are the fallbacks should the download fail.
 
 ### datachart.themes.QUILL_THEME
 
@@ -901,4 +901,4 @@ QUILL_THEME: StyleAttrs = make_theme(
 
 The quill theme: black ink on white paper, as a quill and an etching needle draw.
 
-One ink only: series differ by line style, marker and etching, never by color. Series lines are broad-nib pen strokes whose width varies along the line, bars, areas and bodies are etched by hand instead of hatched, the furniture wobbles, and text is set in IM Fell English, which ships with the package, titles in its italic.
+One ink only: series differ by line style, marker and etching, never by color. Series lines are broad-nib pen strokes whose width varies along the line, bars, areas and bodies are etched by hand instead of hatched, the furniture wobbles, and text is set in IM Fell English, downloaded on first use, titles in its italic.

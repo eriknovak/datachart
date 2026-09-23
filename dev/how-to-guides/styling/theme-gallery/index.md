@@ -196,7 +196,7 @@ Hand-drawn looks for explainers, blog posts and talks, where a chart should read
 
 ### Sketch
 
-Hand-drawn: wobbled paths, series lines cut out by a white halo, thick spines and lines, no grid, and the bundled Comic Neue font, so the look is the same on every machine. The wobble and halo are theme attributes applied at render time, so nothing changes in matplotlib's global settings; the halo sits under line, radial and regression lines only, and a chart's `style` can set `plot_sketch_halo_width` to `0` where many lines overlap.
+Hand-drawn: wobbled paths, series lines cut out by a white halo, thick spines and lines, no grid, and the Comic Neue font, downloaded on first use, so the look is the same on every machine. The wobble and halo are theme attributes applied at render time, so nothing changes in matplotlib's global settings; the halo sits under line, radial and regression lines only, and a chart's `style` can set `plot_sketch_halo_width` to `0` where many lines overlap.
 
 Selected with [`THEME.SKETCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`SKETCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.SKETCH_THEME).
 
@@ -208,7 +208,7 @@ signature(pair=("#2E86AB", "#E4572E")).show()
 
 ### Quill
 
-Black ink on white paper, as a quill and an etching needle would draw it. There is one ink only, so series differ by line style, marker and etching, never by color. Series lines are broad-nib pen strokes whose width follows the pen's direction. Bars, areas and bodies are etched by hand instead of tiled with a hatch, with a faint ink wash under the bars and bodies. A value scale (heatmap, calendar, hexbin, filled contour) reads as steps of etch density; where a chart asks for a colorbar, a legend of the steps takes its place. Text is set in the bundled IM Fell English font, titles in its italic. Like the sketch look, every effect is a theme attribute applied at render time, so nothing changes in matplotlib's global settings.
+Black ink on white paper, as a quill and an etching needle would draw it. There is one ink only, so series differ by line style, marker and etching, never by color. Series lines are broad-nib pen strokes whose width follows the pen's direction. Bars, areas and bodies are etched by hand instead of tiled with a hatch, with a faint ink wash under the bars and bodies. A value scale (heatmap, calendar, hexbin, filled contour) reads as steps of etch density; where a chart asks for a colorbar, a legend of the steps takes its place. Text is set in the IM Fell English font, downloaded on first use, titles in its italic. Like the sketch look, every effect is a theme attribute applied at render time, so nothing changes in matplotlib's global settings.
 
 Selected with [`THEME.QUILL`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`QUILL_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.QUILL_THEME).
 

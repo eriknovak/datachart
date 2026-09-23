@@ -198,7 +198,7 @@ BasemapChart(
 ).show()
 ```
 
-Without the network, a feature that is not cached yet raises an error that names the file it tried to fetch, and leaves no half-written file behind. A machine that never has the network, or a CI job that should not depend on it, works from a warm cache: render the maps once where the network is, or run `python datachart/charts/_basemap/prewarm.py 110m 50m` from a clone of the repository, and copy the cache folder over.
+Without the network, a feature that is not cached yet raises an error that names the file it tried to fetch, and leaves no half-written file behind. A machine that never has the network, or a CI job that should not depend on it, works from a warm cache: render the maps once where the network is, or run `python datachart/utils/_internal/prewarm.py 110m 50m` from a clone of the repository, and copy the cache folder over.
 
 ### Rivers and roads
 
