@@ -197,6 +197,7 @@ def PyramidChart(
     ]
 
     charts = build_charts_structure(
+        "pyramidchart",
         [left_side, data[1]],
         subtitle=subtitle,
         style=style,

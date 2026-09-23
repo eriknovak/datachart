@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render_chart
 from ..utils._internal.chart_builder import build_charts_structure
-from ..utils._internal.validate import validate_bandwidth, validate_single_dataset
+from ..utils._internal.validate import validate_bandwidth
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -252,6 +252,7 @@ def ViolinPlot(
 
     # Build the charts structure using shared utility
     charts = build_charts_structure(
+        "violinplot",
         data,
         subtitle=subtitle,
         emphasis=emphasis,
@@ -304,5 +305,4 @@ def ViolinPlot(
         "yticks_format": yticks_format,
     }
 
-    validate_single_dataset(charts, "violin plot", subplots)
     return render_chart("violinplot", charts, settings)

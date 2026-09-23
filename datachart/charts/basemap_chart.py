@@ -139,6 +139,7 @@ def BasemapChart(
     validate_draw_position(position)
 
     charts = build_charts_structure(
+        "basemapchart",
         {
             "features": features,
             "resolution": resolution,
@@ -146,7 +147,6 @@ def BasemapChart(
             "geometry": geometry,
         },
         style=style,
-        is_2d_data=True,
     )
 
     # Figure-level settings; None values resolve to defaults downstream

@@ -14,7 +14,8 @@ from datachart.config import config
 from datachart.constants import HEXBIN_REDUCE, NORMALIZE, COLORS, THEME
 from datachart.utils import Panel, Grid
 from datachart.utils._internal.config_helpers import get_hexbin_style
-from datachart.utils._internal.layers import build_layers, HEXBIN_REDUCERS
+from datachart.utils._internal.chart_kinds import build_layers
+from datachart.utils._internal.layers import HEXBIN_REDUCERS
 
 
 def points(n=500, seed=0, center=(0.0, 0.0)):

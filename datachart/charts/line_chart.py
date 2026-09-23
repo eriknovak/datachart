@@ -1,3 +1,4 @@
+import warnings
 from datetime import datetime
 from typing import Union, List, Optional, Tuple
 
@@ -231,6 +232,7 @@ def LineChart(
     """
     # Build the charts structure using shared utility
     charts = build_charts_structure(
+        "linechart",
         data,
         subtitle=subtitle,
         emphasis=emphasis,
@@ -283,4 +285,9 @@ def LineChart(
         "yticks_format": yticks_format,
     }
 
+    if show_yerr and show_area:
+        warnings.warn(
+            "Both the `show_yerr` and `show_area` will be used. "
+            + "Only one of them should be True."
+        )
     return render_chart("linechart", charts, settings)

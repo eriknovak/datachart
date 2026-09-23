@@ -237,6 +237,7 @@ def BumpChart(
 
     """
     charts = build_charts_structure(
+        "bumpchart",
         data,
         subtitle=subtitle,
         emphasis=emphasis,

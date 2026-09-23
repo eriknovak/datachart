@@ -199,6 +199,7 @@ def GanttChart(
         )
 
     charts = build_charts_structure(
+        "ganttchart",
         data,
         subtitle=subtitle,
         style=style,

@@ -24,7 +24,7 @@ temporal detection (ADR 0037), the heatmap's cells, value labels (ADR
   data error; an `aggregate` setting is a possible later addition.
 - **One panel per year, in year order.** Data spanning several years splits
   in the front into one chart per year and draws through the existing
-  subplot layout (`CHART_CONFIGS`: `multiplot: False, subplots: True`), so
+  subplot layout (`ChartKind`: `multiplot=False, subplots=True`), so
   `Grid` rebuilds the arrangement in a cell for free. `year=` keeps one
   year, colored over its own values; a year without data raises. The years
   of one dataset share its value range unless `vmin`/`vmax` pin one, so a

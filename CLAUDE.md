@@ -97,6 +97,7 @@ The package is organized into six main modules:
 The `_internal` submodule contains implementation details not exposed to users:
 
 - **layers.py**: The single drawing seam (ADR 0001): `Layer` classes per chart type with `draw(ax, ctx)`, `Panel` owning every cross-layer concern (colors, bar slotting, shared bins, scales, limits, legend, twin axes), `LayerGroup`, and the frozen `DrawContext`
+- **chart_kinds.py**: One frozen `ChartKind` row per front in `CHART_KINDS`, read through `chart_kind()` (ADR 0065); the engine, builder, and composition branch on the row, never on the chart-type string. Also holds its build-time readers `build_layers()` and `build_chart_panel_settings()`
 - **plot_engine.py**: Figure assembly: `render_chart()` builds layers, assembles panels, renders them, and stores the metadata transport
 - **chart_builder.py**: Chart attribute building and validation logic
 - **config_helpers.py**: Helper functions for retrieving and applying style configurations

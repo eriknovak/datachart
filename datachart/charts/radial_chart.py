@@ -262,6 +262,7 @@ def RadialChart(
 
     # Build the charts structure using shared utility
     charts = build_charts_structure(
+        "radialchart",
         data,
         subtitle=subtitle,
         emphasis=emphasis,

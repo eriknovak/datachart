@@ -96,12 +96,6 @@ def SankeyChart(
             `column_labels` does not match the number of columns.
 
     """
-    if emphasis is not None:
-        raise ValueError(
-            "SankeyChart does not support `emphasis`: a Sankey has no series "
-            "to mute or highlight."
-        )
-
     datasets = data if isinstance(data, list) else [data]
     if not all(isinstance(d, dict) and "links" in d for d in datasets):
         raise ValueError(
@@ -114,11 +108,12 @@ def SankeyChart(
             validate_sankey_nodes(nodes, dataset["links"])
 
     charts = build_charts_structure(
+        "sankeychart",
         data,
+        emphasis=emphasis,
         subtitle=subtitle,
         style=style,
         texts=texts,
-        is_2d_data=True,
     )
 
     # Figure-level settings; None values resolve to defaults downstream

@@ -223,6 +223,7 @@ def Histogram(
     """
     # Build the charts structure using shared utility
     charts = build_charts_structure(
+        "histogram",
         data,
         subtitle=subtitle,
         emphasis=emphasis,

@@ -13,7 +13,7 @@ where a `ScatterChart` turns into an opaque blob. With an optional per-point
 ## Commitments
 
 - **Input is a list of column dicts `{x, y, c?}`**, built with
-  `is_2d_data=True` like Heatmap and Contour — not ScatterChart's list of
+  `ChartKind` `dict_data=True` like Heatmap and Contour — not ScatterChart's list of
   points. A list of charts grids them with `subplots=True` and otherwise
   overlays them on one axes; overlaying hexbins is allowed but not
   special-cased, since opaque tiles hide each other.

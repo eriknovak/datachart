@@ -117,12 +117,6 @@ def Treemap(
             `emphasis` is not a role.
 
     """
-    if emphasis is not None:
-        raise ValueError(
-            "Treemap does not support the `emphasis` argument: set the "
-            "`emphasis` key on the records to mute or highlight instead."
-        )
-
     datasets = data if isinstance(data, list) else [data]
     if not all(isinstance(d, dict) and "data" in d for d in datasets):
         raise ValueError(
@@ -133,11 +127,12 @@ def Treemap(
         validate_treemap_records(dataset["data"])
 
     charts = build_charts_structure(
+        "treemap",
         data,
+        emphasis=emphasis,
         subtitle=subtitle,
         style=style,
         texts=texts,
-        is_2d_data=True,
     )
 
     # Figure-level settings; None values resolve to defaults downstream

@@ -14,8 +14,8 @@ height carries the value, and the axes carry nothing.
 - **Input is a `links` list.** A chart dict is `{"links": [{"source",
   "target", "value"}, ...]}`; a node is a string that is both its identity
   and its drawn label. A list of chart dicts renders one Sankey per subplot;
-  there is no overlay semantics (`CHART_CONFIGS`: `multiplot: False,
-  subplots: True`).
+  there is no overlay semantics (`ChartKind`: `multiplot=False,
+  subplots=True`).
 - **Columns are inferred, `nodes` overrides.** A node's column is its
   longest path from any source; leaves stay at their own depth rather than
   being pushed to the last column (pushing them stretched short-lived

@@ -239,6 +239,7 @@ def StackedAreaChart(
 
     """
     charts = build_charts_structure(
+        "stackedareachart",
         data,
         subtitle=subtitle,
         emphasis=emphasis,

@@ -264,6 +264,7 @@ def ContourChart(
 
     # Build the charts structure using shared utility
     charts = build_charts_structure(
+        "contourchart",
         data,
         subtitle=subtitle,
         emphasis=emphasis,
@@ -281,7 +282,6 @@ def ContourChart(
         vspans=vspans,
         hspans=hspans,
         texts=texts,
-        is_2d_data=True,
         norm=norm,
         vmin=vmin,
         vmax=vmax,
