@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0052]
 ---
 
 # A scatter matrix is a grid figure composed from scatter and histogram cells

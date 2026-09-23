@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0017]
 ---
 
 # A Panel has an orientation, inferred from its layers, and its value axis follows it

@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0052]
 ---
 
 # A gantt chart puts time on the value axis and stays a bare figure

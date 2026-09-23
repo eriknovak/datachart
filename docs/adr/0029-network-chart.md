@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0030]
 ---
 
 # NetworkChart draws node-link diagrams from a nodes/edges dict through one layer

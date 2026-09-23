@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0048]
 ---
 
 # Render-scoped rc attributes in themes

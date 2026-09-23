@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0052]
 ---
 
 # A bump chart ranks per period and draws through the line layer

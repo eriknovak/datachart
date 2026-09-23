@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0052]
 ---
 
 # StackedAreaChart stacks series over an ordered axis with a panel-computed baseline

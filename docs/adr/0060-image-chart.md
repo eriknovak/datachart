@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0062]
 ---
 
 # An image is a chart front anchored by an extent, not a setting on other charts

@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0052]
 ---
 
 # A calendar heatmap draws one panel per year through the heatmap's cell seam

@@ -1,5 +1,5 @@
 """The basemap outlines, fetched from Natural Earth on first use into a
-local cache (ADR 0061, 0062).
+local cache (ADR 0062).
 
 Every set is a float32 `(n, 2)` array of longitude and latitude per feature,
 a `NaN` row between one outline and the next. Polygon rings are oriented so

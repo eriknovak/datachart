@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0031]
 ---
 
 # Figures are unmanaged; showing is explicit via `Figure.show()`

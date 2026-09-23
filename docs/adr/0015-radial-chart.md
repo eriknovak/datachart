@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0052]
 ---
 
 # RadialChart is one front with a visual switch, on a projection-aware Panel

@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0045]
 ---
 
 # Bar-type fronts sort their categories, and a rule fills in per-record emphasis

@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0032]
 ---
 
 # Treemap tiles one level of nested part-of-whole data through one layer

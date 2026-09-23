@@ -1294,7 +1294,7 @@ TEXT_COORDS = ("data", "axes")
 TEXT_ANNOTATION_ZORDER = 5
 # reference lines sit above every mark (zorder 3), below annotations (ADR 0054)
 REF_LINE_ZORDER = 3.5
-# an image's or basemap's rung (ADR 0054, 0060, 0061): below under the
+# an image's or basemap's rung (ADR 0054, 0060, 0062): below under the
 # gridlines (0.5), above over the marks (3) and under the reference lines
 DRAW_ZORDER = {DRAW_POSITION.BELOW: 0.25, DRAW_POSITION.ABOVE: 3.25}
 
@@ -7507,7 +7507,7 @@ class ImageLayer(DrawPositionLayer):
 
 class BasemapLayer(DrawPositionLayer):
     """Coastlines, land, borders, lakes, rivers and roads in longitude and
-    latitude (ADR 0061, 0062).
+    latitude (ADR 0062).
 
     Composed with data it leaves the limits to the data; alone it frames its
     own outlines.

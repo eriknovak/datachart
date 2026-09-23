@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0060]
 ---
 
 # Draw order is a fixed ladder: surfaces at the bottom, reference lines near the top
