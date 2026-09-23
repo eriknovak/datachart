@@ -67,7 +67,6 @@ include = ["datachart*"]
 datachart = [
     "themes/_fonts/*.ttf",
     "themes/_fonts/OFL.txt",
-    "charts/_basemap/*.npz",
     "charts/_basemap/NATURAL_EARTH.txt",
 ]
 

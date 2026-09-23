@@ -1263,6 +1263,14 @@ def get_basemap_style(chart_style: dict) -> dict:
             ("edge_width", "plot_basemap_highlight_edge_width"),
         ],
         "lakes": [("facecolor", "plot_basemap_lake_color")],
+        "rivers": [
+            ("colors", "plot_basemap_river_color"),
+            ("linewidths", "plot_basemap_river_width"),
+        ],
+        "roads": [
+            ("colors", "plot_basemap_road_color"),
+            ("linewidths", "plot_basemap_road_width"),
+        ],
     }
 
     return {

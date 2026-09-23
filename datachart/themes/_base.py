@@ -378,6 +378,11 @@ BASE_THEME: StyleAttrs = {
     "plot_basemap_border_style": "-",
     # None takes the axes background, so a lake reads as the sea does
     "plot_basemap_lake_color": None,
+    # a blue-grey river and a warm-grey road, both under the coastline's weight
+    "plot_basemap_river_color": "#8AABC8",
+    "plot_basemap_river_width": 0.5,
+    "plot_basemap_road_color": "#C9BEB1",
+    "plot_basemap_road_width": 0.4,
     # plot scatter style
     "plot_scatter_color": None,
     "plot_scatter_alpha": 0.75,

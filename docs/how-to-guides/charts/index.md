@@ -223,7 +223,7 @@ How two or more variables relate to each other.
 
     [Panel](../utility/panel.ipynb){ .chip } [Grid](../utility/grid.ipynb){ .chip }
 
-    Coastlines, land, borders and lakes under a chart of longitude and latitude, bundled with the package.
+    Coastlines, land, borders, lakes, rivers and roads under a chart of longitude and latitude, from Natural Earth.
 
     ![Epicentres over the land and borders of the Aegean and Anatolia](../../assets/imgs/gallery-basemap.png)
 

@@ -54,6 +54,7 @@ from datachart.constants import (
     ARROW_STYLE,
     ASPECT_RATIO,
     BASEMAP_FEATURE,
+    BASEMAP_RESOLUTION,
     BUMP_LABEL_POSITION,
     BUMP_RANK,
     CALENDAR_WEEKDAY,
@@ -79,6 +80,9 @@ from datachart.utils.stats import kde1d, kde2d
 
 # Cases whose output intentionally changed since the last published baseline.
 EXPECTED_CHANGES = {
+    # new basemap rivers and roads cases (ADR 0062)
+    "basemap_rivers",
+    "basemap_roads",
     # new basemap chart cases (ADR 0061)
     "basemap_default",
     "basemap_borders_lakes",
@@ -3784,6 +3788,48 @@ def basemap_countries_highlight():
         xmax=25,
         ymin=40,
         ymax=50,
+        aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
+    )
+
+
+# ----- basemap rivers and roads (ADR 0062) -----
+
+
+@case
+def basemap_rivers():
+    return BasemapChart(
+        [
+            BASEMAP_FEATURE.LAND,
+            BASEMAP_FEATURE.LAKES,
+            BASEMAP_FEATURE.RIVERS,
+            BASEMAP_FEATURE.BORDERS,
+        ],
+        resolution=BASEMAP_RESOLUTION.MEDIUM,
+        title="The rivers of central Europe at 1:50m",
+        xmin=2,
+        xmax=30,
+        ymin=42,
+        ymax=56,
+        aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
+    )
+
+
+@case
+def basemap_roads():
+    return BasemapChart(
+        [
+            BASEMAP_FEATURE.LAND,
+            BASEMAP_FEATURE.RIVERS,
+            BASEMAP_FEATURE.ROADS,
+            BASEMAP_FEATURE.BORDERS,
+            BASEMAP_FEATURE.COASTLINE,
+        ],
+        resolution=BASEMAP_RESOLUTION.HIGH,
+        title="Slovenia's roads and rivers at 1:10m",
+        xmin=13,
+        xmax=16.8,
+        ymin=45.3,
+        ymax=47,
         aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
     )
 

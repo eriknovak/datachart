@@ -883,6 +883,10 @@ class BasemapStyleAttrs(TypedDict):
         plot_basemap_border_width (Union[float, None]): The width of the borders, in points.
         plot_basemap_border_style (Union[LINE_STYLE, str, None]): The line style of the borders. See [`LINE_STYLE`][datachart.constants.LINE_STYLE].
         plot_basemap_lake_color (Union[str, None]): The fill color of the lakes; `None` takes the axes background, so a lake reads as water.
+        plot_basemap_river_color (Union[str, None]): The color of the rivers.
+        plot_basemap_river_width (Union[float, None]): The width of the rivers, in points.
+        plot_basemap_road_color (Union[str, None]): The color of the roads.
+        plot_basemap_road_width (Union[float, None]): The width of the roads, in points.
 
     """
 
@@ -896,6 +900,10 @@ class BasemapStyleAttrs(TypedDict):
     plot_basemap_border_width: Union[float, None]
     plot_basemap_border_style: Union[LINE_STYLE, str, None]
     plot_basemap_lake_color: Union[str, None]
+    plot_basemap_river_color: Union[str, None]
+    plot_basemap_river_width: Union[float, None]
+    plot_basemap_road_color: Union[str, None]
+    plot_basemap_road_width: Union[float, None]
 
 
 class ScatterStyleAttrs(TypedDict):

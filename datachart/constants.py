@@ -989,9 +989,11 @@ class HEXBIN_REDUCE:
 class BASEMAP_FEATURE:
     """The supported basemap features.
 
-    Passed as the `features` of the basemap chart: which of the bundled
-    Natural Earth 1:110m outlines are drawn. The ocean is not a feature; it
-    is the axes background the land sits on.
+    Passed as the `features` of the basemap chart: which of the Natural
+    Earth outlines are drawn. The ocean is not a feature; it is the axes
+    background the land sits on. Every feature is drawn at every
+    `BASEMAP_RESOLUTION` except the roads, which Natural Earth publishes at
+    1:10 million alone.
 
     ![BASEMAP_FEATURE at a glance](../assets/imgs/const-basemap-feature.svg){ width="100%" }
 
@@ -1012,6 +1014,13 @@ class BASEMAP_FEATURE:
             to `"borders"`.
         LAKES (str): The large lakes, filled with the axes background.
             Equals to `"lakes"`.
+        RIVERS (str): The rivers and the centerlines of the lakes they run
+            through, as lines. At 1:110 million only the largest are a few
+            strokes across a continent; a country wants a finer scale. Equals
+            to `"rivers"`.
+        ROADS (str): The main roads, as lines; 1:10 million only, about 50 MB
+            on first use. Natural Earth maps North America and Europe in more
+            detail than the rest of the world. Equals to `"roads"`.
 
     """
 
@@ -1021,17 +1030,20 @@ class BASEMAP_FEATURE:
     COUNTRIES = "countries"
     BORDERS = "borders"
     LAKES = "lakes"
+    RIVERS = "rivers"
+    ROADS = "roads"
 
 
 class BASEMAP_RESOLUTION:
     """The supported basemap outline resolutions.
 
     Passed as the `resolution` of the basemap chart: the Natural Earth scale
-    the outlines are drawn at. The coarsest ships with the package; the finer
-    ones are downloaded the first time they are asked for and kept in a
-    local cache, so they need the network once. The cache folder is
-    `DATACHART_CACHE_DIR` when that environment variable is set, else
-    `datachart` under `XDG_CACHE_HOME` or `~/.cache`.
+    the outlines are drawn at. Each feature is downloaded the first time it
+    is asked for at a scale and kept in a local cache, so a map needs the
+    network once and never again. The cache folder is `DATACHART_CACHE_DIR`
+    when that environment variable is set, else `datachart` under
+    `XDG_CACHE_HOME` or `~/.cache`; a machine without the network works from
+    a copy of a warm one.
 
     Examples:
         >>> from datachart.constants import BASEMAP_RESOLUTION
@@ -1040,12 +1052,13 @@ class BASEMAP_RESOLUTION:
 
     Attributes:
         DEFAULT (str): The default resolution. Same as `BASEMAP_RESOLUTION.LOW`.
-        LOW (str): 1:110 million, bundled; a continent or a region. Equals to
-            `"110m"`.
+        LOW (str): 1:110 million, under 1 MB on first use; a continent or a
+            region. Equals to `"110m"`.
         MEDIUM (str): 1:50 million, about 5 MB on first use; a country.
             Equals to `"50m"`.
-        HIGH (str): 1:10 million, about 28 MB on first use; a coast or a
-            city's surroundings. Equals to `"10m"`.
+        HIGH (str): 1:10 million, about 28 MB on first use, and 50 MB more
+            for the roads; a coast or a city's surroundings. Equals to
+            `"10m"`.
 
     """
 

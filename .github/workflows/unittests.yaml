@@ -26,6 +26,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: uv sync --group test
+      # the basemap outlines download on first use; fetched once per key (ADR 0062)
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/datachart
+          key: natural-earth-${{ hashFiles('datachart/utils/_internal/basemap.py') }}-110m-50m
+      - run: uv run python datachart/charts/_basemap/prewarm.py 110m 50m
       - run: uv run python -m unittest discover test
 
   notebooks:
@@ -38,4 +44,10 @@ jobs:
         with:
           python-version: "3.12"
       - run: uv sync --group test
+      # the basemap outlines download on first use; fetched once per key (ADR 0062)
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/datachart
+          key: natural-earth-${{ hashFiles('datachart/utils/_internal/basemap.py') }}-110m-50m
+      - run: uv run python datachart/charts/_basemap/prewarm.py 110m 50m
       - run: uv run pytest

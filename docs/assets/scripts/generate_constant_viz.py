@@ -70,6 +70,7 @@ from datachart.constants import (
     HISTOGRAM_TYPE,
     DRAW_POSITION,
     BASEMAP_FEATURE,
+    BASEMAP_RESOLUTION,
     LEGEND_ALIGN,
     LINE_DRAW_STYLE,
     LINE_MARKER,
@@ -886,17 +887,25 @@ def draw_position():
 
 
 def basemap_feature():
-    # each feature alone, over the Baltic, where all four show
+    # each feature alone, over the Baltic, where all of them show
     members = [
         ("COASTLINE", BASEMAP_FEATURE.COASTLINE),
         ("LAND", BASEMAP_FEATURE.LAND),
         ("COUNTRIES", BASEMAP_FEATURE.COUNTRIES),
         ("BORDERS", BASEMAP_FEATURE.BORDERS),
         ("LAKES", BASEMAP_FEATURE.LAKES),
+        ("RIVERS", BASEMAP_FEATURE.RIVERS),
+        ("ROADS", BASEMAP_FEATURE.ROADS),
     ]
+    # the lines read at a finer scale, and roads exist at 1:10m alone
+    resolutions = {
+        "RIVERS": BASEMAP_RESOLUTION.MEDIUM,
+        "ROADS": BASEMAP_RESOLUTION.HIGH,
+    }
     figs = [
         BasemapChart(
             value,
+            resolution=resolutions.get(label),
             # countries are one area each; highlight picks the Baltic states
             highlight=["EST", "LVA", "LTU"] if label == "COUNTRIES" else None,
             title=f"BASEMAP_FEATURE.{label}",
@@ -911,11 +920,10 @@ def basemap_feature():
     chart_grid(
         figs,
         "const-basemap-feature.svg",
-        6.4,
+        8.5,
         cols=2,
-        footnote="COUNTRIES highlights the Baltic states here. The lakes are drawn "
-        "in blue; by default they take the axes background, so they read as "
-        "the sea does.",
+        footnote="COUNTRIES highlights the Baltic states; the lakes are blue "
+        "here. RIVERS is drawn at 1:50m, ROADS at 1:10m, its only scale.",
     )
 
 

@@ -51,6 +51,7 @@ from datachart.utils._internal.basemap import (
     load_outlines,
 )
 from datachart.utils._internal.layers import DRAW_ZORDER
+from datachart.utils._internal.validate import BASEMAP_RESOLUTIONS
 
 # a square island with a square lake, and a line across it
 ISLAND = {
@@ -95,7 +96,7 @@ EU = (
 ).split()
 
 
-class TestBundledData(unittest.TestCase):
+class TestNaturalEarthData(unittest.TestCase):
     def test_every_feature_loads_as_lon_lat_rows(self):
         for feature in ("coastline", "land", "borders", "lakes"):
             outlines = load_basemap(feature)
@@ -129,7 +130,7 @@ class TestCountries(unittest.TestCase):
     def tearDown(self):
         plt.close("all")
 
-    def test_bundled_codes_label_every_ring(self):
+    def test_codes_label_every_ring(self):
         codes = load_country_codes()
         rows = load_basemap("countries")
         rings = np.isnan(rows[:, 0]).sum() + 1
@@ -250,22 +251,103 @@ class TestDownloadedResolutions(unittest.TestCase):
     def urlopen(self, **kwargs):
         return mock.patch.object(basemap.urllib.request, "urlopen", **kwargs)
 
-    def test_bundled_resolution_never_downloads(self):
-        with self.urlopen(side_effect=AssertionError("network")):
-            load_basemap("coastline", BASEMAP_RESOLUTION.LOW)
-            BasemapChart()
+    def coast(self):
+        # a fresh body per call, so one mock serves several downloads
+        return self.urlopen(side_effect=lambda *a, **k: io.BytesIO(COAST_JSON))
 
-    def test_finer_resolution_downloads_once_into_the_cache(self):
-        with self.urlopen(return_value=io.BytesIO(COAST_JSON)) as urlopen:
-            rows = load_basemap("coastline", BASEMAP_RESOLUTION.MEDIUM)
-        self.assertIn("ne_50m_coastline", urlopen.call_args[0][0])
-        self.assertEqual(np.isnan(rows[:, 0]).sum(), 2)
-        self.assertEqual(len(os.listdir(self.folder.name)), 1)
+    def test_every_resolution_downloads_once_into_the_cache(self):
+        for resolution in BASEMAP_RESOLUTIONS:
+            with self.subTest(resolution=resolution):
+                with self.coast() as urlopen:
+                    rows = load_basemap("coastline", resolution)
+                self.assertIn(f"ne_{resolution}_coastline", urlopen.call_args[0][0])
+                self.assertEqual(np.isnan(rows[:, 0]).sum(), 2)
 
-        load_outlines.cache_clear()
-        with self.urlopen(side_effect=AssertionError("network")):
-            cached = load_basemap("coastline", BASEMAP_RESOLUTION.MEDIUM)
-        np.testing.assert_array_equal(cached, rows)
+                load_outlines.cache_clear()
+                with self.urlopen(side_effect=AssertionError("network")):
+                    cached = load_basemap("coastline", resolution)
+                np.testing.assert_array_equal(cached, rows)
+        self.assertEqual(len(os.listdir(self.folder.name)), 3)
+
+    def test_download_waits_long_enough_for_the_largest_layer(self):
+        with self.coast() as urlopen:
+            load_basemap("coastline")
+        self.assertEqual(urlopen.call_args[1]["timeout"], 300)
+
+    def test_rivers_draw_as_lines_at_every_scale(self):
+        for resolution in BASEMAP_RESOLUTIONS:
+            with self.subTest(resolution=resolution):
+                with self.coast() as urlopen:
+                    figure = BasemapChart(BASEMAP_FEATURE.RIVERS, resolution=resolution)
+                self.assertIn(
+                    f"ne_{resolution}_rivers_lake_centerlines",
+                    urlopen.call_args[0][0],
+                )
+                (rivers,) = lines(figure)
+                np.testing.assert_allclose(
+                    rivers.get_colors()[0],
+                    matplotlib.colors.to_rgba(config["plot_basemap_river_color"]),
+                )
+                self.assertAlmostEqual(
+                    rivers.get_linewidths()[0], config["plot_basemap_river_width"]
+                )
+                self.assertEqual(len(fills(figure)), 0)
+
+    def test_roads_draw_as_lines_at_the_finest_scale(self):
+        with self.coast() as urlopen:
+            figure = BasemapChart(
+                BASEMAP_FEATURE.ROADS, resolution=BASEMAP_RESOLUTION.HIGH
+            )
+        self.assertIn("ne_10m_roads", urlopen.call_args[0][0])
+        (roads,) = lines(figure)
+        np.testing.assert_allclose(
+            roads.get_colors()[0],
+            matplotlib.colors.to_rgba(config["plot_basemap_road_color"]),
+        )
+        self.assertAlmostEqual(
+            roads.get_linewidths()[0], config["plot_basemap_road_width"]
+        )
+
+    def test_roads_at_a_scale_without_them_raise_before_downloading(self):
+        for resolution in (BASEMAP_RESOLUTION.LOW, BASEMAP_RESOLUTION.MEDIUM):
+            with self.subTest(resolution=resolution):
+                with self.urlopen(side_effect=AssertionError("network")):
+                    with self.assertRaisesRegex(ValueError, "roads.*'10m'"):
+                        BasemapChart(
+                            [BASEMAP_FEATURE.LAND, BASEMAP_FEATURE.ROADS],
+                            resolution=resolution,
+                        )
+
+    def test_lines_stack_over_the_fills_and_under_the_coast(self):
+        with self.coast():
+            figure = BasemapChart(
+                [
+                    BASEMAP_FEATURE.COASTLINE,
+                    BASEMAP_FEATURE.ROADS,
+                    BASEMAP_FEATURE.BORDERS,
+                    BASEMAP_FEATURE.RIVERS,
+                ],
+                resolution=BASEMAP_RESOLUTION.HIGH,
+            )
+        colors = [
+            matplotlib.colors.to_hex(c.get_colors()[0]).upper() for c in lines(figure)
+        ]
+        expected = [
+            matplotlib.colors.to_hex(config[f"plot_basemap_{key}_color"]).upper()
+            for key in ("river", "road", "border", "coastline")
+        ]
+        self.assertEqual(colors, expected)
+
+    def test_prewarm_fetches_every_feature_the_scale_carries(self):
+        with self.coast() as urlopen:
+            medium = basemap.prewarm(BASEMAP_RESOLUTION.MEDIUM)
+        self.assertNotIn(BASEMAP_FEATURE.ROADS, medium)
+        self.assertIn(BASEMAP_FEATURE.RIVERS, medium)
+        self.assertEqual(urlopen.call_count, len(medium))
+        with self.coast():
+            high = basemap.prewarm(BASEMAP_RESOLUTION.HIGH)
+        self.assertIn(BASEMAP_FEATURE.ROADS, high)
+        self.assertEqual(len(os.listdir(self.folder.name)), len(medium) + len(high))
 
     def test_front_takes_the_resolution(self):
         with self.urlopen(return_value=io.BytesIO(COAST_JSON)) as urlopen:
@@ -373,8 +455,8 @@ class TestBasemapFeatures(unittest.TestCase):
             config.set_theme(THEME.DEFAULT)
 
     def test_unknown_feature_raises(self):
-        with self.assertRaisesRegex(ValueError, "rivers"):
-            BasemapChart("rivers")
+        with self.assertRaisesRegex(ValueError, "glaciers"):
+            BasemapChart("glaciers")
 
     def test_empty_features_raise(self):
         with self.assertRaisesRegex(ValueError, "feature"):
@@ -385,7 +467,7 @@ class TestBasemapGeometry(unittest.TestCase):
     def tearDown(self):
         plt.close("all")
 
-    def test_caller_geometry_replaces_the_bundle(self):
+    def test_caller_geometry_replaces_natural_earth(self):
         figure = BasemapChart(geometry=[ISLAND, ROAD])
         self.assertEqual(len(fills(figure)), 1)
         self.assertEqual(len(lines(figure)), 1)
@@ -424,7 +506,7 @@ class TestBasemapGeometry(unittest.TestCase):
             {"lon": [0, 1]},
             {"lon": [0, 1], "lat": [0]},
             {"lon": ["a", "b"], "lat": [0, 1]},
-            {"lon": [0, 1], "lat": [0, 1], "feature": "rivers"},
+            {"lon": [0, 1], "lat": [0, 1], "feature": "glaciers"},
             [ROAD, "coast"],
             {"lon": [], "lat": []},
             {"lon": [0, 1, 2], "lat": [np.nan] * 3},
