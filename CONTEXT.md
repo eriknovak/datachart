@@ -449,6 +449,14 @@ whose x and y are already longitude and latitude — it transforms nothing, so
 the marks it sits under need no transform either.
 _Avoid_: map, coastline chart, shapefile, geometry (for the front), tile layer
 
+**Cache**:
+The folder holding every asset the package downloads rather than ships: the
+basemap outlines and the theme faces (ADR 0062, 0063). Located by
+`DATACHART_CACHE_DIR`, else `datachart` under `XDG_CACHE_HOME` or `~/.cache`.
+It is the user's to manage, and seedable in one command for a machine with no
+network at render time. Nothing in the wheel is data; everything data is here.
+_Avoid_: bundle, package data, assets folder, vendored data
+
 **Geographic aspect**:
 The axes shape that keeps a small region's proportions right when longitude
 and latitude are plotted straight: one degree of longitude is narrowed by the
@@ -642,6 +650,14 @@ A theme built from a base theme and a lead: the base's furniture, fonts,
 hatches and rendering unchanged, its lead-dependent palettes rebuilt from the
 new lead. It is a plain theme dictionary, applied like any hand-written one.
 _Avoid_: theme variant, recoloured theme, sub-theme
+
+**Font stack**:
+The ordered face names a theme offers for a generic family, resolved to the
+ones this machine can actually use and closed with the generic family itself.
+A face a theme calls its own is downloaded into the cache the first time a
+stack naming it is resolved; one that cannot be fetched warns and drops out,
+leaving the next name in the stack to carry the text (ADR 0063).
+_Avoid_: font family (the generic one), typeface list, bundled font
 
 **Furniture**:
 Everything the panel dresses an axes with around the marks: spines, ticks,
