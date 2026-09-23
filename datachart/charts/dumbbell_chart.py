@@ -2,8 +2,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..utils._internal.validate import (
     validate_dumbbell_records,
     validate_dumbbell_show_values,
@@ -200,6 +199,8 @@ def DumbbellChart(
         The figure containing the dumbbell chart.
 
     """
+    params = dict(locals())
+
     # records and settings fail here, before layers are built
     nested = isinstance(data, list) and bool(data) and isinstance(data[0], list)
     charts_data = data if nested else [data]
@@ -209,55 +210,4 @@ def DumbbellChart(
     validate_dumbbell_show_values(show_values)
     validate_marker_pair(marker)
 
-    if show_legend is None and not subplots:
-        show_legend = start_name is not None or end_name is not None
-
-    charts = build_charts_structure(
-        "dumbbellchart",
-        data,
-        subtitle=subtitle,
-        style=style,
-        xtickrotate=xtickrotate,
-        ytickrotate=ytickrotate,
-        vlines=vlines,
-        hlines=hlines,
-        dlines=dlines,
-        brackets=brackets,
-        vspans=vspans,
-        hspans=hspans,
-        texts=texts,
-        emphasis=emphasis,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "xmin": xmin,
-        "xmax": xmax,
-        "ymin": ymin,
-        "ymax": ymax,
-        "orientation": orientation,
-        "scaley": scaley,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "sharex": sharex,
-        "sharey": sharey,
-        "show_legend": show_legend,
-        "legend": legend,
-        "show_grid": show_grid,
-        "show_values": show_values,
-        "show_direction": show_direction,
-        "value_format": value_format,
-        "sort": sort,
-        "sort_by": sort_by,
-        "start_name": start_name,
-        "end_name": end_name,
-        "marker": marker,
-        "connector_style": connector_style,
-        "emphasis_rule": emphasis_rule,
-    }
-
-    return render_chart("dumbbellchart", charts, settings)
+    return render("dumbbellchart", params)

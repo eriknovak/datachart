@@ -8,12 +8,13 @@ consume.
 """
 
 import warnings
-from typing import Dict, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 
 from .config_helpers import get_subplot_config, configure_labels
 from .figures import new_figure
+from .chart_builder import build_charts_structure
 from .chart_kinds import (
     ChartKind,
     build_chart_panel_settings,
@@ -27,6 +28,31 @@ from ...constants import COLORBAR_LOCATION, FIG_SIZE, ORIENTATION
 # ================================================
 # Chart Rendering
 # ================================================
+
+# the per-chart keys every front shares; a row's `chart_keys` adds its own
+CHART_KEYS = frozenset(
+    {
+        "subtitle",
+        "emphasis",
+        "style",
+        "xticks",
+        "xticklabels",
+        "xtickrotate",
+        "yticks",
+        "yticklabels",
+        "ytickrotate",
+        "vlines",
+        "hlines",
+        "dlines",
+        "brackets",
+        "vspans",
+        "hspans",
+        "texts",
+    }
+)
+
+# rewrites a front's built charts and settings before assembly
+Expand = Callable[[List[dict], dict], Tuple[List[dict], dict]]
 
 # the figure-level settings a subplots figure carries into a grid cell
 SUBPLOT_FURNITURE_KEYS = ("title", "xlabel", "ylabel", "sharex", "sharey")
@@ -84,6 +110,42 @@ def composition_panel(
         title = charts[0].get("subtitle", None)
     composition_settings["title"] = title
     return Panel([group_from_chart(layers, settings)], composition_settings)
+
+
+def render(
+    chart_type: str, params: dict, expand: Optional[Expand] = None
+) -> plt.Figure:
+    """Render a chart front's arguments, split by its row (ADR 0066).
+
+    Per-chart keys are indexed against the charts; every other argument is a
+    figure-level setting, with the row's defaults filling what was left unset.
+
+    Args:
+        chart_type: The chart type, e.g. `"linechart"`.
+        params: The front's arguments by name, `data` among them.
+        expand: Rewrites the built charts and settings before assembly, for a
+            front whose charts are not one per dataset.
+
+    Returns:
+        The rendered figure.
+
+    """
+
+    kind = chart_kind(chart_type)
+    chart_keys = (CHART_KEYS | kind.chart_keys) - kind.figure_keys
+    per_chart = {k: v for k, v in params.items() if k in chart_keys}
+    settings = {k: v for k, v in params.items() if k not in chart_keys and k != "data"}
+    for key, value in kind.defaults.items():
+        if settings.get(key) is None:
+            settings[key] = value
+
+    charts = build_charts_structure(chart_type, params["data"], **per_chart)
+    if kind.legend_default is not None and settings.get("show_legend") is None:
+        chart_list = charts if isinstance(charts, list) else [charts]
+        settings["show_legend"] = kind.legend_default(chart_list, settings)
+    if expand is not None:
+        charts, settings = expand(charts, settings)
+    return render_chart(chart_type, charts, settings)
 
 
 def render_chart(

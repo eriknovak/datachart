@@ -3,8 +3,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     HexbinDataAttrs,
@@ -241,60 +240,5 @@ def HexbinChart(
         The figure containing the hexbin chart.
 
     """
-    # Build the charts structure using shared utility
-    charts = build_charts_structure(
-        "hexbinchart",
-        data,
-        emphasis=emphasis,
-        subtitle=subtitle,
-        style=style,
-        xticks=xticks,
-        xticklabels=xticklabels,
-        xtickrotate=xtickrotate,
-        yticks=yticks,
-        yticklabels=yticklabels,
-        ytickrotate=ytickrotate,
-        vlines=vlines,
-        hlines=hlines,
-        dlines=dlines,
-        brackets=brackets,
-        vspans=vspans,
-        hspans=hspans,
-        texts=texts,
-        gridsize=gridsize,
-        reduce=reduce,
-        mincnt=mincnt,
-        norm=norm,
-        vmin=vmin,
-        vmax=vmax,
-        valfmt=valfmt,
-        colorbar=colorbar,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "emphasis_rule": emphasis_rule,
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "xmin": xmin,
-        "xmax": xmax,
-        "ymin": ymin,
-        "ymax": ymax,
-        "show_legend": show_legend,
-        "legend": legend,
-        "show_grid": show_grid,
-        "aspect_ratio": aspect_ratio,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "sharex": sharex,
-        "sharey": sharey,
-        "show_colorbars": show_colorbars,
-        "scalex": scalex,
-        "scaley": scaley,
-        "xticks_format": xticks_format,
-        "yticks_format": yticks_format,
-    }
-
-    return render_chart("hexbinchart", charts, settings)
+    params = dict(locals())
+    return render("hexbinchart", params)

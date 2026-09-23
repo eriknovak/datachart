@@ -3,8 +3,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -248,6 +247,8 @@ def ContourChart(
         The figure containing the contour chart.
 
     """
+    params = dict(locals())
+
     if filled and emphasis_rule is not None:
         raise ValueError(
             "ContourChart does not support `emphasis_rule` when `filled=True`: "
@@ -262,60 +263,4 @@ def ContourChart(
             "highlight. Use line contours instead."
         )
 
-    # Build the charts structure using shared utility
-    charts = build_charts_structure(
-        "contourchart",
-        data,
-        subtitle=subtitle,
-        emphasis=emphasis,
-        style=style,
-        xticks=xticks,
-        xticklabels=xticklabels,
-        xtickrotate=xtickrotate,
-        yticks=yticks,
-        yticklabels=yticklabels,
-        ytickrotate=ytickrotate,
-        vlines=vlines,
-        hlines=hlines,
-        dlines=dlines,
-        brackets=brackets,
-        vspans=vspans,
-        hspans=hspans,
-        texts=texts,
-        norm=norm,
-        vmin=vmin,
-        vmax=vmax,
-        valfmt=valfmt,
-        colorbar=colorbar,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "emphasis_rule": emphasis_rule,
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "xmin": xmin,
-        "xmax": xmax,
-        "ymin": ymin,
-        "ymax": ymax,
-        "show_legend": show_legend,
-        "legend": legend,
-        "show_grid": show_grid,
-        "aspect_ratio": aspect_ratio,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "sharex": sharex,
-        "sharey": sharey,
-        "filled": filled,
-        "levels": levels,
-        "show_labels": show_labels,
-        "show_colorbars": show_colorbars,
-        "scalex": scalex,
-        "scaley": scaley,
-        "xticks_format": xticks_format,
-        "yticks_format": yticks_format,
-    }
-
-    return render_chart("contourchart", charts, settings)
+    return render("contourchart", params)

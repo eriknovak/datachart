@@ -3,8 +3,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..utils._internal.validate import (
     validate_gantt_groups,
     validate_gantt_sort_by,
@@ -27,7 +26,6 @@ from ..constants import (
     GANTT_DATE_PERIOD,
     GANTT_SORT_KEY,
     GANTT_VALUE,
-    ORIENTATION,
     SHOW_GRID,
     SORT,
     VALUE_FORMAT,
@@ -182,6 +180,8 @@ def GanttChart(
         The figure containing the gantt chart.
 
     """
+    params = dict(locals())
+
     # records fail here, before layers are built; settings fail in the layer
     schedules = data if data and isinstance(data[0], list) else [data]
     sort_key = validate_gantt_sort_by(validate_sort(sort), sort_by)
@@ -191,52 +191,4 @@ def GanttChart(
             records, sort_key if sort is not None else None, show_group_headers
         )
 
-    if show_legend is None:
-        show_legend = not show_group_headers and any(
-            record.get("group") is not None
-            for records in schedules
-            for record in records
-        )
-
-    charts = build_charts_structure(
-        "ganttchart",
-        data,
-        subtitle=subtitle,
-        style=style,
-        xtickrotate=xtickrotate,
-        ytickrotate=ytickrotate,
-        vlines=vlines,
-        vspans=vspans,
-        texts=texts,
-        emphasis=emphasis,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream.
-    # The axis keys are spatial: the date axis is x, the task axis y.
-    settings = {
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "xmin": xmin,
-        "xmax": xmax,
-        "max_cols": 1 if max_cols is None else max_cols,
-        "show_legend": show_legend,
-        "legend": legend,
-        "show_grid": show_grid,
-        "show_values": show_values,
-        "value_format": value_format,
-        "show_dependencies": show_dependencies,
-        "show_today": show_today,
-        "today": today,
-        "today_label": today_label,
-        "period": period,
-        "show_group_headers": show_group_headers,
-        "sort": sort,
-        "sort_by": sort_by,
-        "emphasis_rule": emphasis_rule,
-        "orientation": ORIENTATION.HORIZONTAL,
-        "xticks_format": xticks_format,
-    }
-
-    return render_chart("ganttchart", charts, settings)
+    return render("ganttchart", params)

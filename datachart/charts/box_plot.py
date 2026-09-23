@@ -2,8 +2,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -233,58 +232,5 @@ def BoxPlot(
         The figure containing the box plot.
 
     """
-    # Build the charts structure using shared utility
-    charts = build_charts_structure(
-        "boxplot",
-        data,
-        subtitle=subtitle,
-        emphasis=emphasis,
-        style=style,
-        xticks=xticks,
-        xticklabels=xticklabels,
-        xtickrotate=xtickrotate,
-        yticks=yticks,
-        yticklabels=yticklabels,
-        ytickrotate=ytickrotate,
-        vlines=vlines,
-        hlines=hlines,
-        dlines=dlines,
-        brackets=brackets,
-        vspans=vspans,
-        hspans=hspans,
-        texts=texts,
-        label=label,
-        value=value,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "emphasis_rule": emphasis_rule,
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "xmin": xmin,
-        "xmax": xmax,
-        "ymin": ymin,
-        "ymax": ymax,
-        "show_legend": show_legend,
-        "legend": legend,
-        "show_grid": show_grid,
-        "aspect_ratio": aspect_ratio,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "sharex": sharex,
-        "sharey": sharey,
-        "show_outliers": show_outliers,
-        "show_notch": show_notch,
-        "show_values": show_values,
-        "value_format": value_format,
-        "orientation": orientation,
-        "sort": sort,
-        "scaley": scaley,
-        "xticks_format": xticks_format,
-        "yticks_format": yticks_format,
-    }
-
-    return render_chart("boxplot", charts, settings)
+    params = dict(locals())
+    return render("boxplot", params)

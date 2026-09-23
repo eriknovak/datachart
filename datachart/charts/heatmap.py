@@ -2,8 +2,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -170,58 +169,5 @@ def Heatmap(
         The figure containing the heatmap.
 
     """
-    if not all(
-        isinstance(grid, dict) for grid in (data if isinstance(data, list) else [data])
-    ):
-        raise ValueError(
-            'Heatmap `data` must be a `{"z": [[...], ...]}` dict with optional '
-            '`"x"` column labels and `"y"` row labels, or a list of such dicts.'
-        )
-
-    charts = build_charts_structure(
-        "heatmap",
-        data,
-        emphasis=emphasis,
-        subtitle=subtitle,
-        style=style,
-        xticks=xticks,
-        xticklabels=xticklabels,
-        xtickrotate=xtickrotate,
-        yticks=yticks,
-        yticklabels=yticklabels,
-        ytickrotate=ytickrotate,
-        norm=norm,
-        vmin=vmin,
-        vmax=vmax,
-        vcenter=vcenter,
-        valfmt=valfmt,
-        colorbar=colorbar,
-        texts=texts,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "emphasis_rule": emphasis_rule,
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "xmin": xmin,
-        "xmax": xmax,
-        "ymin": ymin,
-        "ymax": ymax,
-        "show_legend": show_legend,
-        "legend": legend,
-        "show_grid": show_grid,
-        "aspect_ratio": aspect_ratio,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "sharex": sharex,
-        "sharey": sharey,
-        "show_colorbars": show_colorbars,
-        "show_heatmap_values": show_heatmap_values,
-        "xticks_format": xticks_format,
-        "yticks_format": yticks_format,
-    }
-
-    return render_chart("heatmap", charts, settings)
+    params = dict(locals())
+    return render("heatmap", params)

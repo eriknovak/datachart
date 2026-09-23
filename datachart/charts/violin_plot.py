@@ -2,8 +2,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..utils._internal.validate import validate_bandwidth
 from ..typings import (
     EmphasisRuleAttrs,
@@ -244,65 +243,12 @@ def ViolinPlot(
         The figure containing the violin plot.
 
     """
+    params = dict(locals())
+
     if inner not in INNER_OPTIONS:
         raise ValueError(
             f"Invalid `inner` value {inner!r}. Must be one of {INNER_OPTIONS}."
         )
     validate_bandwidth(bandwidth)
 
-    # Build the charts structure using shared utility
-    charts = build_charts_structure(
-        "violinplot",
-        data,
-        subtitle=subtitle,
-        emphasis=emphasis,
-        style=style,
-        xticks=xticks,
-        xticklabels=xticklabels,
-        xtickrotate=xtickrotate,
-        yticks=yticks,
-        yticklabels=yticklabels,
-        ytickrotate=ytickrotate,
-        vlines=vlines,
-        hlines=hlines,
-        dlines=dlines,
-        brackets=brackets,
-        vspans=vspans,
-        hspans=hspans,
-        texts=texts,
-        label=label,
-        value=value,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "emphasis_rule": emphasis_rule,
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "xmin": xmin,
-        "xmax": xmax,
-        "ymin": ymin,
-        "ymax": ymax,
-        "show_legend": show_legend,
-        "legend": legend,
-        "show_grid": show_grid,
-        "show_values": show_values,
-        "value_format": value_format,
-        "aspect_ratio": aspect_ratio,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "sharex": sharex,
-        "sharey": sharey,
-        "inner": inner,
-        "bandwidth": bandwidth,
-        "split": split,
-        "orientation": orientation,
-        "sort": sort,
-        "scaley": scaley,
-        "xticks_format": xticks_format,
-        "yticks_format": yticks_format,
-    }
-
-    return render_chart("violinplot", charts, settings)
+    return render("violinplot", params)

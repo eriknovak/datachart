@@ -28,7 +28,7 @@ class TestHeatmapData(unittest.TestCase):
     def test_bare_list_raises(self):
         with self.assertRaises(ValueError) as cm:
             Heatmap(Z)
-        self.assertIn('{"z": ', str(cm.exception))
+        self.assertIn("a dict with `z`", str(cm.exception))
 
     def test_bare_list_of_lists_raises(self):
         with self.assertRaises(ValueError):

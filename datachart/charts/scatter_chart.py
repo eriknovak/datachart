@@ -3,8 +3,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..utils._internal.validate import validate_point_labels
 from ..typings import (
     EmphasisRuleAttrs,
@@ -306,69 +305,8 @@ def ScatterChart(
         The figure containing the scatter chart.
 
     """
+    params = dict(locals())
+
     # Build the charts structure using shared utility
     validate_point_labels(label, show_values)
-    charts = build_charts_structure(
-        "scatterchart",
-        data,
-        subtitle=subtitle,
-        emphasis=emphasis,
-        style=style,
-        xticks=xticks,
-        xticklabels=xticklabels,
-        xtickrotate=xtickrotate,
-        yticks=yticks,
-        yticklabels=yticklabels,
-        ytickrotate=ytickrotate,
-        vlines=vlines,
-        hlines=hlines,
-        dlines=dlines,
-        brackets=brackets,
-        vspans=vspans,
-        hspans=hspans,
-        texts=texts,
-        x=x,
-        y=y,
-        size=size,
-        hue=hue,
-        label=label,
-        xerr=xerr,
-        yerr=yerr,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "emphasis_rule": emphasis_rule,
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "xmin": xmin,
-        "xmax": xmax,
-        "ymin": ymin,
-        "ymax": ymax,
-        "show_legend": show_legend,
-        "legend": legend,
-        "show_grid": show_grid,
-        "show_xerr": show_xerr,
-        "show_yerr": show_yerr,
-        "aspect_ratio": aspect_ratio,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "sharex": sharex,
-        "sharey": sharey,
-        "show_regression": show_regression,
-        "show_ci": show_ci,
-        "ci_level": ci_level,
-        "show_correlation": show_correlation,
-        "show_values": show_values,
-        "value_format": value_format,
-        "value_step": value_step,
-        "scalex": scalex,
-        "scaley": scaley,
-        "size_range": size_range,
-        "xticks_format": xticks_format,
-        "yticks_format": yticks_format,
-    }
-
-    return render_chart("scatterchart", charts, settings)
+    return render("scatterchart", params)

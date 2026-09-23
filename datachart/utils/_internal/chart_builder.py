@@ -265,6 +265,31 @@ def build_chart_dict_single(
     return chart_dict
 
 
+def dict_datasets(chart_type: str, data: Any) -> List[dict]:
+    """One dict per chart, checked against the keys the front's row requires.
+
+    Args:
+        chart_type: The chart type whose row names the required keys.
+        data: One chart's dict, or a list of them.
+
+    Returns:
+        The datasets as a list, one per chart.
+
+    Raises:
+        ValueError: If a dataset is not a dict or misses a required key.
+    """
+    kind = chart_kind(chart_type)
+    datasets = data if isinstance(data, list) else [data]
+    keys = kind.data_keys or ()
+    if not all(isinstance(d, dict) and all(k in d for k in keys) for d in datasets):
+        shape = " and ".join(f"`{k}`" for k in keys)
+        raise ValueError(
+            f"{kind.label[0].upper()}{kind.label[1:]} `data` must be a dict"
+            f"{' with ' + shape if shape else ''}, or a list of such dicts."
+        )
+    return datasets
+
+
 def build_charts_structure(
     chart_type: str,
     data: Any,
@@ -315,13 +340,15 @@ def build_charts_structure(
         Either a single chart dict or a list of chart dicts.
 
     Raises:
-        ValueError: If the chart type has no row, or a parameter the row
-            rejects is set.
+        ValueError: If the chart type has no row, a parameter the row
+            rejects is set, or the data misses the row's dict shape.
     """
     kind = chart_kind(chart_type)
     for name, reason in kind.rejects.items():
         if extra_attrs.get(name) is not None:
             raise ValueError(reason)
+    if kind.data_keys is not None:
+        dict_datasets(chart_type, data)
 
     # Detect if data is for multiple charts
     if kind.dict_data:

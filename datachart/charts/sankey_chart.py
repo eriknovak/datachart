@@ -2,8 +2,8 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
+from ..utils._internal.chart_builder import dict_datasets
 from ..utils._internal.validate import validate_sankey_links, validate_sankey_nodes
 from ..typings import SankeySingleChartAttrs, SankeyStyleAttrs, TextSettingAttrs
 from ..constants import FIG_SIZE, VALUE_FORMAT
@@ -96,36 +96,11 @@ def SankeyChart(
             `column_labels` does not match the number of columns.
 
     """
-    datasets = data if isinstance(data, list) else [data]
-    if not all(isinstance(d, dict) and "links" in d for d in datasets):
-        raise ValueError(
-            'SankeyChart `data` must be a `{"links": [...]}` dict, or a list of '
-            "such dicts."
-        )
-    for dataset in datasets:
+    params = dict(locals())
+
+    for dataset in dict_datasets("sankeychart", data):
         validate_sankey_links(dataset["links"])
         if nodes is not None:
             validate_sankey_nodes(nodes, dataset["links"])
 
-    charts = build_charts_structure(
-        "sankeychart",
-        data,
-        emphasis=emphasis,
-        subtitle=subtitle,
-        style=style,
-        texts=texts,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "title": title,
-        "figsize": figsize,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "nodes": nodes,
-        "column_labels": column_labels,
-        "show_values": show_values,
-        "value_format": value_format,
-    }
-
-    return render_chart("sankeychart", charts, settings)
+    return render("sankeychart", params)

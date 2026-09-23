@@ -3,8 +3,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..utils._internal.validate import (
     validate_calendar_dates,
     validate_calendar_year,
@@ -147,49 +146,23 @@ def CalendarHeatmap(
             [`CALENDAR_WEEKDAY`][datachart.constants.CALENDAR_WEEKDAY] member.
 
     """
-    datasets = data if isinstance(data, list) else [data]
-    if not all(isinstance(d, dict) and "date" in d and "value" in d for d in datasets):
-        raise ValueError(
-            'CalendarHeatmap `data` must be a `{"date": [...], "value": [...]}` '
-            "dict, or a list of such dicts."
-        )
+    params = dict(locals())
+    return render("calendarheatmap", params, expand=_year_panels)
 
-    charts = build_charts_structure(
-        "calendarheatmap",
-        data,
-        emphasis=emphasis,
-        subtitle=subtitle,
-        style=style,
-        norm=norm,
-        vmin=vmin,
-        vmax=vmax,
-        vcenter=vcenter,
-        colorbar=colorbar,
-        texts=texts,
-    )
+
+def _year_panels(
+    charts: Union[dict, List[dict]], settings: dict
+) -> Tuple[List[dict], dict]:
+    """One chart per calendar year, on a figure tall enough for their rows."""
+
     charts = charts if isinstance(charts, list) else [charts]
+    year = settings.get("year")
     charts = [panel for chart in charts for panel in _year_charts(chart, year)]
-
-    max_cols = 1 if max_cols is None else max_cols
-    if figsize is None:
-        rows = math.ceil(len(charts) / max_cols)
+    if settings.get("figsize") is None:
+        rows = math.ceil(len(charts) / settings["max_cols"])
         figsize = (FIG_SIZE.DEFAULT[0], CALENDAR_ROW_HEIGHT * rows)
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "title": title,
-        "figsize": figsize,
-        "aspect_ratio": ASPECT_RATIO.EQUAL if aspect_ratio is None else aspect_ratio,
-        "max_cols": max_cols,
-        "week_start": week_start,
-        "show_month_labels": show_month_labels,
-        "show_weekday_labels": show_weekday_labels,
-        "show_colorbars": show_colorbars,
-        "show_values": show_values,
-        "value_format": value_format,
-    }
-
-    return render_chart("calendarheatmap", charts, settings)
+        settings = {**settings, "figsize": figsize}
+    return charts, settings
 
 
 def _year_charts(chart: dict, year: Optional[int]) -> List[dict]:

@@ -2,8 +2,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..utils._internal.validate import validate_bandwidth
 from ..typings import (
     EmphasisRuleAttrs,
@@ -253,61 +252,8 @@ def RidgelinePlot(
             both `fill` and `show_outline` are False.
 
     """
+    params = dict(locals())
+
     validate_bandwidth(bandwidth)
 
-    charts = build_charts_structure(
-        "ridgelineplot",
-        data,
-        subtitle=subtitle,
-        emphasis=emphasis,
-        style=style,
-        xticks=xticks,
-        xticklabels=xticklabels,
-        xtickrotate=xtickrotate,
-        yticks=yticks,
-        yticklabels=yticklabels,
-        ytickrotate=ytickrotate,
-        vlines=vlines,
-        hlines=hlines,
-        dlines=dlines,
-        brackets=brackets,
-        vspans=vspans,
-        hspans=hspans,
-        texts=texts,
-        label=label,
-        value=value,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "emphasis_rule": emphasis_rule,
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "xmin": xmin,
-        "xmax": xmax,
-        "ymin": ymin,
-        "ymax": ymax,
-        "show_legend": show_legend,
-        "legend": legend,
-        "show_grid": show_grid,
-        "aspect_ratio": aspect_ratio,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "sharex": sharex,
-        "sharey": sharey,
-        "bandwidth": bandwidth,
-        "overlap": overlap,
-        "normalize": normalize,
-        "inner": inner,
-        "fill": fill,
-        "show_outline": show_outline,
-        "sort": sort,
-        "orientation": orientation,
-        "scaley": scaley,
-        "xticks_format": xticks_format,
-        "yticks_format": yticks_format,
-    }
-
-    return render_chart("ridgelineplot", charts, settings)
+    return render("ridgelineplot", params)

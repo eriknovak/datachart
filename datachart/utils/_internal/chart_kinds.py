@@ -6,7 +6,7 @@ before anything is drawn.
 """
 
 from dataclasses import dataclass, field
-from typing import Callable, List, Mapping, Optional, Type
+from typing import Any, Callable, FrozenSet, List, Mapping, Optional, Tuple, Type
 
 from .config_helpers import (
     get_grid_style,
@@ -81,6 +81,26 @@ def _filled(settings: dict) -> bool:
     return bool(settings.get("filled"))
 
 
+def _bump_legend(charts: List[dict], settings: dict) -> Optional[bool]:
+    # without end labels the legend names the lines
+    return settings.get("show_labels") is False and not settings.get("subplots")
+
+
+def _dumbbell_legend(charts: List[dict], settings: dict) -> Optional[bool]:
+    if settings.get("subplots"):
+        return None
+    return (
+        settings.get("start_name") is not None or settings.get("end_name") is not None
+    )
+
+
+def _gantt_legend(charts: List[dict], settings: dict) -> Optional[bool]:
+    # group headers already name the groups
+    return not settings.get("show_group_headers") and any(
+        record.get("group") is not None for chart in charts for record in chart["data"]
+    )
+
+
 @dataclass(frozen=True)
 class ChartKind:
     """Everything the engine, builder, and composition read about a front.
@@ -88,6 +108,13 @@ class ChartKind:
     Attributes:
         name: The chart-type string the front renders under, e.g. `"linechart"`.
         label: The front's name in error messages, e.g. `"box plot"`.
+        chart_keys: The front's own per-chart parameters, indexed against the
+            charts beside the engine's shared per-chart keys (ADR 0066).
+        figure_keys: Shared per-chart keys the front's panel reads whole, so
+            they stay figure-level settings.
+        defaults: Settings a front fixes when its caller left them unset.
+        legend_default: The `show_legend` value when the caller left it None,
+            given the charts and settings.
         layer: The layer class drawing each chart; for a front assembled from
             several layers, the class of its primary mark.
         build: Builds all of the front's layers from its charts and settings,
@@ -95,6 +122,8 @@ class ChartKind:
         projection: The axes projection, e.g. `"polar"`; None is Cartesian.
         dict_data: One chart's `data` is a dict (a grid, links, a tree), so
             several charts come as a list of dicts rather than of lists.
+        data_keys: The keys one chart's `data` dict must carry; None skips
+            the shape check.
         multiplot: Several charts may share one axes.
         subplots: The charts may split into one subplot each.
         single_dataset: Several datasets need `subplots=True`.
@@ -125,9 +154,14 @@ class ChartKind:
     name: str
     label: str
     layer: Type[Layer]
+    chart_keys: FrozenSet[str] = frozenset()
+    figure_keys: FrozenSet[str] = frozenset()
+    defaults: Mapping[str, Any] = field(default_factory=dict)
+    legend_default: Optional[Callable[[List[dict], dict], Optional[bool]]] = None
     build: Optional[Callable[[List[dict], dict], List[Layer]]] = None
     projection: Optional[str] = None
     dict_data: bool = False
+    data_keys: Optional[Tuple[str, ...]] = None
     multiplot: bool = True
     subplots: bool = True
     single_dataset: bool = False
@@ -167,7 +201,7 @@ def _parallel_layers(charts: List[dict], settings: dict) -> List[Layer]:
 
 
 def _radial_layers(charts: List[dict], settings: dict) -> List[Layer]:
-    visual = settings.get("radial_type") or RADIAL_TYPE.LINE
+    visual = settings.get("type") or RADIAL_TYPE.LINE
     if visual not in RADIAL_LAYER_TYPES:
         raise ValueError(
             f"Invalid radial `type` value {visual!r}. "
@@ -199,8 +233,8 @@ def _ridgeline_layers(charts: List[dict], settings: dict) -> List[Layer]:
 # ================================================
 
 
-def _no_emphasis(reason: str) -> Mapping[str, str]:
-    return {"emphasis": reason}
+def _no_emphasis(front: str, reason: str) -> Mapping[str, str]:
+    return {"emphasis": f"{front} does not support `emphasis`: {reason}"}
 
 
 _KINDS = (
@@ -208,6 +242,7 @@ _KINDS = (
         "linechart",
         "line chart",
         LineLayer,
+        chart_keys=frozenset({"x", "y", "yerr"}),
         tighten_xlim=True,
         emphasis_units=series_units("y"),
         emphasis_by="mean",
@@ -216,6 +251,7 @@ _KINDS = (
         "stackedareachart",
         "stacked area chart",
         StackedAreaLayer,
+        chart_keys=frozenset({"x", "y"}),
         tighten_xlim=True,
         emphasis_units=series_units("y"),
         emphasis_by="mean",
@@ -224,6 +260,8 @@ _KINDS = (
         "bumpchart",
         "bump chart",
         BumpLayer,
+        chart_keys=frozenset({"x", "y"}),
+        legend_default=_bump_legend,
         # a bump chart's ranks read from the lines and labels
         gridless=_always,
         tighten_xlim=True,
@@ -238,6 +276,7 @@ _KINDS = (
         "barchart",
         "bar chart",
         BarLayer,
+        chart_keys=frozenset({"label", "y", "yerr"}),
         swaps_horizontal_labels=True,
         emphasis_units=bar_units,
         order=sort_bar_charts,
@@ -247,6 +286,10 @@ _KINDS = (
         "pyramidchart",
         "pyramid",
         BarLayer,
+        chart_keys=frozenset({"label", "y", "yerr"}),
+        # the panel mirrors the value ticks to both halves (ADR 0017)
+        figure_keys=frozenset({"xticks", "xticklabels", "xtickrotate"}),
+        defaults={"pyramid": True, "orientation": ORIENTATION.HORIZONTAL},
         subplots=False,
         # unmirrored data on a mirrored axis would silently mangle (ADR 0017)
         overlayable=False,
@@ -258,6 +301,7 @@ _KINDS = (
         "radialchart",
         "radial chart",
         RadialLayer,
+        chart_keys=frozenset({"label", "x", "y", "yerr"}),
         build=_radial_layers,
         projection="polar",
         # the front takes a rule and a sort on the bar visual only
@@ -268,11 +312,15 @@ _KINDS = (
         "calendarheatmap",
         "calendar heatmap",
         CalendarHeatmapLayer,
+        chart_keys=frozenset({"colorbar", "norm", "vcenter", "vmax", "vmin"}),
+        defaults={"aspect_ratio": ASPECT_RATIO.EQUAL, "max_cols": 1},
         dict_data=True,
+        data_keys=("date", "value"),
         multiplot=False,
         rejects=_no_emphasis(
-            "CalendarHeatmap does not support `emphasis`: a calendar is a single "
-            "raster layer with no series to mute or highlight."
+            "CalendarHeatmap",
+            "a calendar is a single raster layer with no series to mute or "
+            "highlight.",
         ),
         overlayable=False,
         gridless=_always,
@@ -281,6 +329,8 @@ _KINDS = (
         "ganttchart",
         "gantt",
         GanttLayer,
+        defaults={"max_cols": 1, "orientation": ORIENTATION.HORIZONTAL},
+        legend_default=_gantt_legend,
         multiplot=False,
         # a horizontal panel's twin is a second x, off the task rows (ADR 0049)
         overlayable=False,
@@ -291,6 +341,7 @@ _KINDS = (
         "dumbbellchart",
         "dumbbell chart",
         DumbbellLayer,
+        legend_default=_dumbbell_legend,
         group=True,
         grid_on_value_axis=True,
         emphasis_units=dumbbell_units,
@@ -300,6 +351,7 @@ _KINDS = (
         "histogram",
         "histogram",
         HistogramLayer,
+        chart_keys=frozenset({"x"}),
         # histograms stack by default; bars group (ADR 0014)
         bar_mode="stack",
         shared_bins=True,
@@ -312,6 +364,7 @@ _KINDS = (
         "boxplot",
         "box plot",
         BoxLayer,
+        chart_keys=frozenset({"label", "value"}),
         multiplot=False,
         single_dataset=True,
         group=True,
@@ -322,6 +375,7 @@ _KINDS = (
         "violinplot",
         "violin plot",
         ViolinLayer,
+        chart_keys=frozenset({"label", "value"}),
         multiplot=False,
         single_dataset=True,
         group=True,
@@ -332,6 +386,7 @@ _KINDS = (
         "swarmplot",
         "swarm plot",
         SwarmLayer,
+        chart_keys=frozenset({"label", "value"}),
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -340,6 +395,7 @@ _KINDS = (
         "raincloudplot",
         "raincloud plot",
         ViolinLayer,
+        chart_keys=frozenset({"label", "value"}),
         build=_raincloud_layers,
         multiplot=False,
         group=True,
@@ -350,6 +406,7 @@ _KINDS = (
         "ridgelineplot",
         "ridgeline plot",
         RidgelineLayer,
+        chart_keys=frozenset({"label", "value"}),
         build=_ridgeline_layers,
         multiplot=False,
         group=True,
@@ -360,6 +417,7 @@ _KINDS = (
         "scatterchart",
         "scatter chart",
         ScatterLayer,
+        chart_keys=frozenset({"hue", "label", "size", "x", "xerr", "y", "yerr"}),
         emphasis_units=series_units("y"),
         emphasis_by="mean",
     ),
@@ -367,12 +425,14 @@ _KINDS = (
         "heatmap",
         "heatmap",
         HeatmapLayer,
+        chart_keys=frozenset({"colorbar", "norm", "valfmt", "vcenter", "vmax", "vmin"}),
         dict_data=True,
+        data_keys=("z",),
         multiplot=False,
         rejects=_no_emphasis(
-            "Heatmap does not support `emphasis`: a heatmap has no series to "
-            "mute or highlight. Set the `emphasis` grid on `data` for per-cell "
-            "roles instead."
+            "Heatmap",
+            "a heatmap has no series to mute or highlight. Set the `emphasis` "
+            "grid on `data` for per-cell roles instead.",
         ),
         overlayable=False,
         # a raster covers the grid
@@ -384,6 +444,7 @@ _KINDS = (
         "contourchart",
         "contour chart",
         ContourLayer,
+        chart_keys=frozenset({"colorbar", "norm", "valfmt", "vmax", "vmin"}),
         dict_data=True,
         # filled contour bands cover the grid
         gridless=_filled,
@@ -394,10 +455,23 @@ _KINDS = (
         "hexbinchart",
         "hexbin chart",
         HexbinLayer,
+        chart_keys=frozenset(
+            {
+                "colorbar",
+                "gridsize",
+                "mincnt",
+                "norm",
+                "reduce",
+                "valfmt",
+                "vmax",
+                "vmin",
+            }
+        ),
         dict_data=True,
         rejects=_no_emphasis(
-            "HexbinChart does not support `emphasis`: a hexbin chart is a single "
-            "colormapped layer with no series to mute or highlight."
+            "HexbinChart",
+            "a hexbin chart is a single colormapped layer with no series to "
+            "mute or highlight.",
         ),
         # hexagons cover the grid
         gridless=_always,
@@ -406,6 +480,7 @@ _KINDS = (
         "parallelcoords",
         "parallel coordinates",
         ParallelCoordsLayer,
+        chart_keys=frozenset({"category_orders", "dimensions", "hue"}),
         build=_parallel_layers,
         subplots=False,
         emphasis_units=parallel_units,
@@ -415,10 +490,11 @@ _KINDS = (
         "network",
         NetworkLayer,
         dict_data=True,
+        data_keys=("edges",),
         multiplot=False,
         rejects=_no_emphasis(
-            "NetworkChart does not support the `emphasis` argument: set the "
-            "`emphasis` key on the nodes to mute or highlight instead."
+            "NetworkChart",
+            "set the `emphasis` key on the nodes to mute or highlight instead.",
         ),
         overlayable=False,
         emphasis_units=network_units,
@@ -445,10 +521,10 @@ _KINDS = (
         "Sankey",
         SankeyLayer,
         dict_data=True,
+        data_keys=("links",),
         multiplot=False,
         rejects=_no_emphasis(
-            "SankeyChart does not support `emphasis`: a Sankey has no series "
-            "to mute or highlight."
+            "SankeyChart", "a Sankey has no series to mute or highlight."
         ),
         overlayable=False,
     ),
@@ -457,10 +533,11 @@ _KINDS = (
         "treemap",
         TreemapLayer,
         dict_data=True,
+        data_keys=("data",),
         multiplot=False,
         rejects=_no_emphasis(
-            "Treemap does not support the `emphasis` argument: set the "
-            "`emphasis` key on the records to mute or highlight instead."
+            "Treemap",
+            "set the `emphasis` key on the records to mute or highlight instead.",
         ),
         overlayable=False,
         emphasis_units=treemap_units,
