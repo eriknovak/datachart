@@ -890,12 +890,15 @@ def basemap_feature():
     members = [
         ("COASTLINE", BASEMAP_FEATURE.COASTLINE),
         ("LAND", BASEMAP_FEATURE.LAND),
+        ("COUNTRIES", BASEMAP_FEATURE.COUNTRIES),
         ("BORDERS", BASEMAP_FEATURE.BORDERS),
         ("LAKES", BASEMAP_FEATURE.LAKES),
     ]
     figs = [
         BasemapChart(
             value,
+            # countries are one area each; highlight picks the Baltic states
+            highlight=["EST", "LVA", "LTU"] if label == "COUNTRIES" else None,
             title=f"BASEMAP_FEATURE.{label}",
             xmin=5,
             xmax=40,
@@ -908,10 +911,11 @@ def basemap_feature():
     chart_grid(
         figs,
         "const-basemap-feature.svg",
-        4.4,
+        6.4,
         cols=2,
-        footnote="The lakes are drawn in blue here; by default they take the "
-        "axes background, so they read as the sea does.",
+        footnote="COUNTRIES highlights the Baltic states here. The lakes are drawn "
+        "in blue; by default they take the axes background, so they read as "
+        "the sea does.",
     )
 
 

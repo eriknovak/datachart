@@ -4,7 +4,8 @@ on first use into a local cache (ADR 0061).
 Every set is a float32 `(n, 2)` array of longitude and latitude per feature,
 a `NaN` row between one outline and the next. Polygon rings are oriented so
 a filled path draws their holes: exteriors counter-clockwise, holes
-clockwise.
+clockwise. The countries also carry one Natural Earth `ADM0_A3` code per
+ring.
 """
 
 import functools
@@ -27,6 +28,7 @@ SOURCE = (
 LAYERS = {
     "coastline": "coastline",
     "land": "land",
+    "countries": "admin_0_countries",
     # land boundaries only: a country outline would redraw the coastline
     "borders": "admin_0_boundary_lines_land",
     "lakes": "lakes",
@@ -37,6 +39,8 @@ BUNDLED = (
     / "_basemap"
     / "natural_earth_110m.npz"
 )
+# the key of a country: ISO_A3 is -99 for France and Norway, this never is
+COUNTRY_KEY = "ADM0_A3"
 CACHE_ENV = "DATACHART_CACHE_DIR"
 DOWNLOAD_TIMEOUT = 60
 
@@ -77,17 +81,21 @@ def _outlines(geometry: dict) -> list:
     return rings
 
 
-def convert(collection: dict) -> np.ndarray:
-    """A GeoJSON feature collection as `NaN`-separated float32 lon/lat rows."""
+def convert(collection: dict) -> tuple:
+    """A GeoJSON feature collection as `NaN`-separated float32 lon/lat rows,
+    and the country code of each outline ("" where a feature has none)."""
 
-    parts = []
+    parts, codes = [], []
     for feature in collection["features"]:
+        code = (feature.get("properties") or {}).get(COUNTRY_KEY) or ""
         for outline in _outlines(feature["geometry"]):
             parts += [outline[:, :2], np.full((1, 2), np.nan)]
-    return np.concatenate(parts[:-1]).astype(np.float32)
+            codes.append(code)
+    rows = np.concatenate(parts[:-1]).astype(np.float32)
+    return rows, np.array(codes, dtype="U3")
 
 
-def fetch(feature: str, resolution: str) -> np.ndarray:
+def fetch(feature: str, resolution: str) -> tuple:
     """Download one Natural Earth layer and convert it."""
 
     url = SOURCE.format(resolution=resolution, layer=LAYERS[feature])
@@ -103,20 +111,36 @@ def fetch(feature: str, resolution: str) -> np.ndarray:
 
 
 @functools.lru_cache(maxsize=None)
-def load_basemap(feature: str, resolution: str = BASEMAP_RESOLUTION.LOW) -> np.ndarray:
-    """One feature as `(n, 2)` lon/lat rows, downloading a finer one once."""
+def load_outlines(feature: str, resolution: str) -> dict:
+    """One feature's `rows` and `codes`, downloading a finer one once."""
 
     if resolution == BASEMAP_RESOLUTION.LOW:
         with np.load(BUNDLED) as bundle:
-            return bundle[feature].astype(float)
-    path = cache_dir() / f"natural_earth_{resolution}_{feature}.npy"
+            return {
+                "rows": bundle[feature].astype(float),
+                "codes": bundle.get(f"{feature}_codes"),
+            }
+    path = cache_dir() / f"natural_earth_{resolution}_{feature}.npz"
     if not path.exists():
-        rows = fetch(feature, resolution)
+        rows, codes = fetch(feature, resolution)
         path.parent.mkdir(parents=True, exist_ok=True)
         # written aside and renamed, so an interrupted write leaves no half file
         with tempfile.NamedTemporaryFile(
-            dir=path.parent, suffix=".npy", delete=False
+            dir=path.parent, suffix=".npz", delete=False
         ) as partial:
-            np.save(partial, rows)
+            np.savez_compressed(partial, rows=rows, codes=codes)
         os.replace(partial.name, path)
-    return np.load(path).astype(float)
+    with np.load(path) as cached:
+        return {"rows": cached["rows"].astype(float), "codes": cached["codes"]}
+
+
+def load_basemap(feature: str, resolution: str = BASEMAP_RESOLUTION.LOW) -> np.ndarray:
+    """One feature as `(n, 2)` lon/lat rows, `NaN` between outlines."""
+
+    return load_outlines(feature, resolution)["rows"]
+
+
+def load_country_codes(resolution: str = BASEMAP_RESOLUTION.LOW) -> np.ndarray:
+    """The `ADM0_A3` code of each country outline, in outline order."""
+
+    return load_outlines("countries", resolution)["codes"]

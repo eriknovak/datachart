@@ -24,6 +24,7 @@ def BasemapChart(
     features: Optional[Union[BASEMAP_FEATURE, str, List[str]]] = None,
     *,
     resolution: Optional[Union[BASEMAP_RESOLUTION, str]] = None,
+    highlight: Optional[Union[str, List[str]]] = None,
     geometry: Optional[Union[BasemapDataAttrs, List[BasemapDataAttrs]]] = None,
     position: Optional[Union[DRAW_POSITION, str]] = None,
     title: Optional[str] = None,
@@ -49,7 +50,9 @@ def BasemapChart(
     epicentres, a scatter of stations, a line of a ship's track.
 
     The map carries no series: it takes no cycle color, no legend entry and
-    no emphasis, and its greys come from the theme. `position` decides where
+    no emphasis, and its greys come from the theme. With the countries
+    feature, `highlight` picks countries out by their three-letter code: the
+    ones listed take the highlight color, the rest stay the land's grey. `position` decides where
     it sits in the draw order, under the gridlines and every mark by
     default. Composed with other charts it leaves the axis limits to their
     data; alone it frames its own outlines. `aspect_ratio="geographic"`
@@ -86,9 +89,12 @@ def BasemapChart(
         resolution: The Natural Earth scale: `"110m"` (default) ships with the
             package, `"50m"` and `"10m"` are downloaded once on first use. See
             [`BASEMAP_RESOLUTION`][datachart.constants.BASEMAP_RESOLUTION].
+        highlight: The countries to pick out, as Natural Earth's three-letter
+            `ADM0_A3` codes (`"SVN"`, `"FRA"`); needs the `"countries"`
+            feature. A code too small to draw at the chosen resolution warns.
         geometry: Your own outlines, drawn in place of the bundled ones: a
             `{"lon", "lat", "feature"}` dict, or a list of them. Cannot be
-            combined with `features` or `resolution`. See
+            combined with `features`, `resolution` or `highlight`. See
             [`BasemapDataAttrs`][datachart.typings.BasemapDataAttrs].
         position: Where the map sits in the draw order: `"below"` (default)
             under the gridlines and every mark, or `"above"` over the marks and
@@ -118,7 +124,9 @@ def BasemapChart(
     Raises:
         ValueError: If a feature is not a `BASEMAP_FEATURE`, `resolution` is not
             a `BASEMAP_RESOLUTION`, `geometry` is not outlines of matching
-            longitudes and latitudes or comes with `features` or `resolution`,
+            longitudes and latitudes or comes with `features`, `resolution`
+            or `highlight`, a `highlight` code is not three letters or comes
+            without the countries feature,
             `position` is not a `DRAW_POSITION`, or a geographic aspect meets a
             y-axis outside -90 to 90.
         RuntimeError: If a finer resolution is not cached and cannot be
@@ -128,7 +136,12 @@ def BasemapChart(
     validate_draw_position(position)
 
     charts = build_charts_structure(
-        {"features": features, "resolution": resolution, "geometry": geometry},
+        {
+            "features": features,
+            "resolution": resolution,
+            "highlight": highlight,
+            "geometry": geometry,
+        },
         style=style,
         is_2d_data=True,
     )

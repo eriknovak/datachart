@@ -7,6 +7,7 @@ import math
 import os
 import tempfile
 import unittest
+import warnings
 from unittest import mock
 
 import numpy as np
@@ -14,7 +15,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.collections import LineCollection
+from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.patches import PathPatch
 
 from datachart.charts import BasemapChart, HexbinChart, LineChart, ScatterChart
@@ -28,7 +29,11 @@ from datachart.constants import (
 )
 from datachart.utils import Grid, Panel
 from datachart.utils._internal import basemap
-from datachart.utils._internal.basemap import load_basemap
+from datachart.utils._internal.basemap import (
+    load_basemap,
+    load_country_codes,
+    load_outlines,
+)
 from datachart.utils._internal.layers import DRAW_ZORDER
 
 # a square island with a square lake, and a line across it
@@ -50,6 +55,28 @@ def lines(figure):
 
 def fills(figure):
     return [p for p in figure.axes[0].patches if isinstance(p, PathPatch)]
+
+
+def countries(figure):
+    (collection,) = [
+        c for c in figure.axes[0].collections if isinstance(c, PatchCollection)
+    ]
+    return collection
+
+
+def pixel(figure, x, y):
+    """The RGB color drawn at data point (x, y), from 0 to 1."""
+
+    figure.canvas.draw()
+    pixels = np.asarray(figure.canvas.buffer_rgba())
+    px, py = figure.axes[0].transData.transform((x, y))
+    return pixels[int(pixels.shape[0] - py), int(px), :3] / 255
+
+
+EU = (
+    "AUT BEL BGR HRV CYP CZE DNK EST FIN FRA DEU GRC HUN IRL ITA LVA LTU LUX "
+    "MLT NLD POL PRT ROU SVK SVN ESP SWE"
+).split()
 
 
 class TestBundledData(unittest.TestCase):
@@ -82,6 +109,85 @@ COAST_JSON = json.dumps(
 ).encode()
 
 
+class TestCountries(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+
+    def test_bundled_codes_label_every_ring(self):
+        codes = load_country_codes()
+        rows = load_basemap("countries")
+        rings = np.isnan(rows[:, 0]).sum() + 1
+        self.assertEqual(len(codes), rings)
+        self.assertIn("SVN", codes)
+        # Natural Earth's ISO code is -99 for France; the admin code is not
+        self.assertIn("FRA", codes)
+
+    def test_countries_fill_in_the_land_color(self):
+        collection = countries(BasemapChart("countries"))
+        land = matplotlib.colors.to_rgba(config["plot_basemap_land_color"])
+        faces = collection.get_facecolors()
+        self.assertEqual(len(faces), len(set(load_country_codes())))
+        np.testing.assert_allclose(faces, np.tile(land, (len(faces), 1)))
+
+    def test_highlight_colors_the_listed_countries(self):
+        figure = BasemapChart(
+            [BASEMAP_FEATURE.COUNTRIES, BASEMAP_FEATURE.BORDERS],
+            highlight=["svn", "AUT"],
+            xmin=5,
+            xmax=25,
+            ymin=40,
+            ymax=52,
+        )
+        highlight = matplotlib.colors.to_rgb(config["plot_basemap_highlight_color"])
+        land = matplotlib.colors.to_rgb(config["plot_basemap_land_color"])
+        # Ljubljana and Vienna against Zagreb and Munich
+        for lon, lat, color in (
+            (14.5, 46.05, highlight),
+            (16.2, 48.1, highlight),
+            (16.0, 45.6, land),
+            (11.6, 48.1, land),
+        ):
+            np.testing.assert_allclose(pixel(figure, lon, lat), color, atol=0.03)
+
+    def test_an_enclave_is_not_cancelled_by_its_host(self):
+        figure = BasemapChart(
+            "countries", highlight="LSO", xmin=24, xmax=32, ymin=-32, ymax=-26
+        )
+        highlight = matplotlib.colors.to_rgb(config["plot_basemap_highlight_color"])
+        land = matplotlib.colors.to_rgb(config["plot_basemap_land_color"])
+        np.testing.assert_allclose(pixel(figure, 28.3, -29.5), highlight, atol=0.03)
+        np.testing.assert_allclose(pixel(figure, 25.5, -28.0), land, atol=0.03)
+
+    def test_a_code_missing_at_the_scale_warns(self):
+        with self.assertWarnsRegex(UserWarning, "MLT"):
+            BasemapChart("countries", highlight=EU)
+
+    def test_known_codes_do_not_warn(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            BasemapChart("countries", highlight=["SVN", "FRA"])
+
+    def test_highlight_needs_the_countries_feature(self):
+        with self.assertRaisesRegex(ValueError, "countries"):
+            BasemapChart(highlight=["SVN"])
+
+    def test_malformed_code_raises(self):
+        for bad in (["Slovenia"], [5], ["SV"]):
+            with self.subTest(bad=bad):
+                with self.assertRaisesRegex(ValueError, "highlight"):
+                    BasemapChart("countries", highlight=bad)
+
+    def test_geometry_takes_no_countries(self):
+        with self.assertRaisesRegex(ValueError, "countries"):
+            BasemapChart(
+                geometry={"lon": [0, 1, 1], "lat": [0, 0, 1], "feature": "countries"}
+            )
+
+    def test_highlight_with_geometry_raises(self):
+        with self.assertRaisesRegex(ValueError, "highlight"):
+            BasemapChart(geometry=ROAD, highlight=["SVN"])
+
+
 class TestDownloadedResolutions(unittest.TestCase):
     def setUp(self):
         self.folder = tempfile.TemporaryDirectory()
@@ -89,8 +195,8 @@ class TestDownloadedResolutions(unittest.TestCase):
         env.start()
         self.addCleanup(env.stop)
         self.addCleanup(self.folder.cleanup)
-        load_basemap.cache_clear()
-        self.addCleanup(load_basemap.cache_clear)
+        load_outlines.cache_clear()
+        self.addCleanup(load_outlines.cache_clear)
 
     def tearDown(self):
         plt.close("all")
@@ -110,7 +216,7 @@ class TestDownloadedResolutions(unittest.TestCase):
         self.assertEqual(np.isnan(rows[:, 0]).sum(), 2)
         self.assertEqual(len(os.listdir(self.folder.name)), 1)
 
-        load_basemap.cache_clear()
+        load_outlines.cache_clear()
         with self.urlopen(side_effect=AssertionError("network")):
             cached = load_basemap("coastline", BASEMAP_RESOLUTION.MEDIUM)
         np.testing.assert_array_equal(cached, rows)
@@ -126,6 +232,26 @@ class TestDownloadedResolutions(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "offline"):
                 BasemapChart("coastline", resolution=BASEMAP_RESOLUTION.MEDIUM)
         self.assertEqual(os.listdir(self.folder.name), [])
+
+    def test_downloaded_countries_keep_their_codes(self):
+        collection = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "properties": {"ADM0_A3": code},
+                    "geometry": {"type": "Polygon", "coordinates": [ring]},
+                }
+                for code, ring in (
+                    ("AAA", [[0, 0], [1, 0], [1, 1], [0, 0]]),
+                    ("BBB", [[2, 0], [3, 0], [3, 1], [2, 0]]),
+                )
+            ],
+        }
+        body = io.BytesIO(json.dumps(collection).encode())
+        with self.urlopen(return_value=body) as urlopen:
+            codes = load_country_codes(BASEMAP_RESOLUTION.MEDIUM)
+        self.assertIn("ne_50m_admin_0_countries", urlopen.call_args[0][0])
+        self.assertEqual(list(codes), ["AAA", "BBB"])
 
     def test_unknown_resolution_raises(self):
         with self.assertRaisesRegex(ValueError, "resolution"):

@@ -1005,6 +1005,9 @@ class BASEMAP_FEATURE:
             `(BASEMAP_FEATURE.COASTLINE, BASEMAP_FEATURE.LAND)`.
         COASTLINE (str): The coastlines, as lines. Equals to `"coastline"`.
         LAND (str): The land, as a filled area. Equals to `"land"`.
+        COUNTRIES (str): The land, one filled area per country, so the
+            `highlight` setting can pick countries out. Equals to
+            `"countries"`.
         BORDERS (str): The land borders between countries, as lines. Equals
             to `"borders"`.
         LAKES (str): The large lakes, filled with the axes background.
@@ -1015,6 +1018,7 @@ class BASEMAP_FEATURE:
     DEFAULT = ("coastline", "land")
     COASTLINE = "coastline"
     LAND = "land"
+    COUNTRIES = "countries"
     BORDERS = "borders"
     LAKES = "lakes"
 

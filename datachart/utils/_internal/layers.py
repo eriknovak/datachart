@@ -28,7 +28,12 @@ from matplotlib.font_manager import FontProperties
 from matplotlib import cbook, rc_context
 import matplotlib.ticker as mticker
 from matplotlib.ticker import MaxNLocator
-from matplotlib.collections import LineCollection, PathCollection, PolyCollection
+from matplotlib.collections import (
+    LineCollection,
+    PatchCollection,
+    PathCollection,
+    PolyCollection,
+)
 from matplotlib.container import BarContainer
 from matplotlib.colors import (
     CenteredNorm,
@@ -62,7 +67,7 @@ from matplotlib.legend_handler import (
     HandlerPolyCollection,
 )
 
-from .basemap import load_basemap
+from .basemap import load_basemap, load_country_codes
 from .colors import (
     create_color_cycle,
     create_colormap,
@@ -100,6 +105,7 @@ from .validate import (
     BASEMAP_FILLED,
     validate_basemap_features,
     validate_basemap_geometry,
+    validate_basemap_highlight,
     validate_basemap_resolution,
     validate_basemap_source,
     validate_geographic_latitudes,
@@ -7509,11 +7515,21 @@ class BasemapLayer(DrawPositionLayer):
     def _resolve_style(self):
         data = self.chart.get("data") or {}
         geometry = data.get("geometry")
-        validate_basemap_source(data.get("features"), geometry, data.get("resolution"))
+        validate_basemap_source(
+            data.get("features"),
+            geometry,
+            data.get("resolution"),
+            data.get("highlight"),
+        )
+        self.highlight = ()
         if geometry is None:
             features = validate_basemap_features(data.get("features"))
             resolution = validate_basemap_resolution(data.get("resolution"))
             outlines = [(f, load_basemap(f, resolution)) for f in features]
+            self.highlight = validate_basemap_highlight(data.get("highlight"), features)
+            if BASEMAP_FEATURE.COUNTRIES in features:
+                self.country_codes = load_country_codes(resolution)
+                self._warn_missing_countries(resolution)
         else:
             outlines = validate_basemap_geometry(geometry)
         # bottom up, the caller's order kept within one feature
@@ -7522,6 +7538,37 @@ class BasemapLayer(DrawPositionLayer):
         self.feature_style = get_basemap_style(self.style)
         lakes = self.feature_style[BASEMAP_FEATURE.LAKES]
         lakes.setdefault("facecolor", self.ground)
+
+    def _warn_missing_countries(self, resolution: str) -> None:
+        """Warn about highlighted codes the map at this scale does not draw."""
+
+        missing = sorted(set(self.highlight) - set(self.country_codes))
+        if missing:
+            warnings.warn(
+                f"The basemap at 1:{resolution} draws no country coded "
+                f"{missing}: too small at this scale, or not a Natural Earth "
+                "ADM0_A3 code. A finer `resolution` may draw it."
+            )
+
+    def _draw_countries(self, ax, rows, z_order) -> None:
+        """One patch per country, so an enclave keeps its own fill."""
+
+        style = self.feature_style[BASEMAP_FEATURE.COUNTRIES]
+        rings = defaultdict(list)
+        for code, ring in zip(self.country_codes, _split_outlines(rows)):
+            rings[code].append(ring)
+        codes = list(rings)
+        faces = [
+            style["highlight"] if code in self.highlight else style["facecolor"]
+            for code in codes
+        ]
+        patches = [PathPatch(_filled_path(rings[code])) for code in codes]
+        ax.add_collection(
+            PatchCollection(
+                patches, facecolors=faces, edgecolors="none", zorder=z_order
+            ),
+            autolim=False,
+        )
 
     def bounds(self) -> tuple:
         """The `(xmin, xmax, ymin, ymax)` the outlines span."""
@@ -7534,6 +7581,9 @@ class BasemapLayer(DrawPositionLayer):
     def draw(self, ax, ctx):
         z_order = self.rung(ctx)
         for feature, rows in self.outlines:
+            if feature == BASEMAP_FEATURE.COUNTRIES:
+                self._draw_countries(ax, rows, z_order)
+                continue
             outlines = _split_outlines(rows)
             style = self.feature_style[feature]
             # a basemap never widens the view; a lone one frames it in render

@@ -19,10 +19,14 @@ from datachart.utils._internal.basemap import BUNDLED, LAYERS, fetch
 
 
 def main():
-    arrays = {name: fetch(name, BASEMAP_RESOLUTION.LOW) for name in LAYERS}
+    arrays = {}
+    for name in LAYERS:
+        rows, codes = fetch(name, BASEMAP_RESOLUTION.LOW)
+        arrays[name] = rows
+        print(f"{name}: {len(rows)} rows")
+        if name == "countries":
+            arrays[f"{name}_codes"] = codes
     np.savez_compressed(BUNDLED, **arrays)
-    for name, array in arrays.items():
-        print(f"{name}: {len(array)} rows")
     print(f"{BUNDLED.name}: {BUNDLED.stat().st_size / 1024:.0f} KB")
 
 

@@ -873,7 +873,8 @@ class BasemapStyleAttrs(TypedDict):
     """The typing for the basemap chart style.
 
     Attributes:
-        plot_basemap_land_color (Union[str, None]): The fill color of the land.
+        plot_basemap_land_color (Union[str, None]): The fill color of the land, and of the countries `highlight` leaves out.
+        plot_basemap_highlight_color (Union[str, None]): The fill color of the countries `highlight` picks out.
         plot_basemap_coastline_color (Union[str, None]): The color of the coastlines.
         plot_basemap_coastline_width (Union[float, None]): The width of the coastlines, in points.
         plot_basemap_border_color (Union[str, None]): The color of the borders between countries.
@@ -884,6 +885,7 @@ class BasemapStyleAttrs(TypedDict):
     """
 
     plot_basemap_land_color: Union[str, None]
+    plot_basemap_highlight_color: Union[str, None]
     plot_basemap_coastline_color: Union[str, None]
     plot_basemap_coastline_width: Union[float, None]
     plot_basemap_border_color: Union[str, None]
@@ -2444,7 +2446,7 @@ class BasemapDataAttrs(TypedDict):
     Attributes:
         lon (List[float]): The longitudes of the outlines, drawn on the x-axis. A `NaN` separates one outline from the next.
         lat (List[float]): The latitudes of the outlines, drawn on the y-axis; as long as `lon`, with its `NaN` at the same places.
-        feature (Optional[Union[BASEMAP_FEATURE, str]]): How the outlines are drawn and styled: `"coastline"` (default) or `"borders"` as lines, `"land"` or `"lakes"` as filled areas. See [`BASEMAP_FEATURE`][datachart.constants.BASEMAP_FEATURE].
+        feature (Optional[Union[BASEMAP_FEATURE, str]]): How the outlines are drawn and styled: `"coastline"` (default) or `"borders"` as lines, `"land"` or `"lakes"` as filled areas; `"countries"` needs Natural Earth's country codes and is not accepted here. See [`BASEMAP_FEATURE`][datachart.constants.BASEMAP_FEATURE].
 
     """
 

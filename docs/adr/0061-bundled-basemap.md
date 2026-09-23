@@ -68,12 +68,24 @@ smaller file.
   setting. The rename is free and carries no alias: `ImageChart` merged after
   0.10.2 and has never been released, so ADR 0010's deprecation policy does
   not apply.
-- **`BASEMAP_FEATURE` picks what is drawn** — `COASTLINE`, `LAND`, `BORDERS`,
-  `LAKES` — defaulting to coastline and land. `OCEAN` is the background an
-  axes already has, and rivers at 1:110m are too coarse to read.
+- **`BASEMAP_FEATURE` picks what is drawn** — `COASTLINE`, `LAND`,
+  `COUNTRIES`, `BORDERS`, `LAKES` — defaulting to coastline and land. `OCEAN`
+  is the background an axes already has, and rivers at 1:110m are too coarse
+  to read (rivers and roads at the finer scales are issue #266).
 - **The basemap is furniture, not data.** `plot_basemap_*` styles resolve to
   muted greys, and the front takes no cycle color, legend entry or emphasis,
   for the reason `ImageChart` does not: it carries no series.
+- **Countries are picked out by code, not by emphasis.** `COUNTRIES` draws
+  one area per country from Natural Earth's admin-0 polygons, keyed by
+  `ADM0_A3` (its `ISO_A3` is `-99` for France and Norway). `highlight=` takes
+  those codes and fills the listed countries with
+  `plot_basemap_highlight_color`; the rest keep the land's grey. It is a
+  selection on the map, not the series emphasis the other fronts take, so
+  the map stays out of the palette and the legend. A code that the chosen
+  scale does not draw (Malta at 1:110m) warns rather than raises, so one list
+  of codes works at every resolution. Each country is its own patch, so an
+  enclave such as Lesotho is not cancelled by its host's hole. The countries
+  add about 64 KB to the bundle, which is now 160 KB.
 
 ## Considered options
 

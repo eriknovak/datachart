@@ -367,6 +367,7 @@ BASE_THEME: StyleAttrs = {
     "plot_image_aspect": "auto",
     # plot basemap style; muted greys, the map is furniture (ADR 0061)
     "plot_basemap_land_color": "#EDEDED",
+    "plot_basemap_highlight_color": "#C8C8C8",
     "plot_basemap_coastline_color": "#A6A6A6",
     "plot_basemap_coastline_width": 0.6,
     "plot_basemap_border_color": "#BDBDBD",

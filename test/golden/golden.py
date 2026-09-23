@@ -85,6 +85,7 @@ EXPECTED_CHANGES = {
     "basemap_geometry",
     "basemap_geographic_aspect",
     "basemap_under_hexbin_in_grid",
+    "basemap_countries_highlight",
     # new image chart cases (ADR 0060)
     "image_below_scatter",
     "image_above_line",
@@ -3770,6 +3771,20 @@ def basemap_under_hexbin_in_grid():
         aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
     )
     return Grid([[under, LineChart(LINE1, title="Neighbour")]])
+
+
+@case
+def basemap_countries_highlight():
+    return BasemapChart(
+        [BASEMAP_FEATURE.COUNTRIES, BASEMAP_FEATURE.BORDERS],
+        highlight=["SVN", "AUT", "HRV", "HUN", "ITA"],
+        title="Five countries picked out",
+        xmin=5,
+        xmax=25,
+        ymin=40,
+        ymax=50,
+        aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
+    )
 
 
 if __name__ == "__main__":

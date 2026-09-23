@@ -59,11 +59,16 @@ DRAW_POSITIONS = (DRAW_POSITION.BELOW, DRAW_POSITION.ABOVE)
 # in draw order, bottom up: a lake sits on the land and a line on both
 BASEMAP_FEATURES = (
     BASEMAP_FEATURE.LAND,
+    BASEMAP_FEATURE.COUNTRIES,
     BASEMAP_FEATURE.LAKES,
     BASEMAP_FEATURE.BORDERS,
     BASEMAP_FEATURE.COASTLINE,
 )
-BASEMAP_FILLED = (BASEMAP_FEATURE.LAND, BASEMAP_FEATURE.LAKES)
+BASEMAP_FILLED = (
+    BASEMAP_FEATURE.LAND,
+    BASEMAP_FEATURE.COUNTRIES,
+    BASEMAP_FEATURE.LAKES,
+)
 BASEMAP_RESOLUTIONS = (
     BASEMAP_RESOLUTION.LOW,
     BASEMAP_RESOLUTION.MEDIUM,
@@ -1272,17 +1277,45 @@ def validate_image(image) -> np.ndarray:
     return array
 
 
-def validate_basemap_source(features, geometry, resolution=None) -> None:
+def validate_basemap_source(
+    features, geometry, resolution=None, highlight=None
+) -> None:
     """Raise when caller outlines come with a setting of the Natural Earth set."""
 
     if geometry is None:
         return
-    for name, value in (("features", features), ("resolution", resolution)):
+    for name, value in (
+        ("features", features),
+        ("resolution", resolution),
+        ("highlight", highlight),
+    ):
         if value is not None:
             raise ValueError(
                 f"Pass either basemap `{name}` or `geometry`: the geometry "
                 "replaces the Natural Earth outlines."
             )
+
+
+def validate_basemap_highlight(highlight, features) -> tuple:
+    """The highlighted country codes, upper case; empty when none are."""
+
+    if highlight is None:
+        return ()
+    if BASEMAP_FEATURE.COUNTRIES not in features:
+        raise ValueError(
+            "`highlight` picks countries out, so `features` must include "
+            f"{BASEMAP_FEATURE.COUNTRIES!r}."
+        )
+    codes = (highlight,) if isinstance(highlight, str) else tuple(highlight)
+    malformed = [
+        c for c in codes if not (isinstance(c, str) and len(c) == 3 and c.isalpha())
+    ]
+    if malformed:
+        raise ValueError(
+            f"Invalid basemap `highlight` codes {malformed!r}. Each must be a "
+            "three-letter country code, such as 'SVN' or 'FRA'."
+        )
+    return tuple(c.upper() for c in codes)
 
 
 def validate_basemap_resolution(resolution) -> str:
@@ -1334,6 +1367,11 @@ def validate_basemap_geometry(geometry) -> list:
         if not isinstance(entry, dict) or "lon" not in entry or "lat" not in entry:
             raise ValueError(f"Invalid {where}: must be a dict with `lon` and `lat`.")
         feature = entry.get("feature") or BASEMAP_FEATURE.COASTLINE
+        if feature == BASEMAP_FEATURE.COUNTRIES:
+            raise ValueError(
+                f"Invalid {where}: {feature!r} needs Natural Earth's country "
+                "codes; draw your own areas as 'land'."
+            )
         if feature not in BASEMAP_FEATURES:
             raise ValueError(
                 f"Invalid {where}: `feature` {feature!r} must be one of "
