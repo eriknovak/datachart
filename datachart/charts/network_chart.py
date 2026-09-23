@@ -2,8 +2,8 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
+from ..utils._internal.chart_builder import dict_datasets
 from ..utils._internal.validate import (
     infer_network_nodes,
     validate_network_records,
@@ -159,43 +159,13 @@ def NetworkChart(
             role), or `plot_network_edge_style` is a headed connector look.
 
     """
-    datasets = data if isinstance(data, list) else [data]
-    if not all(isinstance(d, dict) and "edges" in d for d in datasets):
-        raise ValueError(
-            'NetworkChart `data` must be a `{"nodes": [...], "edges": [...]}` '
-            "dict, or a list of such dicts."
-        )
+    params = dict(locals())
+
     resolved_layout = NETWORK_LAYOUT.DEFAULT if layout is None else layout
-    for dataset in datasets:
+    for dataset in dict_datasets("networkchart", data):
         nodes = dataset.get("nodes")
         if nodes is None:
             nodes = infer_network_nodes(dataset["edges"])
         validate_network_records(nodes, dataset["edges"], resolved_layout)
 
-    charts = build_charts_structure(
-        "networkchart",
-        data,
-        emphasis=emphasis,
-        subtitle=subtitle,
-        style=style,
-        texts=texts,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "emphasis_rule": emphasis_rule,
-        "title": title,
-        "figsize": figsize,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "layout": resolved_layout,
-        "directed": directed,
-        "seed": seed,
-        "label_position": label_position,
-        "show_values": show_values,
-        "value_format": value_format,
-        "show_legend": show_legend,
-        "legend": legend,
-    }
-
-    return render_chart("networkchart", charts, settings)
+    return render("networkchart", params)

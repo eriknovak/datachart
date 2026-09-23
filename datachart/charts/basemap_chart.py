@@ -2,8 +2,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..utils._internal.validate import validate_draw_position
 from ..typings import BasemapDataAttrs, BasemapStyleAttrs
 from ..constants import (
@@ -136,32 +135,12 @@ def BasemapChart(
         RuntimeError: If a feature is not cached and cannot be downloaded.
 
     """
+    params = dict(locals())
+
     validate_draw_position(position)
-
-    charts = build_charts_structure(
-        "basemapchart",
-        {
-            "features": features,
-            "resolution": resolution,
-            "highlight": highlight,
-            "geometry": geometry,
-        },
-        style=style,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "position": position,
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "xmin": xmin,
-        "xmax": xmax,
-        "ymin": ymin,
-        "ymax": ymax,
-        "show_grid": show_grid,
-        "aspect_ratio": aspect_ratio,
+    # the basemap's one chart is its features and overlay geometry
+    params["data"] = {
+        key: params.pop(key)
+        for key in ("features", "resolution", "highlight", "geometry")
     }
-
-    return render_chart("basemapchart", charts, settings)
+    return render("basemapchart", params)

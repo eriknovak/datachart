@@ -2,8 +2,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..utils._internal.validate import validate_draw_position
 from ..typings import ImageDataAttrs, ImageStyleAttrs
 from ..constants import ASPECT_RATIO, FIG_SIZE, DRAW_POSITION, SHOW_GRID
@@ -107,34 +106,8 @@ def ImageChart(
             height, or `position` is not a `DRAW_POSITION`.
 
     """
+    params = dict(locals())
+
     validate_draw_position(position)
 
-    charts = build_charts_structure(
-        "imagechart",
-        data,
-        subtitle=subtitle,
-        style=style,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "position": position,
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "xmin": xmin,
-        "xmax": xmax,
-        "ymin": ymin,
-        "ymax": ymax,
-        "vmin": vmin,
-        "vmax": vmax,
-        "show_grid": show_grid,
-        "aspect_ratio": aspect_ratio,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "sharex": sharex,
-        "sharey": sharey,
-    }
-
-    return render_chart("imagechart", charts, settings)
+    return render("imagechart", params)

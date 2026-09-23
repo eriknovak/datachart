@@ -2,8 +2,7 @@ from typing import Union, List, Optional, Tuple, Dict
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -118,30 +117,5 @@ def ParallelCoords(
         The figure containing the parallel coordinates chart.
 
     """
-    # Build the charts structure using shared utility
-    charts = build_charts_structure(
-        "parallelcoords",
-        data,
-        subtitle=subtitle,
-        emphasis=emphasis,
-        style=style,
-        dimensions=dimensions,
-        hue=hue,
-        category_orders=category_orders,
-        texts=texts,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "emphasis_rule": emphasis_rule,
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "show_legend": show_legend,
-        "legend": legend,
-        "show_grid": show_grid,
-        "aspect_ratio": aspect_ratio,
-    }
-
-    return render_chart("parallelcoords", charts, settings)
+    params = dict(locals())
+    return render("parallelcoords", params)
