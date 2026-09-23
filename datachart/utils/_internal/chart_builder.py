@@ -282,15 +282,10 @@ def dict_datasets(chart_type: str, data: Any) -> List[dict]:
     datasets = data if isinstance(data, list) else [data]
     keys = kind.data_keys or ()
     if not all(isinstance(d, dict) and all(k in d for k in keys) for d in datasets):
-        shape = "a dict"
-        if len(keys) == 1:
-            article = "an" if keys[0][0] in "aeiou" else "a"
-            shape += f" with {article} `{keys[0]}` key"
-        elif keys:
-            shape += f" with {' and '.join(f'`{k}`' for k in keys)} keys"
+        shape = " and ".join(f"`{k}`" for k in keys)
         raise ValueError(
-            f"{kind.label[0].upper()}{kind.label[1:]} `data` must be {shape}, "
-            "or a list of such dicts."
+            f"{kind.label[0].upper()}{kind.label[1:]} `data` must be a dict"
+            f"{' with ' + shape if shape else ''}, or a list of such dicts."
         )
     return datasets
 

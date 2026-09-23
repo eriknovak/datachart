@@ -233,8 +233,8 @@ def _ridgeline_layers(charts: List[dict], settings: dict) -> List[Layer]:
 # ================================================
 
 
-def _no_emphasis(reason: str) -> Mapping[str, str]:
-    return {"emphasis": reason}
+def _no_emphasis(front: str, reason: str) -> Mapping[str, str]:
+    return {"emphasis": f"{front} does not support `emphasis`: {reason}"}
 
 
 _KINDS = (
@@ -318,8 +318,9 @@ _KINDS = (
         data_keys=("date", "value"),
         multiplot=False,
         rejects=_no_emphasis(
-            "CalendarHeatmap does not support `emphasis`: a calendar is a single "
-            "raster layer with no series to mute or highlight."
+            "CalendarHeatmap",
+            "a calendar is a single raster layer with no series to mute or "
+            "highlight.",
         ),
         overlayable=False,
         gridless=_always,
@@ -429,9 +430,9 @@ _KINDS = (
         data_keys=("z",),
         multiplot=False,
         rejects=_no_emphasis(
-            "Heatmap does not support `emphasis`: a heatmap has no series to "
-            "mute or highlight. Set the `emphasis` grid on `data` for per-cell "
-            "roles instead."
+            "Heatmap",
+            "a heatmap has no series to mute or highlight. Set the `emphasis` "
+            "grid on `data` for per-cell roles instead.",
         ),
         overlayable=False,
         # a raster covers the grid
@@ -468,8 +469,9 @@ _KINDS = (
         ),
         dict_data=True,
         rejects=_no_emphasis(
-            "HexbinChart does not support `emphasis`: a hexbin chart is a single "
-            "colormapped layer with no series to mute or highlight."
+            "HexbinChart",
+            "a hexbin chart is a single colormapped layer with no series to "
+            "mute or highlight.",
         ),
         # hexagons cover the grid
         gridless=_always,
@@ -491,8 +493,8 @@ _KINDS = (
         data_keys=("edges",),
         multiplot=False,
         rejects=_no_emphasis(
-            "NetworkChart does not support the `emphasis` argument: set the "
-            "`emphasis` key on the nodes to mute or highlight instead."
+            "NetworkChart",
+            "set the `emphasis` key on the nodes to mute or highlight instead.",
         ),
         overlayable=False,
         emphasis_units=network_units,
@@ -522,8 +524,7 @@ _KINDS = (
         data_keys=("links",),
         multiplot=False,
         rejects=_no_emphasis(
-            "SankeyChart does not support `emphasis`: a Sankey has no series "
-            "to mute or highlight."
+            "SankeyChart", "a Sankey has no series to mute or highlight."
         ),
         overlayable=False,
     ),
@@ -535,8 +536,8 @@ _KINDS = (
         data_keys=("data",),
         multiplot=False,
         rejects=_no_emphasis(
-            "Treemap does not support the `emphasis` argument: set the "
-            "`emphasis` key on the records to mute or highlight instead."
+            "Treemap",
+            "set the `emphasis` key on the records to mute or highlight instead.",
         ),
         overlayable=False,
         emphasis_units=treemap_units,

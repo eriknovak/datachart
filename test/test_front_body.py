@@ -1,4 +1,6 @@
+import ast
 import inspect
+import textwrap
 import unittest
 from unittest import mock
 
@@ -55,6 +57,16 @@ class TestRowKeys(unittest.TestCase):
                 self.assertNotIn("settings = {", source)
                 self.assertNotIn("build_charts_structure(", source)
                 self.assertIn("return render(", source)
+
+    def test_params_copy_is_the_first_statement(self):
+        # a local assigned before the copy would leak into the settings
+        for front in FRONTS:
+            tree = ast.parse(
+                textwrap.dedent(inspect.getsource(getattr(datachart.charts, front)))
+            )
+            first = tree.body[0].body[1]
+            with self.subTest(front=front):
+                self.assertEqual(ast.unparse(first), "params = dict(locals())")
 
 
 class TestRenderSplit(unittest.TestCase):
@@ -200,12 +212,14 @@ class TestRenderSplit(unittest.TestCase):
 class TestDictShape(unittest.TestCase):
     def test_missing_key_names_front_and_key(self):
         with self.assertRaisesRegex(
-            ValueError, r"^Network `data` must be a dict with an `edges` key"
+            ValueError, r"^Network `data` must be a dict with `edges`"
         ):
             NetworkChart({"nodes": []})
 
     def test_non_dict_names_front(self):
-        with self.assertRaisesRegex(ValueError, r"^Heatmap `data` must be a dict with a `z` key"):
+        with self.assertRaisesRegex(
+            ValueError, r"^Heatmap `data` must be a dict with `z`"
+        ):
             Heatmap([[1, 2]])
 
 
