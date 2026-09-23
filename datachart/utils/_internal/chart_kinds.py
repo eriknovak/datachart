@@ -6,7 +6,17 @@ before anything is drawn.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Callable, FrozenSet, List, Mapping, Optional, Tuple, Type
+from typing import (
+    Any,
+    Callable,
+    FrozenSet,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+)
 
 from .config_helpers import (
     get_grid_style,
@@ -63,7 +73,56 @@ from .layers import (
 )
 from .validate import validate_baseline, validate_date_period, validate_emphasis_rule
 from ...config import config
-from ...constants import ASPECT_RATIO, ORIENTATION, RADIAL_TYPE
+from ...constants import (
+    ASPECT_RATIO,
+    BANDWIDTH,
+    BAR_MODE,
+    DATE_FORMAT,
+    DRAW_POSITION,
+    EMPHASIS,
+    FIG_SIZE,
+    ORIENTATION,
+    RADIAL_TYPE,
+    SCALE,
+    SHOW_GRID,
+    SORT,
+    SWARM_MODE,
+    VALUE_FORMAT,
+)
+from ...typings import (
+    BracketSettingAttrs,
+    ColorbarSettingAttrs,
+    DLineSettingAttrs,
+    EmphasisRuleAttrs,
+    HLineSettingAttrs,
+    HSpanSettingAttrs,
+    LegendSettingAttrs,
+    TextSettingAttrs,
+    VLineSettingAttrs,
+    VSpanSettingAttrs,
+)
+
+# the per-chart keys every front shares; a row's `chart_keys` adds its own
+CHART_KEYS = frozenset(
+    {
+        "subtitle",
+        "emphasis",
+        "style",
+        "xticks",
+        "xticklabels",
+        "xtickrotate",
+        "yticks",
+        "yticklabels",
+        "ytickrotate",
+        "vlines",
+        "hlines",
+        "dlines",
+        "brackets",
+        "vspans",
+        "hspans",
+        "texts",
+    }
+)
 
 # a function of the charts and settings, returning the charts it rewrote
 ChartsStep = Callable[[List[dict], dict], List[dict]]
@@ -129,6 +188,8 @@ class ChartKind:
         single_dataset: Several datasets need `subplots=True`.
         rejects: Parameters the front takes only as None, with the reason
             a value raises.
+        renamed: Deprecated parameter names the front still takes, mapped
+            to their new names; each is removed one release after it ships.
         group: Categories run along one axis and values along the other, so
             the scale keys name the value axis, not a literal one.
         overlayable: `Panel` may overlay the front's figures.
@@ -166,6 +227,7 @@ class ChartKind:
     subplots: bool = True
     single_dataset: bool = False
     rejects: Mapping[str, str] = field(default_factory=dict)
+    renamed: Mapping[str, str] = field(default_factory=dict)
     group: bool = False
     overlayable: bool = True
     gridless: Callable[[dict], bool] = _never
@@ -181,6 +243,12 @@ class ChartKind:
     emphasis_ranks: bool = False
     prepare: Optional[ChartsStep] = None
     order: Optional[ChartsStep] = None
+
+    @property
+    def per_chart_keys(self) -> FrozenSet[str]:
+        """The parameters indexed against the charts; the rest are settings."""
+
+        return (CHART_KEYS | self.chart_keys) - self.figure_keys
 
     def build_layers(self, charts: List[dict], settings: dict) -> List[Layer]:
         """The front's layers for already prepared charts."""
@@ -557,6 +625,140 @@ def chart_kind(name: str) -> ChartKind:
             f"known types are {sorted(CHART_KINDS)}."
         )
     return kind
+
+
+# ================================================
+# Shared parameters
+# ================================================
+
+
+@dataclass(frozen=True)
+class SharedParameter:
+    """A parameter spelled, typed and defaulted alike on every front taking it.
+
+    Attributes:
+        name: The parameter's name.
+        annotation: The type of one value, without `Optional`: a parameter
+            defaulting to None is annotated `Optional[annotation]`.
+        default: The signature default.
+        per_chart: The type of the value on a front that indexes it against
+            the charts, without `Optional`; None when every front reads it
+            whole.
+    """
+
+    name: str
+    annotation: Any
+    default: Any = None
+    per_chart: Any = None
+
+    def signature_annotation(self, kind: ChartKind) -> Any:
+        """The annotation the parameter carries on the front of `kind`."""
+
+        if self.name in kind.rejects:
+            return None
+        if self.name in kind.per_chart_keys and self.per_chart is not None:
+            annotation = self.per_chart
+        else:
+            annotation = self.annotation
+        return annotation if self.default is not None else Optional[annotation]
+
+
+def _each(annotation: Any) -> Any:
+    # one value for every chart, or one per chart
+    return Union[annotation, List[Optional[annotation]]]
+
+
+def _nested(setting: Any) -> Any:
+    # one or several settings for every chart, or those of each chart
+    return Union[setting, List[setting], List[Union[setting, List[setting], None]]]
+
+
+def _per_chart(name: str, annotation: Any, per_chart: Any) -> SharedParameter:
+    return SharedParameter(name, annotation, per_chart=per_chart)
+
+
+def _setting(name: str, setting: Any) -> SharedParameter:
+    return _per_chart(name, Union[setting, List[setting]], _nested(setting))
+
+
+_Number = Union[int, float]
+_Ticks = List[_Number]
+_Labels = List[str]
+
+# x-axis values, limits, ticks and tick formats are left out: a front's x axis
+# holds numbers or dates, and the annotation says which (ADR 0067)
+_SHARED = (
+    SharedParameter("title", str),
+    SharedParameter("xlabel", str),
+    SharedParameter("ylabel", str),
+    SharedParameter("figsize", Union[FIG_SIZE, Tuple[float, float]]),
+    SharedParameter("show_legend", bool),
+    SharedParameter("legend", LegendSettingAttrs),
+    SharedParameter("show_grid", Union[SHOW_GRID, str, bool]),
+    SharedParameter("subplots", bool),
+    SharedParameter("max_cols", int),
+    SharedParameter("sharex", bool),
+    SharedParameter("sharey", bool),
+    SharedParameter("aspect_ratio", Union[ASPECT_RATIO, str]),
+    SharedParameter("emphasis_rule", EmphasisRuleAttrs),
+    SharedParameter("ymin", _Number),
+    SharedParameter("ymax", _Number),
+    SharedParameter("yticks_format", Union[VALUE_FORMAT, DATE_FORMAT, str]),
+    SharedParameter("scalex", Union[SCALE, str]),
+    SharedParameter("scaley", Union[SCALE, str]),
+    SharedParameter("orientation", Union[ORIENTATION, str]),
+    SharedParameter("sort", Union[SORT, str]),
+    SharedParameter("bar_mode", Union[BAR_MODE, str]),
+    SharedParameter("show_values", bool),
+    SharedParameter("value_step", int),
+    SharedParameter("show_yerr", bool),
+    SharedParameter("show_area", bool),
+    SharedParameter("show_labels", bool),
+    SharedParameter("show_outliers", bool),
+    SharedParameter("show_colorbars", bool),
+    SharedParameter("show_regression", bool),
+    SharedParameter("show_correlation", bool),
+    SharedParameter("num_bins", int),
+    SharedParameter("bandwidth", Union[BANDWIDTH, str, float]),
+    SharedParameter("mode", Union[SWARM_MODE, str]),
+    SharedParameter("jitter", float, default=0.4),
+    SharedParameter("position", Union[DRAW_POSITION, str]),
+    _per_chart(
+        "value_format",
+        Union[VALUE_FORMAT, str],
+        Union[VALUE_FORMAT, str, List[Optional[str]]],
+    ),
+    _per_chart("subtitle", str, _each(str)),
+    _per_chart(
+        "emphasis", Union[EMPHASIS, str], Union[EMPHASIS, str, List[Optional[str]]]
+    ),
+    _per_chart("xticklabels", _Labels, Union[_Labels, List[_Labels]]),
+    _per_chart("xtickrotate", int, _each(int)),
+    _per_chart("yticks", _Ticks, Union[_Ticks, List[_Ticks]]),
+    _per_chart("yticklabels", _Labels, Union[_Labels, List[_Labels]]),
+    _per_chart("ytickrotate", int, _each(int)),
+    _setting("vlines", VLineSettingAttrs),
+    _setting("hlines", HLineSettingAttrs),
+    _setting("dlines", DLineSettingAttrs),
+    _setting("brackets", BracketSettingAttrs),
+    _setting("vspans", VSpanSettingAttrs),
+    _setting("hspans", HSpanSettingAttrs),
+    _setting("texts", TextSettingAttrs),
+    _per_chart("label", str, _each(str)),
+    _per_chart("x", str, _each(str)),
+    _per_chart("y", str, _each(str)),
+    _per_chart("yerr", str, _each(str)),
+    _per_chart("value", str, _each(str)),
+    _per_chart("hue", str, _each(str)),
+    _per_chart("dimensions", _Labels, Union[_Labels, List[_Labels]]),
+    _per_chart("vmin", float, _each(float)),
+    _per_chart("vmax", float, _each(float)),
+    _per_chart("vcenter", float, _each(float)),
+    _per_chart("norm", str, _each(str)),
+    _per_chart("colorbar", ColorbarSettingAttrs, _each(ColorbarSettingAttrs)),
+)
+
+SHARED_PARAMETERS = {parameter.name: parameter for parameter in _SHARED}
 
 
 # ================================================

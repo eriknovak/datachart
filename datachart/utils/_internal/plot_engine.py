@@ -29,28 +29,6 @@ from ...constants import COLORBAR_LOCATION, FIG_SIZE, ORIENTATION
 # Chart Rendering
 # ================================================
 
-# the per-chart keys every front shares; a row's `chart_keys` adds its own
-CHART_KEYS = frozenset(
-    {
-        "subtitle",
-        "emphasis",
-        "style",
-        "xticks",
-        "xticklabels",
-        "xtickrotate",
-        "yticks",
-        "yticklabels",
-        "ytickrotate",
-        "vlines",
-        "hlines",
-        "dlines",
-        "brackets",
-        "vspans",
-        "hspans",
-        "texts",
-    }
-)
-
 # rewrites a front's built charts and settings before assembly
 Expand = Callable[[List[dict], dict], Tuple[List[dict], dict]]
 
@@ -132,7 +110,7 @@ def render(
     """
 
     kind = chart_kind(chart_type)
-    chart_keys = (CHART_KEYS | kind.chart_keys) - kind.figure_keys
+    chart_keys = kind.per_chart_keys
     per_chart = {k: v for k, v in params.items() if k in chart_keys}
     settings = {k: v for k, v in params.items() if k not in chart_keys and k != "data"}
     for key, value in kind.defaults.items():

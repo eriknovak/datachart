@@ -7,7 +7,7 @@ from unittest import mock
 import datachart.charts
 from datachart.charts import BoxPlot, Heatmap, LineChart, NetworkChart
 from datachart.utils._internal import plot_engine
-from datachart.utils._internal.chart_kinds import CHART_KINDS
+from datachart.utils._internal.chart_kinds import CHART_KINDS, SHARED_PARAMETERS
 
 # the fronts that draw one panel through `render`; ScatterMatrix builds a grid
 FRONTS = [name for name in datachart.charts.__all__ if name != "ScatterMatrix"]
@@ -67,6 +67,33 @@ class TestRowKeys(unittest.TestCase):
             first = tree.body[0].body[1]
             with self.subTest(front=front):
                 self.assertEqual(ast.unparse(first), "params = dict(locals())")
+
+
+class TestSharedParameters(unittest.TestCase):
+    def signatures(self):
+        for front in datachart.charts.__all__:
+            yield front, inspect.signature(getattr(datachart.charts, front)).parameters
+
+    def test_fronts_conform_to_the_table(self):
+        for front, params in self.signatures():
+            kind = CHART_KINDS[front.lower()]
+            for name, row in SHARED_PARAMETERS.items():
+                if name not in params:
+                    continue
+                with self.subTest(front=front, parameter=name):
+                    self.assertEqual(
+                        params[name].annotation, row.signature_annotation(kind)
+                    )
+                    self.assertEqual(params[name].default, row.default)
+
+    def test_every_row_is_shared(self):
+        counts = {name: 0 for name in SHARED_PARAMETERS}
+        for _, params in self.signatures():
+            for name in counts.keys() & params.keys():
+                counts[name] += 1
+        for name, count in counts.items():
+            with self.subTest(parameter=name):
+                self.assertGreaterEqual(count, 2)
 
 
 class TestRenderSplit(unittest.TestCase):
