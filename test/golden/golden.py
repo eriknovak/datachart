@@ -83,7 +83,7 @@ EXPECTED_CHANGES = {
     # new basemap rivers and roads cases (ADR 0062)
     "basemap_rivers",
     "basemap_roads",
-    # new basemap chart cases (ADR 0061)
+    # new basemap chart cases (ADR 0062)
     "basemap_default",
     "basemap_borders_lakes",
     "basemap_geometry",
@@ -3705,7 +3705,7 @@ def image_panel_in_grid():
     )
 
 
-# ----- basemap chart (ADR 0061) -----
+# ----- basemap chart (ADR 0062) -----
 
 
 @case

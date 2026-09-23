@@ -362,7 +362,7 @@ BASE_THEME: StyleAttrs = {
     "plot_image_cmap": "gray",
     "plot_image_interpolation": "antialiased",
     "plot_image_aspect": "auto",
-    # plot basemap style; muted greys, the map is furniture (ADR 0061)
+    # plot basemap style; muted greys, the map is furniture (ADR 0062)
     "plot_basemap_land_color": "#EDEDED",
     "plot_basemap_highlight_color": "#C8C8C8",
     # the outline of the highlighted countries; a width of 0 draws none
